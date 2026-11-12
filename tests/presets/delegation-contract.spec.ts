@@ -13,8 +13,16 @@ describe('delegation-policy：共享委派政策（P2 单一政策家）', () =>
     expect(existsSync(POLICY), '缺 delegation-policy/SKILL.md').toBe(true)
     const skill = readFileSync(POLICY, 'utf8')
     expect(skill).toContain('name: delegation-policy')
-    for (const section of ['默认自己做', 'brief 四要素', 'effort 预算', '链设计', '结果可读性', '三条硬规则']) {
-      expect(skill, `policy 缺「${section}」`).toContain(section)
+    const sections = [
+      ['默认自己做', 'Do it yourself by default'],
+      ['brief 四要素', 'Brief four elements'],
+      ['effort 预算', 'Effort budget'],
+      ['链设计', 'Chain design'],
+      ['结果可读性', 'Result readability'],
+      ['三条硬规则', 'Three hard rules'],
+    ] as const
+    for (const [zh, en] of sections) {
+      expect(skill, `policy 缺「${zh} / ${en}」`).toMatch(new RegExp(`${zh}|${en}`))
     }
     expect(skill, 'core 必须指向 capability header').toContain('capability header')
     expect(skill, 'core 必须指向注入的 channel section').toContain('company:delegation-')

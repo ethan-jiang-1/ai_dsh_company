@@ -1,26 +1,26 @@
 ---
 name: ops-feasibility
-description: 运营可行性核查：人力/流程/时程三条逐项过——谁执行（RACI）、走什么流程（SOW/里程碑验收）、时间线是否成立；不过即 veto。
+description: 'Operations feasibility check: staffing / process / timeline, each checked item by item — who executes (RACI), which process (SOW/milestone acceptance), whether the timeline holds; any failure = veto.'
 ---
-# 运营可行性核查（一页纸）
+# Operations feasibility check (one page)
 
-> **方法契约**：适用产品类型 = all；适用交付模式 = project-services；
-> 需要事实 = kb/roster.md（席位 / 投入）；缺 = fail-closed（报「缺方法 / 配置缺口」，不判「没人」、不编人名）。
-> 交付文档 = `content/delivery-modes/project-services/document-map.md`。
+> **Method contract**: applicable product types = all; applicable delivery modes = project-services;
+> required facts = kb/roster.md (seats / effort); missing = fail-closed (report "missing method / config gap"; do not judge "no one" and do not invent names).
+> Delivery document = `content/delivery-modes/project-services/document-map.md`.
 
-对任何要"落地"的方案（项目、流程、对外承诺）的标准打法：
+The standard play for any plan that must "land" (project, process, external commitment):
 
-1. **人力**：先读 `.dsh-company/kb/roster.md` 的席位名册——① 有名有分配 = 可承接；② 有席位但名册 `<待填>` = **配置缺口**（报「待补名册」，不判「没人」）；③ 连席位都没有 = 真「没人 / 接不住」。**不得编人名**；编制事实见 `.dsh-company/kb/org.md`。
-2. **流程**：`交付模式 = project-services` 走 SOW + 里程碑验收（UAT 通过才算数）；`productized` 缺产品交付验收方法 → **fail-closed 报缺**，不套 SOW。分工用 RACI 表说清——写不出 R（谁执行）= 没人负责；流程没有现成载体（模板 / 例会 / 手册）就先立载体，"靠自觉"不算流程。
-3. **时程**：关键路径每段的依赖与缓冲单列；外部依赖（客户、供应商、对方团队）单独标——不在我们手里的时间不是我们的工期。并行项目上限见 `.dsh-company/kb/policy-lines.md`（超出即 veto）。
-4. **结论**：接得住 / 有条件接得住（条件列全）/ 接不住（veto），一句话理由。
-5. **格式与交付**：按 `<company-content>/templates/ops-review-note.md` 结构，一页纸为限，交付到 `.dsh-company/deliverables/<slug>/drafts/coo.md`。
+1. **Staffing**: first read the seat roster in `.dsh-company/kb/roster.md` — ① named and assigned = can take it; ② seat exists but roster is `<to fill>` = **config gap** (report "roster to fill", not "no one"); ③ no seat at all = truly "no one / cannot carry it". **Never invent names**; org facts are in `.dsh-company/kb/org.md`.
+2. **Process**: `delivery mode = project-services` uses SOW + milestone acceptance (counts only after UAT passes); `productized` lacks a product delivery acceptance method → **fail-closed and report the gap**; do not force SOW. Make roles explicit with a RACI table — if you cannot write R (who executes) = no one is responsible; if the process has no existing carrier (template / recurring meeting / handbook), establish one first; "relying on good intentions" is not a process.
+3. **Timeline**: list the dependencies and buffers of each critical-path segment separately; mark external dependencies (customer, supplier, counterpart team) separately — time outside our control is not our schedule. The parallel-project limit is in `.dsh-company/kb/policy-lines.md` (exceeding it = veto).
+4. **Conclusion**: can carry it / can carry it with conditions (list every condition) / cannot carry it (veto), with a one-line reason.
+5. **Format and delivery**: use the structure in `<company-content>/templates/ops-review-note.md`, one page max; deliver to `.dsh-company/deliverables/<slug>/drafts/coo.md`.
 
-**交付模式边界**：`ops-feasibility` 只用于 `交付模式 = project-services`；`productized` 动议缺产品交付验收方法 → fail-closed 报缺，不套 SOW。
+**Delivery-mode boundary**: `ops-feasibility` applies only to `delivery mode = project-services`; a `productized` motion lacks a product delivery acceptance method → fail-closed and report the gap; do not force SOW.
 
-红线：只谈落地与合规；技术可行性归研发、市场需求归销售，不代答。
-需要更多事实支撑时优先读自己的 KB（`.dsh-company/kb/coo/`），不够再用 `subagent` 派 worker 盘点。
+Red lines: only execution and compliance; technical feasibility belongs to engineering, market demand to sales; do not answer for them.
+When more facts are needed, read your own KB (`.dsh-company/kb/coo/`) first; if insufficient, use `subagent` to dispatch a worker to inventory.
 
-> **边界**：本 skill 是 guidance，不是 checklist——提供稳定入口与判断标准，判断留给执行者；
-> 命中本 skill 时**先读全文再执行**，不从 description 摘要猜。可机械核对的部分由操作员在收口时核对
-> （如署名行与任务书、交付物三态与 present），本文只留需要上下文判断的部分。
+> **Boundary**: this skill is guidance, not a checklist — it provides a stable entry point and judgment criteria; judgment stays with the executor.
+> When this skill applies, **read the full text before acting**; do not guess from the description. Mechanical checks remain with the operator at close-out
+> (signature line vs. task brief, deliverable tri-state vs. present); this text keeps only what needs context.

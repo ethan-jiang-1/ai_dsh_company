@@ -668,11 +668,11 @@ describe('经营侧方法契约（CFO / COO / VP-Sales）', () => {
 
   it('项目制方法按交付模式适用；pricing 是独立方法；managed-service 有对应方法', () => {
     const econ = readFileSync(join(PRESETS_DIR, 'cfo/skills/project-economics/SKILL.md'), 'utf8')
-    expect(econ).toContain('适用交付模式 = project-services')
+    expect(econ).toMatch(/适用交付模式 = project-services|applicable delivery modes = project-services/)
     expect(econ).toContain('fail-closed')
     expect(econ).toContain('rates.md')
     const ops = readFileSync(join(PRESETS_DIR, 'coo/skills/ops-feasibility/SKILL.md'), 'utf8')
-    expect(ops).toContain('配置缺口')
+    expect(ops).toMatch(/配置缺口|config gap/)
     expect(ops).toContain('roster.md')
     expect(ops, '不能再把「写不出人名」直接判成没人').not.toContain('写不出人名 = "没人"')
     const pricing = readFileSync(join(PRESETS_DIR, 'vp-sales/skills/pricing/SKILL.md'), 'utf8')

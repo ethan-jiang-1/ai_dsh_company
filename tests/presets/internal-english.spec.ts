@@ -19,15 +19,12 @@ const PILOT = 'packages/company-pack/presets/vp-sales/skills/customer-voice/SKIL
 
 /** 待翻译的 preset skill（相对仓库根）；每翻完一个就删一行。 */
 const PENDING = new Set([
-  'packages/company-pack/presets/_shared/delegation/skills/delegation-policy/SKILL.md',
   'packages/company-pack/presets/_shared/skills/product-definition/SKILL.md',
   'packages/company-pack/presets/_shared/skills/quality-loop/SKILL.md',
   'packages/company-pack/presets/ceo/skills/assembling-the-team/SKILL.md',
   'packages/company-pack/presets/ceo/skills/chairing-staff-meeting/SKILL.md',
   'packages/company-pack/presets/ceo/skills/fact-finding-playbook/SKILL.md',
-  'packages/company-pack/presets/cfo/skills/project-economics/SKILL.md',
   'packages/company-pack/presets/cmo/skills/mrd-playbook/SKILL.md',
-  'packages/company-pack/presets/coo/skills/ops-feasibility/SKILL.md',
   'packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md',
   'packages/company-pack/presets/vp-eng/skills/prd-playbook/SKILL.md',
 ])
