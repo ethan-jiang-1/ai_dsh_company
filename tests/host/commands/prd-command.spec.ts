@@ -1,3 +1,4 @@
+// 负例留证 2026-11-13：去掉 resolveDeliverablePath 的 ensureCompanyRoot ⇒「.dsh-company symlink」用例 success（BUG-134）；加回即绿。
 /**
  * `/prd check` 命令：解析 + 文件读取 + 回执（结构校验本身 = prd-check.spec）。
  *
@@ -174,6 +175,24 @@ describe('registerPrdCommand', () => {
       expect(result.text).toContain('symlink')
     } finally {
       cleanup()
+      rmSync(outside, { recursive: true, force: true })
+    }
+  })
+
+  it('.dsh-company 是 symlink → 命令拒绝，不读外部交付物（BUG-134）', async () => {
+    const workspace = mkdtempSync(join(tmpdir(), 'prd-root-link-'))
+    const outside = mkdtempSync(join(tmpdir(), 'prd-root-outside-'))
+    try {
+      const dir = join(outside, 'deliverables/2026-11-05-demo/drafts')
+      mkdirSync(dir, { recursive: true })
+      writeFileSync(join(dir, 'mrd.md'), doc(mrdJson))
+      writeFileSync(join(dir, 'prd.md'), doc(prdJson))
+      symlinkSync(outside, join(workspace, '.dsh-company'))
+      const result = await mount(workspace).handler({ rawInput: 'check 2026-11-05-demo' })
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain('symlink')
+    } finally {
+      rmSync(workspace, { recursive: true, force: true })
       rmSync(outside, { recursive: true, force: true })
     }
   })

@@ -10,15 +10,19 @@
  * 远端，读不到 pack；而走命令读会往会话日志里写 `command/run`（面板一打开就多一个命令条）。
  * 派生文件既无日志噪声，又与既有 `.dsh-company/` 读盘形状一致。
  */
-import { mkdirSync, readFileSync, realpathSync, renameSync, readdirSync, statSync, writeFileSync } from 'node:fs'
+import { readdirSync, realpathSync, statSync } from 'node:fs'
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { expandHomePath } from '@deepseek-ai/dsh-home-paths'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
+import { companyFileProblem, readCompanyText, writeCompanyAtomic } from '../run-bundle/company-root.ts'
+import type { StartupSettingsProblem } from '../../lib/startup-settings.ts'
 import {
   EMPTY_STARTUP_OPTIONS,
   EMPTY_WIKI_CHECK,
   parseStartupOptions,
+  parseStartupOptionsState,
   parseStartupSettings,
+  parseStartupSettingsState,
   serializeStartupOptions,
   serializeStartupSettings,
   type StartupOptions,
@@ -39,22 +43,39 @@ export function startupOptionsPath(workspace: string): string {
   return join(workspace, RUN_BUNDLE_PATHS.startupOptions)
 }
 
-/** 读项目策略；文件缺失/坏 JSON 一律回「全自动」。 */
-export function readStartupSettings(workspace: string): StartupSettings {
-  try {
-    return parseStartupSettings(readFileSync(startupSettingsPath(workspace), 'utf8'))
-  } catch {
-    return parseStartupSettings(undefined)
-  }
+/** 读项目策略 + 诊断；symlink/目录/坏 JSON 不冒充 auto，也不采用外部值（BUG-123/136）。 */
+export function readStartupSettingsState(workspace: string): {
+  readonly settings: StartupSettings
+  readonly problem: StartupSettingsProblem | 'unsafe'
+} {
+  const rel = RUN_BUNDLE_PATHS.startup
+  const fileProblem = companyFileProblem(workspace, rel)
+  if (fileProblem === 'missing') return { settings: parseStartupSettings(undefined), problem: null }
+  if (fileProblem === 'unsafe') return { settings: parseStartupSettings(undefined), problem: 'unsafe' }
+  const text = readCompanyText(workspace, rel)
+  if (text === undefined) return { settings: parseStartupSettings(undefined), problem: 'corrupt' }
+  return parseStartupSettingsState(text)
 }
 
-/** 读派生可选项；缺失回空集合。 */
+/** 读项目策略；文件缺失/坏 JSON 一律回「全自动」（需要诊断用 `readStartupSettingsState`）。 */
+export function readStartupSettings(workspace: string): StartupSettings {
+  return readStartupSettingsState(workspace).settings
+}
+
+/** 读派生可选项；缺失回空集合；坏形状用 `readStartupOptionsState` 区分。 */
 export function readStartupOptions(workspace: string): StartupOptions {
-  try {
-    return parseStartupOptions(readFileSync(startupOptionsPath(workspace), 'utf8'))
-  } catch {
-    return EMPTY_STARTUP_OPTIONS
-  }
+  return parseStartupOptions(readCompanyText(workspace, RUN_BUNDLE_PATHS.startupOptions))
+}
+
+/** 读派生可选项 + 诊断（symlink/坏 JSON 不静默空集合）。 */
+export function readStartupOptionsState(workspace: string): { readonly options: StartupOptions, readonly problem: 'corrupt' | 'unsafe' | null } {
+  const fileProblem = companyFileProblem(workspace, RUN_BUNDLE_PATHS.startupOptions)
+  if (fileProblem === 'missing') return { options: EMPTY_STARTUP_OPTIONS, problem: null }
+  if (fileProblem === 'unsafe') return { options: EMPTY_STARTUP_OPTIONS, problem: 'unsafe' }
+  const text = readCompanyText(workspace, RUN_BUNDLE_PATHS.startupOptions)
+  if (text === undefined) return { options: EMPTY_STARTUP_OPTIONS, problem: 'corrupt' }
+  const state = parseStartupOptionsState(text)
+  return { options: state.options, problem: state.problem === 'unreadable' ? 'corrupt' : state.problem }
 }
 
 /**
@@ -62,21 +83,14 @@ export function readStartupOptions(workspace: string): StartupOptions {
  * @param path - 目标文件。
  * @param text - 完整内容。
  */
-function writeAtomic(path: string, text: string): void {
-  mkdirSync(dirname(path), { recursive: true })
-  const temporary = `${path}.${process.pid}.${Date.now()}.tmp`
-  writeFileSync(temporary, text, 'utf8')
-  renameSync(temporary, path)
-}
-
-/** 写项目策略。 */
+/** 写项目策略（公司盘根/父目录安全 + 写 gate）。 */
 export function writeStartupSettings(workspace: string, settings: StartupSettings): void {
-  writeAtomic(startupSettingsPath(workspace), serializeStartupSettings(settings))
+  writeCompanyAtomic(workspace, RUN_BUNDLE_PATHS.startup, serializeStartupSettings(settings))
 }
 
-/** 写派生可选项。 */
+/** 写派生可选项（公司盘根/父目录安全 + 写 gate）。 */
 export function writeStartupOptionsFile(workspace: string, options: StartupOptions): void {
-  writeAtomic(startupOptionsPath(workspace), serializeStartupOptions(options))
+  writeCompanyAtomic(workspace, RUN_BUNDLE_PATHS.startupOptions, serializeStartupOptions(options))
 }
 
 /** 枚举一个内容子目录下的可选 id（目录名，排序）。缺目录 = 空。 */

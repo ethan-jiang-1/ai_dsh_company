@@ -64,6 +64,7 @@ import {
   type FsWriteLike,
 } from '../cultivation/cultivation-storage.ts'
 import { canonicalPath } from '../run-bundle/paths.ts'
+import { CompanyWriteBlockedError } from '../run-bundle/write-gate.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
 
 /** bundle patch 行注入的 host config（cordis.patch.yml `company-client` 行）。 */
@@ -164,7 +165,7 @@ interface CultivationCommandContext {
 type CultivationCommandResult = { readonly kind: 'error' | 'success'; readonly text: string }
 
 /** 命令行为只依赖会话输入、配置与培养存储；Cordis 注册留在外层适配器。 */
-function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result) {
+function cultivationCommandHandlerInner(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result) {
   return async ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
     const face = sessionFaceOf(agent)
     if (face === null) {
@@ -224,6 +225,26 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
     return {
       kind: 'error' as const,
       text: '子命令只认：correct / suggest / adopt / reject / verify / revoke / archive / purge / check（培养页有各命令的一句话用法）。',
+    }
+  }
+}
+
+/**
+ * 命令边界统一收口存储 typed error（BUG-127/130/141）：坏形状/写 gate 变可读回执，不抛到命令面。
+ */
+function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result) {
+  const inner = cultivationCommandHandlerInner(config, storage, ctx, companyHome, dataBlocked, blockedReason, roleLabel, resultLabel)
+  return async (input: { readonly agent?: AgentLike, readonly rawInput: string }): Promise<CultivationCommandResult> => {
+    try {
+      return await inner(input)
+    } catch (error) {
+      if (error instanceof UnsafeCultivationPathError) {
+        return { kind: 'error', text: `培养记录目录不是安全目录（文件/symlink）：${error.message}；请修复后重试。` }
+      }
+      if (error instanceof CompanyWriteBlockedError) {
+        return { kind: 'error', text: error.message }
+      }
+      throw error
     }
   }
 }
@@ -437,8 +458,11 @@ function commandAdopt(command: CultivationCommandContext, tokens: readonly strin
       if (config.cultivationRoot === undefined) {
         return { kind: 'error' as const, text: '方法层根未配置（bundle patch 行 config.cultivationRoot 缺席）——无法部署方法。' }
       }
-      let slug = tokens[2] === 'as' ? tokens[3] : undefined
-      if (slug === undefined) slug = `method-${id}`
+      const rest = tokens.slice(2)
+      let slug: string
+      if (rest.length === 0) slug = `method-${id}`
+      else if (rest.length === 2 && rest[0] === 'as' && (rest[1] ?? '') !== '') slug = rest[1] as string
+      else return { kind: 'error' as const, text: '用法：adopt <记录id> [as <方法slug>]（as 后必须恰好一个 slug）。' }
       if (!SLUG_RE.test(slug)) {
         return { kind: 'error' as const, text: `方法 slug 只认小写字母/数字/连字符（≤64 位）：${slug}。` }
       }
@@ -506,6 +530,9 @@ function commandVerify(command: CultivationCommandContext, tokens: readonly stri
   const record = parseRecord(id, found.text)
   if (record === null) return { kind: 'error', text: `记录 ${id} 形状坏。` }
   if (record.status !== 'adopted') return { kind: 'error', text: `只有已采纳的方法才能回填验证（${id} 现为 ${record.status}）。` }
+  if (record.revokedAt !== undefined) {
+    return { kind: 'error', text: `方法 ${record.methodSlug ?? id} 已撤回（${record.revokedAt}），不能再回填验证；如需保留历史观察请另开记录。` }
+  }
   if (record.targetRole !== face.role) {
     return { kind: 'error', text: `${record.id} 归 ${command.roleLabel(record.targetRole)}，请在该角色会话里回填。` }
   }
@@ -730,9 +757,18 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
       }
       const recordsDir = join(scope.root, RECORDS_REL)
       const fs = fsOf(ctx)
-      const id = fs === undefined
-        ? storage.writeRecord(recordsDir, draft)
-        : await writeRecordViaFs(fs, recordsDir, draft, exec.signal, sandboxPolicyOf(ctx, exec.agent))
+      let id: string
+      try {
+        id = fs === undefined
+          ? storage.writeRecord(recordsDir, draft)
+          : await writeRecordViaFs(fs, recordsDir, draft, exec.signal, sandboxPolicyOf(ctx, exec.agent))
+      } catch (error) {
+        if (error instanceof UnsafeCultivationPathError) {
+          return { id: '', recorded: false, note: `培养记录目录不是安全目录（文件/symlink）：${error.message}；请修复后重试。` }
+        }
+        if (error instanceof CompanyWriteBlockedError) return { id: '', recorded: false, note: error.message }
+        throw error
+      }
       return {
         id,
         recorded: true,

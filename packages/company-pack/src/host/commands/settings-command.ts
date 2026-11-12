@@ -7,12 +7,12 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { blockedCompanyText } from './blocked-text.ts'
+import { resolveStartupWorkspace } from '../startup/startup-workspace.ts'
 import {
   clearStartupSettings,
   isStartupField,
   parseStartupSettings,
   STARTUP_FIELDS,
-  startupWorkspace,
   type StartupAgentLike,
   type StartupField,
   type StartupSettings,
@@ -20,7 +20,7 @@ import {
 import {
   checkWikiPointer,
   enumerateStartupOptions,
-  readStartupSettings,
+  readStartupSettingsState,
   refreshStartupOptions,
   writeStartupSettings,
 } from '../startup/startup-store.ts'
@@ -115,7 +115,7 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
     input: { hint: text(STARTUP_COMMAND_COPY.hint.zh, STARTUP_COMMAND_COPY.hint.en) },
     handler: async ({ rawInput, agent }: { readonly rawInput: string, readonly agent?: StartupAgentLike }) => {
       // 会话 cwd 优先：面板按 Lead 会话读，写必须落在同一份（BUG-081）。
-      const workspace = startupWorkspace(options.workspace, agent)
+      const workspace = resolveStartupWorkspace(options.workspace, agent)
       if (workspace === '') {
         return {
           kind: 'error' as const,
@@ -125,6 +125,9 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
         }
       }
       const parsed = parseSettingsCommand(rawInput)
+      if (options.dataBlocked && parsed.kind !== 'show') {
+        return { kind: 'error' as const, text: blockedCompanyText(options.blockedReason, '设置') }
+      }
       if (parsed.kind === 'error') {
         const copy = parsed.code === 'unknown-field'
           ? STARTUP_COMMAND_COPY.unknownField(parsed.field ?? '', STARTUP_FIELDS.join(' / '))
@@ -132,10 +135,12 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
         return { kind: 'error' as const, text: text(copy.zh, copy.en) }
       }
 
-      const current = readStartupSettings(workspace)
+      const currentState = readStartupSettingsState(workspace)
+      const current = currentState.settings
       if (parsed.kind === 'show') {
         const available = enumerateStartupOptions(options.contentDir)
         const wikiCheck = checkWikiPointer(workspace, current.wiki)
+        const problemNote = currentState.problem === null ? '' : `⚠ startup.json ${currentState.problem === 'unsupported' ? 'schema 高于本包支持' : '损坏'}；当前按 auto 显示，重新 set 会覆盖。\n`
         const wikiLine = current.wiki === null
           ? text('wiki=auto', 'wiki=auto')
           : wikiCheck.ok
@@ -146,7 +151,7 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
         return {
           kind: 'success' as const,
           text: text(
-            `当前：${describe(current)}\n${wikiLine}\n可选 产品类型：${available.productTypes.join(' / ') || '（无）'}\n可选 交付模式：${available.deliveryModes.join(' / ') || '（无）'}`,
+            `${problemNote}当前：${describe(current)}\n${wikiLine}\n可选 产品类型：${available.productTypes.join(' / ') || '（无）'}\n可选 交付模式：${available.deliveryModes.join(' / ') || '（无）'}`,
             `Current: ${describe(current)}\n${wikiLine}\nProduct types: ${available.productTypes.join(' / ') || '(none)'}\nDelivery modes: ${available.deliveryModes.join(' / ') || '(none)'}`,
           ),
         }
@@ -154,8 +159,12 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
 
       if (parsed.kind === 'reset') {
         const next = clearStartupSettings(new Date().toISOString())
-        writeStartupSettings(workspace, next)
-        refresh(workspace)
+        try {
+          writeStartupSettings(workspace, next)
+        } catch (error) {
+          return { kind: 'error' as const, text: `恢复自动失败：${(error as Error).message}` }
+        }
+        try { refresh(workspace) } catch { /* 派生失败不回滚设置 */ }
         return {
           kind: 'success' as const,
           text: text('已恢复自动（三项全部不约束）；下一轮生效。', 'Reset to auto (no constraints); effective next turn.'),
@@ -184,8 +193,12 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
         v: 1 as const,
         updatedAt: new Date().toISOString(),
       }
-      writeStartupSettings(workspace, parseStartupSettings(JSON.stringify(next)))
-      refresh(workspace)
+      try {
+        writeStartupSettings(workspace, parseStartupSettings(JSON.stringify(next)))
+      } catch (error) {
+        return { kind: 'error' as const, text: `写入 startup.json 失败：${(error as Error).message}` }
+      }
+      try { refresh(workspace) } catch { /* 派生失败不回滚设置 */ }
       // A3：wiki 指针写进去就查一次——失效要说出来，不能等模型去 read 一个空气目录。
       const wikiWarning = parsed.field === 'wiki' && parsed.value !== null
         ? (() => {

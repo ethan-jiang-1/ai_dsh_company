@@ -15,6 +15,7 @@
 import { existsSync, statSync, watch as fsWatch } from 'node:fs'
 import { basename, dirname, resolve } from 'node:path'
 import type { StartupOptions, WikiCheck } from '../../lib/startup-settings.ts'
+import { isDangerousRoot } from '../workspace/dangerous-roots.ts'
 import {
   checkWikiPointer,
   enumerateStartupOptions,
@@ -111,7 +112,7 @@ export class StartupOptionsWatch {
    * @returns 本次派生内容；空 workspace 返回 null。
    */
   sync(workspace: string): StartupOptions | null {
-    if (this.disposed || workspace === '') return null
+    if (this.disposed || workspace === '' || isDangerousRoot(workspace)) return null
     const settings = readStartupSettings(workspace)
     const next: StartupOptions = {
       ...enumerateStartupOptions(this.options.contentDir),

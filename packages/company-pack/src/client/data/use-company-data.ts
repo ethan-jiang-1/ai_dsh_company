@@ -105,6 +105,7 @@ export function useCompanyData(
   // team 态：Lead 会话的 Host 投影（0.1.7 官方读法；投影帧保持最新，故无轮询）。
   const lead = injected.leadOf(sessionId)
   const projection = useSessions((state) => state.projectionsBySession[lead]?.values.agentTeam)
+  // team 态唯一来源 = sessions store 的 agentTeam；不用 useProjection 兜底（BUG-140 撤回、BUG-146 OOM）。
   const team = projection ?? null
   const error = (projection as { readonly failure?: string } | undefined)?.failure ?? null
 

@@ -1,3 +1,4 @@
+// 负例留证 2026-11-13：writable=false 仍 watch.sync ⇒ blocked host 写 options（BUG-119）；跳过 sync 即绿。
 /**
  * `company:startup-settings` 注入文本的 keyless 判据（2026-11-12）。
  *
@@ -180,5 +181,29 @@ describe('registerStartupSettings', () => {
     const { sections, fire } = mount('', undefined)
     fire()
     expect(sections).toHaveLength(0)
+  })
+
+  it('writable=false：只装 section，不 sync 派生（BUG-119）', () => {
+    const ws = workspaceWithSettings()
+    try {
+      const synced: string[] = []
+      const sections: Array<{ text: () => string }> = []
+      const listeners = new Map<string, ((payload: unknown) => void)[]>()
+      const ctx = { logger: { warn: () => {} }, on: (name: string, listener: (payload: unknown) => void) => { listeners.set(name, [...(listeners.get(name) ?? []), listener]) } }
+      const agent = {
+        session: { header: { cwd: ws } },
+        ctx: {
+          get: () => undefined,
+          inject: (_deps: readonly string[], cb: (scope: unknown) => void) => {
+            cb({ systemPrompt: { section: (section: { text: () => string }) => { sections.push(section); return () => {} } } })
+            return { dispose: async () => {} }
+          },
+        },
+      }
+      registerStartupSettings(ctx as never, '', { writable: false, watch: { sync: (workspace: string) => { synced.push(workspace) } } })
+      for (const listener of listeners.get('agent/created') ?? []) listener({ agent })
+      expect(synced).toEqual([])
+      expect(sections).toHaveLength(1)
+    } finally { rmSync(ws, { recursive: true, force: true }) }
   })
 })

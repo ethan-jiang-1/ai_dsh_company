@@ -1,3 +1,5 @@
+// 负例留证 2026-11-13：replace 直接 writeFileSync flag:w ⇒ 跟随 symlink 写外部（BUG-128）；lstat + temp/rename 即绿。
+// 负例留证 2026-11-13：dir 条目直接 mkdirSync ⇒ 文件占根时 EEXIST 抛出（BUG-143）；lstat + warning 即绿。
 /**
  * run bundle 初始化 v3 的 keyless 完成定义（2026-11-01）。
  *
@@ -278,5 +280,43 @@ describe('listRunBundleFiles', () => {
     } finally {
       rmSync(pack, { recursive: true, force: true }); rmSync(workspace, { recursive: true, force: true })
     }
+  })
+
+  it('replace 目标 symlink/目录 → warning + 不写；外部字节不动（BUG-128/142）', () => {
+    const ws = mkdtempSync(join(tmpdir(), 'bootstrap-shape-'))
+    const contentDir = content()
+    const outside = join(ws, 'outside.txt')
+    writeFileSync(outside, 'ORIGINAL')
+    mkdirSync(join(ws, '.dsh-company/kb'), { recursive: true })
+    symlinkSync(outside, join(ws, '.dsh-company/kb/org.md'))
+    const link = applyBootstrap({
+      workspace: ws, contentDir, entries: [{ rel: '.dsh-company/kb/org.md', kind: 'file', action: 'create', mode: 'replace', content: 'REPLACED' }],
+      creates: 1, skips: 0, warnings: [],
+    })
+    expect(link.created).toEqual([])
+    expect(link.warnings.some(warning => warning.includes('symlink'))).toBe(true)
+    expect(readFileSync(outside, 'utf8')).toBe('ORIGINAL')
+
+    rmSync(join(ws, '.dsh-company/kb/org.md'), { force: true })
+    mkdirSync(join(ws, '.dsh-company/kb/org.md'), { recursive: true })
+    const dir = applyBootstrap({
+      workspace: ws, contentDir, entries: [{ rel: '.dsh-company/kb/org.md', kind: 'file', action: 'create', mode: 'replace', content: 'x' }],
+      creates: 1, skips: 0, warnings: [],
+    })
+    expect(dir.warnings.some(warning => warning.includes('目录'))).toBe(true)
+    rmSync(ws, { recursive: true, force: true })
+    rmSync(contentDir, { recursive: true, force: true })
+  })
+
+  it('.dsh-company 被文件占用 → dir 条目 warning，不抛 EEXIST（BUG-143）', () => {
+    const ws = mkdtempSync(join(tmpdir(), 'bootstrap-file-root-'))
+    writeFileSync(join(ws, '.dsh-company'), 'file')
+    const result = applyBootstrap({
+      workspace: ws, contentDir: content(), entries: [{ rel: '.dsh-company', kind: 'dir', action: 'create' }],
+      creates: 1, skips: 0, warnings: [],
+    })
+    expect(result.created).toEqual([])
+    expect(result.warnings.some(warning => warning.includes('不是目录'))).toBe(true)
+    rmSync(ws, { recursive: true, force: true })
   })
 })

@@ -1,3 +1,4 @@
+// 负例留证 2026-11-13：staging 不复制旧 ledger ⇒ corrupt 账本导出后旧快照消失（BUG-114）；复制旧件即绿。
 /**
  * host 治理导出的 keyless 完成定义（2026-11-01 产品化 P4）。
  *
@@ -82,5 +83,23 @@ describe('导出目录替换的回滚', () => {
       expect(readFileSync(join(target, 'old.md'), 'utf8')).toBe('old')
       expect(existsSync(join(root, 'exports.bak-'))).toBe(false)
     } finally { rmSync(root, { recursive: true, force: true }) }
+  })
+
+  it('账本 corrupt/缺席、methods 源缺失 → 沿用上次快照，不整体删掉（BUG-114）', () => {
+    const { home, ws, cleanup } = make()
+    try {
+      const ok = { kind: 'domain' as const, read: (): PresentedLedgerState => ({ status: 'ok', path: 'x', ledger: LEDGER }) }
+      exportGovernance({ dshHome: home, workspace: ws, ledger: ok })
+      const before = readFileSync(join(ws, '.dsh-company/exports/ledger.json'), 'utf8')
+      const corrupt = { kind: 'domain' as const, read: (): PresentedLedgerState => ({ status: 'corrupt', path: 'x', error: 'bad' }) }
+      const corruptRun = exportGovernance({ dshHome: home, workspace: ws, ledger: corrupt })
+      expect(corruptRun.warnings.some(warning => warning.includes('沿用上次'))).toBe(true)
+      expect(readFileSync(join(ws, '.dsh-company/exports/ledger.json'), 'utf8')).toBe(before)
+      exportGovernance({ dshHome: home, workspace: ws })
+      expect(readFileSync(join(ws, '.dsh-company/exports/ledger.json'), 'utf8')).toBe(before)
+      rmSync(join(home, 'company/methods'), { recursive: true, force: true })
+      exportGovernance({ dshHome: home, workspace: ws })
+      expect(readFileSync(join(ws, '.dsh-company/exports/methods/ceo/m1/SKILL.md'), 'utf8')).toBe('# method\n')
+    } finally { cleanup() }
   })
 })

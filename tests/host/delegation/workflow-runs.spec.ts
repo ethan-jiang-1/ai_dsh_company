@@ -1,3 +1,4 @@
+// 负例留证 2026-11-13：配对改回 `.at(-1)` ⇒ 同名并发 r1 拿 c2/jobB（BUG-126）；FIFO 即绿。
 /**
  * host 半 `workflow_runs` spec（BUG-044 修复的 keyless 锚点）。
  *
@@ -201,5 +202,17 @@ describe('workflow run durable view', () => {
       result(3, 'c2', 'Error: Workflow script failed validation'),
     ])
     expect(rows).toEqual([])
+  })
+
+  it('同名并发 background：按 start 顺序 FIFO 配对，不互换 jobId（BUG-126）', () => {
+    const rows = workflowRunRows([
+      call(1, 'c1', 'same', true),
+      call(2, 'c2', 'same', true),
+      runStart(3, 'r1', 'same'),
+      runStart(4, 'r2', 'same'),
+      result(5, 'c2', backgroundText('same', 'jobB')),
+      result(6, 'c1', backgroundText('same', 'jobA')),
+    ] as never)
+    expect(rows.map(row => [row.runId, row.jobId])).toEqual([['r1', 'jobA'], ['r2', 'jobB']])
   })
 })

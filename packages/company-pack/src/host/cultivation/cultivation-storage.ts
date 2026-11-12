@@ -14,6 +14,7 @@
  *
  * keyless 判据 = `tests/host/cultivation/cultivation-maintenance.spec.ts` 与 `revoke-journal.spec.ts`（命令行为经 `CultivationStorage` 观察同一面）。
  */
+import { assertCompanyWritesAllowed } from '../run-bundle/write-gate.ts'
 import {
   constants,
   copyFileSync,
@@ -204,6 +205,7 @@ export function migrateLegacyMethodLayers(
 
 /** Publish a new file without replacing an existing destination. Both paths share one directory/filesystem. */
 function writeNewFile(path: string, text: string): void {
+  assertCompanyWritesAllowed()
   const temporary = `${path}.${randomUUID()}.tmp`
   try {
     writeFileSync(temporary, text, { flag: 'wx' })
@@ -286,6 +288,7 @@ export function applyRecordUpdates(text: string, updates: Readonly<Record<string
 
 /** 改写 frontmatter 字段（upsert）；正文原样保留，并以 sibling-temp + rename 避免截断。 */
 function updateRecordFile(recordsDir: string, id: string, updates: Readonly<Record<string, string>>, expectedText?: string): boolean {
+  assertCompanyWritesAllowed()
   const path = recordPath(recordsDir, id)
   if (path === null) throw new Error(`不安全的记录 id：${id}`)
   if (recordsDirectoryState(recordsDir) !== 'ready') throw new Error(`记录目录不可达：${recordsDir}`)
@@ -328,6 +331,7 @@ function restoreRecordFile(recordsDir: string, id: string, text: string): boolea
 
 /** 把一条记录移动到归档目录（同一公司盘内；只用于已处理/旧记录）。 */
 function archiveRecordFile(recordsDir: string, archiveDir: string, id: string): boolean {
+  assertCompanyWritesAllowed()
   const path = recordPath(recordsDir, id)
   if (path === null) return false
   if (recordsDirectoryState(recordsDir) !== 'ready') return false
@@ -365,6 +369,7 @@ function listMethodSlugs(root: string, role: string): string[] {
 
 /** 删除归档目录里早于 cutoff 的记录（只动 .md 普通文件；open 不在这里）。 */
 function purgeArchiveFiles(archiveDir: string, cutoff: number): { removed: number, failed: number } {
+  assertCompanyWritesAllowed()
   const info = lstatOrNull(archiveDir)
   if (info === null) return { removed: 0, failed: 0 }
   if (info.isSymbolicLink() || !info.isDirectory()) throw new UnsafeCultivationPathError(archiveDir)
@@ -500,6 +505,7 @@ export const nodeCultivationStorage: CultivationStorage = {
   purgeArchive: purgeArchiveFiles,
   loadRecords,
   installMethod(root, role, slug, text) {
+    assertCompanyWritesAllowed()
     if (!ROSTER.has(role) || !SLUG_RE.test(slug)) throw new Error(`不安全的方法路径：${role}/${slug}`)
     ensureMethodRoot(root)
     const roleDir = join(root, role)

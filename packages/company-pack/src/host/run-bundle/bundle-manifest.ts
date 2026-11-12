@@ -11,6 +11,7 @@
  *
  * 本模块只做纯事；调用方接住错误，apply 期不抛。
  */
+import { assertCompanyWritesAllowed } from './write-gate.ts'
 import { randomUUID } from 'node:crypto'
 import {
   existsSync,
@@ -278,6 +279,7 @@ export function writeBundleManifest(
   plan: ManifestPlan,
   deps: { readonly link?: typeof linkSync } = {},
 ): { created: boolean; skipped: boolean; upgraded: boolean; fallback?: 'wx' } {
+  assertCompanyWritesAllowed()
   if (plan.error !== undefined || plan.action === 'skip') {
     return { created: false, skipped: true, upgraded: false }
   }

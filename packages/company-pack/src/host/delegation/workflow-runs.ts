@@ -92,8 +92,9 @@ export function workflowRunRows(
       const observed = results.get(call.callId)
       return observed === undefined || observed.seq > start.seq || runEvidence.test(observed.text)
     })
-    // 优先最近的、有「产生 run」证据的调用；都没有时退回最近的前置调用（旧行为，仍给 lost 兜底）。
-    const call = eligible.at(-1) ?? preceding.at(-1)
+    // 同名并发：按 start 顺序取**最早未用**的前置 call（FIFO），否则 r1 会抢走最近的 c2（BUG-126）。
+    // 失败前置 call 已在 eligible 里被证据规则排除；都没有时退回最早前置，仍给 lost 兜底。
+    const call = eligible[0] ?? preceding[0]
     if (call === undefined) continue
     usedCalls.add(call.callId)
     const text = results.get(call.callId)?.text ?? ''

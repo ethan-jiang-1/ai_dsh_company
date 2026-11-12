@@ -10,6 +10,7 @@
  */
 import { cpSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
+import { assertCompanyWritesAllowed } from '../run-bundle/write-gate.ts'
 import { randomUUID } from 'node:crypto'
 import type { PresentedLedger, PresentedLedgerState } from '../ledger/presented-ledger.ts'
 
@@ -82,6 +83,7 @@ export function exportGovernance(options: {
   readonly ledger?: ExportLedgerSource
   readonly now?: Date
 }): GovernanceExportResult {
+  assertCompanyWritesAllowed()
   const warnings: string[] = []
   const exportRoot = join(options.workspace, '.dsh-company/exports')
   const staging = `${exportRoot}.tmp-${String(process.pid)}-${randomUUID()}`
@@ -98,9 +100,15 @@ export function exportGovernance(options: {
     if (existsSync(methodsSource)) {
       cpSync(methodsSource, join(staging, 'methods'), { recursive: true, dereference: false })
       methods = true
+    } else if (existsSync(join(exportRoot, 'methods'))) {
+      // 本次没有权威 methods（home 未建/暂不可读）：整目录替换不能因此删掉上一份可用快照（BUG-114）。
+      cpSync(join(exportRoot, 'methods'), join(staging, 'methods'), { recursive: true, dereference: false })
+      warnings.push('methods 源不可用，沿用上次导出快照')
     }
 
-    if (options.ledger !== undefined) {
+    if (options.ledger === undefined) {
+      try { cpSync(join(exportRoot, 'ledger.json'), join(staging, 'ledger.json')) } catch { /* 没有旧快照 */ }
+    } else {
       const state = options.ledger.read()
       if (state.status === 'ok') {
         // 幂等：与上一份导出内容相同就不重写，避免 exportedAt 把「二启零变更」打红。
@@ -123,7 +131,8 @@ export function exportGovernance(options: {
         }
         ledger = true
       } else if (state.status === 'corrupt' || state.status === 'unsupported') {
-        warnings.push(`账本不可导出（${state.status}），保留上次快照`)
+        warnings.push(`账本不可导出（${state.status}），本次不更新，沿用上次快照`)
+        try { cpSync(join(exportRoot, 'ledger.json'), join(staging, 'ledger.json')) } catch { /* 没有旧快照 */ }
       }
     }
 

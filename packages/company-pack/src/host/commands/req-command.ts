@@ -14,6 +14,7 @@ import { blockedCompanyText } from './blocked-text.ts'
 import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { contentMemberFile, isSafeContentId } from './content-id.ts'
 import { isPlainFileInside, readTextInside } from '../fs/safe-file.ts'
+import { ensureCompanyRoot } from '../run-bundle/company-root.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
 import { checkRequirements, isLayer, type MotionDoc } from '../../lib/requirements-check.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
@@ -206,7 +207,10 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
             : '未指定 workspace；先选 workspace 再校验。',
         }
       }
-      const companyRoot = join(workspace, '.dsh-company')
+      let companyRoot: string
+      try { companyRoot = ensureCompanyRoot(workspace) } catch (error) {
+        return { kind: 'error' as const, text: (error as Error).message }
+      }
       const parsed = parseReqCheck(rawInput)
       if (!parsed.ok) return { kind: 'error' as const, text: parsed.text }
       const resolved = resolveDeliverablePath(workspace, parsed.slug)

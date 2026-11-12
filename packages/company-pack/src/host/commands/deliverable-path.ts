@@ -10,6 +10,7 @@
 import { lstatSync } from 'node:fs'
 import { isAbsolute, join, relative } from 'node:path'
 import { isInside } from '../fs/safe-file.ts'
+import { ensureCompanyRoot } from '../run-bundle/company-root.ts'
 
 /** deliverables 目录名：字母/数字开头，允许 `._-`；拒绝 `.`/`..` 与路径分隔符。 */
 const SLUG = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
@@ -31,7 +32,10 @@ export function resolveDeliverablePath(workspace: string, slug: string): Deliver
       text: `非法 deliverables 目录名「${slug}」：只允许单段目录名（字母/数字/._-；不能含 /、\\、. 或 ..）`,
     }
   }
-  const companyRoot = join(workspace, '.dsh-company')
+  let companyRoot: string
+  try { companyRoot = ensureCompanyRoot(workspace) } catch (error) {
+    return { ok: false, text: (error as Error).message }
+  }
   const deliverablesRoot = join(companyRoot, 'deliverables')
   const root = join(deliverablesRoot, slug)
   const dir = join(root, 'drafts')

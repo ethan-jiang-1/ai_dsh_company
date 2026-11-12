@@ -7,7 +7,7 @@
  *
  * 本模块只做纯计划/落盘，不注册服务、不抛错；调用方接住错误，避免 apply 期异常连累应用。
  */
-import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, writeFileSync } from 'node:fs'
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, unlinkSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import { isAbsolute, join, relative, resolve, sep } from 'node:path'
@@ -15,6 +15,7 @@ import { yamlScalar } from '../../lib/yaml-scalar.ts'
 import { ROLE_CANONICAL } from '../../lib/role-copy.ts'
 import { RUN_BUNDLE_DIR, RUN_BUNDLE_REL } from '../run-bundle/run-bundle.ts'
 import { isDangerousRoot } from '../workspace/dangerous-roots.ts'
+import { assertCompanyWritesAllowed } from './write-gate.ts'
 
 /** 六角色（researcher 没有 CHARTER）。 */
 export const COMPANY_ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo'] as const
@@ -57,6 +58,8 @@ export interface BootstrapPlan {
 export interface BootstrapResult {
   readonly created: readonly string[]
   readonly skipped: readonly string[]
+  /** 坏形状/写失败（symlink、目录占文件、父目录 symlink…）；调用方负责 warning。 */
+  readonly warnings: readonly string[]
 }
 
 const toPosix = (path: string): string => path.split(sep).join('/')
@@ -231,34 +234,94 @@ export function readSeeds(contentDir: string, options: ReadSeedsOptions = {}): S
 export function applyBootstrap(plan: BootstrapPlan): BootstrapResult {
   const created: string[] = []
   const skipped: string[] = []
-  if (plan.error !== undefined) return { created, skipped }
+  const warnings: string[] = []
+  if (plan.error !== undefined) return { created, skipped, warnings }
   mkdirSync(plan.workspace, { recursive: true })
+  const workspace = resolve(plan.workspace)
   for (const entry of plan.entries) {
     const target = join(plan.workspace, entry.rel)
+    const rel = relative(workspace, resolve(target))
+    if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
+      warnings.push(`${entry.rel}：目标越出 workspace，未写`)
+      skipped.push(entry.rel)
+      continue
+    }
     if (entry.action === 'skip') {
       skipped.push(entry.rel)
       continue
     }
-    if (entry.kind === 'dir') {
-      mkdirSync(target, { recursive: true })
-    } else {
-      mkdirSync(join(target, '..'), { recursive: true })
-      try {
-        if (entry.content !== undefined) {
-          writeFileSync(target, entry.content, { flag: entry.mode === 'replace' ? 'w' : 'wx' })
-        } else {
-          const source = join(plan.contentDir, entry.sourceRel ?? '')
-          writeFileSync(target, readFileSync(source), { flag: 'wx' })
+    // 父目录逐级 lstat：symlink/文件占目录 → warning + skip（BUG-128/129/143）。
+    const parentSegments = rel.split('/').slice(0, -1)
+    let parent = workspace
+    let parentBad = false
+    for (const segment of entry.kind === 'dir' ? rel.split('/').slice(0, -1) : parentSegments) {
+      parent = join(parent, segment)
+      let info
+      try { info = lstatSync(parent) } catch { info = null }
+      if (info === null) {
+        try { mkdirSync(parent) } catch (error) {
+          warnings.push(`${entry.rel}：父目录创建失败（${(error as Error).message}）`)
+          parentBad = true
+          break
         }
-      } catch (error) {
-        if ((error as { code?: string }).code !== 'EEXIST') throw error
+        continue
+      }
+      if (info.isSymbolicLink()) { warnings.push(`${entry.rel}：父目录是 symlink，未写`); parentBad = true; break }
+      if (!info.isDirectory()) { warnings.push(`${entry.rel}：父目录不是目录，未写`); parentBad = true; break }
+    }
+    if (parentBad) { skipped.push(entry.rel); continue }
+
+    let info
+    try { info = lstatSync(target) } catch { info = null }
+    if (entry.kind === 'dir') {
+      if (info === null) {
+        try { assertCompanyWritesAllowed(); mkdirSync(target) } catch (error) {
+          warnings.push(`${entry.rel}：目录骨架创建失败（${(error as Error).message}）`)
+          skipped.push(entry.rel)
+          continue
+        }
+      } else if (info.isSymbolicLink() || !info.isDirectory()) {
+        warnings.push(`${entry.rel}：目录骨架被 ${info.isSymbolicLink() ? 'symlink' : '文件（不是目录）'}占用，跳过`)
         skipped.push(entry.rel)
         continue
       }
+      created.push(entry.rel)
+      continue
+    }
+
+    if (info !== null && (info.isSymbolicLink() || !info.isFile())) {
+      warnings.push(`${entry.rel}：种子目标是 ${info.isSymbolicLink() ? 'symlink' : '目录'}，未覆盖`)
+      skipped.push(entry.rel)
+      continue
+    }
+    if (info !== null && entry.mode !== 'replace') {
+      skipped.push(entry.rel)
+      continue
+    }
+    try {
+      assertCompanyWritesAllowed()
+      const data = entry.content !== undefined ? entry.content : readFileSync(join(plan.contentDir, entry.sourceRel ?? ''), 'utf8')
+      if (entry.mode === 'replace') {
+        const temporary = `${target}.${String(process.pid)}.${Math.random().toString(36).slice(2)}.tmp`
+        try {
+          writeFileSync(temporary, data, { flag: 'wx' })
+          renameSync(temporary, target)
+        } catch (error) {
+          try { unlinkSync(temporary) } catch { /* 未创建/已 rename */ }
+          throw error
+        }
+      } else {
+        writeFileSync(target, data, { flag: 'wx' })
+      }
+    } catch (error) {
+      if ((error as { code?: string }).code === 'EEXIST') { skipped.push(entry.rel); continue }
+      warnings.push(`${entry.rel}：写入失败（${(error as Error).message}）`)
+      skipped.push(entry.rel)
+      continue
     }
     created.push(entry.rel)
   }
-  return { created, skipped }
+  return { created, skipped, warnings }
 }
 
 /** 一步到位（计划 + 执行）。 */

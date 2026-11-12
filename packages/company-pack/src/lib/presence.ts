@@ -118,11 +118,18 @@ export interface TeamViewLike {
  * @returns 合并后的视图；`view === null` 时仍返回 null。
  */
 export function teamWithEventTasks(view: TeamViewLike | null, events: readonly TeamEventLike[]): TeamViewLike | null {
-  // 没有投影时只有「事件里真有 team/task」才建最小视图；空流仍返回 null（页面显示加载态）。
-  if (view === null && !events.some(event => event.type === 'team/task')) return null
+  // 没有投影时只有「事件里真有 team/member 或 team/task」才建最小视图；空流仍 null（加载态）。
+  if (view === null && !events.some(event => event.type === 'team/task' || event.type === 'team/member')) return null
   const base: TeamViewLike = view ?? { members: [], tasks: [] }
-  const nameById = new Map(base.members.map(member => [member.id, member.name]))
-  const tasks = new Map(base.tasks.map(task => [task.id, task]))
+  const members = new Map((base.members ?? []).map(member => [member.id, member]))
+  const tasks = new Map((base.tasks ?? []).map(task => [task.id, task]))
+  // member 事件也补投影：投影缺席时「在场」不能空行，而动态已说谁上线（BUG-118）。
+  for (const event of events) {
+    if (event.type !== 'team/member') continue
+    const member = (event.data as { member: { readonly id: string, readonly name: string, readonly role: 'lead' | 'teammate', readonly phase: string } }).member
+    members.set(member.id, { id: member.id, name: member.name, role: member.role ?? (member.name === 'lead' ? 'lead' : 'teammate'), phase: member.phase })
+  }
+  const nameById = new Map([...members.values()].map(member => [member.id, member.name]))
   for (const event of events) {
     if (event.type !== 'team/task') continue
     const task = (event.data as { task: { readonly id: string, readonly revision: number, readonly subject: string, readonly status: string, readonly ownerId?: string, readonly blockedBy?: readonly string[], readonly description?: string } }).task
@@ -144,7 +151,7 @@ export function teamWithEventTasks(view: TeamViewLike | null, events: readonly T
       ...(task.blockedBy === undefined ? {} : { blockedBy: task.blockedBy }),
     })
   }
-  return { ...base, tasks: [...tasks.values()] }
+  return { ...base, members: [...members.values()], tasks: [...tasks.values()] }
 }
 
 /** lead 会话日志里的 `team/*` 事件（host 折算路径与回放 fixtures 的输入）。 */
@@ -210,14 +217,14 @@ const isMessageEvent = (event: TeamEventLike): event is MessageEvent => event.ty
  * 是投影的 **state**，不是本函数吃的 wire 视图（2026-10-19 BUG-026 误报的成因）。
  */
 export function rowsFromTeamView(view: TeamViewLike): PresenceRow[] {
-  return view.members.map(member => ({
+  return (view.members ?? []).map(member => ({
     id: member.id,
     name: member.name,
     displayName: displayNameFor(member.name, member.role),
     role: member.role,
     status: presenceStatusFromPhase(member.phase),
     statusLabel: statusLabelFor(presenceStatusFromPhase(member.phase)),
-    currentTask: view.tasks
+    currentTask: (view.tasks ?? [])
       .filter(task => task.status === 'in_progress' && task.ownerName === member.name)
       .map(task => task.subject)
       .join('；') || null,
@@ -418,5 +425,5 @@ export type TeamStreamFrame =
  * @returns id → 成员名。
  */
 export function memberNames(view: TeamViewLike): ReadonlyMap<string, string> {
-  return new Map(view.members.map(member => [member.id, member.name]))
+  return new Map((view.members ?? []).map(member => [member.id, member.name]))
 }

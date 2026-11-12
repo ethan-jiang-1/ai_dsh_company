@@ -1,3 +1,5 @@
+// 负例留证 2026-11-13：null 基座只看 task 事件 ⇒ member-only 事件返回 null（BUG-118）；消费 member 即绿。
+// 负例留证 2026-11-13：去掉 members/tasks 的 `?? []` ⇒ partial view 抛 reading map（BUG-145）；兜底即绿。
 /** 在场板读模型（R5b，Q5–Q8 定案的 keyless 完成定义——提案验收判据 1/4）。 */
 // 负例留证 2026-11-13：把 teamWithEventTasks 改成直接返回 view ⇒「事件流补任务板」用例红（BUG-103）；还原即绿。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
@@ -331,5 +333,18 @@ describe('第六角色 CMO 的显示名映射（防漂移）', () => {
     const assigned: TeamViewLike = { members, tasks: [{ id: 't3', revision: 1, subject: 'x', status: 'in_progress', ownerName: 'lead' }] }
     const unassigned = teamWithEventTasks(assigned, [taskEvent('t3', 2, 'x', 'in_progress', undefined, 3)])
     expect(unassigned?.tasks[0]?.ownerName).toBeUndefined()
+  })
+
+  it('投影缺席时 member 事件也建最小视图；空事件仍 null（BUG-118）', () => {
+    const merged = teamWithEventTasks(null, [memberEvent(VP_SALES, 'vp-sales', 'active', 1)])
+    expect(merged?.members).toMatchObject([{ id: VP_SALES, name: 'vp-sales', role: 'teammate', phase: 'active' }])
+    expect(merged?.tasks).toEqual([])
+    expect(teamWithEventTasks(null, [])).toBeNull()
+  })
+
+  it('partial view（缺 members/tasks）不崩，按空数组归一（BUG-145）', () => {
+    expect(() => teamWithEventTasks({ tasks: [] } as never, [])).not.toThrow()
+    expect(teamWithEventTasks({} as never, [])?.members).toEqual([])
+    expect(teamWithEventTasks({ members: [] } as never, [])?.tasks).toEqual([])
   })
 })

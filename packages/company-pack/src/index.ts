@@ -140,7 +140,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
     // 部署配置只作覆盖旋钮（BUG-047）。
     config.handbookSkipPresets === undefined ? {} : { skipPresets: config.handbookSkipPresets })
   // 不按 hasWorkspace 门控：boot 无 workspace 时之后在会话 cwd 里设的策略也要生效（BUG-089）。
-  registerStartupSettings(ctx, workspace, { contentDir, watch: startupWatch })
+  registerStartupSettings(ctx, workspace, { contentDir, watch: startupWatch, writable: !dataBlocked })
   registerLanguagePolicy(ctx, language)
   registerWorkflowContract(ctx, contentDir, { workflowPresets: ['vp-eng'] })
   registerDelegationContracts(ctx, contentDir)

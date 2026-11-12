@@ -4,6 +4,15 @@
 
 ## 修复流水（倒序）
 
+- **BUG-114..139、141..146**（2026-11-13，根因组 A–F，P1×5 + P2×27）：状态根/写 gate/命令边界的第三次回归收口——
+  **A** 共享 `company-root`（逐级 lstat + realpath + 原子写）覆盖 catalog/ledger/startup/bootstrap/命令；
+  **B** `write-gate` + lease heartbeat token 校验 + 锁路径形状 + 全部旧写入口接 gate；
+  **C** startup corrupt/unsafe 可诊断、危险 cwd 回退；**D** 培养命令边界统一 catch、严格 adopt、verify 拒 revoked；
+  **E** 投影 null/partial 补 member、workflow FIFO、撤销 BUG-140 的 OOM 兜底；
+  **F** 导出沿用旧件、发布清单补 wiki 模板/共享 skill。BUG-140 经复核不成立（测试选址），迁 settled_issues。
+  红→绿逐组见 Note；`pnpm test` 238 files / 1827 tests；`typecheck`/`lint`/`dup`/`verify` 全绿。详见
+  [状态根/写 gate Note](../../../notes/implemented/2026-11-13-state-root-write-gate-sweep.md)。
+
 - **BUG-104..113**（2026-11-13，根因组 S1–S6，P2×10）：上一轮修复后的回归扫收口——
   **S1** [104](BUG-104-team-task-merge-no-revision-null-view.md) / [112](BUG-112-team-task-unassign-keeps-old-owner.md) /
   [105](BUG-105-stream-error-not-rendered-in-board-dag-tasks.md) 任务板 merge revision/基座/owner 语义 + 三页签流错误条；
@@ -14,7 +23,7 @@
   **S4** [109](BUG-109-catalog-warnings-dropped-in-audit-present.md) warnings 传播；
   **S5** [107](BUG-107-deliverables-audit-multi-space-path.md) audit 原始路径；
   **S6** [106](BUG-106-lease-pid-reuse-blocks-writer.md) lease heartbeat/stale 接管。
-  红→绿逐卡见 Note；`pnpm test` 236 files / 1799 tests；`typecheck`/`lint`/`dup`/`verify` 全绿。详见
+  红→绿逐卡见 Note；`pnpm test` 238 files / 1827 tests；`typecheck`/`lint`/`dup`/`verify` 全绿。详见
   [回归扫 Note](../../../notes/implemented/2026-11-13-followup-bug-sweep.md)。
 
 - **BUG-090..103**（2026-11-13，根因组 G1–G7，P1×3 + P2×11）：高复杂度面持续探索的 14 张缺陷，按根因收口——

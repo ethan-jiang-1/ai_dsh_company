@@ -1,3 +1,5 @@
+// 负例留证 2026-11-13：adopt 把 `as` 缺 slug 当默认 ⇒「adopt id as」写方法（BUG-117）；严格解析即红转绿。
+// 负例留证 2026-11-13：verify 不判 revokedAt ⇒ revoke 后 verify success（BUG-139）；加判断即绿。
 /** 培养 /cultivation 命令与 propose 的 host 行为（R5-23 从 640 行 spec 拆族；临时真实盘）。 */
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -369,6 +371,53 @@ describe('revoke / check 的完整性对账', () => {
         expect(result.recorded).toBe(false)
       }
       expect(readdirSync(recordsDir)).toHaveLength(0)
+    })
+  })
+})
+
+describe('命令边界：坏 records 根与状态机（BUG-117/127/130/139/141）', () => {
+  it('records 根是文件 → check/adopt/reject/verify/correct/archive 全部可读 error，不抛', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
+      rmSync(recordsDir, { recursive: true, force: true })
+      writeFileSync(recordsDir, 'not a dir')
+      const { command } = cultivationRegistrations({ cultivationRoot: methods })
+      for (const line of ['check', 'adopt x', 'reject x :: no', 'verify x pass :: y', 'correct 要更稳 :: 证据', 'archive 30']) {
+        const result = await invokeCultivation(command, 'ceo', workspace, line)
+        expect(result.kind, line).toBe('error')
+        expect(String((result as { text: string }).text), line).toContain('不是安全目录')
+      }
+    })
+  })
+
+  it('adopt id as（缺 slug）→ 用法错误，不写方法', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
+      writeFileSync(join(recordsDir, 'r-adopt.md'), recordText({
+        kind: 'correction', targetRole: 'ceo', proposerRole: 'ceo', proposerKind: 'human',
+        source: 'test', expectation: '更稳', body: '先列清单',
+      }))
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+      const result = await invokeCultivation(handler, 'ceo', workspace, 'adopt r-adopt as')
+      expect(result).toMatchObject({ kind: 'error' })
+      expect(existsSync(join(methods, 'ceo'))).toBe(false)
+    })
+  })
+
+  it('verify 在 revoke 后拒绝（BUG-139）', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
+      const recordPath = join(recordsDir, 'r-verify.md')
+      writeFileSync(recordPath, recordText({
+        kind: 'correction', targetRole: 'ceo', proposerRole: 'ceo', proposerKind: 'human',
+        source: 'test', expectation: '更稳', body: '先列清单',
+      }))
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+      expect(await invokeCultivation(handler, 'ceo', workspace, 'adopt r-verify as m-verify')).toMatchObject({ kind: 'success' })
+      expect(await invokeCultivation(handler, 'ceo', workspace, 'revoke m-verify')).toMatchObject({ kind: 'success' })
+      const result = await invokeCultivation(handler, 'ceo', workspace, 'verify r-verify pass :: 后续工作')
+      expect(result).toMatchObject({ kind: 'error' })
+      expect(String((result as { text: string }).text)).toContain('已撤回')
     })
   })
 })

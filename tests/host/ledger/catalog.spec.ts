@@ -1,3 +1,4 @@
+// 负例留证 2026-11-13：presented 写回 temp+rename 不捕获目录 ⇒ setPresentedAudit 抛 EISDIR（BUG-138）；safe 写 + 捕获即绿。
 /**
  * 成品目录 host 生成器（2026-10-25；2026-11-01 v3 路径）的 keyless 判据。
  *
@@ -5,7 +6,7 @@
  * ③present 事件按 `.dsh-company/deliverables.../final.md` 投影；④meta/台账解析与仓库口径一致；
  * ⑤一个 workspace 的扫描不读另一个。
  */
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -301,5 +302,71 @@ describe('坏形状：存在 ≠ 可读普通文件', () => {
     expect(result.catalog?.entries.some(entry => entry.dir === '2026-11-13-link')).toBe(false)
     expect(result.warnings.some(warning => warning.includes('symlink'))).toBe(true)
     rmSync(outside, { recursive: true, force: true })
+  })
+
+  it('扫描根是文件/symlink → warning 不抛；catalog 输出是目录 → written:false', () => {
+    const root = workspace()
+    const deliverables = join(root, RUN_BUNDLE_PATHS.deliverables)
+    rmSync(deliverables, { recursive: true, force: true })
+    writeFileSync(deliverables, 'not a dir')
+    const first = regenerateCatalog(root)
+    expect(first.warnings.some(warning => warning.includes('不是目录'))).toBe(true)
+    // 输出路径被目录占用
+    rmSync(deliverables, { force: true })
+    rmSync(join(root, RUN_BUNDLE_PATHS.catalog), { force: true })
+    mkdirSync(join(root, RUN_BUNDLE_PATHS.catalog), { recursive: true })
+    const second = regenerateCatalog(root)
+    expect(second.written).toBe(false)
+    expect(second.warnings.some(warning => warning.includes('目录占用'))).toBe(true)
+  })
+
+  it('kb 是 symlink → 拒绝写 catalog，外部目录字节不动', () => {
+    const root = workspace()
+    const outside = mkdtempSync(join(tmpdir(), 'catalog-outside-kb-'))
+    rmSync(join(root, RUN_BUNDLE_PATHS.kb), { recursive: true, force: true })
+    symlinkSync(outside, join(root, RUN_BUNDLE_PATHS.kb))
+    const result = regenerateCatalog(root)
+    expect(result.written).toBe(false)
+    expect(result.warnings.some(warning => warning.includes('symlink'))).toBe(true)
+    expect(existsSync(join(outside, 'deliverables-index.json'))).toBe(false)
+    rmSync(outside, { recursive: true, force: true })
+  })
+
+  it('catalog 索引是 symlink → 读面 corrupt，不返回外部条目', () => {
+    const root = workspace()
+    const outside = mkdtempSync(join(tmpdir(), 'catalog-outside-index-'))
+    writeFileSync(join(outside, 'index.json'), JSON.stringify({ schema: 1, generatedAt: 'x', entries: [{ slug: 'fake' }], counts: {} }))
+    mkdirSync(join(root, RUN_BUNDLE_PATHS.kb), { recursive: true })
+    symlinkSync(join(outside, 'index.json'), join(root, RUN_BUNDLE_PATHS.catalog))
+    expect(readCatalogState(root).status).toBe('corrupt')
+    rmSync(outside, { recursive: true, force: true })
+  })
+
+  it('presented 账本 symlink → corrupt；审计 symlink final → 拒绝且不写账本', () => {
+    const root = workspace()
+    const y = deliverable(root, `${RUN_BUNDLE_PATHS.deliverables}/2026-10-25-y`)
+    const xDir = join(root, RUN_BUNDLE_PATHS.deliverables, '2026-10-25-x')
+    mkdirSync(xDir, { recursive: true })
+    symlinkSync(join(y, 'final.md'), join(xDir, 'final.md'))
+    const audit = setPresentedAudit(root, `${RUN_BUNDLE_PATHS.deliverables}/2026-10-25-x/final.md`, true)
+    expect(audit.ledger).toBeUndefined()
+    expect(audit.warning).toContain('symlink')
+    expect(readPresentedLedger(root).status).not.toBe('ok')
+
+    const outside = mkdtempSync(join(tmpdir(), 'catalog-outside-ledger-'))
+    writeFileSync(join(outside, 'ledger.json'), JSON.stringify({ schema: 1, updatedAt: 'x', paths: { fake: true }, slugs: { fake: true } }))
+    mkdirSync(join(root, RUN_BUNDLE_PATHS.kb), { recursive: true })
+    symlinkSync(join(outside, 'ledger.json'), join(root, RUN_BUNDLE_PATHS.presented))
+    expect(readPresentedLedger(root).status).toBe('corrupt')
+    rmSync(outside, { recursive: true, force: true })
+  })
+
+  it('presented 输出被目录占用 → 审计可读失败，不抛 EISDIR（BUG-138）', () => {
+    const root = workspace()
+    deliverable(root, `${RUN_BUNDLE_PATHS.deliverables}/2026-10-25-a`)
+    mkdirSync(join(root, RUN_BUNDLE_PATHS.presented), { recursive: true })
+    const result = setPresentedAudit(root, `${RUN_BUNDLE_PATHS.deliverables}/2026-10-25-a/final.md`, true)
+    expect(result.ledger).toBeUndefined()
+    expect(result.warning).toBeTruthy()
   })
 })

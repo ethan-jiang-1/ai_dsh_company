@@ -1,4 +1,5 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs'
+// 负例留证 2026-11-13：EEXIST 后直接 read/unlink ⇒ 目录锁报 generic 竞争（BUG-124）；lstat 分类即绿。
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, utimesSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -67,6 +68,34 @@ describe('同 home writer lease（2026-10-27 R2）', () => {
       expect(Math.abs(statSync(path).mtimeMs - old.getTime())).toBeLessThan(2)
       touchLease(path, 'mine')
       expect(statSync(path).mtimeMs).toBeGreaterThan(old.getTime())
+    } finally { rmSync(home, { recursive: true, force: true }) }
+  })
+
+  it('锁路径是目录/symlink → 可操作错误，不是 generic 竞争（BUG-124）', () => {
+    const home = mkdtempSync(join(tmpdir(), 'company-lease-'))
+    try {
+      mkdirSync(leasePath(home), { recursive: true })
+      const dir = acquireCompanyLease(home)
+      expect(dir.acquired).toBe(false)
+      if (!dir.acquired) expect(dir.reason).toContain('不是普通文件')
+      rmSync(leasePath(home), { recursive: true, force: true })
+      symlinkSync(join(home, 'missing-target'), leasePath(home))
+      const link = acquireCompanyLease(home)
+      expect(link.acquired).toBe(false)
+      if (!link.acquired) expect(link.reason).toContain('symlink')
+    } finally { rmSync(home, { recursive: true, force: true }) }
+  })
+
+  it('fencing：盘上 token 被换后 touchLease 返回 false（旧 writer 应停写）', () => {
+    const home = mkdtempSync(join(tmpdir(), 'company-lease-'))
+    try {
+      const acquired = acquireCompanyLease(home)
+      expect(acquired.acquired).toBe(true)
+      if (!acquired.acquired) return
+      const original = JSON.parse(readFileSync(leasePath(home), 'utf8')).token as string
+      writeFileSync(leasePath(home), JSON.stringify({ schema: 1, pid: process.ppid, token: 'new-owner', startedAt: 'x' }))
+      expect(touchLease(leasePath(home), original)).toBe(false)
+      acquired.release()
     } finally { rmSync(home, { recursive: true, force: true }) }
   })
 })

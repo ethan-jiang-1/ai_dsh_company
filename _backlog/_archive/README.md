@@ -16,6 +16,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-140（撤回）](settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md) | 已结（撤回）：真页面默认新空会话；显式选中任务会话后任务板 (2)，原文保留测试方法证据 | 2026-11-13 |
 | [2026-11-12-startup-strategy-wiki-regression-exploration.md](settled_issues/2026-11-12-startup-strategy-wiki-regression-exploration.md) | 已结；启动策略（界面）+ wiki 知识地图（配置）回归/探索：A1–A5 / B1–B8 + named child；10 张 BUG-080..089；未证 teammate/workflow 等；去向 = none（只产证据/BUG 卡） | 2026-11-12 |
 | [2026-11-12-wiki-knowledge-map-landing.md](settled_issues/2026-11-12-wiki-knowledge-map-landing.md) | 已结；wiki 模板（AK 三层 + OKF 最小 frontmatter）+ 六角色共享协议 skill + 指针三档校验 + 注入按位置分档；verify/test(233 files/1723)/typecheck/preset-smoke 全绿 + 外部只读真会话实测；去向 = [Note](../../notes/implemented/2026-11-12-wiki-knowledge-map-landing.md) | 2026-11-12 |
 | [2026-11-12-startup-settings-landing.md](settled_issues/2026-11-12-startup-settings-landing.md) | 已结；composer 入口 + 右栏「策略」页签（三字段、首项自动、选项从 content 枚举）+ workspace 级 `startup.json` + `company:startup-settings` 软注入；verify/test(231 files/1704)/typecheck/ui-scene-smoke(10 页签) 全绿；去向 = [Note](../../notes/implemented/2026-11-12-startup-settings.md) | 2026-11-12 |
@@ -218,6 +219,38 @@
 | [BUG-077-teammate-header-omits-team-collaboration.md](fixed_bugs/BUG-077-teammate-header-omits-team-collaboration.md) | team 拆 `team collaboration` / `team spawn (Lead only)`；teammate 列协作、注入 member section | 2026-11-11 |
 | [BUG-078-teammate-dead-subagent-control-tools.md](fixed_bugs/BUG-078-teammate-dead-subagent-control-tools.md) | control 按座位/child 能力装：CEO teammate 无，vp-eng teammate 保留 | 2026-11-11 |
 | [BUG-079-ceo-teammate-spawn-header-no-child-channel.md](fixed_bugs/BUG-079-ceo-teammate-spawn-header-no-child-channel.md) | spawn/fork/retry 按 `childDepth > depth` 门控；CEO teammate 无 spawn，vp-eng teammate 保留；control 消费同一座位 | 2026-11-11 |
+| [BUG-114](fixed_bugs/BUG-114-governance-export-corrupt-ledger-drops-old-snapshot.md) | --- | 2026-11-13 |
+| [BUG-115](fixed_bugs/BUG-115-lease-takeover-no-fencing-old-writer.md) | --- | 2026-11-13 |
+| [BUG-116](fixed_bugs/BUG-116-release-inventory-misses-wiki-template-shared-skill.md) | --- | 2026-11-13 |
+| [BUG-117](fixed_bugs/BUG-117-cultivation-adopt-as-missing-slug.md) | --- | 2026-11-13 |
+| [BUG-118](fixed_bugs/BUG-118-member-events-dropped-without-team-projection.md) | --- | 2026-11-13 |
+| [BUG-119](fixed_bugs/BUG-119-lease-blocked-host-writes-startup-options.md) | --- | 2026-11-13 |
+| [BUG-120](fixed_bugs/BUG-120-startup-settings-dangerous-session-cwd.md) | --- | 2026-11-13 |
+| [BUG-121](fixed_bugs/BUG-121-company-settings-blocked-host-writes.md) | --- | 2026-11-13 |
+| [BUG-122](fixed_bugs/BUG-122-catalog-root-file-symlink-enotdir.md) | --- | 2026-11-13 |
+| [BUG-123](fixed_bugs/BUG-123-startup-json-corrupt-silent-auto.md) | --- | 2026-11-13 |
+| [BUG-124](fixed_bugs/BUG-124-lease-lock-directory-path-blocks.md) | --- | 2026-11-13 |
+| [BUG-125](fixed_bugs/BUG-125-audit-symlink-canonicalizes-to-target.md) | --- | 2026-11-13 |
+| [BUG-126](fixed_bugs/BUG-126-workflow-concurrent-same-name-pairing-swap.md) | --- | 2026-11-13 |
+| [BUG-127](fixed_bugs/BUG-127-cultivation-records-file-throws.md) | --- | 2026-11-13 |
+| [BUG-128](fixed_bugs/BUG-128-bootstrap-replace-follows-symlink-write-outside.md) | --- | 2026-11-13 |
+| [BUG-129](fixed_bugs/BUG-129-dsh-company-symlink-root-writes-outside.md) | --- | 2026-11-13 |
+| [BUG-130](fixed_bugs/BUG-130-cultivation-write-root-throws.md) | --- | 2026-11-13 |
+| [BUG-131](fixed_bugs/BUG-131-kb-symlink-catalog-writes-outside.md) | --- | 2026-11-13 |
+| [BUG-132](fixed_bugs/BUG-132-catalog-index-path-directory-eisdir.md) | --- | 2026-11-13 |
+| [BUG-133](fixed_bugs/BUG-133-startup-json-directory-eisdir.md) | --- | 2026-11-13 |
+| [BUG-134](fixed_bugs/BUG-134-dsh-company-symlink-command-read-outside.md) | --- | 2026-11-13 |
+| [BUG-135](fixed_bugs/BUG-135-catalog-index-symlink-read-outside.md) | --- | 2026-11-13 |
+| [BUG-136](fixed_bugs/BUG-136-startup-settings-symlink-read-outside.md) | --- | 2026-11-13 |
+| [BUG-137](fixed_bugs/BUG-137-presented-ledger-symlink-read-outside.md) | --- | 2026-11-13 |
+| [BUG-138](fixed_bugs/BUG-138-presented-ledger-directory-eisdir.md) | --- | 2026-11-13 |
+| [BUG-139](fixed_bugs/BUG-139-cultivation-verify-after-revoke.md) | --- | 2026-11-13 |
+| [BUG-141](fixed_bugs/BUG-141-cultivation-adopt-reject-verify-throws.md) | --- | 2026-11-13 |
+| [BUG-142](fixed_bugs/BUG-142-bootstrap-replace-directory-eisdir.md) | --- | 2026-11-13 |
+| [BUG-143](fixed_bugs/BUG-143-bootstrap-directory-entry-eexist.md) | --- | 2026-11-13 |
+| [BUG-144](fixed_bugs/BUG-144-write-gate-bypassed-by-direct-company-writes.md) | --- | 2026-11-13 |
+| [BUG-145](fixed_bugs/BUG-145-team-with-event-tasks-partial-view-crash.md) | --- | 2026-11-13 |
+| [BUG-146](fixed_bugs/BUG-146-use-company-data-agent-team-projection-oom.md) | --- | 2026-11-13 |
 | [BUG-104](fixed_bugs/BUG-104-team-task-merge-no-revision-null-view.md) | 任务板 merge 按 revision/null 基座；取消认领清 owner | 2026-11-13 |
 | [BUG-105](fixed_bugs/BUG-105-stream-error-not-rendered-in-board-dag-tasks.md) | board/dag/tasks 统一渲染 streamError（投影可能过期） | 2026-11-13 |
 | [BUG-106](fixed_bugs/BUG-106-lease-pid-reuse-blocks-writer.md) | lease heartbeat mtime；PID 复用旧锁可接管并 warning | 2026-11-13 |

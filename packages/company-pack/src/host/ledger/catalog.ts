@@ -4,8 +4,7 @@
  * 本文件只留「扫描交付物根 + 生成派生索引（幂等）」；读取/校验 = catalog-state.ts，
  * 审计账本 = presented-ledger.ts。索引 `kb/deliverables-index.json` 是盘上 meta/final + 账本的派生视图。
  */
-import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   buildDeliverablesCatalog,
@@ -21,6 +20,7 @@ import {
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
 import { catalogPath, readCatalogState } from '../ledger/catalog-state.ts'
 import { plainFileProblem } from '../fs/safe-file.ts'
+import { ensureCompanyDir, writeCompanyAtomic } from '../run-bundle/company-root.ts'
 import { emptyPresentedLedger, presentedOf, readPresentedLedger, type PresentedLedger } from '../ledger/presented-ledger.ts'
 
 export { CATALOG_REL, catalogPath, readCatalog, readCatalogState, type CatalogReadState } from '../ledger/catalog-state.ts'
@@ -47,8 +47,16 @@ function scanEntries(companyHome: string, ledger: PresentedLedger): { entries: C
   const warnings: string[] = []
   for (const root of CATALOG_ROOTS) {
     const dir = join(companyHome, root)
-    if (!existsSync(dir)) continue
-    for (const item of readdirSync(dir, { withFileTypes: true })) {
+    let dirInfo
+    try { dirInfo = lstatSync(dir) } catch { continue }
+    if (dirInfo.isSymbolicLink()) { warnings.push(`${dir} 是 symlink，不跟随`); continue }
+    if (!dirInfo.isDirectory()) { warnings.push(`${dir} 不是目录`); continue }
+    let children
+    try { children = readdirSync(dir, { withFileTypes: true }) } catch (error) {
+      warnings.push(`${dir} 无法扫描：${(error as Error).message}`)
+      continue
+    }
+    for (const item of children) {
       if (!item.isDirectory()) continue
       const finalPath = join(dir, item.name, 'final.md')
       const finalProblem = plainFileProblem(companyHome, finalPath)
@@ -113,14 +121,23 @@ export function regenerateCatalog(companyHome: string, presented?: PresentedLedg
   if (previous !== null && JSON.stringify(previous.entries) === JSON.stringify(catalog.entries)) {
     return { written: false, catalog: previous, path, warnings }
   }
-  mkdirSync(join(companyHome, RUN_BUNDLE_PATHS.kb), { recursive: true })
-  const temporary = `${path}.${String(process.pid)}.${String(Date.now())}.${randomUUID()}.tmp`
   try {
-    writeFileSync(temporary, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8')
-    renameSync(temporary, path)
+    ensureCompanyDir(companyHome, 'kb', { create: true })
   } catch (error) {
-    try { rmSync(temporary, { force: true }) } catch { /* 保留原错误 */ }
-    throw error
+    warnings.push(`catalog 输出目录不安全：${(error as Error).message}`)
+    return { written: false, catalog: previous, path, warnings }
+  }
+  let targetInfo
+  try { targetInfo = lstatSync(path) } catch { targetInfo = null }
+  if (targetInfo !== null && targetInfo.isDirectory()) {
+    warnings.push(`${path} 被目录占用，未写 catalog`)
+    return { written: false, catalog: previous, path, warnings }
+  }
+  try {
+    writeCompanyAtomic(companyHome, RUN_BUNDLE_PATHS.catalog, `${JSON.stringify(catalog, null, 2)}\n`)
+  } catch (error) {
+    warnings.push(`catalog 写入失败：${(error as Error).message}`)
+    return { written: false, catalog: previous, path, warnings }
   }
   return { written: true, catalog, path, warnings }
 }

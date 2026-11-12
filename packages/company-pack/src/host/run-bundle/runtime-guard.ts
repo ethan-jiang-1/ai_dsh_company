@@ -20,6 +20,7 @@ import { acquireCompanyLease } from '../run-bundle/lease.ts'
 import { profilesWithCompanyPack } from '../run-bundle/profiles.ts'
 import { canonicalPath } from '../run-bundle/paths.ts'
 import { readSavedWorkspace, resolveWorkspace, writeSavedWorkspace, type WorkspaceSource } from '../workspace/workspace-resolution.ts'
+import { blockCompanyWrites, unblockCompanyWrites } from './write-gate.ts'
 
 /** 一次 apply 的运行前提（后续注册与自举都从这里取事实）。 */
 export interface CompanyRuntime {
@@ -83,7 +84,9 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
   if (!lease.acquired) {
     warn(ctx, `company-pack：${lease.reason}；公司数据已停写（DSH 会话仍可用），先关掉另一个 writer`)
     block(`writer lease 被占用：${lease.reason}`)
+    blockCompanyWrites(lease.reason)
   } else {
+    unblockCompanyWrites()
     if (lease.warning !== undefined) warn(ctx, `company-pack：${lease.warning}`)
     const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
     if (typeof effect === 'function') effect.call(ctx, () => () => lease.release())

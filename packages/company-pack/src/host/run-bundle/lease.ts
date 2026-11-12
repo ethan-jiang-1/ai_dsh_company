@@ -9,8 +9,9 @@
  * 它是“防静默互写”的护栏，不是高可用锁。
  */
 import { randomUUID } from 'node:crypto'
-import { readFileSync, statSync, unlinkSync, utimesSync, writeFileSync } from 'node:fs'
+import { lstatSync, readFileSync, statSync, unlinkSync, utimesSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { blockCompanyWrites, unblockCompanyWrites } from './write-gate.ts'
 
 export const LEASE_FILENAME = 'company-pack.lock'
 
@@ -57,14 +58,17 @@ function leaseAgeMs(path: string, now: Date): number {
 }
 
 /** 心跳：只在 token 仍属于自己时 touch mtime，不覆盖别人的锁。 */
-export function touchLease(path: string, token: string): void {
+export function touchLease(path: string, token: string): boolean {
   try {
     const current = parseHolder(readFileSync(path, 'utf8'))
-    if (current?.token === token) {
-      const now = new Date()
-      utimesSync(path, now, now)
-    }
-  } catch { /* 锁已被删/替换：下次 release 自然不删别人的 */ }
+    if (current?.token !== token) return false
+    const now = new Date()
+    utimesSync(path, now, now)
+    return true
+  } catch {
+    // 锁被删/替换：旧 writer 必须停止写，不能静默继续。
+    return false
+  }
 }
 
 function parseHolder(text: string): LeaseHolder | null {
@@ -115,7 +119,10 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
       writeFileSync(path, text, { flag: 'wx' })
-      const timer = setInterval(() => { touchLease(path, holder.token) }, LEASE_HEARTBEAT_MS)
+      unblockCompanyWrites()
+      const timer = setInterval(() => {
+        if (!touchLease(path, holder.token)) blockCompanyWrites('writer lease 已被接管（盘上 token 已变化），本 host 停止写公司数据')
+      }, LEASE_HEARTBEAT_MS)
       ;(timer as unknown as { unref?: () => void }).unref?.()
       held.set(path, { holder, refs: 1, timer })
       return {
@@ -137,6 +144,17 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {
         return { acquired: false, path, reason: `无法写 writer lease：${(error as Error).message}` }
+      }
+    }
+    // 锁路径可能是目录/symlink（BUG-124）：形状先 fail loud，不把「读不了」当竞争。
+    let lockInfo
+    try { lockInfo = lstatSync(path) } catch { lockInfo = null }
+    if (lockInfo !== null) {
+      if (lockInfo.isSymbolicLink()) {
+        return { acquired: false, path, reason: `writer lease 路径是 symlink，拒绝：${path}（请手工删除该链接后重试）` }
+      }
+      if (!lockInfo.isFile()) {
+        return { acquired: false, path, reason: `writer lease 路径不是普通文件（目录？）：${path}（删除后重试）` }
       }
     }
     let current: LeaseHolder | null = null

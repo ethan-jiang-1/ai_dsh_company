@@ -4,11 +4,11 @@
  * 只做「读盘 + schema 校验 + 坏形状报错」；生成/扫描在 catalog.ts，审计账本在 presented-ledger.ts。
  * 拆出原因：ledger 的旧索引迁移要读 catalog，若 ledger 反向 import catalog 会成环；读取面独立成叶。
  */
-import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { DeliverablesCatalog } from '../../lib/deliverables-catalog.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
 import { isRecord } from '../../lib/guards.ts'
+import { companyFileProblem, readCompanyText } from '../run-bundle/company-root.ts'
 
 export const CATALOG_REL = RUN_BUNDLE_PATHS.catalog
 
@@ -25,10 +25,13 @@ export type CatalogReadState =
  * @param companyHome - 公司盘根。
  */
 export function readCatalogState(companyHome: string): CatalogReadState {
-  const path = catalogPath(companyHome)
+  const problem = companyFileProblem(companyHome, CATALOG_REL)
+  if (problem === 'missing') return { status: 'missing' }
+  if (problem === 'unsafe') return { status: 'corrupt', error: 'catalog 路径不安全（symlink/目录/越界），拒绝读取' }
   try {
-    if (!existsSync(path)) return { status: 'missing' }
-    const raw: unknown = JSON.parse(readFileSync(path, 'utf8'))
+    const text = readCompanyText(companyHome, CATALOG_REL)
+    if (text === undefined) return { status: 'corrupt', error: 'catalog 不可读' }
+    const raw: unknown = JSON.parse(text)
     if (!isRecord(raw)) return { status: 'corrupt', error: '不是对象' }
     const schema = raw.schema
     if (typeof schema !== 'number' || !Number.isSafeInteger(schema) || schema < 1) {

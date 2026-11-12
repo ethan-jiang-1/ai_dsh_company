@@ -4,12 +4,11 @@
  * 账本是 `presented` 的权威：true 来自会话事件，false 是操作员审计；索引只读它。
  * catalog.ts 保留目录扫描/生成；账本 I/O、迁移、观测抽取归本文件。
  */
-import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
-import { dirname, isAbsolute, join, relative } from 'node:path'
+import { isAbsolute, join, relative, resolve } from 'node:path'
 import { normalizeRel, slugFromDirName, type DeliverablesCatalog } from '../../lib/deliverables-catalog.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
 import { isRecord } from '../../lib/guards.ts'
+import { companyFileProblem, readCompanyText, writeCompanyAtomic } from '../run-bundle/company-root.ts'
 import { canonicalPath } from '../run-bundle/paths.ts'
 import { readCatalog } from '../ledger/catalog-state.ts'
 
@@ -42,9 +41,13 @@ function validateBooleanMap(value: unknown): value is Record<string, boolean> {
 
 export function readPresentedLedger(companyHome: string): PresentedLedgerState {
   const path = presentedLedgerPath(companyHome)
+  const problem = companyFileProblem(companyHome, RUN_BUNDLE_PATHS.presented)
+  if (problem === 'missing') return { status: 'missing', path }
+  if (problem === 'unsafe') return { status: 'corrupt', path, error: '账本路径不安全（symlink/目录/越界），拒绝读取' }
   try {
-    if (!existsSync(path)) return { status: 'missing', path }
-    const raw: unknown = JSON.parse(readFileSync(path, 'utf8'))
+    const text = readCompanyText(companyHome, RUN_BUNDLE_PATHS.presented)
+    if (text === undefined) return { status: 'corrupt', path, error: '账本不可读' }
+    const raw: unknown = JSON.parse(text)
     if (!isRecord(raw)) return { status: 'corrupt', path, error: '不是对象' }
     const schema = raw.schema
     if (typeof schema !== 'number' || !Number.isSafeInteger(schema) || schema < 1) {
@@ -69,20 +72,8 @@ export interface PresentedObservation {
   readonly slugs?: Iterable<string>
 }
 
-function writeJsonAtomic(path: string, value: unknown): void {
-  mkdirSync(dirname(path), { recursive: true })
-  const temporary = `${path}.${String(process.pid)}.${String(Date.now())}.${randomUUID()}.tmp`
-  try {
-    writeFileSync(temporary, `${JSON.stringify(value, null, 2)}\n`, 'utf8')
-    renameSync(temporary, path)
-  } catch (error) {
-    try { rmSync(temporary, { force: true }) } catch { /* 保留原错误 */ }
-    throw error
-  }
-}
-
 export function writePresentedLedger(companyHome: string, ledger: PresentedLedger): void {
-  writeJsonAtomic(presentedLedgerPath(companyHome), ledger)
+  writeCompanyAtomic(companyHome, RUN_BUNDLE_PATHS.presented, `${JSON.stringify(ledger, null, 2)}\n`)
 }
 
 /** 合并一次观测（只把 true 写进账本；present 事件是“已声明”，不是 false）。 */
@@ -191,9 +182,10 @@ export function auditRelPath(
   companyHome: string,
   rawPath: string,
 ): { readonly rel?: string; readonly warning?: string } {
-  const root = canonicalPath(companyHome)
+  const root = resolve(companyHome)
   const absolute = isAbsolute(rawPath) ? rawPath : join(root, rawPath)
-  const rel = normalizeRel(relative(root, canonicalPath(absolute)))
+  // 不 canonical 化：审计语义是「用户给的那条路径」；symlink 由 auditTargetProblem 拒绝（BUG-125）。
+  const rel = normalizeRel(relative(root, resolve(absolute)))
   if (rel === '' || rel.startsWith('..') || isAbsolute(rel) || !rel.endsWith('/final.md')) {
     return { warning: `审计路径必须是 .dsh-company/deliverables/<dir>/final.md 或 .dsh-company/deliverables-archive/<dir>/final.md：${rawPath}` }
   }
@@ -208,11 +200,10 @@ export function auditRelPath(
  * 只校验路径形状会让一次 typo 在账本里给未来同 slug 的成品预先背书。
  */
 export function auditTargetProblem(companyHome: string, rel: string): string | undefined {
-  try {
-    return statSync(join(companyHome, rel)).isFile() ? undefined : `审计目标不是普通文件：${rel}`
-  } catch {
-    return `审计目标不存在：${rel}（先落 final.md 再审计）`
-  }
+  const problem = companyFileProblem(companyHome, rel)
+  if (problem === null) return undefined
+  if (problem === 'missing') return `审计目标不存在：${rel}（先落 final.md 再审计）`
+  return `审计目标不是普通文件（symlink/目录/越界）：${rel}`
 }
 
 /**
@@ -250,7 +241,11 @@ export function setPresentedAudit(
     const slug = slugFromDirName(rel.split('/').slice(-2)[0] ?? '')
     if (slug !== '') next = { ...next, slugs: { ...next.slugs, [slug]: true } }
   }
-  writePresentedLedger(companyHome, next)
+  try {
+    writePresentedLedger(companyHome, next)
+  } catch (error) {
+    return { warning: `审计未写账本：${(error as Error).message}` }
+  }
   return { ledger: next, path: rel }
 }
 

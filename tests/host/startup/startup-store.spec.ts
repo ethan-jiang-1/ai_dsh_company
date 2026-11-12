@@ -1,3 +1,4 @@
+// 负例留证 2026-11-13：坏 JSON 仍 parseStartupSettings ⇒ problem 缺失、显示 auto（BUG-123）；state 解析即绿。
 /**
  * 启动策略落盘层的 keyless 判据（2026-11-12）。
  *
@@ -17,6 +18,7 @@ import {
   enumerateStartupOptions,
   readStartupOptions,
   readStartupSettings,
+  readStartupSettingsState,
   refreshStartupOptions,
   resolveWikiDir,
   startupOptionsPath,
@@ -170,5 +172,27 @@ describe('wiki 指针的真实路径判据（盘上事实）', () => {
     const content = workspace()
     expect(enumerateStartupOptions(content).wikiTemplate).toBe(join(content, 'wiki-template'))
     expect(enumerateStartupOptions(undefined).wikiTemplate).toBeNull()
+  })
+})
+
+describe('startup 坏文件诊断（BUG-123/136）', () => {
+  it('坏 JSON → problem=corrupt；symlink → unsafe 且不采用外部值', () => {
+    const root = workspace()
+    writeStartupSettings(root, { ...EMPTY_STARTUP_SETTINGS, productType: 'business-software' })
+    writeFileSync(startupSettingsPath(root), '{"v":1,"productType":')
+    expect(readStartupSettingsState(root)).toMatchObject({ problem: 'corrupt' })
+
+    const outside = workspace()
+    writeFileSync(join(outside, 's.json'), JSON.stringify({ v: 1, productType: 'hardware-software', deliveryMode: null, wiki: null }))
+    rmSync(startupSettingsPath(root), { force: true })
+    symlinkSync(join(outside, 's.json'), startupSettingsPath(root))
+    expect(readStartupSettingsState(root).problem).toBe('unsafe')
+    expect(readStartupSettingsState(root).settings.productType).toBeNull()
+  })
+
+  it('输出被目录占用 → 写抛 typed error', () => {
+    const root = workspace()
+    mkdirSync(startupSettingsPath(root), { recursive: true })
+    expect(() => writeStartupSettings(root, EMPTY_STARTUP_SETTINGS)).toThrow(/目录占用/)
   })
 })

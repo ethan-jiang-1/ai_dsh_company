@@ -8,6 +8,7 @@
  *
  * 边界：只处理本包自己写出的 pending；外部手改过的记录不覆盖（报 conflict，留日志给人看）。
  */
+import { assertCompanyWritesAllowed } from '../run-bundle/write-gate.ts'
 import { isRecord } from '../../lib/guards.ts'
 import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
@@ -66,6 +67,7 @@ export function readPendingRevoke(companyRoot: string): PendingRevoke | null {
 }
 
 export function writePendingRevoke(companyRoot: string, pending: PendingRevoke): void {
+  assertCompanyWritesAllowed()
   const path = pendingRevokePath(companyRoot)
   mkdirSync(dirname(path), { recursive: true })
   const temporary = `${path}.${String(process.pid)}.${String(Date.now())}.${randomUUID()}.tmp`
@@ -79,6 +81,7 @@ export function writePendingRevoke(companyRoot: string, pending: PendingRevoke):
 }
 
 export function clearPendingRevoke(companyRoot: string): void {
+  assertCompanyWritesAllowed()
   rmSync(pendingRevokePath(companyRoot), { force: true })
 }
 

@@ -181,6 +181,40 @@ function cleanList(value: unknown): string[] {
  * @param text - 文件原文（缺失给 undefined/null）。
  * @returns 归一后的设置。
  */
+/** `startup.json` 的读取诊断：空/缺失 = 合法 auto；坏 JSON/坏形状 = corrupt；未来 schema = unsupported。 */
+export type StartupSettingsProblem = 'corrupt' | 'unsupported' | null
+
+export interface StartupSettingsState {
+  readonly settings: StartupSettings
+  readonly problem: StartupSettingsProblem
+}
+
+/** 解析并诊断 `startup.json`：损坏单独报，不伪装成用户选择（BUG-123/136）。 */
+export function parseStartupSettingsState(text: string | null | undefined): StartupSettingsState {
+  if (typeof text !== 'string' || text.trim() === '') return { settings: EMPTY_STARTUP_SETTINGS, problem: null }
+  let raw: unknown
+  try {
+    raw = JSON.parse(text)
+  } catch {
+    return { settings: EMPTY_STARTUP_SETTINGS, problem: 'corrupt' }
+  }
+  if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) return { settings: EMPTY_STARTUP_SETTINGS, problem: 'corrupt' }
+  const record = raw as Record<string, unknown>
+  if (record.v !== 1) {
+    return { settings: EMPTY_STARTUP_SETTINGS, problem: typeof record.v === 'number' && record.v > 1 ? 'unsupported' : 'corrupt' }
+  }
+  return {
+    settings: {
+      v: 1,
+      productType: cleanScalar(record.productType),
+      deliveryMode: cleanScalar(record.deliveryMode),
+      wiki: cleanScalar(record.wiki),
+      updatedAt: cleanScalar(record.updatedAt),
+    },
+    problem: null,
+  }
+}
+
 export function parseStartupSettings(text: string | null | undefined): StartupSettings {
   if (typeof text !== 'string' || text.trim() === '') return EMPTY_STARTUP_SETTINGS
   let raw: unknown

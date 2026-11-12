@@ -2,15 +2,34 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮拿到 ≥3 张卡，先按根因分组列表再逐卡修——逐症状打补丁会把同一根因修三遍。
 
-**下一个缺陷号**：Next BUG ID = 114；已分配 BUG-001..113。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 147；已分配 BUG-001..146。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。
 
 ## 活跃清单
 
-**空**（2026-11-13 第二轮全部收口：BUG-104..113 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）。
+**空**（2026-11-13 第三轮全部收口：BUG-114..139、141..145 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；
+BUG-140 经复核不成立，已迁 [settled_issues](../_archive/settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md)）。
 
 **2026-11-12 收口**：BUG-080..089 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+
+## 2026-11-13 修复交接（第三轮，根因组 A–F：BUG-114..145）
+
+**用户指令（2026-11-13）**：「_backlog/bugs 这里又找到一堆bug……setup goal 静默，自主执行……直到所有bug解决了」；
+本轮 30 张卡 + 期间新增 144/145，BUG-140 由探索复核撤回（测试选址，非产品缺陷）。本句即授权，留痕 = Note。
+终点 = 活跃清单清零、卡全部迁 [fixed_bugs](../_archive/fixed_bugs/) 且 `审查：`/证据齐。
+
+| 组 | 卡 | 同一根因 | 修法 |
+|---|---|---|---|
+| **A 状态根/形状** | 122/128/129/131/132/134/135/136/137/142/143/133/138/125 | `.dsh-company` 根/中间目录/叶子被 symlink 或文件替换，各自 join 后直读直写 | 共享 `company-root`（逐级 lstat + realpath + 原子写）；catalog/ledger/startup/bootstrap/命令统一 |
+| **B 写 gate/lease** | 115/119/121/124/144 | lease 只在 boot 取一次；gate 靠调用点记得调 | `write-gate` + heartbeat token 校验 + 锁路径 lstat；旧写入口全接 gate |
+| **C startup** | 120/123 | 坏 JSON 当 auto；危险 cwd 写盘 | `parseStartupSettingsState` + `resolveStartupWorkspace` + writable |
+| **D 培养边界** | 117/127/130/139/141 | typed error 只在部分命令收口；adopt 可选短语缺参静默；verify 不看 revoked | 命令边界统一 catch；严格 adopt 形状；revoke 后拒 verify |
+| **E 客户端/workflow** | 118/126/140/145 | 投影缺席/partial 崩；同名并发配对互换；任务板只信 store | null/partial 基座补 member；FIFO 配对；槽 projection 兜底 |
+| **F 发布/导出** | 114/116 | 整目录替换删旧件；发布清单漏模板/共享 skill | staging 带旧件；must + release-smoke 断言 |
+
+**收口**：`pnpm test` 238 files / 1827 tests、`typecheck`/`lint`/`dup`/`verify` 全绿。
+证据与未验面 = [Note](../../notes/implemented/2026-11-13-state-root-write-gate-sweep.md)。
 
 ## 2026-11-13 修复交接（第二轮，根因组 S1–S6：BUG-104..113）
 
@@ -27,7 +46,7 @@
 | **S5 路径空白** | [107](../_archive/fixed_bugs/BUG-107-deliverables-audit-multi-space-path.md) | split+join 折叠连续空格 | 取原始剩余串 |
 | **S6 lease PID 复用** | [106](../_archive/fixed_bugs/BUG-106-lease-pid-reuse-blocks-writer.md) | 只用 PID 存活判 stale | heartbeat mtime + 过期接管 + warning |
 
-**收口**：10 张卡全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；`pnpm test` 236 files / 1799 tests、
+**收口**：10 张卡全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；`pnpm test` 238 files / 1827 tests、
 `typecheck`/`lint`/`dup`/`verify` 全绿。证据与未验面 = [Note](../../notes/implemented/2026-11-13-followup-bug-sweep.md)。
 
 ## 2026-11-13 修复交接（根因组 G1–G7：BUG-090..103）

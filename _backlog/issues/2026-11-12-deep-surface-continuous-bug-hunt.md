@@ -395,6 +395,665 @@ opened: 2026-11-12
 
 **未跑：** 真页面/真 WebSocket 断流（BUG-105 的视觉证据）；`exportGovernance` rename 失败的真实注入（BUG-110 为代码路径 + 推演）；`writeSavedWorkspace` 崩溃样本（BUG-111 为静态）；`/req` `/delivery` 的 symlink 复验（与 /prd 同 reader）。
 
+## Round 16（BUG-104..113 修复后的第三轮回归：S2/S3/S6/S7）
+
+**背景：** 另一 A 在未提交工作树中修了 10 张卡（236 files / 1799 tests）。本轮只读回归 + 相邻边界，开 3 张新卡，不改产品代码。
+
+| 卡 | 面 | 判定 |
+|---|---|---|
+| [BUG-114](../_archive/fixed_bugs/BUG-114-governance-export-corrupt-ledger-drops-old-snapshot.md) | S3 导出 | `exportGovernance` 账本 corrupt/undef 时整个 exports 替换，旧 `ledger.json` 被删；warning 说「保留上次快照」与实际相反 |
+| [BUG-115](../_archive/fixed_bugs/BUG-115-lease-takeover-no-fencing-old-writer.md) | S6 lease | heartbeat stale 接管只换锁，不 fence 旧 writer；旧 host 恢复后两边都写（实测 child+parent 同时 acquired） |
+| [BUG-116](../_archive/fixed_bugs/BUG-116-release-inventory-misses-wiki-template-shared-skill.md) | C7 发布 | `export-dist` `must` 与 `release-smoke` content 清单不含 wiki-template/共享 skill；缺包仍绿 |
+
+**证据脚本/实跑：**
+
+- `runtime/tmp/newbugs-export-preserve.mts`：旧 ledger 存在，corrupt 导出 → `ledger exists false`。
+- `runtime/tmp/newbugs-live-takeover.mts`：子进程 ACQUIRED，父进程 `now+130s` 接管 acquired。
+- `tools/export-dist.mjs` / `release-smoke` 清单静态对读；当前 tarball 实含模板与共享 skill（本轮 `tar -tzf`）。
+
+**判定：** 3 张新卡；S3/S6/C7 的修复没有覆盖「部分生成仍整体替换」「接管后 fencing」「非 manifest 内容清单」三个边界。修复 Note 已把 lease 双写仲裁列为剩余风险，本卡把它材料化。
+
+## Round 17（C1 培养命令 / adopt 形状）
+
+**选面理由：** C1 的 adopt/revoke 是写状态命令；上一轮只回归了 revoke/check，adopt 的短语解析还没被对抗样本打过。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `adopt <id> as`（缺 slug） | **confirmed P2** | [BUG-117](../_archive/fixed_bugs/BUG-117-cultivation-adopt-as-missing-slug.md)：tokens[3] undefined 被当成「未提供 as」，静默部署 `method-<id>` 并 success。 |
+| `adopt <id> asx <slug>` / 多余 token | **同根因（未单独开卡）** | 解析只认 tokens[2]==='as'，其余形状回默认；卡内列为修复 spec。 |
+| `adopt <id>` 默认 slug | pass（设计） | 仍 success，部署 `method-<id>`；这是合法用法。 |
+| `adopt` 已采纳/已拒绝/角色不符/方法已存在 | pass（spec） | 现有 15 个 cultivation-command spec 全绿。 |
+
+**证据脚本：** `runtime/tmp/newbugs-adopt-malformed.mts`（真 handler + 临时培养盘）。
+
+**未跑：** `adopt` 后崩溃/回滚、方法层安装失败、`revoke --orphan` 与 adopt 交错。
+
+## Round 18（C5 null 投影：member 事件）
+
+**选面理由：** BUG-104 修了 null 投影 + task 事件；本轮检查同一基座下的 `team/member`，看两个读模型是否一致。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| null 投影 + `team/member` | **confirmed P2** | [BUG-118](../_archive/fixed_bugs/BUG-118-member-events-dropped-without-team-projection.md)：`teamWithEventTasks(null,[member])` → null；`presenceFromEvents` 已能出成员行/「上线」动态。 |
+| null 投影 + task | pass（BUG-104） | task 事件建最小视图。 |
+| 有投影 + member | pass | projection members 提供行；follow 只补 activity。 |
+
+**证据脚本：** `runtime/tmp/newbugs-member-null-view.mts`（纯函数，真事件形状）。
+
+**未跑：** 真浏览器断投影视觉；member+task 混合；projection 失败 `failure` 字段的 UI 呈现。
+
+## Round 19（C3 lease 写 gate：startup settings）
+
+**选面理由：** BUG-115 暴露 lease 接管无 fencing；本轮检查「dataBlocked 的 host 还有哪些写路径」，从命令/自举/成品目录扩到 per-agent startup settings。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| lease blocked 的第二 host 写 startup options | **confirmed P2** | [BUG-119](../_archive/fixed_bugs/BUG-119-lease-blocked-host-writes-startup-options.md)：同 home 锁被 live PID 占，host 已报「公司数据已停写」，建 CEO 会话后 `$WS/.dsh-company/startup-options.json` 仍出现。 |
+| lease blocked 的 commands/自举/成品目录 | pass（现有 gate） | `dataBlocked` 传给命令、`ensureRunBundle`、`initializeCatalog`、present handler、`exportNow`。 |
+| lease blocked 的 catalog 写 | pass | `ledgerStorePromise` 在 `hasWorkspace && !runtime.dataBlocked` 才创建。 |
+
+**证据脚本：** `runtime/tmp/newbugs-blocked-startup.mjs`（真 startWeb + 真 profile + 临时 home/workspace + live lock；`options exists true`）。
+
+**未跑：** 两个真 host 同时启动的 startup-options 竞态；`startup-settings.json` 写入路径；watcher 事件在 blocked host 上的写。
+
+## Round 20（C3 startup 落点：session cwd 危险根）
+
+**选面理由：** BUG-119 说明 startup settings 不走 blocked gate；本轮继续查它的 workspace 判据，看 G7 的危险根是否覆盖这条 per-agent 写路径。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| session cwd = tmpdir | **confirmed P2** | [BUG-120](../_archive/fixed_bugs/BUG-120-startup-settings-dangerous-session-cwd.md)：`isDangerousRoot(tmpdir())=true`，但 `startupWorkspace('/ws', agent tmpdir)` 仍返回 tmpdir；watch 会写 `<tmpdir>/.dsh-company/startup-options.json`。 |
+| session cwd = `/tmp`/home/root | 同根因（未单独开卡） | `startupWorkspace` 不校验任何危险根；卡内列修复 spec。 |
+| boot workspace 危险 | pass（G7） | `resolveWorkspace` 已拒绝根、home、tmpdir、`/tmp` 等危险落点。 |
+| 普通子目录 cwd | 设计允许 | BUG-081/089 的多 workspace 语义；不按危险根误杀。 |
+
+**证据脚本：** `runtime/tmp/newbugs-startup-danger.mts`（纯函数 + 平台 tmpdir）。
+
+**未跑：** 真 session cwd=tmpdir 的 `startup-options.json` 实写（纯函数已证路径；实写可复用 BUG-119 脚本改 cwd）。
+
+## Round 21（C3 写 gate：/company-settings）
+
+**选面理由：** BUG-119/120 已说明 startup 写路径不统一；本轮检查人命令 `/company-settings` 是否把 `dataBlocked` 当 gate，而不只是错误文案。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| dataBlocked + `set` | **confirmed P2** | [BUG-121](../_archive/fixed_bugs/BUG-121-company-settings-blocked-host-writes.md)：注入 `dataBlocked:true` + 非空 workspace，`set productType` 仍 success，`startup.json` 写入。 |
+| dataBlocked + `reset` | 同根因 | 同一 handler 分支，未单独开卡；修复 spec 覆盖。 |
+| dataBlocked + `show` | 只读，可放行 | 现状不写；产品可选是否也 blocked。 |
+| 无 workspace + blocked | pass（现有） | 返回 blockedCompanyText。 |
+
+**证据脚本：** `runtime/tmp/newbugs-settings-blocked.mts`（真 handler、fakectx、dataBlocked=true、临时 workspace）。注意 settings 文件名是 `startup.json`（不是 startup-settings）。
+
+**未跑：** 真 blocked host 上通过 RPC 跑 `/company-settings`；刷新 watcher 的实际写（脚本 no-op）。
+
+## Round 22（C4 扫描根：deliverables 根类型）
+
+**选面理由：** G2/BUG-096/108 修了叶子 `final.md`/`meta.md` 的类型与 symlink；本轮检查**扫描根本身**（deliverables / deliverables-archive）被文件或链接替换。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| 根=普通文件 | **confirmed P2** | [BUG-122](../_archive/fixed_bugs/BUG-122-catalog-root-file-symlink-enotdir.md)：`regenerateCatalog` 直接 `ENOTDIR: not a directory, scandir …/deliverables`。 |
+| 根=symlink→目录 | 同根因（未单独开卡） | `existsSync` 后 `readdirSync` 跟随；叶子 safe-file 才按 outside 跳过，根没有 lstat。 |
+| 根=正常目录 | pass | 扫描叶子的 final/meta 仍绿。 |
+| 审计命令在坏根下 | 同根因 | audit 先写账本后 `regenerate` 抛错；命令以异常结束，账本已写。 |
+
+**证据脚本：** `runtime/tmp/newbugs-catalog-root-file.mts`（真 `regenerateCatalog` + 临时 workspace）。
+
+**未跑：** audit handler 在坏根下的真实回执；present 投影在坏根下的 warning；根 symlink 的真实扫描。
+
+## Round 23（C3 startup 持久化：损坏 settings）
+
+**选面理由：** BUG-111 已把 saved workspace 的 corrupt 做成可诊断；本轮检查同一类 `.dsh-company` 人类设置 `startup.json`，看 corruption 是否仍被折成「auto」。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| startup.json 截断 | **confirmed P2** | [BUG-123](../_archive/fixed_bugs/BUG-123-startup-json-corrupt-silent-auto.md)：`readStartupSettings` 返回 EMPTY，无 problem；`/company-settings show` 会显示全 auto，不报坏。 |
+| startup-options.json 截断 | 同根因（未单独开卡） | `readStartupOptions` 同样 catch→EMPTY；面板可能显示无可选项。 |
+| 合法 auto / 正常设置 | pass | 现有 startup store spec 绿。 |
+| saved workspace corrupt | pass（BUG-111） | 已返回 problem='corrupt'，runtime guard warn。 |
+
+**证据脚本：** `runtime/tmp/newbugs-startup-corrupt.mts`（截断 JSON → read 返回空设置）。
+
+**未跑：** `/company-settings show` 真 handler 回执；启动注入 section 的坏设置文案；options 坏文件的面板刷新。
+
+## Round 24（C3 lease 锁路径形状）
+
+**选面理由：** BUG-106/115 覆盖 PID 与 fencing；本轮检查锁**文件本身不是普通文件**（目录/symlink）时是否可诊断。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| lock 是目录 | **confirmed P2** | [BUG-124](../_archive/fixed_bugs/BUG-124-lease-lock-directory-path-blocks.md)：acquire 返回「writer lease 竞争失败（另一个进程抢先）」，无 holder、无坏形状提示；实际没有进程占锁。 |
+| lock 是 symlink→目录 | 同根因（未单独开卡） | 代码路径相同；卡内 spec 覆盖。 |
+| lock 坏 JSON/空文件 | pass（现有） | parseHolder null → unlink → 重试/接管。 |
+| lock 正常/有 holder | pass | 现有 lease spec 绿。 |
+
+**证据脚本：** `runtime/tmp/newbugs-lease-dir-lock.mts`（真 `acquireCompanyLease` + 目录锁）。
+
+**未跑：** 真 home 目录锁下的启动输出；symlink 锁的实机；lock 权限 EACCES。
+
+## Round 25（C4 审计路径：symlink canonical 化）
+
+**选面理由：** S2 已让 catalog/命令拒绝 symlink；本轮检查 `/deliverables audit` 的 canonical 化是否把「审计对象」换成链接目标。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| x/final.md → y/final.md（内部链接） | **confirmed P2** | [BUG-125](../_archive/fixed_bugs/BUG-125-audit-symlink-canonicalizes-to-target.md)：audit x 后 ledger.paths 是 y/final.md、slugs 是 y；x 未被审计。 |
+| final.md → workspace 外 | pass | auditRelPath canonical 越界 → 拒绝。 |
+| 普通 final | pass | 现有 audit spec 绿。 |
+| 目录 final | pass（BUG-099） | auditTargetProblem 拒绝非普通文件。 |
+
+**证据脚本：** `runtime/tmp/newbugs-audit-symlink-inside.mts`（真 `setPresentedAudit` + 内部 symlink）。
+
+**未跑：** 真 `/deliverables audit` handler 回执；presented-domain audit 路径；archive 中的 symlink。
+
+## Round 26（C2 workflow 并发配对）
+
+**选面理由：** BUG-097 修了「失败 call 抢下一次 run」；本轮检查修复后的贪心最近前置在同名并发 background 下是否一对一。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| 两个同名 background call + 两个 start | **confirmed P2** | [BUG-126](../_archive/fixed_bugs/BUG-126-workflow-concurrent-same-name-pairing-swap.md)：r1 拿 jobB（c2），r2 拿 jobA（c1），互换。 |
+| 单 run + 失败前置 call | pass（BUG-097） | 现有 workflow-runs spec 绿。 |
+| 结果先于 start 的启动文案 | pass（现有） | runEvidence 允许前置结果。 |
+| jobKnown live | 未跑 | 交换后 running/lost 行的影响未实机。 |
+
+**证据脚本：** `runtime/tmp/newbugs-workflow-concurrent.mts`（真 `workflowRunRows` + 两个 call/start/result）。
+
+**未跑：** 真 vendor workflow 两个 background run；children 归属；jobKnown 状态；同名三 run。
+
+## Round 27（C1 培养存储坏形状：records 根）
+
+**选面理由：** BUG-091 已修 check 对坏 record/methodSlug 的抛错；本轮检查**records 根**本身是文件/symlink 时，check/archive 是否也收成可读回执。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| records=普通文件 | **confirmed P2** | [BUG-127](../_archive/fixed_bugs/BUG-127-cultivation-records-file-throws.md)：`check` / `archive 30` 都抛 `UnsafeCultivationPathError`；revoke 已有 catch。 |
+| records=symlink | 同根因（未单独开卡） | 存储层 `recordsDirectoryState` 抛；卡内 spec 覆盖。 |
+| records=missing | pass | `reachable=false`，check/revoke 给可读错误。 |
+| 正常 records | pass | 15 个 cultivation-command spec 绿。 |
+
+**证据脚本：** `runtime/tmp/newbugs-cultivation-records-file.mts`（真 command handler + 临时培养盘，records 替换为文件）。
+
+**未跑：** 真启动下 records 文件；propose 工具写坏根；父 cultivation=symlink。
+
+## Round 28（C3 bootstrap 写路径：symlink replace）
+
+**选面理由：** S2/BUG-108/113 修了读面 symlink；本轮检查 run-bundle 自举的**写面**，特别是 `mode:'replace'` 的 `org.md`/`owners.md` 补种。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `kb/org.md` symlink→外部文件 + replace | **confirmed P1** | [BUG-128](../_archive/fixed_bugs/BUG-128-bootstrap-replace-follows-symlink-write-outside.md)：`applyBootstrap` created，外部文件被覆盖为 'REPLACED BY BOOTSTRAP'。 |
+| 父目录 `kb` symlink | 同根因（未单独开卡） | `mkdirSync`/`writeFileSync` 都跟随父 symlink；卡内 spec 覆盖。 |
+| create 模式（`wx`） | 不覆盖，但父 symlink 仍可穿 | 同族；修复要逐级 lstat/realpath。 |
+| 普通 replace | pass | 现有 bootstrap spec 绿。 |
+
+**证据脚本：** `runtime/tmp/newbugs-bootstrap-symlink-write.mts`（真 `applyBootstrap` + 临时 workspace + symlink）。
+
+**未跑：** 真 `ensureRunBundle` 首启/角色补种路径；父 `kb` symlink；owners.md；Windows。
+
+## Round 29（C3/C4 状态根：`.dsh-company` symlink）
+
+**选面理由：** BUG-128 证明文件级 symlink 可写穿；本轮检查状态根 `.dsh-company` 被整体 symlink 时，各写模块是否还有 common gate。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `.dsh-company` symlink→外部 + catalog | **confirmed P1** | [BUG-129](../_archive/fixed_bugs/BUG-129-dsh-company-symlink-root-writes-outside.md)：`regenerateCatalog` written=true，外部 `kb/deliverables-index.json` 出现。 |
+| 同根影响 export/startup/bundle/bootstrap | 同根因（未逐项实跑） | 所有写路径都 `join(workspace,'.dsh-company',…)`；卡内列四个入口。 |
+| `.dsh-company` symlink→内部目录 | 策略未定 | 卡内要求明确允许/拒绝；当前无 lstat。 |
+| 普通 `.dsh-company` 目录 | pass | 现有 catalog/bundle/startup spec 绿。 |
+
+**证据脚本：** `runtime/tmp/newbugs-company-dir-symlink.mts`（真 `regenerateCatalog` + 临时 workspace/outside + 根 symlink）。
+
+**未跑：** export/startup/bundle 四项的实写；内部 symlink；真首启；Windows。
+
+## Round 30（C1 培养写入口：records 根坏形状）
+
+**选面理由：** BUG-127 覆盖了 check/archive 的读边界；本轮检查同一 records 根坏形状下的**写入口**（correct/suggest/propose）。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| records=文件 + correct | **confirmed P2** | [BUG-130](../_archive/fixed_bugs/BUG-130-cultivation-write-root-throws.md)：command correct 抛 UnsafeCultivationPathError。 |
+| records=文件 + propose | **confirmed P2** | 同卡：tool execute 抛 UnsafeCultivationPathError；模型拿不到结构化 note。 |
+| records=missing | pass | writeRecord 建目录；正常写记录。 |
+| check/archive | BUG-127 已记 | 读边界同样抛。 |
+
+**证据脚本：** `runtime/tmp/newbugs-cultivation-write-root.mts`（真 command/tool handler + 临时培养盘，records 替换为文件）。
+
+**未跑：** 真启动下 propose 的 vendor tool-error 形状；records=symlink；父 cultivation=symlink。
+
+## Round 31（C3/C4 状态子目录：`kb` symlink）
+
+**选面理由：** BUG-129 记了 `.dsh-company` 根 symlink；本轮检查根正常、**子目录** `kb` 是 symlink 时 catalog 是否仍写穿。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `.dsh-company/kb` symlink→外部 + catalog | **confirmed P1** | [BUG-131](../_archive/fixed_bugs/BUG-131-kb-symlink-catalog-writes-outside.md)：written=true，`/outside/deliverables-index.json` 出现。 |
+| 同根影响 startup/export/bootstrap | 同根因（未逐项实跑） | 都走固定子路径；卡内列全入口。 |
+| `.dsh-company` 根 symlink | BUG-129 已记 | 根级；本卡是中间目录，修复层次更深。 |
+| `kb` 普通目录 | pass | 现有 catalog spec 绿。 |
+
+**证据脚本：** `runtime/tmp/newbugs-kb-symlink.mts`（真 `regenerateCatalog` + 临时 workspace/outside + kb symlink）。
+
+**未跑：** exports/startup 子目录 symlink 的实写；中间目录 symlink 链；Windows。
+
+## Round 32（C4 catalog 输出路径形状）
+
+**选面理由：** BUG-122/131 覆盖了扫描根与父目录 symlink；本轮检查 catalog 自己的**输出文件**被目录占用时生成器是否 fail loud。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `kb/deliverables-index.json` 是目录 | **confirmed P2** | [BUG-132](../_archive/fixed_bugs/BUG-132-catalog-index-path-directory-eisdir.md)：`regenerateCatalog` 抛 `EISDIR`（rename temp→目录）。 |
+| 输出是 symlink | 安全（rename 替换 symlink） | 未单独开卡；卡内 spec 要求。 |
+| 输出普通文件/缺失 | pass | 现有 catalog spec 绿。 |
+| audit 先写账本后 regenerate 抛 | 同根因 | 卡内列修复：账本/索引两步可读回执。 |
+
+**证据脚本：** `runtime/tmp/newbugs-catalog-index-dir.mts`（真 `regenerateCatalog` + 临时 workspace，输出路径 mkdir）。
+
+**未跑：** 真 `/deliverables audit` handler 回执；present 投影；输出非空目录；Windows。
+
+## Round 33（C3 startup 输出路径形状）
+
+**选面理由：** BUG-132 记了 catalog 输出被目录占用；本轮检查 startup 设置/派生文件的输出路径。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `startup.json` 是目录 | **confirmed P2** | [BUG-133](../_archive/fixed_bugs/BUG-133-startup-json-directory-eisdir.md)：`writeStartupSettings` 抛 EISDIR；`/company-settings set` 无 catch。 |
+| `startup-options.json` 是目录 | 同根因（未单独开卡） | `writeStartupOptionsFile` 同 `writeAtomic`；settings refresh 抛，watcher 只 warn。 |
+| startup.json symlink | 安全（rename 替换 symlink） | 未单独开卡；卡内 spec。 |
+| 普通文件/缺失 | pass | 现有 startup spec 绿。 |
+
+**证据脚本：** `runtime/tmp/newbugs-startup-dir-write.mts`（真 `writeStartupSettings` + 目录目标）。
+
+**未跑：** 真 `/company-settings set` handler 回执；options 目录；watcher 写；Windows。
+
+## Round 34（C6 命令读面：`.dsh-company` 根 symlink）
+
+**选面理由：** BUG-129/131 证明写面可穿根/子目录 symlink；本轮检查命令读面是否也把外部根当公司盘。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `.dsh-company` symlink→外部 + `/prd check` | **confirmed P2** | [BUG-134](../_archive/fixed_bugs/BUG-134-dsh-company-symlink-command-read-outside.md)：外部 mrd/prd 被读，命令 success「PRD 校验通过」。 |
+| 同根影响 /req /delivery /catalog | 同根因（未逐项实跑） | `resolveDeliverablePath`/`readTextInside` 都以 companyRoot 为信任根；卡内列。 |
+| 叶子 symlink | pass（S2） | readTextInside 拒绝叶子 symlink；但根本身未被验证。 |
+| 正常 `.dsh-company` | pass | 现有 prd/req/delivery spec 绿。 |
+
+**证据脚本：** `runtime/tmp/newbugs-company-root-read.mts`（真 `/prd` handler + 临时 workspace/outside + 根 symlink；注入 check 以隔离校验）。
+
+**未跑：** /req /delivery 同场景实跑；catalog 读面；内部 symlink 策略；真 boot。
+
+## Round 35（C2 subagent_retry 策略回归）
+
+**选面理由：** C2 的 workflow 配对已开 126；本轮回归 `subagent_retry` 的 `maxAttempts`/`retryDecision`/`exhausted`，确认选项与常量没有漂移。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `maxAttempts` 选项 vs 决策常量 | pass | 循环 `while attempt < maxAttempts`；`subagentRetryDecision` 用 `SUBAGENT_RETRY.maxAttempts=2`；选项被 clamp 1..2，二者一致。 |
+| `exhausted` | pass（阅读） | `last.stopReason !== 'completed' && attempt >= maxAttempts`；completed 提前 break。 |
+| records 根/命令边界 | 已开 127/130 | 本轮不重复。 |
+| 根 symlink residency | 已开 129/131/134 | 本轮不重复。 |
+
+**判定：** 本轮未发现新的确定性缺陷；不做「为凑数重复根因」的卡。C2 retry 语义与现有 spec 一致。
+
+**未跑：** 真模型 `subagent_retry` 两次失败/取消；vendor 的 `stopReason` 扩展值。
+
+## Round 36（C4 catalog 读路径：索引 symlink）
+
+**选面理由：** BUG-132/131 覆盖输出目录/父 symlink 写面；本轮检查 catalog **输出文件的读面**，看客户端是否跟随外部索引。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `kb/deliverables-index.json` symlink→外部 | **confirmed P2** | [BUG-135](../_archive/fixed_bugs/BUG-135-catalog-index-symlink-read-outside.md)：`readCatalog` 返回外部 JSON 的 fake entries/presented=true。 |
+| 普通索引/缺失 | pass | 现有 catalog-state spec 绿。 |
+| 输出目录/父 symlink | 已开 132/131 | 不重复。 |
+| `workspaceFiles` 客户端读同一路径 | 未实跑 | 卡内列为同一路径。 |
+
+**证据脚本：** `runtime/tmp/newbugs-catalog-index-symlink-read.mts`（真 `readCatalog` + 临时 workspace/outside + 索引 symlink）。
+
+**未跑：** 真浏览器成品页签读外部索引；workspaceFiles 的限制；内部 symlink 策略。
+
+## Round 37（C3 startup 读路径：settings symlink）
+
+**选面理由：** BUG-135 证明 catalog 索引读面跟随 symlink；本轮检查 startup 设置/派生文件的读面。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `startup.json` symlink→外部 | **confirmed P2** | [BUG-136](../_archive/fixed_bugs/BUG-136-startup-settings-symlink-read-outside.md)：`readStartupSettings` 返回外部 productType/deliveryMode/wiki。 |
+| `startup-options.json` symlink | 同根因（未单独开卡） | `readStartupOptions` 同 readFileSync；卡内列。 |
+| 写路径 symlink | 安全（rename 替换 symlink） | 现有 writeAtomic；读/写策略不一致。 |
+| 普通文件/缺失 | pass | 现有 startup spec 绿。 |
+
+**证据脚本：** `runtime/tmp/newbugs-startup-symlink-read.mts`（真 `readStartupSettings` + 临时 workspace/outside + symlink）。
+
+**未跑：** 真启动注入 section；startupWatch 用外部 wiki 布哨；options 读面；symlink→内部。
+
+## Round 38（C4 presented 账本读路径：symlink）
+
+**选面理由：** BUG-135 是 catalog 索引伪造；本轮检查更敏感的 presented 账本文件读路径。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `kb/deliverables-presented.json` symlink→外部 | **confirmed P2** | [BUG-137](../_archive/fixed_bugs/BUG-137-presented-ledger-symlink-read-outside.md)：`readPresentedLedger` status ok，外部 paths/slugs 被采用，伪造 presented。 |
+| 普通账本/缺失 | pass | 现有 presented-ledger spec 绿。 |
+| 写路径 symlink | 安全（rename 替换） | 读写策略不一致。 |
+| domain store | 未变 | 生产 domain 优先；file fallback 仍走坏读。 |
+
+**证据脚本：** `runtime/tmp/newbugs-presented-symlink-read.mts`（真 `readPresentedLedger` + 临时 workspace/outside + ledger symlink）。
+
+**未跑：** 真 catalog regenerate 使用 fake ledger；domain 不可用部署；audit 写后读。
+
+## Round 39（C4 presented 账本写路径：目录）
+
+**选面理由：** BUG-137 是账本 symlink 读；本轮检查账本**输出**被目录占用时写路径是否可读。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `kb/deliverables-presented.json` 是目录 | **confirmed P2** | [BUG-138](../_archive/fixed_bugs/BUG-138-presented-ledger-directory-eisdir.md)：`writePresentedLedger` 抛 EISDIR（rename temp→目录）。 |
+| 账本 symlink | 读面 BUG-137；写 rename 替换 | 未单独开卡；卡内 spec。 |
+| 普通账本/缺失 | pass | 现有 presented-ledger spec 绿。 |
+| domain store | 未变 | 生产 domain 优先；file fallback 仍撞。 |
+
+**证据脚本：** `runtime/tmp/newbugs-presented-dir-write.mts`（真 `writePresentedLedger` + 临时 workspace，账本路径 mkdir）。
+
+**未跑：** 真 `/deliverables audit` 回执；present 投影；domain 不可用部署。
+
+## Round 40（C1 状态机：revoke 后 verify）
+
+**选面理由：** BUG-091 已让 check 排除 revoked；本轮检查同一 `revokedAt` 语义下 verify 是否还把它当活跃方法。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| revoke 后 verify pass/fail | **confirmed P2** | [BUG-139](../_archive/fixed_bugs/BUG-139-cultivation-verify-after-revoke.md)：verify success，记录同时 adopted+revokedAt+verification；方法已删除。 |
+| active adopted 后 verify | pass | 现有 verify spec 绿。 |
+| rejected 后 verify | pass | status 检查拒绝。 |
+| 撤回后 UI/check | check 已排除 revoked | 现有 BUG-091 修复。 |
+
+**证据脚本：** `runtime/tmp/newbugs-verify-revoked.mts`（真 adopt/revoke/verify handler + 临时培养盘）。
+
+**未跑：** 真 UI 培养面板对 revoked+verification 的展示；contract 是否允许历史验证；revoke 后 reject/adopt。
+
+## Round 41（C5 真页面复验 / C2 回归）
+
+**做了：** 复用隔离 home（含此前创建的 CEO 会话与 `team/task` 事件）起 company 实例，cdp-probe 打开任务板/依赖图/在场。
+
+**结果：** 任务板仍显示「还没有共享任务」；但 UI 当前是 **新空会话**（body 标题「新会话」），此前任务会话没有登记进 `storages/workspace.json.sessionIds`，不是被选中会话。**这是测试选址限制，不是产品结论**；不新增缺陷卡。
+
+**判定：** 本轮没有新的确定性缺陷；C5 真页面（选中含任务历史会话）仍需 seed `sessionIds` 或从侧栏点选后再证。
+
+**证据：** `runtime/tmp/c5-iso-recheck2.mjs`、`runtime/tmp/c5-recheck2-body.txt`、cdp-probe `runtime/harness-home/diagnosis/cdp-probe-2026-11-12T19-25-22-512Z`。
+
+**未跑：** 选中任务会话后的任务板/依赖图/在场；带 teammate 的任务板；多窗口。
+
+## Round 42（C5 真页面：选中含 task 的会话仍空）
+
+**做法：** 把 c5-iso-home 的 `workspace.json.sessionIds` 指向已有 `team/task` 的会话 `session-e0b3…`，再跑 cdp-probe。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| 选中会话 + 任务板 | **withdrawn（测试选址）** | [BUG-140（撤回）](../_archive/settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md)：侧栏显示会话标题「用 team_task_create 创建两个任务」，任务板仍「成员：lead(待命) / 还没有共享任务」；waitText 写 PRD 失败。 |
+| 会话日志有 team/task | pass | task-1/task-2 两条事件已在会话日志。 |
+| streamError | 无错误条 | 不是 follow 失败；更像 follow 没返回 task 事件或 merge 未适配。 |
+| 旧 BUG-103/104 修复 | **真页面未收口** | 修复验证停在 projection/纯 merge；这是当前 bug。 |
+
+**证据：** `runtime/tmp/c5-iso-recheck2.mjs`、`runtime/tmp/c5-recheck2-body.txt`、cdp-probe `runtime/harness-home/diagnosis/cdp-probe-2026-11-12T19-26-31-670Z`。
+
+**未跑：** 直接抓 `session/follow` 帧；TasksTab 构建产物版本；BUG-118 member 场景。
+
+## Round 43（C5 follow 适配层定位）
+
+**选面理由：** BUG-140 已证任务板真页面空；本轮抓 adapter 代码路径，区分「事件没到」与「merge 形状」。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `companyFrames` 是否过滤 team/task | **否** | `company-session-adapters.ts` 只把 `snapshot.records[].event` / `event` 原样透传；没有类型过滤。 |
+| `remote.follow` 是否给 task 帧 | **未证** | 页面无 streamError、任务板空；最可能上游帧里没有 `team/task`，或选中会话不是 Lead follow 的地址。 |
+| merge revision/null | 已有 104/118 | 非本轮新点。 |
+| 真页面选中会话 | pass（已 seed sessionIds） | BUG-140 证据。 |
+
+**判定：** 本轮没有新增独立缺陷；把 BUG-140 根因缩到「`remote.follow` 帧内容/地址」，不是 `companyFrames` 过滤，也不是 merge revision。
+
+**未跑：** 直接抓 `remote.session.follow` 的 snapshot/event 原始帧；选中 teammate 会话 vs root；follow 地址。
+
+## Round 44（C5 host projection vs browser）
+
+**做了：** 用 `session/list` RPC 对比同一会话的 host 投影与浏览器任务板，并重建当前 `lib/client.js` 排除旧 bundle。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| host `agentTeam.tasks` | **has task-1/task-2** | `session/list` `_request:{}` for session-e0b3；tasks 完整。 |
+| browser 任务板 | **empty** | 选中同一会话，任务板仍「成员：lead(待命) / 还没有共享任务」。 |
+| 当前 client bundle | **current** | `tsc -b`+`tsdown` 重建 `lib/client.js`（含 `teamWithEventTasks`/`stream.error`），重跑仍空。 |
+| `companyFrames` 过滤 | **no** | adapter 原样透传；问题在上游 follow/浏览器投影缓存。 |
+
+**判定：** BUG-140 从「可能旧 bundle」收紧为「浏览器 session store 的 agentTeam 投影 / follow 帧没有 task，host 投影本身正确」。仍是同一张卡，不新增。
+
+**未跑：** 直接抓浏览器 `remote.session.follow` 原始帧；session store 的 projection 订阅时机；teammate 会话。
+
+## Round 45（C5 follow/host projection 复核 / C1 写入口）
+
+**做了：** 复核 BUG-140 的 host/browser 投影差异；检查 C1 各命令在 records 根坏形状下的可读性。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| host `session/list` agentTeam.tasks | has task-1/task-2 | RPC 实查 |
+| browser task board | empty（当时选到新空会话；BUG-140 已撤回） | 真页面 |
+| records 根坏形状 | BUG-127/130 已覆盖 | 不再重复开卡 |
+| adopt/reject/verify 在 records 根文件下 | 返回「记录不存在」而非根坏 | 同根 127/130；不单开卡 |
+| startup/catalog/presented 输出形状 | 132/133/135/137/138 已覆盖 | 不重复 |
+
+**判定：** 本轮没有新的独立缺陷；BUG-140 是当前最实质的 C5 未收口项。
+
+**未跑：** 浏览器 follow 原始帧；session store 投影缓存刷新；路径区分「不存在」与「根坏」。
+
+## Round 46（C1 读命令：adopt/reject/verify records 根）
+
+**选面理由：** BUG-127/130 覆盖 check/archive 与 correct/propose；本轮补齐 adopt/reject/verify 三个读命令。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| records=文件 + adopt | **confirmed P2** | [BUG-141](../_archive/fixed_bugs/BUG-141-cultivation-adopt-reject-verify-throws.md)：THREW UnsafeCultivationPathError。 |
+| records=文件 + reject/verify | **confirmed P2** | 同卡：两个命令都 THREW，没有「记录目录坏」回执。 |
+| records=missing | pass | 现有命令返回「记录不存在」。 |
+| 正常 records | pass | 现有 cultivation-command spec 绿。 |
+
+**证据脚本：** `runtime/tmp/newbugs-cultivation-readroot.mts`（真 command handler + 临时培养盘，records 替换为文件）。
+
+**未跑：** records=symlink；父 cultivation=symlink；八命令统一 spec。
+
+## Round 47（C3 bootstrap replace 目标形状：目录）
+
+**选面理由：** BUG-128 是 replace 跟随 symlink；本轮检查同一 entry 被**目录**占用时的 EISDIR。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `kb/org.md` 是目录 + replace | **confirmed P2** | [BUG-142](../_archive/fixed_bugs/BUG-142-bootstrap-replace-directory-eisdir.md)：`applyBootstrap` 抛 EISDIR；catch 只处理 EEXIST。 |
+| 目标 symlink | BUG-128 已记 | replace 跟随写到外部。 |
+| 普通文件/缺失 | pass | 现有 bootstrap spec 绿。 |
+| 角色补种调用方 | 未实跑 | `ensureRunBundle`/`applyRoleBackfill` 的错误包装未证。 |
+
+**证据脚本：** `runtime/tmp/newbugs-bootstrap-dir-target.mts`（真 `applyBootstrap` + 临时 workspace + 目录目标）。
+
+**未跑：** 真启动角色补种；owners.md 目录；调用方 catch；boot 输出。
+
+## Round 48（C3 bootstrap 目录条目形状）
+
+**选面理由：** BUG-142 是 file 条目的目录目标；本轮检查 dir 条目目标被文件占用时 `mkdir` 是否可读。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `.dsh-company` 是文件 + dir entry | **confirmed P2** | [BUG-143](../_archive/fixed_bugs/BUG-143-bootstrap-directory-entry-eexist.md)：`applyBootstrap` 抛 EEXIST（mkdir）；dir 分支无 catch。 |
+| `.dsh-company/kb` 文件 | 同根因（未单独开卡） | 同一 dir 分支；卡内 spec 覆盖。 |
+| 正常目录/缺失 | pass | 现有 bootstrap spec 绿。 |
+| 调用方 ensureRunBundle | 未实跑 | 启动是否会 dataBlocked/warn 未证。 |
+
+**证据脚本：** `runtime/tmp/newbugs-bootstrap-dir-entry.mts`（真 `applyBootstrap` + 临时 workspace + `.dsh-company` 文件）。
+
+**未跑：** 真启动 `.dsh-company` 文件；kb 文件；ensureRunBundle 错误包装。
+
+## Round 49（C3 bootstrap 调用方：真实 boot）
+
+**选面理由：** BUG-142/143 直接 `applyBootstrap` 抛 EEXIST/EISDIR；本轮用真 boot 验证 `ensureRunBundle` 是否有顶层 catch，避免把「函数抛」误报成「启动砖」。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `.dsh-company` 是文件 + 真 boot | **boot 成功**（只 warn） | `startWeb` 返回 banner；`ensureRunBundle` 顶层 catch 把 applyBootstrap 异常收成 warn。 |
+| BUG-142/143 的真实影响 | **非启动砖** | 直接调用/补种路径仍抛，且没有结构化 warning；已改卡面，不夸大启动失败。 |
+| 其它 bootstrap 形状 | 128/129/131 写穿真问题 | 不改。 |
+
+**判定：** 本轮没有新增独立缺陷；修正了 142/143 的影响面（不是 boot 砖，是函数/补种边界 + 可读性）。
+
+**未跑：** 角色补种 `applyRoleBackfill` 真触发时的错误包装；`.dsh-company/kb` 文件；owners.md 目录。
+
+## Round 50（C1/C4 形状面饱和复核）
+
+**选面理由：** 50 轮节点，回看 C1/C4 形状面是否还有未覆盖的确定性缺陷；避免为凑数重复根因。
+
+| 面 | 已覆盖 | 本轮结论 |
+|---|---|---|
+| C1 命令边界 | 127/130/139/141/117 | records 根/写读/verify 后状态均已卡；无新形状 |
+| C4 读写形状 | 122/125/132/135/137/138/114 | root/leaf/输出/账本/审计均已卡；无新形状 |
+| C5 任务板 | 118 | BUG-140 已撤回（测试选址） |
+| C3 写 residency | 128/129/131/142/143 | 文件/根/子目录/目录条目均已卡；142/143 已修正影响面 |
+| C7 发布 | 116 | 清单覆盖缺口未修 |
+
+**判定：** 本轮没有新的独立缺陷；C1/C4 形状面接近饱和，继续开卡会重复根因。下一轮应转 C5 raw follow / C2 live workflow（行为面），而不是继续枚举文件形状。
+
+**未跑：** browser remote.session.follow 原始帧；真 workflow 两 run 并发；真模型多轮。
+
+## Round 51（C5 撤回 BUG-140：WS 帧 + 显式选中）
+
+**做法：** Playwright `page.on('websocket')` 抓帧，并**显式点选**侧栏任务会话标题，再开任务板。
+
+**结果：** 任务板显示 **任务板 (2)**，会话正文含 task-1 写 PRD / task-2 复核 PRD。之前的 cdp-probe 默认落在应用新建的空会话 `session-7726…`（storage 有 e0b3，但 UI 新开空会话并选中），所以显示「还没有共享任务」。
+
+**判定：** BUG-140 **撤回，不是产品缺陷**；卡已迁 settled_issues 并在 bugs README/archive 索引登记。真正留下的是测试方法坑（cdp-probe 默认新空会话），不是产品 bug。C5 任务板行为在「显式选中含 task 会话」下通过。
+
+**未跑：** 默认新空会话是否符合产品预期；teammate 会话；多窗口。
+
+## Round 52（C5 任务板确认：任务板 (2)）
+
+**做法：** cdp-probe 先点选侧栏任务会话标题，再点头部 `任务板 (2)` 打开右栏；等待 task 表。
+
+**结果：** 右栏出现：
+
+```
+任务板
+成员：lead(待命)
+任务 / 依赖 / 状态 / owner
+task-1@1 写 PRD → 待办 / 未分配
+task-2@1 复核 PRD → 写 PRD → 待办（阻塞）/ 未分配
+```
+
+**判定：** 任务板在「显式选中含 task 会话」下 PASS；BUG-140 撤回确认。随后点「看板」/「依赖图」找当前 DOM 文本失败——右栏此时只渲染任务板 tab，其他平台 tab 在该状态不可直接点到；这是 UI tab 入口/测试步骤问题，不是本轮的产品结论，不新增卡。
+
+**未跑：** 看板/依赖图/在场在任务板打开后的可达路径；多窗口。
+
+**验证面注记（2026-11-13）：** 本轮 `pnpm verify` 当前红在 `guard-red-record`：另一 A 的未提交 spec 标题声称守卫 BUG-119/121/123/124/128/133/143，但这些卡仍是活跃（不在 fixed_bugs）。这是修复交接的未完成态，不是本轮文档改动；`pnpm test` 236 files / 1812 tests passed。
+
+## Round 53（C3 write gate 覆盖面）
+
+**选面理由：** A 正在加 `write-gate` 修 115/119/121；本轮检查 gate 是否覆盖旧直写模块。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `blockCompanyWrites` + cultivation writeRecord | **confirmed P2** | [BUG-144](../_archive/fixed_bugs/BUG-144-write-gate-bypassed-by-direct-company-writes.md)：writeRecord 仍写入 `2026…md`，不读 gate。 |
+| installMethod/bundle/export | 同根因（未逐项实跑） | cultivation-storage 自己 writeNewFile；bundle-manifest/governance-export 直接写；卡内列。 |
+| catalog/startup/presented/bootstrap | 已接 gate | 新 company-root helper 消费方。 |
+| 读路径 | 不受影响 | gate 只挡写。 |
+
+**证据脚本：** `runtime/tmp/newbugs-write-gate-cultivation.mts`（真 `blockCompanyWrites` + `nodeCultivationStorage.writeRecord`）。
+
+**未跑：** installMethod/bundle/export 的 gate 负例；真 lease-lost host；unblock 后恢复。
+
+## Round 54（C3 写 gate / company-root 修复回归）
+
+**选面理由：** A 的未提交修复引入 `write-gate` + `company-root`；本轮逐点回归新代码，找覆盖面/形状漏洞。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `company-root` 根/子目录/原子写 | pass（阅读 + BUG-144 反例） | symlink/文件占目录/父目录逐级 lstat；writeAtomic 先 gate。 |
+| `write-gate` 覆盖面 | **BUG-144 活跃** | cultivation/bundle/export 仍直写；本轮不重复开卡。 |
+| `bootstrap` 新 warnings/形状 | pass（阅读） | 128/143 形状已收 warning；`ensureRunBundle` 顶层 catch。 |
+| `catalog/presented` 新读 helper | pass（阅读） | symlink/目录 → missing/unsafe/corrupt；无新点。 |
+| `startup` 新 state/writable | pass（阅读） | 120/121/123/136 已覆盖；无新点。 |
+
+**判定：** 本轮没有新的独立缺陷；A 的修复结构合理，剩余风险是 BUG-144 的 gate 覆盖面。`pnpm verify` 当前红在 `guard-red-record`（A 的 spec 引用仍在活跃区的 117/119/121/123/124/128/133/139/143），需 A 收口迁卡；`pnpm test` 236 files / 1818 tests passed。
+
+**未跑：** installMethod/bundle/export 的 gate 反例；真 lease-lost host；A 完成后的 verify。
+
+## Round 55（C5 partial projection：teamWithEventTasks 崩溃）
+
+**选面理由：** A 正在修 BUG-118；本轮直接回归 `teamWithEventTasks` 对 partial `agentTeam` 形状的鲁棒性。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| view=`{tasks:[]}` / `{members:[]}` / `{}` | **confirmed P2** | [BUG-145](../_archive/fixed_bugs/BUG-145-team-with-event-tasks-partial-view-crash.md)：全部 `THREW Cannot read properties of undefined (reading 'map')`。 |
+| 现有 client lifecycle spec | **4 failed** | `tests/client/data/company-data-lifecycle.spec.ts` 4 条同栈；A 的 BUG-118 修复引入。 |
+| 正常 teamView | pass（历史） | 有 members/tasks 的投影不崩。 |
+| member 事件 role 缺失 | 同 patch 风险 | 测试 `memberActive` 只给 id/name/phase；role undefined 需归一化。 |
+
+**验证：** `pnpm test` 当前 **1 failed file / 4 failed tests / 1816 passed**；`pnpm verify` 仍红 guard-red-record（A 的 spec 引用活跃卡）。
+
+**判定：** 新卡 BUG-145；这是 A 的 in-progress 修复回归，需与 BUG-118 一起修（partial view 兜底 + member role 归一化）。
+
+## Round 56（C5 partial view 复验：错误转移到 memberNames）
+
+**做了：** 复跑 `tests/client/data/company-data-lifecycle.spec.ts`；A 已给 `teamWithEventTasks` 的 members/tasks 加 `?? []`。
+
+**结果：** 测试从 4 failed / 2 passed 变成 **5 failed / 1 passed**；错误从 `teamWithEventTasks` 转到：
+
+```
+TypeError: Cannot read properties of undefined (reading 'map')
+ ❯ memberNames packages/company-pack/src/lib/presence.ts:428
+```
+
+即同一张 **BUG-145**（partial view 消费方未全部兜底），不是新卡；A 的修复只修了 merge 的第一层，`memberNames`/rows/tasks 等下游仍假定 members/tasks 必有。测试 1（stream:false + full teamView）通过，其余 partial/stream 场景红。
+
+**验证：** `pnpm test` 5 failed / 1819 passed；`pnpm verify` 仍红 guard-red-record（A 的 spec 引用活跃卡，含已撤回 BUG-140）。
+
+**判定：** BUG-145 继续活跃；修复面要扩到 `memberNames` 及所有 view 消费方，不能只修 `teamWithEventTasks`。
+
+## Round 57（C5 agentTeam projection 兜底：OOM）
+
+**选面理由：** A 为撤回的 BUG-140 在 `useCompanyData` 加了 `useProjection('agentTeam')`；本轮聚焦跑 client 生命周期 spec。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `useProjection('agentTeam')` 兜底 | **confirmed P1** | [BUG-146](../_archive/fixed_bugs/BUG-146-use-company-data-agent-team-projection-oom.md)：focused spec OOM 4GB，worker 退出；之前 5 failed/1 passed。 |
+| 测试 useProjection 替身 | 根因线索 | 对未知 key 返回新 stats 对象 → `team` identity 每帧变 → effect setState 循环。 |
+| BUG-140 | 已撤回 | 新空会话测试选址；兜底不应存在。 |
+| BUG-145 partial view | 仍活跃 | 数组兜底/下游消费方一起修。 |
+
+**验证：** `npx vitest run tests/client/data/company-data-lifecycle.spec.ts` → FATAL OOM，0 tests run；`pnpm verify` 仍红 guard-red-record。
+
+**判定：** 新卡 BUG-146 P1；撤销 useProjection fallback 或改用稳定 session projection，并修测试替身/identity。
+
+## Round 58（C5 145/146 复验：已消）
+
+**做了：** A 当前工作树移除 `useProjection('agentTeam')` fallback、给 `teamWithEventTasks`/`memberNames` 加数组兜底；复跑聚焦 + 全量。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| BUG-146 OOM | **不可复现（A 已撤 fallback）** | focused lifecycle 6 passed；全量 238 files / 1827 tests passed。 |
+| BUG-145 partial view | **不可复现** | `{tasks:[]}` / `{members:[]}` / `{}` 均返回 `{members:[],tasks:[]}`，不抛。 |
+| BUG-118 member-only | 已由 A 补；focused 6 passed | 见 lifecycle。 |
+| `pnpm verify` | **ALL PASS** | A 已收口：活跃清单空（114..139、141..146 全迁 fixed_bugs；140 撤回 settled）；test 238/1827、typecheck/lint/dup/verify 全绿。 |
+
+**判定：** 145/146 已修并归档；本轮探索发现的 33 张卡（114..146，140 撤回）全部收口，active 清零。Goal 保持 active，下一轮从干净基线继续探索未证面。
+
+**未跑：** 真浏览器 partial projection；两 host lease-lost；A 全部归档后的 verify。
+
+## Round 59（C5 平台 tab 可达性 / 干净基线复核）
+
+**做了：** 在干净基线（active 空、238/1827 绿）用 Playwright 选中任务会话、打开 `任务板 (2)`，检查右栏 tab。
+
+**结果：** 实际可见 tab = `对话 / 培养 / 任务板`；`Board/DAG/Presence/Budget` 已注册但未打开；`getByRole('tab', name='看板')` count=0。任务板本身显示 task-1/task-2，PASS。
+
+**判定：** 平台 tab 需要入口（overview / tab picker / openTab）才会出现，不能仅凭当前未打开判定为产品 bug；本轮不新增卡。C5 其他平台 tab 的「打开路径」仍未证。
+
+**验证：** full test 238 files / 1827 tests passed；verify/typecheck/lint/dup 全绿；active 清空。
+
+**未跑：** `sidebarRight.openTab('company-board')` / `company-overview` 入口的真实点击；C2 live workflow；C7 release profile。
+
 ## 证据、判据与处置
 
 - **oracle 纪律**：先写期望，再看实现；不拿实现当 oracle；spec 绿只说明覆盖，不说明行为正确。

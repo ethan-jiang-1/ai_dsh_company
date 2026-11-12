@@ -1,3 +1,5 @@
+// 负例留证 2026-11-13：去掉 dataBlocked 写前判断 ⇒「set 被拒」用例 success（BUG-121）；还原即绿。
+// 负例留证 2026-11-13：writeStartupSettings 直接 writeFileSync ⇒「startup.json 是目录」用例抛 EISDIR（BUG-133）；改 safe 写即绿。
 /**
  * `/company-settings` 命令（2026-11-12）：读写项目启动策略。
  *
@@ -11,7 +13,7 @@
  * 红配方：把 `parseSettingsCommand` 的 `auto` 分支删掉 → 「恢复自动」用例红；
  * 把未知值校验去掉 → 「未知值 fail-closed」用例红。
  */
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -225,5 +227,31 @@ describe('en 命令面（双语单一源）', () => {
     listener?.()
     expect(definition?.description).toBe(STARTUP_COMMAND_COPY.description.en)
     expect(disposed.length).toBe(2)
+  })
+
+  it('dataBlocked：set/reset 拒绝，show 仍可读（BUG-121）', async () => {
+    const root = workspace()
+    let definition: Definition | undefined
+    const ctx = { commands: { register: (def: Definition) => { definition = def } } }
+    registerSettingsCommand(ctx as never, {
+      workspace: root, dataBlocked: true, contentDir: CONTENT_DIR, text: (zh) => zh,
+    })
+    const agent = { session: { header: { cwd: root } } }
+    const set = await (definition as Definition).handler({ rawInput: 'set productType business-software', agent } as never)
+    expect(set.kind).toBe('error')
+    expect(set.text).toContain('公司数据已停写')
+    const show = await (definition as Definition).handler({ rawInput: 'show', agent } as never)
+    expect(show.kind).toBe('success')
+    expect(readStartupSettings(root).productType).toBeNull()
+  })
+
+  it('startup.json 被目录占用 → 可读 error，不抛（BUG-133）', async () => {
+    const root = workspace()
+    mkdirSync(join(root, '.dsh-company', 'startup.json'), { recursive: true })
+    const def = mount()
+    const agent = { session: { header: { cwd: root } } }
+    const result = await def.handler({ rawInput: 'set productType business-software', agent } as never)
+    expect(result.kind).toBe('error')
+    expect(result.text).toContain('目录占用')
   })
 })

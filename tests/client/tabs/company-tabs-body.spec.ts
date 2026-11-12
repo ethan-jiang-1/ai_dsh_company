@@ -53,4 +53,5 @@ describe('公司页签体静态渲染（R5-06/D5）', () => {
     expect(html).toContain('当前没有团队动议')
     expect(html).toContain('协作动态')
   })
+
 })
