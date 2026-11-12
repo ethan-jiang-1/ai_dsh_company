@@ -85,6 +85,13 @@
 - 这些不在最初 token 清单内；assembling/chairing 暂缓，quality-loop 可先翻。
 - 此前“I1b token 清零”只指原清单，需补做署名/认领 token 切片。
 
+## I1b 补遗：署名行 canonical
+
+- `出稿：<role>｜版本 vN｜任务书 = ...` → `By: <role>｜Version vN｜Brief = ...`；`SIG`/`DRAFT_VERSION` 接受 canonical，旧形状兼容。
+- `work-handoff`、`assembling`、`presets.spec`、`authorship.spec` 同步；canonical 字面量红→绿 1 条。
+- `让位/占位` 行仍未清，但不在 assembling/chairing 中；这两个 skill 可进入全文翻译。
+- `pnpm test` 207 files / 1637 tests；`pnpm verify` ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

@@ -3,6 +3,14 @@ import { classifyAuthorship, citedVersionsOf, crossCheckVersions, currentVersion
 
 const BODY_SIGNED = (role: string) => `# 标题\n\n> 出稿：${role}｜版本 v1｜任务书 = deliverables/x/drafts/ceo.md\n\n正文`
 const BODY_LEGACY = '> 出稿：CFO（wochen 财务职能）｜正文 42 非空行｜状态：现行意见'
+const BODY_CANONICAL = '> By: cfo｜Version v2｜Brief = deliverables/x/drafts/ceo.md'
+
+describe('署名行 canonical 形状', () => {
+  it('By: ...｜Version vN｜Brief = ... 可识别，并取出版号', () => {
+    expect(SIG.test(BODY_CANONICAL)).toBe(true)
+    expect(currentVersionOf(BODY_CANONICAL)).toBe(2)
+  })
+})
 
 describe('署名核对：档位判定（判据单一来源 = tools/lib/authorship.mjs）', () => {
   // 负例留证 2026-10-16：把 baseRoleOf 改成恒等（`return preset`，即取消实例后缀规范化）→ BUG-018

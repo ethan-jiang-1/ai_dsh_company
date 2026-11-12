@@ -3,8 +3,8 @@
 // 依赖、秒级），不进 `pnpm test` ⇒ 纯逻辑放这里，keyless 可测。
 import { COMPANY_ROLE_IDS } from './company-roles.mjs'
 
-/** 稿首署名行（兼容两种形状：早期模板 `出稿：CFO（wochen 财务职能）…` 与新形状 `出稿：<角色>｜版本 vN`）。 */
-export const SIG = /出稿[:：]\s*(?:(VP-Eng|VP-Sales|COO|CFO|CEO|CMO)|(vp-eng|vp-sales|coo|cfo|ceo|cmo))/
+/** canonical 稿首署名行：`By: <role>｜Version vN｜Brief = <path>`；仍认旧 `出稿：` 形状。 */
+export const SIG = /(?:By:|出稿[:：])\s*(?:(VP-Eng|VP-Sales|COO|CFO|CEO|CMO)|(vp-eng|vp-sales|coo|cfo|ceo|cmo))/
 
 /** 复核收回署名的更正行。 */
 export const RECLAIM = /本稿由\s*(vp-eng|vp-sales|coo|cfo|ceo|cmo)\s*根会话复核并署名/
@@ -36,8 +36,8 @@ export function baseRoleOf(preset) {
   return preset
 }
 
-/** 稿首署名行里的当前版号（`版本 v<N>`）；无版号行 = undefined。 */
-export const DRAFT_VERSION = /版本\s*v(\d+)/
+/** 稿首署名行里的当前版号（`Version v<N>`；仍认旧 `版本 v<N>`）；无版号行 = undefined。 */
+export const DRAFT_VERSION = /(?:Version|版本)\s*v(\d+)/
 
 export function currentVersionOf(body) {
   const m = DRAFT_VERSION.exec(body)

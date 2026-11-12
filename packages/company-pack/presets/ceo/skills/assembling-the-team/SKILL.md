@@ -71,7 +71,7 @@ team 成员继承**你的**组合，没有角色 preset 的 `skill` catalog；�
 
 - **角色**：`COO` / `CFO` / …
 - **任务书**：`.dsh-company/deliverables/<slug>/drafts/ceo.md`（spawn 前已落盘；成员按这个真实路径署名）
-- **署名行**：稿首 `出稿：<角色>｜版本 v<N>｜任务书 = <任务书路径>`（照抄真实路径，不得编造）
+- **署名行**：稿首 `By: <角色>｜Version v<N>｜Brief = <任务书路径>`（照抄真实路径，不得编造）
 - **CHARTER**：`.dsh-company/kb/<role>/CHARTER.md`
 - **角色 skill**：`<company-content>/../presets/<role>/skills/<skill>/SKILL.md`（列全；用 `read` 读正文）
 - **KB**：`.dsh-company/kb/<role>/`、`kb/org.md`、`kb/policy-lines.md`（按需）

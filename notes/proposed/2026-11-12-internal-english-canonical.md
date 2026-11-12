@@ -169,7 +169,13 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 | `出稿：<role>｜版本 v<N>｜任务书 = <path>` | `tools/lib/authorship.mjs` `SIG` / `DRAFT_VERSION`、`authorship-audit`、`presets.spec`、`work-handoff`、`assembling` | 改 `By: <role>｜Version v<N>｜Brief = <path>`；`SIG`/`DRAFT_VERSION` + 测试 + 模板同步 |
 | `让位=认领撤销，非出稿` / `占位=认领，非出稿` | `tools/lib/deliverables.mjs`、`deliverables-audit` 测试 | 改英文 canonical 行；`isPlaceholderYield`/`isPlaceholderClaim` + 测试同步 |
 
-因此 `assembling-the-team` / `chairing-staff-meeting` **暂缓**；`quality-loop` 可先翻。**此前“I1b token 清零”只指最初清单，署名/认领 token 仍待清。**
+**已做（2026-11-12，署名行）**：
+
+- canonical：`By: <role>｜Version v<N>｜Brief = <path>`；`SIG` / `DRAFT_VERSION` 接受 canonical，旧 `出稿：/版本 v` 仍兼容。
+- 同步 `work-handoff`、`assembling` 的角色包、`presets.spec`、`authorship.spec`；canonical 字面量红→绿 1 条。
+- `让位=认领撤销，非出稿` / `占位=认领，非出稿` **仍未清**；但它们不在 assembling/chairing 里，不阻塞这两个 skill 的全文翻译。
+
+因此 `assembling-the-team` / `chairing-staff-meeting` 的**署名 token 已清**，可以进入全文翻译；`quality-loop` 无该 token。
 
 **I1b 第五片（事实/假设标签）**：
 
