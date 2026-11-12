@@ -165,9 +165,9 @@ function memberTone(status: PresenceRow['status']): 'info' | 'danger' | 'warning
 export function BoardTab(props: CompanyTabProps) {
   const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
-    <PanelFrame title="看板" tone="overview" tabProps={props}>
+    <PanelFrame title={props.t('tabs.board.label')} tone="overview" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
-      <BoardPanel columns={data.columns} />
+      <BoardPanel columns={data.columns} t={props.t} />
     </PanelFrame>
   )
 }
@@ -188,23 +188,23 @@ export function DagTab(props: CompanyTabProps) {
   const [redrawKey, setRedrawKey] = useState(0)
   return (
     <PanelFrame
-      title="依赖图"
+      title={props.t('tabs.dag.label')}
       tone="structure"
       tabProps={props}
       action={(
         <Button
           size="sm"
           variant="ghost"
-          title="强制重画一次（重测栏宽、重放布局与动画）——偶发渲染不对时用"
+          title={props.t('dag.redrawTitle')}
           onClick={() => { setRedrawKey(previous => previous + 1) }}
         >
-          重画
+          {props.t('dag.redraw')}
         </Button>
       )}
     >
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       <DelegationFlowPanel tree={tree} />
-      <DagPanel key={redrawKey} layout={data.dag} roleLabel={label => roleTextForCanonical(label, props.t)} />
+      <DagPanel key={redrawKey} layout={data.dag} roleLabel={label => roleTextForCanonical(label, props.t)} t={props.t} />
     </PanelFrame>
   )
 }

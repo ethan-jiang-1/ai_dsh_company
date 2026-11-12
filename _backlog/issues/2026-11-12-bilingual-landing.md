@@ -42,6 +42,7 @@ opened: 2026-11-12
 - 待办页签 + PanelFrame 浮出/收回双语；`attentionLabel` 中文纯函数移除，改字典 key。
 - `tests/client/i18n/attention-tab.spec.ts` zh/en 静态渲染；client 370 passed；`ui-scene-smoke --isolated --golden` 9 页签金样一致。
 - 任务板页签/表格/头部入口双语；`tasks.*` 字典；header action 注册 locale；client 371 passed；金样仍一致。
+- 看板/DAG 双语：列/空列/依赖就绪/等待/drift、DAG 状态徽章/空态/重画；client 373 passed；金样仍一致。
 
 **剩余**：
 - `content/templates/meta.md`、`prd.md`（2 个）。

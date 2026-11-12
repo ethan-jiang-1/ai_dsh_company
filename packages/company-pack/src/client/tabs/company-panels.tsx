@@ -6,13 +6,25 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
-import type { BoardColumn, TaskRow } from '../../lib/board.ts'
-import { UNASSIGNED_LABEL, driftLabel } from '../../lib/board.ts'
+import type { BoardCard, BoardColumn, TaskRow } from '../../lib/board.ts'
+import { UNASSIGNED_LABEL } from '../../lib/board.ts'
 import type { BudgetSummary } from '../../lib/budget.ts'
 import { formatTokens } from '../../lib/budget.ts'
 import type { DagLayout } from '../../lib/dag.ts'
 import type { ActivityEntry, PresenceRow } from '../../lib/presence.ts'
 import { memberDot } from '../../lib/presence-status.ts'
+import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
+
+const defaultT = ((key: CompanyKey, params?: Record<string, string | number>) => {
+  const template = zh[key]
+  return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+}) as CompanyT
+
+const BOARD_STATUS_KEYS: Record<string, CompanyKey> = {
+  pending: 'board.status.pending',
+  in_progress: 'board.status.in_progress',
+  completed: 'board.status.completed',
+}
 
 /** 任务状态 → Tag 色调。 */
 function taskTone(status: TaskRow['status']): 'success' | 'info' | 'outline' {
@@ -62,11 +74,11 @@ export function wrapTitle(subject: string, maxWidth: number, fontSize = 11): rea
 }
 
 /** 节点状态徽章的数据面（文案 + class；class 决定 SVG text 的 fill）。 */
-function statusBadge(node: DagLayout['nodes'][number]): { text: string; className: string } {
-  if (node.waitingOn > 0) return { text: `等 ${String(node.waitingOn)} 项`, className: 'wk-dag-wait' }
-  if (node.status === 'completed') return { text: '已完成', className: 'wk-dag-done' }
-  if (node.status === 'in_progress') return { text: '进行中', className: 'wk-dag-progress' }
-  return { text: '可开工', className: 'wk-dag-ready' }
+function statusBadge(node: DagLayout['nodes'][number], t: CompanyT): { text: string; className: string } {
+  if (node.waitingOn > 0) return { text: t('dag.status.waiting', { count: node.waitingOn }), className: 'wk-dag-wait' }
+  if (node.status === 'completed') return { text: t('dag.status.completed'), className: 'wk-dag-done' }
+  if (node.status === 'in_progress') return { text: t('dag.status.in_progress'), className: 'wk-dag-progress' }
+  return { text: t('dag.status.ready'), className: 'wk-dag-ready' }
 }
 
 /**
@@ -88,17 +100,22 @@ export const LOADING_NOTE = '读取团队状态…'
  * @param props.columns - 读模型折好的列。
  * @returns 看板。
  */
-export function BoardPanel({ columns, roleLabel = label => label }: { readonly columns: readonly BoardColumn[]; readonly roleLabel?: (ownerLabel: string) => string }) {
+function columnLabel(column: BoardColumn, t: CompanyT = defaultT): string {
+  const key = BOARD_STATUS_KEYS[column.status]
+  return key === undefined ? column.label : t(key)
+}
+
+export function BoardPanel({ columns, roleLabel = label => label, t = defaultT }: { readonly columns: readonly BoardColumn[]; readonly roleLabel?: (ownerLabel: string) => string; readonly t?: CompanyT }) {
   return (
-    <div className="wk-board" role="list" aria-label="任务看板">
+    <div className="wk-board" role="list" aria-label={t('board.aria')}>
       {columns.map(column => (
-        <section className="wk-column" key={column.status} role="listitem" aria-label={`${column.label}列`}>
+        <section className="wk-column" key={column.status} role="listitem" aria-label={t('board.columnAria', { label: columnLabel(column) })}>
           <div className="wk-column-head">
-            <span>{column.label}</span>
+            <span>{columnLabel(column, t)}</span>
             <span className="wk-column-count">{column.cards.length}</span>
           </div>
           {column.cards.length === 0
-            ? <StateNote text="这一列暂时是空的。" />
+            ? <StateNote text={t('board.emptyColumn')} />
             : column.cards.map(card => (
               <article className="wk-card" key={card.id}>
                 <div className="wk-card-subject">{card.subject}</div>
@@ -111,12 +128,12 @@ export function BoardPanel({ columns, roleLabel = label => label }: { readonly c
                       把 pending 的「等 …」也一起吞掉。 */}
                   {column.status === 'pending' && card.blockedBy.length > 0 && (
                     <Tag tone={card.ready ? 'success' : 'warning'}>
-                      {card.ready ? '依赖已就绪' : `等 ${card.blockedBy.join('、')}`}
+                      {card.ready ? t('board.ready') : t('board.waiting', { ids: card.blockedBy.join('、') })}
                     </Tag>
                   )}
                   {/* 声明 vs 板面：任务文本里写了"依赖 T1,T2"而板面没有这条边 ⇒ 上面那句
                       "依赖已就绪"是**假信号**（2026-10-13 真事故：静默缺边）。这条 tag 拆穿它。 */}
-                  {card.drift !== null && <Tag tone="warning">⚠ {driftLabel(card.drift)}</Tag>}
+                  {card.drift !== null && <Tag tone="warning">⚠ {driftText(card.drift, t)}</Tag>}
                   <span className="wk-card-id">{card.id}@{card.revision}</span>
                 </div>
               </article>
@@ -125,6 +142,14 @@ export function BoardPanel({ columns, roleLabel = label => label }: { readonly c
       ))}
     </div>
   )
+}
+
+/** 声明 vs 板面分叉的文案（不靠 lib 的中文 driftLabel）。 */
+function driftText(drift: NonNullable<BoardCard['drift']>, t: CompanyT): string {
+  const parts: string[] = []
+  if (drift.missing.length > 0) parts.push(t('board.drift.missing', { ids: drift.missing.join('、') }))
+  if (drift.unmapped.length > 0) parts.push(t('board.drift.unmapped', { ids: drift.unmapped.join('、') }))
+  return parts.join('；')
 }
 
 /** 画布缩放下限（占布局宽的比例）：再缩 11px 标题就不到 8px，宁可回退横向滚动。 */
@@ -150,7 +175,7 @@ export function fitScale(availableWidth: number, graphWidth: number): number {
  * @param props.layout - `layoutDag` 算好的节点/边与画布尺寸。
  * @returns SVG（空图给空态文案）。
  */
-export function DagPanel({ layout, roleLabel = label => label }: { readonly layout: DagLayout; readonly roleLabel?: (ownerLabel: string) => string }) {
+export function DagPanel({ layout, roleLabel = label => label, t = defaultT }: { readonly layout: DagLayout; readonly roleLabel?: (ownerLabel: string) => string; readonly t?: CompanyT }) {
   const fitRef = useRef<HTMLDivElement | null>(null)
   const [availableWidth, setAvailableWidth] = useState(0)
   useEffect(() => {
@@ -164,7 +189,7 @@ export function DagPanel({ layout, roleLabel = label => label }: { readonly layo
     observer.observe(element)
     return () => { observer.disconnect() }
   }, [])
-  if (layout.nodes.length === 0) return <StateNote text="这场动议还没有任务依赖图。" />
+  if (layout.nodes.length === 0) return <StateNote text={t('dag.empty')} />
   const scale = availableWidth === 0 ? 1 : fitScale(availableWidth, layout.width)
   return (
     <div className="wk-dag-fit" ref={fitRef}>
@@ -176,7 +201,7 @@ export function DagPanel({ layout, roleLabel = label => label }: { readonly layo
           viewBox={`0 0 ${String(layout.width)} ${String(layout.height)}`}
           style={{ transform: `scale(${String(scale)})`, transformOrigin: 'top left' }}
           role="img"
-          aria-label="任务依赖图"
+          aria-label={t('dag.aria')}
         >
       <defs>
         {/* 箭头 = **双 marker 显式上色**（CSS 里 .wk-arrow-tip-*）。不用 SVG2 `context-stroke`：
@@ -210,7 +235,7 @@ export function DagPanel({ layout, roleLabel = label => label }: { readonly layo
         // 排版（wrapTitle 截两行）、状态点改 <circle>，与卡片/连线同一条坐标管线，任何浏览器
         // 都不可能错位。
         const [titleLine1, titleLine2] = wrapTitle(node.subject, node.width - 18 - 13)
-        const badge = statusBadge(node)
+        const badge = statusBadge(node, t)
         const owner = node.ownerLabel === null ? null : truncateToWidth(roleLabel(node.ownerLabel), 90, 10)
         const ownerWidth = owner === null ? 0 : Math.round(textWidth(owner, 10) + 10)
         return (
