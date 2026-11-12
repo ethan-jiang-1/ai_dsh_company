@@ -1,28 +1,28 @@
 ---
 name: managed-service-economics
-description: 运维托管/维护服务的持续经济性：经常性收入、值班/人力成本、SLA 赔付、续约/流失；一页纸（decision-memo）。
+description: 'Ongoing economics of managed operations / maintenance services: recurring revenue, on-call/labor cost, SLA credits, renewal/churn; one page (decision-memo).'
 ---
-# 运维托管 / 维护服务经济性（一页纸）
+# Managed operations / maintenance service economics (one page)
 
-> **方法契约**：适用产品类型 = all；适用交付模式 = managed-service；
-> 需要事实 = kb/roster.md（席位 / 值班）、kb/rates.md（人·周成本）；缺 = fail-closed（报「缺方法 / 配置缺口」，不套 3-4-3、不编数）。
-> 交付文档 = `content/delivery-modes/managed-service/document-map.md`。
+> **Method contract**: applicable product types = all; applicable delivery modes = managed-service;
+> required facts = kb/roster.md (seats / on-call), kb/rates.md (person-week cost); missing = fail-closed (report "missing method / config gap"; do not force 3-4-3 and do not invent numbers).
+> Delivery document = `content/delivery-modes/managed-service/document-map.md`.
 
-## 什么时候用
+## When to use
 
-- 持续 SLA / 值守 / 监控 / 月报 / 续费的动议；
-- **不适用** `project-services`（一次性 SOW/UAT）或 `productized`（产品许可/订阅）——那两种缺各自的经济方法，先报缺。
+- motions with ongoing SLA / on-call / monitoring / monthly report / renewal;
+- **does not apply** to `project-services` (one-off SOW/UAT) or `productized` (product license/subscription) — those need their own economic methods; report the gap first.
 
-## 方法
+## Method
 
-1. **收入侧**：月度/季度服务费 × 合同期；套餐/分级/超量；续约涨幅；**不是** 3-4-3 里程碑收款。
-2. **成本侧**：服务 FTE / 值班 / 工具 / 备份 / 现场支持；按 `kb/roster.md` 的席位与 `kb/rates.md` 的人·周成本算；`<待填>` = 配置缺口，先要费率。
-3. **毛利与赔付**：经常性毛利 = 服务费 − 持续成本；按 `policy-lines.md` 的毛利/折扣线；SLA 赔付按 `policy-lines.md` 的服务信用上限预留，不并入折扣。
-4. **现金**：月付/季付/预付；续约与流失对现金流的影响；没有项目里程碑可依赖。
-5. **风险**：churn、范围蔓延、24×7 值班成本、单一客户集中、第三方依赖；每条给兜底。
-6. **输出**：`decision-memo.md` 一页纸，落 `drafts/cfo.md`；结论先行，数字可复现。
+1. **Revenue side**: monthly/quarterly service fee × contract term; packages/tiers/overage; renewal uplift; **not** 3-4-3 milestone billing.
+2. **Cost side**: service FTE / on-call / tools / backup / on-site support; calculate from the seats in `kb/roster.md` and the person-week cost in `kb/rates.md`; `<to fill>` = config gap; ask for rates first.
+3. **Gross margin and credits**: recurring gross margin = service fee − ongoing cost; use the gross-margin/discount lines in `policy-lines.md`; reserve SLA credits against the service-credit cap in `policy-lines.md`; do not fold them into discount.
+4. **Cash**: monthly/quarterly/prepaid; the cash-flow impact of renewal and churn; there is no project milestone to rely on.
+5. **Risk**: churn, scope creep, 24×7 on-call cost, single-customer concentration, third-party dependency; give a fallback for each.
+6. **Output**: one-page `decision-memo.md`, saved to `drafts/cfo.md`; conclusion first; numbers reproducible.
 
-## 边界
+## Boundary
 
-- 只谈财务与持续经济性；SLA 可交付性归 COO、技术可运维性归 VP-Eng、续约商务归 VP-Sales。
-- 不把一次性实施收入混进经常性收入；实施是 project-services，另开动议。
+- Only finance and ongoing economics; SLA deliverability belongs to COO, technical operability to VP-Eng, renewal commercial terms to VP-Sales.
+- Do not mix one-off implementation revenue into recurring revenue; implementation is project-services and gets its own motion.

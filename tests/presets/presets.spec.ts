@@ -679,7 +679,7 @@ describe('经营侧方法契约（CFO / COO / VP-Sales）', () => {
     expect(pricing).toMatch(/适用交付模式 = project-services|applicable delivery modes = project-services/)
     expect(pricing).toContain('3-4-3')
     const managed = readFileSync(join(PRESETS_DIR, 'cfo/skills/managed-service-economics/SKILL.md'), 'utf8')
-    expect(managed).toContain('适用交付模式 = managed-service')
+    expect(managed).toMatch(/适用交付模式 = managed-service|applicable delivery modes = managed-service/)
     expect(managed).toContain('policy-lines.md')
   })
 
