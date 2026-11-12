@@ -271,6 +271,7 @@ export const zh = {
   'cultivation.overview': '公司总览 ↗',
   'cultivation.resizeAria': '调整培养对话宽度',
   'cultivation.resizeTitle': '拖动调整左右宽度；键盘 ←/→，Home 复位',
+  'meta.language': 'zh',
 } as const
 
 /** 本命名空间的 key 联合。 */
@@ -537,6 +538,7 @@ export const en: Record<CompanyKey, string> = {
   'cultivation.overview': 'Company overview ↗',
   'cultivation.resizeAria': 'Resize the cultivation conversation',
   'cultivation.resizeTitle': 'Drag to resize; ←/→ on the keyboard, Home to reset',
+  'meta.language': 'en',
 }
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {

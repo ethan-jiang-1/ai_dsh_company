@@ -23,7 +23,7 @@ import { CULTIVATION_ROLES, WORK_TEXT_LIMIT } from '../../lib/cultivation.ts'
  * 面向人的文案（面板按钮、表单、校验提示、通道降级）。**迭代里改得最多的就是这里**——
  * 组件不得另写产品文案，一律引用本表。
  */
-export const CULTIVATION_COPY = {
+const CULTIVATION_COPY_ZH = {
   // ── 治理动作 ─────────────────────────────────────────────────────────────
   adopt: '采纳',
   reject: '拒绝',
@@ -124,7 +124,113 @@ export const CULTIVATION_COPY = {
   unexpected: (reason: string): string => `面板内部出错（已收回按钮，可重试）：${reason}`,
   /** 命令面**不回话**（断连时可能既不 resolve 也不 reject——实测过一次）：不能无限等，必须能自己收口。 */
   timedOut: (seconds: number): string => `命令面 ${String(seconds)} 秒没回话（可能断连）——已收回按钮，可重试。`,
-} as const
+}
+
+/** English expression-layer copy (same keys; functions keep the same signatures). */
+const CULTIVATION_COPY_EN = {
+  adopt: 'Adopt',
+  reject: 'Reject',
+  rejectPlaceholder: 'One-line reason (kept for the proposer)',
+  rejectConfirm: 'Confirm rejection',
+  verifyPass: 'This helped',
+  verifyFail: 'It did not help',
+  verifyPassConfirm: 'Record a useful observation',
+  verifyFailConfirm: 'Record a failed observation',
+  verificationEvidenceLabel: 'A later similar piece of work',
+  verificationEvidencePlaceholder: 'e.g. the new budget review still omitted key assumptions and their impact.',
+  verificationEvidenceHint: 'The evidence stays in the cultivation record with this useful/failed judgment. A failed observation does not auto-revoke the method.',
+  verificationEvidenceRequired: 'Name one similar piece of work after adoption; if there is no new case, cancel — do not invent a test.',
+  revoke: 'Revoke…',
+  revokeConfirm: 'Confirm revocation',
+  revokeConsequence: 'Revoke = delete this method (the role stops loading it; running sessions also lose it on directory refresh), and this record can no longer be adopted.',
+  justSaved: 'Just saved',
+  cancel: 'Cancel',
+  running: 'Working…',
+  composeOpen: 'Start recording a piece of work',
+  composeClose: 'Collapse',
+  workLabel: 'What work / what to improve',
+  workPlaceholder: 'e.g. the Q4 budget review used forecast numbers but did not list key assumptions.',
+  previewLabel: 'Preview before submitting',
+  previewTarget: 'Target role',
+  previewWork: 'This work',
+  previewExpectation: 'Next time',
+  previewBody: 'Method and evidence',
+  previewBackground: 'Background',
+  previewEmptyWork: 'Not recorded',
+  selfNote: (role: string): string => `Record a correction for your own role; after submitting, you (in the ${role} role context) decide in "Needs me".`,
+  suggestNote: (role: string): string => `This is a suggestion for ${role}; the person in that role's context decides, and you only keep the receipt.`,
+  submit: 'Record it',
+  expectationLabel: 'What it should do (one sentence)',
+  expectationPlaceholder: 'e.g. list every open item before closing',
+  bodyLabel: 'Method and evidence',
+  bodyOptionalLabel: 'Method (optional)',
+  bodyHint: 'Write the method and evidence; you can also attach background so the approver sees the situation.',
+  bodyOptionalHint: 'Background is attached; you can record without a method — the approver will see the background above.',
+  contextLabel: 'Reference background (optional)',
+  contextAdd: '+ Add background',
+  contextHint: 'Pick a session or a deliverable so the approver sees the situation without you rewriting the whole history.',
+  contextPrivacy: 'Background is written into the company disk cultivation record and visible to relevant roles; only pick material you are willing to share.',
+  contextSecretWarning: 'The background may contain secret/token-like content; confirm it is material you are willing to write to the company disk (no automatic redaction).',
+  contextUseCurrent: 'This session',
+  contextPickTitle: 'Pick reference background',
+  contextSearchPlaceholder: 'Search session title / role / deliverable…',
+  contextSessions: 'Recent sessions',
+  contextDeliverables: 'Recent deliverables',
+  contextEmpty: 'No session or deliverable to reference yet.',
+  contextLoading: 'Reading this background…',
+  contextNoText: 'This session has no usable text background (maybe only tool calls); pick another or submit without background.',
+  contextReadFailed: (reason: string): string => `Cannot read this background: ${reason}. Pick another or submit without background.`,
+  contextTimeout: 'This background took too long — stopped. Continue without it, or retry.',
+  contextRemove: 'Remove',
+  contextChange: 'Change',
+  contextExpand: 'Expand',
+  contextCollapse: 'Collapse',
+  contextClipped: 'The summary is long and was clipped; the approver sees the server-side version.',
+  bodyEmptyWithContext: '(No method written; relying on background)',
+  contextChangeTurn: 'Change turn',
+  contextOpenSession: 'Open session',
+  contextOpenFile: 'Open source',
+  contextTruncated: (turn: number, chars: number): string => `Clipped to the latest ${String(turn)} turns, about ${String(chars)} characters; the source can be opened.`,
+  contextBadPayload: (reason: string): string => `Bad background payload: ${reason}`,
+  contextTooLarge: (bytes: number): string => `Background too large (over ${String(bytes)} bytes); pick shorter material.`,
+  teammateBanner: 'This is a CEO team member session: corrections/suggestions here are recorded as the CEO (Lead); members inherit the CEO method layer.',
+  memberBadge: (name: string): string => `Member ${name} (CEO team)`,
+  bodyExpand: (lines: number): string => `Show full text (${String(lines)} lines)`,
+  listShowAll: (count: number): string => `Show all (${String(count)} items)`,
+  listShowLess: 'Show recent only',
+  bodyCollapse: 'Collapse',
+  targetRoleLabel: 'Target role',
+  problemExpectationEmpty: 'Write one sentence: what should it do.',
+  problemExpectationSeparator: 'The expectation cannot contain `::` (it separates the expectation from the body).',
+  problemBodyEmpty: 'The body cannot be empty: write the method and evidence, or the work/background.',
+  problemWorkEmpty: 'Write what work this is or what to improve.',
+  problemWorkTooLong: `Work facts are limited to ${String(WORK_TEXT_LIMIT)} characters; keep the most relevant part.`,
+  problemReason: 'A rejection needs a one-line reason (kept for the proposer).',
+  problemRoleUnknown: `Target role must be in the roster (${CULTIVATION_ROLES.join(' / ')}).`,
+  problemRoleSelf: 'For your own role use "record a method"; suggestions point to another role.',
+  unavailable: 'Command surface unavailable (this UI did not mount /cultivation) — use the command line.',
+  unmatched: '/cultivation is not in this session\'s command surface — use the command line.',
+  remoteFailed: (code: string, message: string): string => `Command surface error (${code}): ${message}`,
+  unreachable: (reason: string): string => `Command surface unreachable: ${reason}`,
+  done: 'Done.',
+  unexpected: (reason: string): string => `Panel internal error (button restored; retry): ${reason}`,
+  timedOut: (seconds: number): string => `Command surface did not reply in ${String(seconds)} seconds (possibly disconnected) — button restored; retry.`,
+} satisfies typeof CULTIVATION_COPY_ZH
+
+let cultivationLanguage: 'zh' | 'en' = 'zh'
+
+/** Set the expression language for the cultivation copy table (called by CultivationView). */
+export function setCultivationLanguage(language: 'zh' | 'en'): void {
+  cultivationLanguage = language
+}
+
+/** Language-aware copy table; consumers keep reading CULTIVATION_COPY as before. */
+export const CULTIVATION_COPY: typeof CULTIVATION_COPY_ZH = new Proxy(CULTIVATION_COPY_ZH, {
+  get(target, property, receiver) {
+    if (cultivationLanguage === 'en') return Reflect.get(CULTIVATION_COPY_EN, property, receiver)
+    return Reflect.get(target, property, receiver)
+  },
+})
 
 /** 人写文本的校验问题（字段 + 给用户看的一句话）。 */
 export interface DraftProblem {

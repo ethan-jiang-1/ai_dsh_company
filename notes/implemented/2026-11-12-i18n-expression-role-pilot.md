@@ -219,6 +219,12 @@
 - prd/meta 模板英文；PRD 正文标题改 Requirement:，测试同步。
 - content template 棘轮 PENDING 清零；全量 1654 tests，verify ALL PASS。
 
+## P0 UI 第十批（培养文案表）
+
+- CULTIVATION_COPY 拆成 ZH/EN 两份 + Proxy；CultivationView 按 meta.language 设置。
+- Board/Inbox/Chat/Compose 的 72 处引用不变，自动跟随语言；函数签名保留。
+- 新增 cultivation-copy.spec；client 381 tests；金样 9 页签 ALL PASS；全量 1656 tests，verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

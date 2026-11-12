@@ -15,6 +15,7 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { roleLabel } from '../../lib/cultivation.ts'
 import type { CompanyT } from '../locales.ts'
+import { setCultivationLanguage } from './cultivation-actions.ts'
 import { roleText } from '../roles.ts'
 import { CultivationBoard } from './CultivationBoard.tsx'
 import { CultivationChatPanel } from './CultivationChatPanel.tsx'
@@ -73,6 +74,7 @@ function initialChatWidth(): number {
 export function createCultivationView(injected: CultivationViewInjected) {
   return function CultivationView(props: CultivationViewProps) {
     const { sessionId, t } = props
+    setCultivationLanguage(t('meta.language') === 'en' ? 'en' : 'zh')
     const subscribe = useMemo(() => injected.roleSource.subscribe.bind(injected.roleSource), [injected.roleSource])
     const getPreset = useCallback(() => readPresetOf(injected.roleSource, sessionId), [injected.roleSource, sessionId])
     const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
