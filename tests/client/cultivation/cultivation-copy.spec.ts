@@ -29,5 +29,7 @@ describe('CULTIVATION_COPY 语言代理', () => {
     expect(CULTIVATION_COPY.boardCmdCheck).toContain('/cultivation check')
     expect(CULTIVATION_COPY.chatTitle).toBe('Cultivation conversation')
     expect(CULTIVATION_COPY.chatSend).toBe('Send')
+    expect(CULTIVATION_COPY.composeAria).toContain('proposal')
+    expect(CULTIVATION_COPY.composeTurn(2)).toContain('2')
   })
 })

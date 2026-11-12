@@ -257,6 +257,12 @@
 - CultivationChatPanel 迁 chat* copy：标题/副标题/提示/等待/创建/错误/空态/说话人/回复中/附加记录/输入/发送/工具行。
 - cultivation-copy.spec 覆盖 en chatTitle/chatSend；client 381 tests；金样 ALL PASS。
 
+## P0 UI 第十七批（Compose）
+
+- CultivationCompose 的提案 aria/背景/轮次/建议后缀迁 copy。
+- 培养 UI 文案面基本齐；下一步 en 真页面验证。
+- client 381 tests；金样 ALL PASS；全量 1656 tests，verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

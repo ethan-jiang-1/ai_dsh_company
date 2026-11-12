@@ -56,6 +56,7 @@ opened: 2026-11-12
 - Adopted（已采纳方法）迁 copy：验证态/观察历史/原始依据/来源/撤回后缀/展开收起。
 - Board 说明区迁 copy：我的分身/怎么养/熟手命令。
 - ChatPanel 迁 copy：独立会话标题/提示/状态/空态/说话人/附加记录/输入/发送。
+- Compose 迁 copy：提案 aria/背景/轮次/建议后缀；培养 UI 文案面基本齐。
 - content 模板 8/8 英文（meta/prd 补齐）；模板棘轮 PENDING 清零。
 
 **剩余**：

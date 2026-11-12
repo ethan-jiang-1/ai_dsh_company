@@ -267,6 +267,10 @@ const CULTIVATION_COPY_ZH = {
   chatTool: (name: string): string => `工具 · ${name}`,
   chatToolFailed: (reason: string): string => `工具失败${reason === '' ? '' : ` · ${reason}`}`,
   chatToolDone: '工具完成',
+  composeAria: '工作改善提案',
+  composeSuggestionSuffix: '（建议）',
+  composeContextAria: (title: string): string => `背景：${title}`,
+  composeTurn: (turn: number): string => `第 ${String(turn)} 轮`,
 }
 
 /** English expression-layer copy (same keys; functions keep the same signatures). */
@@ -501,6 +505,10 @@ const CULTIVATION_COPY_EN = {
   chatTool: (name: string): string => `Tool · ${name}`,
   chatToolFailed: (reason: string): string => `Tool failed${reason === '' ? '' : ` · ${reason}`}`,
   chatToolDone: 'Tool completed',
+  composeAria: 'Work improvement proposal',
+  composeSuggestionSuffix: ' (suggestion)',
+  composeContextAria: (title: string): string => `Background: ${title}`,
+  composeTurn: (turn: number): string => `turn ${String(turn)}`,
 } satisfies typeof CULTIVATION_COPY_ZH
 
 let cultivationLanguage: 'zh' | 'en' = 'zh'

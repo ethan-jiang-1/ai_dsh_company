@@ -235,7 +235,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
   const hasDraft = work.trim() !== '' || expectation.trim() !== '' || body.trim() !== ''
 
   return (
-    <div className="wk-activity-block wk-cultivation-compose" aria-label="工作改善提案">
+    <div className="wk-activity-block wk-cultivation-compose" aria-label={CULTIVATION_COPY.composeAria}>
       {props.teammate === true && <div className="wk-meta wk-cultivation-teammate">{CULTIVATION_COPY.teammateBanner}</div>}
       {!open
         ? (
@@ -311,14 +311,14 @@ export function CultivationCompose(props: CultivationComposeProps) {
                   </div>
                 )}
                 {context !== null && (
-                  <div className="wk-cultivation-context-card" aria-label={`背景：${context.title}`}>
+                  <div className="wk-cultivation-context-card" aria-label={CULTIVATION_COPY.composeContextAria(context.title)}>
                     <div className="wk-cultivation-context-card-head">
                       <strong>{context.title}</strong>
                       <span className="wk-meta">
                         {[
                           context.role === undefined ? '' : context.role,
                           context.subtitle === undefined ? '' : context.subtitle,
-                          context.turn === undefined ? '' : `第 ${String(context.turn)} 轮`,
+                          context.turn === undefined ? '' : CULTIVATION_COPY.composeTurn(context.turn),
                         ].filter(part => part !== '').join(' · ')}
                       </span>
                     </div>
@@ -360,7 +360,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
                 <span className="wk-meta">{CULTIVATION_COPY.previewLabel}</span>
                 <div className="wk-cultivation-preview-row">
                   <span className="wk-meta">{CULTIVATION_COPY.previewTarget}</span>
-                  <strong>{roleLabel(targetRole)}{isSuggest ? '（建议）' : ''}</strong>
+                  <strong>{roleLabel(targetRole)}{isSuggest ? CULTIVATION_COPY.composeSuggestionSuffix : ''}</strong>
                 </div>
                 {previewRows.map(row => (
                   <div key={row.label} className="wk-cultivation-preview-row">
