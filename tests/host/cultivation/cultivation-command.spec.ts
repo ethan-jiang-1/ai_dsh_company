@@ -42,6 +42,22 @@ describe('cultivation_propose 的 ctx.fs 通道（2026-10-28 二轮）', () => {
 })
 
 describe('/cultivation 注册命令的 host 行为', () => {
+  it('注册处传入的 roleLabel 进入命令回执（表达层语言跟随）', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const { command } = cultivationRegistrations(
+        { cultivationRoot: methods },
+        undefined,
+        workspace,
+        undefined,
+        undefined,
+        role => role === 'cfo' ? 'CFO · 首席财务官' : role,
+      )
+      const result = await invokeCultivation(command, 'ceo', workspace, 'suggest cfo 复核数字口径 :: 先对照底稿')
+      expect(result).toMatchObject({ kind: 'success' })
+      expect(String((result as { text: string }).text)).toContain('CFO · 首席财务官')
+    })
+  })
+
   it('公司数据只认盘根：子目录会话被拒绝，盘根会话照常写', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
       const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)

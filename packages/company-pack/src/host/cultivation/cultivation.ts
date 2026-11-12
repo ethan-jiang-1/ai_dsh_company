@@ -39,7 +39,7 @@ import {
   parseRecord,
   recordBody,
   recordStampOf,
-  roleLabel,
+  roleLabel as defaultRoleLabel,
   type CultivationRecord,
   type CultivationVerification,
   encodeVerificationHistory,
@@ -156,12 +156,13 @@ interface CultivationCommandContext {
   readonly config: CultivationHostConfig
   readonly storage: CultivationStorage
   readonly ctx: Context
+  readonly roleLabel: (role: string) => string
 }
 
 type CultivationCommandResult = { readonly kind: 'error' | 'success'; readonly text: string }
 
 /** 命令行为只依赖会话输入、配置与培养存储；Cordis 注册留在外层适配器。 */
-function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false, blockedReason?: string) {
+function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel) {
   return async ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
     const face = sessionFaceOf(agent)
     if (face === null) {
@@ -180,42 +181,42 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
     // correct [--context=<token>] <期望行为一句话> :: <做法与证据正文>
     // suggest <角色> [--context=<token>] <期望行为一句话> :: <建议与证据>
     if (sub === 'correct' || sub === 'suggest') {
-      return commandCorrectOrSuggest({ face, root: scope.root, recordsDir, config, storage, ctx }, sub, tokens, body)
+      return commandCorrectOrSuggest({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, sub, tokens, body)
     }
 
     // adopt <id> [as <slug>]
     if (sub === 'adopt') {
-      return commandAdopt({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens)
+      return commandAdopt({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens)
     }
 
     // reject <id> :: <理由>
     if (sub === 'reject') {
-      return commandReject({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens, body)
+      return commandReject({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens, body)
     }
 
     // verify <id> <pass|fail> :: <后续相似工作的具体依据>
     if (sub === 'verify') {
-      return commandVerify({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens, body)
+      return commandVerify({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens, body)
     }
 
     // archive <days>：只归档已处理记录，open 不动（人工保留策略）
     if (sub === 'archive') {
-      return commandArchive({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens)
+      return commandArchive({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens)
     }
 
     // purge <days>：只清 records-archive 里的旧记录，不动 live records
     if (sub === 'purge') {
-      return commandPurge({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens)
+      return commandPurge({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens)
     }
 
     // check：只报告孤儿（不自动删/改）
     if (sub === 'check') {
-      return commandCheck({ face, root: scope.root, recordsDir, config, storage, ctx })
+      return commandCheck({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel })
     }
 
     // revoke <slug>
     if (sub === 'revoke') {
-      return commandRevoke({ face, root: scope.root, recordsDir, config, storage, ctx }, tokens)
+      return commandRevoke({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel }, tokens)
     }
 
     return {
@@ -266,7 +267,7 @@ async function commandCorrectOrSuggest(
     if (!decoded.ok) return { kind: 'error', text: decoded.problem }
     const item = decoded.command.items[0]
     if (item === undefined) return { kind: 'error', text: '背景只能带一段（v1）。' }
-    const read = await readContext(ctx, root, item)
+    const read = await readContext(ctx, root, item, command.roleLabel)
     if ('problem' in read) return { kind: 'error', text: read.problem }
     contexts = [read.context]
   }
@@ -301,7 +302,7 @@ async function commandCorrectOrSuggest(
     ...(contexts === undefined ? {} : { contexts }),
   })
   const action = isSuggest
-    ? `建议 → ${roleLabel(targetRole!)}，待其本人在 ${roleLabel(targetRole!)} 会话里处理`
+    ? `建议 → ${command.roleLabel(targetRole!)}，待其本人在 ${command.roleLabel(targetRole!)} 会话里处理`
     : '纠正，待你采纳'
   const contextNote = contexts === undefined
     ? ''
@@ -328,7 +329,7 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
   let records: readonly CultivationRecord[]
   try {
     if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) {
-      return { kind: 'error', text: `${roleLabel(face.role)} 方法层里没有方法 ${slug}。` }
+      return { kind: 'error', text: `${command.roleLabel(face.role)} 方法层里没有方法 ${slug}。` }
     }
     records = storage.loadRecords(recordsDir).records
   } catch (error) {
@@ -398,7 +399,7 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
     }
   }
   clearPendingRevoke(root)
-  return { kind: 'success', text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(updated.length)} 条记录）。新开的 ${roleLabel(face.role)} 会话不再加载它。` }
+  return { kind: 'success', text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(updated.length)} 条记录）。新开的 ${command.roleLabel(face.role)} 会话不再加载它。` }
 }
 
 
@@ -413,7 +414,7 @@ function commandAdopt(command: CultivationCommandContext, tokens: readonly strin
       if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏，无法采纳。` }
       if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已是 ${record.status === 'adopted' ? '已采纳' : '已拒绝'}，不重复处理。` }
       if (record.targetRole !== face.role) {
-        return { kind: 'error' as const, text: `仅建议权：${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在 ${roleLabel(record.targetRole)} 的会话里采纳。` }
+        return { kind: 'error' as const, text: `仅建议权：${record.id} 的培养对象是 ${command.roleLabel(record.targetRole)}，请在 ${command.roleLabel(record.targetRole)} 的会话里采纳。` }
       }
       if (config.cultivationRoot === undefined) {
         return { kind: 'error' as const, text: '方法层根未配置（bundle patch 行 config.cultivationRoot 缺席）——无法部署方法。' }
@@ -444,7 +445,7 @@ function commandAdopt(command: CultivationCommandContext, tokens: readonly strin
       }
       return {
         kind: 'success' as const,
-        text: `已采纳 ${id}：方法 ${slug} 部署到 ${roleLabel(record.targetRole)} 方法层。新开的 ${roleLabel(record.targetRole)} 会话会带着它开工；已经在跑的会话也会随技能目录刷新看到它（下一步就可能用上）。见效后在培养面板点「这条有用」回填，不灵了点「撤回…」（命令行：/cultivation verify ${id} pass|fail、/cultivation revoke ${slug}）。`,
+        text: `已采纳 ${id}：方法 ${slug} 部署到 ${command.roleLabel(record.targetRole)} 方法层。新开的 ${command.roleLabel(record.targetRole)} 会话会带着它开工；已经在跑的会话也会随技能目录刷新看到它（下一步就可能用上）。见效后在培养面板点「这条有用」回填，不灵了点「撤回…」（命令行：/cultivation verify ${id} pass|fail、/cultivation revoke ${slug}）。`,
       }
     
 }
@@ -459,7 +460,7 @@ function commandReject(command: CultivationCommandContext, tokens: readonly stri
       if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏。` }
       if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已处理过（${record.status}）。` }
       if (record.targetRole !== face.role) {
-        return { kind: 'error' as const, text: `${record.id} 的培养对象是 ${roleLabel(record.targetRole)}，请在该角色会话里处理。` }
+        return { kind: 'error' as const, text: `${record.id} 的培养对象是 ${command.roleLabel(record.targetRole)}，请在该角色会话里处理。` }
       }
       if (!storage.updateRecord(recordsDir, id, { status: 'rejected', reason: body.split('\n')[0]!, decidedAt: new Date().toISOString() }, found.text)) {
         return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，拒绝未写；请重试。` }
@@ -488,7 +489,7 @@ function commandVerify(command: CultivationCommandContext, tokens: readonly stri
   if (record === null) return { kind: 'error', text: `记录 ${id} 形状坏。` }
   if (record.status !== 'adopted') return { kind: 'error', text: `只有已采纳的方法才能回填验证（${id} 现为 ${record.status}）。` }
   if (record.targetRole !== face.role) {
-    return { kind: 'error', text: `${record.id} 归 ${roleLabel(record.targetRole)}，请在该角色会话里回填。` }
+    return { kind: 'error', text: `${record.id} 归 ${command.roleLabel(record.targetRole)}，请在该角色会话里回填。` }
   }
   const entry: CultivationVerification = { outcome, evidence: normalizedEvidence, at: new Date().toISOString() }
   const verificationHistory = [...(record.verificationHistory ?? []), entry].slice(-VERIFICATION_HISTORY_LIMIT)
@@ -585,7 +586,7 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
         throw error
       }
       if (missing.length === 0 && orphans.length === 0) {
-        return { kind: 'success' as const, text: `${roleLabel(face.role)} 方法层与已采纳记录一致（${String(adopted.length)} 条）。` }
+        return { kind: 'success' as const, text: `${command.roleLabel(face.role)} 方法层与已采纳记录一致（${String(adopted.length)} 条）。` }
       }
       return {
         kind: 'success' as const,
@@ -596,7 +597,7 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
 }
 
 /** 「/cultivation」命令族与提案工具的注册面。 */
-export function registerCultivation(ctx: Context, config: CultivationHostConfig, companyHome?: string, dataBlocked = false, blockedReason?: string): void {
+export function registerCultivation(ctx: Context, config: CultivationHostConfig, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel): void {
   const storage = nodeCultivationStorage
   if (!dataBlocked && companyHome !== undefined && config.cultivationRoot !== undefined) {
     try {
@@ -706,6 +707,6 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
     name: 'cultivation',
     description: '培养回路：给自己的角色提交纠正、给别的角色提建议、采纳/拒绝/验证/撤回方法（采纳仅目标角色本人）',
     input: { hint: 'correct <期望行为> :: <做法与证据> | suggest <角色> <期望行为> :: <建议> | adopt <id> [as <slug>] | reject <id> :: <理由> | verify <id> <pass|fail> :: <后续相似工作的具体依据> | revoke <slug>' },
-    handler: cultivationCommandHandler(config, storage, ctx, companyHome, dataBlocked, blockedReason),
+    handler: cultivationCommandHandler(config, storage, ctx, companyHome, dataBlocked, blockedReason, roleLabel),
   })
 }

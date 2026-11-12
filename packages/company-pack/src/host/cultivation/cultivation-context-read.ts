@@ -18,7 +18,7 @@ import {
   type CultivationContextRef,
   type SessionEventLike,
 } from '../../lib/cultivation-context.ts'
-import { roleLabel } from '../../lib/cultivation.ts'
+import { roleLabel as defaultRoleLabel } from '../../lib/cultivation.ts'
 import { ROSTER } from '../cultivation/cultivation-storage.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
 
@@ -59,7 +59,7 @@ function sessionQueryOf(ctx: Context): SessionQueryLike | undefined {
 }
 
 /** 会话背景：host 非激活读一轮文字，填自包含 `contexts`。 */
-async function readSessionContext(query: SessionQueryLike, ref: CultivationContextRef): Promise<ContextRead> {
+async function readSessionContext(query: SessionQueryLike, ref: CultivationContextRef, roleLabel: (role: string) => string): Promise<ContextRead> {
   const observation = await query.observeSession(ref.ref, {
     projectionMode: 'none',
     signal: AbortSignal.timeout(5_000),
@@ -143,12 +143,12 @@ function readDeliverableContext(companyRoot: string, ref: CultivationContextRef)
   return { context }
 }
 
-export async function readContext(ctx: Context, companyRoot: string, ref: CultivationContextRef): Promise<ContextRead> {
+export async function readContext(ctx: Context, companyRoot: string, ref: CultivationContextRef, roleLabel: (role: string) => string = defaultRoleLabel): Promise<ContextRead> {
   if (ref.kind === 'session') {
     const query = sessionQueryOf(ctx)
     if (query === undefined) return { problem: '这个界面读不了会话历史（sessionQuery 未挂）。' }
     try {
-      return await readSessionContext(query, ref)
+      return await readSessionContext(query, ref, roleLabel)
     } catch (error) {
       return { problem: `这段背景读不到：${errorMessage(error)}。` }
     }

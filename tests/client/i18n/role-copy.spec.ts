@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import {
-  DELEGATION_TOOL_ROLES, ROLE_CANONICAL, ROLE_COPY, ROLE_IDS, roleCopyOf,
+  DELEGATION_TOOL_ROLES, ROLE_CANONICAL, ROLE_COPY, ROLE_IDS, roleCopyOf, roleLabelFor,
 } from '../../../packages/company-pack/src/lib/role-copy.ts'
 import {
   delegationRoleText, presenceRoleText, roleText,
@@ -71,5 +71,8 @@ describe('表达层取用', () => {
   it('roleCopyOf 未知角色返回 undefined（不抛）', () => {
     expect(roleCopyOf('ceo', 'zh')?.label).toBe('CEO · 首席执行官')
     expect(roleCopyOf('standard', 'zh')).toBeUndefined()
+    expect(roleLabelFor('cfo', 'zh')).toBe('CFO · 首席财务官')
+    expect(roleLabelFor('cfo', 'en')).toBe('CFO')
+    expect(roleLabelFor('standard', 'zh')).toBe('standard')
   })
 })

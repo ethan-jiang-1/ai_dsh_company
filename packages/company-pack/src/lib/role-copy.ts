@@ -82,3 +82,8 @@ export function isRoleId(value: string): value is RoleId {
 export function roleCopyOf(role: string, language: 'zh' | 'en'): RoleCopy | undefined {
   return isRoleId(role) ? ROLE_COPY[role][language] : undefined
 }
+
+/** 角色可见名（host 回执/客户端同源）；未知角色原样。 */
+export function roleLabelFor(role: string, language: 'zh' | 'en'): string {
+  return roleCopyOf(role, language)?.label ?? role
+}

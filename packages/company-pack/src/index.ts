@@ -31,6 +31,7 @@ import { registerPrdCommand } from './host/commands/prd-command.ts'
 import { registerReqCommand } from './host/commands/req-command.ts'
 import { registerDeliveryCommand } from './host/commands/delivery-command.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation/cultivation.ts'
+import { roleLabelFor } from './lib/role-copy.ts'
 import { registerHandbook } from './host/prompt/handbook.ts'
 import { registerWorkflowContract } from './host/prompt/contracts.ts'
 import { registerDelegationContracts } from './host/prompt/delegation-contracts.ts'
@@ -121,7 +122,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
     }
   }
 
-  registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked, blockedReason)
+  registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked, blockedReason, role => roleLabelFor(role, language.current()))
   const contentDir = resolveContentDir(import.meta.url)
   registerHandbook(ctx, contentDir, hasWorkspace ? workspace : undefined,
     // 默认跳过集合由 handbook.ts 按 NON_ROLE_PRESETS 派生（不在这里写 ID 白名单）；
