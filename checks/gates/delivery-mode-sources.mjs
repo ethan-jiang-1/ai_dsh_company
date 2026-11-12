@@ -5,7 +5,7 @@
 // 判据（交付模式包是一等能力，不是产品类型）：
 //   ① `content/delivery-modes/<id>/` 至少有 overview.md、document-map.md、delivery-rules.json；
 //   ② delivery-rules.json 的 deliveryMode = 目录名，entry 在场，每个 document 的 template 在场、owner 非空；
-//   ③ 动议户口模板必须有 `deliveryMode:` 字段；公司手册必须有“交付模式”与 `content/delivery-modes/` 指针；
+//   ③ 动议户口模板必须有 `deliveryMode:` 字段；公司手册必须有 delivery mode 与 `content/delivery-modes/` 指针；
 //   ④ 产品类型目录不得出现 delivery-modes 的同名目录（避免把交付模式塞回类型轴）。
 // 负例留证（建门时实跑）：删 overview → 红；把 deliveryMode 改成 nope → 红；删 meta 的 交付模式 行 → 红；
 //   还原 → 绿。
@@ -95,7 +95,7 @@ export function run({ root, ok, fail }) {
   if (!existsSync(handbookPath)) problems.push(`${CONTENT}/AGENTS.md 缺失`)
   else {
     const handbook = readFileSync(handbookPath, 'utf8')
-    if (!handbook.includes('交付模式')) problems.push(`${CONTENT}/AGENTS.md: 缺交付模式说明（全员 awareness 没有入口）`)
+    if (!/delivery ?mode/i.test(handbook)) problems.push(`${CONTENT}/AGENTS.md: 缺 delivery mode 说明（全员 awareness 没有入口）`)
     if (!handbook.includes('delivery-modes')) problems.push(`${CONTENT}/AGENTS.md: 缺 ${DELIVERY_DIR} 指针`)
   }
 

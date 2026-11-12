@@ -77,7 +77,7 @@ describe('交付模式 awareness：meta 与手册', () => {
     const meta = readFileSync(join(CONTENT, 'templates/meta.md'), 'utf8')
     expect(meta).toMatch(/^deliveryMode\s*[:：]/m)
     const handbook = readFileSync(join(CONTENT, 'AGENTS.md'), 'utf8')
-    expect(handbook).toContain('交付模式')
+    expect(handbook.toLowerCase()).toContain('delivery mode')
     expect(handbook).toContain('delivery-modes')
   })
 })

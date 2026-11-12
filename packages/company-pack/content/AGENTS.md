@@ -1,37 +1,37 @@
-# 公司手册
+# Company handbook
 
-> 公司名 / 产品名见 `.dsh-company/kb/company.md`（出厂是样例；装后改成你的公司）。
+> Company / product name: see `.dsh-company/kb/company.md` (factory is a sample; change it after install).
 
-本文件是公司级共识，由 host 在每个成员 agent 创建时注入 system prompt。它是**公司 run bundle 的说明书 + 协作边界**，
-不是岗位说明书——岗位细节在你自己的 CHARTER 里。CEO 的动议编排细则（任务板落法、ASSIGN 行格式、
-对账回合、补料与复算锚、HITL 前排空、present 顺序）住 CEO skill「chairing-staff-meeting」——
-主持动议时加载；本手册只留**全体成员都要遵守的规矩**。
+This file is company-level consensus, injected into every member agent's system prompt by the host. It is the **company run bundle's manual + collaboration boundary**,
+not a job description — job detail lives in your own CHARTER. The CEO's motion choreography (task-board landing, ASSIGN line format,
+reconciliation round, material/recompute anchors, drain before HITL, present order) lives in the CEO skill `chairing-staff-meeting` —
+load it when chairing; this handbook keeps only **rules every member must follow**.
 
-## 事实的家（别在别处复述数字）
+## Homes of facts (do not restate numbers elsewhere)
 
-- **组织 / 席位 / 费率**：编制与预算上限见 `.dsh-company/kb/org.md`（唯一事实家）；席位与投入见 `.dsh-company/kb/roster.md`；人·周成本见 `.dsh-company/kb/rates.md`——`<待填>` = 配置缺口，不得编人名 / 费率。
-- **你的岗位**：`.dsh-company/kb/<你的角色>/CHARTER.md`；**你的历史纪要**：`.dsh-company/kb/<你的角色>/journal/`。
-- **动议台账**（历史动议一览 + 一句话结论；「台账」页签数据源）：`.dsh-company/kb/motion-ledger.md`。
-- **编号合同**（需求层 / 退役词 / 范围豁免 / 并发口径）：pack `content/product-types/<id>/requirements-model.md`（`<id>` = `productType`）；workspace 的 `kb/process-docs.md` 只是播种副本。
-- **动议的产品类型**：写在 `.dsh-company/deliverables/<slug>/meta.md` 的 `产品类型`；缺省回落 `company.md` 的 `productType`。具体类型 id 见产品类型包；不要按习惯猜，用户没说就问一句或标假设。
-- **动议的交付模式**：写在 `meta.md` 的 `交付模式`；不写 = `productized`；有 SOW/UAT/驻场/里程碑验收 = `project-services`；有持续 SLA/值班/月报/续费 = `managed-service`。产品类型回答“造什么”，交付模式回答“怎么交付”；规则、模板与组合示例见 `content/delivery-modes/`；操作员用 `/delivery check <slug>` 收口交付文档。
-- **交付物**：落 `.dsh-company/deliverables/<日期>-<slug>/`（A1 命名；三态见 `generic/deliverable-states.md`）；**写作模板**：`<company-content>/templates/`。
+- **Organization / seats / rates**: staffing and budget caps in `.dsh-company/kb/org.md` (single source); seats and allocation in `.dsh-company/kb/roster.md`; person-week cost in `.dsh-company/kb/rates.md` — `<to-fill>` = configuration gap; never invent names or rates.
+- **Your job**: `.dsh-company/kb/<your role>/CHARTER.md`; **your historical minutes**: `.dsh-company/kb/<your role>/journal/`.
+- **Motion ledger** (history + one-line conclusions; data source for the Ledger tab): `.dsh-company/kb/motion-ledger.md`.
+- **Numbering contract** (requirement layers / retired words / scope exemption / concurrency): pack `content/product-types/<id>/requirements-model.md` (`<id>` = `productType`); the workspace's `kb/process-docs.md` is only a seeded copy.
+- **A motion's product type**: write `type` in `.dsh-company/deliverables/<slug>/meta.md`; absent falls back to `productType` in `company.md`. Type ids are in the product-type packs; do not guess from habit — if the user did not say, ask once or mark it as an assumption.
+- **A motion's delivery mode**: write `deliveryMode` in `meta.md`; absent = `productized`; SOW/UAT/on-site/milestone acceptance = `project-services`; ongoing SLA/on-call/monthly report/renewal = `managed-service`. Product type answers "what to build", delivery mode answers "how to deliver"; rules, templates, and combination examples in `content/delivery-modes/`; the operator closes out delivery documents with `/delivery check <slug>`.
+- **Deliverables**: land in `.dsh-company/deliverables/<date>-<slug>/` (A1 naming; three states in `generic/deliverable-states.md`); **writing templates**: `<company-content>/templates/`.
 
-## 细则（按需读，不进常驻上下文）
+## Detail (read on demand; not in the standing context)
 
-本手册只留每个成员开场必须知道的规矩；操作细则按需读（路径相对 pack content）：
+This handbook keeps only what every member must know at the start; read operating detail on demand (paths relative to pack content):
 
-- 交付物三态 / 命名 / 署名行 / meta：`<company-content>/generic/deliverable-states.md`
-- 职责边界 / 承诺权：`<company-content>/generic/role-boundary.md`
-- 路由与冲突升级：`<company-content>/generic/routing.md`
-- 协作规矩（ASSIGN、打回、问询、任务板）：`<company-content>/generic/collaboration.md`
-- ASSIGN 行 / 署名行 / 收工 / 日期 / 轮末：`<company-content>/generic/work-handoff.md`
-- 人机接口（待办 / 审批 / 节流）：`<company-content>/generic/human-interface.md`
+- Deliverable states / naming / signature line / meta: `<company-content>/generic/deliverable-states.md`
+- Role boundaries / commitment authority: `<company-content>/generic/role-boundary.md`
+- Routing and conflict escalation: `<company-content>/generic/routing.md`
+- Collaboration rules (ASSIGN, bounce-back, questions, task board): `<company-content>/generic/collaboration.md`
+- ASSIGN line / signature line / close-out / dates / end of round: `<company-content>/generic/work-handoff.md`
+- Human interface (Inbox / approval / throttling): `<company-content>/generic/human-interface.md`
 
-## 工作纪律
+## Work discipline
 
-- 可写范围是公司共享盘；改共享盘文件前先读一遍。**排练会话不写本盘**（在独立目录/独立会话里排练）。
-- **取证能力边界**：`web_fetch` 对一切域名被 DNS 检查拦截；**shell 出网不受限**（`bash` + `curl` + 浏览器 UA 直取可达）⇒ 外部取证首选 bash 直取，打法清单 = CEO skill「fact-finding-playbook」；穷尽通道仍拿不到才准 HITL。
-- 说"完成"之前，先跑过能证明它的检查；跑不了就说"未验证"。
-- **出厂两个人机面**：每轮结束的**文件变更审阅卡**（收工前自查改动）；present 后可点**「在侧边栏打开」**预览（Open in app 再调本机应用——两个连续但不同的动作）。
-- **文件以单个换行结尾**：不空行、不缺行（共享盘产物的统一形状）。
+- The writable area is the shared company disk; read a shared file before changing it. **Rehearsal sessions do not write this disk** (rehearse in a separate directory/session).
+- **Evidence capability boundary**: `web_fetch` is DNS-check-blocked for all domains; **shell egress is unrestricted** (`bash` + `curl` + browser UA) ⇒ prefer direct bash retrieval for external evidence; playbook = CEO skill `fact-finding-playbook`; only after exhausting the channel may you use HITL.
+- Before saying "done", run a check that proves it; if you cannot, say "unverified".
+- **Two factory human interfaces**: the per-round **file-change review card** (self-check changes before close-out); after `present`, click **"Open in sidebar"** to preview (Open in app then launches the local app — two consecutive but different actions).
+- **Files end with a single newline**: no blank line, no missing line (the shared-disk artifact's uniform shape).

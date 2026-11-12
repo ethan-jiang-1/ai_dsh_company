@@ -81,7 +81,7 @@ describe('产品类型 coverage：每个类型五件齐 + playbook + fixture', (
     expect(meta).toMatch(/^productType\s*[:：]/m)
     expect(meta).toContain('content/product-types/')
     const handbook = readFileSync(join(PACK, 'content/AGENTS.md'), 'utf8')
-    expect(handbook).toContain('产品类型')
+    expect(handbook.toLowerCase()).toContain('product type')
     expect(handbook).toContain('product-types')
     const ceo = readFileSync(join(PACK, 'presets/ceo/skills/assembling-the-team/SKILL.md'), 'utf8')
     expect(ceo).toMatch(/productType: <id>/)

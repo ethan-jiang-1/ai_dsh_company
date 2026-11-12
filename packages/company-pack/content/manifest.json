@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "三层加载清单（2026-11-09）。t0 常驻 / t1 摘要 / t2 按需；legacy = 尚未迁移的 state 文件（b 阶段搬入 product-types）。新增/改名文件必须同改本清单。",
+  "note": "Three-layer load manifest (2026-11-09). t0 standing / t1 summary / t2 on demand; legacy = state files not yet migrated (move to product-types in phase b). Adding/renaming a file must update this manifest in the same diff.",
   "tiers": {
     "t0": [
       "AGENTS.md"
