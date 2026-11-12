@@ -19,6 +19,7 @@ import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
 import { TasksTableView } from '../../../packages/company-pack/src/client/tabs/TasksPanel.tsx'
 import type { TeamViewLike } from '../../../packages/company-pack/src/lib/presence.ts'
+import { en, type CompanyKey, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 
 /** 真 wire 形状（`TeamTaskView`）：带 ownerName / ready / revision / blockedBy。 */
 const VIEW: TeamViewLike = {
@@ -49,6 +50,21 @@ function row(id: string): string {
   expect(found, `找不到 ${id} 的行（夹具或渲染变了，复核本断言）`).toBeDefined()
   return found!
 }
+
+const tEn = ((key: CompanyKey, params?: Record<string, string | number>) => {
+  const template = en[key]
+  return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+}) as CompanyT
+
+describe('TasksTableView：英文表达层', () => {
+  it('表头、状态、阻塞与未分配走 en 字典', () => {
+    const html = renderToStaticMarkup(createElement(TasksTableView, { view: VIEW, t: tEn }))
+    expect(html).toContain('<th>Task</th>')
+    expect(html).toContain('<th>Dependencies</th>')
+    expect(html).toContain('In progress')
+    expect(html).toContain('(blocked)')
+  })
+})
 
 describe('TasksTableView：「（阻塞）」只在待办行上（BUG-027 同族判据）', () => {
   it('已完成的行不带阻塞标记', () => {

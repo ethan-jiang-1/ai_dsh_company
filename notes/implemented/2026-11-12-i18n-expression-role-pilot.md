@@ -166,6 +166,11 @@
 - 待办页签、PanelFrame 浮出/收回、attention 类别标签迁 company 字典；移除中文 `attentionLabel` 纯函数。
 - zh/en 静态渲染 spec；client 370 tests；ui-scene-smoke 9 页签金样 ALL PASS；全量 1645 tests，verify ALL PASS。
 
+## P0 UI 第二批（任务板）
+
+- 任务板页签/表格/头部入口迁 tasks.* 字典；列名/状态/阻塞/未分配/空态/依赖缺失全部 t。
+- header action 注册 locale，en 下入口不裸中文；client 371 tests；金样 9 页签 ALL PASS；全量 1646 tests，verify ALL PASS。
+
 ## 暂缓 / 阻断
 
 - `fact-finding-playbook`、`ceo/assembling-the-team`、`ceo/chairing-staff-meeting`、`_shared/product-definition` 含机器可读中文 token：`待补料·<slug>·<T号>`、`派活｜…｜状态：待办`、`产品类型/交付模式`、`【待澄清】`、`日期待核`、`【事实】/【假设】`。必须先做 I1b token 英文化 + 消费方改造，不能和普通文案一起盲翻。

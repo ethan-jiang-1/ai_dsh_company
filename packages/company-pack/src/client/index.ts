@@ -277,6 +277,7 @@ function registerSidebarIdentity(ctx: ClientContext): void {
         name: 'conversation.session.header.actions',
         id: 'company-tasks',
         order: 21,
+        locale: COMPANY_NS,
         inject: () => ({
           leadOf: leadSessionId,
           openTasks: () => { scoped.sidebarRight.openTab('company-tasks') },

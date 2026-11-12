@@ -8,13 +8,18 @@ import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { presenceStatusFromPhase, statusLabelFor, type TeamViewLike } from '../../lib/presence.ts'
 import { tasksFromTeamView, type TaskRow } from '../../lib/board.ts'
-import { LOADING_NOTE, StateNote } from './company-panels.tsx'
+import { StateNote } from './company-panels.tsx'
+import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 
-const STATUS_LABEL: Record<string, string> = {
-  pending: '待办',
-  in_progress: '进行中',
-  completed: '完成',
+const STATUS_KEYS: Record<string, CompanyKey> = {
+  pending: 'tasks.status.pending',
+  in_progress: 'tasks.status.in_progress',
+  completed: 'tasks.status.completed',
 }
+const defaultT = ((key: CompanyKey, params?: Record<string, string | number>) => {
+  const template = zh[key]
+  return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+}) as CompanyT
 
 /**
  * 依赖 cell 的一项：**人读优先**——`owner · subject` 为主体，`task-N` 降为灰字次要。
@@ -25,16 +30,16 @@ const STATUS_LABEL: Record<string, string> = {
  * @param props.byId - 本板归一化任务索引（`tasksFromTeamView` 的产物）。
  * @returns 一项依赖标签。
  */
-function DependencyLabel({ id, byId }: { readonly id: string; readonly byId: ReadonlyMap<string, TaskRow> }) {
+function DependencyLabel({ id, byId, t }: { readonly id: string; readonly byId: ReadonlyMap<string, TaskRow>; readonly t: CompanyT }) {
   const dependency = byId.get(id)
   if (dependency === undefined) {
     return (
-      <span className="wk-dep wk-dep-missing" title={`${id}（未找到）`}>
-        <span className="wk-dep-subject">{id}（未找到）</span>
+      <span className="wk-dep wk-dep-missing" title={t('tasks.missing', { id })}>
+        <span className="wk-dep-subject">{t('tasks.missing', { id })}</span>
       </span>
     )
   }
-  const owner = dependency.ownerName ?? '未分配'
+  const owner = dependency.ownerName ?? t('tasks.unassigned')
   return (
     <span className="wk-dep" title={`${owner} · ${dependency.subject} · ${id}`} data-dep-id={id}>
       <span className="wk-dep-owner">{owner}</span>
@@ -53,25 +58,25 @@ function DependencyLabel({ id, byId }: { readonly id: string; readonly byId: Rea
  * @param props.view - 团队视图（可空：未加载时给空态）。
  * @returns 表格。
  */
-export function TasksTableView({ view, roleLabel = name => name }: { readonly view: TeamViewLike | null; readonly roleLabel?: (name: string) => string }) {
-  if (view === null) return <StateNote kind="loading" text={LOADING_NOTE} />
+export function TasksTableView({ view, roleLabel = name => name, t = defaultT }: { readonly view: TeamViewLike | null; readonly roleLabel?: (name: string) => string; readonly t?: CompanyT }) {
+  if (view === null) return <StateNote kind="loading" text={t('tasks.loading')} />
   const tasks = tasksFromTeamView(view)
   const byId = new Map(tasks.map(task => [task.id, task]))
   return (
     <>
       <div className="wk-meta wk-mb-xs">
-        成员：{view.members.map(member => `${roleLabel(member.name)}(${statusLabelFor(presenceStatusFromPhase(member.phase))})`).join('、') || '（无）'}
+        {t('tasks.members', { members: view.members.map(member => `${roleLabel(member.name)}(${statusLabelFor(presenceStatusFromPhase(member.phase))})`).join('、') || t('tasks.noMembers') })}
       </div>
       {tasks.length === 0
-        ? <StateNote text="还没有共享任务。" />
+        ? <StateNote text={t('tasks.empty')} />
         : (
             <table className="wk-table">
               <thead>
                 <tr>
-                  <th>任务</th>
-                  <th>依赖</th>
-                  <th>状态</th>
-                  <th>owner</th>
+                  <th>{t('tasks.col.task')}</th>
+                  <th>{t('tasks.col.dependencies')}</th>
+                  <th>{t('tasks.col.status')}</th>
+                  <th>{t('tasks.col.owner')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -85,7 +90,7 @@ export function TasksTableView({ view, roleLabel = name => name }: { readonly vi
                         ? '—'
                         : (
                             <span className="wk-deps">
-                              {task.blockedBy.map(id => <DependencyLabel key={id} id={id} byId={byId} />)}
+                              {task.blockedBy.map(id => <DependencyLabel key={id} id={id} byId={byId} t={t} />)}
                             </span>
                           )}
                     </td>
@@ -95,10 +100,10 @@ export function TasksTableView({ view, roleLabel = name => name }: { readonly vi
                           非 pending 时恒 false——单看 `ready === false` 会给**已完成/进行中**的行
                           也挂上「（阻塞）」。2026-10-19 真 wire 实测：298 行里 280 行挂了该标记，
                           其中 273 行是非 pending（活都干完了还标阻塞）。同 BUG-027 族的第二处。 */}
-                      {STATUS_LABEL[task.status] ?? task.status}
-                      {task.status === 'pending' && task.ready === false ? '（阻塞）' : ''}
+                      {STATUS_KEYS[task.status] === undefined ? task.status : t(STATUS_KEYS[task.status] as CompanyKey)}
+                      {task.status === 'pending' && task.ready === false ? t('tasks.blocked') : ''}
                     </td>
-                    <td data-col="owner">{task.ownerName ?? '未分配'}</td>
+                    <td data-col="owner">{task.ownerName ?? t('tasks.unassigned')}</td>
                   </tr>
                 ))}
               </tbody>
@@ -112,6 +117,7 @@ export function TasksTableView({ view, roleLabel = name => name }: { readonly vi
 export type TasksActionProps =
   PropsRuntime<'conversation.session.header.actions'>
   & {
+    readonly t?: CompanyT
     /** 团队态挂在 Lead 上：把任意会话归到它的 Lead（0.1.7 起纯函数，无 team RPC）。 */
     readonly leadOf: (sessionId: SessionId) => SessionId
     /** 打开右栏「任务板」平台页签（`ctx.sidebarRight.openTab('company-tasks')`）。 */
@@ -125,7 +131,7 @@ export type TasksActionProps =
  * @param props - 槽运行时 props 与注入面。
  * @returns 头部按钮（带活动任务计数）。
  */
-export function TasksAction({ sessionId, leadOf, openTasks, useSessions }: TasksActionProps) {
+export function TasksAction({ sessionId, leadOf, openTasks, useSessions, t = defaultT }: TasksActionProps) {
   // 活动任务计数：直接读 Lead 的 `agentTeam` 投影（Host 投影帧保持最新，无需轮询）。
   const team = useSessions((state) => state.projectionsBySession[leadOf(sessionId)]?.values.agentTeam)
   const live = team === undefined
@@ -136,11 +142,11 @@ export function TasksAction({ sessionId, leadOf, openTasks, useSessions }: Tasks
     <Button
       size="sm"
       variant="ghost"
-      title="团队任务板（右栏页签，可拖出成浮窗）"
+      title={t('tasks.actionTitle')}
       icon={<IconChecklistOutlineMedium />}
       onClick={openTasks}
     >
-      任务板{live === 0 ? '' : ` (${String(live)})`}
+      {t('tasks.action')}{live === 0 ? '' : ` (${String(live)})`}
     </Button>
   )
 }

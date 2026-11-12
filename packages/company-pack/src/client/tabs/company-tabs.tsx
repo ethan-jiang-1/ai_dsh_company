@@ -293,9 +293,9 @@ export function BudgetTab(props: CompanyTabProps) {
 export function TasksTab(props: CompanyTabProps) {
   const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
   return (
-    <PanelFrame title="任务板" tone="work" tabProps={props}>
+    <PanelFrame title={props.t('tasks.title')} tone="work" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
-      <TasksTableView view={data.team} roleLabel={(name: string) => roleText(name, 'label', props.t, name)} />
+      <TasksTableView view={data.team} roleLabel={(name: string) => roleText(name, 'label', props.t, name)} t={props.t} />
     </PanelFrame>
   )
 }
