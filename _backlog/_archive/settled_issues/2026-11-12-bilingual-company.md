@@ -9,7 +9,7 @@ opened: 2026-11-12
 >
 > **结论/去向**：rfc — [RFC](../../../notes/proposed/2026-11-12-bilingual-company.md)（已批，未实施；Phase 0/A1–A4 由 RFC 承载）
 >
-> 上游研究：[bilingual-company](../../research/bilingual-company/README.md)（已定性：盘面 = [代码审计](../../research/bilingual-company/2026-11-12-code-audit.md)，方案 = [架构取舍](../../research/bilingual-company/2026-11-12-design-options.md)）。
+> 上游研究：[bilingual-company](../research/bilingual-company/README.md)（已定性：盘面 = [代码审计](../research/bilingual-company/2026-11-12-code-audit.md)，方案 = [架构取舍](../research/bilingual-company/2026-11-12-design-options.md)）。
 
 ## 原始意图（用户原话）
 
@@ -88,7 +88,7 @@ opened: 2026-11-12
 | **D 全量改英文** | 系统提示/内容全英文，输出跟随用户 | 英文质量好；中文资产丢失 | 放弃中文默认与内容资产；否 |
 | **E 每 role 两套 preset** | `ceo` / `ceo-en` | roster 翻倍、会话身份分裂 | 否 |
 
-**推荐架构一句话**：语言开关唯一源 = DSH `locale.preference`（默认 zh）；client 用 typed `company` 字典；host 用 `CompanyLanguage` + 动态 policy；content/persona/skill/docs 分阶段。详细架构、数据流与测试矩阵 = [设计取舍](../../research/bilingual-company/2026-11-12-design-options.md) §3–§6。
+**推荐架构一句话**：语言开关唯一源 = DSH `locale.preference`（默认 zh）；client 用 typed `company` 字典；host 用 `CompanyLanguage` + 动态 policy；content/persona/skill/docs 分阶段。详细架构、数据流与测试矩阵 = [设计取舍](../research/bilingual-company/2026-11-12-design-options.md) §3–§6。
 
 ## 纪律：写在哪、怎么 day one
 

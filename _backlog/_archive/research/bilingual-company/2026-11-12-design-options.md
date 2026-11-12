@@ -7,7 +7,7 @@ intent: 在盘面事实之上给出可落地的方案、阶段边界、测试门
 
 > **2026-11-12 最终范围（覆盖前文 Phase B/C 的全量建议）**：用户最终只要求**界面呈现层**（TAB / Label / button / 空态 / 错误）zh/en + 默认 zh + 角色名混排。
 > 本文件 §5 的 Phase B（内部内容英文）与 Phase C（docs）**不在本次落地验收**；I2/I3 是独立债务，不做全量迁移。
-> 落地卡（已归档） = [2026-11-12-bilingual-landing.md](../../_archive/settled_issues/2026-11-12-bilingual-landing.md)。
+> 落地卡（已归档） = [2026-11-12-bilingual-landing.md](../../settled_issues/2026-11-12-bilingual-landing.md)。
 
 # 范围、架构与纪律落点
 

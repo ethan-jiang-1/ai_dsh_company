@@ -7,9 +7,9 @@ opened: 2026-11-12
 
 # 插件中英文双语（默认中文启动）
 
-> 状态：proposed（已批；Phase 0/A1/A3a/A2-tab-shell 已实现，A2 其余/A3b/A4 未开始）｜ 批准：用户 2026-11-12「按流程推动落地」｜ 上游：[问题卡](../../_backlog/_archive/settled_issues/2026-11-12-bilingual-company.md) · [研究题](../../_backlog/research/bilingual-company/README.md)
+> 状态：proposed（已批；Phase 0/A1/A3a/A2-tab-shell 已实现，A2 其余/A3b/A4 未开始）｜ 批准：用户 2026-11-12「按流程推动落地」｜ 上游：[问题卡](../../_backlog/_archive/settled_issues/2026-11-12-bilingual-company.md) · [研究题](../../_backlog/_archive/research/bilingual-company/README.md)
 >
-> **2026-11-12 方向修正**：双语只在**表达层**；内部代码/提示/内容用**英文单份 canonical**；角色名也属于表达层。Phase B 从「中文正文 + 英文 overlay」改为「内部英文单份 canonicalization」；详见[表达层方向材料](../../_backlog/research/bilingual-company/2026-11-12-expression-layer-direction.md)。
+> **2026-11-12 方向修正**：双语只在**表达层**；内部代码/提示/内容用**英文单份 canonical**；角色名也属于表达层。Phase B 从「中文正文 + 英文 overlay」改为「内部英文单份 canonicalization」；详见[表达层方向材料](../../_backlog/_archive/research/bilingual-company/2026-11-12-expression-layer-direction.md)。
 >
 > **2026-11-12 后续决策**：[内部全英文 canonical RFC](2026-11-12-internal-english-canonical.md) 接管内部语言方向；本 RFC 的 Phase B 被它取代，Phase 0/A1–A4 的表达层地基仍是现行。
 >
@@ -167,7 +167,7 @@ opened: 2026-11-12
 ## 当前状态
 
 - 2026-11-12：RFC 立项；Phase 0 完成；A1 完成；A3a 完成；A2 第一片（页签壳）完成；A2 其余/A3b/A4 未开始。
-- 2026-11-12 方向修正：双语只在表达层；内部英文 canonical；角色名进表达层（A2）；Phase B 改为英文单份 canonicalization，不做 `content/en/` 双语副本。详见[表达层方向材料](../../_backlog/research/bilingual-company/2026-11-12-expression-layer-direction.md)。
+- 2026-11-12 方向修正：双语只在表达层；内部英文 canonical；角色名进表达层（A2）；Phase B 改为英文单份 canonicalization，不做 `content/en/` 双语副本。详见[表达层方向材料](../../_backlog/_archive/research/bilingual-company/2026-11-12-expression-layer-direction.md)。
 - Phase 0：`.agents/skills/company-ui-change-definition/SKILL.md` + `packages/company-pack/src/README.md` / `tests/README.md` 指针；`pnpm verify` ALL PASS。
 - A1：`cordis.patch.yml` 的 `locale.config.preference: zh`；client `inject` 加 `locale`；`packages/company-pack/src/client/locales.ts`（`company` typed 字典）与 `ctx.locale.register`；`conversation.view` label 走 `t`；新增 key/placeholder 与 harness/repo 缺省 patch 结构 spec；`default-locale-runtime.spec.ts` 证 Host preference zh 覆盖英文浏览器 provisional；whole-client composition 证 locale 服务 + 字典切换（UI 组件由 tab/brand spec 覆盖）。
 - A3a：`packages/company-pack/src/host/language/company-language.ts`（`settings.describe()` 读 `locale.preference`、默认 zh、live update、外部语言→en）；`packages/company-pack/src/host/prompt/language-policy.ts`（11 个公司 preset 的动态 `company:language` section，默认 zh，用户明确换语言时跟随）；`src/index.ts` 接线；新增 bridge/policy spec + `apply-lifecycle` 的 wiring spec。真红：临时注释 `registerLanguagePolicy(ctx, language)` → wiring spec 红；还原 → 绿。

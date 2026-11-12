@@ -31,7 +31,7 @@ opened: 2026-11-12
 - 旧 RFC 的 Phase 0/A1/A3a/A2-tab-shell 已落地：locale 字典、默认 zh、host 语言桥、页签壳、品牌；表达层基础不回退。
 - 旧 RFC 的 Phase B 原为「中文正文 + `content/en` overlay」，与用户「内部全英文」冲突；已由新 RFC 取代。
 - I1（内容/领域值/picker 英文）、I2（注释/日志/测试名英文）、I3（开发者文档英文）均未开始。
-- 详细盘面/阶段/验收 = [新 RFC](../../../notes/proposed/2026-11-12-internal-english-canonical.md)；表达层边界 = [方向材料](../../research/bilingual-company/2026-11-12-expression-layer-direction.md)。
+- 详细盘面/阶段/验收 = [新 RFC](../../../notes/proposed/2026-11-12-internal-english-canonical.md)；表达层边界 = [方向材料](../research/bilingual-company/2026-11-12-expression-layer-direction.md)。
 
 ## 范围与排除项
 
