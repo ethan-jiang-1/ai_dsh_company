@@ -163,7 +163,7 @@ function memberTone(status: PresenceRow['status']): 'info' | 'danger' | 'warning
  * @returns 看板。
  */
 export function BoardTab(props: CompanyTabProps) {
-  const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
+  const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions, { stream: true })
   return (
     <PanelFrame title={props.t('tabs.board.label')} tone="overview" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
@@ -180,7 +180,7 @@ export function BoardTab(props: CompanyTabProps) {
  * @returns 依赖图。
  */
 export function DagTab(props: CompanyTabProps) {
-  const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
+  const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions, { stream: true })
   const byId = props.useSessions(state => (state as unknown as {
     readonly byId?: Readonly<Record<string, DelegationSessionSummaryLike>>
   }).byId)
@@ -291,7 +291,7 @@ export function BudgetTab(props: CompanyTabProps) {
  * @returns 任务板表格。
  */
 export function TasksTab(props: CompanyTabProps) {
-  const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions)
+  const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions, { stream: true })
   return (
     <PanelFrame title={props.t('tabs.tasks.label')} tone="work" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}

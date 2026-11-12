@@ -26,6 +26,7 @@ import { layoutDag, type DagLayout } from '../../lib/dag.ts'
 import {
   activityFromEvents,
   memberNames,
+  teamWithEventTasks,
   rowsFromTeamView,
   type ActivityEntry,
   type PresenceRow,
@@ -144,13 +145,16 @@ export function useCompanyData(
     return () => { controller.abort() }
   }, [sessionId, stream])
 
-  const tasks = useMemo(() => (team === null ? [] : tasksFromTeamView(team)), [team])
+  // 任务板/看板/依赖图消费同一视图：用 follow 流里的 team/task 补齐可能过期的 agentTeam 投影。
+  // 依赖 `activity`（每帧更新）促发重算；没有 stream 时 eventsRef 为空，等价于原视图。
+  const effectiveTeam = useMemo(() => teamWithEventTasks(team, eventsRef.current), [team, activity])
+  const tasks = useMemo(() => (effectiveTeam === null ? [] : tasksFromTeamView(effectiveTeam)), [effectiveTeam])
   const columns = useMemo(() => boardColumns(tasks), [tasks])
   const dag = useMemo(() => layoutDag(tasks), [tasks])
-  const rows = useMemo(() => (team === null ? [] : rowsFromTeamView(team)), [team])
+  const rows = useMemo(() => (effectiveTeam === null ? [] : rowsFromTeamView(effectiveTeam)), [effectiveTeam])
   const usage = useProjection('tokenUsage')
   const stats = useProjection('sessionStats')
   const summary = useMemo(() => budgetSummary(usage, stats), [usage, stats])
 
-  return { team, tasks, columns, dag, rows, activity, summary, error, streamError }
+  return { team: effectiveTeam, tasks, columns, dag, rows, activity, summary, error, streamError }
 }

@@ -19,10 +19,10 @@ const SLUG = '2026-11-11-demo'
 
 type Definition = { handler: (input: { readonly rawInput: string }) => Promise<{ readonly kind: string, readonly text: string }> }
 
-function mount(workspace: string): Definition {
+function mount(workspace: string, contentDir = CONTENT_DIR): Definition {
   let definition: Definition | undefined
   const ctx = { commands: { register: (def: Definition) => { definition = def } } }
-  registerDeliveryCommand(ctx as never, { dataBlocked: false, workspace, contentDir: CONTENT_DIR })
+  registerDeliveryCommand(ctx as never, { dataBlocked: false, workspace, contentDir })
   return definition as Definition
 }
 
@@ -147,5 +147,38 @@ describe('registerDeliveryCommand', () => {
       expect(result.kind).toBe('error')
       expect(result.text).toContain('缺 meta.md')
     } finally { cleanup() }
+  })
+})
+
+describe('规则 id 信任边界', () => {
+  it('deliveryMode 路径穿越 → 未知模式，不读 content 外自造规则', async () => {
+    const content = mkdtempSync(join(tmpdir(), 'delivery-content-'))
+    const { workspace, cleanup } = fixture('../evil-mode')
+    try {
+      mkdirSync(join(content, 'evil-mode'), { recursive: true })
+      writeFileSync(join(content, 'evil-mode', 'delivery-rules.json'), JSON.stringify({ documents: {}, requiredSections: {} }))
+      mkdirSync(join(content, 'delivery-modes'), { recursive: true })
+      const result = await mount(workspace, content).handler({ rawInput: `check ${SLUG}` })
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain('未知交付模式')
+      expect(result.text).not.toContain('交付检查通过')
+    } finally {
+      cleanup()
+      rmSync(content, { recursive: true, force: true })
+    }
+  })
+
+  it('规则文件是目录 → 当缺失处理，不抛 EISDIR', async () => {
+    const content = mkdtempSync(join(tmpdir(), 'delivery-content-'))
+    const { workspace, cleanup } = fixture('project-services')
+    try {
+      mkdirSync(join(content, 'delivery-modes', 'project-services', 'delivery-rules.json'), { recursive: true })
+      const result = await mount(workspace, content).handler({ rawInput: `check ${SLUG}` })
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain('delivery-rules.json 缺失')
+    } finally {
+      cleanup()
+      rmSync(content, { recursive: true, force: true })
+    }
   })
 })

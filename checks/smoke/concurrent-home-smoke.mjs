@@ -39,6 +39,8 @@ const rpc = async i => { const cookie = await companyCookie({ fetch: globalThis.
 
 try {
   rmSync(BASE, { recursive: true, force: true }); mkdirSync(join(BASE, 'bin'), { recursive: true }); mkdirSync(join(BASE, 'user'), { recursive: true })
+  // DSH_COMPANY_HOME 必须在 boot 前存在，否则摆渡成 dataBlocked（BUG-101 的检查器前提）。
+  mkdirSync(WS, { recursive: true })
   writeFileSync(join(BASE, 'bin/dsh'), `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(CLI)} "$@"\n`, { mode: 0o755 })
   if (!existsSync(TARBALL)) throw new Error(`缺 ${TARBALL}`)
   check('安装成功', dsh(['plugin', '--profile', 'web', 'add', `file:${TARBALL}`]).status === 0)
@@ -48,9 +50,16 @@ try {
   const down = starts.filter(x => x.status === 'rejected').map(x => x.reason?.message ?? '')
   check('两个进程至少一个能启动', up.length >= 1, `up=${String(up.length)} down=${String(down.length)}`)
   if (down.length > 0) console.log(`  另一进程失败（可解释即可）：${down[0].split('\n')[0]}`)
-  const blocked = up.filter(item => item.output().includes('另一个 writer')).length
+  // lease 结论可能晚于启动 banner：轮询到「两个都已出结论」（恰好一个 blocked）或超时，
+  // 不做 banner 后的单次快照（BUG-101）。
+  const leaseDeadline = Date.now() + 10_000
+  let blocked = up.filter(item => item.output().includes('另一个 writer')).length
+  while (up.length === 2 && blocked !== 1 && Date.now() < leaseDeadline) {
+    await new Promise(resolve => setTimeout(resolve, 250))
+    blocked = up.filter(item => item.output().includes('另一个 writer')).length
+  }
   check('同 home 恰好一个 writer（另一个被点名停写）', up.length === 2 ? blocked === 1 : blocked === 0,
-    `up=${String(up.length)} blocked=${String(blocked)}`)
+    `up=${String(up.length)} blocked=${String(blocked)} waited=${String(Math.round(10_000 - Math.max(0, leaseDeadline - Date.now())))}ms`)
   for (const i of up) {
     const r = await rpc(i)
     const created = await r('session/create', { request: { cwd: WS, agentPreset: 'ceo' } })
@@ -60,14 +69,16 @@ try {
   for (const child of active) { try { child.kill('SIGTERM') } catch { /* gone */ } }
 
   console.log('② 事后完整性：bundle/catalog/数据可解析')
-  const bundle = JSON.parse(readFileSync(join(HOME, 'bundle.json'), 'utf8'))
-  check('bundle.json 可解析且 pack 正确', bundle?.pack?.version === PACK.version)
-  const catalog = JSON.parse(readFileSync(join(WS, 'kb/deliverables-index.json'), 'utf8'))
+  const bundlePath = join(WS, '.dsh-company', 'bundle.json')
+  const bundle = JSON.parse(readFileSync(bundlePath, 'utf8'))
+  check('bundle.json v3 身份在 workspace（home 根不再写）', bundle?.v === 3 && typeof bundle.id === 'string'
+    && bundle?.pack?.version === PACK.version && !existsSync(join(HOME, 'bundle.json')))
+  const catalog = JSON.parse(readFileSync(join(WS, '.dsh-company/kb/deliverables-index.json'), 'utf8'))
   check('catalog 可解析', catalog?.schema === 1 && Array.isArray(catalog.entries))
-  mkdirSync(join(WS, 'kb/ceo/journal'), { recursive: true })
-  writeFileSync(join(WS, 'kb/ceo/journal/after.md'), '# after concurrency\n')
-  const h = sha(join(WS, 'kb/ceo/journal/after.md'))
-  check('数据文件可写/可读', sha(join(WS, 'kb/ceo/journal/after.md')) === h)
+  mkdirSync(join(WS, '.dsh-company/kb/ceo/journal'), { recursive: true })
+  writeFileSync(join(WS, '.dsh-company/kb/ceo/journal/after.md'), '# after concurrency\n')
+  const h = sha(join(WS, '.dsh-company/kb/ceo/journal/after.md'))
+  check('数据文件可写/可读', sha(join(WS, '.dsh-company/kb/ceo/journal/after.md')) === h)
 
   console.log('③ 事后正常 boot 仍可用（单实例，stale lease 可接管）')
   const one = await boot()

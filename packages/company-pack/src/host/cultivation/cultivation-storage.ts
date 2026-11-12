@@ -104,6 +104,8 @@ export const METHOD_MIGRATION_MARKER = '.migrated'
 export interface MethodMigrationResult {
   readonly copied: readonly string[]
   readonly conflicts: readonly string[]
+  /** 因目标域不合法而隔离到 `.legacy-invalid/` 的旧 slug。 */
+  readonly invalid: readonly string[]
   readonly warnings: readonly string[]
   readonly skipped: boolean
 }
@@ -121,7 +123,7 @@ export function migrateLegacyMethodLayers(
   methodRoot: string,
   now: Date = new Date(),
 ): MethodMigrationResult {
-  const result = { copied: [] as string[], conflicts: [] as string[], warnings: [] as string[], skipped: false }
+  const result = { copied: [] as string[], conflicts: [] as string[], invalid: [] as string[], warnings: [] as string[], skipped: false }
   if (existsSync(join(methodRoot, METHOD_MIGRATION_MARKER))) return { ...result, skipped: true }
   ensureMethodRoot(methodRoot)
   const profilesDir = join(dshHome, 'profiles')
@@ -146,6 +148,20 @@ export function migrateLegacyMethodLayers(
         const sourceInfo = lstatOrNull(source)
         if (sourceInfo === null || sourceInfo.isSymbolicLink() || !sourceInfo.isFile()) continue
         const text = readFileSync(source, 'utf8')
+        if (!SLUG_RE.test(slug.name)) {
+          // 旧格式允许自由目录名；目标域有 slug 约束。非法项不进方法根（否则可见但删不掉），
+          // 落到 `.legacy-invalid/<profile>/` 作证据，并在迁移结果里点名（BUG-093）。
+          const quarantine = join(methodRoot, role.name, '.legacy-invalid', profile.name, `${slug.name}.md`)
+          try {
+            mkdirSync(dirname(quarantine), { recursive: true })
+            copyFileSync(source, quarantine, constants.COPYFILE_EXCL)
+          } catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+          }
+          result.invalid.push(`${role.name}/${slug.name}`)
+          result.warnings.push(`${role.name}/${slug.name}：slug 不合法（隔离到 .legacy-invalid/${profile.name}/，不进方法根）`)
+          continue
+        }
         const destDir = join(methodRoot, role.name, slug.name)
         const dest = join(destDir, 'SKILL.md')
         try {
@@ -178,6 +194,7 @@ export function migrateLegacyMethodLayers(
       migratedAt: now.toISOString(),
       copied: result.copied.length,
       conflicts: result.conflicts.length,
+      invalid: result.invalid.length,
     })}\n`, { flag: 'wx' })
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'EEXIST') result.warnings.push(`写迁移 marker 失败：${(error as Error).message}`)
@@ -337,7 +354,8 @@ function listMethodSlugs(root: string, role: string): string[] {
   if (roleInfo.isSymbolicLink() || !roleInfo.isDirectory()) throw new UnsafeCultivationPathError(roleDir)
   const slugs: string[] = []
   for (const entry of readdirSync(roleDir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue
+    // 方法发现面与 revoke/read 的目标域一致：非法目录名不进列表，避免「看得见但删不掉」（BUG-093）。
+    if (!entry.isDirectory() || !SLUG_RE.test(entry.name)) continue
     const file = join(roleDir, entry.name, 'SKILL.md')
     const info = lstatOrNull(file)
     if (info !== null && !info.isSymbolicLink() && info.isFile()) slugs.push(entry.name)

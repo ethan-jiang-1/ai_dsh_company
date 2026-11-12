@@ -19,8 +19,7 @@
 `workspaceFiles` 读、分身经 fs 读——写留日志）。闭环：纠正或跨角色建议（CEO 仅建议权，
 目标角色本人采纳）→ 本人采纳 → 方法落方法层 → 新会话生效 → 同类任务验证回填（`verify`）
 → 不灵可撤回（`revoke`）。每次验证都附一项采纳后的相似工作事实，pass/fail、证据和时间追加到记录历史；失败只记为观察、不自动撤回。缺少原始出处显示为未记录，不推断来源或自然人身份。数据诚实 = 不可达 ≠ 0、未验证 ≠ 已掌握。机制与判据 =
-[cultivation-method-layer-probe](../../probes/session-context/cultivation-method-layer-probe.mjs)。
-
+[cultivation-method-layer-probe](../../probes/session-context/cultivation-method-layer-probe.mjs)。**撤回/对账的完整性（2026-11-13）**：records 不可达 → 拒绝 `revoke`；本 workspace 无采纳记录时需 `revoke <slug> --orphan` 显式确认（方法层 home 级、records workspace 级，0 条 ≠ 全局无记录）。`check` 排除 `revokedAt`、计入坏记录、非法 `methodSlug` 报「记录坏」而不是抛错；legacy 迁移的非法 slug 隔离到 `.legacy-invalid/`，不进方法根。
 **可选参考背景（2026-10-23）**：`/cultivation correct|suggest` 接受可选的
 `--context=<base64url(ref JSON)>`（GUI 培养面板发出；不带 flag 的旧语法逐字不变）。命令只带引用
 （session/成品 path + turn/address），**host 读后**把自包含 `contexts`（kind/ref/title/at/turn/excerpt/

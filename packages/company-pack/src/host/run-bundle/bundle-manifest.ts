@@ -21,7 +21,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { dirname, isAbsolute, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { isRecord } from '../../lib/guards.ts'
 import { RUN_BUNDLE_REL } from '../run-bundle/run-bundle.ts'
@@ -36,9 +36,28 @@ const BUNDLE_IDENTITY_DIR = 'company/identity'
 /** manifest 的绝对路径（`<workspace>/.dsh-company/bundle.json`）。 */
 export const bundleManifestPath = (workspace: string): string => join(workspace, BUNDLE_MANIFEST_REL)
 
-/** home 身份备份路径。 */
-export const identityBackupPath = (dshHome: string, id: string): string =>
-  join(dshHome, BUNDLE_IDENTITY_DIR, `${id}.json`)
+/**
+ * 合法的 bundle id：单段、可做文件名、长度有上限。
+ *
+ * manifest 在 workspace 是**模型可写**的；id 会被拿去 `join` 身份备份路径，所以它必须被当成
+ * 不可信输入（BUG-094）：拒绝 `/`、`\`、`..`、`.`、NUL、盘符与空白。
+ */
+export function isSafeBundleId(value: unknown): value is string {
+  return typeof value === 'string'
+    && value.length > 0
+    && value.length <= 128
+    && /^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(value)
+}
+
+/** home 身份备份路径；不安全 id 直接拒绝，结果必须仍在 `company/identity/` 下。 */
+export const identityBackupPath = (dshHome: string, id: string): string => {
+  if (!isSafeBundleId(id)) throw new Error(`不安全的 bundle id：${JSON.stringify(id)}`)
+  const root = join(dshHome, BUNDLE_IDENTITY_DIR)
+  const target = join(root, `${id}.json`)
+  const rel = relative(root, target)
+  if (rel.startsWith('..') || isAbsolute(rel)) throw new Error(`bundle id 穿出身份目录：${JSON.stringify(id)}`)
+  return target
+}
 
 /** 基部升级日志（workspace 内、按次追加）。 */
 export function appendUpgradeLog(workspace: string, message: string): void {
@@ -128,7 +147,7 @@ function validateBundleManifest(value: unknown): ManifestValidation {
   if (version !== BUNDLE_MANIFEST_VERSION) {
     return { ok: false, error: `不支持的 manifest 版本 ${String(version)}` }
   }
-  if (typeof value.id !== 'string' || value.id.trim() === '') return { ok: false, error: 'id 缺失' }
+  if (!isSafeBundleId(value.id)) return { ok: false, error: 'id 缺失或不是安全的单段文件名' }
   if (typeof value.createdAt !== 'string' || value.createdAt.trim() === '') return { ok: false, error: 'createdAt 缺失' }
   const pack = value.pack
   if (!isRecord(pack) || typeof pack.name !== 'string' || typeof pack.version !== 'string') {
@@ -192,6 +211,21 @@ export function planBundleManifest(options: {
 }): ManifestPlan {
   const path = bundleManifestPath(options.workspace)
   const state = readBundleManifestState(options.workspace)
+  if (options.id !== undefined && !isSafeBundleId(options.id)) {
+    return {
+      path,
+      manifest: {
+        v: BUNDLE_MANIFEST_VERSION,
+        id: `bundle-${randomUUID()}`,
+        createdAt: (options.now ?? new Date()).toISOString(),
+        pack: options.pack,
+        runBundle: { schema: 1 },
+      },
+      backupPath: '',
+      action: 'skip',
+      error: '调用方给的 bundle id 不安全（拒绝当路径组件）',
+    }
+  }
   if (state.status === 'ok') {
     return {
       path,
@@ -216,8 +250,10 @@ export function planBundleManifest(options: {
     }
   }
   const legacy = state.status === 'legacy' ? state.manifest : undefined
+  // v2 legacy 的 id 若不符合目标域（大写/空格/../…），生成新 id 并保留旧 manifest 备份，不原样带进 v3。
+  const legacyId = legacy?.id
   const id = options.id
-    ?? (typeof legacy?.id === 'string' && legacy.id.trim() !== '' ? legacy.id : `bundle-${randomUUID()}`)
+    ?? (isSafeBundleId(legacyId) ? legacyId : `bundle-${randomUUID()}`)
   const createdAt = typeof legacy?.createdAt === 'string' && legacy.createdAt.trim() !== ''
     ? legacy.createdAt
     : (options.now ?? new Date()).toISOString()

@@ -107,6 +107,40 @@ export interface TeamViewLike {
   }[]
 }
 
+/**
+ * 用事件流补任务板（2026-11-13，BUG-103）。
+ *
+ * 任务工具写的是 `team/task` 事件；`agentTeam` 投影在「工具已成功但浏览器拿到的是旧快照」
+ * 时会是空 tasks（隔离 home 真页面复现）。任务板/看板/依赖图都读同一个 `team`，所以这里把
+ * follow 流里的 `team/task` 折回视图：事件是最新的 durable 事实，投影只提供成员名与兜底。
+ * @param view - 当前 `agentTeam` 投影（null = 还没加载）。
+ * @param events - 同会话 follow 到的事件（历史 + 实时）。
+ * @returns 合并后的视图；`view === null` 时仍返回 null。
+ */
+export function teamWithEventTasks(view: TeamViewLike | null, events: readonly TeamEventLike[]): TeamViewLike | null {
+  if (view === null) return null
+  const nameById = new Map(view.members.map(member => [member.id, member.name]))
+  const tasks = new Map(view.tasks.map(task => [task.id, task]))
+  for (const event of events) {
+    if (event.type !== 'team/task') continue
+    const task = (event.data as { task: { readonly id: string, readonly revision: number, readonly subject: string, readonly status: string, readonly ownerId?: string, readonly blockedBy?: readonly string[], readonly description?: string } }).task
+    if (task.status === 'deleted') { tasks.delete(task.id); continue }
+    const ownerName = task.ownerId === undefined
+      ? tasks.get(task.id)?.ownerName
+      : nameById.get(task.ownerId) ?? tasks.get(task.id)?.ownerName
+    tasks.set(task.id, {
+      id: task.id,
+      subject: task.subject,
+      ...(task.description === undefined ? {} : { description: task.description }),
+      status: task.status,
+      ...(ownerName === undefined ? {} : { ownerName }),
+      revision: task.revision,
+      ...(task.blockedBy === undefined ? {} : { blockedBy: task.blockedBy }),
+    })
+  }
+  return { ...view, tasks: [...tasks.values()] }
+}
+
 /** lead 会话日志里的 `team/*` 事件（host 折算路径与回放 fixtures 的输入）。 */
 export type TeamEventLike =
   | {
@@ -219,12 +253,17 @@ export function diffActivity(prev: TeamViewLike | undefined, next: TeamViewLike,
     }
     if (before.status === task.status) continue
     const owner = task.ownerName === undefined ? '未分配' : displayNameFor(task.ownerName, 'teammate')
+    // 状态机有 4 个值：显式分派，别让「pending/未知」落进删除兜底（BUG-098）。
     if (task.status === 'in_progress') {
       entries.push({ time: now, kind: 'task', text: `${owner} 认领 ${task.id}`, token: { key: 'presence.activity.taskClaimed', params: { owner, id: task.id } } })
     } else if (task.status === 'completed') {
       entries.push({ time: now, kind: 'task', text: `${owner} 完成 ${task.id}`, token: { key: 'presence.activity.taskCompleted', params: { owner, id: task.id } } })
-    } else {
+    } else if (task.status === 'pending') {
+      entries.push({ time: now, kind: 'task', text: `${task.id} 退回待办`, token: { key: 'presence.activity.taskReopened', params: { id: task.id } } })
+    } else if (task.status === 'deleted') {
       entries.push({ time: now, kind: 'task', text: `${task.id} 已删除`, token: { key: 'presence.activity.taskDeleted', params: { id: task.id } } })
+    } else {
+      entries.push({ time: now, kind: 'task', text: `${task.id} 状态未知（${String(task.status)}）`, token: { key: 'presence.activity.taskUnknown', params: { id: task.id, status: String(task.status) } } })
     }
   }
   return entries
@@ -277,16 +316,24 @@ export function presenceFromEvents(
       const { task } = event.data
       teamId ??= event.data.teamId
       const previous = tasks.get(task.id)
+      const status = task.status as string
       if (previous === undefined) {
-        activity.push({ time: event.time, kind: 'task', text: `新任务 ${task.id}：${clip(task.subject, 32)}`, token: { key: 'presence.activity.taskNew', params: { id: task.id, subject: clip(task.subject, 32) } } })
+        // 初次出现就是 deleted 不报「新任务」；与 live 差分同口径。
+        if (status !== 'deleted') {
+          activity.push({ time: event.time, kind: 'task', text: `新任务 ${task.id}：${clip(task.subject, 32)}`, token: { key: 'presence.activity.taskNew', params: { id: task.id, subject: clip(task.subject, 32) } } })
+        }
       } else if (previous.status !== task.status) {
         const owner = task.ownerId === undefined ? '未分配' : displayOf(task.ownerId)
-        if (task.status === 'in_progress') {
+        if (status === 'in_progress') {
           activity.push({ time: event.time, kind: 'task', text: `${owner} 认领 ${task.id}`, token: { key: 'presence.activity.taskClaimed', params: { owner, id: task.id } } })
-        } else if (task.status === 'completed') {
+        } else if (status === 'completed') {
           activity.push({ time: event.time, kind: 'task', text: `${owner} 完成 ${task.id}`, token: { key: 'presence.activity.taskCompleted', params: { owner, id: task.id } } })
-        } else {
+        } else if (status === 'pending') {
+          activity.push({ time: event.time, kind: 'task', text: `${task.id} 退回待办`, token: { key: 'presence.activity.taskReopened', params: { id: task.id } } })
+        } else if (status === 'deleted') {
           activity.push({ time: event.time, kind: 'task', text: `${task.id} 已删除`, token: { key: 'presence.activity.taskDeleted', params: { id: task.id } } })
+        } else {
+          activity.push({ time: event.time, kind: 'task', text: `${task.id} 状态未知（${status}）`, token: { key: 'presence.activity.taskUnknown', params: { id: task.id, status } } })
         }
       }
       tasks.set(task.id, { subject: task.subject, status: task.status, ownerId: task.ownerId })

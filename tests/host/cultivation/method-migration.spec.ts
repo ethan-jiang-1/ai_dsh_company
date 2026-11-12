@@ -5,7 +5,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { migrateLegacyMethodLayers, METHOD_MIGRATION_MARKER } from '../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts'
+import { migrateLegacyMethodLayers, METHOD_MIGRATION_MARKER, nodeCultivationStorage } from '../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts'
 import { createTempEnv, type TempEnv } from '../../support/temp-env.ts'
 
 let env: TempEnv
@@ -68,5 +68,18 @@ describe('方法层旧 profile → 公司级迁移', () => {
     expect(result.copied).toEqual([])
     expect(existsSync(join(methodRoot, 'researcher'))).toBe(false)
     expect(existsSync(methodRoot)).toBe(true)
+  })
+
+  it('非法 slug 不进方法根：隔离 .legacy-invalid，listMethods 不列，check 不会报孤儿', () => {
+    seed('web', 'ceo', 'Bad Slug', 'bad')
+    seed('web', 'ceo', 'UPPER', 'bad2')
+    seed('web', 'ceo', 'good-slug', 'good')
+    const result = migrateLegacyMethodLayers(env.home, methodRoot)
+    expect(result.copied).toEqual(['ceo/good-slug'])
+    expect([...result.invalid].sort()).toEqual(['ceo/Bad Slug', 'ceo/UPPER'])
+    expect(result.warnings.some(warning => warning.includes('slug 不合法'))).toBe(true)
+    expect(existsSync(join(methodRoot, 'ceo/Bad Slug'))).toBe(false)
+    expect(readFileSync(join(methodRoot, 'ceo/.legacy-invalid/web/Bad Slug.md'), 'utf8')).toContain('bad')
+    expect(nodeCultivationStorage.listMethods(methodRoot, 'ceo')).toEqual(['good-slug'])
   })
 })

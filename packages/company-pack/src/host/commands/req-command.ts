@@ -8,10 +8,11 @@
  * 追溯/退役词/计数（五层全链）。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { blockedCompanyText } from './blocked-text.ts'
 import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
+import { contentMemberFile, isSafeContentId } from './content-id.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
 import { checkRequirements, isLayer, type MotionDoc } from '../../lib/requirements-check.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
@@ -101,8 +102,11 @@ function deliveryReminderFiles(contentDir: string | undefined, mode: string): st
     'managed-service': ['sla.md', 'runbook.md'],
   }
   if (contentDir === undefined) return fallback[mode] ?? []
+  if (!isSafeContentId(mode) || !availableDeliveryModes(contentDir).includes(mode)) return fallback[mode] ?? []
+  const rulesPath = contentMemberFile(contentDir, 'delivery-modes', mode, 'delivery-rules.json')
+  if (rulesPath === null) return fallback[mode] ?? []
   try {
-    const rules = JSON.parse(readFileSync(join(contentDir, 'delivery-modes', mode, 'delivery-rules.json'), 'utf8')) as {
+    const rules = JSON.parse(readFileSync(rulesPath, 'utf8')) as {
       v1Reminder?: unknown
       documents?: Record<string, { file?: unknown }>
     }
@@ -152,16 +156,21 @@ function resolveProductType(contentDir: string | undefined, workspace: string, r
   const id = motionType ?? companyType
   const source = motionType !== null ? 'motion' : companyType !== null ? 'company' : null
   if (id === null) return { rules: null, id: null, source: null, error: null }
-  const rulesText = readIfExists(join(contentDir, 'product-types', id, 'check-rules.json'))
-  if (rulesText === undefined) {
-    const available = availableProductTypes(contentDir)
-    const where = source === 'motion' ? '动议 meta.md' : 'company.md'
+  // 类型 id 来自模型可写文件：必须是盘上可用的单段成员，不拿它拼 content 外路径。
+  const available = availableProductTypes(contentDir)
+  const where = source === 'motion' ? '动议 meta.md' : 'company.md'
+  if (!isSafeContentId(id) || !available.includes(id)) {
     return {
       rules: null,
       id,
       source,
       error: `未知产品类型「${id}」（来自 ${where}）；可用类型：${available.length > 0 ? available.join(' / ') : '（无）'}`,
     }
+  }
+  const rulesPath = contentMemberFile(contentDir, 'product-types', id, 'check-rules.json')
+  const rulesText = rulesPath === null ? undefined : readIfExists(rulesPath)
+  if (rulesText === undefined) {
+    return { rules: null, id, source, error: `产品类型「${id}」的 check-rules.json 缺失` }
   }
   try {
     return { rules: JSON.parse(rulesText) as ProductTypeRules, id, source, error: null }
@@ -172,7 +181,7 @@ function resolveProductType(contentDir: string | undefined, workspace: string, r
 
 const readIfExists = (path: string): string | undefined => {
   try {
-    return existsSync(path) ? readFileSync(path, 'utf8') : undefined
+    return statSync(path).isFile() ? readFileSync(path, 'utf8') : undefined
   } catch {
     return undefined
   }

@@ -246,3 +246,44 @@ describe('host catalog', () => {
     expect(parsed?.entries[0]?.root).toBe(RUN_BUNDLE_PATHS.deliverables)
   })
 })
+
+describe('坏形状：存在 ≠ 可读普通文件', () => {
+  it('final.md / meta.md 是目录：不抛、不产生假 final、warnings 点名', () => {
+    const root = workspace()
+    const dir = join(root, RUN_BUNDLE_PATHS.deliverables, '2026-10-25-baddir')
+    mkdirSync(join(dir, 'final.md'), { recursive: true })
+    mkdirSync(join(dir, 'meta.md'), { recursive: true })
+    const result = regenerateCatalog(root)
+    expect(result.warnings.some(warning => warning.includes('final.md'))).toBe(true)
+    expect(result.warnings.some(warning => warning.includes('meta.md'))).toBe(true)
+    expect(result.catalog?.entries.some(item => item.dir === '2026-10-25-baddir')).toBe(false)
+  })
+
+  it('kb/motion-ledger.md 是目录：不抛 EISDIR，按空账本处理', () => {
+    const root = workspace()
+    deliverable(root)
+    rmSync(join(root, RUN_BUNDLE_PATHS.ledger), { force: true })
+    mkdirSync(join(root, RUN_BUNDLE_PATHS.ledger), { recursive: true })
+    const result = regenerateCatalog(root)
+    expect(result.warnings.some(warning => warning.includes('motion-ledger.md'))).toBe(true)
+    expect(result.catalog?.entries.length).toBe(1)
+  })
+
+  it('审计不存在的 final.md → 可操作错误，账本不预写 slug', () => {
+    const root = workspace()
+    const rel = `${RUN_BUNDLE_PATHS.deliverables}/nope/final.md`
+    const result = setPresentedAudit(root, rel, true)
+    expect(result.ledger).toBeUndefined()
+    expect(result.warning).toContain('不存在')
+    expect(readPresentedLedger(root).status).not.toBe('ok')
+  })
+
+  it('审计 final.md 是目录 → 拒绝（不是普通文件）', () => {
+    const root = workspace()
+    const dir = join(root, RUN_BUNDLE_PATHS.deliverables, '2026-10-25-dirfinal')
+    mkdirSync(join(dir, 'final.md'), { recursive: true })
+    const result = setPresentedAudit(root, `${RUN_BUNDLE_PATHS.deliverables}/2026-10-25-dirfinal/final.md`, true)
+    expect(result.ledger).toBeUndefined()
+    expect(result.warning).toContain('不是普通文件')
+  })
+})

@@ -6,10 +6,11 @@
  * `project-services` / `managed-service` 缺 SOW/UAT/SLA/Runbook 等应在操作员收口时红，而不是靠角色自证。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { blockedCompanyText } from './blocked-text.ts'
 import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
+import { contentMemberFile, isSafeContentId } from './content-id.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
 import { yamlScalar } from '../../lib/yaml-scalar.ts'
 
@@ -70,7 +71,7 @@ function availableModes(contentDir: string): string[] {
 
 const readIfExists = (path: string): string | undefined => {
   try {
-    return existsSync(path) ? readFileSync(path, 'utf8') : undefined
+    return statSync(path).isFile() ? readFileSync(path, 'utf8') : undefined
   } catch {
     return undefined
   }
@@ -114,11 +115,16 @@ export function registerDeliveryCommand(ctx: Context, options: DeliveryCommandOp
       if (options.contentDir === undefined) {
         return { kind: 'error' as const, text: `无法读取交付模式「${mode}」的规则（contentDir 未配置）。` }
       }
-      const rulesPath = join(options.contentDir, 'delivery-modes', mode, 'delivery-rules.json')
-      const rulesText = readIfExists(rulesPath)
+      // 模式来自模型可写 meta：先做成员校验，再拼 content 路径；未知/穿越就报错，不读 workspace 规则。
+      const available = availableModes(options.contentDir)
+      if (!isSafeContentId(mode) || !available.includes(mode)) {
+        const choices = ['productized', ...available]
+        return { kind: 'error' as const, text: `未知交付模式「${mode}」；可用：${choices.join(' / ')}` }
+      }
+      const rulesPath = contentMemberFile(options.contentDir, 'delivery-modes', mode, 'delivery-rules.json')
+      const rulesText = rulesPath === null ? undefined : readIfExists(rulesPath)
       if (rulesText === undefined) {
-        const available = ['productized', ...availableModes(options.contentDir)]
-        return { kind: 'error' as const, text: `未知交付模式「${mode}」；可用：${available.join(' / ')}` }
+        return { kind: 'error' as const, text: `交付模式「${mode}」的 delivery-rules.json 缺失` }
       }
       let rules: DeliveryRules
       try {

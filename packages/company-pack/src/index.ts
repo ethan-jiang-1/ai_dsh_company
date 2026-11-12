@@ -120,6 +120,9 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
       if (migrated.conflicts.length > 0) {
         ctx.logger?.warn?.(`company-pack：方法层迁移冲突 ${String(migrated.conflicts.length)} 个（${migrated.conflicts.join('、')}）；旧版本落 .legacy/，不覆盖新根`)
       }
+      if (migrated.invalid.length > 0) {
+        ctx.logger?.warn?.(`company-pack：方法层迁移隔离非法 slug ${String(migrated.invalid.length)} 个（${migrated.invalid.join('、')}）；见 .legacy-invalid/`)
+      }
       for (const warning of migrated.warnings) ctx.logger?.warn?.(`company-pack：方法层迁移：${warning}`)
     } catch (error) {
       ctx.logger?.warn?.(`company-pack 方法层迁移跳过（不影响运行）：${(error as Error).message}`)
@@ -211,6 +214,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
 
   if (ledgerStorePromise !== undefined) {
     void initializeCatalog(ctx, workspace, ledgerStorePromise, exportNow)
+      .catch((error: unknown) => { ctx.logger?.warn?.(`company-pack：成品目录初始化失败（不影响运行）：${(error as Error).message}`) })
   }
 
   ctx.on('session/event', (_session, event) => {
@@ -355,6 +359,7 @@ async function initializeCatalog(
   const bootstrap = await ensureLedger(store)
   if (bootstrap.warning !== undefined) ctx.logger?.warn?.(`company-pack：${bootstrap.warning}`)
   const result = regenerateCatalog(workspace, bootstrap.ledger)
+  for (const warning of result.warnings) ctx.logger?.warn?.(`company-pack：成品目录跳过坏形状：${warning}`)
   if (result.written) ctx.logger?.info?.(`company-pack：成品目录已生成（${result.path}）`)
   exportNow(store)
   if (!bootstrap.needsScan) return

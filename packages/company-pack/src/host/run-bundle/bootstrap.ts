@@ -14,6 +14,7 @@ import { isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { yamlScalar } from '../../lib/yaml-scalar.ts'
 import { ROLE_CANONICAL } from '../../lib/role-copy.ts'
 import { RUN_BUNDLE_DIR, RUN_BUNDLE_REL } from '../run-bundle/run-bundle.ts'
+import { isDangerousRoot } from '../workspace/dangerous-roots.ts'
 
 /** 六角色（researcher 没有 CHARTER）。 */
 export const COMPANY_ROLES = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo'] as const
@@ -468,6 +469,9 @@ export function validateCompanyHome(
   if (isAncestor(canonical, home)) return { ok: false, error: `workspace 不能包含 DSH_HOME：${canonical}` }
   if (canonical === osHome || isAncestor(canonical, osHome)) {
     return { ok: false, error: `workspace 不能等于/包含 OS home：${canonical}` }
+  }
+  if (isDangerousRoot(canonical)) {
+    return { ok: false, error: `workspace 不能是根/OS home/系统临时根：${canonical}` }
   }
   return { ok: true }
 }

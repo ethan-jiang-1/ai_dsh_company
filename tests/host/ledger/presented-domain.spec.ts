@@ -91,6 +91,8 @@ describe('presented domain v3', () => {
     const domain = fakeDomain()
     const store = await domainStoreWith({ open: async () => domain.handle })
     await ensureLedger(store)
+    mkdirSync(join(env.workspace, RUN_BUNDLE_PATHS.deliverables, '2026-10-28-alpha'), { recursive: true })
+    writeFileSync(join(env.workspace, rel), '# final\n')
     const audited = await auditLedger(env.workspace, store, rel, false)
     expect(audited.path).toBe(rel)
     const state = store.read() as { ledger: { paths: Record<string, boolean>; slugs: Record<string, boolean> } }

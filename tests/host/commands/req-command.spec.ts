@@ -381,3 +381,34 @@ describe('registerReqCommand', () => {
     }
   })
 })
+
+describe('规则 id 信任边界', () => {
+  it('productType 路径穿越 → 未知类型，不读 content 外自造 check-rules', async () => {
+    const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], `${META}productType: ../../evil-type\n`)
+    const base = mkdtempSync(join(tmpdir(), 'req-command-traversal-'))
+    const contentDir = join(base, 'content')
+    try {
+      mkdirSync(join(contentDir, 'product-types'), { recursive: true })
+      mkdirSync(join(base, 'evil-type'), { recursive: true })
+      writeFileSync(join(base, 'evil-type', 'check-rules.json'), JSON.stringify({
+        productType: 'evil', layers: [], defaultLayers: [], files: {}, retiredPrefixes: [],
+      }))
+      const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain('未知产品类型')
+      expect(result.text).not.toContain('不走五层')
+    } finally {
+      cleanup()
+      rmSync(base, { recursive: true, force: true })
+    }
+  })
+
+  it('productType 绝对路径同样拒绝', async () => {
+    const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], `${META}productType: /etc\n`)
+    try {
+      const result = await mount(workspace, { contentDir: CONTENT_DIR }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain('未知产品类型')
+    } finally { cleanup() }
+  })
+})

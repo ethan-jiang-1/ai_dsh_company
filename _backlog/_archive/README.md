@@ -218,6 +218,20 @@
 | [BUG-077-teammate-header-omits-team-collaboration.md](fixed_bugs/BUG-077-teammate-header-omits-team-collaboration.md) | team 拆 `team collaboration` / `team spawn (Lead only)`；teammate 列协作、注入 member section | 2026-11-11 |
 | [BUG-078-teammate-dead-subagent-control-tools.md](fixed_bugs/BUG-078-teammate-dead-subagent-control-tools.md) | control 按座位/child 能力装：CEO teammate 无，vp-eng teammate 保留 | 2026-11-11 |
 | [BUG-079-ceo-teammate-spawn-header-no-child-channel.md](fixed_bugs/BUG-079-ceo-teammate-spawn-header-no-child-channel.md) | spawn/fork/retry 按 `childDepth > depth` 门控；CEO teammate 无 spawn，vp-eng teammate 保留；control 消费同一座位 | 2026-11-11 |
+| [BUG-090](fixed_bugs/BUG-090-cultivation-revoke-unreachable-records-deletes-method.md) | revoke 先判 records 可达；0 记录需 --orphan，不再误删跨 workspace 方法 | 2026-11-13 |
+| [BUG-091](fixed_bugs/BUG-091-cultivation-check-revoked-broken-unsafe.md) | check 排除 revokedAt、计坏记录、非法 methodSlug 报「记录坏」 | 2026-11-13 |
+| [BUG-092](fixed_bugs/BUG-092-cultivation-propose-empty-fields.md) | propose 空字段拒绝 + recordText/parseRecord 往返，坏记录不落盘 | 2026-11-13 |
+| [BUG-093](fixed_bugs/BUG-093-cultivation-legacy-migration-invalid-slug.md) | legacy 非法 slug 隔离 .legacy-invalid；listMethods 只列合法 | 2026-11-13 |
+| [BUG-094](fixed_bugs/BUG-094-bundle-manifest-id-path-traversal.md) | bundle id 单段校验 + 身份目录前缀检查，v2 非法 id 换新 | 2026-11-13 |
+| [BUG-095](fixed_bugs/BUG-095-workspace-resolution-accepts-tmp-root.md) | dangerousRoots 从平台事实派生，tmp 根不再当 workspace | 2026-11-13 |
+| [BUG-096](fixed_bugs/BUG-096-deliverables-catalog-directory-eisdir.md) | catalog 只读普通文件 + warnings；boot 初始化 catch | 2026-11-13 |
+| [BUG-097](fixed_bugs/BUG-097-workflow-runs-mispair-failed-call.md) | workflow 配对改用「产生 run 的证据」，失败 call 不抢下一次 | 2026-11-13 |
+| [BUG-098](fixed_bugs/BUG-098-presence-pending-transition-shows-deleted.md) | presence 任务状态显式分派；pending=退回待办，未知=状态未知 | 2026-11-13 |
+| [BUG-099](fixed_bugs/BUG-099-deliverables-audit-nonexistent-final.md) | audit 目标必须存在且是普通文件，不预置未来 slug | 2026-11-13 |
+| [BUG-100](fixed_bugs/BUG-100-export-dist-deletes-old-before-pack.md) | export-dist staging→全成功再替换，失败保留旧 _dist | 2026-11-13 |
+| [BUG-101](fixed_bugs/BUG-101-concurrent-home-smoke-stale-v2-and-lease-timing.md) | smoke 改读 v3 workspace bundle；lease 结论轮询等待 | 2026-11-13 |
+| [BUG-102](fixed_bugs/BUG-102-req-delivery-rule-path-traversal.md) | deliveryMode/productType 成员校验 + residency，不读 workspace 自造规则 | 2026-11-13 |
+| [BUG-103](fixed_bugs/BUG-103-tasks-tab-empty-despite-team-task-events.md) | 任务板/看板/依赖图用 team/task 事件补投影旧快照 | 2026-11-13 |
 | [BUG-080](fixed_bugs/BUG-080-en-tab-title-map-missing-strategy.md) | en 页签标题从同一份字典派生：10/10 含 Strategy；缺 en key 探针 fail-loud | 2026-11-12 |
 | [BUG-081](fixed_bugs/BUG-081-strategy-panel-reads-session-workspace-command-writes-host.md) | 启动策略 workspace = 会话 cwd 优先（面板/命令/注入同一份） | 2026-11-12 |
 | [BUG-082](fixed_bugs/BUG-082-strategy-panel-stale-wiki-check.md) | wikiCheck 带 checkedAt + watcher 新鲜度；面板不拿快照冒充当前值 | 2026-11-12 |

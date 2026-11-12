@@ -25,6 +25,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync 
 import { dirname, join } from 'node:path'
 import {
   auditRelPath,
+  auditTargetProblem,
   emptyPresentedLedger,
   mergePresented,
   type LedgerBootstrap,
@@ -254,6 +255,8 @@ export async function auditLedger(
   const resolved = auditRelPath(workspace, rawPath)
   if (resolved.rel === undefined) return { warning: resolved.warning ?? '审计路径不合法' }
   const rel = resolved.rel
+  const targetProblem = auditTargetProblem(workspace, rel)
+  if (targetProblem !== undefined) return { warning: targetProblem }
   const state = store.read()
   if (state.status === 'corrupt' || state.status === 'unsupported') {
     return { warning: `presented 账本损坏（${'error' in state ? state.error : '未知'}），未写` }

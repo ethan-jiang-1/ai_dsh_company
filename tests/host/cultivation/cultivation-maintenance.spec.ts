@@ -126,7 +126,7 @@ describe('/cultivation check 对账（2026-10-27 R5）', () => {
 
       nodeCultivationStorage.installMethod(methods, 'ceo', 'orphan-method', 'orphan body')
       const orphan = await invokeCultivation(command, 'ceo', workspace, 'check')
-      expect(String((orphan as { text: string }).text)).toContain('方法无记录')
+      expect(String((orphan as { text: string }).text)).toContain('方法无本 workspace 记录')
       expect(existsSync(join(methods, 'ceo/orphan-method/SKILL.md'))).toBe(true)
     })
   })

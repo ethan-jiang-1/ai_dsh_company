@@ -10,11 +10,11 @@
  * 这是纯解析；落点校验/登记/初始化由调用方做。
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { expandHomePath } from '@deepseek-ai/dsh-home-paths'
 import { canonicalPath } from '../run-bundle/paths.ts'
 import { validateCompanyHome } from '../run-bundle/bootstrap.ts'
+import { isDangerousRoot } from './dangerous-roots.ts'
 
 const env = (name: string): string | undefined => (process.env as Record<string, string | undefined>)[name]
 
@@ -90,11 +90,8 @@ function cwdIsUsable(cwd: string, dshHome: string): boolean {
   if (!existsSync(cwd)) return false
   const check = validateCompanyHome(dshHome, cwd)
   if (!check.ok) return false
-  // validate 允许 `/`（只要不是 home 祖先）；根目录不应被当作项目 workspace。
-  if (cwd === '/') return false
-  // 系统临时根也不应被当作项目；其子目录可以。
-  if (cwd === homedir()) return false
-  return true
+  // 根 / OS home / 系统临时根（含 /tmp 与 /private/tmp 真身）都不是项目；其子目录可以。
+  return !isDangerousRoot(cwd)
 }
 
 /**

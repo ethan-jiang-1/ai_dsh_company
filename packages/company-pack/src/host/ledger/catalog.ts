@@ -5,7 +5,7 @@
  * 审计账本 = presented-ledger.ts。索引 `kb/deliverables-index.json` 是盘上 meta/final + 账本的派生视图。
  */
 import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   buildDeliverablesCatalog,
@@ -32,17 +32,27 @@ export {
   type PresentedScanResult, type PresentedSessionQuery,
 } from '../ledger/presented-ledger.ts'
 
+/** 存在且是普通文件；目录/坏链接一律当「没有」。 */
+function isRegularFile(path: string): boolean {
+  try { return statSync(path).isFile() } catch { return false }
+}
+
 /** 扫描两个交付物根；presented 由账本按 path/slug 命中决定，未命中 = null。 */
-function scanEntries(companyHome: string, ledger: PresentedLedger): CatalogScanEntry[] {
+function scanEntries(companyHome: string, ledger: PresentedLedger): { entries: CatalogScanEntry[], warnings: string[] } {
   const entries: CatalogScanEntry[] = []
+  const warnings: string[] = []
   for (const root of CATALOG_ROOTS) {
     const dir = join(companyHome, root)
     if (!existsSync(dir)) continue
     for (const item of readdirSync(dir, { withFileTypes: true })) {
       if (!item.isDirectory()) continue
-      const final = existsSync(join(dir, item.name, 'final.md'))
+      const finalPath = join(dir, item.name, 'final.md')
+      const final = isRegularFile(finalPath)
+      if (!final && existsSync(finalPath)) warnings.push(`${finalPath} 不是普通文件，按无 final 处理`)
       const metaPath = join(dir, item.name, 'meta.md')
-      const body = existsSync(metaPath) ? readFileSync(metaPath, 'utf8') : ''
+      const metaIsFile = isRegularFile(metaPath)
+      if (!metaIsFile && existsSync(metaPath)) warnings.push(`${metaPath} 不是普通文件，按无 meta 处理`)
+      const body = metaIsFile ? readFileSync(metaPath, 'utf8') : ''
       const fields = parseMeta(body).fields
       const slug = fields.get('slug') ?? slugFromDirName(item.name)
       const path = normalizeRel(`${root}/${item.name}/final.md`)
@@ -57,13 +67,15 @@ function scanEntries(companyHome: string, ledger: PresentedLedger): CatalogScanE
       })
     }
   }
-  return entries
+  return { entries, warnings }
 }
 
 export interface CatalogResult {
   readonly written: boolean
   readonly catalog: DeliverablesCatalog | null
   readonly path: string
+  /** 扫描时跳过的坏形状（目录冒充文件等）；调用方负责 warn，不静默。 */
+  readonly warnings: readonly string[]
 }
 
 /**
@@ -73,7 +85,7 @@ export interface CatalogResult {
  */
 export function regenerateCatalog(companyHome: string, presented?: PresentedLedger): CatalogResult {
   const path = catalogPath(companyHome)
-  if (!existsSync(companyHome)) return { written: false, catalog: null, path }
+  if (!existsSync(companyHome)) return { written: false, catalog: null, path, warnings: [] }
   let ledger = presented
   if (ledger === undefined) {
     const state = readPresentedLedger(companyHome)
@@ -81,15 +93,18 @@ export function regenerateCatalog(companyHome: string, presented?: PresentedLedg
   }
   const previousState = readCatalogState(companyHome)
   const previous = previousState.status === 'ok' ? previousState.catalog : null
-  const entries = scanEntries(companyHome, ledger)
+  const scanned = scanEntries(companyHome, ledger)
+  const warnings = [...scanned.warnings]
   const ledgerPath = join(companyHome, RUN_BUNDLE_PATHS.ledger)
+  const ledgerIsFile = isRegularFile(ledgerPath)
+  if (!ledgerIsFile && existsSync(ledgerPath)) warnings.push(`${ledgerPath} 不是普通文件，按空账本处理`)
   const catalog = buildDeliverablesCatalog({
-    entries,
-    ledgerSlugs: existsSync(ledgerPath) ? ledgerSlugsFromText(readFileSync(ledgerPath, 'utf8')) : new Set(),
+    entries: scanned.entries,
+    ledgerSlugs: ledgerIsFile ? ledgerSlugsFromText(readFileSync(ledgerPath, 'utf8')) : new Set(),
     generatedAt: new Date().toISOString(),
   })
   if (previous !== null && JSON.stringify(previous.entries) === JSON.stringify(catalog.entries)) {
-    return { written: false, catalog: previous, path }
+    return { written: false, catalog: previous, path, warnings }
   }
   mkdirSync(join(companyHome, RUN_BUNDLE_PATHS.kb), { recursive: true })
   const temporary = `${path}.${String(process.pid)}.${String(Date.now())}.${randomUUID()}.tmp`
@@ -100,5 +115,5 @@ export function regenerateCatalog(companyHome: string, presented?: PresentedLedg
     try { rmSync(temporary, { force: true }) } catch { /* 保留原错误 */ }
     throw error
   }
-  return { written: true, catalog, path }
+  return { written: true, catalog, path, warnings }
 }

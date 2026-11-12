@@ -2,13 +2,37 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮拿到 ≥3 张卡，先按根因分组列表再逐卡修——逐症状打补丁会把同一根因修三遍。
 
-**下一个缺陷号**：Next BUG ID = 90；已分配 BUG-001..089。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 104；已分配 BUG-001..103。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。
 
 ## 活跃清单
 
-**空**（2026-11-12 全部收口：BUG-080..089 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）。
+**空**（2026-11-13 全部收口：BUG-090..103 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）。
+
+**2026-11-12 收口**：BUG-080..089 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+
+## 2026-11-13 修复交接（根因组 G1–G7：BUG-090..103）
+
+**用户指令（2026-11-13）**：「_backlog/bugs 这里又找到一堆bug，系统性地思考好怎么把这些bug能修好吧」+
+「setup goal 静默，自主执行……直到所有bug解决了」「bug数量众多，所以我给你最多的轮次……直到那个所有的bug解决了」。
+本句即本轮授权（材料性：host 行为 + 随包内容 + docs 合同 + 命令面），留痕 = Note。
+终点 = 活跃清单清零、14 张卡全部迁 [fixed_bugs](../_archive/fixed_bugs/) 且 `审查：`/证据齐。
+
+| 组 | 卡 | 同一根因 | 修法 |
+|---|---|---|---|
+| **G1 不可信 id 进路径** | [094](../_archive/fixed_bugs/BUG-094-bundle-manifest-id-path-traversal.md) / [102](../_archive/fixed_bugs/BUG-102-req-delivery-rule-path-traversal.md) | 模型可写 id 直接 `join` 进 home/pack 路径 | 单段 slug + residency 前缀 + 成员校验 |
+| **G3 培养作用域/对账** | [090](../_archive/fixed_bugs/BUG-090-cultivation-revoke-unreachable-records-deletes-method.md) / [091](../_archive/fixed_bugs/BUG-091-cultivation-check-revoked-broken-unsafe.md) | home 方法层 vs workspace records；破坏性命令把空视图当全局空 | reachable 前置 + `--orphan` 显式确认；check 显式分 revoked/broken/invalid |
+| **G2 存在≠可读** | [096](../_archive/fixed_bugs/BUG-096-deliverables-catalog-directory-eisdir.md) / [099](../_archive/fixed_bugs/BUG-099-deliverables-audit-nonexistent-final.md) | `existsSync` 当可读文件；审计不验当前对象 | `isFile()` + warnings + boot catch；audit 目标必须存在且是普通文件 |
+| **G4 写入/迁移目标域** | [092](../_archive/fixed_bugs/BUG-092-cultivation-propose-empty-fields.md) / [093](../_archive/fixed_bugs/BUG-093-cultivation-legacy-migration-invalid-slug.md) | 工具入口只靠 schema required；迁移搬旧非法键 | trim 非空 + 往返校验；非法 slug 隔离 `.legacy-invalid/` |
+| **G5 状态/事件配对** | [097](../_archive/fixed_bugs/BUG-097-workflow-runs-mispair-failed-call.md) / [098](../_archive/fixed_bugs/BUG-098-presence-pending-transition-shows-deleted.md) / [103](../_archive/fixed_bugs/BUG-103-tasks-tab-empty-despite-team-task-events.md) | 配对只看名字+顺序；状态迁移 else 兜底；任务板只信投影快照 | 用「产生 run 的证据」配对；状态显式分派；事件流补任务板 |
+| **G6 发布失败路径/smoke** | [100](../_archive/fixed_bugs/BUG-100-export-dist-deletes-old-before-pack.md) / [101](../_archive/fixed_bugs/BUG-101-concurrent-home-smoke-stale-v2-and-lease-timing.md) | 先删后建；smoke 旧 schema + 单次快照 | staging→全成功再替换；smoke v3 + 轮询 lease |
+| **G7 危险落点** | [095](../_archive/fixed_bugs/BUG-095-workspace-resolution-accepts-tmp-root.md) | 手写枚举漏 tmpdir | `dangerousRoots()` 从平台事实派生 |
+
+**次序 = G1 → G3 → G2 → G4 → G5 → G6 → G7**（P1 先收口；同组先扫同类载体）。
+**收口（2026-11-13）**：14 张卡全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；`pnpm test` 236 files / 1788 tests、
+`typecheck`/`lint`/`dup`/`verify` 全绿；`concurrent-home-smoke` 与 `release-smoke` ALL PASS。
+证据与未验面 = [Note](../../notes/implemented/2026-11-13-deep-surface-bug-sweep.md)。
 
 ## 2026-11-12 修复交接（根因组 W/L/F/V：BUG-080..089）
 

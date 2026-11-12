@@ -136,4 +136,41 @@ describe('升级日志', () => {
       rmSync(ws, { recursive: true, force: true })
     }
   })
+
+  it('不安全 id 不穿出身份目录：v3 判 corrupt；v2 升级换安全 id；identityBackupPath 拒绝', () => {
+    const h = home()
+    const ws = workspace()
+    try {
+      const path = bundleManifestPath(ws)
+      mkdirSync(dirname(path), { recursive: true })
+      writeFileSync(path, JSON.stringify({
+        v: 3, id: '../../../pwn', createdAt: 't', pack: PACK, runBundle: { schema: 1 },
+      }))
+      expect(readBundleManifestState(ws).status).toBe('corrupt')
+      expect(() => identityBackupPath(h, '../../../pwn')).toThrow()
+      const skipped = create(h, ws)
+      expect(skipped.written.skipped).toBe(true)
+      expect(existsSync(join(h, '..', 'pwn.json'))).toBe(false)
+
+      writeFileSync(path, JSON.stringify({ v: 2, id: '../pwn', createdAt: 't', pack: PACK }))
+      const upgraded = create(h, ws)
+      expect(upgraded.written.upgraded).toBe(true)
+      const state = readBundleManifestState(ws)
+      expect(state.status).toBe('ok')
+      if (state.status !== 'ok') return
+      expect(state.manifest.id).toMatch(/^bundle-/)
+      expect(existsSync(identityBackupPath(h, state.manifest.id))).toBe(true)
+      expect(existsSync(join(h, '..', 'pwn.json'))).toBe(false)
+    } finally {
+      rmSync(h, { recursive: true, force: true }); rmSync(ws, { recursive: true, force: true })
+    }
+  })
+
+  it('id 是绝对路径 / 含分隔符 / 点段 时同样拒绝', () => {
+    const h = home()
+    for (const id of ['/abs', 'a/b', '.', '..', '', 'a b', 'x\\y']) {
+      expect(() => identityBackupPath(h, id)).toThrow()
+    }
+    rmSync(h, { recursive: true, force: true })
+  })
 })

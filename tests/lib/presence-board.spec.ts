@@ -1,4 +1,5 @@
 /** 在场板读模型（R5b，Q5–Q8 定案的 keyless 完成定义——提案验收判据 1/4）。 */
+// 负例留证 2026-11-13：把 teamWithEventTasks 改成直接返回 view ⇒「事件流补任务板」用例红（BUG-103）；还原即绿。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { readFileSync } from 'node:fs'
 import { roleLabel } from '../../packages/company-pack/src/lib/presence-status.ts'
@@ -10,6 +11,7 @@ import {
   displayNameFor,
   memberNames,
   presenceFromEvents,
+  teamWithEventTasks,
   rowsFromTeamView,
   statusLabelFor,
   type TeamEventLike,
@@ -41,7 +43,7 @@ function taskEvent(
   id: string,
   revision: number,
   subject: string,
-  status: 'pending' | 'in_progress' | 'completed',
+  status: 'pending' | 'in_progress' | 'completed' | 'deleted',
   ownerId: string | undefined,
   time: number,
 ): TeamEventLike {
@@ -268,5 +270,52 @@ describe('第六角色 CMO 的显示名映射（防漂移）', () => {
   it('displayNameFor / roleLabel 认识 cmo', () => {
     expect(displayNameFor('cmo', 'teammate')).toBe('CMO')
     expect(roleLabel('cmo')).toBe('CMO')
+  })
+
+  it('in_progress → pending：退回待办（不是已删除）；→ deleted 才删除', () => {
+    const task = (id: string, subject: string, status: string, ownerName?: string) => ({ id, subject, status, ...(ownerName === undefined ? {} : { ownerName }) })
+    const t1: TeamViewLike = { members: [], tasks: [task('task-1', '定价结论', 'in_progress', 'vp-sales')] }
+    const tPending: TeamViewLike = { members: [], tasks: [task('task-1', '定价结论', 'pending')] }
+    const tDeleted: TeamViewLike = { members: [], tasks: [task('task-1', '定价结论', 'deleted')] }
+    const reopened = diffActivity(t1, tPending, 1)
+    expect(reopened.map(entry => entry.text)).toEqual(['task-1 退回待办'])
+    expect(reopened[0]?.token?.key).toBe('presence.activity.taskReopened')
+    expect(diffActivity(tPending, tDeleted, 2).map(entry => entry.text)).toEqual(['task-1 已删除'])
+  })
+
+  it('未知状态显式说「状态未知」，不落删除兜底', () => {
+    const task = (id: string, subject: string, status: string) => ({ id, subject, status })
+    const t1: TeamViewLike = { members: [], tasks: [task('task-1', '定价结论', 'in_progress')] }
+    const weird: TeamViewLike = { members: [], tasks: [task('task-1', '定价结论', 'paused')] }
+    expect(diffActivity(t1, weird, 1).map(entry => entry.text)).toEqual(['task-1 状态未知（paused）'])
+  })
+
+  it('事件路径：pending 回退同口径；首次 deleted 不报新任务', () => {
+    const board = presenceFromEvents([
+      taskEvent('task-1', 1, '定价结论', 'in_progress', undefined, 1),
+      taskEvent('task-1', 2, '定价结论', 'pending', undefined, 2),
+    ])
+    expect(board.activity.map(entry => entry.text)).toEqual(['新任务 task-1：定价结论', 'task-1 退回待办'])
+    const deletedOnly = presenceFromEvents([taskEvent('task-2', 1, '幽灵', 'deleted', undefined, 3)])
+    expect(deletedOnly.activity).toEqual([])
+  })
+
+  it('事件流补任务板：投影 tasks 为空时，team/task 事件仍进板（BUG-103）', () => {
+    const view: TeamViewLike = {
+      members: [
+        { id: LEAD, name: 'lead', role: 'lead', phase: 'active' },
+        { id: VP_SALES, name: 'vp-sales', role: 'teammate', phase: 'active' },
+      ],
+      tasks: [],
+    }
+    const merged = teamWithEventTasks(view, [
+      taskEvent('task-1', 1, '写 PRD', 'pending', undefined, 1),
+      taskEvent('task-1', 2, '写 PRD', 'in_progress', VP_SALES, 2),
+      taskEvent('task-2', 1, '复核 PRD', 'pending', undefined, 3),
+      taskEvent('task-2', 2, '复核 PRD', 'deleted', undefined, 4),
+    ])
+    expect(merged?.tasks).toMatchObject([
+      { id: 'task-1', subject: '写 PRD', status: 'in_progress', ownerName: 'vp-sales', revision: 2 },
+    ])
   })
 })

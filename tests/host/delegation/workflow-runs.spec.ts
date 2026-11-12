@@ -174,4 +174,32 @@ describe('workflow run durable view', () => {
     return expect(tool?.execute({} as never, { agent, signal: new AbortController().signal } as never))
       .resolves.toEqual({ runs: [expect.objectContaining({ status: 'lost' })] })
   })
+
+  it('run-start 之前的失败调用不占用下一次 run：jobId/background/running 归真 run', () => {
+    const rows = workflowRunRows([
+      call(0, 'c1', 'audit', true),
+      result(1, 'c1', 'Error: Workflow script failed validation'),
+      call(2, 'c2', 'audit', true),
+      runStart(3, 'r2', 'audit'),
+      result(4, 'c2', backgroundText('audit', 'workflow-real')),
+    ], jobId => jobId === 'workflow-real')
+    expect(rows).toEqual([{
+      runId: 'r2',
+      name: 'audit',
+      background: true,
+      jobId: 'workflow-real',
+      status: 'running',
+      children: [],
+    }])
+  })
+
+  it('只有失败调用、没有 run-start → 不产生 run 行', () => {
+    const rows = workflowRunRows([
+      call(0, 'c1', 'audit', true),
+      result(1, 'c1', 'Error: Workflow script failed validation'),
+      call(2, 'c2', 'audit', true),
+      result(3, 'c2', 'Error: Workflow script failed validation'),
+    ])
+    expect(rows).toEqual([])
+  })
 })

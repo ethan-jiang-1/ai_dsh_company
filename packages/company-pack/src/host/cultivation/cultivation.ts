@@ -37,6 +37,7 @@ import {
   CULTIVATION_ROLES,
   methodSkillText,
   parseRecord,
+  recordText,
   recordBody,
   recordStampOf,
   roleLabel as defaultRoleLabel,
@@ -318,7 +319,8 @@ async function commandCorrectOrSuggest(
 async function commandRevoke(command: CultivationCommandContext, tokens: readonly string[]): Promise<CultivationCommandResult> {
   const { face, root, recordsDir, config, storage } = command
   const slug = tokens[1]
-  if (slug === undefined) return { kind: 'error', text: '用法：revoke <方法slug>。' }
+  const orphanConfirmed = tokens.includes('--orphan')
+  if (slug === undefined) return { kind: 'error', text: '用法：revoke <方法slug> [--orphan]。' }
   if (config.cultivationRoot === undefined) {
     return { kind: 'error', text: '方法层根未配置（config.cultivationRoot 缺席）。' }
   }
@@ -332,7 +334,12 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
     if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) {
       return { kind: 'error', text: `${command.roleLabel(face.role)} 方法层里没有方法 ${slug}。` }
     }
-    records = storage.loadRecords(recordsDir).records
+    const loaded = storage.loadRecords(recordsDir)
+    // 「当前 records 不可达」不是「0 条记录」：不能据此删掉仍被其它视图引用的方法（BUG-090）。
+    if (!loaded.reachable) {
+      return { kind: 'error', text: `记录目录不可达：${recordsDir}；为保护仍被记录引用的方法，拒绝撤回 ${slug}。` }
+    }
+    records = loaded.records
   } catch (error) {
     if (error instanceof UnsafeCultivationPathError) return { kind: 'error', text: error.message }
     throw error
@@ -343,6 +350,13 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
     if (record.status !== 'adopted' || record.methodSlug !== slug || record.targetRole !== face.role) continue
     const current = storage.readRecord(recordsDir, record.id)
     if (current !== null) pendingRecords.push({ id: record.id, text: current.text })
+  }
+  if (pendingRecords.length === 0 && !orphanConfirmed) {
+    return {
+      kind: 'error',
+      text: `本 workspace 的 records 里没有引用方法 ${slug} 的采纳记录；它可能被其它 workspace 采纳（方法层是 home 级、records 是 workspace 级）。`
+        + `确认它是孤儿后再执行 /cultivation revoke ${slug} --orphan。`,
+    }
   }
   if (pendingRecords.length > 0) {
     try {
@@ -400,7 +414,10 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
     }
   }
   clearPendingRevoke(root)
-  return { kind: 'success', text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(updated.length)} 条记录）。新开的 ${command.roleLabel(face.role)} 会话不再加载它。` }
+  return {
+    kind: 'success',
+    text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(updated.length)} 条记录${pendingRecords.length === 0 ? '；--orphan 显式确认：本 workspace 无采纳记录' : ''}）。新开的 ${command.roleLabel(face.role)} 会话不再加载它。`,
+  }
 }
 
 
@@ -566,17 +583,22 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
       }
       const loaded = storage.loadRecords(recordsDir)
       if (!loaded.reachable) return { kind: 'error' as const, text: `记录目录不可达：${recordsDir}` }
-      const adopted = loaded.records.filter(record => record.status === 'adopted' && record.targetRole === face.role)
-      const adoptedSlugs = new Set(adopted.map(record => record.methodSlug).filter((slug): slug is string => typeof slug === 'string' && slug !== ''))
+      const revoked = loaded.records.filter(record => record.revokedAt !== undefined).length
+      const adopted = loaded.records.filter(record => record.status === 'adopted' && record.targetRole === face.role && record.revokedAt === undefined)
+      const adoptedSlugs = new Set<string>()
       const missing: string[] = []
+      const invalid: string[] = []
       for (const record of adopted) {
         const slug = record.methodSlug
         if (slug === undefined || slug === '') { missing.push(`${record.id}（缺 methodSlug）`); continue }
+        // 非法 methodSlug 是「记录坏」，不是「方法缺失」；先按目标域校验，别把普通 Error 抛到命令面（BUG-091）。
+        if (!SLUG_RE.test(slug)) { invalid.push(`${record.id}（methodSlug ${JSON.stringify(slug)} 不合法）`); continue }
+        adoptedSlugs.add(slug)
         try {
           if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) missing.push(`${record.id}（缺方法 ${slug}）`)
         } catch (error) {
           if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
-          throw error
+          missing.push(`${record.id}（读方法 ${slug} 失败：${(error as Error).message}）`)
         }
       }
       let orphans: string[] = []
@@ -586,13 +608,17 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
         if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
         throw error
       }
-      if (missing.length === 0 && orphans.length === 0) {
-        return { kind: 'success' as const, text: `${command.roleLabel(face.role)} 方法层与已采纳记录一致（${String(adopted.length)} 条）。` }
+      const brokenNote = loaded.broken > 0 ? `；另有 ${String(loaded.broken)} 条坏记录未计入` : ''
+      const revokedNote = revoked > 0 ? `；另有 ${String(revoked)} 条已撤回记录` : ''
+      if (missing.length === 0 && orphans.length === 0 && invalid.length === 0) {
+        return { kind: 'success' as const, text: `${command.roleLabel(face.role)} 方法层与已采纳记录一致（${String(adopted.length)} 条）${brokenNote}${revokedNote}。` }
       }
       return {
         kind: 'success' as const,
         text: `对账结果：${missing.length > 0 ? `记录缺方法 ${missing.join('、')}` : '记录与方法一一对应'}`
-          + `${orphans.length > 0 ? `；方法无记录 ${orphans.join('、')}` : ''}。只报告，不自动删改。`,
+          + `${invalid.length > 0 ? `；非法记录 ${invalid.join('、')}` : ''}`
+          + `${orphans.length > 0 ? `；方法无本 workspace 记录 ${orphans.join('、')}（可能属于其它 workspace；确认孤儿后再 revoke --orphan）` : ''}。`
+          + `只报告，不自动删改${brokenNote}${revokedNote}。`,
       }
     
 }
@@ -681,14 +707,26 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
       if (args.kind !== 'correction' && args.kind !== 'suggestion') {
         return { id: '', recorded: false, note: 'kind 只认 correction / suggestion。' }
       }
+      // 模型入口与人类入口共用同一份目标域校验：空/空白不写盘，回执说真话（BUG-092）。
+      const expectation = args.expectation.trim()
+      const body = args.body.trim()
+      if (expectation === '') return { id: '', recorded: false, note: '期望行为不能为空（一句话，写清想要的行为）。' }
+      if (expectation.length > 500) return { id: '', recorded: false, note: '期望行为最多 500 个字符，请压成一句话。' }
+      if (body === '') return { id: '', recorded: false, note: '正文不能为空（写清做法与证据）。' }
+      if (body.length > 16_000) return { id: '', recorded: false, note: '正文最多 16000 个字符，请保留最相关的一段。' }
+      const source = args.source?.trim()
       const draft = {
         kind: args.kind === 'suggestion' ? 'suggestion' as const : 'correction' as const,
         targetRole: args.targetRole,
         proposerRole: face.role,
         proposerKind: 'agent' as const,
-        source: args.source?.trim() !== '' && args.source !== undefined ? args.source : '（会话内提交）',
-        expectation: args.expectation,
-        body: args.body,
+        source: source !== undefined && source !== '' ? source : '（会话内提交）',
+        expectation,
+        body,
+      }
+      // 写入前做一次序列化→解析往返：目标域读不回来的形状不落盘，避免 recorded:true 的坏记录。
+      if (parseRecord('proposal-preview', recordText(draft)) === null) {
+        return { id: '', recorded: false, note: '记录形状不合法（序列化后无法解析），未写盘。' }
       }
       const recordsDir = join(scope.root, RECORDS_REL)
       const fs = fsOf(ctx)

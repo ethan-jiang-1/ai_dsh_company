@@ -5,7 +5,7 @@
  * catalog.ts 保留目录扫描/生成；账本 I/O、迁移、观测抽取归本文件。
  */
 import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, relative } from 'node:path'
 import { normalizeRel, slugFromDirName, type DeliverablesCatalog } from '../../lib/deliverables-catalog.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
@@ -204,6 +204,18 @@ export function auditRelPath(
 }
 
 /**
+ * 审计目标必须是**当前存在的普通文件**；不存在/目录 → 可操作错误（BUG-099）。
+ * 只校验路径形状会让一次 typo 在账本里给未来同 slug 的成品预先背书。
+ */
+export function auditTargetProblem(companyHome: string, rel: string): string | undefined {
+  try {
+    return statSync(join(companyHome, rel)).isFile() ? undefined : `审计目标不是普通文件：${rel}`
+  } catch {
+    return `审计目标不存在：${rel}（先落 final.md 再审计）`
+  }
+}
+
+/**
  * 人侧交付审计：把一条 final.md 的 presented 结论写进账本（true/false），再重生成索引。
  * 这是 `presented=false` 的第一入口；不再要求用户手改 JSON。
  * @param companyHome - 公司盘根。
@@ -220,6 +232,8 @@ export function setPresentedAudit(
   const resolved = auditRelPath(companyHome, rawPath)
   if (resolved.rel === undefined) return { warning: resolved.warning ?? '审计路径不合法' }
   const rel = resolved.rel
+  const targetProblem = auditTargetProblem(companyHome, rel)
+  if (targetProblem !== undefined) return { warning: targetProblem }
   const state = readPresentedLedger(companyHome)
   if (state.status === 'corrupt' || state.status === 'unsupported') {
     return { warning: state.status === 'unsupported'

@@ -1,5 +1,5 @@
 /** 培养 /cultivation 命令与 propose 的 host 行为（R5-23 从 640 行 spec 拆族；临时真实盘）。 */
-import { existsSync, mkdirSync, readdirSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { parseRecord, recordText } from '../../../packages/company-pack/src/lib/cultivation.ts'
@@ -244,7 +244,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
       const methodParent = join(methods, 'cfo')
       mkdirSync(join(methodParent, 'follow-test'), { recursive: true })
       writeFileSync(join(methodParent, 'follow-test', 'SKILL.md'), 'installed')
-      expect(await invokeCultivation(handler, 'cfo', workspace, 'revoke follow-test')).toMatchObject({ kind: 'success' })
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'revoke follow-test --orphan')).toMatchObject({ kind: 'success' })
       expect(readFileSync(externalRecord, 'utf8')).toBe(externalText)
 
       const outsideMethod = join(workspace, '..', 'outside-method')
@@ -275,6 +275,100 @@ describe('/cultivation 注册命令的 host 行为', () => {
       expect(adopted?.status).toBe('adopted')
       expect(adopted?.methodSlug).toBe('review-numbers')
       expect(adopted?.decidedAt).toBeDefined()
+    })
+  })
+})
+
+describe('revoke / check 的完整性对账', () => {
+  const suggestion = {
+    kind: 'suggestion',
+    targetRole: 'cfo',
+    proposerRole: 'ceo',
+    proposerKind: 'human',
+    source: 'test fixture',
+    expectation: '复核数字口径',
+    body: '先对照底稿，再给出数字结论。',
+  } as const
+
+  it('records 目录不可达 → 拒绝 revoke，方法保留', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
+      rmSync(recordsDir, { recursive: true, force: true })
+      const methodDir = join(methods, 'cfo', 'orphan-method')
+      mkdirSync(methodDir, { recursive: true })
+      writeFileSync(join(methodDir, 'SKILL.md'), 'installed')
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+      const result = await invokeCultivation(handler, 'cfo', workspace, 'revoke orphan-method')
+      expect(result).toMatchObject({ kind: 'error' })
+      expect(String((result as { text: string }).text)).toContain('记录目录不可达')
+      expect(existsSync(join(methodDir, 'SKILL.md'))).toBe(true)
+    })
+  })
+
+  it('本 workspace 无采纳记录 → 默认拒绝（可能属于其它 workspace）；--orphan 才删', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const methodDir = join(methods, 'cfo', 'cross-method')
+      mkdirSync(methodDir, { recursive: true })
+      writeFileSync(join(methodDir, 'SKILL.md'), 'installed')
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+      const refused = await invokeCultivation(handler, 'cfo', workspace, 'revoke cross-method')
+      expect(refused).toMatchObject({ kind: 'error' })
+      expect(String((refused as { text: string }).text)).toContain('--orphan')
+      expect(existsSync(join(methodDir, 'SKILL.md'))).toBe(true)
+
+      const orphan = await invokeCultivation(handler, 'cfo', workspace, 'revoke cross-method --orphan')
+      expect(orphan).toMatchObject({ kind: 'success' })
+      expect(existsSync(methodDir)).toBe(false)
+    })
+  })
+
+  it('撤回后的记录不再报「缺方法」；check 计数已撤回与坏记录', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
+      const recordPath = join(recordsDir, 'r-check.md')
+      writeFileSync(recordPath, recordText(suggestion).replace('status: open', 'status: adopted\nmethodSlug: check-method'))
+      const methodDir = join(methods, 'cfo', 'check-method')
+      mkdirSync(methodDir, { recursive: true })
+      writeFileSync(join(methodDir, 'SKILL.md'), 'installed')
+      writeFileSync(join(recordsDir, 'broken.md'), 'not a record')
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'check')).toMatchObject({ kind: 'success' })
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'revoke check-method')).toMatchObject({ kind: 'success' })
+      const after = await invokeCultivation(handler, 'cfo', workspace, 'check')
+      expect(after).toMatchObject({ kind: 'success' })
+      const text = String((after as { text: string }).text)
+      expect(text).not.toContain('缺方法 check-method')
+      expect(text).toContain('已撤回')
+      expect(text).toContain('坏记录')
+    })
+  })
+
+  it('非法 methodSlug 报「记录坏」，不抛普通 Error', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
+      writeFileSync(join(recordsDir, 'r-bad.md'), recordText(suggestion).replace('status: open', 'status: adopted\nmethodSlug: ../evil'))
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+      const result = await invokeCultivation(handler, 'cfo', workspace, 'check')
+      expect(result).toMatchObject({ kind: 'success' })
+      expect(String((result as { text: string }).text)).toContain('不合法')
+    })
+  })
+
+  it('cultivation_propose 空/空白 expectation/body → recorded:false，磁盘零新增', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
+      const { proposal } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)
+      const exec = {
+        agent: { session: { header: { agentPreset: 'ceo', cwd: workspace } } },
+        signal: new AbortController().signal,
+      } as never
+      const base = { kind: 'suggestion', targetRole: 'cfo', expectation: '复核数字口径', body: '先对照底稿' }
+      for (const over of [{ expectation: '   ' }, { expectation: '' }, { body: '  ' }, { body: '' }]) {
+        const result = await proposal.execute({ ...base, ...over } as never, exec) as { recorded: boolean }
+        expect(result.recorded).toBe(false)
+      }
+      expect(readdirSync(recordsDir)).toHaveLength(0)
     })
   })
 })

@@ -4,6 +4,21 @@
 
 ## 修复流水（倒序）
 
+- **BUG-090..103**（2026-11-13，根因组 G1–G7，P1×3 + P2×11）：高复杂度面持续探索的 14 张缺陷，按根因收口——
+  **G1** [094](BUG-094-bundle-manifest-id-path-traversal.md) / [102](BUG-102-req-delivery-rule-path-traversal.md)
+  不可信 id 进路径（单段 slug + residency + 成员校验）；**G3** [090](BUG-090-cultivation-revoke-unreachable-records-deletes-method.md) /
+  [091](BUG-091-cultivation-check-revoked-broken-unsafe.md) 培养作用域/对账（reachable + `--orphan` + revoked/broken/invalid）；
+  **G2** [096](BUG-096-deliverables-catalog-directory-eisdir.md) / [099](BUG-099-deliverables-audit-nonexistent-final.md)
+  存在≠可读（isFile + warnings + audit 目标）；**G4** [092](BUG-092-cultivation-propose-empty-fields.md) /
+  [093](BUG-093-cultivation-legacy-migration-invalid-slug.md) 写入/迁移目标域；**G5**
+  [097](BUG-097-workflow-runs-mispair-failed-call.md) / [098](BUG-098-presence-pending-transition-shows-deleted.md) /
+  [103](BUG-103-tasks-tab-empty-despite-team-task-events.md) 事件配对/状态显式/任务板事件补齐；**G6**
+  [100](BUG-100-export-dist-deletes-old-before-pack.md) / [101](BUG-101-concurrent-home-smoke-stale-v2-and-lease-timing.md)
+  发布 staging + smoke v3/lease；**G7** [095](BUG-095-workspace-resolution-accepts-tmp-root.md) 危险落点派生。
+  红→绿逐卡见 Note；`pnpm test` 236 files / 1788 tests；`typecheck`/`lint`/`dup`/`verify` 全绿；
+  `concurrent-home-smoke`、`release-smoke` ALL PASS。详见
+  [缺陷横扫 Note](../../../notes/implemented/2026-11-13-deep-surface-bug-sweep.md)。
+
 - **BUG-080..089**（2026-11-12，根因组 W/F/L/V，P1×2 + P2×8）：启动策略 + wiki 的十张同轮缺陷，
   按根因收口——**W** [081](BUG-081-strategy-panel-reads-session-workspace-command-writes-host.md) /
   [089](BUG-089-boot-without-workspace-settings-not-injected.md) /

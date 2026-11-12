@@ -48,7 +48,7 @@ export function workflowRunRows(
   const ends = new Map<string, string>()
   const children = new Map<string, Array<{ label: string; childId: string }>>()
   const calls: Array<{ seq: number; callId: string; name: string; background: boolean }> = []
-  const results = new Map<string, string>()
+  const results = new Map<string, { seq: number; text: string }>()
   for (const [index, event] of events.entries()) {
     const data = event.data as Record<string, unknown> | undefined
     const seq = typeof event.seq === 'number' ? event.seq : index
@@ -71,25 +71,32 @@ export function workflowRunRows(
       if (typeof message?.toolCallId !== 'string') continue
       const text = (message.content ?? []).filter(block => block?.type === 'text' && typeof block.text === 'string')
         .map(block => block.text).join('\n')
-      results.set(message.toolCallId, text)
+      results.set(message.toolCallId, { seq, text })
     }
   }
 
-  const byName = new Map<string, Array<{ seq: number; runId: string; name: string }>>()
-  for (const start of starts) {
-    const list = byName.get(start.name) ?? []
-    list.push(start)
-    byName.set(start.name, list)
-  }
-  const used = new Set<string>()
-  const rows: Array<WorkflowRunRow & { order: number }> = []
+  const callsByName = new Map<string, typeof calls>()
   for (const call of calls) {
-    const candidates = byName.get(call.name) ?? []
-    const start = candidates.find(candidate => !used.has(candidate.runId) && candidate.seq > call.seq)
-      ?? candidates.find(candidate => !used.has(candidate.runId))
-    if (start === undefined) continue
-    used.add(start.runId)
-    const text = results.get(call.callId) ?? ''
+    const list = callsByName.get(call.name) ?? []
+    list.push(call)
+    callsByName.set(call.name, list)
+  }
+  // 「这次调用是否真的产生了 run」的独立证据：结果在 start 之后（还没回执），或结果文本
+  // 是 workflow 的启动/完成文案。失败在 run-start 之前的同名调用不能抢走下一次 run（BUG-097）。
+  const runEvidence = /started in the background as job \S+|as job \S+|workflow "[^"]+" completed|workflow (completed|finished|cancelled)/i
+  const usedCalls = new Set<string>()
+  const rows: Array<WorkflowRunRow & { order: number }> = []
+  for (const start of starts) {
+    const preceding = (callsByName.get(start.name) ?? []).filter(call => !usedCalls.has(call.callId) && call.seq < start.seq)
+    const eligible = preceding.filter((call) => {
+      const observed = results.get(call.callId)
+      return observed === undefined || observed.seq > start.seq || runEvidence.test(observed.text)
+    })
+    // 优先最近的、有「产生 run」证据的调用；都没有时退回最近的前置调用（旧行为，仍给 lost 兜底）。
+    const call = eligible.at(-1) ?? preceding.at(-1)
+    if (call === undefined) continue
+    usedCalls.add(call.callId)
+    const text = results.get(call.callId)?.text ?? ''
     const jobMatch = /started in the background as job (\S+?)\./.exec(text) ?? /as job (\S+)/.exec(text)
     const jobId = jobMatch?.[1]
     const background = call.background || jobId !== undefined
@@ -111,7 +118,7 @@ export function workflowRunRows(
   }
   // 未被 call 配对上的 run-start 也不能藏：给 lost/终态，jobId 未知。
   for (const start of starts) {
-    if (used.has(start.runId)) continue
+    if (rows.some(row => row.runId === start.runId)) continue
     const end = ends.get(start.runId)
     rows.push({
       order: start.seq,

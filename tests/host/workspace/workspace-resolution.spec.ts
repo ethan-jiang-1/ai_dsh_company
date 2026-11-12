@@ -65,6 +65,9 @@ describe('resolveWorkspace：优先级与危险落点', () => {
     ['OS home', () => homedir()],
     ['文件系统根', () => '/'],
     ['DSH_HOME', () => dshHome],
+    ['系统临时根 /tmp', () => '/tmp'],
+    ['系统临时根真身 /private/tmp', () => '/private/tmp'],
+    ['os.tmpdir()', () => tmpdir()],
   ])('cwd = %s 时跳过，无 saved 则 none', (_label, cwdOf) => {
     const result = resolveWorkspace({ dshHome, envWorkspace: '', cwd: cwdOf() })
     expect(result.workspace).toBeUndefined()
@@ -106,5 +109,19 @@ describe('readSavedWorkspace / writeSavedWorkspace', () => {
     expect(readSavedWorkspace(dshHome)).toEqual({ path: settingsPath(dshHome) })
     writeSavedWorkspace(dshHome, ws)
     expect(readSavedWorkspace(dshHome).workspace).toBe(canonical(ws))
+  })
+
+  it('env = 系统临时根 → fail loud（不是可用 workspace）', () => {
+    const result = resolveWorkspace({ dshHome, envWorkspace: '/tmp', cwd: ws })
+    expect(result.workspace).toBeUndefined()
+    expect(result.error).toContain('系统临时根')
+  })
+
+  it('tmpdir 的子目录仍是合法 cwd（只排除根本身）', () => {
+    const project = mkdtempSync(join(tmpdir(), 'company-tmp-sub-'))
+    try {
+      const result = resolveWorkspace({ dshHome, envWorkspace: '', cwd: project })
+      expect(result).toMatchObject({ workspace: realpathSync(project), source: 'cwd' })
+    } finally { rmSync(project, { recursive: true, force: true }) }
   })
 })
