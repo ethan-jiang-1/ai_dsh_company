@@ -17,6 +17,7 @@
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
 | [BUG-140（撤回）](settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md) | 已结（撤回）：真页面默认新空会话；显式选中任务会话后任务板 (2)，原文保留测试方法证据 | 2026-11-13 |
+| [BUG-150（撤回）](settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md) | 已结（撤回）：复核时 spec 已传 workspace，company-root-safety 55 passed；无产品改动 | 2026-11-13 |
 | [2026-11-12-startup-strategy-wiki-regression-exploration.md](settled_issues/2026-11-12-startup-strategy-wiki-regression-exploration.md) | 已结；启动策略（界面）+ wiki 知识地图（配置）回归/探索：A1–A5 / B1–B8 + named child；10 张 BUG-080..089；未证 teammate/workflow 等；去向 = none（只产证据/BUG 卡） | 2026-11-12 |
 | [2026-11-12-wiki-knowledge-map-landing.md](settled_issues/2026-11-12-wiki-knowledge-map-landing.md) | 已结；wiki 模板（AK 三层 + OKF 最小 frontmatter）+ 六角色共享协议 skill + 指针三档校验 + 注入按位置分档；verify/test(233 files/1723)/typecheck/preset-smoke 全绿 + 外部只读真会话实测；去向 = [Note](../../notes/implemented/2026-11-12-wiki-knowledge-map-landing.md) | 2026-11-12 |
 | [2026-11-12-startup-settings-landing.md](settled_issues/2026-11-12-startup-settings-landing.md) | 已结；composer 入口 + 右栏「策略」页签（三字段、首项自动、选项从 content 枚举）+ workspace 级 `startup.json` + `company:startup-settings` 软注入；verify/test(231 files/1704)/typecheck/ui-scene-smoke(10 页签) 全绿；去向 = [Note](../../notes/implemented/2026-11-12-startup-settings.md) | 2026-11-12 |
@@ -219,6 +220,9 @@
 | [BUG-077-teammate-header-omits-team-collaboration.md](fixed_bugs/BUG-077-teammate-header-omits-team-collaboration.md) | team 拆 `team collaboration` / `team spawn (Lead only)`；teammate 列协作、注入 member section | 2026-11-11 |
 | [BUG-078-teammate-dead-subagent-control-tools.md](fixed_bugs/BUG-078-teammate-dead-subagent-control-tools.md) | control 按座位/child 能力装：CEO teammate 无，vp-eng teammate 保留 | 2026-11-11 |
 | [BUG-079-ceo-teammate-spawn-header-no-child-channel.md](fixed_bugs/BUG-079-ceo-teammate-spawn-header-no-child-channel.md) | spawn/fork/retry 按 `childDepth > depth` 门控；CEO teammate 无 spawn，vp-eng teammate 保留；control 消费同一座位 | 2026-11-11 |
+| [BUG-147](fixed_bugs/BUG-147-export-governance-symlink-root-writes-outside.md) | --- | 2026-11-13 |
+| [BUG-148](fixed_bugs/BUG-148-bundle-manifest-root-symlink-writes-outside.md) | --- | 2026-11-13 |
+| [BUG-149](fixed_bugs/BUG-149-cultivation-root-symlink-writes-outside.md) | --- | 2026-11-13 |
 | [BUG-114](fixed_bugs/BUG-114-governance-export-corrupt-ledger-drops-old-snapshot.md) | --- | 2026-11-13 |
 | [BUG-115](fixed_bugs/BUG-115-lease-takeover-no-fencing-old-writer.md) | --- | 2026-11-13 |
 | [BUG-116](fixed_bugs/BUG-116-release-inventory-misses-wiki-template-shared-skill.md) | --- | 2026-11-13 |

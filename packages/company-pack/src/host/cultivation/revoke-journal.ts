@@ -9,10 +9,10 @@
  * 边界：只处理本包自己写出的 pending；外部手改过的记录不覆盖（报 conflict，留日志给人看）。
  */
 import { assertCompanyWritesAllowed } from '../run-bundle/write-gate.ts'
+import { ensureCompanyDir, readCompanyText, writeCompanyAtomic } from '../run-bundle/company-root.ts'
 import { isRecord } from '../../lib/guards.ts'
-import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { existsSync, rmSync } from 'node:fs'
+import { join } from 'node:path'
 import { applyRecordUpdates, type CultivationStorage } from '../cultivation/cultivation-storage.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
 
@@ -40,10 +40,10 @@ export type RecoverRevokeResult =
 export const pendingRevokePath = (companyRoot: string): string => join(companyRoot, RUN_BUNDLE_PATHS.cultivation, '.pending-revoke.json')
 
 export function readPendingRevoke(companyRoot: string): PendingRevoke | null {
-  const path = pendingRevokePath(companyRoot)
+  const text = readCompanyText(companyRoot, `${RUN_BUNDLE_PATHS.cultivation}/.pending-revoke.json`)
+  if (text === undefined) return null
   try {
-    if (!existsSync(path)) return null
-    const raw: unknown = JSON.parse(readFileSync(path, 'utf8'))
+    const raw: unknown = JSON.parse(text)
     if (!isRecord(raw) || raw.schema !== 1) return null
     if (typeof raw.role !== 'string' || typeof raw.slug !== 'string') return null
     if (typeof raw.revokedAt !== 'string' || typeof raw.createdAt !== 'string') return null
@@ -68,20 +68,12 @@ export function readPendingRevoke(companyRoot: string): PendingRevoke | null {
 
 export function writePendingRevoke(companyRoot: string, pending: PendingRevoke): void {
   assertCompanyWritesAllowed()
-  const path = pendingRevokePath(companyRoot)
-  mkdirSync(dirname(path), { recursive: true })
-  const temporary = `${path}.${String(process.pid)}.${String(Date.now())}.${randomUUID()}.tmp`
-  try {
-    writeFileSync(temporary, `${JSON.stringify(pending, null, 2)}\n`, { flag: 'wx' })
-    renameSync(temporary, path)
-  } catch (error) {
-    try { rmSync(temporary, { force: true }) } catch { /* preserve original error */ }
-    throw error
-  }
+  writeCompanyAtomic(companyRoot, `${RUN_BUNDLE_PATHS.cultivation}/.pending-revoke.json`, `${JSON.stringify(pending, null, 2)}\n`)
 }
 
 export function clearPendingRevoke(companyRoot: string): void {
   assertCompanyWritesAllowed()
+  ensureCompanyDir(companyRoot, RUN_BUNDLE_PATHS.cultivation, { create: true })
   rmSync(pendingRevokePath(companyRoot), { force: true })
 }
 

@@ -12,6 +12,7 @@
  * 本模块只做纯事；调用方接住错误，apply 期不抛。
  */
 import { assertCompanyWritesAllowed } from './write-gate.ts'
+import { companyFileProblem, readCompanyText, writeCompanyAtomic, ensureCompanyRoot } from './company-root.ts'
 import { randomUUID } from 'node:crypto'
 import {
   existsSync,
@@ -171,9 +172,13 @@ function validateBundleManifest(value: unknown): ManifestValidation {
 /** 读 manifest 状态；不存在/坏/更高版本/legacy 分开报。 */
 export function readBundleManifestState(workspace: string): BundleManifestState {
   const path = bundleManifestPath(workspace)
+  const problem = companyFileProblem(workspace, BUNDLE_MANIFEST_REL)
+  if (problem === 'missing') return { status: 'missing', path }
+  if (problem === 'unsafe') return { status: 'corrupt', path, error: 'bundle.json 路径不安全（symlink/目录/越界）' }
   try {
-    if (!existsSync(path)) return { status: 'missing', path }
-    const raw: unknown = JSON.parse(readFileSync(path, 'utf8'))
+    const text = readCompanyText(workspace, BUNDLE_MANIFEST_REL)
+    if (text === undefined) return { status: 'corrupt', path, error: 'bundle.json 不可读' }
+    const raw: unknown = JSON.parse(text)
     const validation = validateBundleManifest(raw)
     if (validation.unsupportedVersion !== undefined) {
       return {
@@ -277,40 +282,19 @@ export function planBundleManifest(options: {
 /** 执行计划：创建/升级；v2 旧文件备份；身份备份；绝不覆盖有效 v3。 */
 export function writeBundleManifest(
   plan: ManifestPlan,
-  deps: { readonly link?: typeof linkSync } = {},
+  _deps: { readonly link?: typeof linkSync } = {},
 ): { created: boolean; skipped: boolean; upgraded: boolean; fallback?: 'wx' } {
   assertCompanyWritesAllowed()
   if (plan.error !== undefined || plan.action === 'skip') {
     return { created: false, skipped: true, upgraded: false }
   }
-  mkdirSync(dirname(plan.path), { recursive: true })
+  const workspace = dirname(dirname(plan.path))
+  ensureCompanyRoot(workspace, { create: true })
+  if (plan.action === 'create' && existsSync(plan.path)) return { created: false, skipped: true, upgraded: false }
   if (plan.action === 'upgrade' && plan.legacyPath !== undefined && existsSync(plan.path)) {
     try { renameSync(plan.path, plan.legacyPath) } catch { /* 备份失败不阻塞写入；旧内容仍在 */ }
   }
-  const temporary = `${plan.path}.${String(process.pid)}.${String(Date.now())}.${randomUUID()}.tmp`
-  const data = `${JSON.stringify(plan.manifest, null, 2)}\n`
-  try {
-    writeFileSync(temporary, data, { flag: 'wx' })
-    try {
-      ;(deps.link ?? linkSync)(temporary, plan.path)
-      writeIdentityBackup(plan.backupPath, plan.manifest)
-      return { created: plan.action === 'create', skipped: false, upgraded: plan.action === 'upgrade' }
-    } catch (error) {
-      const code = (error as { code?: string }).code
-      if (code === 'EEXIST') return { created: false, skipped: true, upgraded: false }
-      if (code === 'EPERM' || code === 'ENOTSUP' || code === 'EOPNOTSUPP' || code === 'EXDEV' || code === 'EMLINK') {
-        try {
-          writeFileSync(plan.path, data, { flag: 'wx' })
-          writeIdentityBackup(plan.backupPath, plan.manifest)
-          return { created: plan.action === 'create', skipped: false, upgraded: plan.action === 'upgrade', fallback: 'wx' }
-        } catch (fallbackError) {
-          if ((fallbackError as { code?: string }).code === 'EEXIST') return { created: false, skipped: true, upgraded: false }
-          throw fallbackError
-        }
-      }
-      throw error
-    }
-  } finally {
-    try { unlinkSync(temporary) } catch { /* 已 link 走或未创建 */ }
-  }
+  writeCompanyAtomic(workspace, BUNDLE_MANIFEST_REL, `${JSON.stringify(plan.manifest, null, 2)}\n`)
+  writeIdentityBackup(plan.backupPath, plan.manifest)
+  return { created: plan.action === 'create', skipped: false, upgraded: plan.action === 'upgrade' }
 }

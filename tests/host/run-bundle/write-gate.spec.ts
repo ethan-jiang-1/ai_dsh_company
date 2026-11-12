@@ -1,3 +1,4 @@
+// 负例留证 2026-11-13：删 ensureRecordsDirectory 的 residency ⇒ root symlink 下先 mkdir 外部 cultivation（BUG-149）；前置 assert 即绿。
 // 负例留证 2026-11-13：cultivation/export 直写不接 gate ⇒ block 后仍写成功（BUG-144）；接 assert 即绿。
 /** 公司盘写 gate 与根/子目录 residency（BUG-119/121/129/131）。 */
 import { existsSync, mkdtempSync, mkdirSync, rmSync, symlinkSync } from 'node:fs'
@@ -11,6 +12,8 @@ import {
 import { blockCompanyWrites, unblockCompanyWrites, CompanyWriteBlockedError } from '../../../packages/company-pack/src/host/run-bundle/write-gate.ts'
 import { nodeCultivationStorage } from '../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts'
 import { exportGovernance } from '../../../packages/company-pack/src/host/ledger/governance-export.ts'
+import { writePendingRevoke } from '../../../packages/company-pack/src/host/cultivation/revoke-journal.ts'
+import { appendRotatingLine } from '../../../packages/company-pack/src/host/logging/rotating-log.ts'
 
 const temp = (): string => mkdtempSync(join(tmpdir(), 'company-root-'))
 
@@ -65,5 +68,25 @@ describe('公司盘根 residency 与写 gate', () => {
       unblockCompanyWrites()
       expect(nodeCultivationStorage.writeRecord(records, draft)).toMatch(/^\d/)
     } finally { unblockCompanyWrites(); rmSync(ws, { recursive: true, force: true }) }
+  })
+
+  it('根 symlink → cultivation/revoke journal/log 写拒绝，外部不写（BUG-149）', () => {
+    const ws = temp()
+    const outside = temp()
+    const records = join(ws, '.dsh-company/cultivation/records')
+    const draft = {
+      kind: 'correction' as const, targetRole: 'ceo' as const, proposerRole: 'ceo' as const,
+      proposerKind: 'human' as const, source: 'test', expectation: '稳', body: '先列清单',
+    }
+    try {
+      symlinkSync(outside, join(ws, '.dsh-company'))
+      expect(() => nodeCultivationStorage.writeRecord(records, draft)).toThrow(/symlink/)
+      expect(() => writePendingRevoke(ws, {
+        schema: 1, role: 'ceo', slug: 'm1', revokedAt: 'x', createdAt: 'x', records: [],
+      })).toThrow(/symlink/)
+      expect(() => appendRotatingLine(join(ws, '.dsh-company/logs/upgrade.log'), 'x\n')).toThrow(/symlink/)
+      expect(existsSync(join(outside, 'cultivation'))).toBe(false)
+      expect(existsSync(join(outside, 'logs'))).toBe(false)
+    } finally { rmSync(ws, { recursive: true, force: true }); rmSync(outside, { recursive: true, force: true }) }
   })
 })

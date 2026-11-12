@@ -59,6 +59,7 @@ opened: YYYY-MM-DD
 ## 索引
 
 - [wiki-knowledge-map](wiki-knowledge-map/README.md) — wiki 组织的动态知识地图（AK 式 LLM wiki）与轻依赖接入；消费者 = 用户 2026-11-12 点名研究。
+- [adversarial-shape-matrix](adversarial-shape-matrix/README.md) — 对抗性边界矩阵 + 跨载体一致性 spec 的测试资产设计；消费者 = 用户 2026-11-13 点名研究。
 
 （2026-11-12 bilingual-company 随 UI 落地卡归档，迁入[研究归档](../_archive/research/README.md)。）
 

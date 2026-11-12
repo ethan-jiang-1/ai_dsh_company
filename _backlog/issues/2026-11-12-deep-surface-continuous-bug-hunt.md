@@ -1054,6 +1054,280 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 **未跑：** `sidebarRight.openTab('company-board')` / `company-overview` 入口的真实点击；C2 live workflow；C7 release profile。
 
+## Round 60（C5 平台 tab 入口 / 干净基线）
+
+**做了：** 干净基线下再次选任务会话，打开任务板；用 Playwright 读右栏 `role=tab` 与 guide 入口。
+
+**结果：**
+- 任务板显示 task-1/task-2，PASS；
+- 右栏实际 open tab = `对话 / 培养 / 任务板`；
+- 平台 tab（看板/依赖图/在场/用量/待办/台账/成品/策略）是 `sidebar.right.tab.guide.entry` 注册项，需要 guide/`openTab` 入口才会成为 open tab；`getByRole('tab')` 当前只看到 3 个；
+- 这不是产品 bug 的证据不足：入口（company overview / guide capsule / tab picker）未点到，不能把「未打开」当「不可达」。
+
+**判定：** 本轮没有新增独立缺陷；active 仍空。C5 平台 tab 的入口路径仍需专门点测（openCompanyOverview / guide entry）。
+
+**验证：** `pnpm test` 238 files / 1827 tests passed；`verify/typecheck/lint/dup` 全绿。
+
+**未跑：** guide entry 点击、company overview 打开看板/在场、C2 live workflow、C7 release profile。
+
+## Round 61（C7 release-smoke / C5 company overview）
+
+**做了：**
+- `source run/env.sh && node checks/smoke/release-smoke.mjs` → **ALL PASS**（当前源码 tarball → 干净 profile 真安装 → RPC → 首启/幂等/补种/卸载重装）。
+- Playwright：选中任务会话 → 打开「培养」→ 点「公司总览 ↗」→ 看板 tab 出现，`.wk-board` 显示 task-1/task-2（写 PRD/复核 PRD、依赖 task-1、drift 警示）。
+- 任务板 tab 也显示 2 条任务。
+
+**判定：** 没有新增缺陷；C5 看板/任务板在真实页面 PASS；C7 release 当前 PASS。C5 依赖图/在场/用量/待办/台账/成品/策略仍未逐一点开（guide/`openTab` 入口未点全）。
+
+**未跑：** guide entry 胶囊点击、C2 live workflow、C5 其余平台 tab、C7 release profile 六角色 skills/list 再次。
+
+## Round 62（C5 平台 tab guide）
+
+**做了：** 打开「新标签页」guide，读取 `.wk-guide-entry`；逐项点「在场/依赖图/用量」。
+
+**结果：**
+- guide entries 全部在：`策略/待办/看板/依赖图/在场/用量/任务板/培养/台账/成品`；
+- 「在场」能打开新 tab；tab 列表出现 `在场`；
+- 「依赖图」「用量」在脚本同一轮里没有留下对应 tab（最终 tabs = 对话/培养/看板/开始/在场），但同一轮 `openNew` 的 tab 管理/guide 是否已关闭未区分，不能判产品 bug；
+- 任务板/看板已在前几轮 PASS。
+
+**判定：** 平台 tab guide 本身可达；依赖图/用量/待办/台账/成品/策略的打开路径仍未逐项稳定证。没有新增缺陷。
+
+**验证：** release-smoke ALL PASS；pnpm test 238 files / 1827 tests；verify/typecheck/lint/dup 全绿；active 空。
+
+**未跑：** 依赖图/用量/台账/成品/策略 guide 入口的独立点测；C2 live workflow。
+
+## Round 63（C4 governance-export 根 residency / C5 平台 tab）
+
+**做了：**
+- C5 平台 tab 逐项 guide：依赖图/用量/台账/成品/策略/待办全部能打开新 tab（body/面板有内容；任务板/看板此前 PASS）。
+- C7 release-smoke 从含空格/unicode 的 tarball 路径安装 → **ALL PASS**。
+- C4 回归 `exportGovernance` 的 `.dsh-company` symlink。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `.dsh-company` symlink + exportGovernance | **confirmed P1** | [BUG-147](../_archive/fixed_bugs/BUG-147-export-governance-symlink-root-writes-outside.md)：`outside/exports/README.md` 被写；methods/ledger 同根。 |
+| C5 平台 tab | pass（本轮） | 依赖图/用量/台账/成品/策略/待办均可经 guide 打开。 |
+| C7 路径空格/unicode | pass | release-smoke ALL PASS。 |
+| 其它 company-root 消费者 | 上一轮已 PASS | catalog/startup/presented/bootstrap。 |
+
+**判定：** 新卡 BUG-147 P1；BUG-129 的根 residency 修复漏了 governance-export（最后一条直拼 `.dsh-company/exports` 的写路径）。
+
+**未跑：** export 写 gate + symlink 的组合；readLedgerExport 外部读；methods 旧快照随根 symlink 的行为。
+
+## Round 64（C3 身份根 residency：bundle-manifest）
+
+**选面理由：** BUG-147 说明 export 漏了 company-root；本轮扫 `.dsh-company` 直拼写入口，先查 bundle 身份。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| `.dsh-company` symlink + plan/writeBundleManifest | **confirmed P1** | [BUG-148](../_archive/fixed_bugs/BUG-148-bundle-manifest-root-symlink-writes-outside.md)：outside/bundle.json 出现，read 状态 ok。 |
+| cultivation/revoke journal/log | 同根因（卡内列） | 仍直拼 `.dsh-company`；A 加了 write-gate 但没 root residency。 |
+| catalog/startup/presented/bootstrap | 已修 | 129 覆盖。 |
+| export | BUG-147 活跃 | 同族。 |
+
+**判定：** 新卡 BUG-148 P1；根因是 company-root 迁移漏了 bundle/cultivation/revoke/log（147 是 export）。
+
+**未跑：** cultivation 根 symlink 实写；revoke journal；appendUpgradeLog；ensureRunBundle 真启动。
+
+## Round 65（C1/C3 根 residency：cultivation/log）
+
+**选面理由：** BUG-147/148 已证 export/bundle 漏了根 residency；本轮扫 cultivation/revoke/log 的 `.dsh-company` 直写。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| 根 symlink + cultivation writeRecord | **confirmed P1** | [BUG-149](../_archive/fixed_bugs/BUG-149-cultivation-root-symlink-writes-outside.md)：outside/cultivation/records/<id>.md 出现。 |
+| installMethod/archive/revoke journal/log | 同根因（卡内列） | 仍 join `.dsh-company`；write-gate 只挡 blocked。 |
+| catalog/startup/presented/bootstrap | 已修 | 129 覆盖。 |
+| export/bundle | 147/148 活跃 | 同族。 |
+
+**判定：** 新卡 BUG-149 P1；这是 company-root 迁移的最后一组旧直写（cultivation/log），与 147/148 一起收口。
+
+**未跑：** installMethod/archive/revoke journal/log 的实写；真启动根 symlink；内部 symlink 策略。
+
+## Round 66（C7 空格路径 / C5 guide / root 组复核）
+
+**做了：**
+- C7：从 `runtime/tmp/c7 space/安装 包/…tgz` 跑 `release-smoke --tarball` → **ALL PASS**。
+- C5：guide 逐项打开依赖图/用量/台账/成品/策略/待办 → 新 tab 均出现、面板有内容。
+- C1/C3：root symlink 下 cultivation `writeRecord` → outside/cultivation/records 实写（BUG-149）。
+
+**判定：** 本轮没有新增独立缺陷；147/148/149 是同一 company-root 迁移漏项（export/bundle/cultivation-log）。C7 空格/unicode 路径 PASS；C5 guide PASS。
+
+**验证：** `pnpm test` 238 files / 1827 tests passed；`pnpm verify` 仍红在 A 的 research 文档 bare-path（`_backlog/research/adversarial-shape-matrix/2026-11-13-design.md`），非本轮 BUG 卡。
+
+**未跑：** C2 live workflow；root symlink 下 installMethod/revoke/log；A 收口 research 后的 verify。
+
+## Round 67（C5 client symlink / C1 C3 root 复核）
+
+**做了：**
+- C5：真实 workspace 放一条 **symlink record**（`.dsh-company/cultivation/records/20260101-…-sym.md` → 外部文件），打开「培养」；面板显示「1 条记录读不动」，**未采用外部内容**（client/workspaceFiles 读面 fail-closed）。
+- C7：空格/unicode tarball 路径 release-smoke → ALL PASS（Round 66 已记）。
+- C1/C3：root symlink 下 cultivation writeRecord 写外（BUG-149 证据强化）。
+- 全量 test/verify 仍绿。
+
+**判定：** 本轮没有新增独立缺陷；147/148/149 仍是 active root 组；client 读面 symlink 表现安全（不新增卡）。
+
+**验证：** `pnpm test` 238 files / 1827 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** root symlink 下 installMethod/revoke journal/log 的逐项实写；C2 live workflow；C5 平台 tab 的深数据（多成员/多任务）。
+
+## Round 68（C2 live workflow 尝试 / C5 guide / root 组）
+
+**做了：**
+- C2：dev home + 临时 workspace 起 CEO 会话，prompt 要求 `workflow` 两次 background（meta.name=audit），等 turn/end；会话日志 **0 个 tool/call**，模型未调用（不是 workflow 产品结论；不能当失败）。
+- C5：guide 逐项（依赖图/用量/台账/成品/策略/待办）打开新 tab，面板有内容；PASS。
+- C1/C3：root symlink cultivation writeRecord 已证 149；installMethod 在 home 方法层（非 `.dsh-company`），revoke journal/log 同根卡内列。
+
+**判定：** 本轮没有新增独立缺陷；147/148/149 三张 P1 仍活跃。C2 live 未拿到可判工具调用，标记为未证而非 bug。
+
+**验证：** `pnpm test` 238 files / 1827 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** 真 workflow tool 调用（模型未配合）；root symlink 下 revoke journal/log 逐项；C5 平台 tab 多成员/多任务。
+
+## Round 69（C2 live workflow：VP-Eng 真调用）
+
+**做了：** dev home + 临时 workspace，建 `vp-eng` root 会话，prompt 要求立即调用 `workflow` 一次 background（`meta.name='audit'`，`script='return 1'`）。
+
+**结果：**
+- 模型确实调用 `workflow`，参数 `{script:'return 1',meta:{name:'audit'},run_in_background:true}`；
+- tool result：`workflow "audit" started in the background as job workflow-f1a0ff55d71c40bb…`；
+- 随后模型调用 `job_output`，job 状态 `failed, sandbox-unavailable: sandbox_apply: Operation not permitted`（本机 Seatbelt 条件，不是插件缺陷）；
+- `workflowRunRows`：`{runId, name:'audit', background:true, jobId:'workflow-f1a0…', status:'error'}` —— call/run 配对正确。
+
+**判定：** C2 live workflow 的启动/配对 PASS；job 失败是环境 sandbox，不是产品 bug。本轮没有新增缺陷卡。
+
+**验证：** `pnpm test` 238 files / 1827 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** 两个同名 background 的 live 并发（模型只调了一次）；workflow 真完成（sandbox 禁用）；C2 子代/retry live。
+
+## Round 70（C2 live 两个同名 background workflow）
+
+**做了：** VP-Eng root + 临时 workspace；prompt 明确连续调用 `workflow` 两次（同名 audit，background，script return 1/2），不调用 job_output。
+
+**结果：**
+- 两次 `tool/call` 都是 workflow；
+- 两条 result：job `workflow-74c4…` / `workflow-e87c…`；
+- `workflowRunRows`：
+  - run1 → job workflow-74c4…（script return 1）
+  - run2 → job workflow-e87c…（script return 2）
+  - 两条 status error = sandbox-unavailable（环境）；
+- **没有交换**，FIFO 修复在 live 两 run 下成立。
+
+**判定：** C2 live 名称并发 PASS；没有新增缺陷。
+
+**验证：** `pnpm test` 238 files / 1827 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** 三 run 乱序结果、job 真完成（sandbox 禁用）、subagent retry live。
+
+## Round 71（C2 live 并发复核 / C5 平台 tab）
+
+**做了：** 两个同名 background workflow（VP-Eng）真调用；guide 平台 tab 逐项点开。
+
+**结果：**
+- 两次 workflow call + 两条 job result；`workflowRunRows` run1→job1、run2→job2，**jobId 不交换**；status error = sandbox-unavailable（环境）。
+- C5 依赖图/用量/台账/成品/策略/待办均可打开，面板有内容。
+- root 组 147/148/149 仍活跃（export/bundle/cultivation-log 根 symlink 写外）。
+
+**判定：** 本轮没有新增独立缺陷；C2 live 并发 PASS，C5 平台 tab PASS，剩余为 root 组三张 P1。
+
+**验证：** `pnpm test` 238 files / 1827 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** 三 run 乱序结果、root symlink 下 revoke journal/log 逐项、C2 subagent retry live。
+
+## Round 72（C3 全量 `.dsh-company` 直拼扫描）
+
+**做了：** `grep -rn '\.dsh-company' packages/company-pack/src` 逐条分类；区分读/写/纯文案。
+
+**剩余直拼：**
+- `governance-export` 147（exportRoot + readLedgerExport）；
+- `bundle-manifest` 148（bundleManifestPath/write/read）；
+- `cultivation-storage`/`revoke-journal`/`appendUpgradeLog` 149；
+- 命令面的 `companyRoot = join(workspace,'.dsh-company')` 在 `resolveDeliverablePath` 的 `ensureCompanyRoot` 之后，根 symlink 已被拒；
+- `index.ts` 非默认盘 backfill 走 bootstrap（A 已加父目录 lstat），根 symlink 只 warning；
+- 其余是注释/文案/safe-file。
+
+**判定：** 没有发现第 4 条独立直写；147/148/149 是 company-root 迁移的完整剩余集。
+
+**验证：** `pnpm test` 238 files / 1827 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** root symlink 下 revoke journal/log 逐项实写（147/148/149 修复后一起 spec）。
+
+## Round 73（C2 live 并发 / BUG-148 修复 test 漂移）
+
+**做了：** C2 live 两个同名 background workflow（VP-Eng）真调用；C5 平台 tab；root 组全量 grep。
+
+**结果：**
+- C2：两次 workflow call + 两条 job result，`workflowRunRows` run1→job1、run2→job2，不交换；job status error=sandbox-unavailable。
+- C5：依赖图/用量/台账/成品/策略/待办均可打开。
+- root：147/148/149 仍是完整剩余集。
+- **新红**：`tests/host/run-bundle/bundle-manifest.spec.ts` 仍期望 `writeBundleManifest` 返回 `fallback:'wx'`；A 的 BUG-148 修复已改 `writeCompanyAtomic` 并移除 fallback，当前 `pnpm test` **1 failed / 1826 passed**。
+
+**判定：** 本轮没有新增独立缺陷卡；BUG-148 的修复 API 变更需要同步旧 spec（恢复 fallback 或删参数/spec）。C2/C5 PASS。
+
+**验证：** `pnpm test` 1 failed / 1826 passed；`pnpm verify` 见下一轮；root 组 147/148/149 仍活跃。
+
+**未跑：** BUG-148 修复后的 root symlink 复验；revoke journal/log 实写。
+
+## Round 74（root 组复验：147/148 已修，149 仍在）
+
+**做了：** 用原复现脚本重跑 root symlink 三例。
+
+| H | 结果 |
+|---|---|
+| BUG-147 export | **已修**：`exportGovernance` 返回 `warnings:['导出根不安全…']`，outside/exports 不出现 |
+| BUG-148 bundle | **已修**：plan `skip 路径不安全`，write `{created:false,skipped:true}`，outside/bundle 不出现；read 返回 corrupt/unsafe |
+| BUG-149 cultivation | **仍复现**：writeRecord 写 `outside/cultivation/records` |
+
+**判定：** 代码里 147/148 已修（A 的 working tree），149 仍活跃；三张卡当前都还在活跃清单，需要 A 归档 147/148 并修 149（或统一 company-root 迁移）。
+
+**验证：** `pnpm test` 238 files / 1827 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** 147/148 的 root symlink 真启动；revoke journal/log 的 149 逐项；149 修复后归档。
+
+## Round 75（C4 safety 矩阵假红）
+
+**选面理由：** A 新增 `company-root-safety.spec.ts` 后测试 2 failed；本轮定位是产品写外还是 spec 误用。
+
+| H | 判决 | 证据 |
+|---|---|---|
+| catalog.regenerate root-symlink-out | **spec 误用** | [BUG-150](../_archive/settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md)：spec 传 `join(ws,'.dsh-company')`，但 API 要 workspace；双重 `.dsh-company`。 |
+| presented.write root-symlink-out | **spec 误用** | 同卡；startup/bootstrap 传 workspace，正常 typed。 |
+| BUG-147/148 | 代码已修（Round 74） | export 返回不安全 warning；bundle plan skip。 |
+| BUG-149 | 仍活跃 | cultivation writeRecord 仍写 outside。 |
+
+**判定：** 新卡 BUG-150 P2（测试资产）；product 147/148 已修、149 仍活跃。当前 full test **2 failed / 1869 passed**，红在 safety spec 的 2 条假红。
+
+**验证：** `pnpm test` 现 **240 files / 1874 tests passed**（A 已修 safety spec/149 相关测试）；`pnpm verify` 红在 guard-red-record（147/148/149 卡未归档）+ script-index（A 新增 71 门/128 入口，`checks/INDEX.generated.md` 需 `node tools/checks-index.mjs --write`）。这是 A 的收口未完成态，不是产品行为红。
+
+**未跑：** spec 修后 full green；149 实写 revoke/log。
+
+## Round 76（A 第四轮归档 / safety 矩阵复验）
+
+**做了：** 重跑 root 组/ safety 矩阵；检查 A 的归档状态。
+
+**结果：**
+- BUG-147/148/149 已由 A 修好并迁 `fixed_bugs`；`exportGovernance` 根 symlink 返回 unsafe warning、bundle plan skip、cultivation 仍写外（149 修复后？本轮证据：A 已归档 149，需复验）。
+- `tests/host/contract/company-root-safety.spec.ts` 已修；`pnpm test` **240 files / 1874 tests passed**。
+- `BUG-150`（safety spec 假红）代码已修，但卡文件仍在 `_backlog/bugs/` 且未被 README 索引；A 的第四轮归档处于中间态。
+- `pnpm verify` 红：backlog-liveness（BUG-150 未索引）、guard-red-record（147/148/149 spec 已引用但卡在 fixed_bugs？）、link-debt（A 的 fixed README 指向 `notes/implemented/2026-11-13-last-direct-writers.md` 等未落文件）。
+
+**判定：** 不是产品行为红；A 的归档/索引未收口。BUG-150 的测试假红已修；root 组 149 需看 A 的修复。
+
+**未跑：** A 归档完成后的 verify；149 修后 root symlink 复验。
+
+## Round 77（第四轮归档完成：active 清零）
+
+**结果（2026-11-13）：**
+- BUG-147/148/149 已修并迁 fixed_bugs；BUG-150 safety spec 假红复核不成立，迁 settled_issues；
+- active 空；
+- `pnpm test` **240 files / 1896 tests passed**；`pnpm verify` **ALL PASS**；
+- root symlink 复验：export 返回不安全 warning、bundle plan skip、cultivation（149）已修后不再写外（A 的 last-direct-writers Note）。
+
+**判定：** 本轮没有新增缺陷；147/148/149/150 全部收口。Goal 保持 active，下一轮从干净基线继续 C2/C5/C6/C7 未证面。
+
+**未跑：** C2 三 run 乱序、C5 多成员任务板、C6 真命令回执、C7 release profile 再跑。
+
 ## 证据、判据与处置
 
 - **oracle 纪律**：先写期望，再看实现；不拿实现当 oracle；spec 绿只说明覆盖，不说明行为正确。

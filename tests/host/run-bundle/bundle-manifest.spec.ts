@@ -1,3 +1,4 @@
+// 负例留证 2026-11-13：去掉 ensureCompanyRoot + 直写 ⇒ root-symlink bundle 写外部、read 不 corrupt（BUG-148）；safe 写即绿。
 /**
  * run bundle manifest v3 的 keyless 完成定义（2026-11-01）。
  *
@@ -8,7 +9,7 @@
  * - v2 原地升 v3，保留 id/createdAt，旧文件备份 `bundle.v2.json`；
  * - 损坏/更高版本 fail loud（返回状态、保留原文件），不 cast、不覆盖。
  */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -70,20 +71,19 @@ describe('bundle.json v3：身份与位置', () => {
     }
   })
 
-  it('hard link 不支持 ⇒ wx 回退并仍不覆盖', () => {
+  it('create 既有 bundle 不覆盖（原子写也保持 create 语义）', () => {
     const h = home()
     const ws = workspace()
     try {
       const plan = planBundleManifest({ dshHome: h, workspace: ws, pack: PACK })
-      const result = writeBundleManifest(plan, {
-        link: () => { throw Object.assign(new Error('nope'), { code: 'EPERM' }) },
-      })
-      expect(result).toMatchObject({ created: true, fallback: 'wx' })
+      expect(writeBundleManifest(plan)).toMatchObject({ created: true })
       expect(existsSync(plan.path)).toBe(true)
+      expect(writeBundleManifest(plan)).toMatchObject({ created: false, skipped: true })
     } finally {
       rmSync(h, { recursive: true, force: true }); rmSync(ws, { recursive: true, force: true })
     }
   })
+
 })
 
 describe('bundle.json v3：损坏、版本与 v2 升级', () => {
@@ -172,5 +172,23 @@ describe('升级日志', () => {
       expect(() => identityBackupPath(h, id)).toThrow()
     }
     rmSync(h, { recursive: true, force: true })
+  })
+
+  it('.dsh-company 是 symlink → bundle 写拒绝、读 corrupt、外部不写（BUG-148）', () => {
+    const h = home()
+    const ws = workspace()
+    const outside = mkdtempSync(join(tmpdir(), 'bundle-root-outside-'))
+    try {
+      symlinkSync(outside, join(ws, '.dsh-company'))
+      const safe = workspace()
+      const plan = planBundleManifest({ dshHome: h, workspace: safe, pack: PACK })
+      const forced = { ...plan, path: join(ws, '.dsh-company/bundle.json') }
+      expect(() => writeBundleManifest(forced)).toThrow(/symlink/)
+      rmSync(safe, { recursive: true, force: true })
+      expect(existsSync(join(outside, 'bundle.json'))).toBe(false)
+      expect(readBundleManifestState(ws).status).toBe('corrupt')
+    } finally {
+      rmSync(h, { recursive: true, force: true }); rmSync(ws, { recursive: true, force: true }); rmSync(outside, { recursive: true, force: true })
+    }
   })
 })

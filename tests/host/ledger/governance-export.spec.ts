@@ -1,3 +1,4 @@
+// 负例留证 2026-11-13：root 换回 `join(workspace,'.dsh-company')` ⇒ root-symlink 导出写外部（BUG-147）；ensureCompanyRoot 即绿。
 // 负例留证 2026-11-13：staging 不复制旧 ledger ⇒ corrupt 账本导出后旧快照消失（BUG-114）；复制旧件即绿。
 /**
  * host 治理导出的 keyless 完成定义（2026-11-01 产品化 P4）。
@@ -5,7 +6,7 @@
  * 判据：方法层/账本导出到 workspace `.dsh-company/exports/`；导出是派生；账本内容不变时不重写
  * （避免二启 exportedAt 打红）；权威文件不被改动。
  */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -101,5 +102,19 @@ describe('导出目录替换的回滚', () => {
       exportGovernance({ dshHome: home, workspace: ws })
       expect(readFileSync(join(ws, '.dsh-company/exports/methods/ceo/m1/SKILL.md'), 'utf8')).toBe('# method\n')
     } finally { cleanup() }
+  })
+
+  it('.dsh-company 是 symlink → 导出拒绝且外部目录不写（BUG-147）', () => {
+    const root = mkdtempSync(join(tmpdir(), 'governance-root-link-'))
+    const outside = mkdtempSync(join(tmpdir(), 'governance-root-outside-'))
+    try {
+      const ws = join(root, 'ws')
+      mkdirSync(ws, { recursive: true })
+      symlinkSync(outside, join(ws, '.dsh-company'))
+      const result = exportGovernance({ dshHome: join(root, 'home'), workspace: ws })
+      expect(result.warnings.some(warning => warning.includes('不安全'))).toBe(true)
+      expect(existsSync(join(outside, 'exports'))).toBe(false)
+      expect(readLedgerExport(ws)).toBeUndefined()
+    } finally { rmSync(root, { recursive: true, force: true }); rmSync(outside, { recursive: true, force: true }) }
   })
 })

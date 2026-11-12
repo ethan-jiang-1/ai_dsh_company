@@ -87,6 +87,7 @@ import * as devProductParity from './gates/dev-product-parity.mjs'
 import * as replayFixtureFreshness from './gates/replay-fixture-freshness.mjs'
 import * as replayUiFreshness from './gates/replay-ui-freshness.mjs'
 import * as gateWiring from './gates/gate-wiring.mjs'
+import * as companyRootCarriers from './gates/company-root-carriers.mjs'
 import * as charterEntry from './gates/charter-entry.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -173,6 +174,7 @@ scriptIndex.run(ctx)
 devProductParity.run(ctx)
 replayFixtureFreshness.run(ctx)
 replayUiFreshness.run(ctx)
+companyRootCarriers.run(ctx)
 gateWiring.run(ctx)
 
 const unexpected = skips.filter(entry => !EXPECTED_SKIPS.has(entry.name))

@@ -2,16 +2,29 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮拿到 ≥3 张卡，先按根因分组列表再逐卡修——逐症状打补丁会把同一根因修三遍。
 
-**下一个缺陷号**：Next BUG ID = 147；已分配 BUG-001..146。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 151；已分配 BUG-001..150。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。
 
 ## 活跃清单
 
-**空**（2026-11-13 第三轮全部收口：BUG-114..139、141..145 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；
-BUG-140 经复核不成立，已迁 [settled_issues](../_archive/settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md)）。
+**空**（2026-11-13 第四轮收口：BUG-147..149 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；
+BUG-150 复核不成立，迁 [settled_issues](../_archive/settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md)）。
+
+**2026-11-13 第三轮收口**：BUG-114..139、141..145 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；BUG-140 撤回 settled。
 
 **2026-11-12 收口**：BUG-080..089 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+
+## 2026-11-13 修复交接（第四轮，根因组 G：BUG-147..149）
+
+**用户指令（2026-11-13）**：「_backlog/bugs 这里又找到一堆bug……直到所有bug解决了」。三张 P1 同根：
+**写 gate 与 residency 分离**——`exportGovernance` / bundle-manifest / cultivation-storage / revoke-journal /
+upgrade log 仍直接拼 `.dsh-company`，根 symlink 时写到 workspace 外。本轮把它们全部迁到 `company-root`
+（`ensureCompanyRoot/ensureCompanyDir/writeCompanyAtomic/readCompanyText`）并保留 write-gate；读面（bundle/
+`readLedgerExport`）同步安全读。留痕 = Note。
+
+**收口**：3 张卡全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；BUG-150 复核不成立（spec 已传 workspace，55 passed）迁 settled。`pnpm test` 240 files / 1896 tests、
+`typecheck`/`lint`/`dup`/`verify` 全绿。证据 = [Note](../../notes/implemented/2026-11-13-last-direct-writers.md)。
 
 ## 2026-11-13 修复交接（第三轮，根因组 A–F：BUG-114..145）
 

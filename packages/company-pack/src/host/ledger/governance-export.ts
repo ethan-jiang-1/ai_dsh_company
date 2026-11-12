@@ -9,8 +9,9 @@
  * 失败只 warn（不能连累 boot / present）。
  */
 import { cpSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 import { assertCompanyWritesAllowed } from '../run-bundle/write-gate.ts'
+import { ensureCompanyRoot, readCompanyText } from '../run-bundle/company-root.ts'
 import { randomUUID } from 'node:crypto'
 import type { PresentedLedger, PresentedLedgerState } from '../ledger/presented-ledger.ts'
 
@@ -85,12 +86,17 @@ export function exportGovernance(options: {
 }): GovernanceExportResult {
   assertCompanyWritesAllowed()
   const warnings: string[] = []
-  const exportRoot = join(options.workspace, '.dsh-company/exports')
+  let root: string
+  try {
+    root = ensureCompanyRoot(options.workspace, { create: true })
+  } catch (error) {
+    return { methods: false, ledger: false, warnings: [`导出根不安全：${(error as Error).message}`] }
+  }
+  const exportRoot = join(root, 'exports')
   const staging = `${exportRoot}.tmp-${String(process.pid)}-${randomUUID()}`
   let methods = false
   let ledger = false
   try {
-    mkdirSync(dirname(exportRoot), { recursive: true })
     rmSync(staging, { recursive: true, force: true })
     mkdirSync(staging, { recursive: true })
     // 整个 exports/ 在同一 staging 里生成：README / methods / ledger 不会混代。
@@ -147,5 +153,7 @@ export function exportGovernance(options: {
 
 /** 读导出（测试/诊断用）；不存在返回 undefined。 */
 export function readLedgerExport(workspace: string): unknown {
-  try { return JSON.parse(readFileSync(join(workspace, '.dsh-company/exports/ledger.json'), 'utf8')) } catch { return undefined }
+  const text = readCompanyText(workspace, 'exports/ledger.json')
+  if (text === undefined) return undefined
+  try { return JSON.parse(text) } catch { return undefined }
 }

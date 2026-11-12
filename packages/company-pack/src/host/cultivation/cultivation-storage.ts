@@ -15,6 +15,7 @@
  * keyless 判据 = `tests/host/cultivation/cultivation-maintenance.spec.ts` 与 `revoke-journal.spec.ts`（命令行为经 `CultivationStorage` 观察同一面）。
  */
 import { assertCompanyWritesAllowed } from '../run-bundle/write-gate.ts'
+import { ensureCompanyDir } from '../run-bundle/company-root.ts'
 import {
   constants,
   copyFileSync,
@@ -32,7 +33,7 @@ import {
 } from 'node:fs'
 import type { Dirent } from 'node:fs'
 import { randomUUID } from 'node:crypto'
-import { dirname, isAbsolute, join, win32 } from 'node:path'
+import { dirname, isAbsolute, join, relative, sep, win32 } from 'node:path'
 import {
   CULTIVATION_ROLES,
   parseRecord,
@@ -79,7 +80,17 @@ function lstatOrNull(path: string): NonNullable<ReturnType<typeof lstatSync>> | 
 }
 
 /** Require a real directory at this app-owned path component; never accept a symlink. */
+/** 路径若在公司盘内，逐级证明 `.dsh-company` 根与父目录不是 symlink（BUG-149）。 */
+function assertCompanyResidency(path: string): void {
+  const marker = `${sep}.dsh-company${sep}`
+  const index = path.indexOf(marker)
+  if (index < 0) return
+  const workspace = path.slice(0, index)
+  ensureCompanyDir(workspace, relative(join(workspace, '.dsh-company'), dirname(path)), { create: true })
+}
+
 function ensureDirectory(path: string): void {
+  assertCompanyResidency(path)
   let info = lstatOrNull(path)
   if (info === null) {
     mkdirSync(path, { recursive: true })
@@ -90,6 +101,7 @@ function ensureDirectory(path: string): void {
 
 /** The configured profile root is trusted; all role/slug components below it are checked individually. */
 function ensureMethodRoot(root: string): void {
+  assertCompanyResidency(root)
   let info = lstatOrNull(root)
   if (info === null) {
     mkdirSync(root, { recursive: true })
@@ -205,6 +217,7 @@ export function migrateLegacyMethodLayers(
 
 /** Publish a new file without replacing an existing destination. Both paths share one directory/filesystem. */
 function writeNewFile(path: string, text: string): void {
+  assertCompanyResidency(path)
   assertCompanyWritesAllowed()
   const temporary = `${path}.${randomUUID()}.tmp`
   try {
@@ -234,6 +247,7 @@ function recordsDirectoryState(recordsDir: string): 'missing' | 'ready' {
 }
 
 function ensureRecordsDirectory(recordsDir: string): void {
+  assertCompanyResidency(recordsDir)
   const cultivationDir = dirname(recordsDir)
   if (lstatOrNull(cultivationDir) === null) mkdirSync(cultivationDir, { recursive: true })
   ensureDirectory(cultivationDir)
@@ -288,6 +302,7 @@ export function applyRecordUpdates(text: string, updates: Readonly<Record<string
 
 /** 改写 frontmatter 字段（upsert）；正文原样保留，并以 sibling-temp + rename 避免截断。 */
 function updateRecordFile(recordsDir: string, id: string, updates: Readonly<Record<string, string>>, expectedText?: string): boolean {
+  assertCompanyResidency(recordsDir)
   assertCompanyWritesAllowed()
   const path = recordPath(recordsDir, id)
   if (path === null) throw new Error(`不安全的记录 id：${id}`)
@@ -331,6 +346,7 @@ function restoreRecordFile(recordsDir: string, id: string, text: string): boolea
 
 /** 把一条记录移动到归档目录（同一公司盘内；只用于已处理/旧记录）。 */
 function archiveRecordFile(recordsDir: string, archiveDir: string, id: string): boolean {
+  assertCompanyResidency(archiveDir)
   assertCompanyWritesAllowed()
   const path = recordPath(recordsDir, id)
   if (path === null) return false
@@ -369,6 +385,7 @@ function listMethodSlugs(root: string, role: string): string[] {
 
 /** 删除归档目录里早于 cutoff 的记录（只动 .md 普通文件；open 不在这里）。 */
 function purgeArchiveFiles(archiveDir: string, cutoff: number): { removed: number, failed: number } {
+  assertCompanyResidency(archiveDir)
   assertCompanyWritesAllowed()
   const info = lstatOrNull(archiveDir)
   if (info === null) return { removed: 0, failed: 0 }

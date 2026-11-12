@@ -4,6 +4,13 @@
 
 ## 修复流水（倒序）
 
+- **BUG-147..149**（2026-11-13，根因组 G，P1×3）：最后三处未迁 `company-root` 的直写面——
+  [147](BUG-147-export-governance-symlink-root-writes-outside.md) 治理导出根/staging、
+  [148](BUG-148-bundle-manifest-root-symlink-writes-outside.md) bundle 身份读写、
+  [149](BUG-149-cultivation-root-symlink-writes-outside.md) cultivation/revoke-journal/upgrade log。
+  根 symlink 一律拒绝，写 gate + residency 同时过。红→绿见 Note；`pnpm test` 240 files / 1896 tests。详见
+  [最后直写面 Note](../../../notes/implemented/2026-11-13-last-direct-writers.md)。
+
 - **BUG-114..139、141..146**（2026-11-13，根因组 A–F，P1×5 + P2×27）：状态根/写 gate/命令边界的第三次回归收口——
   **A** 共享 `company-root`（逐级 lstat + realpath + 原子写）覆盖 catalog/ledger/startup/bootstrap/命令；
   **B** `write-gate` + lease heartbeat token 校验 + 锁路径形状 + 全部旧写入口接 gate；
