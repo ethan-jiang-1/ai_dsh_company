@@ -20,6 +20,8 @@ export type ContextPickerPick =
   | { readonly kind: 'deliverable'; readonly row: ContextDeliverableRow }
 
 export interface CultivationContextPickerProps {
+  /** 角色名表达层取用；缺席 = canonical 英文。 */
+  readonly roleLabel?: (role: string) => string
   readonly sources: CultivationContextSources
   readonly currentSessionId: string
   readonly targetRole?: string | undefined
@@ -39,6 +41,7 @@ const matches = (query: string, ...values: readonly (string | undefined)[]): boo
  * @returns 内联面板（含搜索、三组候选、加载/错误/空态）。
  */
 export function CultivationContextPicker(props: CultivationContextPickerProps) {
+  const roleLabel = props.roleLabel ?? (role => role)
   const [query, setQuery] = useState('')
   const [deliverables, setDeliverables] = useState<readonly ContextDeliverableRow[]>([])
   const [problem, setProblem] = useState<string | null>(null)
@@ -62,8 +65,8 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
   }, [props.sources, props.currentSessionId])
 
   const current = sessions.find(row => row.current) ?? null
-  const recent = sessions.filter(row => !row.current && matches(query, row.title, row.role, contextSessionLabel(row)))
-  const currentMatches = current !== null && matches(query, current.title, current.role, contextSessionLabel(current))
+  const recent = sessions.filter(row => !row.current && matches(query, row.title, row.role, contextSessionLabel(row, roleLabel)))
+  const currentMatches = current !== null && matches(query, current.title, current.role, contextSessionLabel(current, roleLabel))
   const filteredDeliverables = deliverables.filter(row => matches(query, row.slug, row.result, row.summary))
   const empty = !currentMatches && recent.length === 0 && filteredDeliverables.length === 0 && !loading
 
@@ -106,7 +109,7 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
             <div className="wk-meta" role="presentation">{CULTIVATION_COPY.contextUseCurrent}</div>
             <button type="button" role="option" aria-selected="false" className="wk-cultivation-context-option"
               onClick={() => { props.onPick({ kind: 'session', row: current }) }}>
-              <span>{contextSessionLabel(current)} · {current.title}</span>
+              <span>{contextSessionLabel(current, roleLabel)} · {current.title}</span>
             </button>
           </>
         )}
@@ -118,7 +121,7 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
                 className="wk-cultivation-context-option"
                 onClick={() => { props.onPick({ kind: 'session', row }) }}>
                 <span>{row.title}</span>
-                <span className="wk-meta">{contextSessionLabel(row)}</span>
+                <span className="wk-meta">{contextSessionLabel(row, roleLabel)}</span>
               </button>
             ))}
           </>

@@ -60,6 +60,7 @@ describe('会话候选投影', () => {
     const root = projected.find(item => item.sessionId === 'root-cfo')
     expect(root?.role).toBe('cfo')
     expect(root?.member).toBe(false)
+    expect(contextSessionLabel(root!, role => role === 'cfo' ? 'CFO · 首席财务官' : role)).toBe('CFO · 首席财务官')
     expect(projected.find(item => item.sessionId === 'no-preset')?.role).toBeUndefined()
   })
 

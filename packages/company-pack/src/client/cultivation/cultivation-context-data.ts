@@ -10,7 +10,7 @@
  *
  * host 仍是记录证据的唯一来源：本模块只做预览，命令只带 ref。
  */
-import { CULTIVATION_ROLES, roleLabel } from '../../lib/cultivation.ts'
+import { CULTIVATION_ROLES, roleLabel as defaultRoleLabel } from '../../lib/cultivation.ts'
 import {
   pickSessionTurn,
   type CultivationContextRef,
@@ -280,7 +280,7 @@ export function makeCultivationContextSources(options: {
 }
 
 /** 会话行的展示名（根 = 角色名；成员 = “成员 <name>（CEO 团队）”）。 */
-export function contextSessionLabel(row: ContextSessionRow): string {
+export function contextSessionLabel(row: ContextSessionRow, roleLabel: (role: string) => string = defaultRoleLabel): string {
   if (row.role === undefined) return row.title
   return row.member ? `成员 ${row.role}（CEO 团队）` : roleLabel(row.role)
 }

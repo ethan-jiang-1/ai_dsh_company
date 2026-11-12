@@ -344,6 +344,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
                 {pickerOpen && (
                   <div id="cultivation-context-picker">
                     <CultivationContextPicker
+            roleLabel={roleLabel}
                       sources={sources}
                       currentSessionId={currentSessionId}
                       targetRole={isSuggest ? targetRole : undefined}
