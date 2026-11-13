@@ -16,6 +16,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-13-landing-semantics-agents-md.md](settled_issues/2026-11-13-landing-semantics-agents-md.md) | 已结；“落地 = 系统可验证变更 + 实跑证据；写 RFC/搬卡不算”写进入口/模板/门禁；三条门禁红→绿；去向 = [Note](../../notes/implemented/2026-11-13-landing-semantics.md) | 2026-11-13 |
 | [2026-11-13-workflow-entry-and-fact-checkpoint.md](settled_issues/2026-11-13-workflow-entry-and-fact-checkpoint.md) | 已结；RFC 成立（P0 入口/一致性 → P1 事实检查点 → P2 可执行验收）；实施不在本卡关闭条件内；去向 = [RFC](../../notes/proposed/2026-11-13-workflow-entry-and-fact-checkpoint.md) | 2026-11-13 |
 | [2026-11-13-adversarial-shape-matrix-p0.md](settled_issues/2026-11-13-adversarial-shape-matrix-p0.md) | 已结；shape 库 + Safety/Agreement 矩阵 + 载体登记 + 门禁；verify ALL PASS、test 242/1997、4 红证 + 进程 smoke ALL PASS；去向 = [Note](../../notes/implemented/2026-11-13-adversarial-shape-matrix.md) | 2026-11-13 |
 | [BUG-140（撤回）](settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md) | 已结（撤回）：真页面默认新空会话；显式选中任务会话后任务板 (2)，原文保留测试方法证据 | 2026-11-13 |

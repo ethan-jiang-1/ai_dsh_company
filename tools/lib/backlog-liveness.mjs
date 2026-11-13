@@ -101,6 +101,7 @@ export function backlogLivenessProblems(backlogRoot) {
     return index < 0 ? 1 : index + 1
   }
   // 「非空 ## 节」= 门票的形状锚：标题在场且标题到下一个 `##` 之间有非空正文。
+  const EXECUTABLE = /`(?:pnpm|node|git|rg|source|npx)\s+[^`\n]+`|Given\/When\/Then|\bassert\b/
   const sectionBody = (text, heading) => {
     const lines = text.split('\n')
     const start = lines.findIndex(line => new RegExp(`^##\\s+${heading}\\s*$`).test(line))
@@ -225,12 +226,20 @@ export function backlogLivenessProblems(backlogRoot) {
         const graduation = (/毕业：\s*([^｜|\n]+)/.exec(headText(text))?.[1] ?? '').trim()
         if (graduation && !graduation.startsWith('做'))
           problems.push(`${where}:1 「待落地」只用于「毕业：做」——${graduation} 类结论直接归档，不占落地门`)
-        if (!sectionBody(text, '验收标准'))
+        const acceptance = sectionBody(text, '验收标准')
+        if (!acceptance)
           problems.push(`${where}:${lineOf(text, '## 验收标准')} 「待落地」卡缺非空 ## 验收标准——门票由格式承载，写不出就不许进落地`)
+        else if (String(data.opened ?? '') >= '2026-11-14' && !EXECUTABLE.test(acceptance))
+          problems.push(`${where}:${lineOf(text, '## 验收标准')} 「待落地」卡的 ## 验收标准 没有可执行标记（命令/脚本/Given/assert）——写「测试通过」不算`)
         const dest = destination(headText(text))
         if (!dest) problems.push(`${where}:1 「待落地」卡缺去向值（> **结论/去向**：rfc|note|implementation — <落点>）`)
         else if (!GRADUATED.includes(dest))
           problems.push(`${where}:1 去向「${dest}」不能停在「待落地」——只有 rfc|note|implementation 进落地，其余毕业即归档`)
+        if ((dest === 'note' || dest === 'implementation') && String(data.opened ?? '') >= '2026-11-14') {
+          const evidence = sectionBody(text, '落地证据')
+          if (!evidence) problems.push(`${where}:${lineOf(text, '## 落地证据')} 「待落地」+ 去向 ${dest} 缺非空 ## 落地证据——改了哪些系统面 + 实跑命令`)
+          else if (!EXECUTABLE.test(evidence)) problems.push(`${where}:${lineOf(text, '## 落地证据')} ## 落地证据 没有可执行标记（命令/脚本）`)
+        }
       }
       if (pool === 'bugs' && (data.status === '修复就绪' || data.status === '修复已落地')) {
         if (!sectionBody(text, '已修判定'))

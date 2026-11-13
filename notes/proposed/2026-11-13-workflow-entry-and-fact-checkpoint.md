@@ -1,6 +1,6 @@
 # 加工环路的入口与事实检查点
 
-> 状态：proposed（已批；P0/P1/P2 未实施）｜ 批准：用户 2026-11-13「按照我们的流程，把这个落地吧」｜ 上游：[问题卡](../../_backlog/_archive/settled_issues/2026-11-13-workflow-entry-and-fact-checkpoint.md)（已结）
+> 状态：proposed（已批；P0/P1 已落，P2 余）｜ 批准：用户 2026-11-13「按照我们的流程，把这个落地吧」｜ 上游：[问题卡](../../_backlog/_archive/settled_issues/2026-11-13-workflow-entry-and-fact-checkpoint.md)（已结）
 
 ## 问题
 

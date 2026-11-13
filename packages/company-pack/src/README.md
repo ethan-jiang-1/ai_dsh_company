@@ -10,7 +10,7 @@
 - `host/` —— **host-only 逻辑**（用 node 内建，浏览器面不许进），按关切分 **9 组**（2026-11-09；每组 = 一个目录，
   文件清单 = 目录本身，组地图 = [host/README](./host/README.md)）：`run-bundle/`（首启播种、bundle 身份、租约、
   运行前提）、`workspace/`（解析/登记/门）、`cultivation/`（提案与存储）、`ledger/`（presented 账本、成品目录、
-  治理导出）、`delegation/`（child 控制、turn 终态、重试、workflow run 视图）、`commands/`（四个 `/命令` +
+  治理导出）、`delegation/`（child 控制、turn 终态、重试、workflow run 视图）、`commands/`（五个 `/命令` +
   浏览器诊断）、`prompt/`（手册与能力域合同注入）、`logging/`（有界追加日志）。公开入口 = `index.ts`。
   **为什么单开一层**：`src/lib/` 同时被 client 叶编译（`tsconfig.client.json`），带 node 内建的模块住那儿
   会让 client 叶报 TS2591（2026-10-13 现场）——host-only 的东西住 `host/`。
@@ -36,7 +36,7 @@
     `use-cultivation-board`。
   Cordis 各槽仍各自等待声明并负责卸载/重装；构建走 tsdown client 半（产物 `lib/client.js`）。
 
-**UI 文案纪律（Phase 0 起）**：任何 company Web UI 文案从第一个 commit 就必须 zh+en；改 UI 前加载 `company-ui-change-definition` skill；文案只住 typed `company` 字典，纯 view model 返回 token 而不是中文。A4 落成前由 skill + review 守，A4 后由 `docs/contracts/` 的 language 合同 + `checks/gates/` 的 `client-copy` 硬门禁守。
+**UI 文案纪律（Phase 0 起）**：任何 company Web UI 文案从第一个 commit 就必须 zh+en；改 UI 前加载 `company-ui-change-definition` skill；文案只住 typed `company` 字典，纯 view model 返回 token 而不是中文。A4 未落地，勿引用；当前由 skill + review 守。
 
 **构建**：`tsc -b packages/company-pack` + tsdown 两面（事实家 = [bootstrap](../../../docs/guides/bootstrap.md)）。
 ⚠ 本目录**不进 tarball**（`files` 的现行清单 = [package.json](../package.json)：只发 runtime 两半、

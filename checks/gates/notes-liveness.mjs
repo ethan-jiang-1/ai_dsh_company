@@ -17,12 +17,20 @@ import { join } from 'node:path'
 //   `FAIL notes-liveness: rationale Note 缺「## 现行语义（canonical）」节或节内无链接…`；还原 → 绿。
 export function run({ root, ok, fail }) {
   const NOTES_EFFECTIVE_DATE = '2026-10-05'
+  const FACT_EFFECTIVE_DATE = '2026-11-14'
   const DECISION_EFFECTIVE_DATE = '2026-11-04'
   const implDir = join(root, 'notes/implemented')
   const implNotes = existsSync(implDir)
     ? readdirSync(implDir).filter(n => n.endsWith('.md'))
     : []
   const dateOf = name => /^(\d{4}-\d{2}-\d{2})-/.exec(name)?.[1]
+  const sectionBody = (text, heading) => {
+    const m = new RegExp(`^##\\s+${heading}\\s*$`, 'm').exec(text)
+    if (m === null) return ''
+    const rest = text.slice(m.index + m[0].length)
+    const next = rest.search(/^##\s+/m)
+    return (next < 0 ? rest : rest.slice(0, next)).trim()
+  }
   const freshNotes = implNotes.filter(n => {
     const date = dateOf(n)
     return date !== undefined && date >= NOTES_EFFECTIVE_DATE
@@ -36,6 +44,12 @@ export function run({ root, ok, fail }) {
   })
   const badDecision = decisionNotes.filter(name =>
     !/^##\s+决定\s*$/m.test(readFileSync(join(implDir, name), 'utf8')))
+  const factNotes = implNotes.filter(name => {
+    const date = dateOf(name)
+    return date !== undefined && date >= FACT_EFFECTIVE_DATE
+  })
+  const badFact = factNotes.filter(name =>
+    sectionBody(readFileSync(join(implDir, name), 'utf8'), '状态事实与载体') === '')
   const rationaleNotes = implNotes.filter(name => name.endsWith('-rationale.md'))
   const badRationale = rationaleNotes.filter(name => {
     const body = readFileSync(join(implDir, name), 'utf8')
@@ -48,6 +62,9 @@ export function run({ root, ok, fail }) {
   const problems = []
   if (badNotes.length > 0) {
     problems.push(`前 6 行缺合规「状态：」行（须以 implemented/已交付/已消化 开头）：${badNotes.join(', ')}`)
+  }
+  if (badFact.length > 0) {
+    problems.push(`日期 ≥ ${FACT_EFFECTIVE_DATE} 但缺非空 \`## 状态事实与载体\`：${badFact.join(', ')}`)
   }
   if (badDecision.length > 0) {
     problems.push(`日期 ≥ ${DECISION_EFFECTIVE_DATE} 但缺 \`## 决定\` 节（收据/流水请进 archived/receipts/）：${badDecision.join(', ')}`)

@@ -17,6 +17,8 @@ const HEADROOM_FLOOR = 0.05 // DSH：目标内留 ≥5% headroom（docs/ 适用�
 
 export function run({ root, ok, fail }) {
 const DOC_LINE_BUDGETS = [
+  ['notes/AGENTS.md', 25],
+  ['tests/AGENTS.md', 19],
   ['AGENTS.md', 84],             // 2026-09-23 二次收口；2026-09-27 瘦身轮 108→100、棘轮 115→105；2026-10-06 条目 D 纯路由化（删复述与括号链，纪律指针化；当时 95→72），棘轮 105→84
   ['docs/index.md', 48],         // 2026-10-20 台账/外部材料迁出：131→70；2026-11-10 DSH 步 2：逐文档登记 → 书架（树即 inventory），内容 +5% = 48
   ['docs/reference/decisions.md', 66],     // 2026-10-20 自 index 迁出：D 路由表独立页；2026-10-30 +1（D50）；2026-11-02 +1（D56）；2026-11-07 +2（D57/D58）；2026-11-08 +1（D59 域路由）；2026-11-10 +1（D60 质量环，论证 = notes/implemented/2026-11-10-producer-verifier-quality-loop）

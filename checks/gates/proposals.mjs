@@ -19,15 +19,30 @@ const proposedDir = join(root, 'notes/proposed')
 const proposals = existsSync(proposedDir)
   ? readdirSync(proposedDir).filter(n => n.endsWith('.md') && n !== 'README.md')
   : []
+const sectionBody = (text, heading) => {
+  const m = new RegExp(`^##\\s+${heading}\\s*$`, 'm').exec(text)
+  if (m === null) return ''
+  const rest = text.slice(m.index + m[0].length)
+  const next = rest.search(/^##\s+/m)
+  return (next < 0 ? rest : rest.slice(0, next)).trim()
+}
+const dateOf = name => /^(\d{4}-\d{2}-\d{2})-/.exec(name)?.[1]
+
 const unapproved = proposals.filter(name => {
   const head = readFileSync(join(proposedDir, name), 'utf8').split('\n').slice(0, 12).join('\n')
   return !(head.includes('批准：') || head.includes('批准:'))
 })
 const noAcceptance = proposals.filter(name =>
-  !/^##\s*验收/m.test(readFileSync(join(proposedDir, name), 'utf8')))
+  sectionBody(readFileSync(join(proposedDir, name), 'utf8'), '验收') === '')
+const noFact = proposals.filter(name => {
+  const date = dateOf(name)
+  if (date === undefined || date < '2026-11-14') return false
+  return sectionBody(readFileSync(join(proposedDir, name), 'utf8'), '状态事实与载体') === ''
+})
 const scheduledProblems = [
   ...unapproved.map(name => `${name} 缺「批准：」标记（未批准的思考住 _backlog/issues/ 推敲卡）`),
-  ...noAcceptance.map(name => `${name} 缺「## 验收」节（验收 = RFC 三件之一，「怎么测」先行的载体——见 notes/proposed/README 生命周期段）`),
+  ...noAcceptance.map(name => `${name} 缺非空「## 验收」节（验收 = RFC 三件之一，「怎么测」先行的载体——见 notes/proposed/README 生命周期段）`),
+  ...noFact.map(name => `${name} 缺非空「## 状态事实与载体」节（事实/唯一入口/读载体/写载体）`),
 ]
 scheduledProblems.length === 0
   ? ok(`proposal-scheduled ×${proposals.length}（批准标记 + 验收节）`)
