@@ -27,7 +27,36 @@ const CONTENT_DIR = join(ROOT, 'packages/company-pack/content')
 
 const MRD = `---\nlayer: MRD\ndefinition: json-ledger\n---\n\n\`\`\`json\n{"mrd":{"version":"0.1","status":"draft","opportunities":[{"id":"MR-001","title":"机会","recommendation":"go"}]}}\n\`\`\`\n`
 const STRS = `---\nlayer: StRS\ndefinition: headings\n---\n\n### REQ-001 涉众诉求\n\n- status: 草案\n- traces: [MR-001]\n`
-const PRD = `---\nlayer: PRD\ndefinition: json-ledger\n---\n\n\`\`\`json\n{"prd":{"version":"0.1","status":"draft","slices":[{"id":"S1","goal":"闭环","requirements":["REQ-002"]}],"requirements":[{"id":"REQ-002","title":"需求","type":"functional","priority":"P0","status":"draft","source":["MR-001"],"traces":["REQ-001"],"slice":"S1","userStory":"作为用户我要它","acceptance":[{"id":"AC-002-1","given":"g","when":"w","then":"t"}],"dependsOn":[],"verification":"test","openQuestions":[],"changeLog":[]}]}}\n\`\`\`\n`
+const PRD = `---
+layer: PRD
+definition: headings
+---
+
+## Slices
+
+| slice | Goal | Requirements (explicit ids) | Exit condition |
+|---|---|---|---|
+| S1 | 闭环 | REQ-002 | ok |
+
+### REQ-002 需求
+
+- userStory: 作为用户我要它
+- acceptance:
+  - AC-002-1
+    - given: g
+    - when: w
+    - then: t
+- source: [MR-001]
+- traces: [REQ-001]
+- slice: S1
+- type: functional
+- priority: P0
+- status: draft
+- verification: test
+- dependsOn: []
+- openQuestions: []
+- changeLog: []
+`
 const META = 'slug: demo\nkickoff: 2026-11-07\nnumbering: identity\n'
 const META_DELIVERY = `${META}deliveryMode: project-services\n`
 const META_MANAGED = `${META}deliveryMode: managed-service\n`

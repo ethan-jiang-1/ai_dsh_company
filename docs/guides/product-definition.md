@@ -25,7 +25,7 @@ CEO 收口：final.md（产品决策/合并摘要，引用两份 draft）→ pre
 
 - **MRD**：`json` 头（`mrd.opportunities[]` + `openQuestions`）+ 正文一页纸；`definition: json-ledger`。
 - **StRS（及按需的 SyRS / IRS）**：`layer` + `definition: headings` 头 + `### <ID>` 条目（字段 = 合同「条目形态」）。
-- **PRD**：`json` 头（`slices[]` + `requirements[]`）是**唯一定义点**；正文标题写成「需求说明：REQ-001」这类引用。
+- **PRD**：`layer` + `definition: headings` 头；**每个 `### REQ-###` 小节是唯一定义点**（字段行：`userStory` / `acceptance` / `source` / `traces` / `slice` / `type` / `priority` / `status` / `verification` / `dependsOn` / `changeLog`），摘要与 Slices 表只引用号。旧动议的 `json-ledger` 只读兼容。
 - 编号**只增不改**：`MR-###`、`REQ-###`、`IF-###`、`TC-###`、`AC-###-#`；撤销用状态，不重排、不复用。
 
 ## 编号与追溯（操作面；合同 = process-docs）
@@ -39,11 +39,11 @@ CEO 收口：final.md（产品决策/合并摘要，引用两份 draft）→ pre
 
 `/prd check <deliverables 目录名>`（host 命令，随 pack 发布）读 `drafts/{mrd,prd}.md`，机械校验：
 
-- 编号唯一/格式合法；每条 REQ 至少一条 AC（given/when/then 齐全）；
+- 编号唯一/格式合法；每条 REQ 至少一条 AC（given/when/then 齐全）；Slices 表列显式 REQ id（不用区间）；`type` ∈ functional/non-functional/constraint、`verification` ∈ test/demonstration/analysis/inspection；
 - REQ 的来源 `MR-###` 必须在 MRD 里存在，且**来源判词守边界**（no-go 不得进 PRD；defer 不得进 P0）；slice 存在且列出该 REQ；依赖存在且无环；
 - 状态合法、离开 `draft` 有 changeLog。
 
-`/req check <deliverables 目录名>` 管**编号/层/追溯/退役词/计数**（默认链 + 可选层，含 StRS/SyRS/IRS/TC）；`/delivery check` 管交付模式文档（project-services / managed-service 按 rules 查文档与 section）；两者都是操作员命令，角色只能引用结果。
+`/req check <deliverables 目录名>` 管**编号/层/追溯/退役词/计数**（默认链 + 可选层，含 StRS/SyRS/IRS/TC）；`/delivery check` 管交付模式文档（project-services / managed-service 按 rules 查文档与 section）；两者都是操作员命令，角色只能引用结果。**交付闸门**：`present` 前 host 对声明了 `numbering: identity` 的动议跑同一套 `/prd check`；红则拒绝交付（旧动议按编号标记豁免）。
 
 它只挡结构性错误，**不判断需求好坏/市场真伪**；红就退回作者改，不进研发。
 

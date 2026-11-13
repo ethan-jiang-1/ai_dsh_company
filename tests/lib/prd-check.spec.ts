@@ -21,7 +21,62 @@ const mrd = (overrides = {}) => JSON.stringify({
   },
 }, null, 2)
 
-const prd = (overrides = {}) => JSON.stringify({
+const requirementSection = (overrides: {
+  id?: string
+  title?: string
+  userStory?: string | null
+  acceptance?: string
+  source?: string
+  traces?: string
+  slice?: string
+  type?: string
+  priority?: string
+  status?: string
+  verification?: string
+  dependsOn?: string
+  changeLog?: string
+} = {}): string => {
+  const {
+    id = 'REQ-001', title = '导入银行流水', userStory = '作为财务，我要导入流水，以便自动对账',
+    acceptance = '  - AC-001-1\n    - given: 有流水文件\n    - when: 导入\n    - then: 生成对账草稿',
+    source = '[MR-001]', traces = '[REQ-001]', slice = 'S1', type = 'functional', priority = 'P0',
+    status = 'draft', verification = 'test', dependsOn = '[]', changeLog = '[]',
+  } = overrides
+  return [
+    `### ${id} ${title}`,
+    '',
+    ...(userStory === null ? [] : [`- userStory: ${userStory}`]),
+    '- acceptance:',
+    acceptance,
+    `- source: ${source}`,
+    `- traces: ${traces}`,
+    `- slice: ${slice}`,
+    `- type: ${type}`,
+    `- priority: ${priority}`,
+    `- status: ${status}`,
+    `- verification: ${verification}`,
+    `- dependsOn: ${dependsOn}`,
+    '- openQuestions: []',
+    `- changeLog: ${changeLog}`,
+    '',
+  ].join('\n')
+}
+
+const prd = ({ slices = '| S1 | 最小端到端 | REQ-001 | 导出草稿 |', sections = requirementSection(), header = '---\nlayer: PRD\ndefinition: headings\n---\n', includeSlices = true } = {}): string => `${header}
+# PRD
+${includeSlices ? `
+## Slices
+
+| slice | Goal | Requirements (explicit ids) | Exit condition |
+|---|---|---|---|
+${slices}
+` : ''}
+## Requirements (definition point)
+
+${sections}`
+
+/** 旧形状（json-ledger）只读兼容样例。 */
+const legacyPrd = (overrides = {}) => JSON.stringify({
   prd: {
     version: '0.1',
     status: 'draft',
@@ -37,11 +92,12 @@ const prd = (overrides = {}) => JSON.stringify({
   },
 }, null, 2)
 
-const doc = (json: string) => `# 文档\n\n\`\`\`json\n${json}\n\`\`\`\n`
+const legacyDoc = (json: string) => `---\nlayer: PRD\ndefinition: json-ledger\n---\n\n\`\`\`json\n${json}\n\`\`\`\n`
+const mrdDoc = (json: string) => `# MRD\n\n\`\`\`json\n${json}\n\`\`\`\n`
 
 describe('extractJsonBlock', () => {
   it('取第一个 json 代码块；缺失/坏 JSON → 明确错误', () => {
-    expect(extractJsonBlock(doc(mrd()))).toMatchObject({ ok: true })
+    expect(extractJsonBlock(mrdDoc(mrd()))).toMatchObject({ ok: true })
     expect(extractJsonBlock('# 无块')).toMatchObject({ ok: false })
     const bad = extractJsonBlock('```json\n{nope}\n```')
     expect(bad).toMatchObject({ ok: false })
@@ -49,51 +105,87 @@ describe('extractJsonBlock', () => {
   })
 })
 
-describe('validateProductDocs', () => {
+describe('validateProductDocs（headings PRD）', () => {
   it('合法一对 → ok，计数正确', () => {
-    const result = validateProductDocs(doc(mrd()), doc(prd()))
+    const result = validateProductDocs(mrdDoc(mrd()), prd())
     expect(result.errors).toEqual([])
     expect(result).toMatchObject({ ok: true, mrdCount: 1, reqCount: 1, acCount: 1 })
   })
 
-  it('REQ 重号 / 来源不存在 / AC 缺 then / 状态离开 draft 无 changeLog → 红', () => {
-    const dup = JSON.parse(prd())
-    dup.prd.requirements.push({ ...dup.prd.requirements[0], title: '重复' })
-    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(dup))).errors.some(error => error.includes('重号'))).toBe(true)
-
-    const unknownSource = JSON.parse(prd())
-    unknownSource.prd.requirements[0].source = ['MR-999']
-    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(unknownSource))).errors.some(error => error.includes('不存在的 MR'))).toBe(true)
-
-    const noThen = JSON.parse(prd())
-    delete noThen.prd.requirements[0].acceptance[0].then
-    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(noThen))).errors.some(error => error.includes('then'))).toBe(true)
-
-    const ready = JSON.parse(prd())
-    ready.prd.requirements[0].status = 'ready'
-    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(ready))).errors.some(error => error.includes('changeLog'))).toBe(true)
+  it('硬件工程枚举直接可写：nonFunctional / demonstration / analysis / inspection 不判红', () => {
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ type: 'nonFunctional', verification: 'demonstration' }) })).errors).toEqual([])
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ verification: 'analysis' }) })).errors).toEqual([])
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ verification: 'inspection' }) })).errors).toEqual([])
   })
 
-  it('依赖环 / slice 未列出 REQ → 红', () => {
-    const cycle = JSON.parse(prd())
-    cycle.prd.requirements.push({
-      ...cycle.prd.requirements[0], id: 'REQ-002', title: '第二', dependsOn: ['REQ-001'],
-      // oxlint-disable-next-line unicorn/no-thenable -- AC 的给定字段名（Given/When/Then）
-      acceptance: [{ id: 'AC-002-1', given: 'g', when: 'w', then: 't' }],
-    })
-    cycle.prd.requirements[0].dependsOn = ['REQ-002']
-    cycle.prd.slices[0].requirements.push('REQ-002')
-    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(cycle))).errors.some(error => error.includes('依赖环'))).toBe(true)
-
-    const missing = JSON.parse(prd())
-    missing.prd.slices[0].requirements = ['REQ-999']
-    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(missing))).errors.some(error => error.includes('REQ-999'))).toBe(true)
+  it('REQ 定义小节：缺 userStory / 非法 type / 缺 AC 的 then / AC 号不跟父 REQ → 红', () => {
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ userStory: null }) })).errors.join())
+      .toContain('userStory 缺失')
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ type: 'banana' }) })).errors.join())
+      .toContain('type 必须是')
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ acceptance: '  - AC-001-1\n    - given: 有流水\n    - when: 导入' }) })).errors.join())
+      .toContain('then 缺失')
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ acceptance: '  - AC-002-1\n    - given: g\n    - when: w\n    - then: t' }) })).errors.join())
+      .toContain('与父 REQ 编号不一致')
   })
 
-  it('MRD 机会缺证据 → 红', () => {
+  it('REQ 重号 / 状态离开 draft 无 changeLog / changeLog 条目形状坏 → 红', () => {
+    const duplicate = prd({ sections: `${requirementSection()}\n${requirementSection({ title: '重复' })}` })
+    expect(validateProductDocs(mrdDoc(mrd()), duplicate).errors.join()).toContain('重号')
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ status: 'ready' }) })).errors.join())
+      .toContain('changeLog')
+    const badLog = prd({ sections: requirementSection({ changeLog: '\n  - 不是日期作者变更' }) })
+    expect(validateProductDocs(mrdDoc(mrd()), badLog).errors.join()).toContain('changeLog 条目必须是')
+  })
+
+  it('changeLog 合法条目（日期 · 作者 · 变更）→ 通过', () => {
+    const text = prd({ sections: requirementSection({ status: 'ready', changeLog: '\n  - 2026-11-13 · vp-eng · 修订验收口径' }) })
+    expect(validateProductDocs(mrdDoc(mrd()), text).errors).toEqual([])
+  })
+
+  it('来源 MR 不存在 / slice 未列 REQ / slice 区间 / 依赖环 → 红', () => {
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ source: '[MR-999]' }) })).errors.join())
+      .toContain('不存在的 MR')
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ slice: 'S2' }) })).errors.join())
+      .toContain('不存在的 slice')
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ slices: '| S1 | 端到端 | REQ-001…REQ-003 | ok |' })).errors.join())
+      .toContain('显式 REQ id')
+    const cycleSections = `${requirementSection({ dependsOn: '[REQ-002]' })}\n${requirementSection({ id: 'REQ-002', title: '第二条', acceptance: '  - AC-002-1\n    - given: g\n    - when: w\n    - then: t', dependsOn: '[REQ-001]' })}`
+    const cycleSlices = '| S1 | 端到端 | REQ-001, REQ-002 | ok |'
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ slices: cycleSlices, sections: cycleSections })).errors.join())
+      .toContain('依赖环')
+  })
+
+  it('缺 Slices 表 / 缺 definition 头 / 缺定义小节 → 红', () => {
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ includeSlices: false })).errors.join()).toContain('## Slices')
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ header: '' })).errors.join()).toContain('definition')
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: '' })).errors.join()).toContain('没有 `### REQ-###` 定义小节')
+  })
+
+  it('MRD 机会缺证据 / 非法 confidence → 红', () => {
     const m = JSON.parse(mrd())
     m.mrd.opportunities[0].evidence = []
-    expect(validateProductDocs(doc(JSON.stringify(m)), doc(prd())).errors.some(error => error.includes('evidence'))).toBe(true)
+    expect(validateProductDocs(mrdDoc(JSON.stringify(m)), prd()).errors.join()).toContain('evidence')
+    const c = JSON.parse(mrd())
+    c.mrd.opportunities[0].confidence = 'medium-low'
+    expect(validateProductDocs(mrdDoc(JSON.stringify(c)), prd()).errors.join()).toContain('confidence')
+  })
+})
+
+describe('旧形状兼容（json-ledger，只读）', () => {
+  it('旧 PRD 仍按旧 schema 校验通过', () => {
+    const result = validateProductDocs(mrdDoc(mrd()), legacyDoc(legacyPrd()))
+    expect(result.errors).toEqual([])
+    expect(result).toMatchObject({ ok: true, reqCount: 1, acCount: 1 })
+  })
+
+  it('旧 PRD 的错误照旧报（枚举/断链不因迁移静默）', () => {
+    const bad = JSON.parse(legacyPrd())
+    bad.prd.requirements[0].verification = 'demonstration'
+    expect(validateProductDocs(mrdDoc(mrd()), legacyDoc(JSON.stringify(bad))).errors.join()).toContain('verification 必须是 test|demo|review')
+    const dangling = JSON.parse(legacyPrd())
+    dangling.prd.requirements[0].source = ['MR-999']
+    expect(validateProductDocs(mrdDoc(mrd()), legacyDoc(JSON.stringify(dangling))).errors.join()).toContain('不存在的 MR')
   })
 })
 
@@ -104,32 +196,31 @@ describe('随包模板与校验器同源', () => {
     expect(result.errors).toEqual([])
     expect(result).toMatchObject({ ok: true, mrdCount: 1, reqCount: 1, acCount: 1 })
   })
+
+  it('PRD 模板不再带 JSON 账本；定义点是小节标题', () => {
+    const text = readFileSync(join(ROOT, 'packages/company-pack/content/templates/prd.md'), 'utf8')
+    expect(text).not.toContain('```json')
+    expect(text).toContain('definition: headings')
+    expect(text).toMatch(/^### REQ-\d{3} /m)
+  })
 })
 
 describe('来源 MR 的判词边界', () => {
   it('no-go 不得进 PRD；defer 不得进 P0；defer 进 P2 可过', () => {
     const base = JSON.parse(mrd()).mrd.opportunities[0]
     const noGo = mrd({ opportunities: [{ ...base, recommendation: 'no-go' }] })
-    expect(validateProductDocs(doc(noGo), doc(prd())).errors.join()).toContain('no-go')
+    expect(validateProductDocs(mrdDoc(noGo), prd()).errors.join()).toContain('no-go')
     const defer = mrd({ opportunities: [{ ...base, recommendation: 'defer' }] })
-    expect(validateProductDocs(doc(defer), doc(prd())).errors.join()).toContain('defer')
-    const p2 = JSON.parse(prd())
-    p2.prd.requirements[0].priority = 'P2'
-    expect(validateProductDocs(doc(defer), doc(JSON.stringify(p2))).errors).toEqual([])
+    expect(validateProductDocs(mrdDoc(defer), prd()).errors.join()).toContain('defer')
+    expect(validateProductDocs(mrdDoc(defer), prd({ sections: requirementSection({ priority: 'P2' }) })).errors).toEqual([])
   })
 })
 
-describe('数组字段类型错误不得静默', () => {
-  it('dependsOn / source / acceptance / opportunities / evidence 非数组 ⇒ 明确报错', () => {
-    const dep = JSON.parse(prd()); dep.prd.requirements[0].dependsOn = 'REQ-002'
-    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(dep))).errors.join()).toContain('dependsOn 必须是数组')
-    const src = JSON.parse(prd()); src.prd.requirements[0].source = 'MR-001'
-    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(src))).errors.join()).toContain('source 必须是数组')
-    const acc = JSON.parse(prd()); acc.prd.requirements[0].acceptance = 'x'
-    expect(validateProductDocs(doc(mrd()), doc(JSON.stringify(acc))).errors.join()).toContain('acceptance 必须是数组')
-    const m = JSON.parse(mrd()); m.mrd.opportunities = 'x'
-    expect(validateProductDocs(doc(JSON.stringify(m)), doc(prd())).errors.join()).toContain('opportunities 必须是数组')
-    const ev = JSON.parse(mrd()); ev.mrd.opportunities[0].evidence = 'x'
-    expect(validateProductDocs(doc(JSON.stringify(ev)), doc(prd())).errors.join()).toContain('evidence 必须是数组')
+describe('数组字段不得内联成标量', () => {
+  it('source 空 / dependsOn 指向不存在 → 红', () => {
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ source: '[]' }) })).errors.join())
+      .toContain('source 不能为空')
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ dependsOn: 'REQ-999' }) })).errors.join())
+      .toContain('不存在的 REQ')
   })
 })

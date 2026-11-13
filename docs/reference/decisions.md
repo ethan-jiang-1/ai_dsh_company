@@ -64,3 +64,4 @@
 | D58 | VP-Eng 三门：根门=Lead（带小队）；命名 child 按 agentPreset 请 CMO；CEO teammate 受 maxDepth 1 | [teaming Note](../../notes/archived/2026-11-07-requirements-teaming-program.md) |
 | D59 | ~~SA 先判域、SQA 域审计~~ 2026-11-09 退役 SA/SQA；SyRS/IRS/V&V 改为按需指派 owner | [退役 Note](../../notes/implemented/2026-11-09-retire-sa-sqa.md) |
 | D60 | 质量环 = 两个 support 能力档 + 流程 skill + 角色方法层（任务书点名 `<pack>@<version>`）+ 事后审计；对外签字归人 | [Note](../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md) · [卡](../../_backlog/_archive/settled_issues/2026-11-10-producer-verifier-quality-loop.md) |
+| D61 | PRD 定义形态 = headings（`### REQ-###` 小节 + 行首字段）；旧 json-ledger 只读兼容；`present` 前自动 `/prd check`，红则拒绝交付 | [PRD headings Note](../../notes/implemented/2026-11-13-prd-headings-definition.md) |

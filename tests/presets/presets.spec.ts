@@ -613,9 +613,12 @@ describe('需求编号链：CMO 产 MRD+StRS、VP-Eng 产 PRD（A3）', () => {
 
   it('共享 product-definition 用新词表（层/定义形态/四种号），无退役号形', () => {
     const shared = readFileSync(join(PRESETS_DIR, '_shared/skills/product-definition/SKILL.md'), 'utf8')
-    for (const needle of ['MR-###', 'REQ-###', 'IF-###', 'TC-###', 'layer', 'definition', 'json-ledger']) {
+    for (const needle of ['MR-###', 'REQ-###', 'IF-###', 'TC-###', 'layer', 'definition', 'json-ledger', 'headings']) {
       expect(shared, `共享 product-definition 缺 ${needle}`).toContain(needle)
     }
+    const prdPlaybook = readFileSync(join(PRESETS_DIR, 'vp-eng/skills/prd-playbook/SKILL.md'), 'utf8')
+    expect(prdPlaybook, 'PRD playbook 应声明 headings 定义点').toContain('definition: headings')
+    expect(prdPlaybook, 'PRD playbook 不应再让模型写 json-ledger').not.toContain('definition: json-ledger')
     expect(shared, '共享 product-definition 出现退役号形').not.toMatch(RETIRED)
     const cmo = readFileSync(join(PRESETS_DIR, 'cmo/skills/mrd-playbook/SKILL.md'), 'utf8')
     const prd = readFileSync(join(PRESETS_DIR, 'vp-eng/skills/prd-playbook/SKILL.md'), 'utf8')

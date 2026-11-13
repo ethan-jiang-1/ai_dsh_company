@@ -75,6 +75,7 @@ business-software's MRD→StRS→PRD, plus SOW/UAT/RACI/milestones; the requirem
 - **One REQ, one task**: when entering the engineering task board, the title carries `REQ-###`, `blockedBy` follows REQ dependencies; acceptance checks AC ids.
 - Quality gate: `/prd check <slug>` covers MRD/PRD structure; `/req check <slug>` covers numbering/layers/traceability/retired words/counts
   (operator commands; the role does not self-certify). They do not replace judgment; they only block structural errors.
+  `present` also runs the PRD check on deliverables that declare `numbering: identity` and denies the call while the PRD is red.
 
 ## The three artifacts
 
@@ -82,9 +83,9 @@ business-software's MRD→StRS→PRD, plus SOW/UAT/RACI/milestones; the requirem
   success criteria, go/no-go recommendation. Save to `deliverables/<slug>/drafts/mrd.md` (`layer: MRD`, `definition: json-ledger`).
 - **StRS (CMO lead)**: stakeholder requirements — who cares, what they care about, who signs off at acceptance; each `REQ-###` carries
   `traces: [MR-###]`. Save to `deliverables/<slug>/drafts/strs.md` (`layer: StRS`, `definition: headings`).
-- **PRD (VP-Eng lead)**: product-layer requirements ledger, acceptance, technical constraints, feasibility, milestones; save to
-  `deliverables/<slug>/drafts/prd.md` (`layer: PRD`, `definition: json-ledger`); each REQ uses
-  `source` to point back to MR and `traces` to point back to the StRS REQ. If downstream system/interface/verification documents are assigned by the CEO to someone else, do not author them beyond authority.
+- **PRD (VP-Eng lead)**: product-layer requirement sections, acceptance, technical constraints, feasibility, slices; save to
+  `deliverables/<slug>/drafts/prd.md` (`layer: PRD`, `definition: headings`); each `### REQ-###` section is the sole definition point, uses
+  `source` to point back to MR and `traces` to point back to the StRS REQ. Old motions may still carry `json-ledger`; new PRDs do not. If downstream system/interface/verification documents are assigned by the CEO to someone else, do not author them beyond authority.
 
 ## Boundaries and anti-patterns
 

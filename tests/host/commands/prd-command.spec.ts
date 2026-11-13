@@ -24,16 +24,37 @@ const mrdJson = JSON.stringify({
     evidence: [{ kind: 'fact', source: '访谈' }], recommendation: 'go',
   }] },
 })
-const prdJson = JSON.stringify({
-  prd: { version: '0.1', status: 'draft', slices: [{ id: 'S1', goal: '闭环', requirements: ['REQ-001'] }],
-    requirements: [{
-      id: 'REQ-001', title: '需求', type: 'functional', priority: 'P0', status: 'draft',
-      source: ['MR-001'], slice: 'S1', userStory: '作为用户我要它',
-      // oxlint-disable-next-line unicorn/no-thenable -- AC 的给定字段名（Given/When/Then）
-      acceptance: [{ id: 'AC-001-1', given: 'g', when: 'w', then: 't' }],
-      dependsOn: [], verification: 'test',
-    }] },
-})
+const PRD_HEAD = '---\nlayer: PRD\ndefinition: headings\n---\n'
+const prdText = ({ source = '[MR-001]' } = {}): string => `${PRD_HEAD}
+# PRD
+
+## Slices
+
+| slice | Goal | Requirements (explicit ids) | Exit condition |
+|---|---|---|---|
+| S1 | 闭环 | REQ-001 | ok |
+
+## Requirements (definition point)
+
+### REQ-001 需求
+
+- userStory: 作为用户我要它
+- acceptance:
+  - AC-001-1
+    - given: g
+    - when: w
+    - then: t
+- source: ${source}
+- traces: [REQ-001]
+- slice: S1
+- type: functional
+- priority: P0
+- status: draft
+- verification: test
+- dependsOn: []
+- openQuestions: []
+- changeLog: []
+`
 
 function mount(workspace = '/w', options = {}) {
   type Def = { handler: (input: { readonly rawInput: string, readonly agent?: { session?: { header?: { cwd?: string } } } }) => Promise<{ readonly kind: string, readonly text: string }> }
@@ -74,7 +95,7 @@ describe('registerPrdCommand', () => {
     const outside = join(workspace, '.dsh-company/zz-outside/drafts')
     mkdirSync(outside, { recursive: true })
     writeFileSync(join(outside, 'mrd.md'), doc(mrdJson))
-    writeFileSync(join(outside, 'prd.md'), doc(prdJson))
+    writeFileSync(join(outside, 'prd.md'), prdText())
     let called = false
     const definition = mount(workspace, {
       check: () => { called = true; return { ok: false, errors: ['should not run'] } },
@@ -96,7 +117,7 @@ describe('registerPrdCommand', () => {
     try {
       const dir = join(workspace, '.dsh-company/deliverables/2026-11-05-demo/drafts')
       writeFileSync(join(dir, 'mrd.md'), doc(mrdJson))
-      writeFileSync(join(dir, 'prd.md'), doc(prdJson))
+      writeFileSync(join(dir, 'prd.md'), prdText())
       const definition = mount('', { dataBlocked: true, blockedReason: 'writer lease 被占用：另一个 writer' })
       const result = await definition.handler({
         rawInput: 'check 2026-11-05-demo',
@@ -128,15 +149,13 @@ describe('registerPrdCommand', () => {
     try {
       const dir = join(workspace, '.dsh-company/deliverables/2026-11-05-demo/drafts')
       writeFileSync(join(dir, 'mrd.md'), doc(mrdJson))
-      writeFileSync(join(dir, 'prd.md'), doc(prdJson))
+      writeFileSync(join(dir, 'prd.md'), prdText())
       const definition = mount(workspace)
       const ok = await definition.handler({ rawInput: 'check 2026-11-05-demo' })
       expect(ok.kind).toBe('success')
       expect(ok.text).toContain('1 个机会 / 1 条需求 / 1 条验收')
 
-      const bad = JSON.parse(prdJson)
-      bad.prd.requirements[0].source = ['MR-999']
-      writeFileSync(join(dir, 'prd.md'), doc(JSON.stringify(bad)))
+      writeFileSync(join(dir, 'prd.md'), prdText({ source: '[MR-999]' }))
       const failed = await definition.handler({ rawInput: 'check 2026-11-05-demo' })
       expect(failed.kind).toBe('error')
       expect(failed.text).toContain('PRD 校验失败')
@@ -149,7 +168,7 @@ describe('registerPrdCommand', () => {
     const outside = mkdtempSync(join(tmpdir(), 'prd-outside-'))
     try {
       writeFileSync(join(outside, 'mrd.md'), doc(mrdJson))
-      writeFileSync(join(outside, 'prd.md'), doc(prdJson))
+      writeFileSync(join(outside, 'prd.md'), prdText())
       const dir = join(workspace, '.dsh-company/deliverables/2026-11-05-demo/drafts')
       symlinkSync(join(outside, 'mrd.md'), join(dir, 'mrd.md'))
       symlinkSync(join(outside, 'prd.md'), join(dir, 'prd.md'))
@@ -186,7 +205,7 @@ describe('registerPrdCommand', () => {
       const dir = join(outside, 'deliverables/2026-11-05-demo/drafts')
       mkdirSync(dir, { recursive: true })
       writeFileSync(join(dir, 'mrd.md'), doc(mrdJson))
-      writeFileSync(join(dir, 'prd.md'), doc(prdJson))
+      writeFileSync(join(dir, 'prd.md'), prdText())
       symlinkSync(outside, join(workspace, '.dsh-company'))
       const result = await mount(workspace).handler({ rawInput: 'check 2026-11-05-demo' })
       expect(result.kind).toBe('error')

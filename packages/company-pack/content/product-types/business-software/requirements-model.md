@@ -9,7 +9,7 @@
 |---|---|---|---|---|---|---|
 | 1 | **MRD** market requirements | Should we do it, for whom, why we win | CMO | `drafts/mrd.md` | `json-ledger` | `MR-###` |
 | 2 | **StRS** stakeholder requirements | Who cares, what they care about, who signs off at acceptance | CMO | `drafts/strs.md` | `headings` | `REQ-###` |
-| 3 | **PRD** product requirements | What product we actually sell, how it is accepted, how it is sliced | VP-Eng | `drafts/prd.md` | `json-ledger` | `REQ-###` / `AC-###-#` |
+| 3 | **PRD** product requirements | What product we actually sell, how it is accepted, how it is sliced | VP-Eng | `drafts/prd.md` | `headings` | `REQ-###` / `AC-###-#` |
 
 **No SyRS / IRS / V&V**. Interfaces, system boundaries, and deployment shape are written as PRD technical constraints/risks; if the motion needs a separate system layer,
 switch to `hardware-software`.

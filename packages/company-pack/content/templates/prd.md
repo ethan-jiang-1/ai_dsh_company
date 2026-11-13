@@ -1,48 +1,16 @@
 ---
 layer: PRD
-definition: json-ledger
+definition: headings
 ---
 
-# PRD (product requirements · requirements ledger + one page)
+# PRD (product requirements · one page + requirement sections)
 
 > Lead = **VP-Eng**; input = `drafts/mrd.md` (CMO's market opportunities) + `drafts/strs.md` (CMO's stakeholder requirements) in the same directory; save to `drafts/prd.md`.
 > **It is not an essay**: engineering consumes it slice by slice, **one REQ per task**; every REQ must point back to an MR id.
-> **The JSON ledger is the only definition point** (`definition: json-ledger`): section headings are references and may not start with a bare ID.
+> **Each `### REQ-###` section is the only definition point** (`definition: headings`): summaries and tables reference ids, they never define them. There is no JSON ledger — the document itself is the requirement set.
 > `source` names the MR source; `traces` names upstream StRS items (cross-layer traceability is written as edges through these two fields, not by prose proximity).
-> Mechanical check = `/prd check <deliverables dir>`; numbering/traceability = `/req check <deliverables dir>`; if a field cannot be written, write "undecided", not adjectives.
+> Mechanical check = `/prd check <deliverables dir>`; numbering/traceability = `/req check <deliverables dir>`. Run `/prd check` before presenting the motion — a failing PRD blocks delivery.
 > Technical solution ≠ this file (that is `review-note.md`); pricing ≠ this file (VP-Sales / CFO own it).
-
-```json
-{
-  "prd": {
-    "version": "0.1",
-    "status": "draft",
-    "slices": [
-      { "id": "S1", "goal": "Minimum end-to-end: <smallest demoable/acceptable loop>", "requirements": ["REQ-002"] }
-    ],
-    "requirements": [
-      {
-        "id": "REQ-002",
-        "title": "<one-line requirement>",
-        "type": "functional",
-        "priority": "P0",
-        "status": "draft",
-        "source": ["MR-001"],
-        "traces": ["REQ-001"],
-        "slice": "S1",
-        "userStory": "As <who>, I want <what>, so that <what I get>",
-        "acceptance": [
-          { "id": "AC-002-1", "given": "<precondition>", "when": "<action>", "then": "<observable result>" }
-        ],
-        "dependsOn": [],
-        "verification": "test",
-        "openQuestions": [],
-        "changeLog": []
-      }
-    ]
-  }
-}
-```
 
 ## One-minute summary (plain language)
 
@@ -68,22 +36,38 @@ definition: json-ledger
 
 - **The one thing most likely to fail**: …　**Fallback**: …
 
-## Milestones and slices
+## Slices
 
-| slice | Goal | Contains REQ | Exit condition |
+| slice | Goal | Requirements (explicit ids) | Exit condition |
 |---|---|---|---|
-| S1 | | | |
+| S1 | Minimum end-to-end: <smallest demoable/acceptable loop> | REQ-002 | |
 
-## Requirement detail (one section per REQ, referencing the JSON definition; this section defines no ids)
+## Requirements (definition point)
 
-### Requirement: REQ-002 <title>
+### REQ-002 <one-line requirement>
 
-- Source: MR-001｜StRS: REQ-001｜slice: S1｜priority: P0｜status: draft｜verification: test
-- User story: …
-- Acceptance:
-  - **AC-002-1** given … / when … / then …
-- Depends on: REQ-… (write "none" if none)
-- Open questions: …
+- userStory: As <who>, I want <what>, so that <what I get>
+- acceptance:
+  - AC-002-1
+    - given: <precondition>
+    - when: <action>
+    - then: <observable result>
+- source: [MR-001]
+- traces: [REQ-001]
+- slice: S1
+- type: functional
+- priority: P0
+- status: draft
+- verification: test
+- dependsOn: []
+- openQuestions: []
+- changeLog: []
+
+**Field values** — `type` ∈ `functional | non-functional | constraint`; `priority` ∈ `P0 | P1 | P2`;
+`status` ∈ `draft | ready | in-dev | accepted | deferred | withdrawn`; `verification` ∈ `test | demonstration | analysis | inspection`.
+`source` / `traces` / `dependsOn` are bracketed comma lists (`[]` = none); every REQ needs at least one AC with `given` / `when` / `then`.
+`changeLog` entries are one line each: `<YYYY-MM-DD> · <who> · <change>`; a REQ leaving `draft` must carry at least one.
+Slices list **explicit ids** (no ranges); every REQ's `slice:` must match one row and that row must list the REQ.
 
 ## Open items (do not use as conclusions)
 

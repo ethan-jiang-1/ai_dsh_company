@@ -54,10 +54,9 @@ describe('五层模板头（layer / definition）', () => {
     }
   })
 
-  it('定义形态与层匹配：MRD/PRD = json-ledger；StRS/SyRS/IRS = headings', () => {
+  it('定义形态与层匹配：MRD = json-ledger；PRD/StRS/SyRS/IRS = headings', () => {
     expect(header(read('mrd.md'))?.['definition']).toBe('json-ledger')
-    expect(header(read('prd.md'))?.['definition']).toBe('json-ledger')
-    for (const name of ['strs.md', 'syrs.md', 'irs.md']) {
+    for (const name of ['prd.md', 'strs.md', 'syrs.md', 'irs.md']) {
       expect(header(read(name))?.['definition'], `${name} 应声明 headings`).toBe('headings')
     }
   })
@@ -73,29 +72,23 @@ describe('五层模板头（layer / definition）', () => {
   })
 })
 
-describe('PRD 唯一定义点', () => {
-  it('JSON 账本是唯一定义点；正文小节标题是引用（不带裸 ID 开头）', () => {
+describe('PRD 唯一定义点（headings）', () => {
+  it('`### REQ-###` 小节是唯一定义点；模板不含 JSON 账本', () => {
     const text = read('prd.md')
-    const json = /```json\n([\s\S]*?)\n```/.exec(text)
-    expect(json, 'PRD 模板缺 JSON 账本').not.toBeNull()
-    const parsed = JSON.parse(json?.[1] ?? '') as { prd: { requirements: { id: string }[] } }
-    const ids = parsed.prd.requirements.map(requirement => requirement.id)
-    expect(ids.length, 'PRD 样例至少要一条 REQ').toBeGreaterThan(0)
-    // 正文小节标题不得以 `<ID>` 开头（否则同一号出现两个定义点）。
-    const headingDefs = [...text.matchAll(/^#{2,4}\s+((?:MR|REQ|IF|TC)-\d{3})\b/gm)].map(match => match[1])
-    expect(headingDefs, `PRD 正文出现了定义形状的标题：${headingDefs.join(', ')}`).toEqual([])
-    // 引用标题必须仍在（告诉模型 JSON 是定义、正文是说明）。
-    expect(text).toContain(`Requirement: ${ids[0] ?? ''}`)
+    expect(text, 'PRD 模板不得再带 JSON 账本（2026-11-13 方案 A）').not.toContain('```json')
+    const ids = [...text.matchAll(/^###\s+((?:REQ)-\d{3})\b/gm)].map(match => match[1])
+    expect(ids.length, 'PRD 样例至少要一条 REQ 定义小节').toBeGreaterThan(0)
   })
 
-  it('PRD 样例保留 source（MR 来源）与 traces（跨层上游）', () => {
+  it('PRD 小节带齐定义字段：source / traces / slice / type / priority / status / verification / userStory / acceptance / dependsOn', () => {
     const text = read('prd.md')
-    const json = /```json\n([\s\S]*?)\n```/.exec(text)?.[1] ?? ''
-    const parsed = JSON.parse(json) as { prd: { requirements: Record<string, unknown>[] } }
-    const requirement = parsed.prd.requirements[0] ?? {}
-    expect(Array.isArray(requirement['source']) && (requirement['source'] as string[]).length > 0, 'PRD 样例缺 source').toBe(true)
-    expect(Array.isArray(requirement['traces']), 'PRD 样例缺 traces 字段').toBe(true)
+    for (const field of ['userStory', 'acceptance', 'source', 'traces', 'slice', 'type', 'priority', 'status', 'verification', 'dependsOn']) {
+      expect(text, `PRD 模板缺定义字段 ${field}`).toMatch(new RegExp(`^- ${field}:`, 'm'))
+    }
     expect(text, 'PRD 模板要写明 traces 指 StRS').toMatch(/traces[^\n]*StRS/)
+    expect(text, 'PRD 模板缺 AC 子项形状').toMatch(/^\s{2}- AC-\d{3}-\d+/m)
+    expect(text, 'PRD 模板缺 given/when/then').toMatch(/given:/)
+    expect(text, 'PRD 模板缺 Slices 表').toMatch(/^## Slices$/m)
   })
 
   it('MRD/PRD 样例仍可直接通过 validateProductDocs（模板与校验器同源）', () => {
@@ -122,7 +115,7 @@ describe('headings 模板的追溯字段', () => {
     const idsOf = (name: string) => new Set([...read(name).matchAll(/\b((?:MR|REQ|IF)-\d{3})\b/g)].map(match => match[1] ?? ''))
     const mrdIds = idsOf('mrd.md')
     const strsIds = new Set([...read('strs.md').matchAll(/^#{3,4}\s+(REQ-\d{3})/gm)].map(match => match[1] ?? ''))
-    const prdIds = new Set([...read('prd.md').matchAll(/"id":\s*"(REQ-\d{3})"/g)].map(match => match[1] ?? ''))
+    const prdIds = new Set([...read('prd.md').matchAll(/^#{3,4}\s+(REQ-\d{3})/gm)].map(match => match[1] ?? ''))
     const syrsIds = new Set([...read('syrs.md').matchAll(/^#{3,4}\s+(REQ-\d{3})/gm)].map(match => match[1] ?? ''))
     const irsIds = new Set([...read('irs.md').matchAll(/^#{3,4}\s+(IF-\d{3})/gm)].map(match => match[1] ?? ''))
     const traceTargets = (name: string) => new Set([...read(name).matchAll(/traces:\s*\[([^\]]+)\]/g)].flatMap(match => (match[1] ?? '').match(/(?:MR|REQ|IF)-\d{3}/g) ?? []))

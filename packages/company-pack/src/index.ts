@@ -28,6 +28,7 @@ import { readCatalogState } from './host/ledger/catalog-state.ts'
 import { regenerateCatalog } from './host/ledger/catalog.ts'
 import { registerDeliverablesCommand } from './host/commands/deliverables-command.ts'
 import { registerPrdCommand } from './host/commands/prd-command.ts'
+import { registerPrdGate } from './host/commands/prd-gate.ts'
 import { registerReqCommand } from './host/commands/req-command.ts'
 import { registerDeliveryCommand } from './host/commands/delivery-command.ts'
 import { registerSettingsCommand } from './host/commands/settings-command.ts'
@@ -154,6 +155,8 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
 
   registerDeliverablesCommand(ctx, { dataBlocked, ...blockedFields, workspace, ledgerStorePromise, exportNow })
   registerPrdCommand(ctx, { dataBlocked, ...blockedFields, workspace })
+  // 交付闸门：present 前跑 `/prd check` 同一判据（2026-11-13 方案 A；旧动议按 numbering 标记豁免）。
+  registerPrdGate(ctx)
   registerReqCommand(ctx, { dataBlocked, ...blockedFields, workspace, contentDir })
   registerDeliveryCommand(ctx, { dataBlocked, ...blockedFields, workspace, contentDir })
   registerSettingsCommand(ctx, {

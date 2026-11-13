@@ -29,12 +29,15 @@ engineering consumes it slice by slice, and each REQ can enter the task board in
 
 ## PRD output
 
-Write it with `<company-content>/templates/prd.md`, save to `deliverables/<slug>/drafts/prd.md` (`layer: PRD`, `definition: json-ledger`).
-- **The JSON ledger is the sole definition point**: every REQ's `id`/`source`/`traces`/`acceptance` lives in the ledger; body section headings are references
-  ("Requirement: REQ-###"), and must not start with a bare ID.
-- Body: overview, scope and non-scope, constraints, dependencies and risks, milestones, a description for each REQ.
+Write it with `<company-content>/templates/prd.md`, save to `deliverables/<slug>/drafts/prd.md` (`layer: PRD`, `definition: headings`).
+- **Each `### REQ-###` section is the sole definition point**: field lines under the heading (`userStory` / `acceptance` / `source` / `traces` / `slice` /
+  `type` / `priority` / `status` / `verification` / `dependsOn` / `openQuestions` / `changeLog`) define the requirement; the one-page summary and the
+  Slices table only reference ids. There is no JSON ledger.
+- Body: overview, scope and non-scope, constraints, dependencies and risks, a Slices table (explicit REQ ids, no ranges), then one section per REQ.
+  `verification` ∈ `test | demonstration | analysis | inspection`; every REQ needs at least one AC with `given` / `when` / `then`.
 - Numbering: REQ-###, AC-<REQ>-<n>; append-only, never renumber; withdraw through status (`withdrawn`), do not reorder or reuse.
-- Mechanical check: `/prd check <slug>` (structure) + `/req check <slug>` (numbering/layer/traceability); fix red.
+- Mechanical check: `/prd check <slug>` (structure) + `/req check <slug>` (numbering/layer/traceability); fix red. `present` runs the same PRD check and
+  **blocks the delivery** while it is red — fix the PRD, do not split the delivery to bypass the gate.
 
 ## Boundary
 

@@ -8,7 +8,7 @@
 |---|---|---|---|---|---|---|
 | 1 | **MRD** market | Should we, for whom, why we win | CMO | `drafts/mrd.md` | `json-ledger` | `MR-###` |
 | 2 | **StRS** stakeholder | Who cares, what, who signs acceptance | CMO | `drafts/strs.md` | `headings` | `REQ-###` |
-| 3 | **PRD** product | What product we sell | VP-Eng | `drafts/prd.md` | `json-ledger` | `REQ-###` / `AC-###-#` |
+| 3 | **PRD** product | What product we sell | VP-Eng | `drafts/prd.md` | `headings` | `REQ-###` / `AC-###-#` |
 | 4 | **SyRS** system | What the black box must satisfy, how verified | <assigned> | `drafts/syrs.md` | `headings` | `REQ-###` |
 | 5 | **IRS** interface | What a cross-boundary interface looks like | <assigned> | `drafts/irs.md` | `headings` | `IF-###` |
 | — | Allocation | Requirements → subsystems / purchased parts | <assigned> | IRS appendix `allocation.md` | `none` | no ids |
@@ -49,9 +49,10 @@ definition: headings
 ## Item shapes
 
 - `json-ledger`: the JSON element `id` defines; body headings are references.
-- `headings`: `### REQ-041` / `#### IF-014` define; field lines follow (`kind:` / `status:` / `owner:` / `verifier:` / `traces:` / `covers:`).
+- `headings`: `### REQ-041` / `#### IF-014` define; field lines follow (`kind:` / `status:` / `owner:` / `verifier:` / `traces:` / `covers:`; PRD adds `userStory:` / `acceptance:` / `source:` / `slice:` / `type:` / `priority:` / `verification:` / `dependsOn:` / `openQuestions:` / `changeLog:`).
 - `table-rows`: first cell `<ID>` defines; a summary table references.
 - Fields use line-start labels (`- traces:` / `traces:`); prose "traceability" is not a field.
+- **PRD migration (2026-11-13)**: new PRDs are `headings` — one `### REQ-###` section per requirement, no JSON ledger. Documents that still declare `definition: json-ledger` stay readable (`/prd check` keeps the legacy schema) but are exempt from new authoring.
 
 ## Traceability
 

@@ -7,7 +7,8 @@
  *
  * 判据口径（合同 = 产品类型包 `content/product-types/<id>/requirements-model.md`）：
  * - 文档头 `layer` ∈ MRD/StRS/PRD/SyRS/IRS/V&V；`definition` ∈ json-ledger/headings/table-rows/none；
- *   层与定义形态必须匹配（MRD/PRD = json-ledger；StRS/SyRS/IRS = headings；V&V = table-rows；附录 = none）。
+ *   层与定义形态必须匹配（MRD = json-ledger；PRD/StRS/SyRS/IRS = headings；V&V = table-rows；附录 = none）。
+ *   PRD 的旧 `json-ledger` 文档保留只读兼容（2026-11-13 迁移：新 PRD 用 `### REQ-###` 小节定义）。
  * - 号形 `KIND-NNN`（KIND ∈ MR/REQ/IF/TC），`AC-<REQ号>-<n>` 从属父 REQ。
  * - 字段按行首标签解析（`- traces:`），不子串匹配（V11 实测：散文里的「可追溯性」会误判孤儿）。
  * - 追溯只认作者写的边；`:` 跨动议引用 v1 未支持，不解析、不判红。
@@ -25,10 +26,14 @@ export const DEFINITION_FORMS: readonly DefinitionForm[] = ['json-ledger', 'head
 export const LAYER_FORMS: Readonly<Record<Layer, DefinitionForm>> = {
   MRD: 'json-ledger',
   StRS: 'headings',
-  PRD: 'json-ledger',
+  PRD: 'headings',
   SyRS: 'headings',
   IRS: 'headings',
   'V&V': 'table-rows',
+}
+/** 迁移期只读兼容：旧 PRD（json-ledger）仍可校验，新 PRD 不得再选它。 */
+export const LEGACY_LAYER_FORMS: Readonly<Partial<Record<Layer, readonly DefinitionForm[]>>> = {
+  PRD: ['json-ledger'],
 }
 /** 默认范围 = 到 PRD 为止（模板口径）；meta `layers:` 可扩到 SyRS/IRS/V&V。 */
 export const DEFAULT_LAYERS: readonly Layer[] = ['MRD', 'StRS', 'PRD']
@@ -202,6 +207,22 @@ function headingDefinitions(rel: string, text: string, layer: Layer): Definition
       traces: fields.traces,
       covers: fields.covers,
     })
+    // PRD（2026-11-13 起 headings）的 AC 是 REQ 小节下的缩进子项；父号边由 AC_PATTERN 派生。
+    for (let offset = heading.index + 1; offset < end; offset += 1) {
+      const ac = /^\s*-\s+(AC-\d{3}-\d+)\s*$/.exec(lines[offset] ?? '')
+      if (ac === null) continue
+      definitions.push({
+        id: ac[1] ?? '',
+        kind: 'AC',
+        layer,
+        rel,
+        line: offset + 1,
+        status: '',
+        source: [],
+        traces: [],
+        covers: [],
+      })
+    }
   }
   return definitions
 }
@@ -397,8 +418,10 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
       errors.push(`${doc.rel} 的 definition 非法：${formValue === '' ? '（缺失）' : formValue}`)
       continue
     }
-    if (formValue !== LAYER_FORMS[layer]) {
-      errors.push(`${doc.rel} 的 definition 与层不匹配：${layer} 应为 ${LAYER_FORMS[layer]}，实际 ${formValue}`)
+    if (formValue !== LAYER_FORMS[layer] && !(LEGACY_LAYER_FORMS[layer] ?? []).includes(formValue)) {
+      const legacy = LEGACY_LAYER_FORMS[layer] ?? []
+      const suffix = legacy.length === 0 ? '' : `（旧动议兼容 ${legacy.join('/')}）`
+      errors.push(`${doc.rel} 的 definition 与层不匹配：${layer} 应为 ${LAYER_FORMS[layer]}${suffix}，实际 ${formValue}`)
       continue
     }
     presentLayers.add(layer)

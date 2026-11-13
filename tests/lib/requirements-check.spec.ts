@@ -46,7 +46,28 @@ const STRS = yaml('StRS', 'headings', `# StRS
 - traces: [MR-001]
 `)
 
-const PRD = yaml('PRD', 'json-ledger', `# PRD
+const PRD = yaml('PRD', 'headings', `# PRD
+
+## Slices
+
+| slice | Goal | Requirements (explicit ids) | Exit condition |
+|---|---|---|---|
+| S1 | 最小端到端 | REQ-002 | ok |
+
+### REQ-002 导入流水
+
+- status: draft
+- source: [MR-001]
+- traces: [REQ-001]
+- acceptance:
+  - AC-002-1
+    - given: 有流水
+    - when: 导入
+    - then: 生成草稿
+`)
+
+/** 旧形状（json-ledger）只读兼容样例；迁移期仍须可校验。 */
+const LEGACY_PRD = yaml('PRD', 'json-ledger', `# PRD
 
 \`\`\`json
 {
@@ -129,6 +150,17 @@ describe('解析层与定义形态', () => {
     expect(wrongForm.errors.join()).toContain('definition 与层不匹配')
     const badLayer = checkRequirements({ docs: docs(['mrd.md', yaml('MRX', 'json-ledger', '```json\n{}\n```')]) })
     expect(badLayer.errors.join()).toContain('layer 非法')
+  })
+
+  it('PRD 新形状 headings 通过；旧 json-ledger 只读兼容；其他形态仍红', () => {
+    const fresh = checkRequirements({ docs: docs(['mrd.md', MRD], ['strs.md', STRS], ['prd.md', PRD]) })
+    expect(fresh.errors, fresh.errors.join('\n')).toEqual([])
+    expect(fresh.index.counts.AC).toBe(1)
+    const legacy = checkRequirements({ docs: docs(['mrd.md', MRD], ['strs.md', STRS], ['prd.md', LEGACY_PRD]) })
+    expect(legacy.errors, legacy.errors.join('\n')).toEqual([])
+    const wrong = checkRequirements({ docs: docs(['mrd.md', MRD], ['strs.md', STRS], ['prd.md', yaml('PRD', 'table-rows', '| REQ-002 | x |\n')]) })
+    expect(wrong.errors.join()).toContain('definition 与层不匹配')
+    expect(wrong.errors.join()).toContain('旧动议兼容 json-ledger')
   })
 })
 
