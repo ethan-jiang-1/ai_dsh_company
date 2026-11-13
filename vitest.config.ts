@@ -5,6 +5,10 @@ import { defineConfig } from 'vitest/config'
 // 源码面解析：经 tsconfig paths 把 @deepseek-ai/* 指到 vendor 的 src（DSH 纪律：
 // vitest 一律走 paths 指 src，绝不走 exports 到 lib——否则加载第二份模块单例）。
 export default defineConfig({
+  // 单一 React：干净 clone 的 vendor 安装会落下第二份 react（vendor/dsh/node_modules），
+  // 与根 react-dom 的 dispatcher 不同源 → 源码面组件在 react-dom/server 下 hooks 报 null
+  // （2026-11-13 clean clone 实测 tab-copy.spec）。dedupe 让测试面只保留根副本。
+  resolve: { dedupe: ['react', 'react-dom'] },
   plugins: [tsconfigPaths({
     // vendor/dsh/tsconfig.base.json 同时列为原生项目：extends 链继承的 paths 在本仓根解析时
     // 基址错位（实测 @deepseek-ai/dsh-client-modules/client 解析出 packages/packages 翻倍路径、

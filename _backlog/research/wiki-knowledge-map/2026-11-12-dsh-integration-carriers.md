@@ -45,9 +45,9 @@ intent: wiki 六功能（ingest/query/lint/browse/grow/configure）可挂载的�
 
 ## 3. hooks：事件钩子 → 事件驱动 wiki 维护
 
-**【事实】** `vendor/dsh/packages/hooks/` 三子包：`hook-protocol`、`hooks-claude-code`、`hooks-codex`；实测 `hook-protocol/` **只有 `lib/` 与 `node_modules/`**（构建残壳，无 README/package.json/src），`hooks-claude-code/README.md` 为空文件。
+**【事实】** 2026-11-13 clean clone 复核：pin `rc.5` 的 vendor 源码树**没有 hooks 组**（`git ls-tree` 零命中）；此前在 warm 树看到的 hooks 三子包（`hook-protocol` / `hooks-claude-code` / `hooks-codex`）只剩被忽略的构建残壳，属旧构建/旧 checkout 残留，不能当源码事实。
 
-**【推论】** v0.2.1-rc.5 的 hooks 包是**外部 hooks 协议兼容层**（Claude Code / Codex 风格），不是通用 Cordis 事件订阅面。要事件驱动，正路是 **Cordis 事件**（`ctx.on('agent/created', ...)`，handbook 注入即此用法，主材料 §4.2 一手），不是 hooks 包。**【建议】** wiki 维护不押在 hooks 上；起步也不需要事件驱动（ingest/lint 由人或 schedule 触发）。
+**【推论】** pin rc.5 的源码里没有 hooks 兼容层可押；要事件驱动，正路是 **Cordis 事件**（`ctx.on('agent/created', ...)`，handbook 注入即此用法，主材料 §4.2 一手）。**【建议】** wiki 维护不押在 hooks 上；起步也不需要事件驱动（ingest/lint 由人或 schedule 触发）。
 
 ## 4. client UI：wiki 浏览面板要动什么
 

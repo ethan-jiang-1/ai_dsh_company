@@ -206,7 +206,7 @@ gist 核心原句（以下均 raw 全文逐字摘录）：
 |---|---|
 | `vendor/dsh/packages/`（含 experimental/、extensions/ 全部子包） | 仅 6 处命中，全部是 ui-primitives 的 wikipedia **图标**：`packages/client/ui-primitives/src/SiteGlyph.tsx` L39 `siWikipedia,`、L64 `'wikipedia.org': siWikipedia,`；其余为对应测试（`vendor/dsh/packages/client/ui-primitives/tests/link-icon.client.spec.tsx` L89/L142 用 en.wikipedia.org 做链接图标用例）与 README 描述 |
 | `vendor/dsh/apps/`（cli/desktop/desktop-host/plugin-market-generator/web） | 无命中 |
-| `vendor/dsh/lib/` | 无命中 |
+| vendor 根级旧构建输出（warm 树残留；pin 源码无此目录） | 不适用 |
 | `vendor/dsh/docs/` | 仅 4 处，全部是翻译规则里引用的**外部** Vue.js GitHub wiki URL（`docs/i18n/translation-rules.md` L43/L66 及 zh 对应行），非组件 |
 | `vendor/dsh/website/`、`native/`、`python/`、`scripts/` | 无命中 |
 

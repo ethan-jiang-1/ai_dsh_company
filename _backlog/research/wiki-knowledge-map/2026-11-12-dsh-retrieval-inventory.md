@@ -390,7 +390,7 @@ OK
 1. DSH 无 MCP server 侧产品代码（§2.1 grep 全 packages，命中仅测试夹具与 ACP 转发）。
 2. base bundle 无 mcp-client 行、无任何 MCP server 默认启用（§2.2；mcp-client README "No server is enabled by default."）。
 3. Exa/Perplexity 搜索后端包在树但 base/web-app bundle 未挂载（§3.1 grep bundle 无命中）。
-4. `packages/session-query/tool-session-query/` 是无 package.json 的构建残壳，非工作区包（§4.1 find 实测）。
+4. `packages/session-query/` 下没有独立的 `tool-session-query` 工作区包（2026-11-13 clean clone 的 `git ls-tree` 复核；warm 树里的同名目录是无 package.json 的构建残壳，非源码）。
 5. session-query-sqlite 无 CJK/分词处理（§4.3 grep 零命中）。
 6. web_fetch 不做 PDF 文本提取（web-fetch-http README L134 "text-extractable PDF decoding is named deferred work"）。
 7. 会话内容搜索默认关（openAt: never，§4.2）；session-search bundle 默认关（README "ships switched off"）。
