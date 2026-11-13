@@ -20,20 +20,19 @@
 
 换档先问"这一层能证明我关心的性质吗"，不为安心堆档。
 
-### 1.1 资产命名语法（后缀提示用途；成本与实际档位以头注和参数为准，新资产沿用词表）
+### 1.1 资产命名语法（文件名 = 证据类型；目录 = lane；两者冲突 = 红）
 
-| 名字形态 | lane / 层 |
+| 名字 | 证据类型 / 命令 |
 |---|---|
-| `tests/**/*.spec.ts` | keyless 回归唯一后缀（`pnpm test`）；按 company/client/presets/harness 领域归位，非 spec 形态 = 静默死资产，不许 |
-| `*-e2e-smoke.mjs` | 端到端链路；模型与浏览器是独立成本（presence-e2e 为真模型/RPC，无浏览器） |
-| `*-smoke.mjs` | 冒烟：装配/连通（keyless 挂载或单 prompt 级） |
-| `*-probe.mjs` | 机制/边界探针（单点机制证据） |
-| `*-audit.mjs` / `*-check.mjs` | 审计/判据：读真盘出报告，无模型 |
-| `*-eval.mjs` | 语料评估；candidate-scan 自检/标注评分为 keyless，涉及模型才进认证档 |
-| 其余动词形（sync / export / init / motion / rehearsal / verify） | 工具脚本，非门禁 |
+| `tests/**/*.spec.ts` | 进程内 keyless（`pnpm test:spec`；`pnpm test` 兼容）；目录 = 被测面 |
+| `checks/lanes/*.e2e.mjs` | 真进程（`pnpm test:e2e`；含 keyless process/built） |
+| `checks/lanes/*.entry.mjs` | 真浏览器 / 真 profile / 真 tarball（`pnpm test:entry`） |
+| `checks/lanes/*-lane.mjs` | lane runner（只调度，不证明行为） |
+| `tests/checks/*.test.mjs` | 门禁自身（`pnpm test:checks`） |
+| `probes/**/*-probe.mjs` | 手动诊断证据，不进 `test:*`（fixture 入口只允许 `<域>/<fixture>/index.mjs`） |
+| `checks/audit/*-(audit\|check\|eval\|ratchet).mjs` | 只读判据/报告 |
 
-后缀词表是政策不设新门（未复发，守门禁升格判据）；每个脚本自己的「何时跑/成本」仍由头注自述（`script-triggers`）。用例名 = 行为命题现在时、不写 "should"——测试描述行为，不描述正确性。
-
+**纪律**：后缀只由证据类型决定，目录只由 lane/被测面决定；**名字不编码失败类或 owner**。文件名 token 禁词：`golden`/`util`/`misc`/`helper`/`common`/`tmp`/`temp`/`new`/`old`/`copy`/`backup`。机械判据 = `naming-contract` 门禁；新资产不登记 lane/失败类 = `asset-lanes.spec` / census 红。用例名 = 行为命题现在时、不写 "should"——测试描述行为，不描述正确性。
 ## 2. 改动面 → 最小证据（同 diff 交付）
 
 **行级映射**（哪个改动面跑哪个检查、何时升档、回放/视觉夹具的义务）唯一家 =

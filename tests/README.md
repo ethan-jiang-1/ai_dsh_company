@@ -62,7 +62,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | **四层命令** | spec/checks 秒级；e2e/entry 按面或每周 | test:spec / test:e2e / test:entry / test:checks（后缀 = lane；e2e/entry 由 keyless-lane 分派） |
 | 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接、物理行预算、裸路径、分层方向与 pin 一致性门禁） |
 | **类型面 keyless** | 秒级（增量） | `pnpm typecheck`（pack 两面 + `tests/client` + `tests/host` + `tests/lib` + `tests/content` + `tests/{repo,contract,tools,session,evidence,ui}` 全量 spec（`pack-exports` 混合面除外）；改导出/导入签名或测试类型时跑——verify 与 test 都不做类型检查） |
-| **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器）；便宜 smoke lane = `pnpm smoke:fast`（6 条，~2.4s；pre-push；只证明资产还活着） |
+| **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器）；便宜 smoke lane = `pnpm smoke:fast`（4 条，~2.2s；pre-push；只证明资产还活着） |
 | 装配 keyless | ~25s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
 | **重放 lane（第三档，无 key）** | 现行场景 ~2s | `replay-smoke`（仅 foundation 合成场景，不加载 company-pack；会话日志 + sidecar）——要起进程，不进 `pnpm test`。真页面车道 = `ui-scene-smoke`（自起实例，~40s） |

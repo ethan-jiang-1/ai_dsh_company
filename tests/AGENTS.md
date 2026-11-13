@@ -7,6 +7,7 @@
 1. 这条 spec 钉的是行为，还是事实/不变量？
 2. 失败是 typed 还是静默？外部字节变了吗？
 3. 新写入口/新持久化路径登记了吗？
+4. 文件名对得上证据类型与 lane 吗（spec / e2e / entry / test）？规则 = [testing.md §1.1](../docs/testing.md) + `naming-contract` 门禁。
 
 ## 新持久化事实
 

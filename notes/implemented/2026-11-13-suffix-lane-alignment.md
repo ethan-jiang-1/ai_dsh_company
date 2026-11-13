@@ -10,7 +10,7 @@
    `*.entry.mjs`（真浏览器/真 profile/真 tarball）/ `tests/checks/*.test.mjs`（门禁自身）。
 2. **唯一偏差：进程内保留 `.spec.ts`**。246 个类型化 spec 改 `.mjs` = 降级 JS 并丢掉 tests 的 tsc 面；
    DSH 原生该行也是 `.spec.ts`。后缀表达 lane，扩展名表达语言。
-3. `checks/smoke/` → `checks/lanes/`；29 个资产按证据类型改为 `.e2e.mjs`（5）/ `.entry.mjs`（24）；
+3. checks/smoke/（旧目录，已删） → `checks/lanes/`；29 个资产按证据类型改为 `.e2e.mjs`（5）/ `.entry.mjs`（24）；
    runner `fast-lane.mjs` / `keyless-lane.mjs` 留下；两条门禁自测 → `tests/checks/*.test.mjs`。
 4. 四条命令：`test:spec` / `test:e2e` / `test:entry` / `test:checks`；`pnpm test` 保留兼容（= vitest）。
    `keyless-lane --suffix` 是 e2e/entry 的分派器；`test:checks` 由 `tools/run-check-tests.mjs` 发现执行。
@@ -19,7 +19,7 @@
 ## 输掉的方案
 
 - **`.spec.mjs`**：会把类型化测试降级成 JS 且丢掉 tests 的 tsc 面；DSH 原生也是 `.spec.ts`。
-- **保留 `checks/smoke/` 只换后缀**：目录名继续撒谎（smoke 里住 e2e/entry/browser/tarball）。
+- **保留 checks/smoke/（旧目录，已删） 只换后缀**：目录名继续撒谎（smoke 里住 e2e/entry/browser/tarball）。
 - **把 e2e/entry 搬进 `tests/`**：撞 layering 守卫（tests 禁子进程/浏览器/密钥）。
 - **沿用 `*-smoke` 兼容别名**：两套后缀 = 两套事实，正是本次要消灭的。
 

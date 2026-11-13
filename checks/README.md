@@ -14,7 +14,7 @@
 | 看最近会话的失败摘要（中断轮、非零 bash、待审批也算） | `pnpm diagnose [--strict]` → [diagnose](../tools/diagnose.mjs) |
 | 检查密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs) · [tracked-token](gates/tracked-token.mjs) · [tracked-secrets](gates/tracked-secrets.mjs) |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；分层守卫 = [layering.spec](../tests/repo/layering.spec.ts) |
-| 确认测试资产还活着 | `pnpm smoke:fast` → [fast](lanes/fast-lane.mjs)（6 条，~2.4s；pre-push）；全量 = `pnpm smoke:all` → [keyless-lane](lanes/keyless-lane.mjs)（每周 CI 跑 `--ci`；成员唯一家 = [lane 注册表](../tools/lib/asset-lanes.mjs)） |
+| 确认测试资产还活着 | `pnpm smoke:fast` → [fast](lanes/fast-lane.mjs)（4 条，~2.2s；pre-push）；全量 = `pnpm smoke:all` → [keyless-lane](lanes/keyless-lane.mjs)（每周 CI 跑 `--ci`；成员唯一家 = [lane 注册表](../tools/lib/asset-lanes.mjs)） |
 | 类型 / 导入签名改动 | `pnpm typecheck`（命令与预算 = [tests/README §验证分层与预算](../tests/README.md)） |
 | 确认角色真的挂载 | [preset-smoke](lanes/preset.entry.mjs) |
 | 确认 client 真的装配 | [client-load-smoke](lanes/client-load.entry.mjs) |
