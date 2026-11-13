@@ -28,7 +28,7 @@ intent: 父会话一手核实的机制锚点 + 合同层指针 + 跨题交接，
 
 ## 跨题交接
 
-- wiki 指针格式 = [wiki-knowledge-map 主材料](../../../research/wiki-knowledge-map/2026-11-12-wiki-knowledge-map.md) §5 形状 A（本地根路径 + index.md 先行；llms.txt/DeepWiki 仅可选外部源）；`settings.wiki` = string 指针，两题落地合流。
+- wiki 指针格式 = [wiki-knowledge-map 主材料](../wiki-knowledge-map/2026-11-12-wiki-knowledge-map.md) §5 形状 A（本地根路径 + index.md 先行；llms.txt/DeepWiki 仅可选外部源）；`settings.wiki` = string 指针，两题落地合流。
 - 开放问题 = 主材料 §9（per-session 覆盖、强制档位、贴左/贴右、method 作用域错配、冷启动入口）+ DSH 原生落地材料（modal vs 面板 UX、profile 全局 vs workspace 作用域）。
 
 ## 状态

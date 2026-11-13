@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-13 落地；验证见下）
 
-上游 = 用户 2026-11-13「弄个 issue 出来吧，然后我们推动落地」；问题卡 = [test-asset-fence-p0](../../_backlog/_archive/settled_issues/2026-11-13-test-asset-fence-p0.md)；研究 = [test-asset-fence](../../_backlog/research/test-asset-fence/README.md)（第二遍复核见材料二 §8）。
+上游 = 用户 2026-11-13「弄个 issue 出来吧，然后我们推动落地」；问题卡 = [test-asset-fence-p0](../../_backlog/_archive/settled_issues/2026-11-13-test-asset-fence-p0.md)；研究 = [test-asset-fence](../../_backlog/_archive/research/test-asset-fence/README.md)（第二遍复核见材料二 §8）。
 
 ## 决定
 

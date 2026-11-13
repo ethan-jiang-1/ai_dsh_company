@@ -39,10 +39,10 @@ opened: 2026-11-13
 - **按 DSH 插件五台阶自评**：导出守卫 / 行为 spec / 注册生命周期（client 面）/ REAL composition 都有，**台阶 5「组装转录」缺位、台阶 4 不在必需 lane**——这正是"文案改动只能靠真模型冒烟"和"每次收口临时决定跑哪几条"的根因。
 
 研究依据（含一手源码核对与数字复跑命令）：
-[题名页](../../research/dsh-test-strategy/README.md) ·
-[对账](../../research/dsh-test-strategy/2026-11-13-gap-audit.md) ·
-[落地方案](../../research/dsh-test-strategy/2026-11-13-borrow-roadmap.md) ·
-[一手核对](../../research/dsh-test-strategy/2026-11-13-vendor-source-verification.md)
+[题名页](../research/dsh-test-strategy/README.md) ·
+[对账](../research/dsh-test-strategy/2026-11-13-gap-audit.md) ·
+[落地方案](../research/dsh-test-strategy/2026-11-13-borrow-roadmap.md) ·
+[一手核对](../research/dsh-test-strategy/2026-11-13-vendor-source-verification.md)
 
 ## 方案（三件，顺序 B → C → A，可单独停）
 
@@ -140,9 +140,9 @@ opened: 2026-11-13
 
 ## 研究依据与相关卡
 
-- 研究题：[dsh-test-strategy](../../research/dsh-test-strategy/README.md)（题名页）。
-- 同族研究：[test-asset-fence](../../research/test-asset-fence/README.md)（环外腐烂）、
-  [adversarial-shape-matrix](../../research/adversarial-shape-matrix/README.md)（失败类从哪来）。
+- 研究题：[dsh-test-strategy](../research/dsh-test-strategy/README.md)（题名页）。
+- 同族研究：[test-asset-fence](../research/test-asset-fence/README.md)（环外腐烂）、
+  [adversarial-shape-matrix](../research/adversarial-shape-matrix/README.md)（失败类从哪来）。
 - 本卡与它们的分工：围栏卡解决"慢资产出环后的新鲜度"，矩阵卡解决"补哪类资产"，
   **本卡解决"资产怎么被选中、被兜底、被记账"**——三者不重叠。
 

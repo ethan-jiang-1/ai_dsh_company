@@ -4,7 +4,7 @@
 > 主键是失败类，不是目录：目录表答「改这里跑什么」= [README「改动面 → 最窄检查」](./README.md#改动面--最窄检查)；
 > 本表答「这类失败哪层才看得见」。两张表并存，不是重复。
 > **每行必须点名一个本仓真实载体**；只能写「无」的行 = 缺口，立卡补，不绕过。
-> 规则来源与判据 = `_backlog/research/dsh-test-strategy/`（digest §4、gap-audit §3、roadmap §10）。
+> 规则来源与判据 = `_backlog/_archive/research/dsh-test-strategy/`（digest §4、gap-audit §3、roadmap §10）。
 
 | # | 失败类 | 最低能看见的层 | 本仓载体 | 状态 |
 |---|---|---|---|---|

@@ -67,7 +67,7 @@ intent: 把环外资产腐烂、驱动里的逻辑泄漏、门禁反证不常驻
 | P0 | U1 + U2 + U3；A1 runner 落地并跑绿 | 2–4h | `node tests/checks/two-axis-gates.test.mjs` ALL PASS；`node checks/lanes/replay.e2e.mjs` PASS；`smoke:fast` ALL PASS；`pnpm verify` ALL PASS |
 | P1 | A3（若 `--refresh` 后仍漂）；A4 的 `company-root-carriers` 负例；更新 pre-push/CI/tests-README 的预算数字 | 半天 | 新负例真红→还原绿；`pnpm test` 仍 ≤ 30s；预算文字 = 实跑数字 |
 | P2 | A2（仅复发时）；A5 probe 审计 | 按需 | 不新增慢门；probe 表进研究材料/卡 |
-| P3 | 把 §2 四条围栏规则写进 [testing.md](../../../docs/testing.md) / [tests/README](../../../tests/README.md) | 按行预算 | `pnpm verify` 绿；不新增索引 |
+| P3 | 把 §2 四条围栏规则写进 [testing.md](../../../../docs/testing.md) / [tests/README](../../../../tests/README.md) | 按行预算 | `pnpm verify` 绿；不新增索引 |
 
 **本轮不改任何资产**；上表是待用户裁的落卡候选。
 

@@ -2,15 +2,31 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮拿到 ≥3 张卡，先按根因分组列表再逐卡修——逐症状打补丁会把同一根因修三遍。
 
-**下一个缺陷号**：Next BUG ID = 152；已分配 BUG-001..151。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 160；已分配 BUG-001..159。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。
 
 ## 活跃清单
 
-**空**（2026-11-13 第四轮收口：BUG-147..149 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；
+**活跃 8 张（2026-11-13 focus v2 探索；只报不修）**：见下方「## 2026-11-13 focus v2 探索（C8/C9/C10）」。
+
+**上一轮收口**（2026-11-13 第四轮）：BUG-147..149 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；
 BUG-150 复核不成立，迁 [settled_issues](../_archive/settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md)；
-BUG-151 由 Safety 矩阵首跑发现，同轮修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）。
+BUG-151 由 Safety 矩阵首跑发现，同轮修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+
+## 2026-11-13 focus v2 探索（C8/C9/C10）
+
+**用户指令（2026-11-13）**：「对，抓到bug之后不要改，直接报就行了」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+
+| 组 | 卡 | 一句话 | 级别 |
+|---|---|---|---|
+| A PRD parser 形状 | [152](BUG-152-prd-headings-crlf-bom.md) / [153](BUG-153-prd-headings-fenced-code-blocks.md) | CRLF/BOM 假红；围栏示例被当定义 | P2 / P2 |
+| B PRD gate 边界 | [154](BUG-154-prd-gate-numbering-empty-value.md) / [155](BUG-155-prd-gate-stale-session-cwd.md) / [156](BUG-156-prd-gate-symlink-unreadable-fail-open.md) | numbering 空值放行；header cwd 与 present 分叉；symlink 不可读当旧动议 | P1 ×3 |
+| C PRD 身份 | [157](BUG-157-prd-duplicate-ac-slice-ids.md) | AC/slice 重号不判红 | P2 |
+| D pre-push 范围 | [158](BUG-158-pre-push-zero-sha-range.md) | 新分支只看 tip；删分支崩 | P1 |
+| E client 错误环 | [159](BUG-159-client-error-ring-empty-object-message.md) | `{}` 吞掉 event.message | P2 |
+
+
 
 **2026-11-13 第三轮收口**：BUG-114..139、141..145 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；BUG-140 撤回 settled。
 

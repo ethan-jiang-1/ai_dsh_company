@@ -12,7 +12,7 @@
 ## 决定
 
 1. **测试面 dedupe**：`vitest.config.ts` 加 `resolve.dedupe: ['react','react-dom']`。只影响测试解析，不改产品源码、不改构建、不删 vendor 安装。
-2. **按源码真值改三处指针**：`_backlog/research/wiki-knowledge-map/` 的三份研究页把「事实」改成 clean clone 的 `git ls-tree` 复核；明确「warm 残壳 ≠ 源码」，且不写不存在的路径字面量（写了 bare-path 还会红）。
+2. **按源码真值改三处指针**：`_backlog/_archive/research/wiki-knowledge-map/` 的三份研究页把「事实」改成 clean clone 的 `git ls-tree` 复核；明确「warm 残壳 ≠ 源码」，且不写不存在的路径字面量（写了 bare-path 还会红）。
 3. **证据落本 Note**：clean clone 链、真页面 10 页签金样、probes 逐件消费者三件证据都记在这里；release Note 的未覆盖轴改为指向本 Note。
 
 ## 输掉的方案

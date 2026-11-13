@@ -89,7 +89,7 @@
 - **只做软强制**：`/req check`、`/delivery check` 的解析链**不**读 `startup.json`；模型理论上仍可忽略注入段。
   硬强制要另开卡（改两处解析函数 + fan-out 测试）。
 - **公司默认不可在面板改**：要接 DSH 设置表单需引入 schemastery volatile 字段，未做。
-- **`wiki` 只存指针**：内容形状（index 先行 / 维护协议）归 [wiki 研究题](../../_backlog/research/wiki-knowledge-map/README.md)；
+- **`wiki` 只存指针**：内容形状（index 先行 / 维护协议）归 [wiki 研究题](../../_backlog/_archive/research/wiki-knowledge-map/README.md)；
   指针的**存在性校验与注入三档**（内可写 / 外只读 / 失效警示）由后继 [wiki 落地 Note](2026-11-12-wiki-knowledge-map-landing.md) 扩展；
   v1 按用户 2026-11-12 拍板 = 本地目录路径（可绝对、可在 workspace 外），注入段已写明「外部目录只读、不要尝试写入」。
 - **无会话冷启动**：按钮住 composer 槽，无 session 不渲染；公司空壳页只能从右侧栏「策略」页签进。

@@ -29,7 +29,7 @@ opened: 2026-11-13
 
 ## 当前情况
 
-- 现状证据与完整设计 = [研究稿](../../research/adversarial-shape-matrix/2026-11-13-design.md)（2026-11-13）。
+- 现状证据与完整设计 = [研究稿](../research/adversarial-shape-matrix/2026-11-13-design.md)（2026-11-13）。
 - 三条收敛判据 **282 行**（company-root 202 / safe-file 44 / write-gate 36），只有 **1 个 69 行 spec、4 个形状**。
 - **23 个 src 文件 / 55 处** `.dsh-company` 字面量 + 15 个 `RUN_BUNDLE_PATHS` 消费者；**6 个写入口**自拼路径 + 自做 temp/rename。
 - 零覆盖形状：截断/半写 JSON、`bundle.json` symlink/目录占位、`exports/` symlink、两进程同写、fsync、TOCTOU、`*At` 变体、`createCompanyDir` 越界分支。

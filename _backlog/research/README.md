@@ -58,11 +58,11 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-- [wiki-knowledge-map](wiki-knowledge-map/README.md) — wiki 组织的动态知识地图（AK 式 LLM wiki）与轻依赖接入；消费者 = 用户 2026-11-12 点名研究。
-- [adversarial-shape-matrix](adversarial-shape-matrix/README.md) — 对抗性边界矩阵 + 跨载体一致性 spec 的测试资产设计；消费者 = 用户 2026-11-13 点名研究。
-- [workflow-entry-and-fact-checkpoint](workflow-entry-and-fact-checkpoint/README.md) — 加工环路的 fresh agent 走查与门禁对账；消费者 = 用户 2026-11-13 点名研究。
-- [test-asset-fence](test-asset-fence/README.md) — 测试资产围栏复核：成本盘子、环外腐烂证据与更新/补充/淘汰清单；消费者 = 用户 2026-11-13 点名研究。
-- [dsh-test-strategy](dsh-test-strategy/README.md) — DSH 测试策略全貌、本仓七缺口对账与借鉴落地路线；消费者 = 用户 2026-11-13 点名研究。
+- [DSH notes 流程的剩余借鉴点：不是缺分类维度，是缺三把锁](dsh-notes-flow-borrow/README.md) — 2026-11-13，已定性；候选 B1–B11 待用户裁决，未开卡。
+
+（2026-11-13 五题全部定性且产出卡已结，随末张活卡迁入[研究归档](../_archive/research/README.md)。）
+
+（2026-11-13 wiki-knowledge-map / adversarial-shape-matrix / workflow-entry-and-fact-checkpoint / test-asset-fence / dsh-test-strategy 五题产出卡均 `已结`，迁入[研究归档](../_archive/research/README.md)。）
 
 （2026-11-12 bilingual-company 随 UI 落地卡归档，迁入[研究归档](../_archive/research/README.md)。）
 

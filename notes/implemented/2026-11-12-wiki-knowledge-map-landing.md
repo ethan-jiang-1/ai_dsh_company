@@ -6,7 +6,7 @@
 > [启动策略 + wiki 缺陷横扫 Note](./2026-11-12-startup-strategy-wiki-bug-sweep.md)。
 
 上游 = 用户 2026-11-12 点名研究并要求落地（「wiki 可能不在 workspace 里面，agent 只读也可以」→「把它落地吧」）；
-研究 = [wiki-knowledge-map 研究题](../../_backlog/research/wiki-knowledge-map/README.md)（AK 一手 / OKF 规范 / 搜索阶梯 / 载体盘点 / 只读边界实测）；
+研究 = [wiki-knowledge-map 研究题](../../_backlog/_archive/research/wiki-knowledge-map/README.md)（AK 一手 / OKF 规范 / 搜索阶梯 / 载体盘点 / 只读边界实测）；
 前置 = [项目启动策略 Note](2026-11-12-startup-settings.md)（`startup.json` 的 `wiki` 指针与注入段）；
 卡 = [2026-11-12 Wiki 知识地图落地（M1）](../../_backlog/_archive/settled_issues/2026-11-12-wiki-knowledge-map-landing.md)。
 

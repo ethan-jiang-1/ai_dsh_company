@@ -15,7 +15,7 @@ opened: 2026-11-13
 
 ## 问题与期望结果
 
-**触发**：用户 2026-11-13 要求复核测试资产围栏，目标是「尽量用单元/集成快资产，避免端到端慢资产」。研究（[test-asset-fence](../../research/test-asset-fence/README.md)）实测：8 个便宜 keyless 环外资产里 2 红 1 惰性；`pnpm test` 242 files / 1997 tests / 26.0s；pre-push 全链 ~41s。
+**触发**：用户 2026-11-13 要求复核测试资产围栏，目标是「尽量用单元/集成快资产，避免端到端慢资产」。研究（[test-asset-fence](../research/test-asset-fence/README.md)）实测：8 个便宜 keyless 环外资产里 2 红 1 惰性；`pnpm test` 242 files / 1997 tests / 26.0s；pre-push 全链 ~41s。
 
 **期望结果**：P0 完成后——
 1. `two-axis-gates-smoke` 的负例 mutation 不再空转，四个判据全绿；
@@ -53,7 +53,7 @@ opened: 2026-11-13
 ## 事实与读者
 
 - 事实（新增/修改）：测试资产的**新鲜度回路**——mutation 必须真改字节、重放 fixture 有刷新/归档路径、惰性资产有状态、便宜资产有 lane。
-- 唯一入口：本卡（P0 范围）+ [研究题名页](../../research/test-asset-fence/README.md)（证据与取舍）。
+- 唯一入口：本卡（P0 范围）+ [研究题名页](../research/test-asset-fence/README.md)（证据与取舍）。
 - 读载体 / 写载体：`checks/lanes/*`、`checks/lanes/lib/`、`snapshots/replay/`、`checks/audit/`、`package.json`、`.githooks/pre-push`、`tests/README.md`；维护者与 pre-push 使用者是读者。
 - 环境坏法：内容（i18n/canonical 迁移让 mutation 空转）、生命周期（fixture 资格过期）、来源（CI 不构建 vendor，cheap smoke 跑不动）；根/叶路径不是本条的主轴。
 

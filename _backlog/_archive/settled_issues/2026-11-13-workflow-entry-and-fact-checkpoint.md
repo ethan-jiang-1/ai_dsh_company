@@ -27,7 +27,7 @@ opened: 2026-11-13
 
 ## 当前情况
 
-- 走查与对账材料 = [fresh agent 走查](../../research/workflow-entry-and-fact-checkpoint/2026-11-13-fresh-agent-walkthrough.md) / [规则 × 门禁对账](../../research/workflow-entry-and-fact-checkpoint/2026-11-13-workflow-gate-audit.md)。
+- 走查与对账材料 = [fresh agent 走查](../research/workflow-entry-and-fact-checkpoint/2026-11-13-fresh-agent-walkthrough.md) / [规则 × 门禁对账](../research/workflow-entry-and-fact-checkpoint/2026-11-13-workflow-gate-audit.md)。
 - **入口**：活跃区只有一张探索卡，卡自述「不改产品代码」；`待落地` 不是任务源（[dev-loop:37](../../../docs/guides/dev-loop.md)）；fresh agent 只能纸面假设「用户点名 wiki FTS」才能继续。环路真实形状 = **backlog 是思考层，用户才是队列**（D32），但 `_backlog/AGENTS.md` 的五道门把 `待落地` 写得像「下一步」。
 - **一致性**：走查撞到 6 处文档自相矛盾——`_backlog/README.md` 落地出口「Note 回链」vs `implementation` 不建 Note；`notes/README.md` proposed = 未实施 vs 唯一 RFC 部分已实现；`data-model` 声称字段含 readers/writers 但表头没有；`src/README` 四个命令 vs 源码五个；`src/README` 把 language 合同/`client-copy` 写成将来时；`triggers.md` 不收「用户点名」。
 - **发现**：事实/载体问题不是 `dev-loop §3` 四问要求的，而是 `notes/README.md:108` 和 `tests/README.md:35` 顺带提的；`company-root-carriers` 在 `verify` 阶段才红，代码已写完。

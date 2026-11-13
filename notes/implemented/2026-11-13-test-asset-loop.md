@@ -2,7 +2,7 @@
 
 状态：implemented（B/C/A 三件 2026-11-13 落地）
 
-上游 = 用户 2026-11-13「按卡落地，静默自主、长期正确」；问题卡 = [test-asset-loop](../../_backlog/_archive/settled_issues/2026-11-13-test-asset-loop.md)；研究 = [dsh-test-strategy](../../_backlog/research/dsh-test-strategy/README.md)（缺口 D1/D5）。
+上游 = 用户 2026-11-13「按卡落地，静默自主、长期正确」；问题卡 = [test-asset-loop](../../_backlog/_archive/settled_issues/2026-11-13-test-asset-loop.md)；研究 = [dsh-test-strategy](../../_backlog/_archive/research/dsh-test-strategy/README.md)（缺口 D1/D5）。
 
 ## 决定
 

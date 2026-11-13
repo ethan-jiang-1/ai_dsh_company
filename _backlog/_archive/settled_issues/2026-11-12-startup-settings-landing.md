@@ -43,8 +43,8 @@ opened: 2026-11-12
 ## 已知与未决
 
 - 已知：`conversation.input.left` 只在有 sessionId 时渲染（`InputBar.tsx:467-469`）——无会话无入口，符合「项目跑起来才需要改」。
-- 已知：`wiki` 无现成机制（vendor 0 命中），本卡只做「存指针 + 注入指引」，wiki 内容形状归姊妹题（[wiki 研究](../../../_backlog/research/wiki-knowledge-map/README.md)）。
-- **已知（2026-11-12 晚间用户点名核实）：wiki 可以不在 workspace 里，且 agent 照读不误**。沙箱只限写、不限读（bwrap read-only host root + 写 workspace bind；策略文本只说 cannot modify/may modify），本机实测：读 `~/.dsh/...` 成功、`ls /Users/bowhead` 正常、写 `~/.dsh/zz-probe` → `Operation not permitted`。证据与推演 = [wiki 研究收口件 §4.1](../../../_backlog/research/wiki-knowledge-map/2026-11-12-wiki-in-dsh-possibility-space.md)。
+- 已知：`wiki` 无现成机制（vendor 0 命中），本卡只做「存指针 + 注入指引」，wiki 内容形状归姊妹题（[wiki 研究](../research/wiki-knowledge-map/README.md)）。
+- **已知（2026-11-12 晚间用户点名核实）：wiki 可以不在 workspace 里，且 agent 照读不误**。沙箱只限写、不限读（bwrap read-only host root + 写 workspace bind；策略文本只说 cannot modify/may modify），本机实测：读 `~/.dsh/...` 成功、`ls /Users/bowhead` 正常、写 `~/.dsh/zz-probe` → `Operation not permitted`。证据与推演 = [wiki 研究收口件 §4.1](../research/wiki-knowledge-map/2026-11-12-wiki-in-dsh-possibility-space.md)。
 - **已定（用户 2026-11-12 拍板）：wiki 指针 v1 只收本地目录**——值是一个目录路径，允许**绝对路径**（可在 workspace 外）；不做 http(s) URL。注入段要写明「只读外部知识、先读 `index.md` 再钻页、不要尝试写入」。
 - **随之而来的验收补充（并入 A7）**：wiki 既然指向本地目录，就要做**存在性校验**——目录不存在、或存在但缺 `index.md`，面板都要标出来，不静默沿用。「wiki 是自由指针所以永不失效」的写法会漏掉路径腐化（改名/搬家/换机器）。
 - 未决：面板开合是否记忆（不影响验收）；`startup.json` 是否需要 `updatedAt`（建议有，便于诊断）。

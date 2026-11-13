@@ -14,11 +14,11 @@ opened: 2026-11-12
 
 **当前情况（证据）：**
 - **指针已落地**：[启动设置卡](2026-11-12-startup-settings-landing.md) + [Note](../../../notes/implemented/2026-11-12-startup-settings.md)（`wiki` = 本地目录路径，可绝对、可在 workspace 外；注入段已写「外部目录只读、不要尝试写入」）+ 合同 [profile.md §项目启动策略](../../../docs/contracts/profile.md)。
-- **AK 模式一手考证**：三层（不可变 `raw/` + LLM 维护的 wiki + schema）、index.md/log.md、ingest/query（好答案回写）/lint 三操作；~100 来源规模 index+unix 工具足够（[主材料 §1.1](../../research/wiki-knowledge-map/2026-11-12-wiki-knowledge-map.md)）。
-- **OKF 规范**：Google Cloud Open Knowledge Format v0.2，官方自述"formalizes the LLM-wiki pattern"；唯一必需键 `type`，`description` 推荐，信任族（`sources`/`generated`/`verified`/`status`/`stale_after`）全 opt-in；每层目录 `index.md`、`log.md` ISO 日期、断链容忍（[OKF 材料 §1.4](../../research/wiki-knowledge-map/2026-11-12-okf-and-llm-knowledge-standards.md)）。
-- **只读边界已实测**：沙箱「read-only host root + 可写 workspace bind」，读不限、写限 workspace（[收口件 §4.1](../../research/wiki-knowledge-map/2026-11-12-wiki-in-dsh-possibility-space.md)）。→ wiki 在 workspace 外时 agent 天然只读，不需要额外机制。
-- **搜索阶梯**：L0 = index 先行 + 随包 ripgrep（`grep`/`glob` 默认挂载，零依赖）；L1 自建 FTS5 已有实测但**本卡不做**（[搜索生态 §7](../../research/wiki-knowledge-map/2026-11-12-oss-search-landscape.md)、[探针](../../research/wiki-knowledge-map/2026-11-12-selfbuilt-fts-probe.md)）。
-- **载体已盘点**：skill（catalog→body 按需加载）承载查询协议、`systemPrompt.section` 承载指针、fs 工具承载浏览——全部零新增 npm 依赖（[载体材料 §8](../../research/wiki-knowledge-map/2026-11-12-dsh-integration-carriers.md)）。
+- **AK 模式一手考证**：三层（不可变 `raw/` + LLM 维护的 wiki + schema）、index.md/log.md、ingest/query（好答案回写）/lint 三操作；~100 来源规模 index+unix 工具足够（[主材料 §1.1](../research/wiki-knowledge-map/2026-11-12-wiki-knowledge-map.md)）。
+- **OKF 规范**：Google Cloud Open Knowledge Format v0.2，官方自述"formalizes the LLM-wiki pattern"；唯一必需键 `type`，`description` 推荐，信任族（`sources`/`generated`/`verified`/`status`/`stale_after`）全 opt-in；每层目录 `index.md`、`log.md` ISO 日期、断链容忍（[OKF 材料 §1.4](../research/wiki-knowledge-map/2026-11-12-okf-and-llm-knowledge-standards.md)）。
+- **只读边界已实测**：沙箱「read-only host root + 可写 workspace bind」，读不限、写限 workspace（[收口件 §4.1](../research/wiki-knowledge-map/2026-11-12-wiki-in-dsh-possibility-space.md)）。→ wiki 在 workspace 外时 agent 天然只读，不需要额外机制。
+- **搜索阶梯**：L0 = index 先行 + 随包 ripgrep（`grep`/`glob` 默认挂载，零依赖）；L1 自建 FTS5 已有实测但**本卡不做**（[搜索生态 §7](../research/wiki-knowledge-map/2026-11-12-oss-search-landscape.md)、[探针](../research/wiki-knowledge-map/2026-11-12-selfbuilt-fts-probe.md)）。
+- **载体已盘点**：skill（catalog→body 按需加载）承载查询协议、`systemPrompt.section` 承载指针、fs 工具承载浏览——全部零新增 npm 依赖（[载体材料 §8](../research/wiki-knowledge-map/2026-11-12-dsh-integration-carriers.md)）。
 - **已知缺口（本卡要补）**：`startupRows` 现注「`wiki` 没有枚举集（自由指针），永远不算失效」（`src/lib/startup-settings.ts`）——路径会腐化（改名/搬家/换机器），现在会把模型指向不存在的目录。
 
 **未决问题（落地中自行定，不阻塞）：** 模板目录放 `content/wiki-template/` 还是 `content/wiki/`（倾向 `wiki-template`：明确它是起点不是内容）；skill 住 `presets/_shared/` 还是六个角色 preset 各一行（倾向 `_shared`，一处改全体生效）。

@@ -216,7 +216,7 @@ intent: 回答「怎么借鉴、先做什么、怎么算做到」——每项给
 |---|---|---|---|---|---|
 | 1 | 纯逻辑 / 编解码 / 数据变换 | unit | `tests/lib`、`tests/tools` | workflow schema enum / 结果截断丢数据 | 有 |
 | 2 | 服务 / 注册表 / 贡献生命周期 | unit + dispose | `tests/host`、`tests/client`（部分 dispose） | cultivation 行失败后丢动作 | 部分（host 侧 registry dispose 未点名） |
-| 3 | 导出形态 / 包入口 | 静态门 + 导出守卫 | [pack-exports](../../../tests/repo/pack-exports.spec.ts) + pack-shape | — | 有 |
+| 3 | 导出形态 / 包入口 | 静态门 + 导出守卫 | [pack-exports](../../../../tests/repo/pack-exports.spec.ts) + pack-shape | — | 有 |
 | 4 | 工具定义（schema / args / result） | unit（真 `tools.execute`）+ 组装 | `signoff-tool` 等行为 spec | ask-user 无脚本化应答路径 | 部分（无录制钉 schema） |
 | 5 | 模型可见文本（prompt / 描述 / 诊断） | **组装转录** | 只有真模型冒烟（抽样） | CEO 词汇漂移 / 未验证猜测入指令 | **缺**（D6） |
 | 6 | 会话 / 持久化 / 迁移 | unit + 世界断言 | ledger / presented / run-bundle specs | converge 崩溃留 journal / 重录不可回放 | 有 |

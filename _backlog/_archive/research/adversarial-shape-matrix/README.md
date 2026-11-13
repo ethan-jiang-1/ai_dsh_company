@@ -6,8 +6,9 @@ opened: 2026-11-13
 # 对抗性边界矩阵与跨载体一致性 spec：测试资产怎么补
 
 > 问题：测试资产为什么没拦住 66 个边界缺陷？要补什么样的资产，才能拦住下一批而不是再追一遍已知 bug？
-> 消费者：用户 2026-11-13 点名研究（承上一轮 git 复盘）；落地卡 = [2026-11-13 P0](../../_archive/settled_issues/2026-11-13-adversarial-shape-matrix-p0.md)。
-> 产出的卡：[2026-11-13 对抗性边界矩阵 P0](../../_archive/settled_issues/2026-11-13-adversarial-shape-matrix-p0.md)（已结）。
+> 消费者：用户 2026-11-13 点名研究（承上一轮 git 复盘）；落地卡 = [2026-11-13 P0](../../settled_issues/2026-11-13-adversarial-shape-matrix-p0.md)。
+> 产出的卡：[2026-11-13 对抗性边界矩阵 P0](../../settled_issues/2026-11-13-adversarial-shape-matrix-p0.md)（已结）。
+> 归档：2026-11-13
 > 结论：补三类资产 + 一道门禁——共享世界形状库、不变量矩阵（Safety / Agreement / Atomicity / Idempotence / Non-destruction / Convergence）、载体登记 + 门禁；P0 只覆盖 `company-root` / `safe-file` / `write-gate` 三个 choke point，不按 66 张卡逐张补测试；P1（startup/cultivation/ledger）与 P2 进程矩阵、TOCTOU 收窄同轮补做。
 
 ## 材料

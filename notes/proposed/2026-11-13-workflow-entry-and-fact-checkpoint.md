@@ -11,7 +11,7 @@ fresh-context 走查发现三层缺口，而不是一层：
 3. **发现**：事实/载体问题不是 `dev-loop §3` 四问要求的，而是 `notes/README.md` 和 `tests/README.md` 顺带提的；`company-root-carriers` 在 `verify` 阶段才红，代码已写完。
 4. **验收**：`proposals` 只查 `## 验收` 标题，空节也绿；`notes-liveness` 只查 `## 决定` 标题；`backlog-liveness` 的 `sectionBody` 只查非空，「待定/见 RFC」也绿；普通 feature 的红是自述；语义审连续 24 次「未执行」有记录。
 
-证据 = [fresh agent 走查](../../_backlog/research/workflow-entry-and-fact-checkpoint/2026-11-13-fresh-agent-walkthrough.md) / [规则 × 门禁对账](../../_backlog/research/workflow-entry-and-fact-checkpoint/2026-11-13-workflow-gate-audit.md)。
+证据 = [fresh agent 走查](../../_backlog/_archive/research/workflow-entry-and-fact-checkpoint/2026-11-13-fresh-agent-walkthrough.md) / [规则 × 门禁对账](../../_backlog/_archive/research/workflow-entry-and-fact-checkpoint/2026-11-13-workflow-gate-audit.md)。
 
 ## 事实与载体
 

@@ -424,7 +424,7 @@ const rulesText = readIfExists(join(contentDir, 'product-types', id, 'check-rule
 3. 【负证据·纠正锚点】`packages/settings/settings-file`：pin 内空目录、git 未跟踪（§4.1）。
 4. 【负证据】DSH settings modal 无公共 opener：壳 store 私有、shortcuts 无 execute-by-id、openSettings/openSection 仅 owner props（§3.2）。
 5. 【负证据】`workspaceFiles` remote 无 write（5 方法枚举，§4.3）。
-6. 【负证据】vendor pin 无 wiki 组件（`grep -rln wiki packages/*/*/src -i` 排除 node_modules 后 0 命中）；公司 host/content 亦无 wiki 机制——wiki 指针是新造面；姊妹研究 wiki-knowledge-map 材料已产出（[2026-11-12-wiki-knowledge-map.md](../../../research/wiki-knowledge-map/2026-11-12-wiki-knowledge-map.md)），推荐「wiki 根目录路径 + index.md 先行」指针格式（形状 A），落地时与本题 settings.wiki 字段合流。
+6. 【负证据】vendor pin 无 wiki 组件（`grep -rln wiki packages/*/*/src -i` 排除 node_modules 后 0 命中）；公司 host/content 亦无 wiki 机制——wiki 指针是新造面；姊妹研究 wiki-knowledge-map 材料已产出（[2026-11-12-wiki-knowledge-map.md](../wiki-knowledge-map/2026-11-12-wiki-knowledge-map.md)），推荐「wiki 根目录路径 + index.md 先行」指针格式（形状 A），落地时与本题 settings.wiki 字段合流。
 7. 【负证据】`content/delivery-modes/` 只有 2 个目录；productized 是隐式默认（§5.3）。
 8. 【限制】无 session 的纯空白 hero 没有公司可注入的 list 槽：`conversation.hero.options` 仅 sessionId 存在时渲染（`ConversationContent.tsx:133`），`input.left/right/model` 同样要 sessionId（InputBar.tsx:464-476）。红框按钮是 **session 作用域**——「启动配置」的编辑发生在会话已存在时；冷启动无会话态的入口需另议（§9）。
 9. 【限制】`ps` 被沙箱拒（`/bin/ps: Operation not permitted`）；进程身份证据改用 `lsof`（PID 58417 的 txt 段指向全局 DSH，§0）。未做浏览器截图/DOM 取证——红框位置由源码布局推论（§1.2），未像素级验证。

@@ -3,13 +3,15 @@ status: 待落地
 opened: 2026-11-12
 ---
 
-# 推敲：高复杂度面的持续探索（培养 / 委派 / run-bundle / 账本 / 客户端流）
+# 推敲：高复杂度面的持续探索（培养 / 委派 / run-bundle / 账本 / 客户端流 / PRD 闸门 / 验证元面）
 
 > 立卡：2026-11-12 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
 >
-> **结论/去向**：implementation — 本卡执行多轮探索 + 证据（发现缺陷另开 `_backlog/bugs/` 卡，从 BUG-090 起）；本卡不改产品代码。
+> **结论/去向**：implementation — 本卡执行多轮探索 + 证据（发现缺陷另开 `_backlog/bugs/` 卡；编号唯一源 = [bugs/README](../bugs/README.md) 的 Next BUG ID，2026-11-13 = BUG-152）；本卡不改产品代码。
 >
 > **授权边界**：静态 / keyless / 真挂载 / 真页面可自主；live 模型轮按每轮小预算、隔离 workspace 跑（入口与预算写在 Round 头）。不修产品代码；不改 vendor。
+>
+> **2026-11-13 焦点调整（focus v2）**：Round 85 后按新宪章执行——C1–C4 的文件形状轴由对抗矩阵接管；新增 C8（PRD headings / present 闸门）、C9（测试资产/验证元面）、C10（client 错误环）；见下方同名节。旧 Round 1–85 保留为历史，不改写。
 
 ## 问题与期望结果
 
@@ -17,42 +19,72 @@ opened: 2026-11-12
 
 **期望结果：** 每轮有：选面理由、期望表（独立 oracle）、实跑证据、H 判决（confirmed / refuted / unverified）、缺陷卡或观察、未跑面与 owner。没有「没有 bug」的结论；单场 live 不写稳定。
 
-**当前情况（2026-11-12 修复后）：**
+**当前情况（2026-11-13 focus v2 基线）：**
 
-- 起点 = `50878cd6`（BUG-080..089 修复）｜Note = [startup/wiki bug sweep](../../notes/implemented/2026-11-12-startup-strategy-wiki-bug-sweep.md)｜十张卡已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)｜活跃缺陷 = 空。
-- 修复后基线（Note 实测）：`pnpm test` 236 files/1761 tests；typecheck/lint/dup 绿；`verify` ALL PASS；`ui-scene-smoke --isolated --lang en` 10/10；`release-smoke` ALL PASS。本卡不重复这些全量门禁，只在需要的面抽样。
-- 已知开放点（Note「剩余风险」）：`fs.watch` 平台降级；内容包新增类型仍需重启；其它 host 命令仍中文；`/req` `/prd` 的 workspace 仍 boot 优先——都可作为后续宪章的种子，但不在本卡第一轮抢修。
-- 宪章的「低置信」判据：代码体量大 / 状态跨 home+workspace / 派生文件无新鲜度契约 / 有多进程或并发 / 测试只固定夹具 / 只在真页面或真 team 才暴露。
+- **当前基线（2026-11-13 19:26 实跑）**：`pnpm test` 247 files / 2034 tests；`pnpm verify` ALL PASS（2 门无对象：replay-fixture-freshness / replay-ui-freshness）；活跃缺陷 = **8**（BUG-152..159，2026-11-13 focus v2 首跑；只报不修）；对抗矩阵 `KNOWN_GAP = 0`；`packages/company-pack` version 0.11.6；census = 29 冒烟 / 67 探针 / 72 门禁 / 247 spec。
+- **历史起点（2026-11-12）**：`50878cd6`（BUG-080..089 修复）｜Note = [startup/wiki bug sweep](../../notes/implemented/2026-11-12-startup-strategy-wiki-bug-sweep.md)｜十张卡已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)｜当时基线 236 files / 1761 tests。该基线只作历史，不再当当前事实。
+- **后续已收口**：Round 15–85 找到 BUG-104..151（BUG-140 撤回、BUG-150 复核不成立）；2026-11-13 focus v2 首跑又开 BUG-152..159（见 Round 86–88）。
+- **已知开放点（历史 Note「剩余风险」）**：`fs.watch` 平台降级；内容包新增类型仍需重启；其它 host 命令仍中文；`/req` `/prd` 的 workspace 仍 boot 优先——保留为观察，不在 focus v2 首轮抢修。
+- **宪章的「低置信」判据**：代码体量大 / 状态跨 home+workspace / 派生文件无新鲜度契约 / 有多进程或并发 / 测试只固定夹具 / 只在真页面或真 team 才暴露。
+
+## 2026-11-13 调整（focus v2）
+
+> 触发：Round 85 后系统有四处变化，旧宪章的「文件形状」轴已被系统化。**本轮起不重跑形状枚举；C1–C4 只打矩阵未覆盖的命名缺口，新增 C8–C10。**
+
+**四处变化：**
+
+1. **形状轴由对抗矩阵接管**：`company-root-safety.spec.ts`（10 写入口 × 13 shape = 134 例）、`file-shape-agreement.spec.ts`、`startup-state-agreement.spec.ts`、`ledger-state-agreement.spec.ts`、`company-root-process.e2e.mjs`（16 项）、`tools/lib/carrier-registry.mjs`（15 载体 / `KNOWN_GAP = 0`）+ `company-root-carriers` 门禁；BUG-151 就是矩阵首跑抓的。剩余缺口只列四个：TOCTOU 窗口（recheck 后/rename 前）、真崩溃/fsync、读载体未进矩阵、内容解析器语义（startup/ledger 之外）。
+2. **测试资产改了证据规则**：`tests/` 六面 + 四后缀 lane（`*.spec.ts` / `*.e2e.mjs` / `*.entry.mjs` / `tests/checks/*.test.mjs`）；[asset-lanes.mjs](../../tools/lib/asset-lanes.mjs) 是唯一注册表；census = 29 冒烟 / 67 探针 / 72 门禁 / 247 spec；pre-push 按面 + 覆盖率棘轮。旧的 `*-smoke` / `golden` 名只作历史；新探索脚本留 `runtime/tmp/`，升常驻必须登记。
+3. **新产品面：PRD headings + present 闸门**：[prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts) 新 parser；[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts) 在 `present` 前 deny；[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts) 只有 5 个用例；[PRD headings Note](../../notes/implemented/2026-11-13-prd-headings-definition.md) 明确「真模型 present deny 端到端未跑」。这是 C1–C7 没覆盖的交付阻断面。
+4. **新验证/客户端面**：client 错误环（[error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts)）刚改；lane/pre-push/census 是新系统。错误环可能滤掉真错误；验证系统可能假绿——后者是「元 bug」，仍在本卡射程。
+
+**执行规则：**
+
+- **C1–C4**：只接受「命名矩阵缺口」或「行为/生命周期」假设；不接受「再试一个文件形状」。
+- **C8**：oracle 只用 PRD 模板 / requirements-model / D61 / `/prd check` 合同；不拿 `prd-check.ts` 当 oracle。
+- **C9**：oracle = 声明面（lane 注册表 / 门禁 / 失败类表）与实际行为；假绿/假跳过按测试资产缺口开卡或观察，本卡不修。
+- **C10**：oracle = 错误环的可见性/证据合同；只做小轮，可折进 C5。
+- **停止规则：** C8 ≤ 2 轮，C9/C10 各 ≤ 1 轮；到期未发现新材料即收口归档。没有命名缺口，不再开「换个形状试试」的轮次。
+
+**C8 首轮假设（keyless 已跑，完整表见 `## Round 86`）：** CRLF、围栏代码块、`numbering:` 空值、drafts vs final、meta 坏形状、路径别名、多 slug、AC 缩进、legacy 豁免、live present deny。首轮先跑 keyless；live 只用于 H10。
 
 ## 范围与排除项
 
-**范围（轮转宪章）：**
+**范围（轮转宪章 v2，2026-11-13；C1–C4 的形状轴 = matrix-owned）：**
+
+> C1–C4 只打矩阵未覆盖的命名缺口或行为/生命周期；C5–C7 保留残余行为/真入口；C8–C10 是 focus v2 新增。形状矩阵 = [Note](../../notes/implemented/2026-11-13-adversarial-shape-matrix.md)。
 
 | ID | 面 | 为什么低置信 | 首批入口 |
 |---|---|---|---|
-| C1 | **培养状态机 + 存储**（propose / adopt / reject / revoke / verify / archive / purge / check / journal / 方法层 / context） | 最大单文件 713 + storage 512 + client actions 726；跨 home 方法层与 workspace records；人侧命令 / GUI / 模型提案三条入口；append-only 与撤回并存 | `tests/host/cultivation/`、`tests/client/cultivation/`、`probes/session-context/cultivation-*`、[contract](./../../docs/contracts/cultivation.md) |
-| C2 | **委派 / team / workflow 生命周期** | seat、depth、spawn/wait/interrupt/send_message、member scope、task board、workflow durable view；多进程与冷恢复 | `checks/lanes/product-team-e2e.entry.mjs`、`probes/team/`、`tests/host/delegation/`、[contract](./../../docs/contracts/delegation.md) |
-| C3 | **run-bundle / workspace / lease / upgrade** | v3 身份、seed 只补缺、home 与 workspace 双轴、writer lease、外部盘、二次启动、迁移/回滚 | `checks/lanes/release.entry.mjs`、`external-workspace-smoke`、`company-entry-smoke`、`tests/host/run-bundle/` |
-| C4 | **账本 / 成品 / 治理导出** | presented ledger 派生、catalog、final.md、审计哈希、治理导出幂等/重建 | `tests/host/ledger/`、`probes/browser-visual/deliverables-catalog-probe.mjs`、[data-model](./../../docs/contracts/data-model.md) |
-| C5 | **任务板 / 在场 / DAG / 客户端流** | 文件派生 + 实时 follow + 多窗口/浮动/会话切换；stale/empty/error 三态 | `probes/fs-taskboard/`、`tests/client/`、`ui-scene-smoke --steps` |
-| C6 | **命令 / 解析 / 数据命令的 workspace** | `/req` `/prd` `/delivery` `/deliverables` 仍在 boot 优先；解析器与回执/locale 各写一份 | `tests/host/commands/`、`tests/content/`、`company-entry-smoke` |
-| C7 | **发布 / 安装 / 隔离** | tarball、plugin add/remove/upgrade、多 home、profile 共享、content 打包 | `release-smoke`、`multi-install-smoke`、`isolation-matrix-smoke`、`concurrent-home-smoke` |
+| C1 | **培养状态机 + 存储**（propose / adopt / reject / revoke / verify / archive / purge / check / journal / 方法层 / context） | **shape = matrix-owned**；只打行为/生命周期：跨 workspace 归属、revoke 后状态、迁移/回滚、journal 恢复；文件形状不再枚举 | `tests/host/cultivation/`、`tests/client/cultivation/`、`probes/session-context/cultivation-{propose,method-layer,context}-probe.mjs`、[contract](./../../docs/contracts/cultivation.md) |
+| C2 | **委派 / team / workflow 生命周期** | seat、depth、spawn/wait/interrupt/send_message、member scope、task board、workflow durable view；多进程与冷恢复；**写面形状/进程矩阵已覆盖，只打 live/durable 行为** | `checks/lanes/product-team-e2e.entry.mjs`、`probes/team/`、`tests/host/delegation/`、[contract](./../../docs/contracts/delegation.md) |
+| C3 | **run-bundle / workspace / lease / upgrade** | v3 身份、seed 只补缺、home 与 workspace 双轴、writer lease、外部盘、二次启动、迁移/回滚；**shape = matrix-owned**；只打跨 workspace/lease fencing/真崩溃恢复 | `checks/lanes/release.entry.mjs`、`checks/lanes/external-workspace.entry.mjs`、`checks/lanes/company-entry.entry.mjs`、`tests/host/run-bundle/` |
+| C4 | **账本 / 成品 / 治理导出** | presented ledger 派生、catalog、final.md、审计哈希、治理导出幂等/重建；**shape = matrix-owned**（10 写入口 × 13 shape + 4 读载体）；只打跨来源一致性/导出中断/账本降级 | `tests/host/ledger/`、`tests/host/contract/company-root-safety.spec.ts`、`probes/browser-visual/deliverables-catalog-probe.mjs`、[data-model](./../../docs/contracts/data-model.md) |
+| C5 | **任务板 / 在场 / DAG / 客户端流** | 文件派生 + 实时 follow + 多窗口/浮动/会话切换；stale/empty/error 三态 | `probes/fs-taskboard/`、`tests/client/`、`checks/lanes/ui-scene.entry.mjs`（`--isolated --steps`） |
+| C6 | **命令 / 解析 / 数据命令的 workspace** | `/req` `/prd` `/delivery` `/deliverables` 仍在 boot 优先；解析器与回执/locale 各写一份；**C8 管 prd 闸门，C6 管命令面** | `tests/host/commands/`、`tests/content/`、`checks/lanes/company-entry.entry.mjs`、`tests/host/commands/prd-command.spec.ts` |
+| C7 | **发布 / 安装 / 隔离** | tarball、plugin add/remove/upgrade、多 home、profile 共享、content 打包；用 0.11.6 当前产物重跑 | `checks/lanes/release.entry.mjs`、`checks/lanes/multi-install.entry.mjs`、`checks/lanes/isolation-matrix.entry.mjs`、`checks/lanes/concurrent-home.entry.mjs` |
+| **C8** | **PRD headings / present 闸门 / requirements-check** | 新交付阻断面：新 parser + 新旧兼容 + 模型可写输入；`present` 前 deny；只有 5 个 gate spec；Note 的 live deny 未跑；解析器对 CRLF/围栏/缩进的容错未证 | [prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts)、[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts)、[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts)、[prd 模板](../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../docs/reference/decisions.md) |
+| **C9** | **测试资产 / 验证元面**（lane 注册、pre-push、census、覆盖率） | 新「绿灯」的制造者：假绿/假跳过不会被产品 spec 抓到；新分支 zero-SHA 只 diff tip 已复现 | [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs)、[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs)、[CENSUS](../../tests/CENSUS.generated.md) |
+| **C10** | **client 错误环** | 新增过滤/持久化/上报；可能把真错误滤掉；真页面 lane 只在 weekly | [error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts)、`tests/client/wiring/error-ring.spec.ts`、`checks/lanes/client-error-chain.entry.mjs` |
 
 **排除：**
 
 - 修产品代码、改 contract / content / presets / vendor；发现缺陷只开卡或记录。
-- 重跑已闭合的启动策略/wiki 全量矩阵；除非宪章把它当**回归参考**（不与 C1–C7 同时展开）。
+- **不再枚举矩阵已覆盖的文件形状**（根/叶/中间目录 symlink、目录冒充文件、截断/坏 JSON、原子写半份等）；只有点名的矩阵缺口（TOCTOU 窗口、真崩溃/fsync、读载体覆盖、内容解析器语义）可以开假设。
+- **不把「矩阵绿」当「面已证」**：矩阵只证形状不变量，不证状态机 / 生命周期 / 真实交付；C8 的闸门与 C9 的假绿必须另证。
+- 重跑已闭合的启动策略/wiki 全量矩阵；除非宪章把它当**回归参考**（不与 C1–C10 同时展开）。
 - 把「跑绿」当结论；把单场 live 写成稳定；把未跑折成 PASS。
 - 发布声明 / 公有 registry；release-smoke 只作安装形状证据。
+- C9 的测试资产缺口只开卡/记观察，不在本卡修；C8/C10 的产品缺陷只开卡，不在本卡修。
 
 ## 方法（每轮固定）
 
-1. **选面 + 写期望**：从宪章选一个面，先写 8–12 条可证伪假设与独立 oracle（合同/归档验收/内容文件/vendor 行为），不拿实现当 oracle。
+1. **选面 + 写期望**：从宪章 v2 选一个面，先写 8–12 条可证伪假设与独立 oracle（合同/归档验收/内容文件/vendor 行为），不拿实现当 oracle。C8 的 oracle = PRD 模板 / requirements-model / D61 / `/prd check` 合同；C9 的 oracle = 声明面与实际行为；C10 的 oracle = 错误环的可见性/证据合同。
 2. **静态取证**：读代码、测试、probe、Note 的「未跑/剩余风险」；列出测试只在固定夹具上成立的判据。
 3. **对抗夹具**：优先 keyless 真文件/真 Cordis/真装配；为每条关键断言做一次最小破坏，看现有 spec/门禁是否真会红。
-4. **真实入口**：`preset-smoke` / `client-load-smoke` / `ui-scene-smoke --isolated --steps` / `release-smoke` 按面选择；live 只在必须回答模型行为时跑，用隔离 workspace/home。
-5. **判决 + 证据**：每格 PASS / FAIL / 未证 + 原因；FAIL 立刻开 `_backlog/bugs/` 卡（BUG-090 起）；观察标 owner。
-6. **回填**：本卡追加 `## Round N`（已跑面、H 判决、BUG 卡、未跑面）；不覆盖旧结论。
+4. **真实入口**：`checks/lanes/preset.entry.mjs` / `client-load.entry.mjs` / `ui-scene.entry.mjs` / `release.entry.mjs` / `company-root-process.e2e.mjs` 按面选择；C8 live 只用于 `present` deny 端到端；live 用隔离 workspace/home。
+5. **判决 + 证据**：每格 PASS / FAIL / 未证 + 原因；FAIL 立刻开 `_backlog/bugs/` 卡（编号 = [bugs/README](../bugs/README.md) 的 Next，当前 152）；C9 的假绿/假跳过同样开卡或观察；观察标 owner。
+6. **回填**：本卡追加 `## Round N`（已跑面、H 判决、BUG 卡、未跑面）；不覆盖旧结论；新探索脚本留 `runtime/tmp/`，升常驻必须登记 [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs)。
 
 ## Round 1（C1 培养状态机/存储）
 
@@ -1154,7 +1186,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 **判定：** 本轮没有新增独立缺陷；147/148/149 是同一 company-root 迁移漏项（export/bundle/cultivation-log）。C7 空格/unicode 路径 PASS；C5 guide PASS。
 
-**验证：** `pnpm test` 238 files / 1827 tests passed；`pnpm verify` 仍红在 A 的 research 文档 bare-path（`_backlog/research/adversarial-shape-matrix/2026-11-13-design.md`），非本轮 BUG 卡。
+**验证：** `pnpm test` 238 files / 1827 tests passed；`pnpm verify` 仍红在 A 的 research 文档 bare-path（`_backlog/_archive/research/adversarial-shape-matrix/2026-11-13-design.md`），非本轮 BUG 卡。
 
 **未跑：** C2 live workflow；root symlink 下 installMethod/revoke/log；A 收口 research 后的 verify。
 
@@ -1458,6 +1490,77 @@ TypeError: Cannot read properties of undefined (reading 'map')
 **未证（已登记，不算结论）：** C2 三 run 乱序；C7 release profile 最新重跑；C1/C4 更深真实文件面。
 
 **判定：** 宪章 C1–C7 均有明确结论，active 空；Goal 可收口。
+
+## Round 86（C8 首轮 · keyless）
+
+**状态：** keyless 已跑（2026-11-13）；live H10 **未跑**。本节追加判决与证据，不覆盖旧 Round。
+
+**选面理由：** `prd-check.ts` 的新 headings parser 与 `prd-gate.ts` 是 2026-11-13 新增的交付阻断面：前者解析模型写的 PRD，后者在 `present` 前 deny。它们同时具备「新解析器 + 新旧兼容 + 模型可写输入 + 只在真实交付才暴露」四个低置信特征；现有 gate spec 只有 5 例，Note 明确「真模型 present deny 端到端未跑」。本轮只打这一面，不改产品代码。
+
+**C8 首轮假设（先写死）：**
+
+| ID | 假设 | oracle |
+|---|---|---|
+| H1 | CRLF 的合法 PRD 被判「没有 `### REQ-###` 定义小节」→ `/prd check` 红、present 闸门 deny | 合法文档不因换行符变红；模板 / `/prd check` 合同 |
+| H2 | 围栏代码块里的 `### REQ-###` 被当定义，产生幽灵需求/假红 | 定义点 = 小节；示例不是定义 |
+| H3 | `numbering:` 空值被闸门当旧动议放行；`/req check` 却报「不在词表」 | 编号合同：新动议必须 `identity`；空值 ≠ 未声明 |
+| H4 | 闸门只读 `drafts/{mrd,prd}.md`；`present` 交的是 `final.md`，drafts 缺失/过期时闸门放行或按旧内容判 | 交付物合同：present 的对象到底是哪份文件 |
+| H5 | `meta.md` 是 symlink/目录时 `readTextInside` 返回 undefined → 闸门静默放行 | safe-file 语义：meta 不可读 ≠ 旧动议 |
+| H6 | `deliverableOf` 是词法解析；deliverables 目录 symlink/路径别名可让闸门查错目录或跳过 | present 的真实解析路径 vs 闸门路径 |
+| H7 | 一次 present 多个 slug 只报第一个 deny；后续坏 slug 的错误不聚合 | 闸门回执的可操作性 |
+| H8 | AC 必须 2 空格、given 必须 4 空格；模型用 4/6 空格就「acceptance 为空」 | 模板形状 vs 解析器容错 |
+| H9 | 新动议忘写 `numbering` 即被当旧动议豁免，闸门形同虚设 | 闸门的 stated boundary：兼容还是漏洞 |
+| H10 | 真模型 `present` 被 deny 后能否读懂错误并在下一轮修好 | Note 未跑的端到端；小预算 1 条 prompt |
+
+**首批入口：** `tests/lib/prd-check.spec.ts`、`tests/host/commands/prd-gate.spec.ts`、`tests/host/commands/prd-command.spec.ts`、[prd 模板](../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../docs/reference/decisions.md)；keyless 脚本留 `runtime/tmp/`；live 用隔离 workspace/home。
+
+**首跑结果（2026-11-13 keyless）：**
+
+| H | 判决 | 证据 / BUG |
+|---|---|---|
+| H1 CRLF/BOM | **confirmed** | [BUG-152](../bugs/BUG-152-prd-headings-crlf-bom.md)；CRLF PRD false；BOM PRD false |
+| H2 围栏 | **confirmed** | [BUG-153](../bugs/BUG-153-prd-headings-fenced-code-blocks.md)；fenced REQ/Slices false |
+| H3 numbering 空值 | **confirmed** | [BUG-154](../bugs/BUG-154-prd-gate-numbering-empty-value.md)；gate allow / validate false |
+| H4 drafts vs final | **unverified（设计边界）** | 闸门只读 drafts；drafts 缺失按旧动议 fail-open；未开卡 |
+| H5 meta 坏形状 | **confirmed** | [BUG-156](../bugs/BUG-156-prd-gate-symlink-unreadable-fail-open.md)；meta symlink allow |
+| H6 路径/根别名 | **confirmed** | [BUG-155](../bugs/BUG-155-prd-gate-stale-session-cwd.md) + [BUG-156](../bugs/BUG-156-prd-gate-symlink-unreadable-fail-open.md)；cwd 分叉 + deliverables 根 symlink |
+| H7 多 slug | **unverified** | 未跑；代码只返回首个 deny；未见独立缺陷 |
+| H8 AC 缩进 | **confirmed（严格）** | 4 空格 AC → `acceptance 不能为空`；模板/技能规定 2/4 空格，判为内容不合约，未开卡 |
+| H9 legacy 豁免 | **confirmed（设计）** | 缺 `numbering` → allow；模板要求新动议写 identity；观察，不另开卡 |
+| H10 live deny | **unverified** | 未跑；需真模型/隔离 workspace；显式保留 |
+
+**本轮开卡：** BUG-152、153、154、155、156；相邻形状探针另开 BUG-157。**证据：** `runtime/tmp/c8-round1.mts` / `.log`、`runtime/tmp/c8-structural.mts` / `.log`。
+
+## Round 87（C9 首轮 · pre-push 范围）
+
+**状态：** keyless 已跑（2026-11-13）；无 live。
+
+**选面理由：** pre-push 是 focus v2 新增的「按面必跑」门；范围计算是唯一决定跑不跑的地方，假绿不会被产品 spec 抓到。
+
+| H | 判决 | 证据 / BUG |
+|---|---|---|
+| 新分支 remote 全零只 diff tip | **confirmed** | [BUG-158](../bugs/BUG-158-pre-push-zero-sha-range.md)；合成分支 `bd8eff1`；dry-run 未触发 |
+| 删除分支 local 全零 | **confirmed** | 同卡；`runtime/tmp/c9-delete.log` → bad object |
+| SURFACE_RULES 只覆盖 client/presets/content | **confirmed（观察）** | `src/host/commands/prd-gate.ts` 改动不命中任何 surface glob；`pnpm test` 仍跑 gate spec，但没有真 present；不另开卡 |
+| `--ci` 跳过 browser/model | **pass（设计）** | skip 清单打印；不新开 |
+
+**结果：** 1 张卡（BUG-158，两个 zero-SHA 形状同根）；C9 观察 1 条。**证据：** `runtime/tmp/c9-delete.log`、`runtime/tmp/c9-newbranch-refs`、`runtime/tmp/c9-delete-refs`。
+
+## Round 88（C10 首轮 · client 错误环）
+
+**状态：** keyless 已跑；真页面未跑。
+
+**选面理由：** 2026-11-13 刚改错误环的 `null` 分支；同类「非 Error 形状」可能把真错误滤掉。
+
+| H | 判决 | 证据 / BUG |
+|---|---|---|
+| `error: {}` + `message` | **confirmed** | [BUG-159](../bugs/BUG-159-client-error-ring-empty-object-message.md)；`c10-error-ring` 第一条 `"{}"` |
+| `error: null` | **pass** | 第二条 `null-error message` |
+| string error | **pass** | 第三条 `string error` |
+| console.error 多参 / 跨 realm Error | **unverified** | 未跑；保留 |
+
+**结果：** 1 张卡（BUG-159）；真页面未跑。**证据：** `runtime/tmp/c10-error-ring.mts` / `.log`。
+
 ## 证据、判据与处置
 
 - **oracle 纪律**：先写期望，再看实现；不拿实现当 oracle；spec 绿只说明覆盖，不说明行为正确。
@@ -1474,17 +1577,22 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 1. 每个宪章至少跑一轮，或逐项写「未跑 + 原因 + owner」；每轮有期望 vs 实测与证据坐标。
 2. 每轮假设全部判决（confirmed / refuted / unverified + 原因）；confirmed 有 BUG 卡或观察落点；不写「没有 bug」。
-3. 发现缺陷立即开 `_backlog/bugs/` 卡（编号从 BUG-090 起），本卡不改产品代码。
+3. 发现缺陷立即开 `_backlog/bugs/` 卡（编号唯一源 = [bugs/README](../bugs/README.md) 的 Next，当前 152），本卡不改产品代码。
 4. 每轮回填 `## Round N`，并同步 `_backlog/issues/README.md` 活跃索引；`pnpm verify` 保持 ALL PASS。
-5. 用户叫停或所有宪章有明确结论时，按关闭条件收口；审查记录写 `审查：agent｜用户｜跳过 — 理由`。
+5. focus v2：C8–C10 每面至少一轮，或逐项写「未跑 + 原因」；C8 的 H10（真模型 present deny）若未跑，必须写未跑，不能折成 PASS。
+6. 用户叫停或所有宪章有明确结论时，按关闭条件收口；审查记录写 `审查：agent｜用户｜跳过 — 理由`。
 
 ## 关闭条件
 
-- C1–C7 每面至少一轮，或逐项写未跑原因；每轮 H 全部判决；所有 finding 已分诊。
+- C1–C7 每面至少一轮，或逐项写未跑原因；C8–C10 各至少一轮，或逐项写未跑原因；每轮 H 全部判决；所有 finding 已分诊。
+- **停止规则（focus v2）**：C8 ≤ 2 轮，C9/C10 各 ≤ 1 轮；到期未发现新材料即收口归档。没有命名的矩阵缺口，不再开「换个文件形状试试」的轮次。
 - 不写「没有 bug」；未覆盖面保留并标 owner；单场 live 不写成稳定。
 - 证据可复读；`pnpm verify` + `pnpm test` 绿；审查记录齐后归档。
 
 ## 执行记录（Round 追加）
 
+- 2026-11-13 ｜ focus v2 调整（非 Round）｜ 本卡 + issues/README ｜ 基线 247/2034；C1–C4 形状轴转 matrix-owned；新增 C8–C10 ｜ `pnpm verify` ALL PASS ｜ Round 86 当时预写；随后已跑，见下。
+- 2026-11-13 ｜ Round 86（C8）｜ `runtime/tmp/c8-round1.mts` / `c8-structural.mts` ｜ CRLF/BOM、围栏、numbering 空值、cwd、symlink 五个 confirmed；8 张卡 BUG-152..159 ｜ `pnpm verify` ALL PASS ｜ live H10 未跑。
+- 2026-11-13 ｜ Round 87/88（C9/C10）｜ `pre-push` dry-run、`c10-error-ring.mts` ｜ pre-push zero-SHA、错误环 `{}` confirmed ｜ 同 BUG-158/159 ｜ 真页面未跑。
 - 每轮：日期 ｜ 宪章 ｜ 命令/会话 id ｜ 期望 vs 实测 ｜ 证据坐标 ｜ 判定。
 - BUG 卡链接放这里；未跑面逐条保留。

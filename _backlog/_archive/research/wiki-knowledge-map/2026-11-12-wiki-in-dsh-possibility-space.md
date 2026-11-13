@@ -159,4 +159,4 @@ M2 + **workflow 并行 ingest**（vp-eng 脚本 fan-out：每 child 一个来源
 ## 8. 材料索引
 
 - 证据底座：[主材料](2026-11-12-wiki-knowledge-map.md)（AK/llms.txt/DeepWiki/AGENTS.md 一手 + 仓内现状）、[OKF](2026-11-12-okf-and-llm-knowledge-standards.md)、[搜索生态](2026-11-12-oss-search-landscape.md)、[DSH 家底](2026-11-12-dsh-retrieval-inventory.md)、[载体](2026-11-12-dsh-integration-carriers.md)、[探针](2026-11-12-selfbuilt-fts-probe.md)、[父会话交接](2026-11-12-parent-handoff.md)
-- 跨题：[startup-settings](../../_archive/research/startup-settings/README.md)（已定性：settings 入口 + 双轨持久化）
+- 跨题：[startup-settings](../startup-settings/README.md)（已定性：settings 入口 + 双轨持久化）

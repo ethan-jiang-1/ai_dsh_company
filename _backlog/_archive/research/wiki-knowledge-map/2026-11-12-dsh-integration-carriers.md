@@ -53,7 +53,7 @@ intent: wiki 六功能（ingest/query/lint/browse/grow/configure）可挂载的�
 
 **【事实】** 公司 pack 现有 client 注册 **6 处**（`packages/company-pack/src/client/index.ts`，全部 `slots.inject + register`）：`conversation.view`（L180，培养主视图）、`tool.call.toolview`（L226/230，两张工具卡）、`sidebar.brand.name`（L238）、`sidebar.session.row.leading`（L245）、`conversation.session.header.actions`（L275，任务板按钮）。
 
-**【事实】** 平台原语与槽都在（[startup-settings](../../_archive/research/startup-settings/2026-11-12-startup-settings.md) §1.3-1.5、§3.3 一手）：`ui-primitives.Modal`（"Centered dialog over a page mask"，README L59）、`ui-slots` 四型（single/list/keyed/chain）、`ui-renderer.registry.ts` 的 `slots.inject(name, callback)`（"The controller belongs to the caller's fiber, so plugin unload cancels a pending wait and removes any active contribution"）。公司已依赖 `ui-primitives` / `ui-slots`，`dsh.client.inject` 已含 `ui-conversation`。
+**【事实】** 平台原语与槽都在（[startup-settings](../startup-settings/2026-11-12-startup-settings.md) §1.3-1.5、§3.3 一手）：`ui-primitives.Modal`（"Centered dialog over a page mask"，README L59）、`ui-slots` 四型（single/list/keyed/chain）、`ui-renderer.registry.ts` 的 `slots.inject(name, callback)`（"The controller belongs to the caller's fiber, so plugin unload cancels a pending wait and removes any active contribution"）。公司已依赖 `ui-primitives` / `ui-slots`，`dsh.client.inject` 已含 `ui-conversation`。
 
 **【推论】** 三种浏览形状，成本递增：① **右栏页签**（`sidebarRightTabs` + `sidebarRight.float`，公司已有页签先例）——成本最低，适合 index 树 + 页内容；② **`conversation.view` 主视图**（培养主视图同款）——整页，适合图谱/搜索；③ **`Modal`**（startup-settings 推荐形状）——适合快速查一条。**【建议】** 浏览面板不是第一优先：wiki 是 markdown，agent 用 fs 工具即可，人浏览可用 Quartz/Obsidian（零代码，且 Quartz 本地静态站用 node 起服务就够）；client 面板等「人要在 GUI 里查 wiki」成真实需求再做，起步可先右栏页签（成本最低）。
 

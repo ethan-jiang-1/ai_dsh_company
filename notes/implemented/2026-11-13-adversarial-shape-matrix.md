@@ -3,7 +3,7 @@
 状态：implemented（2026-11-13 落地；验证见下）
 
 上游 = 用户 2026-11-13：「开成一个 issue」「我们的流程推动落地吧」「没做的都应该做掉」；卡 = [对抗性边界矩阵 P0](../../_backlog/_archive/settled_issues/2026-11-13-adversarial-shape-matrix-p0.md)（已结）。
-设计依据 = [研究稿](../../_backlog/research/adversarial-shape-matrix/2026-11-13-design.md)。
+设计依据 = [研究稿](../../_backlog/_archive/research/adversarial-shape-matrix/2026-11-13-design.md)。
 
 ## 问题
 

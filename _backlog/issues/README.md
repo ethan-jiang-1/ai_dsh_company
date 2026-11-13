@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-- [2026-11-12 高复杂度面持续探索（培养/委派/run-bundle/账本/客户端流）](2026-11-12-deep-surface-continuous-bug-hunt.md) — 按 C1–C7 宪章轮转；BUG 从 090 起；不修产品代码。
+- [2026-11-12 高复杂度面持续探索（培养/委派/run-bundle/账本/客户端流）](2026-11-12-deep-surface-continuous-bug-hunt.md) — C1–C7 + focus v2（C8 PRD 闸门 / C9 验证元面 / C10 错误环）；C1–C4 形状轴由矩阵接管；BUG 从 152 起；不修产品代码。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 
