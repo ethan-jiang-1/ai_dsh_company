@@ -2,7 +2,10 @@
 // 状态：常驻
 // 何时跑：present 事件 → catalog/账本接线、run bundle 路径改动后
 // 成本：秒级 keyless（临时 home/workspace + host apply + 假 session/event；不调模型）
-// 用法：node checks/smoke/present-catalog-smoke.mjs
+// 用法：node --import tsx/esm checks/smoke/present-catalog-smoke.mjs
+// 为什么带 tsx：本脚本 import src/**.ts（源码面）；plain node 的 strip-only 模式不支持参数属性等
+//   TS-only 语法——2026-11-13 release --verify 实测 ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX
+//   （startup-watch.ts:104 的 constructor 参数属性）。
 //
 // 证明：host apply 注册的 session/event 监听把 `.dsh-company/deliverables/.../final.md` 的 present
 // 写进 host-only 账本，并重生成 `.dsh-company/kb/deliverables-index.json`；workspace 不写旧 W 账本。

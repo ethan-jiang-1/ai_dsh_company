@@ -260,7 +260,9 @@ function verify() {
     ['company-entry-smoke', [process.execPath, ['checks/smoke/company-entry-smoke.mjs'], true]],
     ['client-load-smoke', [process.execPath, ['checks/smoke/client-load-smoke.mjs'], true]],
     ['preset-smoke', [process.execPath, ['checks/smoke/preset-smoke.mjs'], true]],
-    ['present-catalog-smoke', [process.execPath, ['checks/smoke/present-catalog-smoke.mjs'], false]],
+    // 源码面 smoke：import src/**.ts，plain node 的 strip-only 不支持参数属性等 TS-only 语法；
+    // 用仓库源码面 loader（tsx）跑，别让一条静默红冒充发布验收。
+    ['present-catalog-smoke', [process.execPath, ['--import', 'tsx/esm', 'checks/smoke/present-catalog-smoke.mjs'], false]],
   ]
   const checks = {}
   for (const [name, [command, argv, needsEnv]] of commands) {

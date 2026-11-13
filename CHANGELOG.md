@@ -2,6 +2,22 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.11.6 — 2026-11-13
+
+### Fixed
+
+- 公司状态盘的 symlink/越界防线：`.dsh-company` 根、中间目录、叶子被 symlink 或文件替换时，读面不跟随、写面不越界（catalog / ledger / startup / bootstrap / export / bundle / cultivation / revoke-journal / upgrade log 全接安全读写；BUG-090..151 批次）。
+- 任务板 merge 改为按 revision + null 基座，取消认领清 owner；board / dag / tasks 的流错误提示统一。
+- 导出与备份先 staging 再 swap，失败可回滚；saved workspace 用 temp+rename，坏文件可诊断。
+- 并发写者 lease 心跳校验 token、锁路径分类，stale 接管只认存活判据；升级日志先做叶子目标预检。
+- 发布/导出清单补齐 wiki 模板与共享 skill。
+
+### Changed
+
+- 启动与状态读写的坏形状各自报因（坏 JSON / symlink / 越界），不再静默回退。
+- 首跑文档收敛：fresh clone 顺序只在 bootstrap 一处（install → bundle:init → setup），AGENTS 命令表只留指针。
+- 维护者：对抗性边界矩阵覆盖 13 种根/叶/内容形状 × 写入口/读载体 + 进程 smoke；rename 前 recheck 收窄 TOCTOU 窗口（Node 无 renameat 的残余窗口见 Note）。
+
 ## 0.11.5 — 2026-11-11
 
 ### Changed
