@@ -20,8 +20,8 @@ description: Use when finishing any non-trivial change before reporting it done,
 
 1. **对照授权原文。** 翻回用户/条目的原话读一遍，逐条问「这条做到了吗」。
    机器绿灯不覆盖这一问。范围外多做的东西也要点出来（不是功劳，是没被要求的东西）。
-2. **证据四链点名**（挂得上 / 行为对 / 装得上〔适用时〕/ 批准）：每条点名**实跑的检查**；
-   没跑的**如实标「未执行」**——不混入"应该跑了"的暗示。
+2. **证据四链点名**（挂得上 / 行为对 / 装得上〔适用时〕/ 批准）：每条点名**实跑的检查**，并带三列——**层 / 失败类 / 负控（见过红）**；
+   没跑的**如实标「未执行」**——不混入"应该跑了"的暗示；一类失败没证据就写进「未覆盖」（词表 = [tests/failure-classes.md](../../../tests/failure-classes.md)）。
    **发布类声明另加**：声称 READY/已发布，必须贴 `node tools/release.mjs --check` 的原始 READY 行 + commit SHA；
    没有输出行的 READY 不算证据（2026-11-03 0.8.2 A- 收口的实况：Note 写了 READY，`--check` 实际红）。
 3. **语义审**（四输入 = [policy.md §P5](../../../docs/policy.md)）：带①授权/验收原文 ②该面合同文档（docs 只写 now，同 diff 更新了吗）

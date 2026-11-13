@@ -1,0 +1,792 @@
+{
+  "generatedAt": "2026-11-13",
+  "files": {
+    "packages/company-pack/src/index.ts": {
+      "statements": 63.38,
+      "branches": 58.33
+    },
+    "packages/company-pack/src/client/index.ts": {
+      "statements": 68.65,
+      "branches": 14.28
+    },
+    "packages/company-pack/src/client/locales.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/roles.ts": {
+      "statements": 69.23,
+      "branches": 58.33
+    },
+    "packages/company-pack/src/client/cultivation/CultivationBoard.tsx": {
+      "statements": 100,
+      "branches": 84.61
+    },
+    "packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx": {
+      "statements": 85.71,
+      "branches": 75.77
+    },
+    "packages/company-pack/src/client/cultivation/CultivationChatPanel.tsx": {
+      "statements": 78.87,
+      "branches": 63.11
+    },
+    "packages/company-pack/src/client/cultivation/CultivationCompose.tsx": {
+      "statements": 90.51,
+      "branches": 81.08
+    },
+    "packages/company-pack/src/client/cultivation/CultivationContextPicker.tsx": {
+      "statements": 73.43,
+      "branches": 66.66
+    },
+    "packages/company-pack/src/client/cultivation/CultivationInbox.tsx": {
+      "statements": 84.61,
+      "branches": 79.61
+    },
+    "packages/company-pack/src/client/cultivation/CultivationView.tsx": {
+      "statements": 65.82,
+      "branches": 50
+    },
+    "packages/company-pack/src/client/cultivation/cultivation-actions.ts": {
+      "statements": 63.77,
+      "branches": 87.14
+    },
+    "packages/company-pack/src/client/cultivation/cultivation-context-data.ts": {
+      "statements": 92,
+      "branches": 71.29
+    },
+    "packages/company-pack/src/client/cultivation/cultivation-data.ts": {
+      "statements": 70,
+      "branches": 56.81
+    },
+    "packages/company-pack/src/client/cultivation/use-cultivation-board.tsx": {
+      "statements": 84.93,
+      "branches": 82.14
+    },
+    "packages/company-pack/src/client/data/company-data-plane.ts": {
+      "statements": 60,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/data/company-identity.ts": {
+      "statements": 84,
+      "branches": 68.18
+    },
+    "packages/company-pack/src/client/data/deliverables-index.ts": {
+      "statements": 94.28,
+      "branches": 92.1
+    },
+    "packages/company-pack/src/client/data/session-source.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/data/use-company-data.ts": {
+      "statements": 98,
+      "branches": 86.95
+    },
+    "packages/company-pack/src/client/data/workspace-text.ts": {
+      "statements": 83.33,
+      "branches": 72.72
+    },
+    "packages/company-pack/src/client/startup/StrategyButton.tsx": {
+      "statements": 75,
+      "branches": 91.66
+    },
+    "packages/company-pack/src/client/startup/StrategyPanel.tsx": {
+      "statements": 44.82,
+      "branches": 77.5
+    },
+    "packages/company-pack/src/client/startup/startup-store.ts": {
+      "statements": 40,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/tabs/AttentionTab.tsx": {
+      "statements": 84.48,
+      "branches": 58.62
+    },
+    "packages/company-pack/src/client/tabs/CultivationTab.tsx": {
+      "statements": 94.44,
+      "branches": 50
+    },
+    "packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx": {
+      "statements": 91.66,
+      "branches": 77.14
+    },
+    "packages/company-pack/src/client/tabs/DeliverablesTab.tsx": {
+      "statements": 89.65,
+      "branches": 68.81
+    },
+    "packages/company-pack/src/client/tabs/LedgerTab.tsx": {
+      "statements": 97.87,
+      "branches": 87.5
+    },
+    "packages/company-pack/src/client/tabs/TasksPanel.tsx": {
+      "statements": 80,
+      "branches": 60.6
+    },
+    "packages/company-pack/src/client/tabs/company-panels.tsx": {
+      "statements": 70.96,
+      "branches": 77.39
+    },
+    "packages/company-pack/src/client/tabs/company-tab-registration.ts": {
+      "statements": 97.82,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/tabs/company-tabs.tsx": {
+      "statements": 75,
+      "branches": 51.51
+    },
+    "packages/company-pack/src/client/tabs/tab-copy.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/ui/Brand.tsx": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/ui/DelegationCard.tsx": {
+      "statements": 77.77,
+      "branches": 55.55
+    },
+    "packages/company-pack/src/client/ui/RoleBadge.tsx": {
+      "statements": 100,
+      "branches": 87.5
+    },
+    "packages/company-pack/src/client/ui/TeamToolCard.tsx": {
+      "statements": 81.42,
+      "branches": 56.12
+    },
+    "packages/company-pack/src/client/ui/float-geometry.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/ui/styles.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/ui/tab-icons.tsx": {
+      "statements": 96.66,
+      "branches": 25
+    },
+    "packages/company-pack/src/client/wiring/attention-observers.ts": {
+      "statements": 96.66,
+      "branches": 87.5
+    },
+    "packages/company-pack/src/client/wiring/attention-registry.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/wiring/company-session-adapters.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/wiring/context-wiring.ts": {
+      "statements": 95,
+      "branches": 93.33
+    },
+    "packages/company-pack/src/client/wiring/delegation-keys.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/client/wiring/error-ring.ts": {
+      "statements": 90.55,
+      "branches": 75.3
+    },
+    "packages/company-pack/src/client/wiring/instance-guard.ts": {
+      "statements": 98.14,
+      "branches": 80
+    },
+    "packages/company-pack/src/client/wiring/member-navigation.ts": {
+      "statements": 100,
+      "branches": 83.33
+    },
+    "packages/company-pack/src/client/wiring/title-state.ts": {
+      "statements": 100,
+      "branches": 93.75
+    },
+    "packages/company-pack/src/host/commands/blocked-text.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/host/commands/client-diagnostics.ts": {
+      "statements": 78.57,
+      "branches": 65.38
+    },
+    "packages/company-pack/src/host/commands/command-workspace.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/host/commands/content-id.ts": {
+      "statements": 77.77,
+      "branches": 71.42
+    },
+    "packages/company-pack/src/host/commands/deliverable-path.ts": {
+      "statements": 85.71,
+      "branches": 81.25
+    },
+    "packages/company-pack/src/host/commands/deliverables-command.ts": {
+      "statements": 91.17,
+      "branches": 76.66
+    },
+    "packages/company-pack/src/host/commands/delivery-command.ts": {
+      "statements": 87.01,
+      "branches": 77.35
+    },
+    "packages/company-pack/src/host/commands/prd-command.ts": {
+      "statements": 96.77,
+      "branches": 90
+    },
+    "packages/company-pack/src/host/commands/req-command.ts": {
+      "statements": 92.66,
+      "branches": 82.91
+    },
+    "packages/company-pack/src/host/commands/settings-command.ts": {
+      "statements": 93.1,
+      "branches": 67.61
+    },
+    "packages/company-pack/src/host/commands/signoff-tool.ts": {
+      "statements": 83.33,
+      "branches": 100
+    },
+    "packages/company-pack/src/host/cultivation/cultivation-context-read.ts": {
+      "statements": 80.64,
+      "branches": 66.3
+    },
+    "packages/company-pack/src/host/cultivation/cultivation-storage.ts": {
+      "statements": 80.55,
+      "branches": 74.88
+    },
+    "packages/company-pack/src/host/cultivation/cultivation.ts": {
+      "statements": 77.75,
+      "branches": 74.45
+    },
+    "packages/company-pack/src/host/cultivation/revoke-journal.ts": {
+      "statements": 79.66,
+      "branches": 72.34
+    },
+    "packages/company-pack/src/host/delegation/delegation-control.ts": {
+      "statements": 89.62,
+      "branches": 83.72
+    },
+    "packages/company-pack/src/host/delegation/delegation-terminal.ts": {
+      "statements": 94.11,
+      "branches": 80
+    },
+    "packages/company-pack/src/host/delegation/seat.ts": {
+      "statements": 100,
+      "branches": 95.83
+    },
+    "packages/company-pack/src/host/delegation/subagent-retry.ts": {
+      "statements": 81.11,
+      "branches": 77.35
+    },
+    "packages/company-pack/src/host/delegation/team-seat-guard.ts": {
+      "statements": 89.47,
+      "branches": 83.33
+    },
+    "packages/company-pack/src/host/delegation/workflow-runs.ts": {
+      "statements": 89.42,
+      "branches": 85.1
+    },
+    "packages/company-pack/src/host/fs/safe-file.ts": {
+      "statements": 89.47,
+      "branches": 90.9
+    },
+    "packages/company-pack/src/host/language/company-language.ts": {
+      "statements": 97.77,
+      "branches": 92
+    },
+    "packages/company-pack/src/host/ledger/catalog-state.ts": {
+      "statements": 80.64,
+      "branches": 75.86
+    },
+    "packages/company-pack/src/host/ledger/catalog.ts": {
+      "statements": 88.73,
+      "branches": 88.63
+    },
+    "packages/company-pack/src/host/ledger/governance-export.ts": {
+      "statements": 91.54,
+      "branches": 87.09
+    },
+    "packages/company-pack/src/host/ledger/presented-domain.ts": {
+      "statements": 83.49,
+      "branches": 66.21
+    },
+    "packages/company-pack/src/host/ledger/presented-ledger.ts": {
+      "statements": 75.42,
+      "branches": 62.5
+    },
+    "packages/company-pack/src/host/logging/rotating-log.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/host/prompt/contracts.ts": {
+      "statements": 91.3,
+      "branches": 92.85
+    },
+    "packages/company-pack/src/host/prompt/delegation-contracts.ts": {
+      "statements": 96.29,
+      "branches": 91.42
+    },
+    "packages/company-pack/src/host/prompt/handbook.ts": {
+      "statements": 78.12,
+      "branches": 76.19
+    },
+    "packages/company-pack/src/host/prompt/language-policy.ts": {
+      "statements": 93.75,
+      "branches": 80
+    },
+    "packages/company-pack/src/host/run-bundle/bootstrap.ts": {
+      "statements": 86.6,
+      "branches": 80.18
+    },
+    "packages/company-pack/src/host/run-bundle/bundle-manifest.ts": {
+      "statements": 87.37,
+      "branches": 85.45
+    },
+    "packages/company-pack/src/host/run-bundle/company-root.ts": {
+      "statements": 86.18,
+      "branches": 83.65
+    },
+    "packages/company-pack/src/host/run-bundle/config.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/host/run-bundle/lease.ts": {
+      "statements": 86.17,
+      "branches": 78.84
+    },
+    "packages/company-pack/src/host/run-bundle/paths.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/host/run-bundle/profiles.ts": {
+      "statements": 91.66,
+      "branches": 88.88
+    },
+    "packages/company-pack/src/host/run-bundle/run-bundle.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/host/run-bundle/runtime-guard.ts": {
+      "statements": 77.58,
+      "branches": 64.28
+    },
+    "packages/company-pack/src/host/run-bundle/write-gate.ts": {
+      "statements": 88.88,
+      "branches": 75
+    },
+    "packages/company-pack/src/host/startup/startup-prompt.ts": {
+      "statements": 95.23,
+      "branches": 93.1
+    },
+    "packages/company-pack/src/host/startup/startup-store.ts": {
+      "statements": 95.65,
+      "branches": 87.5
+    },
+    "packages/company-pack/src/host/startup/startup-watch.ts": {
+      "statements": 77.77,
+      "branches": 77.35
+    },
+    "packages/company-pack/src/host/startup/startup-workspace.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/host/workspace/dangerous-roots.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/host/workspace/workspace-doors.ts": {
+      "statements": 81.81,
+      "branches": 66.66
+    },
+    "packages/company-pack/src/host/workspace/workspace-registry.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/host/workspace/workspace-resolution.ts": {
+      "statements": 90.56,
+      "branches": 86
+    },
+    "packages/company-pack/src/lib/abortable.ts": {
+      "statements": 100,
+      "branches": 80
+    },
+    "packages/company-pack/src/lib/attention.ts": {
+      "statements": 97.29,
+      "branches": 95.83
+    },
+    "packages/company-pack/src/lib/board.ts": {
+      "statements": 100,
+      "branches": 92.72
+    },
+    "packages/company-pack/src/lib/budget.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/cultivation-context.ts": {
+      "statements": 87.08,
+      "branches": 80.29
+    },
+    "packages/company-pack/src/lib/cultivation-feedback.ts": {
+      "statements": 100,
+      "branches": 96
+    },
+    "packages/company-pack/src/lib/cultivation-inbox.ts": {
+      "statements": 100,
+      "branches": 91.66
+    },
+    "packages/company-pack/src/lib/cultivation-record.ts": {
+      "statements": 94.01,
+      "branches": 91.73
+    },
+    "packages/company-pack/src/lib/cultivation.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/dag.ts": {
+      "statements": 99.29,
+      "branches": 84.05
+    },
+    "packages/company-pack/src/lib/delegation-capabilities.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/delegation-surface.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/delegation-tree.ts": {
+      "statements": 100,
+      "branches": 95.83
+    },
+    "packages/company-pack/src/lib/deliverables-address.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/deliverables-catalog.ts": {
+      "statements": 98.61,
+      "branches": 86.36
+    },
+    "packages/company-pack/src/lib/doors.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/guards.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/ledger.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/prd-check.ts": {
+      "statements": 78.51,
+      "branches": 67.16
+    },
+    "packages/company-pack/src/lib/presence-status.ts": {
+      "statements": 95.83,
+      "branches": 88.23
+    },
+    "packages/company-pack/src/lib/presence.ts": {
+      "statements": 94.16,
+      "branches": 80.31
+    },
+    "packages/company-pack/src/lib/requirements-check.ts": {
+      "statements": 91.88,
+      "branches": 73.91
+    },
+    "packages/company-pack/src/lib/retry-policy.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/role-copy.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/run-bundle-paths.ts": {
+      "statements": 75,
+      "branches": 0
+    },
+    "packages/company-pack/src/lib/signoff.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/startup-command-copy.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/startup-settings.ts": {
+      "statements": 96.47,
+      "branches": 94.62
+    },
+    "packages/company-pack/src/lib/text.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/tool-card.ts": {
+      "statements": 100,
+      "branches": 90.9
+    },
+    "packages/company-pack/src/lib/yaml-scalar.ts": {
+      "statements": 100,
+      "branches": 90
+    },
+    "tools/lib/asset-lanes.mjs": {
+      "statements": 89.47,
+      "branches": 75
+    },
+    "tools/lib/audit-verdict.mjs": {
+      "statements": 100,
+      "branches": 75
+    },
+    "tools/lib/authorship.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/backlog-liveness.mjs": {
+      "statements": 94.27,
+      "branches": 90
+    },
+    "tools/lib/candidate-scan.mjs": {
+      "statements": 89.52,
+      "branches": 87.67
+    },
+    "tools/lib/carrier-registry.mjs": {
+      "statements": 0,
+      "branches": 100
+    },
+    "tools/lib/cdp-attach.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/checks-index.mjs": {
+      "statements": 93.75,
+      "branches": 71.87
+    },
+    "tools/lib/claim-loser-evidence.mjs": {
+      "statements": 100,
+      "branches": 84.48
+    },
+    "tools/lib/collaboration-evidence.mjs": {
+      "statements": 98.2,
+      "branches": 90.95
+    },
+    "tools/lib/company-roles.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/company-tab-catalog.mjs": {
+      "statements": 95.83,
+      "branches": 92.3
+    },
+    "tools/lib/converge-rules.mjs": {
+      "statements": 96.66,
+      "branches": 91.5
+    },
+    "tools/lib/coverage-baseline.mjs": {
+      "statements": 98.21,
+      "branches": 84.9
+    },
+    "tools/lib/delegation-model.mjs": {
+      "statements": 72.82,
+      "branches": 69.86
+    },
+    "tools/lib/deliverables-audit.mjs": {
+      "statements": 91.21,
+      "branches": 76.22
+    },
+    "tools/lib/deliverables-catalog.mjs": {
+      "statements": 100,
+      "branches": 97.36
+    },
+    "tools/lib/deliverables.mjs": {
+      "statements": 100,
+      "branches": 97.8
+    },
+    "tools/lib/dev-install.mjs": {
+      "statements": 92.15,
+      "branches": 89.06
+    },
+    "tools/lib/diagnosis.mjs": {
+      "statements": 0,
+      "branches": 100
+    },
+    "tools/lib/entry-probe.mjs": {
+      "statements": 94.64,
+      "branches": 96.15
+    },
+    "tools/lib/install-manual.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/kb-seeds.mjs": {
+      "statements": 89.23,
+      "branches": 81.66
+    },
+    "tools/lib/keyless-imports.mjs": {
+      "statements": 89.61,
+      "branches": 87.27
+    },
+    "tools/lib/markdown-links.mjs": {
+      "statements": 97.01,
+      "branches": 94.11
+    },
+    "tools/lib/market-index.mjs": {
+      "statements": 96.77,
+      "branches": 67.24
+    },
+    "tools/lib/member-stale-evidence.mjs": {
+      "statements": 100,
+      "branches": 92.5
+    },
+    "tools/lib/methods-init.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/notes-audit.mjs": {
+      "statements": 95.07,
+      "branches": 81.63
+    },
+    "tools/lib/orient.mjs": {
+      "statements": 95.71,
+      "branches": 88.04
+    },
+    "tools/lib/pack-source.mjs": {
+      "statements": 100,
+      "branches": 90
+    },
+    "tools/lib/pin-transaction.mjs": {
+      "statements": 95.31,
+      "branches": 83.78
+    },
+    "tools/lib/probe-kit.mjs": {
+      "statements": 100,
+      "branches": 93.33
+    },
+    "tools/lib/probe-steps.mjs": {
+      "statements": 93.75,
+      "branches": 90.24
+    },
+    "tools/lib/probe-web.mjs": {
+      "statements": 97.61,
+      "branches": 100
+    },
+    "tools/lib/probe-window.mjs": {
+      "statements": 0,
+      "branches": 0
+    },
+    "tools/lib/prune-runtime.mjs": {
+      "statements": 100,
+      "branches": 90
+    },
+    "tools/lib/quality-loop.mjs": {
+      "statements": 93.87,
+      "branches": 79.72
+    },
+    "tools/lib/question-stop.mjs": {
+      "statements": 96.61,
+      "branches": 84.48
+    },
+    "tools/lib/recovery-scope-evidence.mjs": {
+      "statements": 97.93,
+      "branches": 90.55
+    },
+    "tools/lib/rehearsal.mjs": {
+      "statements": 93.75,
+      "branches": 80
+    },
+    "tools/lib/replay-fixture-freshness.mjs": {
+      "statements": 93.93,
+      "branches": 80
+    },
+    "tools/lib/replay-logic.mjs": {
+      "statements": 95.45,
+      "branches": 91.66
+    },
+    "tools/lib/repository-layout.mjs": {
+      "statements": 97.39,
+      "branches": 92.92
+    },
+    "tools/lib/runtime-home.mjs": {
+      "statements": 92,
+      "branches": 88.88
+    },
+    "tools/lib/session-diagnose.mjs": {
+      "statements": 93.75,
+      "branches": 72.04
+    },
+    "tools/lib/session-evidence.mjs": {
+      "statements": 94.54,
+      "branches": 75.49
+    },
+    "tools/lib/session-log-generation.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/session-log.mjs": {
+      "statements": 53.84,
+      "branches": 58.33
+    },
+    "tools/lib/snapshot-index.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/src-layering.mjs": {
+      "statements": 96.15,
+      "branches": 86.88
+    },
+    "tools/lib/surface-matrix.mjs": {
+      "statements": 87.2,
+      "branches": 70
+    },
+    "tools/lib/team-barrier-evidence.mjs": {
+      "statements": 100,
+      "branches": 88.75
+    },
+    "tools/lib/team-concurrency-verdict.mjs": {
+      "statements": 80,
+      "branches": 100
+    },
+    "tools/lib/tracked-secrets.mjs": {
+      "statements": 92.85,
+      "branches": 75
+    },
+    "tools/lib/tracked-token.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/ui-golden.mjs": {
+      "statements": 97.5,
+      "branches": 71.87
+    },
+    "tools/lib/workspace-oracle.mjs": {
+      "statements": 96.29,
+      "branches": 94.62
+    }
+  },
+  "exemptions": [
+    {
+      "path": "tools/lib/carrier-registry.mjs",
+      "reason": "写入口登记表：由 company-root-carriers 门禁间接消费，尚无直接 spec",
+      "removeWhen": "改这个文件时同 diff 补 spec，或删除/合并进 safe-file"
+    },
+    {
+      "path": "tools/lib/diagnosis.mjs",
+      "reason": "诊断工具的纯逻辑，当前只被 tools/diagnose.mjs 调用，无直接 spec",
+      "removeWhen": "下一次改诊断面时补 spec"
+    },
+    {
+      "path": "tools/lib/probe-window.mjs",
+      "reason": "探针窗口 helpers，当前无直接 spec",
+      "removeWhen": "下一次动 probe 基础设施时补 spec 或删掉该文件"
+    },
+    {
+      "path": "packages/company-pack/src/client/startup/startup-store.ts",
+      "reason": "启动策略面板的既有状态层，当前 40%（2026-11-13 实测）；补测另卡",
+      "removeWhen": "下一次改启动策略面时补测并删除本豁免"
+    },
+    {
+      "path": "packages/company-pack/src/client/startup/StrategyPanel.tsx",
+      "reason": "启动策略面板组件，当前 44.8%（2026-11-13 实测）；静态渲染断言不全",
+      "removeWhen": "下一次改启动策略面时补测并删除本豁免"
+    }
+  ]
+}

@@ -64,6 +64,8 @@ jobs:
       # 首几周若因干净环境差异红，按实际结果修环境或把对应资产标 ciSafe:false + 理由，不删资产。
       - run: node checks/smoke/all-keyless.mjs --ci
         timeout-minutes: 25
+      - run: node checks/audit/coverage-ratchet.mjs
+        timeout-minutes: 10
 
   install-channel:
     runs-on: ubuntu-latest

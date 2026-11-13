@@ -30,11 +30,11 @@
 [upgrade-while-running-smoke](smoke/upgrade-while-running-smoke.mjs)
 [workflow-contract-smoke](smoke/workflow-contract-smoke.mjs)
 
-## 盘面审计（checks/audit/，5）
+## 盘面审计（checks/audit/，6）
 
 [authorship-audit](audit/authorship-audit.mjs) · [candidate-scan-eval](audit/candidate-scan-eval.mjs)
-[deliverables-check](audit/deliverables-check.mjs) · [journal-audit](audit/journal-audit.mjs)
-[surface-matrix-audit](audit/surface-matrix-audit.mjs)
+[coverage-ratchet](audit/coverage-ratchet.mjs) · [deliverables-check](audit/deliverables-check.mjs)
+[journal-audit](audit/journal-audit.mjs) · [surface-matrix-audit](audit/surface-matrix-audit.mjs)
 
 ## 窄机制与视觉探针（probes/，69）
 

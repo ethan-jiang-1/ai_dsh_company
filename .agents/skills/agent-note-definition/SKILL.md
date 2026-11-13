@@ -26,6 +26,7 @@ description: Use when writing or updating a file under notes/ and before claimin
 3. **写四件**：决定 / **输掉的方案**（必载——没写击败了什么的决定会重新开讼）/ 后果 / **验证**。
    备选只记录真实考虑过的，不编造。
 4. **验证必须来自真跑过的命令**，写明命令、断言什么、**红长什么样**——让实施者不看对话就能复现。
+   验证表三列：**层 / 失败类 / 负控（见过红）**；另写一节「未覆盖」（哪一类、为什么现在不做、什么条件下补）。失败类词表 = [tests/failure-classes.md](../../../tests/failure-classes.md)。
    被阻断的检查如实写「阻断 + 原因」。**未验的不得写 implemented**。
    这里的 temptations 是「跑了 verify 就写全绿」：只跑过 verify 就只写 verify，别把没跑的那几道写成绿。
 5. **事实落点保持现行。** 决定的**正文冻结**（翻案要新 Note + 交叉链接），但**路径/符号/默认值随改动就地改新**。

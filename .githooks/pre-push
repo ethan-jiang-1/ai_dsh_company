@@ -3,7 +3,7 @@
 # 为什么：DSH 立场——"Agents follow enforced gates far more reliably than prose conventions"。
 #       实测 2026-11-13：冷分项和 ~44s（verify 8.3 + typecheck 5.4 + lint/dup 1.4 + smoke:fast 2.4 + test 26）；热缓存全链 29–35s（两次实测；test 14–18s）。
 #       仍守「hook 只装便宜高置信缺陷」的边界：慢 E2E（安装/发布/真模型）不进 hook。
-#       分工 = hook 管「忘跑」（verify+typecheck+lint+dup+smoke:fast+surface+test 都强制），CI 管「环境差异/绕过」（verify 穷举档）。
+#       分工 = hook 管「忘跑」（verify+typecheck+lint+dup+smoke:fast+surface+coverage 都强制），CI 管「环境差异/绕过」（verify 穷举档）。
 #        test 进 hook 而非 CI（2026-09-28 实证定界）：vitest 的 vendor 内部 @deepseek-ai/* 解析依赖
 #        已构建 lib——本地 dev 树按 bootstrap 必然已构建所以跑得动；CI 干净环境没有，而补齐 =
 #        全量 vendor 构建链（DSH 自己的 test 脚本也是 build && vitest），负担不成比例。
@@ -37,4 +37,5 @@ pnpm -s dup || { rm -f "$refs_file"; exit 1; }
 pnpm -s smoke:fast || { rm -f "$refs_file"; exit 1; }
 node checks/pre-push-surfaces.mjs --stdin "$refs_file" || { rm -f "$refs_file"; exit 1; }
 rm -f "$refs_file"
-exec pnpm test
+# 覆盖率 = 执行下限（C 件）：跑全量测试并比基线棘轮（只升不降；新文件有下限；已知空洞须豁免）。
+exec node checks/audit/coverage-ratchet.mjs
