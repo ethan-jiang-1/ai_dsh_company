@@ -84,7 +84,7 @@ upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、c
 - `packages/company-pack/README.md` Data 节：按 6+2 分行（D/C/W/U/S/H/K/X），把 `U` 与 `H` 拆开，
   `I`/`R`/`B` 降为「派生/宿主登记/客户端边界」说明；补「W 是模型可写内容、H 是宿主账本」。
 - `tests/presets/presets.spec.ts` 的 T4 措辞改为「未注入指令面；workspace 文件可被 fs 读取」。
-- `checks/smoke/preset-smoke.mjs`：expected 集改成「包内 + 本角色方法层」的数据感知集合；仍断言
+- `checks/lanes/preset.entry.mjs`：expected 集改成「包内 + 本角色方法层」的数据感知集合；仍断言
   看不见其他角色；用临时 home 或先把方法层清空两种方式至少选一种并在头注写明。
 - 培养记录加 `schema: 1`：`recordText` 写新字段，`parseRecord` 缺字段按 1 读；旧记录不改写。
 - client-errors 日志迁 `$DSH_HOME/logs/company-client-errors.log`（保留旧
@@ -158,7 +158,7 @@ upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、c
   「写者·通道」列或制造死链 → 对应门禁红，还原 → 绿。
 - `pnpm test tests/presets tests/host tests/client` 绿；新增 records schema 断言在实现前红
   （旧解析器不写 `schema`）→ 实现后绿；红样可临时删 `recordText` 的 schema 行。
-- `source run/env.sh && node checks/smoke/preset-smoke.mjs` 绿；在 dev profile 方法层放一个
+- `source run/env.sh && node checks/lanes/preset.entry.mjs` 绿；在 dev profile 方法层放一个
   `SKILL.md` 后旧断言红（extra skill）→ 数据感知后绿。
 - 新 home 白名单检查：首启前红（client-errors 在公司盘/白名单外）→ 迁移后绿；二启零变更。
 - `pnpm typecheck` 绿（host/client 类型面）。

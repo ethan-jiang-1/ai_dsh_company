@@ -43,7 +43,7 @@
 
 - `pnpm test tests/client`：`13` 个文件、`74 passed`。
 - 行高绿：同一探针 `{"width":1440,"rows":29,"maxLines":2,"buttons":7,"clipped":7,…}`、`{"width":390,…,"maxLines":2,"buttons":16,"clipped":16,…}`，键盘/鼠标/触屏三路展开全文一致；**buttons == clipped** ⇒ 被裁必有入口。
-- `source run/env.sh && node checks/smoke/client-load-smoke.mjs`：`ALL PASS`（重打包后复跑）。
+- `source run/env.sh && node checks/lanes/client-load.entry.mjs`：`ALL PASS`（重打包后复跑）。
 - `pnpm verify`、`git diff --check`：通过。
 
 ### 现场（真浏览器/真模型，均不进 `pnpm test`）

@@ -38,7 +38,7 @@
 3. **恢复未完成项**：读原工作记录，核对相关合同、未提交 diff 与必要现场，从已证实缺口继续。若恢复的是问题推敲，先读 [_backlog/](../../_backlog/README.md) 章程、相关 [问题卡](../../_backlog/issues/README.md) 和按需 [方法](../../_backlog/methods/README.md)；卡片状态或结论不扩大用户授权。
 
 **四类常设规则**（只读 Notes 的边界、先澄清再 RFC、Plan Mode、长程 goal 写法）= [policy.md §P1](../policy.md)。
-**10 分钟样例（改一行 → 有证据）**：改 `presets/ceo/agent.cordis.yml` 的 persona 一句 → `pnpm test tests/presets` → `source run/env.sh && node checks/smoke/preset-smoke.mjs` → `node checks/smoke/ui-scene-smoke.mjs --isolated --expected` → `pnpm verify`；末行应看到 `Tests … passed` / `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset）` / `金样一致（全部公司页签）` / `verify: ALL PASS`。纯文案改动也要跑 preset-smoke（挂载失败只有它抓得住）。
+**10 分钟样例（改一行 → 有证据）**：改 `presets/ceo/agent.cordis.yml` 的 persona 一句 → `pnpm test tests/presets` → `source run/env.sh && node checks/lanes/preset.entry.mjs` → `node checks/lanes/ui-scene.entry.mjs --isolated --expected` → `pnpm verify`；末行应看到 `Tests … passed` / `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset）` / `金样一致（全部公司页签）` / `verify: ALL PASS`。纯文案改动也要跑 preset-smoke（挂载失败只有它抓得住）。
 
 ## 1. 执行链：从授权到有证据交接
 
@@ -75,14 +75,14 @@
 **教训（R2）**：会话级门禁最初写成"五角色 × 三探针按 KB 事实断言内容"——串行 30 分钟没跑完，慢轮次
 150s+ 会把超时判定拖垮。用户裁定：**"先要它通，对不对没那么重要。"**
 
-**做法**：同一个门禁脚本分两档，默认快档（`checks/smoke/probe-smoke.mjs` 是范例）。
+**做法**：同一个门禁脚本分两档，默认快档（`checks/lanes/probe.entry.mjs` 是范例）。
 
 | 档 | 判据 | 成本 |
 |---|---|---|
 | **连通档（默认）** | 每角色一句 ping（"只回复两个字：在岗，不要调用工具"），断言四件事：① `session/create` 成功（preset 行 config 全过）② 日志出现新 `turn/end` ③ assistant 正文非空 ④ **人格进 prompt**（`system/message` 含角色标记） | 全角色并发 **≈6s** |
 | 内容档（`--full`） | 身份 / 知识 / 产出三探针，按 KB 事实与 veto 语义断言 | 5–10min，按需 |
 
-**要点（可迁移到别的面）**：五条设计要点（"通"不考内容／从权威日志读事实／问句要短／完成信号用持久事件／慢是常态）写在范例脚本头注 = [`checks/smoke/probe-smoke.mjs`](../../checks/smoke/probe-smoke.mjs)（2026-09-26 从本节搬出，一处事实一个家）。
+**要点（可迁移到别的面）**：五条设计要点（"通"不考内容／从权威日志读事实／问句要短／完成信号用持久事件／慢是常态）写在范例脚本头注 = [`checks/lanes/probe.entry.mjs`](../../checks/lanes/probe.entry.mjs)（2026-09-26 从本节搬出，一处事实一个家）。
 
 **门禁升格判据 = [policy.md §P2](../policy.md)**。
 

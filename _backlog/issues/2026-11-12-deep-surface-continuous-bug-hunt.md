@@ -31,8 +31,8 @@ opened: 2026-11-12
 | ID | 面 | 为什么低置信 | 首批入口 |
 |---|---|---|---|
 | C1 | **培养状态机 + 存储**（propose / adopt / reject / revoke / verify / archive / purge / check / journal / 方法层 / context） | 最大单文件 713 + storage 512 + client actions 726；跨 home 方法层与 workspace records；人侧命令 / GUI / 模型提案三条入口；append-only 与撤回并存 | `tests/host/cultivation/`、`tests/client/cultivation/`、`probes/session-context/cultivation-*`、[contract](./../../docs/contracts/cultivation.md) |
-| C2 | **委派 / team / workflow 生命周期** | seat、depth、spawn/wait/interrupt/send_message、member scope、task board、workflow durable view；多进程与冷恢复 | `checks/smoke/product-team-e2e-smoke.mjs`、`probes/team/`、`tests/host/delegation/`、[contract](./../../docs/contracts/delegation.md) |
-| C3 | **run-bundle / workspace / lease / upgrade** | v3 身份、seed 只补缺、home 与 workspace 双轴、writer lease、外部盘、二次启动、迁移/回滚 | `checks/smoke/release-smoke.mjs`、`external-workspace-smoke`、`company-entry-smoke`、`tests/host/run-bundle/` |
+| C2 | **委派 / team / workflow 生命周期** | seat、depth、spawn/wait/interrupt/send_message、member scope、task board、workflow durable view；多进程与冷恢复 | `checks/lanes/product-team-e2e.entry.mjs`、`probes/team/`、`tests/host/delegation/`、[contract](./../../docs/contracts/delegation.md) |
+| C3 | **run-bundle / workspace / lease / upgrade** | v3 身份、seed 只补缺、home 与 workspace 双轴、writer lease、外部盘、二次启动、迁移/回滚 | `checks/lanes/release.entry.mjs`、`external-workspace-smoke`、`company-entry-smoke`、`tests/host/run-bundle/` |
 | C4 | **账本 / 成品 / 治理导出** | presented ledger 派生、catalog、final.md、审计哈希、治理导出幂等/重建 | `tests/host/ledger/`、`probes/browser-visual/deliverables-catalog-probe.mjs`、[data-model](./../../docs/contracts/data-model.md) |
 | C5 | **任务板 / 在场 / DAG / 客户端流** | 文件派生 + 实时 follow + 多窗口/浮动/会话切换；stale/empty/error 三态 | `probes/fs-taskboard/`、`tests/client/`、`ui-scene-smoke --steps` |
 | C6 | **命令 / 解析 / 数据命令的 workspace** | `/req` `/prd` `/delivery` `/deliverables` 仍在 boot 优先；解析器与回执/locale 各写一份 | `tests/host/commands/`、`tests/content/`、`company-entry-smoke` |
@@ -259,8 +259,8 @@ opened: 2026-11-12
 
 **实跑：**
 
-1. `node checks/smoke/release-smoke.mjs --keep` → **ALL PASS**（built CLI → npm pack → 干净 `release-check` profile 真安装 → RPC → 首启/幂等/卸载重装）；profile 保留在 `runtime/harness-home/tmp/release-smoke-home/profiles/release-check`。
-2. `DSH_HOME=runtime/harness-home/tmp/release-smoke-home node checks/smoke/preset-smoke.mjs --profile release-check` → **ALL PASS**：
+1. `node checks/lanes/release.entry.mjs --keep` → **ALL PASS**（built CLI → npm pack → 干净 `release-check` profile 真安装 → RPC → 首启/幂等/卸载重装）；profile 保留在 `runtime/harness-home/tmp/release-smoke-home/profiles/release-check`。
+2. `DSH_HOME=runtime/harness-home/tmp/release-smoke-home node checks/lanes/preset.entry.mjs --profile release-check` → **ALL PASS**：
    - 6 角色 + 5 support 全部 `session/create` 挂上；
    - 六角色 `只看见自己的 skills` 全 PASS（含 `consulting-the-knowledge-map` 共享根）；
    - client 模块闭包 70 模块、本包缺失 0。
@@ -317,7 +317,7 @@ opened: 2026-11-12
 
 ## Round 11（C7 补：isolation-matrix / 外部盘 / 搬家）
 
-**实跑：** `node checks/smoke/isolation-matrix-smoke.mjs` → **ALL PASS**：
+**实跑：** `node checks/lanes/isolation-matrix.entry.mjs` → **ALL PASS**：
 - no-workspace：不建默认盘、不写 home bundle、输出可操作告警；
 - external：`external company`（含空格）workspace 首启落 v3 `bundle.json` 到 workspace，home 不写；
 - unsafe：`DSH_COMPANY_HOME=DSH_HOME` 不把公司盘写进 home 根；
@@ -1073,7 +1073,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 ## Round 61（C7 release-smoke / C5 company overview）
 
 **做了：**
-- `source run/env.sh && node checks/smoke/release-smoke.mjs` → **ALL PASS**（当前源码 tarball → 干净 profile 真安装 → RPC → 首启/幂等/补种/卸载重装）。
+- `source run/env.sh && node checks/lanes/release.entry.mjs` → **ALL PASS**（当前源码 tarball → 干净 profile 真安装 → RPC → 首启/幂等/补种/卸载重装）。
 - Playwright：选中任务会话 → 打开「培养」→ 点「公司总览 ↗」→ 看板 tab 出现，`.wk-board` 显示 task-1/task-2（写 PRD/复核 PRD、依赖 task-1、drift 警示）。
 - 任务板 tab 也显示 2 条任务。
 

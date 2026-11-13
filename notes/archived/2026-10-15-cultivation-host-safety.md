@@ -36,7 +36,7 @@
 | 临时去掉 instance-guard 清理里的两枚 `clearInterval` 后重跑上一条 | disposer 测试有牙齿 | 红：dispose 后泄漏的 beat 定时器续写自身心跳，`expected {...tab-other, tab-self…} to deeply equal {tab-other}`；还原后绿 4/4 |
 | `pnpm exec tsc -b packages/company-pack --pretty false` | host/client 两面类型 | 通过（无输出） |
 | `cd packages/company-pack && ../../node_modules/.bin/tsdown` | 两面产物构建 | Host/Client build complete（仅既有 `external` deprecation warning） |
-| `source run/env.sh && node checks/smoke/client-load-smoke.mjs` | 真浏览器装载 client 面（guard 挂 fiber 后挂载零失败） | ALL PASS：无 banner、零 loader 错误、品牌槽在场 |
+| `source run/env.sh && node checks/lanes/client-load.entry.mjs` | 真浏览器装载 client 面（guard 挂 fiber 后挂载零失败） | ALL PASS：无 banner、零 loader 错误、品牌槽在场 |
 | `source run/env.sh && node probes/session-context/cultivation-method-layer-probe.mjs` | 真 boot web 的方法层机制六判据 + 角色闸反例；判据⑤（adopt 部署方法 + 记录翻 adopted）正是本轮正文修复路径 | ALL PASS；另观察到运行中 cfo 会话 watcher 已刷新 catalog |
 | `set -o pipefail && pnpm verify && pnpm test` | 全门禁 + 全量 keyless | verify ALL PASS（含 md-links/bare-path/doc-budget/notes-liveness 对新 Note）；59 文件 / 556 测试 PASS |
 | replay-smoke | 会话级回归 | **未执行**（本轮改动面非会话级行为，最小证据档 = 上表命令族探针 + client 冒烟；已知基线失败签名见前轮 Note，未刷新夹具） |

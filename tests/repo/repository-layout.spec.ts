@@ -19,18 +19,18 @@ const scene = (path: string) => mkdirSync(join(root, 'snapshots', path), { recur
 
 describe('maintenance entry discovery', () => {
   it('finds nested active and archived entrypoints but excludes implementations and aliases', () => {
-    for (const name of ['checks/run-gates.mjs', 'checks/smoke/preset-smoke.mjs', 'probes/team/recovery-probe.mjs', 'tools/archive/harvest-probe.mjs']) script(name)
+    for (const name of ['checks/run-gates.mjs', 'checks/lanes/preset.entry.mjs', 'probes/team/recovery-probe.mjs', 'tools/archive/harvest-probe.mjs']) script(name)
     for (const name of ['tools/lib/private.mjs', 'tools/drivers/browser.mjs', '.cache/ignored.mjs']) script(name, '')
-    symlinkSync('checks/smoke/preset-smoke.mjs', join(root, 'checks/preset-smoke.mjs'))
-    expect(scriptEntries(root)).toEqual(['checks/run-gates.mjs', 'checks/smoke/preset-smoke.mjs', 'probes/team/recovery-probe.mjs', 'tools/archive/harvest-probe.mjs'])
+    symlinkSync('checks/lanes/preset.entry.mjs', join(root, 'checks/preset.entry.mjs'))
+    expect(scriptEntries(root)).toEqual(['checks/lanes/preset.entry.mjs', 'checks/run-gates.mjs', 'probes/team/recovery-probe.mjs', 'tools/archive/harvest-probe.mjs'])
   })
 
   it('rejects bad trigger, lifecycle and fixed-port fields at nested depth', () => {
     script('probes/nested/bad-probe.mjs', "// 状态：obsolete\nconst PORT = arg('port', '3099')\n")
-    script('checks/smoke/missing-smoke.mjs', '// 何时跑：fixture\n')
+    script('checks/lanes/missing.e2e.mjs', '// 何时跑：fixture\n')
     const report = inspectScripts(root)
     expect(report.missingTriggers).toEqual(['probes/nested/bad-probe.mjs'])
-    expect(report.missingStatus).toEqual(['checks/smoke/missing-smoke.mjs'])
+    expect(report.missingStatus).toEqual(['checks/lanes/missing.e2e.mjs'])
     expect(report.invalidStatus).toEqual(['probes/nested/bad-probe.mjs: 状态：obsolete'])
     expect(report.fixedPorts).toEqual(["probes/nested/bad-probe.mjs → '3099'"])
   })

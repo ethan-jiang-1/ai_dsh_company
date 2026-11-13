@@ -69,11 +69,11 @@ pnpm test:coverage                                # 观察档基线（tools/lib 
 npx vitest run tests/client/data/company-data-lifecycle.spec.ts   # 6/6（C3 新增）
 node probes/browser-visual/{presence,budget,attention}-panel-probe.mjs --fixture  # 三探针 ALL PASS
 # Phase E 全电池：
-node checks/smoke/preset-smoke.mjs                # ALL PASS 6 preset
-node checks/smoke/handbook-smoke.mjs              # ALL PASS（注入与隔离根）
-node checks/smoke/probe-smoke.mjs                 # ALL PASS 5/5 连通档
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation --record  # 第六次重录
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation            # ALL PASS 归一化零 diff 10s
+node checks/lanes/preset.entry.mjs                # ALL PASS 6 preset
+node checks/lanes/handbook-smoke.mjs              # ALL PASS（注入与隔离根）
+node checks/lanes/probe.entry.mjs                 # ALL PASS 5/5 连通档
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation --record  # 第六次重录
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation            # ALL PASS 归一化零 diff 10s
 # B5 零漂移证明：
 node tools/refactor-drift.mjs --compare …               # 721=721 含测试体指纹
 ```

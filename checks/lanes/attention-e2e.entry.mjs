@@ -21,7 +21,7 @@
 //
 // 分层（guides/dev-loop §9.1）：认证档——真模型 + 真浏览器 + 起进程，不进 `pnpm test`。
 // 排练场 cwd，真盘零接触。
-// 用法：source run/env.sh && node checks/smoke/attention-e2e-smoke.mjs [--dual-gate]
+// 用法：source run/env.sh && node checks/lanes/attention-e2e.entry.mjs [--dual-gate]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'

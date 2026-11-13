@@ -76,4 +76,4 @@ tests/entry-probe.spec 夹具。
 
 - index.md：D32 行 + D23+D24 行退役互链（D19+D21 行依据同步换新家）。
 - intents.md +1 行指针；AGENTS.md/README.md 活层指针已改。
-- `scripts/entry-probe-smoke.mjs` 头注触发条件同步（下次入口链文档改动后照常跑）。
+- `scripts/entry-probe.entry.mjs` 头注触发条件同步（下次入口链文档改动后照常跑）。

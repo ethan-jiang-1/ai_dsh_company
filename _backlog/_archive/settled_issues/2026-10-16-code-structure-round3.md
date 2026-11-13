@@ -79,7 +79,7 @@ opened: 2026-10-16
 
 目标形状：新文件 `presence-status.ts`（src/lib，约 70 行）= PresenceStatus、STATUS_LABEL、presenceStatusFromPhase、statusLabelFor、PRESET_DISPLAY_NAMES、displayNameFor；presence.ts 保留折算并再导出词汇模块（facade）。
 
-零外观改动证据链：8 个 client importer 不动；host 入口 `export *` 不动；[replay-smoke](../../../checks/smoke/replay-smoke.mjs) 经 built 入口拿 presenceFromEvents 不动；pack-exports 只钉 inject/apply/无 default；tsconfig.client 目录制自动纳新文件；tsdown 零配置改动。同 diff 义务：[src/README 源码图](../../../packages/company-pack/src/README.md) lib 清单 10→11 + 依赖链补 presence → presence-status。
+零外观改动证据链：8 个 client importer 不动；host 入口 `export *` 不动；[replay-smoke](../../../checks/lanes/replay.e2e.mjs) 经 built 入口拿 presenceFromEvents 不动；pack-exports 只钉 inject/apply/无 default；tsconfig.client 目录制自动纳新文件；tsdown 零配置改动。同 diff 义务：[src/README 源码图](../../../packages/company-pack/src/README.md) lib 清单 10→11 + 依赖链补 presence → presence-status。
 
 价值与代价（如实）：价值中等（词汇有独立可搜的家、presence.ts 收敛单一主题），代价低（零 importer 改动）——若只批一项，批 Item 1。
 
@@ -89,7 +89,7 @@ opened: 2026-10-16
 
 | 观察对象 | 现状 | 触发线 | 触发时动作 | 依据 / 硬阻碍 |
 |---|---|---|---|---|
-| [replay-smoke](../../../checks/smoke/replay-smoke.mjs) | 715 行 | >800 行或新增第 5 个 mode | 判据 / 驱动器分家（沿 replay-ui 拆分先例） | run-gates 的 >800 先例；落点 = 该文件头注 1 行 |
+| [replay-smoke](../../../checks/lanes/replay.e2e.mjs) | 715 行 | >800 行或新增第 5 个 mode | 判据 / 驱动器分家（沿 replay-ui 拆分先例） | run-gates 的 >800 先例；落点 = 该文件头注 1 行 |
 | src/client/ | 23 文件平铺 | >30 文件或第二次「新组件放错家」 | 按 feature 分组子目录 | 前轮已否决过拆（locality note 输掉的方案） |
 | tools/lib/ | 27 模块平铺 | >40 模块或同域散居第 3 次 | 先扩 layering.spec 递归扫描再分组 | layering.spec 只扫顶层（见排除项） |
 | 大镜像 spec | 538 / 454 行 | 随其模块拆分自然缩 | 不单独立项 | Item 1 顺带消解其一 |
@@ -140,8 +140,8 @@ source run/env.sh && node checks/audit/deliverables-check.mjs \
 | 发布面零漂移（facade 设计目标） | 编排 | `pnpm exec vitest run tests/lib/presence-board.spec.ts tests/repo/pack-exports.spec.ts` 全绿 | — | [presence-board.spec](../../../tests/lib/presence-board.spec.ts) + [pack-exports.spec](../../../tests/repo/pack-exports.spec.ts) |
 | 回归全绿 | 确定性 | pnpm test：60 文件 559 用例全绿 | — | `pnpm test` |
 | 两半构建 | 编排 | tsc -b + tsdown 两面 complete | — | pack 构建 |
-| client 真挂载 | 编排 | `source run/env.sh && node checks/smoke/client-load-smoke.mjs` ALL PASS | — | [client-load-smoke](../../../checks/smoke/client-load-smoke.mjs) |
-| 重放真消费面 | 编排 | `source run/env.sh && node checks/smoke/replay-smoke.mjs --scenario r2-motion` ALL PASS | — | replay lane（presence 判据走 built 再导出链） |
+| client 真挂载 | 编排 | `source run/env.sh && node checks/lanes/client-load.entry.mjs` ALL PASS | — | [client-load-smoke](../../../checks/lanes/client-load.entry.mjs) |
+| 重放真消费面 | 编排 | `source run/env.sh && node checks/lanes/replay.e2e.mjs --scenario r2-motion` ALL PASS | — | replay lane（presence 判据走 built 再导出链） |
 | 词汇钉子 | 确定性 | presence-board.spec 全绿 | 临时让 statusLabelFor 未知值直显英文 → 红；若现无未知值断言，同 diff 先补（D-c 定案「未知值落未知」值得钉） | presence-board.spec |
 | 文档同步 | 结构 | src/README 源码图更新 + `pnpm verify` ALL PASS | — | doc 门禁 |
 

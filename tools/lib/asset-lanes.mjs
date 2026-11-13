@@ -11,7 +11,7 @@
  * 其余只靠头注散文，坏了没人知道）。
  *
  * 字段：
- * - name       冒烟文件名去掉 `.mjs`（必须对应 checks/smoke/<name>.mjs）
+ * - name       冒烟文件名去掉 `.mjs`（必须对应 checks/lanes/<name>.mjs）
  * - kind       classic（纯 node）| browser（playwright）| model（要 DEEPSEEK_API_KEY）| tool（非自跑检查）
  * - lanes      参与的自动 lane：fast | surface | weekly；空数组 = 明确手动
  * - nodeArgs   启动参数（要读 TS 源码/workspace 包时带 --import tsx/esm）
@@ -41,120 +41,113 @@ function define(name, kind, lanes, extra = {}) {
 
 export const ASSETS = [
   // ── fast lane（pre-push 每次跑；只收 ≤10s、稳定、keyless）────────────────────
-  define('workflow-contract-smoke', 'classic', ['fast', 'surface', 'weekly'], {
+  define('workflow-contract', 'classic', ['fast', 'surface', 'weekly'], {
     nodeArgs: TSX,
     why: 'workflow/subagent 引擎的 schema 分支与重试语义',
   }),
-  define('present-catalog-smoke', 'classic', ['fast', 'surface', 'weekly'], {
+  define('present-catalog', 'classic', ['fast', 'surface', 'weekly'], {
     nodeArgs: TSX,
     why: 'present 事件 → catalog/账本接线',
   }),
-  define('company-root-process-smoke', 'classic', ['fast', 'surface', 'weekly'], {
+  define('company-root-process', 'classic', ['fast', 'surface', 'weekly'], {
     why: 'company-root 原子写 / lease 接管 / 同文件并发写',
   }),
-  define('gates-negative-smoke', 'classic', ['fast', 'surface', 'weekly'], {
-    why: '结构门禁的负例（门禁自己还会不会红）',
-  }),
-  define('snapshot-motion-smoke', 'classic', ['fast', 'weekly'], {
+  define('snapshot-motion', 'classic', ['fast', 'weekly'], {
     why: 'snapshot-motion CLI 与 workspace capture 接线',
   }),
-  define('two-axis-gates-smoke', 'classic', ['fast', 'weekly'], {
-    why: '两轴 content 枚举与包形状的一致性门',
-  }),
-
   // ── surface lane（改到对应面时 pre-push 必跑；见 SURFACE_RULES）──────────────
-  define('client-load-smoke', 'browser', ['surface', 'weekly'], {
+  define('client-load', 'browser', ['surface', 'weekly'], {
     why: '真页面零挂载失败（client 装配/入口改动的完成定义一部分）',
   }),
-  define('preset-smoke', 'classic', ['surface', 'weekly'], {
+  define('preset', 'classic', ['surface', 'weekly'], {
     why: 'preset 真挂载、六角色 + 五 support 的完成定义',
   }),
-  define('replay-smoke', 'classic', ['surface', 'weekly'], {
+  define('replay', 'classic', ['surface', 'weekly'], {
     why: '合成回放场景的会话日志 + workspace 判据',
   }),
 
   // ── weekly lane（每周全量 keyless；不在 push 时跑，但最多陈旧 7 天）──────────
-  define('company-entry-smoke', 'classic', ['weekly'], {
+  define('company-entry', 'classic', ['weekly'], {
     why: '真 tarball 装 profile → dsh --profile company → workspace/公司状态（1–2 分钟）',
   }),
-  define('concurrent-home-smoke', 'classic', ['weekly'], {
+  define('concurrent-home', 'classic', ['weekly'], {
     why: '两个 writer 同 home 的 lease 与停写行为',
   }),
-  define('external-workspace-smoke', 'classic', ['weekly'], {
+  define('external-workspace', 'classic', ['weekly'], {
     why: 'DSH_COMPANY_HOME / 外部盘 / 搬家逻辑',
   }),
-  define('interrupted-install-smoke', 'classic', ['weekly'], {
+  define('interrupted-install', 'classic', ['weekly'], {
     why: 'install/remove/upgrade 的失败与恢复路径',
   }),
-  define('isolation-matrix-smoke', 'classic', ['weekly'], {
+  define('isolation-matrix', 'classic', ['weekly'], {
     why: 'workspace 解析 / 身份落点 / 停写的隔离矩阵',
   }),
-  define('multi-install-smoke', 'classic', ['weekly'], {
+  define('multi-install', 'classic', ['weekly'], {
     why: 'profile 组合 / 安装形状 / 多 pack 共存',
   }),
-  define('permissions-recovery-smoke', 'classic', ['weekly'], {
+  define('permissions-recovery', 'classic', ['weekly'], {
     why: 'bootstrap/catalog 的文件权限与坏索引恢复',
   }),
-  define('profile-row-smoke', 'classic', ['weekly'], {
+  define('profile-row', 'classic', ['weekly'], {
     why: 'profile patch / 组合行 / 第二 bundle 的装配',
   }),
-  define('revoke-recovery-smoke', 'classic', ['weekly'], {
+  define('revoke-recovery', 'classic', ['weekly'], {
     why: 'revoke / pending journal / 方法层恢复',
   }),
-  define('upgrade-while-running-smoke', 'classic', ['weekly'], {
+  define('upgrade-while-running', 'classic', ['weekly'], {
     why: '运行中升级的边界（旧实例继续工作、数据不丢）',
   }),
-  define('client-error-chain-smoke', 'browser', ['weekly'], {
+  define('client-error-chain', 'browser', ['weekly'], {
     why: '真页面 console.error → 错误环 → host 日志落点',
   }),
-  define('multi-window-banner-smoke', 'browser', ['weekly'], {
+  define('multi-window-banner', 'browser', ['weekly'], {
     why: 'client instance-guard 与多实例横幅',
   }),
-  define('ui-scene-smoke', 'browser', ['weekly'], {
+  define('ui-scene', 'browser', ['weekly'], {
     why: '真页面 9 页签 + 错误环 + 金样（隔离档）',
   }),
 
   // ── 明确手动（lanes 为空；manualReason 必填）────────────────────────────────
-  define('channel-matrix-smoke', 'browser', [], {
+  define('channel-matrix', 'browser', [], {
     why: '安装通道矩阵（global/npm 通道）',
     manualReason: '要真实全局 dsh + 网络 + 已导出 _dist；发布前手动跑 --channel all',
   }),
-  define('release-smoke', 'classic', [], {
+  define('release', 'classic', [], {
     why: '发布形状：构建 → npm pack → 干净 profile 安装 → built 入口 boot',
     manualReason: '分钟级构建 + pack；由 release --verify 调度，不进每周 sweep',
   }),
-  define('probe-smoke', 'model', [], {
+  define('probe', 'model', [], {
     why: '角色内容/persona/KB 的连通与内容档',
     manualReason: '真模型档（连通 ~6s / 内容 --full 5–10min），按内容改动触发',
   }),
-  define('delegation-smoke', 'model', [], {
+  define('delegation', 'model', [], {
     why: '模型可见工具目录与 shadow 边界',
     manualReason: '真模型 1 条 prompt（升 pin 或委托边界改动时）',
   }),
-  define('presence-e2e-smoke', 'model', [], {
+  define('presence-e2e', 'model', [], {
     why: '在场板链的端到端',
     manualReason: '真模型 ~$1，按在场/协作面验收触发',
   }),
-  define('product-team-e2e-smoke', 'model', [], {
+  define('product-team-e2e', 'model', [], {
     why: 'CEO 组队判据与命名委托快捷路径',
     manualReason: '真模型 ~$1，按组队/判据面验收触发',
   }),
-  define('attention-e2e-smoke', 'model', [], {
+  define('attention-e2e', 'model', [], {
     why: '人机三节点全回路（触线→审批→面板→人批→继续）',
     manualReason: '真模型 + 多用户并发 lane，人工在场时跑',
   }),
-  define('human-loop-e2e-smoke', 'model', [], {
+  define('human-loop-e2e', 'model', [], {
     why: '人机接口三载体（补料落盘／建议非阻塞落稿／规矩缺口回流）',
     manualReason: '真模型 + 真浏览器 ~$1–2，人工在场时跑',
   }),
-  define('entry-probe-smoke', 'model', [], {
+  define('entry-probe', 'model', [], {
     why: '入口链 13 题的认证档答卷归档',
     manualReason: '真模型认证档；入口链文档改动后手动跑',
   }),
 ]
 
 /** fast lane 的成员顺序（保持既有 6 条不变；新增要走评审，不许悄悄变长）。 */
-export const FAST = ASSETS.filter(asset => asset.lanes.includes('fast')).map(asset => asset.name)
+export const FAST = ['workflow-contract', 'present-catalog', 'company-root-process', 'snapshot-motion']
 
 /**
  * 按面触发规则：改到 globs 命中的路径时，pre-push 跑 assets。
@@ -164,17 +157,17 @@ export const FAST = ASSETS.filter(asset => asset.lanes.includes('fast')).map(ass
 export const SURFACE_RULES = [
   {
     globs: ['packages/company-pack/src/client/**'],
-    assets: ['client-load-smoke'],
+    assets: ['client-load'],
     why: 'client 装配/入口改动 → 真页面零挂载失败',
   },
   {
     globs: ['packages/company-pack/presets/**'],
-    assets: ['preset-smoke'],
+    assets: ['preset'],
     why: 'persona/skill/组合行改动 → preset 真挂载完成定义',
   },
   {
     globs: ['packages/company-pack/content/**'],
-    assets: ['replay-smoke'],
+    assets: ['replay'],
     why: '只读注入面改动 → 合成回放场景的注入/世界判据',
   },
 ]
@@ -324,37 +317,35 @@ export const FAILURE_CLASSES = ['纯逻辑', '注册生命周期', '导出形态
 
 /** 冒烟的失败类（人工判定；改判定要同 diff 改这里的注释）。探针暂记未分类。 */
 export const FAILURE_CLASS_BY_NAME = {
-  'workflow-contract-smoke': '工具定义',
-  'present-catalog-smoke': '会话持久化',
-  'company-root-process-smoke': '子进程并发',
-  'gates-negative-smoke': '纯逻辑',
-  'snapshot-motion-smoke': '会话持久化',
-  'two-axis-gates-smoke': '配置组合',
-  'client-load-smoke': 'client UI',
-  'preset-smoke': '配置组合',
-  'replay-smoke': '会话持久化',
-  'company-entry-smoke': '配置组合',
-  'concurrent-home-smoke': '子进程并发',
-  'external-workspace-smoke': '子进程并发',
-  'interrupted-install-smoke': '配置组合',
-  'isolation-matrix-smoke': '配置组合',
-  'multi-install-smoke': '配置组合',
-  'permissions-recovery-smoke': '配置组合',
-  'profile-row-smoke': '配置组合',
-  'revoke-recovery-smoke': '注册生命周期',
-  'upgrade-while-running-smoke': '配置组合',
-  'client-error-chain-smoke': 'client UI',
-  'multi-window-banner-smoke': 'client UI',
-  'ui-scene-smoke': 'client UI',
-  'channel-matrix-smoke': '配置组合',
-  'release-smoke': '导出形态',
-  'probe-smoke': '模型可见文本',
-  'delegation-smoke': '工具定义',
-  'presence-e2e-smoke': '模型可见文本',
-  'product-team-e2e-smoke': '模型可见文本',
-  'attention-e2e-smoke': '模型可见文本',
-  'human-loop-e2e-smoke': '模型可见文本',
-  'entry-probe-smoke': '文档指针',
+  'workflow-contract': '工具定义',
+  'present-catalog': '会话持久化',
+  'company-root-process': '子进程并发',
+  'snapshot-motion': '会话持久化',
+  'client-load': 'client UI',
+  'preset': '配置组合',
+  'replay': '会话持久化',
+  'company-entry': '配置组合',
+  'concurrent-home': '子进程并发',
+  'external-workspace': '子进程并发',
+  'interrupted-install': '配置组合',
+  'isolation-matrix': '配置组合',
+  'multi-install': '配置组合',
+  'permissions-recovery': '配置组合',
+  'profile-row': '配置组合',
+  'revoke-recovery': '注册生命周期',
+  'upgrade-while-running': '配置组合',
+  'client-error-chain': 'client UI',
+  'multi-window-banner': 'client UI',
+  'ui-scene': 'client UI',
+  'channel-matrix': '配置组合',
+  'release': '导出形态',
+  'probe': '模型可见文本',
+  'delegation': '工具定义',
+  'presence-e2e': '模型可见文本',
+  'product-team-e2e': '模型可见文本',
+  'attention-e2e': '模型可见文本',
+  'human-loop-e2e': '模型可见文本',
+  'entry-probe': '文档指针',
 }
 
 /** 某资产的失败类；未登记返回「未分类」（census 会报数）。 */
@@ -365,4 +356,43 @@ export function failureClassOf(name) {
 /** 冒烟 + 探针的全集（census 与盘面双向校验用）。 */
 export function allAssets() {
   return [...ASSETS, ...PROBES]
+}
+
+/** 资产后缀 → lane（后缀是证据类型的唯一声明；file = <name>.<suffix>.mjs）。 */
+export const SUFFIX_BY_NAME = {
+  'attention-e2e': 'entry',
+  'channel-matrix': 'entry',
+  'client-error-chain': 'entry',
+  'client-load': 'entry',
+  'company-entry': 'entry',
+  'company-root-process': 'e2e',
+  'concurrent-home': 'entry',
+  'delegation': 'entry',
+  'entry-probe': 'entry',
+  'external-workspace': 'entry',
+  'human-loop-e2e': 'entry',
+  'interrupted-install': 'entry',
+  'isolation-matrix': 'entry',
+  'multi-install': 'entry',
+  'multi-window-banner': 'entry',
+  'permissions-recovery': 'entry',
+  'presence-e2e': 'entry',
+  'present-catalog': 'e2e',
+  'preset': 'entry',
+  'probe': 'entry',
+  'product-team-e2e': 'entry',
+  'profile-row': 'entry',
+  'release': 'entry',
+  'replay': 'e2e',
+  'revoke-recovery': 'entry',
+  'snapshot-motion': 'e2e',
+  'ui-scene': 'entry',
+  'upgrade-while-running': 'entry',
+  'workflow-contract': 'e2e',
+}
+
+export function suffixOf(name) {
+  const suffix = SUFFIX_BY_NAME[name]
+  if (!suffix) throw new Error(`asset-lanes: ${name} 没有登记后缀（e2e|entry）`)
+  return suffix
 }

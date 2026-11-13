@@ -372,7 +372,7 @@
 
 ### Added
 
-- **真实页面自检车道**：`node checks/smoke/ui-scene-smoke.mjs` 一条命令起隔离实例 → 断言全部公司页签 + 浏览器错误环 → 成功/失败都落证据目录（维护者与交付验收用）。
+- **真实页面自检车道**：`node checks/lanes/ui-scene.entry.mjs` 一条命令起隔离实例 → 断言全部公司页签 + 浏览器错误环 → 成功/失败都落证据目录（维护者与交付验收用）。
 - **浏览器错误环**：页面内捕获 `error` / `unhandledrejection` / `console.error`，随真页面探针进入 verdict 与证据（不写会话日志——边界见模块头注）。
 - `pnpm typecheck`（pack 两面 `tsc -b`）与 `dist-freshness` 门禁（交付产物与版本记录自洽）。
 

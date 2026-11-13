@@ -40,8 +40,8 @@ args:   { "agentId": "<SessionId>", "callId": "<toolCallId>",
 | **红**：`pnpm exec vitest run tests/presets`（断言先落：五角色该行须 `mode: timed` + 显式 `timeout`） | 1 failed / 18 passed（五个角色全缺该配置） |
 | 绿：同上 | **19/19 PASS** |
 | 组合自检：`source run/env.sh && pnpm dsh --profile web --dump-config` | 五角色该行 config 在场（`mode: timed` / `timeout: 120`） |
-| 真挂载：`node checks/smoke/preset-smoke.mjs` | **ALL PASS**（5 个 preset 全部可挂载；timed schema 与工具行组合无误） |
-| 回放 lane：`node checks/smoke/replay-smoke.mjs`（默认档） | **ALL PASS**——两份 tool-schemas sidecar 按**有意变更**同步（diff 恰为 `ask_user_question` 块：工具描述 + questions 描述 + 新增 `timeout` 参数，别无二致） |
+| 真挂载：`node checks/lanes/preset.entry.mjs` | **ALL PASS**（5 个 preset 全部可挂载；timed schema 与工具行组合无误） |
+| 回放 lane：`node checks/lanes/replay.e2e.mjs`（默认档） | **ALL PASS**——两份 tool-schemas sidecar 按**有意变更**同步（diff 恰为 `ask_user_question` 块：工具描述 + questions 描述 + 新增 `timeout` 参数，别无二致） |
 | 回放 lane：同脚本 `--ui` 档 | **ALL PASS**（委派卡端到端 + ui 金样零 diff） |
 | 全量 keyless：`pnpm test` | **617 tests PASS** |
 | 结构：`pnpm verify` | ALL PASS |

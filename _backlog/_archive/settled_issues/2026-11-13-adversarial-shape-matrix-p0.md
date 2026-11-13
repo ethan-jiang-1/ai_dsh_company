@@ -72,7 +72,7 @@ opened: 2026-11-13
 - [x] P1 ledger：`ledger-state-agreement.spec.ts`（presented 7 形状 + corrupt 导出沿用旧快照，8 例）。
 - [x] P1 cultivation：`writeRecord` / `pendingRevoke` 升进 Safety 矩阵；records 不可达/revoked/坏记录沿用既有 `cultivation-command.spec.ts`。
 - [x] BUG-151（矩阵首跑）：`appendUpgradeLog` 叶子目标 symlink/目录 → 预检 unsafe 跳过；KNOWN_GAP 清零。
-- [x] P2 进程矩阵：`company-root-process-smoke.mjs`（同文件并发写 / 残留 temp / 根 symlink / 重启读回 / lease stale 接管 / 新鲜锁拒绝）。
+- [x] P2 进程矩阵：`company-root-process.e2e.mjs`（同文件并发写 / 残留 temp / 根 symlink / 重启读回 / lease stale 接管 / 新鲜锁拒绝）。
 - [x] `tests/README.md`「改动面 → 最窄检查」host 逻辑行加「跨载体不变量 → `pnpm test tests/host/contract`」；「目录镜像」登记 `contract/` 例外。
 - [x] Note 落 `新建:notes/implemented/2026-11-13-adversarial-shape-matrix.md`，含红证原话与未验面。
 - [x] **TOCTOU 收窄**：`CompanyAtomicWriteDeps` 注入缝 + temp 后 / rename 前 recheck；测试确定性复现；完全关闭受 Node 无 `renameat` 限制，残余窗口见 Note。

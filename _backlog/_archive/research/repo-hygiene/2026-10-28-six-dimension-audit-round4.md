@@ -32,7 +32,7 @@ pnpm test:coverage                               # 85.73 / 79.02 / 85.08 / 89.65
 node tools/release.mjs --check                   # READY 0.3.15 @ bda2f16（D4 子代理复跑）
 pnpm orient                                      # 5 slug / 凭据✓ / 公司盘 6 交付物 / 3 场景
 pnpm diagnose --strict                           # 最新 ping 会话：turns=1，FAILURES none（正常）
-node checks/smoke/ui-scene-smoke.mjs --isolated --golden
+node checks/lanes/ui-scene.entry.mjs --isolated --golden
                                                  # 3 次均 exit 1；见 §2/§3
 node probes/browser-visual/cdp-probe.mjs <url> --evidence
                                                  # 9/9 页签、console 0、clientErrors 0、page.png 落盘
@@ -78,7 +78,7 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 
 **根因（三条叠加）**：
 
-1. `run/env.sh:70` 导出 `DSH_COMPANY_BOOTSTRAP=off`；`ui-scene-smoke` 的隔离环境只覆盖 `DSH_HOME`/`DSH_COMPANY_HOME`（`checks/smoke/ui-scene-smoke.mjs:61`），把 `off` 继承进去，`standalone --provision-only` 又不落骨架（`tools/standalone.mjs:183`），于是隔离公司盘没有 `kb/motion-ledger.md`，面板显示“不可读”。
+1. `run/env.sh:70` 导出 `DSH_COMPANY_BOOTSTRAP=off`；`ui-scene-smoke` 的隔离环境只覆盖 `DSH_HOME`/`DSH_COMPANY_HOME`（`checks/lanes/ui-scene.entry.mjs:61`），把 `off` 继承进去，`standalone --provision-only` 又不落骨架（`tools/standalone.mjs:183`），于是隔离公司盘没有 `kb/motion-ledger.md`，面板显示“不可读”。
 2. `cdp-probe` 在页签 body 非空后立刻抓文本（`probes/browser-visual/cdp-probe.mjs:192-204`），不等待异步读取稳定；金样因此把“读取中… / 读取团队状态…”钉成期望（`snapshots/visual/company-shell/ui.expected.json:22-24`）。
 3. `ui-expected-freshness` 只做静态形状/目录校验（`checks/gates/ui-expected-freshness.mjs:14-40`），所以 `pnpm verify` 50 门全绿，而真页面车道 exit 1；`ui-scene-smoke` 的 `scene.json` 在 golden 比对之前写（`:128-139`），失败时仍记 `probeExit: 0`、无 golden 结果，下一 agent 会把 pass 目录当绿。
 4. 隔离 home 没有凭据，页面实际停在 “Get started / Add API Key / Sign in” 模态；`cdp-probe` 的 not-onboarded 只在 composer 缺失时触发（`probes/browser-visual/cdp-probe.mjs:128` 附近），这里 composer 已在，所以 `reason: pass`、9/9 页签，截图（`runtime/harness-home/diagnosis/cdp-probe-2026-10-27T17-02-50-972Z/page.png`）却带着 onboarding 模态和「成品索引不可读」。它不是“已就绪的公司壳”，只是“能挂载的壳”。
@@ -95,7 +95,7 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 - `tests/README.md:33`：“**语料回放全绿 = 升 pin 回归网第一道**”。
 - `docs/contracts/release.md:123-125`：本仓现行回放只有一个**不加载 company-pack** 的 headless 合成场景，只证明“回放管线可跑”，**不要把它当第一道**；公司行为真实录制已移私有仓。
 - `tests/README.md:27` 仍要求“受影响 replay 场景同 diff 重录”，并引用已不存在的 r3 full 档。
-- `checks/smoke/replay-smoke.mjs` 头注第 7、16-22 行仍把 `--ui` / r3-delegation 写成可用模式；代码第 91-95 行直接 exit 2。
+- `checks/lanes/replay.e2e.mjs` 头注第 7、16-22 行仍把 `--ui` / r3-delegation 写成可用模式；代码第 91-95 行直接 exit 2。
 - `docs/testing.md:19` 仍把 `candidate-scan 语料` 列为行为质量档；`:62` 又说本仓无该资产、eval exit 2。`tests/README.md:66`、`docs/project-map.md:90` 同族。
 
 **影响**：升 pin 的人会按旧句找不存在的语料，或把合成管线当公司行为回归网。上一轮 R3-26 只修了 release/dev-loop/testing §1，漏了操作入口 tests/README。
@@ -140,10 +140,10 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 | R4-12 | P2 | D3 | `docs/guides/dev-loop.md:45-46` vs `:72`、`docs/testing.md:55` | §1 顺序 = 实施→选证据；§3④ / 宪法 §3.8 = 测试/场景先行。照 §1 字面执行即违反测试先行。 |
 | R4-13 | P2 | D1/D5 | `tests/README.md:24-35` | 映射表只有 src/lib、src/client、“pack 导出/注册面”；`src/host/` 的 bootstrap/catalog/cultivation/lease 等 8 模块 3226 行没有行。场景②只能猜检查层。 |
 | R4-14 | P2 | D1 | `docs/AGENTS.md:30`、`checks/gates/doc-budget.mjs:15` | 文档称“留 ≥5% 头寸”，门禁只拒 >20% 空置；实测 11/32 篇 <5%（release-runbook 0%、presets 1.5%、decisions 1.7%、AGENTS 2.4%…）。`docs/guides/budget-and-ops.md`（68 行）与 `docs/guides/cdp-probe.md`（64 行）无预算，门禁无完整性断言。 |
-| R4-15 | P2 | D4 | `checks/README.md:56`；`checks/smoke/ui-scene-smoke.mjs:8`；`checks/gates/ui-expected-freshness.mjs:8`；`packages/company-pack/README.md:23`；`CHANGELOG.md:23` | 索引写 48 门（实际 50）；两处金样路径写 `snapshots/ui/...`（实际 `snapshots/visual/...`）；包 README 枚举“关注”（实际标签是“待办”）；0.3.15 CHANGELOG 称失效引用已清，现场不符。 |
+| R4-15 | P2 | D4 | `checks/README.md:56`；`checks/lanes/ui-scene.entry.mjs:8`；`checks/gates/ui-expected-freshness.mjs:8`；`packages/company-pack/README.md:23`；`CHANGELOG.md:23` | 索引写 48 门（实际 50）；两处金样路径写 `snapshots/ui/...`（实际 `snapshots/visual/...`）；包 README 枚举“关注”（实际标签是“待办”）；0.3.15 CHANGELOG 称失效引用已清，现场不符。 |
 | R4-16 | P2 | D2/D5 | `client/DeliverablesTab.tsx:98`；`host/bundle-manifest.ts:225`、`host/catalog.ts:43`、`client/cultivation-context-data.ts:89`；`lib/presence.ts:147`、`lib/cultivation-inbox.ts:59`、`lib/cultivation-context.ts:338`；`tests/{client,company}/deliverables-catalog.spec.ts` | `parseCatalog` 埋在 .tsx 却被数据模块与 company spec 反向依赖；`isRecord` 3 份逐字相同；`clip` 3 份语义不同；同名 spec + 同名对象（src/lib 与 tools/lib）并存。 |
 | R4-17 | P2 | D2 | `checks/gates/src-layering.mjs:25`；`tools/lib/src-layering.mjs` | 只守字面相对 import 的方向：模板串/计算式 dynamic import、`require()`、`import x = require()` 全不可见；注释里的 `from '../host/x.ts'` 会被扫成违规（假阳）；无环/导出面检查。 |
-| R4-18 | P2 | D6 | `checks/smoke/ui-scene-smoke.mjs` 第 128-139、162-177 行；另见第 81-82 行 | golden 失败时 `scene.json` 仍 `probeExit:0`、无 golden 结果；`--keep` 只打 base，不打带 token 的 URL；证据无 URL/home。 |
+| R4-18 | P2 | D6 | `checks/lanes/ui-scene.entry.mjs` 第 128-139、162-177 行；另见第 81-82 行 | golden 失败时 `scene.json` 仍 `probeExit:0`、无 golden 结果；`--keep` 只打 base，不打带 token 的 URL；证据无 URL/home。 |
 | R4-19 | P3 | D4 | `docs/reference/decisions.md:51-53`；`docs/contracts/data-model.md:15`（另见第 67 行）；`AGENTS.md:40`；`docs/project-map.md:90` | D46 排在 D45 前；D44 指两个 Note 家；data-model 同一规则写 2 次；AGENTS 说“environments §6”而该文件只有 1 个标题；project-map 仍说“行为质量语料有独立标注”。 |
 | R4-20 | P3 | D1 | `docs/orient.md:42`；`checks/README.md:5`（另见第 16 行） | `orient` 说“不复制门名”后立刻复制四条，第四条写“批得下”（owner = “已获批”）；checks/README 把分层指向 dev-loop §9.1，而 §9.1 是三行转指 tests/README 的桩。 |
 | R4-21 | P3 | D4 | `docs/contracts/profile.md:12`；`notes/implemented/2026-11-10-ui-demo-rationale.md:132`；`packages/company-pack/README.md:23` | profile 把 `headless` 写成“源码直跑 ✅ R0 已验收”，而 README/AGENTS 都说 headless 不是公司运行；ui-demo v3 仍写四面板“用量”（现第四 = 培养）；包 README 的“关注”同上。 |
@@ -164,7 +164,7 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 
 1. `_backlog/AGENTS.md:22`、`_backlog/bugs/README.md:59` 改成**只留指针**（“限 P1/P2；排除项见章程「缺陷的通道」，此处不列”），不再枚举。
 2. `AGENTS.md` 首屏加一行 Plan Mode 闸（feature 任务先 Plan Mode，规则 = policy P1）；`dev-loop.md:141` 改指 policy §P1。
-3. 回放真值：`tests/README.md:33`（另见第 27、66 行）、`checks/smoke/replay-smoke.mjs`（第 7、16-22 行）、`docs/testing.md:19`、`docs/project-map.md:90`、`CHANGELOG.md:23` 统一到 release.md 的口径。
+3. 回放真值：`tests/README.md:33`（另见第 27、66 行）、`checks/lanes/replay.e2e.mjs`（第 7、16-22 行）、`docs/testing.md:19`、`docs/project-map.md:90`、`CHANGELOG.md:23` 统一到 release.md 的口径。
 4. 导航/计数：ledger 指针 → `decisions.md`；外部研究 → `external-research.md`；architecture 的伪配方改成“以 `presets/ceo/agent.cordis.yml` 为准”；`checks/README.md` 48→50；两处 `snapshots/ui` → `snapshots/visual`；包 README “关注”→“待办”。
 5. 验收：`pnpm verify` + `pnpm test`；`rg` 断言“第一道 / snapshots/ui / 48 个模块 / 关注、培养”零命中；`doc-budget` 仍绿。
 

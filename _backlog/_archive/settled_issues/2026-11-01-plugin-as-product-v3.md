@@ -217,29 +217,29 @@ run： <workspace>/.dsh-company/{kb,deliverables,deliverables-archive,cultivatio
 | P1.2 | 入口 | startup/registrar 行进 bundle patch；host-only 隔离方案落地 | `cordis.patch.yml`、host entry、`package.json` files/exports | 装包即带 startup；client tier 绿；无 profile patch 也能登记 | P0.2 |
 | P1.3 | 入口 | workspace resolver：env → cwd（合理目录）→ saved → none；落点校验 | `src/host/startup*`/`runtime-guard.ts`、`paths.ts` | env/cwd/saved 三路都登记；OS home/DSH home/包含 DSH home 拒绝；无值零写 | P0.4 |
 | P1.4 | 入口 | 去 profile patch 依赖；旧 `company-workspace-register` 行兼容 shim/告警 | src/host/register-workspace.ts（0.6.0 已删除）、docs/doctor | 旧 profile 仍能起；新 profile patch 零写入；告警可操作 | P1.2 |
-| P1.5 | 入口 | `company-entry-smoke` + `pack-no-bin` 门禁 | `checks/smoke/`、`checks/gates/pack-shape.mjs`、`tests/README.md` | 干净 home + tarball + 直接 `dsh --profile company` 绿；无 bin 红证 | P1.1–P1.4 |
+| P1.5 | 入口 | `company-entry-smoke` + `pack-no-bin` 门禁 | `checks/lanes/`、`checks/gates/pack-shape.mjs`、`tests/README.md` | 干净 home + tarball + 直接 `dsh --profile company` 绿；无 bin 红证 | P1.1–P1.4 |
 | P1.6 | 入口 | README/manual 安装/启动草稿（先于实现定稿） | `README.md`、`tools/export-dist.mjs` 模板 | 默认句 = Plugins 页；CLI 仅 web；无 `--workspace`/新 home | P0.6 |
 | P2.1 | 内容 | pack `workspace/` → `content/`；files/build/gates 更新 | `packages/company-pack/content/**`、`package.json`、`tsdown.config.ts` | tarball 含 `content/**` 无 `workspace/**`；角色仍能读模板/手册 | P1.6 |
 | P2.2 | 内容 | run bundle 状态初始化：只建 `kb/`/`deliverables/`/`cultivation/`/`.dsh-company/` 与最小状态；不 seed 手册/模板 | `src/host/run-bundle/bootstrap.ts`、`bundle-manifest.ts` | 新 workspace 无 `AGENTS.md`/`COMPANY.md`/`templates/`；已有用户 `AGENTS.md` 不动；二启稳定 | P2.1 |
 | P2.3 | 内容 | handbook 注入：pack `content/AGENTS.md` → `systemPrompt.section`；预算门禁 | host row、presets、`checks/gates/handbook-budget.mjs` | 真模型注入；workspace 无副本；超预算红 | P0.3 |
 | P2.4 | 内容 | 模板/章程解析：pack 默认 + `.dsh-company/overrides/`；角色引用改变量/路径 | presets/skills、host resolver | 无 override 读 pack；有 override 优先；不复制默认内容 | P2.1 |
 | P2.5 | 首启 | client onboarding：无 workspace 选目录、有 workspace 选中目标会话；Desktop 同面板 | `src/client/**`、host remote、`client-load-smoke` | 无 `Choose workspace`；无 welcome-notice 依赖；取消可恢复 | P0.4/P2.2 |
-| P2.6 | 内容 | content-boundary / handbook-injection / manifest-v3 specs + handbook/company-skeleton smokes | `tests/host/`、`checks/smoke/` | 每道新判据红→绿；旧 workspace 不覆盖 | P2.2–P2.5 |
+| P2.6 | 内容 | content-boundary / handbook-injection / manifest-v3 specs + handbook/company-skeleton smokes | `tests/host/`、`checks/lanes/` | 每道新判据红→绿；旧 workspace 不覆盖 | P2.2–P2.5 |
 | P3.1 | 多盘 | 去掉一 home 一 workspace 限制；`settings.json` 仅最近选择 | `bin` 删除后的 host/startup、`runtime-guard.ts` | 同 home 顺序 A/B 不拒绝；旧 settings 只是 hint | P1.3 |
 | P3.2 | 多盘 | presented 账本 v2 per workspace + v1 迁移 | `presented-domain.ts`、`catalog.ts`、specs | A/B 同相对路径不串；true/false 保留；旧文件 `.v1` | P0.5 |
 | P3.3 | 多盘 | host 运行态/命令按 active workspace；不跨盘写 | `src/index.ts`、commands、client data plane | 当前 workspace 命令正确；跨盘拒绝；方法层留 home | P3.1–P3.2 |
-| P3.4 | 多盘 | external/isolation/ledger smokes；无 workspace 零写 | `checks/smoke/` | A/B 两套 run bundle；无 workspace 零写；旧 profile patch 告警 | P3.1–P3.3 |
+| P3.4 | 多盘 | external/isolation/ledger smokes；无 workspace 零写 | `checks/lanes/` | A/B 两套 run bundle；无 workspace 零写；旧 profile patch 告警 | P3.1–P3.3 |
 | P4.1 | 迁移 | manifest v2 → v3（id/createdAt 保留；seed 只记状态） | `bundle-manifest.ts`、fixtures、specs | v2 盘升级不丢 id；旧字段 legacy；二启字节稳定 | P2.2 |
 | P4.2 | 迁移 | 账本 v1 → v2（归当前/唯一 workspace；保留 true/false） | `presented-domain.ts`、fixtures | 旧账本迁移正确；旧文件备份；坏/更高版本不覆盖 | P3.2 |
 | P4.3 | 迁移 | 旧 launcher 遗留：`.company-home`/settings/profile patch/旧手册/模板 | host startup、migration、docs/doctor | 未改 pack 副本移 `.dsh-company/legacy/`；改过的保留告警；旧 profile 可起 | P4.1–P4.2 |
-| P4.4 | 迁移 | `release-smoke`/`company-entry-smoke` 0.5.0→0.6.0 全段 | checks/smoke/release-smoke.mjs + company-entry-smoke（旧 release-smoke/company-entry-smoke 已删除） | 真旧 home/workspace 升级不丢数据；回退可用 | P4.1–P4.3 |
+| P4.4 | 迁移 | `release-smoke`/`company-entry-smoke` 0.5.0→0.6.0 全段 | checks/lanes/release.entry.mjs + company-entry-smoke（旧 release-smoke/company-entry-smoke 已删除） | 真旧 home/workspace 升级不丢数据；回退可用 | P4.1–P4.3 |
 | P5.1 | 文档 | README + `_dist` 手册定稿；安装/启动/首启/数据/升级/卸载/排障 | `README.md`、`tools/export-dist.mjs`、`_dist/安装手册.md` | 无 launcher/`--workspace`/新 home/seed-consent 主路径；Plugins 页一句；sha 一致 | P1.6/P2–P4 |
 | P5.2 | 文档 | docs 合同/指南/决策/CHANGELOG；旧 Note 取代 banner | `docs/{profile,runtime-map,data-model,release,project-map,demo,index,decisions,orient}.md`、guides、`CHANGELOG.md` | 现行合同无旧形状；D 号登记；doc-budget 绿 | P5.1 |
 | P5.3 | 文档 | AGENTS 布局/命令、tests/checks 索引、web-window-ops | `AGENTS.md`、`tests/README.md`、`checks/README.md`、`.agents/skills/web-window-ops/SKILL.md` | 命令表可执行；产品入口行不再指 bin；索引同步 | P5.1–P5.2 |
 | P5.4 | 文档 | 门禁：dist-manual 新关键句/禁句；pack-shape/pack-files 无 bin+content；company-skeleton 无 seed；handbook-budget；run-bundle-clean；doc-budget | `checks/gates/` | 每道门禁红→还原→绿；手册/README 断言 | P5.1–P5.3 |
 | P5.5 | 文档 | doc-budget 处置：旧形状搬 notes/archived 或链接；确需提额写 Note | `docs/AGENTS.md`、`checks/gates/doc-budget.mjs` | 不「先提额再写」；所有超限有处置记录 | P5.2 |
 | P6.1 | 验证 | `pnpm verify`/`pnpm test`/`pnpm typecheck`；新 specs | 全仓 | 全绿；无跳过的新判据 | P5.4 |
-| P6.2 | 验证 | 真实入口：release/native-entry/lifecycle/external/isolation/client-load/handbook/preset | `checks/smoke/` | 认证档全绿；每档写清证明/不证明 | P5.4 |
+| P6.2 | 验证 | 真实入口：release/native-entry/lifecycle/external/isolation/client-load/handbook/preset | `checks/lanes/` | 认证档全绿；每档写清证明/不证明 | P5.4 |
 | P6.3 | 验证 | 红→绿证据：每道新门禁/判据一条原话 | Note/卡 | 不能只报「已验证」 | P6.2 |
 | P6.4 | 发布 | `_dist` 0.6.0；CHANGELOG；实现 Note/RFC；旧 Note 取代 | `_dist/`、`CHANGELOG.md`、`notes/` | tarball = 冒烟字节；sha 一致；`release --verify` 绿 | P6.1–P6.3 |
 

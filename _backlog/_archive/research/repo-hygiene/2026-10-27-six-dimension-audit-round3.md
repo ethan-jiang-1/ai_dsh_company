@@ -24,7 +24,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 
 **亲跑（全部 keyless，读数见 §6）**：
 
-`pnpm verify` · `pnpm test` · `node checks/smoke/client-load-smoke.mjs` · `pnpm dsh web -- --port 0 --no-open` + `probes/browser-visual/cdp-probe.mjs`（活体 9/9）· `node checks/smoke/replay-smoke.mjs`（默认场景）· `pnpm orient` · `pnpm diagnose` · `node checks/audit/candidate-scan-eval.mjs`（崩，见 R3-17）· `replay-smoke --scenario r2-motion --ui`（崩，见 R3-15）· `tsc -b packages/company-pack`（0.29s，增量）· `node tools/prune-runtime.mjs`（子代理 dry-run）。
+`pnpm verify` · `pnpm test` · `node checks/lanes/client-load.entry.mjs` · `pnpm dsh web -- --port 0 --no-open` + `probes/browser-visual/cdp-probe.mjs`（活体 9/9）· `node checks/lanes/replay.e2e.mjs`（默认场景）· `pnpm orient` · `pnpm diagnose` · `node checks/audit/candidate-scan-eval.mjs`（崩，见 R3-17）· `replay-smoke --scenario r2-motion --ui`（崩，见 R3-15）· `tsc -b packages/company-pack`（0.29s，增量）· `node tools/prune-runtime.mjs`（子代理 dry-run）。
 
 **只读深挖（四个子代理，各自带文件:行证据）**：模块图与目录扇出（58 模块 / 143 内部边）· 入口链逐跳计量 · 907 用例分型与覆盖率 · 反馈通道逐件盘点。子代理未查面已在报告内如实标注。
 
@@ -68,10 +68,10 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 
 上轮的判断是"腐化主形态转为检索层退化 + 常驻层饱和"；本轮观察到新形态：**入口还在，对象没了**。
 
-- **回放舰队撤空，但活跃面仍把它当现行**：`snapshots/replay` 只剩一个 headless 合成场景（`foundation-workspace`，其 `snapshot.yml` 自述"产品仓唯一合成场景"）。而 r2-motion / r3-delegation 在活跃树被引用 **43 处**，其中至少 10 处是**指令性**的：`checks/smoke/replay-smoke.mjs` 头注（"何时跑…r3 ~15s / r2 五会话 ~80–100s"、`--ui` 说明）、`checks/smoke/client-load-smoke.mjs:14`、`docs/guides/dev-loop.md:227`、`docs/testing.md:15`、`docs/guides/cdp-probe.md:59`、`tools/snapshot-motion.mjs`（默认输出 `r2-motion`，:10/:28）、`tests/repo/repository-layout.spec.ts` 的示例名。**最刺眼的是 `notes/implemented/2026-11-10-ui-demo-rationale.md:132-133`**：同一张表里 v1 行已写"UI 端到端断言已随真实 snapshots 移出产品仓而退役"，v3/v4 行却仍把 `replay-smoke --ui`（r3 金样 / r2 端到端）列为验收证据。
+- **回放舰队撤空，但活跃面仍把它当现行**：`snapshots/replay` 只剩一个 headless 合成场景（`foundation-workspace`，其 `snapshot.yml` 自述"产品仓唯一合成场景"）。而 r2-motion / r3-delegation 在活跃树被引用 **43 处**，其中至少 10 处是**指令性**的：`checks/lanes/replay.e2e.mjs` 头注（"何时跑…r3 ~15s / r2 五会话 ~80–100s"、`--ui` 说明）、`checks/lanes/client-load.entry.mjs:14`、`docs/guides/dev-loop.md:227`、`docs/testing.md:15`、`docs/guides/cdp-probe.md:59`、`tools/snapshot-motion.mjs`（默认输出 `r2-motion`，:10/:28）、`tests/repo/repository-layout.spec.ts` 的示例名。**最刺眼的是 `notes/implemented/2026-11-10-ui-demo-rationale.md:132-133`**：同一张表里 v1 行已写"UI 端到端断言已随真实 snapshots 移出产品仓而退役"，v3/v4 行却仍把 `replay-smoke --ui`（r3 金样 / r2 端到端）列为验收证据。
 - **语义真空绿**：`replay-fixture-freshness` 输出 `×0 场景`（唯一 runnable 是 headless，按设计跳过注入面比对）；`replay-ui-freshness` 在**盘上 0 个 `ui.expected.md`** 的情况下 PASS。门禁把"没有对象"和"检查通过"渲染成同一个词。
 - **声明资产不存在**：`docs/testing.md:62` 与 `checks/audit/candidate-scan-eval.mjs:20` 都指向 `snapshots/corpora/candidate-scan-corpus/`；盘上 `snapshots/` 下只有 `replay/`。实测该脚本 **ENOENT 崩栈、exit 1**（不是优雅报"语料缺失"），因此"行为质量档"只剩真模型 `probe --full` 一条腿。
-- **升 pin 的“第一道回归网”已名存实亡（最重的一条）**：`docs/contracts/release.md:123-125` 仍写“语料回放全绿 = vendor 换 tag 后先跑 `checks/smoke/replay-smoke.mjs`（r2/r3 会话判据 + foundation workspace oracle）…replay = 升 pin 回归网第一道”，并列出“已知漂移红（r3 ×2 / foundation ×3）”。现实是：r2/r3 已不在盘上，foundation 是 authored 合成场景且我实跑全绿；`docs/guides/dev-loop.md:133` 与 `docs/testing.md:62` 的同一句也指向已不存在的语料。**升 pin 程序会拿一个不加载本包的合成回放当“全绿”证据。**
+- **升 pin 的“第一道回归网”已名存实亡（最重的一条）**：`docs/contracts/release.md:123-125` 仍写“语料回放全绿 = vendor 换 tag 后先跑 `checks/lanes/replay.e2e.mjs`（r2/r3 会话判据 + foundation workspace oracle）…replay = 升 pin 回归网第一道”，并列出“已知漂移红（r3 ×2 / foundation ×3）”。现实是：r2/r3 已不在盘上，foundation 是 authored 合成场景且我实跑全绿；`docs/guides/dev-loop.md:133` 与 `docs/testing.md:62` 的同一句也指向已不存在的语料。**升 pin 程序会拿一个不加载本包的合成回放当“全绿”证据。**
 - **计数与事实漂移**：`packages/company-pack/README.md:23` 写"公司视图与**五个页签**"——注册面实际 9 个（`company-tab-registration.ts` 九个 `id:`，cdp-probe 活体也验到 9 个）。`nav-count-claims` 门禁的扫描面是 `docs/** + AGENTS.md + README.md`，**不含包 README**，所以这条活到了收货人文档里。同类：`tests/session/entry-probe.spec.ts:13` 的 Q4 旧标准答案仍是 `dsh-v0.1.7-rc.2`（现行 pin 是 `dsh-v0.2.1-rc.2`），而判据 `tools/lib/entry-probe.mjs:6` 只匹配 `/dsh-v\d+\.\d+/`——这个"入口链新鲜度"探针抓不到版本腐化；`checks/gates/doc-budget.mjs` 第 13-15 行刚写"注释里不要复述当前行数"，随后三处"内容 N"已过期（64/59/351 写成 60/55/348）。
 - **同文件内重复**：`docs/contracts/data-model.md` 把"面板摘要全扫 + open/最近 120 全文"写了三次（:15 表格、:67、:70——后两条几乎逐字重复）。
 - **归档指针失效**：`docs/contracts/demo.md` 在 :68/:152/:171/:228 引 `snapshots/archive/...` 四个路径，盘上都不存在；:68 还把合成的 `foundation-workspace` 称作一场真实动议的"归档"。
@@ -120,7 +120,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 | R3-01 | D2 | P0 | 分层无默认守卫：无 `typecheck`/`build` 脚本，verify 无 `tsc`，test 裸 vitest；client→host 非法边在两命令下全绿（`package.json:scripts`、`checks/run-gates.mjs`、模块图 0 反向边） |
 | R3-02 | D6 | P0 | `diagnose` 对无 `turn/end` 的中断 turn 报 `FAILURES none` 且恒 exit 0（实跑 `EVENTS total=15 turns=0`；判据见 `tools/lib/session-diagnose.mjs:76-86`） |
 | R3-03 | D6 | P0 | 客户端错误从不进模型可见记录；console/pageerror 只在探针进程且仅失败落盘（`tools/drivers/cdp-driver.mjs:107-114`；无 host 事件类型） |
-| R3-04 | D6 | P0 | UI 症状不可复现：`replay-smoke --ui` 仅 r3/r2 白名单，两场景已不在盘上（实测裸栈 exit 1；`checks/smoke/replay-smoke.mjs:782`） |
+| R3-04 | D6 | P0 | UI 症状不可复现：`replay-smoke --ui` 仅 r3/r2 白名单，两场景已不在盘上（实测裸栈 exit 1；`checks/lanes/replay.e2e.mjs:782`） |
 | R3-05 | D4/D5 | P0 | 声明资产不存在：`snapshots/corpora/candidate-scan-corpus/` 缺失，而 `docs/testing.md:62` 与 `checks/audit/candidate-scan-eval.mjs:20` 指向它（实跑 ENOENT 崩栈 exit 1） |
 | R3-06 | D4 | P1 | 语义真空绿：`replay-fixture-freshness ×0 场景`、`replay-ui-freshness` 在 0 个金样上 PASS（verify 输出；`checks/gates/replay-ui-freshness.mjs:19-24`） |
 | R3-07 | D3 | P1 | 授权边界被复述且截断：`docs/guides/dev-loop.md:35` 丢 `_backlog/README.md:86` 的排除项；`AGENTS.md:29` 点名两个 owner |
@@ -166,10 +166,10 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 ```text
 pnpm verify                                       # ALL PASS 47 门（gate-wiring ×47）
 pnpm test                                         # 97 files / 907 tests passed / 7.39s（Tests 6.40s）
-node checks/smoke/client-load-smoke.mjs           # ALL PASS（真浏览器：零挂载失败 / 零 loader 错误 / 品牌在场）
+node checks/lanes/client-load.entry.mjs           # ALL PASS（真浏览器：零挂载失败 / 零 loader 错误 / 品牌在场）
 pnpm dsh web -- --port 0 --no-open                # banner: http://127.0.0.1:65383/?token=…
 node probes/browser-visual/cdp-probe.mjs <url>    # 9/9 页签、panel 非空、consoleProblems=[] exceptions=[] exit 0
-node checks/smoke/replay-smoke.mjs                # ALL PASS（foundation-workspace，2s，工作区树+日志+sidecar）
+node checks/lanes/replay.e2e.mjs                # ALL PASS（foundation-workspace，2s，工作区树+日志+sidecar）
 pnpm orient                                       # 5 slug / 凭据✓ / 公司盘 6 交付物 / snapshots 1 场景
 pnpm diagnose                                     # EVENTS total=15 turns=0 FAILURES none（= R3-02 的现场）
 node checks/audit/candidate-scan-eval.mjs         # ENOENT 崩栈 exit 1（= R3-05 的现场）

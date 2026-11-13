@@ -14,7 +14,7 @@
 
 - 包声明 [package.json](../../packages/company-pack/package.json) 有 `private: true`，无 `engines`、`license`、`repository`；DSH 运行时不读 `dsh.compatibility.dshReleases`，真正拦安装的是 peers。
 - 手册 [_dist/安装手册.md](../../_dist/安装手册.md) 由 [tools/export-dist.mjs](../../tools/export-dist.mjs) 生成，没有 sha256/前置/回退。
-- [release-smoke.mjs](../../checks/smoke/release-smoke.mjs) 只覆盖首启/二启；升级只有 [bundle-manifest.spec.ts](../../tests/host/run-bundle/bundle-manifest.spec.ts) 的单测。
+- [release.entry.mjs](../../checks/lanes/release.entry.mjs) 只覆盖首启/二启；升级只有 [bundle-manifest.spec.ts](../../tests/host/run-bundle/bundle-manifest.spec.ts) 的单测。
 - 门禁 [pack-shape.mjs](../../checks/gates/pack-shape.mjs) 只查 patch 与台账；[dist-manual.mjs](../../checks/gates/dist-manual.mjs) 只查版本/keywords/pin。
 
 ## 方案
@@ -28,7 +28,7 @@
 
 ### 2. 生命周期证据
 
-- 新增 keyless 冒烟 checks/smoke/lifecycle-smoke.mjs（可复用 release-smoke 的启动/清理设施）：
+- 新增 keyless 冒烟 checks/lanes/lifecycle-smoke.mjs（可复用 release-smoke 的启动/清理设施）：
   1. 用当前 pack 打 v1 tarball；装进干净 home；启动一次后停。
   2. 改 `AGENTS.md` + `kb/org.md`；加 `kb/ceo/journal/` 与 `deliverables/<date>-<slug>/final.md` + `meta.md`。
   3. 复制 pack 到 `runtime` 临时区，bump 版本、改一个未改过的骨架文件（`templates/weekly-report.md`），打 v2 tarball；`plugin remove` + `add v2`；启动。
@@ -50,8 +50,8 @@
 ```sh
 pnpm verify
 pnpm test
-node checks/smoke/release-smoke.mjs
-node checks/smoke/lifecycle-smoke.mjs
+node checks/lanes/release.entry.mjs
+node checks/lanes/lifecycle-smoke.mjs
 ```
 
 断言：
@@ -80,7 +80,7 @@ node checks/smoke/lifecycle-smoke.mjs
 
 - manifest：`engines.node >=22.19.0`、`engines.dsh >=0.2.1-rc.2 <0.3.0`、`license: UNLICENSED`、`repository`；`private: true` 保留。`pack-shape` 新增 `pack-engines`（semver 从 vendor app-boot 解析；窗口不覆盖当前 pin 即红）。
 - 手册生成器 [tools/export-dist.mjs](../../tools/export-dist.mjs)：算 tgz sha256、写 `*.tgz.sha256`、注入前置/校验/卸载/失败与回退/许可；[dist-manual](../../checks/gates/dist-manual.mjs) 在本体在场时逐字节核对。
-- [lifecycle-smoke.mjs](../../checks/smoke/lifecycle-smoke.mjs)：v1 真装 → 改 `AGENTS.md`/`kb/org.md` + 加 journal/交付物 → v2 真装 → 启动；断言保留/替换/扩张不动/`bundle.json` 前移/二启零变更；卸载后数据仍在；搬 home 后重装启动。另含“bad engines.dsh 真装被拒绝”与 profile 未被污染。
+- [lifecycle-smoke.mjs](../../checks/lanes/lifecycle-smoke.mjs)：v1 真装 → 改 `AGENTS.md`/`kb/org.md` + 加 journal/交付物 → v2 真装 → 启动；断言保留/替换/扩张不动/`bundle.json` 前移/二启零变更；卸载后数据仍在；搬 home 后重装启动。另含“bad engines.dsh 真装被拒绝”与 profile 未被污染。
 - 合同：[docs/contracts/release.md](../../docs/contracts/release.md) 写明 engines 是运行时窗口、台账是认证记录、sha256 是产物身份；[checks/README.md](../../checks/README.md) 登记新 smoke；pack README 顶部给收件人入口。
 
 红/绿收据（实跑）：
@@ -88,8 +88,8 @@ node checks/smoke/lifecycle-smoke.mjs
 - 红：只加 `pack-engines` 断言、未补 manifest → `FAIL pack-engines: engines.node 缺失；engines.dsh 缺失；license 缺失；repository 缺失`；补 manifest 后 `PASS pack-engines`。
 - 红：只加 `dist-manual` 断言、未重导手册 → `FAIL dist-manual: … 缺 sha256 / 回退 …`；`node tools/export-dist.mjs` 后 `PASS dist-manual（… sha256 …）`。
 - 绿：`pnpm verify` → `ALL PASS`（含 `pack-engines`、`dist-manual`、`script-index ×90`）。
-- 绿：`node checks/smoke/release-smoke.mjs` → `ALL PASS`（真 tarball 安装、五角色 + researcher 零 broken、首启骨架 + `bundle.json`、二启零变更）。
-- 绿：`node checks/smoke/lifecycle-smoke.mjs` → `ALL PASS`（含 `不兼容 DSH 真拒绝`、`改过的 AGENTS.md 保留`、`未改过的模板随 v2 替换`、`扩张面逐字节不变`、`卸载后数据仍在`、`迁移后 boot 成功`）。
+- 绿：`node checks/lanes/release.entry.mjs` → `ALL PASS`（真 tarball 安装、五角色 + researcher 零 broken、首启骨架 + `bundle.json`、二启零变更）。
+- 绿：`node checks/lanes/lifecycle-smoke.mjs` → `ALL PASS`（含 `不兼容 DSH 真拒绝`、`改过的 AGENTS.md 保留`、`未改过的模板随 v2 替换`、`扩张面逐字节不变`、`卸载后数据仍在`、`迁移后 boot 成功`）。
 - 绿：`node tools/export-dist.mjs` → `ALL PASS`（0.3.1 当时 `sha256 — a89f0ee5…`、260 entries；0.3.2 重导 `3c33dcd…`/269，0.3.3 审查重导见收尾回执）。
 
 环境前提（不是产品 diff）：本机 vendor 的 host/client 产物不完整时，首启会报 `client bundles not found` / `ERR_MODULE_NOT_FOUND`；本次按 bootstrap 重建了 vendor host（`tsdown --env.DSH_BUILD_FACE host`）与 `client/ui-tool` 的 client bundle。产物在 vendor 的 ignore 面，不产生 tracked 改动。

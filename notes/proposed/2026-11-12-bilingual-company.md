@@ -153,7 +153,7 @@ opened: 2026-11-12
 - Policy：`tests/host/prompt` 的 section spec；删 `registerLanguagePolicy` 调用 → spec 红；还原 → 绿。
 - 命令：`tests/host/commands` 的 description 重注册 spec；去掉 dispose+重注册 → en description 仍中文 → 红；还原 → 绿。
 - Gate：`checks/gates/` 的 `client-copy.mjs`；在 `packages/company-pack/src/client/` 的一个组件写回中文字面量 → `pnpm verify` 红并点名文件:行；还原 → 绿。
-- 真页面：`source run/env.sh && node checks/smoke/ui-scene-smoke.mjs --isolated --expected`（zh）；en 用同一隔离 profile 写 `locale.preference: en` 或探针参数；两边都断言无中文残留/金样一致。首屏闪英文单独用英文 locale 浏览器验收。
+- 真页面：`source run/env.sh && node checks/lanes/ui-scene.entry.mjs --isolated --expected`（zh）；en 用同一隔离 profile 写 `locale.preference: en` 或探针参数；两边都断言无中文残留/金样一致。首屏闪英文单独用英文 locale 浏览器验收。
 
 ## 实施顺序（TDD 红绿环）
 

@@ -45,7 +45,7 @@ opened: 2026-11-12
 
 **范围：**
 
-- 两个提交触及的面：`src/client/startup/*`、`src/client/tabs/*`、`src/client/locales.ts`、`src/client/ui/styles.ts`、`src/host/startup/*`、`src/host/commands/settings-command.ts`、`src/lib/startup-settings.ts`、`src/lib/run-bundle-paths.ts`、`content/wiki-template/**`、`presets/_shared/wiki/skills/**`、六个角色 `agent.cordis.yml` 的 `customSkillDirs`、`checks/gates/shipped-links.mjs` 的排除面、`checks/smoke/preset-smoke.mjs` 的共享根、`docs/contracts/profile.md` 与 `content/README.md` 的合同文字。
+- 两个提交触及的面：`src/client/startup/*`、`src/client/tabs/*`、`src/client/locales.ts`、`src/client/ui/styles.ts`、`src/host/startup/*`、`src/host/commands/settings-command.ts`、`src/lib/startup-settings.ts`、`src/lib/run-bundle-paths.ts`、`content/wiki-template/**`、`presets/_shared/wiki/skills/**`、六个角色 `agent.cordis.yml` 的 `customSkillDirs`、`checks/gates/shipped-links.mjs` 的排除面、`checks/lanes/preset.entry.mjs` 的共享根、`docs/contracts/profile.md` 与 `content/README.md` 的合同文字。
 - 真实入口：`pnpm verify` / `pnpm test` / `pnpm typecheck` / `pnpm lint` / `pnpm dup`；隔离 profile 的真页面（zh / en / steps）；真挂载的 `preset-smoke` / `client-load-smoke` / `release-smoke`；真实公司会话的注入与模型行为（B 批）。
 - 回归面：旧 9 页签金样、旧 en 九页签、旧 composer 槽、旧 section（handbook / delegation / workflow）、旧 skill 隔离、旧 `bundle.json` / run-bundle 形状、旧 home settings 与 workspace settings 的边界。
 - 测试资产：可复用现有 probe/spec；不足时允许补**测试资产**（`probes/`、`checks/`、步骤 JSON、临时 fixture），不允许改产品代码 / presets / content / vendor。
@@ -101,11 +101,11 @@ opened: 2026-11-12
 | 结构门禁 | `pnpm verify` | 全绿；红即 regression | 退出码 + 首条红 |
 | keyless 回归 | `pnpm test` | 全绿；红即 regression（先记基线，不在本卡修） | files/tests、失败名 |
 | 类型 / 风格 | `pnpm typecheck`、`pnpm lint`、`pnpm dup` | 全绿 | 退出码 |
-| 11 preset 真挂载 | `node checks/smoke/preset-smoke.mjs` | 6 角色 + 5 support 全部挂上；六角色 `skills/list` 含 `consulting-the-knowledge-map`；support 不含（有 `skills/` 目录的 support 由本 smoke 覆盖，无目录的另用 `skills/list` 或静态面补） | ALL PASS + 逐 preset 读数 |
-| client 真挂载 | `node checks/smoke/client-load-smoke.mjs` | 新槽 / 新页签零挂载失败 | ALL PASS |
-| 真页面 zh | `node checks/smoke/ui-scene-smoke.mjs --isolated --golden` | 10 页签金样一致；无浏览器错误 | ALL PASS + 金样 diff |
-| 真页面 en | `node checks/smoke/ui-scene-smoke.mjs --isolated --lang en` | 10 页签无中文残留（重点第 10 个「策略」） | 每页签文本 / 失败片段 |
-| 安装形状 | `node checks/smoke/release-smoke.mjs` + 检查 tarball 清单 | 干净 profile 装包后 11 preset 可挂载；`content/wiki-template/**` 与 `presets/_shared/wiki/skills/**` 在包里；六角色 skill 可见 | ALL PASS + `tar -tzf` 关键行 |
+| 11 preset 真挂载 | `node checks/lanes/preset.entry.mjs` | 6 角色 + 5 support 全部挂上；六角色 `skills/list` 含 `consulting-the-knowledge-map`；support 不含（有 `skills/` 目录的 support 由本 smoke 覆盖，无目录的另用 `skills/list` 或静态面补） | ALL PASS + 逐 preset 读数 |
+| client 真挂载 | `node checks/lanes/client-load.entry.mjs` | 新槽 / 新页签零挂载失败 | ALL PASS |
+| 真页面 zh | `node checks/lanes/ui-scene.entry.mjs --isolated --golden` | 10 页签金样一致；无浏览器错误 | ALL PASS + 金样 diff |
+| 真页面 en | `node checks/lanes/ui-scene.entry.mjs --isolated --lang en` | 10 页签无中文残留（重点第 10 个「策略」） | 每页签文本 / 失败片段 |
+| 安装形状 | `node checks/lanes/release.entry.mjs` + 检查 tarball 清单 | 干净 profile 装包后 11 preset 可挂载；`content/wiki-template/**` 与 `presets/_shared/wiki/skills/**` 在包里；六角色 skill 可见 | ALL PASS + `tar -tzf` 关键行 |
 | run-bundle 形状 | `ensureRunBundle` / 现有 rehearsal 盘（`pnpm bundle:init` 只作 dev 盘现状基线，不碰真盘） | `startup.json` / `startup-options.json` 路径不破坏既有 `bundle.json` / 二次启动零变更 | 文件清单 + 二次启动 diff |
 
 ### A2 真页面：UI 真值矩阵（zh / en / steps）

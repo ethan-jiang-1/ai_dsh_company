@@ -94,7 +94,7 @@ preset-smoke: 3 FAILURE(S)
 | 步 | 实跑命令 | 判据与结果 |
 |---|---|---|
 | **缺口实证** | 删 ceo 的 `sampleOverCapGlobResults` → `node checks/run-gates.mjs` | `verify: ALL PASS` ⇒ **0001 承诺的快检查确实不存在** |
-| 真挂载仍在 | `source run/env.sh && node checks/smoke/preset-smoke.mjs` | `FAIL session/create 挂上 ceo: … invalid config: $.sampleOverCapGlobResults missing required value`；`preset-smoke: 3 FAILURE(S)` ⇒ 高保真层没丢 |
+| 真挂载仍在 | `source run/env.sh && node checks/lanes/preset.entry.mjs` | `FAIL session/create 挂上 ceo: … invalid config: $.sampleOverCapGlobResults missing required value`；`preset-smoke: 3 FAILURE(S)` ⇒ 高保真层没丢 |
 | 判据源探明 | vendor `docs/config-catalog.md` | 145 catalog 块；56 包有必填字段；`tool-fs-search`→`[sampleOverCapGlobResults]`、`tool-todo`→`[allowParallelInProgress]`（与 0001 元凶字段精确对上） |
 | **红（绿基线后）** | 删两个元凶字段 → `run-gates` | `FAIL preset-required-config: …ceo: @deepseek-ai/dsh-tool-fs-search（1 个必填字段缺）sampleOverCapGlobResults；ceo: @deepseek-ai/dsh-tool-todo（1 个必填字段缺）allowParallelInProgress` → 还原 → `PASS ×32` |
 | 边界红 2 | 保留 `config:` 行但清空内容 | 红（`…（1 个必填字段缺）sampleOverCapGlobResults`）——**首版此处会静默放行** |

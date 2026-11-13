@@ -3,7 +3,7 @@
 // 为什么抽出来：从 .pnpm store 里找 playwright、并在 playwright 期望的 chromium 版本缺席时
 // 回退到缓存里最新一份可执行文件——这段逻辑有真实的坑（`Executable doesn't exist` 的形态、
 // macOS app bundle 与 headless shell 的路径差异），复制第二份必然漂移。
-// 出处：client-load-smoke.mjs（postmortem 0003 起的既有实现）。
+// 出处：client-load.entry.mjs（postmortem 0003 起的既有实现）。
 import { existsSync, readdirSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'

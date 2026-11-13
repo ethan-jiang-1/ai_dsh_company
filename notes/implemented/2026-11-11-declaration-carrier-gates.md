@@ -95,7 +95,7 @@
   - 070：把真值表的 `1/1` 期望改成 allow → spec 红（`1 failed`）；还原 → 5 passed。
 - `pnpm test`：**175 files / 1463 tests passed**（含新 `delegation-depth-truth-table.spec.ts` 5 项）。
 - `pnpm typecheck`：绿；`pnpm lint`：0 warnings / 0 errors。
-- `source run/env.sh && node checks/smoke/preset-smoke.mjs`：`preset-smoke: ALL PASS`（本组未改
+- `source run/env.sh && node checks/lanes/preset.entry.mjs`：`preset-smoke: ALL PASS`（本组未改
   preset；沿用经营组收口时的真挂载结果）。
 - 未执行 / 未验：真模型是否按新合同文档配行（需 key）；`pack-content-paths` 只覆盖
   `packages/company-pack/**/*.md`，不覆盖 `docs/` 的 pack-relative 路径；policy 词表只抓数字型

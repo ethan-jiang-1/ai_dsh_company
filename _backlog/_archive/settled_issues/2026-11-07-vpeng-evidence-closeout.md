@@ -13,7 +13,7 @@ opened: 2026-11-07
 
 **问题与期望结果：** 真模型 VP-Eng 包 E2E；teammate/命名 child 的 preset/depth 证据；CEO `product-team-e2e-smoke` 绿；程序 Note/D57/D58/docs/归档。
 
-**范围：** 新 `vp-eng-teaming-probe.mjs`（待建，落 probes/team/）；`checks/smoke/product-team-e2e-smoke.mjs`；`checks/smoke/delegation-smoke.mjs`；程序 Note + `docs/index.md`、`docs/reference/decisions.md`（D57/D58）、`notes/implemented/2026-11-10-role-content-rationale.md`（按需）；A1/B1 的合同页（`docs/guides/product-definition.md`、`docs/contracts/presets.md`、`docs/contracts/delegation.md`）只核对、不改正文；归档。
+**范围：** 新 `vp-eng-teaming-probe.mjs`（待建，落 probes/team/）；`checks/lanes/product-team-e2e.entry.mjs`；`checks/lanes/delegation.entry.mjs`；程序 Note + `docs/index.md`、`docs/reference/decisions.md`（D57/D58）、`notes/implemented/2026-11-10-role-content-rationale.md`（按需）；A1/B1 的合同页（`docs/guides/product-definition.md`、`docs/contracts/presets.md`、`docs/contracts/delegation.md`）只核对、不改正文；归档。
 
 **依赖：** B1/A8。
 
@@ -31,7 +31,7 @@ opened: 2026-11-07
 |---|---|---|---|---|---|---|
 | VP-Eng 根门 spawn 工程师 + 命名 CMO/SA/SQA；整包产出 | 模型行为 | 排练场真模型 | probe 绿 | 缺专家/缺产物 → 红 | 新 `vp-eng-teaming-probe.mjs`（待建，落 probes/team/） | 用户 review 包 |
 | teammate preset=`vp-eng`；命名 child preset 正确；SQA 结论原样 | 模型行为 | child 日志 | probe 断言 | 冒充/删结论 → 红 | 同上 | 用户 review |
-| CEO 两件套仍走 team | 模型行为/编排 | `product-team-e2e-smoke` | smoke 绿 | 红 = 破坏 | `checks/smoke/product-team-e2e-smoke.mjs` | 无 |
+| CEO 两件套仍走 team | 模型行为/编排 | `product-team-e2e-smoke` | smoke 绿 | 红 = 破坏 | `checks/lanes/product-team-e2e.entry.mjs` | 无 |
 | 程序 Note（伞卡）/D57/D58 | 文档形状 | 伞卡 Note + decisions | `pnpm verify` + `pnpm notes:audit` | 缺路由 → 红 | 伞卡 + `pnpm verify` | 用户 review Note |
 | 索引/台账/合同页核对 | 文档形状 | `docs/index.md` / `docs/reference/decisions.md` + 核对 A1/B1 合同页 | `pnpm verify`（md-links/doc-budget） | 断链/超预算/旧说法 → 红 | `docs/*` + `pnpm verify` | 用户 review 文案 |
 
@@ -40,8 +40,8 @@ opened: 2026-11-07
 | 判据 | 现有 owner / 新资产 | 命令 | 证明什么 | 不证明什么 | 红证·负例 |
 |---|---|---|---|---|---|
 | VP-Eng 包 | 新 probe（现有 `probes` 形状） | `node probes/team/vp-eng-teaming-probe.mjs` | 组队/专家/产物 | 一般可靠性 | 缺 SQA → 红 |
-| CEO 回归 | 既有 `checks/smoke/product-team-e2e-smoke.mjs` | `node checks/smoke/product-team-e2e-smoke.mjs` | CEO team | VP-Eng 包 | 红 = 破坏 |
-| 委派边界 | 既有 `checks/smoke/delegation-smoke.mjs` | `node checks/smoke/delegation-smoke.mjs` | 工具面 | VP-Eng 包 | 红 |
+| CEO 回归 | 既有 `checks/lanes/product-team-e2e.entry.mjs` | `node checks/lanes/product-team-e2e.entry.mjs` | CEO team | VP-Eng 包 | 红 = 破坏 |
+| 委派边界 | 既有 `checks/lanes/delegation.entry.mjs` | `node checks/lanes/delegation.entry.mjs` | 工具面 | VP-Eng 包 | 红 |
 | 程序 Note（伞卡）/台账 | 伞卡 Note + docs/decisions + archive | `pnpm verify` + `pnpm notes:audit` | 路由/形状 | 内容 | 缺 D 号 → 红 |
 | 索引/台账/合同页核对 | `docs/index.md` + `docs/reference/decisions.md` + 核对 A1/B1 合同页 | `pnpm verify`（md-links/doc-budget） | 链接/预算 | 正文语义 | 断链/超预算 → 红 |
 
@@ -61,8 +61,8 @@ opened: 2026-11-07
 
 - 基线：`git rev-parse HEAD` = `1cae832`（B1 提交后）
 - **B2 真跑（VP-Eng 包）**：`node probes/team/vp-eng-teaming-probe.mjs` → **ALL PASS**（root `session-29d0a0bf-9975-403d-a75a-adff4b9bf02c`，slug `2026-11-07-recon-bank-autorecon-v3`）：P1 teammate `prd-detail` 继承 vp-eng 组合/depth 1/parent=根；P2 `cmo`/`system-architect`/`system-qa` 三个命名 child preset 正确；P3 产物 8/8；P4 SQA 裁决词在场 + 包索引点名 SQA；P5 无 final.md
-- **CEO 回归**：`node checks/smoke/product-team-e2e-smoke.mjs` → **ALL PASS**（202s；members=[cmo,vp-eng]、任务板 2 条且 PRD blockedBy MRD、未越编）
-- **委派边界**：`node checks/smoke/delegation-smoke.mjs` → **ALL PASS**（activation 回执、child 首帧 `agentPreset`、child 无 Team 工具、控制名仍团队版）
+- **CEO 回归**：`node checks/lanes/product-team-e2e.entry.mjs` → **ALL PASS**（202s；members=[cmo,vp-eng]、任务板 2 条且 PRD blockedBy MRD、未越编）
+- **委派边界**：`node checks/lanes/delegation.entry.mjs` → **ALL PASS**（activation 回执、child 首帧 `agentPreset`、child 无 Team 工具、控制名仍团队版）
 - 资产：新 `probes/team/vp-eng-teaming-probe.mjs`（P1–P5，逐次结果落 `runtime/vp-eng-teaming-probe/last-run.json`）；`checks/INDEX.generated.md` 重生成
 - 程序 Note：`notes/implemented/2026-11-07-requirements-teaming-program.md`（决定 / 输掉的方案 / 落地提交表 / 验证 / 剩余风险 / 上游卡）；D57/D58 路由已进 `docs/reference/decisions.md`（预算 62→64，论证 = 本 Note）
 - docs：`docs/index.md` 两行更新（presets / product-definition）；A1/B1 合同页只核对未改正文

@@ -55,7 +55,7 @@
 
 - `pnpm verify` → ALL PASS（2 门无对象）。
 - `pnpm test` → **153 files / 1239 tests passed**；改 preset 文本后另跑 `npx vitest run tests/presets`
-  （54 passed）与 `node checks/smoke/preset-smoke.mjs`（ALL PASS）。
+  （54 passed）与 `node checks/lanes/preset.entry.mjs`（ALL PASS）。
 - 本轮真模型/机制证据：P1（spill 全文 71,703 字节、`read` 按行截断）、C2/C2b（cold resume：
   turn1 interrupted → turn2 completed、`1.4.2`，但无 `lastTurnEnd`）、C3（`list_subagents` 含 teammate）、
   C6（`/compact` 摘要保留 eng-teaming，4 模块仍走 workflow）、C7/C7R（job 丢失；child 冷恢复但原输出丢）、

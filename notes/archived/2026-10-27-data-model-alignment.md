@@ -48,12 +48,12 @@
 |---|---|
 | `pnpm test` | 94 files / 880 tests 全绿（含新增 manifest v2/rebind/scope/ledger/scan specs） |
 | `node tools/export-dist.mjs` | ALL PASS：0.3.11、107 条目、手册重生成 |
-| `node checks/smoke/release-smoke.mjs` | ALL PASS（真 tarball 安装 → 六角色 → 首启落盘/二启零变更；presented 账本随首启落盘） |
-| `node checks/smoke/lifecycle-smoke.mjs` | ALL PASS（v1→v2、改基部保留、卸载、**business 恢复**、搬 home） |
-| `node checks/smoke/isolation-matrix-smoke.mjs` | ALL PASS（含 **explicit rebind** 真启动：workspace 前移/备份/日志/sentinel） |
-| `node checks/smoke/present-catalog-smoke.mjs` | ALL PASS（vendor present → 事件 → 索引 + 审计账本） |
-| `node checks/smoke/upgrade-while-running-smoke.mjs` | ALL PASS（当前版运行中 remove/add 下一 patch；session/data 保留） |
-| `node checks/smoke/concurrent-home-smoke.mjs` | ALL PASS（同 home 两进程首启后 bundle/catalog/数据可解析；不声明多 Host 支持） |
+| `node checks/lanes/release.entry.mjs` | ALL PASS（真 tarball 安装 → 六角色 → 首启落盘/二启零变更；presented 账本随首启落盘） |
+| `node checks/lanes/lifecycle-smoke.mjs` | ALL PASS（v1→v2、改基部保留、卸载、**business 恢复**、搬 home） |
+| `node checks/lanes/isolation-matrix.entry.mjs` | ALL PASS（含 **explicit rebind** 真启动：workspace 前移/备份/日志/sentinel） |
+| `node checks/lanes/present-catalog.e2e.mjs` | ALL PASS（vendor present → 事件 → 索引 + 审计账本） |
+| `node checks/lanes/upgrade-while-running.entry.mjs` | ALL PASS（当前版运行中 remove/add 下一 patch；session/data 保留） |
+| `node checks/lanes/concurrent-home.entry.mjs` | ALL PASS（同 home 两进程首启后 bundle/catalog/数据可解析；不声明多 Host 支持） |
 | `pnpm verify` | ALL PASS（含 `dist-manual` 新关键句：`DSH_COMPANY_REBIND` / `deliverables-presented` / business / full） |
 
 红证（实跑，用于证明判据不是空断言）：

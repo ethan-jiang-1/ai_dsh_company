@@ -16,7 +16,7 @@ intent: "D4 高腐化面的 notes 分诊（2026-11-03）：A- 收口/客户端�
 | 机制 | 现行 owner |
 |---|---|
 | 七维评分 | [round5 卡](../../settled_issues/2026-11-03-repo-hygiene-round5.md) 的 fresh 复评（D4 B-，不是全 A-） |
-| 页面错误→host 日志 | [D6 断链修复](../../../../notes/archived/2026-11-03-d6-client-error-chain-fix.md) + `checks/smoke/client-error-chain-smoke.mjs` |
+| 页面错误→host 日志 | [D6 断链修复](../../../../notes/archived/2026-11-03-d6-client-error-chain-fix.md) + `checks/lanes/client-error-chain.entry.mjs` |
 | v3 公司盘 / 内容 | [v3 native entry](../../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)、`packages/company-pack/content/README.md` |
 | CompanyView | 已删；[D2 removal Note](../../../../notes/archived/2026-11-03-d2-companyview-removal.md) |
 | 发布 READY | [release.md](../../../../docs/contracts/release.md) §版本纪律（点态） |

@@ -4,7 +4,7 @@
 // 2026-11-03（A- D1）：覆盖门禁反过来强制 README 手工枚举（违反 D28「枚举的家 = 实现自己」）。
 // 现在改成「扫描目录 → 渲染生成物 → 校验新鲜度」：README 只链接 checks/INDEX.generated.md，
 // 目录一变生成物就红，提示跑 `node tools/checks-index.mjs --write`。
-// 负例留证 2026-11-03：临时建 checks/smoke/zz-index-probe.mjs → 生成物未更新 ⇒
+// 负例留证 2026-11-03：临时建 checks/lanes/zz-index-probe.mjs → 生成物未更新 ⇒
 //   `FAIL script-index: checks/INDEX.generated.md 与目录不一致……`；跑 --write 后绿；
 //   删除探针后生成物多一条 → 再红；--write 还原 → 绿。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'

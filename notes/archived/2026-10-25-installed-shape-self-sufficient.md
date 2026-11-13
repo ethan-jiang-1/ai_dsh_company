@@ -56,9 +56,9 @@
 ```sh
 pnpm verify
 pnpm test
-node checks/smoke/release-smoke.mjs
-node checks/smoke/handbook-smoke.mjs
-node checks/smoke/preset-smoke.mjs
+node checks/lanes/release.entry.mjs
+node checks/lanes/handbook-smoke.mjs
+node checks/lanes/preset.entry.mjs
 ```
 
 断言：
@@ -97,9 +97,9 @@ node checks/smoke/preset-smoke.mjs
 - 红：只加 `shipped-links`、未改内容 → `FAIL shipped-links: …/AGENTS.md:23 链接指向仓库/穿出 workspace：../docs/contracts/demo.md；…templates/meta.md:3 裸路径指向仓库：tools/lib/deliverables.mjs；…chairing…:58 裸路径指向仓库：node tools/converge.mjs`。
 - 红（审查轮，当前门禁）：往 chairing skill 植入 `../../docs/contracts/release.md` 与 fenced `node tools/x.mjs` → `FAIL shipped-links: …:72 链接指向仓库/穿出 workspace；…:75 代码块指向仓库`；还原 → `ALL PASS`。
 - 绿：改完内容后 `pnpm verify` → `ALL PASS`（含 `shipped-links`、`handbook-budget`、`gate-wiring ×46`）。
-- 绿：`node checks/smoke/release-smoke.mjs` → `ALL PASS`，其中 `首启生成成品目录（空目录，不依赖仓库工具）` 与 `第二次启动零变更` 均 PASS。
+- 绿：`node checks/lanes/release.entry.mjs` → `ALL PASS`，其中 `首启生成成品目录（空目录，不依赖仓库工具）` 与 `第二次启动零变更` 均 PASS。
 - 绿：`pnpm test` → 89 files / 848 tests passed（含 catalog/wiring/identity/contract）。
-- 绿：`node checks/smoke/client-load-smoke.mjs` → `ALL PASS`（真浏览器加载、品牌槽、零 loader 错误）。
+- 绿：`node checks/lanes/client-load.entry.mjs` → `ALL PASS`（真浏览器加载、品牌槽、零 loader 错误）。
 
 环境前提（不是产品 diff）：本机 vendor client 产物不齐时首启会报 `client bundles not found`；本轮按 bootstrap 补建 vendor host/client，并对 `packages/api/session-controller` 单独补 client bundle。产物在 vendor ignore 面。
 

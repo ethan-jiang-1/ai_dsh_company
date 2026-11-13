@@ -23,7 +23,7 @@ intent: 核对 DSH 0.2.1 对 preset 组合、subagent/workflow/team 委派、ski
 | `tool-subagent` 的 Config 有 `agentPreset?`：**默认独立 preset；省略则继承父**；`allowedAgentPresets?` 可把 `agent_preset` 暴露给模型选择 | `vendor/dsh/packages/subagent/tool-subagent/src/preset-selection.ts`（7–12 行） | **H4（worker 组合）是原生的**：给通用 `subagent` 行加 `agentPreset: <worker>` 即可；不需要新机制 |
 | 每个 tool-subagent 实例必须用不同 `toolName` | `tool-subagent/src/index.ts` Config 注（toolName 注释） | 命名委派行可以多实例；worker 行与命名行可共存 |
 | `subagent` 行可配 `provider` / `maxDepth`（数字或 `provider-managed`）；数字深度需要 provider 的 `depthLimit` 能力 | `tool-subagent/src/index.ts`（50–78 行） Config | 深度是**每行**手写，不是角色级声明；S2 的一致性只能靠生成器/测试 |
-| 委派是 activation：工具立即返回 `{kind:'activation', subagentId}`，终稿由完成通知回父；`backgroundMode`/`run_in_background` 已删 | `checks/smoke/delegation-smoke.mjs` 头注；`tool-subagent/src/index.ts` start 路径 | 控制/终态/续驶是 subagent 服务的语义，不是 preset 能改的；preset 只能决定“给不给控制行、深度多少、用哪个 preset” |
+| 委派是 activation：工具立即返回 `{kind:'activation', subagentId}`，终稿由完成通知回父；`backgroundMode`/`run_in_background` 已删 | `checks/lanes/delegation.entry.mjs` 头注；`tool-subagent/src/index.ts` start 路径 | 控制/终态/续驶是 subagent 服务的语义，不是 preset 能改的；preset 只能决定“给不给控制行、深度多少、用哪个 preset” |
 
 ## 3. workflow 的委派面
 
@@ -56,7 +56,7 @@ intent: 核对 DSH 0.2.1 对 preset 组合、subagent/workflow/team 委派、ski
 |---|---|---|
 | 会话实际工具面 = `request/header.tools`；`--dump-config` 只证组合层 | `docs/contracts/presets.md`（生效证据节）；本仓研究材料 | H6 的“声明 vs 实际”测试要么读会话 header（需要一次模型请求），要么找 Loader 级 dump（keyless） |
 | `agentPresets/list` 可列名册/预设（web RPC） | `docs/contracts/presets.md` 名册；preset-smoke | keyless 可验“预设在场/可挂载”，但不能证明 per-session 工具面 |
-| preset-smoke 通过 `session/create` 真挂载，零模型 | `checks/smoke/preset-smoke.mjs` 头注 | 面级测试可以复用这条真入口；要读工具面需再找 RPC/日志点 |
+| preset-smoke 通过 `session/create` 真挂载，零模型 | `checks/lanes/preset.entry.mjs` 头注 | 面级测试可以复用这条真入口；要读工具面需再找 RPC/日志点 |
 
 ## 7. 对结构选项的裁决（本轮）
 

@@ -9,7 +9,7 @@
 3. **五角色数组单源**：`tools/lib/company-roles.mjs` 的 `COMPANY_ROLE_IDS` 为 mjs 侧唯一事实家（10 处消费：authorship/candidate-scan[死导出删]/deliverables/converge/run-gates presets 门禁/四 smoke/journal-audit）；journal-audit 原字母序以 `[...COMPANY_ROLE_IDS].sort()` 保持零漂移。
 4. **zstd 解压收 drivers**：`tools/drivers/zstd.mjs` 的 `zstdText(file,{maxBuffer})` 收拢 4 处近似拷贝（orient/snapshot-motion/session-log-export/journal-audit）；各调用点 maxBuffer 沿用现值。
 5. **verdict 抽 lib**：team-concurrency 判分（`concurrencyVerdict` + `verdictOutcome`）自探针内联抽出，collaboration-probe-verdict.spec 第一块改普通 import（其余五探针切片维持——各自抽出时再迁）。
-6. **probe-kit + replay-ui + run-gates 切分**：33 处 sleep 与 16 处 check（V1 results 版 ×10→`makeCheck`、V2 failures 版 ×5→`makeFailingCheck`、V3 异步版 ×1 有意保留）收敛 `tools/lib/probe-kit.mjs`（37 探针迁移，输出格式 3 条 keyless 钉住；**顺带**：replay-smoke 主文件的内联 check/sleep 与 kit 逐字同义，05cddbe 一并收敛——kit 消费面实为 37 探针 + 1 smoke）；replay-smoke 浏览器档（589-830 段）拆 `checks/smoke/lib/replay-ui.mjs`（env 显式注入 check/firstDiff/旗标，共享可变状态留主文件）；run-gates 兑现 2026-10-05 自设触发线——31 个门禁文件（名 = ok/fail 短名，取代已重复的 2c-bis 编号）+ `checks/gates/lib/pin.mjs`（pin 常量唯一家，sync-dsh/export-dist 解析路径同 diff 改指）+ 92 行薄 runner 按原顺序装配。拆分的非逐字改动全量申报（盲审核对原文件 388 条注释行仅 8 处不匹配）：**注释行修正 2**（pin-currency 与 vendor-pin 的「唯一事实家 = 本文件」→「gates/lib/pin.mjs」）；**代码行重定向 1**（retired-path 自排除目标 run-gates.mjs→retired-path.mjs，退役前缀映射表随门禁搬家）；其余 5 行 = runner 头注自身的必然重写（触发线兑现叙述 + 墓碑并入去编号）。
+6. **probe-kit + replay-ui + run-gates 切分**：33 处 sleep 与 16 处 check（V1 results 版 ×10→`makeCheck`、V2 failures 版 ×5→`makeFailingCheck`、V3 异步版 ×1 有意保留）收敛 `tools/lib/probe-kit.mjs`（37 探针迁移，输出格式 3 条 keyless 钉住；**顺带**：replay-smoke 主文件的内联 check/sleep 与 kit 逐字同义，05cddbe 一并收敛——kit 消费面实为 37 探针 + 1 smoke）；replay-smoke 浏览器档（589-830 段）拆 `checks/lanes/lib/replay-ui.mjs`（env 显式注入 check/firstDiff/旗标，共享可变状态留主文件）；run-gates 兑现 2026-10-05 自设触发线——31 个门禁文件（名 = ok/fail 短名，取代已重复的 2c-bis 编号）+ `checks/gates/lib/pin.mjs`（pin 常量唯一家，sync-dsh/export-dist 解析路径同 diff 改指）+ 92 行薄 runner 按原顺序装配。拆分的非逐字改动全量申报（盲审核对原文件 388 条注释行仅 8 处不匹配）：**注释行修正 2**（pin-currency 与 vendor-pin 的「唯一事实家 = 本文件」→「gates/lib/pin.mjs」）；**代码行重定向 1**（retired-path 自排除目标 run-gates.mjs→retired-path.mjs，退役前缀映射表随门禁搬家）；其余 5 行 = runner 头注自身的必然重写（触发线兑现叙述 + 墓碑并入去编号）。
 
 ## 输掉的方案
 
@@ -31,7 +31,7 @@
 
 ## 验证（全部实跑；基线存 `runtime/e2e/refactor-baseline/`，gitignored）
 
-- **基线法**：动手前录 `pnpm verify`（46 PASS）+ `pnpm exec vitest run --reporter=verbose`（54 文件/538 条全名清单）+ `node checks/smoke/replay-smoke.mjs`（默认档，3 预存 FAIL 原样入档）；每阶段后对基线 diff。
+- **基线法**：动手前录 `pnpm verify`（46 PASS）+ `pnpm exec vitest run --reporter=verbose`（54 文件/538 条全名清单）+ `node checks/lanes/replay.e2e.mjs`（默认档，3 预存 FAIL 原样入档）；每阶段后对基线 diff。
 - **纯搬移等价**：A/B 阶段排序后 538 条测试全名 diff 恰为预期搬移/零差异；verify PASS 行每阶段仅实测计数漂移（新文件入扫描面：spec 数、脚本注释面数——每处漂移均对账到因）。
 - **实跑面**：converge 计划模式、`pnpm orient`（568 会话）、snapshot-motion-smoke PASS、session-log-export 568 份导出 0 失败、journal-audit --limit 3 ALL PASS、sync-dsh 簿记一致；zstdText 对真实 592499 字节多帧日志与 CLI 全文字节一致。
 - **replay 双跑**：默认档输出与基线逐行一致（3 预存 FAIL 不变）；`--ui` 档用 git stash 在拆分前后各跑一次，PASS/FAIL 集**完全一致**（4 FAIL 全预存）——拆分零行为漂移的实证。

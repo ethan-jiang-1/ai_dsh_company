@@ -310,7 +310,7 @@ intent: 记录 E0–E4 的假设、命令、原始输出与结论；每条结论
 | 关切 | product-type 侧 | delivery-mode 侧 | 对称性 |
 |---|---|---|---|
 | 包形状 | `tests/content/product-types.spec.ts` + `tests/presets/product-type-coverage.spec.ts`（五件齐 + playbook + fixture） | `tests/content/delivery-modes.spec.ts`（包 + requiredSections） | 两侧都有；类型多 fixture，模式多模板 |
-| 唯一枚举门禁 | `checks/gates/product-type-sources.mjs` | `checks/gates/delivery-mode-sources.mjs` | 两侧都有；负例合并进 `checks/smoke/two-axis-gates-smoke.mjs` |
+| 唯一枚举门禁 | `checks/gates/product-type-sources.mjs` | `checks/gates/delivery-mode-sources.mjs` | 两侧都有；负例合并进 `tests/checks/two-axis-gates.test.mjs` |
 | 行为矩阵 | `tests/host/commands/product-type-scenarios.spec.ts`（默认链 / SyRS 可选 / 类型不支持层 / 缺层） | `tests/host/commands/delivery-mode-scenarios.spec.ts`（两类型 × 四模式 + 占位/引号/注释/未知/误写 + 缺文档提醒） | 两侧都有 |
 | 角色方法 / workflow | 产品类型不挂经营方法；唯一枚举在 product-definition 品类表（by design） | `tests/presets/delivery-mode-coverage.spec.ts`（每模式三角色方法 + 三 workflow + persona） | **刻意不对称**：类型决定需求链，模式决定经营方法 |
 | awareness | `product-type-coverage`（meta/手册/CEO 指针 + 品类表 + fixture） | `delivery-mode-coverage`（meta/手册/product-definition/CEO/经营 persona） | 两侧都有；模式多 persona 面 |
@@ -341,12 +341,12 @@ intent: 记录 E0–E4 的假设、命令、原始输出与结论；每条结论
 |---|---|---|
 | E17–E20 | BUG-061..070 修复后复跑；两轴 v1 首轮 verify/test | `raw/e17–e20*` |
 | E21–E26 | 两轴包形状 / coverage / scenario / 对称性 / warning | `tests/content/delivery-modes.spec.ts`、`tests/presets/{product-type,delivery-mode}-coverage.spec`、`tests/host/commands/{product-type,delivery-mode}-scenarios.spec`、`raw/e21–e26*` |
-| E27–E30 | 两个 sources 门禁负例 smoke；persona awareness；全量绿 | `checks/smoke/two-axis-gates-smoke.mjs`、`raw/e27–e30*` |
+| E27–E30 | 两个 sources 门禁负例 smoke；persona awareness；全量绿 | `tests/checks/two-axis-gates.test.mjs`、`raw/e27–e30*` |
 | E31–E34 | issues / notes 留痕：已结卡 + 活跃 v2 卡 + Note 双向链接 | `_archive/settled_issues/2026-11-11-delivery-mode-axis.md`、`_archive/settled_issues/2026-11-11-delivery-mode-v2.md`、`raw/e33–e34*` |
 | E35 | 2×3 方法适用性真值表（方法看交付模式，不看产品类型） | `tests/presets/two-axis-applicability.spec.ts`、`raw/e35*` |
 | E36 | 真实合同差异 + 真实 content bootstrap（BUG-063 内容级反证） | `tests/content/type-seed-divergence.spec.ts`、`tests/host/run-bundle/bootstrap-content.spec.ts`、`raw/e36*` |
 | E37 | `content-single-home` 正向必需项：删「服务信用」必须红 | `checks/gates/content-single-home.mjs`、`raw/e37*` |
-| E38 | 门禁负例 smoke：method-contract / pack-content-paths / content-single-home / content-manifest / base-clean | `checks/smoke/gates-negative-smoke.mjs`、`raw/e38*` |
+| E38 | 门禁负例 smoke：method-contract / pack-content-paths / content-single-home / content-manifest / base-clean | `tests/checks/gates-negative.test.mjs`、`raw/e38*` |
 | E39 | 独立审计采纳后的 targeted 复跑（真合同 / 2×3 / 两轴 scenario） | `raw/e39*` |
 
 ### 审计采纳取舍（摘要）

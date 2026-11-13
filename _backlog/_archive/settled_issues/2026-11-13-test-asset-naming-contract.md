@@ -33,8 +33,8 @@ opened: 2026-11-13
 | 现状 | 问题 | 证据 |
 |---|---|---|
 | snapshots/visual/company-shell/ui.golden.json（旧名）、checks/gates/ui-golden-freshness.mjs（旧名）、tools/lib/ui-golden.mjs（旧名）、tests/harness/ui/ui-golden.spec.ts（旧位置） + `--golden`/`--refresh-golden` | 「golden」与「expected」并存；DSH 明文禁文件名含 golden（`check-expected-filenames.sh`），且同仓 `workspace.expected/`、`system-prompt.expected.md` 已用 expected | 4 个活文件 + 2 个 flag + 文档引用 |
-| checks/smoke/refactor-drift-oracle.mjs（旧名） | 住 smoke 目录却不是冒烟（需成对调用的重构工具） | kind = tool；无自动 lane |
-| checks/smoke/fast.mjs（旧名）、checks/smoke/all-keyless.mjs（旧名） | 是 **runner**，名字却像资产 | 两者只调度，不证明行为 |
+| checks/lanes/refactor-drift-oracle.mjs（旧名） | 住 smoke 目录却不是冒烟（需成对调用的重构工具） | kind = tool；无自动 lane |
+| checks/lanes/fast.mjs（旧名）、checks/lanes/all-keyless.mjs（旧名） | 是 **runner**，名字却像资产 | 两者只调度，不证明行为 |
 | probes/team/quality-loop-audit.mjs（旧名） | 是**只读审计**（keyless、出报告），住在 probes 调试面 | 头注：只读盘与会话日志，不调模型 |
 | probes/browser-visual/cultivation-ux-walkthrough.mjs（旧名）、`cultivation-ux-scenarios.mjs`、`cultivation-main-e2e.mjs` | 后缀不在资产词表里——**逃过 `script-triggers` 门禁**（只认 `-(smoke\|probe\|audit\|check\|eval)`） | 三个都不是 `-probe` |
 | `probes/team/read-barrier/index.mjs` | 不是探针：是 probe overlay 加载的实验监听器（fixture）；被 census 误算成 69 个探针之一 | 头注 "Experiment-only listener loaded by the concurrency probe overlay" |
@@ -66,8 +66,8 @@ tests/
 | 目录 | 文件名语法 | 含义 |
 |---|---|---|
 | `tests/<face>/` | `<subject>.spec.ts` | keyless 回归；目录 = 被测面 |
-| `checks/smoke/` | `<subject>-smoke.mjs` | 真入口冒烟（真进程/真页面/真模型，按注册表 lane） |
-| `checks/smoke/` | `<lane>-lane.mjs` | lane runner（只调度，不证明行为） |
+| `checks/lanes/` | `<subject>-smoke.mjs` | 真入口冒烟（真进程/真页面/真模型，按注册表 lane） |
+| `checks/lanes/` | `<lane>-lane.mjs` | lane runner（只调度，不证明行为） |
 | `probes/<domain>/` | `<subject>-probe.mjs` | 调试探针（手动、按域） |
 | `checks/audit/` | `<subject>-(audit\|check\|eval\|ratchet).mjs` | 只读判据/报告 |
 | `checks/gates/` | `<rule>.mjs` | 结构门禁（名字即规则） |
@@ -84,7 +84,7 @@ tests/
    `ui-golden.mjs` → `ui-expected.mjs`；`ui-golden.spec.ts` → tests/ui/ui-expected.spec.ts（目标）；
    `--golden`/`--refresh-golden` → `--expected`/`--refresh-expected`。归档 BUG-048 / 2026-10-28 Note 不动。
 2. **runner 正名**：`fast.mjs` → `fast-lane.mjs`；`all-keyless.mjs` → `keyless-lane.mjs`（package.json、CI、pre-push、文档同步）。
-3. **工具出 smoke**：checks/smoke/refactor-drift-oracle.mjs（旧名） → tools/refactor-drift.mjs（目标）（保留头注；从 lane 注册表移除）。
+3. **工具出 smoke**：checks/lanes/refactor-drift-oracle.mjs（旧名） → tools/refactor-drift.mjs（目标）（保留头注；从 lane 注册表移除）。
 4. **审计归位**：probes/team/quality-loop-audit.mjs（旧名） → checks/audit/quality-loop-audit.mjs（目标）。
 5. **探针正名**：三个浏览器探针 → `cultivation-ux-walkthrough-probe.mjs`、`cultivation-ux-scenarios-probe.mjs`、
    `cultivation-main-e2e-probe.mjs`（改名后自动落入 `script-triggers` 覆盖）。
@@ -97,7 +97,7 @@ tests/
 - 禁词表（大小写不敏感，归档与 vendor 除外）。
 - **资产名必须出现在注册表/census**（冒烟/探针），非资产不得混入（`index` 之类）。
 - 与 `script-triggers` 联动：所有资产的后缀都落在 `-(smoke|probe|audit|check|eval|lane)` 覆盖内，不再有逃逸后缀。
-- **负例三条**：① checks/smoke/foo-oracle.mjs（负例假路径） → 红；② probes/bar-e2e.mjs（负例假路径） → 红；③ 改名成 `golden-*.mjs` → 红。
+- **负例三条**：① checks/lanes/foo-oracle.mjs（负例假路径） → 红；② probes/bar-e2e.mjs（负例假路径） → 红；③ 改名成 `golden-*.mjs` → 红。
 
 ## 落地进度
 
@@ -110,7 +110,7 @@ tests/
 
 1. **Phase 1**：`tests/harness/` 不存在；六个面各就位；`pnpm verify` + `pnpm test` + `pnpm typecheck` 全绿；
    残留引用（`grep tests/harness`，归档除外）为 0。
-2. **Phase 2**：`grep -ri golden`（非 vendor、非归档）为 0；`checks/smoke/` 只剩 `*-smoke.mjs` 与 `*-lane.mjs`；
+2. **Phase 2**：`grep -ri golden`（非 vendor、非归档）为 0；`checks/lanes/` 只剩 `*-smoke.mjs` 与 `*-lane.mjs`；
    `probes/**` 只剩 `*-probe.mjs`（fixture 入口已登记为例外）；census 重生成且探针数修正（`index.mjs` 移出）。
 3. `naming-contract` 三条负例各一条实跑原话；还原后 `pnpm verify` 全绿。
 4. `pnpm test` / `typecheck` / `lint` / `dup` / `coverage-ratchet` 全绿；每个 Phase 同 diff 一篇 Note
@@ -122,7 +122,7 @@ tests/
 - **风险**：路径引用漏改 → `verify`（md-links/bare-path/INDEX）+ `pnpm test` 抓；每阶段末全链实跑。
 - **不做**：
   - 不把 `tests/` 改成随包就近（单包拓扑；类型面/覆盖/layering 都围绕 `tests/**`）。
-  - 不照抄 DSH 的 `*.e2e.ts` 后缀分层（我们没有对应 vitest 车道；真入口在 `checks/smoke/`）。
+  - 不照抄 DSH 的 `*.e2e.ts` 后缀分层（我们没有对应 vitest 车道；真入口在 `checks/lanes/`）。
   - **不新增 `harness` / `misc` / `common` 这类 meta 桶**：目录必须是被测面或明确的仓库面。
   - 不为过渡态给门禁写例外（门禁在最终树上落地）。
 

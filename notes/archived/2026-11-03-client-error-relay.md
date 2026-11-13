@@ -42,9 +42,9 @@ npx vitest run tests/client/wiring/error-relay.spec.ts   # 5 passed
 #   还原 → 5 passed
 
 # 真页面（改了用户可见面 + 错误通路，必须两条都跑）
-node checks/smoke/ui-scene-smoke.mjs --isolated --golden
+node checks/lanes/ui-scene.entry.mjs --isolated --golden
 #   金样一致（9 个页签）/ ALL PASS（错误环零命中）
-node checks/smoke/client-error-chain-smoke.mjs
+node checks/lanes/client-error-chain.entry.mjs
 #   PASS 会话打开（单 writer）/ PASS 错误环捕获 / PASS host 日志落盘 → ALL PASS
 
 # 全链

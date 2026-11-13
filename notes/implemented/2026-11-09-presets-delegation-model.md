@@ -129,7 +129,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针 / UI）
 
 - `pnpm test tests/presets`：新增模型 spec + 组合 spec + retry spec 通过；红形态 = 删 vp-eng 的 `agentPreset: worker`、或把 worker 从 patch/roster 拿掉、或给 worker 加回 subagent 行、或把 refusal 加进 retryable，任一让对应断言红；绿形态 = 还原后同命令全绿。
 - `pnpm verify`：`presets ×6 + 子人格 ×4`、`preset-required-config`、`presets`/`pack-bundle` 全绿；红形态 = worker 声明文件缺 patch/roster 或行 config 缺必填字段。
-- `node checks/smoke/preset-smoke.mjs`：worker 真 `session/create` 零 broken；红形态 = worker 行 config 校验失败或 roster 缺 worker。
+- `node checks/lanes/preset.entry.mjs`：worker 真 `session/create` 零 broken；红形态 = worker 行 config 校验失败或 roster 缺 worker。
 - `pnpm typecheck`：绿。
 
 **P2（合同 + 探针）**：

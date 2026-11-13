@@ -29,7 +29,7 @@ intent: "2026-10-30 第二轮 notes/ 复核的实证：5 簇 74 篇逐篇对账�
 | `2026-10-09-n7-ci-narrowing` | `docs/testing.md:75` → 「升级地图」节；「没有 `test:coverage` 脚本」→ 当时没有、现为观察档非门禁 | `package.json` 现有 `test:coverage`；testing §6 在 :70 |
 | `2026-10-09-postmortem-guard-restoration` | `preset-required-config` 的家 → `checks/gates/preset-required-config.mjs` | 门禁已独立成文件 |
 | `2026-10-09-replay-scene-liveness` | 状态行被 banner 截断（括号跨了引用块）；README 锚点 `§快照与 live 盘差异的语义` → `§规则` | 现 README 只有 §场景/§规则 |
-| `2026-10-10-sandbox-backend-probe` | `replay-smoke.mjs:238` → `:279` | 行号随重构移位，同一行仍在 |
+| `2026-10-10-sandbox-backend-probe` | `replay.e2e.mjs:238` → `:279` | 行号随重构移位，同一行仍在 |
 | `2026-10-16-closeout-requires-present` | 190 行预算归 `doc-budget`（不是 `handbook-budget`，后者是字节闸） | `doc-budget.mjs` 的 190 预算；`handbook-budget` 算 maxBytes |
 | `2026-10-16-presence-status-seam` | 360/76 行标「当时读数，现行以代码为准」 | 现 349/110，属历史读数不覆写 |
 | `2026-10-20-tracked-token-guard` | 「runtime/web-logs/ 进 .gitignore」→「runtime/ 默认拒绝 + 白名单」 | `.gitignore:14-19`；owner = repo-hygiene-contract |
@@ -38,7 +38,7 @@ intent: "2026-10-30 第二轮 notes/ 复核的实证：5 簇 74 篇逐篇对账�
 | `2026-10-27-data-model-r1-r6` | 排除项「方法层迁 home 级」→ M3 已落地（补 owner 指针） | `docs/contracts/data-model.md:53` |
 | `2026-10-28-data-design-hardening` | M3 候选句补「M4 定案只收方法层」；`ctx.fs` 未做 → round2 已补（2 处） | `docs/contracts/data-model.md:25`、round2:14 |
 | `2026-10-28-r4-batch-e6-client-apply` | 「四个入口级函数现状」→「当时读数」（2 处） | 现 apply 51 行 / Board 146 / handler 63；不把历史读数改成今天的数 |
-| `postmortem/0001-…` | `scripts/preset-smoke.mjs` → `checks/smoke/…`；门禁路径 → `checks/gates/…` | 两处路径均已迁移 |
+| `postmortem/0001-…` | `scripts/preset.entry.mjs` → `checks/lanes/…`；门禁路径 → `checks/gates/…` | 两处路径均已迁移 |
 
 ## 三、机械面与盲区
 

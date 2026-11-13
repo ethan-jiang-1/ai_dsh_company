@@ -13,7 +13,7 @@ opened: 2026-11-07
 
 **问题与期望结果：** fresh workspace seed 新 process-docs；旧文件不被覆盖；旧动议无 marker 则 skip；新动议带 marker 才查；dev 盘迁移有备份；发布版有升级说明。
 
-**范围：** `src/host/run-bundle/bootstrap.ts` 的 `STATE_FILES`、`tests/host/run-bundle/bootstrap.spec.ts`、`company-workspace/.dsh-company/kb/process-docs.md`（手动迁移 + 备份）、`checks/smoke/release-smoke.mjs`、升级说明。`meta.md` 的 `编号体系` 字段由 A1 落，本卡只读取/验证。
+**范围：** `src/host/run-bundle/bootstrap.ts` 的 `STATE_FILES`、`tests/host/run-bundle/bootstrap.spec.ts`、`company-workspace/.dsh-company/kb/process-docs.md`（手动迁移 + 备份）、`checks/lanes/release.entry.mjs`、升级说明。`meta.md` 的 `编号体系` 字段由 A1 落，本卡只读取/验证。
 
 **依赖：** A1/A5/A6。
 
@@ -31,7 +31,7 @@ opened: 2026-11-07
 | fresh seed；旧文件不覆盖 | 编排 | bootstrap spec | create/skip 正确 | 覆盖旧文件 → 红 | `tests/host/run-bundle/bootstrap.spec.ts` | 无 |
 | 旧动议无 marker → skip；新动议 marker → check | 确定性 | checker scope + 内联 fixture | spec | 旧动议被红 → 红 | `requirements-check.spec`（A5 扩） | 无 |
 | dev `process-docs` 迁移 + 备份；内容不丢 | 编排/人的判断 | 手动迁移 + 备份文件 | diff/备份在场；用户确认 | 覆盖用户改过 → 回滚 | workspace 文件 + Note | 用户确认 |
-| release/upgrade 说明 | 文档形状 | release-smoke/升级 note | release-smoke 绿 | 旧盘升级坏 → 红 | `checks/smoke/release-smoke.mjs` | 用户 review |
+| release/upgrade 说明 | 文档形状 | release-smoke/升级 note | release-smoke 绿 | 旧盘升级坏 → 红 | `checks/lanes/release.entry.mjs` | 用户 review |
 
 ## 测试资产（计划）
 
@@ -40,7 +40,7 @@ opened: 2026-11-07
 | seed/skip | 既有 `tests/host/run-bundle/bootstrap.spec.ts`（加 process-docs） | `pnpm test tests/host/run-bundle/bootstrap.spec.ts` | 只补缺 | 真实安装 | 预置旧文件 → skip |
 | scope skip | A5 spec + 内联旧动议 | `pnpm test tests/lib/requirements-check.spec.ts` | marker 边界 | 语义 | 无 marker 新动议 → 观察/警告 |
 | 迁移 | workspace 备份 + Note | `cp <file> <file>.bak-2026-11-07` + `diff -u`（路径写 Note） | 不丢内容 | 其他部署 | 覆盖 → 备份回滚 |
-| 安装形状 | 既有 `checks/smoke/release-smoke.mjs` | `node checks/smoke/release-smoke.mjs` | fresh install | 升级语义 | 坏包 → 红 |
+| 安装形状 | 既有 `checks/lanes/release.entry.mjs` | `node checks/lanes/release.entry.mjs` | fresh install | 升级语义 | 坏包 → 红 |
 
 **资产边界：** 只证 seed/skip、scope 与安装形状；不证旧动议内容正确、不证其他部署的迁移（文档化）。
 
@@ -67,10 +67,10 @@ opened: 2026-11-07
 
 - 基线：`git rev-parse HEAD` = `1eb21e2`（A4b 提交后）
 - 红（seed 未接）：`pnpm vitest run tests/host/run-bundle/bootstrap.spec.ts` → `2 failed | 6 passed`（plan 不含 `.dsh-company/kb/process-docs.md`）
-- 绿：`pnpm vitest run tests/host/run-bundle/bootstrap.spec.ts` → `8 passed`（fresh seed + 既有盘 skip 且不覆盖用户改版）；`pnpm verify` → `ALL PASS`；`node checks/smoke/release-smoke.mjs` → `ALL PASS`（含「首启 40 件」「第二次零变更」「既有盘升级补种」）
+- 绿：`pnpm vitest run tests/host/run-bundle/bootstrap.spec.ts` → `8 passed`（fresh seed + 既有盘 skip 且不覆盖用户改版）；`pnpm verify` → `ALL PASS`；`node checks/lanes/release.entry.mjs` → `ALL PASS`（含「首启 40 件」「第二次零变更」「既有盘升级补种」）
 - dev 盘迁移：`cp kb/process-docs.md kb/process-docs.md.bak-2026-11-07`（3571B，保留）→ 用 pack 新合同整份替换（6256B）→ `diff -u` 130 行差异（= 旧 STR/SYR/IFR 合同 → 新 R1–R10 合同）；备份与差异路径即本卡证据
 - 旧动议范围：对 `company-workspace/.dsh-company/deliverables/2026-10-29-human-agent-capability-2026` 跑 checker（真 lib）→ `skipped: true / ok: true / reason = meta 无 编号体系: 标记——旧动议只读豁免`，不判红
-- 资产：`src/host/run-bundle/bootstrap.ts` 的 `STATE_FILES` 加 process-docs（只补缺）；`tests/host/run-bundle/bootstrap.spec.ts` 加 seed/skip/不覆盖三条；`checks/smoke/release-smoke.mjs` 的 content 在场清单加 process-docs；`docs/contracts/release.md` 版本纪律加「升级既有 workspace」一条（种子只补缺 + 旧动议 skipped）
+- 资产：`src/host/run-bundle/bootstrap.ts` 的 `STATE_FILES` 加 process-docs（只补缺）；`tests/host/run-bundle/bootstrap.spec.ts` 加 seed/skip/不覆盖三条；`checks/lanes/release.entry.mjs` 的 content 在场清单加 process-docs；`docs/contracts/release.md` 版本纪律加「升级既有 workspace」一条（种子只补缺 + 旧动议 skipped）
 - `meta.md` 的 `编号体系` 字段由 A1 落，本卡只读取/验证（bootstrap 不改动议文件）
 - 用户确认：迁移备份就位（若需回滚 = 用 `.bak-2026-11-07` 覆盖回）；待 W5 汇总确认
 - 审查：`审查：agent — 2026-11-07`

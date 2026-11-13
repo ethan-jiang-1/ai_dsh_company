@@ -91,9 +91,9 @@
 
 - `pnpm typecheck` 绿；`pnpm test` **236 files / 1761 tests passed**；`pnpm lint` 0 warning；
   `pnpm dup` 0 clones；`pnpm verify` ALL PASS。
-- `node checks/smoke/ui-scene-smoke.mjs --isolated --lang en`：**ALL PASS**，10/10 页签（含 Strategy），
+- `node checks/lanes/ui-scene.entry.mjs --isolated --lang en`：**ALL PASS**，10/10 页签（含 Strategy），
   `en 页面无中文残留（10 个页签）`；证据 `runtime/harness-home/diagnosis/ui-scene-smoke-2026-11-12T14-40-39-593Z`。
-- `node checks/smoke/release-smoke.mjs`：**ALL PASS**（干净 profile 真安装 + content 随包 + 首启自举/幂等）。
+- `node checks/lanes/release.entry.mjs`：**ALL PASS**（干净 profile 真安装 + content 随包 + 首启自举/幂等）。
 
 未跑（如实记）：**会话 cwd ≠ host workspace 的真实例 RPC 探针**（keyless 已覆盖读/写/注入同一文件）、
 **BUG-089 的真模型 `system/message` 轮**（apply-lifecycle 真装配 + section text 已覆盖注册与读取）、

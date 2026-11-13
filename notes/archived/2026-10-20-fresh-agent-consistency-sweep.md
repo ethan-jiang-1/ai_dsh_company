@@ -41,9 +41,9 @@
 ```text
 pnpm verify                                      # ALL PASS（含 snapshot-index ×47、script-index ×81、tracked-token ×1744）
 pnpm test                                        # 76 files / 711 tests 全绿
-node checks/smoke/client-load-smoke.mjs          # ALL PASS
+node checks/lanes/client-load.entry.mjs          # ALL PASS
 node probes/browser-visual/cdp-probe.mjs <url>   # tabsOpened 9/9（含成品）；tabFailures []
-node checks/smoke/release-smoke.mjs              # ALL PASS（roster 6 + session/create researcher）
-node checks/smoke/replay-smoke.mjs --scenario r2-motion --ui  # ALL PASS；SKIP 行显式
+node checks/lanes/release.entry.mjs              # ALL PASS（roster 6 + session/create researcher）
+node checks/lanes/replay.e2e.mjs --scenario r2-motion --ui  # ALL PASS；SKIP 行显式
 node tools/diagnose.mjs --session <slug>         # 失败摘要（502 events / present 1 / 0 failures）
 ```

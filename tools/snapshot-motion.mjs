@@ -4,7 +4,7 @@
 // 何时跑：一场动议收尾、要把它的会话与工作区落成回归资产时（**条目收尾动作之一**；不是门禁、不是探针）
 //
 // 形状沿用 R1（`snapshots/replay/r1-motion/`）与 vendor `snapshots/AGENTS.md`：一场景一目录 + snapshot.yml；
-// replay harness 已交付（checks/smoke/replay-smoke.mjs）；本目录用途 = **基线对照**（行为变了就 diff）。
+// replay harness 已交付（checks/lanes/replay.e2e.mjs）；本目录用途 = **基线对照**（行为变了就 diff）。
 //
 // 用法：source run/env.sh && node tools/snapshot-motion.mjs \
 //         --session session-<lead-id> --out snapshots/replay/<场景名> --motion "动议原文" [--cwd company-workspace]

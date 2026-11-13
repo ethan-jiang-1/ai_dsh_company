@@ -88,7 +88,7 @@ try {
         await run('pnpm', ['run', 'build'], { cwd: VENDOR, timeoutMs: 600_000 })
         console.log('④ test + release-smoke（真实 built CLI / tarball 安装）')
         await run('pnpm', ['test'], { timeoutMs: 120_000 })
-        const smokeOutput = await run(process.execPath, [join(ROOT, 'checks/smoke/release-smoke.mjs')], { timeoutMs: 600_000, killGraceMs: 20_000 })
+        const smokeOutput = await run(process.execPath, [join(ROOT, 'checks/lanes/release.entry.mjs')], { timeoutMs: 600_000, killGraceMs: 20_000 })
         console.log(smokeOutput)
       },
       async verify() {

@@ -120,8 +120,8 @@ intent: 二轮覆盖审计——确认 content/presets 是否逐文件覆盖、�
 
 ## 4. 仍未覆盖（明确边界）
 
-- `checks/smoke/**`、`checks/gates/**`、`checks/audit/**` 的逐条断言（现只有 grep 命中行）；重点待读：
-  `preset-smoke.mjs`、`release-smoke.mjs`、`presets.mjs`、`dev-product-parity.mjs`。
+- `checks/lanes/**`、`checks/gates/**`、`checks/audit/**` 的逐条断言（现只有 grep 命中行）；重点待读：
+  `preset.entry.mjs`、`release.entry.mjs`、`presets.mjs`、`dev-product-parity.mjs`。
 - `tools/lib/**` 除 `company-roles.mjs` 外的全部；`tests/**` 通读；`docs/**` 全量。
 - 真实会话 token 开销与"摘要 + 指针"的对比（只有字节数）。
 - 真模型行为：换 `productType` 后 agent 是否真按新链走（keyless 只能证结构）。

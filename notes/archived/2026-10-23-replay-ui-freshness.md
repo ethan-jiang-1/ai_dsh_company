@@ -4,7 +4,7 @@
 
 > **2026-10-27 部分取代（运行模式）**：`--ui` / `--refresh-ui` 已停用（本仓没有声明 `uiEvidence` 的场景），
 > r3 金样随真实证据移出产品仓；本文的“当前模式”作废。机制判据（sha256 sidecar + 静态复算）保留在
-> [replay-ui-freshness 门禁](../../checks/gates/replay-ui-freshness.mjs)；现行 UI 回归 = [ui-scene-smoke](../../checks/smoke/ui-scene-smoke.mjs)。
+> [replay-ui-freshness 门禁](../../checks/gates/replay-ui-freshness.mjs)；现行 UI 回归 = [ui-scene-smoke](../../checks/lanes/ui-scene.entry.mjs)。
 
 ## 决定
 
@@ -30,7 +30,7 @@
 ## 验证（真跑）
 
 ```text
-source run/env.sh && node checks/smoke/replay-smoke.mjs --scenario r3-delegation --ui --refresh-ui
+source run/env.sh && node checks/lanes/replay.e2e.mjs --scenario r3-delegation --ui --refresh-ui
 #   ALL PASS；生成 ui.expected.session.sha256 = 64a18819…  session.v3.jsonl
 printf '\n' >> snapshots/replay/r3-delegation/replay/session.v3.jsonl && pnpm verify
 #   FAIL replay-ui-freshness: r3-delegation 金样所对的 session 已变（64a18819… vs a48dcd3c…）

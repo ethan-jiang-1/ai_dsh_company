@@ -55,5 +55,5 @@
   → 扩 `ASSIGN_LINE` + R3/R3′ 分支 → **23/23 绿**。红长什么样：`scanR3` 的 blocked 缺 T1
   （行被正则静默丢弃）。
 - `pnpm test`：**43 文件 / 445 测试全绿**（含新 4 用例）。
-- `node checks/smoke/preset-smoke.mjs`：**ALL PASS**（5 preset 真挂载 + skills 隔离 + client 闭包）。
+- `node checks/lanes/preset.entry.mjs`：**ALL PASS**（5 preset 真挂载 + skills 隔离 + client 闭包）。
 - `pnpm verify`：**ALL PASS**（doc-budget：手册 189/195；notes-liveness；md-links；ledger 全套）。

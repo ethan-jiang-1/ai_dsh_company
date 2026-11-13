@@ -193,7 +193,7 @@
           #    child 再派由它自己 preset 的行决定：vp-eng 的通用 subagent 行 = 3，
           #    CEO→vp_eng(1)→worker(2) 仍放行；真正的“禁止平级派活”靠 vp-eng 没有
           #    vp_sales/coo/cfo 行，不靠这行 1。
-          #    出处：docs/contracts/delegation.md；探针 checks/smoke/delegation-smoke.mjs（= 这条边界的回归守卫）。
+          #    出处：docs/contracts/delegation.md；探针 checks/lanes/delegation.entry.mjs（= 这条边界的回归守卫）。
           - id: delegation
             name: cordis:group
             group: true

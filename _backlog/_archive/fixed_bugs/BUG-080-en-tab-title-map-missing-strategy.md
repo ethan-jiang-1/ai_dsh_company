@@ -58,7 +58,7 @@ const EN_TAB_TITLES = {
 
 ```sh
 source run/env.sh
-node checks/smoke/ui-scene-smoke.mjs --isolated --lang en
+node checks/lanes/ui-scene.entry.mjs --isolated --lang en
 ```
 
 2026-11-12 实跑（本卡发现时）：

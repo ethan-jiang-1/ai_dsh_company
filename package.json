@@ -31,7 +31,11 @@
     "release:stamp": "node tools/release.mjs --stamp",
     "release:all": "node tools/release.mjs --all",
     "market:hosted": "node tools/market-index.mjs --check --hosted",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:spec": "vitest run",
+    "test:e2e": "node checks/lanes/keyless-lane.mjs --suffix e2e",
+    "test:entry": "node checks/lanes/keyless-lane.mjs --suffix entry",
+    "test:checks": "node tools/run-check-tests.mjs"
   },
   "devDependencies": {
     "@deepseek-ai/dsh-agent-preset": "workspace:*",

@@ -47,7 +47,7 @@
 
 - 已跑：`pnpm vitest run tests/content/product-types.spec.ts tests/host/commands/req-command.spec.ts tests/host/run-bundle/company-fixture.spec.ts tests/presets` → **9 files / 118 tests passed**。
 - 已跑：`pnpm verify` → **ALL PASS**（含 `content-manifest` / `generic-clean` / `backlog-liveness` / `md-links`）。
-- 已跑：`source run/env.sh && node checks/smoke/preset-smoke.mjs` → **ALL PASS**（6 角色 + 5 support 全部真挂载；改 `product-definition` skill 后必跑）。
+- 已跑：`source run/env.sh && node checks/lanes/preset.entry.mjs` → **ALL PASS**（6 角色 + 5 support 全部真挂载；改 `product-definition` skill 后必跑）。
 - 已跑：`pnpm test` → **170 files / 1409 tests passed**；`pnpm typecheck` → 绿（pack + 三套 tests）。
 - 红形态：删 `business-software/check-rules.json` → `product-types` 文件在场红；把 `check-rules` 的层改成
   `ROADMAP` → `product-types` 自洽红；把 `business-software` 的 `productType` 改成 `b2b-saas` → 同名红。

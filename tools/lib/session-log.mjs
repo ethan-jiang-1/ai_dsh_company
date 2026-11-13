@@ -5,7 +5,7 @@
 //   （不是报错，是空数组）；而"当前游标"没有独立 RPC，越界调用才会在错误里吐出它
 //   （`… is past cursor N`）。所以正确读法 = 先用 `MAX_SAFE_INTEGER` 探一次拿游标
 //   （或从错误里解析），再用该游标读全量。
-// 出处：probe-smoke.mjs:139-154（R2 实证）；handbook-smoke 首跑就是踩了 `-1` 而
+// 出处：probe.entry.mjs:139-154（R2 实证）；handbook-smoke 首跑就是踩了 `-1` 而
 //   误判成"基线没注入"（实际基线一直在，见 2026-09-22 R3 S0 诊断）。
 //
 // `page(request)` 由调用方注入（各脚本的 RPC 封套不同，本模块不认识它们的 base/cookie）。

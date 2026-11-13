@@ -112,7 +112,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
    两边各有 keyless 测试，但**没有测试用 generator 的真实输出喂 parser**；生成器加字段、parser 不认，
    单测仍可全绿，只有跑 `deliverables-catalog-probe` 才暴露。一个共享 schema（或生成类型）是更深的模块。
 4. **host 入口把内部读模型当公开导出**：`src/index.ts:18/24` `export * from './lib/presence.ts'` /
-   `'./lib/doors.ts'`，理由是 `checks/smoke/replay-smoke.mjs` 要用。包是 private，风险有限，
+   `'./lib/doors.ts'`，理由是 `checks/lanes/replay.e2e.mjs` 要用。包是 private，风险有限，
    但这是「为测试便利扩大接口」的典型浅化；更干净的做法是测试/检查直接 import `lib/` 源码，
    或给内部读模型一个 test-only 子路径。
 5. **`memberDot`/`memberTone` 与 `presence-status` 的分工**：状态词在 lib，颜色/圆点映射在 client，
@@ -130,7 +130,7 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 |---|---|---|---|
 | 1 | 7 处写「五角色 / 五张卡」 | 6 个 preset（5 角色 + researcher） | `preset-smoke` 末尾 6 个 PASS；`package.json` 的 bundle 数组 6 个 preset 文件 |
 | 2 | `README.md:19`「roster 可见五角色 preset」 | roster 含 researcher | 同上 |
-| 3 | `docs/contracts/release.md:77`「roster 五角色零 broken」 | release-smoke 只验 5 个公司角色；researcher 没验 | `checks/smoke/release-smoke.mjs` 第 15/20 行 `ROLES = COMPANY_ROLE_IDS` |
+| 3 | `docs/contracts/release.md:77`「roster 五角色零 broken」 | release-smoke 只验 5 个公司角色；researcher 没验 | `checks/lanes/release.entry.mjs` 第 15/20 行 `ROLES = COMPANY_ROLE_IDS` |
 | 4 | `snapshots/README.md:15`「索引覆盖当前场景」 | 43 行 vs 47 个场景；漏 4 个 | `find snapshots -mindepth 2 -maxdepth 2 -type d | wc -l` = 47 |
 | 5 | `snapshots/README.md:34`「44 行 = 索引」 | 生成索引 47 条 | `company-workspace/kb/deliverables-index.json` `counts.total=47`；`snapshots/visual/deliverables-catalog/computed.json` `total=47` |
 | 6 | `snapshots/README.md:82`「9 个场景只有 1 个 runnable」 | 10 个场景，runnable 2 | `pnpm verify` 的 `replay-scene-liveness ×10（runnable 2 / archived 4 / baseline 4）` |
@@ -141,8 +141,8 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 | 11 | `docs/project-map.md:29`「runtime 全部 gitignored」 | 审计时 11 件 tracked；修复后 9 件（两件日志已 untrack） | `git ls-files runtime` |
 | 12 | `runtime/README.md` 第 5–8 行 + 根 `AGENTS.md:25` 的 tracked 白名单 | 审计时两处都漏 runtime/web-logs/*.log；修复后 runtime README 已补 ignored 说明 | 同上；且其中一件含 token → BUG-029 |
 | 13 | `docs/testing.md` 第 12/49 行「keyless 不证明装配」「现状零 mock」 | whole-client spec 真 boot + RemoteMock；另有 `vi.mock('node:os')` | `tests/client/company-client-composition.spec.ts` 第 4–15/57 行；`tests/repo/foundation-safety.spec.ts:8` |
-| 14 | `checks/smoke/replay-smoke.mjs:7`「~11s」 | r3 14.7s；r2 98.9s；r2 `--ui` 80.8s | 本轮实跑 |
-| 15 | `checks/smoke/client-load-smoke.mjs:4`「~10s」 | 26.4s | 本轮实跑 |
+| 14 | `checks/lanes/replay.e2e.mjs:7`「~11s」 | r3 14.7s；r2 98.9s；r2 `--ui` 80.8s | 本轮实跑 |
+| 15 | `checks/lanes/client-load.entry.mjs:4`「~10s」 | 26.4s | 本轮实跑 |
 | 16 | `docs/guides/dev-loop.md:252` 引「Tests 5.16s/3.40s，全程 13.6s/4.8s」 | Tests 7.7–13.5s，全程热 9.4–23.6s / 冷 55.4s | 本轮实跑；单点值不是稳定值 |
 | 17 | `DeliverablesTab.tsx:11`「44 条也不至于糊成一片」 | 47 条 | 生成索引 47 |
 
@@ -360,11 +360,11 @@ intent: "以 fresh agent 视角复核六轴（渐进披露 / 代码分层 / 文�
 ```text
 pnpm verify                                  # ALL PASS；热 7.4s / 冷 43.7s
 pnpm test -- --reporter=dot                  # 76 files / 711 tests；热 9.4–23.6s / 冷 55.4s；Tests 7.7–13.5s
-node checks/smoke/client-load-smoke.mjs      # ALL PASS；26.4s
-node checks/smoke/preset-smoke.mjs           # ALL PASS；6 preset；30.1s
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation   # ALL PASS；14.7s；full 零 diff
-node checks/smoke/replay-smoke.mjs --scenario r2-motion       # ALL PASS；98.9s；presence
-node checks/smoke/replay-smoke.mjs --scenario r2-motion --ui  # ALL PASS；80.8s；真浏览器在场板
+node checks/lanes/client-load.entry.mjs      # ALL PASS；26.4s
+node checks/lanes/preset.entry.mjs           # ALL PASS；6 preset；30.1s
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation   # ALL PASS；14.7s；full 零 diff
+node checks/lanes/replay.e2e.mjs --scenario r2-motion       # ALL PASS；98.9s；presence
+node checks/lanes/replay.e2e.mjs --scenario r2-motion --ui  # ALL PASS；80.8s；真浏览器在场板
 git ls-files runtime                         # 审计时 11 件；修复后 9 件（两件日志已 untrack）
 find snapshots -mindepth 2 -maxdepth 2 -type d | wc -l   # 47
 grep -c '^| \[' snapshots/README.md          # 43

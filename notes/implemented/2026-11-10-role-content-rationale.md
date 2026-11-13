@@ -25,7 +25,7 @@
 ## 证据 / 历史
 
 - 完整原稿：`git show ab0fd622^:docs/design/role-content-plan.md`。
-- 六角色内容随 R2 + CMO 落地；探针 = `checks/smoke/probe-smoke.mjs`；决策台账（D8/D17/D25/D43）= [decisions](../../docs/reference/decisions.md)。
+- 六角色内容随 R2 + CMO 落地；探针 = `checks/lanes/probe.entry.mjs`；决策台账（D8/D17/D25/D43）= [decisions](../../docs/reference/decisions.md)。
 - 逐角色清单已退役；本 Note 不复制清单。
 
 ## 现行语义（canonical）

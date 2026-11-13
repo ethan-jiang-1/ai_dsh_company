@@ -1,4 +1,4 @@
-// 状态：常驻（被 checks/smoke/* 负例夹具 import；不单独跑）
+// 状态：常驻（被 checks/lanes/* 负例夹具 import；不单独跑）
 // 何时跑：作为负例 smoke 的一部分（two-axis-gates / gates-negative 等）；秒级。
 //
 // 为什么：负例夹具靠「把输入改坏」来证明 gate 会红。输入语言/字段一改名，replace 就成了

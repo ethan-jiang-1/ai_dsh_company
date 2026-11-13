@@ -15,7 +15,7 @@ opened: 2026-10-10
 > [2026-10-10-extract-without-behavior-change](2026-10-10-extract-without-behavior-change.md)
 > （已结，交付 0a7977f），其关闭条件明说「下游申请另记日期和去向」——本卡即该下游申请。
 
-**问题与期望结果**：`checks/smoke/` 下 10 个起 `bin.ts web` 的脚本各抄一份启动块（等 banner +
+**问题与期望结果**：`checks/lanes/` 下 10 个起 `bin.ts web` 的脚本各抄一份启动块（等 banner +
 token 交换 + client-request 发送），与探针面迁移前的 25 份重复同病。期望同款收进
 `tools/lib/probe-web.mjs`，调用方观察到的行为不变。
 
@@ -49,9 +49,9 @@ preset、probe、replay。
 ## 不做
 
 - **replay-smoke 的 spawnSync CLI lanes**（`--profile headless` 逐场景直跑）——不是 web boot，不迁。
-- **replay-smoke.mjs:238 的 `DSH_PERMISSION_MODE: 'workspace-write'` 死代码钉值**——上游核查已证
+- **replay.e2e.mjs:238 的 `DSH_PERMISSION_MODE: 'workspace-write'` 死代码钉值**——上游核查已证
   场景 cordis.snapshot.yml 覆盖之，改它无行为效果；**本卡明令不碰**，避免「顺手清理」污染迁移 diff。
-- 不改任何 smoke 的判据/提示词/证据函数/退出码；不把 `checks/smoke/` 拆文件。
+- 不改任何 smoke 的判据/提示词/证据函数/退出码；不把 `checks/lanes/` 拆文件。
 - 不重跑全部真模型 smoke 当回归（同上游卡立场：形状 spec + 真 banner + diff 审计）。
 
 ## 验收标准（沿用上游卡形状）
@@ -60,7 +60,7 @@ preset、probe、replay。
 |---|---|---|
 | 模块扩展形状（patch 数组 / onEmptyCookie） | 新 spec 用例先红（模块还没有这两个能力）后绿，断言 argv 与 cookie 行为 | `tests/session/probe-web.spec.ts` |
 | 25 个已迁探针零扰动 | `git diff probes/` 为空；`pnpm test` 全绿 | diff + suite |
-| smoke 判据不变 | 每个 smoke 的 diff 只含启动块删除与模块调用 | `git diff checks/smoke/` 逐文件审计 |
+| smoke 判据不变 | 每个 smoke 的 diff 只含启动块删除与模块调用 | `git diff checks/lanes/` 逐文件审计 |
 | 真 banner 仍解析 | 一次真启动 PASS | 验收脚本 |
 | 门禁全绿 | `pnpm verify` ALL PASS / `pnpm test` 全绿（pipefail） | 实跑 |
 

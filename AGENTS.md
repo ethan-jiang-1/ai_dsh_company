@@ -47,7 +47,7 @@ pnpm release --check                   # 发布就绪（dist 与源码指纹；v
 source run/env.sh && pnpm orient        # 运行态全景（先 source 才看 dev home；keyless 只读；--scenario = run trace 场景视图）
 pnpm diagnose --session <slug>/<id>     # 会话失败摘要（只读；失败 turn/工具错误/非零 bash/待审批/问询/present；child 也可点名）
 pnpm dsh --profile headless "hi"       # 从 DSH 源码起会话（真 API，需 DEEPSEEK_API_KEY）
-source run/env.sh && node checks/smoke/preset-smoke.mjs    # preset 改动的真挂载检查（完整完成定义 = preset-change-definition skill；前置 = bootstrap 构建完成）
+source run/env.sh && node checks/lanes/preset.entry.mjs    # preset 改动的真挂载检查（完整完成定义 = preset-change-definition skill；前置 = bootstrap 构建完成）
 ```
 
 逐脚本触发/成本/状态唯一源 = 脚本头注（门禁强制自述）；索引见 [检查索引](checks/README.md)——**别抄回本文件，复述必漂**。web 观察窗开门步骤唯一见 [演示 runbook](./docs/guides/demo-scenes.md#前置本机)：**先 `source run/env.sh`**——日用 `~/.dsh` 另有同名 `web` profile（起得来不报错、公司角色不出现）；端口是环境状态，token URL 从启动横幅读；现场运维 = [budget-and-ops](docs/guides/budget-and-ops.md)。**push 走 `ssh.github.com:443`**（origin 已配好）。

@@ -11,11 +11,11 @@
 // 用法：
 //   # 拆前（在 HEAD 干净状态）
 //   pnpm exec vitest run --reporter=json --outputFile=runtime/before.json
-//   node checks/smoke/refactor-drift.mjs --hashes runtime/before.json > runtime/before.hashes
+//   node checks/lanes/refactor-drift.mjs --hashes runtime/before.json > runtime/before.hashes
 //   # 拆后
 //   pnpm exec vitest run --reporter=json --outputFile=runtime/after.json
-//   node checks/smoke/refactor-drift.mjs --hashes runtime/after.json > runtime/after.hashes
-//   node checks/smoke/refactor-drift.mjs --compare runtime/before.hashes runtime/after.hashes
+//   node checks/lanes/refactor-drift.mjs --hashes runtime/after.json > runtime/after.hashes
+//   node checks/lanes/refactor-drift.mjs --compare runtime/before.hashes runtime/after.hashes
 //
 // 两档清单（**用 --hashes 那档判等价**）：
 //   --names  ：`<文件> :: <全名>`——人读、写进 Note；

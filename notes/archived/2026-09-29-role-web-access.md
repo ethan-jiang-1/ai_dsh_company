@@ -31,7 +31,7 @@
 
 ## 证据（全部实跑，2026-09-29）
 
-**① 反证：那一行是唯一变量**（用 [delegation-smoke.mjs](../../checks/smoke/delegation-smoke.mjs)——它会打印
+**① 反证：那一行是唯一变量**（用 [delegation.entry.mjs](../../checks/lanes/delegation.entry.mjs)——它会打印
 CEO 会话的模型可见工具目录，读的是 `request/header`，不是模型自述）：
 
 | 状态 | 目录 | web 工具 |
@@ -56,9 +56,9 @@ Lead（depth=0）与**委派子会话（depth=1）都含** `web_search`×2 / `we
 ## 跑过的检查
 
 - `pnpm verify`：ALL PASS（`preset-row-deps ×15`——新行已进依赖核对）
-- `node scripts/preset-smoke.mjs`：ALL PASS（5 个 preset 真挂载 = preset 改动的完成定义）
-- `node scripts/probe-smoke.mjs`：5/5（真调用：挂载 + 轮次 + 回话 + 人格）
-- `node scripts/delegation-smoke.mjs`（含 `--delegate`）：ALL PASS
+- `node scripts/preset.entry.mjs`：ALL PASS（5 个 preset 真挂载 = preset 改动的完成定义）
+- `node scripts/probe.entry.mjs`：5/5（真调用：挂载 + 轮次 + 回话 + 人格）
+- `node scripts/delegation.entry.mjs`（含 `--delegate`）：ALL PASS
 - 端到端真搜（③）
 - 读日志须用 `zstd -dc`（**多帧**；Node 的 `zstdDecompressSync` 只解首帧 → 会把有内容的日志误读成 228 字节的 session 头，本轮踩过）
 

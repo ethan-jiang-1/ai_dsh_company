@@ -109,10 +109,10 @@ intent: 把 `_backlog/issues` 的 11 张卡排成可执行的波次计划，逐�
 
 | Wave | 必跑 | 按需 |
 |---|---|---|
-| W0 | `set -o pipefail; pnpm verify && pnpm test && pnpm typecheck` | `node checks/smoke/preset-smoke.mjs`（基线挂载） |
+| W0 | `set -o pipefail; pnpm verify && pnpm test && pnpm typecheck` | `node checks/lanes/preset.entry.mjs`（基线挂载） |
 | W1 | `pnpm verify`；`pnpm test tests/company`；`prd-check.spec` | `node tools/checks-index.mjs --write`（若新增脚本） |
 | W2 校验轨 | `pnpm test tests/company`；`pnpm typecheck`；`pnpm lint`；`host-composition.spec` | `pnpm dup`（若抽公共逻辑） |
-| W2 角色轨 | `pnpm test tests/presets`；`node checks/smoke/preset-smoke.mjs`；`node checks/smoke/probe-smoke.mjs` | `probe-smoke --full`（内容档，按需） |
+| W2 角色轨 | `pnpm test tests/presets`；`node checks/lanes/preset.entry.mjs`；`node checks/lanes/probe.entry.mjs` | `probe-smoke --full`（内容档，按需） |
 | W3 | `pnpm verify`；`pnpm test`；`pnpm typecheck`；A8 probe | `release-smoke`（A7） |
 | W4 | `preset-smoke`；`probe-smoke`；`delegation-smoke`；`product-team-e2e-smoke`；`client-load-smoke`；`pnpm test tests/client`；`pnpm verify/test/typecheck` | `ui-scene-smoke --isolated --golden`（如金样含文案） |
 | W5 | 全量 `verify/test/typecheck/lint/dup`；`pnpm notes:audit`；`pnpm release --check`（如发版） | `release-smoke`；`converge`（有交付物时） |

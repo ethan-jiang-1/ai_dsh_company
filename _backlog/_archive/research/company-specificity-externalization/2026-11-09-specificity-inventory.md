@@ -189,7 +189,7 @@ intent: 盘点通用能力、领域知识与公司细节在仓库里的实际分
 | `tests/lib/board.spec.ts:98`、`tests/client/ui/brand.spec.ts:13` | 看板/品牌期望值含公司名 | 同上 |
 | `tests/lib/signoff.spec.ts:15`、`signoff-tool.spec.ts:70` | 断言 `'毛利<30% 双签'` | 换策略线 → 测试红 |
 | `tests/content/requirements-templates.spec.ts:38`（另 `:105-129`）、`tests/content/requirements-contract.spec.ts:49` | 五层链逐层自洽 | 删层 → 测试红 |
-| `checks/smoke/client-load-smoke.mjs:37` | `BRAND = 'DSH 梦之队'` | 改品牌 → 冒烟红 |
+| `checks/lanes/client-load.entry.mjs:37` | `BRAND = 'DSH 梦之队'` | 改品牌 → 冒烟红 |
 
 ### 7.5 清单漂移（同骨架的两份陈旧副本）
 

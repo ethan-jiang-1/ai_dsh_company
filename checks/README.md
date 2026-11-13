@@ -14,19 +14,19 @@
 | 看最近会话的失败摘要（中断轮、非零 bash、待审批也算） | `pnpm diagnose [--strict]` → [diagnose](../tools/diagnose.mjs) |
 | 检查密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs) · [tracked-token](gates/tracked-token.mjs) · [tracked-secrets](gates/tracked-secrets.mjs) |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；分层守卫 = [layering.spec](../tests/repo/layering.spec.ts) |
-| 确认测试资产还活着 | `pnpm smoke:fast` → [fast](smoke/fast-lane.mjs)（6 条，~2.4s；pre-push）；全量 = `pnpm smoke:all` → [keyless-lane](smoke/keyless-lane.mjs)（每周 CI 跑 `--ci`；成员唯一家 = [lane 注册表](../tools/lib/asset-lanes.mjs)） |
+| 确认测试资产还活着 | `pnpm smoke:fast` → [fast](lanes/fast-lane.mjs)（6 条，~2.4s；pre-push）；全量 = `pnpm smoke:all` → [keyless-lane](lanes/keyless-lane.mjs)（每周 CI 跑 `--ci`；成员唯一家 = [lane 注册表](../tools/lib/asset-lanes.mjs)） |
 | 类型 / 导入签名改动 | `pnpm typecheck`（命令与预算 = [tests/README §验证分层与预算](../tests/README.md)） |
-| 确认角色真的挂载 | [preset-smoke](smoke/preset-smoke.mjs) |
-| 确认 client 真的装配 | [client-load-smoke](smoke/client-load-smoke.mjs) |
-| **看真页面 / 复现 UI 症状** | [ui-scene-smoke](smoke/ui-scene-smoke.mjs)：自起实例 → 全部公司页签 + 浏览器错误环 → 证据（`--keep` 留实例；`--isolated --expected` = 隔离空壳金样档；`--steps` = 复现点击/输入） |
+| 确认角色真的挂载 | [preset-smoke](lanes/preset.entry.mjs) |
+| 确认 client 真的装配 | [client-load-smoke](lanes/client-load.entry.mjs) |
+| **看真页面 / 复现 UI 症状** | [ui-scene-smoke](lanes/ui-scene.entry.mjs)：自起实例 → 全部公司页签 + 浏览器错误环 → 证据（`--keep` 留实例；`--isolated --expected` = 隔离空壳金样档；`--steps` = 复现点击/输入） |
 | 查看已运行页面 | [cdp-probe](../probes/browser-visual/cdp-probe.mjs)；指南 = [CDP 指南](../docs/guides/cdp-probe.md) |
-| **页面报错了但日志里没有** | [client-error-chain-smoke](smoke/client-error-chain-smoke.mjs)：隔离单 writer 真页面 → `console.error` → 错误环 → `$DSH_HOME/logs/company-client-errors.log`（keyless ~40s） |
-| 确认录制行为与工作区判据 | [replay-smoke](smoke/replay-smoke.mjs)（当前仅 headless 合成场景） |
-| 确认 workflow 引擎机制（失败重试/fatal/null/回执拼接） | [workflow-contract-smoke](smoke/workflow-contract-smoke.mjs)（keyless ~2s，fake provider + 真引擎） |
+| **页面报错了但日志里没有** | [client-error-chain-smoke](lanes/client-error-chain.entry.mjs)：隔离单 writer 真页面 → `console.error` → 错误环 → `$DSH_HOME/logs/company-client-errors.log`（keyless ~40s） |
+| 确认录制行为与工作区判据 | [replay-smoke](lanes/replay.e2e.mjs)（当前仅 headless 合成场景） |
+| 确认 workflow 引擎机制（失败重试/fatal/null/回执拼接） | [workflow-contract-smoke](lanes/workflow-contract.e2e.mjs)（keyless ~2s，fake provider + 真引擎） |
 | 审计动议输出与角色留痕 | [deliverables-check](audit/deliverables-check.mjs) · [authorship-audit](audit/authorship-audit.mjs) · [journal-audit](audit/journal-audit.mjs) |
-| 核对发布链或导出交付包 | [release-smoke](smoke/release-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs) · [export-dist](../tools/export-dist.mjs) · [market-index](../tools/market-index.mjs) |
+| 核对发布链或导出交付包 | [release-smoke](lanes/release.entry.mjs) · [channel-matrix-smoke](lanes/channel-matrix.entry.mjs) · [export-dist](../tools/export-dist.mjs) · [market-index](../tools/market-index.mjs) |
 | **dev 启动** | `pnpm company --no-open` → [company](../tools/company.mjs)：缺 profile 时初始化；默认构建 + `npm pack` + `plugin add file:<tgz>` → exec `dsh --profile company`；`--link` 快速通道 |
-| 启动入口端到端（真 tarball 装 profile → `dsh --profile company` → workspace/公司状态） | [company-entry-smoke](smoke/company-entry-smoke.mjs)（keyless，~1-2 分钟） |
+| 启动入口端到端（真 tarball 装 profile → `dsh --profile company` → workspace/公司状态） | [company-entry-smoke](lanes/company-entry.entry.mjs)（keyless，~1-2 分钟） |
 
 ## 清单
 
@@ -54,6 +54,6 @@
 |---|---|
 | 真实盘**待处理 > 30 条**（或已采纳 > 5 个） | 折叠开始挡东西 ⇒ 先决定上**筛选**（优先于分页）。量法 `ls company-workspace/.dsh-company/cultivation/records \| wc -l`；依据 = [场景轮 Note](../notes/archived/2026-10-18-cultivation-scenario-audit.md) 追加十四 |
 | 再攒 **~20 场真实收口仍 0 次自发提案** | 考虑在 persona/技能加一句引导（先查是不是被别的机制压住）。先跑 [propose-sampler](../tools/propose-sampler.mjs) 看分箱；依据 = 同上 追加十六 |
-| **升 pin** 或动培养面（面板 / host / preset 工具行） | 复跑三档真入口：[cultivation-ux-walkthrough-probe](../probes/browser-visual/cultivation-ux-walkthrough-probe.mjs)、[cultivation-ux-scenarios-probe](../probes/browser-visual/cultivation-ux-scenarios-probe.mjs)、[cultivation-method-layer](../probes/session-context/cultivation-method-layer-probe.mjs)；培养页点击交互另用 [ui-scene-smoke](smoke/ui-scene-smoke.mjs) `--steps`；动 preset 另跑 [preset-smoke](smoke/preset-smoke.mjs) |
+| **升 pin** 或动培养面（面板 / host / preset 工具行） | 复跑三档真入口：[cultivation-ux-walkthrough-probe](../probes/browser-visual/cultivation-ux-walkthrough-probe.mjs)、[cultivation-ux-scenarios-probe](../probes/browser-visual/cultivation-ux-scenarios-probe.mjs)、[cultivation-method-layer](../probes/session-context/cultivation-method-layer-probe.mjs)；培养页点击交互另用 [ui-scene-smoke](lanes/ui-scene.entry.mjs) `--steps`；动 preset 另跑 [preset-smoke](lanes/preset.entry.mjs) |
 | 想复核**问询窗口 120s** 还要不要改 | `node tools/ask-latency.mjs`（只读报数，不改配置）；依据 = [BUG-021 Note](../notes/archived/2026-10-18-bug021-timed-user-question.md) |
 | 命令面行为 / 事件形状要变 | 先看 S12（故障注入恢复）与 `tools/lib/question-stop.mjs` 的形状漂移判据——它们会先红；依据 = [BUG-022 Note](../notes/archived/2026-10-18-bug022-question-stop-guard.md) |

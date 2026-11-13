@@ -34,10 +34,10 @@
 ## 验证（真跑）
 
 ```text
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation --record
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation --record
 #   第 1/3 次 → 录制完成（lead 55 行）→ 自检重放… → 自检通过
 #   再跑一次 → 录制完成（lead 46 行）→ 自检通过
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation --ui --refresh-ui && … --ui
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation --ui --refresh-ui && … --ui
 #   双 lane ALL PASS（金样与 session 同代）
 pnpm verify   # ALL PASS
 ```

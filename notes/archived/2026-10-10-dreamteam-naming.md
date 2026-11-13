@@ -51,9 +51,9 @@
   （1 failed | 12 passed）→ 还原后同套件 **13/13 绿**。前缀门真咬人。
 - `pnpm test`：**43 文件 / 441 测试全绿**（显示名断言、presence-board 防漂移、entry-probe
   守卫、品牌字面同步换代）。
-- `node checks/smoke/preset-smoke.mjs`：**ALL PASS**——5 preset 经真 web RPC session/create
+- `node checks/lanes/preset.entry.mjs`：**ALL PASS**——5 preset 经真 web RPC session/create
   全部挂载 + skills 隔离 + client 模块闭包 68 模块缺失 0。
-- `node checks/smoke/client-load-smoke.mjs`：**ALL PASS**——真浏览器零挂载失败、零 loader
+- `node checks/lanes/client-load.entry.mjs`：**ALL PASS**——真浏览器零挂载失败、零 loader
   错误、品牌槽在场（`DSH 梦之队`）。
 - `pnpm verify`：**ALL PASS**——notes-liveness（新 Note 状态行）、ledger-routing（D41 行
   ≤100 字符、家可解析）、doc-budget（index.md 压行腾 D41 位仍 143/143）、presets ×5、

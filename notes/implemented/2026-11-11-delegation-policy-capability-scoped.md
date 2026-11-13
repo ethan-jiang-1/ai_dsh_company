@@ -59,7 +59,7 @@
 
 **门禁**
 
-- `pnpm test` → **196 files / 1571 tests passed**；`pnpm typecheck` 绿；`pnpm lint` 0 warnings/errors；`pnpm dup` 0 clones；`pnpm verify` ALL PASS；`source run/env.sh && node checks/smoke/preset-smoke.mjs` → **ALL PASS（6 角色 + 5 非角色）**；`product-team-e2e-smoke` → **ALL PASS（295s）**。
+- `pnpm test` → **196 files / 1571 tests passed**；`pnpm typecheck` 绿；`pnpm lint` 0 warnings/errors；`pnpm dup` 0 clones；`pnpm verify` ALL PASS；`source run/env.sh && node checks/lanes/preset.entry.mjs` → **ALL PASS（6 角色 + 5 非角色）**；`product-team-e2e-smoke` → **ALL PASS（295s）**。
 
 ## 现行语义（canonical）
 

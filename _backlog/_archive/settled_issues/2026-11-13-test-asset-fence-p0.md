@@ -40,10 +40,10 @@ opened: 2026-11-13
 
 **做（P0）**：
 
-- **U1**：`two-axis-gates-smoke` 的 mutation 改用现行 canonical 文本；加「mutation 必须改到字节」断言；共享助手放 `checks/smoke/lib/`，`gates-negative-smoke` 同用。
-- **U2**：先 `node checks/smoke/replay-smoke.mjs --refresh`（headless authored、无 key；workspace oracle 失败会拒绝），复跑确认绿并更新 `snapshot.yml` 资格日期；刷不动则 `replayEligible: archived` + 日期理由。
+- **U1**：`two-axis-gates-smoke` 的 mutation 改用现行 canonical 文本；加「mutation 必须改到字节」断言；共享助手放 `checks/lanes/lib/`，`gates-negative-smoke` 同用。
+- **U2**：先 `node checks/lanes/replay.e2e.mjs --refresh`（headless authored、无 key；workspace oracle 失败会拒绝），复跑确认绿并更新 `snapshot.yml` 资格日期；刷不动则 `replayEligible: archived` + 日期理由。
 - **U3**：`candidate-scan-eval` 状态改 `已耗（2026-11-13 语料已移出本仓；恢复语料时重跑）`。
-- **A1**：新增 `新建:checks/smoke/fast-lane.mjs` + `package.json` 的 `smoke:fast`；第一版 6 条：`workflow-contract` / `present-catalog` / `company-root-process` / `gates-negative` / `snapshot-motion` / `two-axis`；进 `.githooks/pre-push`。
+- **A1**：新增 `新建:checks/lanes/fast-lane.mjs` + `package.json` 的 `smoke:fast`；第一版 6 条：`workflow-contract` / `present-catalog` / `company-root-process` / `gates-negative` / `snapshot-motion` / `two-axis`；进 `.githooks/pre-push`。
 - 同轮更新 pre-push/CI 的预算注释为实测值。
 
 **不做**：A2（`export-dist` 抽 plan，仅复发时）、A3（headless 静态新鲜度，`--refresh` 再漂才做）、A4（负例扩面，另卡）、A5（probe 审计，另卡）；不动产品代码/vendor。
@@ -54,7 +54,7 @@ opened: 2026-11-13
 
 - 事实（新增/修改）：测试资产的**新鲜度回路**——mutation 必须真改字节、重放 fixture 有刷新/归档路径、惰性资产有状态、便宜资产有 lane。
 - 唯一入口：本卡（P0 范围）+ [研究题名页](../../research/test-asset-fence/README.md)（证据与取舍）。
-- 读载体 / 写载体：`checks/smoke/*`、`checks/smoke/lib/`、`snapshots/replay/`、`checks/audit/`、`package.json`、`.githooks/pre-push`、`tests/README.md`；维护者与 pre-push 使用者是读者。
+- 读载体 / 写载体：`checks/lanes/*`、`checks/lanes/lib/`、`snapshots/replay/`、`checks/audit/`、`package.json`、`.githooks/pre-push`、`tests/README.md`；维护者与 pre-push 使用者是读者。
 - 环境坏法：内容（i18n/canonical 迁移让 mutation 空转）、生命周期（fixture 资格过期）、来源（CI 不构建 vendor，cheap smoke 跑不动）；根/叶路径不是本条的主轴。
 
 ## 关闭条件
@@ -63,8 +63,8 @@ P0 的 `## 验收标准` 全绿；`## 落地证据` 用实跑结果替换「实�
 
 ## 落地证据（`去向=note|implementation` 必填）
 
-- 改了哪些系统面（路径）：`checks/smoke/two-axis-gates-smoke.mjs`、`checks/smoke/gates-negative-smoke.mjs`、`checks/smoke/lib/mutation.mjs`、`checks/smoke/fast-lane.mjs`、`snapshots/replay/foundation-workspace/`（raw/session/snapshot.yml）、`checks/audit/candidate-scan-eval.mjs`、`package.json`、`.githooks/pre-push`、`.github/workflows/ci.yml`、`tests/README.md`、`checks/README.md`、`docs/testing.md`、`notes/implemented/2026-11-13-test-asset-fence.md`。
-- 实跑命令与结果：`node checks/smoke/two-axis-gates-smoke.mjs` ALL PASS（5/5）；`node checks/smoke/gates-negative-smoke.mjs` ALL PASS（5/5）；`node checks/smoke/replay-smoke.mjs --refresh` exit 0，复跑 ALL PASS（2s）；`pnpm smoke:fast` ALL PASS（6 条，1.92s 单跑 / 2.2–2.8s pre-push）；`pnpm verify` ALL PASS；`sh .githooks/pre-push </dev/null` exit 0（test 242 files / 1997 tests，29–35s，两次）。
+- 改了哪些系统面（路径）：`tests/checks/two-axis-gates.test.mjs`、`tests/checks/gates-negative.test.mjs`、`checks/lanes/lib/mutation.mjs`、`checks/lanes/fast-lane.mjs`、`snapshots/replay/foundation-workspace/`（raw/session/snapshot.yml）、`checks/audit/candidate-scan-eval.mjs`、`package.json`、`.githooks/pre-push`、`.github/workflows/ci.yml`、`tests/README.md`、`checks/README.md`、`docs/testing.md`、`notes/implemented/2026-11-13-test-asset-fence.md`。
+- 实跑命令与结果：`node tests/checks/two-axis-gates.test.mjs` ALL PASS（5/5）；`node tests/checks/gates-negative.test.mjs` ALL PASS（5/5）；`node checks/lanes/replay.e2e.mjs --refresh` exit 0，复跑 ALL PASS（2s）；`pnpm smoke:fast` ALL PASS（6 条，1.92s 单跑 / 2.2–2.8s pre-push）；`pnpm verify` ALL PASS；`sh .githooks/pre-push </dev/null` exit 0（test 242 files / 1997 tests，29–35s，两次）。
 
 ## 抽象度
 
@@ -73,14 +73,14 @@ P0 的 `## 验收标准` 全绿；`## 落地证据` 用实跑结果替换「实�
 - 换做法要改吗？→ 会；若换测试载体/CI 形状，lane 与 fixture 规则跟着换，但「mutation 必须真改字节 + 慢资产有新鲜度」不变。
 - 只有机制本身变才改吗？→ 是。
 - 第二消费者：后续加 smoke/fixture 的维护者、pre-push 使用者。
-- 搬家成本：低；规则住 `checks/smoke/` 与 `tests/README.md`，不新建索引。
+- 搬家成本：低；规则住 `checks/lanes/` 与 `tests/README.md`，不新建索引。
 
 ## 验收标准
 
 | 命令 | 断言 | 红形态 |
 |---|---|---|
-| `node checks/smoke/two-axis-gates-smoke.mjs` | ALL PASS（2 真副本 + 3 负例；mutation 断言在场） | 把任一 canonical mutation 改回旧字符串/删掉断言 → 红 |
-| `node checks/smoke/replay-smoke.mjs` | ALL PASS；`snapshot.yml` 的 `runnable` 与实测一致（或 `archived` + 日期理由） | 不刷新直接跑 → 归一化日志零 diff 红 |
+| `node tests/checks/two-axis-gates.test.mjs` | ALL PASS（2 真副本 + 3 负例；mutation 断言在场） | 把任一 canonical mutation 改回旧字符串/删掉断言 → 红 |
+| `node checks/lanes/replay.e2e.mjs` | ALL PASS；`snapshot.yml` 的 `runnable` 与实测一致（或 `archived` + 日期理由） | 不刷新直接跑 → 归一化日志零 diff 红 |
 | `pnpm smoke:fast` | ALL PASS；6 条、~2.4s、串行 | 从 `fast.mjs` 删一条或改坏其命令 → 红 |
 | `pnpm verify` | ALL PASS | 任一结构门禁红 |
 | `pnpm test` | 242+ files / 1997+ tests passed；≤30s | 任一 spec 红或超预算 |

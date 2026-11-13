@@ -48,8 +48,8 @@
 | bisect 触发器 | 合成 bundle 逐行 | 只有 `session-query-sqlite` 改值替换失败；同值/其它 override/纯 insert 都 applied |
 | 修复后 in-app 安装 | rc.2 + rc.5，干净 web profile | `application: applied`；六 preset 零 broken；`session/create` ceo；client 模块表在场 |
 | 组内行挂载 | rc.2/rc.5 `pluginInventory/list` | `company-session-query-sqlite` / `company-tool-session-query` 均 `active`；tool 行唯一 |
-| 认证档 | `node checks/smoke/release-smoke.mjs` | ALL PASS（含新增 ④c 应用内安装） |
-| preset 冒烟 | `source run/env.sh && node checks/smoke/preset-smoke.mjs` | ALL PASS（六角色 + 组挂载） |
+| 认证档 | `node checks/lanes/release.entry.mjs` | ALL PASS（含新增 ④c 应用内安装） |
+| preset 冒烟 | `source run/env.sh && node checks/lanes/preset.entry.mjs` | ALL PASS（六角色 + 组挂载） |
 | keyless 回归 | `pnpm test` | 121 files / 1025 passed / 3 skipped |
 | 结构门禁 | `pnpm verify` | ALL PASS |
 | npm 身份 | `npm publish --dry-run` + `npm pack --json` | 127 files；LICENSE/README 在场；无 `bin/`；public access；无 EPRIVATE（dry-run） |

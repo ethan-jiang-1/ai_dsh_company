@@ -149,10 +149,10 @@ describe('入口探针不使用全文兜底', () => {
 
   it('引用比对忽略排版空白，但文字仍须真实存在', () => {
     // 忠实复刻 Q5 现场：源文件用空格对齐，模型引用时把它规范化了。
-    const aligned = 'node checks/smoke/preset-smoke.mjs          # preset 改动的完成定义'
+    const aligned = 'node checks/lanes/preset.entry.mjs          # preset 改动的完成定义'
     const reader = (path: string) => (path === 'AGENTS.md' ? aligned : evidence.quote)
     const spaced = good()
-    spaced.answers[4]!.evidence = [{ path: 'AGENTS.md', quote: 'node checks/smoke/preset-smoke.mjs # preset 改动的完成定义' }]
+    spaced.answers[4]!.evidence = [{ path: 'AGENTS.md', quote: 'node checks/lanes/preset.entry.mjs # preset 改动的完成定义' }]
     expect(evaluateEntryProbe(JSON.stringify(spaced), reader).failures).toEqual([])
     const wrong = good()
     wrong.answers[4]!.evidence = [{ path: 'AGENTS.md', quote: '这段原文其实并不存在于任何文件里' }]

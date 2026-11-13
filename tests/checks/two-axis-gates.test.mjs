@@ -1,6 +1,6 @@
 // 状态：常驻
 // 何时跑：改 `checks/gates/{product-type,delivery-mode}-sources.mjs`、对应的 content 枚举/包形状后；
-//   发布前。跑法 = `node checks/smoke/two-axis-gates-smoke.mjs`（keyless，秒级，不进 pnpm test）。
+//   发布前。跑法 = `node tests/checks/two-axis-gates.test.mjs`（keyless，秒级，不进 pnpm test）。
 //
 // 为什么在 smoke 而不在 tests/：这两个门禁读的是根驱动面（checks/gates），tests/ 的 layering 守卫
 //   禁止 import checks 驱动；负例需要真复制 content/presets 再跑门禁，属于入口级检查。
@@ -12,9 +12,9 @@
 import { cpSync, existsSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import * as productGate from '../gates/product-type-sources.mjs'
-import * as deliveryGate from '../gates/delivery-mode-sources.mjs'
-import { mutateFile } from './lib/mutation.mjs'
+import * as productGate from '../../checks/gates/product-type-sources.mjs'
+import * as deliveryGate from '../../checks/gates/delivery-mode-sources.mjs'
+import { mutateFile } from '../../checks/lanes/lib/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
 

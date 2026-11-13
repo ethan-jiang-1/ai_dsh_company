@@ -13,8 +13,8 @@ opened: 2026-10-23
 手册（注入源）改一行后，按 `replay-fixture-freshness` 门禁要求跑：
 
 ```text
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation --record
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation --record
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation
 # replay-smoke: 2 FAILURE(S)
 #   归一化日志零 diff（投递簿记除外）
 #   投递内容集合等价
@@ -68,10 +68,10 @@ node checks/smoke/replay-smoke.mjs --scenario r3-delegation
 ## 验证（真跑）
 
 ```text
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation --record
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation --record
 #   第 1/3 次 → 录制完成（lead 55 行）→ 自检重放… → 自检通过（第 1 次录制可重放）
 #   再跑一次 → 录制完成（lead 46 行）→ 自检通过（第 1 次录制可重放）
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation   # ALL PASS
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation   # ALL PASS
 ```
 
 ## 已修判定（解除阻塞）

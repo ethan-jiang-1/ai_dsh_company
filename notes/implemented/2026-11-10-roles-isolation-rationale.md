@@ -25,7 +25,7 @@
 ## 证据 / 历史
 
 - 完整原稿：`git show ab0fd622^:docs/design/roles-isolation.md`。
-- 0.2.1 源码核对：`packages/subagent/subagent/src/child-agent.ts`、`manager.ts`；活体探针 = `checks/smoke/delegation-smoke.mjs`，身份字段 = `list_subagents`。
+- 0.2.1 源码核对：`packages/subagent/subagent/src/child-agent.ts`、`manager.ts`；活体探针 = `checks/lanes/delegation.entry.mjs`，身份字段 = `list_subagents`。
 - 决策台账：[D18 / D22 / D58](../../docs/reference/decisions.md)。
 
 ## 现行语义（canonical）

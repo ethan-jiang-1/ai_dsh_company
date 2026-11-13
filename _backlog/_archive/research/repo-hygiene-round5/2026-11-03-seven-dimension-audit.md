@@ -32,7 +32,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 
 | # | 维 | 级 | 发现（实证据） |
 |---|---|---|---|
-| R5-01 | D6/D4 | **P0** | `ui-scene-smoke --isolated` 启动即 exit 2：它 spawn 已删除的 **tools/standalone.mjs**（已删除），并 `cpSync` 已删除的 **packages/company-pack/workspace**（已删除）（`checks/smoke/ui-scene-smoke.mjs`（`:65`/`:74`）；`cultivation-gui-probe`（`:95`/`:104`））。两份活文档仍把它当金样档（`checks/README.md:20`、`tests/README.md:30`）。删除发生在 `ef50554`（v3 native entry），消费者未同 diff 扫。**实测**：`node checks/smoke/ui-scene-smoke.mjs --isolated --golden` → exit 2，`MODULE_NOT_FOUND`。 |
+| R5-01 | D6/D4 | **P0** | `ui-scene-smoke --isolated` 启动即 exit 2：它 spawn 已删除的 **tools/standalone.mjs**（已删除），并 `cpSync` 已删除的 **packages/company-pack/workspace**（已删除）（`checks/lanes/ui-scene.entry.mjs`（`:65`/`:74`）；`cultivation-gui-probe`（`:95`/`:104`））。两份活文档仍把它当金样档（`checks/README.md:20`、`tests/README.md:30`）。删除发生在 `ef50554`（v3 native entry），消费者未同 diff 扫。**实测**：`node checks/lanes/ui-scene.entry.mjs --isolated --golden` → exit 2，`MODULE_NOT_FOUND`。 |
 | R5-02 | D4 | **P0** | 两个门禁根在已删除目录，PASS 是真空的：`shipped-links` 根 **packages/company-pack/workspace**（已删除）（`checks/gates/shipped-links.mjs:12`），只查 14 份 skill md，**17 份随包 `content/*.md` 零链接检查**；`nav-count-claims` 同根（`checks/gates/nav-count-claims.mjs:31`），扫 35 份而非 52 份。手册/模板是随每个角色会话注入的最大常驻面，正是这两门要守的对象。 |
 | R5-03 | D4/D7 | **P1** | 两个发布 readiness owner 相反：`node tools/release.mjs --check` **exit 1**（「pack 源码面已变但 `_dist` 没重打」；HEAD `ad07da3` vs manifest `gitSha e59a86c`），而 `pnpm verify` 的 `dist-freshness` / `release-ready` 全 PASS；`_dist/安装手册.md` 与 `market-index.json` 仍写 0.7.1。新 agent 会以为可以发。 |
 | R5-04 | D3 | **P1** | 自动注入的授权门牌截断排除项：`_backlog/AGENTS.md:23` 写「门票即授权（限 P1/P2 修复型）：直接修」，`_backlog/README.md:14` 只留「P0 或严重/变向除外」；完整边界在 `:124`（章程/常设指令、docs 合同、company-pack 公开行为、已记录决定都不自授权）。按门牌执行可自授权改合同。 |
@@ -101,7 +101,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 **问题**：
 
 - **用户可见面三处空白可全绿**（R5-06 / R5-27）：`CultivationTab` 0%、`CultivationContextPicker` 56.5% 且 0 分支（会话/成果检索承诺零 spec）、`company-tabs` 浮窗几何 24.1%。
-- **preset 只有文本**（R5-15）：`tests/presets/presets.spec.ts` 26 个 YAML 正则断言；真挂载只在 `checks/smoke/preset-smoke.mjs`（不在 `pnpm test`）。schema 非法的 preset 在 keyless 档仍绿。
+- **preset 只有文本**（R5-15）：`tests/presets/presets.spec.ts` 26 个 YAML 正则断言；真挂载只在 `checks/lanes/preset.entry.mjs`（不在 `pnpm test`）。schema 非法的 preset 在 keyless 档仍绿。
 - **静默 skip**（R5-16）：`tests/lib/ledger.spec.ts:43` 的 `describe.skipIf(!hasLive)` 正是本轮 3 个 skip；它是 live 台账的唯一结构断言，fresh clone 上消失，且没有「预期 N 个真跑」守卫（宪法 §3.6 要求）。
 - **测试重心**：harness 48 文件 / 504 例 = 48%，一半断言守仓库自身；产品面是少数。
 - **mock 白名单漂移**（R5-28）：`docs/testing.md:49` 说只有两处；`tests/session/probe-web.spec.ts:151-207` 有 11 处 fetch/spawn stub（网络边界），未登记。
@@ -179,12 +179,12 @@ pnpm verify                                # ALL PASS 53 门 + 2 SKIP（replay-f
 pnpm test                                  # 124 files / 1048 tests（1045 pass / 3 skip）/ 31.3s
 pnpm typecheck                             # exit 0
 npx vitest run --coverage                  # 85.14 stmt / 77.33 branch / 86.10 func / 88.87 line
-node checks/smoke/client-load-smoke.mjs    # ALL PASS（零挂载失败 / 零 loader 错误 / 品牌在场）
-node checks/smoke/ui-scene-smoke.mjs --keep
+node checks/lanes/client-load.entry.mjs    # ALL PASS（零挂载失败 / 零 loader 错误 / 品牌在场）
+node checks/lanes/ui-scene.entry.mjs --keep
                                            # ALL PASS：9/9 页签、console/exceptions/clientErrors 全空、errorRingInstalled=true
-node checks/smoke/ui-scene-smoke.mjs --isolated --golden
+node checks/lanes/ui-scene.entry.mjs --isolated --golden
                                            # exit 2：隔离场景预置失败，MODULE_NOT_FOUND（tools/standalone.mjs 已删）
-node checks/smoke/release-smoke.mjs --tarball _dist/... --expect-sha ...
+node checks/lanes/release.entry.mjs --tarball _dist/... --expect-sha ...
                                            # 39 PASS / 0 FAIL（安装/重装/应用内/首启/二启；无 remove）
 node tools/release.mjs --check             # exit 1：pack 源码面已变但 _dist 没重打
 npm view dsh-company-pack version          # E404（0.7.1 未发布）

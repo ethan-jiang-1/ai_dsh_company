@@ -64,7 +64,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
   但**命名 child 不是 team member**——它加载该职能 preset 时只有全局行可用；缺了就是 activation child 失联。
 - 续驶/连续对话归 team（§3）。
 
-证据 = `snapshots/replay/foundation-workspace/replay/session.v3.jsonl` 首帧 `request/header`，及 `checks/smoke/delegation-smoke.mjs`（全新会话复现，已固化为守卫）。
+证据 = `snapshots/replay/foundation-workspace/replay/session.v3.jsonl` 首帧 `request/header`，及 `checks/lanes/delegation.entry.mjs`（全新会话复现，已固化为守卫）。
 
 ### 2.1 根门 = Team Lead（B1 机制事实）
 

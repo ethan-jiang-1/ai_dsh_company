@@ -48,5 +48,5 @@
 | clean clone `pnpm verify`（修后） | `verify: ALL PASS；3 门无对象（dist-freshness / replay-fixture-freshness / replay-ui-freshness）` |
 | clean clone `pnpm test`（修后） | `242 passed (242)`；`1994 passed / 3 skipped (1997)`（3 skip = dev-only 台账） |
 | warm tree `pnpm verify` / `pnpm test`（修后） | `ALL PASS` / `242 files / 1997 tests` |
-| `node checks/smoke/ui-scene-smoke.mjs --isolated --expected` | `ALL PASS（自起实例 + 全部公司页签 + 浏览器错误环零命中）`；`金样一致（10 个页签）` |
+| `node checks/lanes/ui-scene.entry.mjs --isolated --expected` | `ALL PASS（自起实例 + 全部公司页签 + 浏览器错误环零命中）`；`金样一致（10 个页签）` |
 | probes 逐件审计（`git grep -l -F <path>`） | 69/70 有可执行消费者；1 件为探针包 manifest；0 死载体 |

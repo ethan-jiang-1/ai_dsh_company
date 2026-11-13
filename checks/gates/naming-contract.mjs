@@ -12,16 +12,17 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 // quality-loop-audit 住 probes、3 个 -walkthrough/-scenarios/-e2e 逃过 script-triggers、
 // read-barrier/index 被当第 69 个探针）。
 // 判据（窄、机械）：
-//   ① checks/smoke/ 根文件 = *-smoke.mjs（资产）或 *-lane.mjs（runner）；
+//   ① checks/lanes/ = *.{e2e,entry}.mjs（资产）或 *-lane.mjs（runner）；
+//   ①b tests/checks/ = *.test.mjs（门禁自身）；
 //   ② probes/** = *-probe.mjs；仅 probes/<域>/<fixture>/index.mjs 允许作模块入口；
 //   ③ checks/audit/ = *-(audit|check|eval|ratchet).mjs；
 //   ④ **资产面**（smoke/audit/probe/gate）的文件名 token（按 -_. 切）不得含禁用词：
 //      golden/util/misc/helper/common/tmp/temp/new/old/copy/backup。
 //      不扫 tests/support/docs——那里的 copy（文案）/temp（临时环境）是准确用词，不是资产类型。
 // 负例留证 2026-11-13（造红→还原→绿）：
-//   ① checks/smoke/foo-oracle.mjs → `FAIL naming-contract: … 期望 -smoke.mjs 或 -lane.mjs`；
+//   ① checks/lanes/foo-oracle.mjs → `FAIL naming-contract: … 期望 -smoke.mjs 或 -lane.mjs`；
 //   ② probes/bar-e2e.mjs → `FAIL naming-contract: … 期望 -probe.mjs`；
-//   ③ checks/smoke/golden-thing-smoke.mjs → `FAIL naming-contract: … 含禁用词 golden`。
+//   ③ checks/lanes/golden-thing-smoke.mjs → `FAIL naming-contract: … 含禁用词 golden`。
 const BANNED = new Set(['golden', 'util', 'misc', 'helper', 'common', 'tmp', 'temp', 'new', 'old', 'copy', 'backup'])
 
 const walk = (dir, acc = []) => {
@@ -39,11 +40,19 @@ export function run({ ok, fail }) {
   const problems = []
   const failWith = (path, detail) => problems.push(`${relative(root, path)} → ${detail}`)
 
-  const smokeDir = join(root, 'checks/smoke')
-  for (const entry of readdirSync(smokeDir, { withFileTypes: true })) {
+  const laneDir = join(root, 'checks/lanes')
+  for (const entry of readdirSync(laneDir, { withFileTypes: true })) {
     if (!entry.isFile() || !entry.name.endsWith('.mjs')) continue
-    if (!/-(smoke|lane)\.mjs$/.test(entry.name)) {
-      failWith(join(smokeDir, entry.name), '期望 -smoke.mjs（资产）或 -lane.mjs（runner）')
+    if (!/\.(e2e|entry)\.mjs$/.test(entry.name) && !/-lane\.mjs$/.test(entry.name)) {
+      failWith(join(laneDir, entry.name), '期望 .e2e.mjs / .entry.mjs（资产）或 -lane.mjs（runner）')
+    }
+  }
+
+  const checksDir = join(root, 'tests/checks')
+  if (existsSync(checksDir)) {
+    for (const entry of readdirSync(checksDir, { withFileTypes: true })) {
+      if (!entry.isFile() || !entry.name.endsWith('.mjs')) continue
+      if (!entry.name.endsWith('.test.mjs')) failWith(join(checksDir, entry.name), '期望 .test.mjs（门禁自身）')
     }
   }
 
@@ -64,7 +73,7 @@ export function run({ ok, fail }) {
   }
 
   const assetPaths = [
-    ...readdirSync(smokeDir, { withFileTypes: true }).filter(entry => entry.isFile() && entry.name.endsWith('.mjs')).map(entry => join(smokeDir, entry.name)),
+    ...readdirSync(laneDir, { withFileTypes: true }).filter(entry => entry.isFile() && entry.name.endsWith('.mjs')).map(entry => join(laneDir, entry.name)),
     ...readdirSync(auditDir, { withFileTypes: true }).filter(entry => entry.isFile() && entry.name.endsWith('.mjs')).map(entry => join(auditDir, entry.name)),
     ...walk(probesDir).filter(path => path.endsWith('.mjs')),
     ...walk(join(root, 'checks/gates')).filter(path => path.endsWith('.mjs')),

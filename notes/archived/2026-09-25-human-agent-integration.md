@@ -185,7 +185,7 @@ handbook-smoke ALL PASS。
   recipients 字段 ⇒ 平台层分发不成立；落 `src/lib/routing.ts` 纯形状层（消费 owners 表；roleOfWho +
   routeByRole；查不到 = undefined fail-loud）+ 多 owner fixture 单测（两个角色分别路由到不同 owner，
   B1 验收主断言；test 186 全绿）。真模型证据沿用 attention-e2e 7/7。
-- **B2 三类接口真证据**：`scripts/human-loop-e2e-smoke.mjs` 认证档 **12/12 ALL PASS**——补料（人写文件→
+- **B2 三类接口真证据**：`scripts/human-loop-e2e.entry.mjs` 认证档 **12/12 ALL PASS**——补料（人写文件→
   agent 读到并用）/ 建议（两轮零闸门、草稿照常、定稿消化建议）/ 规矩缺口（agent 问人→浏览器问询卡→
   人点选项→回流 journal 日期+缺口+裁决+回落点→收口）。实证：相③ 需硬性步骤指令（模型方差红证在案）。
 - **B3 不在场机制化（退化收口，用户 2026-09-25 裁决 A）**：阻塞型挂起已由注意力中心如实显示

@@ -53,13 +53,13 @@
 - `pnpm test`：121 个 spec、1022 pass / 3 skipped（domain 可选档）。
 - `pnpm verify`：ALL PASS（含 dist-manual 0.6.0 + content + 无 bin/workspace、base-clean v3、
   company-skeleton v3、handbook-budget content）。
-- `node checks/smoke/company-entry-smoke.mjs`：ALL PASS（干净 home + 真 tarball → roster → 直接
+- `node checks/lanes/company-entry.entry.mjs`：ALL PASS（干净 home + 真 tarball → roster → 直接
   `dsh --profile company` → v3 身份/`.dsh-company/kb`/根零产品文件/登记 → 同 home 第二 workspace 可起）。
-- `node checks/smoke/release-smoke.mjs`：ALL PASS（plain Node built CLI → npm pack → 干净 profile 真安装 →
+- `node checks/lanes/release.entry.mjs`：ALL PASS（plain Node built CLI → npm pack → 干净 profile 真安装 →
   RPC → 首启落盘/二启零变更）。
-- `node checks/smoke/client-load-smoke.mjs`：ALL PASS（真浏览器零挂载失败 + 品牌槽）。
-- `node checks/smoke/preset-smoke.mjs`：ALL PASS（五角色 + researcher 可挂载；排练场 v3 镜像）。
-- `node checks/smoke/present-catalog-smoke.mjs`：ALL PASS（present 事件 → `.dsh-company/kb` catalog +
+- `node checks/lanes/client-load.entry.mjs`：ALL PASS（真浏览器零挂载失败 + 品牌槽）。
+- `node checks/lanes/preset.entry.mjs`：ALL PASS（五角色 + researcher 可挂载；排练场 v3 镜像）。
+- `node checks/lanes/present-catalog.e2e.mjs`：ALL PASS（present 事件 → `.dsh-company/kb` catalog +
   host-only 账本；workspace 不写旧 W 账本）。
 - `node tools/release.mjs --verify`：全绿（verify/test/release-smoke/client-load/preset/present-catalog）。
 - `_dist/dsh-company-pack-0.6.0.tgz` + 安装手册：`node tools/export-dist.mjs` 生成；sha256 与 manifest 一致。

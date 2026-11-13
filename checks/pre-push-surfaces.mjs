@@ -14,7 +14,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'
-import { assetByName, selectSurfaces } from '../tools/lib/asset-lanes.mjs'
+import { assetByName, selectSurfaces, suffixOf } from '../tools/lib/asset-lanes.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..')
@@ -90,7 +90,7 @@ for (const name of assets) {
     console.log(`pre-push surfaces FAIL ${name} — 规则引用了未登记资产`)
     continue
   }
-  const file = join(here, 'smoke', `${name}.mjs`)
+  const file = join(here, 'lanes', `${name}.${suffixOf(name)}.mjs`)
   if (!existsSync(file)) {
     failures.push(`${name}（盘上没有）`)
     console.log(`pre-push surfaces FAIL ${name} — 文件不存在：${file}`)

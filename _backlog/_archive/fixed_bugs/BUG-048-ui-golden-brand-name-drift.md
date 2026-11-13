@@ -12,7 +12,7 @@ opened: 2026-11-09
 
 ## 症状
 
-`node checks/smoke/ui-scene-smoke.mjs --isolated --golden` 失败：
+`node checks/lanes/ui-scene.entry.mjs --isolated --golden` 失败：
 
 ```
 GOLDEN FAIL 页签「在场」第 14 字符起不同：
@@ -45,7 +45,7 @@ freshness 门只查形状，不查 golden 内容。横切范围：所有改页�
 
 ```sh
 source run/env.sh
-node checks/smoke/ui-scene-smoke.mjs --isolated --golden
+node checks/lanes/ui-scene.entry.mjs --isolated --golden
 ```
 
 输出会给出页签「在场」的逐字 diff；金样文件 =
@@ -55,7 +55,7 @@ node checks/smoke/ui-scene-smoke.mjs --isolated --golden
 
 - 如果“显示名收窄为角色名”是已批准的有意行为（提交信息与 D14 说明是），修复 = 确认 diff 只有这一处
   预期变化后刷新金样：
-  `node checks/smoke/ui-scene-smoke.mjs --isolated --refresh-golden`，再跑 `--golden` 复核。
+  `node checks/lanes/ui-scene.entry.mjs --isolated --refresh-golden`，再跑 `--golden` 复核。
 - 如果显示名收窄不是有意行为，则修页面/内容面，不刷新金样。
 - 测试/门禁：考虑把 `ui-scene-smoke --isolated --golden`（或等价的文本金样比对）纳入改 `content/`
   显示名/品牌文案时的同 diff 检查；当前 `pnpm verify` 的 `ui-expected-freshness` 只查注册面。
@@ -71,7 +71,7 @@ node checks/smoke/ui-scene-smoke.mjs --isolated --golden
 
 - **意图确认**：显示名收窄为角色名是 D14 的有意行为（`763abc29` +
   [generic-specific-separation Note](../../../notes/implemented/2026-11-09-generic-specific-separation.md)），不是页面回归。
-- **红→绿**：`node checks/smoke/ui-scene-smoke.mjs --isolated --golden` 红（「在场」第 14 字符起
+- **红→绿**：`node checks/lanes/ui-scene.entry.mjs --isolated --golden` 红（「在场」第 14 字符起
   `梦之队 CEO` vs `CEO`）；`--refresh-golden` 后 `git diff` 只有「在场」这一行、`梦之队 CEO` → `CEO`；
   `--golden` 复核 **9 个页签一致 / ALL PASS**。
 - **同 diff 映射**：[`tests/README.md`](../../../tests/README.md) 的 `src/lib` 读模型行补“显示名变化 ⇒

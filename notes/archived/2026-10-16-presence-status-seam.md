@@ -44,8 +44,8 @@
 - **回归**：`pnpm test` → `61 passed (61)` / `559 passed (559)`；`pnpm verify` → `verify: ALL PASS`。
 - **两面构建（卡验收）**：`pnpm exec tsc -b packages/company-pack` exit 0；`(cd packages/company-pack && pnpm exec tsdown)` → host `Build complete`（`lib/index.js` 54.06 kB）、client `Build complete`（`lib/client.js` 196.98 kB）。产物体积较拆前各小 0.09 kB（再导出摊平了重复引用），sourcemap 略大（多一个模块），属结构变化的预期形状。
 - **built 入口契约**：`await import('packages/company-pack/lib/index.js')` 断言词汇面 5 个**运行值**全在（`PresenceStatus` 是 type-only，按 `.d.ts` 验）；抽查 `statusLabelFor('bogus') === '未知'`、`displayNameFor('lead','lead') === '梦之队 CEO'`。类型面：`lib/types/lib/presence-status.d.ts` 定义 6 个符号，`presence.d.ts` 以 `export {…}` / `export type {…}` 再导出它们。
-- **client 真挂载（卡验收）**：`source run/env.sh && node checks/smoke/client-load-smoke.mjs` → `ALL PASS`（真浏览器：零挂载失败 + 零 loader 错误 + 品牌槽在场）。
-- **重放真消费面（卡验收）**：`node checks/smoke/replay-smoke.mjs --scenario r2-motion` → `ALL PASS`（在场板 5 行与录制同形，presence 判据走 built 再导出链）。
+- **client 真挂载（卡验收）**：`source run/env.sh && node checks/lanes/client-load.entry.mjs` → `ALL PASS`（真浏览器：零挂载失败 + 零 loader 错误 + 品牌槽在场）。
+- **重放真消费面（卡验收）**：`node checks/lanes/replay.e2e.mjs --scenario r2-motion` → `ALL PASS`（在场板 5 行与录制同形，presence 判据走 built 再导出链）。
 - **词汇钉子（卡要求的红证）**：卡写「若现无未知值断言，同 diff 先补」——实测**已在场**（`tests/lib/presence-board.spec.ts:164` 的「未知 status 值 → 「未知」，不抛」），无需新补。红证：把 `statusLabelFor` 的兜底从 `?? STATUS_LABEL.unknown` 改成直显裸值 → `× 未知 status 值 → 「未知」，不抛 → expected 'warping' to be '未知'`（exit 1）→ 还原 → `16 passed (16)`。
 - **文档同 diff（卡义务）**：`packages/company-pack/src/README.md` 源码图 lib 清单 10→11 模块 + 依赖链补 `presence → presence-status`。
 - **同轮修掉一处我亲手引入的腐化指针**（语义审 finding）：新模块头注与 `PRESET_DISPLAY_NAMES` 的 JSDoc 照抄旧文「与 `presets/<role>/preset.yml` 的 `name` 同源」，而该文件 0.1.7 起已并入 `agent.cordis.yml`（`preset.yml` 全仓不存在）——真实事实家 = 各 `presets/<role>/agent.cordis.yml` 的 `config.name`（防漂移断言钉的就是它，见 `tests/lib/presence-board.spec.ts:225-233`）。三处指针已改指真实家：**新模块正是「改文案的人」唯一入口，指错文件的代价最高**。

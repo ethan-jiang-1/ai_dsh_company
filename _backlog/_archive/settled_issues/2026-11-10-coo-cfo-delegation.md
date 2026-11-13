@@ -104,7 +104,7 @@ KB：.dsh-company/kb/coo/、kb/org.md、kb/policy-lines.md
 - CEO preset 有五条角色命名行（`vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo`）；`coo` / `cfo` 都是
   `maxDepth: 1` + `agentPreset`；`delegation-model.mjs` / `DELEGATION_TOOL_KEYS` / `DelegationCard` 同步。
 - `tests/presets` 的五条循环、`tests/client/wiring/client-face.spec.ts` 的 key 对齐、
-  `checks/smoke/delegation-smoke.mjs` 的可见工具清单都含 `coo` / `cfo`。
+  `checks/lanes/delegation.entry.mjs` 的可见工具清单都含 `coo` / `cfo`。
 - `docs/contracts/delegation.md` 表与「五个直接汇报」文案一致；CEO 注释/persona 不再说「三个工具」。
 - team 角色包写进 `assembling-the-team` 与 `generic/collaboration.md`（角色 / CHARTER / 角色 skill /
   KB / 产出 / 边界；`<company-content>/../presets/...` 路径），presets spec 有 keyless 断言。

@@ -135,7 +135,7 @@ returned the pending payload, or …"*），而 **`userQuestions/answer` 恰好�
 - [x] 五角色 preset 的 `tool-ask-user` 行带 `mode: timed` + 显式 `timeout`；`pnpm test tests/presets` 断言**先红**
       （1 failed / 18 passed）→ 补配置后绿（19/19）。
 - [x] 组合自检：`pnpm dsh --profile web --dump-config` 里五角色的该行 config 在场（`mode: timed` / `timeout: 120`）。
-- [x] 真挂载：`node checks/smoke/preset-smoke.mjs` ALL PASS（5 个 preset 全部可挂载）。
+- [x] 真挂载：`node checks/lanes/preset.entry.mjs` ALL PASS（5 个 preset 全部可挂载）。
 - [x] 回放 lane：两份 tool-schemas sidecar 按**有意变更**同步（diff 恰为 `ask_user_question` 块：描述 + questions 描述 +
       新增 `timeout` 参数）；同时归因并同步了既有的手册漂移（正文 + `source.digest`）⇒ 默认 lane 与 `--ui` 档
       **均 ALL PASS**。台账记在 `snapshots/replay/r3-delegation/snapshot.yml`。

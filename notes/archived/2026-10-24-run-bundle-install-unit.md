@@ -62,7 +62,7 @@
   制度件 3 处符号链接指回 pack（`AGENTS.md` / `templates` / `kb/org.md`），5 份 CHARTER 是基部实文件）；[`run/env.sh`](../../run/env.sh) 导出 `DSH_COMPANY_HOME` 并在缺盘时提示。
 - **分发**：[`tools/export-dist.mjs`](../../tools/export-dist.mjs) 手册重写 + 清单加
   `workspace/AGENTS.md`/`kb/org.md`/`kb/owners.md` 与禁项（不允许 `company-workspace|sessions|deliverables|cultivation|profiles|credentials`）。
-- **安装冒烟**：[`checks/smoke/release-smoke.mjs`](../../checks/smoke/release-smoke.mjs) ⑥ 新增
+- **安装冒烟**：[`checks/lanes/release.entry.mjs`](../../checks/lanes/release.entry.mjs) ⑥ 新增
   bundle.json / 干净底座 / 二次启动 manifest 字节不变；并修掉“release-smoke 直接用 dev home → 把临时
   workspace 记成 dev bundle 身份”的隔离 bug（现在 `DSH_HOME` 用 `runtime/harness-home/tmp/release-smoke-home`）。
 - **文档**：[运行态地图 §二·五](../../docs/runtime-map.md)（定义 + base/grown 表）、[项目地图](../../docs/project-map.md)、
@@ -100,7 +100,7 @@ workspace 数据层干净了，但 **pack 的基部内容本身漏历史**。这
 |---|---|
 | `node checks/run-gates.mjs` | **ALL PASS**（39 道；含新 `run-bundle-clean`、扩内容 `dist-manual`） |
 | `npx vitest run` | **85 files / 829 tests 绿**（含新 `bundle-manifest.spec.ts` 6 条） |
-| `node checks/smoke/release-smoke.mjs` | **ALL PASS**：安装副本带 `workspace/`；首启 30 件骨架；`bundle.json`（id / workspace=`tmp/release-company-workspace` / files=16）；干净底座 0 件扩张数据；二次 boot 零变更 + manifest 字节不变 |
+| `node checks/lanes/release.entry.mjs` | **ALL PASS**：安装副本带 `workspace/`；首启 30 件骨架；`bundle.json`（id / workspace=`tmp/release-company-workspace` / files=16）；干净底座 0 件扩张数据；二次 boot 零变更 + manifest 字节不变 |
 | `node tools/export-dist.mjs` | **ALL PASS**：`dsh-company-pack-0.3.1.tgz` 260 条目、presets ×20、workspace 在场 |
 | `pnpm bundle:init`（先移走真盘，再建，再还原） | 建出 10 个普通文件 + 8 个符号链接（AGENTS/templates/org/CHARTER×5）；还原后 1880 件工作树文件 |
 | `git ls-files company-workspace` | **0**（迁移前 146 件 / 1.2MB，`git rm --cached` 保留工作树） |

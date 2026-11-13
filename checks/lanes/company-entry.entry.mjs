@@ -2,7 +2,7 @@
 // 状态：常驻
 // 何时跑：安装/启动/workspace 解析/公司状态布局改动后；发布前
 // 成本：~1-2 分钟 keyless（临时 home + 真 tarball 安装 + 两次 boot；不调模型）
-// 用法：node checks/smoke/company-entry-smoke.mjs [--keep]
+// 用法：node checks/lanes/company-entry.entry.mjs [--keep]
 //
 // 证明形状（v3 起；版本随 package.json）：
 // - 干净 home：CLI 建 company profile → `dsh plugin --profile company add <tarball>` → roster 含 pack；

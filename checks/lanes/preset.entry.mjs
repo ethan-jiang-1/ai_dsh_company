@@ -11,7 +11,7 @@
 //
 // 前置：DSH_HOME 指向已装本 pack 的 company profile（`source run/env.sh` 后 `pnpm company` 默认装这里），
 //       client 面与前端 dist 已构建（guides/bootstrap）。
-// 用法：source run/env.sh && node checks/smoke/preset-smoke.mjs [--port 0] [--profile company]
+// 用法：source run/env.sh && node checks/lanes/preset.entry.mjs [--port 0] [--profile company]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
@@ -234,7 +234,7 @@ try {
   //    （vendor packages/client/AGENTS.md）：不排序、不 gate 加载——这里抓的是"引用了
   //    不存在的包名"这类配置笔误，**不是可加载性判据**。client 入口真正的挂载失败
   //    **不静默**：BootPage 错误屏 + console `failed to apply loader entry`，由
-  //    `checks/smoke/client-load-smoke.mjs` 抓。R1 的"官方 Team UI 挂不上"是误诊
+  //    `checks/lanes/client-load.entry.mjs` 抓。R1 的"官方 Team UI 挂不上"是误诊
   //    （postmortem 0003）。本包模块缺失 = FAIL；他人模块缺失 = WARN。
   const closure = await moduleClosure(base, cookie)
   const ours = closure.missing.filter(item => item.startsWith(OUR_PACKAGE))

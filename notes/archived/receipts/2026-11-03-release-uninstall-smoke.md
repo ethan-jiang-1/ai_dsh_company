@@ -7,7 +7,7 @@
 
 ## 决定
 
-`checks/smoke/release-smoke.mjs` 在首启/二启之后新增第 ⑦ 步：`plugin remove dsh-company-pack` →
+`checks/lanes/release.entry.mjs` 在首启/二启之后新增第 ⑦ 步：`plugin remove dsh-company-pack` →
 断言 profile bundles 不再含包、安装副本已移除、公司状态（`.dsh-company/bundle.json` 字节 + `kb/company.md`）
 保留 → 用同一 tarball 重装 → 断言 bundles 恢复且公司状态字节不变。
 
@@ -24,7 +24,7 @@
 
 ```text
 source run/env.sh
-node checks/smoke/release-smoke.mjs --tarball _dist/dsh-company-pack-0.7.1.tgz \
+node checks/lanes/release.entry.mjs --tarball _dist/dsh-company-pack-0.7.1.tgz \
   --expect-sha bd77facf6ea1b86fbccb348ac4fffe8f5e83ec4c2ef9891d80947284079cd2de
 # ALL PASS（39 + 5 项；第 ⑦ 步原话）
 #  PASS plugin remove 后 bundles 不再含 dsh-company-pack（bundles = @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app）

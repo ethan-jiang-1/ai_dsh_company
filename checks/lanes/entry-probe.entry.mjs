@@ -4,7 +4,7 @@
 // 何时跑：入口链/执行链文档（AGENTS.md / docs/index.md / dev-loop / _backlog）改动后；真模型认证档
 // Machine checks validate per-question routing/evidence, not semantic correctness.
 // No keyless regression claim: true-model certification, 不进 pnpm test.
-// Usage: source run/env.sh && node checks/smoke/entry-probe-smoke.mjs [--port 0] [--timeout 240000]
+// Usage: source run/env.sh && node checks/lanes/entry-probe.entry.mjs [--port 0] [--timeout 240000]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { spawn } from 'node:child_process'

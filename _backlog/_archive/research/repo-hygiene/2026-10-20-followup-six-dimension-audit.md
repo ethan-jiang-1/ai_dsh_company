@@ -19,14 +19,14 @@ intent: "第二轮 fresh-agent 打扫（同日晚，母卡持续跟进）：六�
 
 证据链（全部本轮实测）：
 
-1. `node checks/smoke/replay-smoke.mjs --scenario r3-delegation` **红**：full 档「归一化日志零 diff」session#1 第 13 行失败（差异在注入手册内容）。
+1. `node checks/lanes/replay.e2e.mjs --scenario r3-delegation` **红**：full 档「归一化日志零 diff」session#1 第 13 行失败（差异在注入手册内容）。
 2. 根因 = 提交 `589d785`（2026-10-20 21:58，手册去重 190→187 行）——手册（`packages/company-pack/content/AGENTS.md`，唯一家；company-workspace 是符号链接）是会话注入内容，改它=改回放输入；r3 录制（2026-10-10 重录）含旧手册。
 3. 上轮审计当天早些时候 r3 曾全绿（14.7s）→ 589d785 是唯一中间变量。
 4. 通路缺口：pre-push hook 只跑 verify+test（不含 replay）；tests/README「改动面→最窄检查」**没有**「pack workspace 制度件/注入面 → replay」行；`replay-scene-liveness` 门禁按设计不跑进程（只证声明↔磁盘一致），r3 的 runnable 声明已失真。
 5. r2 虽绿，但其内容级判据（归一化全量/sidecar）是 presence 档显式 SKIP——**可跑回归网实际 = 1 个场景（r2 presence 档，只守在场板形状）**。
 6. 病理与 snapshots/README「录制是内容快照而仓库在动」自述一致——上轮审计后的当日复发，新形态 = runnable 声明失真。
 
-次级发现（反馈质量）：replay-smoke full 档 session 行差异显示 `JSON.stringify(...).slice(0,700)` 截断头（replay-smoke.mjs:657-659），手册差异在第 ~150 行 → 期望/实际可见前缀完全相同，跑动中的 agent 看不出差异在哪；`firstDiff()`（:585，首行精确定位）只用于 sidecar（:714）与 --ui。
+次级发现（反馈质量）：replay-smoke full 档 session 行差异显示 `JSON.stringify(...).slice(0,700)` 截断头（replay.e2e.mjs:657-659），手册差异在第 ~150 行 → 期望/实际可见前缀完全相同，跑动中的 agent 看不出差异在哪；`firstDiff()`（:585，首行精确定位）只用于 sidecar（:714）与 --ui。
 
 修法（P0，技术路线已验证）：
 - ① tests/README 改动面表加一行「pack workspace 制度件/注入面（手册、CHARTER、模板、persona、工具表）→ 受影响 replay 场景重跑/重录」。
@@ -120,10 +120,10 @@ intent: "第二轮 fresh-agent 打扫（同日晚，母卡持续跟进）：六�
 pnpm verify                                          # ALL PASS 36 门 4.6s
 pnpm orient                                          # 3.2s；凭据✓；47 场景（archive12·corpora1·probes16·replay10·visual8）
 pnpm test（子代理）                                   # 76 spec / 711 it 全绿 27.6s
-node checks/smoke/client-load-smoke.mjs              # ALL PASS 8.2s
-node checks/smoke/preset-smoke.mjs                   # ALL PASS 6 preset 4.7s
+node checks/lanes/client-load.entry.mjs              # ALL PASS 8.2s
+node checks/lanes/preset.entry.mjs                   # ALL PASS 6 preset 4.7s
 pnpm dsh web（--port 0 --no-open，后台）              # banner token URL → cdp-probe 9/9 零失败 11.5s → 已清理
-node checks/smoke/replay-smoke.mjs --scenario r2-motion        # ALL PASS 34s（presence 档）
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation    # 1 FAILURE：归一化日志零 diff（session#1 第 13 行）
+node checks/lanes/replay.e2e.mjs --scenario r2-motion        # ALL PASS 34s（presence 档）
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation    # 1 FAILURE：归一化日志零 diff（session#1 第 13 行）
 git status --porcelain                               # 评审零足迹
 ```

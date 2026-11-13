@@ -31,7 +31,7 @@ opened: 2026-11-07
 | CMO 文案写 MRD+StRS；REQ 任一层；不写 PRD | 确定性 | `presets/cmo` + `mrd-playbook` | `presets.spec` 断言 | 删 StRS → 红 | `tests/presets/presets.spec.ts` | 无 |
 | VP-Eng 文案写 PRD only；PRD 的 `source` 指 MR、`traces` 指 StRS/REQ；不写 SyRS/IRS | 确定性 | `vp-eng` persona + `prd-playbook` | `presets.spec` 断言 | 加 SyRS → 红 | 同上 | 无 |
 | 共享 `product-definition` 用新词表；无退役词 | 确定性 | `_shared/skills/product-definition` | spec 断言 | 加 `STR-001` → 红 | 同上 | 无 |
-| 两个 preset 真挂载 | 编排 | `preset-smoke` | ALL PASS | 行 config 坏 → 红 | `checks/smoke/preset-smoke.mjs` | 无 |
+| 两个 preset 真挂载 | 编排 | `preset-smoke` | ALL PASS | 行 config 坏 → 红 | `checks/lanes/preset.entry.mjs` | 无 |
 | 模型实际产出 CMO/VP-Eng 两段 | 模型行为 | 真模型动议 | A8 probe 绿 | 缺层 → checker 红 | A8 probe（本卡不拥有） | 用户 review 结论 |
 
 ## 测试资产（计划）
@@ -39,7 +39,7 @@ opened: 2026-11-07
 | 判据 | 现有 owner / 新资产 | 命令 | 证明什么 | 不证明什么 | 红证·负例 |
 |---|---|---|---|---|---|
 | CMO/VP-Eng 文案 | 既有 `tests/presets/presets.spec.ts`（加断言） | `pnpm test tests/presets` | 文案/行声明 | 模型行为 | 删关键句 → 红 |
-| 真挂载 | 既有 `checks/smoke/preset-smoke.mjs` | `node checks/smoke/preset-smoke.mjs` | 组合能挂 | 内容质量 | 改坏行 config → 红 |
+| 真挂载 | 既有 `checks/lanes/preset.entry.mjs` | `node checks/lanes/preset.entry.mjs` | 组合能挂 | 内容质量 | 改坏行 config → 红 |
 | 模型行为 | A8 的 `requirements-chain-probe.mjs`（待建，落 probes/team/）（后置） | A8 命令 | 模型真产出 | 本卡单独不证 | A8 红 |
 | 跨角色交接 | A8 checker | A8 命令 | `traces` 解析 | 语义正确 | 缺 trace → 红 |
 
@@ -59,7 +59,7 @@ SA/SQA 文案（A4a/A4b）、checker（A5）。
 
 - 基线：`git rev-parse HEAD` = `c6c3d76`（A6 提交后）
 - 红（文案未改）：`pnpm vitest run tests/presets` → `3 failed | 38 passed`（CMO 缺 strs.md / VP-Eng 缺 traces→StRS / 共享词表缺 IF/TC）
-- 绿：`pnpm vitest run tests/presets` → `41 passed`（新增 3 条断言）；真挂载 `node checks/smoke/preset-smoke.mjs` → `ALL PASS（6 个角色 + 3 个委派子人格全部可挂载）`；`pnpm verify` → `ALL PASS`
+- 绿：`pnpm vitest run tests/presets` → `41 passed`（新增 3 条断言）；真挂载 `node checks/lanes/preset.entry.mjs` → `ALL PASS（6 个角色 + 3 个委派子人格全部可挂载）`；`pnpm verify` → `ALL PASS`
 - 资产：`tests/presets/presets.spec.ts` 增「需求编号链」describe（CMO MRD+StRS / VP-Eng PRD only / 共享新词表 + 无退役号形）；文案面 = cmo persona + mrd-playbook、vp-eng persona + prd-playbook + eng-workflow、`_shared/skills/product-definition`
 - 真跑：文案能否让模型照做由 A8 五层 probe 证；本卡只证文案/挂载（模型行为未跑）
 - 文档/Note：共享 skill 新增「编号与层」节（指向 `content/state/process-docs.md`）与三种产物；程序 Note 待 W5 落

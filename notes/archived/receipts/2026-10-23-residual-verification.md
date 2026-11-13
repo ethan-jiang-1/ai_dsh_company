@@ -67,13 +67,13 @@
 ## 验证（全部真跑）
 
 ```text
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation --ui
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation --ui
 #   红：FAIL ui 金样零 diff（第 36 行：期望 "单次派活回执" / 实际 "一句话确认"）
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation --ui --refresh-ui
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation --ui        # ALL PASS（43s，零 diff）
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation --ui --refresh-ui
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation --ui        # ALL PASS（43s，零 diff）
 
-node checks/smoke/probe-smoke.mjs --full                                # 红 14/15（coo#3 词面）
-node checks/smoke/probe-smoke.mjs --full                                # ALL PASS（15/15）
+node checks/lanes/probe.entry.mjs --full                                # 红 14/15（coo#3 词面）
+node checks/lanes/probe.entry.mjs --full                                # ALL PASS（15/15）
 
 node probes/team/claim-race-probe.mjs                                   # PASS（恰一人认领，让位行在场）
 

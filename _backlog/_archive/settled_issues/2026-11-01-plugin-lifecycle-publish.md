@@ -136,7 +136,7 @@ opened: 2026-11-01
 
 - **交付**：手册升级段改「卸载 → 装新版 → 重启」；卸载段列精确删除面；`bundle.json.pack.version`
   语义写清（若选跟随，则加更新逻辑与测试）；新增卸载残留快照 smoke（复用
-  [`interrupted-install-smoke.mjs`](../../../checks/smoke/interrupted-install-smoke.mjs) 的形状）。
+  [`interrupted-install.entry.mjs`](../../../checks/lanes/interrupted-install.entry.mjs) 的形状）。
 - **出场门**：升级实验（0.6.x → 0.7.x）依赖/包副本/run bundle 断言通过；卸载后残留面与文档逐项一致；
   不再出现「删整个 `DSH_HOME`」。
 - **失败就停**：残留面与文档不一致 → 改文档或改实现，不带错发布。
@@ -273,6 +273,6 @@ v3 卡 0.7.0 复核见其「0.7.0 复核」节；两卡边界一致，没有互�
   [v3 实现 Note](../../../notes/implemented/2026-11-01-plugin-as-product-v3-native-entry.md)
 - 现行合同：[README](../../../README.md)、[release](../../../docs/contracts/release.md)、
   [安装手册](../../../_dist/安装手册.md)、[包 README](../../../packages/company-pack/README.md)、
-  [release-smoke](../../../checks/smoke/release-smoke.mjs)
+  [release-smoke](../../../checks/lanes/release.entry.mjs)
 - 外部规范（只读）：`_faq_on_digested/26_plugin-as-product/50-lifecycle/`、
   `_faq_on_digested/24_plugin-publish-and-agent-data-planes/`

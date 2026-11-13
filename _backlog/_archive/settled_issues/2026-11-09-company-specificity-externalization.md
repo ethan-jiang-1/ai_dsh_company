@@ -135,7 +135,7 @@ a 在 b 前，因为 b 要搬模板/术语，需要一个已稳定的 company �
 | 1 | 预算：T0 合计 ≤6KB、单文件 ≤2KB；T1 ≤4KB；T2 单文件 ≤6KB | 确定性 | `content/generic/**`、`content/company/**` | gate 汇总字节 ≤ 上限（上限写进清单） | 向任一 T0 文件加 1KB → gate 红 | **blocked**：`content-budget` 门待建 | 预算值是否接受（产品取舍）→ 用户 |
 | 2 | 通用面零污染：公司名/编制/政策数字/产品链术语 = 0 | 确定性 | 通用 T0/T1/T2 + 角色边界 | grep 词表命中 = 0；词表来自 fixture 的公司名/数字 + 类型术语 | 写回「梦之队」或「30%」→ 红 | **blocked**：`generic-clean` 门待建 | 无 |
 | 3 | 清单完整：每份 generic/product-type/company 文件有 tier + 用场 | 确定性 | `manifest` 与磁盘 | 双向差集为空 | 加文件不登记 → 红 | **blocked**：`manifest-shape` 门待建 | 无 |
-| 4 | 换公司：只改 `identity.md` + `policy-lines.md`，显示名跟随 | 编排 + 渲染 | fixture Acme → Beta | `pnpm test tests/client` + `client-load-smoke` 的显示名 = fixture 值 | 品牌写回 tsx → 红 | 现成但需换向：`tests/client/ui/brand.spec.ts`、`node checks/smoke/client-load-smoke.mjs` | 显示名是否符合预期 → 用户看一眼 |
+| 4 | 换公司：只改 `identity.md` + `policy-lines.md`，显示名跟随 | 编排 + 渲染 | fixture Acme → Beta | `pnpm test tests/client` + `client-load-smoke` 的显示名 = fixture 值 | 品牌写回 tsx → 红 | 现成但需换向：`tests/client/ui/brand.spec.ts`、`node checks/lanes/client-load.entry.mjs` | 显示名是否符合预期 → 用户看一眼 |
 | 5 | 换类型：`b2b-saas` 下不要求 StRS、`VR-*` 不误判、链为 roadmap→US→release | 确定性 | `productType: b2b-saas` fixture + `check-rules.json` | `pnpm test tests/lib/requirements-check.spec.ts` 以 fixture 期望为准 | `hardware-software` 仍要求 StRS（回归） | **blocked**：spec 在，fixture/规则未建 | SaaS 链路是否代表目标客户 → 用户 |
 | 6 | 行为不丢：除公司事实断言外 1300 个 keyless 全绿 | 确定性 | 现有 164 spec | `pnpm test` 退出 0（基线已实测 164/1300） | 删一条 seed → `bootstrap.spec` 红 | `pnpm test`（现成） | 无 |
 | 7 | 无部署指针：content 不含具体部署路径 | 确定性 | `content/**` | 扩 `base-clean` 扫 `.dsh-company/deliverables/<名字>` 类模式 | 把 `org.md:73` 路径写回 → 红 | 现成需扩：`checks/gates/base-clean.mjs` | 无 |

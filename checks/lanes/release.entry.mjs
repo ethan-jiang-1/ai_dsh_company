@@ -5,7 +5,7 @@
 // 同时认「出厂骨架随包 + 首启自举（落盘 / 二次启动零变更）」。
 // 何时跑：pack 依赖、安装形状、built 启动器改动时；或它属于关键验收时（无 key，分钟级）
 // vendor 产物是前置条件，不由此脚本重建；存在/运行通过不代表新鲜。构建配方见 guides/bootstrap。
-// 用法：source run/env.sh && node checks/smoke/release-smoke.mjs [--keep] [--tarball <path>] [--expect-sha <sha256>]
+// 用法：source run/env.sh && node checks/lanes/release.entry.mjs [--keep] [--tarball <path>] [--expect-sha <sha256>]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'

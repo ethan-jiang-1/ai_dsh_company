@@ -51,11 +51,11 @@ cordis_inspect_list→bash ×2）。
 
 | # | 命令 | 断言 | 红/绿形态 |
 |---|---|---|---|
-| 1 | `node checks/smoke/replay-smoke.mjs`（修前对照） | 5 FAILURE：归一化日志 session#0/#1 姿态值差 + 4 sidecar（wochen / cordis_inspect_list） | 红 = 问题清单本身 |
+| 1 | `node checks/lanes/replay.e2e.mjs`（修前对照） | 5 FAILURE：归一化日志 session#0/#1 姿态值差 + 4 sidecar（wochen / cordis_inspect_list） | 红 = 问题清单本身 |
 | 2 | 钉值对照实验（stash 前后各跑一次 `--keep`） | 钉 workspace-write ⇒ lead 三条 permission 事件全消失（实测 dump：session/agent/inbox/spliced 直连） | 证伪钉值路线 |
 | 3 | 脱敏后、重录前 | dump 显示实际侧 `preset:{{posture}}`、`mode:{{posture}}+source:delegation`——脱敏生效且 source 保留；期望侧仍裸值（旧 fixture）⇒ 仍红 = 对称性缺口如预期 | 半绿 = 管道对、基线旧 |
 | 4 | `--record`（真模型） | 「录制 + fixture + sidecar 完成（1 lead + 1 child；lead 37 行）」 | — |
-| 5 | `node checks/smoke/replay-smoke.mjs` | **ALL PASS**（归一化零 diff + 4 sidecar 零 diff，13s 无 key） | 修后绿 |
+| 5 | `node checks/lanes/replay.e2e.mjs` | **ALL PASS**（归一化零 diff + 4 sidecar 零 diff，13s 无 key） | 修后绿 |
 | 6 | `--ui` → `--ui --refresh-ui` → `--ui` | 金样红（wochen）→ 写入 → **ALL PASS** | 有意变更刷新路径 |
 | 7 | `node checks/run-gates.mjs` | replay-scene-liveness「runnable 2 / archived 3 / baseline 4」+ ALL PASS | 声明↔磁盘一致 |
 | 8 | `pnpm verify` + `pnpm test`（pipefail） | ALL PASS / 全绿 | — |
@@ -64,5 +64,5 @@ cordis_inspect_list→bash ×2）。
 ## 指针
 
 - 场景声明：[snapshots/replay/r3-delegation/snapshot.yml](../../snapshots/replay/r3-delegation/snapshot.yml)
-- 脱敏实现：[tools/lib/replay-logic.mjs](../../tools/lib/replay-logic.mjs) 的 `normalizeReplayTimeContext`（runner 调用：[checks/smoke/replay-smoke.mjs](../../checks/smoke/replay-smoke.mjs)）
+- 脱敏实现：[tools/lib/replay-logic.mjs](../../tools/lib/replay-logic.mjs) 的 `normalizeReplayTimeContext`（runner 调用：[checks/lanes/replay.e2e.mjs](../../checks/lanes/replay.e2e.mjs)）
 - 后续结构整理：[2026-10-14-code-restructure](../archived/2026-10-14-code-restructure.md)；本轮 replay helper 迁移见 [2026-10-14-client-host-replay-locality](../archived/2026-10-14-client-host-replay-locality.md)。

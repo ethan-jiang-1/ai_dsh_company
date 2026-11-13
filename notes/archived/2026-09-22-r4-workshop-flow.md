@@ -32,8 +32,8 @@
 |---|---|
 | `pnpm verify` | ALL PASS（含 vendor 铁律 SHA + 零改动；`preset-row-deps` ×12） |
 | `pnpm test` | **38/38，171ms**（新增 deliverables 判据 13 条 + 三态合同/模板/职能路径守卫 3 条） |
-| `node scripts/preset-smoke.mjs` | ALL PASS（5 preset 全可挂载、零 broken、skills 隔离仍在） |
-| `node scripts/delegation-smoke.mjs` | ALL PASS（**边界未变**：CEO 会话三个控制名仍是团队版） |
+| `node scripts/preset.entry.mjs` | ALL PASS（5 preset 全可挂载、零 broken、skills 隔离仍在） |
+| `node scripts/delegation.entry.mjs` | ALL PASS（**边界未变**：CEO 会话三个控制名仍是团队版） |
 | `node scripts/handbook-smoke.mjs` | ALL PASS（指令基线 = 公司手册，含新的三态一节） |
 | `node scripts/deliverables-check.mjs` | 运行场 **6 成品 / 12 过程稿 / 0 违规** |
 | R4 端到端动议 | 真 web + 真 team，**150 秒**（预算 6 分钟），无 `ask_user_question` |

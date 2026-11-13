@@ -35,8 +35,8 @@ intent: 把环外资产腐烂、驱动里的逻辑泄漏、门禁反证不常驻
 
 | # | 资产 | 动作 | 验收 |
 |---|---|---|---|
-| U1 | `checks/smoke/two-axis-gates-smoke.mjs` | 两处 mutation 改成现行 canonical 文本（`Hardware-software product` 行 / `deliveryMode:` 字段），同步把 case 4 的期望文案改成 `缺「deliveryMode:」字段`；加**变异断言**：`changed !== original`，否则直接报「mutation 没命中」；共享助手放 `checks/smoke/lib/`，`gates-negative` 同用 | 真副本两绿；三个负例全红；还原全绿 |
-| U2 | `snapshots/replay/foundation-workspace` | **先 `node checks/smoke/replay-smoke.mjs --refresh`**（headless authored 的内置无 key 刷新；workspace oracle 失败会拒绝），复跑确认绿，更新资格日期。若同一处再漂，再选冻结技能目录 / 归一化；若冻结在场景组合里不可行（不碰 vendor 的前提下），退路 = 把 `--refresh` 写进技能改动 checklist，接受「技能改 → replay 需刷新」为已知成本。**不要保持 `runnable` 的红**：刷不了就临时 `archived`（带日期理由），三态语义里 `archived` 就是「有输入但判据红」 | `replay-smoke` ALL PASS；`snapshot.yml` 声明与实测一致 |
+| U1 | `tests/checks/two-axis-gates.test.mjs` | 两处 mutation 改成现行 canonical 文本（`Hardware-software product` 行 / `deliveryMode:` 字段），同步把 case 4 的期望文案改成 `缺「deliveryMode:」字段`；加**变异断言**：`changed !== original`，否则直接报「mutation 没命中」；共享助手放 `checks/lanes/lib/`，`gates-negative` 同用 | 真副本两绿；三个负例全红；还原全绿 |
+| U2 | `snapshots/replay/foundation-workspace` | **先 `node checks/lanes/replay.e2e.mjs --refresh`**（headless authored 的内置无 key 刷新；workspace oracle 失败会拒绝），复跑确认绿，更新资格日期。若同一处再漂，再选冻结技能目录 / 归一化；若冻结在场景组合里不可行（不碰 vendor 的前提下），退路 = 把 `--refresh` 写进技能改动 checklist，接受「技能改 → replay 需刷新」为已知成本。**不要保持 `runnable` 的红**：刷不了就临时 `archived`（带日期理由），三态语义里 `archived` 就是「有输入但判据红」 | `replay-smoke` ALL PASS；`snapshot.yml` 声明与实测一致 |
 | U3 | `checks/audit/candidate-scan-eval.mjs` | 标 `已耗（2026-11-13 语料移出本仓）`，或退役；若保留，写清重新启用条件 | `script-status` 绿；不再以 exit 2 冒充「常驻」 |
 | U4 | `tests/client/company-client-composition.spec.ts` | 观察项，不现在动；若 test 阶段 > 30s，再拆 roster 或迁 `client-load-smoke` | 记录阈值，不设新门 |
 
@@ -64,7 +64,7 @@ intent: 把环外资产腐烂、驱动里的逻辑泄漏、门禁反证不常驻
 
 | 档 | 内容 | 成本 | 验证 |
 |---|---|---|---|
-| P0 | U1 + U2 + U3；A1 runner 落地并跑绿 | 2–4h | `node checks/smoke/two-axis-gates-smoke.mjs` ALL PASS；`node checks/smoke/replay-smoke.mjs` PASS；`smoke:fast` ALL PASS；`pnpm verify` ALL PASS |
+| P0 | U1 + U2 + U3；A1 runner 落地并跑绿 | 2–4h | `node tests/checks/two-axis-gates.test.mjs` ALL PASS；`node checks/lanes/replay.e2e.mjs` PASS；`smoke:fast` ALL PASS；`pnpm verify` ALL PASS |
 | P1 | A3（若 `--refresh` 后仍漂）；A4 的 `company-root-carriers` 负例；更新 pre-push/CI/tests-README 的预算数字 | 半天 | 新负例真红→还原绿；`pnpm test` 仍 ≤ 30s；预算文字 = 实跑数字 |
 | P2 | A2（仅复发时）；A5 probe 审计 | 按需 | 不新增慢门；probe 表进研究材料/卡 |
 | P3 | 把 §2 四条围栏规则写进 [testing.md](../../../docs/testing.md) / [tests/README](../../../tests/README.md) | 按行预算 | `pnpm verify` 绿；不新增索引 |

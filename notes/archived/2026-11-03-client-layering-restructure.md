@@ -54,7 +54,7 @@ pnpm verify      # ALL PASS（56 门 + 2 无对象）
 ../../node_modules/.bin/tsdown   # host 162.00 kB / client 352.21 kB，Build complete（产物形状不变）
 
 # 真页面（改的是用户可见面，必须看渲染）
-node checks/smoke/ui-scene-smoke.mjs --isolated --golden
+node checks/lanes/ui-scene.entry.mjs --isolated --golden
 # ui-scene-smoke: 金样一致（9 个页签）
 # ui-scene-smoke: ALL PASS（自起实例 + 全部公司页签 + 浏览器错误环零命中）
 

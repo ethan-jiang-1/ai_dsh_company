@@ -74,6 +74,6 @@ intent: 把 backlog/notes/实现/收尾的规则逐条对到机械执行，找�
 **③ `新建:checks/gates/env-bound-evidence.mjs`（环境轴）**
 - 环境专属 token：`runtime/`、`company-workspace/`、`snapshots/`、`_dist/`、`--port <非0>`、`127.0.0.1:\d+`、`/Users/`、`.dsh-company/`；便携 token：现存 `pnpm (verify|test|typecheck)`、`node (checks|tests|tools)/…`、`source run/env.sh`。
 - 判据：一条 bullet 含环境专属 token 而没有任何便携命令 → 红（允许显式豁免 `（环境：…；便携复跑：<命令>）`）；`--port` 非 `0` 直接红。
-- 红证：验收写「在 runtime/harness-home 看到 exports/」→ 红；同条补 `node checks/smoke/preset-smoke.mjs` → 绿。
+- 红证：验收写「在 runtime/harness-home 看到 exports/」→ 红；同条补 `node checks/lanes/preset.entry.mjs` → 绿。
 
 **落地约束**：三条合计 ≤220 行；注册进 `checks/run-gates.mjs` 即被 `gate-wiring` 看住；每条块注释带 `// 负例留证 <日期>：… → 红`。规则文本加进 owner 文档前先看行预算：`_backlog/README.md` 136/140、`notes/README.md` 125/132——先搬/压再加，否则 `verify` 先红。

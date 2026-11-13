@@ -57,10 +57,10 @@ tests/fixtures/companies/
 
 | 资产:行 | 断言 | 改造后 |
 |---|---|---|
-| `release-smoke.mjs:155-156` | content 里 6 份文件必须在包内 | 改读 manifest；`export-dist` 的打包清单同步 |
-| `release-smoke.mjs:270` | 种子盘必须出现 `.dsh-company/kb/{company,org,owners,motion-ledger}.md` + 两份章程 | 文件名一改，六条断言同步；要么保留兼容名，要么加迁移映射 |
-| `release-smoke.mjs:299-306` | 六份 CHARTER 零部署历史 | 章程若改由 profile 生成，改为"生成物零历史" |
-| `release-smoke.mjs:345-347` | 升级后 `bundle.json` 不变 + `kb/company.md` 在场 | 随改名同步 |
+| `release.entry.mjs:155-156` | content 里 6 份文件必须在包内 | 改读 manifest；`export-dist` 的打包清单同步 |
+| `release.entry.mjs:270` | 种子盘必须出现 `.dsh-company/kb/{company,org,owners,motion-ledger}.md` + 两份章程 | 文件名一改，六条断言同步；要么保留兼容名，要么加迁移映射 |
+| `release.entry.mjs:299-306` | 六份 CHARTER 零部署历史 | 章程若改由 profile 生成，改为"生成物零历史" |
+| `release.entry.mjs:345-347` | 升级后 `bundle.json` 不变 + `kb/company.md` 在场 | 随改名同步 |
 | `company-entry-smoke`、`upgrade-while-running`、`multi-install`、`interrupted-install`、`external-workspace`、`permissions-recovery` | 全都有 `kb/company.md` 存在/内容断言 | 改名即全红；**建议保留 `company.md` 作为身份文件名**，避免六支冒烟同时改 |
 
 ### 2.3 单元/契约测试（tests/company）

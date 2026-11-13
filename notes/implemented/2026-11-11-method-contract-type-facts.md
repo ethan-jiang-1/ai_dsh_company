@@ -89,7 +89,7 @@
 - `pnpm test`：**174 files / 1458 tests passed**（`tests/presets` 46 项，含新契约钉；bootstrap /
   kb-seeds / product-types 全绿）。
 - `pnpm typecheck`：绿。
-- `source run/env.sh && node checks/smoke/preset-smoke.mjs`：
+- `source run/env.sh && node checks/lanes/preset.entry.mjs`：
   `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）`（含新 `pricing` skill）。
 - E6 复跑：`business-software` 列不再是全 0——命中都在明确“不适用 / fail-closed”的句子里
   （project-economics / ops-feasibility / pricing / sales-workflow）。

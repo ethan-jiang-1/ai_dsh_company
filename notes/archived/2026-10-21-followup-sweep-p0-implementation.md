@@ -56,8 +56,8 @@ pnpm diagnose --session <公司盘slug>/session-1d120f37   # 修前：FAILURES�
 # 绿相（修后实跑）
 pnpm verify                      # ALL PASS 37 门（含 replay-fixture-freshness ×1 场景 2 处一致、guard-red-record ×24）
 pnpm test                        # 77 spec / 721 tests 全绿（新增 replay-fixture-freshness.spec 5 用例 + 守卫扩 2）
-node checks/smoke/replay-smoke.mjs --scenario r3-delegation            # ALL PASS（第五次重录后，归一化零 diff，11s）
-node checks/smoke/replay-smoke.mjs --scenario r2-motion               # ALL PASS（presence 档，34s，未受本轮影响）
+node checks/lanes/replay.e2e.mjs --scenario r3-delegation            # ALL PASS（第五次重录后，归一化零 diff，11s）
+node checks/lanes/replay.e2e.mjs --scenario r2-motion               # ALL PASS（presence 档，34s，未受本轮影响）
 pnpm diagnose --session <公司盘slug>/session-1d120f37   # 修后：FAILURES「approval request_signoff → rejected」
   # （asked 侧 reason「毛利<30% 双签」可对勘）；turn error 渲染为可读 JSON
 pnpm orient --scenario replay/r3-delegation             # 完整 run bundle 视图（children=1，不再 ENOTDIR）

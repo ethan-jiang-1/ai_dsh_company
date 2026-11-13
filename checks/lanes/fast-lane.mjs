@@ -9,7 +9,7 @@
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { FAST, assetByName } from '../../tools/lib/asset-lanes.mjs'
+import { FAST, assetByName, suffixOf } from '../../tools/lib/asset-lanes.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 // 成员唯一家 = tools/lib/asset-lanes.mjs（本文件只读；`asset-lanes.spec` 盯住两边一致）。
@@ -23,7 +23,7 @@ const failed = []
 const started = Date.now()
 for (const entry of CASES) {
   const t0 = Date.now()
-  const result = spawnSync(process.execPath, [...entry.nodeArgs, join(here, `${entry.name}.mjs`)], { stdio: 'inherit' })
+  const result = spawnSync(process.execPath, [...entry.nodeArgs, join(here, `${entry.name}.${suffixOf(entry.name)}.mjs`)], { stdio: 'inherit' })
   const elapsed = ((Date.now() - t0) / 1000).toFixed(2)
   const ok = result.status === 0
   console.log(`smoke:fast ${ok ? 'PASS' : 'FAIL'} ${entry.name} (${elapsed}s)`)

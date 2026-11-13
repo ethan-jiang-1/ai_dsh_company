@@ -66,10 +66,10 @@ UI 半边，不是独立过渡）；③ CEO 跨角色 = **仅建议权，目标�
 | `npx vitest run tests/host/cultivation.spec.ts tests/client/cultivation/cultivation-board.spec.ts tests/presets/presets.spec.ts` | 40/40 |
 | `pnpm test` | **538/538**（54 spec 文件） |
 | `pnpm verify` | ALL PASS |
-| `node checks/smoke/preset-smoke.mjs` | 5/5 ALL PASS（方法层缺目录容忍 ⇒ 挂载不炸；「只看见自己的 skills」隔离断言维持） |
-| `node checks/smoke/delegation-smoke.mjs` | ALL PASS（child 组合边界未变） |
-| `node checks/smoke/client-load-smoke.mjs` | ALL PASS（真浏览器挂载零失败） |
-| `node checks/smoke/probe-smoke.mjs`（快速档） | 5/5 |
+| `node checks/lanes/preset.entry.mjs` | 5/5 ALL PASS（方法层缺目录容忍 ⇒ 挂载不炸；「只看见自己的 skills」隔离断言维持） |
+| `node checks/lanes/delegation.entry.mjs` | ALL PASS（child 组合边界未变） |
+| `node checks/lanes/client-load.entry.mjs` | ALL PASS（真浏览器挂载零失败） |
+| `node checks/lanes/probe.entry.mjs`（快速档） | 5/5 |
 | `node probes/session-context/cultivation-method-layer-probe.mjs` | **12 判据 ALL PASS**：目录冷启动发现 / 角色隔离 ×3 / 缺目录容忍 ×5 / 命令族 wiring / correct 落记录 / adopt 落方法层+记录翻转 / 新会话跨会话生效 / ceo 代采纳被拒（仅建议权反例） |
 | 同上 `--full`（先 `DSH_PERMISSION_MODE=workspace-write`） | ⑦ 写隔离 PASS：分身 fs 写方法层 → 沙箱拒（会话日志 `tool/result` 层锚 `[sandbox: file access denied under workspace-write mode]`）。**首跑在本机默认（danger-full-access）下红**——「无条件沙箱拒」假设被证伪，根因 = 本机 Seatbelt 禁用的 env.sh 处方；钉模式重跑即绿（红绿双证，探针头注已写明复跑条件） |
 

@@ -9,7 +9,7 @@
 1. **Client Lead/follow 适配器**：[company-session-adapters.ts](../../packages/company-pack/src/client/wiring/company-session-adapters.ts) 集中 child→parent Lead 寻址及 follow 快照/live-event 帧投影；消费面仍按既有作用域组装。
 2. **Client 页签注册目录**：[company-tab-registration.ts](../../packages/company-pack/src/client/tabs/company-tab-registration.ts) 的固定 `TAB_REGISTRATIONS` 并置八个页签的身份/元数据与 body/title/guide keyed 回调；`index.ts` 仍是 composition root。三个 slot group 仍分别 `slots.inject`，由 Cordis 各自管理声明等待、销毁与重装。
 3. **Host cultivation seam**：[cultivation.ts](../../packages/company-pack/src/host/cultivation/cultivation.ts) 把命令 handler 从注册体移出并保留命令语义；文件操作住 [cultivation-storage.ts](../../packages/company-pack/src/host/cultivation/cultivation-storage.ts)（2026-10-16 自 cultivation.ts 拆出，安全不变量见该模块头注）的固定 Node `CultivationStorage` 适配器。`registerCultivation` 仍注册工具与命令。存储接口不是调用方可注入的公开替代面；没有把 correct/suggest 等规则抽为共享纯模块。
-4. **Replay 纯逻辑**：[replay-logic.mjs](../../tools/lib/replay-logic.mjs) 仅承载 `normalizeReplayTimeContext` 与 full/presence `judgeReplaySessions`；[replay-smoke.mjs](../../checks/smoke/replay-smoke.mjs) 仍负责会话构造/归一外壳、sidecar、UI 判据、CLI 与输出，`replay-ui.mjs` 不变。缺少 expected session 时的空夹具语义、full 首差异、presence 排序后的 member/task 集合判据保持原样。
+4. **Replay 纯逻辑**：[replay-logic.mjs](../../tools/lib/replay-logic.mjs) 仅承载 `normalizeReplayTimeContext` 与 full/presence `judgeReplaySessions`；[replay.e2e.mjs](../../checks/lanes/replay.e2e.mjs) 仍负责会话构造/归一外壳、sidecar、UI 判据、CLI 与输出，`replay-ui.mjs` 不变。缺少 expected session 时的空夹具语义、full 首差异、presence 排序后的 member/task 集合判据保持原样。
 
 ## 输掉的方案
 
@@ -34,10 +34,10 @@
 | 临时停用 `TIME_CONTEXT_SAMPLE` 正则；跑 `pnpm exec vitest run tests/session/replay-logic.spec.ts`；还原后重跑 | 时间样本归一化合同 | 红：1 failed / 3 passed，时间戳未替换；还原绿：4/4 PASS |
 | `set -o pipefail && pnpm verify && pnpm test` | 门禁、Note/link/path/doc-budget 与全量 keyless 回归 | ALL PASS：verify ALL PASS；59 files / 550 tests PASS |
 | `pnpm exec tsc -b packages/company-pack --pretty false && (cd packages/company-pack && ../../node_modules/.bin/tsdown)` | 两半类型检查与构建 | 通过；Host/Client build complete；仅 `external` deprecation warnings |
-| `source run/env.sh && node checks/smoke/client-load-smoke.mjs` | 真实浏览器插件挂载与 loader 健康 | ALL PASS：无 mount failure、无 loader error、品牌槽在场 |
-| `source run/env.sh && node checks/smoke/replay-smoke.mjs --scenario r2-motion`；`source run/env.sh && node checks/smoke/replay-smoke.mjs --ui --scenario r2-motion` | presence 判据及驾驶舱端到端 | 两项 ALL PASS；后者验证五角色在场行及点击成员进入会话 |
-| `source run/env.sh && node checks/smoke/replay-smoke.mjs` | 默认 full lane 与已知失败基线做签名核对 | exit 1：三类失败签名与保存基线一致（normalized log、两个 tool-schema sidecars）；未刷新 fixture |
-| `source run/env.sh && node checks/smoke/replay-smoke.mjs --ui` | 默认 full + 委派 UI | exit 1：相同三类 replay FAIL + 一项既有 centerCol UI 金样差异；委派卡 render/aria 判据 PASS，未刷新金样 |
+| `source run/env.sh && node checks/lanes/client-load.entry.mjs` | 真实浏览器插件挂载与 loader 健康 | ALL PASS：无 mount failure、无 loader error、品牌槽在场 |
+| `source run/env.sh && node checks/lanes/replay.e2e.mjs --scenario r2-motion`；`source run/env.sh && node checks/lanes/replay.e2e.mjs --ui --scenario r2-motion` | presence 判据及驾驶舱端到端 | 两项 ALL PASS；后者验证五角色在场行及点击成员进入会话 |
+| `source run/env.sh && node checks/lanes/replay.e2e.mjs` | 默认 full lane 与已知失败基线做签名核对 | exit 1：三类失败签名与保存基线一致（normalized log、两个 tool-schema sidecars）；未刷新 fixture |
+| `source run/env.sh && node checks/lanes/replay.e2e.mjs --ui` | 默认 full + 委派 UI | exit 1：相同三类 replay FAIL + 一项既有 centerCol UI 金样差异；委派卡 render/aria 判据 PASS，未刷新金样 |
 
 为运行完整 pre-change 基线，在当前 HEAD 建立了隔离 worktree；但该 worktree 的 shell 命令报 `spawn sandbox-exec ENOENT`，未能在其中执行基线测试或 replay，临时 worktree 已移除。因此不声称完成全仓逐文件 pre-change 对照；证据为已保存的 replay 失败签名基线、keyless contract specs、四项真实变异红/还原绿及当前认证 smoke。
 

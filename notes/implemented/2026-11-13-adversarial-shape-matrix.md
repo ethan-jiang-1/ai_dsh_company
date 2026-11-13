@@ -22,7 +22,7 @@ BUG-080..146 共 66 张卡，**66/66 由探索发现**；`pnpm test` 在缺陷�
 9. **P1 startup** = [startup-state-agreement.spec.ts](../../tests/host/contract/startup-state-agreement.spec.ts)：settings 9 形状（missing/valid/empty/corrupt/truncated/unsupported/dir/symlink/root-symlink）+ options 3 形状；unsafe/corrupt 时不得采用外部或坏内容里的值。
 10. **P1 ledger** = [ledger-state-agreement.spec.ts](../../tests/host/contract/ledger-state-agreement.spec.ts)：presented 7 形状 → status；Non-destruction：账本 corrupt 时导出沿用旧 ledger/methods，不整目录删。
 11. **P1 cultivation** = 既有 [cultivation-command.spec.ts](../../tests/host/cultivation/cultivation-command.spec.ts) 已覆盖 records 不可达/revoked/坏记录/根 symlink；本轮把 `cultivation.writeRecord` / `cultivation.pendingRevoke` 升进 Safety 矩阵。
-12. **P2 进程矩阵** = [company-root-process-smoke.mjs](../../checks/smoke/company-root-process-smoke.mjs)：同文件两进程并发写、残留 temp、根 symlink、进程重启读回、lease stale 接管 / 新鲜锁拒绝；子进程用 `tsx` 直接加载 src，不依赖 tarball。
+12. **P2 进程矩阵** = [company-root-process.e2e.mjs](../../checks/lanes/company-root-process.e2e.mjs)：同文件两进程并发写、残留 temp、根 symlink、进程重启读回、lease stale 接管 / 新鲜锁拒绝；子进程用 `tsx` 直接加载 src，不依赖 tarball。
 
 ## 输掉的方案
 
@@ -39,7 +39,7 @@ BUG-080..146 共 66 张卡，**66/66 由探索发现**；`pnpm test` 在缺陷�
 | full test | `pnpm test` **242 files / 1997 tests passed**；契约目录 4 spec / 167 用例（同树另有 147/148/149 修复轮的 3 条用例） |
 | 结构门禁 | `pnpm verify` **ALL PASS**；`PASS company-root-carriers ×51 文件（写面文件 7 / knownGap 0）` |
 | 类型/风格 | `pnpm typecheck`、`pnpm lint`（0 warning）、`pnpm dup`（0 clones）全绿 |
-| 进程矩阵 | `node checks/smoke/company-root-process-smoke.mjs` → **ALL PASS**（16 项：同文件并发 / 残留 temp / 根 symlink / 重启读回 / lease stale 接管 / 新鲜锁拒绝） |
+| 进程矩阵 | `node checks/lanes/company-root-process.e2e.mjs` → **ALL PASS**（16 项：同文件并发 / 残留 temp / 根 symlink / 重启读回 / lease stale 接管 / 新鲜锁拒绝） |
 | 红证 1（门禁） | 植入 `zz-probe-writer.ts`（`writeFileSync` + `.dsh-company`）→ `FAIL company-root-carriers: packages/company-pack/src/host/zz-probe-writer.ts:4 → 未登记的公司盘写入口`；删文件 → `PASS` |
 | 红证 2（Safety） | `ensureCompanyRoot` 直接 `return companyHomeOf(workspace)`（跳过 symlink/realpath）→ `root-symlink-out` ×6 红 + `root-missing` 红；还原 → 134 passed |
 | 红证 3（Agreement） | `companyFileProblemAt` 直接 `return null`（把分类折成 ok）→ `root-missing` / `root-dir` / `root-file` / `root-symlink-out` / `root-symlink-in` / `mid-symlink-kb` 红；还原 → 13 passed |

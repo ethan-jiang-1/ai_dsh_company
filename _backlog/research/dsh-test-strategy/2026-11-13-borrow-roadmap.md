@@ -99,7 +99,7 @@ intent: 回答「怎么借鉴、先做什么、怎么算做到」——每项给
 ### B5 每周全量 keyless lane（环外资产的新鲜度回路）
 
 - **借自**：DSH 的"必需 job 之外的东西也要可见"；本仓围栏研究已经指出真正的洞是"环外没有新鲜度回路"。
-- **载体**：checks/smoke/keyless-lane.mjs（计划）（读 manifest）+ `fresh-clone.yml` 新 job（每周）。
+- **载体**：checks/lanes/keyless-lane.mjs（计划）（读 manifest）+ `fresh-clone.yml` 新 job（每周）。
 - **形态**：manifest 列全部 33 个冒烟并标 `keyless|with-key`；job 只跑 keyless，跑完打印 `PASS n / FAIL n / SKIP n`；
   69 个探针不进本 lane（多为真模型/浏览器，成本高），但必须出现在 census 里，由它报"多久没跑过"。
   **skip 数与 manifest 不符 = 红**（防止某条被静默移出）；with-key 的不进 job，但必须在 manifest 里（不许消失）。

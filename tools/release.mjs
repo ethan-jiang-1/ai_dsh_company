@@ -255,14 +255,14 @@ function verify() {
   const commands = [
     ['verify', ['pnpm', ['verify'], false]],
     ['test', ['pnpm', ['test'], false]],
-    ['release-smoke', [process.execPath, ['checks/smoke/release-smoke.mjs', '--tarball',
+    ['release-smoke', [process.execPath, ['checks/lanes/release.entry.mjs', '--tarball',
       join(DIST, artifact.file), '--expect-sha', artifact.sha256], true]],
-    ['company-entry-smoke', [process.execPath, ['checks/smoke/company-entry-smoke.mjs'], true]],
-    ['client-load-smoke', [process.execPath, ['checks/smoke/client-load-smoke.mjs'], true]],
-    ['preset-smoke', [process.execPath, ['checks/smoke/preset-smoke.mjs'], true]],
+    ['company-entry-smoke', [process.execPath, ['checks/lanes/company-entry.entry.mjs'], true]],
+    ['client-load-smoke', [process.execPath, ['checks/lanes/client-load.entry.mjs'], true]],
+    ['preset-smoke', [process.execPath, ['checks/lanes/preset.entry.mjs'], true]],
     // 源码面 smoke：import src/**.ts，plain node 的 strip-only 不支持参数属性等 TS-only 语法；
     // 用仓库源码面 loader（tsx）跑，别让一条静默红冒充发布验收。
-    ['present-catalog-smoke', [process.execPath, ['--import', 'tsx/esm', 'checks/smoke/present-catalog-smoke.mjs'], false]],
+    ['present-catalog-smoke', [process.execPath, ['--import', 'tsx/esm', 'checks/lanes/present-catalog.e2e.mjs'], false]],
   ]
   const checks = {}
   for (const [name, [command, argv, needsEnv]] of commands) {

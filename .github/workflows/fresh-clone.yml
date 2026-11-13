@@ -62,7 +62,7 @@ jobs:
       # 2026-11-13（研究 B 件）：环外资产的每周新鲜度回路。真入口证据不在 push 时必跑链里，
       # 最多陈旧 7 天；成员 = tools/lib/asset-lanes.mjs（skip 清单每次都打印，资产不许静默消失）。
       # 首几周若因干净环境差异红，按实际结果修环境或把对应资产标 ciSafe:false + 理由，不删资产。
-      - run: node checks/smoke/keyless-lane.mjs --ci
+      - run: node checks/lanes/keyless-lane.mjs --ci
         timeout-minutes: 25
       - run: node checks/audit/coverage-ratchet.mjs
         timeout-minutes: 10
@@ -84,4 +84,4 @@ jobs:
       # 固定已实测的 npm 发布版；pack 的 install 锚必须走全局包，而不是 repo vendor。
       - run: npm install -g @deepseek-ai/dsh@0.2.1-rc.5
       - run: node tools/export-dist.mjs
-      - run: node checks/smoke/channel-matrix-smoke.mjs --channel global --browser auto
+      - run: node checks/lanes/channel-matrix.entry.mjs --channel global --browser auto

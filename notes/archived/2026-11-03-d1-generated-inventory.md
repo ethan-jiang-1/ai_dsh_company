@@ -24,7 +24,7 @@
 ```text
 node tools/checks-index.mjs --write        # 生成 119 行；107 个公开入口
 node checks/gates/script-index.mjs 内嵌跑    # OK script-index ×107（生成库存与目录一致；README 已链接）
-# 红：临时建 checks/smoke/zz-index-probe.mjs → FAIL「生成物与目录不一致（108 个公开入口）」；
+# 红：临时建 checks/lanes/zz-index-probe.mjs → FAIL「生成物与目录不一致（108 个公开入口）」；
 #     --write 后绿；删除探针 → 再红；--write → 绿。
 pnpm verify                                # ALL PASS
 pnpm test                                  # 131 spec / 1071 例（1068 pass / 3 skip）

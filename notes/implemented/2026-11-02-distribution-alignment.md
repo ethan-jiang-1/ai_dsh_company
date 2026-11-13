@@ -47,10 +47,10 @@
 |---|---|---|
 | 1 | `node tools/release.mjs --prepare --force` | `export-dist: ALL PASS`；0.7.1 tarball sha256 `bd77facf6ea1b86fbccb348ac4fffe8f5e83ec4c2ef9891d80947284079cd2de`；manifest 写 `sourceFingerprint` |
 | 2 | 临时在 `packages/company-pack/cordis.patch.yml` 追加注释 → `node tools/release.mjs --check --allow-dirty` → 还原 | 红原话：`release: pack 源码面已变但 _dist 没重打；先重跑 --prepare`；还原后 fingerprint 通过（脏树检查按预期） |
-| 3 | `source run/env.sh && node checks/smoke/release-smoke.mjs --tarball _dist/dsh-company-pack-0.7.1.tgz --expect-sha bd77facf…` | `release-smoke: ALL PASS`；装的是 `_dist` 同一份，未重打 |
-| 4 | `source run/env.sh && node checks/smoke/company-entry-smoke.mjs` | `company-entry-smoke: ALL PASS`（含同 home 第二个 workspace） |
-| 5 | `source run/env.sh && node checks/smoke/multi-install-smoke.mjs` | `multi-install-smoke: ALL PASS`（官方 `--from-default-profile web` 重建、无手写 roster） |
-| 6 | `source run/env.sh && node checks/smoke/revoke-recovery-smoke.mjs` | `revoke-recovery-smoke: ALL PASS`（v3 `.dsh-company/cultivation/` 路径） |
+| 3 | `source run/env.sh && node checks/lanes/release.entry.mjs --tarball _dist/dsh-company-pack-0.7.1.tgz --expect-sha bd77facf…` | `release-smoke: ALL PASS`；装的是 `_dist` 同一份，未重打 |
+| 4 | `source run/env.sh && node checks/lanes/company-entry.entry.mjs` | `company-entry-smoke: ALL PASS`（含同 home 第二个 workspace） |
+| 5 | `source run/env.sh && node checks/lanes/multi-install.entry.mjs` | `multi-install-smoke: ALL PASS`（官方 `--from-default-profile web` 重建、无手写 roster） |
+| 6 | `source run/env.sh && node checks/lanes/revoke-recovery.entry.mjs` | `revoke-recovery-smoke: ALL PASS`（v3 `.dsh-company/cultivation/` 路径） |
 | 7 | `pnpm verify` | `verify: ALL PASS；2 门无对象（replay-fixture-freshness / replay-ui-freshness）`；新退役词门禁、dist-manual 前置、optional peer、doc-budget 均绿 |
 | 8 | `pnpm test` | `124 passed / 3 skipped`（1042 tests；release --verify 日志） |
 | 9 | `pnpm release --verify` | 最终全绿（verify/test/release-smoke/company-entry/client-load/preset/present-catalog） |
@@ -78,7 +78,7 @@
 - 读者面：`README.md`、`AGENTS.md`、`docs/index.md`、`docs/contracts/profile.md`、`docs/contracts/release.md`、
   `docs/runtime-map.md`、`docs/contracts/data-model.md`、`docs/project-map.md`、`docs/orient.md`、
   `docs/reference/external-research.md`、`docs/reference/terminology.md`、`run/README.md`、`packages/company-pack/README.md`。
-- 发布链：`tools/release.mjs`、`checks/smoke/release-smoke.mjs`、`docs/guides/release-runbook.md`、
+- 发布链：`tools/release.mjs`、`checks/lanes/release.entry.mjs`、`docs/guides/release-runbook.md`、
   `docs/guides/publish-handoff.md`、`checks/gates/dist-manual.mjs`、`checks/gates/pack-shape.mjs`。
 - 门禁：`checks/gates/dev-product-parity.mjs`（退役词 + 市场 staged + optional peer 邻接）。
 - 历史：D55 路由在 `docs/reference/decisions.md`；本 Note 不取代 v3 Note 的入口/数据边界。

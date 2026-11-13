@@ -22,7 +22,7 @@
 |---|---|---|---|
 | [BUG-036](../../_backlog/_archive/fixed_bugs/BUG-036-workflow-schema-enum-type.md) | 已修 | skill 四条子集约束（R6/R15 绿） | 钉子 `tests/contract/json-schema-subset.spec.ts`；上游补 description |
 | [BUG-037](../../_backlog/_archive/fixed_bugs/BUG-037-root-team-tool-shadowing.md) | 已修 | 新增 `list_subagents` / `send_to_subagent`（官方 `ctx.subagents` + 父会话 durable catalog，名字不被团队版 shadow） | `tests/host/delegation/delegation-control.spec.ts` + 真挂载 79 tools；上游修好后**退役**这两工具 |
-| [BUG-038](../../_backlog/_archive/fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md) | 已修 | 分支当叶子规则 + 真跑观察（首轮嵌套→模型自纠为父层扇出）；修正 skill 的“必 null”过度断言 | `checks/smoke/workflow-contract-smoke.mjs` 第 6 条；上游分支结果语义 |
+| [BUG-038](../../_backlog/_archive/fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md) | 已修 | 分支当叶子规则 + 真跑观察（首轮嵌套→模型自纠为父层扇出）；修正 skill 的“必 null”过度断言 | `checks/lanes/workflow-contract.e2e.mjs` 第 6 条；上游分支结果语义 |
 | [BUG-039](../../_backlog/_archive/fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md) | 已修 | **配置真修**：vp-eng preset 的 `tool-workflow.maxResultChars` 50k→200k，spill 设计生效（头尾预览 + 全文落盘 + 可读路径）；删掉“spill 是截断副本”旧句 | 钉子 `tests/contract/workflow-result-budget.spec.ts`；探针见下；上游默认值语义 |
 | [BUG-040](../../_backlog/_archive/fixed_bugs/BUG-040-workflow-schema-text-answer-discarded.md) | 修复已落地（**留活**） | 技能/验收规则 + 机制钉子（completed 纯文本 + schema → null 且 agentEnd failed） | `workflow-contract-smoke` 第 5 条；判定第一条要引擎诊断，本仓做不到（卡内已写上游真 diff） |
 | [BUG-041](../../_backlog/_archive/fixed_bugs/BUG-041-host-restart-orphans-inflight-child.md) | 修复已落地（**留活**） | 查询面（`list_subagents` 读 durable catalog）+ 部署前置（budget-and-ops 行） | `delegation-control.spec.ts`；**缺口**：只报 running/inactive，不报 `turn/end interrupted` |
@@ -45,7 +45,7 @@
    其中第 5 条落地后，本仓的 `list_subagents` / `send_to_subagent` 按 `[CT-LIFE]` 退役条件删除。
 
 **取代**：研究材料 §16.4 的“keyless retry 脚本暂不进 `pnpm test`”**已失效**——本轮把它升格为
-`checks/smoke/workflow-contract-smoke.mjs`（keyless ~2s；机制档，仍不进 `pnpm test`）。理由：脚本已存在、
+`checks/lanes/workflow-contract.e2e.mjs`（keyless ~2s；机制档，仍不进 `pnpm test`）。理由：脚本已存在、
 成本可忽略，且它在本轮补出了 038/040 两条机制钉子。
 
 ## 输掉的方案
@@ -80,9 +80,9 @@
 - `pnpm verify` → ALL PASS（2 门无对象）。
 - `pnpm test` → **1236 passed / 153 files**（新增 10 条：schema 钉子 4、渲染钉子 3、控制工具 6，含替换）。
 - `pnpm typecheck` → 绿（pack 两面 + 三个 tests 面）。
-- `pnpm vitest run tests/presets` → 54 passed；`node checks/smoke/preset-smoke.mjs` → **ALL PASS**
+- `pnpm vitest run tests/presets` → 54 passed；`node checks/lanes/preset.entry.mjs` → **ALL PASS**
   （6 角色 + 3 子人格可挂载；含改过 config 的 vp-eng）。
-- `node --import tsx/esm checks/smoke/workflow-contract-smoke.mjs` → **7/7 PASS**（含 040 规避的 JSON-line 用例）。
+- `node --import tsx/esm checks/lanes/workflow-contract.e2e.mjs` → **7/7 PASS**（含 040 规避的 JSON-line 用例）。
 - **BUG-040 探针**（`runtime/tmp/explore/fix1/S040/`，会话 `session-6a01fa71-…`）：自然任务下 4 次 workflow /
   8 agents，4 个脚本全部**无 schema / 无 structured_output**，按新规则 `JSON.parse` + 保留原文；
   一次 run error 是模型脚本把 `raw` 写成 `undefined`（引擎拒绝正确，模型自修）。

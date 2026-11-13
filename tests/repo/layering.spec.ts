@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest'
  * 真模型/真浏览器才进认证档，均按改动面与验收要求运行。
  *
  * 散文会被忘掉，所以这里把它变成断言：**Vitest spec 里出现子进程 / playwright / fetch / 密钥，
- * 直接红。** 有副作用的 CLI 或真实入口检查 → 写 `checks/smoke/*-smoke.mjs`，别塞进 tests/。
+ * 直接红。** 有副作用的 CLI 或真实入口检查 → 写 `checks/lanes/*-smoke.mjs`，别塞进 tests/。
  */
 
 const TESTS = join(ROOT, 'tests')
@@ -65,7 +65,7 @@ describe('测试分层纪律（真模型/真浏览器不进回归）', () => {
     expect(config, '认证档脚本不得进 vitest include').not.toMatch(/include:.*(?:checks|probes|tools)\/(?!lib\/)/)
   })
 
-  it('replay lane 是第三档：只由 checks/smoke/replay-smoke.mjs 驱动，不进 pnpm test', () => {
+  it('replay lane 是第三档：只由 checks/lanes/replay.e2e.mjs 驱动，不进 pnpm test', () => {
     // ① 回归层不得 import checks|probes|tools 下的**驱动脚本**——上面的 FORBIDDEN 只扫 spec 自己的
     //    文本，import 进来会把 spawn/fetch/浏览器整条带进回归层（文本扫描看不见传递引入）。
     //    `tools/lib/`（纯逻辑库）除外：deliverables.mjs 这类无副作用模块本来就是 keyless
@@ -109,7 +109,7 @@ describe('测试分层纪律（真模型/真浏览器不进回归）', () => {
     }
 
     // ③ 纪律有家：replay-smoke 自己的头注声明分层（guides/dev-loop §9.1）。
-    const replay = readFileSync(join(ROOT, 'checks/smoke/replay-smoke.mjs'), 'utf8')
+    const replay = readFileSync(join(ROOT, 'checks/lanes/replay.e2e.mjs'), 'utf8')
     expect(replay, 'replay-smoke 头注必须声明"不进 pnpm test"').toContain('不进 pnpm test')
   })
 

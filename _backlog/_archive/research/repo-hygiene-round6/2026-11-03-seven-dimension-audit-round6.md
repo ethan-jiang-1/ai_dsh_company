@@ -89,7 +89,7 @@ pnpm verify                       # ALL PASS 53 门 + 2 SKIP
 pnpm test                         # 审计时 139 files / 1108；批 A 后 1107（dag 去重 −21、恢复 +20）；批 B 后 1109（+2 orient）
 pnpm typecheck                    # exit 0
 pnpm test:coverage                # 10 个模块阈值全过；tools/lib 侧 diagnosis/install-manual/probe-window 0%（smoke 面）
-node checks/smoke/ui-scene-smoke.mjs --isolated --golden   # PASS：9/9 页签金样一致
+node checks/lanes/ui-scene.entry.mjs --isolated --golden   # PASS：9/9 页签金样一致
 node tools/orient.mjs             # 6 slug / 凭据 ✓；「便宜检查」只有 verify/test/orient
 node tools/orient.mjs --scenario visual/company-shell      # 「验证命令」= replay-smoke（实跑 ENOENT）
 node tools/diagnose.mjs --help    # 忽略 --help，打印最新会话摘要 exit 0

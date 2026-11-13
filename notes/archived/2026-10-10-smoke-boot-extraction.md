@@ -6,7 +6,7 @@
 
 ## 决定
 
-`checks/smoke/` 下全部 10 个起 `bin.ts web` 的脚本迁入 `tools/lib/probe-web.mjs`（探针面 25 个
+`checks/lanes/` 下全部 10 个起 `bin.ts web` 的脚本迁入 `tools/lib/probe-web.mjs`（探针面 25 个
 之后的第二批）。为此模块扩了四项能力、收了三处健壮性：
 
 - **`patch: string | string[]`**——`--patch` 可重复；replay 的场景 patch + 五个角色预设组合走数组形态。
@@ -46,7 +46,7 @@ entry-probe/replay 的 `catch { child.kill }` 未防护引用 ⇒ spawn 捕获�
 - entry-probe 的 `DSH_PERMISSION_MODE: 'read-only'` 钉值与 `--patch run/entry-probe.patch.yml`
   **逐字节未动**（diff 核对：env 键集与值一致）；replay 的 `workspace-write` 死代码钉值（:238）与
   spawnSync lanes 未动（diff 零命中）。
-- `checks/smoke/` 的判据/提示词/证据函数/退出码/PASS-FAIL 标签全量 diff 审计：被删行 100% 启动块
+- `checks/lanes/` 的判据/提示词/证据函数/退出码/PASS-FAIL 标签全量 diff 审计：被删行 100% 启动块
   代码，加行 100% 模块调用/包装/注释（+2 个 `banner.token→token` goto 改名，值相同）。
 
 ## 验证（全部实跑）

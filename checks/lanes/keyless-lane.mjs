@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：每周 CI（`node checks/smoke/keyless-lane.mjs --ci`）与本地全量 sweep（`pnpm smoke:all`）；不进 pre-push。
+// 何时跑：每周 CI（`node checks/lanes/keyless-lane.mjs --ci`）与本地全量 sweep（`pnpm smoke:all`）；不进 pre-push。
 //
 // 为什么：2026-11-13 实测——33 个冒烟只有 6 条在 `smoke:fast` 里，其余只靠头注「何时跑」的散文契约，
 // 坏了没人知道（围栏那轮修的两条红资产就是收据）。本 runner 把「健康检查」从散文变成每周一次的实跑：
@@ -12,7 +12,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { ASSETS } from '../../tools/lib/asset-lanes.mjs'
+import { ASSETS, suffixOf } from '../../tools/lib/asset-lanes.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const argv = process.argv.slice(2)
@@ -26,12 +26,14 @@ const ci = has('--ci')
 const withBrowser = has('--browser')
 const listOnly = has('--list')
 const filter = valueOf('--filter')
+const suffix = valueOf('--suffix')
 const timeoutMs = Number(valueOf('--timeout') ?? 300_000)
 
 const selected = ASSETS
   .filter(asset => asset.lanes.includes('weekly') && (!ci || asset.ciSafe))
   .filter(asset => asset.kind === 'classic' || (withBrowser && asset.kind === 'browser'))
   .filter(asset => !filter || asset.name.includes(filter))
+  .filter(asset => !suffix || suffixOf(asset.name) === suffix)
 
 if (listOnly) {
   for (const asset of selected) console.log(`${asset.kind}\t${asset.name}\t${asset.why ?? ''}`)
@@ -54,7 +56,7 @@ console.log(`smoke:all ${label} ×${String(selected.length)}（注册表 = tools
 const failures = []
 const started = Date.now()
 for (const asset of selected) {
-  const file = join(here, `${asset.name}.mjs`)
+  const file = join(here, `${asset.name}.${suffixOf(asset.name)}.mjs`)
   if (!existsSync(file)) {
     failures.push(`${asset.name}（注册表有、盘上没有）`)
     console.log(`FAIL ${asset.name} — 文件不存在：${file}`)

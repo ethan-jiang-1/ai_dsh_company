@@ -20,7 +20,7 @@
 
 ## 测试资产
 
-- 新增 [multi-install-smoke.mjs](../../checks/smoke/multi-install-smoke.mjs)：两 home 真装、非空 home 后装、
+- 新增 [multi-install.entry.mjs](../../checks/lanes/multi-install.entry.mjs)：两 home 真装、非空 home 后装、
   同 home 两 profile 反例、自定义 profile 补 web-app、空 bundle 共存/卸载、重复安装幂等、用户 profile patch 保留。
   已进 [checks/README](../../checks/README.md)；成本 ~3-4 分钟，**未进 release --verify**，发布前手动跑。
 - [two-homes.spec.ts](../../tests/host/run-bundle/two-homes.spec.ts)：keyless 双 home identity/company/catalog 隔离。

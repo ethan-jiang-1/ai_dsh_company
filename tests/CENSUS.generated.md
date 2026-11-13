@@ -7,13 +7,13 @@
 
 | 指标 | 数量 |
 |---|---|
-| 冒烟 | 31 |
+| 冒烟 | 29 |
 | 探针 | 67 |
 | 结构门禁 | 72 |
 | keyless spec 文件 | 246 |
-| fast lane | 6 |
-| surface lane | 7 |
-| weekly lane | 22 |
+| fast lane | 4 |
+| surface lane | 6 |
+| weekly lane | 20 |
 | 未分类失败类 | 67 |
 
 ## 失败类分布
@@ -21,7 +21,7 @@
 | 失败类 | 资产数 |
 |---|---|
 | 未分类 | 67 |
-| 配置组合 | 10 |
+| 配置组合 | 9 |
 | 模型可见文本 | 5 |
 | client UI | 4 |
 | 会话持久化 | 3 |
@@ -30,43 +30,40 @@
 | 导出形态 | 1 |
 | 文档指针 | 1 |
 | 注册生命周期 | 1 |
-| 纯逻辑 | 1 |
 
 ## 冒烟
 
 | 资产 | kind | lane | 失败类 |
 |---|---|---|---|
-| workflow-contract-smoke | classic | fast + surface + weekly | 工具定义 |
-| present-catalog-smoke | classic | fast + surface + weekly | 会话持久化 |
-| company-root-process-smoke | classic | fast + surface + weekly | 子进程并发 |
-| gates-negative-smoke | classic | fast + surface + weekly | 纯逻辑 |
-| snapshot-motion-smoke | classic | fast + weekly | 会话持久化 |
-| two-axis-gates-smoke | classic | fast + weekly | 配置组合 |
-| client-load-smoke | browser | surface + weekly | client UI |
-| preset-smoke | classic | surface + weekly | 配置组合 |
-| replay-smoke | classic | surface + weekly | 会话持久化 |
-| company-entry-smoke | classic | weekly | 配置组合 |
-| concurrent-home-smoke | classic | weekly | 子进程并发 |
-| external-workspace-smoke | classic | weekly | 子进程并发 |
-| interrupted-install-smoke | classic | weekly | 配置组合 |
-| isolation-matrix-smoke | classic | weekly | 配置组合 |
-| multi-install-smoke | classic | weekly | 配置组合 |
-| permissions-recovery-smoke | classic | weekly | 配置组合 |
-| profile-row-smoke | classic | weekly | 配置组合 |
-| revoke-recovery-smoke | classic | weekly | 注册生命周期 |
-| upgrade-while-running-smoke | classic | weekly | 配置组合 |
-| client-error-chain-smoke | browser | weekly | client UI |
-| multi-window-banner-smoke | browser | weekly | client UI |
-| ui-scene-smoke | browser | weekly | client UI |
-| channel-matrix-smoke | browser | 手动（要真实全局 dsh + 网络 + 已导出 _dist；发布前手动跑 --channel all） | 配置组合 |
-| release-smoke | classic | 手动（分钟级构建 + pack；由 release --verify 调度，不进每周 sweep） | 导出形态 |
-| probe-smoke | model | 手动（真模型档（连通 ~6s / 内容 --full 5–10min），按内容改动触发） | 模型可见文本 |
-| delegation-smoke | model | 手动（真模型 1 条 prompt（升 pin 或委托边界改动时）） | 工具定义 |
-| presence-e2e-smoke | model | 手动（真模型 ~$1，按在场/协作面验收触发） | 模型可见文本 |
-| product-team-e2e-smoke | model | 手动（真模型 ~$1，按组队/判据面验收触发） | 模型可见文本 |
-| attention-e2e-smoke | model | 手动（真模型 + 多用户并发 lane，人工在场时跑） | 模型可见文本 |
-| human-loop-e2e-smoke | model | 手动（真模型 + 真浏览器 ~$1–2，人工在场时跑） | 模型可见文本 |
-| entry-probe-smoke | model | 手动（真模型认证档；入口链文档改动后手动跑） | 文档指针 |
+| workflow-contract | classic | fast + surface + weekly | 工具定义 |
+| present-catalog | classic | fast + surface + weekly | 会话持久化 |
+| company-root-process | classic | fast + surface + weekly | 子进程并发 |
+| snapshot-motion | classic | fast + weekly | 会话持久化 |
+| client-load | browser | surface + weekly | client UI |
+| preset | classic | surface + weekly | 配置组合 |
+| replay | classic | surface + weekly | 会话持久化 |
+| company-entry | classic | weekly | 配置组合 |
+| concurrent-home | classic | weekly | 子进程并发 |
+| external-workspace | classic | weekly | 子进程并发 |
+| interrupted-install | classic | weekly | 配置组合 |
+| isolation-matrix | classic | weekly | 配置组合 |
+| multi-install | classic | weekly | 配置组合 |
+| permissions-recovery | classic | weekly | 配置组合 |
+| profile-row | classic | weekly | 配置组合 |
+| revoke-recovery | classic | weekly | 注册生命周期 |
+| upgrade-while-running | classic | weekly | 配置组合 |
+| client-error-chain | browser | weekly | client UI |
+| multi-window-banner | browser | weekly | client UI |
+| ui-scene | browser | weekly | client UI |
+| channel-matrix | browser | 手动（要真实全局 dsh + 网络 + 已导出 _dist；发布前手动跑 --channel all） | 配置组合 |
+| release | classic | 手动（分钟级构建 + pack；由 release --verify 调度，不进每周 sweep） | 导出形态 |
+| probe | model | 手动（真模型档（连通 ~6s / 内容 --full 5–10min），按内容改动触发） | 模型可见文本 |
+| delegation | model | 手动（真模型 1 条 prompt（升 pin 或委托边界改动时）） | 工具定义 |
+| presence-e2e | model | 手动（真模型 ~$1，按在场/协作面验收触发） | 模型可见文本 |
+| product-team-e2e | model | 手动（真模型 ~$1，按组队/判据面验收触发） | 模型可见文本 |
+| attention-e2e | model | 手动（真模型 + 多用户并发 lane，人工在场时跑） | 模型可见文本 |
+| human-loop-e2e | model | 手动（真模型 + 真浏览器 ~$1–2，人工在场时跑） | 模型可见文本 |
+| entry-probe | model | 手动（真模型认证档；入口链文档改动后手动跑） | 文档指针 |
 
 ## 探针（调试面，不进自动 lane）
 

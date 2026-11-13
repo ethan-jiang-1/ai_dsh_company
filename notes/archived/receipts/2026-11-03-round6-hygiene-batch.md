@@ -80,7 +80,7 @@ node ./node_modules/typescript/bin/tsc -p tsconfig.test-harness.json        # �
 #   × 首屏带真页面与失败现场入口（页面 / 诊断 / 证据目录 / 客户端错误日志）
 #   还原 → 21 passed
 node tools/orient.mjs --scenario visual/company-shell
-#   验证命令 = node checks/smoke/ui-scene-smoke.mjs --isolated --golden（刷新金样 = 加 --refresh-golden）
+#   验证命令 = node checks/lanes/ui-scene.entry.mjs --isolated --golden（刷新金样 = 加 --refresh-golden）
 node tools/orient.mjs --help      # exit 0，打用法（旧行为：打一份真实摘要并 exit 0）
 node tools/orient.mjs --bogus     # exit 2，orient: 未知参数 --bogus（--help 看用法）
 node tools/diagnose.mjs --help    # exit 0，打用法

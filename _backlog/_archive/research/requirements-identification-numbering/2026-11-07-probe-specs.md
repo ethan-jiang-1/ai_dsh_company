@@ -83,7 +83,7 @@ intent: 把还没跑的三条真模型/真挂载证据写成可执行的 prompt 
 **负例**：
 
 - 若 teammate 被当成 SQA 出结论 → 红；若 SQA 结论被删 → 红；若 `prd-detail` 的 `agentPreset` 不是 `vp-eng` → 说明机制变了，重审。
-- **CEO 回归**（另跑）：`node checks/smoke/product-team-e2e-smoke.mjs`，必须绿；两件套仍走 CEO team。
+- **CEO 回归**（另跑）：`node checks/lanes/product-team-e2e.entry.mjs`，必须绿；两件套仍走 CEO team。
 
 **成本**：真模型 10–20 分钟 + CEO smoke 3–7 分钟；不进 `pnpm test`。
 
@@ -103,5 +103,5 @@ intent: 把还没跑的三条真模型/真挂载证据写成可执行的 prompt 
 ## 5. 边界
 
 - 本材料是规格，**没有跑**；跑完把 session id/命令/结果写程序 Note 验证节。
-- 不替代 `checks/smoke/product-team-e2e-smoke.mjs`（CEO 回归）；不替代 A5 的纯逻辑单测。
+- 不替代 `checks/lanes/product-team-e2e.entry.mjs`（CEO 回归）；不替代 A5 的纯逻辑单测。
 - 真模型/真浏览器不进 `pnpm test`（测试宪法）。

@@ -49,7 +49,7 @@ blocked_by=[task-1,task-2,task-3])` ✅。**但 task-3 的依赖从未落板**�
 - `pnpm test tests/presets` —— **17 tests 绿**（含新增守卫「任务依赖必须教两拍落」）。
 - 守卫反证（红→还原→绿）：把 skill 里第二拍的 `blocked_by` 改回驼峰 `blockedBy`（= 真缺陷原形）
   ⇒ 红（`AssertionError: 不许再出现驼峰 blockedBy（真缺陷原形）`）→ 还原 ⇒ 绿。
-- `source run/env.sh && node checks/smoke/preset-smoke.mjs` —— **ALL PASS**（5 个 preset 全部可挂载；
+- `source run/env.sh && node checks/lanes/preset.entry.mjs` —— **ALL PASS**（5 个 preset 全部可挂载；
   挂载成功 ≠ 行为对，本改动"行为对"的证据是上面那场真会话的事件链）。
 - `pnpm verify` + `pnpm test` —— 全绿（结构门禁含 handbook-budget：手册字节 + 1024B ≤ 32768）。
 - **未跑**（如实登记）：真模型复跑一场动议（要 $ 与真 key，且不是本改动的完成判据）；replay 场景（本仓无

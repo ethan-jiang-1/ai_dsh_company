@@ -42,8 +42,8 @@
 | 门禁红绿 | 六组真树植入：默认改回 link / bootstrap 三处（装进 web profile、`dev = link:`、重指 link）/ parity 指南删「允许差异」/ 包 README 写 market-index.json | 各自点名红（原话见门禁头注）；逐条还原后 `PASS dev-product-parity` |
 | 全量 | `pnpm verify` / `pnpm test` / `pnpm typecheck` | ALL PASS；123 files / 1037 passed / 3 skipped；typecheck 绿 |
 | 活文档指针 | `grep -rn "只 exec\|不装包\|dev = link:\|重指 link" --include=*.md .`（live docs，排除 `_archive`/CHANGELOG） | 零命中；bootstrap / README / checks 索引 / run / ui-demo 与 v3 Note 均改到现行家 |
-| preset 真挂载 | 干净 home 装 company 后 `node checks/smoke/preset-smoke.mjs` | 改前 boot web：19 FAIL（roster 0 公司角色）；改 company 后 ALL PASS（6 角色 + researcher 真挂载） |
-| client 真页面 | 干净 home `node checks/smoke/client-load-smoke.mjs` | 改前 boot web：品牌槽 FAIL；改 company 后 ALL PASS（零挂载失败 / 零 loader 错误） |
+| preset 真挂载 | 干净 home 装 company 后 `node checks/lanes/preset.entry.mjs` | 改前 boot web：19 FAIL（roster 0 公司角色）；改 company 后 ALL PASS（6 角色 + researcher 真挂载） |
+| client 真页面 | 干净 home `node checks/lanes/client-load.entry.mjs` | 改前 boot web：品牌槽 FAIL；改 company 后 ALL PASS（零挂载失败 / 零 loader 错误） |
 
 ## 未做
 

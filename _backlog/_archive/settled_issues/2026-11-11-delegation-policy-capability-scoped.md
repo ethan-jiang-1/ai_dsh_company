@@ -35,7 +35,7 @@ opened: 2026-11-11
 - content：`packages/company-pack/content/contracts/delegation/{spawn,fork,workflow,team,retry}.md`（新）；`presets/_shared/delegation/skills/delegation-policy/SKILL.md` 缩成 core；`content/contracts/workflow.md` 仍是 workflow 引擎事实唯一家。
 - preset：仅 persona 里的 skill 指针/`customSkillDirs` 如需调整；不改工具行。
 - docs：`docs/contracts/delegation.md`、`docs/contracts/presets.md`、`docs/architecture.md`、`docs/reference/terminology.md` 与政策落点同步；`delegation.md` 的 doc-budget 另算。
-- tests：`tests/host/prompt/contracts.spec.ts`（扩展）、`tests/presets/delegation-contract.spec.ts`、`tests/host/delegation/workflow-runs.spec.ts`、真挂载 probe（可扩 `checks/smoke/preset-smoke.mjs` 或新 keyless smoke）。
+- tests：`tests/host/prompt/contracts.spec.ts`（扩展）、`tests/presets/delegation-contract.spec.ts`、`tests/host/delegation/workflow-runs.spec.ts`、真挂载 probe（可扩 `checks/lanes/preset.entry.mjs` 或新 keyless smoke）。
 
 **排除**：Issue 1 的模型事实修正（前置卡）；G7/G8；给其他角色加 workflow/quality loop；team 成员 preset（上游能力，本仓不改）；support root 是否隐藏（产品/UX，另卡）。
 

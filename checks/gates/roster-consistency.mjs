@@ -15,7 +15,7 @@ const SPECS = [
   { file: 'tools/lib/delegation-model.mjs', re: /FULL_ROLE_IDS\s*=\s*\[([^\]]+)\]/, label: 'FULL_ROLE_IDS' },
   { file: 'checks/gates/company-skeleton.mjs', re: /ROLES\s*=\s*\[([^\]]+)\]/, label: 'company-skeleton ROLES' },
   { file: 'tools/lib/rehearsal.mjs', re: /ROLES\s*=\s*\[([^\]]+)\]/, label: 'rehearsal ROLES' },
-  { file: 'checks/smoke/channel-matrix-smoke.mjs', re: /ROLES\s*=\s*\[([^\]]+)\]/, label: 'channel-matrix ROLES' },
+  { file: 'checks/lanes/channel-matrix.entry.mjs', re: /ROLES\s*=\s*\[([^\]]+)\]/, label: 'channel-matrix ROLES' },
   { file: 'packages/company-pack/src/client/wiring/delegation-keys.ts', re: /DELEGATION_TOOL_KEYS\s*=\s*\[([^\]]+)\]/, label: 'DELEGATION_TOOL_KEYS', subset: true },
 ]
 

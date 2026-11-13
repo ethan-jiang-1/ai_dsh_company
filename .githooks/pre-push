@@ -36,6 +36,7 @@ pnpm -s lint || { rm -f "$refs_file"; exit 1; }
 pnpm -s dup || { rm -f "$refs_file"; exit 1; }
 pnpm -s smoke:fast || { rm -f "$refs_file"; exit 1; }
 node checks/pre-push-surfaces.mjs --stdin "$refs_file" || { rm -f "$refs_file"; exit 1; }
+pnpm -s test:checks || { rm -f "$refs_file"; exit 1; }
 rm -f "$refs_file"
 # 覆盖率 = 执行下限（C 件）：跑全量测试并比基线棘轮（只升不降；新文件有下限；已知空洞须豁免）。
 exec node checks/audit/coverage-ratchet.mjs

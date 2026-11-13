@@ -3,31 +3,29 @@
 > 生成：`node tools/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。
 > 触发条件/成本/状态唯一源 = 各脚本头注；本文件只回答“有哪些公开入口、在哪”。
 
-## 冒烟 / 真实入口（checks/smoke/，33）
+## 冒烟 / 真实入口（checks/lanes/，31）
 
-[attention-e2e-smoke](smoke/attention-e2e-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs)
-[client-error-chain-smoke](smoke/client-error-chain-smoke.mjs)
-[client-load-smoke](smoke/client-load-smoke.mjs) · [company-entry-smoke](smoke/company-entry-smoke.mjs)
-[company-root-process-smoke](smoke/company-root-process-smoke.mjs)
-[concurrent-home-smoke](smoke/concurrent-home-smoke.mjs) · [delegation-smoke](smoke/delegation-smoke.mjs)
-[entry-probe-smoke](smoke/entry-probe-smoke.mjs)
-[external-workspace-smoke](smoke/external-workspace-smoke.mjs) · [fast-lane](smoke/fast-lane.mjs)
-[gates-negative-smoke](smoke/gates-negative-smoke.mjs)
-[human-loop-e2e-smoke](smoke/human-loop-e2e-smoke.mjs)
-[interrupted-install-smoke](smoke/interrupted-install-smoke.mjs)
-[isolation-matrix-smoke](smoke/isolation-matrix-smoke.mjs) · [keyless-lane](smoke/keyless-lane.mjs)
-[multi-install-smoke](smoke/multi-install-smoke.mjs)
-[multi-window-banner-smoke](smoke/multi-window-banner-smoke.mjs)
-[permissions-recovery-smoke](smoke/permissions-recovery-smoke.mjs)
-[presence-e2e-smoke](smoke/presence-e2e-smoke.mjs) · [present-catalog-smoke](smoke/present-catalog-smoke.mjs)
-[preset-smoke](smoke/preset-smoke.mjs) · [probe-smoke](smoke/probe-smoke.mjs)
-[product-team-e2e-smoke](smoke/product-team-e2e-smoke.mjs) · [profile-row-smoke](smoke/profile-row-smoke.mjs)
-[release-smoke](smoke/release-smoke.mjs) · [replay-smoke](smoke/replay-smoke.mjs)
-[revoke-recovery-smoke](smoke/revoke-recovery-smoke.mjs)
-[snapshot-motion-smoke](smoke/snapshot-motion-smoke.mjs)
-[two-axis-gates-smoke](smoke/two-axis-gates-smoke.mjs) · [ui-scene-smoke](smoke/ui-scene-smoke.mjs)
-[upgrade-while-running-smoke](smoke/upgrade-while-running-smoke.mjs)
-[workflow-contract-smoke](smoke/workflow-contract-smoke.mjs)
+[attention-e2e.entry](lanes/attention-e2e.entry.mjs) · [channel-matrix.entry](lanes/channel-matrix.entry.mjs)
+[client-error-chain.entry](lanes/client-error-chain.entry.mjs)
+[client-load.entry](lanes/client-load.entry.mjs) · [company-entry.entry](lanes/company-entry.entry.mjs)
+[company-root-process.e2e](lanes/company-root-process.e2e.mjs)
+[concurrent-home.entry](lanes/concurrent-home.entry.mjs) · [delegation.entry](lanes/delegation.entry.mjs)
+[entry-probe.entry](lanes/entry-probe.entry.mjs)
+[external-workspace.entry](lanes/external-workspace.entry.mjs) · [fast-lane](lanes/fast-lane.mjs)
+[human-loop-e2e.entry](lanes/human-loop-e2e.entry.mjs)
+[interrupted-install.entry](lanes/interrupted-install.entry.mjs)
+[isolation-matrix.entry](lanes/isolation-matrix.entry.mjs) · [keyless-lane](lanes/keyless-lane.mjs)
+[multi-install.entry](lanes/multi-install.entry.mjs)
+[multi-window-banner.entry](lanes/multi-window-banner.entry.mjs)
+[permissions-recovery.entry](lanes/permissions-recovery.entry.mjs)
+[presence-e2e.entry](lanes/presence-e2e.entry.mjs) · [present-catalog.e2e](lanes/present-catalog.e2e.mjs)
+[preset.entry](lanes/preset.entry.mjs) · [probe.entry](lanes/probe.entry.mjs)
+[product-team-e2e.entry](lanes/product-team-e2e.entry.mjs) · [profile-row.entry](lanes/profile-row.entry.mjs)
+[release.entry](lanes/release.entry.mjs) · [replay.e2e](lanes/replay.e2e.mjs)
+[revoke-recovery.entry](lanes/revoke-recovery.entry.mjs)
+[snapshot-motion.e2e](lanes/snapshot-motion.e2e.mjs) · [ui-scene.entry](lanes/ui-scene.entry.mjs)
+[upgrade-while-running.entry](lanes/upgrade-while-running.entry.mjs)
+[workflow-contract.e2e](lanes/workflow-contract.e2e.mjs)
 
 ## 盘面审计（checks/audit/，7）
 
@@ -118,7 +116,7 @@
 [worker-orchestrator-probe](../probes/team/worker-orchestrator-probe.mjs)
 [worker-researcher-probe](../probes/team/worker-researcher-probe.mjs)
 
-## 维护工具（tools/，25）
+## 维护工具（tools/，26）
 
 [ask-latency](../tools/ask-latency.mjs) · [bundle-init](../tools/bundle-init.mjs)
 [checks-index](../tools/checks-index.mjs) · [company](../tools/company.mjs)
@@ -129,10 +127,10 @@
 [notes-audit](../tools/notes-audit.mjs) · [orient](../tools/orient.mjs)
 [propose-sampler](../tools/propose-sampler.mjs) · [prune-runtime](../tools/prune-runtime.mjs)
 [refactor-drift](../tools/refactor-drift.mjs) · [rehearsal-init](../tools/rehearsal-init.mjs)
-[release](../tools/release.mjs) · [session-log-export](../tools/session-log-export.mjs)
-[setup](../tools/setup.mjs) · [snapshot-motion](../tools/snapshot-motion.mjs)
-[snapshot-path](../tools/snapshot-path.mjs) · [sync-dsh](../tools/sync-dsh.mjs)
-[test-census](../tools/test-census.mjs)
+[release](../tools/release.mjs) · [run-check-tests](../tools/run-check-tests.mjs)
+[session-log-export](../tools/session-log-export.mjs) · [setup](../tools/setup.mjs)
+[snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs)
+[sync-dsh](../tools/sync-dsh.mjs) · [test-census](../tools/test-census.mjs)
 
 ## 结构门禁（checks/gates/，72 个模块）
 

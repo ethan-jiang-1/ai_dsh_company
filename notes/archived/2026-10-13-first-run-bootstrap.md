@@ -52,7 +52,7 @@ host 半（`packages/company-pack/src/index.ts` 的 `apply`）在每次装载时
 - `pnpm test` —— **53 files / 522 tests 绿**，含 `tests/host/run-bundle/bootstrap.spec.ts`（8 条：全 create / 骨架缺失带 error 不抛 /
   第一次落盘 + 第二次全 skip + 已有文件内容不改 / 部分缺件只补缺 / error 计划是纯 no-op / 落点优先级 / 开关 /
   **路径算术防"多套一层 workspace"**）。
-- **模拟安装**：`source run/env.sh && node checks/smoke/release-smoke.mjs` —— **ALL PASS**，新增：
+- **模拟安装**：`source run/env.sh && node checks/lanes/release.entry.mjs` —— **ALL PASS**，新增：
   `PASS 安装副本带出厂骨架 workspace/（手册 + 章程 + 模板 + 起动件）`、
   `PASS 首启把出厂公司盘落到 DSH_COMPANY_HOME（含手册/章程/起动件）（共 30 件）`、
   `PASS 第二次启动零变更（建立好了就不用再建立了）（before=30 after=30）`。
@@ -75,6 +75,6 @@ host 半（`packages/company-pack/src/index.ts` 的 `apply`）在每次装载时
 - 纯逻辑：`packages/company-pack/src/host/run-bundle/bootstrap.ts`（`planBootstrap` / `applyBootstrap` / `bootstrapCompanyWorkspace` /
   `resolveSkeletonDir` / `resolveCompanyHome` / `bootstrapEnabled`）；host 接线：`packages/company-pack/src/index.ts`（apply 末尾）。
 - 编译面：`tsconfig.host.json`（`include` 加 `src/host` + `types: ["node"]`）；client 叶注释点明 `src/host/**` 不进它。
-- 判据：`tests/host/run-bundle/bootstrap.spec.ts`；模拟安装：`checks/smoke/release-smoke.mjs` ④⑥；
+- 判据：`tests/host/run-bundle/bootstrap.spec.ts`；模拟安装：`checks/lanes/release.entry.mjs` ④⑥；
   文档：`docs/contracts/release.md` §真实安装冒烟程序 6、`packages/company-pack/README.md`、`packages/company-pack/src/README.md`、`run/env.sh`。
 - 同伴决定：[出厂公司盘骨架随包分发](2026-10-13-company-workspace-skeleton-shipped.md)。

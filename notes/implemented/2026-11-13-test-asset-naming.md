@@ -59,9 +59,9 @@
 | 静态质量 | lint / dup / coverage-ratchet | 0 / 0 clones / `PASS（191 文件；5 豁免）` |
 
 | Phase 2 改名 | `git mv` 9 组 + 文本引用重写 | 41 个活文件改写；非归档的旧名引用只剩历史叙述 |
-| naming-contract 负例① | checks/smoke/foo-oracle.mjs（负例假路径） 临时落盘 + verify | `FAIL naming-contract: checks/smoke/foo-oracle.mjs → 期望 -smoke.mjs（资产）或 -lane.mjs（runner）`；删除 → 绿 |
+| naming-contract 负例① | checks/lanes/foo-oracle.mjs（负例假路径） 临时落盘 + verify | `FAIL naming-contract: checks/lanes/foo-oracle.mjs → 期望 -smoke.mjs（资产）或 -lane.mjs（runner）`；删除 → 绿 |
 | 负例② | probes/bar-e2e.mjs（负例假路径） | `FAIL naming-contract: probes/bar-e2e.mjs → 期望 -probe.mjs（fixture 入口只允许 <域>/<fixture>/index.mjs）`；删除 → 绿 |
-| 负例③ | checks/smoke/golden-thing-smoke.mjs（负例假路径） | `FAIL naming-contract: … 文件名含禁用词 golden（改用准确的词，如 expected）`；删除 → 绿 |
+| 负例③ | checks/lanes/golden-thing-smoke.mjs（负例假路径） | `FAIL naming-contract: … 文件名含禁用词 golden（改用准确的词，如 expected）`；删除 → 绿 |
 | 注册表/census | `node tools/test-census.mjs --write` | 冒烟 31 / 探针 67（工具移出、审计移出、fixture 摘出） |
 | 执行下限 | `node checks/audit/coverage-ratchet.mjs --update` | 191 文件、5 豁免；新路径进入基线，PASS |
 | 全链 | test / typecheck / lint / dup / verify | 2017 passed；0；0；0 clones；ALL PASS |

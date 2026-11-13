@@ -10,7 +10,7 @@
 `checks/gates/retired-path.mjs` 的退役前缀表新增两条：
 
 - **packages/company-pack/workspace**（已删除） → 现行家 `packages/company-pack/content`（v3 内容迁移）；
-- **tools/standalone.mjs**（已删除） → 现行入口 `checks/smoke/ui-scene-smoke.mjs`（产品入口 = `dsh --profile company`）。
+- **tools/standalone.mjs**（已删除） → 现行入口 `checks/lanes/ui-scene.entry.mjs`（产品入口 = `dsh --profile company`）。
 
 同时把三处仍写旧路径的活引用改成现行描述：`ui-scene-smoke` 头注、`cultivation-gui-probe` 头注、
 `2026-10-28-d5-ui-golden` Note 的“当时用独立启动器”句。

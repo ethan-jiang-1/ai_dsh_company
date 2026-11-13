@@ -44,7 +44,7 @@
      （business/hardware × 四模式 + 缺省/占位/引号/注释/未知/误写 + 文档提醒）；
    - 对称：`product-type-coverage.spec`（五件齐 + playbook + fixture + awareness）、
      `product-type-scenarios.spec`（默认链 / SyRS 可选 / 类型不支持层 / 缺层）、
-     `checks/smoke/two-axis-gates-smoke.mjs`（两个 sources 门禁的真副本 + 负例）。
+     `tests/checks/two-axis-gates.test.mjs`（两个 sources 门禁的真副本 + 负例）。
 8. **交付模式不进 preset 细节**：SOW/UAT/SLA 模板住 content；preset 只留“读 meta → 加载哪个方法”的指针。
 
 ## 输掉的方案
@@ -77,7 +77,7 @@
 - `pnpm test`：**180 files / 1514 tests passed**。
 - `pnpm typecheck`：退出 0。
 - `preset-smoke`：**ALL PASS（6 角色 + 5 非角色）**，含新 `managed-service-*` skills。
-- `node checks/smoke/two-axis-gates-smoke.mjs`：**ALL PASS**（真副本 + 品类表多行 / 删 SLA 模板 / 删 meta 字段三类负例）。
+- `node tests/checks/two-axis-gates.test.mjs`：**ALL PASS**（真副本 + 品类表多行 / 删 SLA 模板 / 删 meta 字段三类负例）。
 - 场景矩阵：`product-type-scenarios` 7、`delivery-mode-scenarios` 15、coverage 8+8、package 7 全绿。
 
 ## 未决 / 边界

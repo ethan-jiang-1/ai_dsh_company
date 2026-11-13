@@ -14,5 +14,5 @@ description: Use when starting the web observation window, doing live operations
 
 1. `source run/env.sh`——新 shell 必须；不 source = **静默**落日用 home。自检代替警告：`pnpm dsh --profile company --dump-config | grep -c company-pack` ≥ 1。
 2. `pnpm company --workspace "$PWD/company-workspace" --no-open`——缺 profile 时初始化；默认构建 + `npm pack` + `plugin add file:<tgz>` → exec（`--link` 快速通道）；workspace 登记/seed 由 DSH 启动完成。端口与 token URL 从启动横幅读（端口是环境状态）。
-3. 零挂载失败冒烟：`node checks/smoke/client-load-smoke.mjs`——断言什么、前置与成本见[脚本头注](../../../checks/smoke/client-load-smoke.mjs)。
+3. 零挂载失败冒烟：`node checks/lanes/client-load.entry.mjs`——断言什么、前置与成本见[脚本头注](../../../checks/lanes/client-load.entry.mjs)。
 4. 现场出状况 → 按 [budget-and-ops §3](../../../docs/guides/budget-and-ops.md#3-demo-运维-runbook症状--动作) 症状表行动；**3080 是本 GUI 永不动**。

@@ -6,7 +6,7 @@
 
 ## 决定
 
-1. **lane 注册表住 `tools/lib/asset-lanes.mjs`，不是卡里计划的 checks/smoke/lanes.mjs。**
+1. **lane 注册表住 `tools/lib/asset-lanes.mjs`，不是卡里计划的 checks/lanes/lanes.mjs。**
    理由：`tests/repo/layering.spec.ts` 禁止 spec import `checks|probes|tools` 下的驱动脚本，
    而注册表必须被 spec 机械校验；`tools/lib/` 是唯一允许的 keyless seam。注册表是纯数据 + 纯函数，
    import 无副作用、不起进程、不读盘。
@@ -19,7 +19,7 @@
    算本次 outgoing 范围。remote sha 全零（新分支）退化为该提交的 `diff-tree`；只有手动直跑（无 stdin）
    才退化 `HEAD~1` 并**打印退化**。`--dry-run` 只选不跑。
 4. **每周 lane = classic keyless，skip 清单每次打印。**
-   `checks/smoke/keyless-lane.mjs --ci` 跑 18 条 classic（browser/model 逐条打印 SKIP 与原因）；
+   `checks/lanes/keyless-lane.mjs --ci` 跑 18 条 classic（browser/model 逐条打印 SKIP 与原因）；
    CI 挂在 `fresh-clone.yml` 的 macOS 全量 setup 之后（每周一 + 手动）。首几周允许红——那是环境诊断信号，
    处置是修环境或把资产标 `ciSafe:false` + 理由，不删资产。skip 清单每次打印：资产可以手动，但不许静默消失。
 5. **空间完备做成 spec，而不是靠自觉。**
@@ -52,7 +52,7 @@
 
 ## 输掉的方案
 
-- **注册表放 checks/smoke/lanes.mjs（卡里原计划）**：spec 只能读文本/正则，改一个字段就假红或漏判；改住 `tools/lib`。
+- **注册表放 checks/lanes/lanes.mjs（卡里原计划）**：spec 只能读文本/正则，改一个字段就假红或漏判；改住 `tools/lib`。
 - **surface 列全部七个面**：fast 已覆盖的面重复跑，push 变慢且失败归因重复；删到三条。
 - **每周 job 先做观察性（continue-on-error）**：没有通知就没有可见性，等于又一个"没人看"的资产；
   改为让 schedule 失败（不挡 PR）——失败本身就是诊断信号。
@@ -75,13 +75,13 @@
 
 | 判据 | 命令 | 原话 |
 |---|---|---|
-| 空间完备负例（红） | 临时建 checks/smoke/zz-unregistered.mjs + `pnpm vitest run tests/repo/asset-lanes.spec.ts` | `AssertionError: 这些 checks/smoke/*.mjs 没进 tools/lib/asset-lanes.mjs——新资产必须选 lane（或写 manualReason）: expected [ 'zz-unregistered' ] to deeply equal []` |
+| 空间完备负例（红） | 临时建 checks/lanes/zz-unregistered.mjs + `pnpm vitest run tests/repo/asset-lanes.spec.ts` | `AssertionError: 这些 checks/lanes/*.mjs 没进 tools/lib/asset-lanes.mjs——新资产必须选 lane（或写 manualReason）: expected [ 'zz-unregistered' ] to deeply equal []` |
 | 还原（绿） | 删除临时文件 + 重跑 | `Tests 5 passed (5)` |
 | 按面选面（命中） | `node checks/pre-push-surfaces.mjs --stdin /tmp/refs-client --dry-run`（真实历史 commit `d31d8366` 的 parent..commit） | `因为改了 packages/company-pack/src/client/data/use-company-data.ts（命中 packages/company-pack/src/client/**；client 装配/入口改动 → 真页面零挂载失败）→ client-load-smoke` |
 | 按面选面（不命中） | 同上换 docs-only 范围 | `本次未触发面级检查（规则表 = tools/lib/asset-lanes.mjs SURFACE_RULES）` |
 | fast 迁移后不变 | `pnpm -s smoke:fast` | `ALL PASS（6 条，2.95s）` |
-| 全量成员 | `node checks/smoke/keyless-lane.mjs --list` | 18 条 |
-| 全量 runner | `node checks/smoke/keyless-lane.mjs --ci --filter gates-negative-smoke` | `1 PASS / 0 FAIL / 31 SKIP`（SKIP 逐条打印，含真模型/浏览器/手动理由） |
+| 全量成员 | `node checks/lanes/keyless-lane.mjs --list` | 18 条 |
+| 全量 runner | `node checks/lanes/keyless-lane.mjs --ci --filter gates-negative-smoke` | `1 PASS / 0 FAIL / 31 SKIP`（SKIP 逐条打印，含真模型/浏览器/手动理由） |
 | 纯逻辑 | `pnpm vitest run tests/tools/lane-match.spec.ts` | 6 passed |
 | 全链 | `pnpm test` / `pnpm typecheck` / `pnpm -s lint` / `pnpm -s dup` / `pnpm verify` | 244 files / 2008 tests；typecheck 0；lint 0；dup 0 clones；verify ALL PASS |
 
@@ -101,7 +101,7 @@
 
 - 事实：**资产 lane 的唯一家 = lane 注册表**；pre-push 按面补跑；每周全量 keyless。
 - 唯一入口：`tools/lib/asset-lanes.mjs`（lane 成员 + 规则 + 纯匹配）、`checks/pre-push-surfaces.mjs`（取范围 + 跑）、
-  `checks/smoke/keyless-lane.mjs`（全量）、`tests/repo/asset-lanes.spec.ts`（空间完备门）；
+  `checks/lanes/keyless-lane.mjs`（全量）、`tests/repo/asset-lanes.spec.ts`（空间完备门）；
   执行下限的唯一入口 = `checks/audit/coverage-ratchet.mjs` + `tools/lib/coverage-baseline.mjs` + `tests/support/coverage-baseline.json`；
   失败类决策表 = `tests/failure-classes.md`；账本三列 = `close-out-definition` / `agent-note-definition` skill；盘子 = `tools/test-census.mjs` → `tests/CENSUS.generated.md`（生成物），一致性 = `tests/repo/test-census.spec.ts`。
 - 读载体：`tests/README.md`「按面触发」一段、`checks/README.md` quick-select、`.githooks/pre-push` 头注、

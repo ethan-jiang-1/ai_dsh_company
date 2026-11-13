@@ -78,12 +78,12 @@ Web 操作按 [动议合同 §前置](./contracts/demo.md) 执行：启动输出
 | 现象 | 从哪一层查 | 下一步证据 |
 |---|---|---|
 | 公司角色没有出现 | profile 与最终组合 | `pnpm dsh --profile company --dump-config`，核对 bundle/preset 行 |
-| 名册有角色但创建失败 | 实际 preset 挂载 | [preset-smoke](../checks/smoke/preset-smoke.mjs)，dump/名册扫描不能证明 schema 挂载成功 |
-| 工具缺失或委派续驶不可达 | 会话组合、工具目录、团队名册 | [delegation-smoke](../checks/smoke/delegation-smoke.mjs) 与对应机制探针 |
+| 名册有角色但创建失败 | 实际 preset 挂载 | [preset-smoke](../checks/lanes/preset.entry.mjs)，dump/名册扫描不能证明 schema 挂载成功 |
+| 工具缺失或委派续驶不可达 | 会话组合、工具目录、团队名册 | [delegation-smoke](../checks/lanes/delegation.entry.mjs) 与对应机制探针 |
 | 改动没进入当前会话或页面 | 生效方式与构建产物 | [debugging](guides/debugging.md)、[构建指南](guides/bootstrap.md)、[培养合同](./contracts/presets.md) |
-| 页面挂载或面板异常 | client 装配与真实渲染 | [client-load-smoke](../checks/smoke/client-load-smoke.mjs)、[cdp-probe](../probes/browser-visual/cdp-probe.mjs) |
+| 页面挂载或面板异常 | client 装配与真实渲染 | [client-load-smoke](../checks/lanes/client-load.entry.mjs)、[cdp-probe](../probes/browser-visual/cdp-probe.mjs) |
 | 交付物、作者或 journal 不对 | 会话日志与实际工作区 | [deliverables-check](../checks/audit/deliverables-check.mjs)、[authorship-audit](../checks/audit/authorship-audit.mjs)、[journal-audit](../checks/audit/journal-audit.mjs) |
-| 会话行为回归 | 录制场景与明确判据 | [replay-smoke](../checks/smoke/replay-smoke.mjs)（本仓仅 foundation 合成场景；公司行为真实录制在部署仓） |
+| 会话行为回归 | 录制场景与明确判据 | [replay-smoke](../checks/lanes/replay.e2e.mjs)（本仓仅 foundation 合成场景；公司行为真实录制在部署仓） |
 
 ## 测试资产怎样串起来
 

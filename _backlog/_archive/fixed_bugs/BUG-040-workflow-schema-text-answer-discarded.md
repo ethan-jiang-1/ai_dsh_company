@@ -57,7 +57,7 @@ R10 后台 workflow 4 分支（m01–m04），父脚本每个 `agent()` 都带 o
 - **最终修法（2026-11-08，产品规避）**：`eng-teaming` 的 workflow 硬规则改成“**分支不传 schema**，只回一行
   JSON，父脚本 `JSON.parse`；parse 失败或 null 时把原文记进 `missing`”。本仓唯一会碰 schema 的委派形状
   就是工作流分支；去掉它，症状不可达，且 completed 的答案不再被折成裸 null。
-- 机制钉子：`checks/smoke/workflow-contract-smoke.mjs` 第 7 条——非 schema 分支原样返回文本、父 parse 成功；
+- 机制钉子：`checks/lanes/workflow-contract.e2e.mjs` 第 7 条——非 schema 分支原样返回文本、父 parse 成功；
   第 5 条仍钉住引擎的 null 机制（恢复 schema 前必须重看）。
 - 选择理由：upstream 不可改（用户明确）、不造父侧注入插件（更多运行时机制）；按 038“分支当叶子”同款
   **产品级禁止不可靠组合**收口。下面的 A/B 路径与上游 diff **保留为上游提案**，不再是本卡阻塞项。
@@ -70,9 +70,9 @@ R10 后台 workflow 4 分支（m01–m04），父脚本每个 `agent()` 都带 o
   只回文本会被丢弃成 null；并在“返回聚合/异常”加“run/job completed ≠ 分支成功，验收看 null/count”。
 - 绿证据：同一 R10 里 m02/m03/m04 三个分支都调用了 `structured_output`，父均拿到对象；补跑
   `subagent` 也拿到了 m01。
-- **机制钉子（2026-11-08）**：`checks/smoke/workflow-contract-smoke.mjs` 第 5 条——fake provider 返回
+- **机制钉子（2026-11-08）**：`checks/lanes/workflow-contract.e2e.mjs` 第 5 条——fake provider 返回
   `completed` + 纯文本 + schema → `agent()` 返回 null 且 `workflow/agent-end outcome=failed`；
-  钉住“父拿裸 null”这一机制事实（不是模型行为）。命令 = `node --import tsx/esm checks/smoke/workflow-contract-smoke.mjs`。
+  钉住“父拿裸 null”这一机制事实（不是模型行为）。命令 = `node --import tsx/esm checks/lanes/workflow-contract.e2e.mjs`。
 - **上游真 diff（提案，2026-11-08 修正版）**：早先那版只给 `agentEnd` 加 `diagnostic` **不够**——
   父模型看到的是 workflow 的**工具结果文本**，不是 agent-end 事件。要满足判定第一条，诊断必须进工具结果。
   最小改法（三个文件，本仓不编译验证，仅给改动面与验收点）：

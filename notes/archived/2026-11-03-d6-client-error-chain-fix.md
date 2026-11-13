@@ -44,7 +44,7 @@ commands/execute 返回 session/writer-held（dev home 另有 writer 持有该�
 是 dev 多实例的现场。
 
 # 真页面（isolated 单 writer；2026-11-03 补）
-node checks/smoke/client-error-chain-smoke.mjs
+node checks/lanes/client-error-chain.entry.mjs
 # ALL PASS：会话打开（单 writer）→ 错误环捕获 → host 日志落盘
 npx vitest run tests/host/index/host-composition.spec.ts   # 8 passed
 pnpm test                                                # 135 files / 1084 tests

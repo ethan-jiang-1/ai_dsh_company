@@ -75,7 +75,7 @@
 ## 验证（实跑）
 
 - `npx vitest run tests/presets`：**54 passed**。
-- `node checks/smoke/preset-smoke.mjs`：**ALL PASS**（6 角色 + 3 委派子人格）。
+- `node checks/lanes/preset.entry.mjs`：**ALL PASS**（6 角色 + 3 委派子人格）。
 - **红**（R2）：`session-375dd67f-3d57-437c-a1fc-17a7955c7c80` 第一次 workflow run
   `run-end stopReason=error`、零 agent，错误 `schema.properties.status.enum requires type or oneOf`。
 - **绿**（R6）：`session-e25adbbf-22c5-4e38-a999-1b4edb56ca11` 单 run / 7 agents / `completed`，

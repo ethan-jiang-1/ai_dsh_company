@@ -63,7 +63,7 @@ result 等待的是整个 child run，跨轮拼接），但 workflow 的 `agent(
   最终返回干净对象并写明理由；同轮**如实修正**了 skill 的“嵌套 schema 分支一定 null”——3 次复现都没 null，
   null 来自 child 没调 `structured_output`（BUG-040），不是嵌套本身。skill 已改成“回执/自述会混入；
   schema 只约束形状，不保证干净值”。
-- **机制钉子**：`checks/smoke/workflow-contract-smoke.mjs` 第 6 条——非 schema 分支的返回值就是 child
+- **机制钉子**：`checks/lanes/workflow-contract.e2e.mjs` 第 6 条——非 schema 分支的返回值就是 child
   最终文本原样拼接（回执与结论不区分），钉住“为什么分支要当叶子”。
 - 未做机制修复（vendor `runtime.ts` 的分支结果语义不改）；上游提案 = 分支结果只取最后一轮结论/或把
   activation 回执与结论分开（与 BUG-040 同批；[收口 Note](../../../notes/implemented/2026-11-08-delegation-contract-repair.md) §上游批）。

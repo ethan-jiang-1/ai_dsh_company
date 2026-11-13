@@ -112,7 +112,7 @@ CMO 日志含 tool/call 与 tool/result）。
 - per-agent 注册：确认 CMO 的 `subagent_retry` 实例来自 `cmo`（预算 2），而不是从 VP-Eng 实例泄漏；
   如果 host tools 是全局注册，需要按调用者动态解析 preset/预算，而不是安装时闭包。
 - 测试：`tests/host/delegation/subagent-retry.spec.ts` 增加“真实 exec agent 形状 / 无 session /
-  有轮询 id”的用例；并在 `probes/team/` 或 `checks/smoke/` 加一条 CMO depth 2 的真模型/真装配回归。
+  有轮询 id”的用例；并在 `probes/team/` 或 `checks/lanes/` 加一条 CMO depth 2 的真模型/真装配回归。
 - 与 BUG-045 的已修判定对照：当时只跑了 keyless；本卡的验收必须包含真实装配。
 
 ## 已修判定（复核后已满足）

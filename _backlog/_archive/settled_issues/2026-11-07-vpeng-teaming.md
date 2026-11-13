@@ -40,10 +40,10 @@ opened: 2026-11-07
 | 判据 | 现有 owner / 新资产 | 命令 | 证明什么 | 不证明什么 | 红证·负例 |
 |---|---|---|---|---|---|
 | preset 行/文案 | 既有 `tests/presets/presets.spec.ts`（加断言） | `pnpm test tests/presets` | 声明 | 模型行为 | 删 `vp_cmo` → 红 |
-| 真挂载 | 既有 `checks/smoke/preset-smoke.mjs` | `node checks/smoke/preset-smoke.mjs` | 组合 | 内容 | 坏 config → 红 |
-| 角色连通 | 既有 `checks/smoke/probe-smoke.mjs`（快档） | `node checks/smoke/probe-smoke.mjs` | 挂载/回话/人格 | 内容 | 红 = 挂载/人格 |
-| 客户端真挂载 | 既有 `checks/smoke/client-load-smoke.mjs` | `node checks/smoke/client-load-smoke.mjs` | 页面不砖 | 文案语义 | 红 |
-| 页签金样（如含文案） | 既有 `ui-scene-smoke --isolated --golden` | `node checks/smoke/ui-scene-smoke.mjs --isolated --golden` | 页签文本 | 语义 | 金样 diff |
+| 真挂载 | 既有 `checks/lanes/preset.entry.mjs` | `node checks/lanes/preset.entry.mjs` | 组合 | 内容 | 坏 config → 红 |
+| 角色连通 | 既有 `checks/lanes/probe.entry.mjs`（快档） | `node checks/lanes/probe.entry.mjs` | 挂载/回话/人格 | 内容 | 红 = 挂载/人格 |
+| 客户端真挂载 | 既有 `checks/lanes/client-load.entry.mjs` | `node checks/lanes/client-load.entry.mjs` | 页面不砖 | 文案语义 | 红 |
+| 页签金样（如含文案） | 既有 `ui-scene-smoke --isolated --golden` | `node checks/lanes/ui-scene.entry.mjs --isolated --golden` | 页签文本 | 语义 | 金样 diff |
 | 根=Lead | 新 keyless probe（web boot；手工同逻辑已跑） | `node probes/team/vp-eng-root-lead-probe.mjs` | 投影 lead | spawn 成功 | root 无 lead → 红 |
 | UI 文案 | 既有 `tests/client/cultivation/cultivation-board.spec.ts` | `pnpm test tests/client` | 文案 | 机制 | 旧文案 → 红 |
 | 文档 | `pnpm verify` | `pnpm verify` | 链接/预算 | 语义 | 断链 → 红 |
@@ -69,7 +69,7 @@ opened: 2026-11-07
 
 - 基线：`git rev-parse HEAD` = `961ebf0`（A8 提交后）
 - 红（文案/行未落）：`pnpm vitest run tests/presets` → `3 failed | 47 passed`（缺 vp_cmo 行 / 缺 eng-teaming / 手册继承口径未分通道）；`pnpm vitest run tests/client/cultivation/cultivation-board.spec.ts` → `1 failed | 18 passed`（旧承接文案）
-- 绿：`pnpm vitest run tests/presets` → `50 passed`；`pnpm vitest run tests/client` → `332 passed`；`node checks/smoke/preset-smoke.mjs` → `ALL PASS（6 角色 + 3 子人格）`；`node checks/smoke/probe-smoke.mjs` → `ALL PASS（6/6 快速档）`；`node checks/smoke/client-load-smoke.mjs` → `ALL PASS（真浏览器）`；`node probes/team/vp-eng-root-lead-probe.mjs` → `ALL PASS`（vp-eng 根会话投影 = 单成员 lead + tasks 数组）；`pnpm typecheck` / `pnpm lint` / `pnpm verify` 全绿
+- 绿：`pnpm vitest run tests/presets` → `50 passed`；`pnpm vitest run tests/client` → `332 passed`；`node checks/lanes/preset.entry.mjs` → `ALL PASS（6 角色 + 3 子人格）`；`node checks/lanes/probe.entry.mjs` → `ALL PASS（6/6 快速档）`；`node checks/lanes/client-load.entry.mjs` → `ALL PASS（真浏览器）`；`node probes/team/vp-eng-root-lead-probe.mjs` → `ALL PASS`（vp-eng 根会话投影 = 单成员 lead + tasks 数组）；`pnpm typecheck` / `pnpm lint` / `pnpm verify` 全绿
 - 资产：`presets/vp-eng/agent.cordis.yml` 加 `vp_cmo`（maxDepth 2 → cmo）+ persona 组队段；新 `presets/vp-eng/skills/eng-teaming/SKILL.md`（四档 + 硬规则）；`content/AGENTS.md` 组合继承拆两通道；`docs/contracts/delegation.md`（vp_cmo 行 + 根门=Lead §2.1 + §6 压成指针，115/120）；`docs/contracts/presets.md`（VP-Eng 组队段 + CMO StRS，196/198）；`packages/company-pack/README.md` 三門已知限制（160/160）；`CultivationBoard.tsx` 文案 + client spec；新 `probes/team/vp-eng-root-lead-probe.mjs`（keyless 投影，实测需一轮极短 prompt 才发布投影）
 - 机制事实：CEO 的 `vp_cmo` 仍 `maxDepth: 1`（D7 不动，spec 断言守住）；root=Lead 由 keyless 探针证，spawn 成功归 B2
 - 环境备注：dev profile 的 pack 安装从 tarball 换成 `link:`（新 skill 立即生效；`pnpm company` 默认 tarball 会在下次启动时还原），重建了 `lib/` 产物

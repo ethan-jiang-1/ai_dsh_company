@@ -2,7 +2,7 @@
 // 状态：常驻
 // Keyless CLI integration check for snapshot-motion. Kept outside vitest because it starts child processes.
 // 何时跑：snapshot-motion CLI 或 workspace capture 接线改动时（keyless CLI 集成，需子进程）
-// Usage: node checks/smoke/snapshot-motion-smoke.mjs
+// Usage: node checks/lanes/snapshot-motion.e2e.mjs
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import assert from 'node:assert/strict'
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'

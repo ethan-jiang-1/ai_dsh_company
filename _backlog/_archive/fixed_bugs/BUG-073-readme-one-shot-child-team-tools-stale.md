@@ -23,7 +23,7 @@ opened: 2026-11-11
 > `delegation-smoke --delegate` [3] 钉住 child 首帧 `agentPreset = vp-eng` 且工具目录**没有** Team 工具
 > （组合按 preset 解析，旧的"one-shot child 误见 Team 工具"不再复现）。
 
-2026-11-11 实跑 `node checks/smoke/delegation-smoke.mjs --delegate`：
+2026-11-11 实跑 `node checks/lanes/delegation.entry.mjs --delegate`：
 `[3] child 24d3660a：preset=vp-eng，目录 75 个工具，Team 工具不在场` → **ALL PASS**。
 E5C 的命名 child（vp-eng）同样 `spawnTeamTool=false`。
 
@@ -45,7 +45,7 @@ BUG-070 系列/0.2.1 升 pin 时更新了 `delegation-smoke` 与 `docs/contracts
 
 ```sh
 source run/env.sh
-node checks/smoke/delegation-smoke.mjs --delegate
+node checks/lanes/delegation.entry.mjs --delegate
 ```
 
 - `[3] child ...：preset=vp-eng，目录 75 个工具，Team 工具不在场`；

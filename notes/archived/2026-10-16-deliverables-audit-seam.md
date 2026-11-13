@@ -16,7 +16,7 @@
 
 **② 对应 spec 机械拆分**：`tests/tools/deliverables.spec.ts` 538 行 → 基座 128 行 + `deliverables-audit.spec.ts` 462 行（恢复 `tests/company` 的 `<模块>.spec.ts` 一一对应，沿 2026-10-14 doors 迁出先例）。
 
-**③ 观察项触发线落档**：`checks/smoke/replay-smoke.mjs` 头注立触发线（>800 行或再增第 5 个 mode ⇒ 判据/驱动器分家，沿 replay-ui 拆出先例）。另三条观察项（`src/client/`、`tools/lib/`、大镜像 spec）没有自然宿主文件，只住来源卡上表，不硬塞头注。
+**③ 观察项触发线落档**：`checks/lanes/replay.e2e.mjs` 头注立触发线（>800 行或再增第 5 个 mode ⇒ 判据/驱动器分家，沿 replay-ui 拆出先例）。另三条观察项（`src/client/`、`tools/lib/`、大镜像 spec）没有自然宿主文件，只住来源卡上表，不硬塞头注。
 
 ## 输掉的方案
 

@@ -172,8 +172,8 @@ pnpm typecheck                 # 类型面（改 TS/src 时）
 ```
 
 - **keyless 回归**：`pnpm test` / `pnpm verify`；真模型/真浏览器**不进**回归。
-- **真实挂载**：`node checks/smoke/preset-smoke.mjs`（6 角色 + 3 委派子人格；preset 改动的必跑）。
-- **真实入口探针**：`probes/team/`（如 `vp-eng-workflow-probe.mjs`）、`checks/smoke/delegation-smoke.mjs`；
+- **真实挂载**：`node checks/lanes/preset.entry.mjs`（6 角色 + 3 委派子人格；preset 改动的必跑）。
+- **真实入口探针**：`probes/team/`（如 `vp-eng-workflow-probe.mjs`）、`checks/lanes/delegation.entry.mjs`；
   真模型，手工跑，不进 `pnpm test`。
 - **浏览器面**：`client-load-smoke` / `ui-scene-smoke`；本轮不需要。
 - **凭据**：`DEEPSEEK_API_KEY` 住 dev home 的 `.credentials.yaml`（不是 env）；`env | grep` 为空不代表没配；
@@ -359,7 +359,7 @@ await rpc('session/prompt', { request: { requestId, sessionId, mode: 'queue', co
 1. 读本文件 §1–§3；读 [Note](../../settled_issues/2026-11-08-vpeng-workflow-channel.md)、
    [eng-teaming](../../../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md)、
    [delegation 合同](../../../../docs/contracts/delegation.md) §3/§4。
-2. 基线：`source run/env.sh && pnpm verify && pnpm test`；`node checks/smoke/preset-smoke.mjs`。
+2. 基线：`source run/env.sh && pnpm verify && pnpm test`；`node checks/lanes/preset.entry.mjs`。
    全绿预期；若红先分清工作树里其他人的改动。
 3. 清 rehearsal 的旧实验 journal/deliverables；建 exp fixtures。
 4. 先跑 P1 forced 四格；结果表贴回本题材料；再决定 P2/P3。
@@ -447,7 +447,7 @@ N1 的 teammate 在 danger-full-access 下读了 `vendor/dsh` 源码与 `~/.dsh`
 
 - 六张缺陷卡（036–041）留作后续修复/上游提案的载体；
 - keyless retry 脚本暂不进 `pnpm test`（vendor 已有同语义测试；本仓加门禁需 P2 判据，先留证据）；
-  **2026-11-08 修复轮已取代**：升格为 `checks/smoke/workflow-contract-smoke.mjs`（keyless 机制档，仍不进
+  **2026-11-08 修复轮已取代**：升格为 `checks/lanes/workflow-contract.e2e.mjs`（keyless 机制档，仍不进
   `pnpm test`），理由与新增钉子见[收口 Note](../../../../notes/implemented/2026-11-08-delegation-contract-repair.md)；
 - 常驻 probe 不改：本轮是探索，稳定判据（root 控制面、schema 子集）若再次复现再升级为 probe/spec。
 

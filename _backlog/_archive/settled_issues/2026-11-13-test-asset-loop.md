@@ -48,7 +48,7 @@ opened: 2026-11-13
 
 ### B 环外必跑回路（约 2 天）
 
-- **载体**：新增 lane 注册表（checks/smoke/lanes.mjs，计划）作为唯一家；checks/pre-push-surfaces.mjs（计划）读它做按面触发；
+- **载体**：新增 lane 注册表（checks/lanes/lanes.mjs，计划）作为唯一家；checks/pre-push-surfaces.mjs（计划）读它做按面触发；
   每周 runner（all-keyless，计划）读同一份清单；tests/repo/asset-lanes.spec.ts（计划）机械校验「每个冒烟都已登记」。
 - **形态**：
   - lane 注册表字段 = name / kind（classic｜browser｜model）/ lanes（fast｜surface｜weekly）/ ciSafe / 理由；

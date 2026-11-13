@@ -63,7 +63,7 @@
 - `src/client/startup/StrategyPanel.tsx`：wiki 行显示失效原因（缺目录/非目录/缺 index）与位置标签（可写/只读）；五条新文案 zh+en。
 - `checks/gates/shipped-links.mjs`：扫描**包含** `wiki-template/`，内部链接按模板根判存在；指向模板外的链接
   不判存在（拷贝后的根未知），但仍禁指仓库。2026-11-12 的 bug sweep 收掉了「整目录排除」的旧做法。
-- `checks/smoke/preset-smoke.mjs`：共享 skill 根登记 `_shared/wiki/skills/`（不登记 → 「只看见自己的 skills」把正当共享报成泄漏）。
+- `checks/lanes/preset.entry.mjs`：共享 skill 根登记 `_shared/wiki/skills/`（不登记 → 「只看见自己的 skills」把正当共享报成泄漏）。
 - `docs/contracts/profile.md` 与 `packages/company-pack/content/README.md`：补 wiki 指针语义、校验档位与模板说明。
 
 ## 归位
@@ -84,7 +84,7 @@
   body 五要素 / 六 preset 都挂共享根 / 角色目录下无副本）。另扩 `tests/lib/startup-settings.spec.ts`（wiki 三态）、
   `tests/host/startup/startup-store.spec.ts`（检查三档 + 位置 + refresh 落盘）、`tests/host/startup/startup-prompt.spec.ts`（A4 三档 + 失效三因）。
 - `pnpm verify`：ALL PASS（含 `shipped-links`：content 73 份 + skill 27 份 + persona 11 份）。
-- `source run/env.sh && node checks/smoke/preset-smoke.mjs`：**ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）**，
+- `source run/env.sh && node checks/lanes/preset.entry.mjs`：**ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）**，
   含六角色 `只看见自己的 skills`。
 - **红→绿 ①（门禁排除面）**：模板首次进 `shipped-links` → 8 条
   `链接指向仓库/穿出 workspace`（`../index.md`、`path.md` 示例行）；排除 `wiki-template/` 后

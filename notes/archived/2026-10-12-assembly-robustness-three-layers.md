@@ -42,7 +42,7 @@ status: 已消化
   红 = 旧规范下出稿不打回（live T5 实录即红证）。owner = probes/session-context/。
 - **B3**（确定性）：tests/presets 内容锚——assembling-the-team 结构条款关键句 +
   手册打回句在场。owner = tests/presets/presets.spec.ts。
-- **B4**（编排）：preset-smoke 五角色零 broken。owner = checks/smoke/preset-smoke.mjs。
+- **B4**（编排）：preset-smoke 五角色零 broken。owner = checks/lanes/preset.entry.mjs。
 
 ## 交付形状
 

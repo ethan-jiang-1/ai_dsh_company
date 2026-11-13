@@ -67,7 +67,7 @@
 - 色调判据（G6，真 computed 值现算）：五底色互异（`rgb(15,17,21)/rgb(37,99,235)/rgb(34,197,94)/rgb(245,158,11)/rgb(236,19,19)`）+ 逐色字/底对比度 `18.9 / 5.17 / 9.22 / 9.78 / 4.67`（全 ≥ WCAG AA 4.5）+ 五字母互异。
 - keyless 色调守卫反证：把 `vp-sales` 的底色改成与 `vp-eng` 相同的 `--dsw-static-amber-500` ⇒ `client-css.spec.ts`「四个 static 底色两两不同」红 → 还原绿。
 - 图像判据（人/多模态看图）：`snapshots/visual/sidebar-role-mark/roles.png`（1× 行内观感 + 6× 座位格放大，五角色五色齐）——本 Note 的颜色选择是照这张图 + 上表对比度定的，不是照色号想象。
-- `node checks/smoke/client-load-smoke.mjs` —— 真页面零挂载失败（client 面完成定义；本变更的"挂得上"链）。
+- `node checks/lanes/client-load.entry.mjs` —— 真页面零挂载失败（client 面完成定义；本变更的"挂得上"链）。
 - `pnpm verify` —— 结构门禁全绿。
 - **未跑**（如实登记）：`preset-smoke`（未动 presets/ 与组合行）、`release-smoke`（未动导出/安装面）、真模型档（本变更零模型面）。
 

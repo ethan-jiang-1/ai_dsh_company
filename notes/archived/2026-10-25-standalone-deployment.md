@@ -59,7 +59,7 @@
 pnpm verify
 pnpm test
 pnpm standalone --home <tmp>/home --workspace <tmp>/home/company-workspace --port 0 --no-open
-node checks/smoke/standalone-smoke.mjs
+node checks/lanes/standalone-smoke.mjs
 ```
 
 断言：
@@ -91,14 +91,14 @@ node checks/smoke/standalone-smoke.mjs
 已落树：
 
 - [tools/standalone.mjs](../../tools/standalone.mjs) + `pnpm standalone`：`--home`/`--workspace`/`--port`/`--no-open`/`--provision-only`/`--no-build`/`--reset`/`--help`；doctor 查 Node/vendor CLI/web dist/vendor client bundles/pack 产物；隔离 `DSH_HOME`，自建 `web` profile，`link:` 指回当前 pack，`DSH_COMPANY_BOOTSTRAP=if-missing` 让 host copy 骨架；`--reset` 只删带 `.standalone-home` 标记的 home，拒绝接管已有 DSH 数据的 home。
-- [standalone-smoke.mjs](../../checks/smoke/standalone-smoke.mjs)：临时 `HOME` + 隔离 home；provision → 改坏 link → relink → boot/RPC（五角色 + researcher、`session/create`）→ reset；断言不写日用 `~/.dsh`。
+- [standalone-smoke.mjs](../../checks/lanes/standalone-smoke.mjs)：临时 `HOME` + 隔离 home；provision → 改坏 link → relink → boot/RPC（五角色 + researcher、`session/create`）→ reset；断言不写日用 `~/.dsh`。
 - 身份：新增 [kb/company.md](../../packages/company-pack/content/state/company.md)（公司名/产品名/样例标记）；手册标题改为「公司手册」并指向它；[CompanyView](../../packages/company-pack/src/client/CompanyView.tsx) 读该文件显示公司名，读不到显示「非公司盘 / 身份未配置」；[DeliverablesTab](../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx) 的缺索引错误提示确认 workspace。
 - 形状矩阵：[bootstrap.md](../../docs/guides/bootstrap.md) 顶部「先选形状」表；[profile.md](../../docs/contracts/profile.md) 部署形状表加「目录独立启动」行；`bundle-init` 头注标维护者专用。
 - 索引：[checks/README.md](../../checks/README.md) 登记 `standalone` 与 `standalone-smoke`。
 
 红/绿收据（实跑）：
 
-- 绿：`node checks/smoke/standalone-smoke.mjs` → `ALL PASS`（provision / relink / roster 五角色 + researcher / copy 骨架 + 身份 / bundle.json / session-create / 不写日用 `.dsh` / reset / 无标记 reset 拒绝）。
+- 绿：`node checks/lanes/standalone-smoke.mjs` → `ALL PASS`（provision / relink / roster 五角色 + researcher / copy 骨架 + 身份 / bundle.json / session-create / 不写日用 `.dsh` / reset / 无标记 reset 拒绝）。
 - 绿：`pnpm verify` → `ALL PASS`；`pnpm test` → 839 passed（审查加固后 848）；`release-smoke` → `ALL PASS`（32 件骨架、空 catalog、二启零变更）；`lifecycle-smoke` → `ALL PASS`；`client-load-smoke` → `ALL PASS`。
 - 红样：旧树没有 `pnpm standalone` 入口；smoke 的 relink 步骤先写入 `link:/tmp/does-not-exist/...`，入口未修复即红；`--reset` 对无标记目录必须非零。
 

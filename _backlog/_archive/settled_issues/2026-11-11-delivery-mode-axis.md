@@ -30,7 +30,7 @@ awareness、门禁与测试；同时不把 SOW/UAT/SLA 细节写进 preset。
 - awareness 七触点：AGENTS / meta / CEO step / product-definition / 经营 persona / `/req check` 回执 /
   交付模式包 overview。
 - 测试资产：类型与模式各自有包形状、coverage、scenario、awareness；两个 sources 门禁的负例合并进
-  [two-axis-gates-smoke](../../../checks/smoke/two-axis-gates-smoke.mjs)。
+  [two-axis-gates-smoke](../../../tests/checks/two-axis-gates.test.mjs)。
 
 **未决问题：** 无阻塞；v1 明确不做逐动议 `/delivery check`（只 warning）；`productized` 的产品经济/定价方法
 仍缺，遇到 `productized` 报价时 fail-closed，另开方法。D-01（硬软能力前置检查）仍是设计决策。

@@ -27,7 +27,7 @@
 ```
 packages/        代码（不动）
 run/             运行面：env.sh、company.overlay.yml、entry-probe.patch.yml、README（四件套导航）
-checks/          验证面：checks/smoke/（真实入口冒烟）+ checks/audit/（盘面日志判据）+ 根 run-gates.mjs
+checks/          验证面：checks/lanes/（真实入口冒烟）+ checks/audit/（盘面日志判据）+ 根 run-gates.mjs
 probes/          调试面：按机制域四子目录（见 S3）
 tools/           工具面：维护工具 + lib/ + drivers/ + archive/ 归其下
 tests/           keyless 回归（不动）；snapshots/ 证据（不动）；runtime/ 残留（不动）
@@ -68,7 +68,7 @@ docs/ notes/ _backlog/ company-workspace/ vendor/（不动）
 - **S2**：红 = repository-layout fixture + runtime-layout 排练 seam 期望新树 → 4 失败；绿 = 移动后
   `pnpm verify` ALL PASS（script-triggers ×43 / script-status ×52 递归发现新树零遗漏）+ `pnpm test` 355 项全绿 +
   `git grep -nE "scripts/(smoke|probes|audit|tools|lib|drivers)"`（排除冻结层）零活跃命中 +
-  真实入口抽查 `source run/env.sh && node checks/smoke/client-load-smoke.mjs` → ALL PASS
+  真实入口抽查 `source run/env.sh && node checks/lanes/client-load.entry.mjs` → ALL PASS
   （真浏览器：插件挂载零失败 / console 零 loader 错误 / 品牌槽在场）。
 - **S3**：`pnpm verify` ALL PASS（md-links/bare-path 查分域引用同步）+ `pnpm test` 355 项全绿。
   真实入口抽查**阻断**：分域探针均认证档（真模型 / 观察窗），本会话无 `DEEPSEEK_API_KEY`——不写绿。

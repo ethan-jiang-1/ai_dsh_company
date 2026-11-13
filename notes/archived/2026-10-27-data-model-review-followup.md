@@ -44,13 +44,13 @@
 |---|---|
 | `pnpm test` | 97 files / 907 tests 全绿 |
 | `pnpm verify` | ALL PASS |
-| `node checks/smoke/release-smoke.mjs` | ALL PASS（0.3.14） |
-| `node checks/smoke/lifecycle-smoke.mjs` | ALL PASS（含 business 方法层恢复、降级） |
-| `node checks/smoke/present-catalog-smoke.mjs` | ALL PASS（vendor sessionQuery 重建 true；false 保留） |
-| `node checks/smoke/concurrent-home-smoke.mjs` | ALL PASS（一个 writer） |
-| `node checks/smoke/revoke-recovery-smoke.mjs` | ALL PASS（真 host 启动回滚/补完两态） |
-| `node checks/smoke/client-load-smoke.mjs` | ALL PASS |
-| `node checks/smoke/multi-window-banner-smoke.mjs` | ALL PASS（同源两页面横幅） |
+| `node checks/lanes/release.entry.mjs` | ALL PASS（0.3.14） |
+| `node checks/lanes/lifecycle-smoke.mjs` | ALL PASS（含 business 方法层恢复、降级） |
+| `node checks/lanes/present-catalog.e2e.mjs` | ALL PASS（vendor sessionQuery 重建 true；false 保留） |
+| `node checks/lanes/concurrent-home.entry.mjs` | ALL PASS（一个 writer） |
+| `node checks/lanes/revoke-recovery.entry.mjs` | ALL PASS（真 host 启动回滚/补完两态） |
+| `node checks/lanes/client-load.entry.mjs` | ALL PASS |
+| `node checks/lanes/multi-window-banner.entry.mjs` | ALL PASS（同源两页面横幅） |
 | `node cultivation-gui-probe --summary` | ALL PASS（未展开 11 / 坏记录 1） |
 
 红证：临时把 `recoverPendingRevoke` 的 `isTarget` 改成 `includes('revokedAt:')` → BUG-033 用例红（`expected "conflict", received "rolled-back"`）；还原绿。

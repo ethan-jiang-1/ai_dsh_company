@@ -18,7 +18,7 @@
 //       前端与 client 面已构建）；另需
 //       playwright（vendor 全树 `pnpm install` 后在 .pnpm store，本脚本自动定位）与一份
 //       chromium（缺 playwright 期望的版本时自动回退缓存里最新一份）。
-// 用法：source run/env.sh && node checks/smoke/client-load-smoke.mjs [--port 0] [--profile company]
+// 用法：source run/env.sh && node checks/lanes/client-load.entry.mjs [--port 0] [--profile company]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb } from '../../tools/lib/probe-web.mjs'
 import { spawn } from 'node:child_process'

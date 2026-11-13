@@ -13,7 +13,7 @@ opened: 2026-11-13
 
 ## 症状
 
-`node checks/smoke/concurrent-home-smoke.mjs --keep`（当前源码 tarball，v3 身份）：
+`node checks/lanes/concurrent-home.entry.mjs --keep`（当前源码 tarball，v3 身份）：
 
 ```
 ① 同 home 两进程同时首启
@@ -23,7 +23,7 @@ opened: 2026-11-13
 ② 事后完整性：bundle/catalog/数据可解析
 concurrent-home-smoke: Error: ENOENT: no such file or directory,
   open '/…/runtime/concurrent-home-smoke/home/bundle.json'
-  at checks/smoke/concurrent-home-smoke.mjs:63
+  at checks/lanes/concurrent-home.entry.mjs:63
 ```
 
 两个失败都是**检查器陈旧/时序**，不是产品：
@@ -39,7 +39,7 @@ dsh: company-pack：另一个 writer 正在使用这个 home（pid …）；公�
 
 ## 根因（假设）
 
-- `checks/smoke/concurrent-home-smoke.mjs:63` 的 v2 `home/bundle.json` 断言未随 v3 身份迁移更新。
+- `checks/lanes/concurrent-home.entry.mjs:63` 的 v2 `home/bundle.json` 断言未随 v3 身份迁移更新。
 - `:51-53` 的 `blocked` 是单次快照，不是「等待两个 writer 的 lease 结论稳定后再计数」；启动 banner 早于 host 后半段的 company runtime 告警。
 - 两个问题叠加：脚本**每次都红**（ENOENT），lease 断言又**会漏真 blocked**（时序）。
 
@@ -50,7 +50,7 @@ dsh: company-pack：另一个 writer 正在使用这个 home（pid …）；公�
 ## 复现
 
 ```sh
-node checks/smoke/concurrent-home-smoke.mjs --keep
+node checks/lanes/concurrent-home.entry.mjs --keep
 # 然后用 --keep 留下的 base 手工两个 writer，等 3 秒看输出：
 node runtime/tmp/two-writer-check.mjs
 ```
@@ -70,11 +70,11 @@ node runtime/tmp/two-writer-check.mjs
 ## 修复关联
 
 - 发现于 C7；与 [BUG-080](../fixed_bugs/BUG-080-en-tab-title-map-missing-strategy.md) 同属「检查器手维护形状/时序、产品已迁移」。
-- 相关：[`docs/runtime-map.md`](../../../docs/runtime-map.md) 二·五（v3 身份在 workspace）；`checks/smoke/concurrent-home-smoke.mjs`。
+- 相关：[`docs/runtime-map.md`](../../../docs/runtime-map.md) 二·五（v3 身份在 workspace）；`checks/lanes/concurrent-home.entry.mjs`。
 
 ## 已修判定
 
 修成：smoke 在 boot 前创建 `WS`；bundle 读 `<WS>/.dsh-company/bundle.json` 并断言 v3 `id/createdAt/pack` 且 home 根不再有；lease 结论改成轮询最多 10s 直到「恰好一个 blocked」；catalog/数据路径补 `.dsh-company/`。
 
-- 真跑：`node checks/smoke/concurrent-home-smoke.mjs` **ALL PASS**（up=2 blocked=1；bundle v3；catalog/数据可解析；事后单实例 boot 与 roster 正常）。
+- 真跑：`node checks/lanes/concurrent-home.entry.mjs` **ALL PASS**（up=2 blocked=1；bundle v3；catalog/数据可解析；事后单实例 boot 与 roster 正常）。
 - 红证（修复前）：`blocked=0` + `home/bundle.json` / `WS/.dsh-company/bundle.json` ENOENT。

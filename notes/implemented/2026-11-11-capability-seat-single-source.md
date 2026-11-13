@@ -42,7 +42,7 @@
 **新增守卫**：`tests/host/delegation/team-seat-guard.spec.ts` **4 passed**（worker 拒、ceo 不装、无 preset 不猜、纯理由函数）。
 
 **全量**：`pnpm test` → **198 files / 1581 tests passed**；`pnpm typecheck` 绿；`pnpm lint` 0 warnings/0 errors；
-`pnpm verify` ALL PASS；`source run/env.sh && node checks/smoke/preset-smoke.mjs` → **ALL PASS（6 角色 + 5 非角色）**。
+`pnpm verify` ALL PASS；`source run/env.sh && node checks/lanes/preset.entry.mjs` → **ALL PASS（6 角色 + 5 非角色）**。
 
 **未跑/未证**：真模型会话里 support root 仍可能先尝试一次 `spawn_teammate` 再被 guard 拒（执行面成立；
 “模型不尝试”是行为面，单场不证）。`delegation-smoke --delegate` 未重跑（child 组合未改）。

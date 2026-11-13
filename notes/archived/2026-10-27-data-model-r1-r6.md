@@ -43,12 +43,12 @@
 |---|---|
 | `pnpm test` | 97 files / 898 tests 全绿（含 lease、revoke journal、check、bounded records、hardlink fallback） |
 | `pnpm verify` | ALL PASS |
-| `node checks/smoke/release-smoke.mjs` | ALL PASS（0.3.13 真 tarball 安装/首启/二启零变更） |
-| `node checks/smoke/lifecycle-smoke.mjs` | ALL PASS（v2→v1 降级、business 恢复、搬 home） |
-| `node checks/smoke/concurrent-home-smoke.mjs` | ALL PASS（同 home 恰好一个 writer；stale lease 接管） |
-| `node checks/smoke/present-catalog-smoke.mjs` | ALL PASS（删 index/ledger 后重建 true；false 审计保留） |
-| `node checks/smoke/isolation-matrix-smoke.mjs` | ALL PASS |
-| `node checks/smoke/upgrade-while-running-smoke.mjs` | ALL PASS（0.3.13→0.3.14） |
+| `node checks/lanes/release.entry.mjs` | ALL PASS（0.3.13 真 tarball 安装/首启/二启零变更） |
+| `node checks/lanes/lifecycle-smoke.mjs` | ALL PASS（v2→v1 降级、business 恢复、搬 home） |
+| `node checks/lanes/concurrent-home.entry.mjs` | ALL PASS（同 home 恰好一个 writer；stale lease 接管） |
+| `node checks/lanes/present-catalog.e2e.mjs` | ALL PASS（删 index/ledger 后重建 true；false 审计保留） |
+| `node checks/lanes/isolation-matrix.entry.mjs` | ALL PASS |
+| `node checks/lanes/upgrade-while-running.entry.mjs` | ALL PASS（0.3.13→0.3.14） |
 
 红证（前轮 G11，仍适用）：临时让 `validateCompanyHome` 返回 `{ ok: true }` → apply 测试红（home 根出现 `AGENTS.md`）；还原绿。R1/R2/R3/R4/R5/R6 的判据均以新增 spec/smoke 覆盖，未造单独红样。
 

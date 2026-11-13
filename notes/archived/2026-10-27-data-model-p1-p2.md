@@ -42,12 +42,12 @@ P0 收口后，Gap 卡还剩 G6（record CAS/revoke 半状态）、G7（方法�
 | 命令 | 结果 |
 |---|---|
 | `pnpm test` | 95 files / 889 tests 全绿（新增 profiles/apply 多 profile/board broken/archive/CAS/revoke 回滚 specs） |
-| `node checks/smoke/lifecycle-smoke.mjs` | ALL PASS（含 **v2→v1 降级**、business 恢复、搬 home） |
+| `node checks/lanes/lifecycle-smoke.mjs` | ALL PASS（含 **v2→v1 降级**、business 恢复、搬 home） |
 | `pnpm verify` | ALL PASS（0.3.12 手册/数据卡/Note/Gap 卡链接齐） |
-| `node checks/smoke/release-smoke.mjs` | ALL PASS（0.3.12 真 tarball 安装/首启/二启零变更） |
-| `node checks/smoke/isolation-matrix-smoke.mjs` | ALL PASS（含 explicit rebind；落点校验不回归） |
-| `node checks/smoke/upgrade-while-running-smoke.mjs` | ALL PASS（0.3.12 运行中升 0.3.13；session/data 保留） |
-| `node checks/smoke/present-catalog-smoke.mjs` | ALL PASS（presented 账本） |
+| `node checks/lanes/release.entry.mjs` | ALL PASS（0.3.12 真 tarball 安装/首启/二启零变更） |
+| `node checks/lanes/isolation-matrix.entry.mjs` | ALL PASS（含 explicit rebind；落点校验不回归） |
+| `node checks/lanes/upgrade-while-running.entry.mjs` | ALL PASS（0.3.12 运行中升 0.3.13；session/data 保留） |
+| `node checks/lanes/present-catalog.e2e.mjs` | ALL PASS（presented 账本） |
 
 红证（实跑）：临时把 `validateCompanyHome` 改成直接 `{ ok: true }` → `pnpm exec vitest run tests/host/apply-rebind.spec.ts -t "DSH_COMPANY_HOME=DSH_HOME"` 红：`expected false to be true`（home 根出现 `AGENTS.md`）；还原 → 绿。
 

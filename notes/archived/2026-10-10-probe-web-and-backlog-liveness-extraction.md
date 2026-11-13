@@ -14,7 +14,7 @@
    **`spawn` / `fetch` 一律注入、模块零 import**——不是妥协，是被两件事共同逼出来的正确形状：
    `tests/repo/layering.spec.ts` 把 `tools/lib/` 定为 keyless 纯逻辑缝（禁 child_process / spawn / fetch），
    而卡又要求 keyless spec 住在 `tests/` 并直接 import 帮助函数（layering 只放行 `tools/lib/`）。
-   **25 个探针**（probes/ 下全部起 web 的文件）全部迁入；`checks/smoke/*` 不在本卡范围。
+   **25 个探针**（probes/ 下全部起 web 的文件）全部迁入；`checks/lanes/*` 不在本卡范围。
 2. **`tools/lib/backlog-liveness.mjs`（新）**：`backlogLivenessProblems` 从 `checks/run-gates.mjs`
    **逐字节原样**挪入（`diff` 验证函数体与门禁原文完全一致）；门禁留下调用 + 「为什么」注释；
    `tests/tools/backlog-liveness.spec.ts` 从「切源码 + `vm` 求值」改为直接 import，期望字符串一字未动。
@@ -40,7 +40,7 @@
   的 `finally` 未防护引用 `child` ⇒ 用 **spawn 捕获适配器**（`spawn: (...a) => (child = spawn(...a))`）
   保住「boot 失败 → child 已捕获 → finally 杀进程 → exit 2」的原语义。
 - 探针在**真模型下判对与否本轮未验**（卡明说不重跑）；本轮证明的是启动/请求形状不变。
-- `checks/smoke/*` 的启动块未动（卡外；probe-smoke 被卡点名排除）——如要迁，另立卡。
+- `checks/lanes/*` 的启动块未动（卡外；probe-smoke 被卡点名排除）——如要迁，另立卡。
 
 ## 验证（全部实跑；红/绿形态如下）
 

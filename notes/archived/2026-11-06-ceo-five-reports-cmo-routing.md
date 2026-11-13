@@ -25,9 +25,9 @@
 - `pnpm test tests/presets` → 32 passed（含新增的五职能路由断言 + vp_cmo 委托行）
 - `pnpm test tests/client tests/presets` → 364 passed（client-face 的 key↔preset 逐字守卫 + 委派卡）
 - `pnpm verify` → ALL PASS（preset-row-deps / preset-required-config 认新行）
-- `source run/env.sh && node checks/smoke/preset-smoke.mjs` → ALL PASS（6 角色 + 1 委派子人格可挂载）
-- `source run/env.sh && node checks/smoke/delegation-smoke.mjs` → ALL PASS（模型可见 75 工具，含 vp_cmo）
-- `source run/env.sh && node checks/smoke/client-load-smoke.mjs` → ALL PASS（零挂载失败）
+- `source run/env.sh && node checks/lanes/preset.entry.mjs` → ALL PASS（6 角色 + 1 委派子人格可挂载）
+- `source run/env.sh && node checks/lanes/delegation.entry.mjs` → ALL PASS（模型可见 75 工具，含 vp_cmo）
+- `source run/env.sh && node checks/lanes/client-load.entry.mjs` → ALL PASS（零挂载失败）
 - **待人复测**：新会话问 MRD/PRD，CEO 应组 CMO+VP-Eng；旧会话的系统提示不变，必须新开会话。
 
 ## 后果

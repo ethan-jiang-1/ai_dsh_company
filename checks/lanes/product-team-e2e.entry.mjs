@@ -15,7 +15,7 @@
 // 分层：认证档第三档（真模型、起进程），**不进 pnpm test**。
 // 预算：~$1 / 3–7 分钟（--wall 封顶墙钟）。
 // 前置：DSH_HOME + 模型凭据（dev home）；cwd 写死 runtime/rehearsal-workspace（产物落排练场）。
-// 用法：source run/env.sh && node checks/smoke/product-team-e2e-smoke.mjs [--wall 600]
+// 用法：source run/env.sh && node checks/lanes/product-team-e2e.entry.mjs [--wall 600]
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'

@@ -318,7 +318,7 @@ S4 必须早于"逼人下判"的完整体验（没有材料就是逼人盲判）
      host 结果为 error 时把 `text` 呈现为失败文案；成功 ⇒ 触发刷新；文案集中在模块内一处。
    - 红证：这些断言在实现前必须实跑见红（当前无按钮、无动作面模块）。
 2. **装配（不许破）**：`tests/client/company-client-composition.spec.ts` 仍绿（新 prop/闭包不得改槽注册面）。
-3. **真挂载**：`source run/env.sh && node checks/smoke/client-load-smoke.mjs` 零挂载失败。
+3. **真挂载**：`source run/env.sh && node checks/lanes/client-load.entry.mjs` 零挂载失败。
 4. **真行为（「行为对」层）**：新增一条 browser-visual 面的真页面探针（拟名 `cultivation-gui-probe`，落位与命名随实施定）——
    起真 web → 种一条 open 记录到排练盘 → 进培养面板 → 点「采纳」→ 断言：① 记录翻 `adopted` 且带 `methodSlug`；
    ② 方法 `SKILL.md` 落到 `<dev home>/profiles/web/company-cultivation/<role>/method-<id>/`；③ 该会话日志出现

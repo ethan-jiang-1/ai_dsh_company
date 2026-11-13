@@ -531,7 +531,7 @@
     },
     "tools/lib/asset-lanes.mjs": {
       "statements": 100,
-      "branches": 92.85
+      "branches": 93.33
     },
     "tools/lib/audit-verdict.mjs": {
       "statements": 100,

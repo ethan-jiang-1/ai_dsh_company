@@ -34,7 +34,7 @@
 
 | 出口 | 写入者 | 策略 |
 |---|---|---|
-| `tmpdir()/dsh-replay-<场景>-*` | [replay-smoke](../checks/smoke/replay-smoke.mjs) | 进程级 mkdtemp：进程内自清、重启即失；诊断需跨进程保留时按 §11 受控重定向进 repo gitignored 区（触发条件，不预建） |
+| `tmpdir()/dsh-replay-<场景>-*` | [replay-smoke](../checks/lanes/replay.e2e.mjs) | 进程级 mkdtemp：进程内自清、重启即失；诊断需跨进程保留时按 §11 受控重定向进 repo gitignored 区（触发条件，不预建） |
 | `tmpdir()/dag-visual-fixture-<pid>.json` | dag-visual-probe | 同上 |
 | `tmpdir()/e2-cross-*` | cross-process-fs-probe | 同上 |
 | `tmpdir()/dsh-export-dist-*` | export-dist | 同上 |

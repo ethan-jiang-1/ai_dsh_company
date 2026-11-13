@@ -118,7 +118,7 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 
 复核抓到的真缺陷与处置（都改了实现/资产，不是只写说明）：
 
-- **keyless replay lane 红**：`checks/smoke/replay-smoke.mjs` 在 r3-delegation 上报 2 条 FAIL——sidecar 还是旧 CEO prefix、两处注入体还是旧公司手册。复核实测确认：**该 lane 在本轮之前已经红过**（同日更早的手册改动新增 4 条协作规矩，没人跑这条 lane），本轮又加了 CEO 措辞与手册一行两处。处置 = 同步夹具（sidecar 文本、注入体正文、`source.changes[0].digest`）后 `replay-smoke: ALL PASS`；这是**夹具同步不是重录**（本机无 key），已在 `snapshots/replay/r3-delegation/snapshot.yml` 的资格理由里写明并要求此后改手册/persona 同 diff 跑该 lane。**该 lane 有姿态前提**：脱敏只盖姿态事件的**值**，它们的在场/位置随机器姿态变 ⇒ 必须先 `source run/env.sh`；裸跑实测 1 FAILURE（复现脚本自己声明的「序列漂移照样红」，非夹具漂），前置已写进脚本头注与场景说明。
+- **keyless replay lane 红**：`checks/lanes/replay.e2e.mjs` 在 r3-delegation 上报 2 条 FAIL——sidecar 还是旧 CEO prefix、两处注入体还是旧公司手册。复核实测确认：**该 lane 在本轮之前已经红过**（同日更早的手册改动新增 4 条协作规矩，没人跑这条 lane），本轮又加了 CEO 措辞与手册一行两处。处置 = 同步夹具（sidecar 文本、注入体正文、`source.changes[0].digest`）后 `replay-smoke: ALL PASS`；这是**夹具同步不是重录**（本机无 key），已在 `snapshots/replay/r3-delegation/snapshot.yml` 的资格理由里写明并要求此后改手册/persona 同 diff 跑该 lane。**该 lane 有姿态前提**：脱敏只盖姿态事件的**值**，它们的在场/位置随机器姿态变 ⇒ 必须先 `source run/env.sh`；裸跑实测 1 FAILURE（复现脚本自己声明的「序列漂移照样红」，非夹具漂），前置已写进脚本头注与场景说明。
 - **台账行高不稳**（批 3 实现缺陷）：按字符阈值决定裁不裁 ⇒ 22/29 行不裁，1440px 高到 102px（≈6 行）、390px 到 155px（≈9 行）。改为**所有行两行边界 + 按量出的溢出给入口**后，两档视口 maxLines=2 且 buttons == clipped。
 - **空转断言**：`tests/client/wiring/client-face.spec.ts` 原有两条断言在基线上恒绿（`/summary/` 命中 `row.summary`、`/height:/` 命中 `line-height:`）；已改写成逐条在 6094d67 上转红的 7 条，并补「不许给短行开免裁口子」。
 - **探针弱于其声称**：`human-exits-probe` 用全文 grep 判三件套（「埋在尾部」反例照样绿）⇒ 收紧到正文前 400 字 + 机制黑话负判据；`human-exits-nonblocking-probe` 的假设/待确认项改为分别落**开头 400 字**与**末 500 字**，收紧后重跑 PASS。
@@ -130,7 +130,7 @@ Agent 间 drafts、任务书、成员消息保持原有密度。本 RFC 只批�
 
 新增抓到并按上面同款标准处置的：
 
-- **replay lane 的姿态前提**：`snapshot.yml` 原文「判据不随机器沙箱姿态漂」过头——脱敏只盖姿态事件的**值**，在场/位置随机器姿态变。裸跑实测 1 FAILURE（session#0 runtime-context 行 + session#1 权限/inbox 事件错位），`source run/env.sh` 后 ALL PASS。已把前置写进 `checks/smoke/replay-smoke.mjs` 头注与场景说明（那是复现脚本自己声明的「序列漂移照样红」，不是夹具漂）。
+- **replay lane 的姿态前提**：`snapshot.yml` 原文「判据不随机器沙箱姿态漂」过头——脱敏只盖姿态事件的**值**，在场/位置随机器姿态变。裸跑实测 1 FAILURE（session#0 runtime-context 行 + session#1 权限/inbox 事件错位），`source run/env.sh` 后 ALL PASS。已把前置写进 `checks/lanes/replay.e2e.mjs` 头注与场景说明（那是复现脚本自己声明的「序列漂移照样红」，不是夹具漂）。
 - **阻塞支探针遇到真·模型路径故障**：一次实跑 `turn/end.reason = error / MALFORMED_RESPONSE`（模型想调 `ask_user_question` 但工具入参 JSON 坏了），旧探针把它报成「行为不符」。已加**错误识别 + 有界重试一次 + 退出码 2（环境/模型路径失败，非行为判据）**，并把判定与事件落盘；重跑 PASS。稳定性实录：非阻塞支 4/4 通过；阻塞支 2 场有记录的观察里 1 通过 1 场模型路径错误（样本太小，不足以下频率结论）。
 - **首帧无入口**（判据）：60–120 字在窄栏会被裁，却不满足字符提示 ⇒ 量溢出改用 `useLayoutEffect`（绘制前跑）。
 - **无障碍名不含可见标签**（WCAG 2.5.3，A 级）：`全文` vs `查看完整结论` ⇒ 改成 `全文（查看完整结论）`／`收起（收起完整结论）`。

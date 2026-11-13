@@ -7,7 +7,7 @@ opened: 2026-10-11
 
 > 立卡：2026-10-11 ｜ 状态：已结 ｜ 类型：Task ｜ 可关闭：是 ｜ 结论日期：2026-10-11
 > **结论与去向**：场景已建成并零 diff 复演——[snapshots/replay/human-exits-ask](../../../snapshots/replay/human-exits-ask/)
-> （`answerer: browser`：录/放两侧都用真 UI 认领作答，规则 = 第一项）。harness 改动落在 `checks/smoke/replay-smoke.mjs`
+> （`answerer: browser`：录/放两侧都用真 UI 认领作答，规则 = 第一项）。harness 改动落在 `checks/lanes/replay.e2e.mjs`
 > （场景级答题人开关 + 确定性标题 + 按 `session.children` 算期望会话数）。机制依据与实测卡点见文末「落地记录」。
 > 来源：Human Exits RFC 批 2 验收「代表场景先固化为 replay/会话断言」的未落地项
 > （[毕业 Note](../../../notes/archived/2026-10-11-human-exits.md) §收口后复核）。
@@ -26,12 +26,12 @@ opened: 2026-10-11
    （不是 `{request:{…}}`，写错会报 `args fields do not match the descriptor`）；
    但即使形状正确、并在 ask 出现后立刻作答，服务端返回 **`false`（question is no longer continued）**，
    整轮依旧不收口——产品路径是浏览器里**认领卡片**（`attachWait` 流）后作答，RPC 档不认领。
-3. **浏览器答题这条路是通的，但需要先连工作区。** `checks/smoke/human-loop-e2e-smoke.mjs`
+3. **浏览器答题这条路是通的，但需要先连工作区。** `checks/lanes/human-loop-e2e.entry.mjs`
    就是这条路（开页面 → 找 radio → 点选 + Enter 提交），它成功是因为那场会话的工作区已在页面里连上。
    阻塞支探针照抄该流程时停在「按标题搜会话」——fresh profile 的页面里没有排练场工作区入口，
    会话列表按工作目录过滤 ⇒ 搜不到。探针里的这次尝试是**尽力而为**（失败只打印，不改判据）。
 4. **`--record` 的守卫原先写死「≥1 child」**，单轮场景录完必被判失败且不落盘；
-   已改成按 `snapshot.yml` 的 `session.children` 声明算期望（`checks/smoke/replay-smoke.mjs`，2026-10-11）。
+   已改成按 `snapshot.yml` 的 `session.children` 声明算期望（`checks/lanes/replay.e2e.mjs`，2026-10-11）。
    改完单轮录制不再被误拒——但第 1 条仍然挡着：录制侧同样需要一个答题人，否则收到的 raw 只有 header。
 
 **未决问题：** 答题人放哪一侧——(a) 只放录制侧（录到封盘的会话，重放侧另想办法）；
@@ -69,5 +69,5 @@ enable 材料：`cordis.yml` / `cordis.snapshot.yml` 可直接从 r3-delegation 
    （带时间戳会写进日志、重放必红——首轮实测 `…场景会话` 前那版用 `Date.now()%100000`，重放报 `48098 vs 25030`）。
 4. 顺带：`--record` 守卫原写死「≥1 child」，单轮场景录完必被判失败 ⇒ 改成按 `snapshot.yml` 的 `session.children` 声明算。
 
-验收：`source run/env.sh && node checks/smoke/replay-smoke.mjs --scenario human-exits-ask` → `ALL PASS（无 key 重放，归一化零 diff + 2 sidecar 零 diff，20s）`。
+验收：`source run/env.sh && node checks/lanes/replay.e2e.mjs --scenario human-exits-ask` → `ALL PASS（无 key 重放，归一化零 diff + 2 sidecar 零 diff，20s）`。
 夹具钉住的形态：27 行里含 `ask_user_question`（4 选项）与首段三件套（结论/下一步/拍板），`turn/end` 为完成态。

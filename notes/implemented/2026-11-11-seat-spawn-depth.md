@@ -60,7 +60,7 @@
 - 修复前同探针：CEO teammate header 为 `spawn, team collaboration`，控件为 false（BUG-079 症状）。
 
 **全量**：`pnpm test` → **199 files / 1596 tests passed**；`pnpm typecheck` 绿；
-`pnpm lint` 0 warnings / 0 errors；`source run/env.sh && node checks/smoke/preset-smoke.mjs` →
+`pnpm lint` 0 warnings / 0 errors；`source run/env.sh && node checks/lanes/preset.entry.mjs` →
 **ALL PASS（6 角色 + 5 非角色）**；`pnpm verify` ALL PASS。
 
 ## 现行语义（canonical）

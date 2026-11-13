@@ -30,7 +30,7 @@
 ## 验证（实跑）
 
 - **红**：修前 `pnpm exec vitest run tests/contract/delegation-channel-parity.spec.ts` → **3 failed / 3 passed**（team context、control 标签、`teamLeadWhenRoot` 字段各一）。还原配方 = 把 `CHANNELS.team.inheritsParentContext` 改回 `true` 并去掉 `nativeControl`/`repoControl` → 同 spec 红。
-- **绿**：同命令修后 **6 passed**；`pnpm test tests/presets` → **128 passed**；`pnpm test` → **194 files / 1561 tests passed**；`pnpm typecheck` 绿；`source run/env.sh && node checks/smoke/preset-smoke.mjs` → **ALL PASS（6 角色 + 5 非角色）**；`pnpm verify` → **ALL PASS**。
+- **绿**：同命令修后 **6 passed**；`pnpm test tests/presets` → **128 passed**；`pnpm test` → **194 files / 1561 tests passed**；`pnpm typecheck` 绿；`source run/env.sh && node checks/lanes/preset.entry.mjs` → **ALL PASS（6 角色 + 5 非角色）**；`pnpm verify` → **ALL PASS**。
 - 证据边界：parity spec 只证“模型字段与 vendor 源码一致”，不证运行时工具面；运行时面由 `preset-smoke` 与 `surface-matrix` 另证。
 
 ## 现行语义（canonical）

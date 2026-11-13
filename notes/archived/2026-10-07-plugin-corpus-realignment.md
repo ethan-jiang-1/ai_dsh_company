@@ -102,7 +102,7 @@ change-scope 脚本、集中式维护台账。触发 = 第二贡献者 / PR 面 
 
 **首例语义审 = 本轮真跑环**（观察期实例 #1）：
 
-- 真跑 `node checks/smoke/entry-probe-smoke.mjs`（触发条件成立：入口链文档改动 + key 在场；单跑预算）。
+- 真跑 `node checks/lanes/entry-probe.entry.mjs`（触发条件成立：入口链文档改动 + key 在场；单跑预算）。
   **第一跑 9/13**：Q13 即过；Q7/Q10 挂因 = 允许面把 `tests/README.md` / `checks/README.md`（最窄检查与
   脚本索引的**事实家**，AGENTS 入口链点名成员）挡在证据外——脚本头注记载过的「惩罚直答」反模式复发；
   Q1/Q8 = 引文格式漂移（模型侧方差，历史同款）。

@@ -30,7 +30,7 @@ opened: 2026-11-07
 |---|---|---|---|---|---|---|
 | SA 文案：SyRS（REQ-###）+ IRS（IF-###）+ 架构；验证点引用 REQ/IF，不发 `VP-###` | 确定性 | system-architect persona/skill | `presets.spec` 断言 | 加回 `VP-###` → 红 | `tests/presets/presets.spec.ts` | 无 |
 | 退役词 `STR/SYR/IFR/VP/V/VR` 不在活动文案 | 确定性 | 同上 | spec 断言 | 加 `IFR-001` → 红 | 同上 | 无 |
-| 真挂载 | 编排 | `preset-smoke` | ALL PASS | 行 config 坏 → 红 | `checks/smoke/preset-smoke.mjs` | 无 |
+| 真挂载 | 编排 | `preset-smoke` | ALL PASS | 行 config 坏 → 红 | `checks/lanes/preset.entry.mjs` | 无 |
 | 模型行为：SA 出 SyRS/IRS，SQA 可接 | 模型行为 | 既有 E/V 接线 + A8 | 既有探针证接线；A8 证 SyRS/IRS | 缺 IRS → checker 红 | `probes/team/sa-sqa-delegation-probe.mjs`（接线） + A8（整链） | 用户 review |
 
 ## 测试资产（计划）
@@ -38,8 +38,8 @@ opened: 2026-11-07
 | 判据 | 现有 owner / 新资产 | 命令 | 证明什么 | 不证明什么 | 红证·负例 |
 |---|---|---|---|---|---|
 | SA 文案 | 既有 `tests/presets/presets.spec.ts`（加断言） | `pnpm test tests/presets` | 文案/符号 | 模型行为 | 加 `VP-###` → 红 |
-| 真挂载 | 既有 `checks/smoke/preset-smoke.mjs` | `node checks/smoke/preset-smoke.mjs` | 组合 | 内容 | 坏 config → 红 |
-| 角色连通 | 既有 `checks/smoke/probe-smoke.mjs`（快档） | `node checks/smoke/probe-smoke.mjs` | 挂载/回话/人格进 prompt | 内容对错 | 红 = 挂载/人格 |
+| 真挂载 | 既有 `checks/lanes/preset.entry.mjs` | `node checks/lanes/preset.entry.mjs` | 组合 | 内容 | 坏 config → 红 |
+| 角色连通 | 既有 `checks/lanes/probe.entry.mjs`（快档） | `node checks/lanes/probe.entry.mjs` | 挂载/回话/人格进 prompt | 内容对错 | 红 = 挂载/人格 |
 | E/V 接线 | 既有 `probes/team/sa-sqa-delegation-probe.mjs` | `node probes/team/sa-sqa-delegation-probe.mjs` | SA/SQA 独立会话/depth | 本轮五层链 | 缺子会话 → 红 |
 | 五层链 | A8 probe | A8 | 整链 | 本卡单独不证 | A8 红 |
 
@@ -60,7 +60,7 @@ SQA 文案（A4b）、checker（A5）。
 - 基线：`git rev-parse HEAD` = `fbe02aa`（A3 提交后）
 - 红（文案未改）：`pnpm vitest run tests/presets` → `3 failed | 41 passed`（SA persona 缺 syrs/irs / skill 缺 SyRS+IRS / skill 仍有 VP-###）
 - 红（负例：加回退役号形）：persona 保留「不写 VP-###」字样 → 1 failed（`SA persona 仍出现退役号形`）→ 改成「不另立验证点号」→ 绿
-- 绿：`pnpm vitest run tests/presets` → `44 passed`；真挂载 `node checks/smoke/preset-smoke.mjs` → `ALL PASS（6 个角色 + 3 个委派子人格）`；`node checks/smoke/probe-smoke.mjs` → `ALL PASS（6/6，快速档）`；`pnpm verify` → `ALL PASS`
+- 绿：`pnpm vitest run tests/presets` → `44 passed`；真挂载 `node checks/lanes/preset.entry.mjs` → `ALL PASS（6 个角色 + 3 个委派子人格）`；`node checks/lanes/probe.entry.mjs` → `ALL PASS（6/6，快速档）`；`pnpm verify` → `ALL PASS`
 - 资产：`tests/presets/presets.spec.ts` 增「SA 产出」describe（3 条）；SA persona + `systems-architecture` skill 改为四件产物（SyRS/IRS/allocation/架构）+ 引用式验证点
 - 真跑：`probes/team/sa-sqa-delegation-probe.mjs`（真模型 4–9min）未在本卡单跑——E/V 接线由 A8 五层链 + B2 统一证；本卡只证文案/挂载
 - 文档/Note：程序 Note 待 W5 落；合同口径 = `content/state/process-docs.md`

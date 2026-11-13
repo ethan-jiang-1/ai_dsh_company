@@ -92,14 +92,14 @@ VP-Eng 任务书提供现场边界与交付物用途作为输入；不拆 skill�
 | SQA「域审计」：排除要举证、特征词与判定矛盾 → 不通过、在域要有验证项 | 确定性 | `vv-playbook` 文本 | 同上 | 删「域审计」/删矛盾判据 → 红 | 同上 | 无 |
 | VP-Eng 任务书声明域（现场边界 + 执行器/市电/承力 + 产物用途） | 确定性 | `eng-teaming` 文本 | 同上 | 删任一声明 → 红 | 同上 | 无 |
 | 纯软件真跑：SA 五域表、电气/机械判不在、SQA 域审计、任务书三声明 | 模型行为 | 排练场真模型一轮 | `sa-sqa-domain-routing-probe --audit <dir>` R0–R6 全绿 | 任一 R 红 | `probes/team/sa-sqa-domain-routing-probe.mjs` | 用户 review 产物 |
-| 真挂载 | 编排 | `preset-smoke` | ALL PASS | 行 config 坏 → 红 | `checks/smoke/preset-smoke.mjs` | 无 |
+| 真挂载 | 编排 | `preset-smoke` | ALL PASS | 行 config 坏 → 红 | `checks/lanes/preset.entry.mjs` | 无 |
 
 ## 测试资产
 
 | 判据 | 现有 owner / 新资产 | 命令 | 证明什么 | 不证明什么 | 红证·负例 |
 |---|---|---|---|---|---|
 | 文案/结构 | `tests/presets/presets.spec.ts`（新 4 条） | `pnpm vitest run tests/presets` | skill/任务书文案与边界 | 模型行为 | 先红后绿（4 failed → 54 passed） |
-| 真挂载 | `checks/smoke/preset-smoke.mjs` + `probe-smoke.mjs` | `node checks/smoke/{preset,probe}-smoke.mjs` | 组合能挂/回话 | 内容语义 | 坏 config → 红 |
+| 真挂载 | `checks/lanes/preset.entry.mjs` + `probe.entry.mjs` | `node checks/lanes/{preset,probe}-smoke.mjs` | 组合能挂/回话 | 内容语义 | 坏 config → 红 |
 | 纯软件方向 | 新 `probes/team/sa-sqa-domain-routing-probe.mjs` | `node probes/team/sa-sqa-domain-routing-probe.mjs [--audit <dir>]` | SA 五域表 / 电气机械不在 / SQA 域审计 / 任务书声明 | 一般可靠性、含物理件方向 | 任一 R 红 |
 
 ## 关闭条件

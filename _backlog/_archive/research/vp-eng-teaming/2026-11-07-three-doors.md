@@ -55,7 +55,7 @@ agentTeam = {"members":[{"name":"lead","role":"lead","phase":"active"}],"tasks":
 | [content/AGENTS.md](../../../../packages/company-pack/content/AGENTS.md) “组合继承” | “teammate / 命名委托 child 都继承 Lead 组合” | teammate 继承；命名 child 由 `agentPreset` 给 | 分通道表述；命名 child 的方法 skill 能加载 |
 | [CultivationBoard.tsx](../../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx) | “CEO 委派出去的分身继承 CEO 组合——职能方法不会进 child” | 对 teammate 成立；对命名 child 不成立 | 改文案 + 对应 client test |
 | [presets.spec](../../../../tests/presets/presets.spec.ts) 的控制面注释 | 用“根会话不是团队成员”解释为什么职能 preset 要放全局控制行 | 真实原因是命名 child 不是 team member | 改注释/断言说明，行本身保留 |
-| [product-team-e2e-smoke](../../../../checks/smoke/product-team-e2e-smoke.mjs) | CEO 两件套必须走 team，不许 `vp_cmo`/`vp_eng` 捷径 | 这是 CEO 路径的守卫，不能因为 VP-Eng 组队而放宽 | B2 必须复跑，证明没破坏 |
+| [product-team-e2e-smoke](../../../../checks/lanes/product-team-e2e.entry.mjs) | CEO 两件套必须走 team，不许 `vp_cmo`/`vp_eng` 捷径 | 这是 CEO 路径的守卫，不能因为 VP-Eng 组队而放宽 | B2 必须复跑，证明没破坏 |
 
 ## 6. B1/B2 的设计
 

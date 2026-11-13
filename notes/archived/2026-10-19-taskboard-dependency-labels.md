@@ -35,7 +35,7 @@
 - `pnpm test` ⇒ **68 files / 677 tests passed**。
 - `pnpm verify` ⇒ **ALL PASS**。
 - pack 双面构建：`node ./node_modules/typescript/bin/tsc -b packages/company-pack && (cd packages/company-pack && ../../node_modules/.bin/tsdown)` ⇒ 成功；真 app 读的是 `lib/client.js`。
-- `source run/env.sh && node checks/smoke/client-load-smoke.mjs` ⇒ **ALL PASS**（重建后复跑）。
+- `source run/env.sh && node checks/lanes/client-load.entry.mjs` ⇒ **ALL PASS**（重建后复跑）。
 - `source run/env.sh && node probes/browser-visual/tasks-panel-probe.mjs --fixture` ⇒ **ALL PASS**：桌面入口 `{"x":738,"y":11,"width":76,"height":28}`；`Tab` 离开 / `Shift+Tab` 回焦、`outline: auto 2px`；Enter 后 `.wk-pane-head` 标题 = 任务板，`tabCount=1`、`aria-selected=true`；窄栏 390 入口可见。
 - 真 app 截图：T4 的依赖列 = `梦之队 CFO · T1 · CFO 经济性测算与签字线裁定…`，不再是裸 `task-1,task-3`。
 

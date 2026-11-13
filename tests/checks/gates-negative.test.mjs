@@ -1,6 +1,6 @@
 // 状态：常驻
 // 何时跑：改 `checks/gates/` 的判据、或发布前；keyless，秒级。
-// 跑法：`node checks/smoke/gates-negative-smoke.mjs`
+// 跑法：`node tests/checks/gates-negative.test.mjs`
 //
 // 为什么在 smoke 而不在 tests/：门禁读的是根驱动面（checks/gates），tests/ 的 layering 守卫
 // 禁止 import checks 驱动；负例要复制 content/presets 再跑门禁，属于入口级检查。
@@ -14,12 +14,12 @@
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import * as baseClean from '../gates/base-clean.mjs'
-import * as contentManifest from '../gates/content-manifest.mjs'
-import * as contentSingleHome from '../gates/content-single-home.mjs'
-import * as methodContract from '../gates/method-contract.mjs'
-import * as packContentPaths from '../gates/pack-content-paths.mjs'
-import { mutateFile } from './lib/mutation.mjs'
+import * as baseClean from '../../checks/gates/base-clean.mjs'
+import * as contentManifest from '../../checks/gates/content-manifest.mjs'
+import * as contentSingleHome from '../../checks/gates/content-single-home.mjs'
+import * as methodContract from '../../checks/gates/method-contract.mjs'
+import * as packContentPaths from '../../checks/gates/pack-content-paths.mjs'
+import { mutateFile } from '../../checks/lanes/lib/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
 

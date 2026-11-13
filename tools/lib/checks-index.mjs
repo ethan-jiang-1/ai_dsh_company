@@ -9,9 +9,9 @@ import { existsSync, readdirSync } from 'node:fs'
 import { extname, join } from 'node:path'
 
 /** 公开入口所在目录（相对仓库根）。 */
-export const PUBLIC_DIRS = ['checks/smoke', 'checks/audit', 'probes']
+export const PUBLIC_DIRS = ['checks/lanes', 'checks/audit', 'probes']
 /** 内部实现前缀：不要求进公开库存。 */
-export const EXCLUDED_PREFIXES = ['checks/gates/', 'checks/lib/', 'checks/smoke/lib/', 'tools/drivers/', 'tools/lib/', 'tools/archive/']
+export const EXCLUDED_PREFIXES = ['checks/gates/', 'checks/lib/', 'checks/lanes/lib/', 'tools/drivers/', 'tools/lib/', 'tools/archive/']
 
 /** 递归收集某目录下的 .mjs（仓库相对路径）。 */
 function walk(root, rel) {
@@ -77,7 +77,7 @@ const links = (scripts) => scripts.map(rel => `[${labelOf(rel)}](${indexTargetFo
  * @returns {string} Markdown 全文（含生成说明）。
  */
 export function renderScriptInventory(scripts, { gateCount } = {}) {
-  const smoke = scripts.filter(rel => rel.startsWith('checks/smoke/'))
+  const laneFiles = scripts.filter(rel => rel.startsWith('checks/lanes/'))
   const audit = scripts.filter(rel => rel.startsWith('checks/audit/'))
   const probes = scripts.filter(rel => rel.startsWith('probes/'))
   const tools = scripts.filter(rel => rel.startsWith('tools/'))
@@ -95,9 +95,9 @@ export function renderScriptInventory(scripts, { gateCount } = {}) {
     '> 生成：`node tools/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。',
     '> 触发条件/成本/状态唯一源 = 各脚本头注；本文件只回答“有哪些公开入口、在哪”。',
     '',
-    `## 冒烟 / 真实入口（checks/smoke/，${String(smoke.length)}）`,
+    `## 冒烟 / 真实入口（checks/lanes/，${String(laneFiles.length)}）`,
     '',
-    ...wrap(links(smoke)),
+    ...wrap(links(laneFiles)),
     '',
     `## 盘面审计（checks/audit/，${String(audit.length)}）`,
     '',

@@ -342,7 +342,7 @@ npx vitest run tests/client/cultivation/cultivation-board.spec.ts
 
 - `pnpm verify` ALL PASS。
 - `pnpm test` 全绿（新增 spec 计入）。
-- `node checks/smoke/client-load-smoke.mjs` ALL PASS。
+- `node checks/lanes/client-load.entry.mjs` ALL PASS。
 - `docs/contracts/presets.md` 的培养命令合同同 diff 更新：`--context=`、正文可空、`contexts` 字段。
 - 实施 Note 进 `notes/implemented/`：决定、输掉的方案、红/绿命令与输出、未验残留。
 - `pnpm verify` 再跑一次（Note 门禁/链接）。
@@ -354,7 +354,7 @@ npx vitest run tests/client/cultivation/cultivation-board.spec.ts
 | 结构门禁 | `pnpm verify` | ALL PASS（含 proposal/notes/md-links/bare-path） |
 | keyless 全量 | `pnpm test` | 84 files / 823 tests PASS |
 | 构建 | `node ./node_modules/typescript/bin/tsc -b packages/company-pack` + `(cd packages/company-pack && ../../node_modules/.bin/tsdown)` | 成功；`lib/client.js` 296KB |
-| 客户端挂载 | `node checks/smoke/client-load-smoke.mjs` | ALL PASS（真浏览器，零挂载失败） |
+| 客户端挂载 | `node checks/lanes/client-load.entry.mjs` | ALL PASS（真浏览器，零挂载失败） |
 | 机制探针 | `node probes/session-context/cultivation-context-probe.mjs` | ALL PASS：冷读 12ms / 2MB 日志、不激活、2,551 字符 args、6,319B contexts、agentTeam 成员、子会话 address |
 | 真浏览器行为 | `node probes/browser-visual/cultivation-gui-probe.mjs` | ALL PASS：⑤b 成品背景 + 空正文 → `contexts` + `source: 成品「kid-ai-2026」`；**⑤c 会话背景 → `contexts.kind=session` + `source: 会话「…」`（真 host `observeSession`）**；**⑤d 审批行「打开原文」→ 右栏切到 final.md**；采纳/角色闸/日志全过 |
 

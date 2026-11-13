@@ -40,8 +40,8 @@
 source run/env.sh
 pnpm company --no-open            # 默认：pack + file: 安装 + 启动
 pnpm company --link --no-open     # 快速通道（改 presets 即刻生效）
-node checks/smoke/preset-smoke.mjs    # 真挂载（boot dev 默认 company profile）
-node checks/smoke/release-smoke.mjs   # 用户侧认证档（tarball + 应用内安装）
+node checks/lanes/preset.entry.mjs    # 真挂载（boot dev 默认 company profile）
+node checks/lanes/release.entry.mjs   # 用户侧认证档（tarball + 应用内安装）
 pnpm verify                       # 含 dev-product-parity 门禁
 ```
 

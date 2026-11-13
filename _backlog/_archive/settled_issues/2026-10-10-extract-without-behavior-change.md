@@ -32,9 +32,9 @@ opened: 2026-10-10
 不做：
 
 - 把 `checks/run-gates.mjs` 拆成一门禁一文件。分区注释已经是目录；拆开要多一个上下文对象，单道门禁仍然很薄。`replay-scene-liveness` 与 `guard-red-record` 各只有门禁一个调用方，留在原文件。
-- 把 `checks/smoke/replay-smoke.mjs` 按六个模式拆脚本。`normalizeAria` 也留着，除非另有卡要给它写不启动浏览器的断言。
+- 把 `checks/lanes/replay.e2e.mjs` 按六个模式拆脚本。`normalizeAria` 也留着，除非另有卡要给它写不启动浏览器的断言。
 - 按页签拆 `packages/company-pack/src/client/index.ts`，或动 `presence.ts`、`deliverables.mjs`、`styles.ts`。
-- 顺手改 `checks/smoke/probe-smoke.mjs` 的启动，或改 `probes/fs-taskboard/cross-process-fs-probe.mjs`（worker eval）、`probes/browser-visual/browser-behavior-probe.mjs`（起的是 chromium）。
+- 顺手改 `checks/lanes/probe.entry.mjs` 的启动，或改 `probes/fs-taskboard/cross-process-fs-probe.mjs`（worker eval）、`probes/browser-visual/browser-behavior-probe.mjs`（起的是 chromium）。
 - 重跑全部真模型探针来证明这次搬家。模型输出不是启动代码的稳定判据，也覆盖不了这次要守的请求形状。
 
 ## 已知与未决

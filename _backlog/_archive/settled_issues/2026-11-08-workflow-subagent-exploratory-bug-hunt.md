@@ -514,7 +514,7 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
   本次改用磁盘 `session.v4.jsonl.zstd`；证到成员真读了角色 skill。
 - **OBS-2（静态漂移复核，owner = 文档/研究）**：2026-11-10 晚复核——
   `packages/company-pack/cordis.patch.yml:104` 的 `handbookSkipPresets: ['worker']` 是“别把单 profile
-  白名单写回来”的反例警示，不是活漂移；`checks/smoke/release-smoke.mjs:164` 的「9 个 preset」是
+  白名单写回来”的反例警示，不是活漂移；`checks/lanes/release.entry.mjs:164` 的「9 个 preset」是
   2026-11-10 前 stale `_dist` 的历史注释，也不是活口径。只剩两份研究材料
   （`2026-11-10-sa-sqa-method-packs.md` / `2026-11-10-org-coordination-topology.md`）的落地前快照
   已加“2026-11-10 后已变”指针（研究材料正文不回填；两处指针已落，owner 归 research 维护）。

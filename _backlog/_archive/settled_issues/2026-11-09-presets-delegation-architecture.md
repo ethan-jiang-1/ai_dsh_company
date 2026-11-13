@@ -245,9 +245,9 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针）
 | 旧资产 | 现状 | 处置 |
 |---|---|---|
 | `tests/presets/presets.spec.ts` | 硬编码 `ROLES` / 行断言 | 拆成模型 spec + 组合 spec；角色清单从模型来；保留独立字面量只做“模型没被删角”的冗余校验 |
-| `checks/smoke/preset-smoke.mjs` | support presets 硬编码；shared skills 单根 | 加 worker；shared root 泛化为多根（delegation 独立目录） |
-| `checks/smoke/delegation-smoke.mjs` | 只测命名 child `vp_eng` | 保留；新增 generic `subagent` → worker.leaf 的锚点 |
-| `checks/smoke/workflow-contract-smoke.mjs` | 单通道引擎事实 | 保留为机制钉子；嵌套链事实移到链场景/图 spec |
+| `checks/lanes/preset.entry.mjs` | support presets 硬编码；shared skills 单根 | 加 worker；shared root 泛化为多根（delegation 独立目录） |
+| `checks/lanes/delegation.entry.mjs` | 只测命名 child `vp_eng` | 保留；新增 generic `subagent` → worker.leaf 的锚点 |
+| `checks/lanes/workflow-contract.e2e.mjs` | 单通道引擎事实 | 保留为机制钉子；嵌套链事实移到链场景/图 spec |
 | `tests/contract/*` | 钉 vendor 语义 | 不搬家；engine section 的内容 spec 引用这些钉子，不复制 |
 | 研究脚本 composition-matrix / dump-presets / contract-terms | 证据脚本 | 可复算部分升 `tools/lib` 或 tests；只读快照随研究题归档退役 |
 | `tests/README.md` 改动面表 | 按实现面组织 | 同 diff 更新：新增“模型/合同/图”行；预算 100/100，先压缩或搬 `docs/testing.md` |
@@ -271,7 +271,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针）
 - 委派卡：[DelegationCard.tsx](../../../packages/company-pack/src/client/ui/DelegationCard.tsx) + [delegation-keys.ts](../../../packages/company-pack/src/client/wiring/delegation-keys.ts) + [delegation-card.spec.ts](../../../tests/client/ui/delegation-card.spec.ts)、[client-face.spec.ts](../../../tests/client/wiring/client-face.spec.ts)（key ↔ toolName 逐字一致）。
 - Team 工具卡/面板：[TeamToolCard.tsx](../../../packages/company-pack/src/client/ui/TeamToolCard.tsx) + 官方 `ui-agent-team` 的 Team 按钮/roster/任务板；不替换、不 shadow。
 - 公司与培养页签：[DeliverablesTab.tsx](../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx)、[LedgerTab.tsx](../../../packages/company-pack/src/client/tabs/LedgerTab.tsx)、[AttentionTab.tsx](../../../packages/company-pack/src/client/tabs/AttentionTab.tsx)、[CultivationTab.tsx](../../../packages/company-pack/src/client/tabs/CultivationTab.tsx)；不因新图改布局/令牌。
-- 金样/冒烟：[client-css.spec.ts](../../../tests/client/ui/client-css.spec.ts)、[style-lifecycle.spec.ts](../../../tests/client/ui/style-lifecycle.spec.ts)、[client-load-smoke.mjs](../../../checks/smoke/client-load-smoke.mjs)、[ui-scene-smoke.mjs](../../../checks/smoke/ui-scene-smoke.mjs)、[snapshots](../../../snapshots)。
+- 金样/冒烟：[client-css.spec.ts](../../../tests/client/ui/client-css.spec.ts)、[style-lifecycle.spec.ts](../../../tests/client/ui/style-lifecycle.spec.ts)、[client-load.entry.mjs](../../../checks/lanes/client-load.entry.mjs)、[ui-scene.entry.mjs](../../../checks/lanes/ui-scene.entry.mjs)、[snapshots](../../../snapshots)。
 
 **新增视图（尽量利用现有机制）**：
 
@@ -318,7 +318,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针）
 | 承载行为 | 类别 | 输入/状态 | 通过信号 | 反例/恢复 | 证据 owner | 人的判断 |
 |---|---|---|---|---|---|---|
 | 模型 = 唯一期望源 | 确定性 | `delegation-model.mjs` + 11 份 preset YAML | `pnpm test tests/presets` 的模型/组合 spec 全绿；`modelProblems()` 空 | 删 vp-eng 的 `agentPreset: worker`、把 worker 移出 patch/roster、或给 worker 加回 subagent 行 → 对应断言红；还原绿 | `pnpm test tests/presets` | 无 |
-| worker 真挂载 | 编排 | 已建 pack + dev home/profile | `preset-smoke` 零 broken；worker + worker-orchestrator 的 `session/create` 成功 | worker 行 config 缺必填、未进 roster → preset-smoke 红 | `node checks/smoke/preset-smoke.mjs` | 无 |
+| worker 真挂载 | 编排 | 已建 pack + dev home/profile | `preset-smoke` 零 broken；worker + worker-orchestrator 的 `session/create` 成功 | worker 行 config 缺必填、未进 roster → preset-smoke 红 | `node checks/lanes/preset.entry.mjs` | 无 |
 | loader 声明面 = 模型 | 编排 | 真实 `--dump-config` | preset-matrix-smoke 的 10 个 preset 与模型一致 | 改一行 YAML 不同步 → 红；还原绿 | preset-matrix-smoke（待建，P1/P2） | 无 |
 | 合同可见性 | 模型行为 + 编排 | 六个 full role + vp-eng 真会话 | policy skill 被加载/尝试；engine section 只在 vp-eng；未加载时 fallback section | policy 未加载 → fallback；section 不在 → 红；不得静默缺失 | P-A/P-B 探针 + P2 section 真 systemPrompt（2026-11-09） | 规则是否被遵守（定性） |
 | subagent 失败重试 | 模型行为 + 编排 | `retryDecision` 纯模型；`subagent_retry` 的 fake-subagents；P-H 真失败注入待 | error/interrupted/lost + 幂等 + attempt 1 → 允许一次；attempt 2 → exhausted；attempt/terminal 可见 | refusal/aborted/completed/max-tokens/非幂等 → 不重试；重试后仍失败 → exhausted 不第三次 | `tests/presets/delegation-retry.spec.ts` + `tests/host/delegation/subagent-retry.spec.ts`；P-H 真探针待 | 重试是否恰当（定性，必要时人） |

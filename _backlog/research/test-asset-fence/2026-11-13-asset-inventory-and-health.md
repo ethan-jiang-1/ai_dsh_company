@@ -13,7 +13,7 @@ intent: 盘点 tests/smoke/gate/probe 的规模、成本与环外健康度，记
 |---|---|---|---|
 | keyless spec | 242 文件 / 1997 tests / 28,005 行 | `pnpm test`（vitest） | 单元 / 组件 / 真文件集成 |
 | 结构门禁 | 71 个模块（`checks/gates/*.mjs`；另有 `lib/` 共享判据） | `pnpm verify` | 结构、引用、簿记 |
-| 冒烟 | 32 个 `checks/smoke/*.mjs` | 按头注触发 | 装配 / 机制 / 安装 / 浏览器 / 真模型 |
+| 冒烟 | 32 个 `checks/lanes/*.mjs` | 按头注触发 | 装配 / 机制 / 安装 / 浏览器 / 真模型 |
 | 盘面审计 | 5 个 `checks/audit/*.mjs` | 手动 | 读真盘出报告 |
 | 探针 | 69 个 `probes/**/*.mjs` | 按头注触发 | 窄机制 / 视觉 / 团队行为 |
 | 重放 / 视觉夹具 | 1 个 replay 场景 + 1 份 UI 金样 | `replay-smoke` / `ui-scene-smoke --expected` | 会话级回放 / 页签文本金样 |

@@ -118,7 +118,7 @@ describe('orientState + renderOrient', () => {
   it('首屏带真页面与失败现场入口（页面 / 诊断 / 证据目录 / 客户端错误日志）', () => {
     const text = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace }))
     expect(text).toContain('看到真页面 / 查失败现场')
-    expect(text).toContain('ui-scene-smoke.mjs')
+    expect(text).toContain('ui-scene.entry.mjs')
     expect(text).toContain('--isolated --expected')
     expect(text).toContain('--steps')
     expect(text).toContain('diagnosis/')
@@ -128,14 +128,14 @@ describe('orientState + renderOrient', () => {
     expect(LIVE_SURFACES.length).toBeGreaterThanOrEqual(4)
   })
 
-  // 2026-11-03 第六轮 R6-04：`--scenario` 曾对所有场景给同一条 replay-smoke 命令；visual 场景没有
+  // 2026-11-03 第六轮 R6-04：`--scenario` 曾对所有场景给同一条 replay.e2e 命令；visual 场景没有
   // snapshot.yml，照抄即 ENOENT（实测 exit 1）。复跑入口按场景类型分派。
   it('--scenario 的验证命令按场景类型分派（replay / visual / 归档证据）', () => {
-    expect(scenarioVerification('replay', 'replay/x')).toBe('node checks/smoke/replay-smoke.mjs --scenario replay/x')
-    expect(scenarioVerification('visual', 'visual/x')).toContain('ui-scene-smoke.mjs --isolated --expected')
+    expect(scenarioVerification('replay', 'replay/x')).toBe('node checks/lanes/replay.e2e.mjs --scenario replay/x')
+    expect(scenarioVerification('visual', 'visual/x')).toContain('ui-scene.entry.mjs --isolated --expected')
     expect(scenarioVerification('probes', 'probes/x')).toContain('无通用复跑入口')
-    expect(runBundleView(ROOT, 'visual/company-shell').verification).toContain('ui-scene-smoke')
-    expect(runBundleView(ROOT, 'replay/foundation-workspace').verification).toContain('replay-smoke')
+    expect(runBundleView(ROOT, 'visual/company-shell').verification).toContain('ui-scene.entry')
+    expect(runBundleView(ROOT, 'replay/foundation-workspace').verification).toContain('replay.e2e')
   })
 
   it('凭据行只说键名不说值（密钥住凭据库、不是环境变量——env 里没有不代表没配）', () => {

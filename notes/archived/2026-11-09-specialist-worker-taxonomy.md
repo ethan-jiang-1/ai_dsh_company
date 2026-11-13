@@ -63,4 +63,4 @@
 
 - 前序设计 Note：[presets 委派面的模型化重构](../implemented/2026-11-09-presets-delegation-model.md)（后续指针）。
 - 归档卡：[2026-11-09-specialist-worker-taxonomy](../../_backlog/_archive/settled_issues/2026-11-09-specialist-worker-taxonomy.md)。
-- 关键文件：[model](../../tools/lib/delegation-model.mjs)、[worker-researcher](../../packages/company-pack/presets/worker-researcher/agent.cordis.yml)、[CEO 行](../../packages/company-pack/presets/ceo/agent.cordis.yml)、[composition spec](../../tests/presets/delegation-composition.spec.ts)、[preset-smoke](../../checks/smoke/preset-smoke.mjs)。
+- 关键文件：[model](../../tools/lib/delegation-model.mjs)、[worker-researcher](../../packages/company-pack/presets/worker-researcher/agent.cordis.yml)、[CEO 行](../../packages/company-pack/presets/ceo/agent.cordis.yml)、[composition spec](../../tests/presets/delegation-composition.spec.ts)、[preset-smoke](../../checks/lanes/preset.entry.mjs)。

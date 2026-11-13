@@ -34,7 +34,7 @@ intent: 把 13 张卡放在一起查系统性/结构/一致性/逻辑与方法�
 | 12 | 自洽 | A2 说“六个模板都有 `layer/definition`”，但 allocation 是附录、不是需求层 | 模板语义 | 改“五个需求模板有 layer/definition；allocation=`definition: none`、不立号” |
 | 13 | 自洽 | PRD 的 `source`（MR 来源）与共识的 `traces`（跨层上游）混用 | `prd-check` 认 `source`；共识 R7 写 `Traces:` | 明确：`source` 保留为 MR 来源；`traces` 记 StRS/REQ；`/prd check` 仍认 `source` |
 | 14 | 文字 | B2 排除项写 `CIO` | 笔误 | 改 `CEO` |
-| 15 | 测试资产 | A3/A4a/A4b/B1 改角色内容，却没排 `probe-smoke`（角色连通/人格进 prompt） | `checks/smoke/probe-smoke.mjs` 头注：角色内容改动后跑 | 四卡补 `probe-smoke` 快档行 |
+| 15 | 测试资产 | A3/A4a/A4b/B1 改角色内容，却没排 `probe-smoke`（角色连通/人格进 prompt） | `checks/lanes/probe.entry.mjs` 头注：角色内容改动后跑 | 四卡补 `probe-smoke` 快档行 |
 | 16 | 测试资产 | B1 改 `CultivationBoard` 用户可见文案，却没排 `client-load-smoke`/`ui-scene-smoke` | `tests/README.md` client 面板行 | 补 `client-load-smoke` + `ui-scene-smoke --isolated --golden`（如金样含文案） |
 | 17 | 覆盖 | A6/B1 改包行为/已知限制，却没排 `packages/company-pack/README.md` | `notes/README.md`：pack 行为面同 diff 更新 README 已知限制 | A6/B1 补 pack README |
 | 18 | 覆盖 | B1 没排 `docs/runtime-map.md`/`notes/implemented/2026-11-10-roles-isolation-rationale.md` 的旧继承说法 | 两文有“继承 Lead 组合”表述 | B1 补“如引用旧说法” |

@@ -43,7 +43,7 @@
 - 078：去掉 teammate 的“无通用 child 通道”判据 → 「teammate without a generic child」**1 failed / 23 passed**；还原 **24 passed**。
 
 **全量**：`pnpm test` → **199 files / 1594 tests passed**；`pnpm typecheck` 绿；`pnpm lint` 0 warnings/0 errors；
-`pnpm dup` 0 clones；`pnpm verify` ALL PASS；`source run/env.sh && node checks/smoke/preset-smoke.mjs` → **ALL PASS（6 角色 + 5 非角色）**。
+`pnpm dup` 0 clones；`pnpm verify` ALL PASS；`source run/env.sh && node checks/lanes/preset.entry.mjs` → **ALL PASS（6 角色 + 5 非角色）**。
 
 **未跑/未证**：真模型 worker root / teammate 会话复跑（keyless + preset-smoke 为准）；模型是否先尝试一次 team 工具属行为面，单场不证。vendor `team:policy`/`team:identity` 文本仍在（无 host 删除 seam），seat note 是纠正不是删除。
 

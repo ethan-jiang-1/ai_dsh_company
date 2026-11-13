@@ -41,7 +41,7 @@ ROADMAP 磨清单两条对应行已磨即离队。）
 - hook 负例实测：AGENTS.md 临时加死链 → `git push` 被 hook 内 verify 拦下（`verify: 1 FAILURE(S)` +
   `error: failed to push some refs`，exit 1，秒级、**未触网络层**）；还原 → push 秒过 hook、推进到
   网络层（挂于 ssh.github.com:443 间歇故障——网络问题非 hook 问题，两态对比恰为 hook 生效证据）。
-- `pnpm test` 238/238（1.15s）；`node scripts/preset-smoke.mjs` ALL PASS（5 preset 真挂载 + 各角色只见
+- `pnpm test` 238/238（1.15s）；`node scripts/preset.entry.mjs` ALL PASS（5 preset 真挂载 + 各角色只见
   自己的 skills + client 闭包 66 模块无缺失）。
 - CI Actions 首跑：**红 → 真因修复 → 绿**（三跑闭环，2026-09-27）：
   ① 首跑（run 36336141531）红 = 我写 workflow 时断言「verify 零依赖」错了——`markdown-links.mjs`

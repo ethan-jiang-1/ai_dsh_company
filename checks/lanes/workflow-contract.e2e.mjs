@@ -4,7 +4,7 @@
 // 同时把探索轮 runtime/tmp 里的一次性脚本升格为常驻。
 //
 // 何时跑：改 workflow/subagent 组合、改 schema 分支语义、或升 pin 后（keyless ~2s；不进 pnpm test——
-//   它要起真插件图，属机制档）。命令 = `node --import tsx/esm checks/smoke/workflow-contract-smoke.mjs`
+//   它要起真插件图，属机制档）。命令 = `node --import tsx/esm checks/lanes/workflow-contract.e2e.mjs`
 //   （从仓库根；需 workspace 依赖已装，不需要模型凭据）。
 //
 // 钉什么（每条都是"父代理实际看到的行为"，不是引擎内部自述）：

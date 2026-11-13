@@ -8,7 +8,7 @@ import { en, zh, type CompanyT } from '../../../packages/company-pack/src/client
  * 委派工具卡的 keyless 层（R3）。
  *
  * 为什么这层是主门禁：卡片是 **call/result 切片的纯函数**——不需要浏览器、不需要模型、
- * 毫秒级。真浏览器腿（`checks/smoke/ui-scene-smoke.mjs`）覆盖页签与错误环；真模型 + 真页面的
+ * 毫秒级。真浏览器腿（`checks/lanes/ui-scene.entry.mjs`）覆盖页签与错误环；真模型 + 真页面的
  * 委派卡端到端按受影响面另跑，不进回归（分钟级、还依赖模型配合；R3 实测 240s 都没等到）。
  */
 

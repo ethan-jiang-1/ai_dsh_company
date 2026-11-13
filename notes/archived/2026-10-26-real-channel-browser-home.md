@@ -27,9 +27,9 @@
    直接打包会静默打旧代码。发布 `files` 只留 `lib/index.js`、`lib/client.js`、
    `lib/types/**/*.d.ts`；tsc 中间 `.js`/`.map`/`.tsbuildinfo` 不进包。
 5. **新增两条常驻冒烟**：
-   - [channel-matrix-smoke](../../checks/smoke/channel-matrix-smoke.mjs)：vendor built CLI + 真实全局
+   - [channel-matrix-smoke](../../checks/lanes/channel-matrix.entry.mjs)：vendor built CLI + 真实全局
      `dsh` 的五角色 roster/会话；`--with-browser` 验可选包自动启用。
-   - [isolation-matrix-smoke](../../checks/smoke/isolation-matrix-smoke.mjs)：改 `DSH_COMPANY_HOME`
+   - [isolation-matrix-smoke](../../checks/lanes/isolation-matrix.entry.mjs)：改 `DSH_COMPANY_HOME`
      的告警/不建新盘 + 相对/`~` 落点归一。
 
 ## 发现（为什么必须做）
@@ -72,11 +72,11 @@ vendor browser 包，把全局通道的缺包 bug 遮住。channel/isolation 冒
 
 | 命令 | 结果 |
 |---|---|
-| `node checks/smoke/channel-matrix-smoke.mjs --channel global --browser off`（0.3.9 旧包） | **红**：5 角色 broken + 5 session FAIL = 10 FAIL；证明回归线咬得住 |
-| `node checks/smoke/channel-matrix-smoke.mjs --channel all`（0.3.10） | ALL PASS：vendor + 全局 rc.3，五角色/五会话 |
-| `node checks/smoke/channel-matrix-smoke.mjs --channel global --browser auto --with-browser`（0.3.10） | ALL PASS：无包自动禁用；装 rc.3 browser 两包后自动启用 |
-| `node checks/smoke/isolation-matrix-smoke.mjs --pack <0.3.9 修复前>` | **红 7**：rebind 无警告且建了新盘；搬 home 后旧 workspace 登记不点名；relative `bundle.workspace` 记 `./company-rel`；tilde 落成字面 `~` 目录 |
-| `node checks/smoke/isolation-matrix-smoke.mjs`（0.3.10） | ALL PASS：rebind 告警/不建新盘、bundle 字节不变、旧盘 sentinel 不动；搬 home 后旧登记点名且数据在；相对/`~` 归一 |
+| `node checks/lanes/channel-matrix.entry.mjs --channel global --browser off`（0.3.9 旧包） | **红**：5 角色 broken + 5 session FAIL = 10 FAIL；证明回归线咬得住 |
+| `node checks/lanes/channel-matrix.entry.mjs --channel all`（0.3.10） | ALL PASS：vendor + 全局 rc.3，五角色/五会话 |
+| `node checks/lanes/channel-matrix.entry.mjs --channel global --browser auto --with-browser`（0.3.10） | ALL PASS：无包自动禁用；装 rc.3 browser 两包后自动启用 |
+| `node checks/lanes/isolation-matrix.entry.mjs --pack <0.3.9 修复前>` | **红 7**：rebind 无警告且建了新盘；搬 home 后旧 workspace 登记不点名；relative `bundle.workspace` 记 `./company-rel`；tilde 落成字面 `~` 目录 |
+| `node checks/lanes/isolation-matrix.entry.mjs`（0.3.10） | ALL PASS：rebind 告警/不建新盘、bundle 字节不变、旧盘 sentinel 不动；搬 home 后旧登记点名且数据在；相对/`~` 归一 |
 | `pack-shape` 的 `pack-files` 造红（临时把 `files` 加回 `lib/**`） | **红**：`files 缺 lib/index.js；files 缺 lib/client.js；…；files 用了 lib/**`；还原后 PASS |
 | `pnpm test` | 93 files / 864 tests passed（含 workspace-registry 单测） |
 | `pnpm verify` | ALL PASS（含新 `pack-files`、`dist-manual`） |

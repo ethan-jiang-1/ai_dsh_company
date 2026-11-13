@@ -35,7 +35,7 @@
 
 ## 验证
 
-- `node checks/smoke/ui-scene-smoke.mjs --isolated --golden` ×3 → 每次都 `金样一致（9 个页签）` / `ALL PASS`，exit 0。
+- `node checks/lanes/ui-scene.entry.mjs --isolated --golden` ×3 → 每次都 `金样一致（9 个页签）` / `ALL PASS`，exit 0。
 - 红证：把金样「待办」改成 `ZZ-RED-PROOF` → exit 1；`scene.json` `goldenResult: fail`，`goldenProblems.tabs[0]` 带 expected/actual；还原 → 绿。
 - `--steps` 正例：`[{"clickText":"培养"},{"expectText":"培养"}]` → exit 0，verdict `steps` 两条 `ok:true`；反例 `NO-SUCH-TEXT-R4` → exit 1，证据 = `cdp-probe-*`。
 - `tests/session/probe-web.spec.ts` 新增“boot 失败带输出尾部 + onOutput”例；`tests/session/probe-steps.spec.ts` 覆盖解析/拒绝。

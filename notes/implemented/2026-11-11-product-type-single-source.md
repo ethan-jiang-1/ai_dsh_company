@@ -99,7 +99,7 @@
   `tests/host/commands/req-command.spec.ts` 17 项、`tests/lib/yaml-scalar.spec.ts` 2 项）。
 - `pnpm typecheck`：绿（pack + tests/client + tests/company + tests/harness）。
 - `pnpm lint`：0 warnings / 0 errors；`pnpm dup`：0 clones。
-- `source run/env.sh && node checks/smoke/preset-smoke.mjs`：
+- `source run/env.sh && node checks/lanes/preset.entry.mjs`：
   `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）`。
 - E1/E2/E4 复跑：
   - E1：`project-services` 在 skill / CMO / meta / mrd / CEO / docs 全是 `—`；类型目录 = 2。

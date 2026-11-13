@@ -18,8 +18,8 @@ import { join } from 'node:path'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
 const BASE = join(ROOT, 'runtime/company-root-process-smoke')
-const PROBE = join(ROOT, 'checks/smoke/lib/company-root-probe.mjs')
-const LEASE_PROBE = join(ROOT, 'checks/smoke/lib/lease-probe.mjs')
+const PROBE = join(ROOT, 'checks/lanes/lib/company-root-probe.mjs')
+const LEASE_PROBE = join(ROOT, 'checks/lanes/lib/lease-probe.mjs')
 const failures = []
 const active = new Set()
 

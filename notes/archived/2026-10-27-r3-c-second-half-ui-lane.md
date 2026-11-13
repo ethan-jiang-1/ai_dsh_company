@@ -8,7 +8,7 @@
 
 ## 决定
 
-1. **真页面车道 = 自起实例 + 复用 cdp-probe**：新增 `checks/smoke/ui-scene-smoke.mjs`——`startWeb` 起观察窗 →
+1. **真页面车道 = 自起实例 + 复用 cdp-probe**：新增 `checks/lanes/ui-scene.entry.mjs`——`startWeb` 起观察窗 →
    子进程跑 `cdp-probe --evidence`（页签清单仍从注册源解析）→ 汇总 verdict 与证据目录 → 关实例。
    一条命令覆盖「起服务 / 读 token / 拼 URL / 全页签断言 / 截图」；`--keep` 留实例给人接着看。
    退出码分层：0 绿、1 真断言失败、2 环境未就绪（未登录/构建缺失）——不再让 agent 把环境问题诊断成渲染问题。
@@ -46,7 +46,7 @@
 
 ```text
 # 真页面自起实例（rebuild 后）
-node checks/smoke/ui-scene-smoke.mjs
+node checks/lanes/ui-scene.entry.mjs
   → 9/9 页签、errorRingInstalled=true、clientErrors=[]、consoleProblems=[]
   → ALL PASS（自起实例 + 全部公司页签 + 浏览器错误环零命中）；场景回执落 diagnosis/
 

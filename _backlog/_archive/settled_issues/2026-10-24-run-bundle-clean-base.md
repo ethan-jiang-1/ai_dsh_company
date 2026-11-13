@@ -67,7 +67,7 @@ opened: 2026-10-24
 可机械验证；升级不擦用户长出来的能力；不丢现有数据。
 
 **当前情况：**
-- **骨架已经干净**：临时空 home 里一条 `plugin add` 自建 profile；首启只落 31 项出厂骨架（16 文件 + 15 目录），无 journal / 台账行 / 交付物 / 会话；二次 boot 零变更（[release-smoke](../../../checks/smoke/release-smoke.mjs) ⑥）。
+- **骨架已经干净**：临时空 home 里一条 `plugin add` 自建 profile；首启只落 31 项出厂骨架（16 文件 + 15 目录），无 journal / 台账行 / 交付物 / 会话；二次 boot 零变更（[release-smoke](../../../checks/lanes/release.entry.mjs) ⑥）。
 - **仓库不干净**：`git ls-tree` 显示 `company-workspace/` **146 件 / 1.2MB** 在索引（94 archive 成品 + 12 live 成品 + 28 journal + 台账/owners/索引/1 条培养记录）；磁盘 166MB；`.git` 596MB；`runtime/harness-home` 704MB（sessions 160MB / profiles 513MB）。
 - **安装单元没有身份**：首启不写 manifest、不登记 workspace、不区分“新安装”与“复用 home”；复用同一 home 会共享 sessions、`.credentials.yaml`、profile 方法层与 workspace 登记（4 条绝对路径）。
 - **分发件已漂**：`_dist` 的 0.2.0 tarball 是 2026-10-05 的（139 条目、**0 个 `workspace/`**、基线 0.2.0-rc.2）；当前 pack 会打出 256 条目、23 个 `workspace/`、pin 0.2.1-rc.2。`dist-manual` 门禁只比版本号，版本没 bump 就抓不到。

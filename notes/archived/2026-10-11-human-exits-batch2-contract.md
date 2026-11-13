@@ -35,13 +35,13 @@
 
 - 同一测试实现后通过：`1 passed`。
 - `pnpm test tests/presets`：`14 passed`。
-- `source run/env.sh && node checks/smoke/preset-smoke.mjs`：`preset-smoke: ALL PASS（5 个 preset 全部可挂载）`。
+- `source run/env.sh && node checks/lanes/preset.entry.mjs`：`preset-smoke: ALL PASS（5 个 preset 全部可挂载）`。
 - `git diff --check`：通过。
 - `pnpm verify`：`verify: ALL PASS`。
 
 ## 行为证据边界
 
-已运行既有认证档：`source run/env.sh && node checks/smoke/human-loop-e2e-smoke.mjs`，结果 `human-loop-e2e: ALL PASS（12/12）`；该轮的问询卡与收口截图存 `snapshots/probes/human-loop-e2e/2026-10-11/{question-card,after-answer}.png`，本 Note 就是它们的消费入口。
+已运行既有认证档：`source run/env.sh && node checks/lanes/human-loop-e2e.entry.mjs`，结果 `human-loop-e2e: ALL PASS（12/12）`；该轮的问询卡与收口截图存 `snapshots/probes/human-loop-e2e/2026-10-11/{question-card,after-answer}.png`，本 Note 就是它们的消费入口。
 
 该认证档提供了两类可复用证据：
 
@@ -60,7 +60,7 @@
 批 2 当前三类行为证据均已在场：
 
 - `probes/session-context/human-exits-probe.mjs`：阻塞拍板的 `ask_user_question` 与首段三件套。
-- `checks/smoke/human-loop-e2e-smoke.mjs`：非阻塞建议继续且无问询闸门；规矩缺口真实问询回流。
+- `checks/lanes/human-loop-e2e.entry.mjs`：非阻塞建议继续且无问询闸门；规矩缺口真实问询回流。
 - `probes/session-context/human-exits-expression-probe.mjs`：共同维度比较使用短 GFM 表格，关键数字使用文件行锚。
 
 ## 非阻塞支的持久日志证据
@@ -72,7 +72,7 @@
 
 - 场景 = [snapshots/replay/human-exits-ask](../../snapshots/replay/human-exits-ask/)：阻塞拍板（首段三件套 + `ask_user_question`）。
   夹具 27 行，含 ask 调用（4 选项）与首段三件套，`turn/end` 为完成态。
-- 无 key 复演：`source run/env.sh && node checks/smoke/replay-smoke.mjs --scenario human-exits-ask`
+- 无 key 复演：`source run/env.sh && node checks/lanes/replay.e2e.mjs --scenario human-exits-ask`
   → `ALL PASS（归一化零 diff + 2 sidecar 零 diff，20s）`。
 - 为什么以前录不成（三个实测卡点，都已解）：① ask 是前景等待，**没人作答整轮不收口、会话日志不封盘**；
   ② RPC `userQuestions/answer` 对未被 Client 认领的问询返回 `false`；③ UI 会话搜索按**名字**匹配，自动标题搜不到。

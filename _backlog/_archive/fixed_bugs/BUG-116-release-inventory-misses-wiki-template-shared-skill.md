@@ -52,7 +52,7 @@ contentManifest.tiers ... // wiki-template 不在 manifest
 ## 修复关联
 
 - 发现于 C7；与 [BUG-088](BUG-088-shipped-links-excludes-wiki-template.md) 同属「发布形状/安装副本」，但本卡是清单覆盖缺口。
-- 相关：`tools/export-dist.mjs` 的 `must`、`checks/smoke/release-smoke.mjs` 的 content 检查、`preset-smoke` 的 release profile 用法。
+- 相关：`tools/export-dist.mjs` 的 `must`、`checks/lanes/release.entry.mjs` 的 content 检查、`preset-smoke` 的 release profile 用法。
 
 ## 已修判定
 
