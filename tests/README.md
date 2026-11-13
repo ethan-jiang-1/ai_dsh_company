@@ -40,6 +40,8 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 检查与工具入口（`checks/**`、`probes/**`、`tools/**`） | 消费它的 keyless spec + `pnpm verify`（头注/结构门禁） | 真实入口冒烟按脚本头注「何时跑」 | — |
 | 文档 / 指针 | `pnpm verify`（md-links / bare-path / doc-budget） | [entry-probe-smoke](../checks/smoke/entry-probe-smoke.mjs)（入口链文档改动后） | — |
 
+**按面触发（2026-11-13 起）**：pre-push 按改动面自动补跑真入口检查（client → `client-load-smoke`、presets → `preset-smoke`、content → `replay-smoke`；fast 已覆盖的面不重复列）；规则与成员唯一家 = [`tools/lib/asset-lanes.mjs`](../tools/lib/asset-lanes.mjs)，本文件不复述。没命中会打印「未触发」；`pnpm smoke:all` = 本地全量 keyless，每周 CI 跑 `--ci`；新增冒烟不登记 = `pnpm verify` 红。
+
 换档原则与每层证明边界唯一家 = [testing.md §1](../docs/testing.md)；同 diff 义务列的政策（含「不替代组装转录」）= [testing.md §2](../docs/testing.md)；命令与预算速查 = 本文件「验证分层与预算」。
 
 ## 新 Agent 首跑验收（推荐，非强制）
@@ -53,10 +55,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 **教训（R3）**：把"真浏览器 + 真模型 + 真 UI"的委派卡 e2e 当回归门禁——240s 都没等到（CEO persona 的
 开工仪式先烧 5–6 步模型往返），且**依赖模型配合**：模型不调那个工具就永远绿不了。**这是层次放错，不是脚本写得不好。**
 
-**分层（按"要不要模型"切，不按"重不重要"切）**：**层定义与证明边界唯一见 [testing.md §1](../docs/testing.md)**；
-本表只给**命令与预算速查**。每个脚本自己的触发条件与成本在它头注里（`// 何时跑：…`，
-门禁 `script-triggers` 强制自述）——**别把逐个脚本的触发条件抄回本表**（2026-09-26 实测本表曾漏 6 个已存在脚本，而 AGENTS.md 又把
-"何时跑"指回本表，成环）：
+**分层（按"要不要模型"切，不按"重不重要"切）**：层定义与证明边界唯一见 [testing.md §1](../docs/testing.md)；本表只给命令与预算速查，每个脚本的触发条件与成本在它头注里（`script-triggers` 强制自述）——**别把逐个脚本的触发条件抄回本表**（2026-09-26 实测本表曾漏 6 个已存在脚本，而 AGENTS.md 又指回本表，成环）：
 
 | 层 | 时间 | 跑什么（代表脚本；**它自己的触发条件在头注**） |
 |---|---|---|

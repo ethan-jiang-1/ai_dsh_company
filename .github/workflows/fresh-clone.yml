@@ -59,6 +59,11 @@ jobs:
       - run: node tools/setup.mjs --check
       - run: pnpm verify
       - run: pnpm test
+      # 2026-11-13（研究 B 件）：环外资产的每周新鲜度回路。真入口证据不在 push 时必跑链里，
+      # 最多陈旧 7 天；成员 = tools/lib/asset-lanes.mjs（skip 清单每次都打印，资产不许静默消失）。
+      # 首几周若因干净环境差异红，按实际结果修环境或把对应资产标 ciSafe:false + 理由，不删资产。
+      - run: node checks/smoke/all-keyless.mjs --ci
+        timeout-minutes: 25
 
   install-channel:
     runs-on: ubuntu-latest

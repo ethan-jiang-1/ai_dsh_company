@@ -9,16 +9,15 @@
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { FAST, assetByName } from '../../tools/lib/asset-lanes.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const CASES = [
-  { name: 'workflow-contract-smoke', nodeArgs: ['--import', 'tsx/esm'] },
-  { name: 'present-catalog-smoke', nodeArgs: ['--import', 'tsx/esm'] },
-  { name: 'company-root-process-smoke', nodeArgs: [] },
-  { name: 'gates-negative-smoke', nodeArgs: [] },
-  { name: 'snapshot-motion-smoke', nodeArgs: [] },
-  { name: 'two-axis-gates-smoke', nodeArgs: [] },
-]
+// 成员唯一家 = tools/lib/asset-lanes.mjs（本文件只读；`asset-lanes.spec` 盯住两边一致）。
+const CASES = FAST.map(name => {
+  const asset = assetByName(name)
+  if (!asset) throw new Error(`smoke:fast 引用了未登记资产 ${name}`)
+  return { name, nodeArgs: asset.nodeArgs }
+})
 
 const failed = []
 const started = Date.now()
