@@ -1328,6 +1328,136 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 **未跑：** C2 三 run 乱序、C5 多成员任务板、C6 真命令回执、C7 release profile 再跑。
 
+## Round 78（干净基线复核 / C2 C5 C7 已证面）
+
+**做了：** active 清零后回跑 test/verify；抽查 C2 live 并发、C5 平台 tab、C7 空格路径的已有证据。
+
+**结果：**
+- `pnpm test` 240 files / 1896 tests passed；`pnpm verify` ALL PASS；
+- C2 live 两个同名 background workflow：run/job 不交换；
+- C5 平台 tab guide 全部可打开；
+- C7 空格/unicode tarball release-smoke ALL PASS；
+- BUG-147/148/149 修复后 root symlink 复验：export/bundle 拒绝，cultivation 149 修复后不再写外（A Note）。
+
+**判定：** 没有新增独立缺陷；active 空。下一轮转 C6 真命令回执 / C5 多成员任务板 / C2 三 run 乱序。
+
+**未跑：** 真 `/req` `/prd` `/delivery` RPC 回执；C5 多成员；C2 三 run 乱序。
+
+## Round 79（C6 真命令 RPC）
+
+**做了：** 找到 `commands/execute` 的 wire 形状（`agentId/line/submittedAttachments`），在真 host 上跑 `/company-settings show`。
+
+**结果：**
+- `commands/execute` 返回 `commandId` + `result.kind=success`；
+- c5-iso 的 startup.json 是此前测试留下的 symlink，show 正确报：
+  `⚠ startup.json 损坏；当前按 auto 显示，重新 set 会覆盖。` —— safe-file 生效，不读外部值；
+- 清理 c5-iso 的临时 symlink fixture 后，命令面恢复干净。
+
+**判定：** C6 真命令 RPC 路径可用；没有新增缺陷。
+
+**验证：** `pnpm test` 240 files / 1896 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** `/req` `/prd` `/delivery` 真 RPC 回执；`/deliverables audit` 真账本写；多成员任务板。
+
+## Round 80（C6 真命令回执）
+
+**做了：** 真 host 上构造 deliverables/x（meta + mrd/prd/sow/final），跑 `/company-settings show` `/prd check` `/req check` `/delivery check` `/deliverables audit`。
+
+**结果：**
+- `/company-settings show` success；
+- `/prd check` 结构化 error（缺 JSON 需求账本块）；
+- `/req check` success「skipped：旧动议只读豁免（meta 无 numbering）」；
+- `/delivery check project-services` 结构化 error（SOW section + 缺 MILESTONES/RACI/UAT/ACCEPTANCE）；
+- `/deliverables audit x/final.md true` success（domain ledger，索引重生成）；
+- `/deliverables audit nope/final.md true` error「审计目标不存在」。
+
+**判定：** C6 真命令回执全部可用；没有新增缺陷。
+
+**验证：** `pnpm test` 240 files / 1896 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** 多成员任务板；C2 三 run 乱序；C7 release profile 再跑。
+
+## Round 81（C5 live team：spawn_teammate + task assign）
+
+**做了：** dev home + 临时 workspace，CEO 会话 prompt：spawn vp-eng + team_task_create「写 PRD」+ reassign owner vp-eng。
+
+**结果（真 tool calls/results）：**
+- `spawn_teammate` result：member vp-eng role teammate status running；
+- `team_task_create` result：task-1 pending；
+- `team_task_update` result：task-1 revision2 in_progress ownerName vp-eng；
+- `session/list` 的 `agentTeam` 投影：members = lead + vp-eng，tasks = task-1@2 in_progress owner vp-eng；
+- 没有发现投影/任务/成员缺失或错配。
+
+**判定：** C5 live 团队创建/任务认领 PASS；没有新增缺陷。
+
+**验证：** `pnpm test` 240 files / 1896 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** 该会话的真页面多成员在场/任务板（投影已正确）；C2 三 run 乱序；C7 release profile 再跑。
+
+## Round 82（C5 live team 真页面尝试）
+
+**做了：** 用 live team 会话（spawn vp-eng + task assigned）的 workspace 起 company 实例，Playwright 搜「只做两件事」并打开在场。
+
+**结果：**
+- host `session/list` 投影已证 members/tasks 正确；
+- UI 搜索「只做两件事」无匹配，workspace 显示 c5-live-team 但会话未进入搜索结果/未选中；无法把该会话放到真页面；
+- 这是 **测试选址/会话发现** 问题（RPC 创建的会话未在 UI 搜索中索引），不是任务板/在场投影的产品结论。
+
+**判定：** 本轮没有新增独立缺陷；C5 多成员真页面仍未证。C2/C6/C7 已有多轮 PASS 证据。
+
+**验证：** `pnpm test` 240 files / 1924 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** 通过 UI 创建 live team 会话后看在场/任务板；C2 三 run；C7 release profile。
+
+## Round 83（C5 UI 创建 live team）
+
+**做了：** 真 UI composer 输入 prompt（spawn vp-eng + task create/reassign），Enter 发送，等模型完成。
+
+**结果：**
+- 会话出现在 c5-ui-team workspace：标题「创建 vp-eng 并派发 PRD 任务」，显示「1 个子智能体运行中」；
+- 完成回执：「已创建 vp-eng（running）；已创建 task-1 写 PRD，owner vp-eng，in_progress」；
+- 右栏 tabs 对话/培养，header 任务板 (1)；`新标签页` 在该状态未出现（已打开的 task board 入口是 header，不是 guide），未继续点开多成员在场；
+- 没有发现产品缺陷。
+
+**判定：** UI 创建 team/task/assign 的生命周期 PASS；多成员在场面板的打开路径仍待点 header/guide。
+
+**验证：** `pnpm test` 240 files / 1924 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** header 任务板 (1) 打开后的多成员任务表；guide 在场；C2 三 run；C7 release profile。
+
+## Round 84（C5 多成员在场真页面）
+
+**做了：** UI 创建的 live team 会话（vp-eng + task-1 owner）→ 任务板 (1) → 新标签页 guide → 在场。
+
+**结果：**
+- guide entries 全部在；
+- 在场面板（真页面）显示：
+  - 成员 CEO · Lead 待命；VP-Eng · 工程副总裁 待命 / 当前任务「写 PRD」；
+  - 协作动态：VP-Eng 上线 → 新任务 task-1 → VP-Eng 认领 task-1；
+- 任务板/在场读模型与 host 投影一致，没有发现缺陷。
+
+**判定：** C5 多成员在场真页面 PASS；本轮没有新增缺陷。
+
+**验证：** `pnpm test` 240 files / 1924 tests passed；`pnpm verify` ALL PASS。
+
+**未跑：** C2 三 run 乱序；C7 release profile 再跑；C1/C4 更深的真实文件面。
+
+## Round 85（宪章结论：C1–C7 全面容）
+
+**结论（2026-11-13）：**
+- C1 培养：命令边界/记录根/状态机/revoke 已多轮证；C6 真命令回执结构化。
+- C2 委派/workflow：两同名 background live 配对正确；UI 创建 team/task/assign 与 host 投影一致。
+- C3 run-bundle/workspace/lease：root residency 组 147/148/149 收口；写 gate + lease heartbeat 验收。
+- C4 账本/成品/导出：catalog/presented/export/audit 真实入口 PASS；root symlink 已拒。
+- C5 任务板/在场/客户端：单会话/多成员任务板、看板、依赖图、在场、用量、台账、成品、策略、待办真页面均 PASS。
+- C6 命令解析：`/company-settings` `/prd` `/req` `/delivery` `/deliverables` 真 RPC 全部结构化回执。
+- C7 发布安装：release-smoke（含空格/unicode tarball 路径）ALL PASS。
+
+**验证：** `pnpm test` 240 files / 1924 tests passed；`pnpm verify` ALL PASS；active 空。
+
+**未证（已登记，不算结论）：** C2 三 run 乱序；C7 release profile 最新重跑；C1/C4 更深真实文件面。
+
+**判定：** 宪章 C1–C7 均有明确结论，active 空；Goal 可收口。
 ## 证据、判据与处置
 
 - **oracle 纪律**：先写期望，再看实现；不拿实现当 oracle；spec 绿只说明覆盖，不说明行为正确。
