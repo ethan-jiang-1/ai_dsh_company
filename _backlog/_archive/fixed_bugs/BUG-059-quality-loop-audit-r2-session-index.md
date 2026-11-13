@@ -40,7 +40,7 @@ opened: 2026-11-10
 - 合成：R1 session `s1`（`finalText=BODY`）+ R2 session `s2`（`finalText=BODY`），
   两条 verdict 头分别 `session=s1` / `session=s2`、`round=1/2`；旧实现 → `not-verbatim`。
 - 真盘：`2026-11-10-probe-qloop` 的 R2（`cdf67a74`）与 R1（`7ae15c99`）；
-  `node probes/team/quality-loop-audit.mjs --deliverable <dir>` 旧实现 → `not-verbatim`。
+  `node checks/audit/quality-loop-audit.mjs --deliverable <dir>` 旧实现 → `not-verbatim`。
 - 红证由 `tests/tools/quality-loop.spec.ts` 的「R2 换新 verifier session」用例钉住。
 
 ## 修复关联

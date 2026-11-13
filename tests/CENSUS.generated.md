@@ -7,30 +7,30 @@
 
 | 指标 | 数量 |
 |---|---|
-| 冒烟 | 32 |
-| 探针 | 69 |
-| 结构门禁 | 71 |
+| 冒烟 | 31 |
+| 探针 | 67 |
+| 结构门禁 | 72 |
 | keyless spec 文件 | 246 |
 | fast lane | 6 |
 | surface lane | 7 |
 | weekly lane | 22 |
-| 未分类失败类 | 69 |
+| 未分类失败类 | 67 |
 
 ## 失败类分布
 
 | 失败类 | 资产数 |
 |---|---|
-| 未分类 | 69 |
+| 未分类 | 67 |
 | 配置组合 | 10 |
 | 模型可见文本 | 5 |
 | client UI | 4 |
 | 会话持久化 | 3 |
 | 子进程并发 | 3 |
 | 工具定义 | 2 |
-| 纯逻辑 | 2 |
 | 导出形态 | 1 |
 | 文档指针 | 1 |
 | 注册生命周期 | 1 |
+| 纯逻辑 | 1 |
 
 ## 冒烟
 
@@ -60,7 +60,6 @@
 | ui-scene-smoke | browser | weekly | client UI |
 | channel-matrix-smoke | browser | 手动（要真实全局 dsh + 网络 + 已导出 _dist；发布前手动跑 --channel all） | 配置组合 |
 | release-smoke | classic | 手动（分钟级构建 + pack；由 release --verify 调度，不进每周 sweep） | 导出形态 |
-| refactor-drift-oracle | tool | 手动（需重构前后成对调用并传清单参数，不是自跑检查） | 纯逻辑 |
 | probe-smoke | model | 手动（真模型档（连通 ~6s / 内容 --full 5–10min），按内容改动触发） | 模型可见文本 |
 | delegation-smoke | model | 手动（真模型 1 条 prompt（升 pin 或委托边界改动时）） | 工具定义 |
 | presence-e2e-smoke | model | 手动（真模型 ~$1，按在场/协作面验收触发） | 模型可见文本 |
@@ -79,9 +78,9 @@
 | budget-panel-probe | browser-visual | 未分类 |
 | cdp-probe | browser-visual | 未分类 |
 | compact-view-probe | browser-visual | 未分类 |
-| cultivation-main-e2e | browser-visual | 未分类 |
-| cultivation-ux-scenarios | browser-visual | 未分类 |
-| cultivation-ux-walkthrough | browser-visual | 未分类 |
+| cultivation-main-e2e-probe | browser-visual | 未分类 |
+| cultivation-ux-scenarios-probe | browser-visual | 未分类 |
+| cultivation-ux-walkthrough-probe | browser-visual | 未分类 |
 | dag-midflight-probe | browser-visual | 未分类 |
 | dag-visual-probe | browser-visual | 未分类 |
 | deliverables-catalog-probe | browser-visual | 未分类 |
@@ -129,9 +128,7 @@
 | member-rescue-probe | team | 未分类 |
 | member-stale-write-probe | team | 未分类 |
 | multi-user-e2e-probe | team | 未分类 |
-| quality-loop-audit | team | 未分类 |
 | quality-loop-r2-probe | team | 未分类 |
-| index | team | 未分类 |
 | subagent-retry-probe | team | 未分类 |
 | team-atomicity-probe | team | 未分类 |
 | team-claim-loser-probe | team | 未分类 |

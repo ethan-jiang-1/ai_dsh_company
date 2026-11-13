@@ -16,7 +16,7 @@
 
 ## 场景与结果（真浏览器 + 逐张读图）
 
-探针 = [cultivation-ux-scenarios.mjs](../../probes/browser-visual/cultivation-ux-scenarios.mjs)（`--shots`），7 个场景 **ALL PASS**：
+探针 = [cultivation-ux-scenarios.mjs](../../probes/browser-visual/cultivation-ux-scenarios-probe.mjs)（`--shots`），7 个场景 **ALL PASS**：
 
 | 场景 | 结果 |
 |---|---|
@@ -308,5 +308,5 @@ cultivation_propose 调用：2 次
 
 ## 指针
 
-- 探针：[cultivation-ux-scenarios.mjs](../../probes/browser-visual/cultivation-ux-scenarios.mjs)（`--shots`）｜顺路档：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough.mjs)
+- 探针：[cultivation-ux-scenarios.mjs](../../probes/browser-visual/cultivation-ux-scenarios-probe.mjs)（`--shots`）｜顺路档：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough-probe.mjs)
 - 新卡：[BUG-023](../../_backlog/_archive/fixed_bugs/BUG-023-cultivation-float-actions-dead.md)｜前一轮：[firsttimer-audit](./2026-10-18-cultivation-firsttimer-audit.md)

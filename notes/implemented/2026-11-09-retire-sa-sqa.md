@@ -41,7 +41,7 @@
 - `preset-smoke`：**6 角色 + 3 support ALL PASS**。
 - `pnpm test`：**1297 / 163 files**；`pnpm typecheck` 绿；`pnpm lint` 0/0；`pnpm dup` 0 clones；`pnpm verify` **ALL PASS**。
 - 无 SA/SQA preset 目录/patch/support/model 残留；`rg` 活跃面只剩历史/退役说明与可选 SyRS/IRS/V&V 文档。
-- UI 代码未改；`ui-scene --isolated --golden` 重跑 **ALL PASS（9 页签）**；preset picker 少两项，页面不枚举 support。
+- UI 代码未改；`ui-scene --isolated --expected` 重跑 **ALL PASS（9 页签）**；preset picker 少两项，页面不枚举 support。
 
 ## 未验 / 边界
 

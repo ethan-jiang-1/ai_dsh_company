@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：每周 CI（`node checks/smoke/all-keyless.mjs --ci`）与本地全量 sweep（`pnpm smoke:all`）；不进 pre-push。
+// 何时跑：每周 CI（`node checks/smoke/keyless-lane.mjs --ci`）与本地全量 sweep（`pnpm smoke:all`）；不进 pre-push。
 //
 // 为什么：2026-11-13 实测——33 个冒烟只有 6 条在 `smoke:fast` 里，其余只靠头注「何时跑」的散文契约，
 // 坏了没人知道（围栏那轮修的两条红资产就是收据）。本 runner 把「健康检查」从散文变成每周一次的实跑：

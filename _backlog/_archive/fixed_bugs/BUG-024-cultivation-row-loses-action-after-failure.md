@@ -6,7 +6,7 @@ opened: 2026-10-18
 
 # BUG-024：命令面失败后，那一行的「采纳」按钮消失（疑似 pending 卡死或行降级）
 
-> 立卡：2026-10-18 ｜ 状态：已修（2026-10-19 毕业：产品修法经诊断实证 + **S12 连跑两轮硬判全绿**）｜ 发现：探索轴②（`probes/browser-visual/cultivation-ux-scenarios.mjs` S12 故障注入）
+> 立卡：2026-10-18 ｜ 状态：已修（2026-10-19 毕业：产品修法经诊断实证 + **S12 连跑两轮硬判全绿**）｜ 发现：探索轴②（`probes/browser-visual/cultivation-ux-scenarios-probe.mjs` S12 故障注入）
 > 严重级别：P2（不损坏数据；但"失败之后连重试的入口都没了"= 人只能刷新页面，且看不出为什么）
 
 ## 症状
@@ -29,7 +29,7 @@ opened: 2026-10-18
 ## 复现
 
 ```sh
-source run/env.sh && node probes/browser-visual/cultivation-ux-scenarios.mjs --shots
+source run/env.sh && node probes/browser-visual/cultivation-ux-scenarios-probe.mjs --shots
 # S12；截图 runtime/human-exits-evidence/ux-scenarios/S12-command-face-down.png
 ```
 

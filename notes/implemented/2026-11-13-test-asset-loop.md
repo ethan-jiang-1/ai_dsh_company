@@ -19,7 +19,7 @@
    算本次 outgoing 范围。remote sha 全零（新分支）退化为该提交的 `diff-tree`；只有手动直跑（无 stdin）
    才退化 `HEAD~1` 并**打印退化**。`--dry-run` 只选不跑。
 4. **每周 lane = classic keyless，skip 清单每次打印。**
-   `checks/smoke/all-keyless.mjs --ci` 跑 18 条 classic（browser/model 逐条打印 SKIP 与原因）；
+   `checks/smoke/keyless-lane.mjs --ci` 跑 18 条 classic（browser/model 逐条打印 SKIP 与原因）；
    CI 挂在 `fresh-clone.yml` 的 macOS 全量 setup 之后（每周一 + 手动）。首几周允许红——那是环境诊断信号，
    处置是修环境或把资产标 `ciSafe:false` + 理由，不删资产。skip 清单每次打印：资产可以手动，但不许静默消失。
 5. **空间完备做成 spec，而不是靠自觉。**
@@ -80,8 +80,8 @@
 | 按面选面（命中） | `node checks/pre-push-surfaces.mjs --stdin /tmp/refs-client --dry-run`（真实历史 commit `d31d8366` 的 parent..commit） | `因为改了 packages/company-pack/src/client/data/use-company-data.ts（命中 packages/company-pack/src/client/**；client 装配/入口改动 → 真页面零挂载失败）→ client-load-smoke` |
 | 按面选面（不命中） | 同上换 docs-only 范围 | `本次未触发面级检查（规则表 = tools/lib/asset-lanes.mjs SURFACE_RULES）` |
 | fast 迁移后不变 | `pnpm -s smoke:fast` | `ALL PASS（6 条，2.95s）` |
-| 全量成员 | `node checks/smoke/all-keyless.mjs --list` | 18 条 |
-| 全量 runner | `node checks/smoke/all-keyless.mjs --ci --filter gates-negative-smoke` | `1 PASS / 0 FAIL / 31 SKIP`（SKIP 逐条打印，含真模型/浏览器/手动理由） |
+| 全量成员 | `node checks/smoke/keyless-lane.mjs --list` | 18 条 |
+| 全量 runner | `node checks/smoke/keyless-lane.mjs --ci --filter gates-negative-smoke` | `1 PASS / 0 FAIL / 31 SKIP`（SKIP 逐条打印，含真模型/浏览器/手动理由） |
 | 纯逻辑 | `pnpm vitest run tests/tools/lane-match.spec.ts` | 6 passed |
 | 全链 | `pnpm test` / `pnpm typecheck` / `pnpm -s lint` / `pnpm -s dup` / `pnpm verify` | 244 files / 2008 tests；typecheck 0；lint 0；dup 0 clones；verify ALL PASS |
 
@@ -101,12 +101,12 @@
 
 - 事实：**资产 lane 的唯一家 = lane 注册表**；pre-push 按面补跑；每周全量 keyless。
 - 唯一入口：`tools/lib/asset-lanes.mjs`（lane 成员 + 规则 + 纯匹配）、`checks/pre-push-surfaces.mjs`（取范围 + 跑）、
-  `checks/smoke/all-keyless.mjs`（全量）、`tests/repo/asset-lanes.spec.ts`（空间完备门）；
+  `checks/smoke/keyless-lane.mjs`（全量）、`tests/repo/asset-lanes.spec.ts`（空间完备门）；
   执行下限的唯一入口 = `checks/audit/coverage-ratchet.mjs` + `tools/lib/coverage-baseline.mjs` + `tests/support/coverage-baseline.json`；
   失败类决策表 = `tests/failure-classes.md`；账本三列 = `close-out-definition` / `agent-note-definition` skill；盘子 = `tools/test-census.mjs` → `tests/CENSUS.generated.md`（生成物），一致性 = `tests/repo/test-census.spec.ts`。
 - 读载体：`tests/README.md`「按面触发」一段、`checks/README.md` quick-select、`.githooks/pre-push` 头注、
   `checks/INDEX.generated.md`（生成物）。
-- 一致性判据：`fast.mjs` 从注册表派生；spec 双向校验；weekly 成员 = `laneOf('weekly')` 的 classic 子集。
+- 一致性判据：`fast-lane.mjs` 从注册表派生；spec 双向校验；weekly 成员 = `laneOf('weekly')` 的 classic 子集。
 
 ## 未覆盖轴
 

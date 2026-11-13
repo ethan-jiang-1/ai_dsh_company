@@ -3,9 +3,9 @@
 // 培养面板 UX **场景轮**（2026-10-18 第二轮第一人称走查）：不走 T1–T6 顺路，专挑"第一次用会撞上的边角"——
 // 空收件箱 / 无人值守视角 / 失败与校验 / 规模与长文本 / 窄窗与浮窗 / 跨角色流向 / 键盘可达性。
 //
-// 何时跑：改培养面板交互与文案后；或每轮 UX 收口时（与 cultivation-ux-walkthrough.mjs 配对：那条跑顺路，本档跑边角）。
+// 何时跑：改培养面板交互与文案后；或每轮 UX 收口时（与 cultivation-ux-walkthrough-probe.mjs 配对：那条跑顺路，本档跑边角）。
 // 成本：keyless（boot ~20–60s + chromium）。前置：source run/env.sh + pack 与前端已构建。
-// 用法：source run/env.sh && node probes/browser-visual/cultivation-ux-scenarios.mjs [--shots]
+// 用法：source run/env.sh && node probes/browser-visual/cultivation-ux-scenarios-probe.mjs [--shots]
 //
 // ⚠ 边界：本档证明"边角场景下机制与文案仍然可执行"，**不证明**"新人不会困惑"（那是真人档）。
 // 三条仪器纪律（都是被假红/假绿教出来的）：① **先等再判**（有过渡态的面，断言要等收口；S12 教训）；

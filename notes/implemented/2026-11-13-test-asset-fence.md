@@ -9,7 +9,7 @@
 1. **负例 mutation 必须证明改了字节**：新增 `checks/smoke/lib/mutation.mjs` 的 `mutateFile`；`two-axis-gates-smoke` 的品类表 / meta 两处 mutation 改为现行 canonical 文本（`Hardware-software product` 行、`deliveryMode:` 字段），替换不命中直接报「mutation 没命中」；`gates-negative-smoke` 的三处文本 mutation 同用。根因是 2026-11-12 canonical 英文化后旧字符串不再命中，smoke 把「夹具过期」误报成「gate 没红」。
 2. **replay 用 `--refresh` 复绿，不重录**：`node checks/smoke/replay-smoke.mjs --refresh`（headless authored、无 key；workspace oracle 失败会拒绝）刷新会话/sidecar；`snapshot.yml` 的资格理由日期更新为 2026-11-13。`raw/lead.jsonl` 与 `replay/session.v3.jsonl` 随刷新更新。
 3. **`candidate-scan-eval` 标已耗**：语料已移出本仓，脚本 exit 2；头注状态从「常驻」改「已耗（2026-11-13 语料已移出本仓；恢复语料时重跑）」，`tests/README.md` / `docs/testing.md` 同步。
-4. **`smoke:fast` 6 条进 pre-push**：新增 `checks/smoke/fast.mjs` + `package.json` 的 `smoke:fast`，串行跑 workflow-contract / present-catalog / company-root-process / gates-negative / snapshot-motion / two-axis；`replay`（3.9s、易漂）先留在自己的触发线上。`.githooks/pre-push` 在 `test` 前加 `pnpm -s smoke:fast || exit 1`。
+4. **`smoke:fast` 6 条进 pre-push**：新增 `checks/smoke/fast-lane.mjs` + `package.json` 的 `smoke:fast`，串行跑 workflow-contract / present-catalog / company-root-process / gates-negative / snapshot-motion / two-axis；`replay`（3.9s、易漂）先留在自己的触发线上。`.githooks/pre-push` 在 `test` 前加 `pnpm -s smoke:fast || exit 1`。
 5. **预算注释实测化**：`.githooks/pre-push` 与 `.github/workflows/ci.yml` 的旧读数（test 1.3s / verify 2s）改成 2026-11-13 实测（冷分项和 ~44s；热缓存 hook 29–35s（两次实测））；`tests/README.md` 的命令预算表补 `smoke:fast`。
 
 ## 输掉的方案
@@ -23,7 +23,7 @@
 ## 状态事实与载体
 
 - 事实：测试资产的**新鲜度回路**——mutation 必须真改字节、replay fixture 有刷新/归档路径、惰性资产有状态、便宜资产有 lane。
-- 唯一入口：`checks/smoke/fast.mjs`（lane 清单）+ `checks/smoke/lib/mutation.mjs`（mutation 守卫）+ 问题卡。
+- 唯一入口：`checks/smoke/fast-lane.mjs`（lane 清单）+ `checks/smoke/lib/mutation.mjs`（mutation 守卫）+ 问题卡。
 - 读载体 / 写载体：`checks/smoke/*`、`checks/smoke/lib/`、`snapshots/replay/`、`checks/audit/`、`package.json`、`.githooks/pre-push`、`tests/README.md`、`checks/README.md`。
 - 一致性判据：lane 清单与 pre-push 命令同源（都走 `pnpm smoke:fast`）；两个负例 smoke 共用 `mutateFile`；`snapshot.yml` 的资格日期 = 最近一次实跑刷新日。
 - 环境坏法：内容（canonical/i18n 改名让 mutation 空转）、生命周期（fixture 资格过期）、来源（CI 干净环境不构建 vendor，cheap smoke 跑不动 → lane 留 pre-push）。

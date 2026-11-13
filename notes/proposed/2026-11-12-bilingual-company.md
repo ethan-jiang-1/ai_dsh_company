@@ -141,7 +141,7 @@ opened: 2026-11-12
 - [ ] 根 `AGENTS.md` 纪律行指向合同 + gate + skill；`packages/company-pack/src/README.md` / `tests/README.md` 指针更新到现行合同。
 - [ ] 11 个 preset 的 description 不是纯中文（双语一行或英文短句）；picker 不出现纯中文描述；role name 不变。
 - [ ] 根 README / pack README 语言说明（默认中文、Settings 切换、英文输出跟随）；`tools/lib/install-manual.mjs` 语言段 + `_dist/安装手册.md` 重生成；`dist-manual` 绿。
-- [ ] `pnpm verify` ALL PASS；`pnpm test` 全绿；`pnpm typecheck` 0；`pnpm lint` + `pnpm dup`（涉 src）绿；`client-load-smoke` ALL PASS；`ui-scene-smoke --isolated --golden` zh 与 en 都绿；`preset-smoke` ALL PASS。
+- [ ] `pnpm verify` ALL PASS；`pnpm test` 全绿；`pnpm typecheck` 0；`pnpm lint` + `pnpm dup`（涉 src）绿；`client-load-smoke` ALL PASS；`ui-scene-smoke --isolated --expected` zh 与 en 都绿；`preset-smoke` ALL PASS。
 - [ ] 已有 `.dsh-company` 数据兼容**不再作为约束**：内部全英文 RFC 以新格式为准，旧盘一次性迁移/重建；表达层不要求旧盘可读。
 
 ### 验收怎么测（可复现命令与红形态）
@@ -153,7 +153,7 @@ opened: 2026-11-12
 - Policy：`tests/host/prompt` 的 section spec；删 `registerLanguagePolicy` 调用 → spec 红；还原 → 绿。
 - 命令：`tests/host/commands` 的 description 重注册 spec；去掉 dispose+重注册 → en description 仍中文 → 红；还原 → 绿。
 - Gate：`checks/gates/` 的 `client-copy.mjs`；在 `packages/company-pack/src/client/` 的一个组件写回中文字面量 → `pnpm verify` 红并点名文件:行；还原 → 绿。
-- 真页面：`source run/env.sh && node checks/smoke/ui-scene-smoke.mjs --isolated --golden`（zh）；en 用同一隔离 profile 写 `locale.preference: en` 或探针参数；两边都断言无中文残留/金样一致。首屏闪英文单独用英文 locale 浏览器验收。
+- 真页面：`source run/env.sh && node checks/smoke/ui-scene-smoke.mjs --isolated --expected`（zh）；en 用同一隔离 profile 写 `locale.preference: en` 或探针参数；两边都断言无中文残留/金样一致。首屏闪英文单独用英文 locale 浏览器验收。
 
 ## 实施顺序（TDD 红绿环）
 
@@ -172,14 +172,14 @@ opened: 2026-11-12
 - A1：`cordis.patch.yml` 的 `locale.config.preference: zh`；client `inject` 加 `locale`；`packages/company-pack/src/client/locales.ts`（`company` typed 字典）与 `ctx.locale.register`；`conversation.view` label 走 `t`；新增 key/placeholder 与 harness/repo 缺省 patch 结构 spec；`default-locale-runtime.spec.ts` 证 Host preference zh 覆盖英文浏览器 provisional；whole-client composition 证 locale 服务 + 字典切换（UI 组件由 tab/brand spec 覆盖）。
 - A3a：`packages/company-pack/src/host/language/company-language.ts`（`settings.describe()` 读 `locale.preference`、默认 zh、live update、外部语言→en）；`packages/company-pack/src/host/prompt/language-policy.ts`（11 个公司 preset 的动态 `company:language` section，默认 zh，用户明确换语言时跟随）；`src/index.ts` 接线；新增 bridge/policy spec + `apply-lifecycle` 的 wiring spec。真红：临时注释 `registerLanguagePolicy(ctx, language)` → wiring spec 红；还原 → 绿。
 - 证据：`pnpm test` **203 files / 1616 tests passed**；`pnpm typecheck` 0；`pnpm lint` 0；`pnpm dup` 0；`pnpm verify` **ALL PASS**；`--dump-config --patch packages/company-pack/cordis.patch.yml` 的 `locale` 行显示 `config.preference: zh`。
-- 真页面：`ui-scene-smoke --isolated --golden` **ALL PASS**（9 个公司页签 + 浏览器错误环零命中；默认 zh 与现有金样一致）。为让隔离场景在中文界面下可跑，`probes/browser-visual/cdp-probe.mjs` 的模态/Start-chip 匹配补了中文 `预览版说明` / `开始使用` / `开始`（probe-only，非产品行为）。
+- 真页面：`ui-scene-smoke --isolated --expected` **ALL PASS**（9 个公司页签 + 浏览器错误环零命中；默认 zh 与现有金样一致）。为让隔离场景在中文界面下可跑，`probes/browser-visual/cdp-probe.mjs` 的模态/Start-chip 匹配补了中文 `预览版说明` / `开始使用` / `开始`（probe-only，非产品行为）。
 - A2 第一片（页签壳）：9 个页签的 label/tooltip/guide description 住 `company` 字典；`TabTitle` / `GuideEntry` 的 title/guide 槽带 `locale: company`；`company-tab-catalog` 解析器改从 `locales.ts` 的 zh 取 label；新增 `tests/client/i18n/tab-copy.spec.ts` 对 9 个 face 断言 zh/en copy + 真实 `Title`/`GuideEntry` 组件静态渲染，`company-tab-registration.spec.ts` 断言槽 `locale === 'company'` 且注册处 title/guide thunks 随 locale 实时切换。`packages/company-pack/locale/README.md` 写清包元数据与运行时 UI 字典的分工。
 - 真红证据：注册处曾把 `copy` 捕获在注册时；新增切换测试在旧实现下红 = `expected '待办' to be 'Inbox'`；改成 thunk 内 `copyOf(face)` 后绿。
 - A2 角色第一片：`src/lib/role-copy.ts` 单源（canonical 英文 + zh/en 可见名/全称/短标签/委派），`src/client/roles.ts` 取用缝；`RoleBadge`、`DelegationCard`、`PresenceTab`、`TasksTab`、`BoardPanel`、`DagPanel`、`CultivationTab`/`CultivationView` 的 viewer 名、培养子块（Inbox/Compose/Mine/Adopted）的角色名已走表达层；`roles.*` 30 个 key 进 `company` 字典。测试 = `role-copy.spec`（6 角色 zh/en/未知/委派映射）+ RoleBadge/DelegationCard/Tasks/Board 静态渲染 + 培养壳；未做 = picker 的 name 之外的内部英文（I1）、preset 内容/领域值/注释日志。角色名主表面/培养子块/background picker/host `/cultivation` 回执均已走表达层；默认 zh 下混排，en 下英文。
 - A1 补充：品牌 fallback 接 `brand.name` 字典（`FALLBACK_IDENTITY.productName = ''`，语言决定出厂词标）；`brand.spec.ts` 断言 zh/en；smoke 的品牌检查接受两种词标。新增 `default-locale-runtime.spec.ts`：英文浏览器 provisional=en + Host preference=zh → zh；无 preference → 保持 en。
 - I1 第一片（pilot）：`customer-voice` skill 英文单份 + `tests/presets/internal-english.spec.ts` 棘轮（pilot 不在 PENDING；其余 23 个在）；`preset-smoke` ALL PASS。
 - I1 第二片（picker 描述）：六个公司角色的 preset `description` 改成中英混排一行（`中文职能 / English function`），`name` 保持英文缩写；support preset 英文。`pnpm test tests/presets` 130 passed；`preset-smoke` ALL PASS（6 角色 + 5 support 可挂载）。
-- 最终证据：`pnpm test` **207 files / 1630 tests passed**；`pnpm typecheck` 0；`pnpm lint` 0；`pnpm dup` 0；`ui-scene-smoke --isolated --golden` ALL PASS（金样因在场行角色名刻意更新）。`pnpm verify` 的代码/结构门禁通过；工作树另有两个**非本切片**的并行研究目录（`startup-settings` / `wiki-knowledge-map`）正在写材料，当前有 md-newline / md-links / bare-path 红——未触碰，不影响本切片文件集的结论。
+- 最终证据：`pnpm test` **207 files / 1630 tests passed**；`pnpm typecheck` 0；`pnpm lint` 0；`pnpm dup` 0；`ui-scene-smoke --isolated --expected` ALL PASS（金样因在场行角色名刻意更新）。`pnpm verify` 的代码/结构门禁通过；工作树另有两个**非本切片**的并行研究目录（`startup-settings` / `wiki-knowledge-map`）正在写材料，当前有 md-newline / md-links / bare-path 红——未触碰，不影响本切片文件集的结论。
 - 未做：A2（client/lib 全量文案迁移与 token 化）、A3b（host 回执/工具 note/命令 description）、A4（`docs/contracts/` 合同 + `checks/gates/` 的 client-copy 硬门禁 + preset 描述 + 文档/金样全量收口）。UI 在 English 下仍有中文，这是已知未完成项，不在本切片宣称已交付。
 - **未验证（本切片不宣称）**：英文 locale 浏览器首启稳定后中文、`<html lang="zh-CN">`、已有 `preference: en` 升级、reset、第二浏览器——**未执行**；English 真页面——**未跑**（页签壳只有 keyless 组件/注册 spec，zh 金样已跑）；真模型 prompt 里的 `company:language`——**未跑**（keyless + apply 接线）；角色名表达层——**主表面 + 培养子块 + context picker + host `/cultivation` 回执已实现；picker 内部英文未做**；`client-load-smoke` / `preset-smoke` / `release-smoke`——**未执行**。
 - 真合成证据：`node vendor/dsh/apps/cli/lib/bin.js --profile company --patch packages/company-pack/cordis.patch.yml --dump-config` 输出 `- id: locale` / `config: preference: zh`；`tests/repo/default-locale.spec.ts` 只是结构守卫，不替代这条命令。

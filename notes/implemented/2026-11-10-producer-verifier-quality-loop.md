@@ -36,7 +36,7 @@ VP-Eng 一个人既做设计又做验证时，E（工程）与 V（验证）在�
    `session / preset=quality-loop-verifier / depth / producer=<产出者 sessionId> / method / body-sha256`。
    哈希口径 = 正文去掉结尾空白（文件尾随换行不算"改了"）。「未被改」由此可机械核对；`producer` 字段则让**次序**可核。
 6. **审计是事后检测，不是运行时 veto**：判据住 `tools/lib/quality-loop.mjs`（纯函数），驱动 =
-   `probes/team/quality-loop-audit.mjs`（读盘 + 读 child durable header）。核八件：**先产后验的次序**、
+   `checks/audit/quality-loop-audit.mjs`（读盘 + 读 child durable header）。核八件：**先产后验的次序**、
    两个独立 activation、原文一致、未被改、处置覆盖、方法配对、check-id 全覆盖、验证者没调 `write`/`edit`/`bash`。
 7. **非角色边界按"是不是公司角色"派生**：pack 运行时表由 `WORKER_FAMILY_PRESETS` 改名并扩为
    `NON_ROLE_PRESETS`（worker family + 两个能力档）——不注入公司手册、不装 subagent 控制面。
@@ -112,7 +112,7 @@ VP-Eng 一个人既做设计又做验证时，E（工程）与 V（验证）在�
 | `pnpm typecheck` | 全绿（pack 两面 + 四条 tests 面） | `NON_ROLE_PRESETS` 改名漏一处 import → TS 红 |
 | `pnpm verify` | ALL PASS（含 doc-budget / md-links / bare-path / script-index） | 新 guides 文档无预算、content 里写部署日期、INDEX 未重生成——三处各红过一次，逐项修回 |
 | `node checks/smoke/preset-smoke.mjs` | ALL PASS（6 角色 + 5 非角色 preset 全部真挂载） | 未加 `bundle.patch` 登记时曾 `Unknown agent preset`（门禁 presets 也拦） |
-| `node probes/team/quality-loop-audit.mjs --self-test` | ALL PASS（7 支：基线绿 → 改正文/删处置/换版本/**并行发工**/验证者写盘 各红 → 还原绿） | 自带破坏逐支断言 code |
+| `node checks/audit/quality-loop-audit.mjs --self-test` | ALL PASS（7 支：基线绿 → 改正文/删处置/换版本/**并行发工**/验证者写盘 各红 → 还原绿） | 自带破坏逐支断言 code |
 | 真盘红证（临时交付目录 + 夹具方法层） | 改裁决正文 → `body-modified` exit 1；删一条处置 → `disposition-missing` exit 1；把验证侧方法版本改成 1.0.1 → `version-mismatch` + `header-method` exit 1；逐项还原 → exit 0 | 三种破坏各自只出对应 code |
 | **真模型 E2E**（最终一轮） | VP-Eng 会话 `session-1b5a948b…`，**严格串行**：`quality_loop_produce` → child `77dfbd4c…`（preset=quality-loop-producer / depth=1）收工后，才 `quality_loop_verify` → child `b9844a02…`（preset=quality-loop-verifier / depth=1；工具面只调过 `skill` + `read`×2 + `grep`×2，**零 write/edit/bash**）。裁决 R1 = fail（RT-01…RT-04 全覆盖，4 条发现：2 已修 + 2 有证据的反驳），裁决头 `session/preset/depth/producer/method/body-sha256` 齐全且与正文、与该 child 正文三方一致。`quality-loop-audit --deliverable …` = **ALL PASS、零 warning**（含 `order-violation` 未触发 = 先产后验成立）。证据副本留在 dev workspace 的 `deliverables/2026-11-10-qloop-e2e-r3/`（gitignored），随时可重跑审计 | 头两轮 E2E 是**改判据的证据来源**（三轮才绿）：第一轮抓出「原文只认最后一条消息」「处置首格带标题不认编号」两条判据过严 → 改判据 + 加 spec；第二轮抓到发工 prompt 漏了 `preset`/`producer` 字段（我自己写错）→ 证明头的字段缺一个就红；第三轮抓出「处置词带 `**加粗**` 判红」「处置表夹 `无` 行冒假 id」→ 归一化排版 + 只认 `F<n>` 行 |
 

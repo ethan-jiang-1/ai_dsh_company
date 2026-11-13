@@ -11,11 +11,11 @@
 // 用法：
 //   # 拆前（在 HEAD 干净状态）
 //   pnpm exec vitest run --reporter=json --outputFile=runtime/before.json
-//   node checks/smoke/refactor-drift-oracle.mjs --hashes runtime/before.json > runtime/before.hashes
+//   node checks/smoke/refactor-drift.mjs --hashes runtime/before.json > runtime/before.hashes
 //   # 拆后
 //   pnpm exec vitest run --reporter=json --outputFile=runtime/after.json
-//   node checks/smoke/refactor-drift-oracle.mjs --hashes runtime/after.json > runtime/after.hashes
-//   node checks/smoke/refactor-drift-oracle.mjs --compare runtime/before.hashes runtime/after.hashes
+//   node checks/smoke/refactor-drift.mjs --hashes runtime/after.json > runtime/after.hashes
+//   node checks/smoke/refactor-drift.mjs --compare runtime/before.hashes runtime/after.hashes
 //
 // 两档清单（**用 --hashes 那档判等价**）：
 //   --names  ：`<文件> :: <全名>`——人读、写进 Note；
@@ -38,7 +38,7 @@ const flag = (name, fallback) => {
   const i = argv.indexOf(`--${name}`)
   return i === -1 ? fallback : argv[i + 1]
 }
-const USAGE = 'refactor-drift-oracle: --names <vitest.json> | --compare <before.names> <after.names> [--describe-map a=b,c=d]'
+const USAGE = 'refactor-drift: --names <vitest.json> | --compare <before.names> <after.names> [--describe-map a=b,c=d]'
 
 /** vitest JSON → 全名清单（一行一测试；换行归一，跳过 skipped）。 */
 function namesFrom(jsonPath) {
@@ -112,7 +112,7 @@ if (argv.includes('--compare')) {
   }).sort()
   let a, b
   try { [a, b] = [read(before), read(after)] } catch (error) {
-    console.error(`refactor-drift-oracle: 读不到清单：${error.message}`)
+    console.error(`refactor-drift: 读不到清单：${error.message}`)
     process.exit(2)
   }
   const onlyA = a.filter(x => !b.includes(x))

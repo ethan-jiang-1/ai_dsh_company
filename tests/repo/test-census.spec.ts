@@ -14,7 +14,7 @@ function probeFiles() {
   const walk = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const path = join(dir, entry.name)
     if (entry.isDirectory()) return walk(path)
-    return entry.name.endsWith('.mjs') ? [entry.name.replace(/\.mjs$/, '')] : []
+    return entry.name.endsWith('-probe.mjs') ? [entry.name.replace(/\.mjs$/, '')] : []
   })
   return walk(join(ROOT, 'probes')).sort()
 }

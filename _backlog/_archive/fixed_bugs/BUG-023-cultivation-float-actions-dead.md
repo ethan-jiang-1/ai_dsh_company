@@ -6,7 +6,7 @@ opened: 2026-10-18
 
 # BUG-023：培养面板浮出成浮窗后，行内动作点了没反应
 
-> 立卡：2026-10-18 ｜ 状态：已修（2026-11-09 改判归位：原记「已结」走 `settled_issues`，用户裁定误报卡归已修缺陷）｜ 发现：UX 场景轮（`probes/browser-visual/cultivation-ux-scenarios.mjs` S4b）
+> 立卡：2026-10-18 ｜ 状态：已修（2026-11-09 改判归位：原记「已结」走 `settled_issues`，用户裁定误报卡归已修缺陷）｜ 发现：UX 场景轮（`probes/browser-visual/cultivation-ux-scenarios-probe.mjs` S4b）
 > 严重级别：P2（不损坏数据；但"浮窗里看着一样、点了没反应"是静默失效——人多半会再点几次然后放弃）
 
 ## 结论（2026-10-18 当日结）：**误报——缺陷不成立**
@@ -48,7 +48,7 @@ opened: 2026-10-18
 ## 复现
 
 ```sh
-source run/env.sh && node probes/browser-visual/cultivation-ux-scenarios.mjs --shots
+source run/env.sh && node probes/browser-visual/cultivation-ux-scenarios-probe.mjs --shots
 # 看 S4b；截图落 runtime/human-exits-evidence/ux-scenarios/S4b-float*.png
 ```
 

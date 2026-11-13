@@ -30,7 +30,7 @@
 
 - 角色名：`role-copy.spec` 6 角色 zh/en/未知/委派映射；RoleBadge / DelegationCard /
   Presence / Tasks / Board / Cultivation 子块 / context picker / host `/cultivation` 回执
-  静态/纯函数断言；`ui-scene-smoke --isolated --golden` ALL PASS。
+  静态/纯函数断言；`ui-scene-smoke --isolated --expected` ALL PASS。
 - I1 pilot + 第二/三批：`customer-voice`、`tech-feasibility-review`、`pricing`、
   `managed-service-pricing`、`market-sizing`、`managed-service-ops`、`budget-check`、
   `finance-compliance`、`ops-workflow`、`cfo-workflow`、`managed-service-economics`、

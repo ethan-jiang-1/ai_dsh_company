@@ -99,7 +99,7 @@ intent: 回答「怎么借鉴、先做什么、怎么算做到」——每项给
 ### B5 每周全量 keyless lane（环外资产的新鲜度回路）
 
 - **借自**：DSH 的"必需 job 之外的东西也要可见"；本仓围栏研究已经指出真正的洞是"环外没有新鲜度回路"。
-- **载体**：checks/smoke/all-keyless.mjs（计划）（读 manifest）+ `fresh-clone.yml` 新 job（每周）。
+- **载体**：checks/smoke/keyless-lane.mjs（计划）（读 manifest）+ `fresh-clone.yml` 新 job（每周）。
 - **形态**：manifest 列全部 33 个冒烟并标 `keyless|with-key`；job 只跑 keyless，跑完打印 `PASS n / FAIL n / SKIP n`；
   69 个探针不进本 lane（多为真模型/浏览器，成本高），但必须出现在 census 里，由它报"多久没跑过"。
   **skip 数与 manifest 不符 = 红**（防止某条被静默移出）；with-key 的不进 job，但必须在 manifest 里（不许消失）。
@@ -135,9 +135,9 @@ intent: 回答「怎么借鉴、先做什么、怎么算做到」——每项给
 - **借自**：DSH 的 M1 "空间完备"——新造后缀必须同时改配置，否则不会被任何 lane 选中。
 - **载体**：扩展 `script-triggers` 门禁（现只查"何时跑"在场）+ 头注模板。
 - **形态**：每个 `.mjs` 资产头注新增两行：`// 失败类：<封闭集之一>`、`// lane：fast|surface|weekly|manual`。
-  门禁校验：封闭集合法；`lane: fast` 必须在 `fast.mjs` 的 CASES 里；`surface` 必须在 B4 规则表里；
+  门禁校验：封闭集合法；`lane: fast` 必须在 `fast-lane.mjs` 的 CASES 里；`surface` 必须在 B4 规则表里；
   `weekly` 必须在 B5 manifest 里；`manual` 必须同时有 `何时跑` 与 `owner`。
-- **验收（负例三条）**：① 新资产不写 lane → 红；② 写 `lane: fast` 但不在 `fast.mjs` → 红；③ `lane: manual` 无 owner → 红。
+- **验收（负例三条）**：① 新资产不写 lane → 红；② 写 `lane: fast` 但不在 `fast-lane.mjs` → 红；③ `lane: manual` 无 owner → 红。
 - **成本**：门禁半天 + **一次性回填 102 个资产**（脚本补 lane，人工补失败类）。
 - **风险**：回填是大扫除，容易做成"填了就行" → 失败类只许从封闭集选；选不出的先记 `未分类`，由 B0 census 报数，
   每轮减少。**建议先立规则、只对新生效**（`生效日 ≥` 本政策落地日），存量按 census 报数逐轮收敛。

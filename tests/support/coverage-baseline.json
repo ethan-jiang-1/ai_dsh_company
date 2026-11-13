@@ -757,7 +757,7 @@
       "statements": 100,
       "branches": 100
     },
-    "tools/lib/ui-golden.mjs": {
+    "tools/lib/ui-expected.mjs": {
       "statements": 97.5,
       "branches": 71.87
     },

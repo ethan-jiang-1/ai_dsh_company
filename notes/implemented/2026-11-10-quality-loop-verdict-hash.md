@@ -59,11 +59,11 @@ R1 盘上旧头 hash 用 `verdict-hash.mjs --fix` 按正文重算（正文已核
 
 - 红：`pnpm exec vitest run tests/tools/quality-loop.spec.ts` → 修前 1 failed（导入的
   `verdict-hash.mjs` 不存在；补工具后 `未复验` warning 用例仍红）→ 修后 **39 passed**。
-- 真盘红：`node probes/team/quality-loop-audit.mjs --deliverable
+- 真盘红：`node checks/audit/quality-loop-audit.mjs --deliverable
   runtime/rehearsal-workspace/.dsh-company/deliverables/2026-11-10-probe-qloop` → `body-modified`
   （`5738a1…` vs `d9d252…`）+ `post-verdict-unverified` warning；body-modified detail 已带尾随换行提示。
 - 工具：对证据副本 `--check` → `MISMATCH`（exit 1）；`--fix` → `body-sha256=5738a1…`；再 `--check` → `OK`（exit 0）。
-- `node probes/team/quality-loop-audit.mjs --self-test` → **ALL PASS**（7 支：基线绿 → 各破坏红 → 还原绿）。
+- `node checks/audit/quality-loop-audit.mjs --self-test` → **ALL PASS**（7 支：基线绿 → 各破坏红 → 还原绿）。
 - `pnpm verify` → **ALL PASS**（2 门无对象：replay-fixture-freshness / replay-ui-freshness）。
 - `pnpm test` → **171 files / 1420 tests passed**；`pnpm typecheck` → 绿（无输出）。
 - `preset-smoke` → **ALL PASS**（装当前 pack 后 6 角色 + 5 非角色全部可挂载；`presets/**` 含新脚本）。

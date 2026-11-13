@@ -58,7 +58,7 @@ audit 只核裁决原文，不核产物是否在裁决后被改。本轮不给�
 
 ```sh
 source run/env.sh
-node probes/team/quality-loop-audit.mjs --deliverable \
+node checks/audit/quality-loop-audit.mjs --deliverable \
   runtime/rehearsal-workspace/.dsh-company/deliverables/2026-11-10-probe-qloop
 # 期望 FAIL body-modified；用 skill 的 verdict-hash.mjs --fix 重置头里的 hash 后应 PASS
 # （但正文已是“订正前版本”的证据）；audit 同时给 post-verdict-unverified warning
@@ -82,12 +82,12 @@ node probes/team/quality-loop-audit.mjs --deliverable \
 - 红：`pnpm exec vitest run tests/tools/quality-loop.spec.ts` → 修前导入
   `verdict-hash.mjs` 不存在（1 failed）；补工具后 `未复验` warning 用例仍红。
 - 绿：同一命令 → **39 passed**。
-- 真盘红→工具修复：`node probes/team/quality-loop-audit.mjs --deliverable
+- 真盘红→工具修复：`node checks/audit/quality-loop-audit.mjs --deliverable
   runtime/rehearsal-workspace/.dsh-company/deliverables/2026-11-10-probe-qloop` →
   `body-modified`（`5738a1…` vs `d9d252…`）+ `post-verdict-unverified` warning；
   对证据副本 `verdict-hash.mjs --check` → `MISMATCH`（exit 1），`--fix` → `body-sha256=5738a1…`，
   再 `--check` → `OK`（exit 0）。
-- `node probes/team/quality-loop-audit.mjs --self-test` → **ALL PASS**（7 支：基线绿 → 各破坏红 → 还原绿）。
+- `node checks/audit/quality-loop-audit.mjs --self-test` → **ALL PASS**（7 支：基线绿 → 各破坏红 → 还原绿）。
 - 同 diff 记录：见 Note 链接（卡顶 `留痕`）。
 
 ## 已修判定

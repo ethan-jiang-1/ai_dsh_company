@@ -67,6 +67,6 @@ node checks/smoke/ui-scene-smoke.mjs                        # dev 模式
 ## 事实落点
 
 - 门禁：`checks/gates/shipped-links.mjs`、`checks/gates/nav-count-claims.mjs`、`checks/gates/md-utf8.mjs`。
-- 真页面：`checks/smoke/ui-scene-smoke.mjs`；金样 = `snapshots/visual/company-shell/ui.golden.json`。
+- 真页面：`checks/smoke/ui-scene-smoke.mjs`；金样 = `snapshots/visual/company-shell/ui.expected.json`。
 - 诊断：`tools/lib/session-diagnose.mjs`；守卫 = `tests/session/session-diagnose.spec.ts`。
 - 产品面根 = `packages/company-pack/content/`（`workspace/` 已退役）。

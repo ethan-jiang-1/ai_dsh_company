@@ -12,7 +12,7 @@ import { ASSETS, FAST, KINDS, LANES, SURFACE_RULES, assetByName } from '../../to
  *   盘上有文件 → 必须登记；登记了 → 盘上必须有文件；手动条目必须写明理由。
  * 这个 spec 是唯一能挡住"新资产生下来就没人跑"的地方；runner 只消费注册表，不复判。
  */
-const RUNNERS = new Set(['fast.mjs', 'all-keyless.mjs'])
+const RUNNERS = new Set(['fast-lane.mjs', 'keyless-lane.mjs'])
 
 function smokeNames() {
   return readdirSync(join(ROOT, 'checks/smoke'), { withFileTypes: true })

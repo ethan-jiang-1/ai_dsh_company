@@ -47,6 +47,7 @@ import * as barePath from './gates/bare-path.mjs'
 import * as layoutBlock from './gates/layout-block.mjs'
 import * as retiredPath from './gates/retired-path.mjs'
 import * as navEnumeration from './gates/nav-enumeration.mjs'
+import * as namingContract from './gates/naming-contract.mjs'
 import * as navCountClaims from './gates/nav-count-claims.mjs'
 import * as pinCurrency from './gates/pin-currency.mjs'
 import * as scriptTriggers from './gates/script-triggers.mjs'
@@ -61,7 +62,7 @@ import * as packageManagerParity from './gates/package-manager-parity.mjs'
 import * as packShape from './gates/pack-shape.mjs'
 import * as releaseReady from './gates/release-ready.mjs'
 import * as distFreshness from './gates/dist-freshness.mjs'
-import * as uiGoldenFreshness from './gates/ui-golden-freshness.mjs'
+import * as uiGoldenFreshness from './gates/ui-expected-freshness.mjs'
 import * as presetRowDeps from './gates/preset-row-deps.mjs'
 import * as clientHalves from './gates/client-halves.mjs'
 import * as srcLayering from './gates/src-layering.mjs'
@@ -135,6 +136,7 @@ barePath.run(ctx)
 layoutBlock.run(ctx)
 retiredPath.run(ctx)
 navEnumeration.run(ctx)
+namingContract.run(ctx)
 navCountClaims.run(ctx)
 pinCurrency.run(ctx)
 scriptTriggers.run(ctx)

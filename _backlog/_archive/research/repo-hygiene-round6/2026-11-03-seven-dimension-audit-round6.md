@@ -74,7 +74,7 @@ intent: "第六轮七维打扫（2026-11-03）：fresh agent 独立复评七个�
 | A · 止血 ✅ | R6-01/02/03/08/09（已落地）+ R6-13/14 | D1/D4/D5/D7 | 低 | `pnpm verify` + `pnpm test` + `typecheck` |
 | B · 首屏与反馈 ✅ | R6-04/05/06：`orient` 首屏补真页面/诊断/日志入口；`--scenario` 分场景给正确命令；`diagnose`/`orient` 实现 `--help` 与未知参数 fail-loud | D6 | 低 | 实跑四个命令流；`orient` spec |
 | C · 豁免区算账 ✅ | R6-07：活层死链先修；新增 `checks/gates/link-debt.mjs` + `checks/gates/lib/link-debt.json`（archived 32 / moved 0 / live 0） | D4 | 中 | 造红两条：加 moved 死链 / 往归档加死链 → 超基线红；还原绿 |
-| D · 层次化（代码）✅ | R6-10 第一刀：`src/client` → `index.ts` + `wiring/ data/ ui/ tabs/ cultivation/`；同步 `company-tab-catalog` / `ui-golden-freshness` / `cdp-probe` 的源路径 | D2 | 中高 | `typecheck` + `pnpm test` + `verify` + `ui-scene-smoke` 全绿 |
+| D · 层次化（代码）✅ | R6-10 第一刀：`src/client` → `index.ts` + `wiring/ data/ ui/ tabs/ cultivation/`；同步 `company-tab-catalog` / `ui-expected-freshness` / `cdp-probe` 的源路径 | D2 | 中高 | `typecheck` + `pnpm test` + `verify` + `ui-scene-smoke` 全绿 |
 | E · 层次化（测试）✅ | R6-10 第二刀：`tests/client` 镜像五组；`tests/harness` → `repo/ tools/ session/ evidence/ ui/`（54 → 5，顶层 0） | D2 | 中 | 同上；三次真实路径失效被抓（tsconfig 排除 / entry-probe 根 / skip-budget 自身） |
 | F · 测试质量 ✅（首刀+二刀） | R6-11/12：`workspace-doors` / `install-manual` / `error-relay` 补判据；`catalog-wiring` 空断言改真行为；删 `expect(true)`；`dag-panel` 负向正则收窄到 inline style；`host/cultivation` 仍只经 harness（明说不用重复造） | D5 | 低 | 覆盖率读数 + 四次造红 |
 | H · 行为面收口 ✅ | R6-15/16（settings tier 真的写、lease 挪到解析后）；D6 错误中继队列化 + e2e 补「加载即报错」段 | D6/D7 | 中 | 单测造红 + 两条真页面 smoke ALL PASS |

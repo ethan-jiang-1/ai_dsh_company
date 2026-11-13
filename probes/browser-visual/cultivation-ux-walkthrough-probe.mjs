@@ -6,7 +6,7 @@
 // 何时跑：改培养面板的交互/文案（CultivationBoard / CultivationCompose / cultivation-actions）之后；
 //   或要复核「判据 ①②③」（输入进得去 / 没有看不懂的条目 / 不熟悉的人能上手）时。
 // 成本：keyless（boot ~20–60s + chromium，零模型调用）。前置：source run/env.sh + pack 与前端已构建。
-// 用法：source run/env.sh && node probes/browser-visual/cultivation-ux-walkthrough.mjs [--protocol] [--shots]
+// 用法：source run/env.sh && node probes/browser-visual/cultivation-ux-walkthrough-probe.mjs [--protocol] [--shots]
 //   --shots 每步截图到 runtime/human-exits-evidence/ux-shots/（我逐张读图做"第一次用"的观察；也给真人档留现场）
 //
 // ⚠ 边界（诚实口径）：本档证明的是**机制与文案可执行**——按钮在哪、点了发什么、关键说明在不在场、几步能完成。
@@ -184,7 +184,7 @@ try {
   if (role === null) throw new Error(`面板没报出会话角色（我的分身 = ${String(short)}）`)
 
   // 预置四条：T2 采纳 / T4 拒绝 / T5 验证 / T6 撤回（后者带方法目录，撤回才有的删）
-  seedRecord(IDS.adopt, { targetRole: role, expectation: 'UX走查：收口前逐项列出未决项', body: '做法：先列未决清单，按 owner 分行。\n证据：probes/browser-visual/cultivation-ux-walkthrough.mjs。' })
+  seedRecord(IDS.adopt, { targetRole: role, expectation: 'UX走查：收口前逐项列出未决项', body: '做法：先列未决清单，按 owner 分行。\n证据：probes/browser-visual/cultivation-ux-walkthrough-probe.mjs。' })
   seedRecord(IDS.reject, { targetRole: role, expectation: 'UX走查：口径不符的建议', body: '做法：测试拒绝回执。' })
   seedRecord(IDS.verify, { status: 'adopted', targetRole: role, expectation: 'UX走查：验证某条已采纳方法', body: '做法：测试回填验证。', methodSlug: SLUG.verify })
   seedRecord(IDS.revoke, { status: 'adopted', targetRole: role, expectation: 'UX走查：撤掉一条方法', body: '做法：测试撤回。', methodSlug: SLUG.revoke })

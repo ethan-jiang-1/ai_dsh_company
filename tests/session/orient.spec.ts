@@ -119,7 +119,7 @@ describe('orientState + renderOrient', () => {
     const text = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace }))
     expect(text).toContain('看到真页面 / 查失败现场')
     expect(text).toContain('ui-scene-smoke.mjs')
-    expect(text).toContain('--isolated --golden')
+    expect(text).toContain('--isolated --expected')
     expect(text).toContain('--steps')
     expect(text).toContain('diagnosis/')
     expect(text).toContain('company-client-errors.log')
@@ -132,7 +132,7 @@ describe('orientState + renderOrient', () => {
   // snapshot.yml，照抄即 ENOENT（实测 exit 1）。复跑入口按场景类型分派。
   it('--scenario 的验证命令按场景类型分派（replay / visual / 归档证据）', () => {
     expect(scenarioVerification('replay', 'replay/x')).toBe('node checks/smoke/replay-smoke.mjs --scenario replay/x')
-    expect(scenarioVerification('visual', 'visual/x')).toContain('ui-scene-smoke.mjs --isolated --golden')
+    expect(scenarioVerification('visual', 'visual/x')).toContain('ui-scene-smoke.mjs --isolated --expected')
     expect(scenarioVerification('probes', 'probes/x')).toContain('无通用复跑入口')
     expect(runBundleView(ROOT, 'visual/company-shell').verification).toContain('ui-scene-smoke')
     expect(runBundleView(ROOT, 'replay/foundation-workspace').verification).toContain('replay-smoke')

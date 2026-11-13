@@ -15,7 +15,7 @@ description: Use when adding or changing any company Web UI string, panel, tab, 
 2. **接线**：组件用槽注入的 `t`（注册时 `locale: NS`）；嵌套组件把 `t` 往下传；注册处的 title/guide/tooltip 用 `() => t(key)` thunk。不要用模块级 `const t = ...` 绕过语言切换。
 3. **纯函数不返回中文**：`src/lib/` 的 view model 返回 `CopyToken`/enum（`{ key, params }`），组件侧 `text(token)` 翻译。状态、列名、事件句、预算行、卡片抬头都按这条处理；不要只翻译 JSX、把数据里的中文漏过去。
 4. **Host 人可见文案**：命令回执/错误、工具 note、signoff、`blocked-text` 走 `CompanyLanguage.text(zh, en)`；命令 description 在语言变化时 dispose + 重注册；工具 description 英文。不要新增只写中文的 host 回执。
-5. **验证**：`pnpm test tests/client`（碰 `src/lib` 加 `pnpm test tests/lib`）；`pnpm typecheck`；A4 后 `pnpm verify` 会跑 `client-copy`。用户可见改动同 diff 刷 `ui-scene-smoke --isolated --golden` 的 zh/en 金样；真页面切换 English 检查无中文残留。
+5. **验证**：`pnpm test tests/client`（碰 `src/lib` 加 `pnpm test tests/lib`）；`pnpm typecheck`；A4 后 `pnpm verify` 会跑 `client-copy`。用户可见改动同 diff 刷 `ui-scene-smoke --isolated --expected` 的 zh/en 金样；真页面切换 English 检查无中文残留。
 
 ## 判据
 

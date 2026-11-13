@@ -1,7 +1,7 @@
 // 负例留证 2026-11-10（实跑）：把 `verdictBodyHash` 改成不归一结尾换行 ⇒「裁决原文」用例红；
 // 负例留证 2026-11-10：把原文索引改回跨轮全局 ⇒「R2 换新 verifier session」用例红（BUG-059）；
 // 把 `parseDispositions` 的「接受」校验删掉 ⇒「接受必须写接受人」用例红；还原 ⇒ 绿。
-// 真盘红证（探针驱动，同样实跑）见 `node probes/team/quality-loop-audit.mjs --self-test`：
+// 真盘红证（探针驱动，同样实跑）见 `node checks/audit/quality-loop-audit.mjs --self-test`：
 // 改裁决正文 / 删一条处置 / 换方法版本 / 验证者写盘 各自变红，还原回绿。
 //
 // 质量环判据的 keyless 单测：**判据住 tools/lib/quality-loop.mjs，这一层只喂合成输入**。

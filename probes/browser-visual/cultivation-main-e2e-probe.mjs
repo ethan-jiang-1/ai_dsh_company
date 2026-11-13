@@ -7,7 +7,7 @@
 // 何时跑：改培养主视图 / CultivationChatPanel / CultivationCompose / host `/cultivation` 命令族，
 //   或大版本交付前的人工 E2E（keyless 档只证「点了发哪条线」，本档证「真页面、真 host、真模型」）。
 // 成本：**真模型 2 次短调用**（新会话首启 1 次 + 培养对话 1 次）+ chromium；dev home（有密钥）。
-// 用法：source run/env.sh && node probes/browser-visual/cultivation-main-e2e.mjs [--shots]
+// 用法：source run/env.sh && node probes/browser-visual/cultivation-main-e2e-probe.mjs [--shots]
 //
 // ⚠ 与其他培养档的分工：页签点击交互归 `checks/smoke/ui-scene-smoke.mjs --steps`（原 cultivation-gui-probe
 // 已于 2026-11-03 第六轮删除：v3 的宿主形状变了、未迁移；证据在 git 历史）；

@@ -1,5 +1,6 @@
 # _archive/ · 离开活跃区
 
+- [2026-11-13-test-asset-naming-contract.md](settled_issues/2026-11-13-test-asset-naming-contract.md) — 目标树 + 资产正名 + naming-contract 门禁；去向 = note。
 - [2026-11-13-test-asset-loop.md](settled_issues/2026-11-13-test-asset-loop.md) — 测试资产自校正系统 B/C/A（lane 注册表/按面 pre-push/覆盖率棘轮/失败类表/census）；去向 = note。
 - [2026-11-12-bilingual-landing.md](settled_issues/2026-11-12-bilingual-landing.md) — 界面呈现层（Tab / Label / Button）zh/en；默认 zh、角色名混排；内部英文 I2/I3 不在范围；去向 = note。
 默认不要读；从活卡或索引点名才打开。路径表示离场状态；历史讨论与证据原文保留，迁移只修导航链接与索引。

@@ -89,7 +89,7 @@ export const CHECKS = [
 /** 真页面与现场证据（首屏就要指路——真页面车道存在但 `orient` 不提，agent 只能猜）。 */
 export const LIVE_SURFACES = [
   { cmd: 'node checks/smoke/ui-scene-smoke.mjs', what: '真页面自起实例：全部公司页签渲染 + 浏览器错误环（~40s，需已构建 pack client）' },
-  { cmd: 'node checks/smoke/ui-scene-smoke.mjs --isolated --golden', what: '隔离金样档：空壳页签文本与 tracked 金样逐字比对（确定性回归网）' },
+  { cmd: 'node checks/smoke/ui-scene-smoke.mjs --isolated --expected', what: '隔离金样档：空壳页签文本与 tracked 金样逐字比对（确定性回归网）' },
   { cmd: 'node checks/smoke/ui-scene-smoke.mjs --steps <json>', what: '复现点击/输入（clickText / typeText / waitText / expectText）' },
   { cmd: '<DSH_HOME>/diagnosis/', what: '现场证据：page.png / body.txt / verdict.json / console.log（回执里给具体目录）' },
   { cmd: '<DSH_HOME>/logs/company-client-errors.log', what: '客户端错误落盘（页面错误环的持久面；token 已脱敏）' },
@@ -303,7 +303,7 @@ function resolveScene(root, selection) {
 /** 场景类型的复跑入口：replay 走回放、visual 走隔离金样、其余是归档证据（无通用复跑入口）。 */
 export function scenarioVerification(kind, canonical) {
   if (kind === 'replay') return `node checks/smoke/replay-smoke.mjs --scenario ${canonical}`
-  if (kind === 'visual') return 'node checks/smoke/ui-scene-smoke.mjs --isolated --golden（刷新金样 = 加 --refresh-golden）'
+  if (kind === 'visual') return 'node checks/smoke/ui-scene-smoke.mjs --isolated --expected（刷新金样 = 加 --refresh-expected）'
   return '—（归档证据，无通用复跑入口；重跑走产生它的探针，触发条件见其头注）'
 }
 

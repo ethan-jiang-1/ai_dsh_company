@@ -9,7 +9,7 @@
 //   `--lang en`（必须配 --isolated）：隔离 home 写 locale.preference=en，跑 9 页签并断言无中文残留；不与 zh 金样同跑。
 //   `--isolated`：官方 web 模板建临时 `company` profile + `plugin add <pack 目录>`（link）再起
 //   （不读 dev 盘，也不读用户 OS 默认 workspace；`.dsh-company/` 由 host 首启自举，文本确定）。
-//   `--golden` / `--refresh-golden`：与 `snapshots/visual/company-shell/ui.golden.json` 比对/更新
+//   `--expected` / `--refresh-expected`：与 `snapshots/visual/company-shell/ui.expected.json` 比对/更新
 //   （必须配 --isolated；金样只覆盖无会话的公司壳，会话数据面归 keyless 渲染 spec）。
 //
 // 为什么需要它（R3-04 + 六维 D5）：cdp-probe 只能在「你手动起好的实例 + 手抄 token URL」上跑；
@@ -28,13 +28,13 @@ import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb } from '../../tools/lib/probe-web.mjs'
 import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 import { diagnosisDir } from '../../tools/lib/diagnosis.mjs'
-import { buildGolden, compareGolden, firstTextDiff } from '../../tools/lib/ui-golden.mjs'
+import { buildGolden, compareGolden, firstTextDiff } from '../../tools/lib/ui-expected.mjs'
 
 const args = process.argv.slice(2)
 const KEEP = args.includes('--keep')
 const ISOLATED = args.includes('--isolated')
-const GOLDEN = args.includes('--golden')
-const REFRESH_GOLDEN = args.includes('--refresh-golden')
+const EXPECTED = args.includes('--expected')
+const REFRESH_EXPECTED = args.includes('--refresh-expected')
 const langIndex = args.indexOf('--lang')
 const LANG = langIndex === -1 ? 'zh' : (args[langIndex + 1] ?? '')
 const askIndex = args.indexOf('--ask')
@@ -45,14 +45,14 @@ if (stepsIndex !== -1 && (STEPS === undefined || STEPS.startsWith('--'))) {
   console.error('ui-scene-smoke: --steps 需要一个 JSON 文件路径')
   process.exit(2)
 }
-const GOLDEN_PATH = join(ROOT, 'snapshots/visual/company-shell/ui.golden.json')
+const EXPECTED_PATH = join(ROOT, 'snapshots/visual/company-shell/ui.expected.json')
 
-if ((GOLDEN || REFRESH_GOLDEN) && !ISOLATED) {
-  console.error('ui-scene-smoke: --golden/--refresh-golden 必须配 --isolated（隔离盘才能保证每页签文本确定）。')
+if ((EXPECTED || REFRESH_EXPECTED) && !ISOLATED) {
+  console.error('ui-scene-smoke: --expected/--refresh-expected 必须配 --isolated（隔离盘才能保证每页签文本确定）。')
   process.exit(2)
 }
-if (GOLDEN && REFRESH_GOLDEN) {
-  console.error('ui-scene-smoke: --golden 与 --refresh-golden 只能二选一。')
+if (EXPECTED && REFRESH_EXPECTED) {
+  console.error('ui-scene-smoke: --expected 与 --refresh-expected 只能二选一。')
   process.exit(2)
 }
 if (LANG !== 'zh' && LANG !== 'en') {
@@ -63,8 +63,8 @@ if (LANG === 'en' && !ISOLATED) {
   console.error('ui-scene-smoke: --lang en 必须配 --isolated（英文页面检查不能污染日用 home）')
   process.exit(2)
 }
-if (LANG === 'en' && (GOLDEN || REFRESH_GOLDEN)) {
-  console.error('ui-scene-smoke: 金样是 zh；--lang en 走独立「无中文残留」检查，不跑 --golden')
+if (LANG === 'en' && (EXPECTED || REFRESH_EXPECTED)) {
+  console.error('ui-scene-smoke: 金样是 zh；--lang en 走独立「无中文残留」检查，不跑 --expected')
   process.exit(2)
 }
 
@@ -225,7 +225,7 @@ let code = 1
 let output = ''
 let verdict = null
 try {
-  const wantVerdict = GOLDEN || REFRESH_GOLDEN || LANG === 'en'
+  const wantVerdict = EXPECTED || REFRESH_EXPECTED || LANG === 'en'
   const result = await runProbe(wantVerdict ? verdictPath : undefined)
   code = result.code
   output = result.output
@@ -244,7 +244,7 @@ function writeReceipt(extra = {}) {
   const receipt = {
     scene: 'company-shell',
     mode: ISOLATED ? 'isolated' : 'dev-home',
-    goldenMode: GOLDEN ? 'compare' : REFRESH_GOLDEN ? 'refresh' : 'off',
+    goldenMode: EXPECTED ? 'compare' : REFRESH_EXPECTED ? 'refresh' : 'off',
     goldenResult: 'not-run',
     url,
     probeExit: code,
@@ -269,32 +269,32 @@ if (code !== 0) {
   process.exit(1)
 }
 
-if (REFRESH_GOLDEN) {
+if (REFRESH_EXPECTED) {
   if (verdict === null || typeof verdict.tabTexts !== 'object') {
     writeReceipt({ goldenResult: 'fail' })
-    console.error('ui-scene-smoke: --refresh-golden 拿不到逐页签文本（cdp-probe verdict 缺 tabTexts）。')
+    console.error('ui-scene-smoke: --refresh-expected 拿不到逐页签文本（cdp-probe verdict 缺 tabTexts）。')
     process.exit(1)
   }
   const golden = buildGolden({ catalog: verdict.catalog, tabTexts: verdict.tabTexts })
   mkdirSync(join(ROOT, 'snapshots/visual/company-shell'), { recursive: true })
-  writeFileSync(GOLDEN_PATH, `${JSON.stringify(golden, null, 2)}\n`, 'utf8')
+  writeFileSync(EXPECTED_PATH, `${JSON.stringify(golden, null, 2)}\n`, 'utf8')
   writeReceipt({ goldenResult: 'refresh' })
-  console.log(`ui-scene-smoke: 金样已更新 → ${GOLDEN_PATH}（${String(golden.catalog.length)} 个页签）`)
+  console.log(`ui-scene-smoke: 金样已更新 → ${EXPECTED_PATH}（${String(golden.catalog.length)} 个页签）`)
 }
 
-if (GOLDEN) {
+if (EXPECTED) {
   let golden
-  try { golden = JSON.parse(readFileSync(GOLDEN_PATH, 'utf8')) } catch (error) {
+  try { golden = JSON.parse(readFileSync(EXPECTED_PATH, 'utf8')) } catch (error) {
     writeReceipt({ goldenResult: 'fail' })
-    console.error(`ui-scene-smoke: 读不到金样 ${GOLDEN_PATH}（${String(error?.message ?? error)}）——先跑 --isolated --refresh-golden。`)
+    console.error(`ui-scene-smoke: 读不到金样 ${EXPECTED_PATH}（${String(error?.message ?? error)}）——先跑 --isolated --refresh-expected。`)
     process.exit(1)
   }
   const { catalogProblems, tabProblems } = compareGolden(golden, { catalog: verdict?.catalog ?? [], tabTexts: verdict?.tabTexts ?? {} })
   if (catalogProblems.length > 0 || tabProblems.length > 0) {
-    for (const problem of catalogProblems) console.error(`  GOLDEN FAIL ${problem}`)
+    for (const problem of catalogProblems) console.error(`  EXPECTED FAIL ${problem}`)
     for (const problem of tabProblems.slice(0, 9)) {
       const diff = firstTextDiff(problem.expected, problem.actual)
-      console.error(`  GOLDEN FAIL 页签「${problem.tab}」第 ${String(diff.at)} 字符起不同：金样「${diff.expected}」/ 现在「${diff.actual}」`)
+      console.error(`  EXPECTED FAIL 页签「${problem.tab}」第 ${String(diff.at)} 字符起不同：金样「${diff.expected}」/ 现在「${diff.actual}」`)
     }
     writeReceipt({
       goldenResult: 'fail',
@@ -303,12 +303,12 @@ if (GOLDEN) {
         tabs: tabProblems.map(problem => ({ tab: problem.tab, expected: problem.expected, actual: problem.actual })),
       },
     })
-    console.error(`ui-scene-smoke: 金样比对失败；确认是有意改动后跑 --isolated --refresh-golden 更新（金样 = ${GOLDEN_PATH}）。`)
+    console.error(`ui-scene-smoke: 金样比对失败；确认是有意改动后跑 --isolated --refresh-expected 更新（金样 = ${EXPECTED_PATH}）。`)
     process.exit(1)
   }
   writeReceipt({ goldenResult: 'pass' })
   console.log(`ui-scene-smoke: 金样一致（${String((golden.catalog ?? []).length)} 个页签）`)
-} else if (!REFRESH_GOLDEN) {
+} else if (!REFRESH_EXPECTED) {
   writeReceipt({ goldenResult: 'off' })
 }
 

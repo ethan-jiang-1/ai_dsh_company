@@ -35,7 +35,7 @@ entry-probe 语义审阅仍待人；`dist-freshness` 不判断"产物是否落�
 **进展（2026-10-27/28 深夜）：** 批一 D1 已落（[Note](../../../notes/archived/2026-10-27-d1-start-path.md)：
 AGENTS 顶部三样开工、锚点、三件套分工；走查页签任务文档读入 570→206 行）；批二 D4 已落
 （[Note](../../../notes/archived/2026-10-27-d4-release-and-dist-guard.md)：0.3.15 就位、release 8 项全绿、
-dist-freshness 第 49 门、canonicalPath/isRecord 收家）。批三 D5 UI 金样已落（[Note](../../../notes/archived/2026-10-28-d5-ui-golden.md)：隔离场景 3.8s、9 页签金样、`ui-golden-freshness` 第 50 门、cdp-probe `--texts/--json-out`）。批四认证档已跑（用户授权）：entry-probe **13/13 机器通过**、delegation-smoke **ALL PASS**，答卷归档并在 snapshots/README 登记；fixtures 出处已落；拆 4 个单 it 巨测**明确不作**（理由见 D5 Note）。**三批完成，待复评收口。**
+dist-freshness 第 49 门、canonicalPath/isRecord 收家）。批三 D5 UI 金样已落（[Note](../../../notes/archived/2026-10-28-d5-ui-golden.md)：隔离场景 3.8s、9 页签金样、`ui-expected-freshness` 第 50 门、cdp-probe `--texts/--json-out`）。批四认证档已跑（用户授权）：entry-probe **13/13 机器通过**、delegation-smoke **ALL PASS**，答卷归档并在 snapshots/README 登记；fixtures 出处已落；拆 4 个单 it 巨测**明确不作**（理由见 D5 Note）。**三批完成，待复评收口。**
 probe-source 切片 spec 未动（明确留待下一轮）。
 
 ## 当前情况（本轮实测，2026-10-27 深夜）
@@ -93,7 +93,7 @@ probe-source 切片 spec 未动（明确留待下一轮）。
 2. `ui-scene-smoke --isolated [--golden|--refresh-golden]`：standalone 建隔离 home/workspace（`runtime/` 下，
    gitignored）→ 起 web → cdp-probe → 与 `snapshots/ui/company-shell.golden.json` 比对；失败落证据目录；
    `--refresh-golden` 更新金样（必须打印每个页签的首行差异）。
-3. 新门禁 `ui-golden-freshness`：金样的 `catalog` 必须等于注册源解析结果、每个页签有非空文本；
+3. 新门禁 `ui-expected-freshness`：金样的 `catalog` 必须等于注册源解析结果、每个页签有非空文本；
    无金样 → `skip`。红证 = 改一个页签标题（或注册源）→ 红。
 4. `snapshots/README.md` 登记 company-shell 场景与来源性质（合成、无部署数据）。
 5. 若时间允许：修"无会话时台账/成品/培养显示不可读"的文案（先立 BUG 卡，改文案 + 重刷金样）。

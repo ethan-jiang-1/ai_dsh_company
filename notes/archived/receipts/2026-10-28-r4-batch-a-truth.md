@@ -12,7 +12,7 @@
 2. **Plan Mode 进入开工首屏**：根 `AGENTS.md` 的“开工最小路径”加一句“feature 任务先 Plan Mode，规则 = policy P1”；`dev-loop.md` 的“唯一见 §0.5”改成“任务入口见 §0.5；Plan Mode 见 policy §P1”，不再指向桩。
 3. **回放口径统一到“合成管线场景”**：`tests/README.md` 的“语料回放 = 升 pin 第一道”改为“本仓只有不加载 pack 的合成回放，只证管线可跑，不是第一道”；同 diff 清掉 `replay-smoke` 头注里已停用的 `--ui` 说明、`testing.md` 的 candidate-scan 可用性、`project-map.md` 的“语料有独立标注”与 r3 full 残留。
 4. **导航指针只指现行家**：决策台账从 `index.md` 迁到 `decisions.md` 的事实同步到根 AGENTS、docs/AGENTS、project-map、architecture；外部研究材料统一指 `external-research.md`；architecture 的伪 preset YAML 删掉，改成“最小形状以 `presets/ceo/agent.cordis.yml` 为准”，设计层不再复制实现。
-5. **计数与路径去漂**：`checks/README.md` 48→50；两处 UI 金样路径改 `snapshots/visual/company-shell/ui.golden.json`；包 README 的“关注”改“待办”；D45/D46 按号排序；data-model 的“摘要全扫 + open/最近 120 全文”只留一处。
+5. **计数与路径去漂**：`checks/README.md` 48→50；两处 UI 金样路径改 `snapshots/visual/company-shell/ui.expected.json`；包 README 的“关注”改“待办”；D45/D46 按号排序；data-model 的“摘要全扫 + open/最近 120 全文”只留一处。
 6. **预算补完整性、措辞对齐门禁**：`budget-and-ops` / `cdp-probe` 补行数上限；`docs/AGENTS.md` 不再声称“留 ≥5% 头寸”（门禁实际只守 >20% 空置），改为如实描述反向棘轮。
 7. **完成定义单一化**：根 AGENTS 的 preset-smoke 注释改为“真挂载检查，完整完成定义 = preset-change-definition skill”，不再把单脚本说成完成定义；dev-loop §1 的“实施→选证据”改成“证据先行：先写红测/立场景，再实施”。
 

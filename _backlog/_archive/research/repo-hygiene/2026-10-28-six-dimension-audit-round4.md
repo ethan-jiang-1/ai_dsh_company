@@ -79,8 +79,8 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 **根因（三条叠加）**：
 
 1. `run/env.sh:70` 导出 `DSH_COMPANY_BOOTSTRAP=off`；`ui-scene-smoke` 的隔离环境只覆盖 `DSH_HOME`/`DSH_COMPANY_HOME`（`checks/smoke/ui-scene-smoke.mjs:61`），把 `off` 继承进去，`standalone --provision-only` 又不落骨架（`tools/standalone.mjs:183`），于是隔离公司盘没有 `kb/motion-ledger.md`，面板显示“不可读”。
-2. `cdp-probe` 在页签 body 非空后立刻抓文本（`probes/browser-visual/cdp-probe.mjs:192-204`），不等待异步读取稳定；金样因此把“读取中… / 读取团队状态…”钉成期望（`snapshots/visual/company-shell/ui.golden.json:22-24`）。
-3. `ui-golden-freshness` 只做静态形状/目录校验（`checks/gates/ui-golden-freshness.mjs:14-40`），所以 `pnpm verify` 50 门全绿，而真页面车道 exit 1；`ui-scene-smoke` 的 `scene.json` 在 golden 比对之前写（`:128-139`），失败时仍记 `probeExit: 0`、无 golden 结果，下一 agent 会把 pass 目录当绿。
+2. `cdp-probe` 在页签 body 非空后立刻抓文本（`probes/browser-visual/cdp-probe.mjs:192-204`），不等待异步读取稳定；金样因此把“读取中… / 读取团队状态…”钉成期望（`snapshots/visual/company-shell/ui.expected.json:22-24`）。
+3. `ui-expected-freshness` 只做静态形状/目录校验（`checks/gates/ui-expected-freshness.mjs:14-40`），所以 `pnpm verify` 50 门全绿，而真页面车道 exit 1；`ui-scene-smoke` 的 `scene.json` 在 golden 比对之前写（`:128-139`），失败时仍记 `probeExit: 0`、无 golden 结果，下一 agent 会把 pass 目录当绿。
 4. 隔离 home 没有凭据，页面实际停在 “Get started / Add API Key / Sign in” 模态；`cdp-probe` 的 not-onboarded 只在 composer 缺失时触发（`probes/browser-visual/cdp-probe.mjs:128` 附近），这里 composer 已在，所以 `reason: pass`、9/9 页签，截图（`runtime/harness-home/diagnosis/cdp-probe-2026-10-27T17-02-50-972Z/page.png`）却带着 onboarding 模态和「成品索引不可读」。它不是“已就绪的公司壳”，只是“能挂载的壳”。
 
 **影响**：这是本轮唯一“回归网自己骗人”的 P0。它同时解释了为什么上一轮敢给 D5 A-：金样从未在干净树上连续三次通过。
@@ -140,7 +140,7 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 | R4-12 | P2 | D3 | `docs/guides/dev-loop.md:45-46` vs `:72`、`docs/testing.md:55` | §1 顺序 = 实施→选证据；§3④ / 宪法 §3.8 = 测试/场景先行。照 §1 字面执行即违反测试先行。 |
 | R4-13 | P2 | D1/D5 | `tests/README.md:24-35` | 映射表只有 src/lib、src/client、“pack 导出/注册面”；`src/host/` 的 bootstrap/catalog/cultivation/lease 等 8 模块 3226 行没有行。场景②只能猜检查层。 |
 | R4-14 | P2 | D1 | `docs/AGENTS.md:30`、`checks/gates/doc-budget.mjs:15` | 文档称“留 ≥5% 头寸”，门禁只拒 >20% 空置；实测 11/32 篇 <5%（release-runbook 0%、presets 1.5%、decisions 1.7%、AGENTS 2.4%…）。`docs/guides/budget-and-ops.md`（68 行）与 `docs/guides/cdp-probe.md`（64 行）无预算，门禁无完整性断言。 |
-| R4-15 | P2 | D4 | `checks/README.md:56`；`checks/smoke/ui-scene-smoke.mjs:8`；`checks/gates/ui-golden-freshness.mjs:8`；`packages/company-pack/README.md:23`；`CHANGELOG.md:23` | 索引写 48 门（实际 50）；两处金样路径写 `snapshots/ui/...`（实际 `snapshots/visual/...`）；包 README 枚举“关注”（实际标签是“待办”）；0.3.15 CHANGELOG 称失效引用已清，现场不符。 |
+| R4-15 | P2 | D4 | `checks/README.md:56`；`checks/smoke/ui-scene-smoke.mjs:8`；`checks/gates/ui-expected-freshness.mjs:8`；`packages/company-pack/README.md:23`；`CHANGELOG.md:23` | 索引写 48 门（实际 50）；两处金样路径写 `snapshots/ui/...`（实际 `snapshots/visual/...`）；包 README 枚举“关注”（实际标签是“待办”）；0.3.15 CHANGELOG 称失效引用已清，现场不符。 |
 | R4-16 | P2 | D2/D5 | `client/DeliverablesTab.tsx:98`；`host/bundle-manifest.ts:225`、`host/catalog.ts:43`、`client/cultivation-context-data.ts:89`；`lib/presence.ts:147`、`lib/cultivation-inbox.ts:59`、`lib/cultivation-context.ts:338`；`tests/{client,company}/deliverables-catalog.spec.ts` | `parseCatalog` 埋在 .tsx 却被数据模块与 company spec 反向依赖；`isRecord` 3 份逐字相同；`clip` 3 份语义不同；同名 spec + 同名对象（src/lib 与 tools/lib）并存。 |
 | R4-17 | P2 | D2 | `checks/gates/src-layering.mjs:25`；`tools/lib/src-layering.mjs` | 只守字面相对 import 的方向：模板串/计算式 dynamic import、`require()`、`import x = require()` 全不可见；注释里的 `from '../host/x.ts'` 会被扫成违规（假阳）；无环/导出面检查。 |
 | R4-18 | P2 | D6 | `checks/smoke/ui-scene-smoke.mjs` 第 128-139、162-177 行；另见第 81-82 行 | golden 失败时 `scene.json` 仍 `probeExit:0`、无 golden 结果；`--keep` 只打 base，不打带 token 的 URL；证据无 URL/home。 |

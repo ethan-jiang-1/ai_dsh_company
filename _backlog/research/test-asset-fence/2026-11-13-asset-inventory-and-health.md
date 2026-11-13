@@ -16,7 +16,7 @@ intent: 盘点 tests/smoke/gate/probe 的规模、成本与环外健康度，记
 | 冒烟 | 32 个 `checks/smoke/*.mjs` | 按头注触发 | 装配 / 机制 / 安装 / 浏览器 / 真模型 |
 | 盘面审计 | 5 个 `checks/audit/*.mjs` | 手动 | 读真盘出报告 |
 | 探针 | 69 个 `probes/**/*.mjs` | 按头注触发 | 窄机制 / 视觉 / 团队行为 |
-| 重放 / 视觉夹具 | 1 个 replay 场景 + 1 份 UI 金样 | `replay-smoke` / `ui-scene-smoke --golden` | 会话级回放 / 页签文本金样 |
+| 重放 / 视觉夹具 | 1 个 replay 场景 + 1 份 UI 金样 | `replay-smoke` / `ui-scene-smoke --expected` | 会话级回放 / 页签文本金样 |
 | 已耗仪器 | 2 个（`tools/archive/`） | 手动 | 归档 |
 
 分区（文件数 / tests）：`harness` 73/662、`client` 62/395、`host` 58/585、`content` 22/61、`lib` 14/156、`presets` 13/138。测试行数仍大于 pack 源码（22,289 行），资产不是「少」，是「形状」。

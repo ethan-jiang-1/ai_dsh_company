@@ -111,7 +111,7 @@ try {
       check('body-sha256 与正文同口径', verdictBodyHash(body) === header.bodySha256, `${String(header.bodySha256).slice(0, 12)}… vs ${verdictBodyHash(body).slice(0, 12)}…`)
     }
     check('R2 正文覆盖 F1–F4 闭环（文本观察）', ['F1', 'F2', 'F3', 'F4'].every(id => text.includes(id)), '缺了只说明正文没逐条列')
-    const audit = spawnSync(process.execPath, [join(ROOT, 'probes/team/quality-loop-audit.mjs'), '--deliverable', deliverable], { encoding: 'utf8' })
+    const audit = spawnSync(process.execPath, [join(ROOT, 'checks/audit/quality-loop-audit.mjs'), '--deliverable', deliverable], { encoding: 'utf8' })
     const output = `${audit.stdout ?? ''}${audit.stderr ?? ''}`.trim()
     console.log(output.split('\n').slice(-8).join('\n'))
     check('quality-loop-audit 无 problems', audit.status === 0 && !/body-modified/.test(output), `exit=${String(audit.status)}`)

@@ -51,9 +51,9 @@ node <company-content>/../presets/_shared/skills/quality-loop/scripts/verdict-ha
 
 ```sh
 source run/env.sh
-node probes/team/quality-loop-audit.mjs --self-test                      # 判据自证：红→还原→绿
-node probes/team/quality-loop-audit.mjs --workspace company-workspace    # 扫全部交付目录
-node probes/team/quality-loop-audit.mjs --deliverable <交付目录>          # 点名一份
+node checks/audit/quality-loop-audit.mjs --self-test                      # 判据自证：红→还原→绿
+node checks/audit/quality-loop-audit.mjs --workspace company-workspace    # 扫全部交付目录
+node checks/audit/quality-loop-audit.mjs --deliverable <交付目录>          # 点名一份
 ```
 
 它核七件事（实现 = `tools/lib/quality-loop.mjs`）：两个独立 activation（session/preset/depth）、

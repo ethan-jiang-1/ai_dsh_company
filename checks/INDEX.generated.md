@@ -3,40 +3,40 @@
 > 生成：`node tools/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。
 > 触发条件/成本/状态唯一源 = 各脚本头注；本文件只回答“有哪些公开入口、在哪”。
 
-## 冒烟 / 真实入口（checks/smoke/，34）
+## 冒烟 / 真实入口（checks/smoke/，33）
 
-[all-keyless](smoke/all-keyless.mjs) · [attention-e2e-smoke](smoke/attention-e2e-smoke.mjs)
-[channel-matrix-smoke](smoke/channel-matrix-smoke.mjs)
+[attention-e2e-smoke](smoke/attention-e2e-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs)
 [client-error-chain-smoke](smoke/client-error-chain-smoke.mjs)
 [client-load-smoke](smoke/client-load-smoke.mjs) · [company-entry-smoke](smoke/company-entry-smoke.mjs)
 [company-root-process-smoke](smoke/company-root-process-smoke.mjs)
 [concurrent-home-smoke](smoke/concurrent-home-smoke.mjs) · [delegation-smoke](smoke/delegation-smoke.mjs)
 [entry-probe-smoke](smoke/entry-probe-smoke.mjs)
-[external-workspace-smoke](smoke/external-workspace-smoke.mjs) · [fast](smoke/fast.mjs)
+[external-workspace-smoke](smoke/external-workspace-smoke.mjs) · [fast-lane](smoke/fast-lane.mjs)
 [gates-negative-smoke](smoke/gates-negative-smoke.mjs)
 [human-loop-e2e-smoke](smoke/human-loop-e2e-smoke.mjs)
 [interrupted-install-smoke](smoke/interrupted-install-smoke.mjs)
-[isolation-matrix-smoke](smoke/isolation-matrix-smoke.mjs)
+[isolation-matrix-smoke](smoke/isolation-matrix-smoke.mjs) · [keyless-lane](smoke/keyless-lane.mjs)
 [multi-install-smoke](smoke/multi-install-smoke.mjs)
 [multi-window-banner-smoke](smoke/multi-window-banner-smoke.mjs)
 [permissions-recovery-smoke](smoke/permissions-recovery-smoke.mjs)
 [presence-e2e-smoke](smoke/presence-e2e-smoke.mjs) · [present-catalog-smoke](smoke/present-catalog-smoke.mjs)
 [preset-smoke](smoke/preset-smoke.mjs) · [probe-smoke](smoke/probe-smoke.mjs)
 [product-team-e2e-smoke](smoke/product-team-e2e-smoke.mjs) · [profile-row-smoke](smoke/profile-row-smoke.mjs)
-[refactor-drift-oracle](smoke/refactor-drift-oracle.mjs) · [release-smoke](smoke/release-smoke.mjs)
-[replay-smoke](smoke/replay-smoke.mjs) · [revoke-recovery-smoke](smoke/revoke-recovery-smoke.mjs)
+[release-smoke](smoke/release-smoke.mjs) · [replay-smoke](smoke/replay-smoke.mjs)
+[revoke-recovery-smoke](smoke/revoke-recovery-smoke.mjs)
 [snapshot-motion-smoke](smoke/snapshot-motion-smoke.mjs)
 [two-axis-gates-smoke](smoke/two-axis-gates-smoke.mjs) · [ui-scene-smoke](smoke/ui-scene-smoke.mjs)
 [upgrade-while-running-smoke](smoke/upgrade-while-running-smoke.mjs)
 [workflow-contract-smoke](smoke/workflow-contract-smoke.mjs)
 
-## 盘面审计（checks/audit/，6）
+## 盘面审计（checks/audit/，7）
 
 [authorship-audit](audit/authorship-audit.mjs) · [candidate-scan-eval](audit/candidate-scan-eval.mjs)
 [coverage-ratchet](audit/coverage-ratchet.mjs) · [deliverables-check](audit/deliverables-check.mjs)
-[journal-audit](audit/journal-audit.mjs) · [surface-matrix-audit](audit/surface-matrix-audit.mjs)
+[journal-audit](audit/journal-audit.mjs) · [quality-loop-audit](audit/quality-loop-audit.mjs)
+[surface-matrix-audit](audit/surface-matrix-audit.mjs)
 
-## 窄机制与视觉探针（probes/，69）
+## 窄机制与视觉探针（probes/，68）
 
 ### browser-visual（17）
 
@@ -46,9 +46,9 @@
 [budget-panel-probe](../probes/browser-visual/budget-panel-probe.mjs)
 [cdp-probe](../probes/browser-visual/cdp-probe.mjs)
 [compact-view-probe](../probes/browser-visual/compact-view-probe.mjs)
-[cultivation-main-e2e](../probes/browser-visual/cultivation-main-e2e.mjs)
-[cultivation-ux-scenarios](../probes/browser-visual/cultivation-ux-scenarios.mjs)
-[cultivation-ux-walkthrough](../probes/browser-visual/cultivation-ux-walkthrough.mjs)
+[cultivation-main-e2e-probe](../probes/browser-visual/cultivation-main-e2e-probe.mjs)
+[cultivation-ux-scenarios-probe](../probes/browser-visual/cultivation-ux-scenarios-probe.mjs)
+[cultivation-ux-walkthrough-probe](../probes/browser-visual/cultivation-ux-walkthrough-probe.mjs)
 [dag-midflight-probe](../probes/browser-visual/dag-midflight-probe.mjs)
 [dag-visual-probe](../probes/browser-visual/dag-visual-probe.mjs)
 [deliverables-catalog-probe](../probes/browser-visual/deliverables-catalog-probe.mjs)
@@ -92,7 +92,7 @@
 [team-taskbook-probe](../probes/session-context/team-taskbook-probe.mjs)
 [time-context-probe](../probes/session-context/time-context-probe.mjs)
 
-### team（24）
+### team（23）
 
 [claim-race-probe](../probes/team/claim-race-probe.mjs)
 [delegation-contract-probe](../probes/team/delegation-contract-probe.mjs)
@@ -105,7 +105,6 @@
 [member-rescue-probe](../probes/team/member-rescue-probe.mjs)
 [member-stale-write-probe](../probes/team/member-stale-write-probe.mjs)
 [multi-user-e2e-probe](../probes/team/multi-user-e2e-probe.mjs)
-[quality-loop-audit](../probes/team/quality-loop-audit.mjs)
 [quality-loop-r2-probe](../probes/team/quality-loop-r2-probe.mjs)
 [index](../probes/team/read-barrier/index.mjs)
 [subagent-retry-probe](../probes/team/subagent-retry-probe.mjs)
@@ -119,7 +118,7 @@
 [worker-orchestrator-probe](../probes/team/worker-orchestrator-probe.mjs)
 [worker-researcher-probe](../probes/team/worker-researcher-probe.mjs)
 
-## 维护工具（tools/，24）
+## 维护工具（tools/，25）
 
 [ask-latency](../tools/ask-latency.mjs) · [bundle-init](../tools/bundle-init.mjs)
 [checks-index](../tools/checks-index.mjs) · [company](../tools/company.mjs)
@@ -129,11 +128,12 @@
 [market-index](../tools/market-index.mjs) · [methods-init](../tools/methods-init.mjs)
 [notes-audit](../tools/notes-audit.mjs) · [orient](../tools/orient.mjs)
 [propose-sampler](../tools/propose-sampler.mjs) · [prune-runtime](../tools/prune-runtime.mjs)
-[rehearsal-init](../tools/rehearsal-init.mjs) · [release](../tools/release.mjs)
-[session-log-export](../tools/session-log-export.mjs) · [setup](../tools/setup.mjs)
-[snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs)
-[sync-dsh](../tools/sync-dsh.mjs) · [test-census](../tools/test-census.mjs)
+[refactor-drift](../tools/refactor-drift.mjs) · [rehearsal-init](../tools/rehearsal-init.mjs)
+[release](../tools/release.mjs) · [session-log-export](../tools/session-log-export.mjs)
+[setup](../tools/setup.mjs) · [snapshot-motion](../tools/snapshot-motion.mjs)
+[snapshot-path](../tools/snapshot-path.mjs) · [sync-dsh](../tools/sync-dsh.mjs)
+[test-census](../tools/test-census.mjs)
 
-## 结构门禁（checks/gates/，71 个模块）
+## 结构门禁（checks/gates/，72 个模块）
 
 清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，接线一致性由 `gate-wiring` 门禁强制。

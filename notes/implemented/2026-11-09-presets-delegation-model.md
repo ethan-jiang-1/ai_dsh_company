@@ -141,7 +141,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针 / UI）
 **P3（图 + UI + 链场景）**：
 
 - 图投影纯 spec + 两条主链场景：节点/边/depth/terminal/address 正确；重启后 `interrupted`/`lost` 可见；红形态 = 硬折 parentId 把缺失说成状态。
-- UI：九页签目录不变；DagTab 体内 `DelegationFlowPanel` 显示流程/状态；`pnpm test tests/client` + `client-load-smoke` + `ui-scene-smoke --isolated --golden` 绿；红形态 = 金样未刷新、槽位/可访问名变化、DAG 事故钉被破坏。
+- UI：九页签目录不变；DagTab 体内 `DelegationFlowPanel` 显示流程/状态；`pnpm test tests/client` + `client-load-smoke` + `ui-scene-smoke --isolated --expected` 绿；红形态 = 金样未刷新、槽位/可访问名变化、DAG 事故钉被破坏。
 - `pnpm verify` / `pnpm test` / `pnpm typecheck` 全绿。
 
 **P4/P5**：
@@ -158,7 +158,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针 / UI）
 - P1 红配方（真跑）：删 vp-eng 的 `agentPreset: worker` → `tests/presets` **2 failed / 80 passed**（`workerProfile` 与 `agentPreset` 断言）；还原 → **82/82 绿**。证明静态矩阵能红。
 - P2 keyless 绿（2026-11-09）：policy skill 挂六 full role（真挂载 skill catalog 绿）；workflow-contract section host 插件 + 纯 spec 绿；P2 section 真实 vp-eng `systemPrompt` 含 section 全文，CEO/worker/worker-orchestrator 零命中；`pnpm test` **1294/160 files**（当时）；`pnpm typecheck` 绿；`pnpm verify` **ALL PASS**；`preset-smoke` **ALL PASS**。
 - P2c 真模型探针 P-A/P-B（2026-11-09，`probes/team/delegation-contract-probe.mjs`，会话 `session-5b759133-68ad-4379-b649-031705f3fa13`）：P-A **PASS**（skill 调用含 eng-teaming + delegation-policy，2×subagent）；P-B **PASS**（两个 child 首帧 `agentPreset=worker`，23 工具，无 workflow/team/控制）。
-- P3 UI 首片（2026-11-09）：`delegation-tree.ts` 纯模型 + **7** spec（含 CEO/VP 两条链场景）；`DelegationFlowPanel` + 2 spec；接进现有 DagTab（九页签不变；流程列表加树形连接线：每层竖线 + 末级肘线）；`ui-scene-smoke --isolated --golden` **ALL PASS**，金样已刷；`pnpm test` **1310/163 files**；`pnpm typecheck` 绿；`pnpm verify` **ALL PASS**；加树形连接线后 `ui-scene --isolated --golden` 重跑 **ALL PASS**。金样刷新同时收进一处既有 CMO 行漂移（非本次行为改动）。
+- P3 UI 首片（2026-11-09）：`delegation-tree.ts` 纯模型 + **7** spec（含 CEO/VP 两条链场景）；`DelegationFlowPanel` + 2 spec；接进现有 DagTab（九页签不变；流程列表加树形连接线：每层竖线 + 末级肘线）；`ui-scene-smoke --isolated --expected` **ALL PASS**，金样已刷；`pnpm test` **1310/163 files**；`pnpm typecheck` 绿；`pnpm verify` **ALL PASS**；加树形连接线后 `ui-scene --isolated --expected` 重跑 **ALL PASS**。金样刷新同时收进一处既有 CMO 行漂移（非本次行为改动）。
 - 深度预算（2026-11-09）：源码 `workflow-ptc startChild` / `agent-team roster.spawn` 都走 `startActivation(parent)` → depth=parent+1；vp-eng 通用 subagent/fork 2→**3**，其他 full role 仍 2；model/preset/docs/spec 同 diff。`pnpm test` **1303/162**、`pnpm typecheck`、`pnpm verify`、`preset-smoke` 全绿。P-C/P-D 真行为 **PASS**（`probes/team/delegation-depth-probe.mjs`：分支/成员 depth=1、worker depth=2、preset=worker；会话 `session-9100ca33-c313-4a04-a1db-ea3f4056e195` / `session-2fa6cb89-d3f2-4ea6-8db7-14fb1818acf4`）。
 - 重试原语（2026-11-09）：`subagent_retry` per-agent 五个 full role；`tests/host/delegation/subagent-retry.spec.ts` 6 条 + policy parity 6 条；`pnpm test` **1310/163**；typecheck/verify/preset-smoke 全绿；P-H 真失败注入仍待。
 - worker-orchestrator（2026-11-09）：`preset-smoke` 6+5；P-J 真探针 PASS（child depth 1 / 两个 leaf depth 2、preset=worker；会话 `session-016a598c-4817-4104-bdb8-ede9fa76de75`）。worker-workflow no-go：P-K 一次成功（child `1e3f5b79…` → 两分支 depth 2，2 agents/wf-ok），更强 persona 后仍多次未跑 workflow；planned/profile/docs/probe 全部移除；`pnpm test` **1300/164**；typecheck/verify 全绿。

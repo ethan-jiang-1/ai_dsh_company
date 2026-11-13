@@ -65,7 +65,7 @@
 ## 未验残留（显式）
 
 - **体验协议 T1–T6：自动化替身已跑（2026-10-18），真人档仍待跑**。替身 =
-  `probes/browser-visual/cultivation-ux-walkthrough.mjs`：真浏览器把六个任务各走一遍并量「步数/耗时/关键文案在场」，
+  `probes/browser-visual/cultivation-ux-walkthrough-probe.mjs`：真浏览器把六个任务各走一遍并量「步数/耗时/关键文案在场」，
   实跑 **ALL PASS**——T1 2 步、T2 2 步、T3 2 步（「新开的…会话才加载」边界文案在场）、T4 4 步（理由进记录）、
   T5 2 步（`verification: pass` 落记录）、T6 4 步（先见后果说明再确认 → 方法目录被删 + `revokedAt` 落记录）。
   **它证明的是机制与文案可执行，证明不了"新人会不会困惑"**——那一格要真人：`node … --protocol` 打印并落

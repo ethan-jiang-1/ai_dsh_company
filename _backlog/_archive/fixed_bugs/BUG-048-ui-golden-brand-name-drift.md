@@ -28,7 +28,7 @@ GOLDEN FAIL 页签「在场」第 14 字符起不同：
 2026-11-09 的内容三层分离提交（`763abc29`，Note =
 [generic-specific-separation](../../../notes/implemented/2026-11-09-generic-specific-separation.md)）按 D14
 把品牌显示名收窄为角色名，但没有同 diff 刷新
-`snapshots/visual/company-shell/ui.golden.json`。`pnpm verify` 的 `ui-golden-freshness` 只检查
+`snapshots/visual/company-shell/ui.expected.json`。`pnpm verify` 的 `ui-expected-freshness` 只检查
 九页签注册面与金样存在，不检查文本内容；真正的内容守卫是 `ui-scene-smoke --isolated --golden`，
 所以提交时“verify 绿”不等于“金样绿”。
 
@@ -49,7 +49,7 @@ node checks/smoke/ui-scene-smoke.mjs --isolated --golden
 ```
 
 输出会给出页签「在场」的逐字 diff；金样文件 =
-`snapshots/visual/company-shell/ui.golden.json`；诊断目录在回执里（`runtime/harness-home/diagnosis/ui-scene-smoke-…`）。
+`snapshots/visual/company-shell/ui.expected.json`；诊断目录在回执里（`runtime/harness-home/diagnosis/ui-scene-smoke-…`）。
 
 ## 修复关联
 
@@ -58,7 +58,7 @@ node checks/smoke/ui-scene-smoke.mjs --isolated --golden
   `node checks/smoke/ui-scene-smoke.mjs --isolated --refresh-golden`，再跑 `--golden` 复核。
 - 如果显示名收窄不是有意行为，则修页面/内容面，不刷新金样。
 - 测试/门禁：考虑把 `ui-scene-smoke --isolated --golden`（或等价的文本金样比对）纳入改 `content/`
-  显示名/品牌文案时的同 diff 检查；当前 `pnpm verify` 的 `ui-golden-freshness` 只查注册面。
+  显示名/品牌文案时的同 diff 检查；当前 `pnpm verify` 的 `ui-expected-freshness` 只查注册面。
 - 不要把“金样红”静默改成“测试坏了”；先确认产品文案意图，再刷新或回滚。
 
 ## 已修判定
@@ -78,4 +78,4 @@ node checks/smoke/ui-scene-smoke.mjs --isolated --golden
   同 diff 刷 UI 金样（`--refresh-golden` 后 `--golden` 复核）”——这是这次漏掉的那条连线。
 - **不升门禁**：按 [policy P2](../../../docs/policy.md)（复发 + 可机械判定 + 负例已证会失败），这是首犯，
   且真浏览器金样不适合秒级 verify；先补映射与程序，复发再按 P2 立门。
-- **全量**：`pnpm verify` ALL PASS（`ui-golden-freshness` 仍绿）；`ui-scene-smoke --isolated --golden` 绿。
+- **全量**：`pnpm verify` ALL PASS（`ui-expected-freshness` 仍绿）；`ui-scene-smoke --isolated --golden` 绿。

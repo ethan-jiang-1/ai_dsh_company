@@ -53,7 +53,7 @@
   `src/host/commands/settings-command.ts`、`src/client/startup/{startup-store,StrategyButton,StrategyPanel}.tsx|ts`；
   右栏页签目录 +1（`dsh-company-pack/strategy`）、composer 槽 +1、命令族 +1（`/company-settings`）。
 - `RUN_BUNDLE_PATHS` 增 `startup` / `startup-options`；`docs/contracts/profile.md` 增「项目启动策略」一节。
-- 金样 `snapshots/visual/company-shell/ui.golden.json` 从 9 页签刷到 10（`ui-scene-smoke --isolated --refresh-golden`）。
+- 金样 `snapshots/visual/company-shell/ui.expected.json` 从 9 页签刷到 10（`ui-scene-smoke --isolated --refresh-expected`）。
 - 真页面探针（cdp-probe）从注册源自动解析到 10 个页签，本次即用它验证「策略」面板在场。
 
 ## 归位
@@ -73,9 +73,9 @@
 - `pnpm test`：**231 files / 1704 tests passed**（新增 5 个 spec：`tests/lib/startup-settings.spec.ts` 13 项、
   `tests/host/startup/startup-store.spec.ts` 8 项、`tests/host/startup/startup-prompt.spec.ts` 4 项、
   `tests/host/commands/settings-command.spec.ts` 8 项、`tests/client/startup/strategy-button.spec.ts` 4 项）。
-- `pnpm verify`：ALL PASS（含 `ui-golden-freshness` 刷新后复跑）。
-- `node checks/smoke/ui-scene-smoke.mjs --isolated --refresh-golden` → 金样更新为 10 页签；
-  随后 `--golden` 复核 `金样一致（10 个页签）`、`ALL PASS（自起实例 + 全部公司页签 + 浏览器错误环零命中）`；
+- `pnpm verify`：ALL PASS（含 `ui-expected-freshness` 刷新后复跑）。
+- `node checks/smoke/ui-scene-smoke.mjs --isolated --refresh-expected` → 金样更新为 10 页签；
+  随后 `--expected` 复核 `金样一致（10 个页签）`、`ALL PASS（自起实例 + 全部公司页签 + 浏览器错误环零命中）`；
   证据 = `runtime/harness-home/diagnosis/ui-scene-smoke-*`（含 composer「策略：自动」按钮与右栏面板截图）。
 - `source run/env.sh && node checks/smoke/client-load-smoke.mjs`：`ALL PASS（真浏览器加载，client 面健康）`——
   新增槽注册零挂载失败。

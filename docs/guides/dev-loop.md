@@ -38,7 +38,7 @@
 3. **恢复未完成项**：读原工作记录，核对相关合同、未提交 diff 与必要现场，从已证实缺口继续。若恢复的是问题推敲，先读 [_backlog/](../../_backlog/README.md) 章程、相关 [问题卡](../../_backlog/issues/README.md) 和按需 [方法](../../_backlog/methods/README.md)；卡片状态或结论不扩大用户授权。
 
 **四类常设规则**（只读 Notes 的边界、先澄清再 RFC、Plan Mode、长程 goal 写法）= [policy.md §P1](../policy.md)。
-**10 分钟样例（改一行 → 有证据）**：改 `presets/ceo/agent.cordis.yml` 的 persona 一句 → `pnpm test tests/presets` → `source run/env.sh && node checks/smoke/preset-smoke.mjs` → `node checks/smoke/ui-scene-smoke.mjs --isolated --golden` → `pnpm verify`；末行应看到 `Tests … passed` / `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset）` / `金样一致（全部公司页签）` / `verify: ALL PASS`。纯文案改动也要跑 preset-smoke（挂载失败只有它抓得住）。
+**10 分钟样例（改一行 → 有证据）**：改 `presets/ceo/agent.cordis.yml` 的 persona 一句 → `pnpm test tests/presets` → `source run/env.sh && node checks/smoke/preset-smoke.mjs` → `node checks/smoke/ui-scene-smoke.mjs --isolated --expected` → `pnpm verify`；末行应看到 `Tests … passed` / `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset）` / `金样一致（全部公司页签）` / `verify: ALL PASS`。纯文案改动也要跑 preset-smoke（挂载失败只有它抓得住）。
 
 ## 1. 执行链：从授权到有证据交接
 

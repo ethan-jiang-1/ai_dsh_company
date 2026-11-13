@@ -16,7 +16,7 @@
 ## 方法（可复现）
 
 ```sh
-source run/env.sh && node probes/browser-visual/cultivation-ux-walkthrough.mjs --shots
+source run/env.sh && node probes/browser-visual/cultivation-ux-walkthrough-probe.mjs --shots
 # 每步截图落 runtime/human-exits-evidence/ux-shots/（00 首屏全页 / 01 空态+创作入口 / 02 待办行 /
 #   03 采纳后 / 04 拒绝表单 / 05 撤回后果 / 06 创作表单）；再由人（我）逐张读图记录。
 ```
@@ -58,6 +58,6 @@ source run/env.sh && node probes/browser-visual/cultivation-ux-walkthrough.mjs -
 
 ## 指针
 
-- 走查探针：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough.mjs)（`--protocol` / `--shots`）
+- 走查探针：[cultivation-ux-walkthrough.mjs](../../probes/browser-visual/cultivation-ux-walkthrough-probe.mjs)（`--protocol` / `--shots`）
 - 面板合同与实现：[CultivationBoard.tsx](../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx)｜[CultivationCompose.tsx](../../packages/company-pack/src/client/cultivation/CultivationCompose.tsx)｜宿主回执：[cultivation.ts](../../packages/company-pack/src/host/cultivation/cultivation.ts)
 - 前决定：[培养 GUI 行动面](./2026-10-17-cultivation-gui-actions.md)（其「体验协议」节即本轮的入口）

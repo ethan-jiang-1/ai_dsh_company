@@ -1,13 +1,15 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-13
 ---
 
 # 推敲：测试资产命名契约与目标树（文件名即类型声明）
 
-> 立卡：2026-11-13 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-13 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：note — 实施同 diff 写 Note（本卡不预建；命名按 notes/README 的规则）
+> 审查：agent — 两阶段各自实跑（test/typecheck/lint/dup/ratchet/verify + 门禁三条负例）；语义审对授权原文（「命名长期受益」「做对最重要」）逐条核过
+>
+> **结论/去向**：note — [2026-11-13-test-asset-naming.md](../../../notes/implemented/2026-11-13-test-asset-naming.md)
 >
 > **授权边界**：用户 2026-11-13 点出原则「命名是长期受益的事：人和 agent 只看文件名就知道是什么测试资产、不费劲」，
 > 并明确「策略调整期，把事情做对、长期做对比快更重要」。**卡上的方案不授予实施权限**：对 repo 的修改须用户在本卡点名开工。
@@ -30,11 +32,11 @@ opened: 2026-11-13
 
 | 现状 | 问题 | 证据 |
 |---|---|---|
-| `snapshots/visual/company-shell/ui.golden.json`、`checks/gates/ui-golden-freshness.mjs`、`tools/lib/ui-golden.mjs`、tests/harness/ui/ui-golden.spec.ts（旧位置） + `--golden`/`--refresh-golden` | 「golden」与「expected」并存；DSH 明文禁文件名含 golden（`check-expected-filenames.sh`），且同仓 `workspace.expected/`、`system-prompt.expected.md` 已用 expected | 4 个活文件 + 2 个 flag + 文档引用 |
-| `checks/smoke/refactor-drift-oracle.mjs` | 住 smoke 目录却不是冒烟（需成对调用的重构工具） | kind = tool；无自动 lane |
-| `checks/smoke/fast.mjs`、`checks/smoke/all-keyless.mjs` | 是 **runner**，名字却像资产 | 两者只调度，不证明行为 |
-| `probes/team/quality-loop-audit.mjs` | 是**只读审计**（keyless、出报告），住在 probes 调试面 | 头注：只读盘与会话日志，不调模型 |
-| `probes/browser-visual/cultivation-ux-walkthrough.mjs`、`cultivation-ux-scenarios.mjs`、`cultivation-main-e2e.mjs` | 后缀不在资产词表里——**逃过 `script-triggers` 门禁**（只认 `-(smoke\|probe\|audit\|check\|eval)`） | 三个都不是 `-probe` |
+| snapshots/visual/company-shell/ui.golden.json（旧名）、checks/gates/ui-golden-freshness.mjs（旧名）、tools/lib/ui-golden.mjs（旧名）、tests/harness/ui/ui-golden.spec.ts（旧位置） + `--golden`/`--refresh-golden` | 「golden」与「expected」并存；DSH 明文禁文件名含 golden（`check-expected-filenames.sh`），且同仓 `workspace.expected/`、`system-prompt.expected.md` 已用 expected | 4 个活文件 + 2 个 flag + 文档引用 |
+| checks/smoke/refactor-drift-oracle.mjs（旧名） | 住 smoke 目录却不是冒烟（需成对调用的重构工具） | kind = tool；无自动 lane |
+| checks/smoke/fast.mjs（旧名）、checks/smoke/all-keyless.mjs（旧名） | 是 **runner**，名字却像资产 | 两者只调度，不证明行为 |
+| probes/team/quality-loop-audit.mjs（旧名） | 是**只读审计**（keyless、出报告），住在 probes 调试面 | 头注：只读盘与会话日志，不调模型 |
+| probes/browser-visual/cultivation-ux-walkthrough.mjs（旧名）、`cultivation-ux-scenarios.mjs`、`cultivation-main-e2e.mjs` | 后缀不在资产词表里——**逃过 `script-triggers` 门禁**（只认 `-(smoke\|probe\|audit\|check\|eval)`） | 三个都不是 `-probe` |
 | `probes/team/read-barrier/index.mjs` | 不是探针：是 probe overlay 加载的实验监听器（fixture）；被 census 误算成 69 个探针之一 | 头注 "Experiment-only listener loaded by the concurrency probe overlay" |
 | `tests/harness/{repo,tools,session,evidence,contract,ui}` | 6 个不同主题挤在一个 meta 桶里（35/16/11/7/5/3 个 spec）；目录名不说明测什么 | `find tests/harness/*/ -name '*.spec.ts'` |
 
@@ -82,8 +84,8 @@ tests/
    `ui-golden.mjs` → `ui-expected.mjs`；`ui-golden.spec.ts` → tests/ui/ui-expected.spec.ts（目标）；
    `--golden`/`--refresh-golden` → `--expected`/`--refresh-expected`。归档 BUG-048 / 2026-10-28 Note 不动。
 2. **runner 正名**：`fast.mjs` → `fast-lane.mjs`；`all-keyless.mjs` → `keyless-lane.mjs`（package.json、CI、pre-push、文档同步）。
-3. **工具出 smoke**：`checks/smoke/refactor-drift-oracle.mjs` → tools/refactor-drift.mjs（目标）（保留头注；从 lane 注册表移除）。
-4. **审计归位**：`probes/team/quality-loop-audit.mjs` → checks/audit/quality-loop-audit.mjs（目标）。
+3. **工具出 smoke**：checks/smoke/refactor-drift-oracle.mjs（旧名） → tools/refactor-drift.mjs（目标）（保留头注；从 lane 注册表移除）。
+4. **审计归位**：probes/team/quality-loop-audit.mjs（旧名） → checks/audit/quality-loop-audit.mjs（目标）。
 5. **探针正名**：三个浏览器探针 → `cultivation-ux-walkthrough-probe.mjs`、`cultivation-ux-scenarios-probe.mjs`、
    `cultivation-main-e2e-probe.mjs`（改名后自动落入 `script-triggers` 覆盖）。
 6. **fixture 摘出**：`probes/team/read-barrier/` 不进探针注册表与 census；`index.mjs` 保留为 fixture 入口
@@ -101,8 +103,8 @@ tests/
 
 | 阶段 | 状态 | 证据 |
 |---|---|---|
-| Phase 1 目标树（harness 拆分） | **已交付 2026-11-13** | [Note 验证表](../../notes/implemented/2026-11-13-test-asset-naming.md)：77 文件迁移、2017 tests、verify 全绿、nav 改名红→绿 |
-| Phase 2 改名 + 门禁 | 未开工 | — |
+| Phase 1 目标树（harness 拆分） | **已交付 2026-11-13** | [Note 验证表](../../../notes/implemented/2026-11-13-test-asset-naming.md)：77 文件迁移、2017 tests、verify 全绿、nav 改名红→绿 |
+| Phase 2 改名 + 门禁 | **已交付 2026-11-13** | [Note 验证表](../../../notes/implemented/2026-11-13-test-asset-naming.md)：9 组改名、naming-contract 三条负例红→绿、census 31/67、基线更新 |
 
 ## 验收标准
 

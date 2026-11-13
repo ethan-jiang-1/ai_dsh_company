@@ -103,7 +103,7 @@
   ① `/tmp` 外部 wiki：读 `index.md` → 钻 `concepts/alpha.md` → 报出标记 `ZEBRA-42`（读穿透成立；`/tmp` 属平台临时区，
   按策略可写，所以写拒绝那半另找非临时路径验）；② `<home>/ai_dev_context/_temp/`（workspace 外、非临时区；本机维护者路径，脱敏记）：
   读 `index.md` 成功，`printf x >> …/index.md` → 退出码 1、原文 `bash: …: Operation not permitted`，文件未变。
-- **真页面**：本次 client 改动只加条件渲染（失效原因/位置标签），默认态（全自动）不变；金样 `ui-golden-freshness` 由
+- **真页面**：本次 client 改动只加条件渲染（失效原因/位置标签），默认态（全自动）不变；金样 `ui-expected-freshness` 由
   `pnpm verify` 复核通过，未重刷。
 
 ## 剩余风险 / 未做

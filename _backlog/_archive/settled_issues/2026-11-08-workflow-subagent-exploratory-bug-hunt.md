@@ -566,7 +566,7 @@ spot live 选 `delegation-smoke --delegate` 一次；不再跑第四–七轮全
 `tests/host/delegation/subagent-retry.spec.ts`（per-preset 深度/拒绝）、
 `tests/host/prompt/handbook.spec.ts`（family 注入面）、
 `tests/host/delegation/delegation-control.spec.ts` + `tests/contract/session-persistence-terminal.spec.ts`
-（header 身份/真实持久化）、`snapshots/visual/company-shell/ui.golden.json`（显示名收窄）。
+（header 身份/真实持久化）、`snapshots/visual/company-shell/ui.expected.json`（显示名收窄）。
 
 **未执行/未覆盖**：真模型复跑（本轮修复只做 keyless 机制档；第四轮真模型证据仍在研究材料 §9.4）；
 long-term adoption / workspace-write / 真页面 DagTab 图 / 其他职能逐个采用 retry；`preset-smoke` 未在

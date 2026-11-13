@@ -26,7 +26,7 @@
 
 - **修复提交**：`ea21dee7`（warm 树起点 `3f9506f7`）；`vitest.config.ts` 的 `resolve.dedupe`；三份研究页的修订行。
 - **clean clone**：临时目录里的干净 clone，repo HEAD 从 `3f9506f7` pull 到 `ea21dee7`；submodule 从本机维护者的 deepseek-harness checkout init 到 `b830ec950faba0a46dda564be3e2d854afed94f1`（避免网络拉 submodule）。依赖用父仓 pnpm store（`--store-dir`）+ 网络补了至少一个包（react），**不是离线证明**。
-- **真页面证据**：`snapshots/visual/company-shell/ui.golden.json`（10 页签金样）；本次证据目录落 `runtime/harness-home/diagnosis/`（gitignored）。
+- **真页面证据**：`snapshots/visual/company-shell/ui.expected.json`（10 页签金样）；本次证据目录落 `runtime/harness-home/diagnosis/`（gitignored）。
 - **probes 审计**：`git ls-files probes` 70 件；69 件有 `checks/`、`tools/`、`tests/`、`snapshots/` 的可执行消费者；剩 1 件是 read-barrier 探针包的 manifest（被同目录探针以包形式加载）。0 死载体。
 
 ## 未覆盖轴
@@ -48,5 +48,5 @@
 | clean clone `pnpm verify`（修后） | `verify: ALL PASS；3 门无对象（dist-freshness / replay-fixture-freshness / replay-ui-freshness）` |
 | clean clone `pnpm test`（修后） | `242 passed (242)`；`1994 passed / 3 skipped (1997)`（3 skip = dev-only 台账） |
 | warm tree `pnpm verify` / `pnpm test`（修后） | `ALL PASS` / `242 files / 1997 tests` |
-| `node checks/smoke/ui-scene-smoke.mjs --isolated --golden` | `ALL PASS（自起实例 + 全部公司页签 + 浏览器错误环零命中）`；`金样一致（10 个页签）` |
+| `node checks/smoke/ui-scene-smoke.mjs --isolated --expected` | `ALL PASS（自起实例 + 全部公司页签 + 浏览器错误环零命中）`；`金样一致（10 个页签）` |
 | probes 逐件审计（`git grep -l -F <path>`） | 69/70 有可执行消费者；1 件为探针包 manifest；0 死载体 |

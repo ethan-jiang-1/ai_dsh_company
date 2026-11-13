@@ -27,7 +27,7 @@
 - `tests/host/delegation/delegation-terminal.spec.ts`：纯 fold/view + registration seam 2 条。
 - `tests/client/data/delegation-tree.spec.ts`：host 投影 interrupted/aborted 断言；`delegation-flow-panel` 显示“中断”。
 - `pnpm typecheck` 绿；`pnpm verify` **ALL PASS**；`pnpm lint` 0/0；`pnpm dup` 0 clones。
-- `preset-smoke`：**6+3**；`ui-scene --isolated --refresh-golden` / `--golden`：**9 页签 ALL PASS**（头部改为“终态来自 host 投影；缺时不可见”）。
+- `preset-smoke`：**6+3**；`ui-scene --isolated --refresh-expected` / `--expected`：**9 页签 ALL PASS**（头部改为“终态来自 host 投影；缺时不可见”）。
 - 红形态：把 host 投影从 summary 移除 → tree 断言回到 subagentTiming/unavailable；把 worker-workflow 加回 planned → modelProblems/PRESET_IDS spec 红。
 
 ## 未验 / 边界

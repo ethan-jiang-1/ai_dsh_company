@@ -75,7 +75,7 @@ node checks/smoke/probe-smoke.mjs                 # ALL PASS 5/5 连通档
 node checks/smoke/replay-smoke.mjs --scenario r3-delegation --record  # 第六次重录
 node checks/smoke/replay-smoke.mjs --scenario r3-delegation            # ALL PASS 归一化零 diff 10s
 # B5 零漂移证明：
-node checks/smoke/refactor-drift-oracle.mjs --compare …               # 721=721 含测试体指纹
+node tools/refactor-drift.mjs --compare …               # 721=721 含测试体指纹
 ```
 
 未验项：真模型内容档（probe --full）与真动议行为观察（手册重构对角色行为的影响面——下两场真实动议值得盯

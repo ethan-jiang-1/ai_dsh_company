@@ -3,7 +3,7 @@
 // 何时跑：跑过一轮质量环（producer→verifier）之后、或改质量环判据/方法包之后；收口前自检。
 //   也用作规格自证：`--self-test`（keyless，秒级）把三种破坏各跑一遍，红→还原→绿。
 // 成本：真实用例 keyless 秒级（只读盘与会话日志，不调模型）；`--self-test` 同档。
-// 用法：source run/env.sh && node probes/team/quality-loop-audit.mjs [--workspace <dir>] [--deliverable <dir>]
+// 用法：source run/env.sh && node checks/audit/quality-loop-audit.mjs [--workspace <dir>] [--deliverable <dir>]
 //       [--home <dir>] [--methods <dir>] [--self-test] [--json]
 // 判据（实现 = tools/lib/quality-loop.mjs，spec 钉同源）：
 //   ① 两个独立 activation：裁决头的 session/preset/depth/producer 对得上真实 child durable header；

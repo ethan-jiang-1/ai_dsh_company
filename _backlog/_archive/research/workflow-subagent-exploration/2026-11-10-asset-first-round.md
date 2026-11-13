@@ -66,7 +66,7 @@ intent: 回答「继续探索前要不要先补资产」——用八轮缺陷家
 | probe | 60+ 个（team/fs-taskboard/browser-visual/session-context） | 单点机制/边界 | 场景各写一份；child 读取重复 3 份；无统一证据包 |
 | 审计 | `quality-loop-audit`（含 `--self-test`）、`deliverables-check`、`journal-audit` | 真盘判据、离线复判 | 没有「运行时面」审计 |
 | replay | `replay-smoke`（仅 foundation 合成场景，不加载 company-pack） | 会话级重放管线 | **不能**回放 company 会话；别为此新建资产 |
-| 金样 | `snapshots/visual/company-shell/ui.golden.json` | 隔离空壳 9 页签 | 不含会话/卡片数据面 |
+| 金样 | `snapshots/visual/company-shell/ui.expected.json` | 隔离空壳 9 页签 | 不含会话/卡片数据面 |
 
 ## 5. 证据四：round-8 日志实测矩阵（只读原型）
 

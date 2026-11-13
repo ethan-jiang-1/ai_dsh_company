@@ -43,7 +43,7 @@ opened: 2026-11-13
 - **U1**：`two-axis-gates-smoke` 的 mutation 改用现行 canonical 文本；加「mutation 必须改到字节」断言；共享助手放 `checks/smoke/lib/`，`gates-negative-smoke` 同用。
 - **U2**：先 `node checks/smoke/replay-smoke.mjs --refresh`（headless authored、无 key；workspace oracle 失败会拒绝），复跑确认绿并更新 `snapshot.yml` 资格日期；刷不动则 `replayEligible: archived` + 日期理由。
 - **U3**：`candidate-scan-eval` 状态改 `已耗（2026-11-13 语料已移出本仓；恢复语料时重跑）`。
-- **A1**：新增 `新建:checks/smoke/fast.mjs` + `package.json` 的 `smoke:fast`；第一版 6 条：`workflow-contract` / `present-catalog` / `company-root-process` / `gates-negative` / `snapshot-motion` / `two-axis`；进 `.githooks/pre-push`。
+- **A1**：新增 `新建:checks/smoke/fast-lane.mjs` + `package.json` 的 `smoke:fast`；第一版 6 条：`workflow-contract` / `present-catalog` / `company-root-process` / `gates-negative` / `snapshot-motion` / `two-axis`；进 `.githooks/pre-push`。
 - 同轮更新 pre-push/CI 的预算注释为实测值。
 
 **不做**：A2（`export-dist` 抽 plan，仅复发时）、A3（headless 静态新鲜度，`--refresh` 再漂才做）、A4（负例扩面，另卡）、A5（probe 审计，另卡）；不动产品代码/vendor。
@@ -63,7 +63,7 @@ P0 的 `## 验收标准` 全绿；`## 落地证据` 用实跑结果替换「实�
 
 ## 落地证据（`去向=note|implementation` 必填）
 
-- 改了哪些系统面（路径）：`checks/smoke/two-axis-gates-smoke.mjs`、`checks/smoke/gates-negative-smoke.mjs`、`checks/smoke/lib/mutation.mjs`、`checks/smoke/fast.mjs`、`snapshots/replay/foundation-workspace/`（raw/session/snapshot.yml）、`checks/audit/candidate-scan-eval.mjs`、`package.json`、`.githooks/pre-push`、`.github/workflows/ci.yml`、`tests/README.md`、`checks/README.md`、`docs/testing.md`、`notes/implemented/2026-11-13-test-asset-fence.md`。
+- 改了哪些系统面（路径）：`checks/smoke/two-axis-gates-smoke.mjs`、`checks/smoke/gates-negative-smoke.mjs`、`checks/smoke/lib/mutation.mjs`、`checks/smoke/fast-lane.mjs`、`snapshots/replay/foundation-workspace/`（raw/session/snapshot.yml）、`checks/audit/candidate-scan-eval.mjs`、`package.json`、`.githooks/pre-push`、`.github/workflows/ci.yml`、`tests/README.md`、`checks/README.md`、`docs/testing.md`、`notes/implemented/2026-11-13-test-asset-fence.md`。
 - 实跑命令与结果：`node checks/smoke/two-axis-gates-smoke.mjs` ALL PASS（5/5）；`node checks/smoke/gates-negative-smoke.mjs` ALL PASS（5/5）；`node checks/smoke/replay-smoke.mjs --refresh` exit 0，复跑 ALL PASS（2s）；`pnpm smoke:fast` ALL PASS（6 条，1.92s 单跑 / 2.2–2.8s pre-push）；`pnpm verify` ALL PASS；`sh .githooks/pre-push </dev/null` exit 0（test 242 files / 1997 tests，29–35s，两次）。
 
 ## 抽象度

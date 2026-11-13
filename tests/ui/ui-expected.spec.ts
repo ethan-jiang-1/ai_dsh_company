@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildGolden, compareGolden, firstTextDiff, goldenProblems, normalizeText } from '../../tools/lib/ui-golden.mjs'
+import { buildGolden, compareGolden, firstTextDiff, goldenProblems, normalizeText } from '../../tools/lib/ui-expected.mjs'
 
 // 六维提分 D5：UI 金样纯逻辑（门禁与 ui-scene-smoke 共用；真页面车道另验）。
 describe('UI 金样：归一化、构造与比较', () => {
