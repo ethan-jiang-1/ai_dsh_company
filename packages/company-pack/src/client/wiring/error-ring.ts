@@ -70,10 +70,25 @@ export function createErrorRing(limit = ERROR_RING_LIMIT, onEntry?: ClientErrorR
 
 /** 只保留能安全 JSON 化的短文本（错误对象/事件各有各的形状）。 */
 function textOf(value: unknown): string {
+  // null 必须落到空串：`JSON.stringify(null) === 'null'` 会抢在 `||` 回退前把
+  // 有意义的 `event.message` 顶掉——浏览器给 `error === null` 的 error 事件
+  // （跨源 Script error、ResizeObserver 通知）时，环里就只剩一条没头没尾的 "null"。
+  if (value === null || value === undefined) return ''
   if (typeof value === 'string') return value.slice(0, 500)
   if (value instanceof Error) return `${value.name}: ${value.message}`.slice(0, 500)
   try { return JSON.stringify(value)?.slice(0, 500) ?? '' } catch { return String(value).slice(0, 500) }
 }
+
+/**
+ * 浏览器把这两条 ResizeObserver 通知也当 `error` 事件派发（`error === null`），但它们是
+ * **观察器循环的提示，不是页面异常**：既不中断渲染，也没有堆栈。2026-11-13 实测——开右栏
+ * 触发一次，被误记成 client 错误（且因 `error` 为 null 显示成 "null"），`cdp-probe` 因此假红。
+ * 放进环会污染「用户撞了什么」的证据，故在入口滤掉（真布局故障仍会以别的症状出现）。
+ */
+const BENIGN_ERROR_NOTICES = [
+  'ResizeObserver loop completed with undelivered notifications.',
+  'ResizeObserver loop limit exceeded',
+]
 
 function stackOf(value: unknown): string | undefined {
   if (value instanceof Error && typeof value.stack === 'string') {
@@ -125,9 +140,11 @@ export function installErrorCapture(target: ErrorCaptureTarget, ring?: ErrorRing
 
   const onError = (event: unknown): void => {
     const value = event as { error?: unknown; message?: unknown; filename?: unknown }
+    const message = redactTokenUrls(textOf(value.error) || textOf(value.message) || '（未知页面错误）')
+    if (BENIGN_ERROR_NOTICES.some(notice => message.includes(notice))) return
     capture.push({
       kind: 'error',
-      message: redactTokenUrls(textOf(value.error) || textOf(value.message) || '（未知页面错误）'),
+      message,
       ...(stackOf(value.error) !== undefined ? { stack: redactTokenUrls(stackOf(value.error) as string) } : {}),
       at: Date.now(),
       ...(typeof target.location?.href === 'string' ? { href: redactTokenUrls(target.location.href) } : {}),

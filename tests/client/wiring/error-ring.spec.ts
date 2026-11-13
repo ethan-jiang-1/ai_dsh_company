@@ -60,6 +60,25 @@ describe('客户端错误环（R3-03）', () => {
     uninstall()
   })
 
+  it('error 为 null 的 error 事件用 message，不记成 "null"（2026-11-13 假红教训）', () => {
+    const ring = createErrorRing()
+    const { target, emit } = fakeTarget()
+    const uninstall = installErrorCapture(target, ring)
+    emit('error', { error: null, message: 'Script error.' })
+    expect(ring.list().map(entry => entry.message)).toEqual(['Script error.'])
+    uninstall()
+  })
+
+  it('ResizeObserver 循环通知是浏览器提示、不是页面异常：不入环', () => {
+    const ring = createErrorRing()
+    const { target, emit } = fakeTarget()
+    const uninstall = installErrorCapture(target, ring)
+    emit('error', { error: null, message: 'ResizeObserver loop completed with undelivered notifications.' })
+    emit('error', { message: 'ResizeObserver loop limit exceeded' })
+    expect(ring.list()).toEqual([])
+    uninstall()
+  })
+
   it('reporter 收到条目且 token 已脱敏；reporter 抛错不影响环', () => {
     const seen: Array<{ message: string; href?: string }> = []
     const ring = createErrorRing(10, entry => { seen.push(entry) })
