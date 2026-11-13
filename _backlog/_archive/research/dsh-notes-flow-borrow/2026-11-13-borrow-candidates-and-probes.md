@@ -6,8 +6,10 @@ intent: 把材料一的判定落成可裁决的候选（借/不借/触发），�
 # 候选清单与四组实测
 
 > **本轮只产出研究文档，不是落地。** 系统里没有新增门禁、没有改 `notes/` 任何规则文件、没有新增
-> AGENTS.md——按 [_backlog/AGENTS.md](../../AGENTS.md)「落地 = 系统里出现可验证的变更」，本页与
-> 材料一都是立项/交接材料。开卡与实施要另起一轮、由用户点名。
+> AGENTS.md——按 [_backlog/AGENTS.md](../../../AGENTS.md)「落地 = 系统里出现可验证的变更」，本页与
+> 材料一都是立项/交接材料。第一批（B1+B2+B3）已于 2026-11-14 开卡：
+> [notes/ 的树形与载体执行面](../../settled_issues/2026-11-14-notes-tree-and-carrier-gates.md)；开卡不是
+> 落地，实施仍要用户点名。
 >
 > **硬前提：位置不动。** `notes/` 留在仓根（用户 2026-11-13 两次确认）。下面每一条 B 都**在现位置**
 > 实施：新门禁以 `notes/` 为根、新 `AGENTS.md` 落在 `notes/implemented/` 与 `notes/archived/` 里。
@@ -63,7 +65,7 @@ basename 在 `notes/` 下回退一次（`implemented/X.md` → `archived/X.md`�
 | **N5** | 「该写 Note 没写」的存在性门禁 | DSH 也没有；语义判断不能机械判；本仓用「机械单步豁免 + 事后归档」替代（§二） | 有人真的靠「不写 Note」逃过审查，且有实例 |
 
 **N1 的替代压力阀**：`implemented/` 真要按主题找，本仓的原生答案是
-[decisions.md](../../../docs/reference/decisions.md) 的 D 号路由表（手工、有预算、有门禁），
+[decisions.md](../../../../docs/reference/decisions.md) 的 D 号路由表（手工、有预算、有门禁），
 不是 `INDEX.md`（D34 已退役一份）。若路由表也撑不住，再谈 class 轴。
 
 ## 三、四组实测（E1–E4）
@@ -97,7 +99,7 @@ node checks/run-gates.mjs
 ```
 
 机理：`notes-liveness` / `notes-supersession` 平铺读目录 + 按文件名日期过滤
-（[notes-liveness.mjs:31-46](../../../checks/gates/notes-liveness.mjs)），**过滤掉的东西没有人补一句**；
+（[notes-liveness.mjs:31-46](../../../../checks/gates/notes-liveness.mjs)），**过滤掉的东西没有人补一句**；
 `notes-archived-links` 递归走，但只判链接存在性、不判形状（它把 `zz-unknown-kind` 里的文件也扫了，
 只是那文件没链接）。还原后基线 `notes-archived-links ×230`、`ALL PASS`。
 
@@ -141,11 +143,11 @@ pnpm verify → PASS link-debt（archived 4 / moved 0 / live 0；基线 4/0/0）
 ```
 
 那 4 条全部是 `notes/archived/` 指向**已删文件**的非 `.md` 链接——出处 =
-[2026-10-25-standalone-deployment](../../../notes/archived/2026-10-25-standalone-deployment.md)（三条）与
-[2026-10-25-distribution-lifecycle](../../../notes/archived/2026-10-25-distribution-lifecycle.md)（一条），
+[2026-10-25-standalone-deployment](../../../../notes/archived/2026-10-25-standalone-deployment.md)（三条）与
+[2026-10-25-distribution-lifecycle](../../../../notes/archived/2026-10-25-distribution-lifecycle.md)（一条），
 目标是两个已退役的 lane 脚本、一个已退役的 standalone 工具、一个旧版 client 视图组件。也就是说
 「冻结层的链接必须永远有效」这句**今天已经不成立**，只是不成立的部分恰好不被
-`notes-archived-links` 扫（它只扫 `.md`，[gate:37-40](../../../checks/gates/notes-archived-links.mjs)）。
+`notes-archived-links` 扫（它只扫 `.md`，[gate:37-40](../../../../checks/gates/notes-archived-links.mjs)）。
 
 同时 0 条指向 `_backlog/issues` 与 `_backlog/bugs`（移动池）——说明「归档只链归档卡」是事实上的
 好习惯，但没人写下来。

@@ -19,6 +19,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-14-notes-tree-and-carrier-gates.md](settled_issues/2026-11-14-notes-tree-and-carrier-gates.md) | 已结；`notes-tree` 门禁（形状 + 状态行）+ 两份注入载体（`notes/implemented/AGENTS.md` / `notes/archived/AGENTS.md`）；七组真树红证 + 19 项回归；去向 = [Note](../../notes/implemented/2026-11-14-notes-tree-and-carrier-gates.md) | 2026-11-14 |
 | [2026-11-13-landing-semantics-agents-md.md](settled_issues/2026-11-13-landing-semantics-agents-md.md) | 已结；“落地 = 系统可验证变更 + 实跑证据；写 RFC/搬卡不算”写进入口/模板/门禁；三条门禁红→绿；去向 = [Note](../../notes/implemented/2026-11-13-landing-semantics.md) | 2026-11-13 |
 | [2026-11-13-workflow-entry-and-fact-checkpoint.md](settled_issues/2026-11-13-workflow-entry-and-fact-checkpoint.md) | 已结；RFC 成立（P0 入口/一致性 → P1 事实检查点 → P2 可执行验收）；实施不在本卡关闭条件内；去向 = [RFC](../../notes/proposed/2026-11-13-workflow-entry-and-fact-checkpoint.md) | 2026-11-13 |
 | [2026-11-13-test-asset-fence-p0.md](settled_issues/2026-11-13-test-asset-fence-p0.md) | 已结；测试资产围栏 P0：mutation 守卫 + replay `--refresh` + candidate 已耗 + `smoke:fast` 6 条进 pre-push；verify/test 242/1997/pre-push 全绿 | 2026-11-13 |

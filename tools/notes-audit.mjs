@@ -40,7 +40,7 @@ function readDir(dir, { required = false } = {}) {
     return []
   }
   return readdirSync(full)
-    .filter(file => file.endsWith('.md') && file !== 'README.md')
+    .filter(file => file.endsWith('.md') && file !== 'README.md' && file !== 'AGENTS.md')
     .sort()
     .map(file => ({ file: `${dir}/${file}`, text: readFileSync(join(full, file), 'utf8') }))
 }

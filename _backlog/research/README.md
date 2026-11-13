@@ -58,7 +58,7 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-- [DSH notes 流程的剩余借鉴点：不是缺分类维度，是缺三把锁](dsh-notes-flow-borrow/README.md) — 2026-11-13，已定性；候选 B1–B11 待用户裁决，未开卡。
+- （活跃题名 = —；2026-11-14 dsh-notes-flow-borrow 随其卡结项迁入[研究归档](../_archive/research/README.md)。）
 
 （2026-11-13 五题全部定性且产出卡已结，随末张活卡迁入[研究归档](../_archive/research/README.md)。）
 

@@ -25,6 +25,10 @@
 Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制**：`proposed → implemented` 同 diff 把正文
 改写成现在时的已交付事实（删迁移计划与未来时态）。决定已落地、现行合同才是权威、但否决仍能阻止重开的，移到 `archived/`（冻结，不再当 rationale owner）。没有这条否决的旧文按 §五 处置（收据删除需点头），历史在 git。
 
+**形状**（`notes-tree` 门禁）：根只许 `README.md`/`AGENTS.md`，深度 2 只许文件、唯一子目录 = `archived/receipts/`，
+文件名 = `YYYY-MM-DD-<slug>.md`（全小写）或 `README.md`/`AGENTS.md`；`INDEX.md` 与无日期名红。
+状态行（文件名日期 ≥ 2026-11-14）：全文件唯一，且与目录同轴（archived 保留实现状态）。
+
 **检索配方**（「开工按主题检索相关 Note」的一步操作，2026-10-21 立）：决策级先查
 [decisions.md](../docs/reference/decisions.md) 的 D 号路由表；机制级 `rg -l '<关键词>' notes/implemented/`
 ——同义词都试一轮（别名对照 = [terminology](../docs/reference/terminology.md)，如「在场/驾驶舱/presence」）。
@@ -69,6 +73,8 @@ no-index 教义下没有主题索引：**目录树 + 全文检索就是清单**�
   archived 目标豁免（冻结层不回写）。判据 = §五。
 - `notes-archived-links`（2026-10-30 立）：`archived/**/*.md` 的 markdown `.md` 链接必须存在——
   `md-links` 不扫该层，移动/归档后的断链由本门补。
+- `notes-tree`（2026-11-14 立）：§一「形状」段的机械面（深度/闭集/文件名/`INDEX.md` + 状态行唯一与目录同轴）；
+  反证 = 真树七组植入（gate 头注；[承载 Note](implemented/2026-11-14-notes-tree-and-carrier-gates.md)）；回归 = `tests/checks/notes-tree.test.mjs`。
 - `md-links`（implemented/proposed 硬查；**archived 不扫**）/ `bare-path`（**proposed/ +
   implemented/ 新写为硬档**；`_backlog/_archive/` = 观察档；**archived 不扫**）。**事实落点时效**（2026-10-09 N5 修）：implemented/ 的
   **决定正文不动**，但**路径/符号/默认值这类事实落点随改动就地改新**——依据 = vendor

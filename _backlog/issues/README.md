@@ -35,6 +35,8 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 
 ## 近期归档
 
+- notes/ 树形与载体执行面卡 2026-11-14 已结：`notes-tree` 门禁（目录闭集/深度/文件名/INDEX 禁令 + 状态行唯一与目录同轴）+ `notes/implemented/AGENTS.md` 与 `notes/archived/AGENTS.md` 两份注入载体；七组真树红证 + 19 项回归；去向 = [Note](../../notes/implemented/2026-11-14-notes-tree-and-carrier-gates.md)；卡在[归档](../_archive/settled_issues/2026-11-14-notes-tree-and-carrier-gates.md)。
+
 - 测试资产命名契约与目标树卡 2026-11-13 已结：tests/harness 拆六面 + golden→expected + runner/probe/audit 正名 + naming-contract 门禁；去向 = [Note](../../notes/implemented/2026-11-13-test-asset-naming.md)；卡在[归档](../_archive/settled_issues/2026-11-13-test-asset-naming-contract.md)。
 
 - 测试资产自校正系统 B/C/A 卡 2026-11-13 已结：lane 注册表 + 按面 pre-push + 每周 keyless + 覆盖率棘轮 + 失败类表/账本 + census；去向 = [Note](../../notes/implemented/2026-11-13-test-asset-loop.md)；卡在[归档](../_archive/settled_issues/2026-11-13-test-asset-loop.md)。

@@ -18,6 +18,7 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [dsh-notes-flow-borrow/](dsh-notes-flow-borrow/README.md) · DSH notes 流程的剩余借鉴点：八章逐节对照与三把锁（树形/载体/判据） | 2 份 | 用户 2026-11-13 点名研究；[notes 树形与载体卡](../settled_issues/2026-11-14-notes-tree-and-carrier-gates.md) | 同卡（[Note](../../../notes/implemented/2026-11-14-notes-tree-and-carrier-gates.md)） | 2026-11-14 |
 | [wiki-knowledge-map/](wiki-knowledge-map/README.md) · Wiki 知识地图：给虚拟团队一张可浏览的外部知识目录（AK 式 LLM wiki / OKF 规范 / 搜索阶梯 / DSH 载体） | 8 份 | 用户 2026-11-12 点名研究；[Wiki 知识地图落地卡](../settled_issues/2026-11-12-wiki-knowledge-map-landing.md) | 同卡（[Note](../../../notes/implemented/2026-11-12-wiki-knowledge-map-landing.md)） | 2026-11-13 |
 | [adversarial-shape-matrix/](adversarial-shape-matrix/README.md) · 对抗性边界矩阵与跨载体一致性 spec：测试资产怎么补 | 1 份 | 用户 2026-11-13 点名研究；[对抗性边界矩阵 P0 卡](../settled_issues/2026-11-13-adversarial-shape-matrix-p0.md) | 同卡（[Note](../../../notes/implemented/2026-11-13-adversarial-shape-matrix.md)） | 2026-11-13 |
 | [workflow-entry-and-fact-checkpoint/](workflow-entry-and-fact-checkpoint/README.md) · 加工环路的入口与事实检查点：fresh agent 走查与门禁对账 | 2 份 | 用户 2026-11-13 点名；[加工环路卡](../settled_issues/2026-11-13-workflow-entry-and-fact-checkpoint.md) | 同卡（去向 = [RFC](../../../notes/proposed/2026-11-13-workflow-entry-and-fact-checkpoint.md)） | 2026-11-13 |
