@@ -37,7 +37,7 @@
 ```text
 source run/env.sh && node probes/fs-taskboard/converge-e2e-probe.mjs
 #   ALL PASS（8/8；2026-10-30 扩到 16/16，覆盖 resume --dry-run 与 backfill 边界）；当时跑后 snapshots/archive 无残留、git status 无新增
-npx vitest run tests/harness/tools/converge-rules.spec.ts   # 含自定义 wsRel 的计划用例
+npx vitest run tests/tools/converge-rules.spec.ts   # 含自定义 wsRel 的计划用例
 pnpm test     # 753 passed
 pnpm verify   # ALL PASS（snapshot-index 复绿）
 ```

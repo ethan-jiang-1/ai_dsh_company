@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：加/减测试资产、改 lane 或失败类后跑 `--write`；不一致由 tests/harness/repo/test-census.spec.ts 在 pnpm test 里报红。
+// 何时跑：加/减测试资产、改 lane 或失败类后跑 `--write`；不一致由 tests/repo/test-census.spec.ts 在 pnpm test 里报红。
 //
 // 为什么：盘子在文档里手抄必漂。census 是生成物——数据来自 tools/lib/asset-lanes.mjs 的登记
 // 与盘上目录计数；谁改资产不重生成，spec 就红。它不评价资产，只让「有什么、在哪条 lane、

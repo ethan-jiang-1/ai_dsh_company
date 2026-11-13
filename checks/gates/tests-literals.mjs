@@ -19,9 +19,9 @@ const ALLOW = new Set([
   'tests/client/ui/brand.spec.ts',
   'tests/presets/presets.spec.ts',
   // 负向守卫：证明"编码基线拒绝公司手册混入"必须写公司标题样本。
-  'tests/harness/session/entry-probe.spec.ts',
+  'tests/session/entry-probe.spec.ts',
   // 安装手册标题是产品名（dsh-company-pack），不是部署公司名。
-  'tests/harness/repo/install-manual.spec.ts',
+  'tests/repo/install-manual.spec.ts',
 ])
 
 function specs(dir, prefix = '') {

@@ -45,7 +45,7 @@ export function renderCensus(model) {
   const lines = []
   lines.push('# 测试资产盘子（生成物，勿手改）')
   lines.push('')
-  lines.push('> 生成 = `node tools/test-census.mjs --write`；一致性门 = `tests/harness/repo/test-census.spec.ts`（不一致即红）。')
+  lines.push('> 生成 = `node tools/test-census.mjs --write`；一致性门 = `tests/repo/test-census.spec.ts`（不一致即红）。')
   lines.push('> 数据源 = `tools/lib/asset-lanes.mjs`（登记 + lane）+ 盘上目录计数；失败类词表 = `tests/failure-classes.md`。')
   lines.push('')
   lines.push('## 汇总')

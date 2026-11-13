@@ -79,7 +79,7 @@ node --import tsx/esm _backlog/_archive/research/two-product-structure-audit/exp
 4. `seed-integrity` 增加：`process-docs.md` 的 source 必须含 `{productType}`；每个类型包都能
    解析到该 source；默认类型可解析。
 5. bootstrap spec 覆盖两个类型 + 缺/未知 + only-fill；
-   `pnpm test tests/host/run-bundle tests/harness/tools/kb-seeds.spec.ts` 绿。
+   `pnpm test tests/host/run-bundle tests/tools/kb-seeds.spec.ts` 绿。
 
 ## 修复与验证
 

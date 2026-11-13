@@ -47,7 +47,7 @@
 | notes/research（**已退役**） | 12 | 退役并入 `_backlog/issues/` + `_backlog/research/`（D30/D31） |
 | notes/intents.md（**已退役**） | 4 | 曾冻进月度表；2026-10-09 清扫删表，历史在 git（D34） |
 | `packages/preset/agent-presets/*` | 9 | vendor 上游重新分包（本仓路径改写即可） |
-| `tests/*.spec.ts`（根级） | ~18 | 已分子目录：`tests/client/`、`tests/presets/`、`tests/harness/`、`tests/host/` |
+| `tests/*.spec.ts`（根级） | ~18 | 已分子目录：`tests/client/`、`tests/presets/`、`tests/`、`tests/host/` |
 | `snapshots/r{1,2,3,4}-motion`、`snapshots/dag-*` | ~17 | 已归 `snapshots/replay/`、`snapshots/probes/` |
 | snapshots/README（少 `.md`） | 3 | `snapshots/README.md` |
 

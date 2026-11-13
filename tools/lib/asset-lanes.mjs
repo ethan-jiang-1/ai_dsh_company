@@ -3,7 +3,7 @@
  *
  * 为什么在这：`tests/` 的分层守卫禁止 spec import `checks|probes|tools` 下的驱动脚本，
  * 但允许 `tools/lib/`（无副作用纯逻辑）。注册表既要被三个 runner 读（fast / 按面 pre-push / 每周全量），
- * 又要被 `tests/harness/repo/asset-lanes.spec.ts` 机械校验，所以住这里——数据 + 纯匹配函数，
+ * 又要被 `tests/repo/asset-lanes.spec.ts` 机械校验，所以住这里——数据 + 纯匹配函数，
  * import 无副作用、不起进程、不读盘。
  *
  * 唯一家纪律：lane 成员只在本文件出现一次；runner 从 FAST / SURFACE_RULES / ASSETS / PROBES 读，

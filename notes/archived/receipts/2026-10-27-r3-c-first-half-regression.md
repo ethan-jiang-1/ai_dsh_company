@@ -51,7 +51,7 @@ npx vitest run tests/client/wiring/attention-observers.spec.ts      → 5 passed
 npx vitest run tests/client/tabs/company-panels.spec.ts           → 5 passed
 npx vitest run tests/host/index/host-composition.spec.ts        → 4 passed
 npx vitest run tests/host/index/cultivation-propose-guards.spec.ts → 8 passed
-npx vitest run tests/harness/session/session-diagnose.spec.ts        → 8 passed（新增中断轮/工具计数 2 例）
+npx vitest run tests/session/session-diagnose.spec.ts        → 8 passed（新增中断轮/工具计数 2 例）
 npx vitest run                                               → 103 files / 944 tests passed
 node checks/run-gates.mjs                                    → verify: ALL PASS
 pnpm typecheck                                               → exit 0

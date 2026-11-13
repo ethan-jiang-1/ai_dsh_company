@@ -198,7 +198,7 @@ DSH 的 `plan-mode` 不是“写计划”的装饰：`exit_plan_mode` 把完整�
 ```sh
 cd /Users/bowhead/ai_dsh_company
 node checks/run-gates.mjs                     # 形状门禁；本轮 ALL PASS
-npx vitest run tests/harness/tools/backlog-liveness.spec.ts
+npx vitest run tests/tools/backlog-liveness.spec.ts
 wc -l packages/company-pack/src/client/tabs/TasksPanel.tsx \
       packages/company-pack/src/client/tabs/company-panels.tsx \
       packages/company-pack/src/client/tabs/LedgerTab.tsx

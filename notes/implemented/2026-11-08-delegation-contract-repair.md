@@ -20,10 +20,10 @@
 
 | 卡 | 终局 | 修法 | 资产 / 上游 |
 |---|---|---|---|
-| [BUG-036](../../_backlog/_archive/fixed_bugs/BUG-036-workflow-schema-enum-type.md) | 已修 | skill 四条子集约束（R6/R15 绿） | 钉子 `tests/harness/contract/json-schema-subset.spec.ts`；上游补 description |
+| [BUG-036](../../_backlog/_archive/fixed_bugs/BUG-036-workflow-schema-enum-type.md) | 已修 | skill 四条子集约束（R6/R15 绿） | 钉子 `tests/contract/json-schema-subset.spec.ts`；上游补 description |
 | [BUG-037](../../_backlog/_archive/fixed_bugs/BUG-037-root-team-tool-shadowing.md) | 已修 | 新增 `list_subagents` / `send_to_subagent`（官方 `ctx.subagents` + 父会话 durable catalog，名字不被团队版 shadow） | `tests/host/delegation/delegation-control.spec.ts` + 真挂载 79 tools；上游修好后**退役**这两工具 |
 | [BUG-038](../../_backlog/_archive/fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md) | 已修 | 分支当叶子规则 + 真跑观察（首轮嵌套→模型自纠为父层扇出）；修正 skill 的“必 null”过度断言 | `checks/smoke/workflow-contract-smoke.mjs` 第 6 条；上游分支结果语义 |
-| [BUG-039](../../_backlog/_archive/fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md) | 已修 | **配置真修**：vp-eng preset 的 `tool-workflow.maxResultChars` 50k→200k，spill 设计生效（头尾预览 + 全文落盘 + 可读路径）；删掉“spill 是截断副本”旧句 | 钉子 `tests/harness/contract/workflow-result-budget.spec.ts`；探针见下；上游默认值语义 |
+| [BUG-039](../../_backlog/_archive/fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md) | 已修 | **配置真修**：vp-eng preset 的 `tool-workflow.maxResultChars` 50k→200k，spill 设计生效（头尾预览 + 全文落盘 + 可读路径）；删掉“spill 是截断副本”旧句 | 钉子 `tests/contract/workflow-result-budget.spec.ts`；探针见下；上游默认值语义 |
 | [BUG-040](../../_backlog/_archive/fixed_bugs/BUG-040-workflow-schema-text-answer-discarded.md) | 修复已落地（**留活**） | 技能/验收规则 + 机制钉子（completed 纯文本 + schema → null 且 agentEnd failed） | `workflow-contract-smoke` 第 5 条；判定第一条要引擎诊断，本仓做不到（卡内已写上游真 diff） |
 | [BUG-041](../../_backlog/_archive/fixed_bugs/BUG-041-host-restart-orphans-inflight-child.md) | 修复已落地（**留活**） | 查询面（`list_subagents` 读 durable catalog）+ 部署前置（budget-and-ops 行） | `delegation-control.spec.ts`；**缺口**：只报 running/inactive，不报 `turn/end interrupted` |
 
@@ -70,7 +70,7 @@
   上游修 shadow 后必须按退役条件删，避免长期两套名字。
 - **200k 是产品选择**：>200k 仍硬截断且 spill 是副本；端到端“spill 完整”目前靠一次性探针，**未进 CI**
   （钉子只覆盖“工具不截断”）。若将来要常驻，需把 tool+spill 全链做成机制档。
-- **`tests/harness/contract/**` 不进 tsc**：直引 vendor 源，与 `tests/client` / `tests/host` 对
+- **`tests/contract/**` 不进 tsc**：直引 vendor 源，与 `tests/client` / `tests/host` 对
   直引 vendor 源 spec 的处置同形；运行面走 vitest paths，不受影响。
 - **layering 守卫修正**：驱动脚本正则只认“从本文件向仓库根走的相对路径”，修掉
   `vendor/dsh/packages/core/tools` 同名目录的假红；红配方（临时 import `tools/drivers`）已现场验证。

@@ -33,7 +33,7 @@ opened: 2026-11-07
 | 行为 | 类别 | 输入·状态 | 判红·通过信号 | 负例·恢复 | 证据 owner | 人的判断 |
 |---|---|---|---|---|---|---|
 | process-docs 含 R1–R10、退役词表、范围/豁免、并发口径；活动文本不出现退役词 | 确定性 | 读 `content/state/process-docs.md` | 新 spec：章节齐全、退役词只在退役节 | 活动规则里加 `STR-001` → 红；还原 → 绿 | 新 `requirements-contract.spec.ts`（待建，落 tests/host/） | 无（结构） |
-| `meta.md` 有 `编号体系:` 字段；`parseMeta` 接受额外字段 | 确定性 | meta 样例 + `validateMeta` | validateMeta 绿；字段可读 | 删 `slug` → 既有测试红；加字段不红 | `tests/harness/tools/deliverables.spec.ts`（validateMeta） + `tests/host/run-bundle/bootstrap.spec.ts`（模板在场） | 无 |
+| `meta.md` 有 `编号体系:` 字段；`parseMeta` 接受额外字段 | 确定性 | meta 样例 + `validateMeta` | validateMeta 绿；字段可读 | 删 `slug` → 既有测试红；加字段不红 | `tests/tools/deliverables.spec.ts`（validateMeta） + `tests/host/run-bundle/bootstrap.spec.ts`（模板在场） | 无 |
 | `base-clean`/`company-skeleton` 收新内容；`pnpm verify` 绿 | 门禁形状 | repo | verify ALL PASS | 删必需文件 → 门禁红 | `checks/gates/{base-clean,company-skeleton}.mjs` | 无 |
 | V1 词表盲测：裸 token 的第一先验不撞车 | 模型行为 | 裸 `MR/REQ/IF/TC` vs `STR/SYR/IFR/VP` | 记录结果；只有撞车才换词 | 撞车 → 换词/记录；不撞车 → 保留 | 人工 model call（1 次）+ 研究材料 | 用户 review |
 | `docs/guides/product-definition.md` 与新合同一致；无退役词；链接/预算绿 | 文档形状 | 指南原文 | `pnpm verify` 绿 | 改坏链接/超预算 → 红 | 既有 `md-links`/`doc-budget` + 用户 review | 用户 review 文案 |
@@ -43,7 +43,7 @@ opened: 2026-11-07
 | 判据 | 现有 owner / 新资产 | 命令 | 证明什么 | 不证明什么 | 红证·负例 |
 |---|---|---|---|---|---|
 | 合同章节/退役词 | 新 `requirements-contract.spec.ts`（待建，落 tests/host/） | `pnpm test tests/content/requirements-contract.spec.ts` | 合同文本与退役词边界 | 模型是否遵守 | 先写 spec 跑红（缺文件/缺章节）再补文件 |
-| meta 字段 | 既有 `tests/harness/tools/deliverables.spec.ts`（validateMeta） + `tests/host/run-bundle/bootstrap.spec.ts` | `pnpm test tests/harness/tools/deliverables.spec.ts` + `pnpm test tests/host/run-bundle/bootstrap.spec.ts` | 额外字段不破、模板在场 | 字段语义 | 删 `slug` → 既有红 |
+| meta 字段 | 既有 `tests/tools/deliverables.spec.ts`（validateMeta） + `tests/host/run-bundle/bootstrap.spec.ts` | `pnpm test tests/tools/deliverables.spec.ts` + `pnpm test tests/host/run-bundle/bootstrap.spec.ts` | 额外字段不破、模板在场 | 字段语义 | 删 `slug` → 既有红 |
 | 门禁在场 | 既有 `checks/gates/{base-clean,company-skeleton}.mjs` | `pnpm verify` | 只读内容完整 | 语义正确性 | 临时删 `content/state/process-docs.md` → 门禁红 |
 | 链接/文档预算 | 既有 `md-links`/`doc-budget`（含 `docs/guides/product-definition.md`） | `pnpm verify` | 指针不悬空 | 规则好不好 | 改坏链接 → 红 |
 | V1 | 已跑（2026-11-07，1 次 model call；记录 prompt/输出/日期） | 人工 | 第一先验 | 结构正确性 | A 组胜出；记录见 trial；不跑 = 未验证 |

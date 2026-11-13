@@ -132,7 +132,7 @@ rm -f  <DSH_HOME>/cache/company/session-search-*.db    # 派生索引，可删�
 
 `<DSH_HOME>/cache/company/session-search-*.db` 是派生索引，可删可重建；不要为了清插件删整个
 `DSH_HOME`（会话/凭据/workspace 登记都在那里）。完整清单以《安装手册》§八为准；本块与手册由
-`tests/harness/repo/uninstall-parity.spec.ts` 对账。
+`tests/repo/uninstall-parity.spec.ts` 对账。
 
 ## 已知限制（随行为变更同 diff 更新）
 

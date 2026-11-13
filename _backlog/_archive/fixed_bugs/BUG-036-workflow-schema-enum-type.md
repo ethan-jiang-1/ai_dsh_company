@@ -71,7 +71,7 @@ vendor `tool-workflow` 的 model-facing description 列举了允许关键字，�
   `completed`；模型按 skill 用 `oneOf: [{type:'string'},{type:'null'}]`（未用 type 数组），
   两分支都调 `structured_output`，缺失文件返回 `version:null`；首跑无 schema fatal。
 - 上游侧仍建议补一句 model-facing description（本仓不改 vendor）。
-- **资产**：`tests/harness/contract/json-schema-subset.spec.ts`——按当前 pin 钉住四条子集语义
+- **资产**：`tests/contract/json-schema-subset.spec.ts`——按当前 pin 钉住四条子集语义
   （enum/const 需单值 type、无 type 数组、oneOf 不与 type 并列、根 object）。红配方 = 把 fixture
   换成上游修复后的形状（enum 被接受）→ 断言翻转；红 = 上游变了，处理是删/改 skill 与台账 [CT-IN]，
   不是改断言凑绿。

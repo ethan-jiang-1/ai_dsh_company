@@ -12,7 +12,7 @@
 3. **`teamLead` 改名为 `teamLeadWhenRoot`。** 它是 preset 级期望；运行时任何 root 都是 Lead（worker/support root 也拿到团队工具），注入侧必须用 `agentTeams.membership`/`parentSession` 判，并叠加 support 座位（不列 team、guard 拒 spawn——见 [seat Note](./2026-11-11-capability-seat-single-source.md)），不能只看这个字段。
 4. **控制面标签分开。** `CHANNELS.*.control` 拆成 `nativeControl`（vendor 名字）与 `repoControl`（本仓 workaround：`list_subagents`/`send_to_subagent`/`workflow_runs`）；不再把 workaround 写成通道硬能力。
 5. **通道分类归原生四通道。** A/B/D 只作组织别名：A = spawn，B = team，D = workflow；C（dsh-sdk）标未启用；fork 补进能力矩阵。`docs/architecture.md`、`docs/reference/terminology.md`、`docs/contracts/delegation.md` 同 diff 更新。
-6. **加 vendor-parity 钉子。** `tests/harness/contract/delegation-channel-parity.spec.ts` 直接读 vendor 源码断言 provider 能力位/team context/workflow options，并断言模型字段与之一致；升级 pin 时措辞变了就红。
+6. **加 vendor-parity 钉子。** `tests/contract/delegation-channel-parity.spec.ts` 直接读 vendor 源码断言 provider 能力位/team context/workflow options，并断言模型字段与之一致；升级 pin 时措辞变了就红。
 
 ## 输掉的方案
 
@@ -29,14 +29,14 @@
 
 ## 验证（实跑）
 
-- **红**：修前 `pnpm exec vitest run tests/harness/contract/delegation-channel-parity.spec.ts` → **3 failed / 3 passed**（team context、control 标签、`teamLeadWhenRoot` 字段各一）。还原配方 = 把 `CHANNELS.team.inheritsParentContext` 改回 `true` 并去掉 `nativeControl`/`repoControl` → 同 spec 红。
+- **红**：修前 `pnpm exec vitest run tests/contract/delegation-channel-parity.spec.ts` → **3 failed / 3 passed**（team context、control 标签、`teamLeadWhenRoot` 字段各一）。还原配方 = 把 `CHANNELS.team.inheritsParentContext` 改回 `true` 并去掉 `nativeControl`/`repoControl` → 同 spec 红。
 - **绿**：同命令修后 **6 passed**；`pnpm test tests/presets` → **128 passed**；`pnpm test` → **194 files / 1561 tests passed**；`pnpm typecheck` 绿；`source run/env.sh && node checks/smoke/preset-smoke.mjs` → **ALL PASS（6 角色 + 5 非角色）**；`pnpm verify` → **ALL PASS**。
 - 证据边界：parity spec 只证“模型字段与 vendor 源码一致”，不证运行时工具面；运行时面由 `preset-smoke` 与 `surface-matrix` 另证。
 
 ## 现行语义（canonical）
 
 - [delegation 合同](../../docs/contracts/delegation.md) · [architecture 协作通道](../../docs/architecture.md) · [terminology](../../docs/reference/terminology.md) · [presets 四形态](../../docs/contracts/presets.md)
-- 模型 = [tools/lib/delegation-model.mjs](../../tools/lib/delegation-model.mjs)；钉子 = [delegation-channel-parity.spec.ts](../../tests/harness/contract/delegation-channel-parity.spec.ts)
+- 模型 = [tools/lib/delegation-model.mjs](../../tools/lib/delegation-model.mjs)；钉子 = [delegation-channel-parity.spec.ts](../../tests/contract/delegation-channel-parity.spec.ts)
 
 ## 相关
 

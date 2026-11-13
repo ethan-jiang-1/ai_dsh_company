@@ -8,9 +8,9 @@
 
 | # | 失败类 | 最低能看见的层 | 本仓载体 | 状态 |
 |---|---|---|---|---|
-| 1 | 纯逻辑 / 编解码 / 数据变换 | keyless unit | `tests/lib`、`tests/harness/tools` | 有 |
+| 1 | 纯逻辑 / 编解码 / 数据变换 | keyless unit | `tests/lib`、`tests/tools` | 有 |
 | 2 | 服务 / 注册表 / 贡献生命周期（dispose 后残留） | unit + 生命周期 | `tests/host`、`tests/client`（client 面 dispose 已点名） | 部分：host 侧 registry 的 dispose 未逐一点名 |
-| 3 | 导出形态 / 包入口（Loader 丢弃 inject、default export） | 静态门 + 导出守卫 | `tests/harness/repo/pack-exports.spec.ts` + pack-shape / pack-source | 有 |
+| 3 | 导出形态 / 包入口（Loader 丢弃 inject、default export） | 静态门 + 导出守卫 | `tests/repo/pack-exports.spec.ts` + pack-shape / pack-source | 有 |
 | 4 | 工具定义（schema / args / result 渲染） | unit（真 `tools.execute`）+ 组装 | `signoff-tool` 等行为 spec | 部分：无录制钉 schema |
 | 5 | 模型可见文本（prompt / 工具描述 / 诊断） | **组装转录**（keyless 回放） | 现有只有真模型冒烟（抽样） | **缺**：待组装回放场景（研究 B6） |
 | 6 | 会话 / 持久化 / 迁移 | unit + 世界断言 | `tests/host/ledger`、`run-bundle`、`presented-*` | 有 |

@@ -2,7 +2,7 @@
 //
 // 为什么单独抽成 lib：审计要回答的是**契约问题**（裁决是不是原文、覆盖全不全、方法配没配对、
 // 验的人有没有写盘），不是会话读取问题。判据住这里 ⇒ keyless spec 能直接喂合成输入把每条红配方
-// 跑出来（tests/harness/tools/quality-loop.spec.ts），驱动脚本只负责"把盘上的东西读成输入"。
+// 跑出来（tests/tools/quality-loop.spec.ts），驱动脚本只负责"把盘上的东西读成输入"。
 // 解析器口径的唯一家在本文件；流程口径的唯一家 = `presets/_shared/skills/quality-loop/SKILL.md`
 // （改判据形状 = 两边同 diff 改，spec 会拦漂移）。
 import { createHash } from 'node:crypto'

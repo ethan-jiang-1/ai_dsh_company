@@ -67,7 +67,7 @@ read.” 而 child 的 durable 日志里确实记着 `turn/end {"reason":{"kind"
   - `tests/host/delegation/delegation-control.spec.ts`：fake persistence 三态（present / absent → unavailable /
     read 抛错 → unavailable）+ 有界重试（前两次失败、第三次成功 → 仍报终态）+ 三次全失败 →
     `unavailable` 且留一条 warn + `readChildTerminal` 的 open(read)/read(0)/close 调用序。
-  - `tests/harness/contract/session-persistence-terminal.spec.ts`：**真实** `JsonlSessionPersistence`
+  - `tests/contract/session-persistence-terminal.spec.ts`：**真实** `JsonlSessionPersistence`
     临时 root + `create/append/close` 写日志，读回 `interrupted` / `completed` / 无 turn-end / 不存在；
     红配方 = 丢掉日志最后一条 → 2 条红，还原绿。
 - **真实装配复验**：重建 pack 后跑 `runtime/tmp/explore/resume2.mjs`（C2）。通过则 041 的

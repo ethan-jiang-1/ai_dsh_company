@@ -82,7 +82,7 @@
 | F 084 | 词法 `wikiLocation` + `existsSync(index)` → startup-store + settings-command specs | 红 **4 failed**；复原 **25 passed** |
 | F 085 | 读上限改回 64 / 解析折空 → lib + content 预算 + panel specs | 各红 **1 failed**；复原 **24 passed** |
 | F 087 | 模板 README 改回仓库路径 → `tests/content/wiki-template.spec.ts` | 红 **1 failed**；复原 **7 passed** |
-| L 080 | `enTitle` 落回 zh → `tests/harness/ui/company-tab-catalog.spec.ts` | 红 **2 failed**；复原 **4 passed** |
+| L 080 | `enTitle` 落回 zh → `tests/ui/company-tab-catalog.spec.ts` | 红 **2 failed**；复原 **4 passed** |
 | L 083 | description 硬编码中文 → settings-command spec | 红 **2 failed**；复原 **12 passed** |
 | V 086 | tooltip 还原固定句 → strategy-button spec | 红 **1 failed**；复原 **6 passed** |
 | V 088 | 往模板 `AGENTS.md` 塞坏链接 → `pnpm verify` | `FAIL shipped-links ... 模板内部链接目标不在盘上`；还原 **ALL PASS** |

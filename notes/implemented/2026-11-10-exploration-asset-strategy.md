@@ -22,7 +22,7 @@
    ⑤ 资产有层（keyless/smoke/probe/audit/evidence），不把模型塞进 `pnpm test`；
    ⑥ 同类形状第二次出现、或某 charter 被盲区卡住才建，不预建每 bug 场景。
 2. **运行时面矩阵（A1）**：`tools/lib/surface-matrix.mjs` 判据 + `checks/audit/surface-matrix-audit.mjs`
-   读盘 + `tests/harness/evidence/surface-matrix.spec.ts` 红绿。入口语义钉死：
+   读盘 + `tests/evidence/surface-matrix.spec.ts` 红绿。入口语义钉死：
    root = Lead（9 个团队工具，support preset 也不判越权）；team member 继承 Lead；
    one-shot child / workflow 分支才按 preset 判 generic/fork/workflow/control；`send_to_subagent`
    在 root/member 是宿主面，不当 preset control。handbook 跟 `handbookSkipPresets()`，
@@ -62,13 +62,13 @@
 
 ## 验证
 
-- `pnpm vitest run tests/harness/evidence/surface-matrix.spec.ts`：14 tests 绿；spec 内含
+- `pnpm vitest run tests/evidence/surface-matrix.spec.ts`：14 tests 绿；spec 内含
   worker 带 control / verifier 带 write / CEO 缺 coo / handbook 反置四类红例。
 - `node checks/audit/surface-matrix-audit.mjs --home runtime/harness-home --since 2026-11-10T17:00:00+08:00`：
   47 观察（20 root / 19 child / 8 member）、54 个无模型轮跳过、**0 问题**；
   同一 audit 对 `--since 2026-11-09` 旧日志 **exit 1**，报 `worker d1 control=list_subagents,send_to_subagent`
   （BUG-052 同型）与旧 vp-eng 缺 `quality_loop_*` 行——红证在案。
-- `pnpm vitest run tests/harness/session/session-evidence.spec.ts`：6 tests 绿；缺首帧 → `unavailable`。
+- `pnpm vitest run tests/session/session-evidence.spec.ts`：6 tests 绿；缺首帧 → `unavailable`。
 - `node tools/explore-evidence.mjs --session session-2110bd4a… --home runtime/harness-home`：
   root + 2 children（80/71/71 工具、3 轮 completed）。
 - B1 cancel：child 的 `bash sleep 120` 起后 cancel → root/child `turn/end=aborted`、无 `sleep 120` 残留；

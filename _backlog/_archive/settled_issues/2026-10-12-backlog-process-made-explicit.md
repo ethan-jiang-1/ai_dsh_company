@@ -15,7 +15,7 @@ opened: 2026-10-12
 
 **未决问题：**（1）例外边界的操作化；（2）两组枚举，含本仓本地子问（token 用中文面还是随源仓英文面）；（3）确认 `rejected` 终态延后；（4）【本仓新增】修复自授权与[开发环 §0.5](../../../docs/guides/dev-loop.md)任务源清单的对账方式。四项全部在「方案与取舍」带建议，等用户拍板。
 
-**下一步：** 用户评审本卡（五项补充、例外边界、两组枚举）——与源卡是**同一次评审**，一个点头同时解锁两仓。点头后按 do-now 缺省一轮落地：RFC 进 [notes/proposed/](../../../notes/proposed/README.md)，全补丁（[章程](../../README.md)缺陷车道与例外条款、[bugs](../../bugs/README.md)模板与状态节、[issues README](../../issues/README.md)门票句）、活状态门禁修订（`tools/lib/backlog-liveness.mjs` + `tests/harness/tools/backlog-liveness.spec.ts` 反证）、流程 Note、根 AGENTS.md 布局行指针、两边索引；卡按关闭法同轮收口。
+**下一步：** 用户评审本卡（五项补充、例外边界、两组枚举）——与源卡是**同一次评审**，一个点头同时解锁两仓。点头后按 do-now 缺省一轮落地：RFC 进 [notes/proposed/](../../../notes/proposed/README.md)，全补丁（[章程](../../README.md)缺陷车道与例外条款、[bugs](../../bugs/README.md)模板与状态节、[issues README](../../issues/README.md)门票句）、活状态门禁修订（`tools/lib/backlog-liveness.mjs` + `tests/tools/backlog-liveness.spec.ts` 反证）、流程 Note、根 AGENTS.md 布局行指针、两边索引；卡按关闭法同轮收口。
 
 ## 范围与排除项
 
@@ -95,7 +95,7 @@ opened: 2026-10-12
 
 *为什么 修复就绪/修复已落地 值得占位：* 修复就绪一次翻转承载门票与授权（裁定 2＋缺口 4）；修复已落地 = 「实施不是验收」的显形——源仓 BUG-001 占过这个形状而无词可名，等人拍板命名另一半。新增值命名观察到的形状，不发明形状。
 
-**门禁诚实（区别于裁定 1）：** 新值要求修订本仓活状态门禁——`tools/lib/backlog-liveness.mjs` 的 statuses 表与检查（新枚举、调查中改名、行↔frontmatter 镜像互查、毕业封闭头），反证在 `tests/harness/tools/backlog-liveness.spec.ts`——既有类的修订，不新增检查族；被延后的是验收在场**新族**（按状态必备节），记承压候选。门禁改动按 gate-change-definition 技能：红→还原→绿留证。
+**门禁诚实（区别于裁定 1）：** 新值要求修订本仓活状态门禁——`tools/lib/backlog-liveness.mjs` 的 statuses 表与检查（新枚举、调查中改名、行↔frontmatter 镜像互查、毕业封闭头），反证在 `tests/tools/backlog-liveness.spec.ts`——既有类的修订，不新增检查族；被延后的是验收在场**新族**（按状态必备节），记承压候选。门禁改动按 gate-change-definition 技能：红→还原→绿留证。
 
 **选择表（含本仓本地两行）：**
 

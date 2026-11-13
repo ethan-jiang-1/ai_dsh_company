@@ -6,7 +6,7 @@
 
 ## 决定
 
-`tests/harness/` 从 54 个平铺 spec 改为**五个关切目录**（与 `tests/client` 镜像 `src/client` 同一做法）：
+`tests/` 从 54 个平铺 spec 改为**五个关切目录**（与 `tests/client` 镜像 `src/client` 同一做法）：
 
 | 目录 | 放什么 | 数量 |
 |---|---|---|

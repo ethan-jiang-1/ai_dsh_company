@@ -60,7 +60,7 @@ tests/client|presets|harness|support|fixtures   ← 不变
 ## 未验 / 边界
 
 - agent-instructions 的嵌套加载是读 vendor README 得出的，**真会话未跑**；落地后应观察“碰 kb 后地图出现”。
-- `tests/harness/` 仍按关切分组（repo/tools/session/evidence/ui），不镜像 src——它测的是仓库面，没有 src 对应物。
+- `tests/` 仍按关切分组（repo/tools/session/evidence/ui），不镜像 src——它测的是仓库面，没有 src 对应物。
 - archived notes 里的历史路径不回写（冻结）；活跃 docs 与源码注释已同步。
 - `packages/company-pack/lib/types/**` 是构建产物，路径随下次 `tsc -b` 更新。
 

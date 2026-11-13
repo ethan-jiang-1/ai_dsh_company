@@ -49,8 +49,8 @@
 | 检查 | 命令 | 红 | 绿 |
 |---|---|---|---|
 | 落点解析门（真树反证） | 植入 `_backlog/_archive/settled_issues/zz-probe-note-selflink.md`（`去向：note — [Note](./同名卡.md)`）+ 归档索引加行 → `node checks/run-gates.mjs` | `FAIL backlog-liveness: _backlog/_archive/settled_issues/zz-probe-note-selflink.md:10 归档「去向=note」的落点未解析到 notes/ 下的真实文件——写 Markdown 链接到 Note（链到卡自己/inline code/散文都顺不上理由）`（且只有这一条，说明索引行只触发落点检查） | 删卡与索引行 → `verify: ALL PASS；2 门无对象（replay-fixture-freshness / replay-ui-freshness）` |
-| 豁免方向（旧卡不回填） | `npx vitest run tests/harness/tools/backlog-liveness.spec.ts` | — | 夹具 `2026-11-02-old-self-link`（`opened < 2026-11-03` + self-link）不红；真树旧卡（如 `2026-11-02-remove-trajectory-terminal-ui.md`）在全量里仍绿 |
-| keyless 覆盖 | `npx vitest run tests/harness/tools/backlog-liveness.spec.ts` | 先把 lib 的新检查改成 `if (false && dest === 'note')` → `Tests 1 failed \| 32 passed (33)` | 还原 → `Tests 33 passed (33)`；新增用例覆盖 self-link / inline code / 文件不存在三种红与真链接、旧卡两种绿 |
+| 豁免方向（旧卡不回填） | `npx vitest run tests/tools/backlog-liveness.spec.ts` | — | 夹具 `2026-11-02-old-self-link`（`opened < 2026-11-03` + self-link）不红；真树旧卡（如 `2026-11-02-remove-trajectory-terminal-ui.md`）在全量里仍绿 |
+| keyless 覆盖 | `npx vitest run tests/tools/backlog-liveness.spec.ts` | 先把 lib 的新检查改成 `if (false && dest === 'note')` → `Tests 1 failed \| 32 passed (33)` | 还原 → `Tests 33 passed (33)`；新增用例覆盖 self-link / inline code / 文件不存在三种红与真链接、旧卡两种绿 |
 | `留痕：` 形状可过门 | 植入 `_backlog/_archive/fixed_bugs/zz-probe-trace-line.md`（卡顶 `留痕：none — 探针卡…`）+ 索引行 → `pnpm verify` | — | `verify: ALL PASS`（形状不撞现有门禁）；删卡与索引行后仍 ALL PASS |
 | 一处定义（grep 原话） | `grep -rn 'company-pack 公开行为' --include=*.md _backlog` | — | 非历史区的唯一命中 = `_backlog/README.md`「缺陷的通道」的材料性定义段；`bugs/README.md` 两处命中是 2026-11-08/09 的**历史交接叙事**，不是规则副本 |
 | 矛盾消解（grep 原话） | `grep -rn '当场修掉的不建卡' _backlog`；`grep -rn '抓到异常' .agents docs` | — | 前者的规则句只有两处，均带「仅限非材料性」限定（另有研究材料/卡内引用旧文的对照行）；后者两处均为「①抓到异常没——**材料性**的才立」 |

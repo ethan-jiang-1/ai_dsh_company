@@ -93,7 +93,7 @@ change-scope 脚本、集中式维护台账。触发 = 第二贡献者 / PR 面 
 1. AGENTS.md 纪律表「任务反馈面」行补 §13 指针（收尾含语义审）；
 2. dev-loop §12 收尾动作清单加「语义审过一遍再收口」行；
 3. **entry-probe 加 Q13**（完成判断链四条 + 语义审清单位置）——红绿环：先加题跑
-   `pnpm test tests/harness/session/entry-probe.spec.ts` → **红 7 失败**（Q13 无桩答案）；补 spec ANSWERS
+   `pnpm test tests/session/entry-probe.spec.ts` → **红 7 失败**（Q13 无桩答案）；补 spec ANSWERS
    Q13 → **绿 17/17**。从此四不等式与语义审形状进**真模型认证面**。
    （适用性评估补记，review 轮落档——goal 原文「重则登记触发不硬改」：判定加题属**轻改非硬改**：
    问题集是探针的设计扩展点（spec 按题号取答案、数量断言自推导，加题不动存量），且本轮入口链

@@ -19,7 +19,7 @@ docs/                   当前合同与导航：index（地图）+ 顶层门/宪
 notes/                  开发记忆：proposed/（RFC）→ implemented/（活跃决策记忆）；离场目录不复述于此——分类规则唯一家 = notes/README.md
 _backlog/               推敲层：issues/bugs/research/methods/_archive + triggers.md（触发器）；章程与账本 = 其 README；agent 门牌 = AGENTS.md
 checks/                 验证面：run-gates 门禁；smoke/（真实入口冒烟）+ audit/（盘面日志判据）
-tests/                  keyless 回归（company/client/presets/harness 四区 spec）；真模型/浏览器不进本树——分区导航 = tests/README.md
+tests/                  keyless 回归（按面分区 spec，导航 = tests/README.md）；真模型/浏览器不进本树——分区导航 = tests/README.md
 probes/                 调试面：窄机制与视觉探针，按机制域四子目录（team/fs-taskboard/browser-visual/session-context）
 tools/                  工具面：维护工具；lib/ 纯逻辑、drivers/ 真实驱动、archive/ 已耗仪器
 _dist/                  导出目的地：tarball（gitignored）+ 生成式《安装手册》（唯一 tracked 例外）；owner = docs/contracts/release.md
@@ -42,7 +42,7 @@ pnpm bundle:init                       # fresh clone：建 dev 的 .dsh-company/
 pnpm company --no-open                 # repo dev-only：pack + plugin add file: + exec `dsh --profile company`（缺省 --port 0；--link = 快速通道）
 pnpm verify                            # 结构门禁（清单唯一源 = checks/gates/ 目录）
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）
-pnpm typecheck                         # pack 两面 + tests/client + tests/company + tests/harness（glob 全收，混合面 pack-exports 除外）（类型/导入面改动；fresh clone 先按 bootstrap 构建 vendor client 类型）
+pnpm typecheck                         # pack 两面 + tests/client + tests/company + tests/{repo,contract,tools,session,evidence,ui}（glob 全收，混合面 pack-exports 除外）（类型/导入面改动；fresh clone 先按 bootstrap 构建 vendor client 类型）
 pnpm release --check                   # 发布就绪（dist 与源码指纹；verify 绿 ≠ 可发布；pre-publish 用 --allow-pre-publish-index，publish 后删 staged）
 source run/env.sh && pnpm orient        # 运行态全景（先 source 才看 dev home；keyless 只读；--scenario = run trace 场景视图）
 pnpm diagnose --session <slug>/<id>     # 会话失败摘要（只读；失败 turn/工具错误/非零 bash/待审批/问询/present；child 也可点名）

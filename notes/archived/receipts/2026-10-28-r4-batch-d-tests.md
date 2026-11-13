@@ -11,7 +11,7 @@
 1. **公司整页真挂载测试**：`tests/client/company-view.spec.ts` 用 happy-dom + createRoot 真挂 `createCompanyView`，断四子页签、身份条、加载/错误行、浮出回调。测试先抓到一处真 bug：培养页与“读取团队状态…”同时出现；修 `CompanyView.tsx`，培养页不再显示 team loading/error。
 2. **workspace 状态机测试**：`tests/client/data/workspace-text.spec.ts` 覆盖 loading→ready、null→unreadable、卸载 abort、reload 重读；台账/成品/身份条共用的状态机不再零用例。
 3. **Host 生命周期**：`tests/host/index/apply-lifecycle.spec.ts` 覆盖 apply 后迟到 `workspaceRegistry` 触发 inject 回调、dispose 后 `api-session/added` 不再告警；补上 host-composition 没跑的两格。
-4. **测试分区归位**：6 个被测对象是 `tools/lib/*.mjs` 的 spec 从 `tests/host/` 迁 `tests/harness/`（authorship / converge-rules / deliverables-audit / deliverables / candidate-scan-labels / deliverables-catalog）；company 区只剩真公司读模型与 host 行为。
+4. **测试分区归位**：6 个被测对象是 `tools/lib/*.mjs` 的 spec 从 `tests/host/` 迁 `tests/`（authorship / converge-rules / deliverables-audit / deliverables / candidate-scan-labels / deliverables-catalog）；company 区只剩真公司读模型与 host 行为。
 5. **重名消除**：company 区 `deliverables-catalog.spec.ts` 迁 harness 并改名 `deliverables-catalog-tools.spec.ts`；client 区同名 spec 保留，命令不再歧义。
 6. **指针同 diff 更新**：迁移后 `tests/fixtures/README.md`、`_backlog`、`notes/implemented` 的旧路径一并改到 harness（`bare-path` 硬查）。
 

@@ -44,7 +44,7 @@ opened: 2026-11-10
 3. **落点修复**：2 张卡（vpeng / user-facing）与 6 行归档索引的 `note` 落点指向 `notes/` 下真实文件；`pnpm verify` ALL PASS。
 4. **门禁反证**：植入一张 `zz-probe` 归档卡（并在归档索引加行，保证只触发落点检查），`去向：note — [Note](./同目录同名.md)` → `FAIL backlog-liveness` 原话；删除卡与索引行 → ALL PASS；红绿原话记入 Note。
 5. **留痕块**：缺陷卡模板与归档块出现 `留痕：` 行；用一张 `zz-probe` 卡演示形状（不追改历史卡）。
-6. **回归**：`pnpm test` 全绿；若改 `backlog-liveness`，`tests/harness/tools/backlog-liveness.spec.ts` 覆盖新检查（含负例）。
+6. **回归**：`pnpm test` 全绿；若改 `backlog-liveness`，`tests/tools/backlog-liveness.spec.ts` 覆盖新检查（含负例）。
 7. **语义审**：拿最近一轮的一张材料性修复（如 BUG-053）做反事实走查，确认新规则会在当时问出留痕问题；结论写进交付 Note。
 
 ## 关闭条件

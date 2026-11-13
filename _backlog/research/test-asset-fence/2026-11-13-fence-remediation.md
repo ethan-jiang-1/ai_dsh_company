@@ -9,7 +9,7 @@ intent: 把环外资产腐烂、驱动里的逻辑泄漏、门禁反证不常驻
 
 ## 1. 诊断：围栏对了，但环外没有回路
 
-`tests/harness/repo/layering.spec.ts` 的出生注释写着用户的原始反馈：「这种测试如果是 regression 的话，跑得这样慢是完全受不了的。」围栏因此把子进程/浏览器/网络赶出 `tests/`，让 1997 个测试在 26s 内跑完。这一步是对的，不应该反向。
+`tests/repo/layering.spec.ts` 的出生注释写着用户的原始反馈：「这种测试如果是 regression 的话，跑得这样慢是完全受不了的。」围栏因此把子进程/浏览器/网络赶出 `tests/`，让 1997 个测试在 26s 内跑完。这一步是对的，不应该反向。
 
 但「赶出去」只解决了**成本**，没解决**归属**。当前环外有 32 个 smoke、69 个 probe；它们的触发条件是头注里的一句话，没有任何东西定期问「它还活着吗」。实测 8 个便宜 keyless 资产：2 红 1 惰性（材料一 §4）。两条红都不是产品回归，是**资产腐烂**：
 
@@ -20,7 +20,7 @@ intent: 把环外资产腐烂、驱动里的逻辑泄漏、门禁反证不常驻
 
 第三条：**纯逻辑住在驱动里**。第二遍复核后，这条只剩一个明确案例：`tools/export-dist.mjs` 的 staging 编排。它的核心 `swapDirWithBackup` 已有快 spec；驱动本身是线性 `try/catch`，抽 plan 的收益低于成本（见 A2 降级）。`tools/release.mjs` 的 artifact 检查主要在 `release --check` 发布门里，也属发布工具，不急着下沉。
 
-第四条：**门禁的反证不常驻**。71 个 gate 里，常驻负例 smoke 覆盖 7 个（`gates-negative` 5 + `two-axis` 2）；其余靠建门时的「负例留证」注释。注释证明「当时红过」，不证明「现在还能红」。但要说清楚：不是 64 个 gate 都没测试——`backlog-liveness` 等逻辑有 `tests/harness/tools` 的快 spec；缺的是**可重跑的负例 smoke**，高风险面才值得补。
+第四条：**门禁的反证不常驻**。71 个 gate 里，常驻负例 smoke 覆盖 7 个（`gates-negative` 5 + `two-axis` 2）；其余靠建门时的「负例留证」注释。注释证明「当时红过」，不证明「现在还能红」。但要说清楚：不是 64 个 gate 都没测试——`backlog-liveness` 等逻辑有 `tests/tools` 的快 spec；缺的是**可重跑的负例 smoke**，高风险面才值得补。
 
 第五条（第二遍新增）：**预算叙事也漂了**。`.githooks/pre-push` 和 `.github/workflows/ci.yml` 的头注仍写 test ~1.3s / verify ~2s；实测 test 26.0s、verify 8.3s、typecheck 5.4s、lint 0.96s、dup 0.41s；分项冷测和 ~41s，热缓存 hook 29–35s（两次实测）。这不是要改 hook 的边界，是预算数字需要一次实测更新。
 
@@ -47,7 +47,7 @@ intent: 把环外资产腐烂、驱动里的逻辑泄漏、门禁反证不常驻
 | A1 | 便宜 smoke 没有回路 | 新增 `smoke:fast`：**第一版 6 条稳定 keyless（~2.4s）**——workflow-contract / present-catalog / company-root-process / gates-negative / snapshot-motion / two-axis；`replay` 先留在自己的触发线上（3.9s，且 U2 未稳定前易因技能漂移红），稳定后再决定是否并入。**首选 pre-push**——`ci.yml` 不构建 vendor/test，cheap smokes 在干净环境跑不动；`fresh-clone` 每周档可作第二通道。先修 U1/U2 再加 | 2.4s 不是 E2E 成本；它补的是「环外没人看」 |
 | A2 | `export-dist` staging 逻辑只在慢层 | **降级为可选**：核心 `swapDirWithBackup` 已有快 spec；驱动是线性 `try/catch`，抽 plan 的收益低于成本。只有同类失败复发（例如再次出现「旧 `_dist` 被删」）才做 `新建:tools/lib/export-dist-plan.mjs` + spec | 纯文件系统编排可注入 fake pack；但发布工具低频，先不动 |
 | A3 | headless replay 无静态新鲜度 | 若 U2 的 `--refresh` 之后同一处再次漂移，扩 `replay-fixture-freshness`：对 headless 场景比对 session fixture 里的技能目录注入（或对 `.agents/skills` 做哈希） | 静态比对，秒级，不跑 replay |
-| A4 | 门禁反证不常驻 | 只收「失败静默、逻辑未被 `tests/harness/tools` 或现有 spec 盖住」的高风险 gate。当前确认候选 = `company-root-carriers`（安全面，只有一次性 `zz-probe-writer` 红证）；`notes-liveness`/`proposal-scheduled` 属流程形状，价值较低、按需。**`write-gate` 已有 `write-gate.spec`，移出候选** | 0.2s 级；比再写一套 gate 单测便宜 |
+| A4 | 门禁反证不常驻 | 只收「失败静默、逻辑未被 `tests/tools` 或现有 spec 盖住」的高风险 gate。当前确认候选 = `company-root-carriers`（安全面，只有一次性 `zz-probe-writer` 红证）；`notes-liveness`/`proposal-scheduled` 属流程形状，价值较低、按需。**`write-gate` 已有 `write-gate.spec`，移出候选** | 0.2s 级；比再写一套 gate 单测便宜 |
 | A5 | 69 个 probe 无消费者图 | 做一次只读审计：每个 probe 被哪些 Note/卡/README 引用、最后实跑日期；无引用且无触发 = 淘汰候选 | 研究/维护动作，不是测试层 |
 
 ## 5. 淘汰（候选）

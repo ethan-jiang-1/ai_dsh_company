@@ -26,7 +26,7 @@ FAILURES
   工具名在同 id 的 `approval/asked.data.toolName`（`reason` 也在 asked 侧）。
 - `tools/lib/session-diagnose.mjs` 的 `decisionOf` 读的是 `decision?.kind / decision / answer / approval?.decision`——
   与真实键完全不相交 ⇒ 每条审批：allowed-once 被误报失败、真 rejected 丢结论、工具名永远空。
-- **夹具漂移**：`tests/harness/session/session-diagnose.spec.ts` 用想象形状 `{toolName, decision}` ⇒ 76 spec 全绿，
+- **夹具漂移**：`tests/session/session-diagnose.spec.ts` 用想象形状 `{toolName, decision}` ⇒ 76 spec 全绿，
   工具读真日志必错。该工具 2026-10-20 早晨才生（consistency sweep 批次 2），出生当天即带此雷。
 - 附带同修：`turn/end` 的 `reason.error` 为对象时 `String()` 渲染成 `[object Object]`（同会话实测：
   `{"message":"DeepSeek Messages stream: tool input is invalid JSON","code":"MALFORMED_RESPONSE"}` 曾被折成

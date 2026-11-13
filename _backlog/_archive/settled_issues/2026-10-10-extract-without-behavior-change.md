@@ -27,7 +27,7 @@ opened: 2026-10-10
 做两件事，结果是同一个：调用方观察到的行为不变。
 
 1. 启动 `vendor/dsh/apps/cli/src/bin.ts web` 的探针，共用「等 banner」；发 `client-request` 的再共用发请求。`probes/browser-visual/dag-visual-probe.mjs` 只等 banner、不取 cookie，只走前一半。`probes/team/team-recovery-probe.mjs` 起两次 web，函数各调一次，不做进程级单例。
-2. `backlogLivenessProblems` 原样挪到 `tools/lib/` 的一个新模块。门禁文件留下调用和「为什么」注释。`tests/harness/tools/backlog-liveness.spec.ts` 改为 import。期望字符串一字不改。
+2. `backlogLivenessProblems` 原样挪到 `tools/lib/` 的一个新模块。门禁文件留下调用和「为什么」注释。`tests/tools/backlog-liveness.spec.ts` 改为 import。期望字符串一字不改。
 
 不做：
 
@@ -73,9 +73,9 @@ opened: 2026-10-10
 
 | 行为 | 类 | 输入/状态 | 通过/失败 | 反例 | 证据 |
 |---|---|---|---|---|---|
-| 活状态问题句不变 | 确定性逻辑 | spec 现有夹具目录，含缺字段、缺索引、缺 frontmatter | `tests/harness/tools/backlog-liveness.spec.ts` 全绿，且 diff 不改任何期望字符串 | 挪函数时改一句问题文本 → spec 红；修法是改回文本，不是改期望 | 该 spec。它证明问题数组。它不证明门禁进程的打印格式 |
+| 活状态问题句不变 | 确定性逻辑 | spec 现有夹具目录，含缺字段、缺索引、缺 frontmatter | `tests/tools/backlog-liveness.spec.ts` 全绿，且 diff 不改任何期望字符串 | 挪函数时改一句问题文本 → spec 红；修法是改回文本，不是改期望 | 该 spec。它证明问题数组。它不证明门禁进程的打印格式 |
 | 门禁成功行不变 | 编排 | 当前仓库 `_backlog/` | `node checks/run-gates.mjs` 里 backlog-liveness 那一行文字与上表引用的现句一致，退出码 0 | 调用处改写 PASS 文案或换一套问题拼接 → 该行不一致 | `checks/run-gates.mjs` 的这一行。它不证明其他门禁的语义 |
-| web 启动参数与请求体不变 | 确定性逻辑 | 假的 spawn/fetch，喂一条现有 banner | 新 spec 断言 argv、环境、banner 解析、cookie 拼接、请求 JSON 与本卡「已知」列出的字面量一致；不传 signal 的 RPC 请求不带 signal；不调用 cookie 交换就不会发那次 fetch | 帮助函数自行推导 `rpcId` 前缀，或默认给 RPC 加 30 秒 signal → spec 红 | 新的 keyless spec（`tests/harness/`）。它证明帮助函数的形状。它不证明真 web 进程仍打印这条 banner |
+| web 启动参数与请求体不变 | 确定性逻辑 | 假的 spawn/fetch，喂一条现有 banner | 新 spec 断言 argv、环境、banner 解析、cookie 拼接、请求 JSON 与本卡「已知」列出的字面量一致；不传 signal 的 RPC 请求不带 signal；不调用 cookie 交换就不会发那次 fetch | 帮助函数自行推导 `rpcId` 前缀，或默认给 RPC 加 30 秒 signal → spec 红 | 新的 keyless spec（`tests/`）。它证明帮助函数的形状。它不证明真 web 进程仍打印这条 banner |
 | 探针业务块不动 | 编排 | 迁调用方之后的 `git diff` | 每个迁过的探针，diff 只出现启动块删除和帮助函数调用；提示词、证据函数、退出码、前缀字面量不在 diff 里 | 搬家时顺手改一条排练指令或证据调用 → 该 diff 不合格，退回该 hunk | diff 本身。它不证明探针在真模型下仍然判对 |
 | 真 banner 仍能被解析 | 编排 | 一次真实 `web --port 0`，拿到 banner 后立刻停掉，不发 prompt | 帮助函数返回的 port/token 能对上进程输出里的那条 URL | banner 正则与真输出差一个字符 → 解析失败，退出码 2 | 这一次启动。它不代替上面的请求体断言，也不授权把 24 个探针各跑一遍 |
 

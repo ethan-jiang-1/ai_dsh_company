@@ -31,7 +31,7 @@ intent: "记录BUG-007双成员真实入口的共同read放行、freshness拒写
 
 [纯判据](../../../../tools/lib/team-barrier-evidence.mjs)把marker的成员ID、path、read callId与该成员配对的成功全文read结果关联，要求初始target全文为空、read后first write前同turn且无另一目标read；每成员要成功发布本行或成为唯一stale败者；stale后完整读到对方行、同turn成功发布精确合并；Lead无目标write/edit，独立终态精确。驱动也在release前核对marker身份、路径、callId确实是member event中的成功read，结束时需要matching released record。
 
-- `pnpm test tests/harness/evidence/team-barrier-evidence.spec.ts tests/harness/evidence/collaboration-probe-verdict.spec.ts`：27/27通过，覆盖callId不匹配、失败read、跨turn读/恢复、首写前额外read、错误路径、缺失winner成功write、败者未成功恢复、合并载荷错误、partial read、Lead代写、各required判据单独缺失后的exit1与全真exit0。
+- `pnpm test tests/evidence/team-barrier-evidence.spec.ts tests/evidence/collaboration-probe-verdict.spec.ts`：27/27通过，覆盖callId不匹配、失败read、跨turn读/恢复、首写前额外read、错误路径、缺失winner成功write、败者未成功恢复、合并载荷错误、partial read、Lead代写、各required判据单独缺失后的exit1与全真exit0。
 - 收紧后的helper对上述真实成员/Lead event logs回放：exit0，五项全true。
 - 曾有一条新增反例先红：败者在first write前插入额外read仍通过。修正为拒绝该事件顺序后，最终focused tests绿。
 - 真实入口首个启动失败在Lead工具动作前结束为 `REQUEST_EXTENSION`，非成员场景失败；定位为experiment plugin loose path被官方DeepSeek plugin inventory要求声明包身份。本插件移入带本地manifest的独立probe目录后重新启动，双成员真实入口成功。启动错误现在包含child输出。失败启动日志未作为场景失败/绿证。

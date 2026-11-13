@@ -68,7 +68,7 @@ node --import tsx/esm _backlog/_archive/research/two-product-structure-audit/exp
 
 ## 修复关联
 
-未修。修复面 = `docs/contracts/delegation.md`；可在 `tests/harness/` 或 preset 合同测试里加真值表断言。
+未修。修复面 = `docs/contracts/delegation.md`；可在 `tests/` 或 preset 合同测试里加真值表断言。
 
 ## 已修判定
 
@@ -85,7 +85,7 @@ node --import tsx/esm _backlog/_archive/research/two-product-structure-audit/exp
 
 - `docs/contracts/delegation.md` 的“深度”改成绝对语义 + 5 组真值；`vp_eng`/`vp_sales`=1 的
   调用边界写清（只能从 depth 0 调），`vp_cmo`=2 单独说。
-- 新增 `tests/harness/contract/delegation-depth-truth-table.spec.ts`：直引 vendor
+- 新增 `tests/contract/delegation-depth-truth-table.spec.ts`：直引 vendor
   `resolveChildDepth`，用 `{ options.subagentDepth, session.header.delegationDepth }` 构造 parent，
   覆盖 `0/1`、`1/1`、`1/2`、`2/3`、`2/2`。
 - 红→绿：把 `1/1` 的期望从 throw 改成 allow → `1 failed | 4 passed`；还原 → `5 passed`。

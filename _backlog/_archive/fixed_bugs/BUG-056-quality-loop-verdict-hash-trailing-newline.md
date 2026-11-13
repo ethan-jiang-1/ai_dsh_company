@@ -79,7 +79,7 @@ node probes/team/quality-loop-audit.mjs --deliverable \
 
 ## 修复落地（2026-11-10）
 
-- 红：`pnpm exec vitest run tests/harness/tools/quality-loop.spec.ts` → 修前导入
+- 红：`pnpm exec vitest run tests/tools/quality-loop.spec.ts` → 修前导入
   `verdict-hash.mjs` 不存在（1 failed）；补工具后 `未复验` warning 用例仍红。
 - 绿：同一命令 → **39 passed**。
 - 真盘红→工具修复：`node probes/team/quality-loop-audit.mjs --deliverable

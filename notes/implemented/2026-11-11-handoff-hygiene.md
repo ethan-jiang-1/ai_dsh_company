@@ -47,7 +47,7 @@
   （未执行 `npm publish`，不冒充已发布）。
 - 启动：`tools/company.mjs` 缺省追加 `--port 0`；`tools/lib/dev-install.mjs` 的
   `ensureDefaultPort` 是唯一判断点，带单测。
-- 接手面：新测试 `tests/harness/repo/src-readme-pointers.spec.ts` 钉住 README 相对路径与 inject；
+- 接手面：新测试 `tests/repo/src-readme-pointers.spec.ts` 钉住 README 相对路径与 inject；
   `orient.spec` 钉住 6+5 计数；`attention-observers.spec` 钉住两个事件退订。
 - 本地 dev profile 因真实启动从 `link:` 切到 `file:` 安装；这是 dev home 状态，不进 git。
 
@@ -55,7 +55,7 @@
 
 实测 2026-11-11：
 
-- 修前红：`pnpm test tests/harness/repo/src-readme-pointers.spec.ts` → 2 failed：
+- 修前红：`pnpm test tests/repo/src-readme-pointers.spec.ts` → 2 failed：
   `host/cultivation.ts`、`host/bootstrap.ts`、`host/catalog.ts` 不存在；README inject 少
   `workspaceRegistry`。修后同命令 → 2 passed。
 - 修前红：`pnpm release --check` → `pack 源码面已变但 _dist 没重打`，exit 1。修后

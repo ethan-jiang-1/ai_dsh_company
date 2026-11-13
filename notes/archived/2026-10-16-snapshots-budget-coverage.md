@@ -29,7 +29,7 @@
 ## 后果
 
 - 预算门禁恢复全覆盖：9/9 收敛切片、合计 2688209B（2.6M/16M）——**此前的 2.2M 是少算的**。
-- 覆盖由 keyless 单测钉住（`tests/harness/repo/snapshots-budget.spec.ts` 4 条）：两代都计入、只旧、只新、空面；**并已用变异证明判别力**（退回旧过滤器 ⇒ 精确字节断言红）。
+- 覆盖由 keyless 单测钉住（`tests/repo/snapshots-budget.spec.ts` 4 条）：两代都计入、只旧、只新、空面；**并已用变异证明判别力**（退回旧过滤器 ⇒ 精确字节断言红）。
 - 命名知识单源：此后收敛切片再换代际，改一处（`convergenceSlices`）+ 一条断言即可。
 - 遗留（记在 BUG-019）：`snapshots/archive/convergence-*` 仍不含会话日志，故归档件的 `present` 证据仍会随 `$DSH_HOME` 清理而丢失——**本轮的修复只保证「体积增长可见」，不保证「证据可审」**。
 

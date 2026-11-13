@@ -95,7 +95,7 @@
   process-docs.md 的 source 必须含 {productType}`）；删 business-software 的 requirements-model → 红
   （`类型包 business-software 解析不到 ...`）；默认改 `nope` → 红；还原 → PASS。
 - `pnpm test`：**174 files / 1455 tests passed**（含 `tests/host/run-bundle/bootstrap.spec.ts`
-  13 项、`tests/harness/tools/kb-seeds.spec.ts` 8 项、`tests/presets/presets.spec.ts` 43 项、
+  13 项、`tests/tools/kb-seeds.spec.ts` 8 项、`tests/presets/presets.spec.ts` 43 项、
   `tests/host/commands/req-command.spec.ts` 17 项、`tests/lib/yaml-scalar.spec.ts` 2 项）。
 - `pnpm typecheck`：绿（pack + tests/client + tests/company + tests/harness）。
 - `pnpm lint`：0 warnings / 0 errors；`pnpm dup`：0 clones。

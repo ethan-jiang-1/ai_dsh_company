@@ -28,7 +28,7 @@
 npx vitest run tests/lib/cultivation-command.spec.ts \
   tests/lib/cultivation-context.spec.ts tests/host/cultivation/cultivation-maintenance.spec.ts
 # 3 files / 23 tests passed（原 host 23 例）
-npx vitest run tests/harness/repo/pack-exports.spec.ts
+npx vitest run tests/repo/pack-exports.spec.ts
 # 2 passed（host 导出集合 = apply/inject）
 npx vitest run tests/client/ui/team-tool-card.spec.ts tests/client/ui/delegation-card.spec.ts
 # 16 passed（isRecord 迁移未改行为）

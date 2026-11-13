@@ -13,7 +13,7 @@
 | 看运行态全景 / 场景 / 会话历史 | `pnpm orient` → [orient](../tools/orient.mjs) |
 | 看最近会话的失败摘要（中断轮、非零 bash、待审批也算） | `pnpm diagnose [--strict]` → [diagnose](../tools/diagnose.mjs) |
 | 检查密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs) · [tracked-token](gates/tracked-token.mjs) · [tracked-secrets](gates/tracked-secrets.mjs) |
-| 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；分层守卫 = [layering.spec](../tests/harness/repo/layering.spec.ts) |
+| 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；分层守卫 = [layering.spec](../tests/repo/layering.spec.ts) |
 | 确认测试资产还活着 | `pnpm smoke:fast` → [fast](smoke/fast.mjs)（6 条，~2.4s；pre-push）；全量 = `pnpm smoke:all` → [all-keyless](smoke/all-keyless.mjs)（每周 CI 跑 `--ci`；成员唯一家 = [lane 注册表](../tools/lib/asset-lanes.mjs)） |
 | 类型 / 导入签名改动 | `pnpm typecheck`（命令与预算 = [tests/README §验证分层与预算](../tests/README.md)） |
 | 确认角色真的挂载 | [preset-smoke](smoke/preset-smoke.mjs) |
@@ -41,7 +41,7 @@
 
 [lib](../tools/lib/) 保存可由隔离夹具验证的纯逻辑（会话日志、workspace oracle、交付物/作者判据、
 发布事务、仓库布局、分层判据）；[drivers](../tools/drivers/) 保存真实进程/CDP/Playwright 驱动。
-驱动不进入 keyless spec，准入由 [分层守卫](../tests/harness/repo/layering.spec.ts) 检查。
+驱动不进入 keyless spec，准入由 [分层守卫](../tests/repo/layering.spec.ts) 检查。
 
 目录取舍 = [driver-purpose-top-level](../notes/archived/2026-10-07-driver-purpose-top-level.md)
 （`scripts/`、`dev/` 形态名已退役）；顶层分区导航 = [项目地图](../docs/project-map.md)。

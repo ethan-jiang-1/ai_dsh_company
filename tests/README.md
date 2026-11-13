@@ -5,11 +5,11 @@
 > 四区各测什么、**不证明什么**、改动面 → 最窄检查怎么选——本文件做导航 + 改动面映射表（单家，2026-10-10 自 testing.md §2 迁入行级表）。分层与证据政策唯一家 =
 > [docs/testing.md](../docs/testing.md)（九层证明边界 / 证据纪律 / 改动面→最小证据）；逐脚本触发/成本/状态
 > 唯一源 = 脚本头注（[检查索引](../checks/README.md) 只索引，门禁强制自述）——本文件不复述，防漂移。
-> 真模型 / 真浏览器**不进本树**（[harness/repo/layering.spec](./harness/repo/layering.spec.ts) 机械守卫）。
+> 真模型 / 真浏览器**不进本树**（[repo/layering.spec](./repo/layering.spec.ts) 机械守卫）。
 > 行业三分 → 本仓层的对照：**单元 ≈ keyless 单测（本树）；集成 ≈ 装配/机制冒烟与 CLI 集成（[checks/smoke/](../checks/smoke/)）；
 > 端到端 ≈ 重放 lane 与认证档（录制回放 / 真模型）**——逐层证明边界唯一家 = [testing.md §1](../docs/testing.md)。
 
-## 四区
+## 分区
 
 | 区 | 测什么 | 不证明什么 |
 |---|---|---|
@@ -17,7 +17,7 @@
 | [tests/lib](./lib/) · [tests/content](./content/) | `src/lib/` 纯逻辑 + `content/` 形状与合同（模板头、产品类型包、交付模式包、编号合同、两轴 scenario） | Host 注册/装配、运行时注入行为 |
 | [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫；Lead/follow 适配器与 tab 注册目录（真实 Cordis `Context`/`SlotRegistry`）；多实例探活 disposer 契约；whole-client 档（真 `bootClient` × web profile bundle roster）覆盖 `apply` 组合与 fiber 卸载/重载。**目录镜像 `src/client` 的五组**（`wiring/ data/ ui/ tabs/ cultivation/`；根只留 whole-client 组合 spec）；另有 `i18n/` 快速回归（字典/页签壳/缺省 locale），不镜像源码组 | 真浏览器渲染交互（→ client-load-smoke；真页面页签/错误环 → ui-scene-smoke） |
 | [tests/presets](./presets/) | persona / skills 声明内容；两轴 coverage（product-type 五件齐 + playbook + fixture / delivery-mode 经营侧方法 + workflow 分派 + awareness） | 组合装配与工具行实际生效（→ preset-smoke + 会话日志证据） |
-| [tests/harness](./harness/) | 仓库结构与测试分层合同 + `tools/lib/` 纯逻辑判据（如 replay normalization/judges）。**目录按关切分六组**：`repo/`（仓库/发布/包形状等不变量）、`tools/`（tools/lib 纯逻辑）、`session/`（会话日志/诊断/探针驱动）、`evidence/`（协作与证据判据）、`contract/`（引擎合同/真值表）、`ui/`（金样与页签目录） | 运行时或 CLI 端到端行为 |
+| [tests/repo](./repo/) · [tests/contract](./contract/) · [tests/tools](./tools/) · [tests/session](./session/) · [tests/evidence](./evidence/) · [tests/ui](./ui/) | 仓库合同（结构/导航/发布/包形状）· 引擎合同与真值表 · `tools/lib` 纯逻辑 · 会话日志/诊断/探针驱动 · 协作与证据判据 · 页签目录（Phase 2 后叫 expected） | 运行时或 CLI 端到端行为 |
 | [tests/support](./support/) · [tests/fixtures](./fixtures/) | 共享夹具/合成输入与 provenance（不是 spec；`fixture-provenance` 门禁） | 产品行为或运行时行为 |
 
 spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随仓库增长，写进文档必过期）；导航到区，不到件。
@@ -29,14 +29,14 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | persona / skill 文案（`packages/company-pack/presets/`） | `pnpm test tests/presets` | [preset-smoke](../checks/smoke/preset-smoke.mjs) | **行为判据面**改动（改变"模型被要求做什么/判据怎么落"）→ 场景同 diff 必带（两件套组队 = [product-team-e2e-smoke](../checks/smoke/product-team-e2e-smoke.mjs)）；纯措辞润色 → 连通档 + 内容档兜 |
 | 手册 / CHARTER / 模板（`packages/company-pack/content/`——**只读注入面**；host 注入，不落 workspace） | `pnpm verify`（handbook-budget + **replay-fixture-freshness**：runnable 场景的注入新鲜度静态比对） | [handbook.spec](./host/prompt/handbook.spec.ts)（keyless：content/override/section 注册）+ 受影响 replay 场景重跑（[replay-smoke](../checks/smoke/replay-smoke.mjs)；本仓仅 foundation 合成场景） | 注入内容变化 ⇒ 受影响 runnable 场景**同 diff 重录**或声明降档（带日期理由；本仓无 full 档）；规矩变化 ⇒ 行为判据面义务同上行 |
 | bundle / preset 行 config（机制面） | `pnpm test tests/presets` | + [delegation-smoke](../checks/smoke/delegation-smoke.mjs)（工具行） | 同 diff 必带 |
-| workflow/subagent 机制面（schema 语义 / 结果渲染 / 委派控制面 / retry 深度与注册面） | `pnpm test tests/harness/contract`（真引擎渲染与子集语义）+ `pnpm test tests/host/delegation/delegation-control.spec.ts` + `pnpm test tests/presets/delegation-retry.spec.ts tests/host/delegation/subagent-retry.spec.ts` | `node --import tsx/esm checks/smoke/workflow-contract-smoke.mjs`（keyless 机制档；改组合行或升 pin） | 上游修好时按 [收口 Note](../notes/implemented/2026-11-08-delegation-contract-repair.md) 的退役条件删规则/工具 |
+| workflow/subagent 机制面（schema 语义 / 结果渲染 / 委派控制面 / retry 深度与注册面） | `pnpm test tests/contract`（真引擎渲染与子集语义）+ `pnpm test tests/host/delegation/delegation-control.spec.ts` + `pnpm test tests/presets/delegation-retry.spec.ts tests/host/delegation/subagent-retry.spec.ts` | `node --import tsx/esm checks/smoke/workflow-contract-smoke.mjs`（keyless 机制档；改组合行或升 pin） | 上游修好时按 [收口 Note](../notes/implemented/2026-11-08-delegation-contract-repair.md) 的退役条件删规则/工具 |
 | client 面板（用户可见面：视图模型/组件/文案/CSS，`src/client/`） | `pnpm test tests/client`（按模块点名 spec，含 `client-face` / `style-lifecycle`） | [ui-scene-smoke](../checks/smoke/ui-scene-smoke.mjs) `--isolated --golden`（隔离空壳页签文本金样；`--steps` 复现交互）+ [client-load-smoke](../checks/smoke/client-load-smoke.mjs) + [cdp-probe](../probes/browser-visual/cdp-probe.mjs)（活体全页签） | 用户可见改动 → 同 diff 刷金样（`--refresh-golden`）/ 对应 visual probe；新增/改文案先加载 `company-ui-change-definition` skill，zh+en 成对落 `company` 字典 |
-| company 读模型逻辑（`src/lib/` 判据：deliverables / authorship / ledger） | `pnpm test tests/lib`（按模块点名 spec；content 面用 `tests/content`） | oracle 反证（真样本钉列）；**新增模块/影响导出面 → 加 `pnpm test tests/harness`（pack-exports 守卫）** | 改**用户可见文案/显示名**（如 `presence-status.ts` 的 `PRESET_DISPLAY_NAMES`）⇒ 同 diff 刷 UI 金样（`ui-scene-smoke --isolated --refresh-golden` 后 `--golden` 复核；BUG-048 教训） |
-| host 逻辑（`src/host/`：bootstrap / workspace-resolution / handbook / catalog / catalog-state / presented-ledger / cultivation / lease / bundle-manifest / governance-export / revoke-journal） | `pnpm test tests/host`（按模块点名 spec；真文件集成）；**跨载体不变量 → `pnpm test tests/host/contract`** | `pnpm test tests/harness`（导出/布局）+ `pnpm typecheck`；新写入口不登记 → `pnpm verify` 红 | 新持久化路径 → 加 shape / 登记 `tools/lib/carrier-registry.mjs`，同 diff；不要只加模块 spec |
+| company 读模型逻辑（`src/lib/` 判据：deliverables / authorship / ledger） | `pnpm test tests/lib`（按模块点名 spec；content 面用 `tests/content`） | oracle 反证（真样本钉列）；**新增模块/影响导出面 → 加 `pnpm test tests/repo`（pack-exports 守卫）** | 改**用户可见文案/显示名**（如 `presence-status.ts` 的 `PRESET_DISPLAY_NAMES`）⇒ 同 diff 刷 UI 金样（`ui-scene-smoke --isolated --refresh-golden` 后 `--golden` 复核；BUG-048 教训） |
+| host 逻辑（`src/host/`：bootstrap / workspace-resolution / handbook / catalog / catalog-state / presented-ledger / cultivation / lease / bundle-manifest / governance-export / revoke-journal） | `pnpm test tests/host`（按模块点名 spec；真文件集成）；**跨载体不变量 → `pnpm test tests/host/contract`** | `pnpm test tests/repo`（导出/布局）+ `pnpm typecheck`；新写入口不登记 → `pnpm verify` 红 | 新持久化路径 → 加 shape / 登记 `tools/lib/carrier-registry.mjs`，同 diff；不要只加模块 spec |
 | 启动入口 / workspace 解析 / 公司状态（`src/host/startup*`、`tools/company.mjs` dev-only） | `pnpm test tests/host`（bootstrap/manifest/presented-domain） | [company-entry-smoke](../checks/smoke/company-entry-smoke.mjs) + [release-smoke](../checks/smoke/release-smoke.mjs) + [client-load-smoke](../checks/smoke/client-load-smoke.mjs) | 新入口同 diff 进 checks/README；`pnpm verify` script-index/status |
-| 类型面（改 `src/**` 的导出/导入签名） | `pnpm typecheck`（pack 两面 + `tests/client` + `tests/host` + `tests/lib` + `tests/content` + `tests/harness` 全量 spec（`pack-exports` 混合面除外）；fresh clone 需先按 [bootstrap](../docs/guides/bootstrap.md) 构建 vendor client 类型） | [release-smoke](../checks/smoke/release-smoke.mjs)（发布前）；`verify` 的 src-layering 只守方向不守类型 | — |
-| pack 导出/注册面（Host / Client 注册改动） | `pnpm test tests/harness`（导出形态）+ `pnpm test tests/host`（Host 注册回调行为）+ `pnpm test tests/client`（Client 槽注册） | [release-smoke](../checks/smoke/release-smoke.mjs)（真实安装形状；含 researcher） | — |
-| 发布 / 升 pin | `pnpm test tests/harness`（release-foundation 等） | [release-smoke](../checks/smoke/release-smoke.mjs) + 升 pin 程序（合同 = [release.md](../docs/contracts/release.md)；**本仓只有不加载 pack 的合成回放，只证管线可跑，不是升 pin 第一道**） | — |
+| 类型面（改 `src/**` 的导出/导入签名） | `pnpm typecheck`（pack 两面 + `tests/client` + `tests/host` + `tests/lib` + `tests/content` + `tests/{repo,contract,tools,session,evidence,ui}` 全量 spec（`pack-exports` 混合面除外）；fresh clone 需先按 [bootstrap](../docs/guides/bootstrap.md) 构建 vendor client 类型） | [release-smoke](../checks/smoke/release-smoke.mjs)（发布前）；`verify` 的 src-layering 只守方向不守类型 | — |
+| pack 导出/注册面（Host / Client 注册改动） | `pnpm test tests/repo`（导出形态）+ `pnpm test tests/host`（Host 注册回调行为）+ `pnpm test tests/client`（Client 槽注册） | [release-smoke](../checks/smoke/release-smoke.mjs)（真实安装形状；含 researcher） | — |
+| 发布 / 升 pin | `pnpm test tests/repo`（release-foundation 等） | [release-smoke](../checks/smoke/release-smoke.mjs) + 升 pin 程序（合同 = [release.md](../docs/contracts/release.md)；**本仓只有不加载 pack 的合成回放，只证管线可跑，不是升 pin 第一道**） | — |
 | 检查与工具入口（`checks/**`、`probes/**`、`tools/**`） | 消费它的 keyless spec + `pnpm verify`（头注/结构门禁） | 真实入口冒烟按脚本头注「何时跑」 | — |
 | 文档 / 指针 | `pnpm verify`（md-links / bare-path / doc-budget） | [entry-probe-smoke](../checks/smoke/entry-probe-smoke.mjs)（入口链文档改动后） | — |
 
@@ -60,7 +60,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 层 | 时间 | 跑什么（代表脚本；**它自己的触发条件在头注**） |
 |---|---|---|
 | 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接、物理行预算、裸路径、分层方向与 pin 一致性门禁） |
-| **类型面 keyless** | 秒级（增量） | `pnpm typecheck`（pack 两面 + `tests/client` + `tests/host` + `tests/lib` + `tests/content` + `tests/harness` 全量 spec（`pack-exports` 混合面除外）；改导出/导入签名或测试类型时跑——verify 与 test 都不做类型检查） |
+| **类型面 keyless** | 秒级（增量） | `pnpm typecheck`（pack 两面 + `tests/client` + `tests/host` + `tests/lib` + `tests/content` + `tests/{repo,contract,tools,session,evidence,ui}` 全量 spec（`pack-exports` 混合面除外）；改导出/导入签名或测试类型时跑——verify 与 test 都不做类型检查） |
 | **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器）；便宜 smoke lane = `pnpm smoke:fast`（6 条，~2.4s；pre-push；只证明资产还活着） |
 | 装配 keyless | ~25s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
@@ -78,7 +78,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 
 **三条硬规矩**：
 
-1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `checks/smoke/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：[`harness/repo/layering.spec.ts`](harness/repo/layering.spec.ts) 扫 `tests/**`，出现 `node:child_process` / `spawn(` / playwright /
+1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `checks/smoke/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：[`repo/layering.spec.ts`](repo/layering.spec.ts) 扫 `tests/**`，出现 `node:child_process` / `spawn(` / playwright /
    `fetch(` / 密钥即红（已反证：塞一行 `import { spawn } from 'node:child_process'` 立刻变红）。**R5a 起另禁两条**（均双红证）：tests/
    不得 import `tools/` 下的驱动脚本（`tools/lib/` 纯逻辑库除外）；任何 vitest 配置不得把
    `checks|probes|tools` 编进测试发现——重放 lane 是第三档，只由 `checks/smoke/replay-smoke.mjs` 驱动。
@@ -94,6 +94,6 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 
 keyless 单测唯一后缀 `*.spec.ts`（[testing.md §1.1](../docs/testing.md)）；按四区归位；需要真进程 / 浏览器 / 模型的检查写
 `checks/smoke/` 或 `probes/` 下的 `.mjs` 并在头注自述「何时跑 / 成本 / 状态」——不塞进 tests/（layering 守卫拦截）。
-本文件骨架由 [harness/repo/navigation-assets.spec](./harness/repo/navigation-assets.spec.ts) 钉进回归（2026-10-05 红→绿落地）。
+本文件骨架由 [repo/navigation-assets.spec](./repo/navigation-assets.spec.ts) 钉进回归（2026-10-05 红→绿落地）。
 
-> ⚠ `tests/client` / `tests/host` / `tests/lib` / `tests/content` 已由 `tsconfig.test-client.json` / `tsconfig.test-company.json` 覆盖；`tests/harness` 由 `tsconfig.test-harness.json` 以 glob 全收；唯一例外 = `pack-exports`（host+client 混合面，任一单面项目都会让另一半报错，实测两向皆红）。
+> ⚠ `tests/client` / `tests/host` / `tests/lib` / `tests/content` 已由 `tsconfig.test-client.json` / `tsconfig.test-company.json` 覆盖；`tests/{repo,contract,tools,session,evidence,ui}` 由 `tsconfig.test-harness.json` 以 glob 全收；唯一例外 = `pack-exports`（host+client 混合面，任一单面项目都会让另一半报错，实测两向皆红）。

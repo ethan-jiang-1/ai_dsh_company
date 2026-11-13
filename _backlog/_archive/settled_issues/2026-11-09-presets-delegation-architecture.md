@@ -84,7 +84,7 @@ opened: 2026-11-09
 | F6 | 现有观测是分通道的；没有混合链的统一图 | `list_subagents` / `workflow_runs` / team roster |
 | F7 | 共享 skill 目录机制已有先例（`_shared/skills/product-definition` 被 4 角色共用） | preset 的 `customSkillDirs` |
 | F8 | host 插件可在 `agent/created` 注册 per-agent `systemPrompt.section` | [handbook.ts](../../../packages/company-pack/src/host/prompt/handbook.ts)；`tool-workflow` 同款 |
-| F9 | `--dump-config` 可读声明面，但不能进 `pnpm test`（`tests/` 禁子进程） | [layering.spec.ts](../../../tests/harness/repo/layering.spec.ts) |
+| F9 | `--dump-config` 可读声明面，但不能进 `pnpm test`（`tests/` 禁子进程） | [layering.spec.ts](../../../tests/repo/layering.spec.ts) |
 
 ### 未决（需要 spike，不是拍脑袋）
 
@@ -248,7 +248,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针）
 | `checks/smoke/preset-smoke.mjs` | support presets 硬编码；shared skills 单根 | 加 worker；shared root 泛化为多根（delegation 独立目录） |
 | `checks/smoke/delegation-smoke.mjs` | 只测命名 child `vp_eng` | 保留；新增 generic `subagent` → worker.leaf 的锚点 |
 | `checks/smoke/workflow-contract-smoke.mjs` | 单通道引擎事实 | 保留为机制钉子；嵌套链事实移到链场景/图 spec |
-| `tests/harness/contract/*` | 钉 vendor 语义 | 不搬家；engine section 的内容 spec 引用这些钉子，不复制 |
+| `tests/contract/*` | 钉 vendor 语义 | 不搬家；engine section 的内容 spec 引用这些钉子，不复制 |
 | 研究脚本 composition-matrix / dump-presets / contract-terms | 证据脚本 | 可复算部分升 `tools/lib` 或 tests；只读快照随研究题归档退役 |
 | `tests/README.md` 改动面表 | 按实现面组织 | 同 diff 更新：新增“模型/合同/图”行；预算 100/100，先压缩或搬 `docs/testing.md` |
 | `docs/testing.md` 九层证明边界 | 层定义 | 补“模型层/图投影层”的证明边界；不重复 tests/README 的命令 |

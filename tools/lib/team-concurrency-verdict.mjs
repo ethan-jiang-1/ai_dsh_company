@@ -2,7 +2,7 @@
 // 为什么抽出：原先 keyless spec（collaboration-probe-verdict）靠**源码切片 + vm 求值**取这段逻辑
 // （字面锚 "  check('C1a"…'\n} catch (error)'），探针一改格式就假红——backlog-liveness 2026-10-10
 // 同款病灶、同款修法（改为直接 import）；抽成普通 import 后判据改动即测试改动，不再怕锚漂。
-// 何时跑：被 probes/team/team-concurrency-probe.mjs 与 tests/harness/evidence/collaboration-probe-verdict.spec.ts
+// 何时跑：被 probes/team/team-concurrency-probe.mjs 与 tests/evidence/collaboration-probe-verdict.spec.ts
 //   import；改判据后跑 pnpm test（keyless 11 例全覆盖：缺任一证据 ⇒ 恰一红 + exit 1）。
 // 判据的机制依据唯一家 = 探针头注（C1a–C2c）；本模块只做「证据 → 判据行」的纯映射，不碰 IO。
 

@@ -50,7 +50,7 @@ node checks/smoke/ui-scene-smoke.mjs                        # dev 模式
   隔离探针留下的 `runtime/tmp/ui-scene-*/user/.cache/.../README.md` 曾把 verify 打红（真实现场），
   跳过 `runtime/` 后绿。
 - `diagnose`：新增 `>400` 字符输出末尾 `[exit code: 7]` 的 spec，修复前 `toolNonZeroExits` 为空，
-  修复后为 1 且证据文本含 marker；`npx vitest run tests/harness/session/session-diagnose.spec.ts` 13 pass。
+  修复后为 1 且证据文本含 marker；`npx vitest run tests/session/session-diagnose.spec.ts` 13 pass。
 - 隔离真页面：修复前 `MODULE_NOT_FOUND` exit 2；修复后第一次对比金样时发现「培养 / 成品」两页签文本
   已漂（旧金样停更于 v3 前）→ 确认是现行 UI 后 `--refresh-golden`，再连续两次 `--golden` 绿。
 
@@ -68,5 +68,5 @@ node checks/smoke/ui-scene-smoke.mjs                        # dev 模式
 
 - 门禁：`checks/gates/shipped-links.mjs`、`checks/gates/nav-count-claims.mjs`、`checks/gates/md-utf8.mjs`。
 - 真页面：`checks/smoke/ui-scene-smoke.mjs`；金样 = `snapshots/visual/company-shell/ui.golden.json`。
-- 诊断：`tools/lib/session-diagnose.mjs`；守卫 = `tests/harness/session/session-diagnose.spec.ts`。
+- 诊断：`tools/lib/session-diagnose.mjs`；守卫 = `tests/session/session-diagnose.spec.ts`。
 - 产品面根 = `packages/company-pack/content/`（`workspace/` 已退役）。

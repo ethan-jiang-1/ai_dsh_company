@@ -36,7 +36,7 @@ if (verdict?.action === 'stop') {
 
 | 检查 | 结果 |
 |---|---|
-| **红**：`pnpm exec vitest run tests/harness/tools/question-stop.spec.ts` | 模块缺失，spec import 即红（判据先行） |
+| **红**：`pnpm exec vitest run tests/tools/question-stop.spec.ts` | 模块缺失，spec import 即红（判据先行） |
 | 绿：同上 | **10/10 PASS**（无停点 / 已配对不算停点 / 默认窗口剩余 / `-1` 无界 / 超长窗 / 逾期 / 多条取最老 / question.id 带出 / 坏形状不炸 / 别的工具挂住不算） |
 | **真模型（BUG-022 档）**：`node probes/session-context/ask-user-timed-probe.mjs --unbounded` | **ALL PASS**：模型传 `-1` ⇒ 判定 **0s** 给出「需人参与」+ 坐标（`callId=call_00_cuinHWFLhQW5yBKkcWxY1848`、`question.id=three-way-choice`）；现场复核 = 会话确实停住（无 `turn/end`、无 `tool/result`） |
 | **真模型（回归档，不许被本改动带坏）**：同脚本默认档 | **ALL PASS**：判「有界等待」→ 窗口到点 `pending` → `turn/end` → `userQuestions/answer` true → 答案回会话 |
@@ -58,5 +58,5 @@ if (verdict?.action === 'stop') {
 ## 指针
 
 - 卡（三次真跑时序、候选 A/B/C/D）：[BUG-022（已归档）](../../_backlog/_archive/fixed_bugs/BUG-022-ask-user-unbounded-timeout-override.md)
-- 判定实现：[question-stop.mjs](../../tools/lib/question-stop.mjs)｜判据：[question-stop.spec.ts](../../tests/harness/tools/question-stop.spec.ts)｜真模型两档：[ask-user-timed-probe.mjs](../../probes/session-context/ask-user-timed-probe.mjs)
+- 判定实现：[question-stop.mjs](../../tools/lib/question-stop.mjs)｜判据：[question-stop.spec.ts](../../tests/tools/question-stop.spec.ts)｜真模型两档：[ask-user-timed-probe.mjs](../../probes/session-context/ask-user-timed-probe.mjs)
 - 文档面：[web-rpc.md](../../docs/guides/web-rpc.md)｜前决定：[BUG-021 Note](./2026-10-18-bug021-timed-user-question.md)

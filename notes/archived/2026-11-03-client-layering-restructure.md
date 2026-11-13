@@ -35,7 +35,7 @@
 - 94 处相对 import 重写（脚本按旧路径解析→新路径重算，不手改）；47 份 client spec 移入五组，根留
   `company-client-composition.spec.ts`（whole-client 组合）。
 - 同 diff 必须跟着改的「路径即契约」面：`tsconfig.test-client.json` 的三条 exclude（直引 vendor 源码的 spec）、
-  `vitest.config.ts` 的覆盖阈值路径、`checks/gates/ui-golden-freshness.mjs` 与 `tests/harness/ui/company-tab-catalog.spec.ts`
+  `vitest.config.ts` 的覆盖阈值路径、`checks/gates/ui-golden-freshness.mjs` 与 `tests/ui/company-tab-catalog.spec.ts`
   读的 `company-tab-registration.ts` / `tab-icons.tsx`、`cdp-probe` 的源路径、`tests/client` 里读 `styles.ts` 的 CSS 夹具（client-css / motion-css / 三个视觉夹具）。
 - 历史文档里的路径指针（`docs/`、`notes/implemented/`、`notes/archived/`、`_backlog/_archive/`）按**事实落点**机械更新
   ——归档层只改路径、不改决定正文（与 2026-10-30 移动归档时补 66 处断链同一口径）。

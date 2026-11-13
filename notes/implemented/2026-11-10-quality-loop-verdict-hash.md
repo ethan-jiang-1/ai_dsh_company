@@ -25,7 +25,7 @@ audit 的归一化口径是「正文去掉结尾空白」——两位哈希只�
    `verdict-hash.mjs --fix` 重算」，让下一轮看到红的人知道先怀疑什么。
 3. **裁决后改产物必须可见**：不能开 R2 时，dispositions 显式写「未复验」；audit 对最后一轮
    dispositions 的该标记给 `post-verdict-unverified` warning。**不新增 `artifact-sha256`**（见输掉的方案）。
-4. **keyless 钉住**：`tests/harness/tools/quality-loop.spec.ts` 覆盖尾随换行/空白归一、`--fix` 回填、
+4. **keyless 钉住**：`tests/tools/quality-loop.spec.ts` 覆盖尾随换行/空白归一、`--fix` 回填、
    缺头 fail-loud、skill/guide 命令面、`未复验` warning；audit `--self-test` 保持七支红→还原→绿。
 
 ## 输掉的方案
@@ -57,7 +57,7 @@ R1 盘上旧头 hash 用 `verdict-hash.mjs --fix` 按正文重算（正文已核
 
 ## 验证
 
-- 红：`pnpm exec vitest run tests/harness/tools/quality-loop.spec.ts` → 修前 1 failed（导入的
+- 红：`pnpm exec vitest run tests/tools/quality-loop.spec.ts` → 修前 1 failed（导入的
   `verdict-hash.mjs` 不存在；补工具后 `未复验` warning 用例仍红）→ 修后 **39 passed**。
 - 真盘红：`node probes/team/quality-loop-audit.mjs --deliverable
   runtime/rehearsal-workspace/.dsh-company/deliverables/2026-11-10-probe-qloop` → `body-modified`

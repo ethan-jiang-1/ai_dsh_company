@@ -28,7 +28,7 @@
 ## 验证（真跑）
 
 ```text
-npx vitest run tests/harness/tools/audit-verdict.spec.ts   # 3 passed（机器行 / 缺行坏 JSON / assessed:false）
+npx vitest run tests/tools/audit-verdict.spec.ts   # 3 passed（机器行 / 缺行坏 JSON / assessed:false）
 source run/env.sh && node checks/audit/deliverables-check.mjs --json --only ai-coding-security-2026-light
 #   exit=0；末行判词含 warnings:[{code,detail}]（此前只有 code）
 pnpm test     # 753 passed

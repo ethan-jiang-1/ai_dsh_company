@@ -30,7 +30,7 @@ opened: 2026-11-13
 
 | 现状 | 问题 | 证据 |
 |---|---|---|
-| `snapshots/visual/company-shell/ui.golden.json`、`checks/gates/ui-golden-freshness.mjs`、`tools/lib/ui-golden.mjs`、`tests/harness/ui/ui-golden.spec.ts` + `--golden`/`--refresh-golden` | 「golden」与「expected」并存；DSH 明文禁文件名含 golden（`check-expected-filenames.sh`），且同仓 `workspace.expected/`、`system-prompt.expected.md` 已用 expected | 4 个活文件 + 2 个 flag + 文档引用 |
+| `snapshots/visual/company-shell/ui.golden.json`、`checks/gates/ui-golden-freshness.mjs`、`tools/lib/ui-golden.mjs`、tests/harness/ui/ui-golden.spec.ts（旧位置） + `--golden`/`--refresh-golden` | 「golden」与「expected」并存；DSH 明文禁文件名含 golden（`check-expected-filenames.sh`），且同仓 `workspace.expected/`、`system-prompt.expected.md` 已用 expected | 4 个活文件 + 2 个 flag + 文档引用 |
 | `checks/smoke/refactor-drift-oracle.mjs` | 住 smoke 目录却不是冒烟（需成对调用的重构工具） | kind = tool；无自动 lane |
 | `checks/smoke/fast.mjs`、`checks/smoke/all-keyless.mjs` | 是 **runner**，名字却像资产 | 两者只调度，不证明行为 |
 | `probes/team/quality-loop-audit.mjs` | 是**只读审计**（keyless、出报告），住在 probes 调试面 | 头注：只读盘与会话日志，不调模型 |
@@ -96,6 +96,13 @@ tests/
 - **资产名必须出现在注册表/census**（冒烟/探针），非资产不得混入（`index` 之类）。
 - 与 `script-triggers` 联动：所有资产的后缀都落在 `-(smoke|probe|audit|check|eval|lane)` 覆盖内，不再有逃逸后缀。
 - **负例三条**：① checks/smoke/foo-oracle.mjs（负例假路径） → 红；② probes/bar-e2e.mjs（负例假路径） → 红；③ 改名成 `golden-*.mjs` → 红。
+
+## 落地进度
+
+| 阶段 | 状态 | 证据 |
+|---|---|---|
+| Phase 1 目标树（harness 拆分） | **已交付 2026-11-13** | [Note 验证表](../../notes/implemented/2026-11-13-test-asset-naming.md)：77 文件迁移、2017 tests、verify 全绿、nav 改名红→绿 |
+| Phase 2 改名 + 门禁 | 未开工 | — |
 
 ## 验收标准
 

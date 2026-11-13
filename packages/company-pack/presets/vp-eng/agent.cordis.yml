@@ -221,7 +221,7 @@
                 name: '@deepseek-ai/dsh-tool-workflow'
                 # BUG-039 真修（2026-11-08）：默认 50000 会在 spill 之前截断，spill 文件因此
                 # 也是截断副本。抬到 200k（有界）让引擎的 spill 设计生效：头尾预览 + 全文落盘
-                # + 可读路径。锚点 = tests/harness/contract/workflow-result-budget.spec.ts。
+                # + 可读路径。锚点 = tests/contract/workflow-result-budget.spec.ts。
                 config:
                   maxResultChars: 200000
               # CMO 是命名专家（不是 teammate）：根门 / 命名 child 都能请。CEO 的 vp_cmo 仍 maxDepth 1

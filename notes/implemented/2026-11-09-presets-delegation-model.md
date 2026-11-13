@@ -134,7 +134,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针 / UI）
 
 **P2（合同 + 探针）**：
 
-- policy skill 六 full role 挂载；engine section 只在 vp-eng 出现（P2 section 真 systemPrompt 已证）；section 内容 spec 引用 `tests/harness/contract/*` 的 vendor 钉子，不复制。
+- policy skill 六 full role 挂载；engine section 只在 vp-eng 出现（P2 section 真 systemPrompt 已证）；section 内容 spec 引用 `tests/contract/*` 的 vendor 钉子，不复制。
 - P-A/P-B/P-C/P-D 探针按假设取证；红形态 = 模型未加载 policy skill、profile 误选、depth 与模型不符；每次记录证据与未覆盖。
 - P-H/P-I：subagent 失败只重试一次、refusal/aborted/max-tokens 不重试、attempt 可见；workflow error/null 可重试、exhausted 不第三次。红形态 = 重试非幂等/无限重试/把 refusal 当故障。
 

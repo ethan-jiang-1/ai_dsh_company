@@ -1,0 +1,316 @@
+import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { CHECKS, CREDENTIALS_FILE, DEEPSEEK_CREDENTIAL, LIVE_SURFACES, credentialsState, homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseCredentialKeys, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, scanDeliverables, scenarioVerification, workspaceOverview } from '../../tools/lib/orient.mjs'
+
+// 条目 B 判据（RFC driver-surface-package）：pnpm orient 的 keyless 只读核心——
+// home 判定（requireDevHome 同款但只警告不抛）/ profiles / 会话清单 / 公司盘概览 /
+// 便宜检查 / run trace 视图（引用合同字段，引用不复制）。全部走夹具 + 真实 tracked 场景。
+
+const fixtures: string[] = []
+const scratch = (name: string) => {
+  const cache = join(ROOT, 'node_modules/.cache/company-orient')
+  mkdirSync(cache, { recursive: true })
+  const dir = mkdtempSync(join(cache, `${name}-`))
+  fixtures.push(dir)
+  return dir
+}
+afterEach(() => { while (fixtures.length) rmSync(fixtures.pop()!, { recursive: true, force: true }) })
+
+let home: string
+let daily: string
+let workspace: string
+const put = (path: string, text = 'x\n', at?: string) => {
+  mkdirSync(join(path, '..'), { recursive: true })
+  writeFileSync(path, text)
+  if (at) utimesSync(path, new Date(at), new Date(at))
+}
+const dir = (path: string, at?: string) => {
+  mkdirSync(path, { recursive: true })
+  if (at) utimesSync(path, new Date(at), new Date(at))
+}
+
+beforeEach(() => {
+  home = scratch('home')
+  daily = scratch('daily')
+  workspace = scratch('ws')
+  dir(join(home, 'profiles/headless'))
+  dir(join(home, 'profiles/web'))
+  dir(join(home, 'sessions/slug-company/session-1111'), '2026-10-06T10:00:00Z')
+  dir(join(home, 'sessions/slug-company/session-2222'), '2026-10-06T12:00:00Z')
+  dir(join(home, 'sessions/slug-rehearsal/session-3333'), '2026-10-05T09:00:00Z')
+  dir(join(workspace, 'deliverables/old-motion'), '2026-10-04T08:00:00Z')
+  dir(join(workspace, 'deliverables/new-motion'), '2026-10-06T09:00:00Z')
+})
+
+/** 会话头行夹具：type:session + 可选 agentPreset（条目 B/A 共用）。 */
+const headerLine = (preset?: string) =>
+  JSON.stringify({ type: 'session', version: 4, id: 's1', cwd: '/x', ...(preset ? { agentPreset: preset } : {}) })
+
+describe('home status（日用 home 判定，只警告不抛）', () => {
+  it('未设置 / 正常 / 双向重叠 三态', () => {
+    expect(homeStatus({}, { dailyHome: daily }).kind).toBe('unset')
+    expect(homeStatus({ DSH_HOME: home }, { dailyHome: daily }).kind).toBe('ok')
+    expect(homeStatus({ DSH_HOME: join(daily, 'nested') }, { dailyHome: daily }).kind).toBe('daily')
+    expect(homeStatus({ DSH_HOME: daily }, { dailyHome: join(daily, 'nested') }).kind).toBe('daily')
+  })
+
+  it('unset 与 daily 都带 source run/env.sh 提示，ok 不带', () => {
+    expect(homeStatus({}, { dailyHome: daily }).warning).toContain('source run/env.sh')
+    expect(homeStatus({ DSH_HOME: join(daily, 'x') }, { dailyHome: daily }).warning).toContain('source run/env.sh')
+    expect(homeStatus({ DSH_HOME: home }, { dailyHome: daily }).warning).toBeUndefined()
+  })
+})
+
+describe('profiles 与会话清单', () => {
+  it('profiles 列在场目录，home 缺失时为空', () => {
+    expect(listProfiles(home)).toEqual(['headless', 'web'])
+    expect(listProfiles(join(home, 'missing'))).toEqual([])
+  })
+
+  it('profiles 过滤 node_modules 等安装产物目录（它们不是 profile）', () => {
+    dir(join(home, 'profiles/node_modules'))
+    expect(listProfiles(home)).toEqual(['headless', 'web'])
+  })
+
+  it('会话按 slug 汇总：计数、最新时间、近序排列', () => {
+    const sessions = listSessions(home, 5)
+    expect(sessions.total).toBe(2)
+    expect(sessions.recent[0]!.slug).toBe('slug-company')
+    expect(sessions.recent[0]!.sessions).toBe(2)
+    expect(new Date(sessions.recent[0]!.latest).getTime()).toBe(new Date('2026-10-06T12:00:00Z').getTime())
+    expect(sessions.recent[1]!.slug).toBe('slug-rehearsal')
+  })
+})
+
+describe('公司盘概览', () => {
+  it('deliverables 按 mtime 近序', () => {
+    const overview = workspaceOverview(workspace)
+    expect(overview.deliverables).toEqual(['new-motion', 'old-motion'])
+    expect(workspaceOverview(join(workspace, 'none')).deliverables).toEqual([])
+  })
+})
+
+describe('orientState + renderOrient', () => {
+  it('ok 态渲染含 home / profiles / 会话 / 公司盘 / run trace 四件套 / 便宜检查节', () => {
+    // gitIgnored 一并注入：2026-10-13 瘦身轮起 drafts/sources 是 ignored 的**本地过程稿**，
+    // 只看 tracked 会把它报成"零改动"（静默失真）⇒ 概览必须两行都有（反证：删 lib/orient 的
+    // 那一行 push ⇒ 本断言红）。
+    const state = orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace, gitStatus: 3, gitIgnored: 33 })
+    const text = renderOrient(state)
+    expect(text, 'ignored 面（本地过程稿）也要报，别让瘦身把这一层藏起来').toContain('本地过程稿     33 项')
+    expect(text).toContain(home)
+    expect(text).toContain('headless, web')
+    expect(text).toContain('slug-company')
+    expect(text, '角色计数取自 delegation-model，别再写死 5/6').toContain('6 公司角色 + 5 support preset')
+    expect(text).toContain('new-motion')
+    expect(text).toContain('3')
+    expect(text).toContain('run trace 四件套')
+    expect(text).toContain('pnpm orient --scenario')
+    expect(text).toContain('pnpm verify')
+    expect(text).toContain('pnpm test')
+    expect(text).not.toContain('source run/env.sh')
+  })
+
+  // 2026-11-03 第六轮 R6-06：真页面车道存在，但首屏只有 verify/test/orient——agent 看不到
+  // 「页面怎么打开/失败现场在哪」，只能去翻三份文档。首屏必须自带入口（这条断言就是那道门）。
+  it('首屏带真页面与失败现场入口（页面 / 诊断 / 证据目录 / 客户端错误日志）', () => {
+    const text = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace }))
+    expect(text).toContain('看到真页面 / 查失败现场')
+    expect(text).toContain('ui-scene-smoke.mjs')
+    expect(text).toContain('--isolated --golden')
+    expect(text).toContain('--steps')
+    expect(text).toContain('diagnosis/')
+    expect(text).toContain('company-client-errors.log')
+    expect(text).toContain('pnpm diagnose --session')
+    expect(CHECKS.some(check => check.cmd.includes('diagnose'))).toBe(true)
+    expect(LIVE_SURFACES.length).toBeGreaterThanOrEqual(4)
+  })
+
+  // 2026-11-03 第六轮 R6-04：`--scenario` 曾对所有场景给同一条 replay-smoke 命令；visual 场景没有
+  // snapshot.yml，照抄即 ENOENT（实测 exit 1）。复跑入口按场景类型分派。
+  it('--scenario 的验证命令按场景类型分派（replay / visual / 归档证据）', () => {
+    expect(scenarioVerification('replay', 'replay/x')).toBe('node checks/smoke/replay-smoke.mjs --scenario replay/x')
+    expect(scenarioVerification('visual', 'visual/x')).toContain('ui-scene-smoke.mjs --isolated --golden')
+    expect(scenarioVerification('probes', 'probes/x')).toContain('无通用复跑入口')
+    expect(runBundleView(ROOT, 'visual/company-shell').verification).toContain('ui-scene-smoke')
+    expect(runBundleView(ROOT, 'replay/foundation-workspace').verification).toContain('replay-smoke')
+  })
+
+  it('凭据行只说键名不说值（密钥住凭据库、不是环境变量——env 里没有不代表没配）', () => {
+    // 红证（2026-10-18 实测两道）：① 真模型探针曾因 `env | grep DEEPSEEK` 为空被判"本机无 key"而搁置；
+    // 事实 = 密钥在 <home> 的凭据库里。② 首版实现按**顶层键**扫，对着真有 key 的库报 ✗（共 0 个键）——
+    // 真实形状是键**嵌在 `refs:` 块里**（缩进 2）⇒ 下面的 fixture 照真实形状，纯函数与渲染各断言一次。
+    const secret = 'never-render-this-placeholder'
+    const text = `version: 1\nrefs:\n  ${DEEPSEEK_CREDENTIAL}: ${secret}\n  OTHER_API_KEY: x\nrecords: {}\n`
+    expect(parseCredentialKeys(text), '嵌套 refs 块里的键名要读出来').toEqual([DEEPSEEK_CREDENTIAL, 'OTHER_API_KEY'].sort())
+    writeFileSync(join(home, CREDENTIALS_FILE), text)
+    const state = orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace })
+    expect(state.credentials.keys).toContain(DEEPSEEK_CREDENTIAL)
+    const rendered = renderOrient(state)
+    expect(rendered).toContain('凭据')
+    expect(rendered).toContain(`${DEEPSEEK_CREDENTIAL} ✓`)
+    expect(rendered).toContain('不是环境变量')
+    expect(rendered, '密钥值绝不能进报告').not.toContain(secret)
+    rmSync(join(home, CREDENTIALS_FILE), { force: true })
+    expect(credentialsState(home).present).toBe(false)
+  })
+
+  it('unset 态渲染带警告且不误报 profiles（日用 home 的内容不算）', () => {
+    const state = orientState({ env: {}, dailyHome: daily, workspaceRoot: workspace })
+    const text = renderOrient(state)
+    expect(text).toContain('source run/env.sh')
+    expect(text).not.toContain(daily)
+    expect(state.home.kind).toBe('unset')
+    expect(state.profiles).toEqual([])
+  })
+})
+
+describe('session preset（observation-hardening 条目 B）', () => {
+
+  it('解析 type:session 头行的 agentPreset；无 preset = null、非法/缺席 = undefined（三态不混淆）', () => {
+    expect(parseSessionPreset(`${headerLine('ceo')}\n{"type":"permission/preset","data":{"preset":"workspace-write"}}\n{"trunc`)).toBe('ceo')
+    expect(parseSessionPreset(`${headerLine()}\n`)).toBeNull()
+    expect(parseSessionPreset('not json\n{"type":"session","agentPreset":"ceo"}')).toBe('ceo')
+    expect(parseSessionPreset('')).toBeUndefined()
+  })
+
+  it('注入 sessionPresets 后渲染 preset 列；无 preset/不可用/未注入三态如实', () => {
+    dir(join(home, 'sessions/slug-plain/session-4444'))
+    const state = orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace, sessionPresets: { 'slug-company': 'ceo', 'slug-rehearsal': null, 'slug-plain': undefined } })
+    const text = renderOrient(state)
+    expect(text).toContain('preset ceo')
+    expect(text).toContain('（无——非 preset 会话）')
+    expect(text).toContain('（不可用）')
+    const plain = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace }))
+    expect(plain, '未注入时不得渲染 session preset 列（代码组合行的 support preset 不算）').not.toContain('preset ceo')
+  })
+})
+
+describe('session 视图（observation-closeout 条目 A）', () => {
+  it('listSlugSessions 近序列出全部会话；slug 不存在 fail-loud', () => {
+    const rows = listSlugSessions(home, 'slug-company')
+    expect(rows.map(r => r.id)).toEqual(['session-2222', 'session-1111'])
+    expect(rows[0]!.mtime).toBe('2026-10-06T12:00:00.000Z')
+    expect(() => listSlugSessions(home, 'no-such-slug')).toThrow('session slug 不存在')
+  })
+
+  it('parseSessionHead 抽 preset/createdAt/cwd；parseSessionPreset 三态语义不变', () => {
+    const text = `${JSON.stringify({ type: 'session', id: 's1', cwd: '/repo', createdAt: 1790074328381, agentPreset: 'ceo' })}\n{"type":"permission/preset"}\n{"trunc`
+    expect(parseSessionHead(text)).toEqual({ preset: 'ceo', createdAt: 1790074328381, cwd: '/repo' })
+    expect(parseSessionHead(`${headerLine()}\n`)).toEqual({ preset: null, createdAt: null, cwd: '/x' })
+    expect(parseSessionHead('not json')).toBeUndefined()
+    expect(parseSessionPreset(`${headerLine('ceo')}\n`)).toBe('ceo')
+  })
+
+  it('renderSessionView：preset 三态与 head 缺失（不可用）如实分行呈现', () => {
+    const rows = [
+      { id: 'session-1', mtime: '2026-10-06T10:00:00.000Z', head: { preset: 'ceo', createdAt: 1790074328381, cwd: '/repo' } },
+      { id: 'session-2', mtime: '2026-10-06T09:00:00.000Z', head: { preset: null, createdAt: null, cwd: null } },
+      { id: 'session-3', mtime: '2026-10-06T08:00:00.000Z', head: undefined },
+    ]
+    const text = renderSessionView('slug-company', rows, { total: 3 })
+    expect(text).toContain('共 3')
+    expect(text).toContain('preset ceo')
+    expect(text).toContain('（无——非 preset 会话）')
+    expect(text).toContain('（不可用）')
+    expect(text).toContain('cwd /repo')
+    expect(text).toContain('created 2026-09-22T10:52:08.381Z')   // createdAt 1790074328381 的 ISO
+  })
+})
+
+describe('待核工作候选扫描（RFC orient-scan-view，R3′ 口径）', () => {
+  const brief = (lines: string[]) => `# 任务书\n${lines.join('\n')}\n`
+  const assign = (id: string, role: string, deps: string) => `ASSIGN｜${id}｜${role}｜事项 ${id}｜deps: ${deps}｜status: todo`
+  const motion = (ws: string, slug: string, opts: { final?: boolean; ceo?: string; drafts?: string[] }) => {
+    dir(join(ws, 'deliverables', slug, 'drafts'))
+    if (opts.ceo) put(join(ws, 'deliverables', slug, 'drafts/ceo.md'), opts.ceo)
+    for (const name of opts.drafts ?? []) put(join(ws, 'deliverables', slug, 'drafts', name))
+    if (opts.final) put(join(ws, 'deliverables', slug, 'final.md'))
+  }
+
+  it('三形状：已关闭不报 / 进行中候选+阻塞分列 / 盘上稿降档（depByDisk + stale）', () => {
+    const ws = scratch('ws-scan')
+    motion(ws, 'motion-closed', { final: true, ceo: brief([assign('T1', 'vp-sales', 'none')]) })
+    motion(ws, 'motion-open', { ceo: brief([assign('T1', 'vp-sales', 'none'), assign('T2', 'cfo', 'T9')]) })
+    motion(ws, 'motion-drift', { ceo: brief([assign('T1', 'vp-eng', 'none'), assign('T2', 'coo', 'T1'), assign('T3', 'vp-sales', 'T5')]), drafts: ['vp-eng.md'] })
+    const scan: any = scanDeliverables(ws)
+    expect(scan['motion-closed']).toEqual({ closed: true, candidates: [], blocked: [] })
+    const open = scan['motion-open']
+    expect(open.closed).toBe(false)
+    expect(open.candidates.map((c: any) => c.task)).toEqual(['T1'])
+    expect(open.blocked.map((b: any) => b.task)).toEqual(['T2'])
+    const drift = scan['motion-drift']
+    expect(drift.candidates.map((c: any) => `${c.task}${c.depByDisk ? 'ᵈ' : ''}`)).toEqual(['T1', 'T2ᵈ'])
+    expect(drift.candidates.find((c: any) => c.task === 'T1')!.stale).toBe(true)
+    expect(drift.blocked.map((b: any) => b.task)).toEqual(['T3'])
+  })
+
+  it('渲染：公司盘后带「待核工作候选」节（R3′ 口径 + 零容忍门槛声明）；空盘如实「无动议在盘」', () => {
+    const ws = scratch('ws-scan-render')
+    motion(ws, 'motion-closed', { final: true, ceo: brief([assign('T1', 'vp-sales', 'none')]) })
+    motion(ws, 'motion-open', { ceo: brief([assign('T1', 'vp-sales', 'none'), assign('T2', 'cfo', 'T9')]) })
+    const text = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: ws }))
+    expect(text).toContain('待核工作候选')
+    expect(text).toContain('R3′')
+    expect(text).toContain('零容忍')
+    expect(text).toMatch(/motion-closed.*已关闭/s)
+    expect(text).toMatch(/motion-open[\s\S]*候选 1 · 阻塞 1/)
+    const empty = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: scratch('ws-empty') }))
+    expect(empty).toContain('无动议在盘')
+  })
+})
+
+describe('run trace 视图（引用合同字段，引用不复制）', () => {
+  it('夹具场景：缺 lead 引用时如实报 false，不伪造', () => {
+    const root = scratch('scene')
+    const scene = join(root, 'snapshots/replay/mini')
+    put(join(scene, 'snapshot.yml'), [
+      'scenario: mini',
+      'recordedAt: 2026-10-06',
+      'profile: web',
+      'agentPreset: ceo',
+      'cwd: company-workspace',
+      'session:',
+      '  lead: sessions/lead.jsonl',
+      '  children: sessions/',
+      'workspace:',
+      '  expected: workspace.expected/',
+    ].join('\n'))
+    const view: any = runBundleView(root, 'mini')
+    expect(view.fields.scenario).toBe('mini')
+    expect(view.refs.sessionLeadExists).toBe(false)
+    expect(view.refs.sessionChildrenCount).toBe(0)
+    expect(view.refs.workspaceExpectedExists).toBe(false)
+  })
+
+  it('未知场景 fail-loud（复用 snapshotScene 判定）', () => {
+    expect(() => runBundleView(ROOT, 'no-such-scene')).toThrow('not found')
+  })
+
+  // BUG-031 守卫：children 声明为**文件**（r3 形状 sessions/vp-eng-child.jsonl）时不得 ENOTDIR 崩。
+  // 负例留证 2026-10-20：BUG-031 —— 旧 runBundleView 对 children 引用一律 readdirSync，
+  // `pnpm orient --scenario replay/r3-delegation` 实测 ENOTDIR exit 1（r2 目录形状才不炸）。
+  // 红配方：children 引用改回「只当目录读」即对本用例 ENOTDIR；绿 = 文件计 1、目录数 .jsonl。
+  it('夹具：children 指向单个 .jsonl 文件时计 1；指向目录时数 .jsonl 件数', () => {
+    const root = scratch('scene-file')
+    const scene = join(root, 'snapshots/replay/single')
+    put(join(scene, 'snapshot.yml'), [
+      'scenario: single',
+      'recordedAt: 2026-10-20',
+      'profile: web',
+      'agentPreset: ceo',
+      'cwd: company-workspace',
+      'session:',
+      '  lead: sessions/lead.jsonl',
+      '  children: sessions/vp-eng-child.jsonl',
+      'workspace:',
+      '  expected: workspace.expected/',
+    ].join('\n'))
+    put(join(scene, 'sessions/lead.jsonl'), '{}\n')
+    put(join(scene, 'sessions/vp-eng-child.jsonl'), '{}\n')
+    const view = runBundleView(root, 'single')
+    expect(view.refs.sessionChildrenCount).toBe(1)
+  })
+})

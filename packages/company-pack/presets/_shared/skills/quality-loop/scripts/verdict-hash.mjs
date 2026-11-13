@@ -6,7 +6,7 @@
 //   node <company-content>/../presets/_shared/skills/quality-loop/scripts/verdict-hash.mjs --check quality-loop/verdict-r1.md
 //   node <company-content>/../presets/_shared/skills/quality-loop/scripts/verdict-hash.mjs --body <正文文件>
 // 口径：正文去掉结尾空白（与 `tools/lib/quality-loop.mjs` 的 normalizeVerdictBody 同义；
-//       parity spec = tests/harness/tools/quality-loop.spec.ts）。
+//       parity spec = tests/tools/quality-loop.spec.ts）。
 // 为什么存在：`tail -n +2 file | shasum` 会把文件尾随换行算进哈希，audit 的归一化口径会判
 //       `body-modified`（BUG-056 真实事故）。手算口径不可靠，哈希只走这条命令。
 import { createHash } from 'node:crypto'

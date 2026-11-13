@@ -177,7 +177,7 @@
 
 | [BUG-034-no-absolute-time-source-for-signed-records.md](fixed_bugs/BUG-034-no-absolute-time-source-for-signed-records.md) | 记录可举证必须有时间源：SA/SQA skill 必查 + 审计 Q8/Q10 + E2E v8 验收 | 2026-11-07 |
 | [BUG-035-short-circuit-withstand-undefined.md](fixed_bugs/BUG-035-short-circuit-withstand-undefined.md) | 通流/承力路径必须有故障电流耐受：SA/SQA skill 必查 + 审计 Q9/Q11 + E2E v8 验收 | 2026-11-07 |
-| [BUG-036-workflow-schema-enum-type.md](fixed_bugs/BUG-036-workflow-schema-enum-type.md) | workflow schema 子集：enum/const 需单值 type、无 type 数组；skill 四条 + 合同钉子 `tests/harness/contract/json-schema-subset.spec.ts` | 2026-11-08 |
+| [BUG-036-workflow-schema-enum-type.md](fixed_bugs/BUG-036-workflow-schema-enum-type.md) | workflow schema 子集：enum/const 需单值 type、无 type 数组；skill 四条 + 合同钉子 `tests/contract/json-schema-subset.spec.ts` | 2026-11-08 |
 | [BUG-039-workflow-result-truncation-lossy-spill.md](fixed_bugs/BUG-039-workflow-result-truncation-lossy-spill.md) | >50k 结果先截断再落盘：preset 抬 maxResultChars 到 200k，spill 全文可读；探针 71,677 字符 + 渲染钉子 | 2026-11-08 |
 | [BUG-037-root-team-tool-shadowing.md](fixed_bugs/BUG-037-root-team-tool-shadowing.md) | 根门被团队版控制名 shadow：新增 `list_subagents` / `send_to_subagent`（官方服务、不被 shadow）+ 合同/技能同步 | 2026-11-08 |
 | [BUG-038-workflow-branch-nested-delegation-result.md](fixed_bugs/BUG-038-workflow-branch-nested-delegation-result.md) | 分支内再委派返回值混回执：分支当叶子规则 + 真跑自纠观察 + 机制钉子（回执拼接） | 2026-11-08 |

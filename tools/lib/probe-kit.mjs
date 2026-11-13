@@ -1,7 +1,7 @@
 // 探针公共件（2026-10-14 重构轮收拢）：sleep 与两种 check 收集器的单一实现。
 // 此前 33 个探针各自定义 sleep（3 种写法同义）、10 处定义「results 收集」版 check 一行、
 // 5 处定义「failures 收集」版 check——改一次输出格式要点几十处（probe-window.mjs 头注同款教训）。
-// 何时跑：被 probes/**/*-probe.mjs import（keyless 直测 = tests/harness/session/probe-kit.spec.ts）；
+// 何时跑：被 probes/**/*-probe.mjs import（keyless 直测 = tests/session/probe-kit.spec.ts）；
 //   改输出格式属行为变更——快照/金样与探针头注里的判据叙述须连带核对。
 // 语义合同（与原各探针逐字一致）：输出行 = `  PASS/FAIL <label>`，detail 非空时附 `（<detail>）`。
 

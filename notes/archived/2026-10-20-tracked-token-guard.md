@@ -20,13 +20,13 @@
 3. 门禁 = `checks/gates/tracked-token.mjs`：扫 `git ls-files` 的 tracked 面（跳过只读 `vendor/`），
    装配进 `checks/run-gates.mjs`。`checks/README.md` 与 `security-scan.mjs` 头注补范围声明：
    company-workspace 真扫仍归 security-scan，跨仓 token URL 窄扫归 tracked-token。
-4. 测试 = `tests/harness/repo/tracked-token.spec.ts`（真 token URL 命中；动态 token 参数、占位 secret、
-   非 URL 赋值不命中）+ `tests/harness/repo/gitignore-guards.spec.ts` 的 `.gitignore` 规则断言。
+4. 测试 = `tests/repo/tracked-token.spec.ts`（真 token URL 命中；动态 token 参数、占位 secret、
+   非 URL 赋值不命中）+ `tests/repo/gitignore-guards.spec.ts` 的 `.gitignore` 规则断言。
 
 ## 输掉的方案
 
 - **直接复用 a2 高熵扫描全 tracked**：会命中 `probes/session-context/human-exits-nonblocking-probe.mjs`
-  的 `token: url.searchParams.get('token')` 与 `tests/harness/session/orient.spec.ts` 的
+  的 `token: url.searchParams.get('token')` 与 `tests/session/orient.spec.ts` 的
   `secret = 'never-render-this-placeholder'` 两处测试替身；要么加 fixture 分类，要么窄化正则。
   窄正则更小、更准，故选窄正则。
 - **只修路径（BUG-013 同款）**：7 天内复发一次，证明路径级不足以覆盖「任何 tracked 文本」这一类。
@@ -53,7 +53,7 @@ FAIL tracked-token tracked 文件含 token URL（值不打印）：runtime/audit
 PASS tracked-token ×1740（tracked 面零 token URL；跳过 5 个 >2MB 或非普通文件）
 
 .gitignore 红/绿：
-临时删 runtime/web-logs/ 规则 → tests/harness/repo/gitignore-guards.spec.ts 1 failed
+临时删 runtime/web-logs/ 规则 → tests/repo/gitignore-guards.spec.ts 1 failed
 还原 → 3 passed
 
 git ls-files runtime/web-logs        # 0

@@ -42,7 +42,7 @@ SA/SQA 退役后，VP-Eng 只剩质量环骨架：没有默认方法包，verifi
 
 ## 验证
 
-- 已跑：`pnpm vitest run tests/harness/tools/methods-init.spec.ts` → **4 tests passed**
+- 已跑：`pnpm vitest run tests/tools/methods-init.spec.ts` → **4 tests passed**
   （两包两侧同 method/version + check-id 同批；seed 复制/幂等/不覆盖/源缺失）。
 - 已跑：`source run/env.sh && pnpm methods:init` → **copied 4 / skipped 0**（dev home；
   已安装 `system-architecture` / `vv-plan` 两侧）。

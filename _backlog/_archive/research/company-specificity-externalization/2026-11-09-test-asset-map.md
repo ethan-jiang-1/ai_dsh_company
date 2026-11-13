@@ -91,7 +91,7 @@ tests/fixtures/companies/
 |---|---|---|
 | `tools/export-dist.mjs` | 打包 content 清单 | 改目录后随扫或改清单 |
 | `tools/lib/company-roles.mjs:10`（另 `:18`） | 六角色 + 三 worker 名册 | 角色不变可留；但它是 pack 名册的**第二份**，漏改不红但错判 |
-| `tests/harness/repo/pack-source.spec.ts`、`install-manual.spec.ts`、`market-index.spec.ts` | 九 preset 枚举/手册内容 | 角色集不变则稳；改名/加类型要同步 |
+| `tests/repo/pack-source.spec.ts`、`install-manual.spec.ts`、`market-index.spec.ts` | 九 preset 枚举/手册内容 | 角色集不变则稳；改名/加类型要同步 |
 
 ## 3. 测法迁移三条原则
 

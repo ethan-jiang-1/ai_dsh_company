@@ -11,7 +11,7 @@ opened: 2026-10-16
 
 **当前情况：**
 - 基线（2026-10-16 实跑）：`pnpm verify` ALL PASS；`pnpm test` 60 文件 / 559 用例全绿——本轮是绿基线上的纯结构提案，无行为变更目标。
-- 快评一项误判已修正：doors 寄居块 2026-10-14 已迁出，[tests/company](../../../tests/lib/doors.spec.ts) 的 `<模块>.spec.ts` 一一对应已恢复（[deliverables.spec 尾注](../../../tests/harness/tools/deliverables.spec.ts) 是迁出墓碑，非活债务）。
+- 快评一项误判已修正：doors 寄居块 2026-10-14 已迁出，[tests/company](../../../tests/lib/doors.spec.ts) 的 `<模块>.spec.ts` 一一对应已恢复（[deliverables.spec 尾注](../../../tests/tools/deliverables.spec.ts) 是迁出墓碑，非活债务）。
 - 本卡是第三轮：前两轮 owner = [2026-10-14 六项重构](../../../notes/archived/2026-10-14-code-restructure.md) 与 [client-host-replay 局部化](../../../notes/archived/2026-10-14-client-host-replay-locality.md)；本卡只接它们未接的面，不翻它们的案。
 - 用户 2026-10-16 已言「按你的推荐就行」——推荐 A 记为首选范围；开工仍待明示（卡不授予实施权）。
 
@@ -42,7 +42,7 @@ opened: 2026-10-16
 - 模块大小门禁 gate——门禁升格判据未满足（dev-loop §9：「具体错误复发过」不成立）；
 - deliverables / presence 三拆；
 - `packages/company-pack/src/client/` 现在分组——2026-10-14 locality 轮已否决过拆（避免过度拆分与跨文件跳转），只立回访触发线；
-- `tools/lib/` 现在分组——[layering.spec](../../../tests/harness/repo/layering.spec.ts) 只扫 tools/lib 顶层文件，分子目录会让新目录逃出 keyless 守卫（硬阻碍：先扩扫描再谈分组）。
+- `tools/lib/` 现在分组——[layering.spec](../../../tests/repo/layering.spec.ts) 只扫 tools/lib 顶层文件，分子目录会让新目录逃出 keyless 守卫（硬阻碍：先扩扫描再谈分组）。
 
 非目标：任何判据/行为/文案语义变更；刷新 replay 夹具；动 vendor；动工作树里两笔未提交的 company-workspace journal 改动。
 
@@ -53,7 +53,7 @@ opened: 2026-10-16
 - 全仓代码（除 vendor）238 文件 / 27,780 行；83% 文件 ≤200 行，仅 5 文件 >400 行（最大 715）。整体结构已被前两轮收敛，本轮只剩局部接缝。
 - deliverables.mjs：506 行 / 23 导出；三套词汇混住（路径身份 / meta.md 格式 / 审计语义）；消费面三组互不重叠——[authorship-audit](../../../checks/audit/authorship-audit.mjs) 只拿 2 个身份导出、[deliverables-check](../../../checks/audit/deliverables-check.mjs) 全是审计簇、[claim-race-probe](../../../probes/team/claim-race-probe.mjs) 只要让位行常量；presets.spec 有意不 import（测试侧独立事实源，2026-10-14 轮拍板）。
 - presence.ts：396 行 / 17 导出；状态/显示名词汇（约 65 行）与板/事件折算（约 330 行）混住；8 个 client importer + host 入口 `export *` + replay-smoke 经 built 入口拿 presenceFromEvents。
-- 构建/门禁面：tsconfig.client 的 include 是目录制（src/lib 整目录）→ 新 lib 文件自动入编；tsdown 走 tsc 产物 → 零配置改动；[pack-exports 守卫](../../../tests/harness/repo/pack-exports.spec.ts) 只钉 inject/apply/无 default；tools/lib 纯逻辑模块无「状态：」头注要求（script-status 只扫脚本面）。
+- 构建/门禁面：tsconfig.client 的 include 是目录制（src/lib 整目录）→ 新 lib 文件自动入编；tsdown 走 tsc 产物 → 零配置改动；[pack-exports 守卫](../../../tests/repo/pack-exports.spec.ts) 只钉 inject/apply/无 default；tools/lib 纯逻辑模块无「状态：」头注要求（script-status 只扫脚本面）。
 
 ## 方案与取舍
 
@@ -119,7 +119,7 @@ opened: 2026-10-16
 |---|---|---|---|---|
 | 纯搬移零行为漂移 | 确定性 | 拆前/拆后 `pnpm exec vitest run --reporter=verbose` 全名清单 diff = 仅预期搬移 | — | vitest 全名清单（2026-10-14 基线法） |
 | 回归全绿 | 确定性 | pnpm test：61 文件全绿（60 + 新 spec） | — | `pnpm test` |
-| 新模块 keyless | 结构 | pnpm test tests/harness 全绿 | 塞 node:child_process 进新模块 → layering 红「tools/lib 只能保持 keyless 纯逻辑」 | [layering.spec](../../../tests/harness/repo/layering.spec.ts) + keyless-imports 图 |
+| 新模块 keyless | 结构 | pnpm test tests/harness 全绿 | 塞 node:child_process 进新模块 → layering 红「tools/lib 只能保持 keyless 纯逻辑」 | [layering.spec](../../../tests/repo/layering.spec.ts) + keyless-imports 图 |
 | 真入口等价 | 编排 | 拆前/拆后跑 deliverables-check 快照档（命令见下）输出逐行一致、退出码同 | — | [deliverables-check](../../../checks/audit/deliverables-check.mjs) 快照档 |
 | 探针引用可达 | 编排 | node 动态 import 新模块断言 PLACEHOLDER_YIELD_LINE 原文在场（秒级绿） | — | node import 断言（真模型档复跑归该探针头注触发） |
 | 审计判据钉子 | 确定性 | 新 spec（audit describe 迁移件）全绿 | 临时反转 isLeadSession → 越权断言红（expected … toContain final-presented-by-non-lead 类）→ 还原绿 | 新 spec |
@@ -137,7 +137,7 @@ source run/env.sh && node checks/audit/deliverables-check.mjs \
 
 | 行为 | 类别 | 通过信号 | 负例（红配方） | 证据 owner |
 |---|---|---|---|---|
-| 发布面零漂移（facade 设计目标） | 编排 | `pnpm exec vitest run tests/lib/presence-board.spec.ts tests/harness/repo/pack-exports.spec.ts` 全绿 | — | [presence-board.spec](../../../tests/lib/presence-board.spec.ts) + [pack-exports.spec](../../../tests/harness/repo/pack-exports.spec.ts) |
+| 发布面零漂移（facade 设计目标） | 编排 | `pnpm exec vitest run tests/lib/presence-board.spec.ts tests/repo/pack-exports.spec.ts` 全绿 | — | [presence-board.spec](../../../tests/lib/presence-board.spec.ts) + [pack-exports.spec](../../../tests/repo/pack-exports.spec.ts) |
 | 回归全绿 | 确定性 | pnpm test：60 文件 559 用例全绿 | — | `pnpm test` |
 | 两半构建 | 编排 | tsc -b + tsdown 两面 complete | — | pack 构建 |
 | client 真挂载 | 编排 | `source run/env.sh && node checks/smoke/client-load-smoke.mjs` ALL PASS | — | [client-load-smoke](../../../checks/smoke/client-load-smoke.mjs) |

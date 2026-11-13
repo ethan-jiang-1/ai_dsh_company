@@ -41,13 +41,13 @@ opened: 2026-11-10
   两条 verdict 头分别 `session=s1` / `session=s2`、`round=1/2`；旧实现 → `not-verbatim`。
 - 真盘：`2026-11-10-probe-qloop` 的 R2（`cdf67a74`）与 R1（`7ae15c99`）；
   `node probes/team/quality-loop-audit.mjs --deliverable <dir>` 旧实现 → `not-verbatim`。
-- 红证由 `tests/harness/tools/quality-loop.spec.ts` 的「R2 换新 verifier session」用例钉住。
+- 红证由 `tests/tools/quality-loop.spec.ts` 的「R2 换新 verifier session」用例钉住。
 
 ## 修复关联
 
 - `tools/lib/quality-loop.mjs`：`lastTextIndex` → `lastTextIndexBySession`（`Map`）；
   `sessionKey = header.session ?? 'round:<n>'`；命中后只更新该 session 的 index。
-- `tests/harness/tools/quality-loop.spec.ts`：新增 R1/R2 不同 session 的用例 + `// 负例留证`。
+- `tests/tools/quality-loop.spec.ts`：新增 R1/R2 不同 session 的用例 + `// 负例留证`。
 - 不改变 R1 头 hash 的判据（`body-modified` 仍然红）；R1 盘上旧 hash 由 `verdict-hash.mjs --fix`
   按正文重算（正文已核为 verifier 原文）。
 
@@ -62,7 +62,7 @@ opened: 2026-11-10
 
 - **红**：把 `lastTextIndexBySession` 临时改回跨轮全局 → 新用例 **1 failed**
   （`expected [ 'not-verbatim' ] to not include 'not-verbatim'`）；还原即绿。
-- **绿**：`pnpm vitest run tests/harness/tools/quality-loop.spec.ts` = **40 passed**；
+- **绿**：`pnpm vitest run tests/tools/quality-loop.spec.ts` = **40 passed**；
   真盘 R2 audit = **ALL PASS**（R1 头 hash 用 `verdict-hash.mjs --fix` 修正后）。
 - **R1 artifact**：正文 sha256 `5738a1…` 与 verifier `7ae15c99` 第 2 条助手正文一致；
   头里旧值 `d9d252…` 是 round-8 手算/旧副本残留，不是 R2 的代码缺陷；修复只重算头、不改正文。

@@ -14,7 +14,7 @@
    根 `package.json` 的 `prepare` 与 `run/env.sh` 都调用它，不再各写一份 `git config core.hooksPath`。
    原因：core.hooksPath 不随 clone 走，只在 `source run/env.sh` 里接线会让忘 source 的 agent 静默跳过 verify/test。
 3. **卸载残留清单两处对账，不删 README 的可执行清单。** pack README 补齐 lease/日志/检索索引 3 条，
-   与《安装手册》§八 的 6 条 rm 路径一致；判据 = `tests/harness/repo/uninstall-parity.spec.ts`。
+   与《安装手册》§八 的 6 条 rm 路径一致；判据 = `tests/repo/uninstall-parity.spec.ts`。
    手册仍是生成物（唯一模板 = `tools/lib/install-manual.mjs`），README 不指向不可离线取得的清单。
 4. **随包 YAML 注释里的 docs 指针加存在性 spec。** `cordis.patch.yml` 的 docs/release.md 是死指针；
    `bare-path` 只扫 Markdown，注释面没有守卫。新 spec 只查 pack 内 `.yml` 注释的 `docs/` 路径，
@@ -33,7 +33,7 @@
    顺序对齐 vendor `scripts/build.ts` 的 `host-src → host-typert → client-src`。
 9. **带参数的 setup 一律走 node 入口。** `pnpm setup` 是 pnpm 内置命令，`pnpm setup --check` 实测
    `[ERROR] Unknown option: 'check'`；CI/文档/帮助文本统一 `node tools/setup.mjs --check|--types`，
-   并加 `tests/harness/repo/setup-invocation.spec.ts` 防回退。
+   并加 `tests/repo/setup-invocation.spec.ts` 防回退。
 10. **冻结层链接到 runtime/company-workspace/snapshots 不计死链。** clean clone 没有这些 gitignored
    证据树，`notes-archived-links`/`link-debt` 原按 warm 盘判定，clone 上必红（实测 2 处 + archived 23 > 20）。
    只跳过冻结层 × 三棵证据树；普通 `.md` 断链与非冻结源 `moved` 仍判红。warm/clean 双测同为 4，

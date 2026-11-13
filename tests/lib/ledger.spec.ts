@@ -40,7 +40,7 @@ describe('parseMotionLedger', () => {
 })
 
 // dev-only：台账是 run bundle 的扩张数据，不是产品源码；fresh clone 不保证在场。
-// skip 预期：dev home 真跑 3 例；fresh clone 0 例。新增 skip 的登记守卫 = tests/harness/repo/skip-budget.spec.ts。
+// skip 预期：dev home 真跑 3 例；fresh clone 0 例。新增 skip 的登记守卫 = tests/repo/skip-budget.spec.ts。
 describe.skipIf(!hasLive)('live bundle 台账（dev only）', () => {
   it('真台账：全部行可解析、结构不变形（不钉总行数——台账每场动议都会长一行）', () => {
     const rows = parseMotionLedger(REAL_LEDGER)

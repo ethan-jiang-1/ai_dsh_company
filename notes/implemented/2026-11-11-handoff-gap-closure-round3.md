@@ -8,7 +8,7 @@
 1. **root pnpm 对齐 vendor：`pnpm@11.7.0` → `pnpm@11.28.5`。** vendor 随 `dsh-v0.2.1-rc.5` 已是 11.28.5；bootstrap 却写“逐字一致”。先只改 root `packageManager`，`pnpm install --lockfile-only` 无 lock 变更、`pnpm install --frozen-lockfile` 通过。新增 `checks/gates/package-manager-parity.mjs`：两处必须都存在、都是 `pnpm@x.y.z` 且逐字相等，否则红。
 2. **首跑顺序写全：`pnpm setup` → `pnpm bundle:init` → `pnpm company`。** 原 AGENTS 首跑句从 setup 直接跳 company，但 `tools/company.mjs` 在 workspace 缺失时要求先 bundle:init；CI 也先跑 bundle:init。命令表已补 `pnpm setup` 无参数、带 flags 必须 `node tools/setup.mjs ...`（setup-invocation spec 已有守卫）。
 3. **pre-publish READY 说清楚，不删哨兵。** `market-index.staged.json` 在场时 `release --check` 默认拒绝 READY 是设计，不是坏；AGENTS 命令表与 release runbook 改为显式 `--allow-pre-publish-index`，publish 后删 staged 再跑默认 check。保留哨兵 = 防止把未发布版本当可托管索引。
-4. **角色计数改六：`cordis.patch.yml` 两处“五个角色” → “六个公司角色”。** `preset-clock` 实际命中 ceo/vp-eng/vp-sales/coo/cfo/cmo 六个；CMO 增设时清了 AGENTS/market，补丁注释漏了。新增 `tests/harness/repo/role-count-claims.spec.ts`：六个公司角色各声明 `preset-clock`，随包补丁注释不得再出现“五个角色”。
+4. **角色计数改六：`cordis.patch.yml` 两处“五个角色” → “六个公司角色”。** `preset-clock` 实际命中 ceo/vp-eng/vp-sales/coo/cfo/cmo 六个；CMO 增设时清了 AGENTS/market，补丁注释漏了。新增 `tests/repo/role-count-claims.spec.ts`：六个公司角色各声明 `preset-clock`，随包补丁注释不得再出现“五个角色”。
 5. **源码 clone 与发行两件套分开说。** `_dist/` 在 clean clone 只有 tracked 的《安装手册》，tarball 由 `pnpm release --prepare` 生成；README 的开发者入口补这一句，收件人仍用发行两件套。
 6. **版本 0.11.5。** `cordis.patch.yml` 是随包内容，按版本纪律“改内容必 bump”同 diff 重导 `_dist`（tarball/手册/manifest/market index/staged 同步）；不带旧 0.11.4 字节继续。
 
@@ -28,7 +28,7 @@
 - `pnpm verify` → `verify: ALL PASS；2 门无对象（replay-fixture-freshness / replay-ui-freshness）`；新增 `PASS package-manager-parity (pnpm@11.28.5)`、`gate-wiring ×70`。
 - `pnpm test` → `Test Files 193 passed (193)` / `Tests 1554 passed (1554)`。
 - `pnpm typecheck` → exit 0；`pnpm lint` → 0 warnings/0 errors；`pnpm dup` → 0 clones。
-- `pnpm exec vitest run tests/harness/repo/role-count-claims.spec.ts tests/harness/repo/setup-invocation.spec.ts` → 3 passed。
+- `pnpm exec vitest run tests/repo/role-count-claims.spec.ts tests/repo/setup-invocation.spec.ts` → 3 passed。
 - `node tools/checks-index.mjs --write` → `checks-index: 已生成 …（137 行）`；script-index 绿。
 - `pnpm release --prepare` → `export-dist: ALL PASS`；tarball `0.11.5` 259 entries；sha256 `d1d7c14e924f324571c47e063549816c95c40b6db063ab85abbad3057126f730`；手册 0.11.5。
 - `pnpm release --verify` → `release: verify 全绿；提交后跑 --check`（verify/test/release-smoke/company-entry/client-load/preset/present-catalog 全 pass；preset 11/11）。

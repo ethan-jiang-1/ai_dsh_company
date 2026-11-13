@@ -72,7 +72,7 @@ rendered.slice(0, maxChars) + "\n… [truncated: N more characters]"
   4 分支 × 500 行、父原样返回全量 rows：工具结果 49,931 字符 + `(Omitted 21993 bytes … stored at: …)`、
   **无 `[truncated:`**；spill 文件 71,677 字符，含 `m01-line-1` 与 `m04-line-500`，无 Omitted/截断标记；
   模型 `read`/`grep` 读回并核对。对照原症状（49,929 + `[truncated: 35806 more characters]`、spill 50,102 且含同一标记）。
-- **资产**：`tests/harness/contract/workflow-result-budget.spec.ts`——钉住 `maxResultChars` 控制渲染，
+- **资产**：`tests/contract/workflow-result-budget.spec.ts`——钉住 `maxResultChars` 控制渲染，
   且 vp-eng preset 真带 200000；红配方 = 删 preset config → 第三条红。
   缺口（如实记）：端到端“spill 文件完整”目前靠一次性探针，未进 CI；钉子只覆盖“工具不截断”。
 - vendor 未改；上游仍建议 workflow 工具在截断前把完整渲染值交给 spill store（默认值下的其它消费者受益；

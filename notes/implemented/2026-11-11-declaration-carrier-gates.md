@@ -42,7 +42,7 @@
    “本部署以 KB 事实为准”是合法通用语，不列入（避免假阳性）。
 5. **委派深度用真值表钉**：`docs/contracts/delegation.md` 改成绝对语义 + 5 行真值
    （`0/1→1 ALLOW`、`1/1→2 THROW`、`1/2→2 ALLOW`、`2/3→3 ALLOW`、`2/2→3 THROW`），
-   并新增 `tests/harness/contract/delegation-depth-truth-table.spec.ts` 直引 vendor
+   并新增 `tests/contract/delegation-depth-truth-table.spec.ts` 直引 vendor
    `resolveChildDepth`，钉住 `1/1` 必须抛 `SubagentDepthError`。
 
 ## 输掉的方案
@@ -65,7 +65,7 @@
 - `docs/contracts/delegation.md` 补绝对语义真值（行数压到 114/120，保住 5% headroom）。
 - `content/charters/cfo.md` 的服务类附赠块、10%、个案语言移出；`vp-eng.md` / `org.md` 的政策数字
   改成指针；`policy-lines.md` 增加服务类附赠 / 服务信用节。
-- 新增 keyless 合同钉子 `delegation-depth-truth-table.spec.ts`（tests/harness/contract 属
+- 新增 keyless 合同钉子 `delegation-depth-truth-table.spec.ts`（tests/contract 属
   typecheck 已知未覆盖面，运行面走 vitest vendor paths）。
 - 旧部署 only-fill 不受影响：这些是 pack 内容 / 文档 / 门禁，不改 workspace 状态。
 

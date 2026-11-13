@@ -17,7 +17,7 @@
 //      这是"父拿裸 null"的机制侧证据，与卡里的探针/技能规则配套。
 //
 // 证明不了什么：不证明模型会照 skill 派活（那是真模型探针）；不证明 spill 落盘（见
-// `tests/harness/contract/workflow-result-budget.spec.ts` 与 BUG-039 探针）。
+// `tests/contract/workflow-result-budget.spec.ts` 与 BUG-039 探针）。
 import assert from 'node:assert/strict'
 import { randomUUID } from 'node:crypto'
 import { mkdtemp, mkdir, rm } from 'node:fs/promises'

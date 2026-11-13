@@ -1,4 +1,4 @@
-// 会话日志世代选择（RFC log-generation，2026-10-05；合同 = tests/harness/session/session-log-generation.spec.ts）。
+// 会话日志世代选择（RFC log-generation，2026-10-05；合同 = tests/session/session-log-generation.spec.ts）。
 //
 // 为什么存在：同一会话目录可能并存多世代日志（session.v3.jsonl.zstd + session.v4.jsonl.zstd——世代
 // 升级期常态），而历史五处读取点选择逻辑各异（readdir 序第一个 / 迭代序最后一个 / 字典序取末位），

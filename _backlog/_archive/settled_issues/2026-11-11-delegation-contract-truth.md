@@ -25,7 +25,7 @@ opened: 2026-11-11
 
 **未决问题：** 没有需要用户拍板的产品选择；实现时需定两件小口径：① `teamLead` 改成 `teamLeadWhenRoot` 还是加 `runtimeAuthority` 字段（推荐前者：保留 preset 期望，另在注入侧用 `agentTeams.membership` 判运行时）；② A/B/C/D 表保留为组织别名，还是从 `architecture.md` 主表移除（推荐保留 A/B/D 为别名、C 标“未启用的外部 provider 通道”，能力矩阵以原生四通道为准）。
 
-**下一步：** 先写 `tests/harness/contract/<delegation-channel-parity.spec.ts>`（红：当前模型与 vendor 的 team context/teamLead/control 标签不一致）→ 修模型/注释/测试文案 → 改 docs 三处 → 跑 targeted spec + `pnpm test` + `pnpm typecheck` + `pnpm verify`。
+**下一步：** 先写 `tests/contract/<delegation-channel-parity.spec.ts>`（红：当前模型与 vendor 的 team context/teamLead/control 标签不一致）→ 修模型/注释/测试文案 → 改 docs 三处 → 跑 targeted spec + `pnpm test` + `pnpm typecheck` + `pnpm verify`。
 
 ## 范围与排除项
 

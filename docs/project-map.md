@@ -30,7 +30,7 @@
 | 启动配置 | [run](../run/)、[env.sh](../run/env.sh) | tracked 启动配置；`pnpm company` 启动入口；源码验证使用开发 DSH_HOME |
 | 运行残留 | [runtime](../runtime/)、[runtime/README](../runtime/README.md) | 开发 DSH_HOME、第二 home、浏览器工具态与排练盘（默认整树忽略 + 显式白名单，逐件见 runtime/README；排练盘成型见 [rehearsal 实现](../tools/lib/rehearsal.mjs)） |
 | 上游机制 | [vendor/dsh](../vendor/dsh/) | 钉住的只读 submodule；开发 `pnpm dsh` 的源码基线 |
-| keyless 回归 | [tests](../tests/)、[Vitest 配置](../vitest.config.ts) | 模块逻辑、静态渲染、隔离文件夹具；分层守卫见 [layering.spec.ts](../tests/harness/repo/layering.spec.ts) |
+| keyless 回归 | [tests](../tests/)、[Vitest 配置](../vitest.config.ts) | 模块逻辑、静态渲染、隔离文件夹具；分层守卫见 [layering.spec.ts](../tests/repo/layering.spec.ts) |
 | 维护工具 | [检查与工具索引](../checks/README.md) | 门禁、真实入口、窄探针、审计、回放与导出；共享实现位于 [tools/lib](../tools/lib/) |
 | 固化证据 | [snapshots](../snapshots/README.md) | 按场景保留日志、sidecar、工作区与判据；按日期保存归档证据 |
 | 当前合同 | [docs](index.md) | 当前语义与操作方式；本地图负责路由 |

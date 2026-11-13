@@ -25,7 +25,7 @@ import { backlogLivenessProblems } from '../../tools/lib/backlog-liveness.mjs'
 //   归档索引另有 6 行同样；md-links 不红（目标确实存在，就是卡自己），门禁此前只查词。制度唯一家 = _backlog/README.md「缺陷的通道」。
 //   负例留证 2026-11-10（真树植入 zz-probe 卡 + 索引行，实跑原话）：
 //     `_backlog/_archive/settled_issues/zz-probe-note-selflink.md:10 归档「去向=note」的落点未解析到 notes/ 下的真实文件——写 Markdown 链接到 Note（链到卡自己/inline code/散文都顺不上理由）`；
-//     删卡与索引行 → `verify: ALL PASS`。spec 正负例 = tests/harness/tools/backlog-liveness.spec.ts。
+//     删卡与索引行 → `verify: ALL PASS`。spec 正负例 = tests/tools/backlog-liveness.spec.ts。
 // 留在本文件的是调用与上面这段「为什么」——判据正文只有一份实现，spec 改为直接 import 该模块
 // （原先 spec 靠切本文件源码 + vm 求值，改这里的注释就会假红，已实测证伪后拆除）。
 export function run({ root, ok, fail }) {

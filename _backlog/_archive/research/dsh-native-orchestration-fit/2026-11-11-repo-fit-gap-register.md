@@ -34,7 +34,7 @@ intent: 对照原生基线逐项检查公司角色的通道/合同/能力面，�
 2. **命名委托用 spawn + `agentPreset`**：`vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo` 都钉了角色 preset；这是 DSH 唯一能给子代独立组合的通道，用对了。
 3. **team 任务板不被当成调度器**：`board.ts` 是只读读模型，`ready` 只表示依赖完成，不自动派工；CEO 必须自己分派。符合“没有中心 executor”的源码事实。
 4. **观测是只读投影**：`delegation-tree.ts` 明确 `unavailable` 不伪造；`companyDelegationTerminal` 只折 `turn/end.reason.kind`；`workflow_runs` 只读父会话 durable 记录。没有把投影写成状态源。
-5. **深度真值表直接引 vendor**：`tests/harness/contract/delegation-depth-truth-table.spec.ts` 调 `resolveChildDepth`，钉住“绝对深度、按行上限”。这是本仓证据层做得最硬的一处。
+5. **深度真值表直接引 vendor**：`tests/contract/delegation-depth-truth-table.spec.ts` 调 `resolveChildDepth`，钉住“绝对深度、按行上限”。这是本仓证据层做得最硬的一处。
 6. **重试不静默**：`subagent_retry` 有幂等门、attempt 可见、深度不另立预算、取消收敛、退役条件；`subagent-retry` 不是自动重试引擎。方向符合“重试是父侧有界策略”。
 7. **偏差有账**：`delegation-control` / `workflow_runs` / `subagent_retry` 都在头注写了“为什么存在 / 代价 / 退役条件”，符合原生“补控制面要登记偏离”的兜底模式。
 8. **关键 skill 在 pruner 阈值内**：实测 code points `delegation-policy` 2,596 / `assembling-the-team` 5,306 / `eng-teaming` 4,737，均 < 8,192；没有把关键结论放在会被 `tool-result-pruner` 裁掉的中段。（注意：`wc -c` 的字节数会误导；pruner 与 `delegation-contract.spec` 都按 code points 算。）

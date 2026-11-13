@@ -54,7 +54,7 @@ entry-probe/replay 的 `catch { child.kill }` 未防护引用 ⇒ spawn 捕获�
 | # | 命令 | 断言 | 红/绿形态 |
 |---|---|---|---|
 | 1 | 新 spec 用例先行（`dumpBodyOnError`、error 事件/定时器清理） | 模块尚无该能力 ⇒ 必须先红 | 实跑 2 failed（`dumpBodyOnError` 用例 + error/定时器用例）→ 扩模块后 18/18 绿 |
-| 2 | `npx vitest run tests/harness/session/probe-web.spec.ts tests/harness/repo/layering.spec.ts` | 18/18：argv/patch 数组/onEmptyCookie 两态/dumpBody 两序/共享 counter/无默认 signal | 任何自行推导前缀或默认加 signal → 对应用例红 |
+| 2 | `npx vitest run tests/session/probe-web.spec.ts tests/repo/layering.spec.ts` | 18/18：argv/patch 数组/onEmptyCookie 两态/dumpBody 两序/共享 counter/无默认 signal | 任何自行推导前缀或默认加 signal → 对应用例红 |
 | 3 | `node --check` ×10 smoke + `pnpm verify`（pipefail） | 全过；ALL PASS；script-port 门禁全 0 | — |
 | 4 | `pnpm test`（pipefail） | 45 文件 / 466 测试全绿 | — |
 | 5 | `git diff --exit-code -- probes/` | 25 个已迁探针零扰动 | 空 |
@@ -67,5 +67,5 @@ entry-probe/replay 的 `catch { child.kill }` 未防护引用 ⇒ spawn 捕获�
 ## 指针
 
 - 卡：[_backlog/issues/2026-10-10-smoke-boot-extraction.md](../../_backlog/_archive/settled_issues/2026-10-10-smoke-boot-extraction.md)（实施后归档）
-- 模块与形状 spec：[tools/lib/probe-web.mjs](../../tools/lib/probe-web.mjs) / [tests/harness/session/probe-web.spec.ts](../../tests/harness/session/probe-web.spec.ts)
+- 模块与形状 spec：[tools/lib/probe-web.mjs](../../tools/lib/probe-web.mjs) / [tests/session/probe-web.spec.ts](../../tests/session/probe-web.spec.ts)
 - 上游卡与 Note：见状态行引用

@@ -58,7 +58,7 @@
 
 | 面 | 实跑命令与结果（2026-10-30） |
 |---|---|
-| 窄回归 | `npx vitest run tests/harness/tools/backlog-liveness.spec.ts` → **1 file / 29 tests passed**（研究题五例：题名页/三行/归档日、散件与索引、两级反散文、目录枚举、symlink 文件） |
+| 窄回归 | `npx vitest run tests/tools/backlog-liveness.spec.ts` → **1 file / 29 tests passed**（研究题五例：题名页/三行/归档日、散件与索引、两级反散文、目录枚举、symlink 文件） |
 | 结构门禁 | `pnpm verify` → **ALL PASS**（`backlog-liveness` 描述已含「研究题两级索引」） |
 | 真树造红（逐条植入→还原） | ① 删 `_archive/research/collaboration/README.md` → `FAIL backlog-liveness: _backlog/_archive/research/collaboration/README.md 缺题名页——研究题必须有题名页（问题 / 消费者 / 产出的卡 / 材料）`；还原后绿。② 删 `agent-cultivation` 题名页「> 产出的卡：」行 → `…:1 缺「> 产出的卡：」行——题名页要回答研究什么、服务谁、产出了什么`。③ `notes-consistency` 材料链接改散文 → `… 未在题名页 notes-consistency/README.md 中被点名——材料清单必须与盘上一致`。④ 归档索引删 `repo-hygiene` 行 → `… 未被 _archive/research/README.md 索引链接点名——索引按题名页一行登记，不按文件`。⑤ 删 `run-bundle` 题名页「> 归档：」行 → `…:1 缺「> 归档：YYYY-MM-DD」行——归档题名页要记下归档日`。⑥ 材料移回 shelf 根 → `… 平铺在 shelf 根——研究材料必须住进题名目录（_backlog/_archive/research/<slug>/）`。⑦ 只有 png 的 `zz-probe/`（无题名页）→ `… 缺题名页——…`。⑧ `zz-probe` 题名页点名到无头文件的符号链接 → `…:1 缺 frontmatter`（旧 walker 静默跳过）。八条原话同时写进 `backlog-liveness` 块注释 |
 | 复核修补（2026-10-30） | 独立复核后修：`company-panels-ux` 的 BUG-025/026/027 从「消费者」改记「产出的卡」（证据 = 同提交 `9036567` 立审计 + 三卡）；归档程序去重（程序只住归档页）；`multi-user-ux` 的「被引用」移出消费者行、与索引一致；Note 计数/数据出处订正；门禁补目录枚举与 symlink 文件纳入 |

@@ -182,7 +182,7 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 2. 未闭合 turn 回看最后 `tool/call` / `approval/asked`：`ask_user_question` → “等人回答”，审批无 `decided` → “等审批”，否则才说“进程被杀/崩溃”。
 3. 允许 child 目录（`<childId>` 无 `session-` 前缀）；折 `team/member.phase=failed`。
 4. `badLines>0` 进 `--strict`；默认 exit 0 保持不变（只读摘要语义）。
-5. 验收：新增/更新 `tests/harness/session/session-diagnose.spec.ts`；用真实 `session-01b060a7` 复跑，摘要出现 8 条非零退出；用等问/等审批夹具复跑，不再说“崩溃”。
+5. 验收：新增/更新 `tests/session/session-diagnose.spec.ts`；用真实 `session-01b060a7` 复跑，摘要出现 8 条非零退出；用等问/等审批夹具复跑，不再说“崩溃”。
 
 ### 批 D · 测试补强（1–2 天）
 

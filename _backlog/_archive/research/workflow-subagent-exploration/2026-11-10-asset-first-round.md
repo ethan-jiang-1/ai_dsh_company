@@ -140,7 +140,7 @@ model (delegation-model.mjs)  ──keyless spec──▶  preset YAML  ──�
 ### A1 · 运行时面矩阵（judge + audit）
 
 - **落点（待建）**：tools/lib/surface-matrix.mjs（纯判据）+ checks/audit/surface-matrix-audit.mjs（读盘/出矩阵/exit code）
-  + tests/harness/evidence/surface-matrix.spec.ts；YAML 派生从 `tests/presets/preset-yaml.ts` 收成
+  + tests/evidence/surface-matrix.spec.ts；YAML 派生从 `tests/presets/preset-yaml.ts` 收成
   tools/lib/preset-rows.mjs（spec 与 audit 共用，避免第二份 derivation）。
 - **输入**：一个 DSH home + `--since`（默认最近一次 HEAD/构建时间）；读 `sessions/**` 首帧、`request/header`、
   `system/message`、`skill-catalog`。
@@ -152,7 +152,7 @@ model (delegation-model.mjs)  ──keyless spec──▶  preset YAML  ──�
 
 ### A2 · 会话证据包（reader + CLI）
 
-- **落点（待建）**：tools/lib/session-evidence.mjs + tools/explore-evidence.mjs + tests/harness/session/session-evidence.spec.ts。
+- **落点（待建）**：tools/lib/session-evidence.mjs + tools/explore-evidence.mjs + tests/session/session-evidence.spec.ts。
 - **输出**：root/children 树（catalog/team/workflow 事件）、durable header（preset/depth/mode）、每轮终态、
   工具调用（name/args 摘要/error）、写盘文件、turn 时间；JSON + markdown 两种。
 - **复用**：替掉 `delegation-depth-probe` / `worker-orchestrator-probe` / `subagent-retry-probe` 的三份

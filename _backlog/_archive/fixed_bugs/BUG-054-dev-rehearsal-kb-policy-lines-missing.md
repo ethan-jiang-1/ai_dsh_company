@@ -54,7 +54,7 @@ COO/CFO 的 CHARTER 与公司手册都指向 `.dsh-company/kb/policy-lines.md`�
 ```sh
 ls company-workspace/.dsh-company/kb/policy-lines.md   # 修前不存在
 ls runtime/rehearsal-workspace/.dsh-company/kb/policy-lines.md   # 修前不存在
-pnpm exec vitest run tests/harness/tools/kb-seeds.spec.ts   # 修前：mirror 10 件 vs seed 14 件红
+pnpm exec vitest run tests/tools/kb-seeds.spec.ts   # 修前：mirror 10 件 vs seed 14 件红
 node runtime/team-role-packet-exploratory-2026-11-10.mjs
 # 读输出 drafts/coo.md：COO 标「policy-lines / 并行上限缺失」
 ```
@@ -67,14 +67,14 @@ node runtime/team-role-packet-exploratory-2026-11-10.mjs
 - 新增 `tools/lib/kb-seeds.mjs`：读 `seed.json`、过滤 `.dsh-company/kb/` 目标、复制（`onlyMissing`
   对齐生产只补缺语义）；缺清单 / 坏 JSON / target 越界 / **缺源都 fail-loud**（静默跳过正是本卡失败类）。
 - `mirrorCompanyReference` 与 `bundle-init` 改走同一复制面，不再各维护文件清单。
-- 新增 `tests/harness/tools/kb-seeds.spec.ts`：与生产 `readSeeds` 同清单 + fresh workspace 文件逐一
+- 新增 `tests/tools/kb-seeds.spec.ts`：与生产 `readSeeds` 同清单 + fresh workspace 文件逐一
   对同字节 + `onlyMissing` 不覆盖 + mirror 清单一致 + bundle-init 接线。任一侧漏文件即红。
 - 同 diff 更新 `docs/guides/bootstrap.md`、`docs/guides/environments.md`、`tools/rehearsal-init.mjs`
   里「复制什么」的事实句（原句仍写 templates/符号链接，已过期）。
 
 ## 修复落地（2026-11-10）
 
-- 红：`pnpm exec vitest run tests/harness/tools/kb-seeds.spec.ts` → 2 failed；mirror 实测 10 件，
+- 红：`pnpm exec vitest run tests/tools/kb-seeds.spec.ts` → 2 failed；mirror 实测 10 件，
   缺 `policy-lines.md` / `review-protocol.md` / `process-docs.md` / `AGENTS.md`；bundle-init 未接
   `seedKbFiles`。
 - 绿：同一命令 → **5 passed**。
@@ -86,7 +86,7 @@ node runtime/team-role-packet-exploratory-2026-11-10.mjs
   v1 的「policy-lines.md / review-protocol.md 不存在」已被本盘实测推翻；`policy-lines.md` 12 行 /
   `review-protocol.md` 12 行均在场（证据 `runtime/team-role-packet-exploratory-2026-11-10.json`，
   gitignored）。
-- 证据家：`tests/harness/tools/kb-seeds.spec.ts`（回归）；conversation evidence 见提交说明。
+- 证据家：`tests/tools/kb-seeds.spec.ts`（回归）；conversation evidence 见提交说明。
 
 ## 已修判定
 
