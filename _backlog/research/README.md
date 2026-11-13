@@ -62,6 +62,7 @@ opened: YYYY-MM-DD
 - [adversarial-shape-matrix](adversarial-shape-matrix/README.md) — 对抗性边界矩阵 + 跨载体一致性 spec 的测试资产设计；消费者 = 用户 2026-11-13 点名研究。
 - [workflow-entry-and-fact-checkpoint](workflow-entry-and-fact-checkpoint/README.md) — 加工环路的 fresh agent 走查与门禁对账；消费者 = 用户 2026-11-13 点名研究。
 - [test-asset-fence](test-asset-fence/README.md) — 测试资产围栏复核：成本盘子、环外腐烂证据与更新/补充/淘汰清单；消费者 = 用户 2026-11-13 点名研究。
+- [dsh-test-strategy](dsh-test-strategy/README.md) — DSH 测试策略全貌、本仓七缺口对账与借鉴落地路线；消费者 = 用户 2026-11-13 点名研究。
 
 （2026-11-12 bilingual-company 随 UI 落地卡归档，迁入[研究归档](../_archive/research/README.md)。）
 
