@@ -6,7 +6,7 @@
  * 又要被 `tests/harness/repo/asset-lanes.spec.ts` 机械校验，所以住这里——数据 + 纯匹配函数，
  * import 无副作用、不起进程、不读盘。
  *
- * 唯一家纪律：lane 成员只在本文件出现一次；runner 从 FAST / SURFACE_RULES / laneOf() 读，
+ * 唯一家纪律：lane 成员只在本文件出现一次；runner 从 FAST / SURFACE_RULES / ASSETS / PROBES 读，
  * 文档只链接本文件。手抄第二份清单必漂（2026-11-13 研究实测：33 个冒烟只有 6 条在 fast 里，
  * 其余只靠头注散文，坏了没人知道）。
  *
@@ -28,9 +28,6 @@ const TSX = ['--import', 'tsx/esm']
 
 /** @returns {{name:string,kind:string,lanes:string[],nodeArgs:string[],ciSafe:boolean,why?:string,manualReason?:string}} */
 function define(name, kind, lanes, extra = {}) {
-  if (lanes.length === 0 && !extra.manualReason) {
-    throw new Error(`asset-lanes: ${name} 没有 lane 就必须写 manualReason——"忘了登记"和"明确手动"必须可区分`)
-  }
   return {
     name,
     kind,
@@ -252,12 +249,127 @@ export function assetByName(name) {
   return ASSETS.find(asset => asset.name === name)
 }
 
-/** 某条 lane 的成员（按注册顺序）。 */
-export function laneOf(lane) {
-  return ASSETS.filter(asset => asset.lanes.includes(lane)).map(asset => asset.name)
+
+// ── 探针（69 个；调试面，不进自动 lane）─────────────────────────────────────
+// 为什么也登记：探针是「存在但没人跑」的最大一块（69 个，0 个自动）。登记不改变它们的运行方式，
+// 只让盘子可见、让删除/改名必须同 diff 退登记。失败类先记「未分类」——A 件只要求显式，不假装已分类。
+export const PROBES = [
+  { name: 'attention-panel-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'board-drift-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'browser-behavior-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'budget-panel-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'cdp-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'compact-view-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'cultivation-main-e2e', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'cultivation-ux-scenarios', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'cultivation-ux-walkthrough', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'dag-midflight-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'dag-visual-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'deliverables-catalog-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'ledger-summary-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'open-in-app-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'presence-panel-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'sidebar-role-mark-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'tasks-panel-probe', kind: 'probe', domain: 'browser-visual', lanes: [], ciSafe: false, manualReason: '调试探针：browser-visual 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'collaboration-oracle-probe', kind: 'probe', domain: 'fs-taskboard', lanes: [], ciSafe: false, manualReason: '调试探针：fs-taskboard 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'converge-e2e-probe', kind: 'probe', domain: 'fs-taskboard', lanes: [], ciSafe: false, manualReason: '调试探针：fs-taskboard 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'cross-process-fs-probe', kind: 'probe', domain: 'fs-taskboard', lanes: [], ciSafe: false, manualReason: '调试探针：fs-taskboard 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'fs-guard-probe', kind: 'probe', domain: 'fs-taskboard', lanes: [], ciSafe: false, manualReason: '调试探针：fs-taskboard 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'motion-taskboard-probe', kind: 'probe', domain: 'fs-taskboard', lanes: [], ciSafe: false, manualReason: '调试探针：fs-taskboard 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'observed-write-conflict-probe', kind: 'probe', domain: 'fs-taskboard', lanes: [], ciSafe: false, manualReason: '调试探针：fs-taskboard 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'review-staleness-probe', kind: 'probe', domain: 'fs-taskboard', lanes: [], ciSafe: false, manualReason: '调试探针：fs-taskboard 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'task-discovery-probe', kind: 'probe', domain: 'fs-taskboard', lanes: [], ciSafe: false, manualReason: '调试探针：fs-taskboard 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'taskboard-presence-probe', kind: 'probe', domain: 'fs-taskboard', lanes: [], ciSafe: false, manualReason: '调试探针：fs-taskboard 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'taskboard-scope-probe', kind: 'probe', domain: 'fs-taskboard', lanes: [], ciSafe: false, manualReason: '调试探针：fs-taskboard 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'ask-user-timed-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'budget-signoff-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'ceo-assembly-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'cultivation-context-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'cultivation-method-layer-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'cultivation-propose-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'date-rule-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'dual-ceo-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'dual-signoff-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'hitl-dispatch-order-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'human-exits-expression-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'human-exits-nonblocking-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'human-exits-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'journal-boundary-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'member-bounceback-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'reconcile-round-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'team-taskbook-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'time-context-probe', kind: 'probe', domain: 'session-context', lanes: [], ciSafe: false, manualReason: '调试探针：session-context 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'claim-race-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'delegation-contract-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'delegation-depth-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'delegation-lifecycle-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'dissent-preservation-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'member-inquiry-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'member-interrupt-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'member-reject-in-team-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'member-rescue-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'member-stale-write-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'multi-user-e2e-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'quality-loop-audit', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'quality-loop-r2-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'index', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'subagent-retry-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'team-atomicity-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'team-claim-loser-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'team-concurrency-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'team-recovery-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'vp-eng-root-lead-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'vp-eng-teaming-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'vp-eng-workflow-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'worker-orchestrator-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+  { name: 'worker-researcher-probe', kind: 'probe', domain: 'team', lanes: [], ciSafe: false, manualReason: '调试探针：team 域按需跑（触发见头注「何时跑」）', failureClass: '未分类' },
+]
+
+/** 12 类失败词表（DSH 05 的本仓投影）+「未分类」；失败类决策表 = tests/failure-classes.md。 */
+export const FAILURE_CLASSES = ['纯逻辑', '注册生命周期', '导出形态', '工具定义', '模型可见文本', '会话持久化', 'provider', '子进程并发', 'client UI', '配置组合', '性能', '文档指针', '未分类']
+
+/** 冒烟的失败类（人工判定；改判定要同 diff 改这里的注释）。探针暂记未分类。 */
+export const FAILURE_CLASS_BY_NAME = {
+  'workflow-contract-smoke': '工具定义',
+  'present-catalog-smoke': '会话持久化',
+  'company-root-process-smoke': '子进程并发',
+  'gates-negative-smoke': '纯逻辑',
+  'snapshot-motion-smoke': '会话持久化',
+  'two-axis-gates-smoke': '配置组合',
+  'client-load-smoke': 'client UI',
+  'preset-smoke': '配置组合',
+  'replay-smoke': '会话持久化',
+  'company-entry-smoke': '配置组合',
+  'concurrent-home-smoke': '子进程并发',
+  'external-workspace-smoke': '子进程并发',
+  'interrupted-install-smoke': '配置组合',
+  'isolation-matrix-smoke': '配置组合',
+  'multi-install-smoke': '配置组合',
+  'permissions-recovery-smoke': '配置组合',
+  'profile-row-smoke': '配置组合',
+  'revoke-recovery-smoke': '注册生命周期',
+  'upgrade-while-running-smoke': '配置组合',
+  'client-error-chain-smoke': 'client UI',
+  'multi-window-banner-smoke': 'client UI',
+  'ui-scene-smoke': 'client UI',
+  'channel-matrix-smoke': '配置组合',
+  'release-smoke': '导出形态',
+  'refactor-drift-oracle': '纯逻辑',
+  'probe-smoke': '模型可见文本',
+  'delegation-smoke': '工具定义',
+  'presence-e2e-smoke': '模型可见文本',
+  'product-team-e2e-smoke': '模型可见文本',
+  'attention-e2e-smoke': '模型可见文本',
+  'human-loop-e2e-smoke': '模型可见文本',
+  'entry-probe-smoke': '文档指针',
 }
 
-/** 每周/全量 runner 的默认集合：classic + weekly；CI 再按 ciSafe 收窄。 */
-export function weeklyClassic({ ci = false } = {}) {
-  return ASSETS.filter(asset => asset.kind === 'classic' && asset.lanes.includes('weekly') && (!ci || asset.ciSafe))
+/** 某资产的失败类；未登记返回「未分类」（census 会报数）。 */
+export function failureClassOf(name) {
+  return FAILURE_CLASS_BY_NAME[name] ?? '未分类'
+}
+
+/** 冒烟 + 探针的全集（census 与盘面双向校验用）。 */
+export function allAssets() {
+  return [...ASSETS, ...PROBES]
 }

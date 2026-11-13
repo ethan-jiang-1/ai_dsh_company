@@ -1,8 +1,8 @@
-# 2026-11-13 · 测试资产自校正系统 B/C 件：环外必跑回路 + 执行下限
+# 2026-11-13 · 测试资产自校正系统 B/C/A 件：环外必跑回路 + 执行下限 + 资产盘子
 
-状态：implemented（B 件 + C 件 2026-11-13 落地；A 见卡）
+状态：implemented（B/C/A 三件 2026-11-13 落地）
 
-上游 = 用户 2026-11-13「按卡落地，静默自主、长期正确」；问题卡 = [test-asset-loop](../../_backlog/issues/2026-11-13-test-asset-loop.md)；研究 = [dsh-test-strategy](../../_backlog/research/dsh-test-strategy/README.md)（缺口 D1/D5）。
+上游 = 用户 2026-11-13「按卡落地，静默自主、长期正确」；问题卡 = [test-asset-loop](../../_backlog/_archive/settled_issues/2026-11-13-test-asset-loop.md)；研究 = [dsh-test-strategy](../../_backlog/research/dsh-test-strategy/README.md)（缺口 D1/D5）。
 
 ## 决定
 
@@ -42,6 +42,14 @@
    （每条带层/失败类/负控）+ `agent-note-definition` 的验证表（同三列 + 「未覆盖」一节）。这是研究 B2 的结论
    （上一轮已否决「检查 Note 有没有某节」的重门禁）。
 
+10. **A 件：盘子是生成物，探针也登记，失败类先显式「未分类」。**
+    `tools/lib/test-census.mjs` 建模/渲染 + `tools/test-census.mjs` 写 `tests/CENSUS.generated.md`；
+    数据 = 注册表（32 冒烟 + 69 探针）+ 盘上目录计数（71 门禁 / 246 spec）。32 个冒烟的失败类人工判定进
+    `FAILURE_CLASS_BY_NAME`；69 个探针显式记「未分类」并在汇总里报数——**不假装已分类**，下一轮收敛。
+11. **出生登记 = 注册表，不是头注。** 卡里原计划在头注加「失败类 / lane」两行；实作改为注册表字段：
+    头注是第二份清单，必漂（本仓六份清单同一种病）。新冒烟不登记 → B 的 `asset-lanes.spec` 红；
+    新冒烟没失败类 → A 的 `test-census.spec` 红（未分类只允许探针暂用）；新探针不登记 → 同一个 spec 红。
+
 ## 输掉的方案
 
 - **注册表放 checks/smoke/lanes.mjs（卡里原计划）**：spec 只能读文本/正则，改一个字段就假红或漏判；改住 `tools/lib`。
@@ -57,6 +65,11 @@
 - **把覆盖率棘轮放 CI 而不是 pre-push**：CI 只有结构门，覆盖率进 CI 要么补 vendor 构建链（负担不成比例），要么永远不跑；pre-push 是唯一能保证每次变更都过的位置。
 - **失败类表塞 `tests/README.md`**：doc-budget 顶格（99/100），且表是查表不是导航；独立成页。
 - **用「检查 Note 有没有某节」的门禁做账本**：已被 rfc-tdd-loop Note 证伪为仪式性合规（空节即过）；账本只进 skill 的完成判据。
+
+- **在资产头注加「失败类 / lane」两行（卡里原计划）**：与注册表重复、必漂；改为注册表字段，头注只留「状态 / 何时跑」。
+- **给 69 个探针逐个判失败类**：没有证据的判定等于编造；显式记「未分类」并在 census 报数，下一轮按域收敛。
+- **census 写「最后实跑日期」**：来自运行记录，属易变数据，会把生成物变成每次提交都变的文件；留给 weekly lane 的输出，不进 committed census。
+- **把探针也塞进 weekly 自动跑**：多为真模型/真浏览器，成本与凭据边界不同；登记 ≠ 自动跑。
 
 ## 验证（实跑原话，2026-11-13）
 
@@ -80,13 +93,17 @@
 | 判据纯逻辑 | `pnpm vitest run tests/harness/tools/coverage-baseline.spec.ts` | 6 passed（回归/新文件/空洞/过期豁免/nextBaseline/index） |
 | pre-push 集成 | `sh .githooks/pre-push < /dev/null` | 全链实跑（verify + typecheck×4 + lint + dup + smoke:fast + surface 未触发 + coverage 棘轮） |
 
+| census 漂移（红） | 手改 `tests/CENSUS.generated.md` 的「冒烟 32 → 99」后跑 spec | `AssertionError: census 是生成物：运行 node tools/test-census.mjs --write`；重新生成 → `Tests 3 passed` |
+| census 一致性（绿） | `node tools/test-census.mjs --write` | `已写 144 行（冒烟 32 / 探针 69 / 门禁 71 / spec 246；未分类 69 = 全部探针）` |
+| 探针登记 | `pnpm vitest run tests/harness/repo/test-census.spec.ts` | 3 passed（探针双向一致、失败类词表、冒烟 0 未分类） |
+
 ## 状态事实与载体
 
 - 事实：**资产 lane 的唯一家 = lane 注册表**；pre-push 按面补跑；每周全量 keyless。
 - 唯一入口：`tools/lib/asset-lanes.mjs`（lane 成员 + 规则 + 纯匹配）、`checks/pre-push-surfaces.mjs`（取范围 + 跑）、
   `checks/smoke/all-keyless.mjs`（全量）、`tests/harness/repo/asset-lanes.spec.ts`（空间完备门）；
   执行下限的唯一入口 = `checks/audit/coverage-ratchet.mjs` + `tools/lib/coverage-baseline.mjs` + `tests/support/coverage-baseline.json`；
-  失败类决策表 = `tests/failure-classes.md`；账本三列 = `close-out-definition` / `agent-note-definition` skill。
+  失败类决策表 = `tests/failure-classes.md`；账本三列 = `close-out-definition` / `agent-note-definition` skill；盘子 = `tools/test-census.mjs` → `tests/CENSUS.generated.md`（生成物），一致性 = `tests/harness/repo/test-census.spec.ts`。
 - 读载体：`tests/README.md`「按面触发」一段、`checks/README.md` quick-select、`.githooks/pre-push` 头注、
   `checks/INDEX.generated.md`（生成物）。
 - 一致性判据：`fast.mjs` 从注册表派生；spec 双向校验；weekly 成员 = `laneOf('weekly')` 的 classic 子集。
@@ -98,4 +115,6 @@
 - **probe 未纳入注册表**：69 个探针归 A 件的 census；本件只收冒烟。
 - **`--no-verify` 无强制留痕**：沿用既有逃生门规矩（收尾 Note 写原因），本件不新增门禁。
 - **5 条已声明空洞仍是空洞**：carrier-registry / diagnosis / probe-window / startup-store / StrategyPanel——棘轮只保证它们不变差，补测是后续改动时的义务（`removeWhen`）。
-- **性能层与失败类 5/11 仍缺**：组装转录（B6）与 benchmark 不在 B/C 件；它们在失败类表里显式为「缺」。
+- **性能层与失败类 5/11 仍缺**：组装转录（B6）与 benchmark 不在三件内；它们在失败类表里显式为「缺」。
+- **69 个探针仍未分类**：census 显式报「未分类 69」；下一轮按域（team/fs-taskboard/browser-visual/session-context）收敛，不猜。
+- **census 无「最后实跑」**：weekly lane 的失败潜伏时间目前只在 CI 日志；要进盘子得先定运行记录格式（未做）。

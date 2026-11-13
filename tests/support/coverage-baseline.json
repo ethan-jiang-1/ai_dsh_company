@@ -530,8 +530,8 @@
       "branches": 90
     },
     "tools/lib/asset-lanes.mjs": {
-      "statements": 89.47,
-      "branches": 75
+      "statements": 100,
+      "branches": 92.85
     },
     "tools/lib/audit-verdict.mjs": {
       "statements": 100,
@@ -744,6 +744,10 @@
     "tools/lib/team-concurrency-verdict.mjs": {
       "statements": 80,
       "branches": 100
+    },
+    "tools/lib/test-census.mjs": {
+      "statements": 100,
+      "branches": 83.33
     },
     "tools/lib/tracked-secrets.mjs": {
       "statements": 92.85,

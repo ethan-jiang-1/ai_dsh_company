@@ -5,7 +5,6 @@
 ## 活跃清单
 
 - [2026-11-12 高复杂度面持续探索（培养/委派/run-bundle/账本/客户端流）](2026-11-12-deep-surface-continuous-bug-hunt.md) — 按 C1–C7 宪章轮转；BUG 从 090 起；不修产品代码。
-- [2026-11-13 测试资产自校正系统（B → C → A）](2026-11-13-test-asset-loop.md) — 选中/下限/必跑/账本四类机制落地；待用户点名开工，不自行动实现面。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 
@@ -35,6 +34,8 @@
 v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajectory/New terminal 收回卡均已结归档。已结卡见[归档索引](../_archive/README.md)。新问题按 [backlog 入口](../README.md) 立卡，不从归档里自行开工。
 
 ## 近期归档
+
+- 测试资产自校正系统 B/C/A 卡 2026-11-13 已结：lane 注册表 + 按面 pre-push + 每周 keyless + 覆盖率棘轮 + 失败类表/账本 + census；去向 = [Note](../../notes/implemented/2026-11-13-test-asset-loop.md)；卡在[归档](../_archive/settled_issues/2026-11-13-test-asset-loop.md)。
 
 - 启动策略（界面批）+ wiki 知识地图（配置批）回归/探索卡 2026-11-12 已结：A1–A5 / B1–B8 + named child；10 张 BUG-080..089；未证 teammate/workflow 等；去向 = none（只产证据/BUG 卡）；卡在[归档](../_archive/settled_issues/2026-11-12-startup-strategy-wiki-regression-exploration.md)。
 

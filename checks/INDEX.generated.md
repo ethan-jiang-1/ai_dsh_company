@@ -119,7 +119,7 @@
 [worker-orchestrator-probe](../probes/team/worker-orchestrator-probe.mjs)
 [worker-researcher-probe](../probes/team/worker-researcher-probe.mjs)
 
-## 维护工具（tools/，23）
+## 维护工具（tools/，24）
 
 [ask-latency](../tools/ask-latency.mjs) · [bundle-init](../tools/bundle-init.mjs)
 [checks-index](../tools/checks-index.mjs) · [company](../tools/company.mjs)
@@ -132,7 +132,7 @@
 [rehearsal-init](../tools/rehearsal-init.mjs) · [release](../tools/release.mjs)
 [session-log-export](../tools/session-log-export.mjs) · [setup](../tools/setup.mjs)
 [snapshot-motion](../tools/snapshot-motion.mjs) · [snapshot-path](../tools/snapshot-path.mjs)
-[sync-dsh](../tools/sync-dsh.mjs)
+[sync-dsh](../tools/sync-dsh.mjs) · [test-census](../tools/test-census.mjs)
 
 ## 结构门禁（checks/gates/，71 个模块）
 

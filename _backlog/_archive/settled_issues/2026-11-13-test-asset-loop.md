@@ -1,13 +1,15 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-13
 ---
 
 # 推敲：测试资产从「堆」变成「自校正系统」（B → C → A 落地）
 
-> 立卡：2026-11-13 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-13 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：note — [2026-11-13-test-asset-loop.md](../../notes/implemented/2026-11-13-test-asset-loop.md)（B 件已交付；C/A 续写同一 Note）
+> 审查：agent — 三件各自按卡上负例验收并实跑；语义审对授权原文（「按卡落地、静默自主、长期正确」）逐条核过；未做用户验收（用户已在 2026-11-13 定性时接受方向）
+>
+> **结论/去向**：note — [2026-11-13-test-asset-loop.md](../../../notes/implemented/2026-11-13-test-asset-loop.md)（B/C/A 三件已交付）
 >
 > **授权边界**：本卡由用户 2026-11-13「做正确的事情，只要是长期正确的、不短视」转化而来。
 > **卡上的方案不授予实施权限**：对 repo 的修改是下一阶段，须用户在本卡点名开工或另有已批 RFC。
@@ -37,10 +39,10 @@ opened: 2026-11-13
 - **按 DSH 插件五台阶自评**：导出守卫 / 行为 spec / 注册生命周期（client 面）/ REAL composition 都有，**台阶 5「组装转录」缺位、台阶 4 不在必需 lane**——这正是"文案改动只能靠真模型冒烟"和"每次收口临时决定跑哪几条"的根因。
 
 研究依据（含一手源码核对与数字复跑命令）：
-[题名页](../research/dsh-test-strategy/README.md) ·
-[对账](../research/dsh-test-strategy/2026-11-13-gap-audit.md) ·
-[落地方案](../research/dsh-test-strategy/2026-11-13-borrow-roadmap.md) ·
-[一手核对](../research/dsh-test-strategy/2026-11-13-vendor-source-verification.md)
+[题名页](../../research/dsh-test-strategy/README.md) ·
+[对账](../../research/dsh-test-strategy/2026-11-13-gap-audit.md) ·
+[落地方案](../../research/dsh-test-strategy/2026-11-13-borrow-roadmap.md) ·
+[一手核对](../../research/dsh-test-strategy/2026-11-13-vendor-source-verification.md)
 
 ## 方案（三件，顺序 B → C → A，可单独停）
 
@@ -65,14 +67,14 @@ opened: 2026-11-13
 
 - **载体**：`pnpm test:coverage` 实测 **24s**（与 `pnpm test` 同量级），所以 **pre-push 把 `pnpm test` 换成 `pnpm test:coverage`**；
   新增覆盖率基线（tests/support/coverage-baseline.json，计划）+ 棘轮门（checks/audit/coverage-ratchet.mjs，计划）；
-  失败类表进 [tests/README.md](../../tests/README.md)；账本三列进 `close-out-definition` skill 与 Note 验证表。
+  失败类表进 [tests/README.md](../../../tests/README.md)；账本三列进 `close-out-definition` skill 与 Note 验证表。
 - **形态**：① 任一文件不得低于基线；② 新出现的插桩文件 ≥80% statements / 70% branches，否则显式豁免（owner + 移除条件）；
   ③ 基线只升不降；④ 12 类失败类表每行点名本仓真实载体，写不出的标"本仓无载体"。
 - **验收（负例）**：① 把某文件改到低于基线 → 红；恢复 → 绿；② 新加一个 0% 的 `src` 文件 → 红；③ 手改基线调低 → 红；
   ④ 拿最近 3 个真实 commit 回测失败类表，每个能落到 1–2 行。
 - **风险**：基线把坏值冻结 → 只升不降 + 每季度用 A 的盘子复核 top-10 低覆盖文件；`docs/testing.md` 现 70/75 行，只够 5 行，超出先迁去 `tests/README.md`。
 - **不做**：不设 per-file 100% 一步到位（借棘轮，不借数字）；不做"检查 Note 里有没有某节"的重门禁（已被
-  [rfc-tdd-loop Note](../../notes/archived/2026-10-05-rfc-tdd-loop.md) 证伪为仪式性合规）。
+  [rfc-tdd-loop Note](../../../notes/archived/2026-10-05-rfc-tdd-loop.md) 证伪为仪式性合规）。
 
 ### A 资产盘子与出生登记（约 1.5 天）
 
@@ -132,15 +134,15 @@ opened: 2026-11-13
 
 | 件 | 状态 | 证据 |
 |---|---|---|
-| B 环外必跑回路 | **已交付 2026-11-13** | [Note 验证表](../../notes/implemented/2026-11-13-test-asset-loop.md)：空间完备负例红→绿、按面选面 dry-run、fast 6 条、全量 18 条、244 files/2008 tests |
+| B 环外必跑回路 | **已交付 2026-11-13** | [Note 验证表](../../../notes/implemented/2026-11-13-test-asset-loop.md)：空间完备负例红→绿、按面选面 dry-run、fast 6 条、全量 18 条、244 files/2008 tests |
 | C 执行下限与决策账本 | **已交付 2026-11-13** | 同 Note：覆盖率棘轮进 pre-push（24s）、5 条显式空洞、回归/新文件/过期豁免三组红证、失败类表、账本三列进 skill |
-| A 资产盘子与出生登记 | 未开工 | — |
+| A 资产盘子与出生登记 | **已交付 2026-11-13** | 同 Note：census 生成物（32 冒烟/69 探针/71 门禁/246 spec）、探针登记、失败类判定（冒烟 0 未分类）、census 漂移红→绿 |
 
 ## 研究依据与相关卡
 
-- 研究题：[dsh-test-strategy](../research/dsh-test-strategy/README.md)（题名页）。
-- 同族研究：[test-asset-fence](../research/test-asset-fence/README.md)（环外腐烂）、
-  [adversarial-shape-matrix](../research/adversarial-shape-matrix/README.md)（失败类从哪来）。
+- 研究题：[dsh-test-strategy](../../research/dsh-test-strategy/README.md)（题名页）。
+- 同族研究：[test-asset-fence](../../research/test-asset-fence/README.md)（环外腐烂）、
+  [adversarial-shape-matrix](../../research/adversarial-shape-matrix/README.md)（失败类从哪来）。
 - 本卡与它们的分工：围栏卡解决"慢资产出环后的新鲜度"，矩阵卡解决"补哪类资产"，
   **本卡解决"资产怎么被选中、被兜底、被记账"**——三者不重叠。
 
