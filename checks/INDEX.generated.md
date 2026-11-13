@@ -3,7 +3,7 @@
 > 生成：`node tools/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。
 > 触发条件/成本/状态唯一源 = 各脚本头注；本文件只回答“有哪些公开入口、在哪”。
 
-## 冒烟 / 真实入口（checks/smoke/，32）
+## 冒烟 / 真实入口（checks/smoke/，33）
 
 [attention-e2e-smoke](smoke/attention-e2e-smoke.mjs) · [channel-matrix-smoke](smoke/channel-matrix-smoke.mjs)
 [client-error-chain-smoke](smoke/client-error-chain-smoke.mjs)
@@ -11,7 +11,7 @@
 [company-root-process-smoke](smoke/company-root-process-smoke.mjs)
 [concurrent-home-smoke](smoke/concurrent-home-smoke.mjs) · [delegation-smoke](smoke/delegation-smoke.mjs)
 [entry-probe-smoke](smoke/entry-probe-smoke.mjs)
-[external-workspace-smoke](smoke/external-workspace-smoke.mjs)
+[external-workspace-smoke](smoke/external-workspace-smoke.mjs) · [fast](smoke/fast.mjs)
 [gates-negative-smoke](smoke/gates-negative-smoke.mjs)
 [human-loop-e2e-smoke](smoke/human-loop-e2e-smoke.mjs)
 [interrupted-install-smoke](smoke/interrupted-install-smoke.mjs)

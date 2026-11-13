@@ -3,7 +3,7 @@
 # test lane 不在本 workflow（2026-09-28 首跑红实证定界，run 36373885805）：vitest 的 vendor 内部
 # @deepseek-ai/* 解析走包入口（未构建 lib），干净环境必红；补齐 = 全量 vendor 构建链
 # （DSH 自己的 test 脚本 = build && vitest），负担不成比例 ⇒ test 的 enforcement 挪进
-# pre-push hook（本地 dev 树按 bootstrap 必然已构建，test 1.3s 便宜高置信）。触发条件
+# pre-push hook（本地 dev 树按 bootstrap 必然已构建，test ~26s / 2026-11-13 实测；仍是本地 keyless）。触发条件
 # （上游提供免构建 test 路径 / 第二贡献者进场值得付构建链）成立再回 CI。
 # 2026-11-11：fresh-clone 的 setup-macos job 每周/手动在干净 macOS 上跑全量 setup + test——
 # 不是每 push 的通道，不改变本 workflow 的边界。

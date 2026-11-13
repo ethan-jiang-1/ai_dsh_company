@@ -62,14 +62,14 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 |---|---|---|
 | 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接、物理行预算、裸路径、分层方向与 pin 一致性门禁） |
 | **类型面 keyless** | 秒级（增量） | `pnpm typecheck`（pack 两面 + `tests/client` + `tests/host` + `tests/lib` + `tests/content` + `tests/harness` 全量 spec（`pack-exports` 混合面除外）；改导出/导入签名或测试类型时跑——verify 与 test 都不做类型检查） |
-| **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器） |
+| **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器）；便宜 smoke lane = `pnpm smoke:fast`（6 条，~2.4s；pre-push；只证明资产还活着） |
 | 装配 keyless | ~25s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
 | **重放 lane（第三档，无 key）** | 现行场景 ~2s | `replay-smoke`（仅 foundation 合成场景，不加载 company-pack；会话日志 + sidecar）——要起进程，不进 `pnpm test`。真页面车道 = `ui-scene-smoke`（自起实例，~40s） |
 | CLI 集成（keyless，需子进程） | 秒级 | `node checks/smoke/snapshot-motion-smoke.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） |
 | 发布与分发（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../docs/contracts/release.md)） |
 | 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件与成本见其头注「何时跑」**；`script-triggers` 门禁强制） |
-| 行为质量档（认证） | 分钟级 | `probe --full`（内容档三探针）；`candidate-scan-eval` 语料已移出本仓，现报缺失 exit 2（判据 = [testing.md §4](../docs/testing.md)） |
+| 行为质量档（认证） | 分钟级 | `probe --full`（内容档三探针）；`candidate-scan-eval` 已耗（语料移出本仓；恢复语料时重跑） |
 
 **证明边界（每层只证明自己能观察的性质）的唯一家 = [testing.md §1](../docs/testing.md)**
 （2026-10-04 立测试宪法时自开发环迁入——宪法还拥有：改动面→最小证据政策（行级映射表 = 本文件「改动面 → 最窄检查」）、证据纪律（条数以宪法 §3

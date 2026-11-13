@@ -16,7 +16,7 @@
 | CLI 集成（`snapshot-motion-smoke`；真实 CLI + 临时 fixture，不进 `pnpm test`） | 真实 CLI 进程路径 | 语义 |
 | 发布与分发（`release-smoke`） | 安装形状、built 入口可达 | 语义 |
 | 认证档（真模型） | 真行为 | 跨面正确 |
-| 行为质量档（`probe --full`；candidate-scan 语料已移出本仓，eval 报缺失 exit 2） | 角色内容质量 | 机制回归 |
+| 行为质量档（`probe --full`；`candidate-scan-eval` 已耗——语料移出本仓，恢复语料时重跑） | 角色内容质量 | 机制回归 |
 
 换档先问"这一层能证明我关心的性质吗"，不为安心堆档。
 
@@ -59,7 +59,7 @@
 
 - 证据三分法：**回放场景**（会话录制 + 期望，`snapshot.yml`）/ **归档证据**（日期目录，追加不改写）/ **视觉夹具**（合成输入，零模型）——树的规则唯一家 = [snapshots/README.md](../snapshots/README.md)。
 - `workspace.expected/` **独立编写**（与录制解耦）——防"同一录制既当回放输入又当期望的一致作弊"。
-- 行为质量语料（`candidate-scan-corpus`）已随真实证据移出产品仓：本仓无该资产，`candidate-scan-eval` 报「语料缺失」退出；恢复语料时 `labels.md` 仍是判据家。
+- 行为质量语料（`candidate-scan-corpus`）已随真实证据移出产品仓：本仓无该资产，`candidate-scan-eval` 标已耗（恢复语料时重跑）；恢复语料时 `labels.md` 仍是判据家。
 
 ## 5. 节奏与授权
 

@@ -19,6 +19,7 @@ import * as contentManifest from '../gates/content-manifest.mjs'
 import * as contentSingleHome from '../gates/content-single-home.mjs'
 import * as methodContract from '../gates/method-contract.mjs'
 import * as packContentPaths from '../gates/pack-content-paths.mjs'
+import { mutateFile } from './lib/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
 
@@ -46,13 +47,20 @@ const report = (label, messages, needle) => {
   console.log(`${passed ? 'PASS' : 'FAIL'} ${label}`)
   for (const message of messages.slice(0, 2)) console.log(`  ${message}`)
 }
+const mutateOrFail = (label, path, transform) => {
+  if (mutateFile(path, transform)) return true
+  failures += 1
+  console.log(`FAIL ${label}（mutation 没命中：输入已改名/改形，先更新夹具）`)
+  return false
+}
 
 {
   const root = makeRoot()
   try {
     const path = join(root, 'packages/company-pack/presets/cfo/skills/project-economics/SKILL.md')
-    writeFileSync(path, readFileSync(path, 'utf8').replace('applicable delivery modes = project-services', 'applicable delivery modes = nope'))
-    report('method-contract：未知交付模式 → 红', run(methodContract, root), '没有交付模式包')
+    if (mutateOrFail('method-contract：未知交付模式', path, text => text.replace('applicable delivery modes = project-services', 'applicable delivery modes = nope'))) {
+      report('method-contract：未知交付模式 → 红', run(methodContract, root), '没有交付模式包')
+    }
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 
@@ -69,8 +77,9 @@ const report = (label, messages, needle) => {
   const root = makeRoot()
   try {
     const path = join(root, 'packages/company-pack/content/company/policy-lines.md')
-    writeFileSync(path, readFileSync(path, 'utf8').replace(/^- \*\*Service credit\*\*.*$/m, ''))
-    report('content-single-home：删 Service credit → 红', run(contentSingleHome, root), '缺政策线「Service credit」')
+    if (mutateOrFail('content-single-home：删 Service credit', path, text => text.replace(/^- \*\*Service credit\*\*.*$/m, ''))) {
+      report('content-single-home：删 Service credit → 红', run(contentSingleHome, root), '缺政策线「Service credit」')
+    }
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 
@@ -86,8 +95,9 @@ const report = (label, messages, needle) => {
   const root = makeRoot()
   try {
     const path = join(root, 'packages/company-pack/content/charters/cfo.md')
-    writeFileSync(path, readFileSync(path, 'utf8').replace('## Historical minutes', '- 公司财务 agent 案（date-pending）。\n\n## Historical minutes'))
-    report('base-clean：部署个案语言 → 红', run(baseClean, root), '含部署个案语言')
+    if (mutateOrFail('base-clean：部署个案语言', path, text => text.replace('## Historical minutes', '- 公司财务 agent 案（date-pending）。\n\n## Historical minutes'))) {
+      report('base-clean：部署个案语言 → 红', run(baseClean, root), '含部署个案语言')
+    }
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 

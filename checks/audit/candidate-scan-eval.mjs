@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 状态：常驻
+// 状态：已耗（2026-11-13 语料已移出本仓；恢复语料时重跑）
 // 实验语料打分器（2026-09-26 立；keyless，秒级）——实验 B 的"仪器自检"腿 + "金标准打分"腿。
 // 何时跑：`tools/lib/candidate-scan.mjs` 改动时；语料须先在盘上（本仓已无该资产，缺则 exit 2）；
 //         金标准标注文件改动时（打分腿）：`node checks/audit/candidate-scan-eval.mjs --labels <标注文件>`。
