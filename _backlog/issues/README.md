@@ -4,7 +4,6 @@
 
 ## 活跃清单
 
-- [2026-11-13 加工环路的入口与事实检查点（fresh agent 走查 + 门禁对账）](2026-11-13-workflow-entry-and-fact-checkpoint.md) — P0 入口/一致性 → P1 事实检查点 → P2 可执行验收；去向 rfc。
 - [2026-11-12 高复杂度面持续探索（培养/委派/run-bundle/账本/客户端流）](2026-11-12-deep-surface-continuous-bug-hunt.md) — 按 C1–C7 宪章轮转；BUG 从 090 起；不修产品代码。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）

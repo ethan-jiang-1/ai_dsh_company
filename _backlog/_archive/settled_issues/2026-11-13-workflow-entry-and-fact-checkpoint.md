@@ -1,13 +1,15 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-13
 ---
 
 # 推敲：加工环路的入口与事实检查点（fresh agent 走查 + 门禁对账）
 
-> 立卡：2026-11-13 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-13 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：rfc — 下一份 RFC 落 `新建:notes/proposed/2026-11-13-workflow-entry-and-fact-checkpoint.md`；本卡关闭 = RFC 成立，实施判据由 RFC 的 `## 验收` 承接。
+> **结论/去向**：rfc — [RFC](../../../notes/proposed/2026-11-13-workflow-entry-and-fact-checkpoint.md)；本卡关闭 = RFC 成立，实施判据由 RFC 的 `## 验收` 承接。
+>
+> **审查**：agent — RFC 成立（`批准：` + `## 验收` + P0/P1/P2 分档 + 预算/回滚齐）；`pnpm verify` ALL PASS；`pnpm test` 242 files / 1997 tests；实施不在本卡关闭条件内。
 >
 > **授权边界**：本卡只提方案 + 证据，不改 docs/gates/skills；P0/P1/P2 的实施需 RFC 批准后另行点名。
 
@@ -25,8 +27,8 @@ opened: 2026-11-13
 
 ## 当前情况
 
-- 走查与对账材料 = [fresh agent 走查](../research/workflow-entry-and-fact-checkpoint/2026-11-13-fresh-agent-walkthrough.md) / [规则 × 门禁对账](../research/workflow-entry-and-fact-checkpoint/2026-11-13-workflow-gate-audit.md)。
-- **入口**：活跃区只有一张探索卡，卡自述「不改产品代码」；`待落地` 不是任务源（[dev-loop:37](../../docs/guides/dev-loop.md)）；fresh agent 只能纸面假设「用户点名 wiki FTS」才能继续。环路真实形状 = **backlog 是思考层，用户才是队列**（D32），但 `_backlog/AGENTS.md` 的五道门把 `待落地` 写得像「下一步」。
+- 走查与对账材料 = [fresh agent 走查](../../research/workflow-entry-and-fact-checkpoint/2026-11-13-fresh-agent-walkthrough.md) / [规则 × 门禁对账](../../research/workflow-entry-and-fact-checkpoint/2026-11-13-workflow-gate-audit.md)。
+- **入口**：活跃区只有一张探索卡，卡自述「不改产品代码」；`待落地` 不是任务源（[dev-loop:37](../../../docs/guides/dev-loop.md)）；fresh agent 只能纸面假设「用户点名 wiki FTS」才能继续。环路真实形状 = **backlog 是思考层，用户才是队列**（D32），但 `_backlog/AGENTS.md` 的五道门把 `待落地` 写得像「下一步」。
 - **一致性**：走查撞到 6 处文档自相矛盾——`_backlog/README.md` 落地出口「Note 回链」vs `implementation` 不建 Note；`notes/README.md` proposed = 未实施 vs 唯一 RFC 部分已实现；`data-model` 声称字段含 readers/writers 但表头没有；`src/README` 四个命令 vs 源码五个；`src/README` 把 language 合同/`client-copy` 写成将来时；`triggers.md` 不收「用户点名」。
 - **发现**：事实/载体问题不是 `dev-loop §3` 四问要求的，而是 `notes/README.md:108` 和 `tests/README.md:35` 顺带提的；`company-root-carriers` 在 `verify` 阶段才红，代码已写完。
 - **验收**：`proposals` 只查 `## 验收` 标题，空节也绿；`notes-liveness` 只查 `## 决定` 标题；`backlog-liveness` 的 `sectionBody` 只查非空，「待定/见 RFC」也绿；普通 feature 的红是自述；语义审连续 24 次「未执行」有记录。
@@ -76,12 +78,12 @@ opened: 2026-11-13
 
 ## 验收标准
 
-- [ ] RFC 落 `新建:notes/proposed/2026-11-13-workflow-entry-and-fact-checkpoint.md`，状态行带「批准：」，含 `## 验收`。
-- [ ] RFC 把 P0/P1/P2 分档，每档写：判据、落点（文件:节）、机械面、生效日、祖父豁免、回滚、红证计划。
-- [ ] P0 清单逐条对上 6 处矛盾，并给出「改哪一句/哪张表」的现行家。
-- [ ] P1 清单覆盖 `dev-loop §1/§3`、卡模板、RFC/Note 节、两条门禁、两扇 AGENTS.md 门；行预算先搬后加。
-- [ ] P2 清单覆盖「可执行标记」判据 + `zz` 负例 + `acceptance-carrier` 先行；另两条按复发再做。
-- [ ] 明确「不做什么」：不新造流水线、不每目录放门、不把语义审机械化为形式。
+- [x] RFC 落 `新建:notes/proposed/2026-11-13-workflow-entry-and-fact-checkpoint.md`，状态行带「批准：」，含 `## 验收`。
+- [x] RFC 把 P0/P1/P2 分档，每档写：判据、落点（文件:节）、机械面、生效日、祖父豁免、回滚、红证计划。
+- [x] P0 清单逐条对上 6 处矛盾，并给出「改哪一句/哪张表」的现行家。
+- [x] P1 清单覆盖 `dev-loop §1/§3`、卡模板、RFC/Note 节、两条门禁、两扇 AGENTS.md 门；行预算先搬后加。
+- [x] P2 清单覆盖「可执行标记」判据 + `zz` 负例 + `acceptance-carrier` 先行；另两条按复发再做。
+- [x] 明确「不做什么」：不新造流水线、不每目录放门、不把语义审机械化为形式。
 - [ ] 用户批准 RFC 后，按 P0 → P1 → P2 实施；每档独立可验收，不一次全上。
 
 ## 关闭条件
