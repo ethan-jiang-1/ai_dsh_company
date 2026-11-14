@@ -217,8 +217,8 @@ test('company-root-carriers：删「工具盘 .dsh-company 未登记」→ 未�
     'tools/lib/scaffold.mjs': ["mkdirSync(join(ws, '.dsh-company/kb'), { recursive: true })", ''].join('\n'),
   }, ['tools/lib'])
   const mutTooling = await mutant('company-root-carriers',
-    'if (match === null) continue',
-    'if (match !== null) continue')
+    'if (pos === undefined) continue',
+    'if (pos !== undefined) continue')
   try {
     const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [], tooling: [] }
     assert.match(invoke(carrier, root, extra).problems.join(), /tools\/lib\/scaffold\.mjs:1 → 禁止手写裸 \.dsh-company 路径拼接/)

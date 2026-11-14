@@ -46,6 +46,27 @@ test('登记项模块不存在 / KNOWN_GAP 卡不存在 → 红', () => {
   } finally { rmSync(root, { recursive: true, force: true }) }
 })
 
+test('host 只读模块不误红、多行 import 不算写、promises 写调用判红（AST 写调用，复审 S1/S2 跟进）', () => {
+  const root = fixture()
+  try {
+    writeFileSync(join(root, 'packages/company-pack/src/host/readonly.ts'), [
+      'import {',
+      '  writeFileSync,',
+      '  readFileSync,',
+      "} from 'node:fs'",
+      "export const r = p => readFileSync(`${p}/.dsh-company/x`, 'utf8')",
+    ].join('\n'))
+    writeFileSync(join(root, 'packages/company-pack/src/host/promises-writer.ts'), [
+      "import { mkdir } from 'node:fs/promises'",
+      "export const w = ws => mkdir(`${ws}/.dsh-company/kb`, { recursive: true })",
+    ].join('\n'))
+    const problems = gate(root, { markdownPrimitives: [] }).problems.join('；')
+    assert.doesNotMatch(problems, /readonly\.ts/) // 只读模块 + 多行 import 不再误红
+    assert.match(problems, /promises-writer\.ts:2 → 未登记的公司盘写入口/)
+    assert.match(problems, /writer\.ts:3 → 未登记的公司盘写入口/) // 行号仍指真写调用，不是 :0
+  } finally { rmSync(root, { recursive: true, force: true }) }
+})
+
 test('非注册原语植入裸 frontmatter 正则/前缀或裸 Markdown `##` 节切分（含子目录、BOM 前缀、量词空格、拼接构造）→ 报 file:line 红（W2.2）', () => {
   const root = fixture()
   try {
@@ -97,7 +118,7 @@ test('非注册原语植入裸 frontmatter 正则/前缀或裸 Markdown `##` 节
   } finally { rmSync(root, { recursive: true, force: true }) }
 })
 
-test('工具盘直写 .dsh-company 未登记 → 红（file:line）；登记（含理由）→ 绿；无字面量 → 不误报（B2）', () => {
+test('工具盘直写 .dsh-company 未登记 → 红（file:line）；登记（含理由）→ 绿；无/只读/间接形态不误报（B2+复审）', () => {
   const root = fixture()
   try {
     mkdirSync(join(root, 'tools/lib'), { recursive: true })
@@ -106,23 +127,60 @@ test('工具盘直写 .dsh-company 未登记 → 红（file:line）；登记（�
       "import { join } from 'node:path'",
       'export function scaffold(ws) {',
       "  mkdirSync(join(ws, '.dsh-company/kb'), { recursive: true })",
-      '  mkdirSync(join(ws, `.dsh-company/${deliverables}`), { recursive: true })',
+      '  mkdirSync(join(ws, `./.dsh-company/${deliverables}`), { recursive: true })',
       "  return '.dsh-company' + '/exports'",
       '}',
     ].join('\n'))
+    // 逃逸形态：`./` 前缀 / 模板 `${ws}/` 前缀 / 模板后缀插值 / promises 写 API → 都必须红
+    writeFileSync(join(root, 'tools/lib/dot-prefix.mjs'), ["import { mkdirSync } from 'node:fs'", "mkdirSync(join(ws, './.dsh-company/kb'), { recursive: true })"].join('\n'))
+    writeFileSync(join(root, 'tools/lib/template-prefix.mjs'), ['import { mkdirSync } from \'node:fs\'', 'mkdirSync(`${ws}/.dsh-company/kb`, { recursive: true })'].join('\n'))
+    writeFileSync(join(root, 'tools/lib/template-suffix.mjs'), ['import { mkdirSync } from \'node:fs\'', 'mkdirSync(`${ws}/.dsh-company${sub}`, { recursive: true })'].join('\n'))
+    writeFileSync(join(root, 'tools/lib/promises-writer.mjs'), ["import { mkdir } from 'node:fs/promises'", "await mkdir(join(ws, '.dsh-company/kb'), { recursive: true })"].join('\n'))
+    // 无字面量 / 只 import 写原语但只读（含多行 import）/ 变量拼接（声明边界外）→ 都不红
     writeFileSync(join(root, 'tools/lib/plain-writer.mjs'), ["import { writeFileSync } from 'node:fs'", "writeFileSync('x', 'y')"].join('\n'))
+    writeFileSync(join(root, 'tools/lib/reader.mjs'), ["import { readFileSync, writeFileSync } from 'node:fs'", "export const read = ws => readFileSync(join(ws, '.dsh-company/kb/x'), 'utf8')"].join('\n'))
+    writeFileSync(join(root, 'tools/lib/multiline-reader.mjs'), ['import {', '  writeFileSync,', '  readFileSync,', "} from 'node:fs'", "export const read = ws => readFileSync(join(ws, '.dsh-company/kb/x'), 'utf8')"].join('\n'))
+    writeFileSync(join(root, 'tools/lib/indirect.mjs'), ["import { mkdirSync } from 'node:fs'", "const NAME = '.dsh' + '-company'", 'mkdirSync(`${ws}/${NAME}/kb`, { recursive: true })'].join('\n'))
+    // 错误消息/内容里出现 `.dsh-company`、实际写别处 → 不红（只判写调用路径实参）
+    writeFileSync(join(root, 'tools/lib/error-message.mjs'), ["import { writeFileSync } from 'node:fs'", "writeFileSync('/tmp/log', 'see ' + ws + '/.dsh-company/x')", "export const msg = ws => 'blocked: ' + ws + '/.dsh-company/x'"].join('\n'))
     const carriers = [{ kind: 'writer', module: MODULE }]
-    const opened = gate(root, { carriers, markdownPrimitives: [] })
-    assert.match(opened.problems.join('；'), /tools\/lib\/scaffold\.mjs:4 → 禁止手写裸 \.dsh-company 路径拼接/)
-    assert.doesNotMatch(opened.problems.join('；'), /plain-writer\.mjs/)
+    const opened = gate(root, { carriers, markdownPrimitives: [] }).problems.join('；')
+    assert.match(opened, /tools\/lib\/scaffold\.mjs:4 → 禁止手写裸 \.dsh-company 路径拼接/)
+    assert.match(opened, /tools\/lib\/dot-prefix\.mjs:2 → 禁止手写裸 \.dsh-company 路径拼接/)
+    assert.match(opened, /tools\/lib\/template-prefix\.mjs:2 → 禁止手写裸 \.dsh-company 路径拼接/)
+    assert.match(opened, /tools\/lib\/template-suffix\.mjs:2 → 禁止手写裸 \.dsh-company 路径拼接/)
+    assert.match(opened, /tools\/lib\/promises-writer\.mjs:2 → 禁止手写裸 \.dsh-company 路径拼接/)
+    assert.doesNotMatch(opened, /plain-writer\.mjs/)
+    assert.doesNotMatch(opened, /reader\.mjs/) // 只读模块不因 import 写原语被误红
+    assert.doesNotMatch(opened, /multiline-reader\.mjs/) // 多行 import 也不误红
+    assert.doesNotMatch(opened, /indirect\.mjs/) // 变量拼接 = 头注声明的开放边界
+    assert.doesNotMatch(opened, /error-message\.mjs/) // 内容/错误消息里的路径不算写目标
     const registered = gate(root, {
       carriers,
       markdownPrimitives: [],
-      tooling: [{ module: 'tools/lib/scaffold.mjs', symbol: '.dsh-company', reason: '测试夹具：演练盘' }],
+      tooling: [
+        { module: 'tools/lib/scaffold.mjs', symbol: '.dsh-company', reason: '测试夹具：演练盘' },
+        { module: 'tools/lib/dot-prefix.mjs', symbol: './.dsh-company', reason: '测试夹具：点前缀' },
+        { module: 'tools/lib/template-prefix.mjs', symbol: '/.dsh-company/', reason: '测试夹具：模板前缀' },
+        { module: 'tools/lib/template-suffix.mjs', symbol: '/.dsh-company$', reason: '测试夹具：模板后缀' },
+        { module: 'tools/lib/promises-writer.mjs', symbol: '.dsh-company', reason: '测试夹具：promises' },
+      ],
     })
     assert.deepEqual(registered.problems, [])
-    assert.match(registered.okLine, /工具盘入口 1/)
-    // 登记了但符号不在文件里 → 红（登记项自身必须可解析）
+    assert.match(registered.okLine, /工具盘入口 5/)
+    // 登记缺 reason / 缺 symbol / 符号不在文件里 → 红（登记项自身必须可解析）
+    const noReason = gate(root, {
+      carriers,
+      markdownPrimitives: [],
+      tooling: [{ module: 'tools/lib/scaffold.mjs', symbol: '.dsh-company' }],
+    })
+    assert.match(noReason.problems.join('；'), /scaffold\.mjs → WORKSPACE_TOOLING 必须写 reason/)
+    const noSymbol = gate(root, {
+      carriers,
+      markdownPrimitives: [],
+      tooling: [{ module: 'tools/lib/scaffold.mjs', reason: '测试夹具' }],
+    })
+    assert.match(noSymbol.problems.join('；'), /scaffold\.mjs → WORKSPACE_TOOLING 必须写 symbol/)
     const broken = gate(root, {
       carriers,
       markdownPrimitives: [],

@@ -11,16 +11,20 @@ import { parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
 //   B) 治理文档/门禁面：BUG-175..183 同源——门禁与 tools/lib 各自手写 `/^---\r?\n/` 与 `/^##\s+/` 裸切分，
 //      绕过 `repo-markdown.mjs` / `markdown-shape-core.js` 原语（门禁文件总数不净增，并入本载体垄断门）。
 // 机械对账：
-//   ① src/host 里同时出现「公司盘路径特征」与「写原语」的模块，必须在 CARRIERS / EXEMPT / KNOWN_GAP 三档之一；
+//   ① src/host 里同时出现「公司盘路径特征」与「写调用」（AST，`WRITE_CALLS` = sync + promises；只 import 写原语不算）
+//      的模块，必须在 CARRIERS / EXEMPT / KNOWN_GAP 三档之一；
 //   ② 登记项自身必须可解析：module 存在、CARRIERS 的 symbol 在文件里出现、KNOWN_GAP 的 bug 卡存在；
 //   ③ checks/gates/*.mjs 与 tools/lib/*.mjs（排除 MARKDOWN_PRIMITIVES）的 AST 正则字面量与 RegExp 构造
 //      不得出现裸 YAML frontmatter 正则或裸 Markdown `##` 节切分正则（精确报 file:line）。
 //      声明的边界（开放集合，不是穷尽承诺）：只管 ^ 锚 / `\n` 前缀 / `[#]{n}` 的正则字面量与 RegExp 构造，
 //      及 `.startsWith/.split` 的 `#…` 字符串字面量；标识符间接传参、slice/replace/match 不扫——靠 gate-change 盲审补位。
-//   ④ checks/gates/*.mjs 与 tools/lib/*.mjs（排除登记表与已登记的 WORKSPACE_TOOLING 成员）里同时出现
-//      `'.dsh-company'` 字面量与写调用 → 必须在 WORKSPACE_TOOLING 登记并写理由（policy §P2 的路径单原语）。
-//      声明的边界：只认以 `.dsh-company` 开头的字符串/模板/拼接字面量（`'.dsh-company'`、`` `.dsh-company/${x}` ``、
-//      `'.dsh-company' + '/x'`）；变量间接传参、常量再赋值不扫——靠盲审补位。
+//   ④ checks/gates/*.mjs 与 tools/lib/*.mjs（排除登记表与已登记的 WORKSPACE_TOOLING 成员）里，写调用的**路径实参**
+//      把 `.dsh-company` 当路径段用（`writeFileSync` 类只判 args[0]，避免内容/错误消息误红）→ 必须在 WORKSPACE_TOOLING
+//      登记 module + symbol + reason（policy §P2 的路径单原语）。
+//      声明的边界（开放集合）：只认字面量里的路径段形态（`'.dsh-company'`、`'./.dsh-company/kb'`、
+//      `` `${ws}/.dsh-company` ``、`` `${ws}/.dsh-company${sub}` ``）；变量拼接（`'.dsh' + '-company'`）、
+//      别名/元素访问调用（`import { writeFileSync as wf }`、`fs['writeFileSync']`）与 `WRITE_CALLS` 之外的新写 API
+//      不扫；登记粒度 = 整模块（登记后该模块新增裸写不再红），靠 gate-change 盲审复核。
 // 负例留证 2026-11-13 / 2026-11-14：
 //   - 新建未登记 host writer → `FAIL company-root-carriers: … → 未登记的公司盘写入口`；
 //   - 在任一非原语门禁植入 `/^##\s+/` 或 `/^---\r?\n/` → `FAIL company-root-carriers: … → 禁止手写裸 …`。
@@ -28,7 +32,6 @@ import { parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
 const HOST = 'packages/company-pack/src/host'
 const GOVERNANCE_DIRS = ['checks/gates', 'tools/lib']
 const COMPANY_REF = /\.dsh-company|companyHomeOf|companyFilePath|RUN_BUNDLE_PATHS/
-const WRITE_REF = /writeFileSync|appendFileSync|renameSync|mkdirSync|rmSync|cpSync|unlinkSync|linkSync|writeCompanyAtomic/
 const RAW_FRONTMATTER_RE = /^\^(?:\(\?:(?:\\uFEFF|\\ufeff|\\xEF\\xBB\\xBF|\uFEFF)\)\?|(?:\\uFEFF|\\ufeff|\\xEF\\xBB\\xBF|\uFEFF)\?)?---(?:\\r\?\\n|\\n|\\s|\s|\$)/
 const LEADING_WS_TOKEN = String.raw`(?:\(\?:|\()?(?:\\s| |\\t|\[[^\]]+\])(?:[*+?]|\\?\{\d+(?:,\d*)?\\?\})?\)?\??`
 const RAW_HEADING_SPLIT_RE = new RegExp(
@@ -59,8 +62,58 @@ function walk(dir, ext) {
   return out.sort()
 }
 
-function firstWriteLine(lines) {
-  return lines.findIndex(line => WRITE_REF.test(line) && !/^\s*(import|\} from)/.test(line)) + 1
+/** 写调用集合（sync + promises，按 callee 名判、不看 import 行）。开放集合：新 API 由盲审补入。 */
+const WRITE_CALLS = new Set([
+  'writeFileSync', 'appendFileSync', 'renameSync', 'mkdirSync', 'rmSync', 'cpSync', 'unlinkSync', 'linkSync', 'writeCompanyAtomic',
+  'writeFile', 'appendFile', 'rename', 'mkdir', 'rm', 'cp', 'unlink', 'link',
+])
+
+/** 首参是「内容」而非路径的写调用：只判 args[0]（否则错误消息里出现 `.dsh-company` 会误红）。 */
+const CONTENT_LAST = new Set(['writeFileSync', 'appendFileSync', 'writeFile', 'appendFile'])
+
+function callName(node) {
+  if (!ts.isCallExpression(node)) return undefined
+  const callee = node.expression
+  if (ts.isIdentifier(callee)) return callee.text
+  if (ts.isPropertyAccessExpression(callee) && ts.isIdentifier(callee.name)) return callee.name.text
+  return undefined
+}
+
+/** 首个写调用所在行（1-based）；没有写调用 = undefined（只读模块不误判）。 */
+function firstWriteCallLine(sf) {
+  let line
+  const visit = node => {
+    if (line !== undefined) return
+    const name = callName(node)
+    if (name !== undefined && WRITE_CALLS.has(name)) {
+      line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1
+      return
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(sf)
+  return line
+}
+
+/** 写调用**路径实参**里出现 `.dsh-company` 的位置；只在写目标上判，内容/错误消息不算。 */
+function companyDirWritePos(sf, text) {
+  let pos
+  const visit = node => {
+    if (pos !== undefined) return
+    const name = callName(node)
+    if (name !== undefined && WRITE_CALLS.has(name)) {
+      const targets = CONTENT_LAST.has(name) ? node.arguments.slice(0, 1) : node.arguments.slice(0, 2)
+      for (const arg of targets) {
+        if (RAW_COMPANY_DIR_LITERAL.test(text.slice(arg.getStart(sf), arg.getEnd()))) {
+          pos = arg.getStart(sf)
+          return
+        }
+      }
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(sf)
+  return pos
 }
 
 function bugCardExists(root, id) {
@@ -138,8 +191,8 @@ function scanRawParsingProblems(root, primitives) {
 }
 
 const TOOLING_SKIP = new Set([RAW_SCAN_SELF, 'tools/lib/carrier-registry.mjs'])
-/** `'.dsh-company'` / `".dsh-company/kb"` / `` `.dsh-company/${x}` `` / `'.dsh-company' + '/x'` 的公共前缀。 */
-const RAW_COMPANY_DIR_LITERAL = /['"`]\.dsh-company(?:[\\/]|['"`])/
+/** 字面量里把 `.dsh-company` 当**路径段**用：`'.dsh-company'`、`'./.dsh-company/kb'`、`` `${ws}/.dsh-company` ``、`` `${ws}/.dsh-company${sub}` ``。 */
+const RAW_COMPANY_DIR_LITERAL = /['"`](?:[^'"`\n]*?[\\/])?\.dsh-company(?:[\\/]|['"`$])/
 
 /** 维护工具直写工作区 `.dsh-company` 而未登记 → 红；登记表与已登记成员跳过。 */
 function scanToolingProblems(root, tooling) {
@@ -152,10 +205,11 @@ function scanToolingProblems(root, tooling) {
       const rel = absFile.slice(root.length + 1).replaceAll('\\', '/')
       if (TOOLING_SKIP.has(rel) || registered.has(rel)) continue
       const text = stripComments(readFileSync(absFile, 'utf8'))
-      if (!WRITE_REF.test(text)) continue
-      const match = RAW_COMPANY_DIR_LITERAL.exec(text)
-      if (match === null) continue
-      const line = text.slice(0, match.index).split('\n').length
+      if (!text.includes('.dsh-company')) continue
+      const sf = ts.createSourceFile(rel, text, ts.ScriptTarget.Latest, true)
+      const pos = companyDirWritePos(sf, text)
+      if (pos === undefined) continue
+      const line = sf.getLineAndCharacterOfPosition(pos).line + 1
       problems.push(`${rel}:${String(line)} → 禁止手写裸 .dsh-company 路径拼接（登记到 tools/lib/carrier-registry.mjs 的 WORKSPACE_TOOLING 并写理由）`)
     }
   }
@@ -195,10 +249,12 @@ export function run({
   for (const absolute of files) {
     const rel = absolute.slice(root.length + 1)
     const text = stripComments(readFileSync(absolute, 'utf8'))
-    if (!COMPANY_REF.test(text) || !WRITE_REF.test(text)) continue
+    if (!COMPANY_REF.test(text)) continue
+    const sf = ts.createSourceFile(rel, text, ts.ScriptTarget.Latest, true)
+    const line = firstWriteCallLine(sf)
+    if (line === undefined) continue
     writers += 1
     if (!registered.has(rel)) {
-      const line = firstWriteLine(text.split('\n'))
       problems.push(`${rel}:${String(line)} → 未登记的公司盘写入口（登记到 tools/lib/carrier-registry.mjs 的 CARRIERS / EXEMPT / KNOWN_GAP）`)
     }
   }
@@ -214,6 +270,15 @@ export function run({
     }
     if (entry.bug !== undefined && !bugCardExists(root, entry.bug)) {
       problems.push(`${entry.module} → KNOWN_GAP 指向的 ${entry.bug} 卡不存在（活跃/归档均无）`)
+    }
+  }
+
+  for (const entry of tooling) {
+    if (typeof entry.reason !== 'string' || entry.reason.trim() === '') {
+      problems.push(`${entry.module} → WORKSPACE_TOOLING 必须写 reason（为什么这个工具绕 company-root）`)
+    }
+    if (typeof entry.symbol !== 'string' || entry.symbol.trim() === '') {
+      problems.push(`${entry.module} → WORKSPACE_TOOLING 必须写 symbol（登记入口里出现的锚字符串）`)
     }
   }
 
