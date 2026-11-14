@@ -224,3 +224,60 @@ describe('数组字段不得内联成标量', () => {
       .toContain('不存在的 REQ')
   })
 })
+
+describe('平台文本形状（BUG-152：BOM / CRLF）', () => {
+  it('LF / CRLF / BOM+CRLF 三种编码 → 同判 ok、同计数，错误文本不指向内容缺失', () => {
+    const base = validateProductDocs(mrdDoc(mrd()), prd())
+    expect(base).toMatchObject({ ok: true, reqCount: 1, acCount: 1 })
+    for (const text of [prd().replace(/\n/g, '\r\n'), `\uFEFF${prd()}`, `\uFEFF${prd().replace(/\n/g, '\r\n')}`]) {
+      const result = validateProductDocs(mrdDoc(mrd()), text)
+      expect(result.errors, result.errors.join()).toEqual([])
+      expect(result).toMatchObject({ ok: true, reqCount: 1, acCount: 1 })
+    }
+  })
+})
+
+describe('围栏代码块不是定义（BUG-153）', () => {
+  const fenced = (fence: string, body: string) => `${fence}markdown\n${body}\n${fence}`
+
+  it('围栏里的 ### REQ-999 不被当成需求定义', () => {
+    const sections = `${requirementSection()}\n${fenced('```', '### REQ-999 示例\n- userStory: 示例')}\n`
+    const result = validateProductDocs(mrdDoc(mrd()), prd({ sections }))
+    expect(result.errors, result.errors.join()).toEqual([])
+    expect(result).toMatchObject({ ok: true, reqCount: 1 })
+  })
+
+  it('围栏里的 ## Slices 表不顶掉真实表（``` 与 ~~~ 两族都认）', () => {
+    const table = '| S9 | 示例 | REQ-999 | ok |\n## Slices\n### REQ-999 示例'
+    for (const fence of ['```', '~~~']) {
+      const slices = `| S1 | 最小端到端 | REQ-001 | 导出草稿 |\n\n${fenced(fence, table)}`
+      const result = validateProductDocs(mrdDoc(mrd()), prd({ slices }))
+      expect(result.errors, `${fence}：${result.errors.join()}`).toEqual([])
+      expect(result).toMatchObject({ ok: true, reqCount: 1 })
+    }
+  })
+
+  it('围栏外仍正常解析（示例与真实定义并存）', () => {
+    const sections = `${requirementSection()}\n${fenced('```', '### REQ-999 示例')}\n${requirementSection({ id: 'REQ-002', title: '第二条', acceptance: '  - AC-002-1\n    - given: g\n    - when: w\n    - then: t' })}\n`
+    const result = validateProductDocs(mrdDoc(mrd()), prd({ slices: '| S1 | 最小端到端 | REQ-001, REQ-002 | 导出草稿 |', sections }))
+    expect(result.errors, result.errors.join()).toEqual([])
+    expect(result).toMatchObject({ ok: true, reqCount: 2 })
+  })
+})
+
+describe('身份唯一性（BUG-157）', () => {
+  it('同一 REQ 下 AC 重号 → 红；合法多 AC → 绿', () => {
+    const dup = '  - AC-001-1\n    - given: g\n    - when: w\n    - then: t\n  - AC-001-1\n    - given: g2\n    - when: w2\n    - then: t2'
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ acceptance: dup }) })).errors.join())
+      .toContain('AC-001-1 重号')
+    const legal = '  - AC-001-1\n    - given: g\n    - when: w\n    - then: t\n  - AC-001-2\n    - given: g2\n    - when: w2\n    - then: t2'
+    const result = validateProductDocs(mrdDoc(mrd()), prd({ sections: requirementSection({ acceptance: legal }) }))
+    expect(result.errors, result.errors.join()).toEqual([])
+    expect(result).toMatchObject({ ok: true, acCount: 2 })
+  })
+
+  it('slice id 重号 → 红（一个 REQ 不能同时属于两个同名 slice）', () => {
+    const slices = '| S1 | 最小端到端 | REQ-001 | ok |\n| S1 | 重复 | REQ-001 | ok |'
+    expect(validateProductDocs(mrdDoc(mrd()), prd({ slices })).errors.join()).toContain('slice S1 重号')
+  })
+})

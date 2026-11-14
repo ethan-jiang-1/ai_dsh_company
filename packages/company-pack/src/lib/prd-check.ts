@@ -296,6 +296,54 @@ const PRIORITIES: readonly ReqPriority[] = ['P0', 'P1', 'P2']
 const STATUSES: readonly ReqStatus[] = ['draft', 'ready', 'in-dev', 'accepted', 'deferred', 'withdrawn']
 const VERIFICATIONS: readonly Verification[] = ['test', 'demonstration', 'analysis', 'inspection', 'demo', 'review']
 
+/**
+ * 平台差异归一：去 UTF-8 BOM、CRLF/lone-CR → LF（BUG-152）。
+ *
+ * 为什么不靠正则容错：`(.*)$` 里的 `.` 不匹配行终止符，标题行尾的 `\r` 会让 `### REQ-001 …` 整个不命中；
+ * 在入口把文本归一到一种换行，标题/表格/字段三类解析器就只需要一种假设。
+ */
+function normalizeDocument(text: string): string {
+  const withoutBom = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text
+  return withoutBom.replace(/\r\n?/g, '\n')
+}
+
+interface ScannedLine {
+  readonly line: string
+  /** 该行是否属于围栏代码块（围栏开合行本身也算）。 */
+  readonly inFence: boolean
+}
+
+/** 围栏开合行：最多 3 个前导空格 + 三连以上反引号/波浪号，后跟信息串。 */
+function fenceAt(line: string): { readonly char: string; readonly length: number; readonly rest: string } | undefined {
+  const match = /^\s{0,3}(`{3,}|~{3,})(.*)$/.exec(line)
+  if (match === null) return undefined
+  const marker = match[1] ?? ''
+  return { char: marker[0] ?? '`', length: marker.length, rest: match[2] ?? '' }
+}
+
+/**
+ * 逐行标记围栏状态（BUG-153）。
+ *
+ * 为什么：围栏里的 `### REQ-999` 与 `## Slices` 表是**示例**，不是定义；不维护 fence 状态就会造出
+ * 幽灵需求（示例当定义）和假红（示例表顶掉真实表）。围栏记号两族都认（``` 与 ~~~），
+ * 闭合要求同族、长度不短于开启、且关闭行没有其它内容。
+ */
+function scanLines(text: string): ScannedLine[] {
+  const out: ScannedLine[] = []
+  let open: { readonly char: string; readonly length: number } | undefined
+  for (const line of text.split('\n')) {
+    const fence = fenceAt(line)
+    if (open === undefined) {
+      if (fence !== undefined) open = { char: fence.char, length: fence.length }
+      out.push({ line, inFence: open !== undefined })
+      continue
+    }
+    out.push({ line, inFence: true })
+    if (fence !== undefined && fence.char === open.char && fence.length >= open.length && fence.rest.trim() === '') open = undefined
+  }
+  return out
+}
+
 /** 枚举容错：`nonFunctional` / `Non-Functional` → `non-functional`（大小写与驼峰都不判红）。 */
 function normalizeToken(value: string): string {
   return value.trim().replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
@@ -312,17 +360,21 @@ function splitRow(line: string): string[] {
   return line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(cell => cell.trim())
 }
 
-/** 解析 `## Slices` 表；每个 slice 必须列出显式 REQ id（R8 禁区间断言）。 */
+/** 解析 `## Slices` 表；每个 slice 必须列出显式 REQ id（R8 禁区间断言）。围栏里的表不算定义（BUG-153）。 */
 export function parsePrdSlices(text: string, errors: string[]): PrdSlice[] {
-  const lines = text.split('\n')
-  const start = lines.findIndex(line => /^##\s+Slices\b/i.test(line))
+  const lines = scanLines(normalizeDocument(text))
+  const start = lines.findIndex(scanned => !scanned.inFence && /^##\s+Slices\b/i.test(scanned.line))
   if (start === -1) {
     errors.push('PRD 缺「## Slices」表（slice 与 REQ 的归属没有声明面）')
     return []
   }
   const slices: PrdSlice[] = []
+  const seen = new Set<string>()
   for (let index = start + 1; index < lines.length; index += 1) {
-    const line = lines[index] ?? ''
+    const scanned = lines[index]
+    if (scanned === undefined) break
+    const line = scanned.line
+    if (scanned.inFence) continue
     if (/^##\s+/.test(line)) break
     if (!line.trim().startsWith('|')) continue
     const cells = splitRow(line)
@@ -332,6 +384,11 @@ export function parsePrdSlices(text: string, errors: string[]): PrdSlice[] {
       errors.push(`Slices 表首列必须是 slice id（S1…），实际：${id}`)
       continue
     }
+    if (seen.has(id)) {
+      errors.push(`slice ${id} 重号（一个 slice 号只能有一行；同一个 REQ 只能属于一个 slice）`)
+      continue
+    }
+    seen.add(id)
     const goal = cells[1] ?? ''
     const requirementCell = cells[2] ?? ''
     if (/…|\.\.\.|~/.test(requirementCell)) errors.push(`slice ${id} 的 requirements 必须是显式 REQ id（不用区间）`)
@@ -354,16 +411,18 @@ interface RequirementBlock {
   readonly body: readonly string[]
 }
 
-/** 取 `### REQ-###` 定义小节；块在下一个 `##`/`###` 标题处结束。 */
+/** 取 `### REQ-###` 定义小节；块在下一个 `##`/`###` 标题处结束。围栏里的内容不是定义（BUG-153）。 */
 export function prdRequirementBlocks(text: string): RequirementBlock[] {
-  const lines = text.split('\n')
+  const lines = scanLines(normalizeDocument(text))
   const blocks: RequirementBlock[] = []
   let current: { id: string; title: string; line: number; body: string[] } | undefined
   const flush = (): void => {
     if (current !== undefined) blocks.push({ id: current.id, title: current.title, line: current.line, body: current.body })
     current = undefined
   }
-  for (const [index, line] of lines.entries()) {
+  for (const [index, scanned] of lines.entries()) {
+    if (scanned.inFence) continue
+    const line = scanned.line
     const heading = PRD_SECTION_HEADING.exec(line)
     if (heading !== null) {
       flush()
@@ -393,6 +452,7 @@ function readRequirementFields(id: string, body: readonly string[], errors: stri
   const openQuestions: string[] = []
   const changeLog: { at: string; by: string; change: string }[] = []
   const seen = new Set<string>()
+  const acSeen = new Set<string>()
   for (let index = 0; index < body.length; index += 1) {
     const field = /^-\s+([A-Za-z][\w]*):\s*(.*)$/.exec(body[index] ?? '')
     if (field === null) continue
@@ -417,6 +477,8 @@ function readRequirementFields(id: string, body: readonly string[], errors: stri
           inner += 1
         }
         acceptance.push(ac)
+        if (acSeen.has(ac.id)) errors.push(`${id}.acceptance 的 ${ac.id} 重号（一个判据号只能有一个定义）`)
+        else acSeen.add(ac.id)
         cursor = inner
       }
       index = cursor - 1
@@ -521,13 +583,14 @@ export function parsePrdHeadings(text: string): { readonly doc?: PrdDoc; readonl
   return { doc: { version: '1.0', status: 'draft', slices, requirements }, errors }
 }
 
-/** 按 `definition` 头分派：headings（新）/ json-ledger（旧，只读兼容）。 */
+/** 按 `definition` 头分派：headings（新）/ json-ledger（旧，只读兼容）。入口归一化平台差异（BUG-152）。 */
 export function parsePrdDocument(text: string): { readonly doc?: PrdDoc; readonly errors: string[]; readonly form?: PrdForm } {
-  const header = parsePrdHeader(text)
+  const normalized = normalizeDocument(text)
+  const header = parsePrdHeader(normalized)
   const form = header?.definition ?? ''
-  if (form === 'headings') return { ...parsePrdHeadings(text), form }
+  if (form === 'headings') return { ...parsePrdHeadings(normalized), form }
   if (form === 'json-ledger') {
-    const block = extractJsonBlock(text)
+    const block = extractJsonBlock(normalized)
     if (!block.ok) return { errors: [`PRD：${block.error}`], form }
     return { ...coerceLegacyPrd(block.value), form }
   }

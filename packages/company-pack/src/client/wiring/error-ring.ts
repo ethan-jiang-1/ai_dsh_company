@@ -68,7 +68,14 @@ export function createErrorRing(limit = ERROR_RING_LIMIT, onEntry?: ClientErrorR
   }
 }
 
-/** 只保留能安全 JSON 化的短文本（错误对象/事件各有各的形状）。 */
+/**
+ * 从任意错误形状取可读短文本（错误对象/事件各有各的形状）。
+ *
+ * 关键：**普通对象先读有意义的字段**（`message` / `reason` / `name`），不要先 JSON 化——
+ * `JSON.stringify({})` 是 `'{}'`（truthy），会抢在 `||` 回退前把 `event.message` 顶掉；
+ * 跨 realm 的 `Error`（`instanceof Error` 为 false）经 JSON 化同样是 `{}`，但它的 `message`
+ * 字段是可读的（BUG-159）。字段都没有时才退到 JSON；`{}` 这类无信息结果视为空串。
+ */
 function textOf(value: unknown): string {
   // null 必须落到空串：`JSON.stringify(null) === 'null'` 会抢在 `||` 回退前把
   // 有意义的 `event.message` 顶掉——浏览器给 `error === null` 的 error 事件
@@ -76,7 +83,20 @@ function textOf(value: unknown): string {
   if (value === null || value === undefined) return ''
   if (typeof value === 'string') return value.slice(0, 500)
   if (value instanceof Error) return `${value.name}: ${value.message}`.slice(0, 500)
-  try { return JSON.stringify(value)?.slice(0, 500) ?? '' } catch { return String(value).slice(0, 500) }
+  if (typeof value === 'object') {
+    const record = value as { readonly message?: unknown; readonly reason?: unknown; readonly name?: unknown }
+    const name = typeof record.name === 'string' ? record.name.trim() : ''
+    const message = typeof record.message === 'string' ? record.message.trim() : ''
+    if (message !== '') return (name === '' ? message : `${name}: ${message}`).slice(0, 500)
+    const reason = typeof record.reason === 'string' ? record.reason.trim() : ''
+    if (reason !== '') return reason.slice(0, 500)
+    if (name !== '') return name.slice(0, 500)
+    try {
+      const json = JSON.stringify(value)
+      return json === undefined || json === '{}' ? '' : json.slice(0, 500)
+    } catch { return String(value).slice(0, 500) }
+  }
+  return String(value).slice(0, 500)
 }
 
 /**

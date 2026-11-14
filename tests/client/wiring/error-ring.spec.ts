@@ -69,6 +69,24 @@ describe('客户端错误环（R3-03）', () => {
     uninstall()
   })
 
+  it('非 Error 的 error 对象不吞 event.message（{} / 跨 realm Error 两形状）', () => {
+    const ring = createErrorRing()
+    const { target, emit } = fakeTarget()
+    const uninstall = installErrorCapture(target, ring)
+    emit('error', { error: {}, message: 'real cross-realm message' })
+    expect(ring.list().map(entry => entry.message)).toEqual(['real cross-realm message'])
+    // 跨 realm 的 Error：instanceof Error 为 false，但 name/message 字段可读。
+    emit('error', { error: { name: 'TypeError', message: 'cross realm' }, message: 'TypeError: cross realm' })
+    expect(ring.list().map(entry => entry.message)).toEqual(['real cross-realm message', 'TypeError: cross realm'])
+    // 没有 message 的对象取 reason / name；两者都没有才落到「未知」。
+    emit('error', { error: { reason: 'promise said no' } })
+    emit('error', { error: {} })
+    expect(ring.list().map(entry => entry.message)).toEqual([
+      'real cross-realm message', 'TypeError: cross realm', 'promise said no', '（未知页面错误）',
+    ])
+    uninstall()
+  })
+
   it('ResizeObserver 循环通知是浏览器提示、不是页面异常：不入环', () => {
     const ring = createErrorRing()
     const { target, emit } = fakeTarget()
