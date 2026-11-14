@@ -562,8 +562,8 @@
       "branches": 92.85
     },
     "tools/lib/candidate-scan.mjs": {
-      "statements": 95.71,
-      "branches": 89.04
+      "statements": 96.09,
+      "branches": 89.2
     },
     "tools/lib/carrier-registry.mjs": {
       "statements": 0,

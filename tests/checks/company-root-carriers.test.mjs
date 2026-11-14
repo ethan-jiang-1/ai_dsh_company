@@ -76,5 +76,19 @@ test('非注册原语植入裸 frontmatter 正则/前缀或裸 Markdown `##` 节
     assert.match(joined, /checks\/gates\/lib\/sub-bad\.mjs:1 → 禁止手写裸 Markdown 节切分正则/)
     assert.match(joined, /tools\/lib\/bad-helper\.mjs:1 → 禁止手写裸 Markdown 节切分正则/)
     assert.doesNotMatch(joined, /repo-markdown\.mjs:\d+/)
+
+    // 逃逸形态：startsWith/split 字符串前缀、非 ^ 锚正则必须判红；URL 锚 `#` 与 includes/indexOf 探测不误报
+    writeFileSync(join(root, 'checks/gates/escape-gate.mjs'), [
+      "export const a = l => l.startsWith('## 合成')",
+      "export const b = t => t.split('\\n## 尾')",
+      'export const c = /\\n## /',
+      'export const d = /(?=^## )/m',
+      "export const ok1 = u => u.startsWith('#') || u.indexOf('#') || u.includes('# 标题')",
+    ].join('\n'))
+    const escaped = gate(root, { carriers: [{ kind: 'writer', module: MODULE }] }).problems.join('；')
+    for (const line of [1, 2, 3, 4]) {
+      assert.match(escaped, new RegExp(`escape-gate\\.mjs:${String(line)} → 禁止手写裸 Markdown 节`))
+    }
+    assert.doesNotMatch(escaped, /escape-gate\.mjs:5/)
   } finally { rmSync(root, { recursive: true, force: true }) }
 })

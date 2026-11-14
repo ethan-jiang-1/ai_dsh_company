@@ -27,7 +27,7 @@
 5. **棘轮：未覆盖轴必须有四分类与非自链实盘锚点。** `checks/gates/notes-axes.mjs`：新 Note（文件名 ≥ 2026-11-14，覆盖 `notes/implemented/` 与 `notes/archived/`）的
    `## 未覆盖轴` 每个顶层条目必须带 `[covered|policy|environment-gap|unprovable]` 前缀且 `→` 右侧指向非自链的盘上真实文件；用 core 的 `sectionRange` 排除围栏里的假节。
    `tests/failure-classes.md` 加复发规则：同类连续两轮只有 example → 下一轮必须生成器/模型/元测试。
-6. **门禁自身要能被分支级证伪。** `tests/checks/gate-mutation.test.mjs`（并入 `checks/lanes/generative.e2e.mjs`）对高风险门禁的核心拒绝分支与浅克隆跳过分支逐条做定向 mutation（临时文件隔离在 `os.tmpdir()`），坏夹具必须从对应 mutant 漏过，另验 `keyless-lane` 零命中非零退出。
+6. **门禁自身要能被分支级证伪。** `tests/checks/gate-mutation.test.mjs`（并入 `checks/lanes/generative.e2e.mjs`）对高风险门禁的核心拒绝分支与浅克隆跳过分支逐条做定向 mutation（mutant 副本隔离在 gitignored `node_modules/.cache/gate-mutations/`，不碰 tracked 目录），坏夹具必须从对应 mutant 漏过，另验 `keyless-lane` 零命中非零退出。
 
 ## 状态事实与载体
 
@@ -52,13 +52,13 @@
 
 | 层 | 实跑证据 |
 |---|---|
-| 结构 | `pnpm verify` **ALL PASS**（75 门禁；notes-axes 新 Note 0 篇） |
+| 结构 | `pnpm verify` **ALL PASS**（75 门禁；notes-axes 新 Note 8 篇） |
 | 回归 | `pnpm test` **243 files / 2064 tests** |
 | 类型 | `pnpm typecheck` 绿 |
 | 门禁自测 | `pnpm test:checks` **9 PASS / 0 FAIL** |
 | 变形红证 | 把围栏行改成 `structural: true` → property「围栏内永不 structural」红；还原绿 |
-| notes-axes 红证 | 临时 `2026-11-15-zz-axis.md` 缺去向 → `FAIL notes-axes: …没有 → 去向`；删除后 PASS |
-| mutation | naming/carrier/fix-evidence/notes-tree 各删一条规则 → 坏夹具漏过；4/4 |
+| notes-axes 红证 | 现判据 = 四分类前缀 + `→` 右侧盘上真实非自身文件锚点；临时新 Note 写 `- [policy] x → 决定：留后续卡` → `FAIL notes-axes`；删除后 PASS（旧「缺去向」判据已被取代） |
+| mutation | `tests/checks/gate-mutation.test.mjs` 现覆盖 naming/carrier/fix-evidence/notes-tree/notes-axes/backlog-liveness/ledger-routing 七个门禁的分支 + keyless-lane 零命中；17 tests 全绿；每分支被删后坏夹具漏过（首版只有 4 门禁，后续由 [institutional-test-ratchet] 扩展） |
 | R4 棘轮 | 先 `candidate-scan-labels` 删了会让覆盖 76→75 → 红；迁 BUG-011 守卫后删，覆盖仍 76 |
 | v6 dry-run | `tests/evidence/v6-dry-run.spec.ts`：Windows `..\` → unsafe；围栏嵌套只取顶层 json |
 | 现行盘面读数 | 已修 181 / 具名守卫 76（42.0%）；30 冒烟 + 59 探针（未分类 0 / 0 消费者 50）；75 门禁（`notes-axes` 生效日 `2026-11-14`） |

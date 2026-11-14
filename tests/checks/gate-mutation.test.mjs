@@ -176,13 +176,26 @@ test('company-root-carriers：删「禁裸节切分正则」与「SKILL.md YAML 
     'checks/gates/raw-split.mjs': 'export const h = /^##\\s+(.+)$/m\n',
   })
   const mutRaw = await mutant('company-root-carriers',
-    'else if (RAW_HEADING_SPLIT_RE.test(pattern)) {',
+    'else if (RAW_HEADING_SPLIT_RE.test(pattern) || RAW_HEADING_ANYWHERE_RE.test(pattern)) {',
     'else if (false) {')
   try {
     const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [] }
     assert.match(invoke(carrier, rootRaw, extra).problems.join(), /禁止手写裸 Markdown 节切分正则/)
     assert.deepEqual(invoke(mutRaw.mod, rootRaw, extra).problems, [])
   } finally { mutRaw.cleanup(); rmSync(rootRaw, { recursive: true, force: true }) }
+
+  const rootStr = fixture({
+    'packages/company-pack/src/host/noop.ts': 'export const x = 1\n',
+    'checks/gates/str-split.mjs': 'export const f = line => line.startsWith(\'## 节\') || line.split(\'\\n## 尾\')\n',
+  })
+  const mutStr = await mutant('company-root-carriers',
+    'else if (prefix !== undefined && RAW_HEADING_STRING_RE.test(prefix)) {',
+    'else if (false) {')
+  try {
+    const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [] }
+    assert.match(invoke(carrier, rootStr, extra).problems.join(), /禁止手写裸 Markdown 节判据/)
+    assert.deepEqual(invoke(mutStr.mod, rootStr, extra).problems, [])
+  } finally { mutStr.cleanup(); rmSync(rootStr, { recursive: true, force: true }) }
 
   const rootSkill = fixture({
     'packages/company-pack/src/host/noop.ts': 'export const x = 1\n',
@@ -404,6 +417,17 @@ test('notes-axes：删「四分类前缀」与「右侧实盘文件锚点」→ 
     assert.match(invoke(notesAxes, rootSelfLink).problems.join(), /右侧缺盘上真实文件锚点/)
     assert.deepEqual(invoke(mutSelfLink.mod, rootSelfLink).problems, [])
   } finally { mutSelfLink.cleanup(); rmSync(rootSelfLink, { recursive: true, force: true }) }
+
+  const rootArchived = fixture({
+    'notes/archived/2026-11-14-escaped.md': '状态：implemented\n\n## 未覆盖轴\n- [policy] 迁入归档逃逸 → 决定：留后续卡\n',
+  })
+  const mutArchived = await mutant('notes-axes',
+    "const LIFECYCLE_DIRS = ['notes/implemented', 'notes/archived']",
+    "const LIFECYCLE_DIRS = ['notes/implemented']")
+  try {
+    assert.match(invoke(notesAxes, rootArchived).problems.join(), /四分类前缀|右侧缺盘上真实文件锚点/)
+    assert.deepEqual(invoke(mutArchived.mod, rootArchived).problems, [])
+  } finally { mutArchived.cleanup(); rmSync(rootArchived, { recursive: true, force: true }) }
 })
 
 // ── 6. backlog-liveness（2 分支：验收标准可执行标记 / 归档 note 去向真实文件锚点）──

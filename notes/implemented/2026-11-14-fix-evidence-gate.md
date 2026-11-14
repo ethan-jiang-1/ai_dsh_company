@@ -12,7 +12,7 @@
 
 1. `- 改动面：` 至少一个仓库相对反引号路径；不越界且不落在 `_backlog/`、`notes/`、`vendor/`——证据必须指向
    系统面（代码/门禁/测试/文档/内容），只改卡与 Note 不算修复；路径真伪由第 3 步与证据提交 changed files 求交集验证（纯删除型修复在 HEAD 已不在盘上同样可对账，BUG-171）。
-2. `- 红：` / `- 绿：` 非空，且各自点名一条真实测试/验证运行命令（反引号里的 `pnpm …`/`node …`/`npx …`/`vitest …`/`sh …`/`bash …`，显式排除 `git …` 等版本控制命令防伪证，BUG-182），
+2. `- 红：` / `- 绿：` 非空，且各自点名一条真实测试/验证运行命令（反引号里的 `pnpm …`/`node …`/`npx …`/`vitest …`/`sh …`，显式排除 `git …` 等版本控制命令防伪证，BUG-182），
    **红绿必须出现同一条命令**——红→绿的定义就是同一条命令复跑。
 3. `- 提交：commit <sha>`：sha 存在、**是 HEAD 的祖先**（当前分支能复算）、提交日期 ≥ `opened`、
    且该提交的 changed files 与改动面相交（文件相等或在目录下）——“卡上说的改动面”必须真在那次提交里出现过。
@@ -56,8 +56,8 @@
 
 | 层 | 失败类 | 负控（见过红） |
 |---|---|---|
-| 结构门禁 `pnpm verify`（`fix-evidence ×8`） | 12 | 真树植入四种形状各红一次、各自还原后绿（原话见门禁头注）：① 删 BUG-160 的 `## 修复证据` → `缺「## 修复证据」…`；② `- 提交：commit deadbeef` → `提交 deadbeef 不存在`；③ 改动面改成该提交没改过的 `packages/company-pack/src/host/commands/prd-gate.ts` → `提交 85e6fec9 没有改到改动面里的任何路径`；④ 改动面改成 `notes/implemented/…` → `只指向卡/笔记/vendor（不算系统面改动）`；⑤ 红/绿换成两条不同命令 → `红/绿没有同一条命令`；⑥ `- 提交：` 改成不在 HEAD 历史的 `7fe04557` → `不在 HEAD 历史上` |
-| 自测 `tests/checks/fix-evidence.test.mjs`（10 passed） | 12 | 临时 git 仓库钉住四行形状、命令一致性与提交交集（合法卡绿；缺节/坏 sha/路径不存在/只指 notes/提交没改到/命令不一致/无命令/非 HEAD 祖先 各自红） |
+| 结构门禁 `pnpm verify`（`fix-evidence ×24` 张新已修卡） | 12 | 真树植入四种形状各红一次、各自还原后绿（原话见门禁头注）：① 删 BUG-160 的 `## 修复证据` → `缺「## 修复证据」…`；② `- 提交：commit deadbeef` → `提交 deadbeef 不存在`；③ 改动面改成该提交没改过的 `packages/company-pack/src/host/commands/prd-gate.ts` → `提交 85e6fec9 没有改到改动面里的任何路径`；④ 改动面改成 `notes/implemented/…` → `只指向卡/笔记/vendor（不算系统面改动）`；⑤ 红/绿换成两条不同命令 → `红/绿没有同一条命令`；⑥ `- 提交：` 改成不在 HEAD 历史的 `7fe04557` → `不在 HEAD 历史上` |
+| 自测 `tests/checks/fix-evidence.test.mjs`（21 passed） | 12 | 临时 git 仓库钉住四行形状、命令一致性与提交交集（合法卡绿；缺节/坏 sha/路径不存在/只指 notes/提交没改到/命令不一致/无命令/非 HEAD 祖先 各自红） |
 | 全量 | — | `pnpm test` 247 files / 2057 tests；`pnpm typecheck` / `lint` / `dup` / `test:checks` 全绿；`pnpm verify` ALL PASS |
 
 ## 未覆盖轴

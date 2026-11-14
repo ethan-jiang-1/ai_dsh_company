@@ -6,6 +6,8 @@
 // ⚠ 命名纪律（评审 §五 B 的零容忍条款）：未达判据前，输出只能叫「**待核工作候选**」，
 // 不叫"我的待办"，不自动通知。候选项必须带「待核实」标记。
 
+import { headingSections } from './repo-markdown.mjs'
+
 /**
  * 结构化 ASSIGN 行（R2/R3 用）。形状（一行一格，机器可读）：
  *   `ASSIGN｜T1｜vp-sales｜市场门证据｜deps: none｜status: todo`
@@ -162,12 +164,15 @@ const goldPending = (s) => s === '待办' || s === '待核实'
 /** 解析标注文件全文 → 行数组。格式约定唯一见标注文件头部（`；` 分隔条目；条目 = 角色·T号·状态·一句话）。 */
 export function parseLabelsText(text) {
   const rows = []
-  let section = null
-  for (const line of text.split('\n')) {
-    if (line.startsWith('## 合成语料')) { section = 'synthetic'; continue }
-    if (line.startsWith('## 真盘动议')) { section = 'real'; continue }
-    if (line.startsWith('## ') || line.startsWith('# ')) { section = null; continue }
-    if (!section || !line.trim().startsWith('|') || /\|-{2,}/.test(line)) continue
+  // 节归属走 repo-markdown 单原语（顶层 ATX 标题；围栏/注释里的假标题不切节）。
+  const KINDS = { 合成语料: 'synthetic', 真盘动议: 'real' }
+  const labelLines = headingSections(text, { depth: 2 })
+    .flatMap(sec => {
+      const kind = KINDS[sec.title.slice(0, 4)]
+      return kind === undefined ? [] : sec.structuralBody.split('\n').map(body => [kind, body])
+    })
+  for (const [section, line] of labelLines) {
+    if (!line.trim().startsWith('|') || /\|-{2,}/.test(line)) continue
     const cells = line.split('|').slice(1, -1).map(c => c.trim())
     if (cells.length < 4 || !cells[0] || cells[0] === 'case' || cells[0] === 'slug') continue
     const tasks = []

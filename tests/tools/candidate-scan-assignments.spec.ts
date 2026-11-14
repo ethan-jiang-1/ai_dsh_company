@@ -152,6 +152,21 @@ describe('标注解析与打分纯逻辑（parseLabelsText + scoreLabels）', ()
     expect(() => parseLabelsText('## 合成语料\n\n| case | 清单 | 谁 | 零容忍 |\n|---|---|---|---|\n| x | cfo·T1 | cfo | 无 |\n')).toThrow(/缺字段/)
   })
 
+  it('parseLabelsText 节归属走结构标题：围栏内假 `## 真盘动议`/假表行不生效，无关节与 H1 切断表', () => {
+    const table = '| case | 清单 | 谁 | 零容忍 |\n|---|---|---|---|\n'
+    const text = [
+      '# 标题', '', '## 合成语料', '', table + '| a | cfo·T1·待办·x | cfo | 无 |',
+      '', '```', '## 真盘动议', '| fake | cfo·T9·待办·x | cfo | 无 |', '```', '',
+      '## 其它节', '', table + '| b | cfo·T2·待办·x | cfo | 无 |',
+      '', '## 真盘动议', '', table + '| c | cfo·T3·待办·x | cfo | 无 |',
+      '| d | 无 | cfo | 无 |', '| e | cfo·T4·待办·y； | cfo | 无 |',
+    ].join('\n')
+    const rows: any = parseLabelsText(text)
+    expect(rows.map((row: any) => [row.id, row.kind])).toEqual([['a', 'synthetic'], ['c', 'real'], ['d', 'real'], ['e', 'real']])
+    expect(rows[2].tasks).toEqual([])
+    expect(rows[3].tasks).toEqual([{ role: 'cfo', task: 'T4', status: '待办' }])
+  })
+
   it('scoreLabels 覆盖 TP / 阻塞误报 / 待核实错类 / 取消与关闭零容忍 / 变体扩展键', () => {
     const rows = [
       {

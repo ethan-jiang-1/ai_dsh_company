@@ -1,6 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { headingSections } from '../../tools/lib/repo-markdown.mjs'
 import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
 
 // ── 基部零部署历史（base-clean，2026-11-01 v3）──────────────────────────────────
@@ -37,7 +38,9 @@ export function run({ root, ok, fail }) {
       if (/snapshots\/archive|deliverables-archive/.test(line)) problems.push(`${rel}:${String(index + 1)} 含归档引用`)
     }
     // 章程正文（历史纪要之前）不得出现部署个案语言；页脚“本部署的动议纪要…”是合法模板说明。
-    const body = readFileSync(path, 'utf8').split('\n## Historical minutes')[0]
+    const charterText = readFileSync(path, 'utf8')
+    const historyStart = headingSections(charterText, { depth: 2 }).find(sec => sec.title === 'Historical minutes')?.startLine
+    const body = historyStart === undefined ? charterText : charterText.split('\n').slice(0, historyStart - 1).join('\n')
     for (const [index, line] of body.split('\n').entries()) {
       for (const rule of CASE_LANGUAGE) {
         if (rule.re.test(line)) problems.push(`${rel}:${String(index + 1)} 含部署个案语言「${rule.name}」（出厂章程只写中性事实）`)

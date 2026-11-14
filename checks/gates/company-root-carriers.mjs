@@ -28,6 +28,11 @@ const LEADING_WS_TOKEN = String.raw`(?:\(\?:|\()?(?:\\s| |\\t|\[[^\]]+\])(?:[*+?
 const RAW_HEADING_SPLIT_RE = new RegExp(
   String.raw`^\^(?:${LEADING_WS_TOKEN}){0,3}\(?#(?:\{\d+(?:,\d*)?\}|\+|#(?:\s|\\s|\[|\^|\$|\)|#|[^#]))`,
 )
+/** 非 `^` 锚的裸节正则：`\n## `、`(?=^## )`、`(?<=\n)## `（字面量源文本里 `\n` 是反斜杠加 n）。 */
+const RAW_HEADING_ANYWHERE_RE = /(?:\\n|\(\?=\^|\(\?<=\\n)\(?#{1,6}(?:\\s| |\[|\))/
+/** 字符串形态的裸节判据：`'## x'` / `'\n## x'` / `'# '`（startsWith/split 的参数；URL 锚 `#` 与 includes/indexOf 存在性探测不在此列）。 */
+const RAW_HEADING_STRING_RE = /^\n?#{1,6} /
+const RAW_STRING_CALLS = new Set(['startsWith', 'split'])
 const RAW_FRONTMATTER_PREFIX_RE = /^(?:\uFEFF)?---\r?\n/
 const RAW_SCAN_SELF = 'checks/gates/company-root-carriers.mjs'
 
@@ -95,7 +100,7 @@ function scanRawParsingProblems(root, primitives) {
         const line = sf.getLineAndCharacterOfPosition(pos).line + 1
         if (RAW_FRONTMATTER_RE.test(pattern)) {
           problems.push(`${rel}:${String(line)} → 禁止手写裸 frontmatter 正则 /${pattern}/（改调 tools/lib/repo-markdown.mjs 的 parseFrontmatter）`)
-        } else if (RAW_HEADING_SPLIT_RE.test(pattern)) {
+        } else if (RAW_HEADING_SPLIT_RE.test(pattern) || RAW_HEADING_ANYWHERE_RE.test(pattern)) {
           problems.push(`${rel}:${String(line)} → 禁止手写裸 Markdown 节切分正则 /${pattern}/（改调 repo-markdown.mjs 或 markdown-shape-core.js）`)
         }
       }
@@ -109,11 +114,13 @@ function scanRawParsingProblems(root, primitives) {
           checkPattern(extractStringPattern(node.arguments?.[0]), node.getStart(sf))
         } else if (ts.isCallExpression(node)
           && ts.isPropertyAccessExpression(node.expression)
-          && node.expression.name.text === 'startsWith') {
+          && RAW_STRING_CALLS.has(node.expression.name.text)) {
           const prefix = extractStringPattern(node.arguments?.[0])
-          if (prefix !== undefined && RAW_FRONTMATTER_PREFIX_RE.test(prefix)) {
-            const line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1
+          const line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1
+          if (prefix !== undefined && node.expression.name.text === 'startsWith' && RAW_FRONTMATTER_PREFIX_RE.test(prefix)) {
             problems.push(`${rel}:${String(line)} → 禁止手写裸 frontmatter 前缀判据 .startsWith(${JSON.stringify(prefix)})（改调 tools/lib/repo-markdown.mjs 的 parseFrontmatter）`)
+          } else if (prefix !== undefined && RAW_HEADING_STRING_RE.test(prefix)) {
+            problems.push(`${rel}:${String(line)} → 禁止手写裸 Markdown 节判据 .${node.expression.name.text}(${JSON.stringify(prefix)})（改调 repo-markdown.mjs 的 headingSections）`)
           }
         }
         ts.forEachChild(node, visit)
