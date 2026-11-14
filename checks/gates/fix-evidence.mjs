@@ -63,9 +63,10 @@ function frontmatter(text) {
  * @returns {string | undefined} 节正文；缺节返回 undefined。
  */
 function section(text, heading) {
-  const start = text.indexOf(`## ${heading}`)
-  if (start === -1) return undefined
-  const rest = text.slice(start + heading.length + 3)
+  // 标题必须是行首的 `## <heading>`：卡面正文（状态行/说明）可能引用节名，indexOf 会命中文中引用。
+  const match = new RegExp(`^## ${heading}\\s*$`, 'm').exec(text)
+  if (match === null) return undefined
+  const rest = text.slice(match.index + match[0].length)
   const end = rest.search(/\n## /)
   return end === -1 ? rest : rest.slice(0, end)
 }
