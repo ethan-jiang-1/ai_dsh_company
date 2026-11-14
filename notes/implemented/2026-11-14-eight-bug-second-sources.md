@@ -11,9 +11,10 @@
 八张卡（BUG-152..159）不是八个独立补丁，而是四处**同一功能的两个载体各有一套解释**。每处先把事实源
 收成一处，再让所有载体消费它；不按症状各打一个补丁。
 
-1. **headings PRD 的文本形状层**（152/153/157）：解析器此前把原始字节当文档结构。现在
-   `packages/company-pack/src/lib/prd-check.ts` 有一个扫描层：入口 `normalizeDocument()`（去 BOM、
-   CRLF/lone-CR → LF）、`scanLines()` 维护围栏状态（三反引号 / 三波浪号，开合行本身也算围栏内），
+1. **headings PRD 的文本形状层**（152/153/157）：解析器此前把原始字节当文档结构。现在扫描层住在
+   `packages/company-pack/src/lib/markdown-shape.ts`（2026-11-14 后续抽出并与 `/req check` 共享；
+   见 [形状层 Note](2026-11-14-shape-layer-and-structure-semantics.md)）：入口 `normalizeDocument()`（去 BOM、
+   CRLF/lone-CR → LF）、`scanDocument()` 维护围栏状态（三反引号 / 三波浪号，开合行本身也算围栏内），
    AC 与 slice 各自维护 `seen` 集合。Slices 表、`### REQ-###` 定义块、REQ 字段行都只读这个层。
    为什么在入口归一化而不是给每个正则加 `\r?$`：一行 `(.*)$` 的 `.` 不匹配行终止符，标题行尾的 `\r`
    会让整条标题不命中；三个解析器各容错一次就是三处假设，入口归一只有一处。
@@ -57,7 +58,7 @@ hook 没有第二套范围语义，错误环没有第二套取文顺序**。
 | 项 | 内容 |
 |---|---|
 | 事实 | headings PRD 的结构只由「归一化后的非围栏行」决定；present 闸门与命令/工具同源；push 范围三形状；错误文本先字段后 JSON |
-| 唯一入口 | `lib/prd-check.ts`（扫描层）/ `lib/requirements-check.ts` 的 `numberingMarker` / `host/commands/prd-gate.ts` / `checks/pre-push-surfaces.mjs` / `client/wiring/error-ring.ts` |
+| 唯一入口 | `lib/markdown-shape.ts`（扫描层）、`lib/prd-check.ts`（PRD 判据）/ `lib/requirements-check.ts` 的 `numberingMarker` / `host/commands/prd-gate.ts` / `checks/pre-push-surfaces.mjs` / `client/wiring/error-ring.ts` |
 | 读载体 | `/prd check`、present 闸门、`/req check`；push hook；错误环与 cdp-probe |
 | 写载体 | 新增 PRD 解析、闸门判据、push 范围或错误取文时先改上述唯一入口，再改 spec |
 | 契约测试 | `tests/lib/prd-check.spec.ts`、`tests/lib/requirements-check.spec.ts`、`tests/host/commands/prd-gate.spec.ts`、`tests/host/contract/file-shape-agreement.spec.ts`、`tests/client/wiring/error-ring.spec.ts`、`tests/checks/pre-push-surfaces.test.mjs` |

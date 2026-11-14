@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-167：notes-tree 只匹配日期形状，不校验真实日历日期
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；notes-tree 声称日期前缀是 Note 地址的一部分。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9b-notes-date.mts`。
+> **关联**：[探索卡 Round 89](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；notes-tree 声称日期前缀是 Note 地址的一部分。
+> **留痕**：Note [2026-11-14-shape-layer-and-structure-semantics.md](../../../notes/implemented/2026-11-14-shape-layer-and-structure-semantics.md)（同轮八卡）；复现脚本 = `runtime/tmp/c9b-notes-date.mts`。
 
 ## 症状
 
@@ -58,4 +58,4 @@ node --import tsx/esm runtime/tmp/c9b-notes-date.mts
 ## 证据
 
 - `runtime/tmp/c9b-notes-date.mts` / `.log`：非法日期文件 `tree.problems: []`、`status.checked: 1`。
-- 代码：[notes-tree.mjs](../../checks/gates/notes-tree.mjs) 的 `NOTE_FILE` / `noteDate()` / `notesStatusProblems()`。
+- 代码：[notes-tree.mjs](../../../checks/gates/notes-tree.mjs) 的 `NOTE_FILE` / `noteDate()` / `notesStatusProblems()`。

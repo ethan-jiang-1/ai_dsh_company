@@ -16,7 +16,9 @@
    `README.md`/`AGENTS.md`；任何 `INDEX.md`、任何无日期文件名、任何深度 4 目录红。
 2. **状态行收紧**（并入同一门，前向生效 = 文件名日期 ≥ `2026-11-14`）：`状态：` 全文件恰好 1 行、在文件前
    12 行内；`implemented/` 与 `archived/` 的状态词须以 `implemented|已交付|已消化` 开头（**归档保留实现状态，
-   不改写成 archived**——位置是位置，状态是状态）；`proposed/` 只查唯一性（批准标记仍归 `proposals`）。
+   不改写成 archived**——位置是位置，状态是状态）；`proposed/` 只查唯一性（批准标记仍归 `proposals`）；
+   `rejected/` 的状态词须以 `rejected` 开头，文件名日期须是真实日历日期（2026-11-14 后续，
+   见 [形状层 Note](2026-11-14-shape-layer-and-structure-semantics.md)）。
 3. **两份载体**：`notes/implemented/AGENTS.md`（两条义务）与 `notes/archived/AGENTS.md`（一条禁令 + 链接路径
    例外），各 8 行，指回本层 README；同 diff 加两条 `DOC_LINE_BUDGETS`（9/9）。
 4. **义务句搬家**：`notes/implemented/README.md` 的「事实落点/决定冻结」改为指向 `AGENTS.md` 的一行——

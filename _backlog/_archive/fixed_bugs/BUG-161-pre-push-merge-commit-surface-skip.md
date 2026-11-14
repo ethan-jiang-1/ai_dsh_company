@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P1
 opened: 2026-11-14
 ---
 
 # BUG-161：pre-push 逐提交 diff-tree 漏 merge 提交的合并结果
 
-> 严重级别：P1（重要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P1（重要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-158 修了 zero-SHA 范围，但新分支逐提交 `diff-tree` 没有覆盖 merge 提交的合并结果。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9-merge-probe.sh`。
+> **关联**：[探索卡 Round 89](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-158 修了 zero-SHA 范围，但新分支逐提交 `diff-tree` 没有覆盖 merge 提交的合并结果。
+> **留痕**：Note [2026-11-14-shape-layer-and-structure-semantics.md](../../../notes/implemented/2026-11-14-shape-layer-and-structure-semantics.md)（同轮八卡）；复现脚本 = `runtime/tmp/c9-merge-probe.sh`。
 
 ## 症状
 
@@ -23,7 +23,7 @@ opened: 2026-11-14
 
 ## 根因（假设）
 
-[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs) 的 `pathsOfRef()` 把「每个提交的 `diff-tree`」当作完整变更集；merge 提交需要 `-m`（逐父）或 `--cc`/`git show --first-parent` 等形状，当前没有。
+[pre-push-surfaces.mjs](../../../checks/pre-push-surfaces.mjs) 的 `pathsOfRef()` 把「每个提交的 `diff-tree`」当作完整变更集；merge 提交需要 `-m`（逐父）或 `--cc`/`git show --first-parent` 等形状，当前没有。
 
 ## 复现
 
@@ -60,4 +60,4 @@ pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/asset-lan
 ## 证据
 
 - `runtime/tmp/c9-merge-probe.sh` / `runtime/tmp/c9-merge.log`：merge 结果含 client 文件，脚本未触发。
-- 代码：[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs) 的 `pathsOfRef()`。
+- 代码：[pre-push-surfaces.mjs](../../../checks/pre-push-surfaces.mjs) 的 `pathsOfRef()`。

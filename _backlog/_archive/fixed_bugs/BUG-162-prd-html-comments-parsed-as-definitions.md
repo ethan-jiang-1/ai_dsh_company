@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-162：PRD parser 不忽略 HTML 注释，注释里的示例仍成定义
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-153 修了围栏代码块，但另一类「非定义容器」HTML 注释仍未处理。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8b-html-comment.mts`。
+> **关联**：[探索卡 Round 89](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-153 修了围栏代码块，但另一类「非定义容器」HTML 注释仍未处理。
+> **留痕**：Note [2026-11-14-shape-layer-and-structure-semantics.md](../../../notes/implemented/2026-11-14-shape-layer-and-structure-semantics.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8b-html-comment.mts`。
 
 ## 症状
 
@@ -61,4 +61,4 @@ HTML 注释（单行、多行、行内）里的 ### REQ-999 / ## Slices 表 → 
 ## 证据
 
 - `runtime/tmp/c8b-html-comment.mts` / `.log`：注释块产生 `REQ-999` 的 9 条错误，`reqCount 2`。
-- 代码：[prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts) 的 `scanLines()` / `prdRequirementBlocks()`。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts) 的 `scanLines()` / `prdRequirementBlocks()`。

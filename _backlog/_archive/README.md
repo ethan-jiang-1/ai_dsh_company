@@ -19,6 +19,14 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-160（已修）](fixed_bugs/BUG-160-req-check-raw-text-bom-fence.md) | 已修：`/req check` 仍读原始文本（BOM 缺头、围栏幽灵 REQ）；与 `/prd check` 共用 `lib/markdown-shape.ts` | 2026-11-14 |
+| [BUG-161（已修）](fixed_bugs/BUG-161-pre-push-merge-commit-surface-skip.md) | 已修：merge 提交 `diff-tree` 无输出、合并结果的 surface 改动漏检；`commitPaths()` 改取第一父 diff | 2026-11-14 |
+| [BUG-162（已修）](fixed_bugs/BUG-162-prd-html-comments-parsed-as-definitions.md) | 已修：HTML 注释里的 REQ/Slices 当定义；`scanDocument` 增加注释状态并把片段移出行文本 | 2026-11-14 |
+| [BUG-163（已修）](fixed_bugs/BUG-163-notes-tree-rejected-status-unguarded.md) | 已修：notes-tree 状态行检查跳过 `rejected/`；纳入 lifecycle 并要求 `rejected` 状态词 | 2026-11-14 |
+| [BUG-164（已修）](fixed_bugs/BUG-164-req-in-multiple-slices.md) | 已修：同一 REQ 列进两个 slice 仍绿；`parsePrdSlices` 维护 `reqOwner` 并点名两处 | 2026-11-14 |
+| [BUG-165（已修）](fixed_bugs/BUG-165-slices-escaped-pipe.md) | 已修：Slices 表 `\|` 被当列分隔；`splitTableRow` 按未转义竖线切列并还原字面竖线 | 2026-11-14 |
+| [BUG-166（已修）](fixed_bugs/BUG-166-prd-changelog-format.md) | 已修：changeLog 假日期/空作者过门；校验真实日历日期与非空作者/变更 | 2026-11-14 |
+| [BUG-167（已修）](fixed_bugs/BUG-167-notes-tree-invalid-calendar-date.md) | 已修：notes-tree 只验日期形状；文件名日期做真实日历往返，生效比较用解析值 | 2026-11-14 |
 | [BUG-152（已修）](fixed_bugs/BUG-152-prd-headings-crlf-bom.md) | 已修：CRLF/BOM 的 headings PRD 被判「没有定义小节」；入口归一化（去 BOM、CRLF→LF），三编码同判 | 2026-11-14 |
 | [BUG-153（已修）](fixed_bugs/BUG-153-prd-headings-fenced-code-blocks.md) | 已修：围栏里的示例标题/Slices 表被当定义；`scanLines()` 维护围栏状态（三反引号/三波浪号），只有围栏外算结构 | 2026-11-14 |
 | [BUG-154（已修）](fixed_bugs/BUG-154-prd-gate-numbering-empty-value.md) | 已修：present 闸门把空值 `numbering:` 当旧动议放行；闸门改读 `numberingMarker()` 三态，与 `/req check` 同判 | 2026-11-14 |

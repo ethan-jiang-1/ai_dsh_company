@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-165：Slices 表不认 Markdown 转义竖线，合法单元格被拆成两列
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；Slices 表是 PRD 的 slice→REQ 归属面。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8b-more-shapes.mts`。
+> **关联**：[探索卡 Round 89](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；Slices 表是 PRD 的 slice→REQ 归属面。
+> **留痕**：Note [2026-11-14-shape-layer-and-structure-semantics.md](../../../notes/implemented/2026-11-14-shape-layer-and-structure-semantics.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8b-more-shapes.mts`。
 
 ## 症状
 
@@ -63,4 +63,4 @@ Goal / Requirements / Exit 三列里的 `\|` 都按字面竖线解析，不拆�
 ## 证据
 
 - `runtime/tmp/c8b-more-shapes.mts` / `.log`：`escaped pipe false [...]`。
-- 代码：[prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts) 的 `splitRow()`。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts) 的 `splitRow()`。

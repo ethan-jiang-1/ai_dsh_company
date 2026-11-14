@@ -4,6 +4,18 @@
 
 ## 修复流水（倒序）
 
+- **BUG-160..167**（2026-11-14，根因组 A–D，P1×1 + P2×7）：focus v2 修复后的回归扫（Round 89），
+  仍是「同一事实两个解释」——
+  **A** 文档文本形状层：[160](BUG-160-req-check-raw-text-bom-fence.md) `/req check` 与 `/prd check` 分叉、
+  [162](BUG-162-prd-html-comments-parsed-as-definitions.md) HTML 注释当定义 → 新 `lib/markdown-shape.ts` 共享；
+  **B** [161](BUG-161-pre-push-merge-commit-surface-skip.md) merge 提交漏检 → `commitPaths()` 第一父 diff；
+  **C** [164](BUG-164-req-in-multiple-slices.md) REQ 跨 slice、[165](BUG-165-slices-escaped-pipe.md) 转义竖线、
+  [166](BUG-166-prd-changelog-format.md) changeLog 日期/作者；
+  **D** [163](BUG-163-notes-tree-rejected-status-unguarded.md) rejected 生命周期漏检、
+  [167](BUG-167-notes-tree-invalid-calendar-date.md) 非法日历日期 → notes-tree 全覆盖。
+  每卡红→绿证据见卡内 `## 已修判定`；`pnpm test` 247 files / 2057 tests、`test:checks` 4 PASS、
+  `typecheck`/`lint`/`dup`/`verify` 全绿。详见 [形状层 Note](../../../notes/implemented/2026-11-14-shape-layer-and-structure-semantics.md)。
+
 - **BUG-152..159**（2026-11-14，根因组 A–D，P1×4 + P2×4）：exploratory Round 86（C8/C9/C10）八张卡，
   同一病根 = 同一功能的两个载体各有一套解释，修法都是先收成唯一事实源——
   **A** headings PRD 文本形状层：[152](BUG-152-prd-headings-crlf-bom.md) BOM/CRLF 归一化、

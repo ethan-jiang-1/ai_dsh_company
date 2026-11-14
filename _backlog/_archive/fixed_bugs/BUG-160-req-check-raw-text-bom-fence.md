@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-160：`/req check` 仍按原始文本解析：BOM 缺头、围栏示例成幽灵需求
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-152/153 修了 `prd-check` 的文本形状层，但 `/req check` 的 `parseHeader` / `headingDefinitions` 是另一套解析。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8b-reqcheck.mts`。
+> **关联**：[探索卡 Round 89](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-152/153 修了 `prd-check` 的文本形状层，但 `/req check` 的 `parseHeader` / `headingDefinitions` 是另一套解析。
+> **留痕**：Note [2026-11-14-shape-layer-and-structure-semantics.md](../../../notes/implemented/2026-11-14-shape-layer-and-structure-semantics.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8b-reqcheck.mts`。
 
 ## 症状
 
@@ -20,7 +20,7 @@ opened: 2026-11-14
 
 ## 根因（假设）
 
-- [requirements-check.ts](../../packages/company-pack/src/lib/requirements-check.ts) 的 `parseHeader()` 用 `/^---\r?\n/`，不剥 BOM；`headingDefinitions()` 用 `text.split('\n')` + `line.trim()`，没有围栏状态。
+- [requirements-check.ts](../../../packages/company-pack/src/lib/requirements-check.ts) 的 `parseHeader()` 用 `/^---\r?\n/`，不剥 BOM；`headingDefinitions()` 用 `text.split('\n')` + `line.trim()`，没有围栏状态。
 - `prd-check.ts` 的 `normalizeDocument()` / `scanLines()` 只服务 `/prd check`；两个命令各有一套「什么是文档结构」的解释，同一份文件在两边结果不同。
 
 ## 复现
@@ -55,4 +55,4 @@ BOM PRD        checkRequirements 不再报缺头/缺层；REQ 计数与 LF 版�
 ## 证据
 
 - `runtime/tmp/c8b-reqcheck.mts` / `.log`：BOM `REQ:1/AC:0`；围栏 `REQ:3` + 孤儿 REQ-999。
-- 代码：[requirements-check.ts](../../packages/company-pack/src/lib/requirements-check.ts)；对照 [prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts)。
+- 代码：[requirements-check.ts](../../../packages/company-pack/src/lib/requirements-check.ts)；对照 [prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts)。

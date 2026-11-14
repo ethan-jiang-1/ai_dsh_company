@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 8 张（2026-11-14 focus v3 回归；只报不修）**：见下方「## 2026-11-14 focus v3 探索（post-fix 回归）」。
+**活跃 0 张**：2026-11-14 focus v3 的 8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）」）。
 
 **上一轮收口**（2026-11-13 focus v2）：8 张已于 2026-11-14 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接」）。
 
@@ -18,10 +18,10 @@
 
 | 组 | 卡 | 一句话 | 级别 |
 |---|---|---|---|
-| A 文本形状层未共享 | [160](BUG-160-req-check-raw-text-bom-fence.md) | `/req check` 仍读原始文本：BOM 缺头、围栏示例成幽灵需求 | P2 |
-| B pre-push merge | [161](BUG-161-pre-push-merge-commit-surface-skip.md) | 逐提交 `diff-tree` 漏 merge 提交的合并结果 | P1 |
-| C PRD 结构容器/身份/格式 | [162](BUG-162-prd-html-comments-parsed-as-definitions.md) / [164](BUG-164-req-in-multiple-slices.md) / [165](BUG-165-slices-escaped-pipe.md) / [166](BUG-166-prd-changelog-format.md) | HTML 注释当定义；REQ 跨 slice 重复；转义竖线拆列；changeLog 日期/作者不校验 | P2 ×4 |
-| D notes-tree lifecycle/日期 | [163](BUG-163-notes-tree-rejected-status-unguarded.md) / [167](BUG-167-notes-tree-invalid-calendar-date.md) | `rejected/` 状态行被跳过；日期只验形状不验日历 | P2 ×2 |
+| A 文本形状层未共享 | [160](../_archive/fixed_bugs/BUG-160-req-check-raw-text-bom-fence.md) | `/req check` 仍读原始文本：BOM 缺头、围栏示例成幽灵需求 | P2 |
+| B pre-push merge | [161](../_archive/fixed_bugs/BUG-161-pre-push-merge-commit-surface-skip.md) | 逐提交 `diff-tree` 漏 merge 提交的合并结果 | P1 |
+| C PRD 结构容器/身份/格式 | [162](../_archive/fixed_bugs/BUG-162-prd-html-comments-parsed-as-definitions.md) / [164](../_archive/fixed_bugs/BUG-164-req-in-multiple-slices.md) / [165](../_archive/fixed_bugs/BUG-165-slices-escaped-pipe.md) / [166](../_archive/fixed_bugs/BUG-166-prd-changelog-format.md) | HTML 注释当定义；REQ 跨 slice 重复；转义竖线拆列；changeLog 日期/作者不校验 | P2 ×4 |
+| D notes-tree lifecycle/日期 | [163](../_archive/fixed_bugs/BUG-163-notes-tree-rejected-status-unguarded.md) / [167](../_archive/fixed_bugs/BUG-167-notes-tree-invalid-calendar-date.md) | `rejected/` 状态行被跳过；日期只验形状不验日历 | P2 ×2 |
 
 ## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）
 
@@ -33,16 +33,17 @@
 
 | 组 | 卡 | 同一根因 | 修法（唯一事实源） |
 |---|---|---|---|
-| **A 文档文本形状层** | [160](BUG-160-req-check-raw-text-bom-fence.md) / [162](BUG-162-prd-html-comments-parsed-as-definitions.md) | `/prd check` 与 `/req check` 各有一套行假设；`prd-check` 的围栏状态没覆盖 HTML 注释 | 新 `lib/markdown-shape.ts`（归一化 + 围栏 + HTML 注释），两个命令同读；注释片段从行文本移除而不是只加一个 bool |
-| **B push 范围** | [161](BUG-161-pre-push-merge-commit-surface-skip.md) | merge 提交在 `diff-tree` 下没有输出，逐提交取变更漏掉合并结果 | `commitPaths()` 对 merge 用 `git diff <first-parent> <sha>`；非 merge 不变 |
-| **C PRD 结构与字段** | [164](BUG-164-req-in-multiple-slices.md) / [165](BUG-165-slices-escaped-pipe.md) / [166](BUG-166-prd-changelog-format.md) | 归属/表格/字段解析只验形状不验语义：REQ 可跨 slice、`\|` 不识别、changeLog 只看分三段 | slice 解析维护 `reqOwner`；`splitRow` 扫描转义；changeLog 校验真实日历 + 非空作者/变更 |
-| **D notes-tree** | [163](BUG-163-notes-tree-rejected-status-unguarded.md) / [167](BUG-167-notes-tree-invalid-calendar-date.md) | 门禁声称覆盖全 lifecycle/全日期，实际漏 rejected 与日历语义 | lifecycle 循环含 `rejected` 并校验 `rejected` 状态词；日期做真实日历往返，生效比较用解析值 |
+| **A 文档文本形状层** | [160](../_archive/fixed_bugs/BUG-160-req-check-raw-text-bom-fence.md) / [162](../_archive/fixed_bugs/BUG-162-prd-html-comments-parsed-as-definitions.md) | `/prd check` 与 `/req check` 各有一套行假设；`prd-check` 的围栏状态没覆盖 HTML 注释 | 新 `lib/markdown-shape.ts`（归一化 + 围栏 + HTML 注释），两个命令同读；注释片段从行文本移除而不是只加一个 bool |
+| **B push 范围** | [161](../_archive/fixed_bugs/BUG-161-pre-push-merge-commit-surface-skip.md) | merge 提交在 `diff-tree` 下没有输出，逐提交取变更漏掉合并结果 | `commitPaths()` 对 merge 用 `git diff <first-parent> <sha>`；非 merge 不变 |
+| **C PRD 结构与字段** | [164](../_archive/fixed_bugs/BUG-164-req-in-multiple-slices.md) / [165](../_archive/fixed_bugs/BUG-165-slices-escaped-pipe.md) / [166](../_archive/fixed_bugs/BUG-166-prd-changelog-format.md) | 归属/表格/字段解析只验形状不验语义：REQ 可跨 slice、`\|` 不识别、changeLog 只看分三段 | slice 解析维护 `reqOwner`；`splitRow` 扫描转义；changeLog 校验真实日历 + 非空作者/变更 |
+| **D notes-tree** | [163](../_archive/fixed_bugs/BUG-163-notes-tree-rejected-status-unguarded.md) / [167](../_archive/fixed_bugs/BUG-167-notes-tree-invalid-calendar-date.md) | 门禁声称覆盖全 lifecycle/全日期，实际漏 rejected 与日历语义 | lifecycle 循环含 `rejected` 并校验 `rejected` 状态词；日期做真实日历往返，生效比较用解析值 |
 
 **次序 = B → A → C → D**：B 独立且 P1；A 先立共享扫描层（C 的三个解析器都改在同一文件，依赖它）；C 随后；
 D 是独立门禁面。
 
-**逐卡收口**：先写 `## 已修判定`（已随本轮翻转落卡）再翻 `修复就绪`；落树后翻 `已修`（归档同改）并记
-`审查：agent` + 红→绿证据；最后 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/) 并同步两张索引。
+**收口（2026-11-14）**：8 张卡全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent` + 红→绿证据齐、
+`## 已修判定` 落卡。`pnpm test` 247 files / 2057 tests、`pnpm test:checks` 4 PASS、
+`typecheck`/`lint`/`dup`/`verify` 全绿。证据与未覆盖轴 = [Note](../../notes/implemented/2026-11-14-shape-layer-and-structure-semantics.md)。
 
 
 **上一轮收口**（2026-11-13 第四轮）：BUG-147..149 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；

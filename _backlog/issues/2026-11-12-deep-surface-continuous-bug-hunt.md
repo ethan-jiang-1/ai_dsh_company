@@ -1574,11 +1574,11 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| `/req check` 仍按原始文本（BOM/围栏） | **confirmed** | [BUG-160](../bugs/BUG-160-req-check-raw-text-bom-fence.md)；BOM 缺头、围栏幽灵 REQ-999 |
-| HTML 注释不是定义容器 | **confirmed** | [BUG-162](../bugs/BUG-162-prd-html-comments-parsed-as-definitions.md)；注释里的 REQ/Slices 被解析 |
-| 一个 REQ 只能属于一个 slice | **confirmed（缺口）** | [BUG-164](../bugs/BUG-164-req-in-multiple-slices.md)；REQ-001 列进 S1+S2 仍 ok |
-| Slices 表认 Markdown 转义竖线 | **confirmed（缺口）** | [BUG-165](../bugs/BUG-165-slices-escaped-pipe.md)；Goal 里的竖线被拆列 |
-| changeLog 校验日期/作者形状 | **confirmed（缺口）** | [BUG-166](../bugs/BUG-166-prd-changelog-format.md)；`2026-13-99 · nobody · bad` 过门 |
+| `/req check` 仍按原始文本（BOM/围栏） | **confirmed** | [BUG-160](../_archive/fixed_bugs/BUG-160-req-check-raw-text-bom-fence.md)；BOM 缺头、围栏幽灵 REQ-999 |
+| HTML 注释不是定义容器 | **confirmed** | [BUG-162](../_archive/fixed_bugs/BUG-162-prd-html-comments-parsed-as-definitions.md)；注释里的 REQ/Slices 被解析 |
+| 一个 REQ 只能属于一个 slice | **confirmed（缺口）** | [BUG-164](../_archive/fixed_bugs/BUG-164-req-in-multiple-slices.md)；REQ-001 列进 S1+S2 仍 ok |
+| Slices 表认 Markdown 转义竖线 | **confirmed（缺口）** | [BUG-165](../_archive/fixed_bugs/BUG-165-slices-escaped-pipe.md)；Goal 里的竖线被拆列 |
+| changeLog 校验日期/作者形状 | **confirmed（缺口）** | [BUG-166](../_archive/fixed_bugs/BUG-166-prd-changelog-format.md)；`2026-13-99 · nobody · bad` 过门 |
 | CRLF/BOM/围栏/AC 重号（BUG-152/153/157） | **pass（修复后）** | 现有 spec + 探针绿；未复现旧缺陷 |
 
 **C9 post-fix 假设与判决：**
@@ -1586,9 +1586,9 @@ TypeError: Cannot read properties of undefined (reading 'map')
 | H | 判决 | 证据 / BUG |
 |---|---|---|
 | pre-push zero-SHA 覆盖整条出站集 | **pass（线性提交）** | BUG-158 修复 + `tests/checks/pre-push-surfaces.test.mjs` |
-| merge 提交的合并结果可见 | **confirmed（缺口）** | [BUG-161](../bugs/BUG-161-pre-push-merge-commit-surface-skip.md)；merge-only client 改动未触发 client-load |
-| notes-tree 检查全部 lifecycle | **confirmed（缺口）** | [BUG-163](../bugs/BUG-163-notes-tree-rejected-status-unguarded.md)；`rejected/` 状态行跳过 |
-| notes-tree 校验真实日历 | **confirmed（缺口）** | [BUG-167](../bugs/BUG-167-notes-tree-invalid-calendar-date.md)；`2026-99-99` 过门 |
+| merge 提交的合并结果可见 | **confirmed（缺口）** | [BUG-161](../_archive/fixed_bugs/BUG-161-pre-push-merge-commit-surface-skip.md)；merge-only client 改动未触发 client-load |
+| notes-tree 检查全部 lifecycle | **confirmed（缺口）** | [BUG-163](../_archive/fixed_bugs/BUG-163-notes-tree-rejected-status-unguarded.md)；`rejected/` 状态行跳过 |
+| notes-tree 校验真实日历 | **confirmed（缺口）** | [BUG-167](../_archive/fixed_bugs/BUG-167-notes-tree-invalid-calendar-date.md)；`2026-99-99` 过门 |
 | `SURFACE_RULES` 覆盖 host/PRD 改动 | **unverified / 观察** | 仍只收 client/presets/content；`pnpm test` 会跑 gate spec，但没有真 present 入口 |
 
 **本轮开卡：** BUG-160..167（8 张）。**未跑：** C8-H10 live present deny（仍 unverified）；C10 console/rejection；C2/C5/C7 残余真入口。**证据：** `runtime/tmp/c8b-*.mts`、`c9-merge-probe.sh`、`c9b-*.mts` 与对应 `.log`。

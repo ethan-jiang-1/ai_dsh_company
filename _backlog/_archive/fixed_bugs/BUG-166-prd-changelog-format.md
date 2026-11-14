@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-166：/prd check 不校验 changeLog 的日期/作者形状，非法日期也过门
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；`changeLog` 是状态离开 draft 的唯一留痕面。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8b-more-shapes.mts`。
+> **关联**：[探索卡 Round 89](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；`changeLog` 是状态离开 draft 的唯一留痕面。
+> **留痕**：Note [2026-11-14-shape-layer-and-structure-semantics.md](../../../notes/implemented/2026-11-14-shape-layer-and-structure-semantics.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8b-more-shapes.mts`。
 
 ## 症状
 
@@ -55,4 +55,4 @@ changeLog 日期非真实日历（2026-13-99 / 2026-02-29 非闰年）→ 红
 ## 证据
 
 - `runtime/tmp/c8b-more-shapes.mts` / `.log`：`bad changeLog true []`。
-- 代码：[prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts) 的 `readRequirementFields()` `changeLog` 分支。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts) 的 `readRequirementFields()` `changeLog` 分支。

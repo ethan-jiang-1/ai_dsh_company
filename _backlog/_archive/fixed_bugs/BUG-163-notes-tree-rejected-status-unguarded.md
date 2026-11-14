@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-163：notes-tree 状态行检查跳过 rejected/，负知识 Note 不受状态门约束
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；notes-tree 是 2026-11-14 新增门禁，声称「状态行唯一且与目录同轴」。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9b-notes-tree.mts`。
+> **关联**：[探索卡 Round 89](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；notes-tree 是 2026-11-14 新增门禁，声称「状态行唯一且与目录同轴」。
+> **留痕**：Note [2026-11-14-shape-layer-and-structure-semantics.md](../../../notes/implemented/2026-11-14-shape-layer-and-structure-semantics.md)（同轮八卡）；复现脚本 = `runtime/tmp/c9b-notes-tree.mts`。
 
 ## 症状
 
@@ -23,7 +23,7 @@ opened: 2026-11-14
 
 ## 根因（假设）
 
-`notesStatusProblems()` 的循环写死 `['proposed', 'implemented', 'archived']`；`LIFECYCLES` 含 `rejected`，状态行规则注释也说「全文件恰好 1 行」，但拒绝目录没有进入检查。[notes/README](../../notes/README.md) §一 明确 `rejected/` 的状态行读作 `rejected`。
+`notesStatusProblems()` 的循环写死 `['proposed', 'implemented', 'archived']`；`LIFECYCLES` 含 `rejected`，状态行规则注释也说「全文件恰好 1 行」，但拒绝目录没有进入检查。[notes/README](../../../notes/README.md) §一 明确 `rejected/` 的状态行读作 `rejected`。
 
 ## 复现
 
@@ -55,4 +55,4 @@ status.checked 计数包含 rejected 新写
 ## 证据
 
 - `runtime/tmp/c9b-notes-tree.mts` / `.log`：`rejected` 无状态行，`tree.problems: []`、`status.checked: 2`。
-- 代码：[notes-tree.mjs](../../checks/gates/notes-tree.mjs) 的 `notesStatusProblems()` 循环。
+- 代码：[notes-tree.mjs](../../../checks/gates/notes-tree.mjs) 的 `notesStatusProblems()` 循环。

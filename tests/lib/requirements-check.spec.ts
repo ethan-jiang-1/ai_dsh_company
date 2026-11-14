@@ -9,10 +9,9 @@
  *
  * 红配方：把任意一条断言里的 fixture 改回旧形状（重复定义/悬空/退役/孤儿/摘要表当定义）→ 转红。
  * 负例留证 2026-11-07：实现前本 spec 首跑 11 failed（模块不存在）；实现后全绿（见卡 `## 交付证据`）。
- *
- * 负例留证 2026-11-14：parseHeader 改回原始文本 → BOM 缺头用例红（BUG-160）
- * 负例留证 2026-11-14：headingDefinitions 改回 split('\n') → 围栏/注释幽灵 REQ 用例红（BUG-162）
  */
+// 负例留证 2026-11-14：parseHeader 改回原始文本 → BOM 缺头用例红（BUG-160）
+// 负例留证 2026-11-14：headingDefinitions 改回 split('\n') → 围栏/注释幽灵 REQ 用例红（BUG-162）
 import { describe, expect, it } from 'vitest'
 import {
   checkRequirements,
