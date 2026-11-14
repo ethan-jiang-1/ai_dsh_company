@@ -18,7 +18,7 @@ const ROOT = repositoryRoot
 const PILOT = 'packages/company-pack/presets/vp-sales/skills/customer-voice/SKILL.md'
 
 /** 待翻译的 preset skill（相对仓库根）；每翻完一个就删一行。 */
-const PENDING = new Set([
+const PENDING = new Set<string>([
 ])
 
 

@@ -2,8 +2,8 @@
  * Persona 英文单份棘轮（I1，keyless）。
  *
  * 只扫每个 preset 的 `prefix: |-` 人格块，不扫 YAML 注释/计划模式 section。
- * PENDING 之外的 persona 不得含中文；每翻一个就删一行，最终 PENDING 为空 = 硬门禁。
- * 当前 pilot = CFO；其余 10 个仍待翻。
+ * PENDING 之外的 persona 不得含中文；PENDING 为空 = 硬门禁。
+ * 当前 11 个 preset 的 persona 已全部翻成英文（PENDING 为空）。
  */
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -14,14 +14,15 @@ const ROOT = repositoryRoot
 const CJK = /[\u3400-\u9fff]/u
 const PRESETS = 'packages/company-pack/presets'
 const TRANSLATED = new Set(['cfo', 'coo', 'vp-sales', 'cmo', 'vp-eng', 'ceo', 'worker', 'worker-orchestrator', 'worker-researcher', 'quality-loop-producer', 'quality-loop-verifier'])
-const PENDING = new Set([])
+const PENDING = new Set<string>([])
 
 /** 取 `prefix: |-` 起的缩进块（到缩进回退为止）。 */
 function personaOf(text: string): string {
   const lines = text.split('\n')
   const start = lines.findIndex(line => /^\s+prefix:\s*\|-\s*$/.test(line))
   if (start === -1) return ''
-  const indent = /^\s*/.exec(lines[start])?.[0].length ?? 0
+  const first = lines[start] ?? ''
+  const indent = /^\s*/.exec(first)?.[0].length ?? 0
   const body: string[] = []
   for (const line of lines.slice(start + 1)) {
     if (line.trim() === '') { body.push(line); continue }

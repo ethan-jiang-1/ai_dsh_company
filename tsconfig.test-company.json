@@ -32,6 +32,7 @@
     "tests/host/**/*.ts",
     "tests/lib/**/*.ts",
     "tests/content/**/*.ts",
+    "tests/presets/**/*.ts",
     "tests/support/temp-env.ts",
     "tests/support/cultivation-harness.ts"
   ],

@@ -74,6 +74,12 @@ function sha256(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex')
 }
 
+// `--check`/`--verify`/`--stamp` 的下一步提示：三个调用点都在 artifactCheck() 之后，
+// 同版 tgz 必然在盘；正确动作是“提交 → bump → 填 CHANGELOG → prepare/verify”。
+function repackHint() {
+  return '提交当前改动 → `pnpm release --bump patch` → 填 CHANGELOG → `--prepare/--verify`（确要覆写同版用 `--prepare --force`）'
+}
+
 // vendor 是 release-smoke 的运行时前置，但它的构建物是 gitignored（不在 clean clone 里）。
 // 只记录 pack 源指纹无法回答“这次 7 项 pass 用的是哪次 vendor build”——把 HEAD、CLI 哈希和
 // mtime 写进 manifest；--check 对不上即红。mtime 不是源码指纹，但能让“重建过/没重建”可见。
@@ -250,7 +256,7 @@ function verify() {
   const artifact = artifactCheck()
   const prepared = readManifest()
   if (prepared.version !== pack().version) fail(`manifest 版本 ${prepared.version} ≠ package ${pack().version}；先 --prepare`)
-  if (prepared.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；先重跑 --prepare')
+  if (prepared.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；' + repackHint())
   if (!allowStaleManifest && prepared.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest 不是当前 HEAD 的 --prepare 产物；先重跑 --prepare（仅 test/docs 改动可显式 --allow-stale-manifest）')
   const commands = [
     ['verify', ['pnpm', ['verify'], false]],
@@ -287,7 +293,7 @@ function stamp() {
   const manifest = readManifest()
   assertVendor(manifest)
   if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
-  if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；先重跑 --prepare')
+  if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；' + repackHint())
   if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
   const checks = manifest.checks ?? {}
   const notPass = Object.entries(checks).filter(([, status]) => status !== 'pass')
@@ -305,7 +311,7 @@ function check(allowDirtyTree = allowDirty) {
   const manifest = readManifest()
   assertVendor(manifest)
   if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
-  if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；先重跑 --prepare')
+  if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；' + repackHint())
   if (manifest.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest gitSha 不是当前 HEAD（发布后被改过？只提交 docs/receipt 时用 --stamp；重建产物才用 --prepare/--verify）')
   if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
   if (manifest.dirty !== false) fail('manifest 记录的是脏树（发布字节不对应一个干净 commit；重跑 --verify）')

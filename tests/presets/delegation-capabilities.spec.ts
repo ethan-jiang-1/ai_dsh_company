@@ -11,12 +11,27 @@ import {
   DELEGATION_CAPABILITIES, delegationCapabilitiesOf,
 } from '../../packages/company-pack/src/lib/delegation-capabilities.ts'
 
+interface CompositionSpec {
+  readonly channels: readonly string[]
+  readonly workflow: boolean
+  readonly depthRows: Record<string, number | 'default'>
+}
+interface RuntimeCapability {
+  readonly spawn: boolean
+  readonly fork: boolean
+  readonly workflow: boolean
+  readonly retry: boolean
+  readonly childDepth: number
+}
+const COMPOSITIONS_BY_ID = COMPOSITIONS as unknown as Record<string, CompositionSpec>
+const CAPABILITIES_BY_ID = DELEGATION_CAPABILITIES as unknown as Record<string, RuntimeCapability>
+
 describe('delegation runtime capabilities parity', () => {
   it('每个 preset 的 spawn/fork/workflow/retry 与模型一致', () => {
-    const retry = retrySurface().presets
+    const retry = retrySurface().presets as Record<string, number | undefined>
     for (const id of PRESET_IDS) {
-      const spec = COMPOSITIONS[id]
-      const observed = DELEGATION_CAPABILITIES[id]
+      const spec = COMPOSITIONS_BY_ID[id]!
+      const observed = CAPABILITIES_BY_ID[id]
       expect(observed, `${id}: 运行时表缺 preset`).toBeDefined()
       expect(observed?.spawn, `${id}: spawn`).toBe(spec.channels.includes('spawn'))
       expect(observed?.fork, `${id}: fork`).toBe(spec.channels.includes('fork'))

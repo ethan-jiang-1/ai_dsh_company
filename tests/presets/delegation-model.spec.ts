@@ -28,6 +28,25 @@ const PACKAGE = JSON.parse(readFileSync(join(ROOT, 'packages/company-pack/packag
 }
 const PATCH = PACKAGE.dsh?.bundle?.patch ?? []
 
+interface CompositionSpec {
+  readonly workerProfile: string | null
+  readonly targetWorkerProfile: string | null
+  readonly allowedWorkerProfiles?: readonly string[]
+  readonly channels: readonly string[]
+  readonly control: boolean
+  readonly workflow: boolean
+  readonly archetype: string
+  readonly contracts: readonly string[]
+}
+interface ContractSpec {
+  readonly status: string
+  readonly carrierPath?: string
+  readonly mergedInto?: string
+  readonly scopeChannels: readonly string[]
+}
+const COMPOSITION_TABLE = COMPOSITIONS as unknown as Record<string, CompositionSpec>
+const CONTRACT_TABLE = CONTRACTS as unknown as Record<string, ContractSpec>
+
 describe('delegation model：唯一期望源', () => {
   it('模型内部一致（通道/合同/worker profile/组合引用都能解析）', () => {
     expect(modelProblems()).toEqual([])
@@ -79,11 +98,11 @@ describe('delegation model：唯一期望源', () => {
   })
 
   it('worker 铺开目标：vp-eng 已钉 leaf，其余 full role 记 target；CEO 不直接钉 worker', () => {
-    expect(COMPOSITIONS['vp-eng'].workerProfile).toBe('worker')
-    expect(COMPOSITIONS['vp-eng'].allowedWorkerProfiles).toEqual(['worker', 'worker-orchestrator'])
+    expect(COMPOSITION_TABLE['vp-eng']!.workerProfile).toBe('worker')
+    expect(COMPOSITION_TABLE['vp-eng']!.allowedWorkerProfiles).toEqual(['worker', 'worker-orchestrator'])
     for (const id of ['vp-sales', 'coo', 'cfo', 'cmo']) {
-      expect(COMPOSITIONS[id].workerProfile, `${id} 不该先铺开`).toBeNull()
-      expect(COMPOSITIONS[id].targetWorkerProfile, `${id} 缺目标`).toBe('worker')
+      expect(COMPOSITION_TABLE[id]!.workerProfile, `${id} 不该先铺开`).toBeNull()
+      expect(COMPOSITION_TABLE[id]!.targetWorkerProfile, `${id} 缺目标`).toBe('worker')
     }
     expect(COMPOSITIONS.ceo.workerProfile).toBeNull()
     expect(COMPOSITIONS.ceo.targetWorkerProfile).toBeNull()
@@ -113,14 +132,19 @@ describe('delegation model：唯一期望源', () => {
     expect(CONTRACTS['engine.workflow'].status).toBe('delivered')
     expect(CONTRACTS['engine.subagent'].status).toBe('merged')
     expect(CONTRACTS['engine.subagent'].mergedInto).toBe('policy.delegation')
-    for (const [id, contract] of Object.entries(CONTRACTS)) {
+    for (const [id, contract] of Object.entries(CONTRACT_TABLE)) {
       expect(['delivered', 'merged', 'planned'], `${id} 状态词`).toContain(contract.status)
       if (contract.status === 'delivered') {
         expect(typeof contract.carrierPath, `${id} 缺 carrierPath`).toBe('string')
-        expect(existsSync(join(ROOT, contract.carrierPath)), `${id} carrierPath 不存在`).toBe(true)
+        const carrierPath = contract.carrierPath
+        if (typeof carrierPath === 'string') {
+          expect(existsSync(join(ROOT, carrierPath)), `${id} carrierPath 不存在`).toBe(true)
+        }
       }
       if (contract.status === 'merged') {
-        expect(CONTRACTS[contract.mergedInto], `${id} mergedInto 指向未知合同`).toBeDefined()
+        const mergedInto = contract.mergedInto
+        expect(mergedInto, `${id} 缺 mergedInto`).toBeDefined()
+        if (mergedInto !== undefined) expect(CONTRACT_TABLE[mergedInto], `${id} mergedInto 指向未知合同`).toBeDefined()
       }
     }
   })
@@ -146,9 +170,9 @@ describe('delegation model：唯一期望源', () => {
     expect(COMPOSITIONS.ceo.channels).not.toContain('fork')
     expect(COMPOSITIONS['vp-eng'].workflow).toBe(true)
     for (const id of ['worker-researcher', 'worker']) {
-      expect(COMPOSITIONS[id].channels).toEqual([])
-      expect(COMPOSITIONS[id].control).toBe(false)
-      expect(COMPOSITIONS[id].workflow).toBe(false)
+      expect(COMPOSITION_TABLE[id]!.channels).toEqual([])
+      expect(COMPOSITION_TABLE[id]!.control).toBe(false)
+      expect(COMPOSITION_TABLE[id]!.workflow).toBe(false)
     }
   })
 })

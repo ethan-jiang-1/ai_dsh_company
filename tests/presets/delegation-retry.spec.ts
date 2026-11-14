@@ -10,6 +10,12 @@ import {
   subagentRetryDecision,
 } from '../../packages/company-pack/src/lib/retry-policy.ts'
 
+interface CompositionSpec {
+  readonly archetype: string
+  readonly depthRows: Record<string, number | 'default'>
+}
+const COMPOSITION_TABLE = COMPOSITIONS as unknown as Record<string, CompositionSpec>
+
 describe('subagent_retry 注册面：模型是唯一期望源，pack 运行时表同源（BUG-049/045）', () => {
   it('注册 preset 与逐 preset 深度 = 模型的 retrySurface()（从 depthRows.subagent 派生）', () => {
     const expected = retrySurface()
@@ -20,11 +26,16 @@ describe('subagent_retry 注册面：模型是唯一期望源，pack 运行时�
 
   it('深度不另立一份预算：每个注册 preset 的预算 = 该 preset 通用 subagent 行的 maxDepth', () => {
     for (const [preset, depth] of Object.entries(SUBAGENT_RETRY_SURFACE.presets)) {
-      expect(COMPOSITIONS[preset].depthRows.subagent, preset).toBe(depth)
+      const spec = COMPOSITION_TABLE[preset]
+      expect(spec, preset).toBeDefined()
+      if (spec === undefined) continue
+      expect(spec.depthRows.subagent, preset).toBe(depth)
     }
     // 注册面 = full role 且有通用 subagent 行；CEO（lead）与 worker family 一律不注册。
     for (const preset of PRESET_IDS) {
-      const spec = COMPOSITIONS[preset]
+      const spec = COMPOSITION_TABLE[preset]
+      expect(spec, preset).toBeDefined()
+      if (spec === undefined) continue
       const registered = spec.archetype === 'full' && typeof spec.depthRows.subagent === 'number'
       if (!registered) expect(SUBAGENT_RETRY_SURFACE.presets, preset).not.toHaveProperty(preset)
     }

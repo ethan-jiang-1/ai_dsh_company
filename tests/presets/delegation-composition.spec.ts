@@ -13,6 +13,20 @@ const TOOL_SUBAGENT_CONTROL = '@deepseek-ai/dsh-tool-subagent-control'
 const TOOL_WORKFLOW = '@deepseek-ai/dsh-tool-workflow'
 const WORKFLOW_PTC = '@deepseek-ai/dsh-workflow-ptc'
 
+interface CompositionSpec {
+  readonly channels: readonly string[]
+  readonly genericSpawn: boolean
+  readonly workerProfile: string | null
+  readonly namedDelegates: readonly string[]
+  readonly namedProfiles?: Record<string, string>
+  readonly depthRows: Record<string, number | 'default'>
+  readonly control: boolean
+  readonly workflow: boolean
+  readonly archetype: string
+  readonly teamLeadWhenRoot: boolean
+}
+const COMPOSITION_TABLE = COMPOSITIONS as unknown as Record<string, CompositionSpec>
+
 interface Derived {
   readonly channels: string[]
   readonly genericSpawn: boolean
@@ -26,7 +40,7 @@ interface Derived {
 
 /** 从真实 YAML 推导组合面；模型是期望，这里是观测。 */
 function derive(id: string): Derived {
-  const spec = COMPOSITIONS[id]
+  const spec = COMPOSITION_TABLE[id]!
   const rows = allRows(loadPresetDoc(id))
   const subagentRows = rows.filter(row => row.name === TOOL_SUBAGENT)
   const spawnRows = subagentRows.filter(row => pluginConfig(row).provider === 'spawn')
@@ -65,7 +79,7 @@ function derive(id: string): Derived {
 describe('delegation composition：YAML 是模型的投影', () => {
   for (const id of PRESET_IDS) {
     it(`${id}：通道/worker/命名委托/深度/控制/workflow 与模型一致`, () => {
-      const spec = COMPOSITIONS[id]
+      const spec = COMPOSITION_TABLE[id]!
       const observed = derive(id)
       expect(observed.channels).toEqual(spec.channels)
       expect(observed.genericSpawn).toBe(spec.genericSpawn)
@@ -80,7 +94,7 @@ describe('delegation composition：YAML 是模型的投影', () => {
 
   it('archetype 形状：lead/full/worker 各自不越界', () => {
     for (const id of PRESET_IDS) {
-      const spec = COMPOSITIONS[id]
+      const spec = COMPOSITION_TABLE[id]!
       const observed = derive(id)
       if (spec.archetype === 'lead') {
         expect(observed.genericSpawn, `${id}: lead 不该有通用 subagent`).toBe(false)

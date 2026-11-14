@@ -146,9 +146,9 @@
 | 041 | 2026-11-08 | tests/host/delegation/delegation-control.spec.ts:359 |
 | 045 | 2026-11-09 | tests/host/delegation/subagent-retry.spec.ts:113 |
 | 046 | 2026-11-09 | tests/host/delegation/delegation-control.spec.ts:391 |
-| 047 | 2026-11-09 | tests/host/prompt/handbook.spec.ts:136；tests/presets/delegation-model.spec.ts:67 |
-| 049 | 2026-11-09 | tests/presets/delegation-model.spec.ts:111；tests/presets/delegation-retry.spec.ts:13 |
-| 051 | 2026-11-09 | tests/presets/delegation-composition.spec.ts:177；tests/presets/delegation-model.spec.ts:74 |
+| 047 | 2026-11-09 | tests/host/prompt/handbook.spec.ts:136；tests/presets/delegation-model.spec.ts:86 |
+| 049 | 2026-11-09 | tests/presets/delegation-model.spec.ts:130；tests/presets/delegation-retry.spec.ts:19 |
+| 051 | 2026-11-09 | tests/presets/delegation-composition.spec.ts:191；tests/presets/delegation-model.spec.ts:93 |
 | 052 | 2026-11-09 | tests/evidence/surface-matrix.spec.ts:89；tests/host/delegation/delegation-control.spec.ts:118 |
 | 053 | 2026-11-09 | tests/host/delegation/subagent-retry.spec.ts:216 |
 | 054 | 2026-11-10 | tests/tools/kb-seeds.spec.ts:53 |

@@ -21,7 +21,8 @@ const MODES = ['productized', 'project-services', 'managed-service'] as const
 const ROLES = ['cfo', 'coo', 'vp-sales'] as const
 const WORKFLOWS = { cfo: 'cfo-workflow', coo: 'ops-workflow', 'vp-sales': 'sales-workflow' } as const
 
-const METHODS = {
+type Role = typeof ROLES[number]
+const METHODS: Record<typeof MODES[number], Partial<Record<Role, string>>> = {
   'project-services': {
     cfo: 'project-economics',
     coo: 'ops-feasibility',
@@ -33,7 +34,7 @@ const METHODS = {
     'vp-sales': 'managed-service-pricing',
   },
   productized: {},
-} as const
+}
 
 function contractOf(text: string): { type: string; mode: string } | null {
   const block = text.split('\n').filter(line => line.startsWith('>')).join(' ')

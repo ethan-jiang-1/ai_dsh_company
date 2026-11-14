@@ -64,6 +64,6 @@
 
 - 不默认全量：本地按 §2 选最小证据；CI = 结构门禁 + 干净环境差异；pre-push hook = verify + typecheck + lint + dup + smoke:fast + 按面真入口 + **test:coverage + 覆盖率棘轮**（typecheck 面见 2026-11-03 D5 Note；lane 与按面规则唯一家 = `tools/lib/asset-lanes.mjs`）。
 - **执行下限** = 关键模块阈值（[`vitest.config.ts`](../vitest.config.ts) `coverage.thresholds`）+ **全量棘轮** `tests/support/coverage-baseline.json`（只升不降；新文件 80/70 下限；<50% 的已知空洞必须豁免并写移除条件）；`pnpm coverage:ratchet` 验，低于即红。失败类决策表 = [tests/failure-classes.md](../tests/failure-classes.md)。
-- **tests 的类型面（已知未覆盖面）**：四个 `tsconfig.test-*` 覆盖 213/244 spec；未接 31 = `tests/presets` 13 + `tests/contract` 5（直引 vendor 源）+ `pack-exports` 1 + client 4 + host 8（后两类在各 tsconfig 的 `exclude`；清单以配置为准）。
+- **tests 的类型面（已知未覆盖面）**：三个 `tsconfig.test-*` 覆盖 226/244 spec；未接 18 = `tests/contract` 5（直引 vendor 源）+ `pack-exports` 1 + client 4 + host 8（四类都在各 tsconfig 的 `exclude`；清单以配置为准）。
 - **自测轮**（全门禁 sweep + UX 走查 + entry-probe 语义探针）：agent 阶段收口时提案、用户批后跑（2026-10-04 定）；预算按 [policy §P3](./policy.md) 轻任务纪律。
 - **已知未覆盖面（明说不覆盖）**：多人交互/协作 UX 面——4 个常驻真模型判据探针（dual-ceo / task-discovery / claim-race / dual-signoff，触发见头注），历史 BUG-002..006 台账见 [_fixed_bugs](../_backlog/_archive/fixed_bugs/)；机制面 E1/E2 与 `fs-guard-probe` 不变。

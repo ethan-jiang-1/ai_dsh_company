@@ -11,6 +11,8 @@
 3. **加一条防漂移 spec，不加门禁。** [navigation-assets.spec.ts](../../tests/repo/navigation-assets.spec.ts) 增「AGENTS 命令表路径」：只扫 `## 命令表` 的 sh 围栏，把 `tests/{a,b}` 花括号展开后逐成员对盘。红证两次：真实旧分区名 tests/company（1 failed / 7 passed）；盲审后又以真实 AGENTS 临时插入 `tests/{host,missing}` 复证花括号成员会红（1 failed / 7 passed，还原即绿）。选 spec 不选 gate：单次复发证据 + 门禁总数受只降不升硬顶；navigation-assets 本就是导航资产 owner。
 4. **交接物边界写进根 README。** 根 [README.md](../../README.md) 明说：本仓库是维护者源码 handoff，不产出可安装 tarball；收件人两件套由 `pnpm release --prepare` 生成；[安装手册](../../_dist/安装手册.md)与最新导出版同版本，HEAD 未导出的改动以 README / [pack README](../../packages/company-pack/README.md) 为准；维护者首跑含 vendor 构建（分钟级），与收件人 5 分钟安装是两条路。inject 边数不再写死（条数以 `package.json` 为准）。
 5. **干净 clone 验收暴露的死指针收口。** 在 `/tmp` 做真 clean clone（`git clone --no-hardlinks` + submodule + `pnpm install` + vendor install + `bundle:init` + `pnpm run setup`）：`pnpm verify` 首跑 **5 FAIL**，全是 tests/harness（已退役）死指针——[testing.md](../../docs/testing.md) 与旧 Note [test-asset-naming](./2026-11-13-test-asset-naming.md) 把它当活指针；暖树没红是因为本地留了空目录 tests/harness/（git 不跟踪空目录，clean clone 没有）。修：testing / dev-loop 的现行目录清单更新到 `tests/{host,lib,content}` 与 `tests/{repo,contract,tools,session,evidence,ui}`；旧 Note 的历史名改为非反引号叙述；删空目录。clean clone 重跑 verify 红→绿。
+6. **tests/presets 纳入类型面（2026-11-15 追补）。** 把 `tests/presets/**/*.ts` 加进 `tsconfig.test-company.json` 后首跑暴露 **24 个类型错误**（8 个 spec：字面对象按 string 索引、`Set<never>`、可能 undefined 的数组下标/捕获组）；逐文件加类型表与非空断言/守卫，不改测试语义。覆盖从 213→**226/244**；未接 18 = contract 5 + pack-exports 1 + client 4 + host 8。AGENTS / tests README / testing / dev-loop 四处数字同步。
+7. **生成物随行号漂移 + 配置计数纠偏。** 类型修让 delegation spec 行号下移，`tests/BUG-COVERAGE.generated.md` 必须 `node tools/bug-coverage.mjs --write` 重生成（204 行），否则 `tests/repo/bug-coverage.spec.ts` 逐字比对红。另把四份文档里的「四个 tsconfig.test-*」改为盘上实数**三个**，并修 tests/README 的两处旧枚举。
 
 ## 输掉的方案
 
@@ -47,7 +49,9 @@
 | 防漂移 spec | 花括号红证：AGENTS 临时插入 tests/{host,missing} → **1 failed / 7 passed**；还原 → **8 passed**；旧分区名红证 → 8 passed | 真文件，还原后 `git diff` 空 |
 | 独立盲审 | 只读子代理审两提交：**2 blocker**（spec 花括号失明 / typecheck 覆盖面多处文档过宽）全部回修；建议 9 条收 8 条（未收 = _backlog 历史结案叙述不改） | 输入 = 提交 diff + 盘面；不含外部 WIP |
 | 干净 clone | `git clone --no-hardlinks` + submodule + `pnpm install` + vendor install + `bundle:init` + `pnpm run setup` → 构建成功；verify 红→绿；test 绿 | `/tmp` 独立树，不碰工作区 |
-| 类型 | `pnpm typecheck` → exit 0 | 改前 / 改后各一次 |
+| 类型 | `pnpm typecheck` → exit 0（含新纳入的 tests/presets 13 spec） | 改前 / 改后各一次；新增覆盖抓到 24 个类型错误并修 |
+| presets 类型面 | 加 `tests/presets` 后首跑 **24 errors / 8 files**；修 typings 后 exit 0；`pnpm test tests/presets` **13 files / 138 tests passed** | 类型断言不改测试语义；lint 0 |
+| 生成物 | 行号漂移后 `node tools/bug-coverage.mjs --write` → **204 行**；`pnpm test tests/repo/bug-coverage.spec.ts` 绿（逐字比对） | 不重生成时该 spec 必红 |
 | 源码面 | `pnpm lint` 0 warnings / 0 errors；`pnpm dup` 0 clones | 注释与 tsconfig 改动 |
 | 真挂载 | `node checks/lanes/preset.entry.mjs` → **preset-smoke: ALL PASS**（11 preset 逐个 session/create、skills 隔离、client 闭包） | 真 company profile，不是 roster 扫描 |
 | 真页面 | `node checks/lanes/client-load.entry.mjs` → **ALL PASS**（零挂载失败 / 零 loader 错误 / 品牌槽在场） | 真浏览器 |
