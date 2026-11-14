@@ -1,15 +1,15 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-14
 ---
 
 # 推敲：测试治理制度棘轮——从“加脚本贴膏药”升级为宪章 × 流程 × 元门禁
 
-> 立卡：2026-11-14 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-14 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 8 轮独立只读子代理盲审，末轮（第 8 轮）BLOCKER 0 / SUGGESTION 0；每轮发现与处置的唯一家 = [落地 Note §验证「盲审记录」](../../../notes/implemented/2026-11-14-institutional-test-ratchet.md)
 >
-> **结论/去向**：note — `计划:notes/implemented/2026-11-14-institutional-test-ratchet.md`
+> **结论/去向**：note — [2026-11-14-institutional-test-ratchet](../../../notes/implemented/2026-11-14-institutional-test-ratchet.md)
 
-**问题与期望结果：** 首轮归档卡 [2026-11-14-test-asset-leverage](../_archive/settled_issues/2026-11-14-test-asset-leverage.md)（按章程已结卡不重开，立本卡承接）虽然准确指出了“上一轮只改了 legibility 没改 leverage、新门禁自己成了 bug 面”，但在落地的 9 个提交里又滑回了“加几个外围脚本 + 搭象征性骨架 + 自查打勾结案”的老路。本卡要从**宪章条款、收尾权力分立、源头元门禁**三层建立不可绕过的制度棘轮，并一次性清掉首轮遗留的 4 个实测活漏洞与探针未分类负债，让后续探索轮在已收口三域（Markdown 形状、门禁读卡/命令解析、公司盘路径与交付闸门）复发率为 **0**，且门禁总数与活跃探针总数进入**只降不升**轨道。
+**问题与期望结果：** 首轮归档卡 [2026-11-14-test-asset-leverage](./2026-11-14-test-asset-leverage.md)（按章程已结卡不重开，立本卡承接）虽然准确指出了“上一轮只改了 legibility 没改 leverage、新门禁自己成了 bug 面”，但在落地的 9 个提交里又滑回了“加几个外围脚本 + 搭象征性骨架 + 自查打勾结案”的老路。本卡要从**宪章条款、收尾权力分立、源头元门禁**三层建立不可绕过的制度棘轮，并一次性清掉首轮遗留的 4 个实测活漏洞与探针未分类负债，让后续探索轮在已收口三域（Markdown 形状、门禁读卡/命令解析、公司盘路径与交付闸门）复发率为 **0**，且门禁总数与活跃探针总数进入**只降不升**轨道。
 
 **当前情况：** 二阶实测审计（完整复现与全仓底数见 [二阶深挖材料](../research/test-asset-spiral/2026-11-14-leverage-postmortem-and-institutional-ratchet.md)，题名页 = [test-asset-spiral](../research/test-asset-spiral/README.md)）在干净 `HEAD`（`95d05326`）上证实了 6 处结构性缩水与 4 个当场复现的问题：
 1. **核心内部仍藏两套分叉状态机**：`packages/company-pack/src/lib/markdown-shape-core.js` 内 `sectionRange` 与 `scanDocumentDetailed` 对跨行反引号内标题、同行注释后标题结论相反；而 `tests/support/doc-grammar.ts`（仅 38 行固定模板）不生成这些语法，替实现掩盖了分叉。
@@ -19,7 +19,7 @@ opened: 2026-11-14
 
 **未决问题：** 无阻塞性未知事实（全仓解析器、75 门禁、67 探针及 `doc-budget` 行数余量均已实测摸清）。唯一需注意的执行约束：门禁总数实行**不净增硬顶（≤ 75）**——新增“禁裸解析”检查须并入既有门禁或通过合并重叠门禁腾出槽位。
 
-**下一步：** 等用户审阅本卡后，通过 `/goal`（或明确实施指令）按 W1→W4 切片顺序推动系统面落地；收尾时必须真跑一次独立只读子代理盲审作为新流程首验。
+**下一步：** 已按 `/goal` 完成 W1→W4；归档判定 = 机械门禁全绿 + 第 8 轮独立盲审 BLOCKER 0，归档（轮次与结论见 Note §验证「盲审记录」）。
 
 ---
 
@@ -27,7 +27,7 @@ opened: 2026-11-14
 
 **做（四块硬切片，不加凑数脚本）：**
 - **W1 宪章与流程硬化**：升级 `docs/testing.md`（单原语铁律 + 共享层缺陷必须交独立真值差分/全通道矩阵）、`docs/policy.md`（§P2 门禁与探针封顶 + §P5 非平凡变更废除作者自查、强制独立只读子代理盲审），以及 `.agents/skills/close-out-definition/SKILL.md`、`.agents/skills/gate-change-definition/SKILL.md`、`.agents/skills/agent-note-definition/SKILL.md`、`_backlog/README.md`、`notes/README.md`；
-- **W2 单原语垄断与静态禁裸解析**：抽出 `新建:tools/lib/repo-markdown.mjs`（封装 `vendor/dsh` 现成的 `mdast` GFM AST + `js-yaml`，零新依赖），收口 `fix-evidence` / `notes-liveness` / `proposals` / `notes-axes` / `notes-tree` / `release-ready` / `backlog-liveness` / `quality-loop` 的节/头/状态行读取；消除 `markdown-shape-core.js` 内部 `sectionRange` 第二状态机（统一从 `scanDocumentDetailed` 结构行派生）；在结构门禁中加上**禁裸解析规则**（门禁总数保持 **≤ 75**）；
+- **W2 单原语垄断与静态禁裸解析**：抽出 `tools/lib/repo-markdown.mjs`（封装 `vendor/dsh` 现成的 `mdast` GFM AST + `js-yaml`，零新依赖），收口 `fix-evidence` / `notes-liveness` / `proposals` / `notes-axes` / `notes-tree` / `release-ready` / `backlog-liveness` / `quality-loop` 的节/头/状态行读取；消除 `markdown-shape-core.js` 内部 `sectionRange` 第二状态机（统一从 `scanDocumentDetailed` 结构行派生）；在结构门禁中加上**禁裸解析规则**（门禁总数保持 **≤ 75**）；
 - **W3 真语法生成器 + `mdast` 独立真值差分 + 4 消费者契约 + 路径读写闸门同判据**：重写 `tests/support/doc-grammar.ts` 覆盖全语法轴，以 `mdast` 为独立参考真值校验 `markdown-shape-core`；补齐 `prd-check / requirements-check / prd-gate / 读卡原语` 4 消费者同语料差分；修 `prd-gate.ts` 分隔符绕过与 `company-root.ts` 中间段 `lstat` 顺序/尾部 `..` 边界，建立读写目录闸门同判据矩阵；
 - **W4 门禁分支级变异 + `notes-axes` 落盘锚点 + 资产负债棘轮与探针实减**：把 `notes-axes` 收紧为强制四分类前缀 + 校验 `→` 右侧盘上真实锚点（覆盖 `implemented/` 与前向 `archived/`，生效日调至 `2026-11-14` 并修齐前序 Note）；扩充 `tests/checks/gate-mutation.test.mjs` 至核心门禁多分支与 `fix-evidence` 浅克隆跳过分支，并接入 `checks/lanes/generative.e2e.mjs`；修 `tools/lib/asset-consumers.mjs` 自动 lane 口径与 `fast-lane.mjs` / `asset-lanes.mjs` 散文漂移，抽纯 `collaboration-probe-verdict` 判据，合并/归档首批同族重复探针，清零探针 `未分类` 并在 `tests/repo/test-census.spec.ts` 钉死**门禁数与探针数只降不升棘轮** + `keyless-lane.mjs` 零命中防假绿。
 
@@ -70,8 +70,8 @@ opened: 2026-11-14
 | **W3.2 4 消费者跨层契约差分** | 确定性逻辑 / 编排 | 同一批生成/变异的交付物语料（含合法与坏编号/坏账本/坏路径形态） | `prd-check`、`requirements-check`、`prd-gate`、门禁读卡原语对结构有效性与拒绝方向一致 | 让 `prd-gate` 漏掉某类坏 `numbering` 或混合分隔符路径 → 4 消费者契约测试红 | `pnpm test tests/host/contract/` |
 | **W3.3 路径读写目录闸门全通道矩阵** | 确定性逻辑 | 路径矩阵含 `.`、`..`、`kb/..`、`kb/../..`、`kb/symlink/../x`、`./a`、`kb//a`、`..\outside`、`a/../../outside` 及混合分隔符 `deliverables` 路径 | `readCompanyFileAt`、`companyFileProblem*`、`writeCompanyAtomic*`、`createCompanyDir` 与 `prd-gate` 同判据拒绝越界与中间段 symlink；`<ws>/.dsh-company\deliverables\bad\prd.md` 被 `prd-gate` 拦截而非静默放行 | 还原 `prd-gate.ts` 的 `split(sep)` 或 `company-root.ts` 跳过中间 symlink `lstat` → 矩阵红 | `pnpm test tests/host/contract/file-shape-agreement.spec.ts` |
 | **W4.1 `notes-axes` 实盘锚点 + 门禁分支级变异** | 门禁元测试 | 新 Note `## 未覆盖轴` 写无真实路径的 `→ 决定：留后续卡`；对 6 个高风险门禁的核心拒绝分支（含命令解析、改动面对账、浅克隆跳过、实盘锚点）逐条变异 | `notes-axes` 强制分类前缀 + 校验右侧路径/锚点真实存在（扫 `implemented/` 与前向 `archived/`）；`gate-mutation.test.mjs` 全部分支变异均使对应坏夹具漏过（证明夹具真踩在该规则上），且纳入 `generative.e2e.mjs` | 植入 `- 某轴 → 留后续卡` → `notes-axes` 红；删任一被测门禁分支或变异锚点 → `pnpm test:checks` 红 | `pnpm test:checks && node checks/lanes/generative.e2e.mjs` |
-| **W4.2 资产负债棘轮 + 探针实减 + 零命中防假绿** | 结构 / 盘子 | 修 `asset-consumers` 自动 lane 口径、修散文漂移、抽纯 `collaboration-probe-verdict`、合并/归档同族重复探针、补齐剩余探针 `failureClass` | `CENSUS.generated.md` 与盘面一致：`未分类` = **0**，探针总数实质下降（净减 ≥6 个重复/历史走查件），门禁数 ≤ 75，`test-census.spec.ts` 锁死门禁/探针上限棘轮；`keyless-lane.mjs --filter zz-none` 选 0 件返回非零退出码 | 临时把某探针改回 `未分类`、新增未减额探针、或跑 `--filter zz-none` → 对应断言红 / exit ≠ 0 | `pnpm test tests/repo/test-census.spec.ts tests/tools/asset-consumers.spec.ts && pnpm typecheck` |
-| **收尾盲审首验** | 流程治理 | W1–W4 全部提交就绪后，拉起无历史上下文的只读 `research` 子代理盲审（仅喂本卡 `## 验收标准` + `git diff` + 测试/门禁源码） | 盲审逐条核验无缩水、无逃生舱卸责、blocker = 0，结论记入归档状态行与实现 Note | 若盲审指出任何缩水或伪守卫 → 回退修补重审，不许直接翻 `已结` | `pnpm verify && pnpm test && pnpm test:checks && pnpm typecheck && pnpm lint && pnpm dup` |
+| **W4.2 资产负债棘轮 + 探针实减 + 零命中防假绿** | 结构 / 盘子 | 修 `asset-consumers` 自动 lane 口径、修散文漂移、抽纯 `collaboration-oracle` / `team-concurrency` 判据（`tools/lib/{collaboration-oracle,team-concurrency}-verdict.mjs`；其余四探针的受控切片见 Note `## 未覆盖轴`）、合并/归档同族重复探针、补齐剩余探针 `failureClass` | `CENSUS.generated.md` 与盘面一致：`未分类` = **0**，探针总数实质下降（净减 ≥6 个重复/历史走查件），门禁数 ≤ 75，`test-census.spec.ts` 锁死门禁/探针上限棘轮；`keyless-lane.mjs --filter zz-none` 选 0 件返回非零退出码 | 临时把某探针改回 `未分类`、新增未减额探针、或跑 `--filter zz-none` → 对应断言红 / exit ≠ 0 | `pnpm test tests/repo/test-census.spec.ts tests/tools/asset-consumers.spec.ts && pnpm typecheck` |
+| **收尾盲审首验** | 流程治理 | W1–W4 全部提交就绪后，拉起无历史上下文的只读 `research` 子代理盲审（输入集 = policy §P5：当前 diff + 四样判据，清单不复述） | 盲审逐条核验无缩水、无逃生舱卸责、blocker = 0，结论记入归档状态行与实现 Note | 若盲审指出任何缩水或伪守卫 → 回退修补重审，不许直接翻 `已结` | `pnpm verify && pnpm test && pnpm test:checks && pnpm typecheck && pnpm lint && pnpm dup` |
 
 ---
 
@@ -80,7 +80,7 @@ opened: 2026-11-14
 - **事实（新增/修改）**：本仓测试与门禁的**原语唯一性、证明等级下限、验收分权规则、治理资产总量上限**（不含业务产品状态）。
 - **唯一入口**：
   - 宪章与流程：`docs/testing.md`、`docs/policy.md`、`.agents/skills/{close-out-definition,gate-change-definition,agent-note-definition}/SKILL.md`；
-  - 解析与路径原语：`packages/company-pack/src/lib/markdown-shape-core.js`、`新建:tools/lib/repo-markdown.mjs`、`packages/company-pack/src/host/run-bundle/company-root.ts`；
+  - 解析与路径原语：`packages/company-pack/src/lib/markdown-shape-core.js`、`tools/lib/repo-markdown.mjs`、`packages/company-pack/src/host/run-bundle/company-root.ts`；
   - 棘轮与元测试：`checks/gates/notes-axes.mjs`、`tests/checks/gate-mutation.test.mjs`、`tools/lib/{asset-lanes,asset-consumers,test-census}.mjs`、`tests/repo/test-census.spec.ts`。
 - **读载体 / 写载体**：后续所有开发会话 agent、独立盲审子代理、`pnpm verify`、pre-push hook、weekly `generative` lane。
 - **环境坏法**：
@@ -98,8 +98,11 @@ opened: 2026-11-14
 
 ## 落地证据
 
-- 改了哪些系统面（路径）：尚未实施（本轮仅完成研究深挖与立项定性，**不是落地**）；待授权实施后将覆盖 `docs/{testing,policy}.md`、`.agents/skills/{close-out-definition,gate-change-definition,agent-note-definition}/SKILL.md`、`packages/company-pack/src/{lib/markdown-shape-core.js,host/run-bundle/company-root.ts,host/commands/prd-gate.ts}`、`tools/lib/`、`checks/gates/`、`tests/`、`probes/` 并在此回填精确文件清单与 commit SHA。
-- 实跑命令与结果：待用户授权（如 `/goal`）实施后回填实跑输出；计划收口验证链 = `pnpm verify && pnpm test && pnpm test:checks && pnpm typecheck && pnpm lint && pnpm dup`。
+- 改了哪些系统面（路径）：`docs/{testing,policy}.md`、`_backlog/README.md`、`notes/README.md`、`.agents/skills/{close-out,gate-change,agent-note}-definition/SKILL.md`；`packages/company-pack/src/lib/{markdown-shape-core.js,prd-check.ts,requirements-check.ts}`、`packages/company-pack/src/host/commands/prd-gate.ts`；`tools/lib/{repo-markdown,backlog-liveness,notes-audit,bug-coverage,asset-consumers,candidate-scan,collaboration-oracle-verdict,team-concurrency-verdict}.mjs`；`checks/gates/{company-root-carriers,notes-axes,base-clean}.mjs`、`checks/lanes/generative.e2e.mjs`；`tests/support/doc-grammar.ts`、`tests/lib/markdown-shape.property.spec.ts`、`tests/host/contract/`、`tests/checks/{gate-mutation,company-root-carriers,notes-axes}.test.mjs`、`tests/repo/test-census.spec.ts`、`probes/`（67→59）。
+- 提交：`dc7ddb05`（立卡）→ `8bbfb0c5`（W1）→ `a4b6a7db`（W2）→ `4b463116`（W3）→ `789b39fb`（W4）→ `ee93d85f`（首轮盲审整改）→ `817340db`（次轮盲审整改）→ `a1dc14a6`（三轮建议收口）→ `a5ab852f`（归档前覆盖棘轮回补）→ `82831fc1`（归档前盲审整改：工具盘路径登记门 + 注释对齐）→ `10b29105`（末轮复审建议：host/工具盘统一 AST 写调用 + 路径实参判据）。
+- 实跑命令与结果：`pnpm verify` ALL PASS（`company-root-carriers ×52`：写面文件 7 / knownGap 0 / 禁裸解析 ×137 / 工具盘入口 2；`gate-wiring ×75`）；`pnpm test` 244 files / 2093 tests；`pnpm test:checks` 10 PASS / 0 FAIL；`node checks/lanes/generative.e2e.mjs` 14/14 PASS；`pnpm smoke:fast` ALL PASS（4 条）；`pnpm typecheck` / `lint` / `dup` 绿（0 clones）；`pnpm coverage:ratchet` PASS（197 文件；`notes-audit` 分支 86.79% → 88.46% 并 `--update` 落基线）；`pnpm notes:audit` 状态行不符 0。
+- 负控：每切片 prove-it-red 记录见 [落地 Note §验证](../../../notes/implemented/2026-11-14-institutional-test-ratchet.md)。
+- 盲审：8 轮独立只读子代理；每轮 BLOCKER/建议数见 Note §验证「盲审记录」；第 8 轮（末轮）BLOCKER 0 / SUGGESTION 0。
 
 ## 抽象度
 

@@ -58,8 +58,7 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-- [test-asset-spiral](test-asset-spiral/README.md) — 测试资产螺旋与二阶制度棘轮深挖（从例子/加脚本升级为宪章×流程×元门禁）；消费者 = [institutional-test-ratchet](../issues/2026-11-14-institutional-test-ratchet.md)。
-- （活跃题名 = —；2026-11-14 dsh-notes-flow-borrow 随其卡结项迁入[研究归档](../_archive/research/README.md)。）
+- （活跃题名 = —；2026-11-14 dsh-notes-flow-borrow 与 test-asset-spiral 随其卡结项迁入[研究归档](../_archive/research/README.md)。）
 
 （2026-11-13 五题全部定性且产出卡已结，随末张活卡迁入[研究归档](../_archive/research/README.md)。）
 

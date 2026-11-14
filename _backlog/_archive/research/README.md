@@ -18,6 +18,7 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [test-asset-spiral/](test-asset-spiral/README.md) · 测试资产螺旋与二阶制度棘轮：从例子/加脚本升级为宪章×流程×元门禁 | 2 份 | 用户 2026-11-14 点名研究；[制度棘轮卡](../settled_issues/2026-11-14-institutional-test-ratchet.md) | [测试资产杠杆卡](../settled_issues/2026-11-14-test-asset-leverage.md) + 同卡（[Note](../../../notes/implemented/2026-11-14-institutional-test-ratchet.md)） | 2026-11-14 |
 | [dsh-notes-flow-borrow/](dsh-notes-flow-borrow/README.md) · DSH notes 流程的剩余借鉴点：八章逐节对照与三把锁（树形/载体/判据） | 2 份 | 用户 2026-11-13 点名研究；[notes 树形与载体卡](../settled_issues/2026-11-14-notes-tree-and-carrier-gates.md) | 同卡（[Note](../../../notes/implemented/2026-11-14-notes-tree-and-carrier-gates.md)） | 2026-11-14 |
 | [wiki-knowledge-map/](wiki-knowledge-map/README.md) · Wiki 知识地图：给虚拟团队一张可浏览的外部知识目录（AK 式 LLM wiki / OKF 规范 / 搜索阶梯 / DSH 载体） | 8 份 | 用户 2026-11-12 点名研究；[Wiki 知识地图落地卡](../settled_issues/2026-11-12-wiki-knowledge-map-landing.md) | 同卡（[Note](../../../notes/implemented/2026-11-12-wiki-knowledge-map-landing.md)） | 2026-11-13 |
 | [adversarial-shape-matrix/](adversarial-shape-matrix/README.md) · 对抗性边界矩阵与跨载体一致性 spec：测试资产怎么补 | 1 份 | 用户 2026-11-13 点名研究；[对抗性边界矩阵 P0 卡](../settled_issues/2026-11-13-adversarial-shape-matrix-p0.md) | 同卡（[Note](../../../notes/implemented/2026-11-13-adversarial-shape-matrix.md)） | 2026-11-13 |

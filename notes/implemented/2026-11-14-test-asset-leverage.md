@@ -2,7 +2,9 @@
 
 状态：implemented（2026-11-14 落地）
 
-上游 = [问题卡](../../_backlog/_archive/settled_issues/2026-11-14-test-asset-leverage.md)（已结）；深挖材料 = [测试资产螺旋](../../_backlog/research/test-asset-spiral/2026-11-14-test-asset-spiral.md)。
+> 被 [2026-11-14-institutional-test-ratchet](./2026-11-14-institutional-test-ratchet.md) 部分取代：首轮遗留的双状态机、路径双标与作者自查收尾已在后者收口；本篇事实已按盘面更新。
+
+上游 = [问题卡](../../_backlog/_archive/settled_issues/2026-11-14-test-asset-leverage.md)（已结）；深挖材料 = [测试资产螺旋](../../_backlog/_archive/research/test-asset-spiral/2026-11-14-test-asset-spiral.md)。
 
 ## 决定
 
@@ -58,7 +60,7 @@
 | 门禁自测 | `pnpm test:checks` **9 PASS / 0 FAIL** |
 | 变形红证 | 把围栏行改成 `structural: true` → property「围栏内永不 structural」红；还原绿 |
 | notes-axes 红证 | 现判据 = 四分类前缀 + `→` 右侧盘上真实非自身文件锚点；临时新 Note 写 `- [policy] x → 决定：留后续卡` → `FAIL notes-axes`；删除后 PASS（旧「缺去向」判据已被取代） |
-| mutation | `tests/checks/gate-mutation.test.mjs` 现覆盖 naming/carrier/fix-evidence/notes-tree/notes-axes/backlog-liveness/ledger-routing 七个门禁的分支 + keyless-lane 零命中；全绿；每分支被删后坏夹具漏过（首版只有 4 门禁，后续由 [institutional-test-ratchet] 扩展） |
+| mutation | `tests/checks/gate-mutation.test.mjs` 现覆盖 naming/carrier/fix-evidence/notes-tree/notes-axes/backlog-liveness/ledger-routing 七个门禁的分支 + keyless-lane 零命中；全绿；每分支被删后坏夹具漏过（首版只有 4 门禁，后续由 [institutional-test-ratchet](./2026-11-14-institutional-test-ratchet.md) 扩展） |
 | R4 棘轮 | 先 `candidate-scan-labels` 删了会让覆盖 76→75 → 红；迁 BUG-011 守卫后删，覆盖仍 76 |
 | v6 dry-run | `tests/evidence/v6-dry-run.spec.ts`：Windows `..\` → unsafe；围栏嵌套只取顶层 json |
 | 现行盘面读数 | 已修 181 / 具名守卫 76（42.0%）；30 冒烟 + 59 探针（未分类 0 / 0 消费者 50）；75 门禁（`notes-axes` 生效日 `2026-11-14`） |

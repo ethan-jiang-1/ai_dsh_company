@@ -7,7 +7,7 @@ intent: 实测审计 2b155ea4..95d05326 的缩水根因与残余漏洞，盘清�
 
 ## 0. 核心判断
 
-首轮 [测试资产杠杆卡](../../_archive/settled_issues/2026-11-14-test-asset-leverage.md)（`2b155ea4..95d05326`，9 个提交同日结案）准确诊断了 v2→v5 四轮每轮稳定 8 个 bug 的病根——“上一轮改善的是 legibility，不是 leverage；新建门禁自己成了新的 bug 面”。但在实施后半程，它自己滑回了同一套动作模式：**靠新增统计/门禁脚本（`bug-coverage`、`asset-consumers`、`notes-axes`）+ 象征性骨架（38 行固定模板伪装语法生成器、每门禁 1 处表层变异）把所有 `[x]` 快速勾完归档。**
+首轮 [测试资产杠杆卡](../../settled_issues/2026-11-14-test-asset-leverage.md)（`2b155ea4..95d05326`，9 个提交同日结案）准确诊断了 v2→v5 四轮每轮稳定 8 个 bug 的病根——“上一轮改善的是 legibility，不是 leverage；新建门禁自己成了新的 bug 面”。但在实施后半程，它自己滑回了同一套动作模式：**靠新增统计/门禁脚本（`bug-coverage`、`asset-consumers`、`notes-axes`）+ 象征性骨架（38 行固定模板伪装语法生成器、每门禁 1 处表层变异）把所有 `[x]` 快速勾完归档。**
 
 这不是单个会话的粗心，而是**制度激励的必然结果**：只要本仓的宪章仍允许手搓裸解析器、完成定义仍把“单条 `BUG-nnn` 例子红→绿”当达标、收尾流程仍允许“同上下文自查 + 未覆盖轴口头支票”、门禁与探针仍无总量封顶，任何长会话在收口压力下都会走阻力最小的“加脚本贴膏药”路径。要让螺旋真正上升，必须改**宪章禁令、验收分权、源头元门禁**三件事，而不是再叠一层外围统计脚本。
 
@@ -19,7 +19,7 @@ intent: 实测审计 2b155ea4..95d05326 的缩水根因与残余漏洞，盘清�
 
 ### 1.1 活漏洞 A：`markdown-shape-core.js` 内部自带两套分叉状态机
 
-首轮声称“markdown 形状 4→1 收口”，但打开 [markdown-shape-core.js](../../../packages/company-pack/src/lib/markdown-shape-core.js) 可见文件内部并存两套独立扫描器：
+首轮声称“markdown 形状 4→1 收口”，但打开 [markdown-shape-core.js](../../../../packages/company-pack/src/lib/markdown-shape-core.js) 可见文件内部并存两套独立扫描器：
 - `scanDocumentDetailed`（第 91–169 行）：处理围栏、跨行 code span、行内与跨行 HTML 注释；
 - `sectionRange`（第 190–258 行）：专门为门禁新写的一套简化扫描器，**不处理跨行 code span，也不剥离同行行内注释**。
 
@@ -31,11 +31,11 @@ intent: 实测审计 2b155ea4..95d05326 的缩水根因与残余漏洞，盘清�
    - `scanDocumentDetailed` 剥去行内注释后得到 `{ text: ' ## 修复证据', structural: true }`；
    - `sectionRange` 返回 `undefined`。
 
-为什么 [structure-agreement.spec.ts](../../../tests/host/contract/structure-agreement.spec.ts) 跑了 200 例全绿？因为 [doc-grammar.ts](../../../tests/support/doc-grammar.ts)（全文 38 行，`makeDoc` 仅 16 行固定顺序模板）**从不生成跨行 code span、BOM、孤立 `\r`、围栏嵌套或同行注释包标题**——生成器替实现掩盖了分叉。
+为什么 [structure-agreement.spec.ts](../../../../tests/host/contract/structure-agreement.spec.ts) 跑了 200 例全绿？因为 [doc-grammar.ts](../../../../tests/support/doc-grammar.ts)（全文 38 行，`makeDoc` 仅 16 行固定顺序模板）**从不生成跨行 code span、BOM、孤立 `\r`、围栏嵌套或同行注释包标题**——生成器替实现掩盖了分叉。
 
 ### 1.2 活漏洞 B：`fix-evidence.mjs` 注释声称“只返回结构行”，代码实际原样返回围栏块
 
-[fix-evidence.mjs](../../../checks/gates/fix-evidence.mjs) 第 70–71 行注释写明：
+[fix-evidence.mjs](../../../../checks/gates/fix-evidence.mjs) 第 70–71 行注释写明：
 > `节内只返回结构行，避免围栏里的假字段被读成证据。`
 
 但第 76–80 行真实实现是：
@@ -46,26 +46,26 @@ function section(text, heading) {
   return normalizeDocument(text).split('\n').slice(range.start + 1, range.end).join('\n')
 }
 ```
-**实测复现**：在 `## 修复证据` 节内放一个示例围栏代码块（内含 `` - 改动面：`packages/company-pack/src/index.ts` ``），正文不写任何真字段，`fix-evidence` 的 `field()` 仍直接从围栏代码块内提取出 `packages/company-pack/src/index.ts`。同理，[notes-liveness.mjs](../../../checks/gates/notes-liveness.mjs) 与 [proposals.mjs](../../../checks/gates/proposals.mjs) 用同一裸切片判“非空节”，节内只要有一对空围栏或注释即被判为“有正文”。
+**实测复现**：在 `## 修复证据` 节内放一个示例围栏代码块（内含 `` - 改动面：`packages/company-pack/src/index.ts` ``），正文不写任何真字段，`fix-evidence` 的 `field()` 仍直接从围栏代码块内提取出 `packages/company-pack/src/index.ts`。同理，[notes-liveness.mjs](../../../../checks/gates/notes-liveness.mjs) 与 [proposals.mjs](../../../../checks/gates/proposals.mjs) 用同一裸切片判“非空节”，节内只要有一对空围栏或注释即被判为“有正文”。
 
 ### 1.3 活漏洞 C：路径与闸门第二事实源（只测读不测写，`prd-gate` 混合分隔符静默绕过）
 
-首轮验收单承诺：`路径矩阵：/、\、.、内部 ..、尾部 ..、a/../../b，读写删同判据`。实际 [file-shape-agreement.spec.ts](../../../tests/host/contract/file-shape-agreement.spec.ts) 只测了 `readCompanyFileAt` / `companyFileProblemAt` 读面 9 条字符串，未测任何写入口、尾部 `..` 或 `prd-gate` 协同。实测暴露两处真缺陷：
-1. **`prd-gate` 分隔符双标导致静默放行**：[prd-gate.ts](../../../packages/company-pack/src/host/commands/prd-gate.ts) 中 `isDeliverableShaped` 用 `/[\\/]+/` 切段，而 `deliverableOf` 用 POSIX `sep`（`/`）切段：
+首轮验收单承诺：`路径矩阵：/、\、.、内部 ..、尾部 ..、a/../../b，读写删同判据`。实际 [file-shape-agreement.spec.ts](../../../../tests/host/contract/file-shape-agreement.spec.ts) 只测了 `readCompanyFileAt` / `companyFileProblemAt` 读面 9 条字符串，未测任何写入口、尾部 `..` 或 `prd-gate` 协同。实测暴露两处真缺陷：
+1. **`prd-gate` 分隔符双标导致静默放行**：[prd-gate.ts](../../../../packages/company-pack/src/host/commands/prd-gate.ts) 中 `isDeliverableShaped` 用 `/[\\/]+/` 切段，而 `deliverableOf` 用 POSIX `sep`（`/`）切段：
    - 传入相对路径 `.dsh-company\deliverables\bad-slug\prd.md` 且 **`cwd` 明明在场**时，`deliverableOf` 返回 `undefined`，闸门误报 *“解析不到工作目录”*；
    - 传入带反斜杠的绝对路径 `<ws>/.dsh-company\deliverables\bad-slug\prd.md` 时，`!isAbsolute(path)` 为 `false` 且 `deliverableOf` 返回 `undefined`，闸门走到 `continue` **静默放行坏 PRD（绕过交付闸门）**。
-2. **`company-root.ts` 先词法消解 `..` 再 `lstatSync`**：在 [company-root.ts](../../../packages/company-pack/src/host/run-bundle/company-root.ts) `walkCompanyDirs`（第 43–52 行）中，`kb/link/../d.md` 在词法栈阶段直接把 `link` 弹出，从未对 `.dsh-company/kb/link` 调 `lstatSync`——即使 `kb/link` 是指向仓外的符号链接，`writeCompanyAtomicAt(home, 'kb/link/../d.md', ...)` 与 `readCompanyFileAt` 仍畅通无阻（与 POSIX 内核路径解析语义不一致）；而传尾部 `'..'` 或 `'kb/../..'` 给 `writeCompanyAtomicAt` 时，因 `dirname('..') === '.'` 跳过了 `walkCompanyDirs` 越界分支，靠偶然撞上外层目录报“文件被目录占用”而非越界错误。
+2. **`company-root.ts` 先词法消解 `..` 再 `lstatSync`**：在 [company-root.ts](../../../../packages/company-pack/src/host/run-bundle/company-root.ts) `walkCompanyDirs`（第 43–52 行）中，`kb/link/../d.md` 在词法栈阶段直接把 `link` 弹出，从未对 `.dsh-company/kb/link` 调 `lstatSync`——即使 `kb/link` 是指向仓外的符号链接，`writeCompanyAtomicAt(home, 'kb/link/../d.md', ...)` 与 `readCompanyFileAt` 仍畅通无阻（与 POSIX 内核路径解析语义不一致）；而传尾部 `'..'` 或 `'kb/../..'` 给 `writeCompanyAtomicAt` 时，因 `dirname('..') === '.'` 跳过了 `walkCompanyDirs` 越界分支，靠偶然撞上外层目录报“文件被目录占用”而非越界错误。
 
 ### 1.4 失真 D：`asset-consumers` 把 20 个自动 lane 冒烟误判为“0 消费者”，且探针 0 减法
 
 首轮 Note 报告“30 冒烟 + 67 探针里 **72 个 0 消费者**”。实测拆解这 72 个：
-- 其中 **20 个其实是正在 `fast` / `surface` / `weekly` 自动运行的冒烟**（包括 `workflow-contract`、`company-root-process`、`snapshot-motion` 甚至本轮新建的 `generative`）！原因：[fast-lane.mjs](../../../checks/lanes/fast-lane.mjs) 与 [keyless-lane.mjs](../../../checks/lanes/keyless-lane.mjs) 通过 `tools/lib/asset-lanes.mjs` 数组动态调度，而 [asset-consumers.mjs](../../../tools/lib/asset-consumers.mjs) 把 `asset-lanes.mjs` 列入 `SELF` 排除后，只扫代码文本硬编码字面量，导致所有动态调度的冒烟全被记为 `0 消费者`。真实的 0 消费者是 **5 个手动真模型冒烟 + 52 个探针**。
+- 其中 **20 个其实是正在 `fast` / `surface` / `weekly` 自动运行的冒烟**（包括 `workflow-contract`、`company-root-process`、`snapshot-motion` 甚至本轮新建的 `generative`）！原因：[fast-lane.mjs](../../../../checks/lanes/fast-lane.mjs) 与 [keyless-lane.mjs](../../../../checks/lanes/keyless-lane.mjs) 通过 `tools/lib/asset-lanes.mjs` 数组动态调度，而 [asset-consumers.mjs](../../../../tools/lib/asset-consumers.mjs) 把 `asset-lanes.mjs` 列入 `SELF` 排除后，只扫代码文本硬编码字面量，导致所有动态调度的冒烟全被记为 `0 消费者`。真实的 0 消费者是 **5 个手动真模型冒烟 + 52 个探针**。
 - 更关键的是：**67 个探针 0 个分类、0 个退役、0 个合并**；连原卡正文第 52 行亲手点名的 3 处散文数字漂移（`fast-lane.mjs:3` 写 6 条实为 4 条、`asset-lanes.mjs:162` 写“保持既有 6 条不变”实为 4 条、`asset-lanes.mjs:255` 写“69 个探针”实为 67 个）在结案时都一字未改。
 
 ### 1.5 缩水 E & F：象征性变异与“箭头即合规”棘轮
 
 - **P1 4 消费者差分跳票**：原定同一语料跑 `prd-check / requirements-check / prd-gate / fix-evidence` 未做，结案时以一句 `- 4 消费者真命令面差分 → 决定：…prd-gate 真 ctx 面留后续卡` 塞进 Note `## 未覆盖轴` 销账。
-- **门禁变异只砍 1 刀**：75 道门禁里仅 9 个文件有 `tests/checks/*.test.mjs`；[gate-mutation.test.mjs](../../../tests/checks/gate-mutation.test.mjs) 仅对 4 道门禁各替换 1 行最表层 `if`（连同 diff 新建的第 75 道门禁 [notes-axes.mjs](../../../checks/gates/notes-axes.mjs) 自己都没测变异，`fix-evidence` 的 `shallowSkipped` 静默跳过分支仍零测试）。
+- **门禁变异只砍 1 刀**：75 道门禁里仅 9 个文件有 `tests/checks/*.test.mjs`；[gate-mutation.test.mjs](../../../../tests/checks/gate-mutation.test.mjs) 仅对 4 道门禁各替换 1 行最表层 `if`（连同 diff 新建的第 75 道门禁 [notes-axes.mjs](../../../../checks/gates/notes-axes.mjs) 自己都没测变异，`fix-evidence` 的 `shallowSkipped` 静默跳过分支仍零测试）。
 - **`notes-axes` 门禁只认箭头符号**：生效日设为次日 `2026-11-15`（豁免了本卡自己的 Note），只扫 `notes/implemented/`（迁 `archived/` 即失明），且不验三分类词表、不验 `→` 右侧目标是否存在——任何一句空话带 `→` 即可过关。
 
 ---
@@ -76,13 +76,13 @@ function section(text, heading) {
 
 | 层面 | 现行机制 | 实际产生的反向激励 |
 |---|---|---|
-| **原语层（违反「不自造」）** | 本仓 [markdown-links.mjs](../../../tools/lib/markdown-links.mjs) 早接通了 `vendor/dsh` 的标准 GFM AST（`mdast-util-from-markdown` + `gfm`），[backlog-liveness.mjs](../../../tools/lib/backlog-liveness.mjs) 早接通了 `js-yaml`；但没有任何规则禁止门禁/工具手写裸正则解析 | 每建一道门禁就顺手 `split('\n')` 手搓半套 Markdown/YAML/路径解析器；32 张卡里 21 张在替手搓解析器擦边角 |
-| **宪章层（点证据导向）** | [testing.md §3.7](../../../docs/testing.md) 与 `bug-coverage` 考核“标题含 `BUG-nnn` + 单次红→绿” | 在共享层出 bug 时，打 1 行 `if` + 写 1 条常量字符串 `it('BUG-xxx')` 是最快拿分的路径，没人被逼去消解第二事实源或找独立参考真值 |
-| **流程层（同源收尾自审）** | [policy.md §P5](../../../docs/policy.md) 与 [close-out-definition](../../../.agents/skills/close-out-definition/SKILL.md) 允许“独立子代理盲审 **或 收尾自查**”；`## 未覆盖轴` 允许把原定验收降级记账 | 连续写完 9 个 commit 的作者有强烈的确认偏误；原本在探索轮（新上下文）才能抓出的 8 个 bug，在归档门前零阻力滑过 |
-| **预算层（加法零摩擦）** | `docs/` 有严厉的 [doc-budget.mjs](../../../checks/gates/doc-budget.mjs) 封顶；但 `checks/gates/`（75）与 `probes/`（67）无上限棘轮 | 遇到治理问题时，“再加 3 个脚本”永远比“合并旧门禁、清理旧探针、抽单一原语”省事 |
+| **原语层（违反「不自造」）** | 本仓 [markdown-links.mjs](../../../../tools/lib/markdown-links.mjs) 早接通了 `vendor/dsh` 的标准 GFM AST（`mdast-util-from-markdown` + `gfm`），[backlog-liveness.mjs](../../../../tools/lib/backlog-liveness.mjs) 早接通了 `js-yaml`；但没有任何规则禁止门禁/工具手写裸正则解析 | 每建一道门禁就顺手 `split('\n')` 手搓半套 Markdown/YAML/路径解析器；32 张卡里 21 张在替手搓解析器擦边角 |
+| **宪章层（点证据导向）** | [testing.md §3.7](../../../../docs/testing.md) 与 `bug-coverage` 考核“标题含 `BUG-nnn` + 单次红→绿” | 在共享层出 bug 时，打 1 行 `if` + 写 1 条常量字符串 `it('BUG-xxx')` 是最快拿分的路径，没人被逼去消解第二事实源或找独立参考真值 |
+| **流程层（同源收尾自审）** | [policy.md §P5](../../../../docs/policy.md) 与 [close-out-definition](../../../../.agents/skills/close-out-definition/SKILL.md) 允许“独立子代理盲审 **或 收尾自查**”；`## 未覆盖轴` 允许把原定验收降级记账 | 连续写完 9 个 commit 的作者有强烈的确认偏误；原本在探索轮（新上下文）才能抓出的 8 个 bug，在归档门前零阻力滑过 |
+| **预算层（加法零摩擦）** | `docs/` 有严厉的 [doc-budget.mjs](../../../../checks/gates/doc-budget.mjs) 封顶；但 `checks/gates/`（75）与 `probes/`（67）无上限棘轮 | 遇到治理问题时，“再加 3 个脚本”永远比“合并旧门禁、清理旧探针、抽单一原语”省事 |
 
 **对照本仓已成功的先例**：
-1. 为什么 `.dsh-company` 裸写乱象被根治了？不是因为写了更多点测试，而是立了 [carrier-registry.mjs](../../../tools/lib/carrier-registry.mjs) + [company-root-carriers.mjs](../../../checks/gates/company-root-carriers.mjs) **从静态门上禁止了登记载体以外的直接写入（单原语垄断）**。
+1. 为什么 `.dsh-company` 裸写乱象被根治了？不是因为写了更多点测试，而是立了 [carrier-registry.mjs](../../../../tools/lib/carrier-registry.mjs) + [company-root-carriers.mjs](../../../../checks/gates/company-root-carriers.mjs) **从静态门上禁止了登记载体以外的直接写入（单原语垄断）**。
 2. 为什么 `docs/` 不再无限膨胀？不是靠提醒，而是 `doc-budget` 设了硬顶与空置反向棘轮——**想加新条款，必须先压掉或合并旧废话（负债封顶）**。
 
 测试资产与门禁治理缺的正是把这两个模式搬过来。
