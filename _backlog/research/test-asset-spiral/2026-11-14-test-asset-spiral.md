@@ -13,7 +13,7 @@ intent: 解释“资产很多但 exploratory 每轮还能抓 8 个 bug”的机�
 
 - 247 个 keyless spec / **29,090 行** / 5,042 个 `expect` / 1,770 个 `it`；74 道门禁；29 个冒烟；67 个探针（全部手动、67 个“未分类”）。
 - 断言形状：`it.each` 仅 17 处（约 1% 用例），用例内 `for…of` 332 处；`toMatchSnapshot` 0；59 个 spec 带「负例留证」。**资产体量已经很大，问题不是“少”。**
-- 已修缺陷 173 张；活跃 BUG-176..183（focus v5，8 张）。
+- 已修缺陷 **181** 张；活跃 **0**（v5 的 BUG-176..183 已全部修复归档；Next=184）。
 - 已有资产系统：四层 lane（spec/e2e/entry/checks）、`asset-lanes` 注册表、`test-census` 盘子、覆盖率棘轮、`failure-classes` 决策表、`naming-contract`、`fix-evidence`、`notes-tree`、`carrier` 门禁、`world-shapes` 矩阵。
 - 缺口（`tests/failure-classes.md`）：类 5 模型可见文本无回放资产；类 11 性能无层；类 2 host registry dispose 部分；类 4 工具 schema 部分。
 - 未做（`test-asset-fence`）：A4 门禁负例扩面、A5 探针消费者图、B6 模型可见回放。
@@ -25,9 +25,10 @@ intent: 解释“资产很多但 exploratory 每轮还能抓 8 个 bug”的机�
 | 2026-11-13 19:26（v2） | 2034 | 8（BUG-152..159） |
 | 2026-11-14 08:45（v3） | 2046 | 8（BUG-160..167） |
 | 2026-11-14 10:17（v4） | 2066 | 8（BUG-168..175） |
-| 2026-11-14 11:01（v5） | 2072 | 8（BUG-176..183） |
+| 2026-11-14 11:01（v5 发现） | 2072 | 8（BUG-176..183） |
+| 2026-11-14 12:58（v5 修复后） | **2074** | **0** |
 
-四轮 +32 个缺陷，用例只 +38；**每轮新增的用例数与下一轮新缺陷数基本同量级**。资产在长，缺陷也在长——这就是“例子型资产”的稳态。
+四轮 +32 个缺陷，用例只 +40；**每轮新增的用例数与下一轮新缺陷数基本同量级**。资产在长，缺陷也在长——这就是“例子型资产”的稳态。
 
 ## 2. 三轮螺旋证据
 
@@ -41,6 +42,7 @@ intent: 解释“资产很多但 exploratory 每轮还能抓 8 个 bug”的机�
 
 - v3 Note 的 `## 未覆盖轴` 写了「注释与围栏嵌套」「GFM 行内代码 span 里未转义的 `|`」；v4 的 168/169/172/173 正是行内代码、未闭合注释、表格转义、注释里的 JSON。
 - v4 Note 的 `## 未覆盖轴` 写了「行内代码 span 的跨行/嵌套」；v5 的 181 正是跨行 code span。
+- v5 Note 的 `## 未覆盖轴` 写了 5 条：Windows 实机/CI、跨行 code span 闭合行之后、围栏块嵌套、命令只证形态不证执行、notes 根 symlink 一律红——**这就是 v6 的种子**。
 - 这不是巧合，是循环：**修完一层 → 记下未覆盖轴 → 下一轮 exploratory 按轴找 → 又落回例子型 spec。**
 
 ## 2.2 具体第二事实源（这是“类”的物理位置）
@@ -125,7 +127,7 @@ intent: 解释“资产很多但 exploratory 每轮还能抓 8 个 bug”的机�
 
 | # | 候选 | 现状 | 为什么退/并 | 保留什么 |
 |---|---|---|---|---|
-| R1 | `tests/content/{charters,company,contracts,delivery-modes,entries,generic,kb-setup,methods,product-types,state,template}-english.spec.ts`（11 件） | 只证“目录无中文” | `content-english.spec.ts:23-27` 已对 `content/**` 做同断言（超集）；存在性另有 `content-manifest.mjs:9-12` | 文件清单相等这一条并成一件；其余 11 件删 |
+| R1 | `tests/content/*-english.spec.ts` 共 12 个：其中 11 个是 `content-english.spec.ts` 的子集重复，保留超集 | 只证“目录无中文” | `content-english.spec.ts:23-27` 已对 `content/**` 做同断言（超集）；存在性另有 `content-manifest.mjs:9-12` | 文件清单相等这一条并成一件；其余 11 件删 |
 | R2 | `tests/evidence/collaboration-probe-verdict.spec.ts` | 74 行，`indexOf` 切探针源码 + `runInNewContext` | 探针 0 自动；改探针文案即抛 “Verdict block moved” | 判据抽 `tools/lib`（先例 `team-concurrency-verdict.mjs`） |
 | R3 | `tests/repo/gitignore-guards.spec.ts` | 40 行，只断 `.gitignore` 文本形状 | 门 `gitignore-shape.mjs:5-8` 同时做文本 + `git check-ignore` 真匹配，每次 verify 都跑 | 无；删 |
 | R4 | `tests/tools/candidate-scan-labels.spec.ts` | 321 行 | 语料已移出仓；`candidate-scan-eval.mjs:2-3` 自标已耗 | 无；删（或随语料恢复再建） |
