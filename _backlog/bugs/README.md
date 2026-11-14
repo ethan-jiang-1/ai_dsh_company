@@ -2,17 +2,30 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮拿到 ≥3 张卡，先按根因分组列表再逐卡修——逐症状打补丁会把同一根因修三遍。
 
-**下一个缺陷号**：Next BUG ID = 176；已分配 BUG-001..175。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 184；已分配 BUG-001..183。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**：2026-11-14 focus v4 的 8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–C：BUG-168..175）」）。
+**活跃 8 张（2026-11-14 focus v5 回归；只报不修）**：见下方「## 2026-11-14 focus v5 探索（post-fix 3）」。
 
-**上一轮收口**（2026-11-14 focus v3）：8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）」）。
+**上一轮收口**（2026-11-14 focus v4）：8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–C：BUG-168..175）」）。
 
-**更早收口**（2026-11-13 focus v2）：8 张已于 2026-11-14 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接」）。
+**更早收口**（2026-11-14 focus v3）：8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）」）。
+
+**最早收口**（2026-11-13 focus v2）：8 张已于 2026-11-14 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接」）。
+
+## 2026-11-14 focus v5 探索（post-fix 3）
+
+**用户指令（2026-11-14）**：「你发现的问题全修好了，继续往前，Exploratory test去寻找更多的bug」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+
+| 组 | 卡 | 一句话 | 级别 |
+|---|---|---|---|
+| A 共享形状层 | [176](BUG-176-json-fence-example-extracted.md) / [181](BUG-181-multiline-code-span.md) | 围栏示例 JSON 盖过真账本；跨行 code span 里的标题被当定义 | P2 ×2 |
+| B 三态/平台路径 | [179](BUG-179-internal-dotdot-over-rejected.md) / [180](BUG-180-walk-company-dirs-windows-dotdot.md) | 内部 `..` 误杀；Windows `..\` 绕过 `..` 闸 | P2 / P1 |
+| C fix-evidence 边界 | [177](BUG-177-fix-evidence-valid-command-forms.md) / [178](BUG-178-fix-evidence-section-in-code-block.md) / [182](BUG-182-fix-evidence-noop-commands.md) | 合法命令被拒；代码块里的节标题截错；空操作命令也过 | P2 ×3 |
+| D notes-tree 根 | [183](BUG-183-notes-root-symlink-followed.md) | `notes/` 根本身是 symlink 仍被跟随 | P2 |
 
 ## 2026-11-14 focus v4 探索（post-fix 2）
 
