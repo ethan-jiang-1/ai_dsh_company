@@ -20,10 +20,8 @@ description: Use when adding or changing a gate in checks/gates/ (one gate per m
 
 ## 步骤
 
-1. **先确认该不该建。** 无复发证据不建门禁；能用现成载体（DSH 原生机制）就不自造。
-   可机械判断的规则才进门禁——**Skill = guidance，可机械判断的才进 gate**。
-2. **定位唯一家。** 一条规则只住一道门禁；换地方就是搬家，不是复制。
-   规则正文（为什么存在）写在门禁块**注释头**，紧挨代码——不要只写在 Note 里（证据要在它自己的家）。
+1. **先确认该不该建（总量封顶，先并后加）。** 无复发证据不建门禁；能用现成载体就不自造；可机械判断的才进 gate（[policy.md §P2](../../../docs/policy.md)）。`checks/gates/` 文件总数受只降不升棘轮约束——新规则优先并入既有 owner 门禁，确需新建必须先合并/退役重叠旧门禁。
+2. **定位唯一家 + 严禁手搓裸解析。** 一条规则只住一道门禁；规则正文（为什么存在）写在门禁注释头。**严禁在门禁或 `tools/lib/` 手写裸 Markdown 节切分（`/^##\s+/`）、裸 YAML frontmatter 正则或裸 `.dsh-company` 路径拼接**——一律消费共享解析原语（`vendor/dsh` `mdast` + `js-yaml` / `markdown-shape-core` / `company-root`），防门禁自身沦为第二事实源 bug 工厂。
 3. **写检查**，并让失败信息**点名具体位置**（文件:行、行号、文件名的清单）——
    否则实施者拿到"红了"却不知道改哪。
 4. **加形状锚。** 若门禁依赖某种文档/表格形状，锚住**表头或结构性标记**，
@@ -43,6 +41,8 @@ description: Use when adding or changing a gate in checks/gates/ (one gate per m
 - [ ] 若分档：**两个方向都跑过**（该红的红 + 该豁免的绿）。
 - [ ] 若依赖文档形状：锚在表头/结构标记上，不是弱计数条件。
 - [ ] 被检查文件缺失时报「缺失」而非抛异常中断整个 run。
+- [ ] 总量封顶已守住（并入既有 owner 门禁或同 diff 合并旧门禁），且未手写裸 Markdown/YAML/路径解析正则。
+- [ ] 核心/高风险门禁的新增拒绝分支与静默跳过分支（如 shallow-clone）已补 `tests/checks/` conformance 及 `gate-mutation.test.mjs` 定向变异必漏断言（`pnpm test:checks` 绿）。
 - [ ] 「负例留证 <日期>：<怎么破的> → 红」写进门禁块注释头。
 - [ ] 同 diff Note 记录了红的原话；`pnpm verify` 全绿。
 

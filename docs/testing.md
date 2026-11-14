@@ -50,7 +50,7 @@
 4. **单向归因**：单跑才绿 = spec 自身缺陷，不赖环境；测试获取的资源自己负责到 teardown。
 5. **掩盖黑名单**：加 sleep、加超时不指认等待状态、加重试、整文件串行化、弱化断言、改归一化凑绿——都不是修法。retry 只许出现在真模型档。
 6. **防假绿**：命令链 `set -o pipefail`；自跳过不是成本信号（现状：仅 `ledger.spec` 的 dev-only live 档条件跳过、spec 头注已声明；新增 skip 须配「预期 N 个真跑」守卫，全跳 = 假绿）。
-7. **prove-it-red**：守卫只有挡得住回归才算守卫——制造回归看红、还原看绿，三步留证。**标题带 `BUG-nnn` 的 `describe`/`it` = 守卫声明**：须对到真事故卡 + 同文件带 `// 负例留证 日期：…`（`guard-red-record` 门禁强制；判据为何长这样见该 Note）。
+7. **prove-it-red 与共享层升格**：守卫只有挡得住回归才算守卫——制造回归看红、还原看绿，三步留证。**标题带 `BUG-nnn` 的 `describe`/`it` = 守卫声明**：须对到真事故卡 + 同文件带 `// 负例留证 日期：…`（`guard-red-record` 门禁强制；判据为何长这样见该 Note）。**单点业务分支缺陷**可交具名例子守卫；凡根因在**横切共享语义**（Markdown/YAML 解析、安全路径段消解、状态机、门禁判据）或同模块二次复发，**单点例子不予结案**——必须先收口至唯一原语（禁门禁/工具层手写裸正则解析），并同 diff 交付**独立参考真值差分**（如 `mdast` 标准 AST）或**读写全通道等价类矩阵**。
 8. **红/场景先行**：机制面改动 = 实现前那个测试已存在且红（红→绿）；行为/UX 面 = 场景先立（Given/When/Then + 判据点名）；口头担忧第二次提起 → 立卡或明确否决，不留复发性话题。
 9. **判据读什么，写死**：探针/审计的判据只读类型化字段（agent 正文只认 `content[].type==='text'`、路径只认 `file_path`、行为只认事件 `type`），不对整段 `data`/`arguments` 做正则；结论必须有收口凭据（`turn/end`），超时 = 无结论、不得判绿；判据要能拿同一份事件流离线复判（`--log`/`--evidence`）。
 
@@ -64,6 +64,6 @@
 
 - 不默认全量：本地按 §2 选最小证据；CI = 结构门禁 + 干净环境差异；pre-push hook = verify + typecheck + lint + dup + smoke:fast + 按面真入口 + **test:coverage + 覆盖率棘轮**（typecheck 面见 2026-11-03 D5 Note；lane 与按面规则唯一家 = `tools/lib/asset-lanes.mjs`）。
 - **执行下限** = 关键模块阈值（[`vitest.config.ts`](../vitest.config.ts) `coverage.thresholds`）+ **全量棘轮** `tests/support/coverage-baseline.json`（只升不降；新文件 80/70 下限；<50% 的已知空洞必须豁免并写移除条件）；`pnpm coverage:ratchet` 验，低于即红。失败类决策表 = [tests/failure-classes.md](../tests/failure-classes.md)。
-- **tests 部分不在 tsc（已知未覆盖面）**：`tests/client` 已接（`tsconfig.test-client.json`；排除 3 个直引 vendor 源码的 spec）；`tests/host` / `tests/lib` / `tests/content` 已接（同一个 `tsconfig.test-company.json`；排除 7 个直引 vendor 源码 / host-composition 的 spec）；`tests/harness` 已接（`tsconfig.test-harness.json`；glob 全收，唯一例外 = `tests/repo/pack-exports.spec.ts`——它同时 import host 与 client 两半，任一面的全局环境（`process`/`client-build-environment`）都会让另一半报错，实测两向皆红，只能留在 tsc 外）。
+- **tests 部分不在 tsc（已知未覆盖面）**：`tests/client`、`tests/host` / `tests/lib` / `tests/content`、`tests/harness` 均已接各自 `tsconfig.test-*.json`（排除直引 vendor 源码的少量 spec，及混合 host/client 两半全局环境的 `tests/repo/pack-exports.spec.ts`）。
 - **自测轮**（全门禁 sweep + UX 走查 + entry-probe 语义探针）：agent 阶段收口时提案、用户批后跑（2026-10-04 定）；预算按 [policy §P3](./policy.md) 轻任务纪律。
-- **已知未覆盖面（明说不覆盖）**：多人交互/协作 UX 面——2026-10-06 用户立项首轮猎捕已立 4 个判据探针（dual-ceo / task-discovery / claim-race / dual-signoff，真模型档、常驻，触发见头注）+ 4 张 bug 卡（BUG-002..005 **已修闭环**——修复落地+复跑转绿，卡迁 [_fixed_bugs](../_backlog/_archive/fixed_bugs/)；BUG-006 于 2026-10-07 发现即修。台账 = 那些已修卡，不另留猎捕日记）；机制面 E1/E2 与 `fs-guard-probe` 不变。
+- **已知未覆盖面（明说不覆盖）**：多人交互/协作 UX 面——4 个常驻真模型判据探针（dual-ceo / task-discovery / claim-race / dual-signoff，触发见头注），历史 BUG-002..006 台账见 [_fixed_bugs](../_backlog/_archive/fixed_bugs/)；机制面 E1/E2 与 `fs-guard-probe` 不变。
