@@ -18,7 +18,7 @@
      `/req check` 各报「注释未闭合」根因，不再级联成「没有需求」；
    - `splitTableRow` 按 CommonMark 顺序吃转义：先 `\\`（字面反斜杠）再 `\|`（字面竖线），行尾竖线按
      反斜杠奇偶判是否分隔符；
-   - `extractJsonBlock` 先经 `maskHtmlComments()`（与结构扫描同一个状态机），注释里的账本不生效。
+   - `extractJsonBlock` 与 `/req check` 的 json 账本都改读 `scanDocument` 的**顶层围栏块**（2026-11-14 后续：`maskHtmlComments` 退役，见 [围栏与门禁解析 Note](2026-11-14-shape-fences-and-gate-parsing.md)），注释/示例围栏里的账本都不生效。
 2. **三态读契约的越界子类**（170）：`walkCompanyDirs` 在走目录之前**全量**拒绝 `..` 段。
    为什么不在循环里判：不存在的中间段会让 `create=false` 的循环提前返回，`a/../..` 形状会把「越界」
    折成 `missing`（可豁免语义）。越界一律 `unsafe`，`missing` 只表示「根内真没有」。

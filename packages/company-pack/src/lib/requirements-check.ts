@@ -245,8 +245,9 @@ interface JsonRequirement {
 
 function jsonLedgerDefinitions(rel: string, text: string, layer: Layer, errors: string[]): Definition[] {
   text = normalizeDocument(text)
-  const block = /```json\r?\n([\s\S]*?)\r?\n```/.exec(text)
-  if (block === null) {
+  // 只认顶层 json 围栏块（与 `/prd check` 同源）：示例围栏不再抢先（BUG-176）。
+  const block = scanDocumentDetailed(text).fences.find(fence => /^json\b/i.test(fence.info.trim()))
+  if (block === undefined) {
     errors.push(`${rel} 声明 definition: json-ledger 但没有 json 账本代码块`)
     return []
   }
@@ -257,7 +258,7 @@ function jsonLedgerDefinitions(rel: string, text: string, layer: Layer, errors: 
   }
   let parsed: unknown
   try {
-    parsed = JSON.parse(block[1] ?? '')
+    parsed = JSON.parse(block.content)
   } catch {
     errors.push(`${rel} 的 json 账本不可解析`)
     return []

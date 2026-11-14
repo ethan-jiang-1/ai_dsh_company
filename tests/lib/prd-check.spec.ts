@@ -386,3 +386,27 @@ describe('注释里的 legacy JSON（BUG-173）', () => {
     expect(result.errors.join()).toContain('缺 ```json 需求块')
   })
 })
+
+describe('围栏示例与跨行行内代码（BUG-176/181）', () => {
+  it('示例围栏里的 json 块不被当账本，取真实块；只有示例 → 缺块', () => {
+    // 外层用 4 个反引号：同长度的嵌套围栏才是合法的 Markdown 示例。
+    const body = `\`\`\`\`markdown\n\`\`\`json\n{"prd":{"requirements":[]}}\n\`\`\`\n\`\`\`\`\n\n\`\`\`json\n${legacyPrd()}\n\`\`\`\n`
+    const extracted = extractJsonBlock(body)
+    expect(extracted.ok).toBe(true)
+    if (extracted.ok) {
+      const parsed = extracted.value as { prd: { requirements: unknown[] } }
+      expect(parsed.prd.requirements).toHaveLength(1)
+    }
+    expect(extractJsonBlock('````markdown\n```json\n{}\n```\n````\n').ok).toBe(false)
+  })
+
+  it('跨行行内代码里的标题不算定义，REQ 字段不被截断', () => {
+    const sections = requirementSection().replace(
+      '- userStory: 作为财务，我要导入流水，以便自动对账',
+      '- userStory: `start\n### REQ-999 示例\n`\n- 说明: 这行仍在 REQ-001 里',
+    )
+    const result = validateProductDocs(mrdDoc(mrd()), prd({ sections }))
+    expect(result.errors, result.errors.join()).toEqual([])
+    expect(result).toMatchObject({ ok: true, reqCount: 1 })
+  })
+})

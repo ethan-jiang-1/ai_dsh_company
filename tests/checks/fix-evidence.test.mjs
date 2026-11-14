@@ -8,7 +8,7 @@
 // 负例留证 2026-11-14：删掉 `section(evidence)` 判定 → 「缺节」用例绿（红）；去掉提交交集比较 →
 // 「提交没改到」用例绿（红）。
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { test } from 'node:test'
@@ -188,5 +188,65 @@ test('证据提交不在 HEAD 历史上 → 红（当前分支无法复算）', 
     git(['checkout', '-q', 'main'])
     card(dir, { evidence: evidence(sideSha) })
     assert.match(gate(dir).problems.join(), /不在 HEAD 历史上/)
+  } finally { cleanup() }
+})
+
+test('卡面代码块里引用节标题不影响真实节（BUG-178）', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    card(dir, { evidence: evidence(sha) })
+    const path = join(dir, '_backlog/_archive/fixed_bugs/BUG-900-fixture.md')
+    writeFileSync(path, readFileSync(path, 'utf8').replace('## 修复证据', '```md\n## 修复证据\n```\n\n## 修复证据'))
+    assert.deepEqual(gate(dir).problems, [])
+  } finally { cleanup() }
+})
+
+test('只有代码块里的节标题 → 缺节', () => {
+  const { dir, cleanup } = repo()
+  try {
+    const path = join(dir, '_backlog/_archive/fixed_bugs/BUG-900-fixture.md')
+    mkdirSync(join(dir, '_backlog/_archive/fixed_bugs'), { recursive: true })
+    writeFileSync(path, ['---', 'status: 已修', 'severity: P2', `opened: ${OPENED}`, '---', '', '```md', '## 修复证据', '```', ''].join('\n'))
+    assert.match(gate(dir).problems.join(), /缺「## 修复证据」/)
+  } finally { cleanup() }
+})
+
+test('合法命令形态不误伤：pnpm run / --filter / node --import（BUG-177）', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    mkdirSync(join(dir, 'tests/demo'), { recursive: true })
+    writeFileSync(join(dir, 'tests/demo/run.mjs'), '// probe\n')
+    const forms = [
+      '`pnpm run test`',
+      '`pnpm --filter fix-evidence-fixture test`',
+      '`node --import tsx/esm tests/demo/run.mjs`',
+    ]
+    forms.forEach((command, index) => {
+      card(dir, {
+        name: `BUG-90${index + 1}-fixture.md`,
+        evidence: evidence(sha, 'packages/demo/a.ts', `- 红：拆守卫 → ${command} 红`, `- 绿：接回守卫 → ${command} 绿`),
+      })
+    })
+    assert.deepEqual(gate(dir).problems, [])
+  } finally { cleanup() }
+})
+
+test('空操作命令不算证据：sh -c / node 配置 / git（BUG-182）', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    const forms = ['sh -c true', 'node package.json', 'git status']
+    forms.forEach((command, index) => {
+      card(dir, {
+        name: `BUG-91${index + 1}-fixture.md`,
+        evidence: evidence(sha, 'packages/demo/a.ts', `- 红：拆守卫 → \`${command}\` 红`, `- 绿：接回守卫 → \`${command}\` 绿`),
+      })
+    })
+    const problems = gate(dir).problems.join('；')
+    assert.match(problems, /sh -c 是内联脚本/)
+    assert.match(problems, /node 目标须是脚本文件/)
+    assert.match(problems, /git 子命令不产生红→绿/)
   } finally { cleanup() }
 })

@@ -13,7 +13,7 @@
  * 2026-11-14：文档结构行判据（平台归一化 + 围栏 + HTML 注释）移到 `markdown-shape.ts`，
  * 与 `/req check` 共用同一份——两个消费者对同一份文档不允许有两种结论（BUG-160/162）。
  */
-import { maskHtmlComments, normalizeDocument, scanDocument, scanDocumentDetailed, splitTableRow } from './markdown-shape.ts'
+import { normalizeDocument, scanDocument, scanDocumentDetailed, splitTableRow } from './markdown-shape.ts'
 
 export type PrdDocStatus = 'draft' | 'ready' | 'in-dev' | 'accepted'
 export type PrdForm = 'headings' | 'json-ledger'
@@ -110,10 +110,12 @@ export function parsePrdHeader(text: string): { readonly layer?: string; readonl
  * 先屏蔽 HTML 注释：注释里的账本是「停用」的，不能被当成定义（BUG-173）。
  */
 export function extractJsonBlock(text: string): { readonly ok: true; readonly value: unknown } | { readonly ok: false; readonly error: string } {
-  const match = /```json\s*\n([\s\S]*?)\n```/.exec(maskHtmlComments(text))
-  if (match === null) return { ok: false, error: '缺 ```json 需求块（模板见 content/templates/mrd.md；PRD 新形状见 prd.md）' }
+  // 只认**顶层**围栏块：示例围栏（markdown 块里嵌 json 块）不会被当成账本（BUG-176）；
+  // 注释里的围栏在结构扫描里已经不算围栏，天然被排除。
+  const block = scanDocumentDetailed(text).fences.find(fence => /^json\b/i.test(fence.info.trim()))
+  if (block === undefined) return { ok: false, error: '缺 ```json 需求块（模板见 content/templates/mrd.md；PRD 新形状见 prd.md）' }
   try {
-    return { ok: true, value: JSON.parse(match[1] ?? '') as unknown }
+    return { ok: true, value: JSON.parse(block.content) as unknown }
   } catch (error) {
     return { ok: false, error: `json 需求块不可解析：${(error as Error).message}` }
   }

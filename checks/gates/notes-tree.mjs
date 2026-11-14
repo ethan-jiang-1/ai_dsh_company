@@ -1,6 +1,6 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 // 何时跑：每次 verify；在 notes/ 下新增、移动文件或目录，或改 Note 状态行后。
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { lstatSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 // ── notes 树形与状态行门禁（notes-tree，2026-11-14 立；卡 = _backlog/issues/2026-11-14-notes-tree-and-carrier-gates.md）──
@@ -70,6 +70,15 @@ const isDirectory = (path) => {
   }
 }
 
+/** lstat（不跟随 symlink）；缺失返回 null。 */
+const lstatOrNull = (path) => {
+  try {
+    return lstatSync(path)
+  } catch {
+    return null
+  }
+}
+
 const noteDate = (name) => /^(\d{4}-\d{2}-\d{2})-/.exec(name)?.[1]
 
 /** 一个文件条目的形状问题；非 `.md`（证据件）不判。 */
@@ -97,8 +106,15 @@ function fileProblems(rel, name, problems) {
  */
 export function notesTreeProblems(root) {
   const notesDir = join(root, 'notes')
-  if (!isDirectory(notesDir)) {
+  const rootInfo = lstatOrNull(notesDir)
+  if (rootInfo === null) {
     return { problems: ['notes/ — 不在盘上（树形门禁的根；目录树就是清单，不许消失）'], files: 0 }
+  }
+  if (rootInfo.isSymbolicLink()) {
+    return { problems: ['notes/ — 根是符号链接（Notes 只许仓内普通目录；链接目标绕不过形状与状态门）'], files: 0 }
+  }
+  if (!rootInfo.isDirectory()) {
+    return { problems: ['notes/ — 不是目录（树形门禁的根；目录树就是清单）'], files: 0 }
   }
   const problems = []
   let files = 0
@@ -165,7 +181,9 @@ export function notesTreeProblems(root) {
  */
 export function notesStatusProblems(root, effective = STATUS_EFFECTIVE_DATE) {
   const notesDir = join(root, 'notes')
-  if (!isDirectory(notesDir)) return { problems: [], checked: 0 }
+  const rootInfo = lstatOrNull(notesDir)
+  // 根不在/是链接/不是目录时状态门不跟随（根形状由 notesTreeProblems 报一次，避免同一问题两处红）。
+  if (rootInfo === null || rootInfo.isSymbolicLink() || !rootInfo.isDirectory()) return { problems: [], checked: 0 }
   const problems = []
   let checked = 0
   for (const lifecycle of LIFECYCLES) {

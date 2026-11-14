@@ -166,6 +166,22 @@ const check = (label, passed) => {
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 
+// ── notes 根 symlink（BUG-183）───────────────────────────────────────────────
+{
+  const base = mkdtempSync(join(tmpdir(), 'notes-root-symlink-'))
+  try {
+    const outside = join(base, 'outside')
+    mkdirSync(join(outside, 'implemented'), { recursive: true })
+    writeFileSync(join(outside, 'README.md'), '# outside\n')
+    writeFileSync(join(outside, 'implemented/2026-11-14-x.md'), '# x\n\n状态：implemented\n')
+    mkdirSync(join(base, 'repo'))
+    symlinkSync(outside, join(base, 'repo/notes'))
+    const root = join(base, 'repo')
+    check('notes 根 symlink → 红', treeHas(root, '根是符号链接'))
+    check('根 symlink 时 status 不跟随', gate.notesStatusProblems(root).checked === 0)
+  } finally { rmSync(base, { recursive: true, force: true }) }
+}
+
 // ── rejected 生命周期与日历日期（BUG-163/167）────────────────────────────────
 {
   const root = makeTree()

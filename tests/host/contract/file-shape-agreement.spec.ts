@@ -174,10 +174,18 @@ describe('越界 `..` 路径的三态子类（BUG-170）', () => {
       mkdirSync(join(ws, '.dsh-company/kb'), { recursive: true })
       writeFileSync(join(ws, '.dsh-company/kb/company.md'), '# ok\n')
       const home = join(ws, '.dsh-company')
-      for (const rel of ['../outside/secret.md', '../../outside/secret.md', 'a/../../outside/secret.md']) {
+      for (const rel of [
+        '../outside/secret.md',
+        '../../outside/secret.md',
+        'a/../../outside/secret.md',
+        '..\\outside\\secret.md',
+        'kb\\..\\..\\outside\\secret.md',
+      ]) {
         expect(readCompanyFileAt(home, rel).kind, rel).toBe('unsafe')
         expect(companyFileProblemAt(home, rel), rel).toBe('unsafe')
       }
+      // 内部 `..` 消解后仍在根内 → 照常读（BUG-179）；等价规范路径结果一致。
+      expect(readCompanyFileAt(home, 'kb/../kb/company.md')).toEqual({ kind: 'text', text: '# ok\n' })
       expect(readCompanyFileAt(home, 'kb/company.md')).toEqual({ kind: 'text', text: '# ok\n' })
     } finally { rmSync(ws, { recursive: true, force: true }) }
   })

@@ -21,7 +21,8 @@ export class UnsafeCompanyPathError extends Error {
 
 /** 把 `.dsh-company/…` / `kb/…` 统一成相对公司盘根的路径。 */
 function relToCompany(rel: string): string {
-  const normalized = rel.replace(/^\.?\//, '')
+  // 公司盘内部路径统一用 `/`；Windows 分隔符也按分隔符处理（BUG-180）。
+  const normalized = rel.replaceAll('\\', '/').replace(/^\.?\//, '')
   return normalized.startsWith('.dsh-company/') ? normalized.slice('.dsh-company/'.length) : normalized
 }
 
@@ -36,15 +37,21 @@ function lstatOrNull(path: string): Stats | null {
 
 /** 从已证明安全的根逐级走目录；create 时缺失则创建，symlink/文件占目录 → typed error。 */
 function walkCompanyDirs(root: string, rel: string, create: boolean): string {
-  const segments = rel.split('/').filter(Boolean)
-  // `..` 段一律 unsafe，且必须在走目录之前全量判定：不存在的中间段会让循环提前返回（create=false 时），
-  // 把「越界」折成「没有」——而 missing 是可豁免语义（BUG-170，a/../.. 形状实测会漏）。
-  if (segments.some(segment => segment === '..')) {
-    throw new UnsafeCompanyPathError(`公司盘路径不能含 .. 段（越出根）：${rel}`)
+  // 段语义（BUG-179/180）：平台无关分隔符（`/` 与 `\`）切段，`..` 用栈式消解——
+  // 内部 `..`（`a/../b`）解析为盘内路径，栈空再遇 `..` 才是越界。必须先消解再走目录：
+  // 不存在的中间段会让循环提前返回（create=false 时），把「越界」折成「没有」（missing 可豁免）。
+  const segments: string[] = []
+  for (const segment of rel.split(/[\\/]+/)) {
+    if (segment === '' || segment === '.') continue
+    if (segment === '..') {
+      if (segments.length === 0) throw new UnsafeCompanyPathError(`公司盘路径越出根：${rel}`)
+      segments.pop()
+      continue
+    }
+    segments.push(segment)
   }
   let current = root
   for (const segment of segments) {
-    if (segment === '.') continue
     current = join(current, segment)
     let info = lstatOrNull(current)
     if (info === null) {
@@ -218,12 +225,14 @@ export function ensureCompanyRootAt(companyHome: string, options: { readonly cre
 
 /** 逐级证明 companyHome 下的目录安全（可选创建）；symlink/文件占目录 → typed error。 */
 export function ensureCompanyDirAt(companyHome: string, rel: string, options: { readonly create?: boolean } = {}): string {
+  rel = rel.replaceAll('\\', '/')
   if (options.create === true) assertCompanyWritesAllowed()
   return walkCompanyDirs(ensureCompanyRootAt(companyHome, options), rel, options.create === true)
 }
 
 /** companyHome 下文件的形状：missing / unsafe（symlink/目录/越界）/ null（可读普通文件）。 */
 export function companyFileProblemAt(companyHome: string, rel: string): 'missing' | 'unsafe' | null {
+  rel = rel.replaceAll('\\', '/')
   try { ensureCompanyRootAt(companyHome) } catch { return 'unsafe' }
   const parentRel = dirname(rel)
   try { if (parentRel !== '.') ensureCompanyDirAt(companyHome, parentRel) } catch { return 'unsafe' }
@@ -233,6 +242,7 @@ export function companyFileProblemAt(companyHome: string, rel: string): 'missing
 
 /** 读 companyHome 下普通文件；坏形状返回 undefined。 */
 export function readCompanyTextAt(companyHome: string, rel: string): string | undefined {
+  rel = rel.replaceAll('\\', '/')
   if (companyFileProblemAt(companyHome, rel) !== null) return undefined
   try { return readFileSync(join(companyHome, rel), 'utf8') } catch { return undefined }
 }
@@ -253,6 +263,7 @@ export type CompanyFileRead =
  * @returns text / missing / unsafe；unsafe 的 reason 可直接进模型可见文案。
  */
 export function readCompanyFileAt(companyHome: string, rel: string): CompanyFileRead {
+  rel = rel.replaceAll('\\', '/')
   try { ensureCompanyRootAt(companyHome) } catch (error) {
     return { kind: 'unsafe', reason: `公司盘根不是可读目录：${(error as Error).message}` }
   }
@@ -270,6 +281,7 @@ export function readCompanyFileAt(companyHome: string, rel: string): CompanyFile
 
 /** 原子写 companyHome 下文件（父目录安全、目标非目录；symlink 由 rename 替换）。 */
 export function writeCompanyAtomicAt(companyHome: string, rel: string, text: string, deps: CompanyAtomicWriteDeps = {}): void {
+  rel = rel.replaceAll('\\', '/')
   assertCompanyWritesAllowed()
   writeAtomicAtRoot(ensureCompanyRootAt(companyHome, { create: true }), rel, text, deps)
 }
