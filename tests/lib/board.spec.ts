@@ -3,7 +3,7 @@
 //   实地造红→还原→绿：把 `board.ts` 的 `ready: task.ready ?? (status === 'pending' && readyOf(...))`
 //   改回 `ready: task.ready ?? readyOf(...)`（去掉 pending 半句）⇒ 本文件 2 条红
 //   （「真 wire 形状：非 pending 任务一律不报 ready」与「ready 字段缺失时回落值也不许比官方宽松」）；
-//   还原后 17 passed。配方可逐字复现：sed 那一行 → npx vitest run tests/company/board.spec.ts。
+//   还原后 17 passed。配方可逐字复现：sed 那一行 → npx vitest run tests/lib/board.spec.ts。
 import { describe, expect, it } from 'vitest'
 import {
   BOARD_STATUS_ORDER,

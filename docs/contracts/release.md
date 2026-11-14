@@ -137,9 +137,10 @@ reset/clean，不覆盖并发修改。安装限 180 秒、vendor build 与 relea
   `--allow-pre-publish-index` 确认“不会托管”；发布后 `npm publish`、删 staged，再跑
   `pnpm market:hosted` 通过后才托管。
 > `market-index.staged.json` 是 6 行**未发布哨兵**，不是待托管索引副本；不要把它编辑成 index。
-- **READY 的适用面 = 当前工作树**（暖 `lib/` + `_dist/`）。fresh-clone CI 只跑
-  `install + bundle:init + verify`，不跑 test/release；干净 clone 上重放 release 是已知缺口，
-  不冒充 READY 的承诺。
+- **READY 的适用面 = 当前工作树**（暖 `lib/` + `_dist/`）。fresh-clone CI 三档：
+  `install-verify`（Ubuntu+macOS：install + bundle:init + verify）、`setup-macos`（macOS 全量
+  `pnpm setup` + verify + test + keyless lane）、`install-channel`（真实 npm DSH 通道）；
+  **不跑 release**。干净 clone 上重放 release 仍是已知缺口，不冒充 READY 的承诺。
 - **升级既有 workspace**：新增的状态默认值（如 `.dsh-company/kb/process-docs.md`）只在缺失时补种，用户改过的版本一个字节不覆盖；旧动议无 `编号体系:` 标记 = `/req check` 只读豁免（`skipped`），不回溯改历史。
 
 ## 手动分发（`node tools/export-dist.mjs`）

@@ -61,6 +61,18 @@ describe('tests/README 导航骨架', () => {
   })
 })
 
+describe('AGENTS 命令表路径', () => {
+  it('命令表提到的 tests/ 路径都存在', () => {
+    const text = read('AGENTS.md')
+    const tokens = [...new Set([...text.matchAll(/tests\/[A-Za-z0-9._-]+/g)].map((match) => match[0]))]
+      .filter((token) => !token.endsWith('.md'))
+    expect(tokens.length).toBeGreaterThan(0)
+    for (const token of tokens) {
+      expect(existsSync(join(repositoryRoot, token)), `AGENTS.md 引用不存在的路径：${token}`).toBe(true)
+    }
+  })
+})
+
 describe('snapshots 场景元数据政策', () => {
   it('新场景 oracle 来源性质声明政策在场', () => {
     const text = read('snapshots/README.md')

@@ -83,7 +83,7 @@ Desktop 自带 Node/pnpm；命令行版 DSH 需 pnpm 在 PATH（或 `corepack en
 
 ## 更多
 
-- **完整安装与使用手册**：[安装手册](./_dist/安装手册.md)（tarball 与手册同目录分发，两件套；含升级/备份/卸载/排障）
+- **完整安装与使用手册**：[安装手册](./_dist/安装手册.md)（与最新导出的发布版同版本；HEAD 未导出的改动以本 README / pack README 为准；tarball 与手册同目录分发，两件套）
 - **出问题了**：先看手册 §九；仍不行去 [仓库 issue](https://github.com/ethan-jiang-1/ai_dsh_company/issues) 提问
-- **开发者**（从源码构建、跑门禁、改角色内容）：[bootstrap](./docs/guides/bootstrap.md)；源码 clone 的 `_dist/` 只有 tracked 手册，tarball 由 `pnpm release --prepare` 生成（收件人用发行两件套）。
+- **开发者**（从源码构建、跑门禁、改角色内容）：[bootstrap](./docs/guides/bootstrap.md)；**本仓库是维护者源码 handoff，不产出可安装 tarball**——收件人两件套由 `pnpm release --prepare` 生成；维护者首跑含 vendor 构建（分钟级），与收件人的 5 分钟安装是两条路。
 - **Agent / 机制**：[AGENTS.md](./AGENTS.md) · [文档地图](./docs/index.md) · License: MIT
