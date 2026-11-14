@@ -83,12 +83,16 @@ test('非注册原语植入裸 frontmatter 正则/前缀或裸 Markdown `##` 节
       "export const b = t => t.split('\\n## 尾')",
       'export const c = /\\n## /',
       'export const d = /(?=^## )/m',
+      'export const e = /(?:^|\\n)## /',
+      'export const f = /\\n#{2} /',
+      'export const g = /^[#]{2}/',
+      "export const h = t => t.startsWith('##')",
       "export const ok1 = u => u.startsWith('#') || u.indexOf('#') || u.includes('# 标题')",
     ].join('\n'))
     const escaped = gate(root, { carriers: [{ kind: 'writer', module: MODULE }] }).problems.join('；')
-    for (const line of [1, 2, 3, 4]) {
+    for (const line of [1, 2, 3, 4, 5, 6, 7, 8]) {
       assert.match(escaped, new RegExp(`escape-gate\\.mjs:${String(line)} → 禁止手写裸 Markdown 节`))
     }
-    assert.doesNotMatch(escaped, /escape-gate\.mjs:5/)
+    assert.doesNotMatch(escaped, /escape-gate\.mjs:9/)
   } finally { rmSync(root, { recursive: true, force: true }) }
 })

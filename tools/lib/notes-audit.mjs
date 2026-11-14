@@ -26,10 +26,14 @@ const RECEIPT_SIGNALS = [
   [/不是产品合同/, '自述「不是产品合同」'],
   [/一次真环境模拟/, '自述「一次真环境模拟」'],
   [/收尾回执/, '标题/性质是收尾回执'],
-  [/^#\s*第[一二三四五六七八九十\d]+场/m, '标题是演练场次'],
-  [/^#\s*批[ A-Z0-9]/m, '标题是批次进度'],
   [/批次收尾/, '标题是批次收尾'],
-  [/^#.*(基线|走查|模拟)/m, '标题是基线/走查/模拟'],
+]
+
+// 标题体裁只认 H1 文本（`noteTitle` 经 repo-markdown 结构视图取得，不再手写 `^#` 行匹配）。
+const TITLE_SIGNALS = [
+  [/^第[一二三四五六七八九十\d]+场/, '标题是演练场次'],
+  [/^批[ A-Z0-9]/, '标题是批次进度'],
+  [/(基线|走查|模拟)/, '标题是基线/走查/模拟'],
 ]
 
 /** 文件名日期（`YYYY-MM-DD-<slug>.md`）；不合命名 = null。 */
@@ -119,7 +123,10 @@ export function receiptReasons(text) {
   const head = structural.filter(item => item.lineNumber <= 4).map(item => item.text).join('\n')
   const nature = structural.map(item => item.text).find(row => /^\s*性质[:：]/.test(row)) ?? ''
   const scope = `${noteTitle(text) ?? ''}\n${noteStatus(text) ?? ''}\n${head}\n${nature}`
-  return RECEIPT_SIGNALS.filter(([re]) => re.test(scope)).map(([, why]) => why)
+  const title = noteTitle(text) ?? ''
+  const reasons = RECEIPT_SIGNALS.filter(([re]) => re.test(scope)).map(([, why]) => why)
+  for (const [re, why] of TITLE_SIGNALS) if (re.test(title) && !reasons.includes(why)) reasons.push(why)
+  return reasons
 }
 
 /** 是否有「## 决定 / ## 决策」节（容许 `## ② 决定（机制栈）` 这类编号前缀；经 `repo-markdown` GFM AST 排除围栏示例）。 */

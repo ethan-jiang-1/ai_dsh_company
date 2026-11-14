@@ -15,6 +15,8 @@ import { parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
 //   ② 登记项自身必须可解析：module 存在、CARRIERS 的 symbol 在文件里出现、KNOWN_GAP 的 bug 卡存在；
 //   ③ checks/gates/*.mjs 与 tools/lib/*.mjs（排除 MARKDOWN_PRIMITIVES）的 AST 正则字面量与 RegExp 构造
 //      不得出现裸 YAML frontmatter 正则或裸 Markdown `##` 节切分正则（精确报 file:line）。
+//      声明的边界（开放集合，不是穷尽承诺）：只管 ^ 锚 / `\n` 前缀 / `[#]{n}` 的正则字面量与 RegExp 构造，
+//      及 `.startsWith/.split` 的 `#…` 字符串字面量；标识符间接传参、slice/replace/match 不扫——靠 gate-change 盲审补位。
 // 负例留证 2026-11-13 / 2026-11-14：
 //   - 新建未登记 host writer → `FAIL company-root-carriers: … → 未登记的公司盘写入口`；
 //   - 在任一非原语门禁植入 `/^##\s+/` 或 `/^---\r?\n/` → `FAIL company-root-carriers: … → 禁止手写裸 …`。
@@ -26,12 +28,12 @@ const WRITE_REF = /writeFileSync|appendFileSync|renameSync|mkdirSync|rmSync|cpSy
 const RAW_FRONTMATTER_RE = /^\^(?:\(\?:(?:\\uFEFF|\\ufeff|\\xEF\\xBB\\xBF|\uFEFF)\)\?|(?:\\uFEFF|\\ufeff|\\xEF\\xBB\\xBF|\uFEFF)\?)?---(?:\\r\?\\n|\\n|\\s|\s|\$)/
 const LEADING_WS_TOKEN = String.raw`(?:\(\?:|\()?(?:\\s| |\\t|\[[^\]]+\])(?:[*+?]|\\?\{\d+(?:,\d*)?\\?\})?\)?\??`
 const RAW_HEADING_SPLIT_RE = new RegExp(
-  String.raw`^\^(?:${LEADING_WS_TOKEN}){0,3}\(?#(?:\{\d+(?:,\d*)?\}|\+|#(?:\s|\\s|\[|\^|\$|\)|#|[^#]))`,
+  String.raw`^\^(?:${LEADING_WS_TOKEN}){0,3}\(?(?:\[#\]|#)(?:\{\d+(?:,\d*)?\}|\+|#(?:\s|\\s|\[|\^|\$|\)|#|[^#])|\{)`,
 )
 /** 非 `^` 锚的裸节正则：`\n## `、`(?=^## )`、`(?<=\n)## `（字面量源文本里 `\n` 是反斜杠加 n）。 */
-const RAW_HEADING_ANYWHERE_RE = /(?:\\n|\(\?=\^|\(\?<=\\n)\(?#{1,6}(?:\\s| |\[|\))/
+const RAW_HEADING_ANYWHERE_RE = /(?:\\n|\(\?=\^|\(\?<=\\n|\^\|\\n\))\(?(?:\[#\]|#)(?:#|\{|\\s| |\[|\))/
 /** 字符串形态的裸节判据：`'## x'` / `'\n## x'` / `'# '`（startsWith/split 的参数；URL 锚 `#` 与 includes/indexOf 存在性探测不在此列）。 */
-const RAW_HEADING_STRING_RE = /^\n?#{1,6} /
+const RAW_HEADING_STRING_RE = /^\n?(?:#{1,6} |#{2,6}$)/
 const RAW_STRING_CALLS = new Set(['startsWith', 'split'])
 const RAW_FRONTMATTER_PREFIX_RE = /^(?:\uFEFF)?---\r?\n/
 const RAW_SCAN_SELF = 'checks/gates/company-root-carriers.mjs'
