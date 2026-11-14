@@ -402,6 +402,18 @@ describe('围栏示例与跨行行内代码（BUG-176/181）', () => {
     expect(extractJsonBlock('````markdown\n```json\n{}\n```\n````\n').ok).toBe(false)
   })
 
+  it('跨行 span 闭合行上的残余标题也不当定义（保守非结构）', () => {
+    // 闭合行本身也属于 span（CommonMark 代码 span 的闭合行是边界）；闭合反引号之后的残余
+    // 文本保守按非结构处理，避免把正文残片当定义。这是策略钉，不是 bug 复现。
+    const sections = requirementSection().replace(
+      '- userStory: 作为财务，我要导入流水，以便自动对账',
+      '- userStory: `start\n### REQ-999 示例\n` 闭合行残余 ### REQ-998\n- 说明: 这行仍在 REQ-001 里',
+    )
+    const result = validateProductDocs(mrdDoc(mrd()), prd({ sections }))
+    expect(result.errors, result.errors.join()).toEqual([])
+    expect(result).toMatchObject({ ok: true, reqCount: 1 })
+  })
+
   it('跨行行内代码里的标题不算定义，REQ 字段不被截断', () => {
     const sections = requirementSection().replace(
       '- userStory: 作为财务，我要导入流水，以便自动对账',

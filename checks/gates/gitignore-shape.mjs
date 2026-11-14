@@ -19,6 +19,9 @@ const REQUIRED_RULES = [
   /^runtime\/harness-home\/\*$/m,
   /^!runtime\/harness-home\/README\.md$/m,
   /^coverage\/$/m,
+  /^company-workspace\/$/m,
+  /^_dist\/\*$/m,
+  /^!_dist\/安装手册\.md$/m,
 ]
 
 const EXPECTED = [
@@ -33,6 +36,7 @@ const EXPECTED = [
   ['_dist/dsh-company-pack-0.3.1.tgz', true],
   ['_dist/安装手册.md', false],
   ['coverage/coverage-summary.json', true],
+  ['company-workspace/.dsh-company/kb/x.md', true],
 ]
 
 function statusFor(root, path) {

@@ -61,6 +61,18 @@ opened: 2026-11-14
 2. **policy**：notes 根 symlink 一律红（v5 已定；未来支持要新形状）、跨行 span 闭合行之后（保守非结构，是取舍）；
 3. **unprovable in verify**：命令“真跑过/真会红”不能在秒级 `verify` 里证明（执行归 test/pre-push）。
 
+### v5 未覆盖轴的分类（P0.2）
+
+| 轴 | 分类 | 现行证据 / 去向 |
+|---|---|---|
+| Windows `..\` | **environment gap**（字符串语义已有 fixture） | `tests/host/contract/file-shape-agreement.spec.ts` 的 `..\outside` 形状；真 runner 另立 trigger = `_backlog/triggers.md`「Windows CI/实机 runner 可用」 |
+| 跨行 span 闭合行残余 | **policy** | 新增 `tests/lib/prd-check.spec.ts`「闭合行上的残余标题也不当定义」——保守非结构是取舍，不是 bug |
+| 围栏块嵌套 | **covered** | `tests/lib/prd-check.spec.ts` BUG-176 用例（外层 4 反引号 + 内层 3 反引号 + 真账本） |
+| 命令只证形态不证执行 | **unprovable in verify** | 执行归 `pnpm test` / pre-push；`fix-evidence` 只做命令语法解析（`tests/checks/fix-evidence.test.mjs`） |
+| notes 根 symlink 一律红 | **policy** | `tests/checks/notes-tree.test.mjs` 的根 symlink 用例；未来支持要新形状，不直接放开 |
+
+**结论**：5 条里 1 条 covered、1 条 environment gap、2 条 policy、1 条 unprovable；**没有一条需要再补“同类手写 spec”**。这比“看到未覆盖轴就加测试”少 4 个无效资产。
+
 ## 事实与读者
 
 - 事实：**测试资产的杠杆/预防能力**（不是某个产品状态）。

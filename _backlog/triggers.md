@@ -14,3 +14,4 @@
 |---|---|---|---|
 | snapshots 证据副本体积（`convergence-*/` 的 journal 留底，每 slug 收敛各拷一份） | 维持现行政策（不预外置）；外置冷存的家 = snapshots/README 冷存政策 | 下一次 `pnpm verify` 的 snapshots 体积门禁（≤64M）红 | 当轮收敛执行者（维护者） |
 | wiki 页数 >100–200（`company-workspace` 的 wiki 目录页数统计） | 升级为 L1 FTS 索引（`/wiki search`） | 当轮观察者（维护者） |
+| Windows CI/实机 runner 可用 | 把 `..\` / UNC / 大小写路径从字符串单测升到真 runner（BUG-180 的 P1 观察） | 首次 Windows runner 可用（一次 CI 配置或一次审计） | 维护者 |

@@ -37,7 +37,7 @@
 3. **业务数据拆独立仓 / submodule**：converge、deliverables-check、orient、rehearsal 全要跨仓跳，收益不抵复杂度（数据再涨 10× 再回看）。
 4. **journal 也出 git**：converge 的 `git rm` 收割与 [journal-audit](../../checks/audit/journal-audit.mjs) 的"在场(已归档)"识别都吃 tracked 面；
    留待有明确收益时再动（现在它们小、且是收敛流程的输入）。
-5. **只在 .gitignore 写规则、不做进程级核查**：`git add -f` 能绕过（[gitignore-guards spec](../../tests/repo/gitignore-guards.spec.ts) 自己登记过这个盲点）。
+5. **只在 .gitignore 写规则、不做进程级核查**：`git add -f` 能绕过（[gitignore-shape 门](../../checks/gates/gitignore-shape.mjs) 自己登记过这个盲点）。
 
 ## 后果与边界
 
@@ -69,5 +69,5 @@
 - 规则：`.gitignore`（两条点名规则 + 理由/量级注释）。
 - 机制：`tools/lib/converge-rules.mjs`（`archiveMovePlan`）、`tools/converge.mjs`（搬移段）、`tools/orient.mjs`（ignored 计数）。
 - 判据：`checks/run-gates.mjs` 的 `drafts-untracked`、`probes/fs-taskboard/archive-move-probe.mjs`、
-  `tests/tools/converge-rules.spec.ts`（纯计划）、`tests/repo/gitignore-guards.spec.ts`（规则在场）。
+  `tests/tools/converge-rules.spec.ts`（纯计划）、`checks/gates/gitignore-shape.mjs`（规则在场；原 gitignore-guards spec 2026-11-14 退役）。
 - 文档：`docs/guides/dev-loop.md` §7、`snapshots/README.md` §归档动作、`docs/project-map.md` 公司盘行。

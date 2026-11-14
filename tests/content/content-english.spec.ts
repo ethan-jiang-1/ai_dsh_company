@@ -25,3 +25,19 @@ describe('content 全局英文棘轮', () => {
     expect(offenders.map(path => path.slice(DIR.length + 1)), '仍有中文').toEqual([])
   })
 })
+
+/** 关键内容目录的**文件清单**（原 charters/company/generic 三个 spec 的唯一独有断言）。 */
+const FILE_LISTS: Record<string, string[]> = {
+  charters: ['ceo.md', 'cfo.md', 'cmo.md', 'coo.md', 'vp-eng.md', 'vp-sales.md'],
+  company: ['policy-lines.md', 'rates.md', 'review-protocol.md'],
+  generic: ['collaboration.md', 'deliverable-states.md', 'human-interface.md', 'role-boundary.md', 'routing.md', 'work-handoff.md'],
+}
+
+describe('关键内容目录的文件清单', () => {
+  for (const [dir, expected] of Object.entries(FILE_LISTS)) {
+    it(`${dir} 清单不漂`, () => {
+      const files = readdirSync(join(DIR, dir)).filter(name => name.endsWith('.md')).sort()
+      expect(files).toEqual([...expected].sort())
+    })
+  }
+})
