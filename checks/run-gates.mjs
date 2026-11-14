@@ -75,6 +75,7 @@ import * as backlogLiveness from './gates/backlog-liveness.mjs'
 import * as replaySceneLiveness from './gates/replay-scene-liveness.mjs'
 import * as snapshotIndex from './gates/snapshot-index.mjs'
 import * as guardRedRecord from './gates/guard-red-record.mjs'
+import * as fixEvidence from './gates/fix-evidence.mjs'
 import * as specDuplicates from './gates/spec-duplicates.mjs'
 import * as linkDebt from './gates/link-debt.mjs'
 import * as retiredClaims from './gates/retired-claims.mjs'
@@ -165,6 +166,7 @@ backlogLiveness.run(ctx)
 replaySceneLiveness.run(ctx)
 snapshotIndex.run(ctx)
 guardRedRecord.run(ctx)
+fixEvidence.run(ctx)
 specDuplicates.run(ctx)
 linkDebt.run(ctx)
 retiredClaims.run(ctx)

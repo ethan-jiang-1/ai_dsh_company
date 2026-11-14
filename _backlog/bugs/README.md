@@ -4,7 +4,7 @@
 
 **下一个缺陷号**：Next BUG ID = 168；已分配 BUG-001..167。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
-修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。
+修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
@@ -461,4 +461,12 @@ opened: YYYY-MM-DD
 
 ## 已修判定
 修成什么算修好；可点名验证搭载的工作（其验证随那次运行给出真实答案才动）。翻转到 `修复就绪` 前必须写好——该翻转即门票且授权（限 P1/P2 修复型；排除项见[章程](../README.md)「缺陷的通道」，此处不列）。`修复就绪`/`修复已落地` 缺这一节 = `pnpm verify` 红（门禁查形状，不查判据写得对不对）。
+
+## 修复证据
+（`status: 已修` 且 `opened` ≥ 2026-11-14 必填；缺一即 `pnpm verify` 红——判据唯一家 = [章程](../README.md)「缺陷的通道」）
+
+- 改动面：`path/to/changed`（真实存在；不落在 `_backlog/`、`notes/`、`vendor/`）
+- 红：还原什么 → 哪条断言红（实跑过的命令与结果）
+- 绿：接回什么 → 哪条断言绿（同一命令）
+- 提交：commit <sha>（红→绿所在提交；门禁对账：该提交必须真改到改动面）
 ```

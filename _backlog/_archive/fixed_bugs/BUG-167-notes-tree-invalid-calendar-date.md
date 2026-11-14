@@ -55,6 +55,12 @@ node --import tsx/esm runtime/tmp/c9b-notes-date.mts
 
 判据由 `tests/checks/notes-tree.test.mjs` 的日历日期用例搭载；红证 = 还原成纯形状正则 → 非法日期用例变绿。
 
+## 修复证据
+
+- 改动面：`checks/gates/notes-tree.mjs`、`tests/checks/notes-tree.test.mjs`
+- 红：把 `isCalendarDate` 还原成纯形状正则 + rejected 出循环 → `node tests/checks/notes-tree.test.mjs` 5 FAIL（越界月/非闰年各一条）
+- 绿：接回真实日历往返 → ALL PASS；2024-02-29（闰年）仍绿、非法日期不进受查集合
+- 提交：commit 85e6fec9
 ## 证据
 
 - `runtime/tmp/c9b-notes-date.mts` / `.log`：非法日期文件 `tree.problems: []`、`status.checked: 1`。

@@ -52,6 +52,12 @@ status.checked 计数包含 rejected 新写
 
 判据由 `tests/checks/notes-tree.test.mjs` 的 rejected 三形状搭载；红证 = 把 rejected 从 lifecycle 循环删掉 → 缺状态用例变绿（门禁漏检复现）。
 
+## 修复证据
+
+- 改动面：`checks/gates/notes-tree.mjs`、`tests/checks/notes-tree.test.mjs`
+- 红：把 `rejected` 移出 lifecycle 循环 → rejected 缺状态行用例变绿（门禁漏检复现）
+- 绿：接回 rejected → `node tests/checks/notes-tree.test.mjs` ALL PASS（缺状态/错词/计数三形状）
+- 提交：commit 85e6fec9
 ## 证据
 
 - `runtime/tmp/c9b-notes-tree.mts` / `.log`：`rejected` 无状态行，`tree.problems: []`、`status.checked: 2`。

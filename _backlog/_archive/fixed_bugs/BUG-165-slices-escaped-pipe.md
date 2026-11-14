@@ -60,6 +60,12 @@ Goal / Requirements / Exit 三列里的 `\|` 都按字面竖线解析，不拆�
 
 判据由 `tests/lib/prd-check.spec.ts` 的转义竖线用例搭载；红证 = 还原 `split('|')` → 三条错误（非法 REQ id B / 未列出 REQ-001 / 列出不存在的 REQ B）复现。
 
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/markdown-shape.ts`、`packages/company-pack/src/lib/prd-check.ts`、`tests/lib/prd-check.spec.ts`
+- 红：把 `splitTableRow` 还原成 `split('|')` → 转义竖线用例红（非法 REQ id B / 未列出 REQ-001 / 列出不存在的 REQ B）
+- 绿：接回转义扫描 → 同 spec 29 passed，Goal 还原为 `A | B`
+- 提交：commit 85e6fec9
 ## 证据
 
 - `runtime/tmp/c8b-more-shapes.mts` / `.log`：`escaped pipe false [...]`。

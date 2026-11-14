@@ -57,6 +57,12 @@ pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/asset-lan
 
 判据由 `tests/checks/pre-push-surfaces.test.mjs` 的 merge 形状搭载；红证 = 去掉 merge 分支（回退到单 `diff-tree`）→ 该用例印「未触发」变红。
 
+## 修复证据
+
+- 改动面：`checks/pre-push-surfaces.mjs`、`tests/checks/pre-push-surfaces.test.mjs`
+- 红：删 `commitPaths` 的 merge 分支（回退成单 `diff-tree`）→ merge 用例 `not ok 4`，其余 3 条仍绿
+- 绿：接回「合并结果 vs 第一父」→ `node tests/checks/pre-push-surfaces.test.mjs` 4 passed
+- 提交：commit 85e6fec9
 ## 证据
 
 - `runtime/tmp/c9-merge-probe.sh` / `runtime/tmp/c9-merge.log`：merge 结果含 client 文件，脚本未触发。

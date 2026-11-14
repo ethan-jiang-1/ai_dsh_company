@@ -54,6 +54,12 @@ node --import tsx/esm runtime/tmp/c8b-more-shapes.mts
 
 判据由 `tests/lib/prd-check.spec.ts` 的归属用例搭载；红证 = 去掉 `reqOwner` 映射 → `REQ in two slices true []` 复现。
 
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/prd-check.ts`、`tests/lib/prd-check.spec.ts`
+- 红：去掉 slice 解析里的 `reqOwner` 映射 → 跨 slice 与同 slice 重复两条用例红
+- 绿：接回归属映射 → `tests/lib/prd-check.spec.ts` 29 passed，单归属不误判
+- 提交：commit 85e6fec9
 ## 证据
 
 - `runtime/tmp/c8b-more-shapes.mts` / `.log`：`REQ in two slices true []`。
