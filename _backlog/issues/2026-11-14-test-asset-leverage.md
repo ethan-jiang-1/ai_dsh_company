@@ -105,7 +105,7 @@ opened: 2026-11-14
 
 **R4 被自己的棘轮挡住**：`candidate-scan-labels.spec.ts` 看似“语料已移出”，但它是 **BUG-011 的唯一具名守卫**；删它会让 bug-coverage 从 76 掉到 75，baseline 立即红。**保留**，直到 BUG-011 有活守卫；这是“证明层”第一次阻止错误退役。
 
-**余**：4 个高风险 gate 的定向 mutation（naming/carrier 尚无 tests/checks）；4 消费者差分（prd-check / requirements-check / prd-gate / fix-evidence）；v6 dry-run 证据；R2 collaboration verdict 的纯逻辑提取。
+**余**：4 个高风险 gate 的**定向 mutation**（conformance 已补：fix-evidence/notes-tree 原有，naming/carrier 新增 root 注入测试）；4 消费者差分（prd-check / requirements-check / prd-gate / fix-evidence）；v6 dry-run 证据；R2 collaboration verdict 的纯逻辑提取。
 
 ## 方案与取舍
 
