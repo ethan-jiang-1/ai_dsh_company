@@ -8,9 +8,11 @@ import {
 
 import { makeDoc } from '../support/doc-grammar'
 
-describe('markdown-shape 变形不变量（seeded，200 例）', () => {
+const CASES = Number(process.env.MARKDOWN_SHAPE_CASES ?? 200)
+
+describe(`markdown-shape 变形不变量（seeded，${String(CASES)} 例）`, () => {
   it('归一化幂等：scan(normalize(x)) 与 scan(x) 同形', () => {
-    for (let seed = 0; seed < 200; seed += 1) {
+    for (let seed = 0; seed < CASES; seed += 1) {
       const text = makeDoc(seed)
       const once = scanDocumentDetailed(text)
       const twice = scanDocumentDetailed(normalizeDocument(text))

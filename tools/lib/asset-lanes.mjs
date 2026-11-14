@@ -152,6 +152,11 @@ export const ASSETS = [
     why: '入口链 13 题的认证档答卷归档',
     manualReason: '真模型认证档；入口链文档改动后手动跑',
   }),
+  define('generative', 'classic', ['weekly'], {
+    why: '1000 seeded 文档的形状不变量（归一化/围栏/节定位）',
+    shape: 'generator',
+  }),
+
 ]
 
 /** fast lane 的成员顺序（保持既有 6 条不变；新增要走评审，不许悄悄变长）。 */
@@ -354,6 +359,7 @@ export const FAILURE_CLASS_BY_NAME = {
   'attention-e2e': '模型可见文本',
   'human-loop-e2e': '模型可见文本',
   'entry-probe': '文档指针',
+  'generative': '文档指针',
 }
 
 /** 某资产的失败类；未登记返回「未分类」（census 会报数）。 */
@@ -379,6 +385,7 @@ export const SUFFIX_BY_NAME = {
   'entry-probe': 'entry',
   'external-workspace': 'entry',
   'human-loop-e2e': 'entry',
+  'generative': 'e2e',
   'interrupted-install': 'entry',
   'isolation-matrix': 'entry',
   'multi-install': 'entry',

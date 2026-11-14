@@ -3,7 +3,7 @@
 > 生成：`node tools/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。
 > 触发条件/成本/状态唯一源 = 各脚本头注；本文件只回答“有哪些公开入口、在哪”。
 
-## 冒烟 / 真实入口（checks/lanes/，31）
+## 冒烟 / 真实入口（checks/lanes/，32）
 
 [attention-e2e.entry](lanes/attention-e2e.entry.mjs) · [channel-matrix.entry](lanes/channel-matrix.entry.mjs)
 [client-error-chain.entry](lanes/client-error-chain.entry.mjs)
@@ -12,7 +12,7 @@
 [concurrent-home.entry](lanes/concurrent-home.entry.mjs) · [delegation.entry](lanes/delegation.entry.mjs)
 [entry-probe.entry](lanes/entry-probe.entry.mjs)
 [external-workspace.entry](lanes/external-workspace.entry.mjs) · [fast-lane](lanes/fast-lane.mjs)
-[human-loop-e2e.entry](lanes/human-loop-e2e.entry.mjs)
+[generative.e2e](lanes/generative.e2e.mjs) · [human-loop-e2e.entry](lanes/human-loop-e2e.entry.mjs)
 [interrupted-install.entry](lanes/interrupted-install.entry.mjs)
 [isolation-matrix.entry](lanes/isolation-matrix.entry.mjs) · [keyless-lane](lanes/keyless-lane.mjs)
 [multi-install.entry](lanes/multi-install.entry.mjs)

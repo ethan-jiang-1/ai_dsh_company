@@ -26,3 +26,10 @@
 改动落笔前问一句：**「这次最可能坏的是哪一类？」** 选中一行，按「最低能看见的层」挑检查；
 一行都选不出来 = 要么这次没有行为变更（走文档/静态门），要么表缺一行——立卡改表，不许硬套。
 同一变更常跨多行（例如改 preset 同时触碰模型可见文本与组合装配），每行各要一条证据。
+
+## 复发棘轮（2026-11-14）
+
+- 同一失败类连续两轮 exploratory 出现，且资产形状只有 `example` → 下一轮必须补生成器/模型/元测试；再补一条手写 spec 不算。
+- 资产形状词表 = `example | generator | model | meta`；census 的 `shape` 列是账，`tools/lib/asset-lanes.mjs` 是唯一家。
+- `## 未覆盖轴` 的每条必须有去向（资产/卡/决定/不适用）；机械门 = `notes-axes`（新 Note 生效日 2026-11-15）。
+- 具名守卫只升不降；新修 BUG（opened ≥ 2026-11-15）必须在 spec/test 标题里带 `BUG-nnn`；账 = `tests/BUG-COVERAGE.generated.md` + `tests/support/bug-coverage-baseline.json`。

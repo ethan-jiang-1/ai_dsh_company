@@ -7,15 +7,15 @@
 
 | 指标 | 数量 |
 |---|---|
-| 冒烟 | 29 |
+| 冒烟 | 30 |
 | 探针 | 67 |
 | 结构门禁 | 75 |
 | keyless spec 文件 | 242 |
 | fast lane | 4 |
 | surface lane | 6 |
-| weekly lane | 20 |
+| weekly lane | 21 |
 | 未分类失败类 | 67 |
-| 无消费者资产 | 56 |
+| 无消费者资产 | 57 |
 
 ## 失败类分布
 
@@ -28,8 +28,8 @@
 | 会话持久化 | 3 |
 | 子进程并发 | 3 |
 | 工具定义 | 2 |
+| 文档指针 | 2 |
 | 导出形态 | 1 |
-| 文档指针 | 1 |
 | 注册生命周期 | 1 |
 
 ## 字段（v2）
@@ -69,6 +69,7 @@
 | attention-e2e | model | 手动（真模型 + 多用户并发 lane，人工在场时跑） | 模型可见文本 | example | 2 |
 | human-loop-e2e | model | 手动（真模型 + 真浏览器 ~$1–2，人工在场时跑） | 模型可见文本 | example | 2 |
 | entry-probe | model | 手动（真模型认证档；入口链文档改动后手动跑） | 文档指针 | example | 6 |
+| generative | classic | weekly | 文档指针 | generator | 0 |
 
 ## 探针（调试面，不进自动 lane）
 
