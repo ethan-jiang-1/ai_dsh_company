@@ -8,6 +8,7 @@
 // 边界：只读；不跑 git、不读会话；不把 `notes/` 当第二本账（不生成索引文件）。
 import { existsSync } from 'node:fs'
 import { basename, dirname, join, normalize } from 'node:path'
+import { headingSections, structuralLines } from './repo-markdown.mjs'
 
 const NOTE_DATE = /^(\d{4}-\d{2}-\d{2})-/
 const NOTE_LINK = /\]\(([^)\s]+?\.md)(?:#[^)]*)?\)/g
@@ -120,18 +121,14 @@ export function receiptReasons(text) {
   return RECEIPT_SIGNALS.filter(([re]) => re.test(scope)).map(([, why]) => why)
 }
 
-/** 是否有「## 决定 / ## 决策」节（容许 `## ② 决定（机制栈）` 这类编号前缀）。 */
+/** 是否有「## 决定 / ## 决策」节（容许 `## ② 决定（机制栈）` 这类编号前缀；经 `repo-markdown` GFM AST 排除围栏示例）。 */
 export function hasDecisionSection(text) {
-  return /^##[^\n]*(决定|决策)/m.test(String(text))
+  return headingSections(String(text), { depth: 2 }).some(sec => /(决定|决策)/.test(sec.rawTitle))
 }
 
-/** 把围栏代码块替换成空行（保留行号）；门禁不把示例/代码里的“取代”当指针。 */
+/** 把围栏代码块与块级注释替换成空行（保留行号）；门禁不把示例/代码里的“取代”当指针。 */
 function maskFences(text) {
-  let fenced = false
-  return String(text).split('\n').map(line => {
-    if (/^\s*```/.test(line)) { fenced = !fenced; return '' }
-    return fenced ? '' : line
-  }).join('\n')
+  return structuralLines(String(text)).map(item => (item.structural ? item.text : '')).join('\n')
 }
 
 /** 目标文里是否真的提到了源文件名（整词；`new` 不能命中 `newer`）。 */

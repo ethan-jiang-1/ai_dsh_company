@@ -1,258 +1,328 @@
 /**
- * Markdown 文档形状的唯一实现（2026-11-14，P0 收口）。
+ * Markdown 文档形状的唯一实现（2026-11-14，单状态机收口）。
  *
  * 为什么是 .js：同一份判据要被 **pack（TS）** 与 **门禁（.mjs）** 同时消费；TS 侧只做类型包装，
- * 门禁直接 import 本文件。此前 TS 一份 + fix-evidence 一份简化版，围栏/注释/跨行 code span/BOM
- * 各自解释，BUG-176/178/181 都是这条分叉的症状。规则说明见下方各函数注释。
+ * 门禁直接 import 本文件。全文件仅保留单一扫描状态机 `scanDocumentDetailed`；`sectionRange` 与
+ * `sectionStructuralText` 一律从 `scanDocumentDetailed` 的结构行视图派生，消除第二状态机分叉。
  */
+
+const ASCII_PUNCTUATION = /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/
+
 /**
- * 按 CommonMark 反斜杠转义切表格行（BUG-165/172）。
+ * 按 CommonMark / GFM §4.10 反斜杠转义切表格行（BUG-165/172）。
  *
  * 两条规则按顺序吃：`\\` 是字面反斜杠（吃掉两个字符），`\|` 是字面竖线（吃掉两个字符）；
- * 未转义的 `|` 才是列分隔。先判 `\|` 会把 `\\|` 吞进单元格，少切一列。
- * @param line - 一行表格文本（可带首尾竖线）。
- * @returns 单元格文本（已 trim，转义已还原）。
+ * 未转义的 `|` 才是列分隔（GFM 表格在行内代码解析前切列）。
+ * @param {string} line 一行表格文本（可带首尾竖线）。
+ * @returns {string[]} 单元格文本（已 trim，转义已还原）。
  */
 export function splitTableRow(line) {
-    let body = line.trim();
-    if (body.startsWith('|'))
-        body = body.slice(1);
-    if (body.endsWith('|')) {
-        let backslashes = 0;
-        let cursor = body.length - 2;
-        while (cursor >= 0 && body[cursor] === '\\') {
-            backslashes += 1;
-            cursor -= 1;
-        }
-        if (backslashes % 2 === 0)
-            body = body.slice(0, -1);
+  let body = line.trim()
+  if (body.startsWith('|')) body = body.slice(1)
+  if (body.endsWith('|')) {
+    let backslashes = 0
+    let cursor = body.length - 2
+    while (cursor >= 0 && body[cursor] === '\\') {
+      backslashes += 1
+      cursor -= 1
     }
-    const cells = [];
-    let cell = '';
-    for (let index = 0; index < body.length; index += 1) {
-        const char = body[index] ?? '';
-        if (char === '\\' && body[index + 1] === '\\') {
-            cell += '\\';
-            index += 1;
-            continue;
-        }
-        if (char === '\\' && body[index + 1] === '|') {
-            cell += '|';
-            index += 1;
-            continue;
-        }
-        if (char === '|') {
-            cells.push(cell.trim());
-            cell = '';
-            continue;
-        }
-        cell += char;
+    if (backslashes % 2 === 0) body = body.slice(0, -1)
+  }
+  const cells = []
+  let cell = ''
+  for (let index = 0; index < body.length; index += 1) {
+    const char = body[index] ?? ''
+    if (char === '\\' && body[index + 1] === '\\') {
+      cell += '\\'
+      index += 1
+      continue
     }
-    cells.push(cell.trim());
-    return cells;
-}
-/**
- * 平台差异归一：去 UTF-8 BOM、CRLF 与孤立 CR → LF。
- * @param text - 原始文档文本。
- * @returns 归一化后的文本（行号不变）。
- */
-export function normalizeDocument(text) {
-    const withoutBom = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
-    return withoutBom.replace(/\r\n?/g, '\n');
-}
-/** 围栏开合行：最多 3 个前导空格 + 三连以上反引号/波浪号，后跟信息串。 */
-function fenceAt(line) {
-    const match = /^\s{0,3}(`{3,}|~{3,})(.*)$/.exec(line);
-    if (match === null)
-        return undefined;
-    const marker = match[1] ?? '';
-    return { char: marker[0] ?? '`', length: marker.length, rest: match[2] ?? '' };
-}
-/** 从 index 起连续反引号的个数（不是反引号 → 0）。 */
-function backtickRun(line, index) {
-    let run = 0;
-    while (line[index + run] === '`')
-        run += 1;
-    return run;
-}
-/** 在后续行里找第一个包含 marker 的行号（1-based）；没有 → undefined。 */
-function markerLine(source, offset, marker) {
-    for (let cursor = offset + 1; cursor < source.length; cursor += 1) {
-        if ((source[cursor] ?? '').includes(marker))
-            return cursor + 1;
+    if (char === '\\' && body[index + 1] === '|') {
+      cell += '|'
+      index += 1
+      continue
     }
-    return undefined;
-}
-/**
- * 逐行产出结构视图（行数/行号与归一化后的文档一致）。
- * @param text - 文档全文（内部先归一化）。
- * @returns 每行的可见文本、结构标记、未闭合注释行号与顶层围栏块。
- */
-export function scanDocumentDetailed(text) {
-    const source = normalizeDocument(text).split('\n');
-    const lines = [];
-    const fences = [];
-    let fence;
-    let inComment = false;
-    let commentStart;
-    let spanUntil;
-    for (const [offset, raw] of source.entries()) {
-        const lineNumber = offset + 1;
-        if (fence !== undefined) {
-            lines.push({ text: raw, structural: false });
-            const close = fenceAt(raw);
-            if (close !== undefined && close.char === fence.char && close.length >= fence.length && close.rest.trim() === '') {
-                fences.push({ info: fence.info, content: fence.content.join('\n'), startLine: fence.startLine });
-                fence = undefined;
-            }
-            else {
-                fence.content.push(raw);
-            }
-            continue;
-        }
-        if (spanUntil !== undefined) {
-            lines.push({ text: raw, structural: false });
-            if (lineNumber >= spanUntil)
-                spanUntil = undefined;
-            continue;
-        }
-        if (!inComment) {
-            const open = fenceAt(raw);
-            if (open !== undefined) {
-                fence = { char: open.char, length: open.length, info: open.rest.trim(), content: [], startLine: lineNumber };
-                lines.push({ text: raw, structural: false });
-                continue;
-            }
-        }
-        let visible = '';
-        let index = 0;
-        while (index < raw.length) {
-            if (inComment) {
-                const end = raw.indexOf('-->', index);
-                if (end === -1) {
-                    index = raw.length;
-                    break;
-                }
-                inComment = false;
-                commentStart = undefined;
-                index = end + 3;
-                continue;
-            }
-            const run = backtickRun(raw, index);
-            if (run > 0) {
-                const marker = '`'.repeat(run);
-                const close = raw.indexOf(marker, index + run);
-                if (close !== -1) {
-                    visible += raw.slice(index, close + run);
-                    index = close + run;
-                    continue;
-                }
-                const later = markerLine(source, offset, marker);
-                if (later !== undefined)
-                    spanUntil = later;
-                visible += raw.slice(index);
-                index = raw.length;
-                continue;
-            }
-            if (raw.startsWith('<!--', index)) {
-                inComment = true;
-                commentStart = lineNumber;
-                index += 4;
-                continue;
-            }
-            visible += raw[index] ?? '';
-            index += 1;
-        }
-        lines.push({ text: visible, structural: true });
+    if (char === '|') {
+      cells.push(cell.trim())
+      cell = ''
+      continue
     }
-    return { lines, fences, ...(inComment && commentStart !== undefined ? { unclosedCommentLine: commentStart } : {}) };
-}
-/**
- * 结构扫描的短视图：只要行。
- * @param text - 文档全文。
- * @returns 每行的可见文本与结构标记。
- */
-export function scanDocument(text) {
-    return scanDocumentDetailed(text).lines;
+    cell += char
+  }
+  cells.push(cell.trim())
+  return cells
 }
 
 /**
- * 定位 `## <heading>` 节的起止行（行级视图，供门禁读卡）。
- *
- * 与 `scanDocumentDetailed` 的区别：这里只回答「哪一行是节标题」，不解析行内代码/跨行 span。
- * 卡片正文常把 `<!--` 当字面示例写（BUG-181 卡就有），若按完整注释状态扫描，一个未闭合的
- * 字面示例会把后面所有标题吞掉。节标题是行级事实，所以：围栏块内的标题不算；行首 HTML 注释
- * （`^\s*<!--`）内的标题不算；行内出现的 `<!--` 不改变节定位。
+ * 平台差异归一：去 UTF-8 BOM、CRLF 与孤立 CR → LF。
+ * @param {string} text 原始文档文本。
+ * @returns {string} 归一化后的文本（行号不变）。
+ */
+export function normalizeDocument(text) {
+  const withoutBom = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text
+  return withoutBom.replace(/\r\n?/g, '\n')
+}
+
+/**
+ * CommonMark §4.5 围栏开行：最多 3 个前导空格 + 三连以上反引号/波浪号；
+ * 反引号围栏的信息串不得再含反引号（否则如 ```` ```foo``` ```` 属于行内代码）。
+ * @param {string} line 单行文本。
+ */
+function openFenceAt(line) {
+  const match = /^\s{0,3}(`{3,}|~{3,})(.*)$/.exec(line)
+  if (match === null) return undefined
+  const marker = match[1] ?? ''
+  const char = marker[0] ?? '`'
+  const rest = match[2] ?? ''
+  if (char === '`' && rest.includes('`')) return undefined
+  return { char, length: marker.length, rest }
+}
+
+/** CommonMark §4.5 围栏闭行：最多 3 个前导空格 + 同字符且不少于开行长度 + 仅尾随空白。 */
+function isClosingFence(line, fence) {
+  const match = /^\s{0,3}(`{3,}|~{3,})\s*$/.exec(line)
+  if (match === null) return false
+  const marker = match[1] ?? ''
+  return marker[0] === fence.char && marker.length >= fence.length
+}
+
+/** 从 index 起连续反引号的个数（不是反引号 → 0）。 */
+function backtickRun(line, index) {
+  let run = 0
+  while (line[index + run] === '`') run += 1
+  return run
+}
+
+/** 在单行 from 起找**恰好等于** run 长度的反引号串起始下标（CommonMark §6.1）；无 → -1。 */
+function exactBacktickClose(line, from, run) {
+  for (let index = from; index < line.length; index += 1) {
+    if (line[index] !== '`') continue
+    const actual = backtickRun(line, index)
+    if (actual === run) return index
+    index += actual - 1
+  }
+  return -1
+}
+
+/**
+ * 在当前段落后续行（遇空行或新围栏即止）找恰好等于 run 长度的闭合反引号行号（1-based）；
+ * 兼顾 BUG-181 跨行 code span 与 CommonMark 段落边界（未闭合反引号不跨空行吞后文）。
+ */
+function multilineSpanCloseLine(source, offset, run) {
+  for (let cursor = offset + 1; cursor < source.length; cursor += 1) {
+    const line = source[cursor] ?? ''
+    if (line.trim() === '' || openFenceAt(line) !== undefined) return undefined
+    if (exactBacktickClose(line, 0, run) !== -1) return cursor + 1
+  }
+  return undefined
+}
+
+/**
+ * 行内 HTML 注释（CommonMark §6.6）：仅在同一段落内存在 `-->` 时才构成注释；
+ * 若直到空行/块边界/EOF 都无 `-->`（如卡片散文把 `<!--` 当字面示例），按字面文本保留，不吞后文。
+ */
+function inlineCommentClose(source, offset, fromCol) {
+  const sameLine = (source[offset] ?? '').indexOf('-->', fromCol)
+  if (sameLine !== -1) return { endOffset: offset, endCol: sameLine + 3 }
+  for (let cursor = offset + 1; cursor < source.length; cursor += 1) {
+    const line = source[cursor] ?? ''
+    if (line.trim() === '' || openFenceAt(line) !== undefined || /^\s{0,3}#{1,6}(?:\s|$)/.test(line)) {
+      return undefined
+    }
+    const end = line.indexOf('-->')
+    if (end !== -1) return { endOffset: cursor, endCol: end + 3 }
+  }
+  return undefined
+}
+
+/** 识别文档首行起的紧凑 YAML frontmatter 结束行下标（无空行且含键值行，不误伤 `---` 分隔线）。 */
+function frontmatterEndOffset(source) {
+  if ((source[0] ?? '') !== '---') return -1
+  let hasField = false
+  for (let index = 1; index < source.length; index += 1) {
+    const line = source[index] ?? ''
+    if (line === '---') return hasField ? index : -1
+    if (line.trim() === '') return -1
+    if (/^[A-Za-z_][\w-]*\s*:/.test(line.trim())) hasField = true
+  }
+  return -1
+}
+
+/**
+ * 逐行产出结构视图（行数/行号与归一化后的文档一致）。
+ * @param {string} text 文档全文（内部先归一化）。
+ * @returns {{ lines: { text: string, structural: boolean }[], fences: { info: string, content: string, startLine: number }[], unclosedCommentLine?: number }}
+ */
+export function scanDocumentDetailed(text) {
+  const source = normalizeDocument(text).split('\n')
+  const fmEnd = frontmatterEndOffset(source)
+  const lines = []
+  const fences = []
+  let fence
+  let inBlockComment = false
+  let commentStart
+  let inlineCommentUntil
+  let spanUntil
+
+  for (const [offset, raw] of source.entries()) {
+    const lineNumber = offset + 1
+    if (offset <= fmEnd) {
+      lines.push({ text: raw, structural: false })
+      continue
+    }
+    if (fence !== undefined) {
+      lines.push({ text: raw, structural: false })
+      if (isClosingFence(raw, fence)) {
+        fences.push({ info: fence.info, content: fence.content.join('\n'), startLine: fence.startLine })
+        fence = undefined
+      } else {
+        fence.content.push(raw)
+      }
+      continue
+    }
+    if (inBlockComment) {
+      lines.push({ text: '', structural: false })
+      if (raw.includes('-->')) {
+        inBlockComment = false
+        commentStart = undefined
+      }
+      continue
+    }
+    if (spanUntil !== undefined) {
+      lines.push({ text: raw, structural: false })
+      if (lineNumber >= spanUntil) spanUntil = undefined
+      continue
+    }
+    let index = 0
+    if (inlineCommentUntil !== undefined) {
+      if (offset < inlineCommentUntil.endOffset) {
+        lines.push({ text: '', structural: true })
+        continue
+      }
+      index = inlineCommentUntil.endCol
+      inlineCommentUntil = undefined
+    } else {
+      const open = openFenceAt(raw)
+      if (open !== undefined) {
+        fence = { char: open.char, length: open.length, info: open.rest.trim(), content: [], startLine: lineNumber }
+        lines.push({ text: raw, structural: false })
+        continue
+      }
+      if (/^\s{0,3}<!--/.test(raw)) {
+        lines.push({ text: '', structural: false })
+        const startCol = raw.indexOf('<!--') + 4
+        if (raw.indexOf('-->', startCol) === -1) {
+          inBlockComment = true
+          commentStart = lineNumber
+        }
+        continue
+      }
+    }
+
+    let visible = ''
+    while (index < raw.length) {
+      const ch = raw[index] ?? ''
+      const next = raw[index + 1] ?? ''
+      if (ch === '\\' && next !== '' && ASCII_PUNCTUATION.test(next)) {
+        visible += ch + next
+        index += 2
+        continue
+      }
+      const run = backtickRun(raw, index)
+      if (run > 0) {
+        const close = exactBacktickClose(raw, index + run, run)
+        if (close !== -1) {
+          visible += raw.slice(index, close + run)
+          index = close + run
+          continue
+        }
+        const later = multilineSpanCloseLine(source, offset, run)
+        if (later !== undefined) spanUntil = later
+        visible += raw.slice(index)
+        index = raw.length
+        continue
+      }
+      if (raw.startsWith('<!--', index)) {
+        const closed = inlineCommentClose(source, offset, index + 4)
+        if (closed !== undefined) {
+          if (closed.endOffset === offset) {
+            index = closed.endCol
+            continue
+          }
+          inlineCommentUntil = closed
+          index = raw.length
+          continue
+        }
+      }
+      visible += ch
+      index += 1
+    }
+    lines.push({ text: visible, structural: true })
+  }
+  return {
+    lines,
+    fences,
+    ...(inBlockComment && commentStart !== undefined ? { unclosedCommentLine: commentStart } : {}),
+  }
+}
+
+/**
+ * 结构扫描的短视图：只要行。
+ * @param {string} text 文档全文。
+ * @returns {{ text: string, structural: boolean }[]} 每行的可见文本与结构标记。
+ */
+export function scanDocument(text) {
+  return scanDocumentDetailed(text).lines
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * 定位 `## <heading>` 节的起止行（直接从 `scanDocumentDetailed` 单一状态机派生，零第二扫描器）。
  * @param {string} text 文档全文。
  * @param {string} heading 节标题（不含 `## `）。
+ * @param {{ lines: { text: string, structural: boolean }[] }} [preScanned] 可选复用已扫描结果。
  * @returns {{ start: number, end: number } | undefined} 归一化行下标；缺节返回 undefined。
  */
-export function sectionRange(text, heading) {
-    const source = normalizeDocument(text).split('\n');
-    const pattern = new RegExp(`^##\\s+${heading}\\s*$`);
-    let fence;
-    let inComment = false;
-    let start = -1;
-    for (let index = 0; index < source.length; index += 1) {
-        const line = source[index] ?? '';
-        if (fence !== undefined) {
-            const close = fenceAt(line);
-            if (close !== undefined && close.char === fence.char && close.length >= fence.length && close.rest.trim() === '')
-                fence = undefined;
-            continue;
-        }
-        if (inComment) {
-            if (line.includes('-->'))
-                inComment = false;
-            continue;
-        }
-        const open = fenceAt(line);
-        if (open !== undefined) {
-            fence = { char: open.char, length: open.length };
-            continue;
-        }
-        if (/^\s*<!--/.test(line)) {
-            if (!line.includes('-->'))
-                inComment = true;
-            continue;
-        }
-        if (pattern.test(line)) {
-            start = index;
-            break;
-        }
+export function sectionRange(text, heading, preScanned) {
+  const { lines } = preScanned ?? scanDocumentDetailed(text)
+  const pattern = new RegExp(`^\\s{0,3}##\\s+${escapeRegExp(heading)}\\s*$`)
+  let start = -1
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index]
+    if (line !== undefined && line.structural && pattern.test(line.text)) {
+      start = index
+      break
     }
-    if (start === -1)
-        return undefined;
-    fence = undefined;
-    inComment = false;
-    let end = source.length;
-    for (let index = start + 1; index < source.length; index += 1) {
-        const line = source[index] ?? '';
-        if (fence !== undefined) {
-            const close = fenceAt(line);
-            if (close !== undefined && close.char === fence.char && close.length >= fence.length && close.rest.trim() === '')
-                fence = undefined;
-            continue;
-        }
-        if (inComment) {
-            if (line.includes('-->'))
-                inComment = false;
-            continue;
-        }
-        const open = fenceAt(line);
-        if (open !== undefined) {
-            fence = { char: open.char, length: open.length };
-            continue;
-        }
-        if (/^\s*<!--/.test(line)) {
-            if (!line.includes('-->'))
-                inComment = true;
-            continue;
-        }
-        if (/^##\s+/.test(line)) {
-            end = index;
-            break;
-        }
+  }
+  if (start === -1) return undefined
+  let end = lines.length
+  for (let index = start + 1; index < lines.length; index += 1) {
+    const line = lines[index]
+    if (line !== undefined && line.structural && /^\s{0,3}#{1,2}\s+/.test(line.text)) {
+      end = index
+      break
     }
-    return { start, end };
+  }
+  return { start, end }
+}
+
+/**
+ * 取 `## <heading>` 节内的**结构行**文本（非结构行置空以保持行相对位置，围栏/注释/跨行代码内的假字段清零）。
+ * @param {string} text 文档全文。
+ * @param {string} heading 节标题（不含 `## `）。
+ * @returns {string | undefined} 结构行正文；缺节返回 undefined。
+ */
+export function sectionStructuralText(text, heading) {
+  const scan = scanDocumentDetailed(text)
+  const range = sectionRange(text, heading, scan)
+  if (range === undefined) return undefined
+  const out = []
+  for (let index = range.start + 1; index < range.end; index += 1) {
+    const line = scan.lines[index]
+    out.push(line !== undefined && line.structural ? line.text : '')
+  }
+  return out.join('\n')
 }

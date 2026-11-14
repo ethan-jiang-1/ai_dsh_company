@@ -75,16 +75,18 @@ export function sourceMarkdownFiles(root) {
   return [...files.values()].sort()
 }
 
-const parse = (source) => fromMarkdown(source, { extensions: [gfm()], mdastExtensions: [gfmFromMarkdown()] })
+export const parseMarkdownAst = (source) => fromMarkdown(source, { extensions: [gfm()], mdastExtensions: [gfmFromMarkdown()] })
+const parse = parseMarkdownAst
 const visit = (node, fn) => { fn(node); for (const child of node.children ?? []) visit(child, fn) }
 
 // Rendered Markdown text, not raw heading syntax: code, links, images, emphasis and entities.
-const renderedText = (node) => {
+export const renderedNodeText = (node) => {
   if (node.type === 'text' || node.type === 'inlineCode') return node.value
   if (node.type === 'image' || node.type === 'imageReference') return node.alt ?? ''
   if (node.type === 'break') return ' '
-  return (node.children ?? []).map(renderedText).join('')
+  return (node.children ?? []).map(renderedNodeText).join('')
 }
+const renderedText = renderedNodeText
 
 /** Pinned vendor verify-md-links.ts semantics, not a claim of full Unicode GitHub renderer parity. */
 function documentAnchors(tree) {

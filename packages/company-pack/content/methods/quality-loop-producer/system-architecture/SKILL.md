@@ -1,6 +1,6 @@
 ---
 name: system-architecture
-description: Producer side of the system-architecture method (hardware-software / system products): judge five engineering domains, then write SyRS/IRS/architecture and verification points; do not write verification conclusions.
+description: "Producer side of the system-architecture method (hardware-software / system products): judge five engineering domains, then write SyRS/IRS/architecture and verification points; do not write verification conclusions."
 metadata:
   method: system-architecture
   version: 1.0.0

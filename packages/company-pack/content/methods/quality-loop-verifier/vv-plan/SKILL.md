@@ -1,6 +1,6 @@
 ---
 name: vv-plan
-description: Verifier side of the V&V-plan method (read-only): audit coverage, criterion reproducibility, and level gaps per check-id; do not edit or run tests.
+description: "Verifier side of the V&V-plan method (read-only): audit coverage, criterion reproducibility, and level gaps per check-id; do not edit or run tests."
 metadata:
   method: vv-plan
   version: 1.0.0

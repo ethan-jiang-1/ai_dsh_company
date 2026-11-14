@@ -2,7 +2,8 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { normalizeDocument, sectionRange } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
+import { sectionStructuralText } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
+import { parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
 
 // ── 修复证据门（fix-evidence，2026-11-14 立）──────────────────────────────────────
 // 触发事故（用户亲述）：让 agent 批修一批缺陷，它只把卡的状态翻了、`git mv` 进已修区，**仓库一行没变**。
@@ -50,33 +51,31 @@ const EVIDENCE_HEADING = '修复证据'
 const NOT_SURFACE = ['_backlog/', 'notes/', 'vendor/']
 
 /**
- * 取卡片 frontmatter 字段（只认 `key: value` 行）。
+ * 取卡片 frontmatter 字段（统一走 `repo-markdown` 的 `js-yaml` 解析，禁止手写裸正则）。
  * @param {string} text 卡片全文。
- * @returns {Record<string, string>} 字段表。
+ * @returns {Record<string, string>} 字符串化后的顶层标量字段表。
  */
 function frontmatter(text) {
-  const match = /^---\n([\s\S]*?)\n---/.exec(text)
-  if (match === null) return {}
+  const parsed = parseFrontmatter(text)
+  if (!parsed.present || parsed.data === null) return {}
   const fields = {}
-  for (const line of (match[1] ?? '').split('\n')) {
-    const field = /^([a-z-]+):\s*(.*)$/.exec(line.trim())
-    if (field !== null) fields[field[1]] = (field[2] ?? '').trim()
+  for (const [key, value] of Object.entries(parsed.data)) {
+    if (value === null || value === undefined) continue
+    fields[key] = value instanceof Date ? value.toISOString().slice(0, 10) : String(value).trim()
   }
   return fields
 }
 
 /**
- * 取 `## <heading>` 到下一个结构 `## ` 之间的结构行正文（BUG-178）。
+ * 取 `## <heading>` 到下一个结构 `## ` 之间的**结构行**正文（BUG-178 + W2 假字段封堵）。
  * 形状判据唯一家 = markdown-shape-core.js：BOM/CRLF 归一、围栏/注释/跨行 code span 内的标题不算节，
- * 行内注释移除后的可见文本参与匹配。节内只返回结构行，避免围栏里的假字段被读成证据。
+ * 且节内非结构行（围栏代码块、块注释等）一律置空，避免围栏里的示例 `- 改动面：` 被误读为真证据。
  * @param {string} text 卡片全文。
  * @param {string} heading 节标题（不含 `## `）。
- * @returns {string | undefined} 节正文；缺节返回 undefined。
+ * @returns {string | undefined} 节结构正文；缺节返回 undefined。
  */
 function section(text, heading) {
-  const range = sectionRange(text, heading)
-  if (range === undefined) return undefined
-  return normalizeDocument(text).split('\n').slice(range.start + 1, range.end).join('\n')
+  return sectionStructuralText(text, heading)
 }
 
 /**

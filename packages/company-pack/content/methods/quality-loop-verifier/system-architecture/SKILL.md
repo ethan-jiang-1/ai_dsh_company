@@ -1,6 +1,6 @@
 ---
 name: system-architecture
-description: Verifier side of the system-architecture method (read-only): audit domain judgment, interfaces, traceability, and verification points per check-id; issue a verdict, do not edit.
+description: "Verifier side of the system-architecture method (read-only): audit domain judgment, interfaces, traceability, and verification points per check-id; issue a verdict, do not edit."
 metadata:
   method: system-architecture
   version: 1.0.0

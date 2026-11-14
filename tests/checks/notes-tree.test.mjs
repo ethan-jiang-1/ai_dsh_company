@@ -227,6 +227,14 @@ const check = (label, passed) => {
     check('闰年 2024-02-29 → 绿', gate.notesTreeProblems(root).problems.length === 0 && gate.notesStatusProblems(root).problems.length === 0)
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
+{
+  const root = makeTree()
+  try {
+    const text = ['# w2', '', '状态：implemented', '', '```md', '状态：implemented', '```', ''].join('\n')
+    write(root, 'notes/implemented/2026-11-14-fenced-status.md', text)
+    check('前 12 行围栏内写第二个 `状态：` → 不误报重复（W2.1）', gate.notesStatusProblems(root).problems.length === 0)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
 
 // ── 入口与缺失 ────────────────────────────────────────────────────────────────
 {

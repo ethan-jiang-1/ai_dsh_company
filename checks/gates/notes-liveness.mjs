@@ -1,7 +1,8 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
-import { normalizeDocument, sectionRange } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
 import { join } from 'node:path'
+import { sectionStructuralText } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
+import { noteStatusLines } from '../../tools/lib/repo-markdown.mjs'
 
 // ── 9-bis. Note 活状态门禁（notes-liveness，2026-10-05 D35 立；notes/ 分类 owner = notes/README.md）──
 // implemented/ 新写 Note（文件名日期 ≥ 生效日）前 6 行须有「状态：」行且以生命周期词开头
@@ -25,24 +26,22 @@ export function run({ root, ok, fail }) {
     ? readdirSync(implDir).filter(n => n.endsWith('.md'))
     : []
   const dateOf = name => /^(\d{4}-\d{2}-\d{2})-/.exec(name)?.[1]
-  const sectionBody = (text, heading) => {
-    const range = sectionRange(text, heading)
-    if (range === undefined) return ''
-    return normalizeDocument(text).split('\n').slice(range.start + 1, range.end).join('\n').trim()
-  }
+  const sectionBody = (text, heading) => (sectionStructuralText(text, heading) ?? '').trim()
   const freshNotes = implNotes.filter(n => {
     const date = dateOf(n)
     return date !== undefined && date >= NOTES_EFFECTIVE_DATE
   })
-  const LIFECYCLE_WORD = /^状态：\s*\**\s*(implemented|已交付|已消化)/m
-  const badNotes = freshNotes.filter(name =>
-    !LIFECYCLE_WORD.test(readFileSync(join(implDir, name), 'utf8').split('\n').slice(0, 6).join('\n')))
+  const LIFECYCLE_WORD = /^状态：\s*\**\s*(implemented|已交付|已消化)/
+  const badNotes = freshNotes.filter(name => {
+    const text = readFileSync(join(implDir, name), 'utf8')
+    return !noteStatusLines(text).some(item => item.lineIndex < 6 && LIFECYCLE_WORD.test(item.text))
+  })
   const decisionNotes = implNotes.filter(n => {
     const date = dateOf(n)
     return date !== undefined && date >= DECISION_EFFECTIVE_DATE
   })
   const badDecision = decisionNotes.filter(name =>
-    !/^##\s+决定\s*$/m.test(readFileSync(join(implDir, name), 'utf8')))
+    sectionStructuralText(readFileSync(join(implDir, name), 'utf8'), '决定') === undefined)
   const factNotes = implNotes.filter(name => {
     const date = dateOf(name)
     return date !== undefined && date >= FACT_EFFECTIVE_DATE
@@ -51,12 +50,8 @@ export function run({ root, ok, fail }) {
     sectionBody(readFileSync(join(implDir, name), 'utf8'), '状态事实与载体') === '')
   const rationaleNotes = implNotes.filter(name => name.endsWith('-rationale.md'))
   const badRationale = rationaleNotes.filter(name => {
-    const body = readFileSync(join(implDir, name), 'utf8')
-    const at = body.search(/^##\s+现行语义（canonical）\s*$/m)
-    if (at < 0) return true
-    const next = body.indexOf('\n## ', at + 1)
-    const section = body.slice(at, next < 0 ? body.length : next)
-    return !/\]\([^)]+\)/.test(section)
+    const section = sectionStructuralText(readFileSync(join(implDir, name), 'utf8'), '现行语义（canonical）')
+    return section === undefined || !/\]\([^)]+\)/.test(section)
   })
   const problems = []
   if (badNotes.length > 0) {

@@ -2,6 +2,7 @@
 // 何时跑：每次 verify；在 notes/ 下新增、移动文件或目录，或改 Note 状态行后。
 import { lstatSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { noteStatusLines } from '../../tools/lib/repo-markdown.mjs'
 
 // ── notes 树形与状态行门禁（notes-tree，2026-11-14 立；卡 = _backlog/issues/2026-11-14-notes-tree-and-carrier-gates.md）──
 // 为什么：notes/ 的合法形状此前只写在 notes/README §一 的表里，没有任何门禁走查。2026-11-14 研究实测：
@@ -195,26 +196,22 @@ export function notesStatusProblems(root, effective = STATUS_EFFECTIVE_DATE) {
       if (date === undefined || !isCalendarDate(date)) continue
       if (Date.parse(date) < Date.parse(effective)) continue
       checked += 1
-      const at = []
-      const lines = readFileSync(join(dir, entry.name), 'utf8').split('\n')
-      lines.forEach((line, index) => {
-        if (/^状态[:：]/.test(line)) at.push(index)
-      })
+      const statuses = noteStatusLines(readFileSync(join(dir, entry.name), 'utf8'))
       const rel = `notes/${lifecycle}/${entry.name}`
-      if (at.length !== 1) {
-        problems.push(`${rel} — 状态行必须恰好 1 行（实际 ${at.length} 行）`)
+      if (statuses.length !== 1) {
+        problems.push(`${rel} — 状态行必须恰好 1 行（实际 ${statuses.length} 行）`)
         continue
       }
-      const line = at[0]
+      const { lineIndex: line, text: statusText } = statuses[0]
       if (line >= 12) problems.push(`${rel}:${line + 1} — 状态行必须在前 12 行内（当前第 ${line + 1} 行）`)
       if (lifecycle === 'proposed') continue
       if (lifecycle === 'rejected') {
-        if (!/^状态[:：]\s*\**\s*rejected/.test(lines[line])) {
+        if (!/^状态[:：]\s*\**\s*rejected/.test(statusText)) {
           problems.push(`${rel}:${line + 1} — 状态词须以 rejected 开头（rejected/ 是负知识层，不改写成 implemented）`)
         }
         continue
       }
-      if (!/^状态[:：]\s*\**\s*(implemented|已交付|已消化)/.test(lines[line])) {
+      if (!/^状态[:：]\s*\**\s*(implemented|已交付|已消化)/.test(statusText)) {
         problems.push(`${rel}:${line + 1} — 状态词须以 implemented/已交付/已消化 开头（${lifecycle}/ 保留实现状态，不改写成 archived）`)
       }
     }

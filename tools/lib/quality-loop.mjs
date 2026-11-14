@@ -6,6 +6,7 @@
 // 解析器口径的唯一家在本文件；流程口径的唯一家 = `presets/_shared/skills/quality-loop/SKILL.md`
 // （改判据形状 = 两边同 diff 改，spec 会拦漂移）。
 import { createHash } from 'node:crypto'
+import { headingSections, parseFrontmatter, splitGfmTableCells } from './repo-markdown.mjs'
 
 /** 质量环产物目录（相对交付目录）。 */
 export const QUALITY_LOOP_DIR = 'quality-loop'
@@ -59,31 +60,21 @@ export function splitVerdict(text) {
   return { header: parseVerdictHeader(text), body: lines.slice(index + 1).join('\n') }
 }
 
-/** 取某个 `##/### 标题` 起的段落（到下一个同级或更高级标题为止）。 */
+/** 取某个 `##..#### 标题` 起的段落（经 `repo-markdown` GFM AST 到下一个同级或更高级标题为止）。 */
 function section(body, titles) {
-  const lines = String(body ?? '').split('\n')
-  const start = lines.findIndex(line => {
-    const m = /^(#{2,4})\s+(.+?)\s*$/.exec(line)
-    return m !== null && titles.some(title => m[2].includes(title))
-  })
-  if (start < 0) return ''
-  const level = /^(#{2,4})/.exec(lines[start])[1].length
-  const out = []
-  for (let i = start + 1; i < lines.length; i++) {
-    const m = /^(#{2,4})\s+/.exec(lines[i])
-    if (m !== null && m[1].length <= level) break
-    out.push(lines[i])
-  }
-  return out.join('\n')
+  const found = headingSections(String(body ?? '')).find(
+    sec => sec.depth >= 2 && sec.depth <= 4 && titles.some(title => sec.rawTitle.includes(title) || sec.title.includes(title)),
+  )
+  return found?.structuralBody ?? ''
 }
 
-/** 解析 markdown 表格行；跳过表头分隔行与空行。 */
+/** 解析 markdown 表格行；跳过表头分隔行与空行，支持 GFM `\\` 与 `\|` 转义。 */
 export function parseTable(text) {
   const rows = []
   for (const raw of String(text ?? '').split('\n')) {
     const line = raw.trim()
     if (!line.startsWith('|')) continue
-    const cells = line.replace(/^\|/, '').replace(/\|$/, '').split('|').map(cell => cell.trim())
+    const cells = splitGfmTableCells(line)
     if (cells.every(cell => /^:?-{2,}:?$/.test(cell) || cell === '')) continue
     rows.push(cells)
   }
@@ -136,32 +127,22 @@ export function parseDispositions(text) {
   }))
 }
 
-/** 方法包 skill：frontmatter 的 `metadata.method/version/side` + 正文里的 check-id 表。 */
+/** 方法包 skill：frontmatter 的 `metadata.method/version/side`（经 `repo-markdown` `js-yaml` 解析）+ 正文里的 check-id 表。 */
 export function parseMethodSkill(text) {
-  const source = String(text ?? '')
-  const fence = /^---\n([\s\S]*?)\n---\n?/.exec(source)
-  if (fence === null) return null
-  const values = { metadata: {} }
-  let target = values
-  for (const raw of fence[1].split('\n')) {
-    if (raw.trim() === '') continue
-    const indented = /^\s/.test(raw)
-    const m = /^\s*([A-Za-z_][\w-]*):\s*(.*?)\s*$/.exec(raw)
-    if (m === null) continue
-    if (!indented) {
-      target = m[1] === 'metadata' ? values.metadata : values
-      if (m[1] === 'metadata' && m[2] === '') continue
-    }
-    if (m[2] === '') continue
-    target[m[1]] = m[2].replace(/^['"]|['"]$/g, '')
-  }
-  const body = source.slice(fence[0].length)
+  const parsed = parseFrontmatter(String(text ?? ''))
+  if (!parsed.present || parsed.data === null) return null
+  const data = parsed.data
+  const metadata = typeof data.metadata === 'object' && data.metadata !== null && !Array.isArray(data.metadata)
+    ? data.metadata
+    : {}
+  const asScalar = value => (value === null || value === undefined || value === '' ? null : String(value))
+  const body = parsed.body
   return {
-    name: values.name ?? null,
-    description: values.description ?? null,
-    method: values.metadata.method ?? null,
-    version: values.metadata.version ?? null,
-    side: values.metadata.side ?? null,
+    name: asScalar(data.name),
+    description: asScalar(data.description),
+    method: asScalar(metadata.method),
+    version: asScalar(metadata.version),
+    side: asScalar(metadata.side),
     checkIds: parseCheckIds(body),
     body,
   }
@@ -181,7 +162,7 @@ export function parseCheckIds(body) {
   for (const raw of String(body ?? '').split('\n')) {
     const line = raw.trim()
     if (!line.startsWith('|')) { flush(); continue }
-    const cells = line.replace(/^\|/, '').replace(/\|$/, '').split('|').map(cell => cell.trim())
+    const cells = splitGfmTableCells(line)
     if (cells.every(cell => /^:?-{2,}:?$/.test(cell) || cell === '')) continue
     group.push(cells)
   }

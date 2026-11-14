@@ -1,6 +1,6 @@
 ---
 name: vv-plan
-description: Producer side of the V&V-plan method (hardware-software / system products): map V-model left-side artifacts to right-side verification, using TC-### + covers + L1–L4.
+description: "Producer side of the V&V-plan method (hardware-software / system products): map V-model left-side artifacts to right-side verification, using TC-### + covers + L1–L4."
 metadata:
   method: vv-plan
   version: 1.0.0

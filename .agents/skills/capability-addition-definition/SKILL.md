@@ -1,6 +1,6 @@
 ---
 name: capability-addition-definition
-description: Use when adding or changing company content — a role, capability, method, template, workflow, or policy — or when deciding which layer a piece of content belongs in, to run the placement pass before editing: answer the four lifetime questions, run the two deletion tests, name a second consumer, and route the content to the layer that changes with it.
+description: "Use when adding or changing company content — a role, capability, method, template, workflow, or policy — or when deciding which layer a piece of content belongs in, to run the placement pass before editing: answer the four lifetime questions, run the two deletion tests, name a second consumer, and route the content to the layer that changes with it."
 ---
 
 # 新增内容的归位完成定义

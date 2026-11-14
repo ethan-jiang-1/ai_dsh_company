@@ -1,26 +1,30 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { CARRIERS, EXEMPT, KNOWN_GAP } from '../../tools/lib/carrier-registry.mjs'
+import ts from 'typescript'
+import { CARRIERS, EXEMPT, KNOWN_GAP, MARKDOWN_PRIMITIVES } from '../../tools/lib/carrier-registry.mjs'
+import { parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
 
-// ── 公司盘载体门禁（company-root-carriers，2026-11-13 P0）────────────────────────
-// 为什么：BUG-144 是「写 gate 靠调用点记得调」，BUG-119/121 是「新增写路径漏了」；
-//   同一类病在 BUG-147/148/149/150 复发——写入口自拼 `.dsh-company` 绕过 company-root。
-//   登记表（tools/lib/carrier-registry.mjs）是唯一地图；本门禁只做机械对账：
-//   ① src/host 里同时出现「公司盘路径特征」与「写原语」的模块，必须在
-//      CARRIERS / EXEMPT / KNOWN_GAP 三档之一；未登记 = 红，报 file:line。
-//   ② 登记项自身必须可解析：module 存在、CARRIERS 的 symbol 在文件里出现、
-//      KNOWN_GAP 的 bug 卡在 _backlog（活跃或归档）里存在。
-//   ③ 缺失目录/文件报「缺失」，不抛异常中断 run-gates。
-// 负例留证 2026-11-13（真树植入后删除，实跑原话）：
-//   新建 `packages/company-pack/src/host/zz-probe-writer.ts`（writeFileSync + `.dsh-company`）→
-//   `FAIL company-root-carriers: packages/company-pack/src/host/zz-probe-writer.ts:3 → 未登记的公司盘写入口`;
-//   删文件 → PASS（写入口 5 / knownGap 7）。
-// 边界：只扫写入口，不扫读载体（读面由 file-shape-agreement spec 判）；不做 AST/符号解析。
+// ── 公司盘载体与治理面单原语门禁（company-root-carriers，2026-11-13 P0；2026-11-14 W2 扩禁裸解析）──
+// 为什么：
+//   A) 公司盘面：BUG-144/147/148/149/150 同源——写入口自拼 `.dsh-company` 绕过 company-root。
+//   B) 治理文档/门禁面：BUG-175..183 同源——门禁与 tools/lib 各自手写 `/^---\r?\n/` 与 `/^##\s+/` 裸切分，
+//      绕过 `repo-markdown.mjs` / `markdown-shape-core.js` 原语（门禁文件总数不净增，并入本载体垄断门）。
+// 机械对账：
+//   ① src/host 里同时出现「公司盘路径特征」与「写原语」的模块，必须在 CARRIERS / EXEMPT / KNOWN_GAP 三档之一；
+//   ② 登记项自身必须可解析：module 存在、CARRIERS 的 symbol 在文件里出现、KNOWN_GAP 的 bug 卡存在；
+//   ③ checks/gates/*.mjs 与 tools/lib/*.mjs（排除 MARKDOWN_PRIMITIVES）的 AST 正则字面量与 RegExp 构造
+//      不得出现裸 YAML frontmatter 正则或裸 Markdown `##` 节切分正则（精确报 file:line）。
+// 负例留证 2026-11-13 / 2026-11-14：
+//   - 新建未登记 host writer → `FAIL company-root-carriers: … → 未登记的公司盘写入口`；
+//   - 在任一非原语门禁植入 `/^##\s+/` 或 `/^---\r?\n/` → `FAIL company-root-carriers: … → 禁止手写裸 …`。
 
 const HOST = 'packages/company-pack/src/host'
+const GOVERNANCE_DIRS = ['checks/gates', 'tools/lib']
 const COMPANY_REF = /\.dsh-company|companyHomeOf|companyFilePath|RUN_BUNDLE_PATHS/
 const WRITE_REF = /writeFileSync|appendFileSync|renameSync|mkdirSync|rmSync|cpSync|unlinkSync|linkSync|writeCompanyAtomic/
+const RAW_FRONTMATTER_RE = /^\^---(?:\\r\?\\n|\\n|\s|\$)/
+const RAW_HEADING_SPLIT_RE = /^\^(?:\\s[*+?]|\(\?:\\s\{\d,\d\}\)\?)?\(?#(?:\{1,|\{2|#(?:\s|\\s|\[|\^|\$|\)|[^#]))/
 
 /** 去掉块注释与整行注释；行内 `//` 保留（误报由「同时要有写原语」挡住）。 */
 function stripComments(text) {
@@ -29,12 +33,12 @@ function stripComments(text) {
     .replace(/^\s*\/\/.*$/gm, '')
 }
 
-function walk(dir) {
+function walk(dir, ext) {
   const out = []
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const path = join(dir, entry.name)
-    if (entry.isDirectory()) out.push(...walk(path))
-    else if (entry.name.endsWith('.ts')) out.push(path)
+    if (entry.isDirectory()) out.push(...walk(path, ext))
+    else if (entry.name.endsWith(ext)) out.push(path)
   }
   return out.sort()
 }
@@ -53,14 +57,69 @@ function bugCardExists(root, id) {
   return false
 }
 
-export function run({ root, ok, fail, carriers = CARRIERS, exempt = EXEMPT, knownGap = KNOWN_GAP }) {
+function extractRegExpArg(arg, sf) {
+  if (!arg) return undefined
+  if (ts.isStringLiteralLike(arg)) return arg.text
+  if (ts.isTemplateExpression(arg)) return arg.getText(sf).slice(1, -1)
+  return undefined
+}
+
+function scanRawParsingProblems(root, primitives) {
+  const allowed = new Set(primitives)
+  const problems = []
+  let scanned = 0
+  for (const dirRel of GOVERNANCE_DIRS) {
+    const absDir = join(root, dirRel)
+    if (!existsSync(absDir)) continue
+    for (const entry of readdirSync(absDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      if (!entry.isFile() || !entry.name.endsWith('.mjs')) continue
+      const rel = `${dirRel}/${entry.name}`
+      if (allowed.has(rel)) continue
+      scanned += 1
+      const sourceText = readFileSync(join(absDir, entry.name), 'utf8')
+      const sf = ts.createSourceFile(rel, sourceText, ts.ScriptTarget.Latest, true)
+      const checkPattern = (pattern, pos) => {
+        if (pattern === undefined) return
+        const line = sf.getLineAndCharacterOfPosition(pos).line + 1
+        if (RAW_FRONTMATTER_RE.test(pattern)) {
+          problems.push(`${rel}:${String(line)} → 禁止手写裸 frontmatter 正则 /${pattern}/（改调 tools/lib/repo-markdown.mjs 的 parseFrontmatter）`)
+        } else if (RAW_HEADING_SPLIT_RE.test(pattern)) {
+          problems.push(`${rel}:${String(line)} → 禁止手写裸 Markdown 节切分正则 /${pattern}/（改调 repo-markdown.mjs 或 markdown-shape-core.js）`)
+        }
+      }
+      const visit = node => {
+        if (ts.isRegularExpressionLiteral(node)) {
+          const text = node.text
+          const lastSlash = text.lastIndexOf('/')
+          checkPattern(lastSlash > 0 ? text.slice(1, lastSlash) : text, node.getStart(sf))
+        } else if ((ts.isNewExpression(node) || ts.isCallExpression(node))
+          && ts.isIdentifier(node.expression) && node.expression.text === 'RegExp') {
+          checkPattern(extractRegExpArg(node.arguments?.[0], sf), node.getStart(sf))
+        }
+        ts.forEachChild(node, visit)
+      }
+      visit(sf)
+    }
+  }
+  return { problems, scanned }
+}
+
+export function run({
+  root,
+  ok,
+  fail,
+  carriers = CARRIERS,
+  exempt = EXEMPT,
+  knownGap = KNOWN_GAP,
+  markdownPrimitives = MARKDOWN_PRIMITIVES,
+}) {
   const hostDir = join(root, HOST)
   if (!existsSync(hostDir)) {
     fail('company-root-carriers', `源码面缺失：${HOST}`)
     return
   }
   let files
-  try { files = walk(hostDir) } catch {
+  try { files = walk(hostDir, '.ts') } catch {
     fail('company-root-carriers', `源码面不可读：${HOST}`)
     return
   }
@@ -98,9 +157,30 @@ export function run({ root, ok, fail, carriers = CARRIERS, exempt = EXEMPT, know
     }
   }
 
+  for (const primRel of markdownPrimitives) {
+    if (existsSync(join(root, 'tools/lib')) && !existsSync(join(root, primRel))) {
+      problems.push(`${primRel} → 注册的 Markdown 原语模块不存在`)
+    }
+  }
+  const rawScan = scanRawParsingProblems(root, markdownPrimitives)
+  problems.push(...rawScan.problems)
+
+  for (const skillRoot of ['packages/company-pack', '.agents/skills']) {
+    const absSkillRoot = join(root, skillRoot)
+    if (!existsSync(absSkillRoot)) continue
+    for (const skillPath of walk(absSkillRoot, 'SKILL.md')) {
+      const rel = skillPath.slice(root.length + 1)
+      const parsed = parseFrontmatter(readFileSync(skillPath, 'utf8'))
+      if (!parsed.present || parsed.error !== undefined) {
+        problems.push(`${rel}:1 → SKILL.md YAML frontmatter 不可解析（DSH 运行时会静默丢弃该技能）：${parsed.error ?? '缺 frontmatter'}`)
+      }
+    }
+  }
+
   const gaps = knownGap.map(entry => entry.bug).filter((bug, index, all) => all.indexOf(bug) === index)
   const gapText = knownGap.length === 0 ? 'knownGap 0' : `knownGap ${String(knownGap.length)}：${gaps.join('、')}`
+  const rawNote = rawScan.scanned > 0 ? ` / 禁裸解析 ×${String(rawScan.scanned)}` : ''
   problems.length === 0
-    ? ok(`company-root-carriers ×${String(files.length)} 文件（写面文件 ${String(writers)} / ${gapText}）`)
+    ? ok(`company-root-carriers ×${String(files.length)} 文件（写面文件 ${String(writers)} / ${gapText}${rawNote}）`)
     : fail('company-root-carriers', problems.join('；'))
 }

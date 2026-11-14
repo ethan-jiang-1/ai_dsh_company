@@ -26,6 +26,18 @@ export const FACTS = [
     spec: 'file-shape-agreement',
     invariant: '同一形状下，所有读载体归一后 ok / not-ok 一致；允许的偏离必须声明',
   },
+  {
+    id: 'repo-markdown-single-primitive',
+    contract: 'docs/testing.md',
+    spec: 'repo-markdown',
+    invariant: '门禁与 tools/lib 严禁手写裸 YAML frontmatter 正则或裸 Markdown ## 节切分，一律走注册原语',
+  },
+]
+
+/** 治理面唯一允许直接承载 Markdown/frontmatter 底层解析的原语模块（其余门禁与 tools/lib 禁裸解析）。 */
+export const MARKDOWN_PRIMITIVES = [
+  'tools/lib/repo-markdown.mjs',
+  'tools/lib/markdown-links.mjs',
 ]
 
 /** 已收口载体：写入口与读载体共用一张表，`kind` 区分。 */

@@ -1,7 +1,8 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
-import { normalizeDocument, sectionRange } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
 import { join } from 'node:path'
+import { sectionStructuralText } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
+import { noteStatusBlock, structuralLines } from '../../tools/lib/repo-markdown.mjs'
 
 // ── 9. 提案纪律：notes/proposed/ 只收已批 RFC，且该毕业的必须毕业 ─────────────
 // 负例留证 2026-09-27：无归宿提案 → proposal-scheduled 红；「已交付」状态滞留 proposed → proposal-graduated 红。
@@ -15,57 +16,43 @@ import { join } from 'node:path'
 //      负例留证：无验收节的 fixture RFC → red → 还原 → green（三步 = archived/2026-10-05-rfc-tdd-loop.md）。
 // ⚠ 门禁只保证"被批准 + 该毕业的毕业"，不保证"会实现"——实施由用户指令逐条进入。
 export function run({ root, ok, fail }) {
-const proposedDir = join(root, 'notes/proposed')
-// README.md 是文件夹说明书（curated entry point，非提案）——DSH 同款：notes 层的 README 不在提案命名空间
-const proposals = existsSync(proposedDir)
-  ? readdirSync(proposedDir).filter(n => n.endsWith('.md') && n !== 'README.md')
-  : []
-const sectionBody = (text, heading) => {
-  const range = sectionRange(text, heading)
-  if (range === undefined) return ''
-  return normalizeDocument(text).split('\n').slice(range.start + 1, range.end).join('\n').trim()
-}
-const dateOf = name => /^(\d{4}-\d{2}-\d{2})-/.exec(name)?.[1]
+  const proposedDir = join(root, 'notes/proposed')
+  // README.md 是文件夹说明书（curated entry point，非提案）——DSH 同款：notes 层的 README 不在提案命名空间
+  const proposals = existsSync(proposedDir)
+    ? readdirSync(proposedDir).filter(n => n.endsWith('.md') && n !== 'README.md')
+    : []
+  const sectionBody = (text, heading) => (sectionStructuralText(text, heading) ?? '').trim()
+  const dateOf = name => /^(\d{4}-\d{2}-\d{2})-/.exec(name)?.[1]
 
-const unapproved = proposals.filter(name => {
-  const head = readFileSync(join(proposedDir, name), 'utf8').split('\n').slice(0, 12).join('\n')
-  return !(head.includes('批准：') || head.includes('批准:'))
-})
-const noAcceptance = proposals.filter(name =>
-  sectionBody(readFileSync(join(proposedDir, name), 'utf8'), '验收') === '')
-const noFact = proposals.filter(name => {
-  const date = dateOf(name)
-  if (date === undefined || date < '2026-11-14') return false
-  return sectionBody(readFileSync(join(proposedDir, name), 'utf8'), '状态事实与载体') === ''
-})
-const scheduledProblems = [
-  ...unapproved.map(name => `${name} 缺「批准：」标记（未批准的思考住 _backlog/issues/ 推敲卡）`),
-  ...noAcceptance.map(name => `${name} 缺非空「## 验收」节（验收 = RFC 三件之一，「怎么测」先行的载体——见 notes/proposed/README 生命周期段）`),
-  ...noFact.map(name => `${name} 缺非空「## 状态事实与载体」节（事实/唯一入口/读载体/写载体）`),
-]
-scheduledProblems.length === 0
-  ? ok(`proposal-scheduled ×${proposals.length}（批准标记 + 验收节）`)
-  : fail('proposal-scheduled', `这些 RFC 不合规：${scheduledProblems.join('；')}`)
+  const unapproved = proposals.filter(name => {
+    const head = structuralLines(readFileSync(join(proposedDir, name), 'utf8'))
+      .slice(0, 12)
+      .filter(line => line.structural)
+      .map(line => line.text)
+      .join('\n')
+    return !(head.includes('批准：') || head.includes('批准:'))
+  })
+  const noAcceptance = proposals.filter(name =>
+    sectionBody(readFileSync(join(proposedDir, name), 'utf8'), '验收') === '')
+  const noFact = proposals.filter(name => {
+    const date = dateOf(name)
+    if (date === undefined || date < '2026-11-14') return false
+    return sectionBody(readFileSync(join(proposedDir, name), 'utf8'), '状态事实与载体') === ''
+  })
+  const scheduledProblems = [
+    ...unapproved.map(name => `${name} 缺「批准：」标记（未批准的思考住 _backlog/issues/ 推敲卡）`),
+    ...noAcceptance.map(name => `${name} 缺非空「## 验收」节（验收 = RFC 三件之一，「怎么测」先行的载体——见 notes/proposed/README 生命周期段）`),
+    ...noFact.map(name => `${name} 缺非空「## 状态事实与载体」节（事实/唯一入口/读载体/写载体）`),
+  ]
+  scheduledProblems.length === 0
+    ? ok(`proposal-scheduled ×${proposals.length}（批准标记 + 验收节）`)
+    : fail('proposal-scheduled', `这些 RFC 不合规：${scheduledProblems.join('；')}`)
 
-/** 终态字：提案的状态行里出现这些，说明它已经被消化，该毕业了。 */
-const DIGESTED_MARKERS = ['已消化', '已交付', '部分交付']
-/**
- * 取提案的「状态：」**逻辑行**——含其后的缩进续行（到空行为止）。
- * 为什么不能只读第一个物理行（2026-09-26 修盲区）：状态行常写成两行（首行给去向、续行给
- * "执行待批准"之类的补充），只读首行时，把「已消化」落在续行就能**逃过毕业门禁**。
- * 现行 RFC 的 `状态：` 就是跨两行写的——这不是假想风险。
- */
-const statusBlockOf = (text) => {
-  const lines = text.split('\n')
-  const start = lines.findIndex(line => line.startsWith('状态：'))
-  if (start === -1) return ''
-  const block = [lines[start]]
-  for (let i = start + 1; i < lines.length && lines[i].trim() !== ''; i++) block.push(lines[i])
-  return block.join('\n')
-}
-const notGraduated = proposals.filter(name =>
-  DIGESTED_MARKERS.some(marker => statusBlockOf(readFileSync(join(proposedDir, name), 'utf8')).includes(marker)))
-notGraduated.length === 0
-  ? ok('proposal-graduated (proposed/ 里只剩未落地的)')
-  : fail('proposal-graduated', `这些提案已消化却仍在 notes/proposed/（搬到 notes/implemented/ 并写明条目去向）：${notGraduated.join(', ')}`)
+  /** 终态字：提案的状态行里出现这些，说明它已经被消化，该毕业了。 */
+  const DIGESTED_MARKERS = ['已消化', '已交付', '部分交付']
+  const notGraduated = proposals.filter(name =>
+    DIGESTED_MARKERS.some(marker => noteStatusBlock(readFileSync(join(proposedDir, name), 'utf8')).includes(marker)))
+  notGraduated.length === 0
+    ? ok('proposal-graduated (proposed/ 里只剩未落地的)')
+    : fail('proposal-graduated', `这些提案已消化却仍在 notes/proposed/（搬到 notes/implemented/ 并写明条目去向）：${notGraduated.join(', ')}`)
 }

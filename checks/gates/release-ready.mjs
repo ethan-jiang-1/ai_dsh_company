@@ -5,6 +5,7 @@
 // 负例留证 2026-10-26：删掉 `## 0.3.3` 整段 → release-ready 红；还原 → 绿。
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { headingSections } from '../../tools/lib/repo-markdown.mjs'
 
 export function run({ root, ok, fail }) {
   const packPath = join(root, 'packages/company-pack/package.json')
@@ -20,18 +21,20 @@ export function run({ root, ok, fail }) {
     return
   }
   const changelog = readFileSync(changelogPath, 'utf8')
-  const headings = [...changelog.matchAll(/^##\s+(\d+\.\d+\.\d+)\s+—\s+(\d{4}-\d{2}-\d{2})\s*$/gm)]
-  const top = headings[0]
-  if (top === undefined || top[1] !== version) {
-    const at = top === undefined ? 1 : changelog.slice(0, top.index).split('\n').length
-    fail('release-ready', `CHANGELOG.md:${String(at)} 顶部条目是 ${top?.[1] ?? '无'}，package version 是 ${version}（同版必须先写条目）`)
+  const releases = headingSections(changelog, { depth: 2 })
+    .map(sec => ({ sec, match: /^(\d+\.\d+\.\d+)\s+—\s+(\d{4}-\d+\.\d+|\d{4}-\d{2}-\d{2})$/.exec(sec.rawTitle) }))
+    .filter(item => item.match !== null && /^\d{4}-\d{2}-\d{2}$/.test(item.match[2]))
+  const top = releases[0]
+  if (top === undefined || top.match[1] !== version) {
+    const at = top === undefined ? 1 : top.sec.startLine
+    fail('release-ready', `CHANGELOG.md:${String(at)} 顶部条目是 ${top?.match[1] ?? '无'}，package version 是 ${version}（同版必须先写条目）`)
     return
   }
-  const next = headings[1]
-  const body = changelog.slice((top.index ?? 0) + top[0].length, next?.index ?? changelog.length)
-  const bullet = body.split('\n').find(line => /^\s*-\s+\S+/.test(line) && !/\b(TODO|TBD)\b/i.test(line))
+  const bullet = top.sec.structuralBody
+    .split('\n')
+    .find(line => /^\s*-\s+\S+/.test(line) && !/\b(TODO|TBD)\b/i.test(line))
   if (bullet === undefined) {
-    fail('release-ready', `CHANGELOG.md:${String(changelog.slice(0, top.index).split('\n').length)} 的 ${version} 条目没有实际变化（TODO/空不算）`)
+    fail('release-ready', `CHANGELOG.md:${String(top.sec.startLine)} 的 ${version} 条目没有实际变化（TODO/空不算）`)
     return
   }
   const compat = pack?.dsh?.compatibility
@@ -39,5 +42,5 @@ export function run({ root, ok, fail }) {
     fail('release-ready', `${packPath} 仍携带 dsh.compatibility（DSH 不读；台账应在 checks/gates/lib/compat-tags.json）`)
     return
   }
-  ok(`release-ready（${version}；条目 ${top[2]}；源码指纹看 release --check）`)
+  ok(`release-ready（${version}；条目 ${top.match[2]}；源码指纹看 release --check）`)
 }

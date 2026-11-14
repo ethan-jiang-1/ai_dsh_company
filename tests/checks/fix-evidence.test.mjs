@@ -273,3 +273,46 @@ test('BOM + CRLF 不影响证据节定位', () => {
     assert.deepEqual(gate(dir).problems, [])
   } finally { cleanup() }
 })
+
+test('`## 修复证据` 围栏块内写假字段、正文留空 → 判缺字段红（W2.1 假字段封堵）', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    card(dir, {
+      evidence: [
+        '## 修复证据',
+        '',
+        '```md',
+        '- 改动面：`packages/demo/a.ts`',
+        `- 红：拆守卫 → ${CMD} 红`,
+        `- 绿：接回守卫 → ${CMD} 绿`,
+        `- 提交：commit ${sha}`,
+        '```',
+      ],
+    })
+    const problems = gate(dir).problems.join('；')
+    assert.match(problems, /缺反引号路径/)
+    assert.match(problems, /缺 `- 红：`/)
+    assert.match(problems, /缺 `- 提交：commit <sha>`/)
+  } finally { cleanup() }
+})
+
+test('跨行反引号假标题与同行块注释标题不顶替真实 `## 修复证据`（W2.1 单状态机）', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    card(dir, { evidence: evidence(sha) })
+    const path = join(dir, '_backlog/_archive/fixed_bugs/BUG-900-fixture.md')
+    const decoys = [
+      '前缀 `',
+      '## 修复证据',
+      '` 后缀',
+      '',
+      '<!-- memo --> ## 修复证据',
+      '',
+      '## 修复证据',
+    ].join('\n')
+    writeFileSync(path, readFileSync(path, 'utf8').replace('## 修复证据', decoys))
+    assert.deepEqual(gate(dir).problems, [])
+  } finally { cleanup() }
+})

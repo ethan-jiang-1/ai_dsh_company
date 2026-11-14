@@ -17,20 +17,8 @@
 //   必须解析到 notes/ 下真实文件（见下方 settled_issues 分支的检查块；负例留证 = checks/gates/backlog-liveness.mjs 头注）。
 import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { basename, isAbsolute, join, relative, resolve } from 'node:path'
-import { createRequire } from 'node:module'
 import { markdownLinkTargets } from './markdown-links.mjs'
-
-// Reuse a declared parser from the pinned vendor; member fallback covers root-workspace CI installs.
-// （沿用原门禁的声明式解析器与同一条 fallback 链，不新增第二份 YAML 读取方式。）
-const loadYaml = (() => {
-  for (const base of ['../../vendor/dsh/package.json', '../../vendor/dsh/packages/preset/agent-preset/package.json']) {
-    try {
-      const yaml = createRequire(new URL(base, import.meta.url))('js-yaml')
-      return text => yaml.load(text, { schema: yaml.CORE_SCHEMA })
-    } catch { /* next declared owner */ }
-  }
-  throw new Error('js-yaml 缺失：先按 bootstrap 安装 workspace 依赖')
-})()
+import { parseFrontmatter, sectionBody as readSectionBody } from './repo-markdown.mjs'
 
 export function backlogLivenessProblems(backlogRoot) {
   const problems = []
@@ -79,18 +67,13 @@ export function backlogLivenessProblems(backlogRoot) {
     return date === undefined ? undated : date >= effectiveDate
   }
   const frontmatter = (text, where) => {
-    const match = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text)
-    if (!match) { problems.push(`${where}:1 缺 frontmatter`); return }
-    let data
-    try { data = loadYaml(match[1]) } catch (error) {
-      problems.push(`${where}:1 frontmatter YAML 不可解析：${String(error).split('\n')[0]}`)
+    const parsed = parseFrontmatter(text)
+    if (!parsed.present) { problems.push(`${where}:1 缺 frontmatter`); return }
+    if (parsed.error !== undefined || parsed.data === null) {
+      problems.push(`${where}:1 ${parsed.error ?? 'frontmatter 须为字段映射'}`)
       return
     }
-    if (data === null || typeof data !== 'object' || Array.isArray(data)) {
-      problems.push(`${where}:1 frontmatter 须为字段映射`)
-      return
-    }
-    return data
+    return parsed.data
   }
   // ── 五道门（2026-11-02 立）：状态 ↔ 出口物的机械耦合 ─────────────────────────────
   // 规则正本 = _backlog/README.md「五道门」；本块只证形状，不证结论对不对。
@@ -104,18 +87,9 @@ export function backlogLivenessProblems(backlogRoot) {
     const index = text.split('\n').findIndex(line => line.includes(needle))
     return index < 0 ? 1 : index + 1
   }
-  // 「非空 ## 节」= 门票的形状锚：标题在场且标题到下一个 `##` 之间有非空正文。
+  // 「非空 ## 节」= 门票的形状锚：统一消费 `repo-markdown` 的 GFM AST 结构节读取（围栏示例内的标题与字段不算）。
   const EXECUTABLE = /`(?:pnpm|node|git|rg|source|npx)\s+[^`\n]+`|Given\/When\/Then|\bassert\b/
-  // 本文件住 tools/lib（keyless seam），不能 import pack 的 markdown-shape-core；这里只做行级节定位。
-  // 完整形状（围栏/注释/跨行 code span）在门禁侧用 core；两边边界由 tests/checks 的形状用例兜住。
-  const sectionBody = (text, heading) => {
-    const lines = text.split('\n')
-    const start = lines.findIndex(line => new RegExp(`^##\\s+${heading}\\s*$`).test(line))
-    if (start < 0) return ''
-    const rest = lines.slice(start + 1)
-    const end = rest.findIndex(line => /^##\s+/.test(line))
-    return (end < 0 ? rest : rest.slice(0, end)).join('\n').trim()
-  }
+  const sectionBody = (text, heading) => (readSectionBody(text, heading) ?? '').trim()
   // Source graduation checks inspect only the first 12 lines: historical discussion is not a verdict.
   const closureSignals = [
     /可关闭\s*[：:=＝]\s*是\s*(?=[｜|\n（(]|$)/,
