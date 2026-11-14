@@ -1,5 +1,6 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { normalizeDocument, sectionRange } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
 import { join } from 'node:path'
 
 // ── 9. 提案纪律：notes/proposed/ 只收已批 RFC，且该毕业的必须毕业 ─────────────
@@ -20,11 +21,9 @@ const proposals = existsSync(proposedDir)
   ? readdirSync(proposedDir).filter(n => n.endsWith('.md') && n !== 'README.md')
   : []
 const sectionBody = (text, heading) => {
-  const m = new RegExp(`^##\\s+${heading}\\s*$`, 'm').exec(text)
-  if (m === null) return ''
-  const rest = text.slice(m.index + m[0].length)
-  const next = rest.search(/^##\s+/m)
-  return (next < 0 ? rest : rest.slice(0, next)).trim()
+  const range = sectionRange(text, heading)
+  if (range === undefined) return ''
+  return normalizeDocument(text).split('\n').slice(range.start + 1, range.end).join('\n').trim()
 }
 const dateOf = name => /^(\d{4}-\d{2}-\d{2})-/.exec(name)?.[1]
 

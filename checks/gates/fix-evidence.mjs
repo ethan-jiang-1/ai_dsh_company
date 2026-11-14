@@ -2,6 +2,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { normalizeDocument, sectionRange } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
 
 // ── 修复证据门（fix-evidence，2026-11-14 立）──────────────────────────────────────
 // 触发事故（用户亲述）：让 agent 批修一批缺陷，它只把卡的状态翻了、`git mv` 进已修区，**仓库一行没变**。
@@ -65,61 +66,17 @@ function frontmatter(text) {
 }
 
 /**
- * 取 `## <heading>` 到下一个 `## ` 之间的正文。
- * @param {string} text 卡片全文。
- * @param {string} heading 节标题（不含 `## `）。
- * @returns {string | undefined} 节正文；缺节返回 undefined。
- */
-/**
- * 每行是否可用于结构解析（只处理围栏与整行/跨行 HTML 注释；完整形状家 = markdown-shape.ts，
- * 门禁是 .mjs 不引 TS，这里只留读卡需要的最小围栏状态）。
- * @param {string} text 卡片全文。
- * @returns {boolean[]} 与行一一对应。
- */
-function structuralFlags(text) {
-  const flags = []
-  let fence
-  let inComment = false
-  for (const line of text.split('\n')) {
-    if (fence !== undefined) {
-      flags.push(false)
-      const close = /^\s{0,3}(`{3,}|~{3,})(.*)$/.exec(line)
-      if (close !== null && close[1][0] === fence.char && close[1].length >= fence.length && close[2].trim() === '') fence = undefined
-      continue
-    }
-    if (inComment) {
-      flags.push(false)
-      if (line.includes('-->')) inComment = false
-      continue
-    }
-    const open = /^\s{0,3}(`{3,}|~{3,})(.*)$/.exec(line)
-    if (open !== null) { fence = { char: open[1][0], length: open[1].length }; flags.push(false); continue }
-    if (/^\s*<!--/.test(line)) { flags.push(false); if (!line.includes('-->')) inComment = true; continue }
-    flags.push(true)
-  }
-  return flags
-}
-
-/**
- * 取 `## <heading>` 到下一个 `## ` 之间的正文，只在非围栏/非注释行匹配标题（BUG-178）。
+ * 取 `## <heading>` 到下一个结构 `## ` 之间的结构行正文（BUG-178）。
+ * 形状判据唯一家 = markdown-shape-core.js：BOM/CRLF 归一、围栏/注释/跨行 code span 内的标题不算节，
+ * 行内注释移除后的可见文本参与匹配。节内只返回结构行，避免围栏里的假字段被读成证据。
  * @param {string} text 卡片全文。
  * @param {string} heading 节标题（不含 `## `）。
  * @returns {string | undefined} 节正文；缺节返回 undefined。
  */
 function section(text, heading) {
-  const lines = text.split('\n')
-  const flags = structuralFlags(text)
-  const pattern = new RegExp(`^##\\s+${heading}\\s*$`)
-  let start = -1
-  for (let index = 0; index < lines.length; index += 1) {
-    if (flags[index] && pattern.test(lines[index])) { start = index; break }
-  }
-  if (start === -1) return undefined
-  let end = lines.length
-  for (let index = start + 1; index < lines.length; index += 1) {
-    if (flags[index] && /^##\s+/.test(lines[index])) { end = index; break }
-  }
-  return lines.slice(start + 1, end).join('\n')
+  const range = sectionRange(text, heading)
+  if (range === undefined) return undefined
+  return normalizeDocument(text).split('\n').slice(range.start + 1, range.end).join('\n')
 }
 
 /**

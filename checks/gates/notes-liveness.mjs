@@ -1,5 +1,6 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { normalizeDocument, sectionRange } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
 import { join } from 'node:path'
 
 // ── 9-bis. Note 活状态门禁（notes-liveness，2026-10-05 D35 立；notes/ 分类 owner = notes/README.md）──
@@ -25,11 +26,9 @@ export function run({ root, ok, fail }) {
     : []
   const dateOf = name => /^(\d{4}-\d{2}-\d{2})-/.exec(name)?.[1]
   const sectionBody = (text, heading) => {
-    const m = new RegExp(`^##\\s+${heading}\\s*$`, 'm').exec(text)
-    if (m === null) return ''
-    const rest = text.slice(m.index + m[0].length)
-    const next = rest.search(/^##\s+/m)
-    return (next < 0 ? rest : rest.slice(0, next)).trim()
+    const range = sectionRange(text, heading)
+    if (range === undefined) return ''
+    return normalizeDocument(text).split('\n').slice(range.start + 1, range.end).join('\n').trim()
   }
   const freshNotes = implNotes.filter(n => {
     const date = dateOf(n)

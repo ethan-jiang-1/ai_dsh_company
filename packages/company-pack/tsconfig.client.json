@@ -4,6 +4,7 @@
 {
   "extends": "../../vendor/dsh/tsconfig.base.client.json",
   "compilerOptions": {
+    "allowJs": true,
     "rootDir": "src",
     "outDir": "lib/types",
     "tsBuildInfoFile": "lib/tsconfig.client.tsbuildinfo",

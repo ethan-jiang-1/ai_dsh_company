@@ -106,6 +106,8 @@ export function backlogLivenessProblems(backlogRoot) {
   }
   // 「非空 ## 节」= 门票的形状锚：标题在场且标题到下一个 `##` 之间有非空正文。
   const EXECUTABLE = /`(?:pnpm|node|git|rg|source|npx)\s+[^`\n]+`|Given\/When\/Then|\bassert\b/
+  // 本文件住 tools/lib（keyless seam），不能 import pack 的 markdown-shape-core；这里只做行级节定位。
+  // 完整形状（围栏/注释/跨行 code span）在门禁侧用 core；两边边界由 tests/checks 的形状用例兜住。
   const sectionBody = (text, heading) => {
     const lines = text.split('\n')
     const start = lines.findIndex(line => new RegExp(`^##\\s+${heading}\\s*$`).test(line))

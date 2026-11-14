@@ -250,3 +250,26 @@ test('空操作命令不算证据：sh -c / node 配置 / git（BUG-182）', () 
     assert.match(problems, /git 子命令不产生红→绿/)
   } finally { cleanup() }
 })
+
+test('正文里的字面 `<!--` 不影响证据节定位（BUG-181）', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    card(dir, { evidence: evidence(sha) })
+    const path = join(dir, '_backlog/_archive/fixed_bugs/BUG-900-fixture.md')
+    writeFileSync(path, readFileSync(path, 'utf8').replace('## 修复证据', '扫描器把 `<!--` 当普通结构。\n\n## 修复证据'))
+    assert.deepEqual(gate(dir).problems, [])
+  } finally { cleanup() }
+})
+
+test('BOM + CRLF 不影响证据节定位', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    card(dir, { evidence: evidence(sha) })
+    const path = join(dir, '_backlog/_archive/fixed_bugs/BUG-900-fixture.md')
+    const text = readFileSync(path, 'utf8')
+    writeFileSync(path, '\uFEFF' + text.replace(/\n/g, '\r\n'))
+    assert.deepEqual(gate(dir).problems, [])
+  } finally { cleanup() }
+})

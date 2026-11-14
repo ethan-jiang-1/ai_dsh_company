@@ -6,6 +6,7 @@
 {
   "extends": "../../vendor/dsh/tsconfig.base.json",
   "compilerOptions": {
+    "allowJs": true,
     "rootDir": "src",
     "outDir": "lib/types",
     "tsBuildInfoFile": "lib/tsconfig.host.tsbuildinfo",
