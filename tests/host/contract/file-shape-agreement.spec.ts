@@ -129,18 +129,14 @@ describe('readCompanyFileAt 三态（missing 与 unsafe 不可互折）', () => 
     } finally { world.cleanup() }
   })
 
-  it('父目录越出公司盘 → 不吐内容（子类可能是 unsafe 或 missing）', () => {
+  it('父目录越出公司盘 → unsafe（不吐内容）', () => {
     const world = makeWorld()
     try {
       mkdirSync(join(world.ws, '.dsh-company'), { recursive: true })
       writeFileSync(join(world.outside, 'secret.md'), 'TOP SECRET\n')
       const result = readAt(world, '../outside/secret.md')
-      // 判据是「不吐内容」：越界路径永远不算 text。子类不钉死——见下方已知不一致。
-      expect(result.kind).not.toBe('text')
-      // 已知不一致（2026-11-14 实测，不是本卡回归）：`../outside/x` 报 missing，
-      // 而等价的 `../../outside/x` 报 unsafe——`walkCompanyDirs` 遇到不存在的段先 return，
-      // 不抛，于是走到 plainFileProblem 的 missing。安全面不受影响（两种都不吐内容），
-      // 但 subclass 不稳定：任何把 missing 当「可豁免」的读者在 `../` 形状上会跳过而非拒绝。
+      // 越界一律 unsafe（BUG-170）：`../` / `../../` / `a/../../` 与混合分隔符同判据，不折成 missing。
+      expect(result.kind).toBe('unsafe')
     } finally { world.cleanup() }
   })
 

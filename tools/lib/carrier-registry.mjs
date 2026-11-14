@@ -4,10 +4,11 @@
  * 一个事实（`.dsh-company` 形状/安全）有 N 个载体；登记表是「谁解释了这个事实」的唯一地图。
  * `checks/gates/company-root-carriers.mjs` 拿它做机械门禁：新写入口不登记 → `pnpm verify` 红。
  *
- * 三档：
+ * 三档 + 工具盘：
  * - `CARRIERS`：已收口、由矩阵覆盖的载体；`coveredBy` 必须能对上 spec 标题。
  * - `EXEMPT`：不写 workspace 公司盘的载体（home 锁/设置/日志等），带理由。
  * - `KNOWN_GAP`：已知未收口的公司盘写入口，带缺陷卡号；门禁不判红但必须在 PASS 行列出。
+ * - `WORKSPACE_TOOLING`：维护工具（非 pack 运行时）直写 `.dsh-company` 的入口，带理由。
  *
  * 路径相对仓库根；`symbol` 必须在该文件里出现（门禁粗验，不做 AST）。
  */
@@ -190,4 +191,22 @@ export const EXEMPT = [
 
 /** 矩阵未覆盖的已知入口；每条的 `bug` 必须是 _backlog（活跃或归档）里真实存在的卡。 */
 export const KNOWN_GAP = []
+
+/**
+ * 维护工具直写工作区 `.dsh-company` 的入口（不是 pack 运行时；按设计不经 company-root）。
+ * policy §P2 的「禁裸 `.dsh-company` 路径拼接」对这些入口 = 必须在此登记并写理由；
+ * 新增未登记入口 → `company-root-carriers` 红。`symbol` 必须在该文件里出现（门禁粗验）。
+ */
+export const WORKSPACE_TOOLING = [
+  {
+    module: 'tools/lib/rehearsal.mjs',
+    symbol: 'mirrorCompanyReference',
+    reason: '演练盘镜像：只写 runtime/rehearsal-workspace（gitignored）的 .dsh-company 参考状态，不触达用户 workspace',
+  },
+  {
+    module: 'tools/lib/kb-seeds.mjs',
+    symbol: 'RUN_BUNDLE_DIR',
+    reason: 'kb 种子派生：bundle:init 与排练场按 seed.json 在建盘期写 .dsh-company 初始盘；bootstrap 工具，不是运行时写入口',
+  },
+]
 

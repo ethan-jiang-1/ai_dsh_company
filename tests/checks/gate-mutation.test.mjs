@@ -164,7 +164,7 @@ test('company-root-carriers：删「未登记写入口」→ 未登记 writer �
   })
   const mutated = await mutant('company-root-carriers', 'if (!registered.has(rel)) {', 'if (false) {')
   try {
-    const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [] }
+    const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [], tooling: [] }
     assert.match(invoke(carrier, root, extra).problems.join(), /未登记的公司盘写入口/)
     assert.deepEqual(invoke(mutated.mod, root, extra).problems, [])
   } finally { mutated.cleanup(); rmSync(root, { recursive: true, force: true }) }
@@ -179,7 +179,7 @@ test('company-root-carriers：删「禁裸节切分正则」与「SKILL.md YAML 
     'else if (RAW_HEADING_SPLIT_RE.test(pattern) || RAW_HEADING_ANYWHERE_RE.test(pattern)) {',
     'else if (false) {')
   try {
-    const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [] }
+    const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [], tooling: [] }
     assert.match(invoke(carrier, rootRaw, extra).problems.join(), /禁止手写裸 Markdown 节切分正则/)
     assert.deepEqual(invoke(mutRaw.mod, rootRaw, extra).problems, [])
   } finally { mutRaw.cleanup(); rmSync(rootRaw, { recursive: true, force: true }) }
@@ -192,7 +192,7 @@ test('company-root-carriers：删「禁裸节切分正则」与「SKILL.md YAML 
     'else if (prefix !== undefined && RAW_HEADING_STRING_RE.test(prefix)) {',
     'else if (false) {')
   try {
-    const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [] }
+    const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [], tooling: [] }
     assert.match(invoke(carrier, rootStr, extra).problems.join(), /禁止手写裸 Markdown 节判据/)
     assert.deepEqual(invoke(mutStr.mod, rootStr, extra).problems, [])
   } finally { mutStr.cleanup(); rmSync(rootStr, { recursive: true, force: true }) }
@@ -205,10 +205,25 @@ test('company-root-carriers：删「禁裸节切分正则」与「SKILL.md YAML 
     'if (!parsed.present || parsed.error !== undefined) {',
     'if (false) {')
   try {
-    const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [] }
+    const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [], tooling: [] }
     assert.match(invoke(carrier, rootSkill, extra).problems.join(), /SKILL\.md YAML frontmatter 不可解析/)
     assert.deepEqual(invoke(mutSkill.mod, rootSkill, extra).problems, [])
   } finally { mutSkill.cleanup(); rmSync(rootSkill, { recursive: true, force: true }) }
+})
+
+test('company-root-carriers：删「工具盘 .dsh-company 未登记」→ 未登记 tooling 漏过（B2）', async () => {
+  const root = fixture({
+    'packages/company-pack/src/host/noop.ts': 'export const x = 1\n',
+    'tools/lib/scaffold.mjs': ["mkdirSync(join(ws, '.dsh-company/kb'), { recursive: true })", ''].join('\n'),
+  }, ['tools/lib'])
+  const mutTooling = await mutant('company-root-carriers',
+    'if (match === null) continue',
+    'if (match !== null) continue')
+  try {
+    const extra = { carriers: [], exempt: [], knownGap: [], markdownPrimitives: [], tooling: [] }
+    assert.match(invoke(carrier, root, extra).problems.join(), /tools\/lib\/scaffold\.mjs:1 → 禁止手写裸 \.dsh-company 路径拼接/)
+    assert.deepEqual(invoke(mutTooling.mod, root, extra).problems, [])
+  } finally { mutTooling.cleanup(); rmSync(root, { recursive: true, force: true }) }
 })
 
 // ── 3. fix-evidence（5 分支：缺节 / 空操作命令 / 围栏假字段 / 提交改动面对账 / 浅克隆跳过）──

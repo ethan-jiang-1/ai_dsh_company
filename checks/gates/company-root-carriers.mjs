@@ -2,7 +2,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import ts from 'typescript'
-import { CARRIERS, EXEMPT, KNOWN_GAP, MARKDOWN_PRIMITIVES } from '../../tools/lib/carrier-registry.mjs'
+import { CARRIERS, EXEMPT, KNOWN_GAP, MARKDOWN_PRIMITIVES, WORKSPACE_TOOLING } from '../../tools/lib/carrier-registry.mjs'
 import { parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
 
 // ── 公司盘载体与治理面单原语门禁（company-root-carriers，2026-11-13 P0；2026-11-14 W2 扩禁裸解析）──
@@ -17,6 +17,10 @@ import { parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
 //      不得出现裸 YAML frontmatter 正则或裸 Markdown `##` 节切分正则（精确报 file:line）。
 //      声明的边界（开放集合，不是穷尽承诺）：只管 ^ 锚 / `\n` 前缀 / `[#]{n}` 的正则字面量与 RegExp 构造，
 //      及 `.startsWith/.split` 的 `#…` 字符串字面量；标识符间接传参、slice/replace/match 不扫——靠 gate-change 盲审补位。
+//   ④ checks/gates/*.mjs 与 tools/lib/*.mjs（排除登记表与已登记的 WORKSPACE_TOOLING 成员）里同时出现
+//      `'.dsh-company'` 字面量与写调用 → 必须在 WORKSPACE_TOOLING 登记并写理由（policy §P2 的路径单原语）。
+//      声明的边界：只认以 `.dsh-company` 开头的字符串/模板/拼接字面量（`'.dsh-company'`、`` `.dsh-company/${x}` ``、
+//      `'.dsh-company' + '/x'`）；变量间接传参、常量再赋值不扫——靠盲审补位。
 // 负例留证 2026-11-13 / 2026-11-14：
 //   - 新建未登记 host writer → `FAIL company-root-carriers: … → 未登记的公司盘写入口`；
 //   - 在任一非原语门禁植入 `/^##\s+/` 或 `/^---\r?\n/` → `FAIL company-root-carriers: … → 禁止手写裸 …`。
@@ -41,7 +45,7 @@ const RAW_SCAN_SELF = 'checks/gates/company-root-carriers.mjs'
 /** 去掉块注释与整行注释；行内 `//` 保留（误报由「同时要有写原语」挡住）。 */
 function stripComments(text) {
   return text
-    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\*[\s\S]*?\*\//g, block => block.replace(/[^\n]/g, ''))
     .replace(/^\s*\/\/.*$/gm, '')
 }
 
@@ -133,6 +137,31 @@ function scanRawParsingProblems(root, primitives) {
   return { problems, scanned }
 }
 
+const TOOLING_SKIP = new Set([RAW_SCAN_SELF, 'tools/lib/carrier-registry.mjs'])
+/** `'.dsh-company'` / `".dsh-company/kb"` / `` `.dsh-company/${x}` `` / `'.dsh-company' + '/x'` 的公共前缀。 */
+const RAW_COMPANY_DIR_LITERAL = /['"`]\.dsh-company(?:[\\/]|['"`])/
+
+/** 维护工具直写工作区 `.dsh-company` 而未登记 → 红；登记表与已登记成员跳过。 */
+function scanToolingProblems(root, tooling) {
+  const registered = new Set(tooling.map(entry => entry.module))
+  const problems = []
+  for (const dirRel of GOVERNANCE_DIRS) {
+    const absDir = join(root, dirRel)
+    if (!existsSync(absDir)) continue
+    for (const absFile of walk(absDir, '.mjs')) {
+      const rel = absFile.slice(root.length + 1).replaceAll('\\', '/')
+      if (TOOLING_SKIP.has(rel) || registered.has(rel)) continue
+      const text = stripComments(readFileSync(absFile, 'utf8'))
+      if (!WRITE_REF.test(text)) continue
+      const match = RAW_COMPANY_DIR_LITERAL.exec(text)
+      if (match === null) continue
+      const line = text.slice(0, match.index).split('\n').length
+      problems.push(`${rel}:${String(line)} → 禁止手写裸 .dsh-company 路径拼接（登记到 tools/lib/carrier-registry.mjs 的 WORKSPACE_TOOLING 并写理由）`)
+    }
+  }
+  return problems
+}
+
 export function run({
   root,
   ok,
@@ -141,6 +170,7 @@ export function run({
   exempt = EXEMPT,
   knownGap = KNOWN_GAP,
   markdownPrimitives = MARKDOWN_PRIMITIVES,
+  tooling = WORKSPACE_TOOLING,
 }) {
   const hostDir = join(root, HOST)
   if (!existsSync(hostDir)) {
@@ -157,6 +187,7 @@ export function run({
     ...carriers.filter(entry => entry.kind === 'writer').map(entry => entry.module),
     ...exempt.map(entry => entry.module),
     ...knownGap.map(entry => entry.module),
+    ...tooling.map(entry => entry.module),
   ])
   const problems = []
   let writers = 0
@@ -172,7 +203,7 @@ export function run({
     }
   }
 
-  for (const entry of [...carriers, ...exempt, ...knownGap]) {
+  for (const entry of [...carriers, ...exempt, ...knownGap, ...tooling]) {
     const path = join(root, entry.module)
     if (!existsSync(path)) {
       problems.push(`${entry.module} → 登记项指向的模块不存在`)
@@ -192,7 +223,7 @@ export function run({
     }
   }
   const rawScan = scanRawParsingProblems(root, markdownPrimitives)
-  problems.push(...rawScan.problems)
+  problems.push(...rawScan.problems, ...scanToolingProblems(root, tooling))
 
   for (const skillRoot of ['packages/company-pack', '.agents/skills']) {
     const absSkillRoot = join(root, skillRoot)
@@ -209,7 +240,8 @@ export function run({
   const gaps = knownGap.map(entry => entry.bug).filter((bug, index, all) => all.indexOf(bug) === index)
   const gapText = knownGap.length === 0 ? 'knownGap 0' : `knownGap ${String(knownGap.length)}：${gaps.join('、')}`
   const rawNote = rawScan.scanned > 0 ? ` / 禁裸解析 ×${String(rawScan.scanned)}` : ''
+  const toolingNote = tooling.length > 0 ? ` / 工具盘入口 ${String(tooling.length)}` : ''
   problems.length === 0
-    ? ok(`company-root-carriers ×${String(files.length)} 文件（写面文件 ${String(writers)} / ${gapText}${rawNote}）`)
+    ? ok(`company-root-carriers ×${String(files.length)} 文件（写面文件 ${String(writers)} / ${gapText}${rawNote}${toolingNote}）`)
     : fail('company-root-carriers', problems.join('；'))
 }

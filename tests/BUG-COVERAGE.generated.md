@@ -194,7 +194,7 @@
 | 166 | 2026-11-14 | tests/lib/prd-check.spec.ts:344 |
 | 168 | 2026-11-14 | tests/lib/prd-check.spec.ts:358 |
 | 169 | 2026-11-14 | tests/lib/requirements-check.spec.ts:340 |
-| 170 | 2026-11-14 | tests/host/contract/file-shape-agreement.spec.ts:185 |
+| 170 | 2026-11-14 | tests/host/contract/file-shape-agreement.spec.ts:181 |
 | 172 | 2026-11-14 | tests/lib/prd-check.spec.ts:376 |
 | 173 | 2026-11-14 | tests/lib/prd-check.spec.ts:383 |
 | 176 | 2026-11-14 | tests/lib/prd-check.spec.ts:392 |

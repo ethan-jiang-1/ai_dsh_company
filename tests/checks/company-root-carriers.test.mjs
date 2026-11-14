@@ -20,7 +20,7 @@ function fixture() {
 function gate(root, registry = {}) {
   const problems = []
   let okLine
-  run({ root, carriers: [], exempt: [], knownGap: [], ...registry, ok: line => { okLine = line }, fail: (_name, detail) => problems.push(detail) })
+  run({ root, carriers: [], exempt: [], knownGap: [], tooling: [], ...registry, ok: line => { okLine = line }, fail: (_name, detail) => problems.push(detail) })
   return { problems, okLine }
 }
 
@@ -94,5 +94,40 @@ test('非注册原语植入裸 frontmatter 正则/前缀或裸 Markdown `##` 节
       assert.match(escaped, new RegExp(`escape-gate\\.mjs:${String(line)} → 禁止手写裸 Markdown 节`))
     }
     assert.doesNotMatch(escaped, /escape-gate\.mjs:9/)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+})
+
+test('工具盘直写 .dsh-company 未登记 → 红（file:line）；登记（含理由）→ 绿；无字面量 → 不误报（B2）', () => {
+  const root = fixture()
+  try {
+    mkdirSync(join(root, 'tools/lib'), { recursive: true })
+    writeFileSync(join(root, 'tools/lib/scaffold.mjs'), [
+      "import { mkdirSync } from 'node:fs'",
+      "import { join } from 'node:path'",
+      'export function scaffold(ws) {',
+      "  mkdirSync(join(ws, '.dsh-company/kb'), { recursive: true })",
+      '  mkdirSync(join(ws, `.dsh-company/${deliverables}`), { recursive: true })',
+      "  return '.dsh-company' + '/exports'",
+      '}',
+    ].join('\n'))
+    writeFileSync(join(root, 'tools/lib/plain-writer.mjs'), ["import { writeFileSync } from 'node:fs'", "writeFileSync('x', 'y')"].join('\n'))
+    const carriers = [{ kind: 'writer', module: MODULE }]
+    const opened = gate(root, { carriers, markdownPrimitives: [] })
+    assert.match(opened.problems.join('；'), /tools\/lib\/scaffold\.mjs:4 → 禁止手写裸 \.dsh-company 路径拼接/)
+    assert.doesNotMatch(opened.problems.join('；'), /plain-writer\.mjs/)
+    const registered = gate(root, {
+      carriers,
+      markdownPrimitives: [],
+      tooling: [{ module: 'tools/lib/scaffold.mjs', symbol: '.dsh-company', reason: '测试夹具：演练盘' }],
+    })
+    assert.deepEqual(registered.problems, [])
+    assert.match(registered.okLine, /工具盘入口 1/)
+    // 登记了但符号不在文件里 → 红（登记项自身必须可解析）
+    const broken = gate(root, {
+      carriers,
+      markdownPrimitives: [],
+      tooling: [{ module: 'tools/lib/scaffold.mjs', symbol: 'not-in-file', reason: '测试夹具' }],
+    })
+    assert.match(broken.problems.join('；'), /scaffold\.mjs → 登记符号 not-in-file 不在文件里/)
   } finally { rmSync(root, { recursive: true, force: true }) }
 })
