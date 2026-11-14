@@ -13,7 +13,8 @@
  *
  * 证明不了：写路径、跨进程/重启、内容语义（只判形状，不判 JSON 对不对）。
  */
-import { mkdirSync, symlinkSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { companyFileProblem, companyFileProblemAt, readCompanyFileAt, readCompanyText, readCompanyTextAt } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
@@ -163,5 +164,21 @@ describe('readCompanyFileAt 三态（missing 与 unsafe 不可互折）', () => 
       symlinkSync(join(world.outside, 'secret.md'), join(world.ws, '.dsh-company', 'kb/link.md'))
       expect(readCompanyTextAt(join(world.ws, '.dsh-company'), 'kb/link.md')).toBeUndefined()
     } finally { world.cleanup() }
+  })
+})
+
+describe('越界 `..` 路径的三态子类（BUG-170）', () => {
+  it('../ / ../../ / a/../../ 一律 unsafe，不折成 missing', () => {
+    const ws = mkdtempSync(join(tmpdir(), 'shape-dotdot-'))
+    try {
+      mkdirSync(join(ws, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(ws, '.dsh-company/kb/company.md'), '# ok\n')
+      const home = join(ws, '.dsh-company')
+      for (const rel of ['../outside/secret.md', '../../outside/secret.md', 'a/../../outside/secret.md']) {
+        expect(readCompanyFileAt(home, rel).kind, rel).toBe('unsafe')
+        expect(companyFileProblemAt(home, rel), rel).toBe('unsafe')
+      }
+      expect(readCompanyFileAt(home, 'kb/company.md')).toEqual({ kind: 'text', text: '# ok\n' })
+    } finally { rmSync(ws, { recursive: true, force: true }) }
   })
 })

@@ -494,8 +494,8 @@ opened: YYYY-MM-DD
 ## 修复证据
 （`status: 已修` 且 `opened` ≥ 2026-11-14 必填；缺一即 `pnpm verify` 红——判据唯一家 = [章程](../README.md)「缺陷的通道」）
 
-- 改动面：`path/to/changed`（真实存在；不落在 `_backlog/`、`notes/`、`vendor/`）
-- 红：还原什么 → 哪条断言红（实跑过的命令与结果）
+- 改动面：`path/to/changed`（存在，或在证据提交里被删除/重命名；不落在 `_backlog/`、`notes/`、`vendor/`）
+- 红：还原什么 → 哪条断言红（实跑过的命令与结果；命令须可解析：pnpm 脚本在 package.json、npx bin 在本地、路径存在）
 - 绿：接回什么 → 哪条断言绿（同一命令）
 - 提交：commit <sha>（红→绿所在提交；门禁对账：该提交必须真改到改动面）
 ```

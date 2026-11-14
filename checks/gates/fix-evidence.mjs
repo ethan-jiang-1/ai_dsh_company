@@ -11,10 +11,15 @@ import { spawnSync } from 'node:child_process'
 //
 // 判据（前向生效：`opened` ≥ 2026-11-14 的已修卡；存量不追补）：
 //   ① 有非空 `## 修复证据` 节，且含四行：
-//      `- 改动面：` 至少一个反引号路径；每个路径真实存在，且不落在 `_backlog/`、`notes/`、`vendor/`
+//      `- 改动面：` 至少一个反引号路径；每个路径不落在 `_backlog/`、`notes/`、`vendor/`
 //        ——证据必须指向系统面（代码/门禁/测试/文档/内容），只改卡与 Note 不算修复。
+//        路径可以已被删除/重命名：真实性与在岗由「证据提交的 changed files」对账（BUG-171），
+//        不再要求它此刻仍在盘上。
 //      `- 红：` / `- 绿：` 非空，且各自点名一条可执行命令（反引号里的 `pnpm …`/`node …`/`npx …`/
 //        `vitest …`/`sh …`/`git …`）——并且红绿必须出现**同一条**命令（同一命令复跑才是红→绿）。
+//        命令本身要能解析（BUG-175）：`pnpm <script>` 在根 package.json scripts 里；
+//        `node <path>` / `sh <path>` 目标存在；`npx <bin>` / `vitest` 在本地 `node_modules/.bin`；
+//        参数里出现的仓库路径存在。前缀对但脚本不存在 = 假证据。
 //      `- 提交：commit <sha>`：该 sha 存在、**是 HEAD 的祖先**（当前分支可复算）、提交日期 ≥ opened、
 //        且该提交的 changed files 与改动面相交（文件相等或落在目录下）——「卡上说的改动面」必须真在那次提交里出现过。
 //   ② 浅克隆（`git rev-parse --is-shallow-repository` = true）且 sha 不可达时，跳过该卡的提交解析并在
@@ -26,8 +31,9 @@ import { spawnSync } from 'node:child_process'
 //   ③ 把 BUG-160 的改动面改成 `packages/company-pack/src/host/commands/prd-gate.ts`（该提交没改它）→ `…的提交 85e6fec9 没有改到改动面里的任何路径`；
 //   ④ 把 BUG-160 的改动面改成 `notes/implemented/…` → `…只指向卡/笔记/vendor（不算系统面改动）`；
 //   ⑤ 把 BUG-160 的红/绿命令改成两条不同命令（或去掉命令）→ `…的红/绿没有同一条命令` / `…必须点名一条可执行命令`；
-//   ⑥ 把 BUG-160 的 `- 提交：` 改成 `7fe04557`（提交存在但不在当前分支历史上）→ `…不在 HEAD 历史上`。
-//   六条各自还原后 `PASS fix-evidence ×8`。
+//   ⑥ 把 BUG-160 的 `- 提交：` 改成 `7fe04557`（提交存在但不在当前分支历史上）→ `…不在 HEAD 历史上`；
+//   ⑦ 把 BUG-160 的红/绿命令改成 `pnpm definitely-not-a-real-script-xyz` → `…命令不可执行…没有脚本`。
+//   七条各自还原后 `PASS fix-evidence ×8`。
 const EFFECTIVE = '2026-11-14'
 const CARD = /^BUG-\d{3}-.*\.md$/
 const EVIDENCE_HEADING = '修复证据'
@@ -88,6 +94,48 @@ function commands(text) {
 }
 
 /**
+ * 命令是否在本仓可执行（BUG-175）：前缀对但脚本/路径不存在的「同一条假命令」不算证据。
+ * @param {string} root checkout 根。
+ * @param {string} command 反引号里的命令原文。
+ * @returns {string | undefined} 不可执行的原因；undefined = 可解析。
+ */
+function commandProblem(root, command) {
+  const tokens = command.split(/\s+/)
+  const bin = tokens[0]
+  if (bin === 'pnpm') {
+    const script = tokens.slice(1).find(token => !token.startsWith('-'))
+    if (script === undefined) return '缺脚本名'
+    let scripts = {}
+    try { scripts = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).scripts ?? {} } catch { return 'package.json 不可读' }
+    return typeof scripts[script] === 'string' ? undefined : `pnpm 没有脚本 ${script}`
+  }
+  if (bin === 'node') {
+    const target = tokens.slice(1).find(token => !token.startsWith('-'))
+    if (target === undefined) return undefined
+    return existsSync(join(root, target)) ? undefined : `node 目标不存在：${target}`
+  }
+  if (bin === 'npx' || bin === 'vitest') {
+    const name = bin === 'npx' ? tokens[1] : 'vitest'
+    if (name === undefined) return '缺可执行名'
+    if (!existsSync(join(root, 'node_modules/.bin', name))) return `本地没有可执行 ${name}`
+    const rest = bin === 'npx' ? tokens.slice(2) : tokens.slice(1)
+    for (const token of rest) {
+      if (/^(?:tests|checks|tools|packages|probes|run|docs|snapshots)\//.test(token) && !existsSync(join(root, token))) {
+        return `命令引用的路径不存在：${token}`
+      }
+    }
+    return undefined
+  }
+  if (bin === 'sh') {
+    const target = tokens[1]
+    if (target !== undefined && !target.startsWith('-') && !existsSync(join(root, target))) return `sh 脚本不存在：${target}`
+    return undefined
+  }
+  if (bin === 'git') return undefined
+  return `未知命令前缀：${bin}`
+}
+
+/**
  * 跑 git（失败返回 undefined，由调用方决定是判红还是跳过）。
  * @param {string} root checkout 根。
  * @param {readonly string[]} args 参数。
@@ -119,7 +167,6 @@ function checkCard(root, rel, text, state) {
       state.problems.push(`${rel} 的改动面 ${path} 只指向卡/笔记/vendor（不算系统面改动）`)
       continue
     }
-    if (!existsSync(join(root, path))) state.problems.push(`${rel} 的改动面 ${path} 不在盘上`)
   }
   const red = field(evidence, '红')
   const green = field(evidence, '绿')
@@ -131,6 +178,10 @@ function checkCard(root, rel, text, state) {
   if (green !== undefined && green !== '' && greenCommands.length === 0) state.problems.push(`${rel} 的 \`- 绿：\` 必须点名一条可执行命令（反引号里的 pnpm/node/npx/vitest/sh/git）`)
   if (redCommands.length > 0 && greenCommands.length > 0 && !redCommands.some(command => greenCommands.includes(command))) {
     state.problems.push(`${rel} 的红/绿没有同一条命令（红→绿必须用同一条命令复跑：红=${redCommands.join(' / ')}；绿=${greenCommands.join(' / ')}）`)
+  }
+  for (const command of new Set([...redCommands, ...greenCommands])) {
+    const problem = commandProblem(root, command)
+    if (problem !== undefined) state.problems.push(`${rel} 的红/绿命令不可执行（${command}）：${problem}`)
   }
   const commitField = field(evidence, '提交')
   const sha = commitField === undefined ? undefined : /^commit\s+([0-9a-f]{7,40})$/.exec(commitField)?.[1]

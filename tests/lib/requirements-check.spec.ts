@@ -335,3 +335,15 @@ describe('文档文本形状层与 /prd check 同源（BUG-160/162）', () => {
     expect(result.errors.join()).not.toContain('REQ-999')
   })
 })
+
+describe('未闭合注释的根因报错（BUG-169）', () => {
+  it('/req check 报注释未闭合，不级联成缺层', () => {
+    const broken = `${PRD}\n<!-- 未闭合\n`
+    const result = checkRequirements(
+      { meta: meta(['numbering: identity', 'layers: MRD, PRD']), docs: docs(['mrd.md', MRD], ['prd.md', broken]) },
+      { layers: ['MRD', 'PRD'] },
+    )
+    expect(result.errors.join()).toContain('HTML 注释未闭合')
+    expect(result.errors.join()).not.toContain('缺层 PRD')
+  })
+})

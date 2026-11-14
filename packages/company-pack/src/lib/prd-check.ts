@@ -13,7 +13,7 @@
  * 2026-11-14：文档结构行判据（平台归一化 + 围栏 + HTML 注释）移到 `markdown-shape.ts`，
  * 与 `/req check` 共用同一份——两个消费者对同一份文档不允许有两种结论（BUG-160/162）。
  */
-import { normalizeDocument, scanDocument, splitTableRow } from './markdown-shape.ts'
+import { maskHtmlComments, normalizeDocument, scanDocument, scanDocumentDetailed, splitTableRow } from './markdown-shape.ts'
 
 export type PrdDocStatus = 'draft' | 'ready' | 'in-dev' | 'accepted'
 export type PrdForm = 'headings' | 'json-ledger'
@@ -105,9 +105,12 @@ export function parsePrdHeader(text: string): { readonly layer?: string; readonl
   return { ...(fields['layer'] !== undefined ? { layer: fields['layer'] } : {}), ...(fields['definition'] !== undefined ? { definition: fields['definition'] } : {}) }
 }
 
-/** 从 Markdown 中取第一个 ```json 代码块（MRD 的机器可读头；旧 PRD 也走这里）。 */
+/**
+ * 从 Markdown 中取第一个 ```json 代码块（MRD 的机器可读头；旧 PRD 也走这里）。
+ * 先屏蔽 HTML 注释：注释里的账本是「停用」的，不能被当成定义（BUG-173）。
+ */
 export function extractJsonBlock(text: string): { readonly ok: true; readonly value: unknown } | { readonly ok: false; readonly error: string } {
-  const match = /```json\s*\n([\s\S]*?)\n```/.exec(text)
+  const match = /```json\s*\n([\s\S]*?)\n```/.exec(maskHtmlComments(text))
   if (match === null) return { ok: false, error: '缺 ```json 需求块（模板见 content/templates/mrd.md；PRD 新形状见 prd.md）' }
   try {
     return { ok: true, value: JSON.parse(match[1] ?? '') as unknown }
@@ -564,6 +567,10 @@ export function parsePrdHeadings(text: string): { readonly doc?: PrdDoc; readonl
 /** 按 `definition` 头分派：headings（新）/ json-ledger（旧，只读兼容）。入口归一化平台差异（BUG-152）。 */
 export function parsePrdDocument(text: string): { readonly doc?: PrdDoc; readonly errors: string[]; readonly form?: PrdForm } {
   const normalized = normalizeDocument(text)
+  const scan = scanDocumentDetailed(normalized)
+  if (scan.unclosedCommentLine !== undefined) {
+    return { errors: [`PRD：HTML 注释未闭合（第 ${scan.unclosedCommentLine} 行起）——后文会被当成注释内容；补上 \`-->\` 后重跑 /prd check（BUG-169）`] }
+  }
   const header = parsePrdHeader(normalized)
   const form = header?.definition ?? ''
   if (form === 'headings') return { ...parsePrdHeadings(normalized), form }

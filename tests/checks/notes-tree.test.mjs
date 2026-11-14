@@ -9,7 +9,7 @@
 //   把日期判据还原成纯形状正则 → 「2026-13-01」用例变绿（红）。
 // 为什么在 tests/checks/ 而不是 tests/：门禁读的是根驱动面（checks/gates），门禁自测统一住这里
 // （同一发现器 = `tools/run-check-tests.mjs`，文件即清单）。
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import * as gate from '../../checks/gates/notes-tree.mjs'
@@ -146,6 +146,23 @@ const check = (label, passed) => {
     write(root, 'notes/archived/2026-11-14-d.md', '# d\n\n状态：已交付（2026-11-14；批准：fixture）\n')
     check('archived 保留实现状态 → 绿', gate.notesStatusProblems(root).problems.length === 0)
     check('archived 新写计入受查数', gate.notesStatusProblems(root).checked === 1)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+// ── symlink 形状（BUG-174）────────────────────────────────────────────────────
+{
+  const root = makeTree()
+  try {
+    write(root, 'notes/implemented/2026-11-14-target.md', '# target\n')
+    symlinkSync(join(root, 'notes/implemented/2026-11-14-target.md'), join(root, 'notes/implemented/2026-11-14-link.md'))
+    check('文件 symlink → 红', treeHas(root, '符号链接'))
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+{
+  const root = makeTree()
+  try {
+    symlinkSync(join(root, 'notes/implemented'), join(root, 'notes/implemented-link'))
+    check('目录 symlink → 红', treeHas(root, '符号链接'))
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 

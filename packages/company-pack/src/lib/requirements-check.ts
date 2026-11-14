@@ -17,7 +17,7 @@
  * 2026-11-14：文档结构行判据（平台归一化 + 围栏 + HTML 注释）与 `/prd check` 共用
  * `markdown-shape.ts`——BOM 不再让合法文档「缺头」，围栏/注释里的示例不再进编号索引（BUG-160/162）。
  */
-import { normalizeDocument, scanDocument, splitTableRow } from './markdown-shape.ts'
+import { normalizeDocument, scanDocument, scanDocumentDetailed, splitTableRow } from './markdown-shape.ts'
 
 export type Layer = 'MRD' | 'StRS' | 'PRD' | 'SyRS' | 'IRS' | 'V&V'
 export type DefinitionForm = 'json-ledger' | 'headings' | 'table-rows' | 'none'
@@ -469,6 +469,12 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
       const legacy = LEGACY_LAYER_FORMS[layer] ?? []
       const suffix = legacy.length === 0 ? '' : `（旧动议兼容 ${legacy.join('/')}）`
       errors.push(`${doc.rel} 的 definition 与层不匹配：${layer} 应为 ${LAYER_FORMS[layer]}${suffix}，实际 ${formValue}`)
+      continue
+    }
+    const scan = scanDocumentDetailed(doc.text)
+    if (scan.unclosedCommentLine !== undefined) {
+      errors.push(`${doc.rel}：第 ${scan.unclosedCommentLine} 行的 HTML 注释未闭合——后文会被当成注释内容（先补 -->；BUG-169）`)
+      presentLayers.add(layer)
       continue
     }
     presentLayers.add(layer)

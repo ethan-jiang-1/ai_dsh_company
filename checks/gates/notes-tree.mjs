@@ -104,6 +104,10 @@ export function notesTreeProblems(root) {
   let files = 0
   for (const entry of readdirSync(notesDir, { withFileTypes: true })) {
     if (entry.name.startsWith('.')) continue
+    if (entry.isSymbolicLink()) {
+      problems.push(`notes/${entry.name} — 符号链接（Notes 只许普通文件/目录；链接内容绕不过状态与形状门）`)
+      continue
+    }
     if (entry.isFile()) {
       if (entry.name.toLowerCase() === 'index.md') problems.push(`notes/${entry.name} — ${INDEX_MESSAGE}`)
       else if (!ROOT_FILES.has(entry.name)) {
@@ -120,6 +124,10 @@ export function notesTreeProblems(root) {
     for (const child of readdirSync(join(notesDir, entry.name), { withFileTypes: true })) {
       if (child.name.startsWith('.')) continue
       const rel = `notes/${entry.name}/${child.name}`
+      if (child.isSymbolicLink()) {
+        problems.push(`${rel} — 符号链接（Notes 只许普通文件/目录；链接内容绕不过状态与形状门）`)
+        continue
+      }
       if (child.isFile()) {
         fileProblems(rel, child.name, problems)
         files += 1
@@ -133,6 +141,10 @@ export function notesTreeProblems(root) {
       for (const inner of readdirSync(join(notesDir, entry.name, child.name), { withFileTypes: true })) {
         if (inner.name.startsWith('.')) continue
         const innerRel = `${rel}/${inner.name}`
+        if (inner.isSymbolicLink()) {
+          problems.push(`${innerRel} — 符号链接（Notes 只许普通文件/目录）`)
+          continue
+        }
         if (!inner.isFile()) {
           problems.push(`${innerRel}/ — ${entry.name}/${child.name}/ 只许文件（不允许深度 4 目录）`)
           continue

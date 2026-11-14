@@ -11,6 +11,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { extractJsonBlock, parsePrdSlices, validateProductDocs } from '../../packages/company-pack/src/lib/prd-check.ts'
+import { splitTableRow } from '../../packages/company-pack/src/lib/markdown-shape.ts'
 
 const mrd = (overrides = {}) => JSON.stringify({
   mrd: {
@@ -346,5 +347,39 @@ describe('changeLog 日期/作者形状（BUG-166）', () => {
     expect(validateProductDocs(mrdDoc(mrd()), withLog('2026-13-99 · nobody · bad')).errors.join()).toContain('真实日历日期')
     expect(validateProductDocs(mrdDoc(mrd()), withLog('2026-02-29 · nobody · bad')).errors.join()).toContain('真实日历日期')
     expect(validateProductDocs(mrdDoc(mrd()), withLog('2026-11-14 · · bad')).errors.join()).toContain('作者不能为空')
+  })
+})
+
+describe('行内代码与注释容器（BUG-168/169）', () => {
+  it('行内代码里的注释记号不起注释作用', () => {
+    const sections = requirementSection().replace(
+      '- userStory: 作为财务，我要导入流水，以便自动对账',
+      '- userStory: 支持 `<!--` 注释语法，以便自动对账',
+    )
+    const result = validateProductDocs(mrdDoc(mrd()), prd({ sections }))
+    expect(result.errors, result.errors.join()).toEqual([])
+  })
+
+  it('未闭合 HTML 注释 → 报根因，不报「没有需求」', () => {
+    const sections = `${requirementSection()}\n<!-- 未闭合\n`
+    const result = validateProductDocs(mrdDoc(mrd()), prd({ sections }))
+    expect(result.errors.join()).toContain('HTML 注释未闭合')
+    expect(result.errors.join()).not.toContain('没有 `### REQ-###` 定义小节')
+  })
+})
+
+describe('双反斜杠的表格转义（BUG-172）', () => {
+  it('`\\\\` 是字面反斜杠，后面的竖线仍分列；`\\|` 仍是字面竖线', () => {
+    expect(splitTableRow('| S1 | C:\\\\ | REQ-001 | ok |')).toEqual(['S1', 'C:\\', 'REQ-001', 'ok'])
+    expect(splitTableRow('| S1 | A \\| B | REQ-001 | ok |')).toEqual(['S1', 'A | B', 'REQ-001', 'ok'])
+  })
+})
+
+describe('注释里的 legacy JSON（BUG-173）', () => {
+  it('HTML 注释里的 json 账本不生效（不再被当成定义）', () => {
+    const commented = `---\nlayer: PRD\ndefinition: json-ledger\n---\n\n<!--\n\`\`\`json\n${legacyPrd()}\n\`\`\`\n-->\n`
+    const result = validateProductDocs(mrdDoc(mrd()), commented)
+    expect(result.ok).toBe(false)
+    expect(result.errors.join()).toContain('缺 ```json 需求块')
   })
 })

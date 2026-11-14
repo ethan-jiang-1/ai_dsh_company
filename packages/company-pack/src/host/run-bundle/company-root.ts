@@ -36,8 +36,15 @@ function lstatOrNull(path: string): Stats | null {
 
 /** 从已证明安全的根逐级走目录；create 时缺失则创建，symlink/文件占目录 → typed error。 */
 function walkCompanyDirs(root: string, rel: string, create: boolean): string {
+  const segments = rel.split('/').filter(Boolean)
+  // `..` 段一律 unsafe，且必须在走目录之前全量判定：不存在的中间段会让循环提前返回（create=false 时），
+  // 把「越界」折成「没有」——而 missing 是可豁免语义（BUG-170，a/../.. 形状实测会漏）。
+  if (segments.some(segment => segment === '..')) {
+    throw new UnsafeCompanyPathError(`公司盘路径不能含 .. 段（越出根）：${rel}`)
+  }
   let current = root
-  for (const segment of rel.split('/').filter(Boolean)) {
+  for (const segment of segments) {
+    if (segment === '.') continue
     current = join(current, segment)
     let info = lstatOrNull(current)
     if (info === null) {

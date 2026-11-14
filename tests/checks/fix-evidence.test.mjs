@@ -25,6 +25,10 @@ function repo() {
   git(['config', 'user.email', 't@t'])
   git(['config', 'user.name', 't'])
   git(['config', 'commit.gpgsign', 'false'])
+  // 门禁会解析命令：给临时仓库一份最小 package.json 与本地 bin（否则 pnpm/npx 一律不可解析）。
+  writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'fix-evidence-fixture', scripts: { test: 'vitest run' } }))
+  mkdirSync(join(dir, 'node_modules/.bin'), { recursive: true })
+  writeFileSync(join(dir, 'node_modules/.bin/vitest'), '#!/bin/sh\n')
   const commit = (rel, body, message) => {
     mkdirSync(dirname(join(dir, rel)), { recursive: true })
     writeFileSync(join(dir, rel), body)
@@ -86,12 +90,44 @@ test('证据提交不存在 → 红', () => {
   } finally { cleanup() }
 })
 
-test('改动面路径不在盘上 → 红', () => {
+test('改动面路径不存在且不在证据提交里 → 红（对账失败）', () => {
   const { dir, commit, cleanup } = repo()
   try {
     const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
     card(dir, { evidence: evidence(sha, 'packages/demo/missing.ts') })
-    assert.match(gate(dir).problems.join(), /不在盘上/)
+    assert.match(gate(dir).problems.join(), /没有改到改动面里的任何路径/)
+  } finally { cleanup() }
+})
+
+test('删除型修复：证据提交删除了文件 → 绿（改动面不必还在盘上）', () => {
+  const { dir, git, commit, cleanup } = repo()
+  try {
+    commit('packages/demo/dead.ts', 'export {}\n', 'feat: dead')
+    git(['rm', '-q', 'packages/demo/dead.ts'])
+    git(['commit', '-qm', 'chore: remove dead'])
+    const sha = git(['rev-parse', 'HEAD'])
+    card(dir, { evidence: evidence(sha, 'packages/demo/dead.ts') })
+    assert.deepEqual(gate(dir).problems, [])
+  } finally { cleanup() }
+})
+
+test('同一条不存在的 pnpm 脚本 → 红（假命令不算证据）', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    const fake = '`pnpm definitely-not-a-real-script-xyz`'
+    card(dir, { evidence: evidence(sha, 'packages/demo/a.ts', `- 红：拆守卫 → ${fake} 红`, `- 绿：接回 → ${fake} 绿`) })
+    assert.match(gate(dir).problems.join(), /命令不可执行.*pnpm 没有脚本 definitely-not-a-real-script-xyz/)
+  } finally { cleanup() }
+})
+
+test('npx 引用的 spec 不存在 → 红', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    const missing = '`npx vitest run tests/demo/missing.spec.ts`'
+    card(dir, { evidence: evidence(sha, 'packages/demo/a.ts', `- 红：拆守卫 → ${missing} 红`, `- 绿：接回 → ${missing} 绿`) })
+    assert.match(gate(dir).problems.join(), /命令引用的路径不存在/)
   } finally { cleanup() }
 })
 
