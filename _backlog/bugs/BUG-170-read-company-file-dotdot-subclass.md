@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-170：readCompanyFileAt 对越界 `../` 路径的 missing/unsafe 子类不稳定
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；`readCompanyFileAt` 是 BUG-156 修复引入的三态读契约，`prd-gate` 以 `missing` 作为旧动议豁免。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8c-markdown-shape.mts`。
@@ -46,6 +46,16 @@ node --import tsx/esm runtime/tmp/c8c-markdown-shape.mts
 - `walkCompanyDirs()` 在遇到 `..` 段时先规范化/判定是否越出 root，再做存在性检查；越界统一 `unsafe`；
 - 或 `readCompanyFileAt()` 先 `realpath`/`relative` 判 root 前缀，再分 missing/unsafe；
 - 契约测试补 `../` / `../../` / `a/../../` 三种形状，断言全部 `unsafe`（或至少同一类）。
+
+## 已修判定
+
+```text
+`../outside`、`../../outside`、`a/../../outside` 三形状 `readCompanyFileAt` 都返回 `unsafe`（不再 `missing`）
+正常相对路径（含 `./`）不受影响；`companyFileProblemAt` / `readCompanyTextAt` 同判
+红证：还原 `walkCompanyDirs` 对 `..` 的早退 → `../../` 返回 missing
+```
+
+判据由 `tests/host/contract/file-shape-agreement.spec.ts`（或 company-root spec）的三形状用例搭载；红证 = 去掉 `..` 段判定。
 
 ## 证据
 

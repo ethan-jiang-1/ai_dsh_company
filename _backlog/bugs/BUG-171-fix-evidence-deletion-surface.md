@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-171：fix-evidence 拒绝删除型修复——改动面路径已不在盘上
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；`fix-evidence` 是 2026-11-14 新增的「修 = 改动面 + 红→绿 + 可对账提交」门禁。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9c-fix-evidence.mts`。
@@ -48,6 +48,16 @@ node --import tsx/esm runtime/tmp/c9c-fix-evidence.mts
 - 去掉 `existsSync` 硬判，改为「路径在提交 changed 列表里」或「路径存在**或**在提交里被删除/重命名」；
 - 若要保留存在性检查，允许 `- 改动面：` 标 `deleted:` / 用父目录并说明；
 - 自测补「删除」「重命名」两形状。
+
+## 已修判定
+
+```text
+删除型修复：证据提交删除了 `dead.ts`，卡上 `- 改动面：dead.ts` → 门禁绿（不再「不在盘上」）
+路径既不存在也不在证据提交里 → 仍红（对账失败）
+红证：还原 existsSync 硬判 → 删除用例红
+```
+
+判据由 `tests/checks/fix-evidence.test.mjs` 的删除/不存在两形状搭载；红证 = 恢复存在性硬判。
 
 ## 证据
 

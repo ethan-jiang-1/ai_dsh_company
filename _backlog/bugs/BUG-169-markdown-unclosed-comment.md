@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-169：未闭合 HTML 注释静默吞掉后文，/prd check 报「没有需求」
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；与 BUG-162 的注释容器同层。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8c-markdown-shape.mts`。
@@ -52,6 +52,16 @@ node --import tsx/esm runtime/tmp/c8c-markdown-shape.mts
 - `scanDocument()` 返回 `unclosedComment` 标记/行号；`validateProductDocs` / `checkRequirements` 先报「HTML 注释未闭合」；
 - 或未闭合注释按「结构错误」fail loud，不静默吞到 EOF；
 - spec 覆盖未闭合注释、注释内 fence、注释后正文。
+
+## 已修判定
+
+```text
+未闭合 HTML 注释 → `/prd check` 报「HTML 注释未闭合（第 N 行起）」，不再报「没有需求」
+`/req check` 对同一文档报同一条根因错误（不级联成缺层）
+闭合注释后正文照常解析（不回归）
+```
+
+判据由 `tests/lib/prd-check.spec.ts` 与 `tests/lib/requirements-check.spec.ts` 的未闭合注释用例搭载；红证 = 去掉 EOF 检测 → 「没有需求」级联复现。
 
 ## 证据
 

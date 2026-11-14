@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-174：notes-tree 对 symlink 条目视而不见，链接 Note 绕过整道门
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；notes-tree 是 2026-11-14 新增的树形/状态门。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9c-gate-edges.mts`。
@@ -41,6 +41,16 @@ node --import tsx/esm runtime/tmp/c9c-gate-edges.mts
 
 - 两处循环显式处理 `entry.isSymbolicLink()`：直接红（Notes 只许普通文件/目录），或按真实路径解析后再判但记录链接形状；
 - 补红证：`notes/implemented/<date>-link.md` symlink → `notes-tree` 红；还原 → 绿。
+
+## 已修判定
+
+```text
+`notes/implemented/` 下的文件 symlink → notes-tree 红（符号链接不是许可形状）
+目录 symlink 同样红；普通文件/目录不误判
+红证：去掉 symlink 分支 → problems [] / files 0 复现
+```
+
+判据由 `tests/checks/notes-tree.test.mjs` 的 symlink 形状搭载；红证 = 移除 symlink 判定。
 
 ## 证据
 

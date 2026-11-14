@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-168：共享扫描器把行内代码里的 `<!--` 当注释开始，后续需求整段被吞
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；`markdown-shape.ts` 是 BUG-160/162 修复后的共享结构行判据。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8c-markdown-shape.mts`。
@@ -50,6 +50,16 @@ node --import tsx/esm runtime/tmp/c8c-markdown-shape.mts
 - `scanDocument()` 增加行内代码 span 状态（成对反引号，支持多反引号围栏），代码 span 里的 `<!--` / `-->` 不参与注释状态；
 - 或先按 CommonMark 解析行内结构再扫块级；
 - spec 覆盖「行内 `<!--` 不成注释」「行内 `-->` 不闭合」「成对注释正常」。
+
+## 已修判定
+
+```text
+行内代码里的注释开头/结尾记号不参与注释状态：字段值引用注释语法时，后续字段仍解析，ok true
+成对行内代码与普通 HTML 注释仍被移除（不回归）
+红证：去掉 code span 状态 → 行内注释开头吞掉后文、6 条字段缺失复现
+```
+
+判据由 `tests/lib/prd-check.spec.ts` 的行内代码注释用例搭载；红证 = 去掉 `codeSpanAt` 分支 → 字段缺失复现。
 
 ## 证据
 

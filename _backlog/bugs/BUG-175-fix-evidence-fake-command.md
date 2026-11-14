@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-175：fix-evidence 只认命令前缀，不存在的脚本也能充当红/绿证据
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；fix-evidence 的目标是「只翻卡 + git mv 不算修复」。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9c-gate-edges.mts`。
@@ -53,6 +53,16 @@ node --import tsx/esm runtime/tmp/c9c-gate-edges.mts
 - `node <path>`：查路径存在；`vitest`：查配置文件/测试路径存在；
 - 或要求命令带 `--filter`/具体 spec 路径并在盘上校验；
 - 负例：假脚本名 → 红；真脚本 → 绿。
+
+## 已修判定
+
+```text
+假 `pnpm definitely-not-a-real-script-xyz` → 红（根 package.json 没有该脚本）
+不存在的 `node` 目标 / `npx` 可执行 / spec 路径 → 红
+真命令（`pnpm test` / `node tests/…` / `npx vitest run tests/…`）→ 绿（不误判）
+```
+
+判据由 `tests/checks/fix-evidence.test.mjs` 的假命令用例搭载；红证 = 去掉命令解析 → 假命令 PASS 复现。
 
 ## 证据
 

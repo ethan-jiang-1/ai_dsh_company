@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-173：legacy json-ledger 的 JSON 块在 HTML 注释里仍被解析
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-162 修了 headings 的注释容器，JSON-ledger 提取器没有共用同一形状层。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8c-more-shape.mts`。
@@ -46,6 +46,16 @@ node --import tsx/esm runtime/tmp/c8c-more-shape.mts
 - `extractJsonBlock()` 消费 `scanDocument()` 的结构行，只在 `structural` 行上找围栏/json 块；注释内不算；
 - 或提取后与 `scanDocument()` 的行号对齐，跳过注释行；
 - spec 覆盖「注释里的 json 块不提取」「围栏里的 json 块正常」。
+
+## 已修判定
+
+```text
+HTML 注释里的 json 围栏块不被提取：legacy PRD 的注释账本不再生效（`validateProductDocs` 报缺定义/计数 0）
+围栏外（非注释）的 json 块正常提取（不回归）
+红证：extractJsonBlock 回到原文匹配 → 注释 JSON 生效复现
+```
+
+判据由 `tests/lib/prd-check.spec.ts` 的注释 JSON 用例搭载；红证 = 去掉注释掩码。
 
 ## 证据
 

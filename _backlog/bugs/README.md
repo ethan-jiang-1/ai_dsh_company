@@ -24,6 +24,23 @@
 | B 三态读契约 | [170](BUG-170-read-company-file-dotdot-subclass.md) | `../` 越界路径 missing 与 unsafe 子类不稳定 | P2 |
 | C 新门禁覆盖 | [171](BUG-171-fix-evidence-deletion-surface.md) / [174](BUG-174-notes-tree-symlink-invisible.md) / [175](BUG-175-fix-evidence-fake-command.md) | fix-evidence 拒删除型修复；notes-tree 忽略 symlink；假命令也能过 fix-evidence | P2 ×3 |
 
+## 2026-11-14 修复交接（根因组 A–C：BUG-168..175）
+
+**用户指令（2026-11-14）**：「_backlog/bugs 现有大量刚才经过exploratory test发现的bug，你全部扫描完之后，系统地思考思考如何修复它们，按照我们的研发流程」。
+本句即本轮授权（材料性：company-pack 公开行为 + 门禁判据 + docs），留痕 = Note。
+终点 = 活跃清单清零、8 张卡全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent` 与 `## 修复证据`（改动面/红/绿/提交）齐。
+
+这八张全在**上一轮自己新建的层**上找边界：共享形状状态机、三态读契约、两道新门禁。
+
+| 组 | 卡 | 同一根因 | 修法（唯一事实源） |
+|---|---|---|---|
+| **A 形状状态机** | [168](BUG-168-markdown-inline-code-comment.md) / [169](BUG-169-markdown-unclosed-comment.md) / [172](BUG-172-split-table-row-double-backslash.md) / [173](BUG-173-legacy-json-in-comment.md) | 共享层只处理了「块级容器」，没处理行内代码/未闭合/双转义；JSON 提取器另走原始文本 | `scanDocument` 增行内代码 span 与未闭合检测（`scanDocumentDetailed`）；`splitTableRow` 先 `\\` 后 `\|`；`extractJsonBlock` 吃注释掩码 |
+| **B 三态子类** | [170](BUG-170-read-company-file-dotdot-subclass.md) | `walkCompanyDirs` 对不存在的中间段早退，`..` 段没被判定，越界折成 missing | 逐段拒绝 `..`（越界一律 unsafe，missing 只表示「根内真没有」） |
+| **C 新门禁** | [171](BUG-171-fix-evidence-deletion-surface.md) / [174](BUG-174-notes-tree-symlink-invisible.md) / [175](BUG-175-fix-evidence-fake-command.md) | 门禁只按「文件存在/命令前缀」判，没覆盖删除、symlink、假命令 | 删除改由「提交 changed 列表」对账；notes-tree 遇 symlink 直接红；命令按 `package.json` scripts / 本地 bin / 路径真实性解析 |
+
+**次序 = A → B → C**：A 先把共享层边界补齐（c 依赖同一形状语义）；B 独立；C 收尾门禁自身。
+**证据口径**：按新流程「先落代码提交拿 sha → 再归档补 `## 修复证据`」；每卡红/绿写同一条可执行命令。
+
 ## 2026-11-14 focus v3 探索（post-fix 回归）
 
 **用户指令（2026-11-14）**：「继续再来……探索抓更多的bug」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。

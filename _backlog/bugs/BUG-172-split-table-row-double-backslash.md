@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-172：splitTableRow 把 `\\|` 当转义竖线，合法单元格不切分
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-165 修了单反斜杠 `\|`，双反斜杠是另一条 Markdown 转义规则。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8c-more-shape.mts`。
@@ -54,6 +54,16 @@ node --import tsx/esm runtime/tmp/c8c-more-shape.mts
 
 - 先处理 `\\` → 字面反斜杠（并跳过两个字符），再处理 `\|` → 字面竖线；或按 CommonMark 转义表一次扫描；
 - spec 覆盖 `\|`、`\\|`、`\\\|` 与行尾反斜杠。
+
+## 已修判定
+
+```text
+`splitTableRow` 先吃双反斜杠（字面反斜杠）再判单转义竖线：单元格保留字面反斜杠，竖线照常分列
+单转义竖线行为不变；行尾反斜杠不吞分隔符
+红证：按旧顺序（先转义竖线）→ 少一列复现
+```
+
+判据由 `tests/lib/prd-check.spec.ts` 的双反斜杠用例搭载；红证 = 还原旧分支顺序。
 
 ## 证据
 
