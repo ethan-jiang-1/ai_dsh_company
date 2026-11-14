@@ -95,6 +95,21 @@ describe('notes-audit · 收据特征', () => {
     const text = '# 一个决定\n\n状态：implemented（2026-10-30）\n\n## 决定\n\n基准 = 基线读数。\n'
     expect(receiptReasons(text)).toEqual([])
   })
+
+  it('标题体裁只认 H1：演练场次 / 批次进度 / 基线走查模拟', () => {
+    expect(receiptReasons('# 第三场演练\n\n状态：implemented（2026-11-14）\n')).toContain('标题是演练场次')
+    expect(receiptReasons('# 批 B2 进度\n\n状态：implemented（2026-11-14）\n')).toContain('标题是批次进度')
+    expect(receiptReasons('# 场景走查\n\n状态：已交付（2026-10-18）\n')).toContain('标题是基线/走查/模拟')
+  })
+
+  it('围栏代码里的假 H1 不判体裁（标题经 repo-markdown 取结构态 H1）', () => {
+    const text = '```bash\n# 第三场演练\n```\n\n# 真标题\n\n状态：implemented（2026-11-14）\n'
+    expect(receiptReasons(text)).toEqual([])
+  })
+
+  it('没有 H1 时标题回落为空、不误报', () => {
+    expect(receiptReasons('状态：implemented（2026-10-30）\n\n正文。\n')).toEqual([])
+  })
 })
 
 describe('notes-audit · 路径', () => {

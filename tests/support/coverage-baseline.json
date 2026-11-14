@@ -662,8 +662,8 @@
       "branches": 100
     },
     "tools/lib/notes-audit.mjs": {
-      "statements": 95.94,
-      "branches": 87
+      "statements": 96.1,
+      "branches": 88.46
     },
     "tools/lib/orient.mjs": {
       "statements": 95.71,

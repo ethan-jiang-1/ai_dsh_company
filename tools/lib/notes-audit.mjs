@@ -125,7 +125,8 @@ export function receiptReasons(text) {
   const scope = `${noteTitle(text) ?? ''}\n${noteStatus(text) ?? ''}\n${head}\n${nature}`
   const title = noteTitle(text) ?? ''
   const reasons = RECEIPT_SIGNALS.filter(([re]) => re.test(scope)).map(([, why]) => why)
-  for (const [re, why] of TITLE_SIGNALS) if (re.test(title) && !reasons.includes(why)) reasons.push(why)
+  // 两表 why 不相交（标题体裁已整体搬出 RECEIPT_SIGNALS），命中即记，无需去重。
+  for (const [re, why] of TITLE_SIGNALS) if (re.test(title)) reasons.push(why)
   return reasons
 }
 
