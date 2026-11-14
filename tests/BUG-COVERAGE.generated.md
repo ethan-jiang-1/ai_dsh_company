@@ -130,7 +130,7 @@
 | 003 | — | tests/tools/deliverables-audit.spec.ts:462 |
 | 004 | — | tests/tools/deliverables-audit.spec.ts:546 |
 | 008 | 2026-10-10 | tests/tools/deliverables-audit.spec.ts:294 |
-| 011 | 2026-10-11 | tests/tools/candidate-scan-labels.spec.ts:276 |
+| 011 | 2026-10-11 | tests/tools/candidate-scan-assignments.spec.ts:8 |
 | 013 | 2026-10-12 | tests/repo/tracked-secrets.spec.ts:22；tests/repo/tracked-token.spec.ts:20 |
 | 014 | 2026-10-12 | tests/tools/converge-rules.spec.ts:149 |
 | 016 | 2026-10-12 | tests/tools/converge-rules.spec.ts:177 |

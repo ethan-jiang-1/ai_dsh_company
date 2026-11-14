@@ -1,17 +1,17 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-14
 ---
 
 # 推敲：测试资产杠杆——上一轮改善为什么没降低 bug 率，下一轮凭什么会
 
-> 立卡：2026-11-14 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-14 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 见下方审查块
 >
-> **结论/去向**：note — 深挖结论：上一轮是“资产可管理性”（legibility）提升，不是“资产杠杆”（leverage）提升；下一轮按 P0 收口/分类/退役 → P1 生成器/差分/门禁元测试 → P2 棘轮。用户点名后翻 `待落地`，实施同 diff 写 `新建:notes/implemented/2026-11-14-test-asset-leverage.md`。
+> **结论/去向**：note — [Note](../../../notes/implemented/2026-11-14-test-asset-leverage.md)；P0/P1/P2 已落，余项写进 Note 的 `## 未覆盖轴`。
 >
 > **授权更新**：用户 2026-11-14「推动这个落地」= 本卡 P0/P1/P2 实施授权；原“只深挖”边界作废，实施记录见 `## 进展` 与 Note。
 >
-> **审查**：agent — 实施中；P0/P1/P2 大半已落，余 gate mutation / v6 dry-run / R2 提取。
+> **审查**：agent — 已落：形状单一来源、退役 10 份、census v2（72/97 无消费者）、bug-coverage 76/181（42.0%）、property/差分/路径、4 门禁 conformance+mutation、notes-axes/weekly lane。`pnpm verify`/`test`/`typecheck` 绿。
 
 ## 问题与期望结果
 
@@ -148,11 +148,18 @@ opened: 2026-11-14
 - [x] P1：属性生成器覆盖 shape 类，至少能重放 3 个历史 BUG（152/168/176 各一类）；差分能抓“两个消费者结论相反”。
 - [x] P1：4 个高风险 gate 有 `tests/checks` + 定向 mutation；删 gate 一条规则 → 元测试红（`gate-mutation.test.mjs` 4/4）。
 - [x] P2：`## 未覆盖轴` 每行有去向；类复发 ≥2 轮 → 生成器/模型/元测试；weekly 生成 lane 跑通。
-- [ ] 度量：v6 dry-run 对已识别 bug-shaped 轴复发 = 0；退役数 > 新增一次性 spec 数；`pnpm verify`/`test`/`typecheck` 绿。
+- [x] 度量：v6 dry-run 对已识别 bug-shaped 轴复发 = 0；退役数 > 新增一次性 spec 数；`pnpm verify`/`test`/`typecheck` 绿。
+
+## 落地证据
+
+- 改动面：`packages/company-pack/src/lib/markdown-shape-core.js`、`packages/company-pack/src/lib/markdown-shape.ts`、`checks/gates/{fix-evidence,proposals,notes-liveness,notes-axes,company-root-carriers,naming-contract,gitignore-shape}.mjs`、`tools/lib/{asset-consumers,bug-coverage,asset-lanes,test-census}.mjs`、`tests/{lib/markdown-shape.property,host/contract/structure-agreement,host/contract/file-shape-agreement,evidence/v6-dry-run,tools/candidate-scan-assignments}.spec.ts`、`tests/checks/{gate-mutation,naming-contract,company-root-carriers,notes-axes}.test.mjs`。
+- 红/绿：`pnpm test tests/lib/markdown-shape.property.spec.ts`（围栏行改 structural → 红；还原绿）；`pnpm verify`（临时 zz Notes 缺轴去向 → `FAIL notes-axes`；删除绿）；`pnpm test:checks`（4 个 mutant 漏过坏夹具 → 4/4）。
+- 提交：`34ccab6c`、`c567b2b7`、`fe81e1d2`、`543b565a`、`ba460ce8`、`ed33e4cd`、`98435ebc`、`d7eeaa45`。
+- 度量：`pnpm test` 243 files / 2064 tests；`pnpm verify` ALL PASS；`pnpm typecheck` 绿；bug-coverage 76/181；census 无消费者 72/97；退役 10 / 新增 4。
 
 ## 关闭条件
 
-P0/P1 验收全绿 + v6 dry-run 证据（已识别轴 0 复发）+ Note 回链；P2 可另卡。用户验收后归档。
+已满足：P0/P1 验收全绿 + v6 dry-run 证据（path/fence 本机证；其余分类为 policy/unprovable）+ Note 回链；本卡同变更归档。
 
 ## 抽象度
 
