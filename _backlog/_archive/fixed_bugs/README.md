@@ -4,6 +4,18 @@
 
 ## 修复流水（倒序）
 
+- **BUG-176..183**（2026-11-14，根因组 A–D，P1×1 + P2×7）：Round 91 回归扫，同一批层再推一层——
+  **A** 形状层容器：[176](BUG-176-json-fence-example-extracted.md) 顶层围栏块成为 JSON 账本唯一来源、
+  [181](BUG-181-multiline-code-span.md) 跨行行内代码状态；
+  **B** 路径段：[179](BUG-179-internal-dotdot-over-rejected.md) 内部 `..` 栈式消解、
+  [180](BUG-180-walk-company-dirs-windows-dotdot.md) Windows 分隔符；
+  **C** 门禁：[177](BUG-177-fix-evidence-valid-command-forms.md) 合法命令形态、
+  [178](BUG-178-fix-evidence-section-in-code-block.md) 围栏里的节标题、
+  [182](BUG-182-fix-evidence-noop-commands.md) 空操作命令；
+  **D** [183](BUG-183-notes-root-symlink-followed.md) notes 根 symlink。
+  证据提交 = `8a95fc51`；`pnpm test` 247 files / 2074 tests、`test:checks` 5 PASS、
+  `typecheck`/`lint`/`dup`/`verify` 全绿。详见 [围栏与门禁解析 Note](../../../notes/implemented/2026-11-14-shape-fences-and-gate-parsing.md)。
+
 - **BUG-168..175**（2026-11-14，根因组 A–C，P2×8）：focus v3 修复后的回归扫（Round 90），
   全部落在上一轮自己新建的层上——
   **A** 形状状态机：[168](BUG-168-markdown-inline-code-comment.md) 行内代码里的注释记号、

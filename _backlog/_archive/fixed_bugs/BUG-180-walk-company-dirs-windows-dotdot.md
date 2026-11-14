@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P1
 opened: 2026-11-14
 ---
 
 # BUG-180：walkCompanyDirs 的 `..` 闸只按 `/` 分段，Windows `..\\` 可绕过
 
-> 严重级别：P1（重要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P1（重要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-170 的 `..` 修复只覆盖 POSIX 分隔符。
-> **留痕**：本卡只报不修；证据 = `runtime/tmp/c9d-win-dotdot.log` + 代码；**Windows 实跑未做**（本机 macOS），按 platform 语义判。
+> **关联**：[探索卡 Round 91](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-170 的 `..` 修复只覆盖 POSIX 分隔符。
+> **留痕**：Note [2026-11-14-shape-fences-and-gate-parsing.md](../../../notes/implemented/2026-11-14-shape-fences-and-gate-parsing.md)（同轮八卡）；证据 = `runtime/tmp/c9d-win-dotdot.log` + 代码；**Windows 实跑未做**（本机 macOS），按 platform 语义判。
 
 ## 症状
 
@@ -70,8 +70,15 @@ POSIX 形状（`../`、`a/../../`）不回归
 
 判据由 `tests/host/contract/file-shape-agreement.spec.ts` 的 Windows 分隔符用例搭载；Windows 实机未跑（Note 未覆盖轴登记）。
 
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/run-bundle/company-root.ts`、`tests/host/contract/file-shape-agreement.spec.ts`
+- 红：还原只按 / 切 + 不归一分隔符 → `npx vitest run tests/host/contract/file-shape-agreement.spec.ts` 红（..\ 折成 missing）
+- 绿：平台无关分隔符 + 入口归一 → `npx vitest run tests/host/contract/file-shape-agreement.spec.ts` 绿（22 passed）
+- 提交：commit 8a95fc51
+
 ## 证据
 
 - `runtime/tmp/c9d-win-dotdot.log`：`win32.join` 解析到 `C:\outside\secret.md`；`split('/')` 只有一段。
-- 代码：[company-root.ts](../../packages/company-pack/src/host/run-bundle/company-root.ts) 的 `walkCompanyDirs()`。
+- 代码：[company-root.ts](../../../packages/company-pack/src/host/run-bundle/company-root.ts) 的 `walkCompanyDirs()`。
 - 未跑：Windows 实机/CI（本机 macOS）。

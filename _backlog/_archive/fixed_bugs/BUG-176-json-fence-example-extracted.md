@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-176：legacy JSON 提取仍会命中围栏示例，示例账本盖过真实账本
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-173 修了「注释里的 JSON」，围栏仍未进入 `extractJsonBlock` 的掩码。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8d-json-fence.mts`。
+> **关联**：[探索卡 Round 91](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-173 修了「注释里的 JSON」，围栏仍未进入 `extractJsonBlock` 的掩码。
+> **留痕**：Note [2026-11-14-shape-fences-and-gate-parsing.md](../../../notes/implemented/2026-11-14-shape-fences-and-gate-parsing.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8d-json-fence.mts`。
 
 ## 症状
 
@@ -61,7 +61,14 @@ node --import tsx/esm runtime/tmp/c8d-json-fence.mts
 
 判据由 `tests/lib/prd-check.spec.ts` 的围栏示例用例搭载；红证 = 去掉围栏块提取。
 
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/prd-check.ts`、`packages/company-pack/src/lib/markdown-shape.ts`、`tests/lib/prd-check.spec.ts`
+- 红：还原整篇 json 正则 → `npx vitest run tests/lib/prd-check.spec.ts` 红（示例围栏被当账本）
+- 绿：改读顶层围栏块 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（35 passed）
+- 提交：commit 8a95fc51
+
 ## 证据
 
 - `runtime/tmp/c8d-json-fence.mts` / `.log`：返回示例的空 opportunities。
-- 代码：[prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts) 的 `extractJsonBlock()`；[markdown-shape.ts](../../packages/company-pack/src/lib/markdown-shape.ts) 的 `maskHtmlComments()`。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts) 的 `extractJsonBlock()`；[markdown-shape.ts](../../../packages/company-pack/src/lib/markdown-shape.ts) 的 `maskHtmlComments()`。

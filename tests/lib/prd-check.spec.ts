@@ -9,6 +9,8 @@
 // 负例留证 2026-11-14：去掉 code span 状态 → 行内注释用例红（BUG-168）
 // 负例留证 2026-11-14：还原转义顺序 → 双反斜杠用例红（BUG-172）
 // 负例留证 2026-11-14：去掉注释掩码 → 注释 JSON 用例红（BUG-173）
+// 负例留证 2026-11-14：还原整篇 json 正则 → 示例围栏被当账本例红（BUG-176）
+// 负例留证 2026-11-14：去掉跨行 code span 状态 → 跨行标题用例红（BUG-181）
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'

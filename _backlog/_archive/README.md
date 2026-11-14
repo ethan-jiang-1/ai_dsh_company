@@ -19,6 +19,14 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-176（已修）](fixed_bugs/BUG-176-json-fence-example-extracted.md) | 已修：示例围栏里的 json 块被当账本；顶层围栏块成为唯一来源 | 2026-11-14 |
+| [BUG-177（已修）](fixed_bugs/BUG-177-fix-evidence-valid-command-forms.md) | 已修：合法命令形态（`pnpm run`/`--filter`/`node --import`）被拒；按语法解析选项+值 | 2026-11-14 |
+| [BUG-178（已修）](fixed_bugs/BUG-178-fix-evidence-section-in-code-block.md) | 已修：代码块里的节标题截错；节标题只在非围栏行匹配 | 2026-11-14 |
+| [BUG-179（已修）](fixed_bugs/BUG-179-internal-dotdot-over-rejected.md) | 已修：内部 `..` 被误杀；栈式消解，越界才 unsafe | 2026-11-14 |
+| [BUG-180（已修）](fixed_bugs/BUG-180-walk-company-dirs-windows-dotdot.md) | 已修：Windows `..\` 绕过闸；平台无关分隔符 + 入口归一 | 2026-11-14 |
+| [BUG-181（已修）](fixed_bugs/BUG-181-multiline-code-span.md) | 已修：跨行行内代码里的标题被当定义；code span 状态跨行维护 | 2026-11-14 |
+| [BUG-182（已修）](fixed_bugs/BUG-182-fix-evidence-noop-commands.md) | 已修：空操作命令（`sh -c`/`git`/任意 node 文件）也算证据；拒绝并限定入口面 | 2026-11-14 |
+| [BUG-183（已修）](fixed_bugs/BUG-183-notes-root-symlink-followed.md) | 已修：`notes/` 根 symlink 被跟随；根 lstat 判定直接红 | 2026-11-14 |
 | [BUG-168（已修）](fixed_bugs/BUG-168-markdown-inline-code-comment.md) | 已修：行内代码里的注释记号起注释；`scanDocument` 增代码 span 状态 | 2026-11-14 |
 | [BUG-169（已修）](fixed_bugs/BUG-169-markdown-unclosed-comment.md) | 已修：未闭合注释静默吞后文；`scanDocumentDetailed` 报起始行号，两命令各报根因 | 2026-11-14 |
 | [BUG-170（已修）](fixed_bugs/BUG-170-read-company-file-dotdot-subclass.md) | 已修：`a/../..` 越界折成 missing；`walkCompanyDirs` 走目录前全量拒绝 `..` 段 | 2026-11-14 |

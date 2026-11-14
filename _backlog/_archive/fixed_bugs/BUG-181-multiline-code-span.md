@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-181：scanDocument 只按行找 code span 闭合，跨行行内代码被当结构
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-168 修了行内代码里的 `<!--`，但只覆盖单行。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8d-multiline-span.mts`。
+> **关联**：[探索卡 Round 91](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-168 修了行内代码里的 `<!--`，但只覆盖单行。
+> **留痕**：Note [2026-11-14-shape-fences-and-gate-parsing.md](../../../notes/implemented/2026-11-14-shape-fences-and-gate-parsing.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8d-multiline-span.mts`。
 
 ## 症状
 
@@ -55,7 +55,14 @@ node --import tsx/esm runtime/tmp/c8d-multiline-span.mts
 
 判据由 `tests/lib/prd-check.spec.ts` 的跨行 code span 用例搭载；红证 = 去掉跨行状态。
 
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/markdown-shape.ts`、`tests/lib/prd-check.spec.ts`
+- 红：去掉跨行 span 状态 → `npx vitest run tests/lib/prd-check.spec.ts` 红（REQ-999 幽灵 + 字段截断）
+- 绿：接回跨行状态 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（35 passed）
+- 提交：commit 8a95fc51
+
 ## 证据
 
 - `runtime/tmp/c8d-multiline-span.mts` / `.log`：`false 2`，幽灵 `REQ-999`。
-- 代码：[markdown-shape.ts](../../packages/company-pack/src/lib/markdown-shape.ts) 的 `codeSpanEnd()` / `scanDocumentDetailed()`。
+- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/markdown-shape.ts) 的 `codeSpanEnd()` / `scanDocumentDetailed()`。

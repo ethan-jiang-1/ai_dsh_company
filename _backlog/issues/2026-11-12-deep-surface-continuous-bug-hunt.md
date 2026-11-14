@@ -1633,14 +1633,14 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| legacy JSON 提取会跳过围栏示例 | **confirmed（缺口）** | [BUG-176](../bugs/BUG-176-json-fence-example-extracted.md)；示例空账本盖过真账本 |
-| 跨行行内 code span 里的标题不算定义 | **confirmed（缺口）** | [BUG-181](../bugs/BUG-181-multiline-code-span.md)；幽灵 REQ-999 + 真字段截断 |
-| `..` 闸只拒越出根，不拒内部跳转 | **confirmed（缺口）** | [BUG-179](../bugs/BUG-179-internal-dotdot-over-rejected.md)；`a/../b` → unsafe |
-| `..` 闸覆盖 Windows `..\` | **confirmed（代码+win32 语义；Windows 未实跑）** | [BUG-180](../bugs/BUG-180-walk-company-dirs-windows-dotdot.md)；`win32.join` 到盘外，`split('/')` 只有一段 |
-| fix-evidence 命令解析接受合法形态 | **confirmed（缺口）** | [BUG-177](../bugs/BUG-177-fix-evidence-valid-command-forms.md)；`pnpm run`/`--filter`/`node --import` 被拒 |
-| fix-evidence 节标题只匹配真节 | **confirmed（缺口）** | [BUG-178](../bugs/BUG-178-fix-evidence-section-in-code-block.md)；代码块里的标题截错节 |
-| fix-evidence 命令必须是真判据 | **confirmed（缺口）** | [BUG-182](../bugs/BUG-182-fix-evidence-noop-commands.md)；`sh -c true` 等 PASS |
-| notes-tree 根 symlink 不被跟随 | **confirmed（缺口）** | [BUG-183](../bugs/BUG-183-notes-root-symlink-followed.md)；`notes` 根 symlink `files:2/checked:1` |
+| legacy JSON 提取会跳过围栏示例 | **confirmed（缺口）** | [BUG-176](../_archive/fixed_bugs/BUG-176-json-fence-example-extracted.md)；示例空账本盖过真账本 |
+| 跨行行内 code span 里的标题不算定义 | **confirmed（缺口）** | [BUG-181](../_archive/fixed_bugs/BUG-181-multiline-code-span.md)；幽灵 REQ-999 + 真字段截断 |
+| `..` 闸只拒越出根，不拒内部跳转 | **confirmed（缺口）** | [BUG-179](../_archive/fixed_bugs/BUG-179-internal-dotdot-over-rejected.md)；`a/../b` → unsafe |
+| `..` 闸覆盖 Windows `..\` | **confirmed（代码+win32 语义；Windows 未实跑）** | [BUG-180](../_archive/fixed_bugs/BUG-180-walk-company-dirs-windows-dotdot.md)；`win32.join` 到盘外，`split('/')` 只有一段 |
+| fix-evidence 命令解析接受合法形态 | **confirmed（缺口）** | [BUG-177](../_archive/fixed_bugs/BUG-177-fix-evidence-valid-command-forms.md)；`pnpm run`/`--filter`/`node --import` 被拒 |
+| fix-evidence 节标题只匹配真节 | **confirmed（缺口）** | [BUG-178](../_archive/fixed_bugs/BUG-178-fix-evidence-section-in-code-block.md)；代码块里的标题截错节 |
+| fix-evidence 命令必须是真判据 | **confirmed（缺口）** | [BUG-182](../_archive/fixed_bugs/BUG-182-fix-evidence-noop-commands.md)；`sh -c true` 等 PASS |
+| notes-tree 根 symlink 不被跟随 | **confirmed（缺口）** | [BUG-183](../_archive/fixed_bugs/BUG-183-notes-root-symlink-followed.md)；`notes` 根 symlink `files:2/checked:1` |
 | fix-evidence 删除/重命名 | **pass（修复后）** | 删除型通过；`git show --name-only` 对 rename 输出新路径，gate 通过 |
 
 **本轮开卡：** BUG-176..183（8 张）。**未跑：** C8-H10 live present deny；C10 console/rejection；C2/C5/C7 残余真入口；Windows 实机。**证据：** `runtime/tmp/c8d-*.mts`、`c9d-*.mts` 与对应 `.log`。

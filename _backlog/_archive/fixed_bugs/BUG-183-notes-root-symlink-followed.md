@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-183：notes-tree 只拦子条目 symlink，notes/ 根本身是 symlink 仍被跟随
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-174 修了 lifecycle 下/entry 级 symlink，根级未修。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9d-notes-root-symlink.mts`。
+> **关联**：[探索卡 Round 91](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-174 修了 lifecycle 下/entry 级 symlink，根级未修。
+> **留痕**：Note [2026-11-14-shape-fences-and-gate-parsing.md](../../../notes/implemented/2026-11-14-shape-fences-and-gate-parsing.md)（同轮八卡）；复现脚本 = `runtime/tmp/c9d-notes-root-symlink.mts`。
 
 ## 症状
 
@@ -59,7 +59,14 @@ node --import tsx/esm runtime/tmp/c9d-notes-root-symlink.mts
 
 判据由 `tests/checks/notes-tree.test.mjs` 的根 symlink 用例搭载；红证 = 去掉根判定。
 
+## 修复证据
+
+- 改动面：`checks/gates/notes-tree.mjs`、`tests/checks/notes-tree.test.mjs`
+- 红：去掉根 lstat 判定 → `node tests/checks/notes-tree.test.mjs` 红（根 symlink 两条）
+- 绿：接回根形状判定 → `node tests/checks/notes-tree.test.mjs` 绿（ALL PASS）
+- 提交：commit 8a95fc51
+
 ## 证据
 
 - `runtime/tmp/c9d-notes-root-symlink.mts` / `.log`：根 symlink 时 `files:2/checked:1` 且无问题。
-- 代码：[notes-tree.mjs](../../checks/gates/notes-tree.mjs) 的 `notesTreeProblems()` / `notesStatusProblems()` 入口。
+- 代码：[notes-tree.mjs](../../../checks/gates/notes-tree.mjs) 的 `notesTreeProblems()` / `notesStatusProblems()` 入口。

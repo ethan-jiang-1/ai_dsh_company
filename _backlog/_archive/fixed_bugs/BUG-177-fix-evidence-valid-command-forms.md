@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-177：fix-evidence 命令解析把合法形态判成不可执行
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-175 修了「假脚本」，解析变严后误伤合法命令。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9d-fix-evidence-command.mts`。
+> **关联**：[探索卡 Round 91](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-175 修了「假脚本」，解析变严后误伤合法命令。
+> **留痕**：Note [2026-11-14-shape-fences-and-gate-parsing.md](../../../notes/implemented/2026-11-14-shape-fences-and-gate-parsing.md)（同轮八卡）；复现脚本 = `runtime/tmp/c9d-fix-evidence-command.mts`。
 
 ## 症状
 
@@ -55,7 +55,14 @@ node --import tsx/esm runtime/tmp/c9d-fix-evidence-command.mts
 
 判据由 `tests/checks/fix-evidence.test.mjs` 的合法命令形态用例搭载；红证 = 还原旧解析。
 
+## 修复证据
+
+- 改动面：`checks/gates/fix-evidence.mjs`、`tests/checks/fix-evidence.test.mjs`
+- 红：还原旧命令解析 → `node tests/checks/fix-evidence.test.mjs` 红（pnpm run / --filter / node --import 三条合法形态）
+- 绿：按命令语法解析选项+值 → `node tests/checks/fix-evidence.test.mjs` 绿（17 passed）
+- 提交：commit 8a95fc51
+
 ## 证据
 
 - `runtime/tmp/c9d-fix-evidence-command.mts` / `.log`：三条合法命令红。
-- 代码：[fix-evidence.mjs](../../checks/gates/fix-evidence.mjs) 的 `commandProblem()`。
+- 代码：[fix-evidence.mjs](../../../checks/gates/fix-evidence.mjs) 的 `commandProblem()`。

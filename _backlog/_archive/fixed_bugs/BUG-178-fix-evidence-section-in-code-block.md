@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-178：fix-evidence 的节标题在代码块里也会命中，截到错误节
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；4a142a8b 把节标题改成行首锚定，但没有排除代码块。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9d-section-codeblock.mts`。
+> **关联**：[探索卡 Round 91](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；4a142a8b 把节标题改成行首锚定，但没有排除代码块。
+> **留痕**：Note [2026-11-14-shape-fences-and-gate-parsing.md](../../../notes/implemented/2026-11-14-shape-fences-and-gate-parsing.md)（同轮八卡）；复现脚本 = `runtime/tmp/c9d-section-codeblock.mts`。
 
 ## 症状
 
@@ -66,7 +66,14 @@ node --import tsx/esm runtime/tmp/c9d-section-codeblock.mts
 
 判据由 `tests/checks/fix-evidence.test.mjs` 的代码块引用用例搭载；红证 = 去掉围栏状态。
 
+## 修复证据
+
+- 改动面：`checks/gates/fix-evidence.mjs`、`tests/checks/fix-evidence.test.mjs`
+- 红：还原无围栏 section → `node tests/checks/fix-evidence.test.mjs` 红（代码块引用节标题/只有代码块两条）
+- 绿：节标题只在非围栏行匹配 → `node tests/checks/fix-evidence.test.mjs` 绿（17 passed）
+- 提交：commit 8a95fc51
+
 ## 证据
 
 - `runtime/tmp/c9d-section-codeblock.mts` / `.log`：代码块示例导致四行全缺。
-- 代码：[fix-evidence.mjs](../../checks/gates/fix-evidence.mjs) 的 `section()`。
+- 代码：[fix-evidence.mjs](../../../checks/gates/fix-evidence.mjs) 的 `section()`。

@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-179：walkCompanyDirs 拒绝所有 `..` 段，包括仍留在公司盘内的路径
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-170 修越界 `..` 时采取「全量拒绝」，把内部 `..` 也误杀。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9d-read-internal-dotdot.mts`。
+> **关联**：[探索卡 Round 91](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-170 修越界 `..` 时采取「全量拒绝」，把内部 `..` 也误杀。
+> **留痕**：Note [2026-11-14-shape-fences-and-gate-parsing.md](../../../notes/implemented/2026-11-14-shape-fences-and-gate-parsing.md)（同轮八卡）；复现脚本 = `runtime/tmp/c9d-read-internal-dotdot.mts`。
 
 ## 症状
 
@@ -61,7 +61,14 @@ node --import tsx/esm runtime/tmp/c9d-read-internal-dotdot.mts
 
 判据由 `tests/host/contract/file-shape-agreement.spec.ts` 的内部/越界用例搭载；红证 = 还原全量拒绝。
 
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/run-bundle/company-root.ts`、`tests/host/contract/file-shape-agreement.spec.ts`
+- 红：还原「任何 .. 一律拒绝」→ `npx vitest run tests/host/contract/file-shape-agreement.spec.ts` 红（内部 .. 误杀）
+- 绿：改栈式消解 → `npx vitest run tests/host/contract/file-shape-agreement.spec.ts` 绿（22 passed）
+- 提交：commit 8a95fc51
+
 ## 证据
 
 - `runtime/tmp/c9d-read-internal-dotdot.mts` / `.log`：内部 `..` → unsafe；规范路径 → text。
-- 代码：[company-root.ts](../../packages/company-pack/src/host/run-bundle/company-root.ts) 的 `walkCompanyDirs()`。
+- 代码：[company-root.ts](../../../packages/company-pack/src/host/run-bundle/company-root.ts) 的 `walkCompanyDirs()`。
