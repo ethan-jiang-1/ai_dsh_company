@@ -4,7 +4,7 @@
 # 范围（诚实声明）：install-verify job **不**构建 vendor 全量/native、不跑 pnpm test；
 # 2026-11-11 起由 setup-macos job 在 macOS 上单独证明 `pnpm setup` 全量构建 + verify + test。
 # Ubuntu 全量构建仍有已知缺口（vendor lock 双锁、全 host OOM、client aggregate 测试类型、musl-gcc），
-# 记录见 notes/implemented/2026-10-25-repo-hygiene-contract.md「已知缺口」节；不在这里假绿。
+# 记录见 notes/archived/2026-10-25-repo-hygiene-contract.md「已知缺口」节；不在这里假绿。
 # 手动 + 每周一 03:00 UTC；Ubuntu + macOS 双跑（跨环境合同 = docs/repo-hygiene.md）。
 # install-channel：Ubuntu 上用**真实 npm 发布版 DSH** 验六角色（channel-matrix-smoke；不是 vendor 通道）。
 # 2026-11-11：global 版本钉回台账内 rc.5；export-dist 前补 vendor 类型面（干净 checkout 没有 lib/types）。

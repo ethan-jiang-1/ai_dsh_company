@@ -97,7 +97,7 @@
 - `pnpm test`：**174 files / 1455 tests passed**（含 `tests/host/run-bundle/bootstrap.spec.ts`
   13 项、`tests/tools/kb-seeds.spec.ts` 8 项、`tests/presets/presets.spec.ts` 43 项、
   `tests/host/commands/req-command.spec.ts` 17 项、`tests/lib/yaml-scalar.spec.ts` 2 项）。
-- `pnpm typecheck`：绿（pack + tests/client + tests/company + tests/harness）。
+- `pnpm typecheck`：绿（pack + tests/client + tests/company + tests/harness；当轮旧分区名）。
 - `pnpm lint`：0 warnings / 0 errors；`pnpm dup`：0 clones。
 - `source run/env.sh && node checks/lanes/preset.entry.mjs`：
   `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）`。

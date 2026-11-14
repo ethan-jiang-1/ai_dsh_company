@@ -5,7 +5,7 @@
 //         判收；agent-team 投影 / presence 读模型 / 手册「动议任务板」行改动涉及其上时复跑
 //
 // 为什么存在：两 Note 的待验证项 = 「认领两态与在场板两态在真会话流转中可读」。web 面板读
-// agentTeam 投影；渲染半边 keyless 已钉（tests/lib/presence-board.spec.ts 16/16），本 probe 补
+// agentTeam 投影；渲染半边 keyless 已钉（tests/lib/presence-board.spec.ts），本 probe 补
 // **真会话原料链**：真模型动议里 CEO 落任务带 writeScopes、成员认领→加工→完成，投影事件与
 // 任务视图里两态（已领走 / 加工中）可读。
 //

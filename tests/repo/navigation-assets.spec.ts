@@ -62,11 +62,18 @@ describe('tests/README 导航骨架', () => {
 })
 
 describe('AGENTS 命令表路径', () => {
-  it('命令表提到的 tests/ 路径都存在', () => {
+  it('命令表提到的 tests/ 路径（含花括号组）都存在', () => {
     const text = read('AGENTS.md')
-    const tokens = [...new Set([...text.matchAll(/tests\/[A-Za-z0-9._-]+/g)].map((match) => match[0]))]
-      .filter((token) => !token.endsWith('.md'))
-    expect(tokens.length).toBeGreaterThan(0)
+    const block = /## 命令表[\s\S]*?```sh\n([\s\S]*?)```/.exec(text)?.[1] ?? ''
+    const tokens = new Set<string>()
+    for (const match of block.matchAll(/tests\/(?:\{[^}\n]+\}|[A-Za-z0-9._-]+)/g)) {
+      const raw = match[0]
+      const names = raw.startsWith('tests/{')
+        ? raw.slice('tests/{'.length, -1).split(',').map((name) => name.trim()).filter(Boolean)
+        : [raw.slice('tests/'.length)]
+      for (const name of names) tokens.add(`tests/${name}`)
+    }
+    expect(tokens.size).toBeGreaterThan(0)
     for (const token of tokens) {
       expect(existsSync(join(repositoryRoot, token)), `AGENTS.md 引用不存在的路径：${token}`).toBe(true)
     }

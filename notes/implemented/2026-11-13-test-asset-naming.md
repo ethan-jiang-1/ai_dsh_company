@@ -9,7 +9,7 @@
 
 1. **旧 tests/harness 目录拆成它实际在测的六个面**：`repo/`（仓库合同：结构/导航/发布/包形状）、`contract/`（引擎合同与真值表）、
    `tools/`（tools/lib 纯逻辑）、`session/`（会话日志/诊断/探针驱动）、`evidence/`（协作与证据判据）、`ui/`（页签目录/金样）。
-   原来六种主题挤在一个 meta 桶里，目录名不说明测什么；且 `harness` 与 DSH 的共享夹具文件 tests/harness.ts **同名不同义**。
+   原来六种主题挤在一个 meta 桶里，目录名不说明测什么；且 `harness` 与 DSH（vendor）的共享夹具文件 tests/harness.ts **同名不同义**。
 2. **先树后名**：同一文件只搬一次（`ui-expected.spec.ts` 先到 `tests/ui/`，Phase 2 再改名）；门禁在**最终树**上落地，
    不为过渡态写例外。两阶段各自可停。
 3. **导航节 `## 四区` → `## 分区`**，`nav-enumeration` 的整行锚同步（`^## 分区$`）。理由：十来个面叫「四区」是名字撒谎，

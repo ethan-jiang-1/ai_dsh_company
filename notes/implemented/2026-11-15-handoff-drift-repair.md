@@ -8,7 +8,7 @@
 
 1. **CI 证据范围单家 = release.md。** 删掉 [bootstrap.md](../../docs/guides/bootstrap.md) 与 [release.md](../../docs/contracts/release.md) 两处「fresh-clone CI 只跑 install + bundle:init + verify」的过期断言，改成 [fresh-clone.yml](../../.github/workflows/fresh-clone.yml) 的三 job 口径：`install-verify`（Ubuntu+macOS）、`setup-macos`（macOS 全量构建 + verify + test + keyless lane）、`install-channel`（真实 npm DSH 通道）；release 仍不在 CI 内。bootstrap 只留指针，不复述。
 2. **旧测试分区名随盘面更新。** 旧分区 tests/company 已不存在，但仍在 [AGENTS.md](../../AGENTS.md) 命令表、[board.spec.ts](../../tests/lib/board.spec.ts) 的红配方、[doors.spec.ts](../../tests/lib/doors.spec.ts) 的迁移注、[signoff.ts](../../packages/company-pack/src/lib/signoff.ts) / [presence-status.ts](../../packages/company-pack/src/lib/presence-status.ts) / [ledger.ts](../../packages/company-pack/src/lib/ledger.ts) 的模块注、[taskboard-presence-probe.mjs](../../probes/fs-taskboard/taskboard-presence-probe.mjs) 的头注与 [tsconfig.test-harness.json](../../tsconfig.test-harness.json) 的注释里。全部改到 `tests/{host,lib,content}`、tests/lib 下的对应 spec、或对应 tsconfig 名；生成物 `lib/types/**` 不手改（随下次 build 更新）。
-3. **加一条防漂移 spec，不加门禁。** [navigation-assets.spec.ts](../../tests/repo/navigation-assets.spec.ts) 增「AGENTS 命令表路径」：抽出 AGENTS.md 里 `tests/<path>` token 逐个对盘。先以真实旧分区名造红（1 failed / 7 passed），改 AGENTS 后绿（8 passed）。选 spec 不选 gate：单次复发证据 + 门禁总数受只降不升硬顶；navigation-assets 本就是导航资产 owner。
+3. **加一条防漂移 spec，不加门禁。** [navigation-assets.spec.ts](../../tests/repo/navigation-assets.spec.ts) 增「AGENTS 命令表路径」：只扫 `## 命令表` 的 sh 围栏，把 `tests/{a,b}` 花括号展开后逐成员对盘。红证两次：真实旧分区名 tests/company（1 failed / 7 passed）；盲审后又以真实 AGENTS 临时插入 `tests/{host,missing}` 复证花括号成员会红（1 failed / 7 passed，还原即绿）。选 spec 不选 gate：单次复发证据 + 门禁总数受只降不升硬顶；navigation-assets 本就是导航资产 owner。
 4. **交接物边界写进根 README。** 根 [README.md](../../README.md) 明说：本仓库是维护者源码 handoff，不产出可安装 tarball；收件人两件套由 `pnpm release --prepare` 生成；[安装手册](../../_dist/安装手册.md)与最新导出版同版本，HEAD 未导出的改动以 README / [pack README](../../packages/company-pack/README.md) 为准；维护者首跑含 vendor 构建（分钟级），与收件人 5 分钟安装是两条路。inject 边数不再写死（条数以 `package.json` 为准）。
 5. **干净 clone 验收暴露的死指针收口。** 在 `/tmp` 做真 clean clone（`git clone --no-hardlinks` + submodule + `pnpm install` + vendor install + `bundle:init` + `pnpm run setup`）：`pnpm verify` 首跑 **5 FAIL**，全是 tests/harness（已退役）死指针——[testing.md](../../docs/testing.md) 与旧 Note [test-asset-naming](./2026-11-13-test-asset-naming.md) 把它当活指针；暖树没红是因为本地留了空目录 tests/harness/（git 不跟踪空目录，clean clone 没有）。修：testing / dev-loop 的现行目录清单更新到 `tests/{host,lib,content}` 与 `tests/{repo,contract,tools,session,evidence,ui}`；旧 Note 的历史名改为非反引号叙述；删空目录。clean clone 重跑 verify 红→绿。
 
@@ -32,7 +32,7 @@
 
 ## 未覆盖轴
 
-- [environment-gap] Linux 全量构建未跑：本轮 clean clone 验收在 macOS 本机完成，Linux 缺口只读工作流头注 → `docs/contracts/release.md`
+- [environment-gap] Linux 全量构建未跑：本轮 clean clone 验收在 macOS 本机完成，Linux 缺口只读工作流头注 → `docs/repo-hygiene.md`
 - [environment-gap] 新装 profile 的浏览器首屏未单独跑：本轮真页面证据是 dev home 的 client-load → `checks/lanes/client-load.entry.mjs`
 - [policy] 用户工作树的 `temp/` 两篇跨仓提案保持原位（不是仓库字节）→ `docs/repo-hygiene.md`
 - [unprovable] Desktop 真机安装：合同已声明未逐平台认证 → `docs/contracts/release.md`
@@ -44,6 +44,8 @@
 | 路径防漂移 spec | 修前 `pnpm test tests/repo/navigation-assets.spec.ts` → **1 failed / 7 passed**（真实旧分区名）；修后 **8 passed** | 红来自真 AGENTS 字节，不是构造输入 |
 | 结构 | 暖树 `pnpm verify` → **ALL PASS**（75 门；2 门无对象）；**clean clone 首跑 5 FAIL（tests/harness 死指针）→ 修后 ALL PASS** | 两次跑（暖树 / clean clone） |
 | 回归 | 暖树 `pnpm test` → **244 files / 2094 tests passed**；clean clone → **244 files / 2091 passed + 3 skipped**（dev-only 台账） | 新增 1 条断言；skip 预算内 |
+| 防漂移 spec | 花括号红证：AGENTS 临时插入 tests/{host,missing} → **1 failed / 7 passed**；还原 → **8 passed**；旧分区名红证 → 8 passed | 真文件，还原后 `git diff` 空 |
+| 独立盲审 | 只读子代理审两提交：**2 blocker**（spec 花括号失明 / typecheck 覆盖面多处文档过宽）全部回修；建议 5 条收 4 条 | 输入 = 提交 diff + 盘面；不含外部 WIP |
 | 干净 clone | `git clone --no-hardlinks` + submodule + `pnpm install` + vendor install + `bundle:init` + `pnpm run setup` → 构建成功；verify 红→绿；test 绿 | `/tmp` 独立树，不碰工作区 |
 | 类型 | `pnpm typecheck` → exit 0 | 改前 / 改后各一次 |
 | 源码面 | `pnpm lint` 0 warnings / 0 errors；`pnpm dup` 0 clones | 注释与 tsconfig 改动 |
