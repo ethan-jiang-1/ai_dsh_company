@@ -10,12 +10,12 @@
  *    ④ 门禁读卡原语（`repo-markdown` `sectionBody` / `parseFrontmatter` 与 `sectionStructuralText`）
  *    四者在接受/拒绝方向与豁免口径上零分叉。
  */
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { gateToolCall } from '../../../packages/company-pack/src/host/commands/prd-gate'
-import { readCompanyFileAt } from '../../../packages/company-pack/src/host/run-bundle/company-root'
+import { companyFileProblemAt, readCompanyFileAt } from '../../../packages/company-pack/src/host/run-bundle/company-root'
 import {
   scanDocumentDetailed,
   sectionRange,
@@ -27,7 +27,7 @@ import { headingSections, parseFrontmatter, sectionBody } from '../../../tools/l
 import { makeDeliverableBundle, makeDocDetailed } from '../../support/doc-grammar'
 
 const CASES = Number(process.env.MARKDOWN_SHAPE_CASES ?? 500)
-const BUNDLE_CASES = 84
+const BUNDLE_CASES = 90
 const HEADINGS = ['修复证据', '验收', '决定', '其它', '状态事实与载体', '未覆盖轴'] as const
 
 describe(`sectionRange × scanDocumentDetailed × repo-markdown（${String(CASES)} seeded docs）`, () => {
@@ -66,19 +66,30 @@ describe(`4 消费者跨层契约差分（prd-check × requirements-check × prd
   it('同源有效语料与可控故障注入下 4 消费者结论严格同向，且混合分隔符与围栏噪声零误判', () => {
     const root = mkdtempSync(join(tmpdir(), 'four-consumer-'))
     try {
+      const outside = join(root, 'outside-target')
+      mkdirSync(outside, { recursive: true })
       for (let seed = 0; seed < BUNDLE_CASES; seed += 1) {
         const bundle = makeDeliverableBundle(seed)
         const ws = join(root, `ws-${String(seed)}`)
-        const deliverableDir = join(ws, '.dsh-company', 'deliverables', bundle.slug)
+        const home = join(ws, '.dsh-company')
+        const deliverableDir = join(home, 'deliverables', bundle.slug)
         mkdirSync(join(deliverableDir, 'drafts'), { recursive: true })
         writeFileSync(join(deliverableDir, 'meta.md'), bundle.meta)
         writeFileSync(join(deliverableDir, 'drafts/mrd.md'), bundle.mrd)
         writeFileSync(join(deliverableDir, 'drafts/prd.md'), bundle.prd)
         writeFileSync(join(deliverableDir, 'final.md'), '# final\n')
+        symlinkSync(outside, join(home, 'deliverables', 'symlink-hop'))
+        symlinkSync(outside, join(ws, 'symlink-prefix'))
 
-        const presentPath = bundle.useBackslashPath
-          ? `${ws}\\.dsh-company\\deliverables\\${bundle.slug}\\final.md`
-          : `.dsh-company/deliverables/${bundle.slug}/final.md`
+        const presentPath = bundle.fault === 'bad-path'
+          ? (bundle.badPathVariant === 'symlink-inside'
+            ? `.dsh-company/deliverables/symlink-hop/../${bundle.slug}/final.md`
+            : bundle.badPathVariant === 'symlink-prefix'
+              ? `symlink-prefix/../.dsh-company/deliverables/${bundle.slug}/final.md`
+              : `.dsh-company/deliverables/${bundle.slug}/..`)
+          : bundle.useBackslashPath
+            ? `${ws}\\.dsh-company\\deliverables\\${bundle.slug}\\final.md`
+            : `.dsh-company/deliverables/${bundle.slug}/final.md`
 
         const prdResult = validateProductDocs(bundle.mrd, bundle.prd)
         const reqResult = checkRequirements({
@@ -121,8 +132,22 @@ describe(`4 消费者跨层契约差分（prd-check × requirements-check × prd
           expect(reqResult.ok, `seed=${String(seed)} req-check 漏放坏 numbering`).toBe(false)
           expect(reqResult.skipped).toBe(false)
           expect(gateDecision?.kind, `seed=${String(seed)} prd-gate 漏放坏 numbering`).toBe('deny')
+        } else if (bundle.fault === 'bad-path') {
+          // 坏路径：内容合法，但路径含 symlink 目录回退或尾部 `..`，读载体与 prd-gate 必须同判不安全并拦截
+          expect(prdResult.ok).toBe(true)
+          expect(reqResult.ok).toBe(true)
+          expect(gateDecision?.kind, `seed=${String(seed)} [bad-path:${bundle.badPathVariant}] prd-gate 漏放`).toBe('deny')
+          if (bundle.badPathVariant === 'symlink-inside') {
+            const relInside = `deliverables/symlink-hop/../${bundle.slug}/final.md`
+            expect(readCompanyFileAt(home, relInside).kind).toBe('unsafe')
+            expect(companyFileProblemAt(home, relInside)).toBe('unsafe')
+          } else if (bundle.badPathVariant === 'trailing-dotdot') {
+            const relDotDot = `deliverables/${bundle.slug}/..`
+            expect(readCompanyFileAt(home, relDotDot).kind).toBe('unsafe')
+            expect(companyFileProblemAt(home, relDotDot)).toBe('unsafe')
+          }
         } else {
-          // dangling-mr / duplicate-req / unclosed-comment：三处交付校验消费者必须一致判红并拦截 present
+          // missing-field / dangling-mr / duplicate-req / bad-ledger / unclosed-comment：三处交付校验消费者必须一致判红并拦截 present
           expect(prdResult.ok, `seed=${String(seed)} [${bundle.fault}] prd-check 漏放`).toBe(false)
           expect(reqResult.ok, `seed=${String(seed)} [${bundle.fault}] req-check 漏放`).toBe(false)
           expect(

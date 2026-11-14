@@ -46,10 +46,10 @@ test('登记项模块不存在 / KNOWN_GAP 卡不存在 → 红', () => {
   } finally { rmSync(root, { recursive: true, force: true }) }
 })
 
-test('非注册原语植入裸 frontmatter 正则或裸 Markdown `##` 节切分 → 报 file:line 红（W2.2）', () => {
+test('非注册原语植入裸 frontmatter 正则/前缀或裸 Markdown `##` 节切分（含子目录、BOM 前缀、量词空格、拼接构造）→ 报 file:line 红（W2.2）', () => {
   const root = fixture()
   try {
-    mkdirSync(join(root, 'checks/gates'), { recursive: true })
+    mkdirSync(join(root, 'checks/gates/lib'), { recursive: true })
     mkdirSync(join(root, 'tools/lib'), { recursive: true })
     writeFileSync(join(root, 'tools/lib/repo-markdown.mjs'), 'export const FRONTMATTER = /^---\\n([\\s\\S]*?)\\n---/\n')
     writeFileSync(join(root, 'tools/lib/markdown-links.mjs'), 'export const ok = true\n')
@@ -58,14 +58,22 @@ test('非注册原语植入裸 frontmatter 正则或裸 Markdown `##` 节切分 
       'export function run(text) {',
       '  const fm = /^---\\r?\\n([\\s\\S]*?)\\r?\\n---/.exec(text)',
       '  const sec = text.split("\\n").findIndex(l => /^##\\s+/.test(l))',
-      '  return { fm, sec }',
+      '  const bomFm = /^(?:\\uFEFF)?---\\r?\\n/.test(text)',
+      '  const prefix = text.startsWith("---\\n")',
+      '  const spaced = /^\\s{0,3}##\\s+/.test(text) || /^ {0,3}##\\s+/.test(text)',
+      '  return { fm, sec, bomFm, prefix, spaced }',
       '}',
     ].join('\n'))
-    writeFileSync(join(root, 'tools/lib/bad-helper.mjs'), 'export const r = new RegExp(`^##\\\\s+${name}$`)\n')
+    writeFileSync(join(root, 'checks/gates/lib/sub-bad.mjs'), 'export const r = new RegExp("^##\\\\s+" + name)\n')
+    writeFileSync(join(root, 'tools/lib/bad-helper.mjs'), 'export const r = new RegExp(`^\\\\s{0,3}##\\\\s+${name}$`)\n')
     const result = gate(root, { carriers: [{ kind: 'writer', module: MODULE }] })
     const joined = result.problems.join('；')
     assert.match(joined, /checks\/gates\/bad-gate\.mjs:3 → 禁止手写裸 frontmatter 正则/)
     assert.match(joined, /checks\/gates\/bad-gate\.mjs:4 → 禁止手写裸 Markdown 节切分正则/)
+    assert.match(joined, /checks\/gates\/bad-gate\.mjs:5 → 禁止手写裸 frontmatter 正则/)
+    assert.match(joined, /checks\/gates\/bad-gate\.mjs:6 → 禁止手写裸 frontmatter 前缀判据/)
+    assert.match(joined, /checks\/gates\/bad-gate\.mjs:7 → 禁止手写裸 Markdown 节切分正则/)
+    assert.match(joined, /checks\/gates\/lib\/sub-bad\.mjs:1 → 禁止手写裸 Markdown 节切分正则/)
     assert.match(joined, /tools\/lib\/bad-helper\.mjs:1 → 禁止手写裸 Markdown 节切分正则/)
     assert.doesNotMatch(joined, /repo-markdown\.mjs:\d+/)
   } finally { rmSync(root, { recursive: true, force: true }) }

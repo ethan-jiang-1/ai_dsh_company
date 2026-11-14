@@ -69,7 +69,7 @@ export function normalizeDocument(text) {
  * @param {string} line 单行文本。
  */
 function openFenceAt(line) {
-  const match = /^(\s{0,3})(`{3,}|~{3,})(.*)$/.exec(line)
+  const match = /^([ ]{0,3})(`{3,}|~{3,})(.*)$/.exec(line)
   if (match === null) return undefined
   const indent = (match[1] ?? '').length
   const marker = match[2] ?? ''
@@ -87,10 +87,41 @@ function stripUpToSpaces(line, count) {
 
 /** CommonMark §4.5 围栏闭行：最多 3 个前导空格 + 同字符且不少于开行长度 + 仅尾随空白。 */
 function isClosingFence(line, fence) {
-  const match = /^\s{0,3}(`{3,}|~{3,})\s*$/.exec(line)
+  const match = /^[ ]{0,3}(`{3,}|~{3,})\s*$/.exec(line)
   if (match === null) return false
   const marker = match[1] ?? ''
   return marker[0] === fence.char && marker.length >= fence.length
+}
+
+/** 计算行首空白列宽（空格=1，Tab 按 4 列制表位对齐）。 */
+function leadingColumns(line) {
+  let cols = 0
+  for (let index = 0; index < line.length; index += 1) {
+    const ch = line[index]
+    if (ch === ' ') cols += 1
+    else if (ch === '\t') cols += 4 - (cols % 4)
+    else break
+  }
+  return cols
+}
+
+function isThematicBreak(line) {
+  return /^[ ]{0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$/.test(line)
+}
+
+/** 识别顶层列表项开头的正文缩进列宽（CommonMark §5.2）；非顶层列表项返回 0。 */
+function topListContentIndent(line) {
+  if (isThematicBreak(line)) return 0
+  const match = /^([ ]{0,3})([-+*]|\d{1,9}[.)])(?:([ \t]+)(.*)|$)/.exec(line)
+  if (match === null) return 0
+  const prefixCols = (match[1] ?? '').length + (match[2] ?? '').length
+  const spaces = match[3] ?? ''
+  if (spaces === '' || (match[4] ?? '').trim() === '') return prefixCols + 1
+  let spaceCols = 0
+  for (let index = 0; index < spaces.length; index += 1) {
+    spaceCols += spaces[index] === '\t' ? 4 - ((prefixCols + spaceCols) % 4) : 1
+  }
+  return spaceCols >= 5 ? prefixCols + 1 : prefixCols + spaceCols
 }
 
 /** 从 index 起连续反引号的个数（不是反引号 → 0）。 */
@@ -133,7 +164,7 @@ function inlineCommentClose(source, offset, fromCol) {
   if (sameLine !== -1) return { endOffset: offset, endCol: sameLine + 3 }
   for (let cursor = offset + 1; cursor < source.length; cursor += 1) {
     const line = source[cursor] ?? ''
-    if (line.trim() === '' || openFenceAt(line) !== undefined || /^\s{0,3}#{1,6}(?:\s|$)/.test(line)) {
+    if (line.trim() === '' || openFenceAt(line) !== undefined || /^[ ]{0,3}#{1,6}(?:\s|$)/.test(line)) {
       return undefined
     }
     const end = line.indexOf('-->')
@@ -170,11 +201,19 @@ export function scanDocumentDetailed(text) {
   let commentStart
   let inlineCommentUntil
   let spanUntil
+  let inParagraph = false
+  let inTable = false
+  let listIndent = 0
+  let inIndentedCode = false
 
   for (const [offset, raw] of source.entries()) {
     const lineNumber = offset + 1
     if (offset <= fmEnd) {
       lines.push({ text: raw, structural: false })
+      inParagraph = false
+      inTable = false
+      listIndent = 0
+      inIndentedCode = false
       continue
     }
     if (fence !== undefined) {
@@ -185,6 +224,9 @@ export function scanDocumentDetailed(text) {
       } else {
         fence.content.push(stripUpToSpaces(raw, fence.indent))
       }
+      inParagraph = false
+      inTable = false
+      inIndentedCode = false
       continue
     }
     if (inBlockComment) {
@@ -193,31 +235,102 @@ export function scanDocumentDetailed(text) {
         inBlockComment = false
         commentStart = undefined
       }
+      inParagraph = false
+      inTable = false
+      inIndentedCode = false
       continue
     }
     if (spanUntil !== undefined) {
       lines.push({ text: raw, structural: false })
-      if (lineNumber >= spanUntil) spanUntil = undefined
+      if (lineNumber >= spanUntil) {
+        spanUntil = undefined
+        inParagraph = true
+      }
       continue
     }
     if (inlineCommentUntil !== undefined) {
       lines.push({ text: '', structural: false })
-      if (offset >= inlineCommentUntil.endOffset) inlineCommentUntil = undefined
+      if (offset >= inlineCommentUntil.endOffset) {
+        inlineCommentUntil = undefined
+        inParagraph = true
+      }
       continue
     }
-    const open = openFenceAt(raw)
-    if (open !== undefined) {
-      fence = { char: open.char, length: open.length, indent: open.indent, info: open.rest.trim(), content: [], startLine: lineNumber }
+
+    const leadCols = leadingColumns(raw)
+    const requiredIndent = listIndent > 0 ? listIndent + 4 : 4
+    if (inIndentedCode) {
+      if (raw.trim() === '') {
+        let nextNonBlank = offset + 1
+        while (nextNonBlank < source.length && (source[nextNonBlank] ?? '').trim() === '') nextNonBlank += 1
+        const nextCols = nextNonBlank < source.length ? leadingColumns(source[nextNonBlank] ?? '') : 0
+        if (nextNonBlank < source.length && nextCols >= requiredIndent) {
+          lines.push({ text: raw, structural: false })
+          continue
+        }
+        inIndentedCode = false
+      } else if (leadCols >= requiredIndent) {
+        lines.push({ text: raw, structural: false })
+        continue
+      } else {
+        inIndentedCode = false
+      }
+    }
+
+    if (raw.trim() === '') {
+      inParagraph = false
+      inTable = false
+      if (listIndent > 0) {
+        let nextNonBlank = offset + 1
+        while (nextNonBlank < source.length && (source[nextNonBlank] ?? '').trim() === '') nextNonBlank += 1
+        const nextLine = source[nextNonBlank] ?? ''
+        if (nextNonBlank >= source.length || (leadingColumns(nextLine) < listIndent && topListContentIndent(nextLine) === 0)) {
+          listIndent = 0
+        }
+      }
+      lines.push({ text: raw, structural: true })
+      continue
+    }
+
+    if (listIndent > 0 && leadCols < listIndent) {
+      listIndent = topListContentIndent(raw)
+      inParagraph = false
+      inTable = false
+    } else if (listIndent === 0) {
+      const openedList = topListContentIndent(raw)
+      if (openedList > 0) {
+        listIndent = openedList
+        inParagraph = false
+        inTable = false
+      }
+    }
+
+    const effectiveRequiredIndent = listIndent > 0 ? listIndent + 4 : 4
+    const isNestedListMarker = listIndent > 0 && /^\s*(?:[-+*]|\d{1,9}[.)])(?:\s|$)/.test(raw)
+    if (!inParagraph && leadCols >= effectiveRequiredIndent && !isNestedListMarker) {
+      inIndentedCode = true
+      inTable = false
       lines.push({ text: raw, structural: false })
       continue
     }
-    if (/^\s{0,3}<!--/.test(raw)) {
+
+    const open = openFenceAt(raw)
+    if (open !== undefined) {
+      fence = { char: open.char, length: open.length, indent: open.indent, info: open.rest.trim(), content: [], startLine: lineNumber }
+      inParagraph = false
+      inTable = false
+      lines.push({ text: raw, structural: false })
+      continue
+    }
+    if (/^[ ]{0,3}<!--/.test(raw)) {
       lines.push({ text: '', structural: false })
       const startCol = raw.indexOf('<!--') + 4
       if (raw.indexOf('-->', startCol) === -1) {
         inBlockComment = true
         commentStart = lineNumber
       }
+      inParagraph = false
+      inTable = false
       continue
     }
     let index = 0
@@ -261,6 +374,22 @@ export function scanDocumentDetailed(text) {
       index += 1
     }
     lines.push({ text: visible, structural: true })
+    if (/^[ ]{0,3}#{1,6}(?:\s|$)/.test(raw) || isThematicBreak(raw)) {
+      inParagraph = false
+      inTable = false
+    } else if (inTable && raw.includes('|')) {
+      inParagraph = false
+    } else if (
+      offset + 1 < source.length
+      && raw.includes('|')
+      && /^[ ]{0,3}\|?[\s:|-]+\|[\s:|-]*$/.test(source[offset + 1] ?? '')
+    ) {
+      inTable = true
+      inParagraph = false
+    } else {
+      inTable = false
+      inParagraph = true
+    }
   }
   return {
     lines,
@@ -292,7 +421,7 @@ function escapeRegExp(value) {
  */
 export function sectionRange(text, heading, preScanned) {
   const { lines } = preScanned ?? scanDocumentDetailed(text)
-  const pattern = new RegExp(`^\\s{0,3}##\\s+${escapeRegExp(heading)}\\s*$`)
+  const pattern = new RegExp(`^[ ]{0,3}##\\s+${escapeRegExp(heading)}\\s*$`)
   let start = -1
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index]
@@ -305,7 +434,7 @@ export function sectionRange(text, heading, preScanned) {
   let end = lines.length
   for (let index = start + 1; index < lines.length; index += 1) {
     const line = lines[index]
-    if (line !== undefined && line.structural && /^\s{0,3}#{1,2}\s+/.test(line.text)) {
+    if (line !== undefined && line.structural && /^[ ]{0,3}#{1,2}\s+/.test(line.text)) {
       end = index
       break
     }

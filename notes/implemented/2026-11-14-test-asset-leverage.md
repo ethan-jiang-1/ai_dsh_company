@@ -6,46 +6,44 @@
 
 ## 决定
 
-1. **先收口第二事实源，再加资产。** markdown 形状从「pack TS 一份 + fix-evidence 简化版 + 各门禁 sectionBody」收成
-   `packages/company-pack/src/lib/markdown-shape-core.js` 一份核心：TS 侧 `markdown-shape.ts` 只做类型包装，
-   `fix-evidence` / `proposals` / `notes-liveness` 直接 import 核心的 `sectionRange`。
-   `tools/lib/backlog-liveness.mjs` 因 keyless seam（`tests/repo/layering.spec.ts` 禁止 `tools/lib` 依赖
-   `tools/lib` 之外）保留行级节定位，边界写在文件里——**最终是 2 个实现 + 一条声明的 keyless 边界，不是 4 份各说各话**。
+1. **先收口第二事实源，再加资产。** markdown 形状从「pack TS 一份 + fix-evidence 简化版 + 各门禁 sectionBody」收成两层授权单原语：
+   pack 与门禁消费 `packages/company-pack/src/lib/markdown-shape-core.js` 单一状态机（`markdown-shape.ts` 只做类型包装），
+   keyless 治理层（`backlog-liveness` / `notes-audit` / `bug-coverage` / `notes-tree` / `proposals`）统一消费
+   `tools/lib/repo-markdown.mjs`（复用 `vendor/dsh` `mdast` GFM + `js-yaml`），并由 `company-root-carriers` AST 扫描静态禁绝手写裸解析。
 2. **退役优先于新增。** 删 8 份 content english spec（超集 `content-english` + 3 份唯一文件清单合并）、
    删 `gitignore-guards` spec（`gitignore-shape` 门补 `company-workspace`/`_dist`），
    删 candidate-scan-labels 的 321 行语料测试；把 BUG-011 的「假设段」、CMO、ASSIGN canonical 四个活守卫
-   迁到 `tests/tools/candidate-scan-assignments.spec.ts`（带 `// 负例留证`）。**退役 10 份，新增 4 份（property / structure-agreement / v6 dry-run / candidate 活守卫）。**
-3. **census v2 回答“谁在用”。** `tools/lib/asset-consumers.mjs` 只读引用图（精确 token，排除自身/README/generated 索引）；
-   30 冒烟 + 67 探针里 **72 个 0 消费者**。字段加 `shape`/`lastRed`/`replaceBy`/`retireWhen`；
+   迁到 `tests/tools/candidate-scan-assignments.spec.ts`（带 `// 负例留证`）；合并/退役 8 个同构探针（67→59）。
+3. **census v2 回答“谁在用”。** `tools/lib/asset-consumers.mjs` 合并自动调度 lane 数与显式引用图（排除自身/README/generated 索引）；
+   现行盘面 30 冒烟 + 59 探针（`MAX_PROBES = 59`、`MAX_GATES = 75`、未分类失败类 **0**、**50 个 0 消费者**）。字段加 `shape`/`lastRed`/`replaceBy`/`retireWhen`；
    `lastRed` 未接运行日志，填 `—` 不伪造。
-4. **证明层：历史 BUG 覆盖 + 变形不变量 + 差分。**
+4. **证明层：历史 BUG 覆盖 + 组合语法差分 + 4 消费者契约。**
    - `tools/lib/bug-coverage.mjs`：181 张已修卡 → **76 有具名守卫（42.0%）**，105 无（保守下界）；baseline 只升不降，
      新修 BUG（opened ≥ 2026-11-15）缺具名守卫即红。
-   - `tests/lib/markdown-shape.property.spec.ts`：200 个 seeded 文档（weekly lane 1000）证归一化幂等、围栏永不
-     `structural`、行首注释 vs 行内 `<!--`、表格转义列数。
-   - `tests/host/contract/structure-agreement.spec.ts`：200 个生成文档证 `sectionRange` 与 `scanDocumentDetailed`
-     选中同一个标题；`file-shape-agreement` 加 9 条路径等价类。
-5. **棘轮：未覆盖轴必须有去向。** `checks/gates/notes-axes.mjs`：新 Note（文件名 ≥ 2026-11-15）的
-   `## 未覆盖轴` 每个顶层条目必须带 `→` 去向，无条目也红；用 core 的 `sectionRange` 排除围栏里的假节。
+   - `tests/lib/markdown-shape.property.spec.ts`：500 个组合语法 seeded 文档（weekly lane 1000）× `mdast` GFM 独立真值差分，
+     证归一化幂等、顶层围栏载荷、4+ 空格缩进代码块、行首/行内注释与 GFM 表格逐单元格转义还原一致。
+   - `tests/host/contract/structure-agreement.spec.ts`：500 个生成文档对齐二级节定位 + 90 组同源语料对齐 4 消费者（`prd-check` × `requirements-check` × `prd-gate` × 读卡原语）；
+     `file-shape-agreement` 覆盖 16 条路径等价类的读/写/建目录/`prd-gate` 全通道同判据矩阵。
+5. **棘轮：未覆盖轴必须有四分类与非自链实盘锚点。** `checks/gates/notes-axes.mjs`：新 Note（文件名 ≥ 2026-11-14，覆盖 `notes/implemented/` 与 `notes/archived/`）的
+   `## 未覆盖轴` 每个顶层条目必须带 `[covered|policy|environment-gap|unprovable]` 前缀且 `→` 右侧指向非自链的盘上真实文件；用 core 的 `sectionRange` 排除围栏里的假节。
    `tests/failure-classes.md` 加复发规则：同类连续两轮只有 example → 下一轮必须生成器/模型/元测试。
-6. **门禁自身要能被证伪。** `tests/checks/gate-mutation.test.mjs` 对 naming/carrier/fix-evidence/notes-tree
-   各删一条规则，坏夹具必须从 mutant 漏过；4/4 通过。naming/carrier 另补 root 注入 conformance。
+6. **门禁自身要能被分支级证伪。** `tests/checks/gate-mutation.test.mjs`（并入 `checks/lanes/generative.e2e.mjs`）对高风险门禁的核心拒绝分支与浅克隆跳过分支逐条做定向 mutation（临时文件隔离在 `os.tmpdir()`），坏夹具必须从对应 mutant 漏过，另验 `keyless-lane` 零命中非零退出。
 
 ## 状态事实与载体
 
 | 项 | 内容 |
 |---|---|
-| 事实 | 测试资产的**杠杆/预防能力**：形状单一来源、退役、消费者、历史守卫、未覆盖轴去向 |
-| 唯一入口 | `markdown-shape-core.js`（形状）、`asset-consumers`/`bug-coverage`（度量）、`notes-axes`/`failure-classes`（棘轮） |
+| 事实 | 测试资产的**杠杆/预防能力**：双层单原语垄断、上限封顶退役、消费者计数、历史守卫、未覆盖轴实盘锚点 |
+| 唯一入口 | `markdown-shape-core.js` + `repo-markdown.mjs`（形状/AST）、`asset-consumers`/`bug-coverage`（度量）、`notes-axes`/`failure-classes`（棘轮） |
 | 读载体 | fresh agent、测试资产作者、门禁作者、pre-push/weekly lane |
 | 写载体 | `checks/gates/`、`tests/checks/`、`tests/lib/`、`tests/host/contract/`、`tools/lib/` |
-| 一致性判据 | 形状 2 实现 + 边界；census/coverage 生成物与盘面一致；新 Note 未覆盖轴有去向；新 BUG 有具名守卫 |
+| 一致性判据 | 单原语静态禁裸解析；census/coverage 生成物与盘面一致（`MAX_GATES=75`/`MAX_PROBES=59`/未分类=0）；新 Note 未覆盖轴带四分类与非自链真文件；新 BUG 有具名守卫 |
 
 ## 输掉的方案
 
 - **继续一 bug 一 spec**：v2–v5 已证明 bug 率 8/8/8/8；例子型资产关实例不关类。
-- **直接把 4 份形状实现都 import 到 `tools/lib`**：`tools/lib` keyless seam 会红；改为 core + 声明边界。
-- **全量 mutation / soak**：慢、噪声、易 flaky；只做 4 个高风险门禁的定向 mutation。
+- **在 `tools/lib` 反向 import `packages/company-pack`**：违反 `tools/lib` keyless seam；改为 `tools/lib/repo-markdown.mjs` 消费 `vendor/dsh` `mdast` + `js-yaml`，并与 `markdown-shape-core.js` 做 500 例跨层差分对齐。
+- **全量字节码 mutation / 长时 soak**：慢、噪声、易 flaky；只对高风险门禁的核心拒绝/跳过分支做定向分支级 mutation。
 - **引 fast-check**：手写 seeded 生成器足够；不新增依赖。
 - **用覆盖率当改善指标**：线覆盖量执行，不量输入分布；改用 bug-coverage + 类复发 + 退役数。
 - **R4 直接删**：bug-coverage 棘轮先挡住（BUG-011 唯一守卫）；先迁守卫再退役，而不是把门禁当形式。
@@ -63,7 +61,7 @@
 | mutation | naming/carrier/fix-evidence/notes-tree 各删一条规则 → 坏夹具漏过；4/4 |
 | R4 棘轮 | 先 `candidate-scan-labels` 删了会让覆盖 76→75 → 红；迁 BUG-011 守卫后删，覆盖仍 76 |
 | v6 dry-run | `tests/evidence/v6-dry-run.spec.ts`：Windows `..\` → unsafe；围栏嵌套只取顶层 json |
-| 度量 | 已修 181 / 具名守卫 76（42.0%）；30 冒烟 + 67 探针 / 0 消费者 72；退役 10 / 新增 4 |
+| 现行盘面读数 | 已修 181 / 具名守卫 76（42.0%）；30 冒烟 + 59 探针（未分类 0 / 0 消费者 50）；75 门禁（`notes-axes` 生效日 `2026-11-14`） |
 
 ## 未覆盖轴
 

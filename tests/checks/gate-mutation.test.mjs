@@ -5,7 +5,7 @@
 // 证明夹具真正踩在该条规则上，而不是靠别的分支顺带变红。
 import { spawnSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { test } from 'node:test'
@@ -21,13 +21,27 @@ const ROOT_DIR = join(dirname(fileURLToPath(import.meta.url)), '../..')
 const GATES = join(ROOT_DIR, 'checks/gates')
 const TOOLS_LIB = join(ROOT_DIR, 'tools/lib')
 
+function rewriteMutantSource(source, dir, baseName) {
+  const originalUrl = JSON.stringify(pathToFileURL(join(dir, `${baseName}.mjs`)).href)
+  return source
+    .replace(
+      /((?:import|export)\s+(?:[^'"]*?\s+from\s+)?|import\s*\(\s*)(['"])(\.\.?\/[^'"]+)\2/g,
+      (_full, prefix, quote, relSpec) => `${prefix}${quote}${pathToFileURL(resolve(dir, relSpec)).href}${quote}`,
+    )
+    .replaceAll('import.meta.url', originalUrl)
+}
+
+const MUTANT_CACHE = join(ROOT_DIR, 'node_modules/.cache/gate-mutations')
+
 async function mutantInDir(dir, baseName, from, to) {
   const source = readFileSync(join(dir, `${baseName}.mjs`), 'utf8')
   assert.ok(source.includes(from), `${baseName} 的 mutation 锚点不在了——先同步本测试`)
-  const path = join(dir, `.zz-mut-${baseName}-${String(Date.now())}-${String(Math.random()).slice(2)}.mjs`)
-  writeFileSync(path, source.replace(from, to))
+  mkdirSync(MUTANT_CACHE, { recursive: true })
+  const tempDir = mkdtempSync(join(MUTANT_CACHE, `${baseName}-`))
+  const path = join(tempDir, `${baseName}.mjs`)
+  writeFileSync(path, rewriteMutantSource(source.replace(from, to), dir, baseName))
   const mod = await import(`${pathToFileURL(path).href}?v=${String(Date.now())}`)
-  return { mod, cleanup: () => rmSync(path, { force: true }) }
+  return { mod, cleanup: () => rmSync(tempDir, { recursive: true, force: true }) }
 }
 
 const mutant = (gate, from, to) => mutantInDir(GATES, gate, from, to)
@@ -372,12 +386,23 @@ test('notes-axes：删「四分类前缀」与「右侧实盘文件锚点」→ 
     'notes/implemented/2026-11-14-hollow.md': '状态：implemented\n\n## 未覆盖轴\n- [policy] 4 消费者差分 → 决定：留后续卡\n',
   })
   const mutHollow = await mutant('notes-axes',
-    'if (!hasRealTargetFile(target, rootDir, noteDir)) {',
+    'if (!hasRealTargetFile(target, rootDir, noteDir, selfAbsPath)) {',
     'if (false) {')
   try {
     assert.match(invoke(notesAxes, rootHollow).problems.join(), /右侧缺盘上真实文件锚点/)
     assert.deepEqual(invoke(mutHollow.mod, rootHollow).problems, [])
   } finally { mutHollow.cleanup(); rmSync(rootHollow, { recursive: true, force: true }) }
+
+  const rootSelfLink = fixture({
+    'notes/implemented/2026-11-14-self.md': '状态：implemented\n\n## 未覆盖轴\n- [policy] 自链逃逸 → [自己](./2026-11-14-self.md)\n',
+  })
+  const mutSelfLink = await mutant('notes-axes',
+    'if (resolved !== selfAbsPath && isExistingRepoFile(rootDir, resolved)) return true',
+    'if (isExistingRepoFile(rootDir, resolved)) return true')
+  try {
+    assert.match(invoke(notesAxes, rootSelfLink).problems.join(), /右侧缺盘上真实文件锚点/)
+    assert.deepEqual(invoke(mutSelfLink.mod, rootSelfLink).problems, [])
+  } finally { mutSelfLink.cleanup(); rmSync(rootSelfLink, { recursive: true, force: true }) }
 })
 
 // ── 6. backlog-liveness（2 分支：验收标准可执行标记 / 归档 note 去向真实文件锚点）──

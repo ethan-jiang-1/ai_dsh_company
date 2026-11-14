@@ -47,6 +47,27 @@ describe('notes-audit · 解析', () => {
     expect(hasDecisionSection('## 决策\n')).toBe(true)
     expect(hasDecisionSection('## 结果\n')).toBe(false)
   })
+
+  it('首部围栏代码里的 `# 注释` 与假 `状态：` 不抢占真实 H1 与状态行', () => {
+    const fencedLead = [
+      '```bash',
+      '# bash comment not H1',
+      '状态：proposed',
+      '```',
+      '',
+      '# 真标题',
+      '',
+      '  状态：implemented（2026-11-14）',
+      '',
+      '## 决定',
+      '',
+      '做 A。',
+    ].join('\n')
+    expect(noteTitle(fencedLead)).toBe('真标题')
+    expect(noteStatus(fencedLead)).toBe('状态：implemented（2026-11-14）')
+    const result = auditNotes([note('notes/implemented/2026-11-14-fenced.md', fencedLead)], { root: process.cwd() })
+    expect(result.summary.statusMismatch).toEqual([])
+  })
 })
 
 describe('notes-audit · 收据特征', () => {

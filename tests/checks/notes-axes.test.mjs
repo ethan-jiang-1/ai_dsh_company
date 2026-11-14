@@ -24,10 +24,24 @@ test('缺四分类前缀或写了非法分类名 → 红', () => {
   assert.match(axisProblems(note('- [later] 跨行 span 残余 → `docs/testing.md`'), 'x.md').join(), /四分类前缀/)
 })
 
-test('写空头支票「决定：留后续卡」或指向不存在的文件 → 红', () => {
+test('写空头支票「决定：留后续卡」、指向不存在文件或自链 Note 自身 → 红', () => {
   assert.match(axisProblems(note('- [policy] 4 消费者差分 → 决定：留后续卡'), 'x.md').join(), /右侧缺盘上真实文件锚点/)
   assert.match(axisProblems(note('- [covered] 假文件 → `tests/does-not-exist-ever.spec.ts`'), 'x.md').join(), /右侧缺盘上真实文件锚点/)
   assert.match(axisProblems(note('- [covered] 假链接 → [missing](./no-such-note.md)'), 'x.md').join(), /右侧缺盘上真实文件锚点/)
+  assert.match(
+    axisProblems(
+      note('- [policy] 自链逃逸 → [self](./2026-11-14-test-asset-leverage.md)'),
+      'notes/implemented/2026-11-14-test-asset-leverage.md',
+    ).join(),
+    /右侧缺盘上真实文件锚点/,
+  )
+  assert.match(
+    axisProblems(
+      note('- [policy] 反引号自链逃逸 → `notes/implemented/2026-11-14-test-asset-leverage.md`'),
+      'notes/implemented/2026-11-14-test-asset-leverage.md',
+    ).join(),
+    /右侧缺盘上真实文件锚点/,
+  )
 })
 
 test('条目没有 → 去向 / → 后为空 / 空节 / 缺节 / 围栏假节 → 红', () => {

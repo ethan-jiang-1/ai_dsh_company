@@ -23,8 +23,13 @@ const HOST = 'packages/company-pack/src/host'
 const GOVERNANCE_DIRS = ['checks/gates', 'tools/lib']
 const COMPANY_REF = /\.dsh-company|companyHomeOf|companyFilePath|RUN_BUNDLE_PATHS/
 const WRITE_REF = /writeFileSync|appendFileSync|renameSync|mkdirSync|rmSync|cpSync|unlinkSync|linkSync|writeCompanyAtomic/
-const RAW_FRONTMATTER_RE = /^\^---(?:\\r\?\\n|\\n|\s|\$)/
-const RAW_HEADING_SPLIT_RE = /^\^(?:\\s[*+?]|\(\?:\\s\{\d,\d\}\)\?)?\(?#(?:\{1,|\{2|#(?:\s|\\s|\[|\^|\$|\)|[^#]))/
+const RAW_FRONTMATTER_RE = /^\^(?:\(\?:(?:\\uFEFF|\\ufeff|\\xEF\\xBB\\xBF|\uFEFF)\)\?|(?:\\uFEFF|\\ufeff|\\xEF\\xBB\\xBF|\uFEFF)\?)?---(?:\\r\?\\n|\\n|\\s|\s|\$)/
+const LEADING_WS_TOKEN = String.raw`(?:\(\?:|\()?(?:\\s| |\\t|\[[^\]]+\])(?:[*+?]|\\?\{\d+(?:,\d*)?\\?\})?\)?\??`
+const RAW_HEADING_SPLIT_RE = new RegExp(
+  String.raw`^\^(?:${LEADING_WS_TOKEN}){0,3}\(?#(?:\{\d+(?:,\d*)?\}|\+|#(?:\s|\\s|\[|\^|\$|\)|#|[^#]))`,
+)
+const RAW_FRONTMATTER_PREFIX_RE = /^(?:\uFEFF)?---\r?\n/
+const RAW_SCAN_SELF = 'checks/gates/company-root-carriers.mjs'
 
 /** 去掉块注释与整行注释；行内 `//` 保留（误报由「同时要有写原语」挡住）。 */
 function stripComments(text) {
@@ -57,10 +62,18 @@ function bugCardExists(root, id) {
   return false
 }
 
-function extractRegExpArg(arg, sf) {
-  if (!arg) return undefined
-  if (ts.isStringLiteralLike(arg)) return arg.text
-  if (ts.isTemplateExpression(arg)) return arg.getText(sf).slice(1, -1)
+function extractStringPattern(expr) {
+  if (!expr) return undefined
+  if (ts.isParenthesizedExpression(expr)) return extractStringPattern(expr.expression)
+  if (ts.isStringLiteralLike(expr)) return expr.text
+  if (ts.isTemplateExpression(expr)) {
+    return expr.head.text + expr.templateSpans.map(span => `X${span.literal.text}`).join('')
+  }
+  if (ts.isBinaryExpression(expr) && expr.operatorToken.kind === ts.SyntaxKind.PlusToken) {
+    const left = extractStringPattern(expr.left)
+    const right = extractStringPattern(expr.right)
+    if (left !== undefined || right !== undefined) return `${left ?? 'X'}${right ?? 'X'}`
+  }
   return undefined
 }
 
@@ -71,12 +84,11 @@ function scanRawParsingProblems(root, primitives) {
   for (const dirRel of GOVERNANCE_DIRS) {
     const absDir = join(root, dirRel)
     if (!existsSync(absDir)) continue
-    for (const entry of readdirSync(absDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-      if (!entry.isFile() || !entry.name.endsWith('.mjs')) continue
-      const rel = `${dirRel}/${entry.name}`
-      if (allowed.has(rel)) continue
+    for (const absFile of walk(absDir, '.mjs')) {
+      const rel = absFile.slice(root.length + 1).replaceAll('\\', '/')
+      if (allowed.has(rel) || rel === RAW_SCAN_SELF) continue
       scanned += 1
-      const sourceText = readFileSync(join(absDir, entry.name), 'utf8')
+      const sourceText = readFileSync(absFile, 'utf8')
       const sf = ts.createSourceFile(rel, sourceText, ts.ScriptTarget.Latest, true)
       const checkPattern = (pattern, pos) => {
         if (pattern === undefined) return
@@ -94,7 +106,15 @@ function scanRawParsingProblems(root, primitives) {
           checkPattern(lastSlash > 0 ? text.slice(1, lastSlash) : text, node.getStart(sf))
         } else if ((ts.isNewExpression(node) || ts.isCallExpression(node))
           && ts.isIdentifier(node.expression) && node.expression.text === 'RegExp') {
-          checkPattern(extractRegExpArg(node.arguments?.[0], sf), node.getStart(sf))
+          checkPattern(extractStringPattern(node.arguments?.[0]), node.getStart(sf))
+        } else if (ts.isCallExpression(node)
+          && ts.isPropertyAccessExpression(node.expression)
+          && node.expression.name.text === 'startsWith') {
+          const prefix = extractStringPattern(node.arguments?.[0])
+          if (prefix !== undefined && RAW_FRONTMATTER_PREFIX_RE.test(prefix)) {
+            const line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1
+            problems.push(`${rel}:${String(line)} → 禁止手写裸 frontmatter 前缀判据 .startsWith(${JSON.stringify(prefix)})（改调 tools/lib/repo-markdown.mjs 的 parseFrontmatter）`)
+          }
         }
         ts.forEachChild(node, visit)
       }

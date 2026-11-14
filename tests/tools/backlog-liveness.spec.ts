@@ -337,4 +337,73 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     put('research/qualified/README.md', banner({ status: '已定性', conclusion: '结论一句话', lines: ['- [b](2026-11-02-b.md)'] }))
     expect(check(root).join('\n')).not.toContain('qualified/README.md')
   })
+
+  // 2026-11-14（W2.1 盲审清零）：卡头首 12 行、题名页字段与 UTF-8 BOM/CRLF 全量走 repo-markdown 原语，围栏/注释假字段不生效。
+  it('ignores fenced or HTML-commented fake header/banner lines and accepts UTF-8 BOM + CRLF', () => {
+    // 1) 首 12 行围栏里的假状态行与假去向不能冒充真状态行/真去向
+    put('issues/fenced-fake-status.md', [
+      '---',
+      'status: 待落地',
+      'opened: 2026-11-14',
+      '---',
+      '```md',
+      '> 立卡：2026-11-14 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否',
+      '> **结论/去向**：note — `notes/implemented/x.md`',
+      '```',
+      '',
+      '## 验收标准',
+      '- `pnpm test` 通过',
+      '',
+      '## 落地证据',
+      '- `pnpm verify` 通过',
+      '',
+    ].join('\n'))
+    // 2) 真状态行在场时，首 12 行围栏示例里的「可关闭：是」不得误判已关闭
+    put('issues/fenced-closure-example.md', [
+      '---',
+      'status: 推敲中',
+      'opened: 2026-11-14',
+      '---',
+      '# Issue',
+      '> 立卡：2026-11-14 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：未定 ｜ 可关闭：否',
+      '```md',
+      '可关闭：是',
+      '```',
+      '',
+    ].join('\n'))
+    // 3) UTF-8 BOM + CRLF 的活跃卡与活跃题名页必须正常解析，不得误报缺 frontmatter
+    put('issues/bom-crlf-ok.md', '\uFEFF' + issue().replaceAll('\n', '\r\n'))
+    put('issues/README.md', '# Index\n\n' + ['fenced-fake-status.md', 'fenced-closure-example.md', 'bom-crlf-ok.md'].map(name => `[material](<${name}>)`).join('\n') + '\n')
+
+    put('research/commented-banner/2026-11-14-a.md', '---\ntopic: 技术\nintent: A.\n---\n')
+    put('research/commented-banner/README.md', [
+      '\uFEFF---',
+      'status: 已定性',
+      'opened: 2026-11-14',
+      '---',
+      '',
+      '# Topic',
+      '> 问题：真问题',
+      '> 消费者：真消费者',
+      '```md',
+      '> 产出的卡：假卡',
+      '```',
+      '<!--',
+      '> 结论：注释里的假结论',
+      '-->',
+      '',
+      '## 材料',
+      '- [a](2026-11-14-a.md)',
+    ].join('\r\n'))
+    put('research/README.md', '# Index\n\n[topic](<commented-banner/README.md>)\n')
+
+    const problems = check(root).join('\n')
+    expect(problems).toContain('_backlog/issues/fenced-fake-status.md:1 缺状态行')
+    expect(problems).toContain('_backlog/issues/fenced-fake-status.md:1 「待落地」卡缺去向值')
+    expect(problems).not.toContain('fenced-closure-example.md')
+    expect(problems).not.toContain('bom-crlf-ok.md')
+    expect(problems).toContain('_backlog/research/commented-banner/README.md:1 缺「> 产出的卡：」行')
+    expect(problems).toContain('_backlog/research/commented-banner/README.md:1 「已定性」缺「> 结论：」行')
+    expect(problems).not.toContain('commented-banner/README.md:1 缺 frontmatter')
+  })
 })

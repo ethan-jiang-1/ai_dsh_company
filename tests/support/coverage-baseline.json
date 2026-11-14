@@ -234,8 +234,8 @@
       "branches": 90
     },
     "packages/company-pack/src/host/commands/prd-gate.ts": {
-      "statements": 92.3,
-      "branches": 82.4
+      "statements": 94.4,
+      "branches": 85.24
     },
     "packages/company-pack/src/host/commands/req-command.ts": {
       "statements": 92.66,
@@ -486,8 +486,8 @@
       "branches": 100
     },
     "packages/company-pack/src/lib/prd-check.ts": {
-      "statements": 84.6,
-      "branches": 73.06
+      "statements": 85.18,
+      "branches": 73.49
     },
     "packages/company-pack/src/lib/presence-status.ts": {
       "statements": 95.83,
@@ -498,8 +498,8 @@
       "branches": 80.31
     },
     "packages/company-pack/src/lib/requirements-check.ts": {
-      "statements": 92.93,
-      "branches": 76.51
+      "statements": 94.06,
+      "branches": 76.89
     },
     "packages/company-pack/src/lib/retry-policy.ts": {
       "statements": 100,
@@ -538,8 +538,8 @@
       "branches": 90
     },
     "tools/lib/asset-consumers.mjs": {
-      "statements": 97.67,
-      "branches": 94.44
+      "statements": 97.82,
+      "branches": 95
     },
     "tools/lib/asset-lanes.mjs": {
       "statements": 100,
@@ -554,12 +554,12 @@
       "branches": 100
     },
     "tools/lib/backlog-liveness.mjs": {
-      "statements": 94.76,
-      "branches": 90.51
+      "statements": 95.55,
+      "branches": 91.69
     },
     "tools/lib/bug-coverage.mjs": {
       "statements": 100,
-      "branches": 92.3
+      "branches": 92.85
     },
     "tools/lib/candidate-scan.mjs": {
       "statements": 95.71,
@@ -662,8 +662,8 @@
       "branches": 100
     },
     "tools/lib/notes-audit.mjs": {
-      "statements": 95.68,
-      "branches": 86.45
+      "statements": 95.94,
+      "branches": 87
     },
     "tools/lib/orient.mjs": {
       "statements": 95.71,

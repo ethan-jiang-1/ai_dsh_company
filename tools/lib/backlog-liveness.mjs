@@ -18,7 +18,7 @@
 import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { basename, isAbsolute, join, relative, resolve } from 'node:path'
 import { markdownLinkTargets } from './markdown-links.mjs'
-import { parseFrontmatter, sectionBody as readSectionBody } from './repo-markdown.mjs'
+import { parseFrontmatter, sectionBody as readSectionBody, structuralLines } from './repo-markdown.mjs'
 
 export function backlogLivenessProblems(backlogRoot) {
   const problems = []
@@ -81,11 +81,18 @@ export function backlogLivenessProblems(backlogRoot) {
   //   散文里的「用户已拍板…」不可枚举；窄到 6 个词，机器才知道这张卡该去哪儿。
   const DESTINATIONS = ['rfc', 'note', 'implementation', 'pending', 'none', 'rejected']
   const GRADUATED = ['rfc', 'note', 'implementation']
-  const headText = text => text.split('\n').slice(0, 12).join('\n').replaceAll('**', '')
+  const headStructuralLines = text => structuralLines(text)
+    .filter(item => item.lineNumber <= 12 && item.structural)
+    .map(item => item.text)
+  const headText = text => headStructuralLines(text).join('\n').replaceAll('**', '')
+  const findStatusLine = text => headStructuralLines(text)
+    .find(line => line.trimStart().startsWith('>') && line.includes('状态：'))
   const destination = head => /去向\s*[:：=＝]\s*`?([a-z][a-z-]*)/.exec(head)?.[1] ?? ''
   const lineOf = (text, needle) => {
-    const index = text.split('\n').findIndex(line => line.includes(needle))
-    return index < 0 ? 1 : index + 1
+    const lines = structuralLines(text)
+    const hit = lines.find(item => item.structural && item.text.includes(needle))
+      ?? lines.find(item => item.text.includes(needle))
+    return hit ? hit.lineNumber : 1
   }
   // 「非空 ## 节」= 门票的形状锚：统一消费 `repo-markdown` 的 GFM AST 结构节读取（围栏示例内的标题与字段不算）。
   const EXECUTABLE = /`(?:pnpm|node|git|rg|source|npx)\s+[^`\n]+`|Given\/When\/Then|\bassert\b/
@@ -140,25 +147,32 @@ export function backlogLivenessProblems(backlogRoot) {
           continue
         }
         const banner = readFileSync(bannerFull, 'utf8')
+        const bannerStructural = structuralLines(banner)
+          .filter(item => item.structural)
+          .map(item => item.text)
         for (const field of ['问题', '消费者', '产出的卡']) {
-          if (!new RegExp(`^>\\s*${field}[：:]`, 'm').test(banner))
+          const fieldRe = new RegExp(`^>\\s*${field}[：:]`)
+          if (!bannerStructural.some(line => fieldRe.test(line)))
             problems.push(`${bannerWhere}:1 缺「> ${field}：」行——题名页要回答研究什么、服务谁、产出了什么`)
         }
-        if (pool.startsWith('_archive/') && !/^>\s*归档[：:]\s*\d{4}-\d{2}-\d{2}/m.test(banner))
+        if (pool.startsWith('_archive/') && !bannerStructural.some(line => /^>\s*归档[：:]\s*\d{4}-\d{2}-\d{2}/.test(line)))
           problems.push(`${bannerWhere}:1 缺「> 归档：YYYY-MM-DD」行——归档题名页要记下归档日`)
         // 2026-11-02（五道门落地）：题名页是工作项，有自己的位置（调研中 → 已定性）；
         //   归档题名页是冻结层，不回填。材料无 status（上面研究分支另查反向）。
         if (!pool.startsWith('_archive/')) {
-          const head = banner.startsWith('---\n') ? frontmatter(banner, bannerWhere) : null
-          if (!head) {
-            if (!banner.startsWith('---\n')) problems.push(`${bannerWhere}:1 缺 frontmatter（status: 调研中|已定性 + opened: YYYY-MM-DD）——题名页是工作项，材料才是证据`)
+          const bannerFm = parseFrontmatter(banner)
+          if (!bannerFm.present) {
+            problems.push(`${bannerWhere}:1 缺 frontmatter（status: 调研中|已定性 + opened: YYYY-MM-DD）——题名页是工作项，材料才是证据`)
           } else {
-            const keys = Object.keys(head)
-            if (keys[0] !== 'status') problems.push(`${bannerWhere}:2 frontmatter 首字段须为 status`)
-            else if (!['调研中', '已定性'].includes(String(head.status))) problems.push(`${bannerWhere}:2 status ${JSON.stringify(head.status)} 不属于题名页（调研中|已定性）`)
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(String(head.opened ?? ''))) problems.push(`${bannerWhere}:1 缺 opened: YYYY-MM-DD`)
-            if (head.status === '已定性' && !/^>\s*结论[：:]\s*\S/m.test(banner))
-              problems.push(`${bannerWhere}:1 「已定性」缺「> 结论：」行——定性门要求能一句话说出结论`)
+            const head = frontmatter(banner, bannerWhere)
+            if (head) {
+              const keys = Object.keys(head)
+              if (keys[0] !== 'status') problems.push(`${bannerWhere}:2 frontmatter 首字段须为 status`)
+              else if (!['调研中', '已定性'].includes(String(head.status))) problems.push(`${bannerWhere}:2 status ${JSON.stringify(head.status)} 不属于题名页（调研中|已定性）`)
+              if (!/^\d{4}-\d{2}-\d{2}$/.test(String(head.opened ?? ''))) problems.push(`${bannerWhere}:1 缺 opened: YYYY-MM-DD`)
+              if (head.status === '已定性' && !bannerStructural.some(line => /^>\s*结论[：:]\s*\S/.test(line)))
+                problems.push(`${bannerWhere}:1 「已定性」缺「> 结论：」行——定性门要求能一句话说出结论`)
+            }
           }
         }
         if (!indexed.has(resolve(bannerFull)))
@@ -182,13 +196,13 @@ export function backlogLivenessProblems(backlogRoot) {
       if (!researchPool && !indexed.has(resolve(full))) problems.push(`${where} 未被 ${indexPath} 索引链接点名`)
       const text = readFileSync(full, 'utf8')
       if (pool === 'issues' || pool === 'bugs') {
-        const head = text.split('\n').slice(0, 12).join('\n').replaceAll('**', '')
+        const head = headText(text)
         if (closureSignals.some(signal => signal.test(head))) {
           problems.push(`${where}:1 声明可关闭/关闭条件已满足却仍在活跃区；移至 _archive/${pool === 'issues' ? 'settled_issues' : 'fixed_bugs'}/ 并同步索引`)
         }
       }
       if (pool === '_archive/legacy') continue
-      const hasHead = text.startsWith('---\n') || text.startsWith('---\r\n')
+      const hasHead = parseFrontmatter(text).present
       // Active issue/bug headers are migrated now; old archived prose and research keep their text.
       if (pool !== 'issues' && pool !== 'bugs' && pool !== 'methods' && !hasHead && !isFresh(name, !pool.startsWith('_archive/'))) continue
       const data = frontmatter(text, where)
@@ -228,7 +242,7 @@ export function backlogLivenessProblems(backlogRoot) {
       // 2026-11-02（五道门落地）：归档「毕业：做」卡的去向升级为封闭集值 + 审查记录在场。
       //   生效日 = 2026-11-03：规则落地当天及以前的卡按原契约（去向在场即可），不追改已归档正文。
       if (pool === '_archive/settled_issues' && String(data.opened) >= '2026-11-03') {
-        const statusLine = text.split('\n').slice(0, 12).find(line => line.trimStart().startsWith('>') && line.includes('状态：')) ?? ''
+        const statusLine = findStatusLine(text) ?? ''
         const head = headText(text)
         if (/毕业：\s*做/.test(statusLine.replaceAll('**', ''))) {
           const dest = destination(head)
@@ -266,7 +280,7 @@ export function backlogLivenessProblems(backlogRoot) {
       //   ④ 缺陷卡 frontmatter 旧值 活跃 → `status "活跃" 不属于此桶` 红；
       //   ⑤ 修复就绪卡缺 ## 已修判定 → 不报警（验收在场检查族按用户裁定延后，记承压候选——如实不查）。
       if (pool === 'issues' || pool === 'bugs') {
-        const statusLine = text.split('\n').slice(0, 12).find(line => line.trimStart().startsWith('>') && line.includes('状态：'))
+        const statusLine = findStatusLine(text)
         if (!statusLine) problems.push(`${where}:1 缺状态行（> … ｜ 状态：<frontmatter 值> ｜ …）`)
         else {
           const token = (/状态：\s*([^｜|\n]+)/.exec(statusLine)?.[1] ?? '').replace(/🔒/g, '').trim()

@@ -309,35 +309,58 @@ describe('路径等价类与读写目录闸门全通道同判据矩阵（W3.3，
       writeFileSync(join(goodDir, 'final.md'), '# ok\n')
 
       symlinkSync(world.outside, join(world.ws, '.dsh-company/deliverables/symlink-slug'))
+      symlinkSync(world.outside, join(world.ws, 'symlink-dir'))
+      mkdirSync(join(world.ws, 'real-sub'), { recursive: true })
+      writeFileSync(join(world.ws, 'plain-file'), 'not a dir\n')
       const realDeps = { check: validateProductDocs, readFile: readCompanyFileAt }
 
-      // 1) 混合分隔符绝对路径与相对路径都必须命中 bad 动议并被拦截
+      // 1) 混合分隔符、真实子目录 `..` 与不存在前缀目录 `..` 都必须命中 bad 动议并被拦截
       const mixedAbs = `${world.ws}/.dsh-company\\deliverables\\bad\\prd.md`
       expect(deliverableOf(mixedAbs, undefined)?.slug).toBe('bad')
-      const mixedAbsVerdict = gateToolCall(
-        { name: 'present', arguments: { files: [{ path: mixedAbs }] } },
-        realDeps,
-      )
-      expect(mixedAbsVerdict?.kind).toBe('deny')
-      if (mixedAbsVerdict?.kind === 'deny') expect(mixedAbsVerdict.reason).toContain('MR-999')
+      for (const badPath of [
+        mixedAbs,
+        '.dsh-company\\deliverables\\bad\\prd.md',
+        'real-sub/../.dsh-company/deliverables/bad/prd.md',
+        'missing-sub/../.dsh-company/deliverables/bad/prd.md',
+      ]) {
+        const verdict = gateToolCall(
+          { name: 'present', arguments: { files: [{ path: badPath }] }, cwd: world.ws },
+          realDeps,
+        )
+        expect(verdict?.kind, badPath).toBe('deny')
+        if (verdict?.kind === 'deny') expect(verdict.reason).toContain('MR-999')
+      }
 
-      const mixedRelVerdict = gateToolCall(
-        { name: 'present', arguments: { files: [{ path: '.dsh-company\\deliverables\\bad\\prd.md' }] }, cwd: world.ws },
-        realDeps,
-      )
-      expect(mixedRelVerdict?.kind).toBe('deny')
+      // 2) 中间段（公司盘内或 `.dsh-company` 前缀段）经由 symlink 目录 / 非目录 / ENOTDIR 再 `..` 回退到合法动议 good → 必须按不安全形状拒绝
+      for (const hopPath of [
+        '.dsh-company/deliverables/symlink-slug/../good/final.md',
+        `${world.ws}/symlink-dir/../.dsh-company/deliverables/good/final.md`,
+        'symlink-dir/../.dsh-company/deliverables/good/final.md',
+        'plain-file/../.dsh-company/deliverables/good/final.md',
+        'plain-file/sub/../../.dsh-company/deliverables/good/final.md',
+      ]) {
+        const hopVerdict = gateToolCall(
+          {
+            name: 'present',
+            arguments: { files: [{ path: hopPath }] },
+            cwd: world.ws,
+          },
+          realDeps,
+        )
+        expect(hopVerdict?.kind, hopPath).toBe('deny')
+        if (hopVerdict?.kind === 'deny') expect(hopVerdict.reason).toContain('文件形状挡住')
+      }
 
-      // 2) 中间段经由 symlink 目录再 `..` 回退到合法动议 good → 必须按不安全形状拒绝
-      const hopSymlinkVerdict = gateToolCall(
-        {
-          name: 'present',
-          arguments: { files: [{ path: '.dsh-company/deliverables/symlink-slug/../good/final.md' }] },
-          cwd: world.ws,
-        },
-        realDeps,
-      )
-      expect(hopSymlinkVerdict?.kind).toBe('deny')
-      if (hopSymlinkVerdict?.kind === 'deny') expect(hopSymlinkVerdict.reason).toContain('文件形状挡住')
+      // 非 deliverables（如 kb）即便前缀含 symlink / ENOTDIR，也不误触 PRD 闸门（由写读基座自行拦）
+      for (const kbPath of [
+        'symlink-dir/../.dsh-company/kb/company.md',
+        'plain-file/sub/../../.dsh-company/kb/company.md',
+      ]) {
+        expect(
+          gateToolCall({ name: 'present', arguments: { files: [{ path: kbPath }] }, cwd: world.ws }, realDeps),
+          kbPath,
+        ).toBeUndefined()
+      }
 
       // 3) 尾部 `..` 与越出 deliverables / .dsh-company 的路径一律按形状拒绝
       for (const unsafeDeliverablePath of [

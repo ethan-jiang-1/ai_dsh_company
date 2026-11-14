@@ -49,6 +49,53 @@ function joinWithRandomEol(lines: readonly string[], random: () => number): stri
   return out
 }
 
+function buildCombinatorialTable(random: () => number, seed: number): string[] {
+  const colCount = 2 + Math.floor(random() * 4) // 2..5 列
+  const rowCount = 2 + Math.floor(random() * 3) // 2..4 数据行
+  const alignments = ['---', ':---', ':---:', '---:'] as const
+  const headers = Array.from({ length: colCount }, (_, col) => `列${String(col + 1)}`)
+  const seps = Array.from({ length: colCount }, () => alignments[Math.floor(random() * alignments.length)] ?? '---')
+  const out = [`| ${headers.join(' | ')} |`, `| ${seps.join(' | ')} |`]
+
+  const rawCellTemplates = [
+    (r: number, c: number) => `v-${String(seed % 7)}-${String(r)}${String(c)}`,
+    () => 'a\\|b',
+    () => '左\\|中\\|右',
+    () => 'C:\\\\',
+    () => '奇\\\\\\|偶',
+    () => '`x\\|y`',
+    () => '',
+    () => '尾\\\\',
+  ] as const
+
+  for (let row = 0; row < rowCount; row += 1) {
+    const rowMode = Math.floor(random() * 3)
+    if (rowMode === 0) {
+      // 紧邻分隔符模式（如 `| adj\\| next |` 与行尾 `末\\|`）：专测 `\\` 后紧跟真列分隔 `|`
+      const pieces = Array.from({ length: colCount }, (_, col) => {
+        if (col === 0) return `adj-${String(row)}\\\\`
+        if (col === colCount - 1) return '末\\\\'
+        return rawCellTemplates[(seed + row + col) % rawCellTemplates.length]!(row, col)
+      })
+      out.push(`| ${pieces.join('| ')}|`)
+    } else if (rowMode === 1) {
+      // 无闭合尾竖线 + 末列转义竖线 `末列\|`
+      const pieces = Array.from({ length: colCount }, (_, col) =>
+        col === colCount - 1
+          ? `末列-${String(row)}\\|`
+          : rawCellTemplates[Math.floor(random() * rawCellTemplates.length)]!(row, col),
+      )
+      out.push(`| ${pieces.join(' | ')}`)
+    } else {
+      const pieces = Array.from({ length: colCount }, (_, col) =>
+        rawCellTemplates[Math.floor(random() * rawCellTemplates.length)]!(row, col),
+      )
+      out.push(`| ${pieces.join(' | ')} |`)
+    }
+  }
+  return out
+}
+
 /** 生成覆盖全语法轴的 Markdown 文档及独立元数据。 */
 export function makeDocDetailed(seed: number): GeneratedDoc {
   const random = rng(seed)
@@ -68,16 +115,37 @@ export function makeDocDetailed(seed: number): GeneratedDoc {
     lines.push('---', '---', '')
   }
 
-  // 2. 顶层 ATX 标题（0..3 前导空格，1..4 级）
+  // 2. 顶层 ATX 标题与前导空格轴（0..3 空格 = 真标题；4..6 空格 = CommonMark §4.4 缩进代码块或段落惰性续行）
   const leadSpaces = ' '.repeat(Math.floor(random() * 4))
-  lines.push(`${leadSpaces}# 文档样本 ${String(seed)}`, '')
+  const hDepth = 1 + Math.floor(random() * 2)
+  lines.push(`${leadSpaces}${'#'.repeat(hDepth)} 文档样本 ${String(seed)}`, '')
 
-  // 3. 顶层与嵌套围栏轴（3/4 反引号、3/4 波浪号、1..2 空格缩进、反引号信息串非围栏）
+  const indentAxis = Math.floor(random() * 3)
+  if (indentAxis === 0) {
+    // 4..6 前导空格缩进代码块（含假标题、假围栏、假 REQ）
+    const codePad = ' '.repeat(4 + Math.floor(random() * 3))
+    lines.push(
+      `${codePad}## ${pick(SECTION_NAMES)}`,
+      `${codePad}### REQ-995 缩进代码块假需求`,
+      `${codePad}\`\`\`json`,
+      `${codePad}{"indented": true}`,
+      `${codePad}\`\`\``,
+      '',
+    )
+  } else if (indentAxis === 1) {
+    // 段落后紧跟 4..6 空格惰性续行（CommonMark 归入同一段落，既非缩进代码块也非标题）
+    const lazyPad = ' '.repeat(4 + Math.floor(random() * 3))
+    lines.push('普通段落首行', `${lazyPad}## ${pick(SECTION_NAMES)} 惰性续行不构成标题`, '')
+  }
+
+  // 3. 顶层与嵌套围栏轴（3/4/5 反引号、3/4/5 波浪号、0..3 空格缩进、反引号信息串非围栏）
   const fenceVariant = Math.floor(random() * 5)
   if (fenceVariant === 0) {
-    const indent = ' '.repeat(Math.floor(random() * 3))
+    const indent = ' '.repeat(Math.floor(random() * 4))
+    const outerLen = 4 + Math.floor(random() * 2)
+    const outer = '`'.repeat(outerLen)
     lines.push(
-      `${indent}\`\`\`\`markdown`,
+      `${indent}${outer}markdown`,
       `${indent}\`\`\`json`,
       `${indent}{"fake": ${String(seed)}}`,
       `${indent}\`\`\``,
@@ -86,28 +154,30 @@ export function makeDocDetailed(seed: number): GeneratedDoc {
       `${indent}| a | b |`,
       `${indent}|---|---|`,
       `${indent}| 1 | 2 |`,
-      `${indent}\`\`\`\``,
+      `${indent}${outer}`,
       '',
     )
   } else if (fenceVariant === 1) {
+    const outerTilde = '~'.repeat(4 + Math.floor(random() * 2))
     lines.push(
-      '~~~~yaml',
+      `${outerTilde}yaml`,
       '```md',
       `## ${pick(SECTION_NAMES)}`,
       '```',
       '~~~',
-      'still inside four-tilde fence',
-      '~~~~',
+      'still inside outer tilde fence',
+      outerTilde,
       '',
     )
   } else if (fenceVariant === 2) {
-    lines.push(' ```json', ` {"seed": ${String(seed)}, "ok": true}`, ' ```', '')
+    const indent = ' '.repeat(Math.floor(random() * 4))
+    lines.push(`${indent}\`\`\`json`, `${indent}{"seed": ${String(seed)}, "ok": true}`, `${indent}\`\`\``, '')
   } else if (fenceVariant === 3) {
     // CommonMark §4.5：反引号围栏信息串再含反引号 → 不是围栏，而是行内代码段落
     lines.push('```js `inline-not-a-fence` 尾部字面', '')
   }
 
-  // 4. HTML 注释轴（单行注释吞尾标题、多行块注释、行内注释、行内字面 <!--）
+  // 4. HTML 注释轴（单行注释吞尾标题、多行块注释、行内注释、跨行行内注释、行内字面 <!--）
   const commentVariant = Math.floor(random() * 5)
   if (commentVariant === 0) {
     lines.push(`<!-- 单行注释 --> ## ${pick(SECTION_NAMES)}`, '')
@@ -121,41 +191,43 @@ export function makeDocDetailed(seed: number): GeneratedDoc {
     lines.push('段落把 <!-- 当未闭合字面示例（后跟空行不吞标题）', '')
   }
 
-  // 5. 转义字符与多反引号行内代码轴 + BUG-181 跨行反引号策略轴
-  const escapeVariant = Math.floor(random() * 4)
+  // 5. 转义字符（奇偶反斜杠紧邻反引号 + 次行真标题）与 BUG-181 跨行反引号策略轴
+  const escapeVariant = Math.floor(random() * 5)
   if (escapeVariant === 0) {
     lines.push(`\\# 转义井号不是标题 \`## 也不是\` \`\` \`双反引号内含<!--\` \`\``, '')
   } else if (escapeVariant === 1) {
-    lines.push('\\`<!-- 转义反引号后字面注释记号', '')
+    // 奇数反斜杠转义反引号：不开启跨行 code span，次行 `## <节>` 必须保持结构态真标题
+    lines.push(
+      '前缀 \\` 字面转义反引号（非跨行起点）',
+      `## ${pick(SECTION_NAMES)}`,
+      '后缀 \\` 另一个转义反引号',
+      '',
+    )
   } else if (escapeVariant === 2) {
-    // BUG-181：段落内跨行单/双反引号（闭合于同一段落内，无空行）
+    // 偶数反斜杠 + 未转义反引号（或裸未转义反引号）：开启 BUG-181 段落内跨行 code span
     const tick = random() < 0.5 ? '`' : '``'
-    lines.push(`- 示例字段：${tick}跨行起点`)
+    const evenSlashes = random() < 0.5 ? '\\\\' : ''
+    lines.push(`- 示例字段：${evenSlashes}${tick}跨行起点`)
     multilineSpanLines.push(lines.length + 1)
     lines.push(`## ${pick(SECTION_NAMES)}`)
     multilineSpanLines.push(lines.length + 1)
     lines.push(`### REQ-997 跨行代码假标题 ${tick} 尾部收口`)
     lines.push('')
+  } else if (escapeVariant === 3) {
+    lines.push('\\`<!-- 转义反引号后字面注释记号', '')
   } else {
     lines.push('```inline triple backtick ## 非标题``` 普通正文', '')
   }
 
-  // 6. 真实二级节 + GFM 转义表格轴
+  // 6. 真实二级节 + 组合式 GFM 转义表格轴（2..5 列 × 2..4 行 × 奇偶反斜杠紧邻分隔符）
   const primaryHeading = pick(SECTION_NAMES)
   lines.push(`${' '.repeat(Math.floor(random() * 4))}## ${primaryHeading}`, '')
   lines.push(`- 改动面：\`packages/demo/file-${String(seed % 11)}.ts\``)
   lines.push('- 红：拆守卫 → `pnpm test` 失败')
   lines.push('- 绿：恢复守卫 → `pnpm test` 通过', '')
 
-  if (random() < 0.75) {
-    lines.push(
-      '| 列A | 列B | 列C |',
-      '| --- | :---: | ---: |',
-      `| s-${String(seed % 5)} | a\\|b | ok |`,
-      '| C:\\\\ | `x\\|y` | 尾\\\\ |',
-      '| 奇数尾转义 | val\\| | 末列\\|',
-      '',
-    )
+  if (random() < 0.85) {
+    lines.push(...buildCombinatorialTable(random, seed), '')
   }
 
   const secondaryHeading = SECTION_NAMES[(SECTION_NAMES.indexOf(primaryHeading) + 2) % SECTION_NAMES.length] ?? '验收'
@@ -188,9 +260,12 @@ export function makeDoc(seed: number): string {
 export type BundleFault =
   | 'valid'
   | 'legacy-exempt'
+  | 'missing-field'
   | 'bad-numbering'
   | 'dangling-mr'
   | 'duplicate-req'
+  | 'bad-ledger'
+  | 'bad-path'
   | 'unclosed-comment'
 
 export interface GeneratedDeliverableBundle {
@@ -202,15 +277,18 @@ export interface GeneratedDeliverableBundle {
   readonly prd: string
   readonly card: string
   readonly useBackslashPath: boolean
+  readonly badPathVariant: 'symlink-inside' | 'symlink-prefix' | 'trailing-dotdot'
 }
 
 const FAULT_ROTATION: readonly BundleFault[] = [
   'valid',
-  'valid',
   'legacy-exempt',
+  'missing-field',
   'bad-numbering',
   'dangling-mr',
   'duplicate-req',
+  'bad-ledger',
+  'bad-path',
   'unclosed-comment',
 ]
 
@@ -221,6 +299,8 @@ export function makeDeliverableBundle(seed: number): GeneratedDeliverableBundle 
   const slug = `2026-11-14-seed-${String(seed)}`
   const bom = random() < 0.4 ? '\uFEFF' : ''
   const useBackslashPath = random() < 0.5
+  const badPathVariants = ['symlink-inside', 'symlink-prefix', 'trailing-dotdot'] as const
+  const badPathVariant = badPathVariants[Math.floor(random() * badPathVariants.length)] ?? 'symlink-inside'
 
   const metaLines: string[] = [`slug: ${slug}`, 'kickoff: 2026-11-14']
   if (fault === 'legacy-exempt') {
@@ -231,22 +311,32 @@ export function makeDeliverableBundle(seed: number): GeneratedDeliverableBundle 
     metaLines.push('numbering: identity', 'layers: MRD, PRD')
   }
 
-  const mrdJson = JSON.stringify({
-    mrd: {
-      version: '0.1',
-      status: 'draft',
-      opportunities: [
-        {
-          id: 'MR-001',
-          title: `自动化对账-${String(seed)}`,
-          segment: '财务团队',
-          pain: '手工核对慢',
-          evidence: [{ kind: 'fact', source: '客户访谈' }],
-          recommendation: 'go',
+  const mrdJson = fault === 'bad-ledger'
+    ? (random() < 0.5
+      ? '{"mrd":{"opportunities":[BROKEN_JSON}}'
+      : JSON.stringify({
+        mrd: {
+          version: '0.1',
+          status: 'draft',
+          opportunities: [{ id: 'MR-BAD', title: '坏编号', segment: 's', pain: 'p', evidence: [{ kind: 'fact', source: 'x' }], recommendation: 'go' }],
         },
-      ],
-    },
-  }, null, 2)
+      }))
+    : JSON.stringify({
+      mrd: {
+        version: '0.1',
+        status: 'draft',
+        opportunities: [
+          {
+            id: 'MR-001',
+            title: `自动化对账-${String(seed)}`,
+            segment: '财务团队',
+            pain: '手工核对慢',
+            evidence: [{ kind: 'fact', source: '客户访谈' }],
+            recommendation: 'go',
+          },
+        ],
+      },
+    }, null, 2)
 
   const mrdLines = [
     '---',
@@ -268,6 +358,7 @@ export function makeDeliverableBundle(seed: number): GeneratedDeliverableBundle 
   ]
 
   const targetMr = fault === 'dangling-mr' ? 'MR-999' : 'MR-001'
+  const leadHeadingSpaces = ' '.repeat(Math.floor(random() * 4)) // 0..3 前导空格真标题
   const prdLines = [
     '---',
     'layer: PRD',
@@ -282,7 +373,7 @@ export function makeDeliverableBundle(seed: number): GeneratedDeliverableBundle 
     '### REQ-999 注释假需求',
     '-->',
     '',
-    '## Slices',
+    `${leadHeadingSpaces}## Slices`,
     '',
     '| slice | Goal | Requirements (explicit ids) | Exit condition |',
     '|---|---|---|---|',
@@ -295,7 +386,10 @@ export function makeDeliverableBundle(seed: number): GeneratedDeliverableBundle 
     '- source: [MR-888]',
     '````',
     '',
-    '### REQ-001 核心需求',
+    '    ### REQ-996 缩进代码块假需求（4 空格）',
+    '    - source: [MR-888]',
+    '',
+    `${leadHeadingSpaces}### REQ-001 核心需求`,
     '',
     '- userStory: 作为财务，我要支持 `<!--` 与跨行示例，以便稳定对账',
     '- acceptance:',
@@ -303,7 +397,7 @@ export function makeDeliverableBundle(seed: number): GeneratedDeliverableBundle 
     '    - given: 有效账单',
     '    - when: 执行导入',
     '    - then: 结果一致',
-    `- source: [${targetMr}]`,
+    ...(fault === 'missing-field' ? [] : [`- source: [${targetMr}]`]),
     '- slice: S1',
     '- type: functional',
     '- priority: P0',
@@ -370,5 +464,6 @@ export function makeDeliverableBundle(seed: number): GeneratedDeliverableBundle 
     prd: (random() < 0.5 ? '\uFEFF' : '') + joinWithRandomEol(prdLines, random),
     card: (random() < 0.3 ? '\uFEFF' : '') + joinWithRandomEol(cardLines, random),
     useBackslashPath,
+    badPathVariant,
   }
 }

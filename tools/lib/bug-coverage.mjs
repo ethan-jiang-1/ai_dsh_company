@@ -10,6 +10,7 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { headingSections, parseFrontmatter } from './repo-markdown.mjs'
 
 /** 读已修卡：id/opened/slug/title。 */
 export function fixedBugs(root) {
@@ -19,8 +20,10 @@ export function fixedBugs(root) {
     const match = /^BUG-(\d{3})-(.+)\.md$/.exec(name)
     if (match === null) continue
     const text = readFileSync(join(dir, name), 'utf8')
-    const opened = /^opened:\s*(\d{4}-\d{2}-\d{2})/m.exec(text)?.[1] ?? '—'
-    const title = /^#\s+(.+)$/m.exec(text)?.[1]?.trim() ?? name
+    const fm = parseFrontmatter(text)
+    const rawOpened = fm.data?.opened
+    const opened = typeof rawOpened === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(rawOpened) ? rawOpened : '—'
+    const title = headingSections(text, { depth: 1 })[0]?.rawTitle || name
     bugs.push({ id: match[1], opened, slug: match[2], title, file: `_backlog/_archive/fixed_bugs/${name}` })
   }
   return bugs.sort((a, b) => a.id.localeCompare(b.id))

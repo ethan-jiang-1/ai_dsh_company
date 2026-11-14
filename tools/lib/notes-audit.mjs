@@ -8,7 +8,7 @@
 // 边界：只读；不跑 git、不读会话；不把 `notes/` 当第二本账（不生成索引文件）。
 import { existsSync } from 'node:fs'
 import { basename, dirname, join, normalize } from 'node:path'
-import { headingSections, structuralLines } from './repo-markdown.mjs'
+import { headingSections, noteStatusLines, structuralLines } from './repo-markdown.mjs'
 
 const NOTE_DATE = /^(\d{4}-\d{2}-\d{2})-/
 const NOTE_LINK = /\]\(([^)\s]+?\.md)(?:#[^)]*)?\)/g
@@ -38,20 +38,21 @@ export function noteDate(file) {
   return m?.[1] ?? null
 }
 
-/** 首个 H1；没有 = null。 */
+/** 首个结构态 H1（排除围栏代码块与 HTML 注释里的 `# `）；没有 = null。 */
 export function noteTitle(text) {
-  const m = String(text).match(/^#\s+(.+)$/m)
-  return m?.[1]?.trim() ?? null
+  const first = headingSections(String(text), { depth: 1 })[0]?.rawTitle
+  return first ? first : null
 }
 
-/** 首部「状态：」行；没有 = null。 */
+/** 首部（前 12 行）结构态「状态：」行；围栏/注释里的示例不算；没有 = null。 */
 export function noteStatus(text) {
-  const line = String(text)
-    .split('\n')
-    .slice(0, 12)
-    .map(row => row.trim())
+  const direct = noteStatusLines(String(text)).find(item => item.lineNumber <= 12)?.text.trim()
+  if (direct) return direct
+  const trimmed = structuralLines(String(text))
+    .filter(item => item.lineNumber <= 12 && item.structural)
+    .map(item => item.text.trim())
     .find(row => /^状态[:：]/.test(row))
-  return line ?? null
+  return trimmed ?? null
 }
 
 /** 生命周期词：目录优先（implemented/archived），其余看状态行。 */
@@ -114,9 +115,9 @@ export function deadPaths(root, text, exists = existsSync) {
 /** 收据/状态快照特征；返回命中的理由（空数组 = 不像收据）。 */
 export function receiptReasons(text) {
   if (hasDecisionSection(text)) return []
-  const rows = String(text).split('\n')
-  const head = rows.slice(0, 4).join('\n')
-  const nature = rows.find(row => /^\s*性质[:：]/.test(row)) ?? ''
+  const structural = structuralLines(String(text)).filter(item => item.structural)
+  const head = structural.filter(item => item.lineNumber <= 4).map(item => item.text).join('\n')
+  const nature = structural.map(item => item.text).find(row => /^\s*性质[:：]/.test(row)) ?? ''
   const scope = `${noteTitle(text) ?? ''}\n${noteStatus(text) ?? ''}\n${head}\n${nature}`
   return RECEIPT_SIGNALS.filter(([re]) => re.test(scope)).map(([, why]) => why)
 }

@@ -15,6 +15,7 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import type { PreToolDecision } from '@deepseek-ai/dsh-tools'
+import { lstatSync } from 'node:fs'
 import { join } from 'node:path'
 import { readCompanyFileAt, resolveCompanySegments, verifyCompanySubpathAt } from '../run-bundle/company-root.ts'
 import type { CompanyFileRead } from '../run-bundle/company-root.ts'
@@ -85,13 +86,6 @@ function inspectDeliverablePath(path: string, cwd: string | undefined): Delivera
   const companyIndex = rawParts.indexOf('.dsh-company')
   if (companyIndex === -1) return { kind: 'non-deliverable' }
 
-  const preSegments: string[] = []
-  for (const part of rawParts.slice(0, companyIndex)) {
-    if (part === '' || part === '.') continue
-    if (part === '..') { preSegments.pop(); continue }
-    preSegments.push(part)
-  }
-  const companyRoot = `${rootPrefix}${preSegments.join('/')}${preSegments.length > 0 ? '/' : ''}.dsh-company`
   const afterParts = rawParts.slice(companyIndex + 1)
   const afterNonEmpty = afterParts.filter(part => part !== '' && part !== '.')
   const combinedMentionsDeliverables = mentionsDeliverables || afterNonEmpty[0] === 'deliverables'
@@ -99,6 +93,40 @@ function inspectDeliverablePath(path: string, cwd: string | undefined): Delivera
     ? afterNonEmpty[1]
     : rawSlugHint
   const relInsideCompany = afterParts.join('/')
+
+  const preSegments: string[] = []
+  for (const part of rawParts.slice(0, companyIndex)) {
+    if (part === '' || part === '.') continue
+    if (part === '..') {
+      if (preSegments.length > 0) {
+        const prefixOnDisk = `${rootPrefix}${preSegments.join('/')}`
+        const poppedName = preSegments.pop() as string
+        try {
+          const stat = lstatSync(prefixOnDisk)
+          if (stat.isSymbolicLink() || !stat.isDirectory()) {
+            return combinedMentionsDeliverables
+              ? {
+                kind: 'unsafe',
+                slug: slugHint,
+                reason: stat.isSymbolicLink()
+                  ? `路径前缀段含符号链接目录回退（${poppedName}/..），OS 路径消解与词法路径不一致`
+                  : `路径前缀段不是目录（${poppedName}/..）`,
+              }
+              : { kind: 'non-deliverable' }
+          }
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+            return combinedMentionsDeliverables
+              ? { kind: 'unsafe', slug: slugHint, reason: `无法校验路径前缀段（${poppedName}）` }
+              : { kind: 'non-deliverable' }
+          }
+        }
+      }
+      continue
+    }
+    preSegments.push(part)
+  }
+  const companyRoot = `${rootPrefix}${preSegments.join('/')}${preSegments.length > 0 ? '/' : ''}.dsh-company`
 
   let segments: readonly string[]
   try {

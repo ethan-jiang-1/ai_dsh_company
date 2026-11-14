@@ -1,4 +1,4 @@
-// 负例留证 2026-11-14：把 markdown-shape-core.js 长围栏闭合判据 `>= fence.length` 改为 `>= 3` ⇒ seed=3 与 BUG-176 当场红；去掉归一化/转义/行内代码/跨行闭合判据 ⇒ BUG-152 / BUG-165 / BUG-168 / BUG-172 / BUG-181 各组转红；还原即绿。
+// 负例留证 2026-11-14：把 markdown-shape-core.js 长围栏闭合判据 `>= fence.length` 改为 `>= 3` ⇒ seed=3 与 BUG-176 当场红；关掉 splitTableRow `\\` 转义 ⇒ seed=0 line=32 与 BUG-165 / BUG-172 红；关掉 scanDocumentDetailed `\` 转义 ⇒ seed=1 ATX 标题差分红；去掉归一化/注释/跨行闭合判据 ⇒ BUG-152 / BUG-168 / BUG-181 红；还原即绿。
 import { describe, expect, it } from 'vitest'
 import {
   normalizeDocument,
@@ -24,14 +24,22 @@ interface MdastNode {
   }
 }
 
-function collectAstProjection(root: MdastNode): {
+function renderTableCell(cell: MdastNode): string {
+  return (cell.children ?? [])
+    .map(node => (node.type === 'inlineCode' ? `\`${node.value ?? ''}\`` : (node.value ?? '')))
+    .join('')
+}
+
+function collectAstProjection(root: MdastNode, normalizedLines: readonly string[]): {
   readonly headingLines: readonly number[]
   readonly topFences: readonly { readonly startLine: number; readonly lang: string; readonly content: string }[]
-  readonly tableDataRows: readonly { readonly line: number; readonly cellCount: number }[]
+  readonly indentedCodeRanges: readonly { readonly startLine: number; readonly endLine: number }[]
+  readonly tableDataRows: readonly { readonly line: number; readonly cells: readonly string[] }[]
 } {
   const headingLines: number[] = []
   const topFences: { startLine: number; lang: string; content: string }[] = []
-  const tableDataRows: { line: number; cellCount: number }[] = []
+  const indentedCodeRanges: { startLine: number; endLine: number }[] = []
+  const tableDataRows: { line: number; cells: readonly string[] }[] = []
 
   for (const child of root.children ?? []) {
     const startLine = child.position?.start.line ?? 0
@@ -39,23 +47,28 @@ function collectAstProjection(root: MdastNode): {
     if (child.type === 'heading' && startLine > 0 && startLine === endLine) {
       headingLines.push(startLine)
     } else if (child.type === 'code' && startLine > 0) {
-      topFences.push({
-        startLine,
-        lang: child.lang ?? '',
-        content: child.value ?? '',
-      })
+      const openingRaw = normalizedLines[startLine - 1] ?? ''
+      if (/^[ ]{0,3}(?:`{3,}|~{3,})/.test(openingRaw)) {
+        topFences.push({
+          startLine,
+          lang: child.lang ?? '',
+          content: child.value ?? '',
+        })
+      } else {
+        indentedCodeRanges.push({ startLine, endLine: Math.max(startLine, endLine) })
+      }
     } else if (child.type === 'table') {
       const rows = child.children ?? []
       // rows[0] = 表头行，rows[1..] = 数据行（分隔线不在 AST children 中）
       for (const row of rows.slice(1)) {
         const line = row.position?.start.line ?? 0
         if (line > 0) {
-          tableDataRows.push({ line, cellCount: (row.children ?? []).length })
+          tableDataRows.push({ line, cells: (row.children ?? []).map(renderTableCell) })
         }
       }
     }
   }
-  return { headingLines, topFences, tableDataRows }
+  return { headingLines, topFences, indentedCodeRanges, tableDataRows }
 }
 
 describe(`markdown-shape × mdast 独立真值差分（seeded，${String(CASES)} 例）`, () => {
@@ -69,13 +82,13 @@ describe(`markdown-shape × mdast 独立真值差分（seeded，${String(CASES)}
     }
   })
 
-  it('结构标题行、闭合顶层围栏载荷、GFM 表格列数与 mdast 参考投影一致（已声明 BUG-181 跨行反引号策略除外）', () => {
+  it('结构标题行、缩进代码块、闭合顶层围栏载荷、GFM 表格逐格转义结果与 mdast 一致（已声明 BUG-181 跨行反引号策略除外）', () => {
     for (let seed = 0; seed < CASES; seed += 1) {
       const generated = makeDocDetailed(seed)
       const normalizedLines = normalizeDocument(generated.text).split('\n')
       const scan = scanDocumentDetailed(generated.text)
       const ast = parseGfmAst(generated.text) as MdastNode
-      const expected = collectAstProjection(ast)
+      const expected = collectAstProjection(ast, normalizedLines)
       const policySpanSet = new Set(generated.multilineSpanLines)
 
       // 1) 已声明的 BUG-181 跨行反引号内部行在 pack 原语中必须是非结构行
@@ -86,12 +99,23 @@ describe(`markdown-shape × mdast 独立真值差分（seeded，${String(CASES)}
         ).toBe(false)
       }
 
+      // 1b) CommonMark §4.4 顶层 4+ 空格缩进代码块内的非空行在 pack 原语中必须是非结构行
+      for (const range of expected.indentedCodeRanges) {
+        for (let lineNumber = range.startLine; lineNumber <= range.endLine; lineNumber += 1) {
+          if ((normalizedLines[lineNumber - 1] ?? '').trim() === '') continue
+          expect(
+            scan.lines[lineNumber - 1]?.structural,
+            `seed=${String(seed)} line=${String(lineNumber)} 4+ 空格缩进代码块行被误判为结构行`,
+          ).toBe(false)
+        }
+      }
+
       // 2) 除已声明 BUG-181 跨行反引号行外，ATX 标题行集合与 mdast 完全一致
       const ourHeadingLines: number[] = []
       for (const [index, entry] of scan.lines.entries()) {
         const lineNumber = index + 1
         if (policySpanSet.has(lineNumber)) continue
-        if (entry.structural && /^\s{0,3}#{1,6}(?:\s|$)/.test(entry.text)) {
+        if (entry.structural && /^[ ]{0,3}#{1,6}(?:\s|$)/.test(entry.text)) {
           ourHeadingLines.push(lineNumber)
         }
       }
@@ -116,11 +140,11 @@ describe(`markdown-shape × mdast 独立真值差分（seeded，${String(CASES)}
         generated.hasUnclosedBlockComment,
       )
 
-      // 5) GFM 表格数据行：splitTableRow 列数与 mdast tableRow 单元格数一致（GFM 缺列补齐或超列截断以表头列数为上界）
+      // 5) GFM 表格数据行：splitTableRow 切出的单元格字符串数组（转义还原后）与 mdast tableCell 完全一致
       for (const row of expected.tableDataRows) {
         const rawLine = normalizedLines[row.line - 1] ?? ''
         expect(scan.lines[row.line - 1]?.structural, `seed=${String(seed)} line=${String(row.line)} 真表格行被误吞`).toBe(true)
-        expect(splitTableRow(rawLine).length, `seed=${String(seed)} line=${String(row.line)} 表格切列与 mdast 不一致`).toBe(row.cellCount)
+        expect(splitTableRow(rawLine), `seed=${String(seed)} line=${String(row.line)} 表格单元格转义切分与 mdast 不一致`).toEqual(row.cells)
       }
     }
   })

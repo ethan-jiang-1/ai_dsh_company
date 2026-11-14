@@ -12,7 +12,8 @@ import { basename, join, relative } from 'node:path'
 
 const ROOTS = ['tests', 'checks', 'tools', 'probes', 'run']
 const EXTS = /\.(?:mjs|js|ts|tsx|md)$/
-const SKIP_DIRS = new Set(['node_modules', '.git', 'vendor', '_dist', 'runtime', 'snapshots', 'lib'])
+const SKIP_DIRS = new Set(['node_modules', '.git', 'vendor', '_dist', 'runtime', 'snapshots'])
+const SKIP_REL_DIRS = new Set(['tools/lib'])
 const SELF = new Set([
   'tools/lib/asset-lanes.mjs',
   'tools/lib/test-census.mjs',
@@ -26,10 +27,14 @@ function walk(root, dir, acc) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (SKIP_DIRS.has(entry.name)) continue
     const path = join(dir, entry.name)
-    if (entry.isDirectory()) { walk(root, path, acc); continue }
+    const rel = relative(root, path).replaceAll('\\', '/')
+    if (entry.isDirectory()) {
+      if (SKIP_REL_DIRS.has(rel)) continue
+      walk(root, path, acc)
+      continue
+    }
     if (!EXTS.test(entry.name)) continue
     if (entry.name === 'README.md' || entry.name.endsWith('.generated.md')) continue
-    const rel = relative(root, path)
     if (SELF.has(rel)) continue
     acc.push(rel)
   }

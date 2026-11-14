@@ -37,18 +37,20 @@ function stripAnchorOrLine(raw) {
     .replace(/:\d+(?::\d+)?$/, '')
 }
 
-function hasRealTargetFile(target, rootDir, noteDir) {
+function hasRealTargetFile(target, rootDir, noteDir, selfAbsPath) {
   for (const match of target.matchAll(/\[[^\]]*\]\(([^)\s]+)\)/g)) {
     const href = stripAnchorOrLine(match[1] ?? '')
     if (href === '' || /^(?:https?:|mailto:|conversation:|file:)/i.test(href)) continue
-    if (isExistingRepoFile(rootDir, resolve(noteDir, href))) return true
+    const resolved = resolve(noteDir, href)
+    if (resolved !== selfAbsPath && isExistingRepoFile(rootDir, resolved)) return true
   }
   for (const match of target.matchAll(/`([^`\n]+)`/g)) {
     const candidate = stripAnchorOrLine(match[1] ?? '').replaceAll('\\', '/')
     if (candidate === '' || candidate.startsWith('/') || candidate.includes(' ')) continue
     const normalized = normalize(candidate)
     if (normalized.startsWith('..')) continue
-    if (isExistingRepoFile(rootDir, resolve(rootDir, normalized))) return true
+    const resolved = resolve(rootDir, normalized)
+    if (resolved !== selfAbsPath && isExistingRepoFile(rootDir, resolved)) return true
   }
   return false
 }
@@ -57,12 +59,17 @@ function hasRealTargetFile(target, rootDir, noteDir) {
  * 检查一篇 Note 的「未覆盖轴」条目是否有合法四分类前缀与盘上真实锚点。
  * @param {string} text Note 全文。
  * @param {string} [name] 文件名（错误信息用）。
- * @param {{ rootDir?: string, noteDir?: string }} [options] 解析根目录与 Note 所在目录。
+ * @param {{ rootDir?: string, noteDir?: string, selfPath?: string }} [options] 解析根目录与 Note 所在目录。
  * @returns {string[]} 问题；空 = 合规。
  */
 export function axisProblems(text, name = 'note', options = {}) {
   const rootDir = options.rootDir ?? defaultRoot
   const noteDir = options.noteDir ?? join(rootDir, 'notes/implemented')
+  const selfAbsPath = options.selfPath
+    ? resolve(options.selfPath)
+    : name.includes('/')
+      ? resolve(rootDir, name)
+      : resolve(noteDir, name)
   const range = sectionRange(text, AXIS)
   if (range === undefined) return [`${name} 缺「## ${AXIS}」节（新 Note 必须显式写）`]
   const scan = scanDocumentDetailed(text)
@@ -89,8 +96,8 @@ export function axisProblems(text, name = 'note', options = {}) {
       problems.push(`${lineLabel} 「${AXIS}」→ 后没有去向`)
       continue
     }
-    if (!hasRealTargetFile(target, rootDir, noteDir)) {
-      problems.push(`${lineLabel} 「${AXIS}」→ 右侧缺盘上真实文件锚点（须含真实反引号路径或有效 Markdown 文件链接，禁写无落盘去向的空头支票）：${target.slice(0, 70)}`)
+    if (!hasRealTargetFile(target, rootDir, noteDir, selfAbsPath)) {
+      problems.push(`${lineLabel} 「${AXIS}」→ 右侧缺盘上真实文件锚点（须含非自链的真实反引号路径或有效 Markdown 文件链接，禁写无落盘去向的空头支票）：${target.slice(0, 70)}`)
     }
   }
   if (bullets === 0) problems.push(`${name} 「## ${AXIS}」没有顶层条目——无轴也要写一条带分类与真实锚点的条目`)
@@ -110,7 +117,8 @@ export function run({ root = defaultRoot, ok, fail }) {
     for (const name of files) {
       checked += 1
       const label = `${relDir}/${name}`
-      problems.push(...axisProblems(readFileSync(join(dir, name), 'utf8'), label, { rootDir: root, noteDir: dir }))
+      const selfPath = join(dir, name)
+      problems.push(...axisProblems(readFileSync(selfPath, 'utf8'), label, { rootDir: root, noteDir: dir, selfPath }))
     }
   }
   problems.length === 0

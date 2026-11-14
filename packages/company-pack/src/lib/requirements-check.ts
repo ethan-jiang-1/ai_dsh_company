@@ -194,7 +194,7 @@ function headingDefinitions(rel: string, text: string, layer: Layer): Definition
   const headings: { index: number; id: string }[] = []
   for (const [index, scanned] of lines.entries()) {
     if (!scanned.structural) continue
-    const match = /^(#{2,4})\s+((?:MR|REQ|IF|TC)-\d{3})\b/.exec(scanned.text.trim())
+    const match = /^[ ]{0,3}(#{2,4})\s+((?:MR|REQ|IF|TC)-\d{3})\b/.exec(scanned.text.trimEnd())
     if (match === null) continue
     headings.push({ index, id: match[2] ?? '' })
   }

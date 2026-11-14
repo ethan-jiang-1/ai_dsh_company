@@ -93,9 +93,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const asString = (value: unknown): string | undefined => (typeof value === 'string' && value.trim() !== '' ? value.trim() : undefined)
 const asArray = (value: unknown): unknown[] => (Array.isArray(value) ? value : [])
 
-/** 取 YAML 头（`---` 包起来的字段行）；缺失返回 null。只认 `key: value` 行，够本文件用。 */
+/** 取 YAML 头（`---` 包起来的字段行）；缺失返回 null。只认 `key: value` 行，够本文件用。入口先归一化平台差异。 */
 export function parsePrdHeader(text: string): { readonly layer?: string; readonly definition?: string } | null {
-  const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/.exec(text)
+  const normalized = normalizeDocument(text)
+  const match = /^---\n([\s\S]*?)\n---(?:\n|$)/.exec(normalized)
   if (match === null) return null
   const fields: Record<string, string> = {}
   for (const line of (match[1] ?? '').split('\n')) {
@@ -299,7 +300,7 @@ function coerceLegacyPrd(root: unknown): { readonly doc?: PrdDoc; readonly error
 
 // ── 新形状：headings（定义点 = `### REQ-###` 小节；正文/表格只引用）────────────────
 
-const PRD_SECTION_HEADING = /^###\s+(REQ-\d{3})\b\s*(.*)$/
+const PRD_SECTION_HEADING = /^[ ]{0,3}###\s+(REQ-\d{3})\b\s*(.*)$/
 const TYPES: readonly ReqType[] = ['functional', 'non-functional', 'constraint']
 const PRIORITIES: readonly ReqPriority[] = ['P0', 'P1', 'P2']
 const STATUSES: readonly ReqStatus[] = ['draft', 'ready', 'in-dev', 'accepted', 'deferred', 'withdrawn']
@@ -333,7 +334,7 @@ function parseBracketList(raw: string): string[] {
 /** 解析 `## Slices` 表；每个 slice 必须列出显式 REQ id（R8 禁区间断言）。围栏/注释里的表不算定义（BUG-153/162）。 */
 export function parsePrdSlices(text: string, errors: string[]): PrdSlice[] {
   const lines = scanDocument(text)
-  const start = lines.findIndex(scanned => scanned.structural && /^##\s+Slices\b/i.test(scanned.text))
+  const start = lines.findIndex(scanned => scanned.structural && /^[ ]{0,3}##\s+Slices\b/i.test(scanned.text))
   if (start === -1) {
     errors.push('PRD 缺「## Slices」表（slice 与 REQ 的归属没有声明面）')
     return []
@@ -347,7 +348,7 @@ export function parsePrdSlices(text: string, errors: string[]): PrdSlice[] {
     if (scanned === undefined) break
     if (!scanned.structural) continue
     const line = scanned.text
-    if (/^##\s+/.test(line)) break
+    if (/^[ ]{0,3}##\s+/.test(line)) break
     if (!line.trim().startsWith('|')) continue
     const cells = splitTableRow(line)
     const id = cells[0] ?? ''
@@ -408,7 +409,7 @@ export function prdRequirementBlocks(text: string): RequirementBlock[] {
       current = { id: heading[1] ?? '', title: (heading[2] ?? '').trim(), line: index + 1, body: [] }
       continue
     }
-    if (current !== undefined && /^#{2,3}\s+/.test(line)) { flush(); continue }
+    if (current !== undefined && /^[ ]{0,3}#{2,3}\s+/.test(line)) { flush(); continue }
     if (current !== undefined) current.body.push(line)
   }
   flush()
