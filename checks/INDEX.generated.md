@@ -133,6 +133,6 @@
 [snapshot-path](../tools/snapshot-path.mjs) · [sync-dsh](../tools/sync-dsh.mjs)
 [test-census](../tools/test-census.mjs)
 
-## 结构门禁（checks/gates/，74 个模块）
+## 结构门禁（checks/gates/，75 个模块）
 
 清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，接线一致性由 `gate-wiring` 门禁强制。

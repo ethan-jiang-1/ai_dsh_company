@@ -68,6 +68,7 @@ import * as clientHalves from './gates/client-halves.mjs'
 import * as srcLayering from './gates/src-layering.mjs'
 import * as proposals from './gates/proposals.mjs'
 import * as notesLiveness from './gates/notes-liveness.mjs'
+import * as notesAxes from './gates/notes-axes.mjs'
 import * as notesSupersession from './gates/notes-supersession.mjs'
 import * as notesArchivedLinks from './gates/notes-archived-links.mjs'
 import * as notesTree from './gates/notes-tree.mjs'
@@ -159,6 +160,7 @@ clientHalves.run(ctx)
 srcLayering.run(ctx)
 proposals.run(ctx)
 notesLiveness.run(ctx)
+notesAxes.run(ctx)
 notesSupersession.run(ctx)
 notesArchivedLinks.run(ctx)
 notesTree.run(ctx)
