@@ -36,6 +36,8 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 
 ## 近期归档
 
+- 决策台账跨仓对齐卡 2026-11-14 已结：`docs/reference/decisions.md` 拆出 `## 现行决定`（54 行）+ `## 已退役`（5 行）与 D1–D61 `<a id="dN"></a>` 行锚点 + `docs/decisions.md` 8 行顶层门牌 + `ledger-routing` 接管表外控长（禁代码块/H3+/漏尾竖线）+ 10 项单测与 5 分支变异 + 独立 `research` 子代理两轮盲审清零；去向 = [Note](../../notes/implemented/2026-11-14-decision-ledger-unification.md)；卡在[归档](../_archive/settled_issues/2026-11-14-decision-ledger-unification.md)。
+
 - notes/ 树形与载体执行面卡 2026-11-14 已结：`notes-tree` 门禁（目录闭集/深度/文件名/INDEX 禁令 + 状态行唯一与目录同轴）+ `notes/implemented/AGENTS.md` 与 `notes/archived/AGENTS.md` 两份注入载体；七组真树红证 + 19 项回归；去向 = [Note](../../notes/implemented/2026-11-14-notes-tree-and-carrier-gates.md)；卡在[归档](../_archive/settled_issues/2026-11-14-notes-tree-and-carrier-gates.md)。
 
 - 测试资产命名契约与目标树卡 2026-11-13 已结：tests/harness 拆六面 + golden→expected + runner/probe/audit 正名 + naming-contract 门禁；去向 = [Note](../../notes/implemented/2026-11-13-test-asset-naming.md)；卡在[归档](../_archive/settled_issues/2026-11-13-test-asset-naming-contract.md)。

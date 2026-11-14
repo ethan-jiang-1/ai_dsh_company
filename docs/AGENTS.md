@@ -3,7 +3,7 @@
 > 什么时候读：写/改/搬 `docs/` 下的文档、判断某事实该住哪层时。
 
 本文件是 `docs/` 的**分层规矩唯一家**：哪层放什么、**哪层不放什么**、写多长、写完了怎么更新。
-文档地图 = [index.md](./index.md)；决策台账 = [decisions.md](./reference/decisions.md)；写作风格（一次一句、不复述代码）= 根 [AGENTS.md](../AGENTS.md) 纪律表。
+文档地图 = [index.md](./index.md)；决策台账 = [decisions.md](./decisions.md) → [reference/decisions.md](./reference/decisions.md)；写作风格（一次一句、不复述代码）= 根 [AGENTS.md](../AGENTS.md) 纪律表。
 **本文件管形状，不管事实**——各主题的现在时语义住各合同文件，本文件不复述。
 
 ## 一处事实一个家
@@ -13,12 +13,12 @@
 
 | 层 | 目录 | Job（这层管什么） | **不属于这层** |
 |---|---|---|---|
-| 导航 | [index.md](./index.md) | 文档地图（决策台账路由 = [decisions.md](./reference/decisions.md)） | 决定正文、理由、输掉的方案（→ Note）；主题事实（→ 该主题的合同） |
+| 导航 | [index.md](./index.md) | 文档地图（决策台账 = [decisions.md](./decisions.md) → [reference/decisions.md](./reference/decisions.md)） | 决定正文、理由、输掉的方案（→ Note）；主题事实（→ 该主题的合同） |
 | 参考 | [reference/](./reference/) | 查表与登记：D 号、术语、外部材料 | 决定正文（→ Note）；主题事实（→ 合同） |
 | 政策 | [policy.md](./policy.md) | **常设规则**：授权边界、门禁升格、自动化上限、越界写入、自主协议 | 操作步骤与命令（→ 指南）；机制依据（→ notes/implemented）；决定史（→ Note） |
 | 指南 | `guides/` | **怎么操作**：runbook、查表步骤、环境怎么立 | 机制依据（→ notes/implemented）；枚举型清单（→ 实现自己，见 D28）；完成定义（→ `.agents/skills/` 或该面 owner）；常设禁令（→ 政策层） |
 | 合同 | 顶层跨面宪法（[testing](./testing.md) / [repo-hygiene](./repo-hygiene.md) / [content-charter](./content-charter.md)）+ [contracts/](./contracts/)（按主题） | **是什么**：某主题/子系统**现在时**语义，随代码同 diff | 历史决策（→ Note）；迁移计划；未来设想 |
-| 常驻入口 | [orient.md](./orient.md) | 驾驭者白话七问，只导航 | 任何事实的复述 |
+| 常驻入口 | [orient.md](./orient.md) · [decisions.md](./decisions.md) | 驾驭者七问与顶层决策门牌，只导航 | 任何事实的复述 |
 | 规范 | [AGENTS.md](./AGENTS.md) | 文档层自身的分层、长度与更新规矩 | 主题事实（→ 合同层）；操作步骤（→ 指南） |
 
 **「理由」的边界**：为什么选 A 不选 B、输掉的方案、验证证据 → `notes/implemented/`（Agent Note）；

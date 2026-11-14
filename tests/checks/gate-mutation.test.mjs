@@ -1,5 +1,5 @@
 // 状态：常驻
-// 何时跑：改六个高风险门禁（naming-contract / company-root-carriers / fix-evidence / notes-tree / notes-axes / backlog-liveness）的判据后；
+// 何时跑：改七个高风险门禁（naming-contract / company-root-carriers / fix-evidence / notes-tree / notes-axes / backlog-liveness / ledger-routing）的判据后；
 //         `pnpm test:checks` 与 `node checks/lanes/generative.e2e.mjs`。
 // 这是**分支级定向 mutation**：逐条阉割门禁的核心拒绝分支（或浅克隆跳过分支），坏夹具必须当场漏过（或浅克隆分支翻转）；
 // 证明夹具真正踩在该条规则上，而不是靠别的分支顺带变红。
@@ -15,6 +15,7 @@ import * as carrier from '../../checks/gates/company-root-carriers.mjs'
 import * as fixEvidence from '../../checks/gates/fix-evidence.mjs'
 import * as notesTree from '../../checks/gates/notes-tree.mjs'
 import * as notesAxes from '../../checks/gates/notes-axes.mjs'
+import * as ledgerRouting from '../../checks/gates/ledger-routing.mjs'
 import { backlogLivenessProblems } from '../../tools/lib/backlog-liveness.mjs'
 
 const ROOT_DIR = join(dirname(fileURLToPath(import.meta.url)), '../..')
@@ -460,4 +461,94 @@ test('keyless-lane：--filter zz-none 选中 0 个资产必须非零退出（拒
   })
   assert.equal(res.status, 1)
   assert.match(res.stderr, /0 个资产命中过滤条件/)
+})
+
+// ── 8. ledger-routing（5 分支：现行表禁退役残留 / 表外散文上限 / 禁非结构块 / 行尾闭合竖线 / 编号连续不断档）──
+
+test('ledger-routing：删「现行表禁删除线」「表外散文上限」「禁代码块」「行尾闭合竖线」「断档检查」→ 各自坏台账漏过', async () => {
+  const mkLedger = ({ intro = ['> 路由表。'], dirty = false, skip24 = false, unclosed4th = false } = {}) => {
+    const active = Array.from({ length: 20 }, (_, i) => {
+      const n = i + 1
+      const txt = dirty && n === 3 ? '~~旧决定~~ 现已废止' : `现行决定 ${String(n)}`
+      const tail = unclosed4th && n === 2 ? ' 第四列逃逸正文' : ''
+      return `| <a id="d${String(n)}"></a>D${String(n)} | ${txt} | [Note](../../notes/implemented/n.md) |${tail}`
+    })
+    const retired = [
+      '| <a id="d21"></a>D21 | 退役 21 | [旧](../../notes/archived/o.md) |',
+      '| <a id="d22"></a>D22 | 退役 22 | [旧](../../notes/archived/o.md) |',
+      skip24
+        ? '| <a id="d24"></a>D24 | 跳过 D23 | [旧](../../notes/archived/o.md) |'
+        : '| <a id="d23"></a>D23 | 退役 23 | [旧](../../notes/archived/o.md) |',
+    ]
+    return [
+      '# 决策台账', '', ...intro, '',
+      '## 现行决定', '', '| # | 一句话 | 决定的家 |', '|---|---|---|', ...active, '',
+      '## 已退役', '', '| # | 一句话 | 决定的家 |', '|---|---|---|', ...retired, '',
+    ].join('\n')
+  }
+
+  const rootDirty = fixture({
+    'notes/implemented/n.md': '# n\n',
+    'notes/archived/o.md': '# o\n',
+    'docs/reference/decisions.md': mkLedger({ dirty: true }),
+  })
+  const mutDirty = await mutant('ledger-routing',
+    "if (sec.title === '现行决定' && ACTIVE_FORBIDDEN.test(summary)) {",
+    'if (false) {')
+  try {
+    assert.match(invoke(ledgerRouting, rootDirty).problems.join(), /含删除线或已退役/)
+    assert.deepEqual(invoke(mutDirty.mod, rootDirty).problems, [])
+  } finally { mutDirty.cleanup(); rmSync(rootDirty, { recursive: true, force: true }) }
+
+  const rootProse = fixture({
+    'notes/implemented/n.md': '# n\n',
+    'notes/archived/o.md': '# o\n',
+    'docs/reference/decisions.md': mkLedger({ intro: Array.from({ length: 11 }, (_, i) => `散文 ${String(i + 1)}`) }),
+  })
+  const mutProse = await mutant('ledger-routing',
+    'if (proseLines.length > LEDGER_MAX_PROSE_LINES) {',
+    'if (false) {')
+  try {
+    assert.match(invoke(ledgerRouting, rootProse).problems.join(), /表外散文 11 行超上限 10 行/)
+    assert.deepEqual(invoke(mutProse.mod, rootProse).problems, [])
+  } finally { mutProse.cleanup(); rmSync(rootProse, { recursive: true, force: true }) }
+
+  const rootCode = fixture({
+    'notes/implemented/n.md': '# n\n',
+    'notes/archived/o.md': '# o\n',
+    'docs/reference/decisions.md': mkLedger({ intro: ['```txt', '代码块膨胀', '```'] }),
+  })
+  const mutCode = await mutant('ledger-routing',
+    'if (nonStructural.length > 0) {',
+    'if (false) {')
+  try {
+    assert.match(invoke(ledgerRouting, rootCode).problems.join(), /不许出现代码块、块级 HTML 或 frontmatter/)
+    assert.deepEqual(invoke(mutCode.mod, rootCode).problems, [])
+  } finally { mutCode.cleanup(); rmSync(rootCode, { recursive: true, force: true }) }
+
+  const rootUnclosed = fixture({
+    'notes/implemented/n.md': '# n\n',
+    'notes/archived/o.md': '# o\n',
+    'docs/reference/decisions.md': mkLedger({ unclosed4th: true }),
+  })
+  const mutUnclosed = await mutant('ledger-routing',
+    'if (cells.length !== 5 || !closedLeft || !closedRight) {',
+    'if (cells.length !== 5) {')
+  try {
+    assert.match(invoke(ledgerRouting, rootUnclosed).problems.join(), /行必须是闭合三列/)
+    assert.deepEqual(invoke(mutUnclosed.mod, rootUnclosed).problems, [])
+  } finally { mutUnclosed.cleanup(); rmSync(rootUnclosed, { recursive: true, force: true }) }
+
+  const rootGap = fixture({
+    'notes/implemented/n.md': '# n\n',
+    'notes/archived/o.md': '# o\n',
+    'docs/reference/decisions.md': mkLedger({ skip24: true }),
+  })
+  const mutGap = await mutant('ledger-routing',
+    'if (missing.length) {',
+    'if (false) {')
+  try {
+    assert.match(invoke(ledgerRouting, rootGap).problems.join(), /编号断档.*缺 D23/)
+    assert.deepEqual(invoke(mutGap.mod, rootGap).problems, [])
+  } finally { mutGap.cleanup(); rmSync(rootGap, { recursive: true, force: true }) }
 })

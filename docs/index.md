@@ -12,13 +12,13 @@
 | 跑起来 / 演示 | [演示 runbook](./guides/demo-scenes.md#前置本机) | [guides/bootstrap.md](./guides/bootstrap.md) |
 | 改代码 / 改角色 | [project-map.md](./project-map.md) | [contracts/presets.md](./contracts/presets.md) / [src/README](../packages/company-pack/src/README.md) |
 | 交证据 / 收尾 | [testing.md](./testing.md) | [guides/dev-loop.md](./guides/dev-loop.md) §1/§12 |
-| 查某个决定 | [reference/decisions.md](./reference/decisions.md) | 对应 Note |
+| 查某个决定 | [decisions.md](./decisions.md) → [reference/decisions.md](./reference/decisions.md) | 对应 Note |
 
 ## 书架（按层）
 
 | 层 | 目录 | 放什么 | 读者怎么进 |
 |---|---|---|---|
-| 门/宪法 | 顶层 | 每个人都可能先读：入口、架构地图、规范、政策、测试宪法、git 边界、空间/运行态地图 | [AGENTS.md](./AGENTS.md) · [architecture.md](./architecture.md) · [orient.md](./orient.md) · [policy.md](./policy.md) · [testing.md](./testing.md) · [repo-hygiene.md](./repo-hygiene.md) · [content-charter.md](./content-charter.md) · [project-map.md](./project-map.md) · [runtime-map.md](./runtime-map.md) |
+| 门/宪法 | 顶层 | 每个人都可能先读：入口、架构地图、规范、政策、测试宪法、git 边界、空间/运行态地图、决策门牌 | [AGENTS.md](./AGENTS.md) · [architecture.md](./architecture.md) · [decisions.md](./decisions.md) · [orient.md](./orient.md) · [policy.md](./policy.md) · [testing.md](./testing.md) · [repo-hygiene.md](./repo-hygiene.md) · [content-charter.md](./content-charter.md) · [project-map.md](./project-map.md) · [runtime-map.md](./runtime-map.md) |
 | 合同 | [contracts/](./contracts/) | 按主题/子系统的当前语义；随代码同 diff | 进目录按文件名选；先看文件头「什么时候读」 |
 | 指南 | [guides/](./guides/) | 怎么做：runbook、环境、排障、发布 | 进目录按任务选 |
 | 参考 | [reference/](./reference/) | 查表与登记：D 号、术语、外部材料 | 进目录按需查 |
