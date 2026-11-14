@@ -60,8 +60,8 @@ pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/asset-lan
 ## 修复证据
 
 - 改动面：`checks/pre-push-surfaces.mjs`、`tests/checks/pre-push-surfaces.test.mjs`
-- 红：删 `commitPaths` 的 merge 分支（回退成单 `diff-tree`）→ merge 用例 `not ok 4`，其余 3 条仍绿
-- 绿：接回「合并结果 vs 第一父」→ `node tests/checks/pre-push-surfaces.test.mjs` 4 passed
+- 红：删 `commitPaths` 的 merge 分支 → `node tests/checks/pre-push-surfaces.test.mjs` 红（merge 用例 not ok 4，其余 3 条仍绿）
+- 绿：接回「合并结果 vs 第一父」→ `node tests/checks/pre-push-surfaces.test.mjs` 绿（4 passed）
 - 提交：commit 85e6fec9
 ## 证据
 

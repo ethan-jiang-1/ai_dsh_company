@@ -61,8 +61,8 @@ HTML 注释（单行、多行、行内）里的 ### REQ-999 / ## Slices 表 → 
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/markdown-shape.ts`、`packages/company-pack/src/lib/prd-check.ts`、`tests/lib/prd-check.spec.ts`
-- 红：把 `scanDocument` 的注释状态置空 → 注释用例红（9 条 REQ-999 字段错误、reqCount 2）
-- 绿：接回注释状态 → `tests/lib/prd-check.spec.ts` 29 passed，注释内外结论一致
+- 红：`scanDocument` 注释状态置空 → `npx vitest run tests/lib/prd-check.spec.ts` 红（9 条 REQ-999 字段错误、reqCount 2）
+- 绿：接回注释状态 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（29 passed，注释内外结论一致）
 - 提交：commit 85e6fec9
 ## 证据
 

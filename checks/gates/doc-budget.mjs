@@ -20,6 +20,8 @@ const DOC_LINE_BUDGETS = [
   ['notes/AGENTS.md', 25],
   ['notes/implemented/AGENTS.md', 9], // 2026-11-14 立（notes-tree-and-carrier-gates）：按目录自动注入的义务——README 不会被注入，军规必须住 AGENTS.md；每条一句 + 指回 README
   ['notes/archived/AGENTS.md', 8],    // 同上：冻结禁令 + 唯一允许的链接路径修复；注入面常驻，棘轮只降不升
+  ['_backlog/bugs/AGENTS.md', 12], // 2026-11-14 立（fix-evidence）：按目录注入的硬线——修 ≠ 翻状态 + git mv；只写两条硬线 + 指针，判据原文住章程
+  ['_backlog/_archive/fixed_bugs/AGENTS.md', 11], // 同上：迁卡前三问（留痕/审查、修复证据四行、verify）——注入面常驻，棘轮只降不升
   ['tests/AGENTS.md', 19],
   ['AGENTS.md', 84],             // 2026-09-23 二次收口；2026-09-27 瘦身轮 108→100、棘轮 115→105；2026-10-06 条目 D 纯路由化（删复述与括号链，纪律指针化；当时 95→72），棘轮 105→84
   ['docs/index.md', 48],         // 2026-10-20 台账/外部材料迁出：131→70；2026-11-10 DSH 步 2：逐文档登记 → 书架（树即 inventory），内容 +5% = 48

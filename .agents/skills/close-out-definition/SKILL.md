@@ -28,7 +28,8 @@ description: Use when finishing any non-trivial change before reporting it done,
    ③证据选层（选的检查能证明承诺的性质吗）④Note（决定/备选/真证据齐吗），**重读当前 diff**，
    不沿用旧结论。输出 finding 带「缺陷/位置/影响/证据」，blocker 与建议分开；机器已可靠拒绝的不复报。
 4. **收割三问**（资产从运行里长出来，不从想象里写）：这次运行——①抓到异常没——**材料性**的才立 BUG 卡 + 红绿修复
-   （判据 = [_backlog 章程](../../../_backlog/README.md)「缺陷的通道」；这也是「手上有个 bug 先分诊」的入口）——
+   （判据 = [_backlog 章程](../../../_backlog/README.md)「缺陷的通道」；**归档卡必须带 `## 修复证据`：
+   改动面 / 红 / 绿（同一条命令）/ 提交（HEAD 祖先且改到改动面）**；这也是「手上有个 bug 先分诊」的入口）——
    非材料性当场修掉，commit 写根因与影响面，不建卡
    ②行为值得钉吗（判据「变了我们要不要知道」→ replay 场景 / keyless 断言 / 视觉夹具；钉之前反证一次：把被测函数改成返回 null，断言仍绿 = 这条没钉住）
    ③撞到运行态事实没（→ 调试阶梯 / Note / 升级 probe）。**三问全「无」也是合法答案，如实记。**
@@ -61,6 +62,8 @@ description: Use when finishing any non-trivial change before reporting it done,
 - [ ] `pnpm verify` + `pnpm test` 全绿，且命令链用了 `set -o pipefail`（涉类型面时 `typecheck`、涉源码面时 `lint` + `dup` 也跑过）。
 - [ ] 发布类声明贴了 `release --check` 原始 READY 行 + commit SHA；没有就标「未发布/未执行」。
 - [ ] 六行回执已发，且每行都有内容（「未执行」「无」也是内容）。
+- [ ] 若本轮归档缺陷卡：`## 修复证据` 四行齐、红/绿同一条命令、证据提交在 HEAD 历史且改到改动面——
+      `pnpm verify` 的 `fix-evidence` 绿；只翻状态 + `git mv` = 未收口。
 
 ## 指针（别复述）
 

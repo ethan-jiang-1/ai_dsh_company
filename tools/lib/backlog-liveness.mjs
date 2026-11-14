@@ -53,6 +53,10 @@ export function backlogLivenessProblems(backlogRoot) {
     if (entry.isDirectory()) return markdownFiles(full, join(prefix, entry.name))
     // 符号链接文件与 markdown-links 的源文件 walker 同口径纳入（目录 symlink 两边都不跟随）。
     const file = entry.isFile() || entry.isSymbolicLink() && existsSync(full) && statSync(full).isFile()
+    // `AGENTS.md` = 平台按目录注入的门牌，不是卡：没有 frontmatter、不进索引、不参与状态纪律。
+    // 2026-11-14（fix-evidence）：`_backlog/bugs/` 与 `_archive/fixed_bugs/` 各加一份门牌，
+    // 让迁卡动作发生时规则就在上下文里；没有这条跳过会把门牌当卡报到「缺 frontmatter」。
+    if (file && entry.name === 'AGENTS.md') return []
     return file && entry.name.endsWith('.md') ? [join(prefix, entry.name)] : []
   })
   const statuses = {

@@ -58,8 +58,8 @@ node --import tsx/esm runtime/tmp/c9b-notes-date.mts
 ## 修复证据
 
 - 改动面：`checks/gates/notes-tree.mjs`、`tests/checks/notes-tree.test.mjs`
-- 红：把 `isCalendarDate` 还原成纯形状正则 + rejected 出循环 → `node tests/checks/notes-tree.test.mjs` 5 FAIL（越界月/非闰年各一条）
-- 绿：接回真实日历往返 → ALL PASS；2024-02-29（闰年）仍绿、非法日期不进受查集合
+- 红：`isCalendarDate` 还原成纯形状正则 → `node tests/checks/notes-tree.test.mjs` 红（越界月/非闰年各一条；rejected 出循环另 3 条）
+- 绿：接回真实日历往返 → `node tests/checks/notes-tree.test.mjs` 绿（ALL PASS；2024-02-29 闰年仍绿、非法日期不进受查集合）
 - 提交：commit 85e6fec9
 ## 证据
 

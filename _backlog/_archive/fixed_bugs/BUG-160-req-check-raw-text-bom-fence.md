@@ -55,8 +55,8 @@ BOM PRD        checkRequirements 不再报缺头/缺层；REQ 计数与 LF 版�
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/markdown-shape.ts`、`packages/company-pack/src/lib/requirements-check.ts`、`tests/lib/requirements-check.spec.ts`
-- 红：`parseHeader` 改回原始文本 → `tests/lib/requirements-check.spec.ts` 的 BOM 用例红（缺 layer/definition 头）；`headingDefinitions` 回退 `split('\n')` → 围栏幽灵 REQ 用例红
-- 绿：接回共享形状层 → 同 spec 25 passed，BOM / 围栏 / 注释三形状与 LF 版结论一致
+- 红：`parseHeader` 改回原始文本 → `npx vitest run tests/lib/requirements-check.spec.ts` 红（BOM 用例缺 layer/definition 头）；`headingDefinitions` 回退 `split('\n')` → 同命令红（围栏幽灵 REQ）
+- 绿：接回共享形状层 → `npx vitest run tests/lib/requirements-check.spec.ts` 绿（25 passed；BOM/围栏/注释与 LF 版结论一致）
 - 提交：commit 85e6fec9
 ## 证据
 

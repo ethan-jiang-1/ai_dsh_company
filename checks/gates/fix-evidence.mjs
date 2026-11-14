@@ -13,9 +13,10 @@ import { spawnSync } from 'node:child_process'
 //   ① 有非空 `## 修复证据` 节，且含四行：
 //      `- 改动面：` 至少一个反引号路径；每个路径真实存在，且不落在 `_backlog/`、`notes/`、`vendor/`
 //        ——证据必须指向系统面（代码/门禁/测试/文档/内容），只改卡与 Note 不算修复。
-//      `- 红：` / `- 绿：` 非空（写清还原什么 → 哪条断言红；接回 → 哪条绿）。
-//      `- 提交：commit <sha>` 该 sha 存在、提交日期 ≥ opened、且该提交的 changed files 与改动面相交
-//        （文件相等或落在目录下）——「卡上说的改动面」必须真在那次提交里出现过。
+//      `- 红：` / `- 绿：` 非空，且各自点名一条可执行命令（反引号里的 `pnpm …`/`node …`/`npx …`/
+//        `vitest …`/`sh …`/`git …`）——并且红绿必须出现**同一条**命令（同一命令复跑才是红→绿）。
+//      `- 提交：commit <sha>`：该 sha 存在、**是 HEAD 的祖先**（当前分支可复算）、提交日期 ≥ opened、
+//        且该提交的 changed files 与改动面相交（文件相等或落在目录下）——「卡上说的改动面」必须真在那次提交里出现过。
 //   ② 浅克隆（`git rev-parse --is-shallow-repository` = true）且 sha 不可达时，跳过该卡的提交解析并在
 //      PASS 行点名跳过数——不静默；完整历史是判据的前提，本地与 pre-push 都是完整历史。
 //
@@ -23,8 +24,10 @@ import { spawnSync } from 'node:child_process'
 //   ① 删 BUG-160 的 `## 修复证据` → `FAIL fix-evidence: …BUG-160… 缺「## 修复证据」（已修卡必须给改动面/红/绿/提交）`；
 //   ② 把 BUG-160 的 `- 提交：commit <sha>` 改成不存在的 sha → `…的提交 deadbeef 不存在`；
 //   ③ 把 BUG-160 的改动面改成 `packages/company-pack/src/host/commands/prd-gate.ts`（该提交没改它）→ `…的提交 85e6fec9 没有改到改动面里的任何路径`；
-//   ④ 把 BUG-160 的改动面改成 `notes/implemented/…` → `…只指向卡/笔记/vendor（不算系统面改动）`。
-//   四条各自还原后 `PASS fix-evidence ×8`。
+//   ④ 把 BUG-160 的改动面改成 `notes/implemented/…` → `…只指向卡/笔记/vendor（不算系统面改动）`；
+//   ⑤ 把 BUG-160 的红/绿命令改成两条不同命令（或去掉命令）→ `…的红/绿没有同一条命令` / `…必须点名一条可执行命令`；
+//   ⑥ 把 BUG-160 的 `- 提交：` 改成 `7fe04557`（提交存在但不在当前分支历史上）→ `…不在 HEAD 历史上`。
+//   六条各自还原后 `PASS fix-evidence ×8`。
 const EFFECTIVE = '2026-11-14'
 const CARD = /^BUG-\d{3}-.*\.md$/
 const EVIDENCE_HEADING = '修复证据'
@@ -73,6 +76,18 @@ function field(text, label) {
 }
 
 /**
+ * 取字段文本里反引号标注的可执行命令（红/绿必须点名同一条）。
+ * @param {string | undefined} text 字段值。
+ * @returns {string[]} 命令原文（已 trim）。
+ */
+function commands(text) {
+  if (text === undefined) return []
+  return [...text.matchAll(/`([^`]+)`/g)]
+    .map(match => (match[1] ?? '').trim())
+    .filter(token => /^(?:pnpm|node|npx|vitest|sh|git)\s/.test(token))
+}
+
+/**
  * 跑 git（失败返回 undefined，由调用方决定是判红还是跳过）。
  * @param {string} root checkout 根。
  * @param {readonly string[]} args 参数。
@@ -110,6 +125,13 @@ function checkCard(root, rel, text, state) {
   const green = field(evidence, '绿')
   if (red === undefined || red === '') state.problems.push(`${rel} 缺 \`- 红：\`（还原什么 → 哪条断言红）`)
   if (green === undefined || green === '') state.problems.push(`${rel} 缺 \`- 绿：\`（接回什么 → 哪条断言绿）`)
+  const redCommands = commands(red)
+  const greenCommands = commands(green)
+  if (red !== undefined && red !== '' && redCommands.length === 0) state.problems.push(`${rel} 的 \`- 红：\` 必须点名一条可执行命令（反引号里的 pnpm/node/npx/vitest/sh/git）`)
+  if (green !== undefined && green !== '' && greenCommands.length === 0) state.problems.push(`${rel} 的 \`- 绿：\` 必须点名一条可执行命令（反引号里的 pnpm/node/npx/vitest/sh/git）`)
+  if (redCommands.length > 0 && greenCommands.length > 0 && !redCommands.some(command => greenCommands.includes(command))) {
+    state.problems.push(`${rel} 的红/绿没有同一条命令（红→绿必须用同一条命令复跑：红=${redCommands.join(' / ')}；绿=${greenCommands.join(' / ')}）`)
+  }
   const commitField = field(evidence, '提交')
   const sha = commitField === undefined ? undefined : /^commit\s+([0-9a-f]{7,40})$/.exec(commitField)?.[1]
   if (sha === undefined) {
@@ -121,6 +143,10 @@ function checkCard(root, rel, text, state) {
   if (exists === undefined) {
     if (git(root, ['rev-parse', '--is-shallow-repository']) === 'true') { state.shallowSkipped += 1; return }
     state.problems.push(`${rel} 的提交 ${sha} 不存在（证据必须对到真实提交）`)
+    return
+  }
+  if (git(root, ['merge-base', '--is-ancestor', sha, 'HEAD']) === undefined) {
+    state.problems.push(`${rel} 的提交 ${sha} 不在 HEAD 历史上（证据必须能在当前分支复算）`)
     return
   }
   const date = git(root, ['show', '-s', '--format=%cs', sha])

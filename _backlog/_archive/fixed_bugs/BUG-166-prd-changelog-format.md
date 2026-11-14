@@ -55,8 +55,8 @@ changeLog 日期非真实日历（2026-13-99 / 2026-02-29 非闰年）→ 红
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/prd-check.ts`、`tests/lib/prd-check.spec.ts`
-- 红：去掉 changeLog 的日期/作者校验 → 假日期（2026-13-99、2026-02-29）与空作者用例红
-- 绿：接回校验 → 同 spec 29 passed，合法条目（2026-11-14 · alice · ok）仍绿
+- 红：去掉 changeLog 的日期/作者校验 → `npx vitest run tests/lib/prd-check.spec.ts` 红（假日期 2026-13-99 / 2026-02-29 与空作者）
+- 绿：接回校验 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（29 passed，合法条目 2026-11-14 · alice · ok 仍绿）
 - 提交：commit 85e6fec9
 ## 证据
 

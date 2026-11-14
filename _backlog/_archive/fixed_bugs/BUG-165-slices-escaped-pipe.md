@@ -63,8 +63,8 @@ Goal / Requirements / Exit 三列里的 `\|` 都按字面竖线解析，不拆�
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/markdown-shape.ts`、`packages/company-pack/src/lib/prd-check.ts`、`tests/lib/prd-check.spec.ts`
-- 红：把 `splitTableRow` 还原成 `split('|')` → 转义竖线用例红（非法 REQ id B / 未列出 REQ-001 / 列出不存在的 REQ B）
-- 绿：接回转义扫描 → 同 spec 29 passed，Goal 还原为 `A | B`
+- 红：把 `splitTableRow` 还原成 `split('|')` → `npx vitest run tests/lib/prd-check.spec.ts` 红（非法 REQ id B / 未列出 REQ-001 / 列出不存在的 REQ B）
+- 绿：接回转义扫描 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（29 passed，Goal 还原为 `A | B`）
 - 提交：commit 85e6fec9
 ## 证据
 

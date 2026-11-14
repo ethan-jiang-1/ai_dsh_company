@@ -43,11 +43,12 @@ function card(dir, { name = 'BUG-900-fixture.md', opened = OPENED, evidence } = 
   writeFileSync(join(dir, '_backlog/_archive/fixed_bugs', name), lines.join('\n'))
 }
 
-const evidence = (sha, surface = 'packages/demo/a.ts') => [
+const CMD = '`pnpm test tests/demo.spec.ts`'
+const evidence = (sha, surface = 'packages/demo/a.ts', red = `- 红：拆掉守卫 → ${CMD} 红`, green = `- 绿：接回守卫 → ${CMD} 绿`) => [
   '## 修复证据', '',
   `- 改动面：\`${surface}\``,
-  '- 红：拆掉守卫 → 用例红',
-  '- 绿：接回守卫 → 用例绿',
+  red,
+  green,
   `- 提交：commit ${sha}`,
 ]
 
@@ -121,5 +122,35 @@ test('存量卡（opened < 生效日）不追补：无证据也不红', () => {
     const { problems, okLine } = gate(dir)
     assert.deepEqual(problems, [])
     assert.match(okLine, /×0/)
+  } finally { cleanup() }
+})
+
+test('红/绿没有同一条命令 → 红（红→绿必须同一条命令复跑）', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    card(dir, { evidence: evidence(sha, 'packages/demo/a.ts', '- 红：拆守卫 → `pnpm test tests/a.spec.ts` 红', '- 绿：接回 → `pnpm test tests/b.spec.ts` 绿') })
+    assert.match(gate(dir).problems.join(), /红\/绿没有同一条命令/)
+  } finally { cleanup() }
+})
+
+test('红/绿没点名命令 → 红', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const sha = commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    card(dir, { evidence: evidence(sha, 'packages/demo/a.ts', '- 红：拆守卫 → 用例红', '- 绿：接回 → 用例绿') })
+    assert.match(gate(dir).problems.join(), /必须点名一条可执行命令/)
+  } finally { cleanup() }
+})
+
+test('证据提交不在 HEAD 历史上 → 红（当前分支无法复算）', () => {
+  const { dir, git, commit, cleanup } = repo()
+  try {
+    commit('packages/demo/a.ts', 'export const a = 1\n', 'feat: a')
+    git(['checkout', '-q', '-b', 'side'])
+    const sideSha = commit('packages/demo/a.ts', 'export const a = 2\n', 'side: a2')
+    git(['checkout', '-q', 'main'])
+    card(dir, { evidence: evidence(sideSha) })
+    assert.match(gate(dir).problems.join(), /不在 HEAD 历史上/)
   } finally { cleanup() }
 })
