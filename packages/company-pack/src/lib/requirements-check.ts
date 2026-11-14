@@ -13,7 +13,11 @@
  * - 字段按行首标签解析（`- traces:`），不子串匹配（V11 实测：散文里的「可追溯性」会误判孤儿）。
  * - 追溯只认作者写的边；`:` 跨动议引用 v1 未支持，不解析、不判红。
  * - 范围：meta 没写 `numbering:` 的旧动议 = skipped（只读豁免）；`layers:` 声明本轮层，缺层 = 红。
+ *
+ * 2026-11-14：文档结构行判据（平台归一化 + 围栏 + HTML 注释）与 `/prd check` 共用
+ * `markdown-shape.ts`——BOM 不再让合法文档「缺头」，围栏/注释里的示例不再进编号索引（BUG-160/162）。
  */
+import { normalizeDocument, scanDocument, splitTableRow } from './markdown-shape.ts'
 
 export type Layer = 'MRD' | 'StRS' | 'PRD' | 'SyRS' | 'IRS' | 'V&V'
 export type DefinitionForm = 'json-ledger' | 'headings' | 'table-rows' | 'none'
@@ -137,9 +141,10 @@ const emptyIndex = (): RequirementIndex => ({
 export const isLayer = (value: string): value is Layer => (LAYERS as readonly string[]).includes(value)
 export const isDefinitionForm = (value: string): value is DefinitionForm => (DEFINITION_FORMS as readonly string[]).includes(value)
 
-/** 取 YAML 头字段（`---` 包起来）；没有头返回 null（= 不是需求文档，或漏写头）。 */
+/** 取 YAML 头字段（`---` 包起来）；没有头返回 null（= 不是需求文档，或漏写头）。入口先归一化平台差异（BUG-160）。 */
 export function parseHeader(text: string): { layer?: string; definition?: string } | null {
-  const match = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)
+  const normalized = normalizeDocument(text)
+  const match = /^---\r?\n([\s\S]*?)\r?\n---/.exec(normalized)
   if (match === null) return null
   const fields: { layer?: string; definition?: string } = {}
   for (const line of (match[1] ?? '').split('\n')) {
@@ -185,17 +190,18 @@ function parseBlockFields(lines: readonly string[]): { status: string; source: s
 }
 
 function headingDefinitions(rel: string, text: string, layer: Layer): Definition[] {
-  const lines = text.split('\n')
+  const lines = scanDocument(text)
   const headings: { index: number; id: string }[] = []
-  for (const [index, line] of lines.entries()) {
-    const match = /^(#{2,4})\s+((?:MR|REQ|IF|TC)-\d{3})\b/.exec(line.trim())
+  for (const [index, scanned] of lines.entries()) {
+    if (!scanned.structural) continue
+    const match = /^(#{2,4})\s+((?:MR|REQ|IF|TC)-\d{3})\b/.exec(scanned.text.trim())
     if (match === null) continue
     headings.push({ index, id: match[2] ?? '' })
   }
   const definitions: Definition[] = []
   for (const [position, heading] of headings.entries()) {
     const end = headings[position + 1]?.index ?? lines.length
-    const fields = parseBlockFields(lines.slice(heading.index + 1, end))
+    const fields = parseBlockFields(lines.slice(heading.index + 1, end).filter(scanned => scanned.structural).map(scanned => scanned.text))
     definitions.push({
       id: heading.id,
       kind: idKind(heading.id),
@@ -209,7 +215,9 @@ function headingDefinitions(rel: string, text: string, layer: Layer): Definition
     })
     // PRD（2026-11-13 起 headings）的 AC 是 REQ 小节下的缩进子项；父号边由 AC_PATTERN 派生。
     for (let offset = heading.index + 1; offset < end; offset += 1) {
-      const ac = /^\s*-\s+(AC-\d{3}-\d+)\s*$/.exec(lines[offset] ?? '')
+      const scanned = lines[offset]
+      if (scanned === undefined || !scanned.structural) continue
+      const ac = /^\s*-\s+(AC-\d{3}-\d+)\s*$/.exec(scanned.text)
       if (ac === null) continue
       definitions.push({
         id: ac[1] ?? '',
@@ -236,6 +244,7 @@ interface JsonRequirement {
 }
 
 function jsonLedgerDefinitions(rel: string, text: string, layer: Layer, errors: string[]): Definition[] {
+  text = normalizeDocument(text)
   const block = /```json\r?\n([\s\S]*?)\r?\n```/.exec(text)
   if (block === null) {
     errors.push(`${rel} 声明 definition: json-ledger 但没有 json 账本代码块`)
@@ -324,19 +333,23 @@ function jsonLedgerDefinitions(rel: string, text: string, layer: Layer, errors: 
 }
 
 function tableRowDefinitions(rel: string, text: string, layer: Layer): Definition[] {
-  const lines = text.split('\n')
+  const scanned = scanDocument(text)
+  const lines = scanned.map(entry => entry.text)
+  const structural = (index: number): boolean => scanned[index]?.structural === true
   const definitions: Definition[] = []
   for (let index = 0; index + 1 < lines.length; index += 1) {
+    if (!structural(index) || !structural(index + 1)) continue
     const headerLine = lines[index] ?? ''
     const separator = lines[index + 1] ?? ''
     if (!headerLine.trim().startsWith('|') || !/^\s*\|[\s:|-]+\|\s*$/.test(separator)) continue
-    const cells = (line: string): string[] => line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(cell => cell.trim())
+    const cells = splitTableRow
     const headers = cells(headerLine).map(cell => cell.toLowerCase())
     const coversColumn = headers.findIndex(header => /covers|覆盖/.test(header))
     let cursor = index + 2
     let lineNo = cursor + 1
     for (; cursor < lines.length; cursor += 1, lineNo += 1) {
       const row = lines[cursor] ?? ''
+      if (!structural(cursor)) continue
       if (!row.trim().startsWith('|')) break
       const values = cells(row)
       const id = values.find(value => ID_PATTERN.test(value.replace(/\*/g, '')))?.replace(/\*/g, '') ?? ''
@@ -463,7 +476,7 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
     else if (formValue === 'headings') definitions.push(...headingDefinitions(doc.rel, doc.text, layer))
     else if (formValue === 'table-rows') definitions.push(...tableRowDefinitions(doc.rel, doc.text, layer))
     // 退役词 / 区间断言：只扫声明了层的需求文档（评审稿与 final 是引用面）。
-    for (const [index, line] of doc.text.split('\n').entries()) {
+    for (const [index, line] of normalizeDocument(doc.text).split('\n').entries()) {
       for (const match of line.matchAll(retired)) errors.push(`${doc.rel}:${String(index + 1)} 退役词 ${match[0]}`)
       for (const match of line.matchAll(RANGE_CLAIM)) errors.push(`${doc.rel}:${String(index + 1)} 区间计数断言 ${match[0]}（R8：计数由索引派生）`)
     }

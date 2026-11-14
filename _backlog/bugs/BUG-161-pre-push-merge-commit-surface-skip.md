@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P1
 opened: 2026-11-14
 ---
 
 # BUG-161：pre-push 逐提交 diff-tree 漏 merge 提交的合并结果
 
-> 严重级别：P1（重要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P1（重要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-158 修了 zero-SHA 范围，但新分支逐提交 `diff-tree` 没有覆盖 merge 提交的合并结果。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9-merge-probe.sh`。
@@ -46,6 +46,16 @@ pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/asset-lan
 - merge 提交用 `git diff-tree -m --first-parent`（或 `git show --cc`）取合并结果；
 - 或对出站范围直接 `git diff <merge-base> <local>`（一次覆盖范围，不逐提交）；
 - 自测补一条 merge 形状，断言 merge-only 的 client 改动能带出 `client-load`。
+
+## 已修判定
+
+```text
+新分支首次 push、tip 是 merge 提交、合并结果新增 client 文件 → dry-run 必须印出 client-load
+非 merge 提交 / 普通 push（remote 非零）→ 行为不变
+删除 ref → 仍跳过（BUG-158 不回归）
+```
+
+判据由 `tests/checks/pre-push-surfaces.test.mjs` 的 merge 形状搭载；红证 = 去掉 merge 分支（回退到单 `diff-tree`）→ 该用例印「未触发」变红。
 
 ## 证据
 

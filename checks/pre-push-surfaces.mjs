@@ -39,6 +39,21 @@ const git = args => {
 }
 const isZero = sha => /^0+$/.test(sha)
 
+/**
+ * 单个提交引入的文件。
+ *
+ * merge 提交要按「合并结果相对第一父提交」取：`git diff-tree` 对 merge 默认没有输出（除非 -m/-c），
+ * 只跑 diff-tree 会把冲突解决/合并编辑里引入的 surface 改动漏掉（BUG-161）。
+ */
+function commitPaths(sha) {
+  const parents = git(['rev-list', '--parents', '-n', '1', sha]).trim().split(/\s+/).slice(1)
+  const first = parents[0]
+  if (parents.length > 1 && first !== undefined) {
+    return git(['diff', '--name-only', first, sha]).split('\n').filter(Boolean)
+  }
+  return git(['diff-tree', '--root', '--no-commit-id', '--name-only', '-r', sha]).split('\n').filter(Boolean)
+}
+
 /** 一条 ref 四元组 → 该 ref 本次 push 带出的变更文件。 */
 function pathsOfRef(localRef, localSha, remoteSha) {
   if (isZero(localSha)) {
@@ -55,9 +70,7 @@ function pathsOfRef(localRef, localSha, remoteSha) {
     console.log(`pre-push surfaces: ${localRef || localSha} 的提交都已在远端 ref 上——按 tip 自身取变更面`)
   }
   const paths = []
-  for (const sha of targets) {
-    paths.push(...git(['diff-tree', '--root', '--no-commit-id', '--name-only', '-r', sha]).split('\n').filter(Boolean))
-  }
+  for (const sha of targets) paths.push(...commitPaths(sha))
   return paths
 }
 

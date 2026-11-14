@@ -2,11 +2,15 @@
 // 负例留证 2026-11-14：拆掉 normalizeDocument → CRLF/BOM 用例红（BUG-152）
 // 负例留证 2026-11-14：拆掉 fence 状态 → 围栏三条用例红（BUG-153）
 // 负例留证 2026-11-14：拆掉 AC/slice 的 seen 集合 → 重号两条用例红（BUG-157）
+// 负例留证 2026-11-14：去掉 scanDocument 的 HTML 注释状态 → 注释用例红（BUG-162）
+// 负例留证 2026-11-14：去掉 slice 的 reqOwner 映射 → 跨 slice 用例红（BUG-164）
+// 负例留证 2026-11-14：还原 splitTableRow 为 split('|') → 转义竖线用例红（BUG-165）
+// 负例留证 2026-11-14：去掉 changeLog 的日期/作者校验 → 假日期用例红（BUG-166）
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { extractJsonBlock, validateProductDocs } from '../../packages/company-pack/src/lib/prd-check.ts'
+import { extractJsonBlock, parsePrdSlices, validateProductDocs } from '../../packages/company-pack/src/lib/prd-check.ts'
 
 const mrd = (overrides = {}) => JSON.stringify({
   mrd: {
@@ -282,5 +286,65 @@ describe('身份唯一性（BUG-157）', () => {
   it('slice id 重号 → 红（一个 REQ 不能同时属于两个同名 slice）', () => {
     const slices = '| S1 | 最小端到端 | REQ-001 | ok |\n| S1 | 重复 | REQ-001 | ok |'
     expect(validateProductDocs(mrdDoc(mrd()), prd({ slices })).errors.join()).toContain('slice S1 重号')
+  })
+})
+
+describe('HTML 注释不是定义（BUG-162）', () => {
+  it('多行注释里的 REQ/Slices 不算定义；注释外正常解析', () => {
+    const comment = '<!--\n## Slices\n| S9 | 示例 | REQ-999 | ok |\n### REQ-999 示例\n- userStory: 示例\n-->\n'
+    const result = validateProductDocs(mrdDoc(mrd()), prd({ sections: `${requirementSection()}\n${comment}` }))
+    expect(result.errors, result.errors.join()).toEqual([])
+    expect(result).toMatchObject({ ok: true, reqCount: 1 })
+  })
+
+  it('行内注释片段从行文本移除，同行剩余内容仍解析', () => {
+    const sections = requirementSection().replace(
+      '- userStory: 作为财务，我要导入流水，以便自动对账',
+      '- userStory: 作为财务，我要导入流水 <!-- 旧版示例 -->，以便自动对账',
+    )
+    const result = validateProductDocs(mrdDoc(mrd()), prd({ sections }))
+    expect(result.errors, result.errors.join()).toEqual([])
+  })
+})
+
+describe('一个 REQ 只能属于一个 slice（BUG-164）', () => {
+  it('同一 REQ 列进两个 slice → 红并点名两处', () => {
+    const slices = '| S1 | 最小端到端 | REQ-001 | ok |\n| S2 | 另一个 | REQ-001 | ok |'
+    const result = validateProductDocs(mrdDoc(mrd()), prd({ slices }))
+    expect(result.errors.join()).toContain('REQ-001 同时列在 slice S1 与 S2')
+  })
+
+  it('同一 slice 行里重复列同一 REQ → 红', () => {
+    const result = validateProductDocs(mrdDoc(mrd()), prd({ slices: '| S1 | 最小端到端 | REQ-001, REQ-001 | ok |' }))
+    expect(result.errors.join()).toContain('重复列出 REQ-001')
+  })
+
+  it('单归属（合法形状）→ 绿', () => {
+    const result = validateProductDocs(mrdDoc(mrd()), prd())
+    expect(result.errors, result.errors.join()).toEqual([])
+  })
+})
+
+describe('Slices 表按未转义竖线切列（BUG-165）', () => {
+  it('Goal 里的 \\| 不拆列；cell 保留字面竖线', () => {
+    const text = prd({ slices: '| S1 | A \\| B | REQ-001 | ok |' })
+    const errors: string[] = []
+    expect(parsePrdSlices(text, errors)).toEqual([{ id: 'S1', goal: 'A | B', requirements: ['REQ-001'] }])
+    expect(errors).toEqual([])
+    expect(validateProductDocs(mrdDoc(mrd()), text).errors).toEqual([])
+  })
+})
+
+describe('changeLog 日期/作者形状（BUG-166）', () => {
+  const withLog = (log: string) => prd({ sections: requirementSection({ status: 'ready', changeLog: `\n  - ${log}` }) })
+
+  it('真实日历日期 + 非空作者/变更 → 绿', () => {
+    expect(validateProductDocs(mrdDoc(mrd()), withLog('2026-11-14 · alice · 修订验收口径')).errors).toEqual([])
+  })
+
+  it('假日期 / 非闰年 2 月 29 / 空作者 → 红', () => {
+    expect(validateProductDocs(mrdDoc(mrd()), withLog('2026-13-99 · nobody · bad')).errors.join()).toContain('真实日历日期')
+    expect(validateProductDocs(mrdDoc(mrd()), withLog('2026-02-29 · nobody · bad')).errors.join()).toContain('真实日历日期')
+    expect(validateProductDocs(mrdDoc(mrd()), withLog('2026-11-14 · · bad')).errors.join()).toContain('作者不能为空')
   })
 })

@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-163：notes-tree 状态行检查跳过 rejected/，负知识 Note 不受状态门约束
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；notes-tree 是 2026-11-14 新增门禁，声称「状态行唯一且与目录同轴」。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9b-notes-tree.mts`。
@@ -41,6 +41,16 @@ node --import tsx/esm runtime/tmp/c9b-notes-tree.mts
 
 - 把 `rejected` 加入状态行检查；状态词匹配 `rejected`（或按目录定义的同轴词）；
 - 补一条红证：`notes/rejected/` 缺状态行 → `notes-tree` 红；还原 → 绿。
+
+## 已修判定
+
+```text
+notes/rejected/ 下新 Note 缺状态行 → notes-tree 红（不再静默放行）
+状态：rejected → 绿；状态：implemented（与目录不符）→ 红
+status.checked 计数包含 rejected 新写
+```
+
+判据由 `tests/checks/notes-tree.test.mjs` 的 rejected 三形状搭载；红证 = 把 rejected 从 lifecycle 循环删掉 → 缺状态用例变绿（门禁漏检复现）。
 
 ## 证据
 

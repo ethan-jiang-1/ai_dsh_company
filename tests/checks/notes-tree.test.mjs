@@ -4,6 +4,9 @@
 //
 // 为什么：真树红证在门禁头注（2026-11-14 七组植入），但那只证明「今天会红一次」。本文件用临时树
 // 把每条判据钉成可回归形状——判据被改动时，这里先红，不靠下一次真树审计发现。
+//
+// 负例留证 2026-11-14（BUG-163/167）：把 rejected 从 lifecycle 循环删掉 → rejected 缺状态用例变绿（红）；
+//   把日期判据还原成纯形状正则 → 「2026-13-01」用例变绿（红）。
 // 为什么在 tests/checks/ 而不是 tests/：门禁读的是根驱动面（checks/gates），门禁自测统一住这里
 // （同一发现器 = `tools/run-check-tests.mjs`，文件即清单）。
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
@@ -143,6 +146,52 @@ const check = (label, passed) => {
     write(root, 'notes/archived/2026-11-14-d.md', '# d\n\n状态：已交付（2026-11-14；批准：fixture）\n')
     check('archived 保留实现状态 → 绿', gate.notesStatusProblems(root).problems.length === 0)
     check('archived 新写计入受查数', gate.notesStatusProblems(root).checked === 1)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+// ── rejected 生命周期与日历日期（BUG-163/167）────────────────────────────────
+{
+  const root = makeTree()
+  try {
+    write(root, 'notes/rejected/2026-11-14-e.md', '# 负知识\n\n无状态行\n')
+    check('rejected 缺状态行 → 红（不再跳过该 lifecycle）', statusHas(root, 'notes/rejected/2026-11-14-e.md'))
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+{
+  const root = makeTree()
+  try {
+    write(root, 'notes/rejected/2026-11-14-f.md', '# 负知识\n\n状态：rejected（2026-11-14）\n')
+    check('rejected 状态词正确 → 绿', gate.notesStatusProblems(root).problems.length === 0)
+    check('rejected 新写计入受查数', gate.notesStatusProblems(root).checked === 1)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+{
+  const root = makeTree()
+  try {
+    write(root, 'notes/rejected/2026-11-14-g.md', '# 负知识\n\n状态：implemented（2026-11-14）\n')
+    check('rejected 写成 implemented → 红', statusHas(root, '状态词须以 rejected 开头'))
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+{
+  const root = makeTree()
+  try {
+    write(root, 'notes/implemented/2026-13-01-bad-month.md', '# x\n\n状态：implemented\n')
+    check('越界月份 2026-13-01 → 红', treeHas(root, '不是真实日历日期'))
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+{
+  const root = makeTree()
+  try {
+    write(root, 'notes/implemented/2026-02-29-non-leap.md', '# x\n\n状态：implemented\n')
+    check('非闰年 2026-02-29 → 红', treeHas(root, '不是真实日历日期'))
+    check('非法日期不进状态受查集合', gate.notesStatusProblems(root).checked === 0)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+{
+  const root = makeTree()
+  try {
+    write(root, 'notes/implemented/2024-02-29-leap.md', '# x\n\n状态：implemented\n')
+    check('闰年 2024-02-29 → 绿', gate.notesTreeProblems(root).problems.length === 0 && gate.notesStatusProblems(root).problems.length === 0)
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 

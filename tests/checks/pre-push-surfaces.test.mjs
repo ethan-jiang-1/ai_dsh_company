@@ -9,9 +9,12 @@
 //   ① 新分支首次 push（remote 全零）：父提交改了 client、tip 只改 docs → 必须印出 client 面；
 //   ② 删除 ref（local 全零）：跳过该 ref、不跑 git diff、退出码 0；
 //   ③ 普通 push（remote 非零）：仍按 <remote>..<local> 范围（不回归）。
+// 判据（BUG-161，merge 形状）：
+//   ④ 新分支 tip 是 merge 提交、合并结果里新增 client 文件 → 必须印出 client 面（diff-tree 对 merge 无输出）。
 //
 // 负例留证 2026-11-14：把 `pathsOfRef` 改回「零 remote → 只 diff-tree tip」→ ① 红；
-//   去掉 `isZero(localSha)` 跳过 → ② 红（`bad object 000…`，退出码非零）。
+//   去掉 `isZero(localSha)` 跳过 → ② 红（`bad object 000…`，退出码非零）；
+//   把 `commitPaths` 的 merge 分支删掉（回退成单 diff-tree）→ ④ 红（印「未触发」）。
 import { execFileSync, spawnSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -84,5 +87,28 @@ test('普通 push（remote 非零）：仍按 <remote>..<local> 范围，不回�
     const { status, out } = run(dir, [`refs/heads/feat ${tip} refs/heads/feat ${base}`])
     assert.equal(status, 0, out)
     assert.match(out, /client-load/, `范围内有 client 改动 → client-load：${out}`)
+  } finally { cleanup() }
+})
+
+test('merge 提交（remote 全零）：合并结果里的 surface 改动必须带出 client-load', () => {
+  const { dir, commit, git, cleanup } = repo()
+  try {
+    commit(DOC_FILE, '# base\n', 'base')
+    commit('notes/feat.md', '# feat\n', 'feat: docs')
+    // side 的提交已在远端：merge 本身才是出站提交
+    git(['checkout', '-q', '-b', 'side', 'HEAD~1'])
+    const side = commit('notes/side.md', '# side\n', 'side: docs')
+    git(['update-ref', 'refs/remotes/origin/main', side])
+    git(['checkout', '-q', 'main'])
+    git(['merge', '--no-commit', 'side'])
+    // 只有合并结果才有的 client 改动（模拟冲突解决/合并编辑）
+    mkdirSync(join(dir, 'packages/company-pack/src/client/wiring'), { recursive: true })
+    writeFileSync(join(dir, CLIENT_FILE), 'export const merged = 1\n')
+    git(['add', '-A'])
+    git(['commit', '-q', '-m', 'merge: client change in result'])
+    const tip = git(['rev-parse', 'HEAD'])
+    const { status, out } = run(dir, [`refs/heads/main ${tip} refs/heads/main ${ZERO}`])
+    assert.equal(status, 0, out)
+    assert.match(out, /client-load/, `merge 合并结果的 client 改动必须带出 client-load：${out}`)
   } finally { cleanup() }
 })

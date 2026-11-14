@@ -9,6 +9,9 @@
  *
  * 红配方：把任意一条断言里的 fixture 改回旧形状（重复定义/悬空/退役/孤儿/摘要表当定义）→ 转红。
  * 负例留证 2026-11-07：实现前本 spec 首跑 11 failed（模块不存在）；实现后全绿（见卡 `## 交付证据`）。
+ *
+ * 负例留证 2026-11-14：parseHeader 改回原始文本 → BOM 缺头用例红（BUG-160）
+ * 负例留证 2026-11-14：headingDefinitions 改回 split('\n') → 围栏/注释幽灵 REQ 用例红（BUG-162）
  */
 import { describe, expect, it } from 'vitest'
 import {
@@ -18,6 +21,7 @@ import {
   type Layer,
   type MotionDoc,
 } from '../../packages/company-pack/src/lib/requirements-check.ts'
+import { validateProductDocs } from '../../packages/company-pack/src/lib/prd-check.ts'
 
 const yaml = (layer: string, definition: string, body: string): string =>
   `---\nlayer: ${layer}\ndefinition: ${definition}\n---\n\n${body}\n`
@@ -298,5 +302,37 @@ describe('产品类型包覆盖（2026-11-09）', () => {
     const prd = `${PRD}\n- 验证：VR-001\n`
     const result = checkRequirements({ meta: meta(['numbering: identity', 'layers: MRD, PRD']), docs: docs(['mrd.md', MRD], ['prd.md', prd]) })
     expect(result.errors.join()).toContain('退役词 VR-001')
+  })
+})
+
+describe('文档文本形状层与 /prd check 同源（BUG-160/162）', () => {
+  const check = (prdText: string) => checkRequirements(
+    { meta: meta(['numbering: identity', 'layers: MRD, PRD']), docs: docs(['mrd.md', MRD], ['prd.md', prdText]) },
+    { layers: ['MRD', 'PRD'] },
+  )
+
+  it('BOM 不再让合法文档缺头/缺层：结论与 LF 版一致', () => {
+    const lf = check(PRD)
+    const bom = check(`\uFEFF${PRD}`)
+    expect(bom.errors, bom.errors.join()).toEqual(lf.errors)
+    expect(lf.errors.join()).not.toContain('缺 layer/definition 头')
+    expect(validateProductDocs(MRD, `\uFEFF${PRD}`).ok).toBe(validateProductDocs(MRD, PRD).ok)
+  })
+
+  it('围栏里的示例 REQ 不进索引（两个校验器都不多出 REQ-999）', () => {
+    const lf = check(PRD)
+    const fenced = `${PRD}\n\`\`\`markdown\n### REQ-999 示例\n- status: 草案\n\`\`\`\n`
+    const fencedResult = check(fenced)
+    expect(fencedResult.errors, fencedResult.errors.join()).toEqual(lf.errors)
+    expect(fencedResult.errors.join()).not.toContain('REQ-999')
+    expect(validateProductDocs(MRD, fenced).errors.join()).not.toContain('REQ-999')
+  })
+
+  it('HTML 注释里的示例 REQ 同样不进索引', () => {
+    const lf = check(PRD)
+    const commented = `${PRD}\n<!--\n### REQ-999 示例\n- status: 草案\n-->\n`
+    const result = check(commented)
+    expect(result.errors, result.errors.join()).toEqual(lf.errors)
+    expect(result.errors.join()).not.toContain('REQ-999')
   })
 })

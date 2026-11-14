@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-160：`/req check` 仍按原始文本解析：BOM 缺头、围栏示例成幽灵需求
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-152/153 修了 `prd-check` 的文本形状层，但 `/req check` 的 `parseHeader` / `headingDefinitions` 是另一套解析。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8b-reqcheck.mts`。
@@ -40,6 +40,17 @@ node --import tsx/esm runtime/tmp/c8b-reqcheck.mts
 - 抽出共享的文档文本形状层（去 BOM/CRLF、围栏扫描），`prd-check` 与 `requirements-check` 都消费同一份；
 - `parseHeader` 入口剥 BOM；`headingDefinitions` 跳过围栏行；
 - spec 用同一 BOM/围栏文档同时跑 `/prd check` 与 `/req check`，断言结论一致。
+
+## 已修判定
+
+```text
+BOM PRD        checkRequirements 不再报缺头/缺层；REQ 计数与 LF 版一致（不再 2→1）
+围栏里的 REQ-999 不进索引（无「孤儿 REQ-999」）；REQ 计数不再 2→3
+同一份 BOM/围栏文档同时跑 validateProductDocs 与 checkRequirements → 结论一致（parity 用例）
+结构层唯一家 = lib/markdown-shape.ts；prd-check 不再留本地 normalize/fence 副本
+```
+
+判据由 `tests/lib/requirements-check.spec.ts` 的 parity 用例搭载（同 diff 落）；红证 = 把 `parseHeader`/`headingDefinitions` 改回原始文本处理 → BOM 缺头与围栏幽灵需求两条复现。
 
 ## 证据
 

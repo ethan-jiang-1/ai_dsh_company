@@ -18,7 +18,9 @@ import { join } from 'node:path'
 // 判据（状态行；前向生效 = 文件名日期 ≥ 2026-11-14，存量按生效日祖父豁免）：
 //   ⑤ `状态：` 行全文件恰好 1 行，且在前 12 行内；
 //   ⑥ implemented/ 与 archived/ 的状态词须以 implemented|已交付|已消化 开头——归档保留实现状态，
-//      不改写成 archived（位置是位置，状态是状态）；proposed/ 只查唯一性（批准标记归 proposals）。
+//      不改写成 archived（位置是位置，状态是状态）；proposed/ 只查唯一性（批准标记归 proposals）；
+//      rejected/ 的状态词须以 rejected 开头（负知识层；2026-11-14 BUG-163 起纳入检查）。
+//   ⑦ 文件名日期必须是真实日历日期（YYYY-MM-DD 往返；2026-13-01 / 2026-02-29 非闰年都红，BUG-167）。
 // ⚠ 不查的反面：不判 Note 内容、不判「该不该写 Note」；非 `.md` 证据件（pin-review `.json`）不纳入形状。
 // 负例留证 2026-11-14（真树植入 → 红 → 还原 → 绿；逐条原话）：
 //   ① notes/zz-lifecycle/ → `未知生命周期目录（允许：proposed、implemented、rejected、archived）`；
@@ -30,6 +32,8 @@ import { join } from 'node:path'
 //   ⑦ 同上把状态词改成 proposed → `状态词须以 implemented/已交付/已消化 开头`；
 //   ⑧ receipts/ 下再建目录 → `只许文件（不允许深度 4 目录）`；receipts/ 下无日期文件 → 文件名红；
 //   ⑨ 反向豁免：合法新 Note（状态行 ×1）→ 绿；存量（日期 < 生效日）与 receipts 证据件不查状态 → 绿。
+//   ⑩ rejected/ 缺状态行 → 红；状态：rejected → 绿；状态：implemented → 红（BUG-163）。
+//   ⑪ 文件名 2026-13-01 / 2026-02-29 → 红；2024-02-29（闰年）与合法日期 → 绿（BUG-167）。
 //   ⚠ 首版本门禁在 ④ 上是**假守卫**：根文件走了通用命名规则，`2026-11-14-root-stray.md` 因为
 //     名字本身合规而放行——正是「先造红再相信绿」要抓的那类（原话见承载 Note 验证节，已修）。
 //   ⚠ 首版 ② 的报错只到「未登记子目录」不到「深度 3」：对生命周期目录来说，深度 3 文件必然意味着
@@ -44,6 +48,19 @@ const NOTE_FILE = /^\d{4}-\d{2}-\d{2}-[a-z0-9][a-z0-9._-]*\.md$/
 /** 状态行规则的生效日：此前写成的 Note 按祖父豁免（存量不回扫）。 */
 export const STATUS_EFFECTIVE_DATE = '2026-11-14'
 const INDEX_MESSAGE = '集中索引禁止（D34：目录树即清单；集中索引重复路径元数据并与无关修改争用同一文件）'
+/**
+ * `YYYY-MM-DD` 且是真实日历日期（BUG-167）。
+ * 形状正则不够：`2026-13-99`、`2026-02-29`（非闰年）都能过 `\d{4}-\d{2}-\d{2}`；
+ * Date 往返会把越界月/日规范化成另一个日期，往返串不相等即判非法。
+ * @param {string} value 日期串。
+ * @returns {boolean} 是否为真实日历日期。
+ */
+export function isCalendarDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  const parsed = new Date(`${value}T00:00:00Z`)
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
+}
+
 
 const isDirectory = (path) => {
   try {
@@ -65,6 +82,11 @@ function fileProblems(rel, name, problems) {
   if (ROOT_FILES.has(name)) return
   if (!NOTE_FILE.test(name)) {
     problems.push(`${rel} — 文件名须为 yyyy-mm-dd-<slug>.md（slug 全小写，点号只用于版本号；日期前缀是地址的一部分）`)
+    return
+  }
+  const date = noteDate(name)
+  if (date !== undefined && !isCalendarDate(date)) {
+    problems.push(`${rel} — 文件名日期 ${date} 不是真实日历日期（日期前缀是地址的一部分，必须可解析）`)
   }
 }
 
@@ -134,13 +156,14 @@ export function notesStatusProblems(root, effective = STATUS_EFFECTIVE_DATE) {
   if (!isDirectory(notesDir)) return { problems: [], checked: 0 }
   const problems = []
   let checked = 0
-  for (const lifecycle of ['proposed', 'implemented', 'archived']) {
+  for (const lifecycle of LIFECYCLES) {
     const dir = join(notesDir, lifecycle)
     if (!isDirectory(dir)) continue
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       if (!entry.isFile() || !entry.name.endsWith('.md') || ROOT_FILES.has(entry.name)) continue
       const date = noteDate(entry.name)
-      if (date === undefined || date < effective) continue
+      if (date === undefined || !isCalendarDate(date)) continue
+      if (Date.parse(date) < Date.parse(effective)) continue
       checked += 1
       const at = []
       const lines = readFileSync(join(dir, entry.name), 'utf8').split('\n')
@@ -155,6 +178,12 @@ export function notesStatusProblems(root, effective = STATUS_EFFECTIVE_DATE) {
       const line = at[0]
       if (line >= 12) problems.push(`${rel}:${line + 1} — 状态行必须在前 12 行内（当前第 ${line + 1} 行）`)
       if (lifecycle === 'proposed') continue
+      if (lifecycle === 'rejected') {
+        if (!/^状态[:：]\s*\**\s*rejected/.test(lines[line])) {
+          problems.push(`${rel}:${line + 1} — 状态词须以 rejected 开头（rejected/ 是负知识层，不改写成 implemented）`)
+        }
+        continue
+      }
       if (!/^状态[:：]\s*\**\s*(implemented|已交付|已消化)/.test(lines[line])) {
         problems.push(`${rel}:${line + 1} — 状态词须以 implemented/已交付/已消化 开头（${lifecycle}/ 保留实现状态，不改写成 archived）`)
       }

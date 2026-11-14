@@ -23,6 +23,28 @@
 | C PRD 结构容器/身份/格式 | [162](BUG-162-prd-html-comments-parsed-as-definitions.md) / [164](BUG-164-req-in-multiple-slices.md) / [165](BUG-165-slices-escaped-pipe.md) / [166](BUG-166-prd-changelog-format.md) | HTML 注释当定义；REQ 跨 slice 重复；转义竖线拆列；changeLog 日期/作者不校验 | P2 ×4 |
 | D notes-tree lifecycle/日期 | [163](BUG-163-notes-tree-rejected-status-unguarded.md) / [167](BUG-167-notes-tree-invalid-calendar-date.md) | `rejected/` 状态行被跳过；日期只验形状不验日历 | P2 ×2 |
 
+## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）
+
+**用户指令（2026-11-14）**：「能提交的先提交掉，然后你继续做。现在有新的一轮，又有新的bug上来了，准备修复新的bug吧」。
+本句即本轮授权（材料性：company-pack 公开行为 + 门禁判据），留痕 = Note。
+终点 = 活跃清单清零、8 张卡全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent` 与红→绿证据齐。
+
+这八张是上一轮修复后的**回归扫**：四处仍是「同一事实有两个解释」，各收成一个来源：
+
+| 组 | 卡 | 同一根因 | 修法（唯一事实源） |
+|---|---|---|---|
+| **A 文档文本形状层** | [160](BUG-160-req-check-raw-text-bom-fence.md) / [162](BUG-162-prd-html-comments-parsed-as-definitions.md) | `/prd check` 与 `/req check` 各有一套行假设；`prd-check` 的围栏状态没覆盖 HTML 注释 | 新 `lib/markdown-shape.ts`（归一化 + 围栏 + HTML 注释），两个命令同读；注释片段从行文本移除而不是只加一个 bool |
+| **B push 范围** | [161](BUG-161-pre-push-merge-commit-surface-skip.md) | merge 提交在 `diff-tree` 下没有输出，逐提交取变更漏掉合并结果 | `commitPaths()` 对 merge 用 `git diff <first-parent> <sha>`；非 merge 不变 |
+| **C PRD 结构与字段** | [164](BUG-164-req-in-multiple-slices.md) / [165](BUG-165-slices-escaped-pipe.md) / [166](BUG-166-prd-changelog-format.md) | 归属/表格/字段解析只验形状不验语义：REQ 可跨 slice、`\|` 不识别、changeLog 只看分三段 | slice 解析维护 `reqOwner`；`splitRow` 扫描转义；changeLog 校验真实日历 + 非空作者/变更 |
+| **D notes-tree** | [163](BUG-163-notes-tree-rejected-status-unguarded.md) / [167](BUG-167-notes-tree-invalid-calendar-date.md) | 门禁声称覆盖全 lifecycle/全日期，实际漏 rejected 与日历语义 | lifecycle 循环含 `rejected` 并校验 `rejected` 状态词；日期做真实日历往返，生效比较用解析值 |
+
+**次序 = B → A → C → D**：B 独立且 P1；A 先立共享扫描层（C 的三个解析器都改在同一文件，依赖它）；C 随后；
+D 是独立门禁面。
+
+**逐卡收口**：先写 `## 已修判定`（已随本轮翻转落卡）再翻 `修复就绪`；落树后翻 `已修`（归档同改）并记
+`审查：agent` + 红→绿证据；最后 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/) 并同步两张索引。
+
+
 **上一轮收口**（2026-11-13 第四轮）：BUG-147..149 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；
 BUG-150 复核不成立，迁 [settled_issues](../_archive/settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md)；
 BUG-151 由 Safety 矩阵首跑发现，同轮修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。

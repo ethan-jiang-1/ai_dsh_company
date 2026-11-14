@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-164：/prd check 不校验「一个 REQ 只能属于一个 slice」：同一 REQ 列进两个 slice 仍绿
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-157 修了 slice/AC 的**重号**，但「REQ 跨 slice 重复归属」是另一条身份规则。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8b-more-shapes.mts`。
@@ -43,6 +43,16 @@ node --import tsx/esm runtime/tmp/c8b-more-shapes.mts
 - `validateProductDocs()` 反向建 `reqId -> sliceIds`，任一 REQ 出现在 >1 个 slice 即红；
 - 或 `parsePrdSlices()` 维护 `reqSeen`，跨行重复即报；
 - spec 覆盖「跨 slice 重复」「同 slice 内重复」「合法单归属」三形状。
+
+## 已修判定
+
+```text
+同一 REQ 同时列进 S1 与 S2 → 红，点名两个 slice
+同一 slice 行里重复列同一 REQ → 红
+单归属（合法形状）→ 绿，不误判
+```
+
+判据由 `tests/lib/prd-check.spec.ts` 的归属用例搭载；红证 = 去掉 `reqOwner` 映射 → `REQ in two slices true []` 复现。
 
 ## 证据
 

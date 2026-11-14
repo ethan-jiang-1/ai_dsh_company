@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-165：Slices 表不认 Markdown 转义竖线，合法单元格被拆成两列
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；Slices 表是 PRD 的 slice→REQ 归属面。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8b-more-shapes.mts`。
@@ -49,6 +49,16 @@ node --import tsx/esm runtime/tmp/c8b-more-shapes.mts
 
 - `splitRow()` 按未转义 `|` 切分：扫描字符，遇到 `\|` 保留为 `|`，遇到反斜杠转义下一个字符；或先保护 `\|` 再 split；
 - spec 覆盖 Goal / requirements / Exit 三列里的 `\|`。
+
+## 已修判定
+
+```text
+Goal / Requirements / Exit 三列里的 `\|` 都按字面竖线解析，不拆列
+`| S1 | A \| B | REQ-001 | ok |` → ok，slice S1 的 goal = `A | B`
+未转义竖线仍是列分隔（不回归）
+```
+
+判据由 `tests/lib/prd-check.spec.ts` 的转义竖线用例搭载；红证 = 还原 `split('|')` → 三条错误（非法 REQ id B / 未列出 REQ-001 / 列出不存在的 REQ B）复现。
 
 ## 证据
 

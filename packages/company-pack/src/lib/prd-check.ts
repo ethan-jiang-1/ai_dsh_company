@@ -9,7 +9,11 @@
  * 旧形状把 32 条需求写成 52KB JSON、再在正文复制一遍，且账本的软件枚举与工程惯例
  * 冲突（一场真实硬件 PRD 33 条红）。现在 `### REQ-###` 小节是唯一定义点，字段行
  * 直接可读；旧 `json-ledger` 文档保留只读兼容（`definition` 头分派），不回写。
+ *
+ * 2026-11-14：文档结构行判据（平台归一化 + 围栏 + HTML 注释）移到 `markdown-shape.ts`，
+ * 与 `/req check` 共用同一份——两个消费者对同一份文档不允许有两种结论（BUG-160/162）。
  */
+import { normalizeDocument, scanDocument, splitTableRow } from './markdown-shape.ts'
 
 export type PrdDocStatus = 'draft' | 'ready' | 'in-dev' | 'accepted'
 export type PrdForm = 'headings' | 'json-ledger'
@@ -296,57 +300,21 @@ const PRIORITIES: readonly ReqPriority[] = ['P0', 'P1', 'P2']
 const STATUSES: readonly ReqStatus[] = ['draft', 'ready', 'in-dev', 'accepted', 'deferred', 'withdrawn']
 const VERIFICATIONS: readonly Verification[] = ['test', 'demonstration', 'analysis', 'inspection', 'demo', 'review']
 
-/**
- * 平台差异归一：去 UTF-8 BOM、CRLF/lone-CR → LF（BUG-152）。
- *
- * 为什么不靠正则容错：`(.*)$` 里的 `.` 不匹配行终止符，标题行尾的 `\r` 会让 `### REQ-001 …` 整个不命中；
- * 在入口把文本归一到一种换行，标题/表格/字段三类解析器就只需要一种假设。
- */
-function normalizeDocument(text: string): string {
-  const withoutBom = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text
-  return withoutBom.replace(/\r\n?/g, '\n')
-}
-
-interface ScannedLine {
-  readonly line: string
-  /** 该行是否属于围栏代码块（围栏开合行本身也算）。 */
-  readonly inFence: boolean
-}
-
-/** 围栏开合行：最多 3 个前导空格 + 三连以上反引号/波浪号，后跟信息串。 */
-function fenceAt(line: string): { readonly char: string; readonly length: number; readonly rest: string } | undefined {
-  const match = /^\s{0,3}(`{3,}|~{3,})(.*)$/.exec(line)
-  if (match === null) return undefined
-  const marker = match[1] ?? ''
-  return { char: marker[0] ?? '`', length: marker.length, rest: match[2] ?? '' }
-}
-
-/**
- * 逐行标记围栏状态（BUG-153）。
- *
- * 为什么：围栏里的 `### REQ-999` 与 `## Slices` 表是**示例**，不是定义；不维护 fence 状态就会造出
- * 幽灵需求（示例当定义）和假红（示例表顶掉真实表）。围栏记号两族都认（``` 与 ~~~），
- * 闭合要求同族、长度不短于开启、且关闭行没有其它内容。
- */
-function scanLines(text: string): ScannedLine[] {
-  const out: ScannedLine[] = []
-  let open: { readonly char: string; readonly length: number } | undefined
-  for (const line of text.split('\n')) {
-    const fence = fenceAt(line)
-    if (open === undefined) {
-      if (fence !== undefined) open = { char: fence.char, length: fence.length }
-      out.push({ line, inFence: open !== undefined })
-      continue
-    }
-    out.push({ line, inFence: true })
-    if (fence !== undefined && fence.char === open.char && fence.length >= open.length && fence.rest.trim() === '') open = undefined
-  }
-  return out
-}
-
 /** 枚举容错：`nonFunctional` / `Non-Functional` → `non-functional`（大小写与驼峰都不判红）。 */
 function normalizeToken(value: string): string {
   return value.trim().replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+}
+
+/**
+ * `YYYY-MM-DD` 且是真实日历日期（BUG-166）。
+ *
+ * 形状正则不够：`2026-13-99`、`2026-02-29`（非闰年）都能过 `\d{4}-\d{2}-\d{2}`；
+ * Date 往返会把越界月/日规范化成另一个日期，往返串不相等即判非法。
+ */
+function isCalendarDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  const parsed = new Date(`${value}T00:00:00Z`)
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
 }
 
 function parseBracketList(raw: string): string[] {
@@ -356,28 +324,27 @@ function parseBracketList(raw: string): string[] {
   return inner.split(',').map(item => item.trim()).filter(item => item !== '')
 }
 
-function splitRow(line: string): string[] {
-  return line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(cell => cell.trim())
-}
 
-/** 解析 `## Slices` 表；每个 slice 必须列出显式 REQ id（R8 禁区间断言）。围栏里的表不算定义（BUG-153）。 */
+/** 解析 `## Slices` 表；每个 slice 必须列出显式 REQ id（R8 禁区间断言）。围栏/注释里的表不算定义（BUG-153/162）。 */
 export function parsePrdSlices(text: string, errors: string[]): PrdSlice[] {
-  const lines = scanLines(normalizeDocument(text))
-  const start = lines.findIndex(scanned => !scanned.inFence && /^##\s+Slices\b/i.test(scanned.line))
+  const lines = scanDocument(text)
+  const start = lines.findIndex(scanned => scanned.structural && /^##\s+Slices\b/i.test(scanned.text))
   if (start === -1) {
     errors.push('PRD 缺「## Slices」表（slice 与 REQ 的归属没有声明面）')
     return []
   }
   const slices: PrdSlice[] = []
   const seen = new Set<string>()
+  /** REQ → 它已归属的 slice；同一 REQ 只能属于一个 slice（BUG-164）。 */
+  const reqOwner = new Map<string, string>()
   for (let index = start + 1; index < lines.length; index += 1) {
     const scanned = lines[index]
     if (scanned === undefined) break
-    const line = scanned.line
-    if (scanned.inFence) continue
+    if (!scanned.structural) continue
+    const line = scanned.text
     if (/^##\s+/.test(line)) break
     if (!line.trim().startsWith('|')) continue
-    const cells = splitRow(line)
+    const cells = splitTableRow(line)
     const id = cells[0] ?? ''
     if (id === '' || /^slice$/i.test(id) || /^-+$/.test(id)) continue
     if (!/^S\d+$/.test(id)) {
@@ -394,7 +361,14 @@ export function parsePrdSlices(text: string, errors: string[]): PrdSlice[] {
     if (/…|\.\.\.|~/.test(requirementCell)) errors.push(`slice ${id} 的 requirements 必须是显式 REQ id（不用区间）`)
     const requirements = requirementCell.split(',').map(item => item.trim()).filter(item => item !== '')
     for (const reqId of requirements) {
-      if (!/^REQ-\d{3}$/.test(reqId)) errors.push(`slice ${id} 含非法 REQ id：${reqId}`)
+      if (!/^REQ-\d{3}$/.test(reqId)) {
+        errors.push(`slice ${id} 含非法 REQ id：${reqId}`)
+        continue
+      }
+      const owner = reqOwner.get(reqId)
+      if (owner === undefined) reqOwner.set(reqId, id)
+      else if (owner === id) errors.push(`slice ${id} 重复列出 ${reqId}（同一 slice 里一个 REQ 只能列一次）`)
+      else errors.push(`${reqId} 同时列在 slice ${owner} 与 ${id}（一个 REQ 只能属于一个 slice）`)
     }
     if (goal === '') errors.push(`slice ${id} 缺 goal`)
     if (requirements.length === 0) errors.push(`slice ${id} 的 requirements 不能为空`)
@@ -411,9 +385,9 @@ interface RequirementBlock {
   readonly body: readonly string[]
 }
 
-/** 取 `### REQ-###` 定义小节；块在下一个 `##`/`###` 标题处结束。围栏里的内容不是定义（BUG-153）。 */
+/** 取 `### REQ-###` 定义小节；块在下一个 `##`/`###` 标题处结束。围栏/注释里的内容不是定义（BUG-153/162）。 */
 export function prdRequirementBlocks(text: string): RequirementBlock[] {
-  const lines = scanLines(normalizeDocument(text))
+  const lines = scanDocument(text)
   const blocks: RequirementBlock[] = []
   let current: { id: string; title: string; line: number; body: string[] } | undefined
   const flush = (): void => {
@@ -421,8 +395,8 @@ export function prdRequirementBlocks(text: string): RequirementBlock[] {
     current = undefined
   }
   for (const [index, scanned] of lines.entries()) {
-    if (scanned.inFence) continue
-    const line = scanned.line
+    if (!scanned.structural) continue
+    const line = scanned.text
     const heading = PRD_SECTION_HEADING.exec(line)
     if (heading !== null) {
       flush()
@@ -496,8 +470,12 @@ function readRequirementFields(id: string, body: readonly string[], errors: stri
       else {
         for (const entry of items) {
           const parts = entry.split('·').map(part => part.trim())
-          if (parts.length !== 3) errors.push(`${id}.changeLog 条目必须是「日期 · 作者 · 变更」：${entry}`)
-          else changeLog.push({ at: parts[0] ?? '', by: parts[1] ?? '', change: parts[2] ?? '' })
+          if (parts.length !== 3) { errors.push(`${id}.changeLog 条目必须是「日期 · 作者 · 变更」：${entry}`); continue }
+          const [at, by, change] = parts as [string, string, string]
+          if (!isCalendarDate(at)) errors.push(`${id}.changeLog 日期必须是真实日历日期 YYYY-MM-DD：${entry}`)
+          if (by === '') errors.push(`${id}.changeLog 作者不能为空：${entry}`)
+          if (change === '') errors.push(`${id}.changeLog 变更说明不能为空：${entry}`)
+          changeLog.push({ at, by, change })
         }
       }
       index = cursor - 1

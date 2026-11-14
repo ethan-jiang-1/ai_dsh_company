@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-162：PRD parser 不忽略 HTML 注释，注释里的示例仍成定义
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-153 修了围栏代码块，但另一类「非定义容器」HTML 注释仍未处理。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8b-html-comment.mts`。
@@ -47,6 +47,16 @@ node --import tsx/esm runtime/tmp/c8b-html-comment.mts
 
 - 在 `scanLines()` 增加 HTML 注释状态（`<!--` 到 `-->`，支持多行），注释行不参与标题/表格扫描；
 - spec 覆盖「注释里的 REQ/Slices 不算定义」与「注释外正常解析」。
+
+## 已修判定
+
+```text
+HTML 注释（单行、多行、行内）里的 ### REQ-999 / ## Slices 表 → 不算定义；reqCount 保持 1
+注释外的标题/表格照常解析（不回归）
+围栏与注释两种「非定义容器」由同一 scanDocument 状态机处理
+```
+
+判据由 `tests/lib/prd-check.spec.ts` 的注释用例搭载；红证 = 去掉注释状态 → 注释用例回到 9 条 REQ-999 字段错误、reqCount 2。
 
 ## 证据
 
