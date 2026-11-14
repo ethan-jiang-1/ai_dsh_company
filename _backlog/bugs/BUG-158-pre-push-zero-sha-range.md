@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P1
 opened: 2026-11-13
 ---
 
 # BUG-158：pre-push 按面选择在 zero SHA 场景漏检/崩溃
 
-> 严重级别：P1（重要）｜发现：2026-11-13｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P1（重要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C9-H1）；pre-push 是 2026-11-13 新增的「改到哪个面就必须跑哪条真入口」机械门。
 > **留痕**：本卡只报不修；复现证据 = `runtime/tmp/c8-round1.mts` 之外的 `runtime/tmp/c9-delete.log` 与合成分支。
@@ -60,6 +60,17 @@ node checks/pre-push-surfaces.mjs --stdin runtime/tmp/c9-delete-refs --dry-run
 - remote 全零：用 `git merge-base`（有 upstream）或空树/`git diff-tree --root` 覆盖该分支全部提交，而不是只 diff tip。
 - local 全零（删除）：跳过该 ref，不调用 diff。
 - 把两种 stdin 形状做成自测（`tests/checks/` 或 `checks/audit` 的纯函数测试），避免靠手工。
+
+## 已修判定
+
+```text
+新分支首次 push（remote 全零）：父提交改 client、tip 只改 docs → dry-run 必须印出 client 面
+删除 ref（local 全零）     → 跳过该 ref，不跑 git diff、退出码 0
+普通 push（remote 非零）    → 仍取 <remote>..<local> 范围（不回归）
+无 stdin 手动直跑           → 仍明确打印「退化为 HEAD~1」
+```
+
+判据由 `tests/checks/pre-push-surfaces.test.mjs` 搭载（临时 git 仓库 + 真脚本子进程；`pnpm test:checks`）；红证 = 还原旧范围分支 → 新分支用例印「未触发」、删除 ref 用例 `bad object` 崩。
 
 ## 证据
 

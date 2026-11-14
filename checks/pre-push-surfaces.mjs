@@ -7,9 +7,14 @@
 // 本脚本把「改到哪个面就必须跑哪条真入口检查」变成 push 前的机械动作：规则住
 // `tools/lib/asset-lanes.mjs` 的 SURFACE_RULES（一处事实一个家），这里只做取范围 + 匹配 + 跑。
 //
-// 取范围不猜 base：pre-push hook 自带 `<local ref> <local sha> <remote ref> <remote sha>` 四元组，
-// 用它算 `<remote sha>..<local sha>`；remote sha 全零（新分支）退化为该提交自身的 diff-tree。
+// 取范围不猜 base：pre-push hook 自带 `<local ref> <local sha> <remote ref> <remote sha>` 四元组。
+// 三种形状各有一条明确语义（2026-11-14，BUG-158）：
+// - remote sha 非零  → `git diff <remote sha> <local sha>`（这次 push 新增的提交）
+// - remote sha 全零  → 新分支/远端没有这个 sha：`git rev-list <local sha> --not --remotes` 取**整条出站
+//   提交集**再逐个 diff-tree——只 diff tip 会漏掉分支里更早的提交（假绿）；
+// - local sha 全零   → ref 被删除：跳过，不调 diff（对 `000…` 做 diff 会 `bad object` 崩，假红）。
 // 没有 stdin（手动直跑）才退化为 HEAD~1，并明确打印"退化"，不静默。
+// `--root <dir>` 只用于自测（`tests/checks/pre-push-surfaces.test.mjs` 在临时仓库里跑真脚本）。
 import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -17,13 +22,14 @@ import { dirname, join, resolve } from 'node:path'
 import { assetByName, selectSurfaces, suffixOf } from '../tools/lib/asset-lanes.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const root = resolve(here, '..')
 const argv = process.argv.slice(2)
 const has = flag => argv.includes(flag)
 const valueOf = flag => {
   const index = argv.indexOf(flag)
   return index >= 0 ? argv[index + 1] : undefined
 }
+const rootFlag = valueOf('--root')
+const root = rootFlag === undefined ? resolve(here, '..') : resolve(process.cwd(), rootFlag)
 const dryRun = has('--dry-run')
 
 const git = args => {
@@ -32,6 +38,28 @@ const git = args => {
   return result.stdout
 }
 const isZero = sha => /^0+$/.test(sha)
+
+/** 一条 ref 四元组 → 该 ref 本次 push 带出的变更文件。 */
+function pathsOfRef(localRef, localSha, remoteSha) {
+  if (isZero(localSha)) {
+    console.log(`pre-push surfaces: 跳过 ${localRef || '被删除的 ref'}（ref 被删除，没有变更面）`)
+    return []
+  }
+  if (remoteSha && !isZero(remoteSha)) {
+    return git(['diff', '--name-only', remoteSha, localSha]).split('\n').filter(Boolean)
+  }
+  // 新分支/远端还没有这个 sha：整条出站提交集，而不是只看 tip。
+  const commits = git(['rev-list', localSha, '--not', '--remotes']).split('\n').filter(Boolean)
+  const targets = commits.length > 0 ? commits : [localSha]
+  if (commits.length === 0) {
+    console.log(`pre-push surfaces: ${localRef || localSha} 的提交都已在远端 ref 上——按 tip 自身取变更面`)
+  }
+  const paths = []
+  for (const sha of targets) {
+    paths.push(...git(['diff-tree', '--root', '--no-commit-id', '--name-only', '-r', sha]).split('\n').filter(Boolean))
+  }
+  return paths
+}
 
 /** 从 hook stdin 或退化路径取本次 push 的变更文件。 */
 function changedPaths() {
@@ -47,12 +75,9 @@ function changedPaths() {
 
   const paths = new Set()
   for (const line of refs) {
-    const [, localSha, , remoteSha] = line.split(/\s+/)
+    const [localRef, localSha, , remoteSha] = line.split(/\s+/)
     if (!localSha) continue
-    const diff = remoteSha && !isZero(remoteSha)
-      ? git(['diff', '--name-only', remoteSha, localSha])
-      : git(['diff-tree', '--no-commit-id', '--name-only', '-r', localSha])
-    for (const path of diff.split('\n')) if (path) paths.add(path)
+    for (const path of pathsOfRef(localRef, localSha, remoteSha)) paths.add(path)
   }
   return [...paths]
 }

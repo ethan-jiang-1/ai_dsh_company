@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-13
 ---
 
 # BUG-152：CRLF/BOM 的 headings PRD 被判「没有定义小节」
 
-> 严重级别：P2（次要）｜发现：2026-11-13｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H1）；`/prd check` 与 present 闸门共用 `validateProductDocs`。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8-round1.mts`、`runtime/tmp/c8-structural.mts`。
@@ -46,6 +46,17 @@ node --import tsx/esm runtime/tmp/c8-structural.mts
 - 切行用 `split(/\r?\n/)` 或在入口归一化 CRLF；标题正则允许 `\r?$`。
 - 入口剥 UTF-8 BOM；或让 `parsePrdHeader` 允许 `^\uFEFF?---`。
 - spec 覆盖 CRLF / BOM / LF 三形状，并断言错误文本不误导。
+
+## 已修判定
+
+```text
+LF          validateProductDocs(mrd, prd) === { ok: true, reqCount: 1, acCount: 1 }
+CRLF        validateProductDocs(mrd, prd) === { ok: true }   ← 现在 false「没有定义小节」
+BOM+CRLF    validateProductDocs(mrd, prd) === { ok: true }   ← 现在 false「缺 definition 头」
+错误文本    不含「没有定义小节」「缺 definition 头」（三形状都不再指向内容缺失）
+```
+
+判据由 `tests/lib/prd-check.spec.ts` 的 CRLF / BOM 用例搭载（同 diff 落）；红证 = 把归一化拆掉，两类用例立刻回到当前输出。原复现脚本 `runtime/tmp/c8-round1.mts` 的 `CRLF PRD` 行由 `false [...]` 变 `true []`，`runtime/tmp/c8-structural.mts` 的 `BOM PRD` 行同上。
 
 ## 证据
 

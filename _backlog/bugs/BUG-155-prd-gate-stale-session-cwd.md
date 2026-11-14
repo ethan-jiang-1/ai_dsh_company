@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P1
 opened: 2026-11-13
 ---
 
 # BUG-155：present 闸门按 session header cwd 解析相对路径，与 present 的实际工作目录不一致
 
-> 严重级别：P1（重要）｜发现：2026-11-13｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P1（重要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H4/H6 的路径面）；`present` 工具用 `ctx.workingDirectory.ensure`，闸门用 `session.header.cwd`。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8-round1.mts`。
@@ -46,6 +46,17 @@ node --import tsx/esm runtime/tmp/c8-round1.mts
 
 - 闸门与 `present` 用同一 workingDirectory projection/服务解析路径（pre-execute listener 是 async，可 `await ctx.workingDirectory.ensure(...)`），或只接受绝对路径并明确拒绝相对路径。
 - spec 覆盖 `cd` 后 present、header.cwd 缺失、绝对/相对两形状。
+
+## 已修判定
+
+```text
+header.cwd=/old，cd 到 /old/new 后 present 相对路径 → 闸门看 /old/new 的文档（deny 坏 PRD），不再看 /old
+present 侧解析器                                  → 同一 workingDirectory 服务（ctx.workingDirectory.ensure）
+cwd 无法解析 + 相对路径指向 .dsh-company/deliverables → deny（不静默跳过）
+绝对路径                                          → 仍按绝对路径解析（不回归）
+```
+
+判据由 `tests/host/commands/prd-gate.spec.ts` 的「cd 后相对路径」「cwd 缺失」两组用例搭载；红证 = 闸门改回 `session.header.cwd` → cd 用例变 allow。
 
 ## 证据
 

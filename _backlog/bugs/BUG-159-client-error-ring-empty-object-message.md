@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-13
 ---
 
 # BUG-159：错误环把非 Error 的 error 对象记成 `{}`，丢掉 event.message
 
-> 严重级别：P2（次要）｜发现：2026-11-13｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C10-H1）；与 2026-11-13 `error === null` 修复同族。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c10-error-ring.mts`。
@@ -48,6 +48,18 @@ ring 第一条 `"message": "{}"`；第二条 `error: null` 是 `"null-error mess
 - `textOf` 对普通对象先取 `message` / `reason` / `name` 字段；或 `onError` 在 `error` 非 `Error` 且 `event.message` 非空时优先 message。
 - 仅当 `event.error` 与 `event.message` 都为空时才落 JSON/未知。
 - spec 覆盖 `{}`、跨 realm Error、null、string、Error 五形状。
+
+## 已修判定
+
+```text
+{ error: {}, message: 'real cross-realm message' }      → ring message = 'real cross-realm message'
+{ error: { name: 'TypeError', message: 'cross' } }（跨 realm 形） → 'TypeError: cross'
+{ error: null, message: 'null-error message' }         → 'null-error message'（不回归）
+{ error: 'string error' } / new Error('boom')          → 原文 / 'Error: boom'（不回归）
+error 与 message 都为空                                → '（未知页面错误）'
+```
+
+判据由 `tests/client/wiring/error-ring.spec.ts` 的五形状用例搭载；红证 = 还原 `textOf` 的 `JSON.stringify({}) → '{}'` 短路 → 第一条回到 `"message": "{}"`。
 
 ## 证据
 

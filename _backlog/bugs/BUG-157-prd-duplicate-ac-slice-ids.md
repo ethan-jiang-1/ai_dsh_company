@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-13
 ---
 
 # BUG-157：`/prd check` 不校验 AC/slice 身份唯一性
 
-> 严重级别：P2（次要）｜发现：2026-11-13｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H8 的相邻面）；编号合同要求每个 kind 的号在动议内唯一。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8-structural.mts`。
@@ -52,6 +52,17 @@ node --import tsx/esm runtime/tmp/c8-structural.mts
 - AC 解析加 `seen`（按 REQ 内/全局，与合同一致），重复时点名两处；
 - slice 解析加 `seen`，重复 id 报红；
 - spec 覆盖「同 REQ 重 AC」「跨 REQ 重 AC」「重 slice」「合法多 AC」四形状。
+
+## 已修判定
+
+```text
+同一 REQ 下两条 AC-001-1      → ok: false，错误点名 AC-001-1 重号
+两条 S1 slice 行              → ok: false，错误点名 S1 重号
+合法多 AC（AC-001-1/2）       → ok: true（不误判）
+跨 REQ 重号（REQ-002 下写 AC-001-1） → 仍报父号不一致（现有行为不回归）
+```
+
+判据由 `tests/lib/prd-check.spec.ts` 的重号用例搭载；红证 = 去掉 AC/slice 的 seen 集合 → `dup AC true []` / `dup slice true []` 原样复现。
 
 ## 证据
 

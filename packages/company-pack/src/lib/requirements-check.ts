@@ -359,13 +359,47 @@ function tableRowDefinitions(rel: string, text: string, layer: Layer): Definitio
   return definitions
 }
 
+/**
+ * meta.md 的 `numbering:` 标记（`/req check` 与 present 交付闸门共用的唯一解析）。
+ *
+ * 三态是判据本身：整行缺失 = 旧动议只读豁免；声明了但值空/非法 = 坏声明（必须报，不是豁免）；
+ * 声明且合法 = 进编号校验。两个消费者对同一 marker 必须给同一答案（BUG-154）。
+ */
+export interface NumberingMarker {
+  /** 整行是否存在。 */
+  readonly declared: boolean
+  /** 冒号后的原值（已 trim）。 */
+  readonly value: string
+  /** 声明且值在词表内。 */
+  readonly valid: boolean
+}
+
+/** 词表唯一源；`/req check` 的报错文案与闸门同读它。 */
+export const NUMBERING_VOCABULARY = ['identity'] as const
+
+/**
+ * 解析 meta 里的 `numbering:` 标记。
+ * @param meta - meta.md 全文；undefined（读不到/没有）与「整行缺失」同义。
+ * @returns declared / value / valid 三态。
+ */
+export function numberingMarker(meta: string | undefined): NumberingMarker {
+  const marker = meta === undefined ? null : /^numbering:\s*(.*)$/m.exec(meta)
+  if (marker === null) return { declared: false, value: '', valid: false }
+  const value = (marker[1] ?? '').trim()
+  return { declared: true, value, valid: (NUMBERING_VOCABULARY as readonly string[]).includes(value) }
+}
+
+/** 声明了但值不在词表时的统一报错句（命令与闸门复用，避免两套文案）。 */
+export function numberingVocabularyError(value: string): string {
+  return `meta 的 \`numbering: ${value}\` 不在词表（只认 ${NUMBERING_VOCABULARY.join('|')}）`
+}
+
 function metaLayers(meta: string | undefined, errors: string[]): { layers: readonly Layer[] | undefined; skipped: boolean; reason: string } {
   if (meta === undefined) return { layers: undefined, skipped: false, reason: '' }
-  const marker = /^numbering:\s*(.*)$/m.exec(meta)
-  if (marker === null) return { layers: undefined, skipped: true, reason: 'meta 无 `numbering:` 标记——旧动议只读豁免' }
-  const value = (marker[1] ?? '').trim()
-  if (value !== 'identity') {
-    errors.push(`meta 的 \`numbering: ${value}\` 不在词表（只认 identity）`)
+  const marker = numberingMarker(meta)
+  if (!marker.declared) return { layers: undefined, skipped: true, reason: 'meta 无 `numbering:` 标记——旧动议只读豁免' }
+  if (!marker.valid) {
+    errors.push(numberingVocabularyError(marker.value))
     return { layers: undefined, skipped: false, reason: '' }
   }
   const declared = /^layers:\s*(.*)$/m.exec(meta)

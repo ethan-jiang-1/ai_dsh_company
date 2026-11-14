@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P1
 opened: 2026-11-13
 ---
 
 # BUG-156：present 闸门在 meta/drafts 不可读（symlink/越界）时静默放行
 
-> 严重级别：P1（重要）｜发现：2026-11-13｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P1（重要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H5/H6）；与 BUG-129/131/134/147/149 同族的「新增读载体未接 company-root」。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8-round1.mts`。
@@ -43,6 +43,17 @@ node --import tsx/esm runtime/tmp/c8-round1.mts
 - 把 `readTextInside` 的 `undefined` 拆成 typed problem：`missing` → 旧动议豁免；`symlink` / `outside` / `not-file` → deny 或 fail loud，不能当旧动议。
 - 闸门先做 company-root 根/子目录 residency（或消费同一个 `companyFileProblem`），再读 meta/drafts。
 - 把 `prd-gate` 登记的读载体加进 `file-shape-agreement` / `carrier-registry`，并补 spec：deliverables 根 symlink、meta 叶子 symlink、drafts symlink。
+
+## 已修判定
+
+```text
+deliverables 根 symlink → 外部目录   → deny（reason = 形状不安全），不再当旧动议
+meta.md 叶子 symlink → 外部文件      → deny
+drafts/ 下 mrd/prd 叶子 symlink      → deny
+meta 缺失（真没写）                  → allow（旧动议豁免；保持）
+```
+
+读取判据 = `readCompanyFileAt()` 的三态（text / missing / unsafe）：missing 才豁免，unsafe 一律 deny。该载体同 diff 登记进 `tools/lib/carrier-registry.mjs`（reader / `file-shape-agreement`）并加入 `tests/host/contract/file-shape-agreement.spec.ts` 的 READERS。红证 = 把 unsafe 折回 undefined → 三种 symlink 用例变 allow。
 
 ## 证据
 

@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P1
 opened: 2026-11-13
 ---
 
 # BUG-154：present 闸门把 `numbering:` 空值当旧动议放行
 
-> 严重级别：P1（重要）｜发现：2026-11-13｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P1（重要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H3）；与 `/req check` 的 numbering 词表分叉。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8-round1.mts`。
@@ -44,6 +44,17 @@ node --import tsx/esm runtime/tmp/c8-round1.mts
 - 闸门复用 `requirements-check` 的 marker 解析与词表：任何 `numbering:` 行都算「已声明」；值不是 `identity` 时 deny 或 fail loud。
 - 保留唯一豁免：**整行缺失**（旧动议），不是空值/非法值。
 - spec 覆盖 missing / empty / invalid / identity 四形状，断言 gate 与 `/req check` 同判。
+
+## 已修判定
+
+```text
+meta 整行缺失 numbering           → allow（旧动议只读豁免；保持）
+meta 写 numbering:（空值）        → deny，reason 点名 meta.md 的 numbering 值并指向 /req check
+meta 写 numbering: numbering-v2   → deny（同上）
+meta 写 numbering: identity + 坏 PRD → deny（现有行为不回归）
+```
+
+同源判据：闸门与 `/req check` 共用 `numberingMarker()`（`tests/host/commands/prd-gate.spec.ts` 断言四形状，`tests/lib` 断言同一函数对同一 marker 的判定）。红证 = 闸门还原 `/^numbering:\s*\S/m` → 空值形状变 allow，用例红。
 
 ## 证据
 

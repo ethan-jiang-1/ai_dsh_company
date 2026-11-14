@@ -230,6 +230,37 @@ export function readCompanyTextAt(companyHome: string, rel: string): string | un
   try { return readFileSync(join(companyHome, rel), 'utf8') } catch { return undefined }
 }
 
+/** 公司盘文件读取的三态；`unsafe` = 有实体但不是可读普通文件（symlink / 越界 / 非文件 / 根或父目录坏）。 */
+export type CompanyFileRead =
+  | { readonly kind: 'text'; readonly text: string }
+  | { readonly kind: 'missing' }
+  | { readonly kind: 'unsafe'; readonly reason: string }
+
+/**
+ * 读 companyHome 下文件并保留形状子类（BUG-156）。
+ *
+ * 为什么不是 `readCompanyTextAt`：调用方需要区分「真没有」与「有但不能安全读」——旧动议的
+ * 缺失豁免只适用于前者；把 symlink/越界折成 undefined 会让别的读面把「不安全」当成「没有」。
+ * @param companyHome - `<workspace>/.dsh-company` 目录（不跟随 symlink 的根）。
+ * @param rel - 相对 companyHome 的路径。
+ * @returns text / missing / unsafe；unsafe 的 reason 可直接进模型可见文案。
+ */
+export function readCompanyFileAt(companyHome: string, rel: string): CompanyFileRead {
+  try { ensureCompanyRootAt(companyHome) } catch (error) {
+    return { kind: 'unsafe', reason: `公司盘根不是可读目录：${(error as Error).message}` }
+  }
+  const parentRel = dirname(rel)
+  try { if (parentRel !== '.') ensureCompanyDirAt(companyHome, parentRel) } catch (error) {
+    return { kind: 'unsafe', reason: `父目录不是公司盘内的普通目录：${(error as Error).message}` }
+  }
+  const problem = plainFileProblem(companyHome, join(companyHome, rel))
+  if (problem === 'missing') return { kind: 'missing' }
+  if (problem !== null) return { kind: 'unsafe', reason: `${rel} 不是可读普通文件（${problem}）` }
+  try { return { kind: 'text', text: readFileSync(join(companyHome, rel), 'utf8') } } catch (error) {
+    return { kind: 'unsafe', reason: `${rel} 读取失败：${(error as Error).message}` }
+  }
+}
+
 /** 原子写 companyHome 下文件（父目录安全、目标非目录；symlink 由 rename 替换）。 */
 export function writeCompanyAtomicAt(companyHome: string, rel: string, text: string, deps: CompanyAtomicWriteDeps = {}): void {
   assertCompanyWritesAllowed()

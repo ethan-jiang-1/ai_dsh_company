@@ -150,6 +150,14 @@ export const CARRIERS = [
     companyRoot: true,
     coveredBy: 'file-shape-agreement',
   },
+  {
+    id: 'company.readFileAt',
+    module: 'packages/company-pack/src/host/run-bundle/company-root.ts',
+    symbol: 'readCompanyFileAt',
+    kind: 'reader',
+    companyRoot: true,
+    coveredBy: 'file-shape-agreement',
+  },
 ]
 
 /** 不写 workspace 公司盘的载体；`reason` 是豁免的唯一凭据。 */

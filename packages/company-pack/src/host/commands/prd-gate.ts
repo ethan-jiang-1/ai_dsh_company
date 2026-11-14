@@ -6,19 +6,27 @@
  * `tools/pre-execute` 能在调用落地前拒绝，所以把校验放在 present 的前置面上：红 → deny，
  * 把错误原样交给模型；不是"提醒一下"的软约束。
  *
- * 边界：只拦 `present`；只对**声明了 `numbering: identity` 的动议**生效（旧动议只读豁免，
- * 与 `/req check` 同口径）；文件缺失/读失败一律放行（闸门不能把正常交付卡死）。
+ * 边界：只拦 `present`；只对**声明了 `numbering:` 的动议**生效（整行缺失 = 旧动议只读豁免）。
+ *
+ * 2026-11-14（BUG-154/155/156）：闸门不许自带第二套事实源——
+ * - cwd 与 `present` 同读 `ctx.workingDirectory.ensure`（会话 `cd` 后 header.cwd 会过期）；
+ * - numbering 与 `/req check` 同读 `numberingMarker`（空值/非法值照报，不折成「没有声明」）；
+ * - 读取用 `readCompanyFileAt` 的三态（missing 才豁免；symlink/越界/非文件一律 deny）。
  */
 import type { Context } from '@deepseek-ai/cordis'
 import type { PreToolDecision } from '@deepseek-ai/dsh-tools'
 import { isAbsolute, join, sep } from 'node:path'
-import { readTextInside } from '../fs/safe-file.ts'
+import { readCompanyFileAt } from '../run-bundle/company-root.ts'
+import type { CompanyFileRead } from '../run-bundle/company-root.ts'
+import { numberingMarker, numberingVocabularyError } from '../../lib/requirements-check.ts'
 import { validateProductDocs } from '../../lib/prd-check.ts'
 
-/** 闸门只读这次调用的三件事（结构最小面，测试可直接构造）。 */
+/** 闸门只读这次调用的几件事（结构最小面，测试可直接构造）。 */
 export interface GateToolCall {
   readonly name: string
   readonly arguments: unknown
+  /** 已解析的当前工作目录（`registerPrdGate` 用 workingDirectory 服务注入；缺省回退 header.cwd）。 */
+  readonly cwd?: string
   readonly agent?: {
     readonly session?: {
       readonly header?: {
@@ -31,7 +39,7 @@ export interface GateToolCall {
 /** 注入面（keyless 可测）。 */
 export interface PrdGateDeps {
   readonly check: typeof validateProductDocs
-  readonly readText: (root: string, path: string) => string | undefined
+  readonly readFile: (companyHome: string, rel: string) => CompanyFileRead
 }
 
 /** 从 present 的参数里取文件路径（schema = `files: [{ path, description? }]`）。 */
@@ -61,9 +69,20 @@ export function deliverableOf(path: string, cwd: string | undefined): { readonly
   }
 }
 
-/** 读 meta.md 的 `numbering:` 标记；缺失 = 旧动议（只读豁免）。 */
-function numberingDeclared(meta: string | undefined): boolean {
-  return meta !== undefined && /^numbering:\s*\S/m.test(meta)
+/** 这条路径是不是「公司成品」的形状（用于 cwd 缺失时拒绝静默放行）。 */
+function isDeliverableShaped(path: string): boolean {
+  const parts = path.split(/[\\/]+/)
+  const companyIndex = parts.indexOf('.dsh-company')
+  return companyIndex !== -1 && parts[companyIndex + 1] === 'deliverables' && (parts[companyIndex + 2] ?? '') !== ''
+}
+
+/** 形状挡住校验：不能当旧动议跳过，也不把读者指向内容缺失。 */
+function denyShape(slug: string, name: string, detail: string): PreToolDecision {
+  return {
+    kind: 'deny',
+    reason: `交付前 PRD 校验被文件形状挡住（${slug}）：${name} ${detail}。\n`
+      + `闸门只读公司盘内的普通文件（不跟随 symlink、不越出 \`.dsh-company\`）；把文件放回公司盘内并换成普通文件后重试。`,
+  }
 }
 
 /**
@@ -72,18 +91,44 @@ function numberingDeclared(meta: string | undefined): boolean {
  */
 export function gateToolCall(exec: GateToolCall, deps: PrdGateDeps): PreToolDecision | undefined {
   if (exec.name !== 'present') return undefined
-  const cwd = exec.agent?.session?.header?.cwd
+  const cwd = exec.cwd ?? exec.agent?.session?.header?.cwd
   const seen = new Set<string>()
   for (const path of presentedPaths(exec.arguments)) {
     const target = deliverableOf(path, cwd)
-    if (target === undefined || seen.has(target.slug)) continue
+    if (target === undefined) {
+      // 相对路径 + 公司成品形状但拿不到 cwd：旧行为是静默跳过（BUG-155），现在必须说清楚。
+      if (!isAbsolute(path) && isDeliverableShaped(path)) {
+        return {
+          kind: 'deny',
+          reason: `present 的路径 ${path} 是相对路径，但本次调用解析不到工作目录。\n`
+            + `改用绝对路径 present，或先 cd 到项目目录再试。`,
+        }
+      }
+      continue
+    }
+    if (seen.has(target.slug)) continue
     seen.add(target.slug)
-    const meta = deps.readText(target.companyRoot, join(target.dir, 'meta.md'))
-    if (!numberingDeclared(meta)) continue
-    const mrd = deps.readText(target.companyRoot, join(target.dir, 'drafts/mrd.md'))
-    const prd = deps.readText(target.companyRoot, join(target.dir, 'drafts/prd.md'))
-    if (mrd === undefined || prd === undefined) continue
-    const result = deps.check(mrd, prd)
+    const base = join('deliverables', target.slug)
+    const meta = deps.readFile(target.companyRoot, join(base, 'meta.md'))
+    if (meta.kind === 'missing') continue
+    if (meta.kind === 'unsafe') return denyShape(target.slug, 'meta.md', meta.reason)
+    const numbering = numberingMarker(meta.text)
+    if (!numbering.declared) continue
+    if (!numbering.valid) {
+      return {
+        kind: 'deny',
+        reason: `交付前 PRD 校验无法开始：${target.slug} 的 ${numberingVocabularyError(numbering.value)}。\n`
+          + `修 meta.md 的 numbering（新动议写 \`identity\`；旧动议整行删除），再跑 \`/req check ${target.slug}\` 与 \`/prd check ${target.slug}\`。`,
+      }
+    }
+    const mrd = deps.readFile(target.companyRoot, join(base, 'drafts/mrd.md'))
+    const prd = deps.readFile(target.companyRoot, join(base, 'drafts/prd.md'))
+    for (const [name, read] of [['drafts/mrd.md', mrd], ['drafts/prd.md', prd]] as const) {
+      if (read.kind === 'unsafe') return denyShape(target.slug, name, read.reason)
+    }
+    // 缺草稿：闸门不能把正常交付卡死；内容面由 `/prd check` 的人类命令给可操作错误。
+    if (mrd.kind !== 'text' || prd.kind !== 'text') continue
+    const result = deps.check(mrd.text, prd.text)
     if (result.ok) continue
     const shown = result.errors.slice(0, 12)
     const more = result.errors.length > shown.length ? `\n- …另有 ${result.errors.length - shown.length} 条，跑 /prd check ${target.slug} 看全量` : ''
@@ -96,12 +141,45 @@ export function gateToolCall(exec: GateToolCall, deps: PrdGateDeps): PreToolDeci
   return undefined
 }
 
-/** 注册交付闸门；任何内部错误都放行（不能把正常交付卡死）。 */
+/** workingDirectory 服务的最小面（缺失时回退 header.cwd）。 */
+interface WorkingDirectoryLike {
+  readonly ensure?: (agent: unknown, signal?: AbortSignal) => Promise<string>
+}
+
+interface PreExecuteLike {
+  readonly name: string
+  readonly arguments: unknown
+  readonly signal?: AbortSignal
+  readonly agent?: {
+    readonly session?: { readonly header?: { readonly cwd?: string } }
+  } | undefined
+}
+
+/**
+ * 本次调用应使用的 cwd：与 `present` 同读 working directory projection。
+ * @param ctx - host context（服务缺席时按 header.cwd 退化）。
+ * @param exec - pre-execute 的执行面。
+ * @returns 绝对工作目录；解析不到 → undefined。
+ */
+async function resolveGateCwd(ctx: Context, exec: PreExecuteLike): Promise<string | undefined> {
+  const headerCwd = exec.agent?.session?.header?.cwd
+  const lookup = (ctx as { get?: (name: string) => unknown }).get
+  const service = typeof lookup === 'function' ? lookup.call(ctx, 'workingDirectory') as WorkingDirectoryLike | undefined : undefined
+  if (service?.ensure === undefined || exec.agent === undefined) return headerCwd
+  try { return await service.ensure(exec.agent, exec.signal) } catch { return headerCwd }
+}
+
+/** 注册交付闸门；读取/解析失败放行（不能把正常交付卡死），但形状不安全与坏 numbering 会 deny。 */
 export function registerPrdGate(ctx: Context, overrides: Partial<PrdGateDeps> = {}): void {
-  const deps: PrdGateDeps = { check: validateProductDocs, readText: readTextInside, ...overrides }
+  const deps: PrdGateDeps = { check: validateProductDocs, readFile: readCompanyFileAt, ...overrides }
   ctx.on('tools/pre-execute', async (exec, next): Promise<PreToolDecision> => {
     try {
-      const verdict = gateToolCall(exec as unknown as GateToolCall, deps)
+      // SAFETY: dsh 的 pre-execute 事件载荷没有导出结构化类型；这里一次收窄成「name/arguments/agent.cwd/signal」窄面，
+      // 读不到的字段一律当缺席（外层 try/catch 兜底放行，不会把正常交付卡死）。
+      const raw = exec as unknown as PreExecuteLike
+      const cwd = await resolveGateCwd(ctx, raw)
+      const call: GateToolCall = { ...(raw as GateToolCall), ...(cwd === undefined ? {} : { cwd }) }
+      const verdict = gateToolCall(call, deps)
       if (verdict !== undefined) return verdict
     } catch {
       // 闸门是旁路：读取/解析失败放行，由 /prd check 的人类命令给出可操作错误。

@@ -11,7 +11,7 @@
  */
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { companyFileProblem, companyFileProblemAt, readCompanyText } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
+import { companyFileProblem, companyFileProblemAt, readCompanyFileAt, readCompanyText } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
 import { plainFileProblem } from '../../../packages/company-pack/src/host/fs/safe-file.ts'
 import { ALL_SHAPES, makeWorld, type World } from '../../support/world-shapes.ts'
 
@@ -30,11 +30,13 @@ const READERS: readonly Reader[] = [
     run: (world) => plainFileProblem(join(world.ws, '.dsh-company'), join(world.ws, '.dsh-company', TARGET)),
   },
   { id: 'company.readText', run: (world) => readCompanyText(world.ws, TARGET) },
+  { id: 'company.readFileAt', run: (world) => readCompanyFileAt(join(world.ws, '.dsh-company'), TARGET) },
 ]
 
-/** 归一：ok / not-ok。`readCompanyText` 的 undefined 是声明过的「更粗」视图。 */
+/** 归一：ok / not-ok。`readCompanyText` 的 undefined 与 `readCompanyFileAt` 的 missing/unsafe 都是声明过的「更粗」视图。 */
 function isOk(id: string, value: unknown): boolean {
   if (id === 'company.readText') return typeof value === 'string'
+  if (id === 'company.readFileAt') return (value as { readonly kind?: string } | null)?.kind === 'text'
   return value === null
 }
 

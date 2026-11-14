@@ -28,6 +28,27 @@ BUG-151 由 Safety 矩阵首跑发现，同轮修并迁 [fixed_bugs](../_archive
 
 
 
+## 2026-11-14 修复交接（根因组 A–D：BUG-152..159）
+
+**用户指令（2026-11-14）**：「_backlog/bugs 现有大量刚才经过exploratory test发现的bug，你全部扫描完之后，系统地思考思考如何修复它们，按照我们的研发流程」。
+本句即本轮授权（材料性：company-pack 公开行为 + 命令面 + client UI），留痕 = Note。
+终点 = 活跃清单清零、8 张卡全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent` 与红→绿证据齐。
+
+八张卡不是八个补丁，是**四个「两套事实」根因**——每处都是同一个功能的两个载体各有一套解释：
+
+| 组 | 卡 | 同一根因 | 修法（唯一事实源） |
+|---|---|---|---|
+| **A 文档文本形状层** | [152](BUG-152-prd-headings-crlf-bom.md) / [153](BUG-153-prd-headings-fenced-code-blocks.md) / [157](BUG-157-prd-duplicate-ac-slice-ids.md) | headings 解析器把「原始字节」当「文档结构」：行尾 CR/BOM 改文本、围栏示例改结构、重复 id 改身份 | 入口归一化（去 BOM / CRLF→LF）+ 围栏感知扫描（``` 与 ~~~）+ AC/slice `seen` 集合；`prd-check.ts` 一套扫描层，三个消费者都读它 |
+| **B 交付闸门的事实源** | [154](BUG-154-prd-gate-numbering-empty-value.md) / [155](BUG-155-prd-gate-stale-session-cwd.md) / [156](BUG-156-prd-gate-symlink-unreadable-fail-open.md) | 闸门自带第二套判据：自己的 numbering 正则、自己的 cwd（header 而非 projection）、自己的「读不到就放行」 | numbering 复用 `numberingMarker()`（/req check 同源）；cwd 复用 `ctx.workingDirectory.ensure`（present 同源）；读取用 `readCompanyFileAt()` 三态（missing 才豁免，unsafe 一律 deny）并登记载体 |
+| **C push 范围** | [158](BUG-158-pre-push-zero-sha-range.md) | zero-SHA 被当成「没有范围」而不是「范围未知」：新分支只看 tip，删 ref 仍去 diff | remote 全零 = `rev-list <local> --not --remotes` 覆盖整个出站提交集；local 全零 = 跳过该 ref |
+| **D client 错误文本** | [159](BUG-159-client-error-ring-empty-object-message.md) | `JSON.stringify` 的 `{}` 真值短路了 `event.message`；跨 realm Error 也只被当普通对象 | `textOf` 先从对象取 `message`/`reason`/`name`，取不到才回退 JSON/未知 |
+
+**次序 = B → C → A → D**：B 是 P1×3 且同一函数，先立「闸门与命令同源」的骨架；C 独立收口另一条 P1；
+A 是同一解析层三张 P2，一次改完；D 独立。
+
+**逐卡收口**：先写 `## 已修判定`（已随本轮翻转落卡）再翻 `修复就绪`；落树翻 `修复已落地` 并记
+`审查：agent` + 红→绿证据；最后 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/) 并同步两张索引。
+
 **2026-11-13 第三轮收口**：BUG-114..139、141..145 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；BUG-140 撤回 settled。
 
 **2026-11-12 收口**：BUG-080..089 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。

@@ -13,6 +13,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   checkRequirements,
+  numberingMarker,
   parseHeader,
   type Layer,
   type MotionDoc,
@@ -259,6 +260,17 @@ describe('范围与豁免（meta 标记）', () => {
 
   it('未知编号体系值 → 红（不静默跳过）', () => {
     const result = checkRequirements({ meta: meta(['numbering: legacy']), docs: clean() })
+    expect(result.errors.join()).toContain('不在词表')
+  })
+
+  it('空值 `numbering:` 也是坏声明（declared 但不合法）——present 闸门同读这一个判据', () => {
+    expect(numberingMarker(undefined)).toEqual({ declared: false, value: '', valid: false })
+    expect(numberingMarker('slug: demo\n')).toEqual({ declared: false, value: '', valid: false })
+    expect(numberingMarker('numbering:\n')).toEqual({ declared: true, value: '', valid: false })
+    expect(numberingMarker('numbering: legacy\n')).toEqual({ declared: true, value: 'legacy', valid: false })
+    expect(numberingMarker('numbering: identity\n')).toEqual({ declared: true, value: 'identity', valid: true })
+    const result = checkRequirements({ meta: meta(['numbering:']), docs: clean() })
+    expect(result.skipped).toBe(false)
     expect(result.errors.join()).toContain('不在词表')
   })
 })
