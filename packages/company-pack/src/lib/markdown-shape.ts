@@ -30,6 +30,7 @@ export interface DocumentFence {
 /** 结构扫描结果；`unclosedCommentLine` = 未闭合块级 HTML 注释的起始行（1-based）。 */
 export interface DocumentScan {
   readonly lines: readonly DocumentLine[]
+  readonly frontmatterEndOffset?: number
   readonly unclosedCommentLine?: number
   readonly fences: readonly DocumentFence[]
 }
@@ -52,7 +53,11 @@ export interface SectionRange {
   readonly end: number
 }
 
-export const sectionRange: (text: string, heading: string) => SectionRange | undefined = sectionRangeCore
+export const sectionRange: (
+  text: string,
+  heading: string,
+  preScanned?: { readonly lines: readonly DocumentLine[] },
+) => SectionRange | undefined = sectionRangeCore
 
 /** 取 `## <heading>` 节内的结构行正文（围栏/注释/跨行代码内的假字段清零）。 */
 export const sectionStructuralText: (text: string, heading: string) => string | undefined = sectionStructuralTextCore

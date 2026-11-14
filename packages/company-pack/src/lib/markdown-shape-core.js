@@ -69,13 +69,20 @@ export function normalizeDocument(text) {
  * @param {string} line 单行文本。
  */
 function openFenceAt(line) {
-  const match = /^\s{0,3}(`{3,}|~{3,})(.*)$/.exec(line)
+  const match = /^(\s{0,3})(`{3,}|~{3,})(.*)$/.exec(line)
   if (match === null) return undefined
-  const marker = match[1] ?? ''
+  const indent = (match[1] ?? '').length
+  const marker = match[2] ?? ''
   const char = marker[0] ?? '`'
-  const rest = match[2] ?? ''
+  const rest = match[3] ?? ''
   if (char === '`' && rest.includes('`')) return undefined
-  return { char, length: marker.length, rest }
+  return { char, length: marker.length, indent, rest }
+}
+
+function stripUpToSpaces(line, count) {
+  let index = 0
+  while (index < count && line[index] === ' ') index += 1
+  return line.slice(index)
 }
 
 /** CommonMark §4.5 围栏闭行：最多 3 个前导空格 + 同字符且不少于开行长度 + 仅尾随空白。 */
@@ -176,7 +183,7 @@ export function scanDocumentDetailed(text) {
         fences.push({ info: fence.info, content: fence.content.join('\n'), startLine: fence.startLine })
         fence = undefined
       } else {
-        fence.content.push(raw)
+        fence.content.push(stripUpToSpaces(raw, fence.indent))
       }
       continue
     }
@@ -193,31 +200,27 @@ export function scanDocumentDetailed(text) {
       if (lineNumber >= spanUntil) spanUntil = undefined
       continue
     }
-    let index = 0
     if (inlineCommentUntil !== undefined) {
-      if (offset < inlineCommentUntil.endOffset) {
-        lines.push({ text: '', structural: true })
-        continue
-      }
-      index = inlineCommentUntil.endCol
-      inlineCommentUntil = undefined
-    } else {
-      const open = openFenceAt(raw)
-      if (open !== undefined) {
-        fence = { char: open.char, length: open.length, info: open.rest.trim(), content: [], startLine: lineNumber }
-        lines.push({ text: raw, structural: false })
-        continue
-      }
-      if (/^\s{0,3}<!--/.test(raw)) {
-        lines.push({ text: '', structural: false })
-        const startCol = raw.indexOf('<!--') + 4
-        if (raw.indexOf('-->', startCol) === -1) {
-          inBlockComment = true
-          commentStart = lineNumber
-        }
-        continue
-      }
+      lines.push({ text: '', structural: false })
+      if (offset >= inlineCommentUntil.endOffset) inlineCommentUntil = undefined
+      continue
     }
+    const open = openFenceAt(raw)
+    if (open !== undefined) {
+      fence = { char: open.char, length: open.length, indent: open.indent, info: open.rest.trim(), content: [], startLine: lineNumber }
+      lines.push({ text: raw, structural: false })
+      continue
+    }
+    if (/^\s{0,3}<!--/.test(raw)) {
+      lines.push({ text: '', structural: false })
+      const startCol = raw.indexOf('<!--') + 4
+      if (raw.indexOf('-->', startCol) === -1) {
+        inBlockComment = true
+        commentStart = lineNumber
+      }
+      continue
+    }
+    let index = 0
 
     let visible = ''
     while (index < raw.length) {
@@ -262,6 +265,7 @@ export function scanDocumentDetailed(text) {
   return {
     lines,
     fences,
+    ...(fmEnd >= 0 ? { frontmatterEndOffset: fmEnd } : {}),
     ...(inBlockComment && commentStart !== undefined ? { unclosedCommentLine: commentStart } : {}),
   }
 }
@@ -283,7 +287,7 @@ function escapeRegExp(value) {
  * 定位 `## <heading>` 节的起止行（直接从 `scanDocumentDetailed` 单一状态机派生，零第二扫描器）。
  * @param {string} text 文档全文。
  * @param {string} heading 节标题（不含 `## `）。
- * @param {{ lines: { text: string, structural: boolean }[] }} [preScanned] 可选复用已扫描结果。
+ * @param {{ readonly lines: readonly { readonly text: string, readonly structural: boolean }[] }} [preScanned] 可选复用已扫描结果。
  * @returns {{ start: number, end: number } | undefined} 归一化行下标；缺节返回 undefined。
  */
 export function sectionRange(text, heading, preScanned) {

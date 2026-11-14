@@ -391,16 +391,27 @@ export interface NumberingMarker {
 /** 词表唯一源；`/req check` 的报错文案与闸门同读它。 */
 export const NUMBERING_VOCABULARY = ['identity'] as const
 
+function metaFieldLines(meta: string): readonly string[] {
+  const scan = scanDocumentDetailed(meta)
+  return scan.lines
+    .filter((entry, index) => entry.structural || (scan.frontmatterEndOffset !== undefined && index > 0 && index < scan.frontmatterEndOffset))
+    .map(entry => entry.text)
+}
+
 /**
  * 解析 meta 里的 `numbering:` 标记。
  * @param meta - meta.md 全文；undefined（读不到/没有）与「整行缺失」同义。
  * @returns declared / value / valid 三态。
  */
 export function numberingMarker(meta: string | undefined): NumberingMarker {
-  const marker = meta === undefined ? null : /^numbering:\s*(.*)$/m.exec(meta)
-  if (marker === null) return { declared: false, value: '', valid: false }
-  const value = (marker[1] ?? '').trim()
-  return { declared: true, value, valid: (NUMBERING_VOCABULARY as readonly string[]).includes(value) }
+  if (meta === undefined) return { declared: false, value: '', valid: false }
+  for (const line of metaFieldLines(meta)) {
+    const marker = /^numbering:\s*(.*)$/.exec(line)
+    if (marker === null) continue
+    const value = (marker[1] ?? '').trim()
+    return { declared: true, value, valid: (NUMBERING_VOCABULARY as readonly string[]).includes(value) }
+  }
+  return { declared: false, value: '', valid: false }
 }
 
 /** 声明了但值不在词表时的统一报错句（命令与闸门复用，避免两套文案）。 */
@@ -416,7 +427,8 @@ function metaLayers(meta: string | undefined, errors: string[]): { layers: reado
     errors.push(numberingVocabularyError(marker.value))
     return { layers: undefined, skipped: false, reason: '' }
   }
-  const declared = /^layers:\s*(.*)$/m.exec(meta)
+  const declaredLine = metaFieldLines(meta).find(line => /^layers:\s*/.test(line))
+  const declared = declaredLine === undefined ? null : /^layers:\s*(.*)$/.exec(declaredLine)
   if (declared === null) return { layers: undefined, skipped: false, reason: '' }
   const layers: Layer[] = []
   for (const item of parseList(declared[1] ?? '')) {

@@ -17,9 +17,21 @@ import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { companyFileProblem, companyFileProblemAt, readCompanyFileAt, readCompanyText, readCompanyTextAt } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
+import { deliverableOf, gateToolCall } from '../../../packages/company-pack/src/host/commands/prd-gate.ts'
+import {
+  UnsafeCompanyPathError,
+  companyFileProblem,
+  companyFileProblemAt,
+  createCompanyDir,
+  readCompanyFileAt,
+  readCompanyText,
+  readCompanyTextAt,
+  writeCompanyAtomic,
+  writeCompanyAtomicAt,
+} from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
 import { plainFileProblem } from '../../../packages/company-pack/src/host/fs/safe-file.ts'
-import { ALL_SHAPES, makeWorld, type World } from '../../support/world-shapes.ts'
+import { validateProductDocs } from '../../../packages/company-pack/src/lib/prd-check.ts'
+import { ALL_SHAPES, makeWorld, outsideSnapshot, type World } from '../../support/world-shapes.ts'
 
 const TARGET = 'kb/company.md'
 
@@ -191,32 +203,155 @@ describe('越界 `..` 路径的三态子类（BUG-170）', () => {
   })
 })
 
-describe('路径等价类矩阵（P1，2026-11-14）', () => {
+describe('路径等价类与读写目录闸门全通道同判据矩阵（W3.3，2026-11-14）', () => {
   const cases: Array<[string, 'text' | 'missing' | 'unsafe']> = [
     ['kb/company.md', 'text'],
+    ['./kb/company.md', 'text'],
     ['kb/./company.md', 'text'],
     ['kb/../kb/company.md', 'text'],
     ['kb//company.md', 'text'],
     ['kb\\company.md', 'text'],
     ['.../company.md', 'missing'],
+    ['.', 'unsafe'],
+    ['..', 'unsafe'],
+    ['kb/..', 'unsafe'],
+    ['kb/../..', 'unsafe'],
+    ['kb/symlink/../company.md', 'unsafe'],
+    ['kb/not-a-dir/../company.md', 'unsafe'],
     ['..\\outside\\secret.md', 'unsafe'],
     ['kb\\..\\..\\outside\\secret.md', 'unsafe'],
     ['a/../../outside/secret.md', 'unsafe'],
   ]
 
-  it.each(cases)('%s → %s', (rel, expected) => {
-    const ws = mkdtempSync(join(tmpdir(), 'shape-paths-'))
+  it.each(cases)('读 + problem + 原子写 + createCompanyDir 同判：%s → %s', (rel, expected) => {
+    const world = makeWorld('shape-paths-')
     try {
-      mkdirSync(join(ws, '.dsh-company/kb'), { recursive: true })
-      writeFileSync(join(ws, '.dsh-company/kb/company.md'), '# ok\n')
-      writeFileSync(join(ws, 'outside-secret.md'), 'secret\n')
-      const home = join(ws, '.dsh-company')
-      const result = readCompanyFileAt(home, rel)
-      expect(result.kind, rel).toBe(expected)
-      if (expected === 'text') expect(result).toEqual({ kind: 'text', text: '# ok\n' })
-      expect(companyFileProblemAt(home, rel), rel).toBe(expected === 'text' ? null : expected)
+      const home = join(world.ws, '.dsh-company')
+      mkdirSync(join(home, 'kb'), { recursive: true })
+      writeFileSync(join(home, 'kb/company.md'), '# ok\n')
+      writeFileSync(join(home, 'kb/not-a-dir'), 'plain file\n')
+      mkdirSync(join(world.outside, 'target-dir'), { recursive: true })
+      writeFileSync(join(world.outside, 'secret.md'), 'secret\n')
+      symlinkSync(join(world.outside, 'target-dir'), join(home, 'kb/symlink'))
+      const before = outsideSnapshot(world)
+
+      const resultAt = readCompanyFileAt(home, rel)
+      expect(resultAt.kind, `readCompanyFileAt(${rel})`).toBe(expected)
+      if (expected === 'text') expect(resultAt).toEqual({ kind: 'text', text: '# ok\n' })
+      expect(companyFileProblemAt(home, rel), `companyFileProblemAt(${rel})`).toBe(expected === 'text' ? null : expected)
+      expect(companyFileProblem(world.ws, rel), `companyFileProblem(${rel})`).toBe(expected === 'text' ? null : expected)
+
+      if (expected === 'unsafe') {
+        expect(() => writeCompanyAtomic(world.ws, rel, 'bad\n'), `writeCompanyAtomic(${rel})`).toThrow(UnsafeCompanyPathError)
+        expect(() => writeCompanyAtomicAt(home, rel, 'bad\n'), `writeCompanyAtomicAt(${rel})`).toThrow(UnsafeCompanyPathError)
+        expect(() => createCompanyDir(world.ws, rel), `createCompanyDir(${rel})`).toThrow(UnsafeCompanyPathError)
+        expect(outsideSnapshot(world), `outside 被污染：${rel}`).toEqual(before)
+      }
     } finally {
-      rmSync(ws, { recursive: true, force: true })
+      world.cleanup()
+    }
+  })
+
+  it('prd-gate 对混合分隔符、尾部 `..` 与中间段 symlink 目录回退一律拦截而非静默放行', () => {
+    const world = makeWorld('shape-prd-gate-')
+    try {
+      const mrd = [
+        '---',
+        'layer: MRD',
+        'definition: json-ledger',
+        '---',
+        '',
+        '```json',
+        '{"mrd":{"version":"0.1","status":"draft","opportunities":[{"id":"MR-001","title":"机会","segment":"财务","pain":"慢","evidence":[{"kind":"fact","source":"访谈"}],"recommendation":"go"}]}}',
+        '```',
+      ].join('\n')
+      const badPrd = [
+        '---',
+        'layer: PRD',
+        'definition: headings',
+        '---',
+        '',
+        '## Slices',
+        '| slice | Goal | Requirements (explicit ids) | Exit condition |',
+        '|---|---|---|---|',
+        '| S1 | 端到端 | REQ-001 | ok |',
+        '',
+        '### REQ-001 需求',
+        '- userStory: 作为用户我要它',
+        '- acceptance:',
+        '  - AC-001-1',
+        '    - given: g',
+        '    - when: w',
+        '    - then: t',
+        '- source: [MR-999]',
+        '- slice: S1',
+        '- type: functional',
+        '- priority: P0',
+        '- status: draft',
+        '- verification: test',
+      ].join('\n')
+      const goodPrd = badPrd.replace('[MR-999]', '[MR-001]')
+
+      const badDir = join(world.ws, '.dsh-company/deliverables/bad')
+      mkdirSync(join(badDir, 'drafts'), { recursive: true })
+      writeFileSync(join(badDir, 'meta.md'), 'slug: bad\nnumbering: identity\n')
+      writeFileSync(join(badDir, 'drafts/mrd.md'), mrd)
+      writeFileSync(join(badDir, 'drafts/prd.md'), badPrd)
+
+      const goodDir = join(world.ws, '.dsh-company/deliverables/good')
+      mkdirSync(join(goodDir, 'drafts'), { recursive: true })
+      writeFileSync(join(goodDir, 'meta.md'), 'slug: good\nnumbering: identity\n')
+      writeFileSync(join(goodDir, 'drafts/mrd.md'), mrd)
+      writeFileSync(join(goodDir, 'drafts/prd.md'), goodPrd)
+      writeFileSync(join(goodDir, 'final.md'), '# ok\n')
+
+      symlinkSync(world.outside, join(world.ws, '.dsh-company/deliverables/symlink-slug'))
+      const realDeps = { check: validateProductDocs, readFile: readCompanyFileAt }
+
+      // 1) 混合分隔符绝对路径与相对路径都必须命中 bad 动议并被拦截
+      const mixedAbs = `${world.ws}/.dsh-company\\deliverables\\bad\\prd.md`
+      expect(deliverableOf(mixedAbs, undefined)?.slug).toBe('bad')
+      const mixedAbsVerdict = gateToolCall(
+        { name: 'present', arguments: { files: [{ path: mixedAbs }] } },
+        realDeps,
+      )
+      expect(mixedAbsVerdict?.kind).toBe('deny')
+      if (mixedAbsVerdict?.kind === 'deny') expect(mixedAbsVerdict.reason).toContain('MR-999')
+
+      const mixedRelVerdict = gateToolCall(
+        { name: 'present', arguments: { files: [{ path: '.dsh-company\\deliverables\\bad\\prd.md' }] }, cwd: world.ws },
+        realDeps,
+      )
+      expect(mixedRelVerdict?.kind).toBe('deny')
+
+      // 2) 中间段经由 symlink 目录再 `..` 回退到合法动议 good → 必须按不安全形状拒绝
+      const hopSymlinkVerdict = gateToolCall(
+        {
+          name: 'present',
+          arguments: { files: [{ path: '.dsh-company/deliverables/symlink-slug/../good/final.md' }] },
+          cwd: world.ws,
+        },
+        realDeps,
+      )
+      expect(hopSymlinkVerdict?.kind).toBe('deny')
+      if (hopSymlinkVerdict?.kind === 'deny') expect(hopSymlinkVerdict.reason).toContain('文件形状挡住')
+
+      // 3) 尾部 `..` 与越出 deliverables / .dsh-company 的路径一律按形状拒绝
+      for (const unsafeDeliverablePath of [
+        '.dsh-company/deliverables/..',
+        '.dsh-company/deliverables/good/..',
+        '.dsh-company/deliverables/../../outside/secret.md',
+        '.dsh-company\\deliverables\\..\\..\\outside\\secret.md',
+      ]) {
+        const verdict = gateToolCall(
+          { name: 'present', arguments: { files: [{ path: unsafeDeliverablePath }] }, cwd: world.ws },
+          realDeps,
+        )
+        expect(verdict?.kind, unsafeDeliverablePath).toBe('deny')
+        if (verdict?.kind === 'deny') expect(verdict.reason).toContain('文件形状挡住')
+      }
+    } finally {
+      world.cleanup()
     }
   })
 })

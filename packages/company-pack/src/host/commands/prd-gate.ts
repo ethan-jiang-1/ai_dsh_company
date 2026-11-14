@@ -15,8 +15,8 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import type { PreToolDecision } from '@deepseek-ai/dsh-tools'
-import { isAbsolute, join, sep } from 'node:path'
-import { readCompanyFileAt } from '../run-bundle/company-root.ts'
+import { join } from 'node:path'
+import { readCompanyFileAt, resolveCompanySegments, verifyCompanySubpathAt } from '../run-bundle/company-root.ts'
 import type { CompanyFileRead } from '../run-bundle/company-root.ts'
 import { numberingMarker, numberingVocabularyError } from '../../lib/requirements-check.ts'
 import { validateProductDocs } from '../../lib/prd-check.ts'
@@ -52,28 +52,85 @@ function presentedPaths(args: unknown): readonly string[] {
     .filter((path): path is string => typeof path === 'string' && path.trim() !== '')
 }
 
-/** 从呈现路径里解出 `<workspace>/.dsh-company/deliverables/<slug>`；不是公司的成品路径 → undefined。 */
-export function deliverableOf(path: string, cwd: string | undefined): { readonly slug: string; readonly dir: string; readonly companyRoot: string } | undefined {
-  const absolute = isAbsolute(path) ? path : cwd === undefined ? undefined : join(cwd, path)
-  if (absolute === undefined) return undefined
-  const parts = absolute.split(sep)
-  const companyIndex = parts.indexOf('.dsh-company')
-  if (companyIndex === -1) return undefined
-  if (parts[companyIndex + 1] !== 'deliverables') return undefined
-  const slug = parts[companyIndex + 2]
-  if (slug === undefined || slug === '') return undefined
+type DeliverablePathInspection =
+  | { readonly kind: 'non-deliverable' }
+  | { readonly kind: 'missing-cwd' }
+  | { readonly kind: 'unsafe'; readonly slug: string; readonly reason: string }
+  | {
+    readonly kind: 'target'
+    readonly slug: string
+    readonly dir: string
+    readonly companyRoot: string
+    readonly relInsideCompany: string
+  }
+
+function inspectDeliverablePath(path: string, cwd: string | undefined): DeliverablePathInspection {
+  const normPath = path.replaceAll('\\', '/')
+  const isAbs = normPath.startsWith('/') || /^[A-Za-z]:\//.test(normPath)
+  const rawNonEmpty = normPath.split('/').filter(part => part !== '' && part !== '.')
+  const rawCompanyIndex = rawNonEmpty.indexOf('.dsh-company')
+  const mentionsDeliverables = rawCompanyIndex !== -1 && rawNonEmpty[rawCompanyIndex + 1] === 'deliverables'
+  const rawSlugHint = mentionsDeliverables ? (rawNonEmpty[rawCompanyIndex + 2] ?? 'deliverables') : 'deliverables'
+
+  if (!isAbs && cwd === undefined) {
+    return mentionsDeliverables ? { kind: 'missing-cwd' } : { kind: 'non-deliverable' }
+  }
+  const combined = isAbs ? normPath : `${cwd!.replaceAll('\\', '/').replace(/\/+$/, '')}/${normPath}`
+  const rootMatch = /^(\/|[A-Za-z]:\/)/.exec(combined)
+  if (rootMatch === null) {
+    return mentionsDeliverables ? { kind: 'missing-cwd' } : { kind: 'non-deliverable' }
+  }
+  const rootPrefix = rootMatch[1] ?? ''
+  const rawParts = combined.slice(rootPrefix.length).split('/')
+  const companyIndex = rawParts.indexOf('.dsh-company')
+  if (companyIndex === -1) return { kind: 'non-deliverable' }
+
+  const preSegments: string[] = []
+  for (const part of rawParts.slice(0, companyIndex)) {
+    if (part === '' || part === '.') continue
+    if (part === '..') { preSegments.pop(); continue }
+    preSegments.push(part)
+  }
+  const companyRoot = `${rootPrefix}${preSegments.join('/')}${preSegments.length > 0 ? '/' : ''}.dsh-company`
+  const afterParts = rawParts.slice(companyIndex + 1)
+  const afterNonEmpty = afterParts.filter(part => part !== '' && part !== '.')
+  const combinedMentionsDeliverables = mentionsDeliverables || afterNonEmpty[0] === 'deliverables'
+  const slugHint = afterNonEmpty[0] === 'deliverables' && afterNonEmpty[1] !== undefined && afterNonEmpty[1] !== '..'
+    ? afterNonEmpty[1]
+    : rawSlugHint
+  const relInsideCompany = afterParts.join('/')
+
+  let segments: readonly string[]
+  try {
+    segments = resolveCompanySegments(relInsideCompany, { allowRoot: false, stripCompanyPrefix: false }).segments
+  } catch (error) {
+    return combinedMentionsDeliverables
+      ? { kind: 'unsafe', slug: slugHint, reason: (error as Error).message }
+      : { kind: 'non-deliverable' }
+  }
+  if (segments[0] !== 'deliverables') {
+    return combinedMentionsDeliverables
+      ? { kind: 'unsafe', slug: slugHint, reason: '交付物路径经由 `..` 回退出了 deliverables 目录' }
+      : { kind: 'non-deliverable' }
+  }
+  const slug = segments[1]
+  if (slug === undefined || slug === '') {
+    return { kind: 'unsafe', slug: 'deliverables', reason: '交付物路径缺少 <slug> 目录或回退到了 deliverables 根' }
+  }
   return {
+    kind: 'target',
     slug,
-    dir: join(parts.slice(0, companyIndex + 3).join(sep)),
-    companyRoot: parts.slice(0, companyIndex + 1).join(sep),
+    dir: `${companyRoot}/deliverables/${slug}`,
+    companyRoot,
+    relInsideCompany,
   }
 }
 
-/** 这条路径是不是「公司成品」的形状（用于 cwd 缺失时拒绝静默放行）。 */
-function isDeliverableShaped(path: string): boolean {
-  const parts = path.split(/[\\/]+/)
-  const companyIndex = parts.indexOf('.dsh-company')
-  return companyIndex !== -1 && parts[companyIndex + 1] === 'deliverables' && (parts[companyIndex + 2] ?? '') !== ''
+/** 从呈现路径里解出 `<workspace>/.dsh-company/deliverables/<slug>`；不是公司的成品路径 → undefined。 */
+export function deliverableOf(path: string, cwd: string | undefined): { readonly slug: string; readonly dir: string; readonly companyRoot: string } | undefined {
+  const inspected = inspectDeliverablePath(path, cwd)
+  if (inspected.kind !== 'target') return undefined
+  return { slug: inspected.slug, dir: inspected.dir, companyRoot: inspected.companyRoot }
 }
 
 /** 形状挡住校验：不能当旧动议跳过，也不把读者指向内容缺失。 */
@@ -94,18 +151,23 @@ export function gateToolCall(exec: GateToolCall, deps: PrdGateDeps): PreToolDeci
   const cwd = exec.cwd ?? exec.agent?.session?.header?.cwd
   const seen = new Set<string>()
   for (const path of presentedPaths(exec.arguments)) {
-    const target = deliverableOf(path, cwd)
-    if (target === undefined) {
+    const inspected = inspectDeliverablePath(path, cwd)
+    if (inspected.kind === 'non-deliverable') continue
+    if (inspected.kind === 'missing-cwd') {
       // 相对路径 + 公司成品形状但拿不到 cwd：旧行为是静默跳过（BUG-155），现在必须说清楚。
-      if (!isAbsolute(path) && isDeliverableShaped(path)) {
-        return {
-          kind: 'deny',
-          reason: `present 的路径 ${path} 是相对路径，但本次调用解析不到工作目录。\n`
-            + `改用绝对路径 present，或先 cd 到项目目录再试。`,
-        }
+      return {
+        kind: 'deny',
+        reason: `present 的路径 ${path} 是相对路径，但本次调用解析不到工作目录。\n`
+          + `改用绝对路径 present，或先 cd 到项目目录再试。`,
       }
-      continue
     }
+    if (inspected.kind === 'unsafe') return denyShape(inspected.slug, path, inspected.reason)
+    try {
+      verifyCompanySubpathAt(inspected.companyRoot, inspected.relInsideCompany)
+    } catch (error) {
+      return denyShape(inspected.slug, path, (error as Error).message)
+    }
+    const target = inspected
     if (seen.has(target.slug)) continue
     seen.add(target.slug)
     const base = join('deliverables', target.slug)

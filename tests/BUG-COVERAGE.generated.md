@@ -183,9 +183,9 @@
 | 147 | 2026-11-13 | tests/host/ledger/governance-export.spec.ts:107 |
 | 148 | 2026-11-13 | tests/host/run-bundle/bundle-manifest.spec.ts:177 |
 | 149 | 2026-11-13 | tests/host/run-bundle/write-gate.spec.ts:73 |
-| 152 | 2026-11-13 | tests/lib/prd-check.spec.ts:241 |
+| 152 | 2026-11-13 | tests/lib/markdown-shape.property.spec.ts:128；tests/lib/prd-check.spec.ts:241 |
 | 153 | 2026-11-13 | tests/lib/prd-check.spec.ts:253 |
-| 156 | 2026-11-13 | tests/host/contract/file-shape-agreement.spec.ts:95 |
+| 156 | 2026-11-13 | tests/host/contract/file-shape-agreement.spec.ts:107 |
 | 157 | 2026-11-13 | tests/lib/prd-check.spec.ts:281 |
 | 160 | 2026-11-14 | tests/lib/requirements-check.spec.ts:308 |
 | 162 | 2026-11-14 | tests/lib/prd-check.spec.ts:298 |
@@ -194,11 +194,11 @@
 | 166 | 2026-11-14 | tests/lib/prd-check.spec.ts:344 |
 | 168 | 2026-11-14 | tests/lib/prd-check.spec.ts:358 |
 | 169 | 2026-11-14 | tests/lib/requirements-check.spec.ts:340 |
-| 170 | 2026-11-14 | tests/host/contract/file-shape-agreement.spec.ts:170 |
+| 170 | 2026-11-14 | tests/host/contract/file-shape-agreement.spec.ts:182 |
 | 172 | 2026-11-14 | tests/lib/prd-check.spec.ts:376 |
 | 173 | 2026-11-14 | tests/lib/prd-check.spec.ts:383 |
 | 176 | 2026-11-14 | tests/lib/prd-check.spec.ts:392 |
 | 177 | 2026-11-14 | tests/checks/fix-evidence.test.mjs:215 |
 | 178 | 2026-11-14 | tests/checks/fix-evidence.test.mjs:194 |
-| 181 | 2026-11-14 | tests/checks/fix-evidence.test.mjs:254 |
+| 181 | 2026-11-14 | tests/checks/fix-evidence.test.mjs:254；tests/host/contract/structure-agreement.spec.ts:34；tests/lib/markdown-shape.property.spec.ts:72 |
 | 182 | 2026-11-14 | tests/checks/fix-evidence.test.mjs:236 |
