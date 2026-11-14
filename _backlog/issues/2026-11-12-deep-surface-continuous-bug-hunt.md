@@ -7,13 +7,13 @@ opened: 2026-11-12
 
 > 立卡：2026-11-12 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
 >
-> **结论/去向**：implementation — 本卡执行多轮探索 + 证据（发现缺陷另开 `_backlog/bugs/` 卡；编号唯一源 = [bugs/README](../bugs/README.md) 的 Next BUG ID，2026-11-14 = BUG-160..167，Next = 168）；本卡不改产品代码。
+> **结论/去向**：implementation — 本卡执行多轮探索 + 证据（发现缺陷另开 `_backlog/bugs/` 卡；编号唯一源 = [bugs/README](../bugs/README.md) 的 Next BUG ID，2026-11-14 = BUG-168..175，Next = 176）；本卡不改产品代码。
 >
 > **授权边界**：静态 / keyless / 真挂载 / 真页面可自主；live 模型轮按每轮小预算、隔离 workspace 跑（入口与预算写在 Round 头）。不修产品代码；不改 vendor。
 >
 > **2026-11-13 焦点调整（focus v2）**：Round 85 后按新宪章执行——C1–C4 的文件形状轴由对抗矩阵接管；新增 C8（PRD headings / present 闸门）、C9（测试资产/验证元面）、C10（client 错误环）；见下方同名节。旧 Round 1–85 保留为历史，不改写。
 >
-> **2026-11-14 post-fix 回归（focus v3）**：BUG-152..159 修复后，按用户「继续再来」对修复面做对抗回归；新增 Round 89，开 BUG-160..167。这是**修复后新面**，不是重复 focus v2 首轮；C9 的 pre-push/notes-tree 按新预算计。
+> **2026-11-14 post-fix 回归（focus v3/v4）**：v3 = BUG-152..159 修复后的回归（Round 89，开 BUG-160..167）；v4 = BUG-160..167 修复后的回归（Round 90，开 BUG-168..175）。这是**修复后新面**，不是重复 focus v2 首轮；C9 的新门禁/资产按新预算计。
 
 ## 问题与期望结果
 
@@ -21,13 +21,14 @@ opened: 2026-11-12
 
 **期望结果：** 每轮有：选面理由、期望表（独立 oracle）、实跑证据、H 判决（confirmed / refuted / unverified）、缺陷卡或观察、未跑面与 owner。没有「没有 bug」的结论；单场 live 不写稳定。
 
-**当前情况（2026-11-14 post-fix 基线）：**
+**当前情况（2026-11-14 focus v4 基线）：**
 
-- **当前基线（2026-11-14 08:45 实跑）**：`pnpm test` 247 files / 2046 tests；`pnpm verify` ALL PASS（2 门无对象）；活跃缺陷 = **8**（BUG-160..167，2026-11-14 focus v3 回归；只报不修）；focus v2 的 BUG-152..159 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；对抗矩阵 `KNOWN_GAP = 0`；`packages/company-pack` version 0.11.6；census = 29 冒烟 / 67 探针 / 72 门禁 / 247 spec。
-- **上一轮基线（2026-11-13 19:26）**：`pnpm test` 247 files / 2034 tests；活跃缺陷 8（BUG-152..159）；该批已于 2026-11-14 修复。
+- **当前基线（2026-11-14 10:17 实跑）**：`pnpm test` 247 files / 2066 tests；`pnpm verify` ALL PASS（2 门无对象）；活跃缺陷 = **8**（BUG-168..175，2026-11-14 focus v4 回归；只报不修）；focus v3 的 BUG-160..167 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；对抗矩阵 `KNOWN_GAP = 0`；`packages/company-pack` version 0.11.6；census = 29 冒烟 / 67 探针 / 72 门禁 / 247 spec。
+- **上一轮基线（2026-11-14 08:45）**：`pnpm test` 247 files / 2046 tests；活跃缺陷 8（BUG-160..167）；该批已修复。
+- **更早基线（2026-11-13 19:26）**：`pnpm test` 247 files / 2034 tests；活跃缺陷 8（BUG-152..159）；该批已修复。
 - **历史起点（2026-11-12）**：`50878cd6`（BUG-080..089 修复）｜Note = [startup/wiki bug sweep](../../notes/implemented/2026-11-12-startup-strategy-wiki-bug-sweep.md)｜十张卡已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)｜当时基线 236 files / 1761 tests。该基线只作历史，不再当当前事实。
-- **后续已收口**：Round 15–85 找到 BUG-104..151（BUG-140 撤回、BUG-150 复核不成立）；focus v2 开 BUG-152..159 并于 2026-11-14 修复；focus v3 开 BUG-160..167（Round 89）。
-- **已知开放点（历史 Note「剩余风险」）**：`fs.watch` 平台降级；内容包新增类型仍需重启；其它 host 命令仍中文；`/req` `/prd` 的 workspace 仍 boot 优先——保留为观察，不在 focus v3 首轮抢修。
+- **后续已收口**：Round 15–85 找到 BUG-104..151（BUG-140 撤回、BUG-150 复核不成立）；focus v2 开 BUG-152..159；focus v3 开 BUG-160..167；focus v4 开 BUG-168..175（Round 90）。
+- **已知开放点（历史 Note「剩余风险」）**：`fs.watch` 平台降级；内容包新增类型仍需重启；其它 host 命令仍中文；`/req` `/prd` 的 workspace 仍 boot 优先——保留为观察，不在 focus v4 首轮抢修。
 - **宪章的「低置信」判据**：代码体量大 / 状态跨 home+workspace / 派生文件无新鲜度契约 / 有多进程或并发 / 测试只固定夹具 / 只在真页面或真 team 才暴露。
 
 ## 2026-11-13 调整（focus v2）
@@ -1593,6 +1594,34 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 **本轮开卡：** BUG-160..167（8 张）。**未跑：** C8-H10 live present deny（仍 unverified）；C10 console/rejection；C2/C5/C7 残余真入口。**证据：** `runtime/tmp/c8b-*.mts`、`c9-merge-probe.sh`、`c9b-*.mts` 与对应 `.log`。
 
+## Round 90（2026-11-14 post-fix 2 · 共享形状层 + 新门禁）
+
+**状态：** keyless 已跑；live / 真页面未跑。
+
+**选面理由：** BUG-160..167 的修复新引入了 `markdown-shape.ts`、`fix-evidence` 门禁、`readCompanyFileAt` 三态和 notes-tree 日期/ lifecycle 收紧；这些是修复后的**新代码/新门禁**，最容易被「只测成功路径」的 spec 漏掉。本轮打共享形状层的容器/转义边界、三态契约的越界子类、以及两个新门禁的覆盖/证据判据。
+
+**C8/C6 post-fix 2 假设与判决：**
+
+| H | 判决 | 证据 / BUG |
+|---|---|---|
+| 行内代码里的 `<!--` 不算注释开始 | **confirmed（缺口）** | [BUG-168](../bugs/BUG-168-markdown-inline-code-comment.md)；userStory 后的字段全被吞 |
+| 未闭合 HTML 注释会 fail loud | **confirmed（缺口）** | [BUG-169](../bugs/BUG-169-markdown-unclosed-comment.md)；整份 PRD 被读成「没有需求」 |
+| `\\|`（字面反斜杠 + 分隔符）能被正确切列 | **confirmed（缺口）** | [BUG-172](../bugs/BUG-172-split-table-row-double-backslash.md)；单元格少切一列 |
+| legacy JSON 在 HTML 注释里不算定义 | **confirmed（缺口）** | [BUG-173](../bugs/BUG-173-legacy-json-in-comment.md)；注释账本仍 `ok/reqCount 1` |
+| `readCompanyFileAt` 的越界 `../` 子类稳定 | **confirmed（缺口）** | [BUG-170](../bugs/BUG-170-read-company-file-dotdot-subclass.md)；`../` unsafe vs `../../` missing |
+
+**C9 新门禁假设与判决：**
+
+| H | 判决 | 证据 / BUG |
+|---|---|---|
+| fix-evidence 支持删除型修复 | **confirmed（缺口）** | [BUG-171](../bugs/BUG-171-fix-evidence-deletion-surface.md)；删除文件的改动面被判「不在盘上」 |
+| notes-tree 对 symlink 条目不静默 | **confirmed（缺口）** | [BUG-174](../bugs/BUG-174-notes-tree-symlink-invisible.md)；链接 Note `files:0/checked:0` |
+| fix-evidence 校验命令真实存在 | **confirmed（缺口）** | [BUG-175](../bugs/BUG-175-fix-evidence-fake-command.md)；`pnpm` 假脚本 PASS |
+| fix-evidence 支持 merge 提交 | **pass** | 临时仓库 merge 的 `git show --name-only` 有输出，gate 通过（与 pre-push 的 `diff-tree` 不同） |
+| 共享形状层已覆盖 headings/table-rows/JSON | **unverified / 部分** | `scanDocument` 覆盖标题/表格；JSON 提取仍独立（BUG-173） |
+
+**本轮开卡：** BUG-168..175（8 张）。**未跑：** C8-H10 live present deny；C10 console/rejection；C2/C5/C7 残余真入口。**证据：** `runtime/tmp/c8c-*.mts`、`c9c-*.mts` 与对应 `.log`。
+
 ## 证据、判据与处置
 
 - **oracle 纪律**：先写期望，再看实现；不拿实现当 oracle；spec 绿只说明覆盖，不说明行为正确。
@@ -1609,7 +1638,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 1. 每个宪章至少跑一轮，或逐项写「未跑 + 原因 + owner」；每轮有期望 vs 实测与证据坐标。
 2. 每轮假设全部判决（confirmed / refuted / unverified + 原因）；confirmed 有 BUG 卡或观察落点；不写「没有 bug」。
-3. 发现缺陷立即开 `_backlog/bugs/` 卡（编号唯一源 = [bugs/README](../bugs/README.md) 的 Next，当前 168），本卡不改产品代码。
+3. 发现缺陷立即开 `_backlog/bugs/` 卡（编号唯一源 = [bugs/README](../bugs/README.md) 的 Next，当前 176），本卡不改产品代码。
 4. 每轮回填 `## Round N`，并同步 `_backlog/issues/README.md` 活跃索引；`pnpm verify` 保持 ALL PASS。
 5. focus v2：C8–C10 每面至少一轮，或逐项写「未跑 + 原因」；C8 的 H10（真模型 present deny）若未跑，必须写未跑，不能折成 PASS。
 6. 用户叫停或所有宪章有明确结论时，按关闭条件收口；审查记录写 `审查：agent｜用户｜跳过 — 理由`。
@@ -1619,6 +1648,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 - C1–C7 每面至少一轮，或逐项写未跑原因；C8–C10 各至少一轮，或逐项写未跑原因；每轮 H 全部判决；所有 finding 已分诊。
 - **停止规则（focus v2）**：C8 ≤ 2 轮，C9/C10 各 ≤ 1 轮；到期未发现新材料即收口归档。没有命名的矩阵缺口，不再开「换个文件形状试试」的轮次。
 - **focus v3（2026-11-14）**：这是 BUG-152..159 修复后的 post-fix 回归；C8 第 2 轮、C9 额外 1 轮按用户新预算计，不算重复 v2 首轮。C8-H10 live 仍未跑，保持 `unverified`。
+- **focus v4（2026-11-14）**：这是 BUG-160..167 修复后的第二轮回归；新门禁 `fix-evidence` 与共享形状层按新预算计；C8-H10 live 仍未跑。
 - 不写「没有 bug」；未覆盖面保留并标 owner；单场 live 不写成稳定。
 - 证据可复读；`pnpm verify` + `pnpm test` 绿；审查记录齐后归档。
 
@@ -1628,5 +1658,6 @@ TypeError: Cannot read properties of undefined (reading 'map')
 - 2026-11-13 ｜ Round 86（C8）｜ `runtime/tmp/c8-round1.mts` / `c8-structural.mts` ｜ CRLF/BOM、围栏、numbering 空值、cwd、symlink 五个 confirmed；8 张卡 BUG-152..159 ｜ `pnpm verify` ALL PASS ｜ live H10 未跑。
 - 2026-11-13 ｜ Round 87/88（C9/C10）｜ `pre-push` dry-run、`c10-error-ring.mts` ｜ pre-push zero-SHA、错误环 `{}` confirmed ｜ 同 BUG-158/159 ｜ 真页面未跑。
 - 2026-11-14 ｜ Round 89（post-fix C8/C9）｜ `c8b-reqcheck` / `c8b-html-comment` / `c8b-more-shapes` / `c9-merge-probe.sh` / `c9b-notes-tree` / `c9b-notes-date` ｜ `/req check` 原文本、merge 漏检、HTML 注释、slice 归属、转义竖线、changeLog、notes-tree lifecycle/日期 八项 confirmed ｜ BUG-160..167 ｜ `pnpm test` 247/2046、`pnpm verify` ALL PASS；live H10 未跑。
+- 2026-11-14 ｜ Round 90（post-fix 2 C8/C9）｜ `c8c-markdown-shape` / `c8c-more-shape` / `c9c-fix-evidence` / `c9c-gate-edges` ｜ 行内代码注释、未闭合注释、双反斜杠、legacy JSON、`../` 子类、fix-evidence 删除/假命令、notes-tree symlink 八项 confirmed ｜ BUG-168..175 ｜ `pnpm test` 247/2066、`pnpm verify` ALL PASS；live H10 未跑。
 - 每轮：日期 ｜ 宪章 ｜ 命令/会话 id ｜ 期望 vs 实测 ｜ 证据坐标 ｜ 判定。
 - BUG 卡链接放这里；未跑面逐条保留。

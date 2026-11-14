@@ -2,15 +2,27 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮拿到 ≥3 张卡，先按根因分组列表再逐卡修——逐症状打补丁会把同一根因修三遍。
 
-**下一个缺陷号**：Next BUG ID = 168；已分配 BUG-001..167。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 176；已分配 BUG-001..175。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**：2026-11-14 focus v3 的 8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）」）。
+**活跃 8 张（2026-11-14 focus v4 回归；只报不修）**：见下方「## 2026-11-14 focus v4 探索（post-fix 2）」。
 
-**上一轮收口**（2026-11-13 focus v2）：8 张已于 2026-11-14 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接」）。
+**上一轮收口**（2026-11-14 focus v3）：8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）」）。
+
+**更早收口**（2026-11-13 focus v2）：8 张已于 2026-11-14 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接」）。
+
+## 2026-11-14 focus v4 探索（post-fix 2）
+
+**用户指令（2026-11-14）**：「继续再来……探索抓更多的bug」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+
+| 组 | 卡 | 一句话 | 级别 |
+|---|---|---|---|
+| A 共享形状层边界 | [168](BUG-168-markdown-inline-code-comment.md) / [169](BUG-169-markdown-unclosed-comment.md) / [172](BUG-172-split-table-row-double-backslash.md) / [173](BUG-173-legacy-json-in-comment.md) | 行内代码 `<!--` 起注释；未闭合注释吞后文；`\\|` 不切列；注释里的 legacy JSON 仍解析 | P2 ×4 |
+| B 三态读契约 | [170](BUG-170-read-company-file-dotdot-subclass.md) | `../` 越界路径 missing 与 unsafe 子类不稳定 | P2 |
+| C 新门禁覆盖 | [171](BUG-171-fix-evidence-deletion-surface.md) / [174](BUG-174-notes-tree-symlink-invisible.md) / [175](BUG-175-fix-evidence-fake-command.md) | fix-evidence 拒删除型修复；notes-tree 忽略 symlink；假命令也能过 fix-evidence | P2 ×3 |
 
 ## 2026-11-14 focus v3 探索（post-fix 回归）
 

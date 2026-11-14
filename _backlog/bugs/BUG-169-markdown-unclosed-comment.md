@@ -1,0 +1,59 @@
+---
+status: 调查中
+severity: P2
+opened: 2026-11-14
+---
+
+# BUG-169：未闭合 HTML 注释静默吞掉后文，/prd check 报「没有需求」
+
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+>
+> **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；与 BUG-162 的注释容器同层。
+> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8c-markdown-shape.mts`。
+
+## 症状
+
+PRD 里有一个未闭合的 HTML 注释：
+
+```html
+<!-- 未闭合注释
+
+## Requirements (definition point)
+### REQ-001 ...
+```
+
+`validateProductDocs` 报：
+
+```text
+PRD 没有 `### REQ-###` 定义小节（没有需求 = 没定义产品）
+slice S1 列出不存在的 REQ：REQ-001
+```
+
+后文整段被当注释内容，解析器没有提示「注释未闭合」。
+
+## 根因（假设）
+
+`scanDocument()` 在 `inComment === true` 时，如果当前行找不到 `-->`，就把 `index = raw.length` 结束该行并**继续保持 `inComment` 到 EOF**；没有 EOF 检查，也没有把「注释未闭合」记成结构错误。调用方只看到「没有 REQ」这个级联结果。
+
+## 复现
+
+```sh
+node --import tsx/esm runtime/tmp/c8c-markdown-shape.mts
+```
+
+看 `unclosed comment false [...]` 两条错误。
+
+## 影响 / 失败类
+
+**失败类 6/9（文档文本形状）**：一个漏写 `-->` 的编辑错误会让整份 PRD 被读成空文档，错误信息指向「没有需求」，而不是「注释未闭合」；模型/操作员会去补需求而不是修注释。
+
+## 修复方向（不在本卡实施）
+
+- `scanDocument()` 返回 `unclosedComment` 标记/行号；`validateProductDocs` / `checkRequirements` 先报「HTML 注释未闭合」；
+- 或未闭合注释按「结构错误」fail loud，不静默吞到 EOF；
+- spec 覆盖未闭合注释、注释内 fence、注释后正文。
+
+## 证据
+
+- `runtime/tmp/c8c-markdown-shape.mts` / `.log`：`unclosed comment false [...]`。
+- 代码：[markdown-shape.ts](../../packages/company-pack/src/lib/markdown-shape.ts) 的 `scanDocument()`。
