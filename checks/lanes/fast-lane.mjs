@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：pre-push 自动（`pnpm smoke:fast`）；也手动跑。6 条稳定 keyless，~2.4s；不进 pnpm test。
+// 何时跑：pre-push 自动（`pnpm smoke:fast`）；也手动跑。4 条稳定 keyless（成员唯一家 = FAST），~2.4s；不进 pnpm test。
 //
 // 为什么：便宜 smoke 不在 pnpm test / verify / pre-push 里，坏了没人知道——2026-11-13 实测
 // two-axis-gates 与 replay 两条红、candidate-scan-eval 一条惰性。本 lane 只收「稳定 + ≤10s +

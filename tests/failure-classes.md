@@ -31,5 +31,5 @@
 
 - 同一失败类连续两轮 exploratory 出现，且资产形状只有 `example` → 下一轮必须补生成器/模型/元测试；再补一条手写 spec 不算。
 - 资产形状词表 = `example | generator | model | meta`；census 的 `shape` 列是账，`tools/lib/asset-lanes.mjs` 是唯一家。
-- `## 未覆盖轴` 的每条必须有去向（资产/卡/决定/不适用）；机械门 = `notes-axes`（新 Note 生效日 2026-11-15）。
+- `## 未覆盖轴` 的每条必须带 `[covered|policy|environment-gap|unprovable]` 前缀且 `→` 右侧指向盘上真实文件锚点；机械门 = `notes-axes`（生效日 2026-11-14，扫 `implemented/` + `archived/`）。
 - 具名守卫只升不降；新修 BUG（opened ≥ 2026-11-15）必须在 spec/test 标题里带 `BUG-nnn`；账 = `tests/BUG-COVERAGE.generated.md` + `tests/support/bug-coverage-baseline.json`。

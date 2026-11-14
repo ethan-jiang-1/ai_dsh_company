@@ -73,7 +73,7 @@ export function renderCensus(model) {
   lines.push('')
   lines.push('## 字段（v2）')
   lines.push('')
-  lines.push('`shape` = example | generator | model | meta（当前默认 example）；`lastRed` = 最近一次真红日期（— = 未接运行日志，不伪造）；`replaceBy` / `retireWhen` = 替代资产 / 退役条件（— = 未排期）。`消费者` = tests/checks/tools/probes/run 里引用该资产名的文件数（引用计数，不是运行次数）。')
+  lines.push('`shape` = example | generator | model | meta（当前默认 example）；`lastRed` = 最近一次真红日期（— = 未接运行日志，不伪造）；`replaceBy` / `retireWhen` = 替代资产 / 退役条件（— = 未排期）。`消费者` = 自动调度 lane 数 + tests/checks/tools/probes/run 里引用该资产名的文件数。')
   lines.push('')
   lines.push('## 冒烟')
   lines.push('')

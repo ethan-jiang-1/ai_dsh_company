@@ -23,9 +23,12 @@ import {
   companyFileProblem,
   companyFileProblemAt,
   createCompanyDir,
+  ensureCompanyDir,
+  ensureCompanyDirAt,
   readCompanyFileAt,
   readCompanyText,
   readCompanyTextAt,
+  verifyCompanySubpathAt,
   writeCompanyAtomic,
   writeCompanyAtomicAt,
 } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
@@ -349,6 +352,61 @@ describe('路径等价类与读写目录闸门全通道同判据矩阵（W3.3，
         )
         expect(verdict?.kind, unsafeDeliverablePath).toBe('deny')
         if (verdict?.kind === 'deny') expect(verdict.reason).toContain('文件形状挡住')
+      }
+    } finally {
+      world.cleanup()
+    }
+  })
+
+  it('空字节、盘符/绝对路径、不存在中间段回退、根级原子写 TOCTOU 与 verifyCompanySubpathAt 叶子 symlink', () => {
+    const world = makeWorld('shape-edges-')
+    try {
+      const home = join(world.ws, '.dsh-company')
+      mkdirSync(join(home, 'kb'), { recursive: true })
+      writeFileSync(join(home, 'kb/company.md'), '# ok\n')
+      writeFileSync(join(world.outside, 'secret.md'), 'secret\n')
+      symlinkSync(join(world.outside, 'secret.md'), join(home, 'kb/leaf-link.md'))
+
+      // 不存在中间目录再 `..` 回退（盘上无 symlink 可跟随）→ 允许按消解路径读到合法文件
+      expect(readCompanyFileAt(home, 'kb/missing-hop/../company.md')).toEqual({ kind: 'text', text: '# ok\n' })
+      expect(readCompanyText(world.ws, './.dsh-company/kb/company.md')).toBe('# ok\n')
+      expect(ensureCompanyDir(world.ws, '.dsh-company')).toBe(home)
+      expect(ensureCompanyDirAt(home, '.')).toBe(home)
+
+      // 空字节、绝对路径、Windows 盘符路径一律 unsafe
+      for (const badRel of ['kb/a\0b.md', '/etc/passwd', 'C:/evil.md', 'C:\\evil.md']) {
+        expect(readCompanyFileAt(home, badRel).kind, badRel).toBe('unsafe')
+        expect(() => writeCompanyAtomicAt(home, badRel, 'x'), badRel).toThrow(UnsafeCompanyPathError)
+      }
+
+      // verifyCompanySubpathAt：未落盘路径放行；叶子自身是 symlink 则抛
+      expect(verifyCompanySubpathAt(home, 'deliverables/m1/prd.md')).toEqual(['deliverables', 'm1', 'prd.md'])
+      expect(() => verifyCompanySubpathAt(home, 'kb/leaf-link.md')).toThrow(UnsafeCompanyPathError)
+
+      // 根级文件（parentSegments.length === 0）原子写期间根真实路径或根形状被替换 → 拒绝 rename
+      expect(() =>
+        writeCompanyAtomicAt(home, 'bundle.json', '{}', {
+          realpath: (() => {
+            let calls = 0
+            return (p: string) => (++calls === 1 ? p : `${p}-swapped`)
+          })(),
+        }),
+      ).toThrow(UnsafeCompanyPathError)
+
+      const worldSwap = makeWorld('shape-root-swap-')
+      try {
+        const swapHome = join(worldSwap.ws, '.dsh-company')
+        mkdirSync(swapHome, { recursive: true })
+        expect(() =>
+          writeCompanyAtomicAt(swapHome, 'bundle.json', '{}', {
+            writeFile: () => {
+              rmSync(swapHome, { recursive: true, force: true })
+              symlinkSync(worldSwap.outside, swapHome)
+            },
+          }),
+        ).toThrow(UnsafeCompanyPathError)
+      } finally {
+        worldSwap.cleanup()
       }
     } finally {
       world.cleanup()

@@ -20,7 +20,7 @@
 | `harness-home/b/`、`harness-home-b/` | 第二/嵌套 home——多 home 实验与跨 home 审计视角（authorship 口径：每家导出各审一次再拼结果） | runtime·实验面 |
 | `pw-browsers/` | 浏览器二进制与 profile（`PLAYWRIGHT_BROWSERS_PATH` 重定向落点）；**UI 布局记忆按 origin 隔离**存在浏览器 profile——换端口重启即新 origin、记忆清零 | runtime |
 | `rehearsal-workspace/` | **排练盘**：排练/探针 cwd——**绝不写 live 公司盘**（`company-workspace/`） | runtime·排练 |
-| `human-exits-evidence/` | 行为探针（[human-exits 非阻塞支](../probes/session-context/human-exits-nonblocking-probe.mjs)）落盘的会话事件 JSON，供人工复核判定；gitignored，可从会话日志再生 | runtime·探针证据 |
+| `human-exits-evidence/` | 行为探针（[human-exits-probe](../probes/session-context/human-exits-probe.mjs) 阻塞/非阻塞支）落盘的会话事件 JSON，供人工复核判定；gitignored，可从会话日志再生 | runtime·探针证据 |
 | `ops/` | 窗口启动/人工检查截图等一次性产物（2026-10-23 起）；ignored，7 天清扫；被 tracked markdown 引用时保留 | runtime·本机证据 |
 
 ## 二、层级事实（四条，钉死）

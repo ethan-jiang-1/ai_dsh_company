@@ -130,7 +130,7 @@
 | 003 | — | tests/tools/deliverables-audit.spec.ts:462 |
 | 004 | — | tests/tools/deliverables-audit.spec.ts:546 |
 | 008 | 2026-10-10 | tests/tools/deliverables-audit.spec.ts:294 |
-| 011 | 2026-10-11 | tests/tools/candidate-scan-assignments.spec.ts:8 |
+| 011 | 2026-10-11 | tests/tools/candidate-scan-assignments.spec.ts:49 |
 | 013 | 2026-10-12 | tests/repo/tracked-secrets.spec.ts:22；tests/repo/tracked-token.spec.ts:20 |
 | 014 | 2026-10-12 | tests/tools/converge-rules.spec.ts:149 |
 | 016 | 2026-10-12 | tests/tools/converge-rules.spec.ts:177 |
@@ -185,7 +185,7 @@
 | 149 | 2026-11-13 | tests/host/run-bundle/write-gate.spec.ts:73 |
 | 152 | 2026-11-13 | tests/lib/markdown-shape.property.spec.ts:128；tests/lib/prd-check.spec.ts:241 |
 | 153 | 2026-11-13 | tests/lib/prd-check.spec.ts:253 |
-| 156 | 2026-11-13 | tests/host/contract/file-shape-agreement.spec.ts:107 |
+| 156 | 2026-11-13 | tests/host/contract/file-shape-agreement.spec.ts:110 |
 | 157 | 2026-11-13 | tests/lib/prd-check.spec.ts:281 |
 | 160 | 2026-11-14 | tests/lib/requirements-check.spec.ts:308 |
 | 162 | 2026-11-14 | tests/lib/prd-check.spec.ts:298 |
@@ -194,7 +194,7 @@
 | 166 | 2026-11-14 | tests/lib/prd-check.spec.ts:344 |
 | 168 | 2026-11-14 | tests/lib/prd-check.spec.ts:358 |
 | 169 | 2026-11-14 | tests/lib/requirements-check.spec.ts:340 |
-| 170 | 2026-11-14 | tests/host/contract/file-shape-agreement.spec.ts:182 |
+| 170 | 2026-11-14 | tests/host/contract/file-shape-agreement.spec.ts:185 |
 | 172 | 2026-11-14 | tests/lib/prd-check.spec.ts:376 |
 | 173 | 2026-11-14 | tests/lib/prd-check.spec.ts:383 |
 | 176 | 2026-11-14 | tests/lib/prd-check.spec.ts:392 |

@@ -66,9 +66,8 @@
 
 ## 未覆盖轴
 
-- **行内代码 span 的跨行/嵌套**：CommonMark 代码 span 不跨行；扫描器按行处理，嵌套反引号按最长 run 匹配，
-  极端嵌套未单列。
-- **未闭合注释在围栏内**：围栏优先，围栏里的 `<!--` 是字面文本；不报未闭合（符合围栏语义）。
-- **`..` 只拦路径段**：符号链接目录由 `ensureCompanyDir` 的 symlink 检查拦；Windows 分隔符不在本仓路径约定内。
-- **notes symlink 一律红**：若将来需要「archived 指向活 Note」之类形状，要新形状 + 对应门禁规则，不能直接放开。
-- **命令解析只证存在**：不证明命令真跑过、也不证明它真会红；红绿执行证据仍归 `pnpm test` / pre-push 与 Note 验证表。
+- [covered] **行内/跨行代码 span 与 HTML 注释交错**：单状态机已与 `mdast` 差分对齐 → `packages/company-pack/src/lib/markdown-shape-core.js`、`tests/lib/markdown-shape.property.spec.ts`
+- [covered] **围栏内未闭合 `<!--` 字面量**：围栏优先语义已由单测与属性差分覆盖 → `tests/lib/prd-check.spec.ts`、`tests/lib/markdown-shape.property.spec.ts`
+- [covered] **中间段 symlink + `..` 与混合分隔符越界**：读写目录与 `prd-gate` 全通道同判据矩阵已覆盖 → `packages/company-pack/src/host/run-bundle/company-root.ts`、`tests/host/contract/file-shape-agreement.spec.ts`
+- [policy] **notes 软链禁令**：活跃与归档层只许仓内普通文件与目录 → `checks/gates/notes-tree.mjs`
+- [policy] **命令解析只证静态可解析**：执行证据归 `pnpm test` / pre-push 与收尾留证 → `checks/gates/fix-evidence.mjs`

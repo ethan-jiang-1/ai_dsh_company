@@ -85,6 +85,7 @@ describe('StartupOptionsWatch', () => {
     try {
       watch.sync(root)
       const before = readStartupOptions(root).wikiCheck.checkedAt
+      await settle(5)
       rmSync(join(wiki, 'index.md'))
       fake.listeners.get(wiki)?.('index.md')
       await settle()

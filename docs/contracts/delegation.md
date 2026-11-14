@@ -72,8 +72,8 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 `spawn_teammate` 带研发小队（成员继承 VP-Eng 组合，是"VP-Eng 带的工程师"）；support preset 不是 team 座位——header 不列 team，九件套 team 工具由 host seat guard 拒并注入 `company:delegation-seat` 纠正段（BUG-072/076）；team 在 header 分 `team collaboration`（Lead+成员）与 `team spawn (Lead only)`（BUG-077）。
 三种门的能力不同，别用一个门承诺另一个：① VP-Eng 根门 = Lead，能组 team、能命名请 CMO；
 ② CEO 命名 `vp_eng` child = 不是 member，不能 spawn，但能请专家（depth 2）；③ CEO teammate `vp-eng`
-= 继承 CEO 组合，受 CEO 的 `vp_cmo maxDepth 1` 限制。root=Lead 的 keyless 证据 =
-`probes/team/vp-eng-root-lead-probe.mjs`。
+= 继承 CEO 组合，受 CEO 的 `vp_cmo maxDepth 1` 限制。root=Lead 的探针证据 =
+`probes/team/vp-eng-workflow-probe.mjs`。
 
 ## 3. 团队（通道 B，主通道 D4）
 

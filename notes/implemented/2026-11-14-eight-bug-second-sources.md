@@ -77,11 +77,7 @@ hook 没有第二套范围语义，错误环没有第二套取文顺序**。
 
 ## 未覆盖轴
 
-- **真浏览器/真页面错误环**（`cdp-probe`）本轮未跑：`textOf` 是纯逻辑，五种形状由 keyless 覆盖；跨 realm 的
-  真实来源（iframe / worker 抛错）本仓没有现成页面可复现，等有场景时按面跑 `ui-scene-smoke`。
-- **真实 pre-push**（真 push 一条新分支到远端）本轮未跑：三条形状由临时 git 仓库 + 真脚本子进程覆盖；
-  下一次真实新分支 push 时观察 banner 是否按预期点名面级检查。
-- **`/prd check` 真命令面**的 CRLF/BOM 只经由同一 `validateProductDocs` 覆盖，未单独起 CLI；命令与闸门共用
-  实现，故不重复造证据。
-- **flush 位置**：`parsePrdSlices` 在首个 `## ` 标题处结束，围栏外的 `## ` 之后若还有 slice 行会被忽略——
-  现行模板形状之外没有消费者，未展开。
+- [environment-gap] **真浏览器跨 realm 错误源**（iframe / worker 抛错）：五种形状已由 keyless 覆盖，等有跨 realm 页面场景时跑 UI 冒烟 → `tests/client/wiring/error-ring.spec.ts`、`checks/lanes/ui-scene.entry.mjs`
+- [environment-gap] **真实远端新分支 pre-push 横幅**：三条形状已由临时 git 仓库 + 真脚本子进程覆盖 → `tests/checks/pre-push-surfaces.test.mjs`、`.githooks/pre-push`
+- [covered] **`/prd check` 命令面 CRLF/BOM**：命令与闸门共用同一 `validateProductDocs` 实现 → `packages/company-pack/src/lib/prd-check.ts`、`tests/lib/prd-check.spec.ts`
+- [policy] **`parsePrdSlices` 在首个 `## ` 标题处截断**：现行模板在 `## ` 之后不放 slice 行 → `packages/company-pack/src/lib/prd-check.ts`

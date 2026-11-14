@@ -3,11 +3,15 @@ import { runInNewContext } from 'node:vm'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { concurrencyVerdict, verdictOutcome } from '../../tools/lib/team-concurrency-verdict.mjs'
+import {
+  ORACLE_EXPECTED_LABELS,
+  collectCollaborationOracleFindings,
+  evaluateCollaborationOracle,
+} from '../../tools/lib/collaboration-oracle-verdict.mjs'
 
 // Exercise the actual verdict block: a helper test alone cannot catch a dropped required check.
-// （2026-10-14 重构轮：team-concurrency 的判分已抽 tools/lib/team-concurrency-verdict.mjs，
-//  本文件对它用**普通 import** 直测；其余探针 verdict 仍内联、仍走下面的源码切片 vm 求值——
-//  各自抽出时照 backlog-liveness 2026-10-10 的同款修法迁过来。）
+// team-concurrency 与 collaboration-oracle 已抽纯模块（tools/lib/*-verdict.mjs）直连 import；
+// 其余四个真模型探针的内联 verdict 仍通过下方受控切片断言退出码关系。
 function verdict(path: string, from: string, through: string, input: object) {
   const source = readFileSync(`${ROOT}/${path}`, 'utf8')
   const start = source.indexOf(from)
@@ -60,15 +64,29 @@ describe('probe required checks determine the actual exit code', () => {
       { judge1: failed !== 'judge1', judge2: failed !== 'judge2', judge3: failed !== 'judge3' })
     expect(judged.process.exitCode).toBe(1)
   })
-  it('oracle rejects a missing counterexample inventory', () => {
-    const source = readFileSync(`${ROOT}/probes/fs-taskboard/collaboration-oracle-probe.mjs`, 'utf8')
-    const inventoryStart = source.indexOf('const expectedLabels =')
-    const inventoryEnd = source.indexOf('const findings =', inventoryStart)
-    const guardStart = source.indexOf('  if (findings.length')
-    const guardEnd = source.indexOf('\n  const count =', guardStart)
-    expect(inventoryStart).toBeGreaterThan(0)
-    expect(guardStart).toBeGreaterThan(inventoryStart)
-    const script = source.slice(inventoryStart, inventoryEnd) + '\nconst findings = []\n' + source.slice(guardStart, guardEnd)
-    expect(() => runInNewContext(script)).toThrow('oracle case inventory changed or missing')
+  it('collaboration-oracle rejects all counterexamples and refuses missing/tampered inventory without source slicing', () => {
+    const findings = collectCollaborationOracleFindings()
+    expect(findings.map(item => item.label)).toEqual([...ORACLE_EXPECTED_LABELS])
+    expect(evaluateCollaborationOracle(findings)).toEqual({
+      acceptedCount: 0,
+      total: ORACLE_EXPECTED_LABELS.length,
+      exitCode: 0,
+    })
+
+    const leaked = findings.map((item, idx) => (idx === 0 ? { ...item, accepted: true } : item))
+    expect(evaluateCollaborationOracle(leaked)).toEqual({
+      acceptedCount: 1,
+      total: ORACLE_EXPECTED_LABELS.length,
+      exitCode: 1,
+    })
+
+    expect(() => evaluateCollaborationOracle([])).toThrow('oracle case inventory changed or missing')
+    expect(() => evaluateCollaborationOracle(findings.slice(1))).toThrow('oracle case inventory changed or missing')
+    expect(() => evaluateCollaborationOracle(
+      findings.map((item, idx) => (idx === 0 ? { label: 'wrong', accepted: false } : item)),
+    )).toThrow('oracle case inventory changed or missing')
+    expect(() => evaluateCollaborationOracle(
+      findings.map((item, idx) => (idx === 0 ? { label: item.label, accepted: 'nope' as unknown as boolean } : item)),
+    )).toThrow('oracle case inventory changed or missing')
   })
 })

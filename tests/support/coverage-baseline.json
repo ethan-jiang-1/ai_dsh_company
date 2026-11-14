@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-11-13",
+  "generatedAt": "2026-11-14",
   "files": {
     "packages/company-pack/src/index.ts": {
-      "statements": 63.38,
+      "statements": 63.55,
       "branches": 58.33
     },
     "packages/company-pack/src/client/index.ts": {
@@ -186,8 +186,8 @@
       "branches": 100
     },
     "packages/company-pack/src/client/wiring/error-ring.ts": {
-      "statements": 90.55,
-      "branches": 75.3
+      "statements": 91.15,
+      "branches": 81.9
     },
     "packages/company-pack/src/client/wiring/instance-guard.ts": {
       "statements": 98.14,
@@ -232,6 +232,10 @@
     "packages/company-pack/src/host/commands/prd-command.ts": {
       "statements": 96.77,
       "branches": 90
+    },
+    "packages/company-pack/src/host/commands/prd-gate.ts": {
+      "statements": 92.3,
+      "branches": 82.4
     },
     "packages/company-pack/src/host/commands/req-command.ts": {
       "statements": 92.66,
@@ -342,8 +346,8 @@
       "branches": 85.45
     },
     "packages/company-pack/src/host/run-bundle/company-root.ts": {
-      "statements": 86.18,
-      "branches": 83.65
+      "statements": 88.72,
+      "branches": 88.23
     },
     "packages/company-pack/src/host/run-bundle/config.ts": {
       "statements": 100,
@@ -477,9 +481,13 @@
       "statements": 100,
       "branches": 100
     },
+    "packages/company-pack/src/lib/markdown-shape.ts": {
+      "statements": 100,
+      "branches": 100
+    },
     "packages/company-pack/src/lib/prd-check.ts": {
-      "statements": 78.51,
-      "branches": 67.16
+      "statements": 84.6,
+      "branches": 73.06
     },
     "packages/company-pack/src/lib/presence-status.ts": {
       "statements": 95.83,
@@ -490,8 +498,8 @@
       "branches": 80.31
     },
     "packages/company-pack/src/lib/requirements-check.ts": {
-      "statements": 91.88,
-      "branches": 73.91
+      "statements": 92.93,
+      "branches": 76.51
     },
     "packages/company-pack/src/lib/retry-policy.ts": {
       "statements": 100,
@@ -529,9 +537,13 @@
       "statements": 100,
       "branches": 90
     },
+    "tools/lib/asset-consumers.mjs": {
+      "statements": 97.67,
+      "branches": 94.44
+    },
     "tools/lib/asset-lanes.mjs": {
       "statements": 100,
-      "branches": 93.33
+      "branches": 96.15
     },
     "tools/lib/audit-verdict.mjs": {
       "statements": 100,
@@ -542,12 +554,16 @@
       "branches": 100
     },
     "tools/lib/backlog-liveness.mjs": {
-      "statements": 94.27,
-      "branches": 90
+      "statements": 94.76,
+      "branches": 90.51
+    },
+    "tools/lib/bug-coverage.mjs": {
+      "statements": 100,
+      "branches": 92.3
     },
     "tools/lib/candidate-scan.mjs": {
-      "statements": 89.52,
-      "branches": 87.67
+      "statements": 95.71,
+      "branches": 89.04
     },
     "tools/lib/carrier-registry.mjs": {
       "statements": 0,
@@ -568,6 +584,10 @@
     "tools/lib/collaboration-evidence.mjs": {
       "statements": 98.2,
       "branches": 90.95
+    },
+    "tools/lib/collaboration-oracle-verdict.mjs": {
+      "statements": 97.29,
+      "branches": 94.11
     },
     "tools/lib/company-roles.mjs": {
       "statements": 100,
@@ -626,7 +646,7 @@
       "branches": 87.27
     },
     "tools/lib/markdown-links.mjs": {
-      "statements": 97.01,
+      "statements": 97.05,
       "branches": 94.11
     },
     "tools/lib/market-index.mjs": {
@@ -642,8 +662,8 @@
       "branches": 100
     },
     "tools/lib/notes-audit.mjs": {
-      "statements": 95.07,
-      "branches": 81.63
+      "statements": 95.68,
+      "branches": 86.45
     },
     "tools/lib/orient.mjs": {
       "statements": 95.71,
@@ -678,8 +698,8 @@
       "branches": 90
     },
     "tools/lib/quality-loop.mjs": {
-      "statements": 93.87,
-      "branches": 79.72
+      "statements": 94.75,
+      "branches": 80.95
     },
     "tools/lib/question-stop.mjs": {
       "statements": 96.61,
@@ -687,7 +707,7 @@
     },
     "tools/lib/recovery-scope-evidence.mjs": {
       "statements": 97.93,
-      "branches": 90.55
+      "branches": 91.33
     },
     "tools/lib/rehearsal.mjs": {
       "statements": 93.75,
@@ -700,6 +720,10 @@
     "tools/lib/replay-logic.mjs": {
       "statements": 95.45,
       "branches": 91.66
+    },
+    "tools/lib/repo-markdown.mjs": {
+      "statements": 98.65,
+      "branches": 87.7
     },
     "tools/lib/repository-layout.mjs": {
       "statements": 97.39,
@@ -747,7 +771,7 @@
     },
     "tools/lib/test-census.mjs": {
       "statements": 100,
-      "branches": 83.33
+      "branches": 96.55
     },
     "tools/lib/tracked-secrets.mjs": {
       "statements": 92.85,

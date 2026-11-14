@@ -34,24 +34,21 @@
 [journal-audit](audit/journal-audit.mjs) · [quality-loop-audit](audit/quality-loop-audit.mjs)
 [surface-matrix-audit](audit/surface-matrix-audit.mjs)
 
-## 窄机制与视觉探针（probes/，68）
+## 窄机制与视觉探针（probes/，60）
 
-### browser-visual（17）
+### browser-visual（14）
 
 [attention-panel-probe](../probes/browser-visual/attention-panel-probe.mjs)
 [board-drift-probe](../probes/browser-visual/board-drift-probe.mjs)
 [browser-behavior-probe](../probes/browser-visual/browser-behavior-probe.mjs)
 [budget-panel-probe](../probes/browser-visual/budget-panel-probe.mjs)
 [cdp-probe](../probes/browser-visual/cdp-probe.mjs)
-[compact-view-probe](../probes/browser-visual/compact-view-probe.mjs)
-[cultivation-main-e2e-probe](../probes/browser-visual/cultivation-main-e2e-probe.mjs)
 [cultivation-ux-scenarios-probe](../probes/browser-visual/cultivation-ux-scenarios-probe.mjs)
 [cultivation-ux-walkthrough-probe](../probes/browser-visual/cultivation-ux-walkthrough-probe.mjs)
 [dag-midflight-probe](../probes/browser-visual/dag-midflight-probe.mjs)
 [dag-visual-probe](../probes/browser-visual/dag-visual-probe.mjs)
 [deliverables-catalog-probe](../probes/browser-visual/deliverables-catalog-probe.mjs)
 [ledger-summary-probe](../probes/browser-visual/ledger-summary-probe.mjs)
-[open-in-app-probe](../probes/browser-visual/open-in-app-probe.mjs)
 [presence-panel-probe](../probes/browser-visual/presence-panel-probe.mjs)
 [sidebar-role-mark-probe](../probes/browser-visual/sidebar-role-mark-probe.mjs)
 [tasks-panel-probe](../probes/browser-visual/tasks-panel-probe.mjs)
@@ -69,20 +66,17 @@
 [taskboard-presence-probe](../probes/fs-taskboard/taskboard-presence-probe.mjs)
 [taskboard-scope-probe](../probes/fs-taskboard/taskboard-scope-probe.mjs)
 
-### session-context（18）
+### session-context（15）
 
 [ask-user-timed-probe](../probes/session-context/ask-user-timed-probe.mjs)
 [budget-signoff-probe](../probes/session-context/budget-signoff-probe.mjs)
 [ceo-assembly-probe](../probes/session-context/ceo-assembly-probe.mjs)
 [cultivation-context-probe](../probes/session-context/cultivation-context-probe.mjs)
 [cultivation-method-layer-probe](../probes/session-context/cultivation-method-layer-probe.mjs)
-[cultivation-propose-probe](../probes/session-context/cultivation-propose-probe.mjs)
 [date-rule-probe](../probes/session-context/date-rule-probe.mjs)
 [dual-ceo-probe](../probes/session-context/dual-ceo-probe.mjs)
 [dual-signoff-probe](../probes/session-context/dual-signoff-probe.mjs)
 [hitl-dispatch-order-probe](../probes/session-context/hitl-dispatch-order-probe.mjs)
-[human-exits-expression-probe](../probes/session-context/human-exits-expression-probe.mjs)
-[human-exits-nonblocking-probe](../probes/session-context/human-exits-nonblocking-probe.mjs)
 [human-exits-probe](../probes/session-context/human-exits-probe.mjs)
 [journal-boundary-probe](../probes/session-context/journal-boundary-probe.mjs)
 [member-bounceback-probe](../probes/session-context/member-bounceback-probe.mjs)
@@ -90,7 +84,7 @@
 [team-taskbook-probe](../probes/session-context/team-taskbook-probe.mjs)
 [time-context-probe](../probes/session-context/time-context-probe.mjs)
 
-### team（23）
+### team（21）
 
 [claim-race-probe](../probes/team/claim-race-probe.mjs)
 [delegation-contract-probe](../probes/team/delegation-contract-probe.mjs)
@@ -110,8 +104,6 @@
 [team-claim-loser-probe](../probes/team/team-claim-loser-probe.mjs)
 [team-concurrency-probe](../probes/team/team-concurrency-probe.mjs)
 [team-recovery-probe](../probes/team/team-recovery-probe.mjs)
-[vp-eng-root-lead-probe](../probes/team/vp-eng-root-lead-probe.mjs)
-[vp-eng-teaming-probe](../probes/team/vp-eng-teaming-probe.mjs)
 [vp-eng-workflow-probe](../probes/team/vp-eng-workflow-probe.mjs)
 [worker-orchestrator-probe](../probes/team/worker-orchestrator-probe.mjs)
 [worker-researcher-probe](../probes/team/worker-researcher-probe.mjs)

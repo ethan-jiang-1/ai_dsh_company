@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { ASSETS, FAST, KINDS, LANES, SURFACE_RULES, assetByName, suffixOf } from '../../tools/lib/asset-lanes.mjs'
+import { ASSETS, FAST, KINDS, LANES, SURFACE_RULES, assetByName, selectWeeklyAssets, suffixOf } from '../../tools/lib/asset-lanes.mjs'
 
 /**
  * 「空间完备」的机械门（DSH M1 的本仓形状）。
@@ -67,5 +67,15 @@ describe('资产 lane 注册表（空间完备）', () => {
   it('fast 的每条都真的在 fast lane 里（注册表与派生列表一致）', () => {
     const derived = ASSETS.filter(asset => asset.lanes.includes('fast')).map(asset => asset.name)
     expect(derived).toEqual(FAST)
+  })
+
+  it('weekly 筛选：正常命中 classic weekly 资产，支持浏览器/后缀过滤，不存在的 filter 返回空集供 runner 判非零', () => {
+    const defaults = selectWeeklyAssets()
+    expect(defaults.length).toBeGreaterThan(0)
+    const normal = selectWeeklyAssets(ASSETS, { ci: true })
+    expect(normal.length).toBeGreaterThan(0)
+    const withBrowser = selectWeeklyAssets(ASSETS, { withBrowser: true, suffix: 'entry' })
+    expect(withBrowser.some(asset => asset.kind === 'browser')).toBe(true)
+    expect(selectWeeklyAssets(ASSETS, { filter: 'zz-none' })).toEqual([])
   })
 })

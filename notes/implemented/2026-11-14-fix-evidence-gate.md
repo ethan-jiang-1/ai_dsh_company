@@ -62,12 +62,8 @@
 
 ## 未覆盖轴
 
-- **证据强度只到“对账 + 形状”**：一次提交改了目录里另一个无关文件也能过交集判定；红/绿命令只验
-  “存在且一致”，不执行。本门证明“有可对账的系统面改动与可复跑的配方”，不证明“改动就是正确修复”、
-  也不证明“红绿真跑过”。正确性归 spec，执行归 `pnpm test` / pre-push。
-- **浅克隆**：`git rev-parse --is-shallow-repository` 为 true 且 sha 不可达时跳过提交解析，PASS 行点名
-  跳过数；完整历史是判据前提（本地与 pre-push 都是完整历史）。
-- **存量祖父豁免**：`opened` < 2026-11-14 的已修卡不追补；新写从严（与落地语义同款前向生效）。
-- **多提交修复只对一笔**：卡的 `- 提交：` 只写主证据提交；其余提交不逐一对账。
-- **文档-only 修复**：`docs/` 视为系统面（允许），因此“只改文档”的合法修复可以过门——判据不区分
-  “内容修复”与“文档修复”，只挡“只有卡与 Note”。
+- [policy] **证据强度只到“对账 + 形状”**：门禁只验提交交集与命令可解析，不在 `verify` 内重跑测试 → `checks/gates/fix-evidence.mjs`、`.githooks/pre-push`
+- [environment-gap] **浅克隆不可达提交**：`--is-shallow-repository` 为 true 且 sha 不可达时显式计入跳过数，完整历史归本地与 CI → `checks/gates/fix-evidence.mjs`、`tests/checks/gate-mutation.test.mjs`
+- [policy] **存量祖父豁免**：`opened < 2026-11-14` 的历史已修卡不追补，新卡从严 → `checks/gates/fix-evidence.mjs`
+- [policy] **多提交修复只对账主提交**：卡面 `- 提交：` 锚定主证据 SHA，不逐笔枚举辅助提交 → `checks/gates/fix-evidence.mjs`
+- [policy] **文档型缺陷修复允许指向 `docs/`**：只拦截纯 `_backlog/` / `notes/` / `vendor/` 伪修复 → `checks/gates/fix-evidence.mjs`

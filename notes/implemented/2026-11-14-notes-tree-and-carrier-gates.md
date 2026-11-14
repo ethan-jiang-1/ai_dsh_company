@@ -50,13 +50,11 @@
 
 ## 未覆盖轴
 
-- **注入的字节成本**：两份门牌各 8 行，只进入「动该层文件」的会话；没有实测注入后的上下文占用（doc-budget
-  管行数，不管字节）。
-- **冻结层链接容忍度**（研究 B5）：`notes-archived-links`（`.md` 零容忍）与 `link-debt`（天花板 4）仍是两套口径；
-  本卡明确排除，门牌只写了「目标迁移后改那一行路径」的现状，没有统一容忍度。
-- **骨架门禁**（B4）：`## 输掉的方案`/`## 验证` 仍靠散文与 skill，没有门禁。
-- **存在性**：「该写 Note 没写」仍不可机械判（与 DSH 同）；`notes-tree` 只判已存在文件的形状。
-- **非 `.md` 证据件**：不判形状（pin-review `.json` 任意命名都不会红）。
+- [unprovable] **目录门牌注入后的上下文 token 占比**：两份 8 行门牌只进动该层的会话，`doc-budget` 管行数不管 token → `notes/implemented/AGENTS.md`、`notes/archived/AGENTS.md`
+- [policy] **冻结层链接容忍度双轨**：`.md` 断链零容忍与历史证据天花板按职责分立 → `checks/gates/notes-archived-links.mjs`、`checks/gates/link-debt.mjs`
+- [policy] **Note 论证散文质量**：`## 输掉的方案` / `## 验证` 深度归完成定义与独立盲审，不做词面门禁 → `.agents/skills/agent-note-definition/SKILL.md`
+- [unprovable] **“该写 Note 却没建文件”的存在性判断**：静态门只判已存在文件形状，漏写归收尾盲审 → `checks/gates/notes-tree.mjs`、`.agents/skills/close-out-definition/SKILL.md`
+- [policy] **非 `.md` 归档证据件命名**：JSON 等附件不套 Note 日期命名规则 → `checks/gates/notes-tree.mjs`
 
 ## 验证
 

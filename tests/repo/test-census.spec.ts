@@ -7,10 +7,14 @@ import { buildCensus, countProjectSurface, renderCensus } from '../../tools/lib/
 import { consumerCount } from '../../tools/lib/asset-consumers.mjs'
 
 /**
- * 资产盘子（研究 A 件）的两个机械面：
- * ① `tests/CENSUS.generated.md` 是**生成物**——与注册表/盘面不一致即红（防手抄漂移）；
- * ② 69 个探针也必须登记——它们是「存在但从没跑」的最大一块，登记不改变运行方式，只让删除/改名必须同 diff 退登记。
+ * 资产盘子与制度负债棘轮（W4 硬化）：
+ * ① `tests/CENSUS.generated.md` 是生成物——与注册表/盘面不一致即红（防手抄漂移）；
+ * ② 探针与冒烟双向对齐，且全量显式失败类（`未分类 === 0`）；
+ * ③ 结构门禁总数与活跃探针总数实行只降不升硬顶（`policy §P2`）。
  */
+const MAX_GATES = 75
+const MAX_PROBES = 59
+
 function probeFiles() {
   const walk = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const path = join(dir, entry.name)
@@ -20,7 +24,7 @@ function probeFiles() {
   return walk(join(ROOT, 'probes')).sort()
 }
 
-describe('资产盘子（census 生成物）', () => {
+describe('资产盘子与负债上限棘轮（census + P2 硬顶）', () => {
   it('tests/CENSUS.generated.md 与注册表/盘面一致（漂了就跑 --write）', () => {
     const { gateCount, specCount } = countProjectSurface(ROOT)
     const consumers = consumerCount(ROOT, [...ASSETS, ...PROBES])
@@ -37,13 +41,33 @@ describe('资产盘子（census 生成物）', () => {
     expect(new Set(registered).size).toBe(registered.length)
   })
 
-  it('失败类只用封闭词表，且冒烟都有判定', () => {
+  it('门禁数与探针数只降不升（policy §P2 硬顶）', () => {
+    const { gateCount } = countProjectSurface(ROOT)
+    expect(gateCount, `结构门禁总数不得超过 ${String(MAX_GATES)}（新规则并入既有门禁或先合并旧门）`).toBeLessThanOrEqual(MAX_GATES)
+    expect(PROBES.length, `活跃探针总数不得超过 ${String(MAX_PROBES)}（加一减一，禁止探针负债回潮）`).toBeLessThanOrEqual(MAX_PROBES)
+  })
+
+  it('失败类只用封闭词表，且冒烟与探针全量清零「未分类」', () => {
     for (const asset of [...ASSETS, ...PROBES]) {
       expect(FAILURE_CLASSES, `${asset.name} 的失败类不在词表`).toContain(failureClassOf(asset.name))
     }
     expect(failureClassOf('zz-unknown'), '未登记名字必须落「未分类」而不是猜').toBe('未分类')
     expect(allAssets().length).toBe(ASSETS.length + PROBES.length)
-    const unclassifiedSmokes = ASSETS.filter(asset => failureClassOf(asset.name) === '未分类').map(asset => asset.name)
-    expect(unclassifiedSmokes, '冒烟是手判的 32 条：新冒烟必须登记失败类（未分类只允许探针暂用）').toEqual([])
+    const unclassified = allAssets().filter(asset => failureClassOf(asset.name) === '未分类').map(asset => asset.name)
+    expect(unclassified, `冒烟（${String(ASSETS.length)}）与探针（${String(PROBES.length)}）均须登记真实失败类，禁止留「未分类」负债`).toEqual([])
+  })
+
+  it('buildCensus + renderCensus 保持未分类计数、缺省消费者与缺省 shape/manualReason 兜底分支', () => {
+    const model = buildCensus({
+      smokes: [{ name: 's1', kind: 'classic', lanes: [] }],
+      probes: [{ name: 'p1', domain: 'team', lanes: [] }],
+      gateCount: 1,
+      specCount: 2,
+      failureClassOf: name => (name === 's1' ? '纯逻辑' : '未分类'),
+    })
+    expect(model.noConsumer).toBe(2)
+    const rendered = renderCensus(model)
+    expect(rendered).toContain('| 未分类失败类 | 1 |')
+    expect(rendered).toContain('手动（未写理由）')
   })
 })

@@ -59,9 +59,7 @@
 
 ## 未覆盖轴
 
-- **真实 pre-push（真 push 一条含 merge 的分支）** 本轮未跑：merge 形状由临时仓库 + 真脚本子进程覆盖；
-  下一次真实 merge 分支 push 时观察 banner 是否点名面级检查。
-- **真 CLI** `/req check` / `/prd check` 未单独起进程：两个命令与 spec 共用同一实现函数，未重复造证据。
-- **注释与围栏嵌套的极端形状**（注释里开围栏、围栏里写注释）未单列：当前语义 = 围栏优先
-  （围栏内的注释记号是字面文本，符合 Markdown）；现行模板不使用这类嵌套。
-- **GFM 行内代码 span 里未转义的 `|`**：规范要求转义，未支持；模板与技能不产出该形状。
+- [environment-gap] **真实远端含 merge 分支的 push 横幅**：merge 路径集合已由临时仓库 + 真脚本子进程覆盖 → `tests/checks/pre-push-surfaces.test.mjs`、`.githooks/pre-push`
+- [covered] **4 消费者跨层契约一致性**（`prd-check` / `requirements-check` / `prd-gate` / 读卡原语）→ `tests/host/contract/structure-agreement.spec.ts`
+- [covered] **注释与围栏嵌套交错形状**：已由语法生成器与 `mdast` 独立真值差分覆盖 → `tests/support/doc-grammar.ts`、`tests/lib/markdown-shape.property.spec.ts`
+- [policy] **GFM 表格行内代码 span 内裸 `|`**：GFM 规范要求转义 `\|`，与 `mdast` 行为一致 → `packages/company-pack/src/lib/markdown-shape-core.js`

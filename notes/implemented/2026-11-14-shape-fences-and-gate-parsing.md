@@ -64,9 +64,8 @@
 
 ## 未覆盖轴
 
-- **Windows 实机/CI 未跑**（本机 macOS）：`..\` 形状按路径段语义与单元形状证明；跨平台 runner 仍需一次实跑
-  （BUG-180 的 P1 评级因此保留观察）。
-- **跨行 code span 闭合行之后的内容**：保守按非结构处理（残余正文里的标题不会被当定义，代价是可能少解析一行）。
-- **围栏块嵌套**：同长度同字符的嵌套本身不是合法 Markdown；实现按「外层用更长围栏」的规范形态处理。
-- **命令解析只证形态**：证明命令可解析且非空操作，不证明它真跑过或真会红；执行仍归 `pnpm test` / pre-push。
-- **notes 根 symlink 一律红**：将来若要支持链接目录，需新增形状与门禁规则，不能直接放开。
+- [environment-gap] **Windows 实机/CI 未跑**：反斜杠与越界段已在契约矩阵覆盖，待跨平台 runner 触发实跑 → `_backlog/triggers.md`、`tests/host/contract/file-shape-agreement.spec.ts`
+- [covered] **跨行 code span 与缩进围栏边界**：单状态机已与 `mdast` 500/1000 种子差分对齐 → `packages/company-pack/src/lib/markdown-shape-core.js`、`tests/lib/markdown-shape.property.spec.ts`
+- [policy] **同长度同字符围栏嵌套**：CommonMark 规范按提前闭合解析，嵌套须外层用更长围栏 → `packages/company-pack/src/lib/markdown-shape-core.js`
+- [policy] **命令解析只验可解析且非空操作**：真跑留证归 `pnpm test` / pre-push → `checks/gates/fix-evidence.mjs`
+- [policy] **notes 根 symlink 一律红**：防止软链绕过形状与状态门禁 → `checks/gates/notes-tree.mjs`

@@ -67,8 +67,8 @@
 
 ## 未覆盖轴
 
-- **4 消费者真命令面差分**（prd-check / requirements-check / prd-gate / fix-evidence 同一语料）→ 决定：本卡用 `structure-agreement` + 4 门禁 conformance/mutation 覆盖两视图与门禁；prd-gate 真 ctx 面留后续卡。
-- **R2 collaboration verdict 纯逻辑提取** → 决定：下次改 `tests/evidence/collaboration-probe-verdict.spec.ts` 时按 `team-concurrency-verdict.mjs` 先例提取；触发 = 该 spec 再改。
-- **Windows 真 runner** → 触发：`_backlog/triggers.md`「Windows CI/实机 runner 可用」（一次 CI 配置/审计）。
-- **命令“真跑过/真会红”不可在 verify 证** → 边界：执行归 `pnpm test` / pre-push；fix-evidence 只证命令可解析且非空操作。
-- **类复发 `lastRound` 机械表** → 决定：`failure-classes` 的规则 + 人工判轮次；复发成卡时再机械化为 census 字段，避免为假精确造表。
+- [covered] **4 消费者跨层契约差分**（`prd-check` / `requirements-check` / `prd-gate` / 读卡原语同语料）→ `tests/host/contract/structure-agreement.spec.ts`
+- [covered] **R2 collaboration verdict 纯逻辑抽离**（拆除源码切片 `vm.runInNewContext`）→ `tools/lib/collaboration-oracle-verdict.mjs`、`tests/evidence/collaboration-probe-verdict.spec.ts`
+- [environment-gap] **Windows 实机/CI runner** → `_backlog/triggers.md`、`tests/host/contract/file-shape-agreement.spec.ts`
+- [unprovable] **静态门禁内证明测试命令“历史上真红过”** → `checks/gates/fix-evidence.mjs`、`.agents/skills/close-out-definition/SKILL.md`
+- [policy] **失败类跨轮复发轮次不单造假精确字段**：以具名守卫棘轮与生成式差分承接 → `tests/failure-classes.md`、`tests/repo/bug-coverage.spec.ts`

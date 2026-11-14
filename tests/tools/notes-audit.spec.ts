@@ -27,9 +27,13 @@ describe('notes-audit · 解析', () => {
 
   it('日期取文件名、标题取 H1、状态取首部行', () => {
     expect(noteDate('notes/implemented/2026-10-30-x.md')).toBe('2026-10-30')
+    expect(noteDate('notes/README.md')).toBeNull()
     expect(noteTitle(text)).toBe('2026-10-30 · 一个决定')
+    expect(noteTitle('只有正文没有标题\n')).toBeNull()
     expect(noteStatus(text)).toBe('状态：implemented（2026-10-30；授权）')
     expect(lifecycleOf('notes/implemented/2026-10-30-x.md', noteStatus(text))).toBe('implemented')
+    expect(lifecycleOf('notes/proposed/2026-10-30-x.md', noteStatus(text))).toBe('implemented')
+    expect(lifecycleOf('notes/proposed/2026-10-30-x.md', '状态：proposed')).toBe('other')
   })
 
   it('状态词前有加粗也认', () => {

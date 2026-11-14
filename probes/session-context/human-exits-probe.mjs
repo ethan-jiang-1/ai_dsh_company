@@ -5,9 +5,9 @@
 //   会话日志也不封盘（此前证据只能靠 RPC 现场读，事后不可复核）。RPC 的 userQuestions/answer
 //   对未认领的问询返回 false（产品路径是浏览器里认领卡片）⇒ 这里照 human-loop-e2e-smoke 的
 //   做法：开页面、找选项 radio、点选 + Enter 提交，轮收口后日志才有终态。
-// 何时跑：CEO persona/主持动议 skill 的人话出口、阻塞拍板或三件套规则改动时。
-// 用法：source run/env.sh && node probes/session-context/human-exits-probe.mjs
-// 退出码：0 = ask 事件与首段三件套均满足；1 = 行为不符；2 = 环境/启动失败。
+// 何时跑：CEO persona/主持动议 skill 的人话出口、阻塞拍板、非阻塞假设继续或短表行锚规则改动时（合并原 expression/nonblocking 两子探针）。
+// 用法：source run/env.sh && node probes/session-context/human-exits-probe.mjs [--mode blocking|nonblocking|expression|all]
+// 退出码：0 = 指定模式全部满足；1 = 行为不符；2 = 环境/启动失败。
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
 import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
@@ -123,6 +123,61 @@ const turnError = events => events
   .filter(event => event?.type === 'turn/end')
   .map(event => event?.data?.reason).find(reason => reason?.kind === 'error')?.error
 
+const modeIdx = process.argv.indexOf('--mode')
+const MODE = modeIdx >= 0 ? (process.argv[modeIdx + 1] ?? 'blocking') : 'blocking'
+const runNonblocking = async () => {
+  const { sessionId } = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'ceo' } })
+  await rpc('session/prompt', { request: {
+    requestId: `henb-${String(Date.now())}`, sessionId, mode: 'queue', clientTimeZone: 'Asia/Shanghai',
+    content: [{ type: 'text', text: '排练：只回复这一件事，不写文件、不派成员、不发布。请拟一份内部周会的三个议题，主题是交付进度、风险和下周安排。目前尚缺会议时长，你可自行采用合理默认值；这份草案不涉及预算、对外承诺或任何需要授权的决定。' }],
+  } })
+  let evs = []
+  const dl = Date.now() + 180_000
+  while (Date.now() < dl) {
+    evs = (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })).map(r => r.event).filter(Boolean)
+    if (evs.some(e => e?.type === 'turn/end')) break
+    await sleep(3_000)
+  }
+  const txt = evs.filter(e => e?.type === 'assistant/message').map(messageText).join('\n')
+  const askedAny = evs.some(e => e?.type === 'tool/call' && e?.data?.name === 'ask_user_question')
+  const ok = evs.some(e => e?.type === 'turn/end') && !askedAny
+    && /默认|假设|暂按/.test(txt.slice(0, 400))
+    && /待.*确认|待你拍板|确认.*时长|时长.*确认/.test(txt.slice(-500))
+    && /交付进度/.test(txt) && /风险/.test(txt) && /下周/.test(txt)
+  console.log(`  [nonblocking] pass=${String(ok)} asked=${String(askedAny)}`)
+  return ok
+}
+
+const runExpression = async () => {
+  const { sessionId } = await rpc('session/create', { request: { cwd: REHEARSAL, agentPreset: 'ceo' } })
+  const exprPrompt = `排练指令（只做这一件事，做完即收口；不要 spawn 成员、不要写文件、不要 present）：
+请审阅三个交付方案：方案 A 成本 10、周期 2 周、风险低；方案 B 成本 6、周期 4 周、风险中；方案 C 成本 14、周期 1 周、风险高。
+用一个短 GFM 表格按“方案/成本/周期/风险”比较，再给出一句业务结论。
+关键数字 10、6、14 的依据统一来自 [meta.md#L10-L14](meta.md#L10-L14)，请只给这个依据链接一次；不要给背景数字重复加锚。`
+  await rpc('session/prompt', { request: {
+    requestId: `heep-${String(Date.now())}`, sessionId, mode: 'queue', clientTimeZone: 'Asia/Shanghai',
+    content: [{ type: 'text', text: exprPrompt }],
+  } })
+  let evs = []
+  const dl = Date.now() + 240_000
+  while (Date.now() < dl) {
+    evs = (await readRecords(request => rpc('session/page', { request }), { kind: 'session', sessionId })).map(r => r.event).filter(Boolean)
+    if (evs.some(e => e?.type === 'turn/end')) break
+    await sleep(4_000)
+  }
+  const txt = evs.filter(e => e?.type === 'assistant/message').map(e => JSON.stringify(e.data)).join('\n')
+  const ok = /\|[^\n]+\|[^\n]+\|/.test(txt) && /方案/.test(txt) && /#L\d+(?:-L\d+)?/.test(txt)
+  console.log(`  [expression] pass=${String(ok)}`)
+  return ok
+}
+
+if (MODE === 'nonblocking' || MODE === 'expression') {
+  const subOk = MODE === 'nonblocking' ? await runNonblocking() : await runExpression()
+  try { child.kill('SIGTERM') } catch { /* 已退出 */ }
+  console.log(`human-exits-probe (${MODE}): ${subOk ? 'PASS' : 'FAIL'}`)
+  process.exit(subOk ? 0 : 1)
+}
+
 const evidenceDirShot = join(ROOT, 'runtime', 'human-exits-evidence')
 
 // 有界重试一次：模型/传输错误不是行为证据，重跑一次再定性（RFC 只说「有界单场观察」，不是「一场定生死」）。
@@ -192,10 +247,12 @@ await writeFile(join(evidenceDir, `${sessionId}.json`), JSON.stringify({
   turnError: failure, asked, opening: { hasConclusion, hasNextStep, hasDecision, jargon },
   openingText: opening, events,
 }, null, 2) + '\n')
+const extraOk = MODE === 'all' ? (await runNonblocking()) && (await runExpression()) : true
 try { child.kill('SIGTERM') } catch { /* 已退出 */ }
 if (failure !== null) {
   console.log(`human-exits-probe: 环境/模型路径失败（${failure.code ?? 'unknown'}：${failure.message ?? ''}）——不是行为判据，别据此判规则失效`)
   process.exit(2)
 }
-console.log(`human-exits-probe: ${pass ? 'PASS（阻塞 ask + 三件套）' : 'FAIL（需人工检查会话日志）'}`)
-process.exit(pass ? 0 : 1)
+const allPass = pass && extraOk
+console.log(`human-exits-probe: ${allPass ? 'PASS（阻塞 ask + 三件套）' : 'FAIL（需人工检查会话日志）'}`)
+process.exit(allPass ? 0 : 1)
