@@ -51,12 +51,16 @@ export function consumerCount(root, assets) {
     try { return readFileSync(join(root, file), 'utf8') } catch { return '' }
   })
   const counts = {}
+  const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   for (const asset of assets) {
-    const needles = [asset.name, `${asset.name}.mjs`]
+    const name = asset.name
+    // 精确 token：文件名/引号包围的名字；`probe.mjs` 不能命中 `team-xxx-probe.mjs`。
+    const needles = [`${name}.e2e.mjs`, `${name}.entry.mjs`, `${name}.mjs`, `'${name}'`, `"${name}"`, `\`${name}\``]
+    const patterns = needles.map(needle => new RegExp(`(^|[^a-z0-9-])${escape(needle)}(?=$|[^a-z0-9-])`, 'i'))
     counts[asset.name] = files.reduce((sum, file, index) => {
       // 资产自己的文件不是自己的消费者（smoke 的 .e2e/.entry、probe 的 .mjs 都算）。
       if (basename(file).startsWith(`${asset.name}.`)) return sum
-      return sum + (needles.some(needle => texts[index].includes(needle)) ? 1 : 0)
+      return sum + (patterns.some(pattern => pattern.test(texts[index])) ? 1 : 0)
     }, 0)
   }
   return counts

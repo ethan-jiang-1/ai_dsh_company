@@ -53,7 +53,7 @@ function bugCardExists(root, id) {
   return false
 }
 
-export function run({ root, ok, fail }) {
+export function run({ root, ok, fail, carriers = CARRIERS, exempt = EXEMPT, knownGap = KNOWN_GAP }) {
   const hostDir = join(root, HOST)
   if (!existsSync(hostDir)) {
     fail('company-root-carriers', `源码面缺失：${HOST}`)
@@ -66,9 +66,9 @@ export function run({ root, ok, fail }) {
   }
 
   const registered = new Set([
-    ...CARRIERS.filter(entry => entry.kind === 'writer').map(entry => entry.module),
-    ...EXEMPT.map(entry => entry.module),
-    ...KNOWN_GAP.map(entry => entry.module),
+    ...carriers.filter(entry => entry.kind === 'writer').map(entry => entry.module),
+    ...exempt.map(entry => entry.module),
+    ...knownGap.map(entry => entry.module),
   ])
   const problems = []
   let writers = 0
@@ -84,7 +84,7 @@ export function run({ root, ok, fail }) {
     }
   }
 
-  for (const entry of [...CARRIERS, ...EXEMPT, ...KNOWN_GAP]) {
+  for (const entry of [...carriers, ...exempt, ...knownGap]) {
     const path = join(root, entry.module)
     if (!existsSync(path)) {
       problems.push(`${entry.module} → 登记项指向的模块不存在`)
@@ -98,8 +98,8 @@ export function run({ root, ok, fail }) {
     }
   }
 
-  const gaps = KNOWN_GAP.map(entry => entry.bug).filter((bug, index, all) => all.indexOf(bug) === index)
-  const gapText = KNOWN_GAP.length === 0 ? 'knownGap 0' : `knownGap ${String(KNOWN_GAP.length)}：${gaps.join('、')}`
+  const gaps = knownGap.map(entry => entry.bug).filter((bug, index, all) => all.indexOf(bug) === index)
+  const gapText = knownGap.length === 0 ? 'knownGap 0' : `knownGap ${String(knownGap.length)}：${gaps.join('、')}`
   problems.length === 0
     ? ok(`company-root-carriers ×${String(files.length)} 文件（写面文件 ${String(writers)} / ${gapText}）`)
     : fail('company-root-carriers', problems.join('；'))

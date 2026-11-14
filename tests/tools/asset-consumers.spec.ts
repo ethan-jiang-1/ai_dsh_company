@@ -11,7 +11,7 @@ describe('consumerCount（census v2 消费者图）', () => {
       mkdirSync(join(root, 'tests'), { recursive: true })
       mkdirSync(join(root, 'checks'), { recursive: true })
       mkdirSync(join(root, 'probes'), { recursive: true })
-      writeFileSync(join(root, 'tests/a.spec.ts'), 'alpha\n')
+      writeFileSync(join(root, 'tests/a.spec.ts'), "alpha.e2e.mjs\n")
       writeFileSync(join(root, 'checks/alpha.e2e.mjs'), 'alpha\n')
       writeFileSync(join(root, 'checks/INDEX.generated.md'), 'alpha beta\n')
       writeFileSync(join(root, 'checks/README.md'), 'alpha beta\n')

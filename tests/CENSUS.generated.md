@@ -15,7 +15,7 @@
 | surface lane | 6 |
 | weekly lane | 21 |
 | 未分类失败类 | 67 |
-| 无消费者资产 | 57 |
+| 无消费者资产 | 72 |
 
 ## 失败类分布
 
@@ -42,33 +42,33 @@
 |---|---|---|---|---|---|
 | workflow-contract | classic | fast + surface + weekly | 工具定义 | example | 0 |
 | present-catalog | classic | fast + surface + weekly | 会话持久化 | example | 1 |
-| company-root-process | classic | fast + surface + weekly | 子进程并发 | example | 1 |
-| snapshot-motion | classic | fast + weekly | 会话持久化 | example | 1 |
-| client-load | browser | surface + weekly | client UI | example | 20 |
-| preset | classic | surface + weekly | 配置组合 | example | 132 |
-| replay | classic | surface + weekly | 会话持久化 | example | 23 |
-| company-entry | classic | weekly | 配置组合 | example | 3 |
-| concurrent-home | classic | weekly | 子进程并发 | example | 1 |
+| company-root-process | classic | fast + surface + weekly | 子进程并发 | example | 0 |
+| snapshot-motion | classic | fast + weekly | 会话持久化 | example | 0 |
+| client-load | browser | surface + weekly | client UI | example | 4 |
+| preset | classic | surface + weekly | 配置组合 | example | 6 |
+| replay | classic | surface + weekly | 会话持久化 | example | 7 |
+| company-entry | classic | weekly | 配置组合 | example | 1 |
+| concurrent-home | classic | weekly | 子进程并发 | example | 0 |
 | external-workspace | classic | weekly | 子进程并发 | example | 0 |
 | interrupted-install | classic | weekly | 配置组合 | example | 0 |
 | isolation-matrix | classic | weekly | 配置组合 | example | 0 |
-| multi-install | classic | weekly | 配置组合 | example | 1 |
+| multi-install | classic | weekly | 配置组合 | example | 0 |
 | permissions-recovery | classic | weekly | 配置组合 | example | 0 |
 | profile-row | classic | weekly | 配置组合 | example | 0 |
 | revoke-recovery | classic | weekly | 注册生命周期 | example | 0 |
 | upgrade-while-running | classic | weekly | 配置组合 | example | 0 |
-| client-error-chain | browser | weekly | client UI | example | 1 |
+| client-error-chain | browser | weekly | client UI | example | 0 |
 | multi-window-banner | browser | weekly | client UI | example | 0 |
-| ui-scene | browser | weekly | client UI | example | 22 |
+| ui-scene | browser | weekly | client UI | example | 6 |
 | channel-matrix | browser | 手动（要真实全局 dsh + 网络 + 已导出 _dist；发布前手动跑 --channel all） | 配置组合 | example | 1 |
-| release | classic | 手动（分钟级构建 + pack；由 release --verify 调度，不进每周 sweep） | 导出形态 | example | 42 |
-| probe | model | 手动（真模型档（连通 ~6s / 内容 --full 5–10min），按内容改动触发） | 模型可见文本 | example | 151 |
-| delegation | model | 手动（真模型 1 条 prompt（升 pin 或委托边界改动时）） | 工具定义 | example | 49 |
-| presence-e2e | model | 手动（真模型 ~$1，按在场/协作面验收触发） | 模型可见文本 | example | 1 |
+| release | classic | 手动（分钟级构建 + pack；由 release --verify 调度，不进每周 sweep） | 导出形态 | example | 6 |
+| probe | model | 手动（真模型档（连通 ~6s / 内容 --full 5–10min），按内容改动触发） | 模型可见文本 | example | 4 |
+| delegation | model | 手动（真模型 1 条 prompt（升 pin 或委托边界改动时）） | 工具定义 | example | 3 |
+| presence-e2e | model | 手动（真模型 ~$1，按在场/协作面验收触发） | 模型可见文本 | example | 0 |
 | product-team-e2e | model | 手动（真模型 ~$1，按组队/判据面验收触发） | 模型可见文本 | example | 0 |
-| attention-e2e | model | 手动（真模型 + 多用户并发 lane，人工在场时跑） | 模型可见文本 | example | 2 |
-| human-loop-e2e | model | 手动（真模型 + 真浏览器 ~$1–2，人工在场时跑） | 模型可见文本 | example | 2 |
-| entry-probe | model | 手动（真模型认证档；入口链文档改动后手动跑） | 文档指针 | example | 6 |
+| attention-e2e | model | 手动（真模型 + 多用户并发 lane，人工在场时跑） | 模型可见文本 | example | 0 |
+| human-loop-e2e | model | 手动（真模型 + 真浏览器 ~$1–2，人工在场时跑） | 模型可见文本 | example | 0 |
+| entry-probe | model | 手动（真模型认证档；入口链文档改动后手动跑） | 文档指针 | example | 0 |
 | generative | classic | weekly | 文档指针 | generator | 0 |
 
 ## 探针（调试面，不进自动 lane）
@@ -79,7 +79,7 @@
 | board-drift-probe | browser-visual | 未分类 | example | 2 |
 | browser-behavior-probe | browser-visual | 未分类 | example | 0 |
 | budget-panel-probe | browser-visual | 未分类 | example | 0 |
-| cdp-probe | browser-visual | 未分类 | example | 15 |
+| cdp-probe | browser-visual | 未分类 | example | 4 |
 | compact-view-probe | browser-visual | 未分类 | example | 0 |
 | cultivation-main-e2e-probe | browser-visual | 未分类 | example | 0 |
 | cultivation-ux-scenarios-probe | browser-visual | 未分类 | example | 0 |
@@ -94,13 +94,13 @@
 | tasks-panel-probe | browser-visual | 未分类 | example | 0 |
 | collaboration-oracle-probe | fs-taskboard | 未分类 | example | 1 |
 | converge-e2e-probe | fs-taskboard | 未分类 | example | 1 |
-| cross-process-fs-probe | fs-taskboard | 未分类 | example | 3 |
+| cross-process-fs-probe | fs-taskboard | 未分类 | example | 1 |
 | fs-guard-probe | fs-taskboard | 未分类 | example | 1 |
 | motion-taskboard-probe | fs-taskboard | 未分类 | example | 0 |
 | observed-write-conflict-probe | fs-taskboard | 未分类 | example | 0 |
 | review-staleness-probe | fs-taskboard | 未分类 | example | 0 |
 | task-discovery-probe | fs-taskboard | 未分类 | example | 0 |
-| taskboard-presence-probe | fs-taskboard | 未分类 | example | 1 |
+| taskboard-presence-probe | fs-taskboard | 未分类 | example | 0 |
 | taskboard-scope-probe | fs-taskboard | 未分类 | example | 1 |
 | ask-user-timed-probe | session-context | 未分类 | example | 0 |
 | budget-signoff-probe | session-context | 未分类 | example | 0 |
@@ -108,7 +108,7 @@
 | cultivation-context-probe | session-context | 未分类 | example | 0 |
 | cultivation-method-layer-probe | session-context | 未分类 | example | 1 |
 | cultivation-propose-probe | session-context | 未分类 | example | 0 |
-| date-rule-probe | session-context | 未分类 | example | 1 |
+| date-rule-probe | session-context | 未分类 | example | 0 |
 | dual-ceo-probe | session-context | 未分类 | example | 0 |
 | dual-signoff-probe | session-context | 未分类 | example | 0 |
 | hitl-dispatch-order-probe | session-context | 未分类 | example | 0 |
@@ -116,16 +116,16 @@
 | human-exits-nonblocking-probe | session-context | 未分类 | example | 0 |
 | human-exits-probe | session-context | 未分类 | example | 0 |
 | journal-boundary-probe | session-context | 未分类 | example | 0 |
-| member-bounceback-probe | session-context | 未分类 | example | 1 |
+| member-bounceback-probe | session-context | 未分类 | example | 0 |
 | reconcile-round-probe | session-context | 未分类 | example | 0 |
 | team-taskbook-probe | session-context | 未分类 | example | 0 |
 | time-context-probe | session-context | 未分类 | example | 0 |
-| claim-race-probe | team | 未分类 | example | 1 |
+| claim-race-probe | team | 未分类 | example | 0 |
 | delegation-contract-probe | team | 未分类 | example | 0 |
 | delegation-depth-probe | team | 未分类 | example | 0 |
 | delegation-lifecycle-probe | team | 未分类 | example | 0 |
 | dissent-preservation-probe | team | 未分类 | example | 0 |
-| member-inquiry-probe | team | 未分类 | example | 1 |
+| member-inquiry-probe | team | 未分类 | example | 0 |
 | member-interrupt-probe | team | 未分类 | example | 0 |
 | member-reject-in-team-probe | team | 未分类 | example | 0 |
 | member-rescue-probe | team | 未分类 | example | 0 |
@@ -135,7 +135,7 @@
 | subagent-retry-probe | team | 未分类 | example | 0 |
 | team-atomicity-probe | team | 未分类 | example | 1 |
 | team-claim-loser-probe | team | 未分类 | example | 1 |
-| team-concurrency-probe | team | 未分类 | example | 2 |
+| team-concurrency-probe | team | 未分类 | example | 0 |
 | team-recovery-probe | team | 未分类 | example | 0 |
 | vp-eng-root-lead-probe | team | 未分类 | example | 0 |
 | vp-eng-teaming-probe | team | 未分类 | example | 0 |

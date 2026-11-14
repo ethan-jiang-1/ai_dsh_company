@@ -36,11 +36,11 @@ const walk = (dir, acc = []) => {
   return acc
 }
 
-export function run({ ok, fail }) {
+export function run({ ok, fail, root: base = root }) {
   const problems = []
-  const failWith = (path, detail) => problems.push(`${relative(root, path)} → ${detail}`)
+  const failWith = (path, detail) => problems.push(`${relative(base, path)} → ${detail}`)
 
-  const laneDir = join(root, 'checks/lanes')
+  const laneDir = join(base, 'checks/lanes')
   for (const entry of readdirSync(laneDir, { withFileTypes: true })) {
     if (!entry.isFile() || !entry.name.endsWith('.mjs')) continue
     if (!/\.(e2e|entry)\.mjs$/.test(entry.name) && !/-lane\.mjs$/.test(entry.name)) {
@@ -48,7 +48,7 @@ export function run({ ok, fail }) {
     }
   }
 
-  const checksDir = join(root, 'tests/checks')
+  const checksDir = join(base, 'tests/checks')
   if (existsSync(checksDir)) {
     for (const entry of readdirSync(checksDir, { withFileTypes: true })) {
       if (!entry.isFile() || !entry.name.endsWith('.mjs')) continue
@@ -56,7 +56,7 @@ export function run({ ok, fail }) {
     }
   }
 
-  const auditDir = join(root, 'checks/audit')
+  const auditDir = join(base, 'checks/audit')
   for (const entry of readdirSync(auditDir, { withFileTypes: true })) {
     if (!entry.isFile() || !entry.name.endsWith('.mjs')) continue
     if (!/-(audit|check|eval|ratchet)\.mjs$/.test(entry.name)) {
@@ -64,7 +64,7 @@ export function run({ ok, fail }) {
     }
   }
 
-  const probesDir = join(root, 'probes')
+  const probesDir = join(base, 'probes')
   for (const path of walk(probesDir)) {
     if (!path.endsWith('.mjs')) continue
     const rel = relative(probesDir, path).split('/')
@@ -76,7 +76,7 @@ export function run({ ok, fail }) {
     ...readdirSync(laneDir, { withFileTypes: true }).filter(entry => entry.isFile() && entry.name.endsWith('.mjs')).map(entry => join(laneDir, entry.name)),
     ...readdirSync(auditDir, { withFileTypes: true }).filter(entry => entry.isFile() && entry.name.endsWith('.mjs')).map(entry => join(auditDir, entry.name)),
     ...walk(probesDir).filter(path => path.endsWith('.mjs')),
-    ...walk(join(root, 'checks/gates')).filter(path => path.endsWith('.mjs')),
+    ...walk(join(base, 'checks/gates')).filter(path => path.endsWith('.mjs')),
   ]
   for (const path of assetPaths) {
     const base = path.split('/').pop() ?? ''
