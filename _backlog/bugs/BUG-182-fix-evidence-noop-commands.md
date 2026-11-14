@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-182：fix-evidence 接受无操作命令当红/绿证据
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-175 把「假脚本」抠出来了，但 `sh -c`/`node 任意文件`/`git` 仍是空证据。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9d-noop-command.mts`。
@@ -50,6 +50,16 @@ node --import tsx/esm runtime/tmp/c9d-noop-command.mts
 - 对 `node` 要求目标在 `tests/` / `tools/` / `checks/` 等测试面，或后缀 `.mjs/.ts/.spec.ts`，不接受任意 JSON/配置文件；
 - 对 `git` 只接受 `git diff`/`git show` 等能展示变更的子命令；`git status` 不算红→绿；
 - spec 覆盖三条空命令。
+
+## 已修判定
+
+```text
+`sh -c true`、`node package.json`、`git status` 三条空命令都红（不产生红→绿）
+合法形态（`node tests/x.mjs`、`sh checks/x.sh`）仍绿（不误判）
+红证：还原宽松分支 → 三条空命令 PASS
+```
+
+判据由 `tests/checks/fix-evidence.test.mjs` 的空命令用例搭载；红证 = 去掉空命令判定。
 
 ## 证据
 

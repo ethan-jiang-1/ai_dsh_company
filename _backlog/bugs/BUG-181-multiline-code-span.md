@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-181：scanDocument 只按行找 code span 闭合，跨行行内代码被当结构
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-168 修了行内代码里的 `<!--`，但只覆盖单行。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8d-multiline-span.mts`。
@@ -44,6 +44,16 @@ node --import tsx/esm runtime/tmp/c8d-multiline-span.mts
 - `scanDocument()` 的 code span 状态跨行维护（打开后保持到闭合，或 EOF 报未闭合 code span）；
 - 或者要求行内代码不跨行并在 spec 里显式（但 CommonMark 允许，文档工具可能生成）；
 - spec 覆盖跨行 code span、跨行未闭合 backtick、代码块（围栏）不受影响。
+
+## 已修判定
+
+```text
+跨行行内代码：`- userStory: `start` 换行 `### REQ-999` 换行 `` ` `` 里的标题不算定义，REQ-001 字段不被截断，ok true
+跨行未闭合 backtick 按字面处理（不吞全文）；围栏内的反引号不受影响
+红证：去掉跨行 span 状态 → reqCount 2 与字段截断复现
+```
+
+判据由 `tests/lib/prd-check.spec.ts` 的跨行 code span 用例搭载；红证 = 去掉跨行状态。
 
 ## 证据
 

@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-183：notes-tree 只拦子条目 symlink，notes/ 根本身是 symlink 仍被跟随
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-174 修了 lifecycle 下/entry 级 symlink，根级未修。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9d-notes-root-symlink.mts`。
@@ -48,6 +48,16 @@ node --import tsx/esm runtime/tmp/c9d-notes-root-symlink.mts
 - 两处入口先 `lstatSync` 判 `notes` 根不是 symlink（也不跟随），是 symlink → 红；
 - 或统一用 `safe-file`/`company-root` 的「root residency」判据；
 - spec 覆盖 `notes` 根 symlink、`notes/implemented` 根 symlink、正常目录。
+
+## 已修判定
+
+```text
+`notes` 根为 symlink → notes-tree 红（不跟随）；status 不把外部树计入受查集合
+`notes/implemented` 为 symlink 同样红；正常目录不误判
+红证：去掉根 lstat 判定 → problems [] / files 2 复现
+```
+
+判据由 `tests/checks/notes-tree.test.mjs` 的根 symlink 用例搭载；红证 = 去掉根判定。
 
 ## 证据
 

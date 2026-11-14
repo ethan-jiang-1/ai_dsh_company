@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-179：walkCompanyDirs 拒绝所有 `..` 段，包括仍留在公司盘内的路径
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-170 修越界 `..` 时采取「全量拒绝」，把内部 `..` 也误杀。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9d-read-internal-dotdot.mts`。
@@ -50,6 +50,16 @@ node --import tsx/esm runtime/tmp/c9d-read-internal-dotdot.mts
 - 先把 `rel` 规范化（`path.posix.normalize`）并判断是否仍在 companyHome 内；越出才 unsafe；
 - 或对 `..` 段做栈式消解，栈空再遇 `..` 才拒绝；
 - spec 覆盖 `a/../b`（允许）、`../outside`（拒绝）、`a/../../outside`（拒绝）。
+
+## 已修判定
+
+```text
+内部 `..`（`deliverables/x/../y/meta.md`）按栈消解为盘内路径 → text；`../outside`、`a/../../outside` 仍 unsafe
+`companyFileProblemAt` / `readCompanyTextAt` 同判；不回归 BUG-170 的越界拒绝
+红证：还原「任何 .. 一律拒绝」→ 内部路径红
+```
+
+判据由 `tests/host/contract/file-shape-agreement.spec.ts` 的内部/越界用例搭载；红证 = 还原全量拒绝。
 
 ## 证据
 

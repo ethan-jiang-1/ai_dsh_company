@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-177：fix-evidence 命令解析把合法形态判成不可执行
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-175 修了「假脚本」，解析变严后误伤合法命令。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9d-fix-evidence-command.mts`。
@@ -44,6 +44,16 @@ node --import tsx/esm runtime/tmp/c9d-fix-evidence-command.mts
 - 按命令语法解析：`pnpm [run] <script>`、`pnpm --filter <pkg> [run] <script>`、`pnpm exec <bin>`；`node [--import <mod>] <path>`；
 - 参数值不参与「脚本/路径」选择；只对最终 script/path 做存在性检查；
 - spec 覆盖 `pnpm run` / `--filter` / `node --import` / `npx --yes` 四形态。
+
+## 已修判定
+
+```text
+`pnpm run test`、`pnpm --filter <pkg> test`、`pnpm exec <bin>`、`node --import tsx/esm <path>`、`npx --yes <bin>` 都能解析（目标存在时绿）
+选项的值不参与脚本/入口选择；最终 script/path 才做存在性检查
+红证：还原旧 token 选择 → 三条合法命令红
+```
+
+判据由 `tests/checks/fix-evidence.test.mjs` 的合法命令形态用例搭载；红证 = 还原旧解析。
 
 ## 证据
 

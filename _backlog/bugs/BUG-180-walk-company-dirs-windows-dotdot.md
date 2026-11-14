@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P1
 opened: 2026-11-14
 ---
 
 # BUG-180：walkCompanyDirs 的 `..` 闸只按 `/` 分段，Windows `..\\` 可绕过
 
-> 严重级别：P1（重要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P1（重要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-170 的 `..` 修复只覆盖 POSIX 分隔符。
 > **留痕**：本卡只报不修；证据 = `runtime/tmp/c9d-win-dotdot.log` + 代码；**Windows 实跑未做**（本机 macOS），按 platform 语义判。
@@ -59,6 +59,16 @@ readCompanyFileAt(companyHome, 'deliverables\\..\\..\\outside\\missing.md')
 - `segments = rel.split(/[\\/]+/)`；对 `..` 做栈式消解，栈空再遇 `..` 才 unsafe；
 - 或入口用 `path.win32`/`path.posix` 按平台规范化后再判；
 - 加 Windows CI 形状：`..\outside`、`a\..\..\outside`、存在/缺失两目标。
+
+## 已修判定
+
+```text
+`..\` 与 `a\..\..\outside` 按平台无关分隔符同样识别：越界 unsafe、内部消解为盘内路径
+POSIX 形状（`../`、`a/../../`）不回归
+红证：还原 `split('/')` → `..\` 形状不判（越界折成 missing）
+```
+
+判据由 `tests/host/contract/file-shape-agreement.spec.ts` 的 Windows 分隔符用例搭载；Windows 实机未跑（Note 未覆盖轴登记）。
 
 ## 证据
 

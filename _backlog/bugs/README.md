@@ -27,6 +27,24 @@
 | C fix-evidence 边界 | [177](BUG-177-fix-evidence-valid-command-forms.md) / [178](BUG-178-fix-evidence-section-in-code-block.md) / [182](BUG-182-fix-evidence-noop-commands.md) | 合法命令被拒；代码块里的节标题截错；空操作命令也过 | P2 ×3 |
 | D notes-tree 根 | [183](BUG-183-notes-root-symlink-followed.md) | `notes/` 根本身是 symlink 仍被跟随 | P2 |
 
+## 2026-11-14 修复交接（根因组 A–D：BUG-176..183）
+
+**用户指令（2026-11-14）**：「你看，又发现了一些bug，你系统性地思考完了之后，看看怎么处理吧」。
+本句即本轮授权（材料性：company-pack 公开行为 + 门禁判据 + docs），留痕 = Note。
+终点 = 活跃清单清零、8 张卡全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent` 与 `## 修复证据` 齐。
+
+这八张是**同一批层被推到边界后再推一层**：形状层的「容器/跨行」、路径层的「分隔符/规范化」、门禁读卡与命令解析。
+
+| 组 | 卡 | 同一根因 | 修法（唯一事实源） |
+|---|---|---|---|
+| **A 形状层容器与跨行** | [176](BUG-176-json-fence-example-extracted.md) / [181](BUG-181-multiline-code-span.md) | `extractJsonBlock` 仍整篇找第一个 json 块（围栏示例先命中）；code span 只在单行找闭合 | `scanDocumentDetailed` 产出**顶层围栏块**（info + content + 行号），`extractJsonBlock` 只取顶层 json 块；行内代码状态跨行维护（EOF 无闭合按字面） |
+| **B 路径段语义** | [179](BUG-179-internal-dotdot-over-rejected.md) / [180](BUG-180-walk-company-dirs-windows-dotdot.md) | `..` 判定从「全拒绝」到「只按 `/` 切」：内部 `..` 被误杀、Windows `..\` 又漏判 | 平台无关分隔符切段 + 栈式消解：栈空再遇 `..` 才 unsafe，内部 `..` 规范化后照常走 |
+| **C fix-evidence 读卡与命令** | [177](BUG-177-fix-evidence-valid-command-forms.md) / [178](BUG-178-fix-evidence-section-in-code-block.md) / [182](BUG-182-fix-evidence-noop-commands.md) | 命令解析不认 `run`/`--filter`/`--import` 的值；节标题不区分围栏；空操作命令（`sh -c`/`git`/任意 `node` 文件）也能过 | 按命令语法解析「选项+值 / script / path」；节标题只在非围栏行匹配；拒绝 `sh -c`/`git`，`node`/`sh` 目标限定在测试/工具面 |
+| **D notes 根** | [183](BUG-183-notes-root-symlink-followed.md) | 子条目 symlink 拦了，根没拦；`statSync` 跟随链接 | 两处入口先 `lstat` 判 `notes` 根：symlink → 红；status 不跟随 |
+
+**次序 = A → B → C → D**：A 先把形状层的「容器/跨行」收成闭集；B 独立；C 用 A 的围栏语义做门禁读卡；
+D 独立。**证据口径**：先落代码提交拿 sha → 再归档补 `## 修复证据`；红/绿同一条可解析命令。
+
 ## 2026-11-14 focus v4 探索（post-fix 2）
 
 **用户指令（2026-11-14）**：「继续再来……探索抓更多的bug」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。

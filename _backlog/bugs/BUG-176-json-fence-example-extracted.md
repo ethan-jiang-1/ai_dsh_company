@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-176：legacy JSON 提取仍会命中围栏示例，示例账本盖过真实账本
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-173 修了「注释里的 JSON」，围栏仍未进入 `extractJsonBlock` 的掩码。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8d-json-fence.mts`。
@@ -50,6 +50,16 @@ node --import tsx/esm runtime/tmp/c8d-json-fence.mts
 - `extractJsonBlock()` 消费 `scanDocument()`：只在 `structural === false` 的**围栏块**内找 JSON，且跳过示例围栏（例如只认顶层围栏，不认嵌套）；
 - 或先剥掉所有围栏示例，再取第一个顶层 ```json；
 - spec 覆盖「示例围栏 + 真账本」「只有示例」「围栏内坏 JSON」。
+
+## 已修判定
+
+```text
+示例围栏（markdown 块里嵌 json 块）不再被当账本：extractJsonBlock 取第一个顶层 json 围栏块
+示例在前、真账本在后 → 返回真账本；只有示例时明确报缺块/解析错误，不静默取示例
+红证：还原整篇正则 → 返回示例的空 opportunities 复现
+```
+
+判据由 `tests/lib/prd-check.spec.ts` 的围栏示例用例搭载；红证 = 去掉围栏块提取。
 
 ## 证据
 

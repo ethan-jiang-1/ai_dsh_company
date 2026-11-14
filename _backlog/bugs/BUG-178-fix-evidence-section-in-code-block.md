@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-178：fix-evidence 的节标题在代码块里也会命中，截到错误节
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：调查中｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
 >
 > **关联**：[探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；4a142a8b 把节标题改成行首锚定，但没有排除代码块。
 > **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9d-section-codeblock.mts`。
@@ -55,6 +55,16 @@ node --import tsx/esm runtime/tmp/c9d-section-codeblock.mts
 - `section()` 用 `scanDocument()`/围栏状态，只在 `structural` 行匹配 `## 修复证据`；
 - 或要求节标题唯一，重复直接红并点名两处；
 - spec 覆盖「代码块引用标题 + 真节」「只有代码块」「重复节」。
+
+## 已修判定
+
+```text
+卡面代码块里引用 `## 修复证据` 不影响真实节解析；只有代码块引用、没有真节 → 报缺节
+真节四行照常解析（不回归）
+红证：还原行首正则（无围栏状态）→ 合法卡报四条缺失复现
+```
+
+判据由 `tests/checks/fix-evidence.test.mjs` 的代码块引用用例搭载；红证 = 去掉围栏状态。
 
 ## 证据
 
