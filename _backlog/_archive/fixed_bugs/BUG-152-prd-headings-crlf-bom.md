@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-13
 ---
 
 # BUG-152：CRLF/BOM 的 headings PRD 被判「没有定义小节」
 
-> 严重级别：P2（次要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-13｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H1）；`/prd check` 与 present 闸门共用 `validateProductDocs`。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8-round1.mts`、`runtime/tmp/c8-structural.mts`。
+> **关联**：[探索卡 Round 86](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H1）；`/prd check` 与 present 闸门共用 `validateProductDocs`。
+> **留痕**：Note [2026-11-14-eight-bug-second-sources.md](../../../notes/implemented/2026-11-14-eight-bug-second-sources.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8-round1.mts`、`runtime/tmp/c8-structural.mts`。
 
 ## 症状
 
@@ -62,4 +62,4 @@ BOM+CRLF    validateProductDocs(mrd, prd) === { ok: true }   ← 现在 false「
 
 - `runtime/tmp/c8-round1.mts`：LF baseline `true 0 1`；CRLF PRD `false` + 两条错误；CRLF MRD 仍 `true`（MRD 的 JSON 块兼容 CRLF）。
 - `runtime/tmp/c8-structural.mts`：BOM PRD `false`，错误「缺 definition 头」。
-- 代码：[prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts#L358) / [prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts#L293)。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts#L358) / [prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts#L293)。

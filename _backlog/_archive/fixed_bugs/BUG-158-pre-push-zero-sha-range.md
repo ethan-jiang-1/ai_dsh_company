@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P1
 opened: 2026-11-13
 ---
 
 # BUG-158：pre-push 按面选择在 zero SHA 场景漏检/崩溃
 
-> 严重级别：P1（重要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P1（重要）｜发现：2026-11-13｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C9-H1）；pre-push 是 2026-11-13 新增的「改到哪个面就必须跑哪条真入口」机械门。
-> **留痕**：本卡只报不修；复现证据 = `runtime/tmp/c8-round1.mts` 之外的 `runtime/tmp/c9-delete.log` 与合成分支。
+> **关联**：[探索卡 Round 86](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C9-H1）；pre-push 是 2026-11-13 新增的「改到哪个面就必须跑哪条真入口」机械门。
+> **留痕**：Note [2026-11-14-eight-bug-second-sources.md](../../../notes/implemented/2026-11-14-eight-bug-second-sources.md)（同轮八卡）；复现证据 = `runtime/tmp/c8-round1.mts` 之外的 `runtime/tmp/c9-delete.log` 与合成分支。
 
 ## 症状
 
@@ -76,4 +76,4 @@ node checks/pre-push-surfaces.mjs --stdin runtime/tmp/c9-delete-refs --dry-run
 
 - `runtime/tmp/c9-delete.log`：`git diff --name-only 5d6920d… 000… 失败：fatal: bad object 000…`。
 - 合成分支 `bd8eff1`：`git diff-tree` 只列 `notes/implemented/zz-focus-probe.md`；`git diff 63a78db0^ bd8eff1` 列 `packages/company-pack/src/client/wiring/error-ring.ts`。
-- 代码：[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs#L52)。
+- 代码：[pre-push-surfaces.mjs](../../../checks/pre-push-surfaces.mjs#L52)。

@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P1
 opened: 2026-11-13
 ---
 
 # BUG-155：present 闸门按 session header cwd 解析相对路径，与 present 的实际工作目录不一致
 
-> 严重级别：P1（重要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P1（重要）｜发现：2026-11-13｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H4/H6 的路径面）；`present` 工具用 `ctx.workingDirectory.ensure`，闸门用 `session.header.cwd`。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8-round1.mts`。
+> **关联**：[探索卡 Round 86](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H4/H6 的路径面）；`present` 工具用 `ctx.workingDirectory.ensure`，闸门用 `session.header.cwd`。
+> **留痕**：Note [2026-11-14-eight-bug-second-sources.md](../../../notes/implemented/2026-11-14-eight-bug-second-sources.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8-round1.mts`。
 
 ## 症状
 
@@ -26,7 +26,7 @@ keyless 复现直接注入 `header.cwd=/old`，真实坏文档放在 `/old/new/.
 
 ## 根因（假设）
 
-- `gateToolCall()` 只取 `exec.agent?.session?.header?.cwd`（[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts#L48) 的 `deliverableOf`），header cwd 是会话创建时的值；vendor `workingDirectory.set()` 只 append `working-directory/change` projection，不改 header。
+- `gateToolCall()` 只取 `exec.agent?.session?.header?.cwd`（[prd-gate.ts](../../../packages/company-pack/src/host/commands/prd-gate.ts#L48) 的 `deliverableOf`），header cwd 是会话创建时的值；vendor `workingDirectory.set()` 只 append `working-directory/change` projection，不改 header。
 - `present` 工具用 `ctx.workingDirectory.ensure(exec.agent)` 读同一 projection（vendor `session/working-directory/src/index.ts` 的 `get/ensure`），所以两者在 `cd` 后分叉。
 - 同类触发：`header.cwd` 缺失（旧会话/未 ensure）时，相对路径直接 `undefined` → 闸门跳过。
 
@@ -36,7 +36,7 @@ keyless 复现直接注入 `header.cwd=/old`，真实坏文档放在 `/old/new/.
 node --import tsx/esm runtime/tmp/c8-round1.mts
 ```
 
-看 `gate stale-cwd allow real invalid: false`。真实 `present` 路径解析见 vendor [working-directory/index.ts](../../vendor/dsh/packages/session/working-directory/src/index.ts) 的 `ensure()` 与 [tool-present/index.ts](../../vendor/dsh/packages/deliverables/tool-present/src/index.ts) 的 `ctx.workingDirectory.ensure(...)`。
+看 `gate stale-cwd allow real invalid: false`。真实 `present` 路径解析见 vendor [working-directory/index.ts](../../../vendor/dsh/packages/session/working-directory/src/index.ts) 的 `ensure()` 与 [tool-present/index.ts](../../../vendor/dsh/packages/deliverables/tool-present/src/index.ts) 的 `ctx.workingDirectory.ensure(...)`。
 
 ## 影响 / 失败类
 
@@ -61,4 +61,4 @@ cwd 无法解析 + 相对路径指向 .dsh-company/deliverables → deny（不�
 ## 证据
 
 - `runtime/tmp/c8-round1.mts`：`gate stale-cwd allow real invalid: false`；临时 workspace 的坏 PRD 在 `/old/new/...`。
-- 代码：[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts#L48)；vendor [working-directory](../../vendor/dsh/packages/session/working-directory/src/index.ts)、[tool-present](../../vendor/dsh/packages/deliverables/tool-present/src/index.ts)。
+- 代码：[prd-gate.ts](../../../packages/company-pack/src/host/commands/prd-gate.ts#L48)；vendor [working-directory](../../../vendor/dsh/packages/session/working-directory/src/index.ts)、[tool-present](../../../vendor/dsh/packages/deliverables/tool-present/src/index.ts)。

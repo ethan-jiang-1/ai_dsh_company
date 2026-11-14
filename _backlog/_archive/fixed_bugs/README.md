@@ -4,6 +4,18 @@
 
 ## 修复流水（倒序）
 
+- **BUG-152..159**（2026-11-14，根因组 A–D，P1×4 + P2×4）：exploratory Round 86（C8/C9/C10）八张卡，
+  同一病根 = 同一功能的两个载体各有一套解释，修法都是先收成唯一事实源——
+  **A** headings PRD 文本形状层：[152](BUG-152-prd-headings-crlf-bom.md) BOM/CRLF 归一化、
+  [153](BUG-153-prd-headings-fenced-code-blocks.md) 围栏感知扫描、[157](BUG-157-prd-duplicate-ac-slice-ids.md) AC/slice 重号；
+  **B** present 闸门与命令/工具同源：[154](BUG-154-prd-gate-numbering-empty-value.md) `numberingMarker()`、
+  [155](BUG-155-prd-gate-stale-session-cwd.md) `ctx.workingDirectory.ensure`、
+  [156](BUG-156-prd-gate-symlink-unreadable-fail-open.md) `readCompanyFileAt()` 三态 + 载体登记；
+  **C** [158](BUG-158-pre-push-zero-sha-range.md) push 范围按 zero-SHA 语义分派（新分支 = 出站提交集，删 ref = 跳过）；
+  **D** [159](BUG-159-client-error-ring-empty-object-message.md) 错误环先字段后 JSON，`{}` 不再吞 `event.message`。
+  每卡红→绿证据见卡内 `## 已修判定`；`pnpm test` 247 files / 2046 tests、`test:checks` 4 PASS、
+  `typecheck`/`lint`/`dup`/`verify` 全绿。详见 [八缺陷 Note](../../../notes/implemented/2026-11-14-eight-bug-second-sources.md)。
+
 - **BUG-151**（2026-11-13，P1）：upgrade log 叶子目标被 symlink/目录占用时跟随写外/裸抛 EISDIR；
   `appendUpgradeLog` 先 `companyFileProblem` 预检，unsafe 跳过。Safety 矩阵 134 passed；`KNOWN_GAP` 清零。
   详见 [adversarial-shape-matrix Note](../../../notes/implemented/2026-11-13-adversarial-shape-matrix.md)。

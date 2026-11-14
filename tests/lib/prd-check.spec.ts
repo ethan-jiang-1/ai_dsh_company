@@ -1,4 +1,7 @@
 /** MRD/PRD 结构校验（keyless 纯逻辑；`/prd check` 的头注说明边界）。 */
+// 负例留证 2026-11-14：拆掉 normalizeDocument → CRLF/BOM 用例红（BUG-152）
+// 负例留证 2026-11-14：拆掉 fence 状态 → 围栏三条用例红（BUG-153）
+// 负例留证 2026-11-14：拆掉 AC/slice 的 seen 集合 → 重号两条用例红（BUG-157）
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'

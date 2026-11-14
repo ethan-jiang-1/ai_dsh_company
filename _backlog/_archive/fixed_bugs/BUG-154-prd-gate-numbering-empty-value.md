@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P1
 opened: 2026-11-13
 ---
 
 # BUG-154：present 闸门把 `numbering:` 空值当旧动议放行
 
-> 严重级别：P1（重要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P1（重要）｜发现：2026-11-13｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H3）；与 `/req check` 的 numbering 词表分叉。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8-round1.mts`。
+> **关联**：[探索卡 Round 86](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H3）；与 `/req check` 的 numbering 词表分叉。
+> **留痕**：Note [2026-11-14-eight-bug-second-sources.md](../../../notes/implemented/2026-11-14-eight-bug-second-sources.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8-round1.mts`。
 
 ## 症状
 
@@ -59,4 +59,4 @@ meta 写 numbering: identity + 坏 PRD → deny（现有行为不回归）
 ## 证据
 
 - `runtime/tmp/c8-round1.mts`：`gate numbering-empty allow validate: false`；`gate numbering-identity deny`。
-- 代码：[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts#L65)；对照 [requirements-check.ts](../../packages/company-pack/src/lib/requirements-check.ts#L364)。
+- 代码：[prd-gate.ts](../../../packages/company-pack/src/host/commands/prd-gate.ts#L65)；对照 [requirements-check.ts](../../../packages/company-pack/src/lib/requirements-check.ts#L364)。

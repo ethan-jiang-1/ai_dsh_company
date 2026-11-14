@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-13
 ---
 
 # BUG-159：错误环把非 Error 的 error 对象记成 `{}`，丢掉 event.message
 
-> 严重级别：P2（次要）｜发现：2026-11-13｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-13｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C10-H1）；与 2026-11-13 `error === null` 修复同族。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c10-error-ring.mts`。
+> **关联**：[探索卡 Round 86](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C10-H1）；与 2026-11-13 `error === null` 修复同族。
+> **留痕**：Note [2026-11-14-eight-bug-second-sources.md](../../../notes/implemented/2026-11-14-eight-bug-second-sources.md)（同轮八卡）；复现脚本 = `runtime/tmp/c10-error-ring.mts`。
 
 ## 症状
 
@@ -23,7 +23,7 @@ opened: 2026-11-13
 
 ## 根因（假设）
 
-[error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts#L72) 的 `textOf({})` 返回 `'{}'`（truthy）；[onError](../../packages/company-pack/src/client/wiring/error-ring.ts#L143) 用：
+[error-ring.ts](../../../packages/company-pack/src/client/wiring/error-ring.ts#L72) 的 `textOf({})` 返回 `'{}'`（truthy）；[onError](../../../packages/company-pack/src/client/wiring/error-ring.ts#L143) 用：
 
 ```ts
 const message = textOf(value.error) || textOf(value.message) || '（未知页面错误）'
@@ -64,4 +64,4 @@ error 与 message 都为空                                → '（未知页面�
 ## 证据
 
 - `runtime/tmp/c10-error-ring.mts`：第一条 `"message": "{}"`；`error: null` 正确回退。
-- 代码：[error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts#L72)、[error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts#L143)。
+- 代码：[error-ring.ts](../../../packages/company-pack/src/client/wiring/error-ring.ts#L72)、[error-ring.ts](../../../packages/company-pack/src/client/wiring/error-ring.ts#L143)。

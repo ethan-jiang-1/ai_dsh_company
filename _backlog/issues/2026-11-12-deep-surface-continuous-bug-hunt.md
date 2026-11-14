@@ -1518,12 +1518,12 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| H1 CRLF/BOM | **confirmed** | [BUG-152](../bugs/BUG-152-prd-headings-crlf-bom.md)；CRLF PRD false；BOM PRD false |
-| H2 围栏 | **confirmed** | [BUG-153](../bugs/BUG-153-prd-headings-fenced-code-blocks.md)；fenced REQ/Slices false |
-| H3 numbering 空值 | **confirmed** | [BUG-154](../bugs/BUG-154-prd-gate-numbering-empty-value.md)；gate allow / validate false |
+| H1 CRLF/BOM | **confirmed** | [BUG-152](../_archive/fixed_bugs/BUG-152-prd-headings-crlf-bom.md)；CRLF PRD false；BOM PRD false |
+| H2 围栏 | **confirmed** | [BUG-153](../_archive/fixed_bugs/BUG-153-prd-headings-fenced-code-blocks.md)；fenced REQ/Slices false |
+| H3 numbering 空值 | **confirmed** | [BUG-154](../_archive/fixed_bugs/BUG-154-prd-gate-numbering-empty-value.md)；gate allow / validate false |
 | H4 drafts vs final | **unverified（设计边界）** | 闸门只读 drafts；drafts 缺失按旧动议 fail-open；未开卡 |
-| H5 meta 坏形状 | **confirmed** | [BUG-156](../bugs/BUG-156-prd-gate-symlink-unreadable-fail-open.md)；meta symlink allow |
-| H6 路径/根别名 | **confirmed** | [BUG-155](../bugs/BUG-155-prd-gate-stale-session-cwd.md) + [BUG-156](../bugs/BUG-156-prd-gate-symlink-unreadable-fail-open.md)；cwd 分叉 + deliverables 根 symlink |
+| H5 meta 坏形状 | **confirmed** | [BUG-156](../_archive/fixed_bugs/BUG-156-prd-gate-symlink-unreadable-fail-open.md)；meta symlink allow |
+| H6 路径/根别名 | **confirmed** | [BUG-155](../_archive/fixed_bugs/BUG-155-prd-gate-stale-session-cwd.md) + [BUG-156](../_archive/fixed_bugs/BUG-156-prd-gate-symlink-unreadable-fail-open.md)；cwd 分叉 + deliverables 根 symlink |
 | H7 多 slug | **unverified** | 未跑；代码只返回首个 deny；未见独立缺陷 |
 | H8 AC 缩进 | **confirmed（严格）** | 4 空格 AC → `acceptance 不能为空`；模板/技能规定 2/4 空格，判为内容不合约，未开卡 |
 | H9 legacy 豁免 | **confirmed（设计）** | 缺 `numbering` → allow；模板要求新动议写 identity；观察，不另开卡 |
@@ -1539,7 +1539,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| 新分支 remote 全零只 diff tip | **confirmed** | [BUG-158](../bugs/BUG-158-pre-push-zero-sha-range.md)；合成分支 `bd8eff1`；dry-run 未触发 |
+| 新分支 remote 全零只 diff tip | **confirmed** | [BUG-158](../_archive/fixed_bugs/BUG-158-pre-push-zero-sha-range.md)；合成分支 `bd8eff1`；dry-run 未触发 |
 | 删除分支 local 全零 | **confirmed** | 同卡；`runtime/tmp/c9-delete.log` → bad object |
 | SURFACE_RULES 只覆盖 client/presets/content | **confirmed（观察）** | `src/host/commands/prd-gate.ts` 改动不命中任何 surface glob；`pnpm test` 仍跑 gate spec，但没有真 present；不另开卡 |
 | `--ci` 跳过 browser/model | **pass（设计）** | skip 清单打印；不新开 |
@@ -1554,7 +1554,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| `error: {}` + `message` | **confirmed** | [BUG-159](../bugs/BUG-159-client-error-ring-empty-object-message.md)；`c10-error-ring` 第一条 `"{}"` |
+| `error: {}` + `message` | **confirmed** | [BUG-159](../_archive/fixed_bugs/BUG-159-client-error-ring-empty-object-message.md)；`c10-error-ring` 第一条 `"{}"` |
 | `error: null` | **pass** | 第二条 `null-error message` |
 | string error | **pass** | 第三条 `string error` |
 | console.error 多参 / 跨 realm Error | **unverified** | 未跑；保留 |

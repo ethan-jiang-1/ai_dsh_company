@@ -19,6 +19,14 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-152（已修）](fixed_bugs/BUG-152-prd-headings-crlf-bom.md) | 已修：CRLF/BOM 的 headings PRD 被判「没有定义小节」；入口归一化（去 BOM、CRLF→LF），三编码同判 | 2026-11-14 |
+| [BUG-153（已修）](fixed_bugs/BUG-153-prd-headings-fenced-code-blocks.md) | 已修：围栏里的示例标题/Slices 表被当定义；`scanLines()` 维护围栏状态（三反引号/三波浪号），只有围栏外算结构 | 2026-11-14 |
+| [BUG-154（已修）](fixed_bugs/BUG-154-prd-gate-numbering-empty-value.md) | 已修：present 闸门把空值 `numbering:` 当旧动议放行；闸门改读 `numberingMarker()` 三态，与 `/req check` 同判 | 2026-11-14 |
+| [BUG-155（已修）](fixed_bugs/BUG-155-prd-gate-stale-session-cwd.md) | 已修：闸门按 header.cwd 解析相对路径、与 present 分叉；改读 `ctx.workingDirectory.ensure`，解析不到时明确 deny | 2026-11-14 |
+| [BUG-156（已修）](fixed_bugs/BUG-156-prd-gate-symlink-unreadable-fail-open.md) | 已修：meta/drafts symlink/越界被当旧动议放行；`readCompanyFileAt()` 三态（missing 才豁免，unsafe 一律 deny）+ 载体登记 | 2026-11-14 |
+| [BUG-157（已修）](fixed_bugs/BUG-157-prd-duplicate-ac-slice-ids.md) | 已修：AC/slice 重号不判红；AC 与 slice 各自维护 seen 集合并点名重号 | 2026-11-14 |
+| [BUG-158（已修）](fixed_bugs/BUG-158-pre-push-zero-sha-range.md) | 已修：新分支只看 tip、删 ref 崩；remote 全零取整条出站提交集，local 全零跳过；`tests/checks` 三条形状自测 | 2026-11-14 |
+| [BUG-159（已修）](fixed_bugs/BUG-159-client-error-ring-empty-object-message.md) | 已修：`{}` 的 `JSON.stringify` 短路 `event.message`；`textOf` 先读 `message`/`reason`/`name` 再退 JSON | 2026-11-14 |
 | [2026-11-14-notes-tree-and-carrier-gates.md](settled_issues/2026-11-14-notes-tree-and-carrier-gates.md) | 已结；`notes-tree` 门禁（形状 + 状态行）+ 两份注入载体（`notes/implemented/AGENTS.md` / `notes/archived/AGENTS.md`）；七组真树红证 + 19 项回归；去向 = [Note](../../notes/implemented/2026-11-14-notes-tree-and-carrier-gates.md) | 2026-11-14 |
 | [2026-11-13-landing-semantics-agents-md.md](settled_issues/2026-11-13-landing-semantics-agents-md.md) | 已结；“落地 = 系统可验证变更 + 实跑证据；写 RFC/搬卡不算”写进入口/模板/门禁；三条门禁红→绿；去向 = [Note](../../notes/implemented/2026-11-13-landing-semantics.md) | 2026-11-13 |
 | [2026-11-13-workflow-entry-and-fact-checkpoint.md](settled_issues/2026-11-13-workflow-entry-and-fact-checkpoint.md) | 已结；RFC 成立（P0 入口/一致性 → P1 事实检查点 → P2 可执行验收）；实施不在本卡关闭条件内；去向 = [RFC](../../notes/proposed/2026-11-13-workflow-entry-and-fact-checkpoint.md) | 2026-11-13 |

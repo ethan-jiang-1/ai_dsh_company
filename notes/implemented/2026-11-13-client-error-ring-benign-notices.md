@@ -5,6 +5,9 @@
 上游 = 用户「启动一下这个插件」的启动自检（[web-window-ops](../../.agents/skills/web-window-ops/SKILL.md) 呈现即验证）：
 `cdp-probe` 在健康实例上判红，暴露的是错误环的取文顺序与过滤缺口，不是启动失败。
 
+后续（2026-11-14）：`textOf` 的取文顺序继续收口——普通对象先读 `message`/`reason`/`name`，`'{}'` 不再短路
+`event.message`；见 [八缺陷 Note](2026-11-14-eight-bug-second-sources.md)（BUG-159）。本 Note 的 `null` 判据不变。
+
 ## 决定
 
 1. **`error` 事件的 `error === null` 时用事件自带的 `message`**。原实现 `textOf(value.error) || textOf(value.message)`

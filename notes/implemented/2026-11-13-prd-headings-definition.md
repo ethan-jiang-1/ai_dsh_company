@@ -2,6 +2,9 @@
 
 状态：implemented（2026-11-13 落地）
 
+后续（2026-11-14）：headings 解析器的文本形状层（BOM / CRLF 归一化、围栏感知扫描、AC/slice 重号）由
+[八缺陷 Note](2026-11-14-eight-bug-second-sources.md) 收口（BUG-152/153/157）；定义点与字段形状不变。
+
 上游 = 用户 2026-11-13「PRD 里搞一个很大的 JSON…这很荒唐」+ 批准方案 A（根治）；证据现场 =
 `.../c5-ui-team-HZo6Rt/.dsh-company/deliverables/2026-11-13-sgcc-portable-leakage-monitor/drafts/prd.md`
 （74.5KB = 52.6KB JSON / 960 行 + 21.9KB 正文副本；32 条 REQ、62 条 AC，正文的 32 个需求小节里只有 1 个带 userStory）。

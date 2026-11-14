@@ -15,9 +15,11 @@
    它们已被 fast 每次 push 无条件跑，再列一遍 = 同一检查跑两遍。surface 现在只收
    client → `client-load-smoke`、presets → `preset-smoke`、content → `replay-smoke`。
 3. **pre-push 取范围用 hook 自带的四元组，不猜 base。**
-   `git push` 通过 stdin 给 `<local ref> <local sha> <remote ref> <remote sha>`；用 `remote sha..local sha`
-   算本次 outgoing 范围。remote sha 全零（新分支）退化为该提交的 `diff-tree`；只有手动直跑（无 stdin）
-   才退化 `HEAD~1` 并**打印退化**。`--dry-run` 只选不跑。
+   `git push` 通过 stdin 给 `<local ref> <local sha> <remote ref> <remote sha>`；三形状各有明确语义：
+   remote sha 非零 = `git diff <remote sha> <local sha>`；remote sha 全零（新分支）= `git rev-list <local sha> --not --remotes`
+   取整条出站提交集再逐个 `diff-tree --root`（2026-11-14 修正：只 diff tip 会漏分支里更早的提交）；
+   local sha 全零（删除 ref）= 跳过该 ref，不调 diff。只有手动直跑（无 stdin）才退化 `HEAD~1` 并**打印退化**。
+   `--dry-run` 只选不跑。修正的判据与红证 = [八缺陷 Note](2026-11-14-eight-bug-second-sources.md)。
 4. **每周 lane = classic keyless，skip 清单每次打印。**
    `checks/lanes/keyless-lane.mjs --ci` 跑 18 条 classic（browser/model 逐条打印 SKIP 与原因）；
    CI 挂在 `fresh-clone.yml` 的 macOS 全量 setup 之后（每周一 + 手动）。首几周允许红——那是环境诊断信号，
