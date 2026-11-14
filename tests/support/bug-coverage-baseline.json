@@ -1,0 +1,7 @@
+{
+  "generatedAt": "2026-11-14",
+  "covered": 76,
+  "total": 181,
+  "newBugSince": "2026-11-15",
+  "reason": "具名守卫覆盖（保守下界）。只升不降；新修的 BUG（opened >= newBugSince）必须在 spec/test 标题里带 BUG-nnn，否则 tests/repo/bug-coverage.spec.ts 红。"
+}

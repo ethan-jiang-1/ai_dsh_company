@@ -10,11 +10,13 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'
 import { ASSETS, PROBES, FAILURE_CLASSES, failureClassOf } from './lib/asset-lanes.mjs'
 import { buildCensus, countProjectSurface, renderCensus } from './lib/test-census.mjs'
+import { consumerCount } from './lib/asset-consumers.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const target = join(root, 'tests/CENSUS.generated.md')
 const { gateCount, specCount } = countProjectSurface(root)
-const text = renderCensus(buildCensus({ smokes: ASSETS, probes: PROBES, gateCount, specCount, failureClassOf }))
+const consumers = consumerCount(root, [...ASSETS, ...PROBES])
+const text = renderCensus(buildCensus({ smokes: ASSETS, probes: PROBES, gateCount, specCount, failureClassOf, consumers }))
 
 if (process.argv.includes('--write')) {
   writeFileSync(target, text)

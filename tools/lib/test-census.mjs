@@ -28,16 +28,17 @@ function laneLabel(asset) {
 }
 
 /**
- * @param {{smokes: any[], probes: any[], gateCount: number, specCount: number, failureClassOf: (name: string) => string}} input
+ * @param {{smokes: any[], probes: any[], gateCount: number, specCount: number, failureClassOf: (name: string) => string, consumers?: Record<string, number>}} input
  */
-export function buildCensus({ smokes, probes, gateCount, specCount, failureClassOf }) {
+export function buildCensus({ smokes, probes, gateCount, specCount, failureClassOf, consumers = {} }) {
   const laneCounts = Object.fromEntries(LANE_ORDER.map(lane => [lane, smokes.filter(asset => asset.lanes.includes(lane)).length]))
   const classes = {}
   for (const asset of [...smokes, ...probes]) {
     const name = failureClassOf(asset.name)
     classes[name] = (classes[name] ?? 0) + 1
   }
-  return { smokes, probes, gateCount, specCount, laneCounts, classes, failureClassOf }
+  const noConsumer = [...smokes, ...probes].filter(asset => (consumers[asset.name] ?? 0) === 0).length
+  return { smokes, probes, gateCount, specCount, laneCounts, classes, failureClassOf, consumers, noConsumer }
 }
 
 /** @param {ReturnType<typeof buildCensus>} model */
@@ -60,6 +61,7 @@ export function renderCensus(model) {
   lines.push(`| surface lane | ${model.laneCounts.surface} |`)
   lines.push(`| weekly lane | ${model.laneCounts.weekly} |`)
   lines.push(`| 未分类失败类 | ${model.classes['未分类'] ?? 0} |`)
+  lines.push(`| 无消费者资产 | ${model.noConsumer} |`)
   lines.push('')
   lines.push('## 失败类分布')
   lines.push('')
@@ -69,20 +71,24 @@ export function renderCensus(model) {
     lines.push(`| ${name} | ${count} |`)
   }
   lines.push('')
+  lines.push('## 字段（v2）')
+  lines.push('')
+  lines.push('`shape` = example | generator | model | meta（当前默认 example）；`lastRed` = 最近一次真红日期（— = 未接运行日志，不伪造）；`replaceBy` / `retireWhen` = 替代资产 / 退役条件（— = 未排期）。`消费者` = tests/checks/tools/probes/run 里引用该资产名的文件数（引用计数，不是运行次数）。')
+  lines.push('')
   lines.push('## 冒烟')
   lines.push('')
-  lines.push('| 资产 | kind | lane | 失败类 |')
-  lines.push('|---|---|---|---|')
+  lines.push('| 资产 | kind | lane | 失败类 | shape | 消费者 |')
+  lines.push('|---|---|---|---|---|---|')
   for (const asset of model.smokes) {
-    lines.push(`| ${asset.name} | ${asset.kind} | ${laneLabel(asset)} | ${model.failureClassOf(asset.name)} |`)
+    lines.push(`| ${asset.name} | ${asset.kind} | ${laneLabel(asset)} | ${model.failureClassOf(asset.name)} | ${asset.shape ?? 'example'} | ${model.consumers[asset.name] ?? 0} |`)
   }
   lines.push('')
   lines.push('## 探针（调试面，不进自动 lane）')
   lines.push('')
-  lines.push('| 资产 | 域 | 失败类 |')
-  lines.push('|---|---|---|')
+  lines.push('| 资产 | 域 | 失败类 | shape | 消费者 |')
+  lines.push('|---|---|---|---|---|')
   for (const probe of model.probes) {
-    lines.push(`| ${probe.name} | ${probe.domain} | ${model.failureClassOf(probe.name)} |`)
+    lines.push(`| ${probe.name} | ${probe.domain} | ${model.failureClassOf(probe.name)} | ${probe.shape ?? 'example'} | ${model.consumers[probe.name] ?? 0} |`)
   }
   return `${lines.join('\n')}\n`
 }

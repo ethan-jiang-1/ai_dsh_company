@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { ASSETS, FAILURE_CLASSES, PROBES, allAssets, failureClassOf } from '../../tools/lib/asset-lanes.mjs'
 import { buildCensus, countProjectSurface, renderCensus } from '../../tools/lib/test-census.mjs'
+import { consumerCount } from '../../tools/lib/asset-consumers.mjs'
 
 /**
  * 资产盘子（研究 A 件）的两个机械面：
@@ -22,7 +23,8 @@ function probeFiles() {
 describe('资产盘子（census 生成物）', () => {
   it('tests/CENSUS.generated.md 与注册表/盘面一致（漂了就跑 --write）', () => {
     const { gateCount, specCount } = countProjectSurface(ROOT)
-    const expected = renderCensus(buildCensus({ smokes: ASSETS, probes: PROBES, gateCount, specCount, failureClassOf }))
+    const consumers = consumerCount(ROOT, [...ASSETS, ...PROBES])
+    const expected = renderCensus(buildCensus({ smokes: ASSETS, probes: PROBES, gateCount, specCount, failureClassOf, consumers }))
     const current = readFileSync(join(ROOT, 'tests/CENSUS.generated.md'), 'utf8')
     expect(current, 'census 是生成物：运行 node tools/test-census.mjs --write').toBe(expected)
   })

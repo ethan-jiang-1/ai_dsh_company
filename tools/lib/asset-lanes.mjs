@@ -18,6 +18,10 @@
  * - ciSafe     能否在干净 CI（macOS 全量 setup 之后）跑；只在 classic + weekly 时有意义
  * - why        一句话：它守住什么（给人看，不参与判据）
  * - manualReason  lanes 为空时必填：为什么不进自动 lane
+ * - shape       example | generator | model | meta（v2；当前默认 example，生成器/模型接上后改）
+ * - lastRed     最近一次真红日期（— = 未接运行日志，不伪造）
+ * - replaceBy   被哪个资产替代（— = 无）
+ * - retireWhen  退役条件（— = 未排期）
  */
 
 export const LANES = ['fast', 'surface', 'weekly']
@@ -26,7 +30,7 @@ export const KINDS = ['classic', 'browser', 'model', 'tool']
 
 const TSX = ['--import', 'tsx/esm']
 
-/** @returns {{name:string,kind:string,lanes:string[],nodeArgs:string[],ciSafe:boolean,why?:string,manualReason?:string}} */
+/** @returns {{name:string,kind:string,lanes:string[],nodeArgs:string[],ciSafe:boolean,shape:string,lastRed:string,replaceBy:string,retireWhen:string,why?:string,manualReason?:string}} */
 function define(name, kind, lanes, extra = {}) {
   return {
     name,
@@ -34,6 +38,10 @@ function define(name, kind, lanes, extra = {}) {
     lanes,
     nodeArgs: extra.nodeArgs ?? [],
     ciSafe: extra.ciSafe ?? kind === 'classic',
+    shape: extra.shape ?? 'example',
+    lastRed: extra.lastRed ?? '—',
+    replaceBy: extra.replaceBy ?? '—',
+    retireWhen: extra.retireWhen ?? '—',
     ...(extra.why ? { why: extra.why } : {}),
     ...(extra.manualReason ? { manualReason: extra.manualReason } : {}),
   }

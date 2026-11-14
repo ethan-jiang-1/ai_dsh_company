@@ -8,6 +8,7 @@ import {
   normalizeDocument as normalizeCore,
   scanDocument as scanCore,
   scanDocumentDetailed as scanDetailedCore,
+  sectionRange as sectionRangeCore,
   splitTableRow as splitCore,
 } from './markdown-shape-core.js'
 
@@ -43,3 +44,11 @@ export const scanDocument: (text: string) => readonly DocumentLine[] = scanCore
 
 /** 结构扫描完整视图：行 + 未闭合注释行号 + 顶层围栏块。 */
 export const scanDocumentDetailed: (text: string) => DocumentScan = scanDetailedCore
+
+/** 节标题的起止行（行级视图；围栏/行首注释内的标题不算）。 */
+export interface SectionRange {
+  readonly start: number
+  readonly end: number
+}
+
+export const sectionRange: (text: string, heading: string) => SectionRange | undefined = sectionRangeCore
