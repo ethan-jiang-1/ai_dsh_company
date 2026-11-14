@@ -190,3 +190,33 @@ describe('越界 `..` 路径的三态子类（BUG-170）', () => {
     } finally { rmSync(ws, { recursive: true, force: true }) }
   })
 })
+
+describe('路径等价类矩阵（P1，2026-11-14）', () => {
+  const cases: Array<[string, 'text' | 'missing' | 'unsafe']> = [
+    ['kb/company.md', 'text'],
+    ['kb/./company.md', 'text'],
+    ['kb/../kb/company.md', 'text'],
+    ['kb//company.md', 'text'],
+    ['kb\\company.md', 'text'],
+    ['.../company.md', 'missing'],
+    ['..\\outside\\secret.md', 'unsafe'],
+    ['kb\\..\\..\\outside\\secret.md', 'unsafe'],
+    ['a/../../outside/secret.md', 'unsafe'],
+  ]
+
+  it.each(cases)('%s → %s', (rel, expected) => {
+    const ws = mkdtempSync(join(tmpdir(), 'shape-paths-'))
+    try {
+      mkdirSync(join(ws, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(ws, '.dsh-company/kb/company.md'), '# ok\n')
+      writeFileSync(join(ws, 'outside-secret.md'), 'secret\n')
+      const home = join(ws, '.dsh-company')
+      const result = readCompanyFileAt(home, rel)
+      expect(result.kind, rel).toBe(expected)
+      if (expected === 'text') expect(result).toEqual({ kind: 'text', text: '# ok\n' })
+      expect(companyFileProblemAt(home, rel), rel).toBe(expected === 'text' ? null : expected)
+    } finally {
+      rmSync(ws, { recursive: true, force: true })
+    }
+  })
+})
