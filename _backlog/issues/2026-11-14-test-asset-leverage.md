@@ -102,6 +102,7 @@ opened: 2026-11-14
 - **P0.4 census v2**：`asset-consumers` 消费者图，96 个资产 **56 个 0 消费者**；`shape`/消费者列 + `lastRed`/`replaceBy`/`retireWhen` 字段说明。
 - **证明层**：`bug-coverage` 181 张已修卡 → **76 有具名守卫（42.0%）**，baseline 只升不降；`markdown-shape.property` 200 例（weekly 1000）；`structure-agreement` 200 例差分；路径 9 条等价类。
 - **P2 棘轮**：`notes-axes` 门禁（新 Note 未覆盖轴必须有 → 去向；红证已跑）；weekly `generative` lane（1000 例）；`failure-classes` 复发棘轮。
+- **P1 定向 mutation**：`tests/checks/gate-mutation.test.mjs` 对 4 个高风险门禁各删一条规则，坏输入必须漏过；4/4 通过（naming/carrier/fix-evidence/notes-tree）。
 
 **R4 被自己的棘轮挡住**：`candidate-scan-labels.spec.ts` 看似“语料已移出”，但它是 **BUG-011 的唯一具名守卫**；删它会让 bug-coverage 从 76 掉到 75，baseline 立即红。**保留**，直到 BUG-011 有活守卫；这是“证明层”第一次阻止错误退役。
 
@@ -145,7 +146,7 @@ opened: 2026-11-14
 - [x] P0：R1–R3 退役后 `pnpm test`/`verify` 全绿；12 个 english spec 留超集 + 一件文件清单。
 - [x] P0：census 有 `lastRed|consumer|replaceBy|retireWhen|shape`；67 探针有消费者或 `manualReason`。
 - [x] P1：属性生成器覆盖 shape 类，至少能重放 3 个历史 BUG（152/168/176 各一类）；差分能抓“两个消费者结论相反”。
-- [ ] P1：4 个高风险 gate 有 `tests/checks` + 定向 mutation；删 gate 一条规则 → 元测试红。
+- [x] P1：4 个高风险 gate 有 `tests/checks` + 定向 mutation；删 gate 一条规则 → 元测试红（`gate-mutation.test.mjs` 4/4）。
 - [x] P2：`## 未覆盖轴` 每行有去向；类复发 ≥2 轮 → 生成器/模型/元测试；weekly 生成 lane 跑通。
 - [ ] 度量：v6 dry-run 对已识别 bug-shaped 轴复发 = 0；退役数 > 新增一次性 spec 数；`pnpm verify`/`test`/`typecheck` 绿。
 
