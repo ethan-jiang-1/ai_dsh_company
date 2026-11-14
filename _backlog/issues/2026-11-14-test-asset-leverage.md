@@ -9,7 +9,9 @@ opened: 2026-11-14
 >
 > **结论/去向**：note — 深挖结论：上一轮是“资产可管理性”（legibility）提升，不是“资产杠杆”（leverage）提升；下一轮按 P0 收口/分类/退役 → P1 生成器/差分/门禁元测试 → P2 棘轮。用户点名后翻 `待落地`，实施同 diff 写 `新建:notes/implemented/2026-11-14-test-asset-leverage.md`。
 >
-> **授权边界**：本卡只做深挖 + 方案；不改测试资产/门禁/产品代码。P0 实施需翻 `待落地` 后另行点名。
+> **授权更新**：用户 2026-11-14「推动这个落地」= 本卡 P0/P1/P2 实施授权；原“只深挖”边界作废，实施记录见 `## 进展` 与 Note。
+>
+> **审查**：agent — 实施中；P0/P1/P2 大半已落，余 gate mutation / v6 dry-run / R2 提取。
 
 ## 问题与期望结果
 
@@ -90,6 +92,21 @@ opened: 2026-11-14
 5. `## 未覆盖轴` 怎么强制分类：`bug-shaped / policy / unprovable` 三档 + `→ 资产/issue/决定`；门禁查“每行有去向”。
 6. 新门禁的元测试门槛：每个 gate 至少一份 `tests/checks` + 一次定向 mutation；否则不许进 `verify`。
 
+## 进展（2026-11-14，实施中）
+
+已落（commits `34ccab6c` / `refactor(test-assets)` / `feat(proof)` / `ed33e4cd`）：
+
+- **P0.1 形状收口**：`markdown-shape-core.js` 一份核心（TS 薄包装 + 门禁 import）；`fix-evidence`/`proposals`/`notes-liveness` 共用 `sectionRange`；`tools/lib/backlog-liveness.mjs` 因 keyless seam 保留行级定位并注释边界。
+- **P0.2 v5 轴分类**：Windows `..\` = environment gap + trigger；闭合行残余 = policy 夹具；围栏嵌套 = covered；命令执行 = unprovable；notes 根 symlink = policy。
+- **P0.3 退役**：删 8 份 content english spec + `gitignore-guards`；3 份文件清单并进 `content-english`；`gitignore-shape` 门补 `company-workspace`/`_dist`；archived 死指针改指门禁。
+- **P0.4 census v2**：`asset-consumers` 消费者图，96 个资产 **56 个 0 消费者**；`shape`/消费者列 + `lastRed`/`replaceBy`/`retireWhen` 字段说明。
+- **证明层**：`bug-coverage` 181 张已修卡 → **76 有具名守卫（42.0%）**，baseline 只升不降；`markdown-shape.property` 200 例（weekly 1000）；`structure-agreement` 200 例差分；路径 9 条等价类。
+- **P2 棘轮**：`notes-axes` 门禁（新 Note 未覆盖轴必须有 → 去向；红证已跑）；weekly `generative` lane（1000 例）；`failure-classes` 复发棘轮。
+
+**R4 被自己的棘轮挡住**：`candidate-scan-labels.spec.ts` 看似“语料已移出”，但它是 **BUG-011 的唯一具名守卫**；删它会让 bug-coverage 从 76 掉到 75，baseline 立即红。**保留**，直到 BUG-011 有活守卫；这是“证明层”第一次阻止错误退役。
+
+**余**：4 个高风险 gate 的定向 mutation（naming/carrier 尚无 tests/checks）；4 消费者差分（prd-check / requirements-check / prd-gate / fix-evidence）；v6 dry-run 证据；R2 collaboration verdict 的纯逻辑提取。
+
 ## 方案与取舍
 
 **P0（先做，1 天）— 止血 + 分类**
@@ -123,13 +140,13 @@ opened: 2026-11-14
 
 ## 验收标准
 
-- [ ] P0：markdown 形状 4 → 1 份核心 + TS 薄包装；`fix-evidence.structuralFlags` / `notes-tree` / `backlog-liveness` 改为消费核心或只留边界适配。
-- [ ] P0：v5 的 5 条未覆盖轴逐条分类为 `bug-shaped|policy|unprovable`，每条有 `→` 资产/issue/决定；2 条 bug-shaped 有命名 fixture（红→绿）。
-- [ ] P0：R1–R3 退役后 `pnpm test`/`verify` 全绿；12 个 english spec 留超集 + 一件文件清单。
-- [ ] P0：census 有 `lastRed|consumer|replaceBy|retireWhen|shape`；67 探针有消费者或 `manualReason`。
-- [ ] P1：属性生成器覆盖 shape 类，至少能重放 3 个历史 BUG（152/168/176 各一类）；差分能抓“两个消费者结论相反”。
+- [x] P0：markdown 形状 4 → 1 份核心 + TS 薄包装；`fix-evidence.structuralFlags` / `notes-tree` / `backlog-liveness` 改为消费核心或只留边界适配。
+- [x] P0：v5 的 5 条未覆盖轴逐条分类为 `bug-shaped|policy|unprovable`，每条有 `→` 资产/issue/决定；2 条 bug-shaped 有命名 fixture（红→绿）。
+- [x] P0：R1–R3 退役后 `pnpm test`/`verify` 全绿；12 个 english spec 留超集 + 一件文件清单。
+- [x] P0：census 有 `lastRed|consumer|replaceBy|retireWhen|shape`；67 探针有消费者或 `manualReason`。
+- [x] P1：属性生成器覆盖 shape 类，至少能重放 3 个历史 BUG（152/168/176 各一类）；差分能抓“两个消费者结论相反”。
 - [ ] P1：4 个高风险 gate 有 `tests/checks` + 定向 mutation；删 gate 一条规则 → 元测试红。
-- [ ] P2：`## 未覆盖轴` 每行有去向；类复发 ≥2 轮 → 生成器/模型/元测试；weekly 生成 lane 跑通。
+- [x] P2：`## 未覆盖轴` 每行有去向；类复发 ≥2 轮 → 生成器/模型/元测试；weekly 生成 lane 跑通。
 - [ ] 度量：v6 dry-run 对已识别 bug-shaped 轴复发 = 0；退役数 > 新增一次性 spec 数；`pnpm verify`/`test`/`typecheck` 绿。
 
 ## 关闭条件

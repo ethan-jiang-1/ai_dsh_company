@@ -130,7 +130,7 @@ intent: 解释“资产很多但 exploratory 每轮还能抓 8 个 bug”的机�
 | R1 | `tests/content/*-english.spec.ts` 共 12 个：其中 11 个是 `content-english.spec.ts` 的子集重复，保留超集 | 只证“目录无中文” | `content-english.spec.ts:23-27` 已对 `content/**` 做同断言（超集）；存在性另有 `content-manifest.mjs:9-12` | 文件清单相等这一条并成一件；其余 11 件删 |
 | R2 | `tests/evidence/collaboration-probe-verdict.spec.ts` | 74 行，`indexOf` 切探针源码 + `runInNewContext` | 探针 0 自动；改探针文案即抛 “Verdict block moved” | 判据抽 `tools/lib`（先例 `team-concurrency-verdict.mjs`） |
 | R3 | gitignore-guards spec（已退役 2026-11-14） | 40 行，只断 `.gitignore` 文本形状 | 门 `checks/gates/gitignore-shape.mjs` 同时做文本 + `git check-ignore` 真匹配，每次 verify 都跑；`company-workspace` / `_dist` 规则已并入门 | 无；已删 |
-| R4 | `tests/tools/candidate-scan-labels.spec.ts` | 321 行 | 语料已移出仓；`candidate-scan-eval.mjs:2-3` 自标已耗 | 无；删（或随语料恢复再建） |
+| R4 | `tests/tools/candidate-scan-labels.spec.ts` | 321 行 | 看似“语料已移出”，但它是 **BUG-011 的唯一具名守卫**；bug-coverage 棘轮会从 76 掉到 75 | **阻断：保留**，直到 BUG-011 有活守卫 |
 | R5 | `tests/repo/snapshot-index.spec.ts` | 21 行，只测 helper 渲染 | 真判据在 `snapshot-index.mjs:3-5`；`snapshots-budget.spec.ts` 同型 | 合并成一件 snapshots 纯逻辑 |
 | R6 | `probes/session-context/human-exits-{expression,nonblocking}-probe.mjs`、`probes/team/{claim-race,team-claim-loser,team-concurrency}-probe.mjs` | 同一边界三份实现；0 自动、全未分类 | 合并每族 1 个（保留覆盖面最宽者），其余删 | 合并件的 `consumer`/`manualReason` |
 | R7 | `tests/checks/gates-negative.test.mjs:5`、`two-axis-gates.test.mjs:5`、`tests/content/state-english.spec.ts:2`、`tests/presets/persona-english.spec.ts:8-9` | 陈旧头注 | 写的是已删除的 checks/smoke/、已翻完的 PENDING | 头注改现行事实，不删文件 |
