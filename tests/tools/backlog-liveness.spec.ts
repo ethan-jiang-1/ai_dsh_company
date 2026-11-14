@@ -81,6 +81,19 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     expect(check(root)).toEqual([])
   })
 
+  it('放行 AGENTS.md 门牌（无 frontmatter、不进索引、不参与状态纪律），普通卡照旧被查', () => {
+    // 正例：两个真门牌位置（活跃缺陷区 + 已修区）都不报缺 frontmatter。
+    put('bugs/AGENTS.md', '# bugs/ 门牌\n\n没有 frontmatter，也不是卡。\n')
+    put('_archive/fixed_bugs/AGENTS.md', '# fixed_bugs/ 门牌\n')
+    const withSignposts = check(root)
+    expect(withSignposts.join('\n')).not.toContain('bugs/AGENTS.md')
+    expect(withSignposts.join('\n')).not.toContain('fixed_bugs/AGENTS.md')
+
+    // 负例：同样的内容换个名字就是缺头的卡——门牌豁免不许扩散成「名字随便写都能过」。
+    put('bugs/BUG-900-demo.md', '# bugs/ 门牌\n\n没有 frontmatter，也不是卡。\n')
+    expect(check(root).join('\n')).toContain('BUG-900-demo.md:1 缺 frontmatter')
+  })
+
   it('reports a missing README, directory or wrongly shaped path without throwing', () => {
     const target = resolve(root, 'issues/README.md')
     expect(target).toBe(join(root, 'issues/README.md'))
