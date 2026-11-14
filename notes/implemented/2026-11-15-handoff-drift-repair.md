@@ -48,7 +48,8 @@
 | 回归 | 暖树 `pnpm test` → **244 files / 2094 tests passed**；clean clone → **244 files / 2091 passed + 3 skipped**（dev-only 台账） | 新增 1 条断言；skip 预算内 |
 | 防漂移 spec | 花括号红证：AGENTS 临时插入 tests/{host,missing} → **1 failed / 7 passed**；还原 → **8 passed**；旧分区名红证 → 8 passed | 真文件，还原后 `git diff` 空 |
 | 独立盲审 | 只读子代理审两提交：**2 blocker**（spec 花括号失明 / typecheck 覆盖面多处文档过宽）全部回修；建议 9 条收 8 条（未收 = _backlog 历史结案叙述不改） | 输入 = 提交 diff + 盘面；不含外部 WIP |
-| 干净 clone | `git clone --no-hardlinks` + submodule + `pnpm install` + vendor install + `bundle:init` + `pnpm run setup` → 构建成功；verify 红→绿；test 绿 | `/tmp` 独立树，不碰工作区 |
+| 独立盲审（第二轮） | 审未提交 diff：**3 blocker**（BUG-COVERAGE 生成物随行号漂移 / tests README 旧枚举 / “四个 tsconfig”实为三个）全部回修；建议 13 条收 10 条（未收 = 局部类型表共享化、24 errors 回执、_backlog 历史文风） | 输入 = 未提交 diff；不含外部 WIP |
+| 干净 clone | `git clone --no-hardlinks` + submodule + `pnpm install` + vendor install + `bundle:init` + `pnpm run setup` → 构建成功；verify 红→绿；test 绿；0fb6256c 仅 install+verify 亦 **ALL PASS** | `/tmp` 独立树，不碰工作区 |
 | 类型 | `pnpm typecheck` → exit 0（含新纳入的 tests/presets 13 spec） | 改前 / 改后各一次；新增覆盖抓到 24 个类型错误并修 |
 | presets 类型面 | 加 `tests/presets` 后首跑 **24 errors / 8 files**；修 typings 后 exit 0；`pnpm test tests/presets` **13 files / 138 tests passed** | 类型断言不改测试语义；lint 0 |
 | 生成物 | 行号漂移后 `node tools/bug-coverage.mjs --write` → **204 行**；`pnpm test tests/repo/bug-coverage.spec.ts` 绿（逐字比对） | 不重生成时该 spec 必红 |

@@ -8,7 +8,7 @@
 import { describe, expect, it } from 'vitest'
 import { COMPOSITIONS, PRESET_IDS, retrySurface } from '../../tools/lib/delegation-model.mjs'
 import {
-  DELEGATION_CAPABILITIES, delegationCapabilitiesOf,
+  DELEGATION_CAPABILITIES, delegationCapabilitiesOf, type DelegationCapabilities,
 } from '../../packages/company-pack/src/lib/delegation-capabilities.ts'
 
 interface CompositionSpec {
@@ -16,15 +16,8 @@ interface CompositionSpec {
   readonly workflow: boolean
   readonly depthRows: Record<string, number | 'default'>
 }
-interface RuntimeCapability {
-  readonly spawn: boolean
-  readonly fork: boolean
-  readonly workflow: boolean
-  readonly retry: boolean
-  readonly childDepth: number
-}
 const COMPOSITIONS_BY_ID = COMPOSITIONS as unknown as Record<string, CompositionSpec>
-const CAPABILITIES_BY_ID = DELEGATION_CAPABILITIES as unknown as Record<string, RuntimeCapability>
+const CAPABILITIES_BY_ID: Readonly<Record<string, DelegationCapabilities>> = DELEGATION_CAPABILITIES
 
 describe('delegation runtime capabilities parity', () => {
   it('每个 preset 的 spawn/fork/workflow/retry 与模型一致', () => {
