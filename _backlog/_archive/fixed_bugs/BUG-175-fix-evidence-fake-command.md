@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-175：fix-evidence 只认命令前缀，不存在的脚本也能充当红/绿证据
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；fix-evidence 的目标是「只翻卡 + git mv 不算修复」。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9c-gate-edges.mts`。
+> **关联**：[探索卡 Round 90](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；fix-evidence 的目标是「只翻卡 + git mv 不算修复」。
+> **留痕**：Note [2026-11-14-shape-state-machine-and-gate-edges.md](../../../notes/implemented/2026-11-14-shape-state-machine-and-gate-edges.md)（同轮八卡）；复现脚本 = `runtime/tmp/c9c-gate-edges.mts`。
 
 ## 症状
 
@@ -64,7 +64,14 @@ node --import tsx/esm runtime/tmp/c9c-gate-edges.mts
 
 判据由 `tests/checks/fix-evidence.test.mjs` 的假命令用例搭载；红证 = 去掉命令解析 → 假命令 PASS 复现。
 
+## 修复证据
+
+- 改动面：`checks/gates/fix-evidence.mjs`、`tests/checks/fix-evidence.test.mjs`
+- 红：去掉命令解析 → `node tests/checks/fix-evidence.test.mjs` 红（假脚本/假 spec 两条 not ok）
+- 绿：接回 `commandProblem` → `node tests/checks/fix-evidence.test.mjs` 绿（13 passed）
+- 提交：commit d6aa860d
+
 ## 证据
 
 - `runtime/tmp/c9c-gate-edges.mts` / `.log`：假 `pnpm` 脚本 PASS。
-- 代码：[fix-evidence.mjs](../../checks/gates/fix-evidence.mjs) 的 `commands()` / `checkCard()`。
+- 代码：[fix-evidence.mjs](../../../checks/gates/fix-evidence.mjs) 的 `commands()` / `checkCard()`。

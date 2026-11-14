@@ -4,6 +4,18 @@
 
 ## 修复流水（倒序）
 
+- **BUG-168..175**（2026-11-14，根因组 A–C，P2×8）：focus v3 修复后的回归扫（Round 90），
+  全部落在上一轮自己新建的层上——
+  **A** 形状状态机：[168](BUG-168-markdown-inline-code-comment.md) 行内代码里的注释记号、
+  [169](BUG-169-markdown-unclosed-comment.md) 未闭合注释报根因、[172](BUG-172-split-table-row-double-backslash.md) 双反斜杠转义、
+  [173](BUG-173-legacy-json-in-comment.md) 注释里的 legacy JSON；
+  **B** [170](BUG-170-read-company-file-dotdot-subclass.md) `..` 越界段先于存在性判定；
+  **C** 门禁自查：[171](BUG-171-fix-evidence-deletion-surface.md) 删除型修复对账、
+  [174](BUG-174-notes-tree-symlink-invisible.md) notes symlink、
+  [175](BUG-175-fix-evidence-fake-command.md) 假命令解析。
+  证据提交 = `d6aa860d`；`pnpm test` 247 files / 2072 tests、`test:checks` 5 PASS、
+  `typecheck`/`lint`/`dup`/`verify` 全绿。详见 [状态机边界 Note](../../../notes/implemented/2026-11-14-shape-state-machine-and-gate-edges.md)。
+
 - **BUG-160..167**（2026-11-14，根因组 A–D，P1×1 + P2×7）：focus v2 修复后的回归扫（Round 89），
   仍是「同一事实两个解释」——
   **A** 文档文本形状层：[160](BUG-160-req-check-raw-text-bom-fence.md) `/req check` 与 `/prd check` 分叉、

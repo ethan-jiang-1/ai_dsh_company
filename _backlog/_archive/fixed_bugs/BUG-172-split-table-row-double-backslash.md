@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-172：splitTableRow 把 `\\|` 当转义竖线，合法单元格不切分
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-165 修了单反斜杠 `\|`，双反斜杠是另一条 Markdown 转义规则。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8c-more-shape.mts`。
+> **关联**：[探索卡 Round 90](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-165 修了单反斜杠 `\|`，双反斜杠是另一条 Markdown 转义规则。
+> **留痕**：Note [2026-11-14-shape-state-machine-and-gate-edges.md](../../../notes/implemented/2026-11-14-shape-state-machine-and-gate-edges.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8c-more-shape.mts`。
 
 ## 症状
 
@@ -65,7 +65,14 @@ node --import tsx/esm runtime/tmp/c8c-more-shape.mts
 
 判据由 `tests/lib/prd-check.spec.ts` 的双反斜杠用例搭载；红证 = 还原旧分支顺序。
 
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/markdown-shape.ts`、`tests/lib/prd-check.spec.ts`
+- 红：还原旧转义顺序（先竖线后反斜杠）→ `npx vitest run tests/lib/prd-check.spec.ts` 红（双反斜杠少一列）
+- 绿：接回「先双反斜杠（字面反斜杠）再单转义竖线」的顺序 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（33 passed）
+- 提交：commit d6aa860d
+
 ## 证据
 
 - `runtime/tmp/c8c-more-shape.mts` / `.log`：`row double` 少切一列。
-- 代码：[markdown-shape.ts](../../packages/company-pack/src/lib/markdown-shape.ts) 的 `splitTableRow()`。
+- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/markdown-shape.ts) 的 `splitTableRow()`。

@@ -1604,19 +1604,19 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| 行内代码里的 `<!--` 不算注释开始 | **confirmed（缺口）** | [BUG-168](../bugs/BUG-168-markdown-inline-code-comment.md)；userStory 后的字段全被吞 |
-| 未闭合 HTML 注释会 fail loud | **confirmed（缺口）** | [BUG-169](../bugs/BUG-169-markdown-unclosed-comment.md)；整份 PRD 被读成「没有需求」 |
-| `\\|`（字面反斜杠 + 分隔符）能被正确切列 | **confirmed（缺口）** | [BUG-172](../bugs/BUG-172-split-table-row-double-backslash.md)；单元格少切一列 |
-| legacy JSON 在 HTML 注释里不算定义 | **confirmed（缺口）** | [BUG-173](../bugs/BUG-173-legacy-json-in-comment.md)；注释账本仍 `ok/reqCount 1` |
-| `readCompanyFileAt` 的越界 `../` 子类稳定 | **confirmed（缺口）** | [BUG-170](../bugs/BUG-170-read-company-file-dotdot-subclass.md)；`../` unsafe vs `../../` missing |
+| 行内代码里的 `<!--` 不算注释开始 | **confirmed（缺口）** | [BUG-168](../_archive/fixed_bugs/BUG-168-markdown-inline-code-comment.md)；userStory 后的字段全被吞 |
+| 未闭合 HTML 注释会 fail loud | **confirmed（缺口）** | [BUG-169](../_archive/fixed_bugs/BUG-169-markdown-unclosed-comment.md)；整份 PRD 被读成「没有需求」 |
+| `\\|`（字面反斜杠 + 分隔符）能被正确切列 | **confirmed（缺口）** | [BUG-172](../_archive/fixed_bugs/BUG-172-split-table-row-double-backslash.md)；单元格少切一列 |
+| legacy JSON 在 HTML 注释里不算定义 | **confirmed（缺口）** | [BUG-173](../_archive/fixed_bugs/BUG-173-legacy-json-in-comment.md)；注释账本仍 `ok/reqCount 1` |
+| `readCompanyFileAt` 的越界 `../` 子类稳定 | **confirmed（缺口）** | [BUG-170](../_archive/fixed_bugs/BUG-170-read-company-file-dotdot-subclass.md)；`../` unsafe vs `../../` missing |
 
 **C9 新门禁假设与判决：**
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| fix-evidence 支持删除型修复 | **confirmed（缺口）** | [BUG-171](../bugs/BUG-171-fix-evidence-deletion-surface.md)；删除文件的改动面被判「不在盘上」 |
-| notes-tree 对 symlink 条目不静默 | **confirmed（缺口）** | [BUG-174](../bugs/BUG-174-notes-tree-symlink-invisible.md)；链接 Note `files:0/checked:0` |
-| fix-evidence 校验命令真实存在 | **confirmed（缺口）** | [BUG-175](../bugs/BUG-175-fix-evidence-fake-command.md)；`pnpm` 假脚本 PASS |
+| fix-evidence 支持删除型修复 | **confirmed（缺口）** | [BUG-171](../_archive/fixed_bugs/BUG-171-fix-evidence-deletion-surface.md)；删除文件的改动面被判「不在盘上」 |
+| notes-tree 对 symlink 条目不静默 | **confirmed（缺口）** | [BUG-174](../_archive/fixed_bugs/BUG-174-notes-tree-symlink-invisible.md)；链接 Note `files:0/checked:0` |
+| fix-evidence 校验命令真实存在 | **confirmed（缺口）** | [BUG-175](../_archive/fixed_bugs/BUG-175-fix-evidence-fake-command.md)；`pnpm` 假脚本 PASS |
 | fix-evidence 支持 merge 提交 | **pass** | 临时仓库 merge 的 `git show --name-only` 有输出，gate 通过（与 pre-push 的 `diff-tree` 不同） |
 | 共享形状层已覆盖 headings/table-rows/JSON | **unverified / 部分** | `scanDocument` 覆盖标题/表格；JSON 提取仍独立（BUG-173） |
 

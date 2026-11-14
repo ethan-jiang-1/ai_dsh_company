@@ -6,6 +6,9 @@
 // 负例留证 2026-11-14：去掉 slice 的 reqOwner 映射 → 跨 slice 用例红（BUG-164）
 // 负例留证 2026-11-14：还原 splitTableRow 为 split('|') → 转义竖线用例红（BUG-165）
 // 负例留证 2026-11-14：去掉 changeLog 的日期/作者校验 → 假日期用例红（BUG-166）
+// 负例留证 2026-11-14：去掉 code span 状态 → 行内注释用例红（BUG-168）
+// 负例留证 2026-11-14：还原转义顺序 → 双反斜杠用例红（BUG-172）
+// 负例留证 2026-11-14：去掉注释掩码 → 注释 JSON 用例红（BUG-173）
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'

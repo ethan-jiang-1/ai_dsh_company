@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-174：notes-tree 对 symlink 条目视而不见，链接 Note 绕过整道门
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；notes-tree 是 2026-11-14 新增的树形/状态门。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c9c-gate-edges.mts`。
+> **关联**：[探索卡 Round 90](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；notes-tree 是 2026-11-14 新增的树形/状态门。
+> **留痕**：Note [2026-11-14-shape-state-machine-and-gate-edges.md](../../../notes/implemented/2026-11-14-shape-state-machine-and-gate-edges.md)（同轮八卡）；复现脚本 = `runtime/tmp/c9c-gate-edges.mts`。
 
 ## 症状
 
@@ -52,7 +52,14 @@ node --import tsx/esm runtime/tmp/c9c-gate-edges.mts
 
 判据由 `tests/checks/notes-tree.test.mjs` 的 symlink 形状搭载；红证 = 移除 symlink 判定。
 
+## 修复证据
+
+- 改动面：`checks/gates/notes-tree.mjs`、`tests/checks/notes-tree.test.mjs`
+- 红：去掉 symlink 分支 → `node tests/checks/notes-tree.test.mjs` 红（文件/目录两条 FAIL）
+- 绿：接回 symlink 直接红 → `node tests/checks/notes-tree.test.mjs` 绿（ALL PASS）
+- 提交：commit d6aa860d
+
 ## 证据
 
 - `runtime/tmp/c9c-gate-edges.mts` / `.log`：symlink 目录条目被跳过，`files: 0`、`checked: 0`。
-- 代码：[notes-tree.mjs](../../checks/gates/notes-tree.mjs) 的 `notesTreeProblems()` / `notesStatusProblems()`。
+- 代码：[notes-tree.mjs](../../../checks/gates/notes-tree.mjs) 的 `notesTreeProblems()` / `notesStatusProblems()`。

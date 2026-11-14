@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-169：未闭合 HTML 注释静默吞掉后文，/prd check 报「没有需求」
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；与 BUG-162 的注释容器同层。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8c-markdown-shape.mts`。
+> **关联**：[探索卡 Round 90](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；与 BUG-162 的注释容器同层。
+> **留痕**：Note [2026-11-14-shape-state-machine-and-gate-edges.md](../../../notes/implemented/2026-11-14-shape-state-machine-and-gate-edges.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8c-markdown-shape.mts`。
 
 ## 症状
 
@@ -63,7 +63,14 @@ node --import tsx/esm runtime/tmp/c8c-markdown-shape.mts
 
 判据由 `tests/lib/prd-check.spec.ts` 与 `tests/lib/requirements-check.spec.ts` 的未闭合注释用例搭载；红证 = 去掉 EOF 检测 → 「没有需求」级联复现。
 
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/prd-check.ts`、`packages/company-pack/src/lib/requirements-check.ts`、`tests/lib/prd-check.spec.ts`
+- 红：去掉 EOF 未闭合检测 → `npx vitest run tests/lib/prd-check.spec.ts` 红（两条「注释未闭合」用例）
+- 绿：接回 `scanDocumentDetailed` 的未闭合行号 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（33 passed）
+- 提交：commit d6aa860d
+
 ## 证据
 
 - `runtime/tmp/c8c-markdown-shape.mts` / `.log`：`unclosed comment false [...]`。
-- 代码：[markdown-shape.ts](../../packages/company-pack/src/lib/markdown-shape.ts) 的 `scanDocument()`。
+- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/markdown-shape.ts) 的 `scanDocument()`。

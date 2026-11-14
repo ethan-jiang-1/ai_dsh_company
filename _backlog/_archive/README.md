@@ -19,6 +19,14 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-168（已修）](fixed_bugs/BUG-168-markdown-inline-code-comment.md) | 已修：行内代码里的注释记号起注释；`scanDocument` 增代码 span 状态 | 2026-11-14 |
+| [BUG-169（已修）](fixed_bugs/BUG-169-markdown-unclosed-comment.md) | 已修：未闭合注释静默吞后文；`scanDocumentDetailed` 报起始行号，两命令各报根因 | 2026-11-14 |
+| [BUG-170（已修）](fixed_bugs/BUG-170-read-company-file-dotdot-subclass.md) | 已修：`a/../..` 越界折成 missing；`walkCompanyDirs` 走目录前全量拒绝 `..` 段 | 2026-11-14 |
+| [BUG-171（已修）](fixed_bugs/BUG-171-fix-evidence-deletion-surface.md) | 已修：删除型修复被存在性硬判拦住；改由证据提交 changed 对账 | 2026-11-14 |
+| [BUG-172（已修）](fixed_bugs/BUG-172-split-table-row-double-backslash.md) | 已修：双反斜杠吞竖线；`splitTableRow` 先双反斜杠再单转义竖线 | 2026-11-14 |
+| [BUG-173（已修）](fixed_bugs/BUG-173-legacy-json-in-comment.md) | 已修：注释里的 legacy JSON 仍生效；`extractJsonBlock` 吃注释掩码 | 2026-11-14 |
+| [BUG-174（已修）](fixed_bugs/BUG-174-notes-tree-symlink-invisible.md) | 已修：notes-tree 对 symlink 视而不见；depth 1–3 的 symlink 直接红 | 2026-11-14 |
+| [BUG-175（已修）](fixed_bugs/BUG-175-fix-evidence-fake-command.md) | 已修：假 pnpm 脚本充当证据；命令按 scripts/本地 bin/路径解析 | 2026-11-14 |
 | [BUG-160（已修）](fixed_bugs/BUG-160-req-check-raw-text-bom-fence.md) | 已修：`/req check` 仍读原始文本（BOM 缺头、围栏幽灵 REQ）；与 `/prd check` 共用 `lib/markdown-shape.ts` | 2026-11-14 |
 | [BUG-161（已修）](fixed_bugs/BUG-161-pre-push-merge-commit-surface-skip.md) | 已修：merge 提交 `diff-tree` 无输出、合并结果的 surface 改动漏检；`commitPaths()` 改取第一父 diff | 2026-11-14 |
 | [BUG-162（已修）](fixed_bugs/BUG-162-prd-html-comments-parsed-as-definitions.md) | 已修：HTML 注释里的 REQ/Slices 当定义；`scanDocument` 增加注释状态并把片段移出行文本 | 2026-11-14 |

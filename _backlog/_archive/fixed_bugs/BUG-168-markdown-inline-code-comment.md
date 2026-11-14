@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-168：共享扫描器把行内代码里的 `<!--` 当注释开始，后续需求整段被吞
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；`markdown-shape.ts` 是 BUG-160/162 修复后的共享结构行判据。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8c-markdown-shape.mts`。
+> **关联**：[探索卡 Round 90](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；`markdown-shape.ts` 是 BUG-160/162 修复后的共享结构行判据。
+> **留痕**：Note [2026-11-14-shape-state-machine-and-gate-edges.md](../../../notes/implemented/2026-11-14-shape-state-machine-and-gate-edges.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8c-markdown-shape.mts`。
 
 ## 症状
 
@@ -61,7 +61,14 @@ node --import tsx/esm runtime/tmp/c8c-markdown-shape.mts
 
 判据由 `tests/lib/prd-check.spec.ts` 的行内代码注释用例搭载；红证 = 去掉 `codeSpanAt` 分支 → 字段缺失复现。
 
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/markdown-shape.ts`、`tests/lib/prd-check.spec.ts`
+- 红：去掉 `codeSpanEnd` 分支 → `npx vitest run tests/lib/prd-check.spec.ts` 红（行内注释开头吞后文，6 条字段缺失）
+- 绿：接回 code span 状态 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（33 passed）
+- 提交：commit d6aa860d
+
 ## 证据
 
 - `runtime/tmp/c8c-markdown-shape.mts` / `.log`：行内 `<!--` → 6 条字段错误；成对 → `true []`。
-- 代码：[markdown-shape.ts](../../packages/company-pack/src/lib/markdown-shape.ts) 的 `scanDocument()`。
+- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/markdown-shape.ts) 的 `scanDocument()`。

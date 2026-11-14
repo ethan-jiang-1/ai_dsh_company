@@ -12,6 +12,7 @@
  */
 // 负例留证 2026-11-14：parseHeader 改回原始文本 → BOM 缺头用例红（BUG-160）
 // 负例留证 2026-11-14：headingDefinitions 改回 split('\n') → 围栏/注释幽灵 REQ 用例红（BUG-162）
+// 负例留证 2026-11-14：去掉未闭合注释检测 → 注释未闭合用例红（BUG-169）
 import { describe, expect, it } from 'vitest'
 import {
   checkRequirements,

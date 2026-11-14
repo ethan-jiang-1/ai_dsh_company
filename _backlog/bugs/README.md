@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 8 张（2026-11-14 focus v4 回归；只报不修）**：见下方「## 2026-11-14 focus v4 探索（post-fix 2）」。
+**活跃 0 张**：2026-11-14 focus v4 的 8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–C：BUG-168..175）」）。
 
 **上一轮收口**（2026-11-14 focus v3）：8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）」）。
 
@@ -20,9 +20,9 @@
 
 | 组 | 卡 | 一句话 | 级别 |
 |---|---|---|---|
-| A 共享形状层边界 | [168](BUG-168-markdown-inline-code-comment.md) / [169](BUG-169-markdown-unclosed-comment.md) / [172](BUG-172-split-table-row-double-backslash.md) / [173](BUG-173-legacy-json-in-comment.md) | 行内代码 `<!--` 起注释；未闭合注释吞后文；`\\|` 不切列；注释里的 legacy JSON 仍解析 | P2 ×4 |
-| B 三态读契约 | [170](BUG-170-read-company-file-dotdot-subclass.md) | `../` 越界路径 missing 与 unsafe 子类不稳定 | P2 |
-| C 新门禁覆盖 | [171](BUG-171-fix-evidence-deletion-surface.md) / [174](BUG-174-notes-tree-symlink-invisible.md) / [175](BUG-175-fix-evidence-fake-command.md) | fix-evidence 拒删除型修复；notes-tree 忽略 symlink；假命令也能过 fix-evidence | P2 ×3 |
+| A 共享形状层边界 | [168](../_archive/fixed_bugs/BUG-168-markdown-inline-code-comment.md) / [169](../_archive/fixed_bugs/BUG-169-markdown-unclosed-comment.md) / [172](../_archive/fixed_bugs/BUG-172-split-table-row-double-backslash.md) / [173](../_archive/fixed_bugs/BUG-173-legacy-json-in-comment.md) | 行内代码 `<!--` 起注释；未闭合注释吞后文；`\\|` 不切列；注释里的 legacy JSON 仍解析 | P2 ×4 |
+| B 三态读契约 | [170](../_archive/fixed_bugs/BUG-170-read-company-file-dotdot-subclass.md) | `../` 越界路径 missing 与 unsafe 子类不稳定 | P2 |
+| C 新门禁覆盖 | [171](../_archive/fixed_bugs/BUG-171-fix-evidence-deletion-surface.md) / [174](../_archive/fixed_bugs/BUG-174-notes-tree-symlink-invisible.md) / [175](../_archive/fixed_bugs/BUG-175-fix-evidence-fake-command.md) | fix-evidence 拒删除型修复；notes-tree 忽略 symlink；假命令也能过 fix-evidence | P2 ×3 |
 
 ## 2026-11-14 修复交接（根因组 A–C：BUG-168..175）
 
@@ -34,12 +34,16 @@
 
 | 组 | 卡 | 同一根因 | 修法（唯一事实源） |
 |---|---|---|---|
-| **A 形状状态机** | [168](BUG-168-markdown-inline-code-comment.md) / [169](BUG-169-markdown-unclosed-comment.md) / [172](BUG-172-split-table-row-double-backslash.md) / [173](BUG-173-legacy-json-in-comment.md) | 共享层只处理了「块级容器」，没处理行内代码/未闭合/双转义；JSON 提取器另走原始文本 | `scanDocument` 增行内代码 span 与未闭合检测（`scanDocumentDetailed`）；`splitTableRow` 先 `\\` 后 `\|`；`extractJsonBlock` 吃注释掩码 |
-| **B 三态子类** | [170](BUG-170-read-company-file-dotdot-subclass.md) | `walkCompanyDirs` 对不存在的中间段早退，`..` 段没被判定，越界折成 missing | 逐段拒绝 `..`（越界一律 unsafe，missing 只表示「根内真没有」） |
-| **C 新门禁** | [171](BUG-171-fix-evidence-deletion-surface.md) / [174](BUG-174-notes-tree-symlink-invisible.md) / [175](BUG-175-fix-evidence-fake-command.md) | 门禁只按「文件存在/命令前缀」判，没覆盖删除、symlink、假命令 | 删除改由「提交 changed 列表」对账；notes-tree 遇 symlink 直接红；命令按 `package.json` scripts / 本地 bin / 路径真实性解析 |
+| **A 形状状态机** | [168](../_archive/fixed_bugs/BUG-168-markdown-inline-code-comment.md) / [169](../_archive/fixed_bugs/BUG-169-markdown-unclosed-comment.md) / [172](../_archive/fixed_bugs/BUG-172-split-table-row-double-backslash.md) / [173](../_archive/fixed_bugs/BUG-173-legacy-json-in-comment.md) | 共享层只处理了「块级容器」，没处理行内代码/未闭合/双转义；JSON 提取器另走原始文本 | `scanDocument` 增行内代码 span 与未闭合检测（`scanDocumentDetailed`）；`splitTableRow` 先 `\\` 后 `\|`；`extractJsonBlock` 吃注释掩码 |
+| **B 三态子类** | [170](../_archive/fixed_bugs/BUG-170-read-company-file-dotdot-subclass.md) | `walkCompanyDirs` 对不存在的中间段早退，`..` 段没被判定，越界折成 missing | 逐段拒绝 `..`（越界一律 unsafe，missing 只表示「根内真没有」） |
+| **C 新门禁** | [171](../_archive/fixed_bugs/BUG-171-fix-evidence-deletion-surface.md) / [174](../_archive/fixed_bugs/BUG-174-notes-tree-symlink-invisible.md) / [175](../_archive/fixed_bugs/BUG-175-fix-evidence-fake-command.md) | 门禁只按「文件存在/命令前缀」判，没覆盖删除、symlink、假命令 | 删除改由「提交 changed 列表」对账；notes-tree 遇 symlink 直接红；命令按 `package.json` scripts / 本地 bin / 路径真实性解析 |
 
 **次序 = A → B → C**：A 先把共享层边界补齐（c 依赖同一形状语义）；B 独立；C 收尾门禁自身。
 **证据口径**：按新流程「先落代码提交拿 sha → 再归档补 `## 修复证据`」；每卡红/绿写同一条可执行命令。
+
+**收口（2026-11-14）**：8 张卡全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent` + `## 修复证据`（改动面/红/绿/提交）齐，
+证据提交 = `d6aa860d`。`pnpm test` 247 files / 2072 tests、`test:checks` 5 PASS、`typecheck`/`lint`/`dup`/`verify` 全绿。
+证据与未覆盖轴 = [Note](../../notes/implemented/2026-11-14-shape-state-machine-and-gate-edges.md)。
 
 ## 2026-11-14 focus v3 探索（post-fix 回归）
 

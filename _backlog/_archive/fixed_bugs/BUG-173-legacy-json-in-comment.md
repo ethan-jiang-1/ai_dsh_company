@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-14
 ---
 
 # BUG-173：legacy json-ledger 的 JSON 块在 HTML 注释里仍被解析
 
-> 严重级别：P2（次要）｜发现：2026-11-14｜状态：修复就绪｜审查：未修（用户指示：抓到 bug 不改，直接报）
+> 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-162 修了 headings 的注释容器，JSON-ledger 提取器没有共用同一形状层。
-> **留痕**：本卡只报不修；复现脚本 = `runtime/tmp/c8c-more-shape.mts`。
+> **关联**：[探索卡 Round 90](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-162 修了 headings 的注释容器，JSON-ledger 提取器没有共用同一形状层。
+> **留痕**：Note [2026-11-14-shape-state-machine-and-gate-edges.md](../../../notes/implemented/2026-11-14-shape-state-machine-and-gate-edges.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8c-more-shape.mts`。
 
 ## 症状
 
@@ -57,7 +57,14 @@ HTML 注释里的 json 围栏块不被提取：legacy PRD 的注释账本不再�
 
 判据由 `tests/lib/prd-check.spec.ts` 的注释 JSON 用例搭载；红证 = 去掉注释掩码。
 
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/prd-check.ts`、`packages/company-pack/src/lib/markdown-shape.ts`、`tests/lib/prd-check.spec.ts`
+- 红：去掉 `maskHtmlComments` → `npx vitest run tests/lib/prd-check.spec.ts` 红（注释 JSON 生效）
+- 绿：接回注释掩码 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（33 passed）
+- 提交：commit d6aa860d
+
 ## 证据
 
 - `runtime/tmp/c8c-more-shape.mts` / `.log`：注释 JSON → `true [] 1`。
-- 代码：[prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts) 的 `extractJsonBlock()`；[requirements-check.ts](../../packages/company-pack/src/lib/requirements-check.ts) 的 `jsonLedgerDefinitions()`。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts) 的 `extractJsonBlock()`；[requirements-check.ts](../../../packages/company-pack/src/lib/requirements-check.ts) 的 `jsonLedgerDefinitions()`。
