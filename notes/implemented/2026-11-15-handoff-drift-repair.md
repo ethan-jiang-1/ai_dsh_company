@@ -45,7 +45,7 @@
 | 结构 | 暖树 `pnpm verify` → **ALL PASS**（75 门；2 门无对象）；**clean clone 首跑 5 FAIL（tests/harness 死指针）→ 修后 ALL PASS** | 两次跑（暖树 / clean clone） |
 | 回归 | 暖树 `pnpm test` → **244 files / 2094 tests passed**；clean clone → **244 files / 2091 passed + 3 skipped**（dev-only 台账） | 新增 1 条断言；skip 预算内 |
 | 防漂移 spec | 花括号红证：AGENTS 临时插入 tests/{host,missing} → **1 failed / 7 passed**；还原 → **8 passed**；旧分区名红证 → 8 passed | 真文件，还原后 `git diff` 空 |
-| 独立盲审 | 只读子代理审两提交：**2 blocker**（spec 花括号失明 / typecheck 覆盖面多处文档过宽）全部回修；建议 5 条收 4 条 | 输入 = 提交 diff + 盘面；不含外部 WIP |
+| 独立盲审 | 只读子代理审两提交：**2 blocker**（spec 花括号失明 / typecheck 覆盖面多处文档过宽）全部回修；建议 9 条收 8 条（未收 = _backlog 历史结案叙述不改） | 输入 = 提交 diff + 盘面；不含外部 WIP |
 | 干净 clone | `git clone --no-hardlinks` + submodule + `pnpm install` + vendor install + `bundle:init` + `pnpm run setup` → 构建成功；verify 红→绿；test 绿 | `/tmp` 独立树，不碰工作区 |
 | 类型 | `pnpm typecheck` → exit 0 | 改前 / 改后各一次 |
 | 源码面 | `pnpm lint` 0 warnings / 0 errors；`pnpm dup` 0 clones | 注释与 tsconfig 改动 |
