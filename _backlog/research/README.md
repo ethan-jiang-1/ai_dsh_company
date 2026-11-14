@@ -58,6 +58,7 @@ opened: YYYY-MM-DD
 
 ## 索引
 
+- [test-asset-spiral](test-asset-spiral/README.md) — 测试资产螺旋：从例子到生成器/模型/元测试；消费者 = 用户 2026-11-14 点名研究。
 - （活跃题名 = —；2026-11-14 dsh-notes-flow-borrow 随其卡结项迁入[研究归档](../_archive/research/README.md)。）
 
 （2026-11-13 五题全部定性且产出卡已结，随末张活卡迁入[研究归档](../_archive/research/README.md)。）
