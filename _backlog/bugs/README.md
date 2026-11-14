@@ -2,13 +2,26 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮拿到 ≥3 张卡，先按根因分组列表再逐卡修——逐症状打补丁会把同一根因修三遍。
 
-**下一个缺陷号**：Next BUG ID = 160；已分配 BUG-001..159。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 168；已分配 BUG-001..167。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。
 
 ## 活跃清单
 
-**活跃 0 张**：2026-11-13 focus v2 的 8 张已于 2026-11-14 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接」）。
+**活跃 8 张（2026-11-14 focus v3 回归；只报不修）**：见下方「## 2026-11-14 focus v3 探索（post-fix 回归）」。
+
+**上一轮收口**（2026-11-13 focus v2）：8 张已于 2026-11-14 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接」）。
+
+## 2026-11-14 focus v3 探索（post-fix 回归）
+
+**用户指令（2026-11-14）**：「继续再来……探索抓更多的bug」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+
+| 组 | 卡 | 一句话 | 级别 |
+|---|---|---|---|
+| A 文本形状层未共享 | [160](BUG-160-req-check-raw-text-bom-fence.md) | `/req check` 仍读原始文本：BOM 缺头、围栏示例成幽灵需求 | P2 |
+| B pre-push merge | [161](BUG-161-pre-push-merge-commit-surface-skip.md) | 逐提交 `diff-tree` 漏 merge 提交的合并结果 | P1 |
+| C PRD 结构容器/身份/格式 | [162](BUG-162-prd-html-comments-parsed-as-definitions.md) / [164](BUG-164-req-in-multiple-slices.md) / [165](BUG-165-slices-escaped-pipe.md) / [166](BUG-166-prd-changelog-format.md) | HTML 注释当定义；REQ 跨 slice 重复；转义竖线拆列；changeLog 日期/作者不校验 | P2 ×4 |
+| D notes-tree lifecycle/日期 | [163](BUG-163-notes-tree-rejected-status-unguarded.md) / [167](BUG-167-notes-tree-invalid-calendar-date.md) | `rejected/` 状态行被跳过；日期只验形状不验日历 | P2 ×2 |
 
 **上一轮收口**（2026-11-13 第四轮）：BUG-147..149 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；
 BUG-150 复核不成立，迁 [settled_issues](../_archive/settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md)；
