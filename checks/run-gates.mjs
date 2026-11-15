@@ -56,7 +56,6 @@ import * as distManual from './gates/dist-manual.mjs'
 import * as scriptPort from './gates/script-port.mjs'
 import * as presets from './gates/presets.mjs'
 import * as presetRequiredConfig from './gates/preset-required-config.mjs'
-import * as claudeSymlink from './gates/claude-symlink.mjs'
 import * as vendorPin from './gates/vendor-pin.mjs'
 import * as packageManagerParity from './gates/package-manager-parity.mjs'
 import * as packShape from './gates/pack-shape.mjs'
@@ -148,7 +147,6 @@ distManual.run(ctx)
 scriptPort.run(ctx)
 presets.run(ctx)
 presetRequiredConfig.run(ctx)
-claudeSymlink.run(ctx)
 vendorPin.run(ctx)
 packageManagerParity.run(ctx)
 packShape.run(ctx)

@@ -10,7 +10,6 @@
 ## 布局
 
 ```
-CLAUDE.md -> AGENTS.md    symlink（编辑真文件 AGENTS.md，verify 校验）
 .agents/skills/          完成定义 skill 与 web-window-ops 的宿主（清单 = 目录本身，DSH 会话 catalog 自动发现；catalog 只收模型可加载项，`disable-model-invocation` 的用户命令〔/retro 等〕需用户点名）；DSH 会话技能从这里装载（D39）
 packages/company-pack/   唯一自写包：presets/<role>/（persona+skills）、cordis.patch.yml、src/（host）+ src/client/、content/（只读手册/模板/默认章程/状态默认值）；无 bin/启动器
 company-workspace/      **dev 公司状态的 workspace**（会话 cwd；整树 gitignored，不进 git）：只有 `.dsh-company/`（kb/、deliverables/、cultivation/、logs/、exports/、bundle.json v3，legacy 文件名）；`pnpm bundle:init` 建；插件内容不复制

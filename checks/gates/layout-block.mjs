@@ -21,10 +21,10 @@ export function run({ root, ok, fail }) {
   let inFence = false
   let layoutChecked = 0
   let layoutBad = false
-  const KNOWN_TOP = /^(CLAUDE\.md|\.agents\/|packages\/|company-workspace\/|vendor\/|docs\/|notes\/|_backlog\/|checks\/|tests\/|probes\/|tools\/|_dist\/|run\/|runtime\/|snapshots\/)/
+  const KNOWN_TOP = /^(\.agents\/|packages\/|company-workspace\/|vendor\/|docs\/|notes\/|_backlog\/|checks\/|tests\/|probes\/|tools\/|_dist\/|run\/|runtime\/|snapshots\/)/
   for (let i = 0; i < layoutLines.length; i++) {
     const line = layoutLines[i]
-    if (/^```/.test(line)) { inFence = !inFence; continue }
+    if (line.startsWith('```')) { inFence = !inFence; continue }
     if (!inFence) continue
     const m = line.match(/^(\S+)/)
     if (!m) continue
