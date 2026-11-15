@@ -18,9 +18,9 @@ import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { sourceFingerprint } from './lib/pack-source.mjs'
-import { expectedTag } from '../checks/gates/lib/pin.mjs'
+import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { sourceFingerprint } from '../lib/pack-source.mjs'
+import { expectedTag } from '../../checks/gates/lib/pin.mjs'
 
 const PACK = join(ROOT, 'packages/company-pack')
 const DIST = join(ROOT, '_dist')
@@ -208,14 +208,14 @@ function bump(kind) {
   }
   // 版本唯一家 = package.json + CHANGELOG；release.md 不再复制版本号。
   // 仓库根 market-index.json 是发布/托管物，版本必须与 package 同一步更新。
-  run(process.execPath, ['tools/market-index.mjs', '--prepare'])
+  run(process.execPath, ['tools/release/market-index.mjs', '--prepare'])
   console.log(`release: ${manifest.version} 就位；填 CHANGELOG.md 的 ${next} 条目后跑 --prepare`)
 }
 
 function build() {
   run(process.execPath, ['./node_modules/typescript/bin/tsc', '-b', 'packages/company-pack'])
   run(join(ROOT, 'node_modules/.bin/tsdown'), [], { cwd: PACK })
-  run(process.execPath, ['tools/export-dist.mjs'])
+  run(process.execPath, ['tools/release/export-dist.mjs'])
 }
 
 function writeManifest(checks) {
@@ -245,7 +245,7 @@ function prepare() {
     fail(`已存在 ${version} 的 tgz；发布物已落盘。改内容先 bump；确要重打加 --force`)
   }
   build()
-  run(process.execPath, ['tools/market-index.mjs', '--prepare'])
+  run(process.execPath, ['tools/release/market-index.mjs', '--prepare'])
   artifactCheck()
   writeManifest({ verify: 'not-run', test: 'not-run' })
   console.log('release: prepare 完成；下一步 --verify')

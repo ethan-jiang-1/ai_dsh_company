@@ -14,7 +14,7 @@
 
 | 机制点 | dev（默认） | 用户侧 | 证据 |
 |---|---|---|---|
-| 安装源 | `npm pack` 的 tarball，`plugin add file:<tgz>` | tarball / registry `name@version` | `tools/company.mjs`、`tools/lib/dev-install.mjs` |
+| 安装源 | `npm pack` 的 tarball，`plugin add file:<tgz>` | tarball / registry `name@version` | `tools/dev/company.mjs`、`tools/lib/dev-install.mjs` |
 | 安装写入者 | `dsh plugin add` 写 profile 依赖与 `dsh.profile.bundles` | 同左（应用内 Plugins 页同款操作） | 不手写 roster；`docs/contracts/profile.md` |
 | profile 名 | `company` | `company` | `docs/contracts/profile.md`、smokes |
 | 版本门 | 包 `engines.dsh` 在安装/启动时校验 | 同左 | `release-smoke`、`pack-engines` |

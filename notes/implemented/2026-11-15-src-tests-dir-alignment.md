@@ -46,7 +46,7 @@
 | 全量 keyless | `pnpm test` | 249 files / 2120 tests passed |
 | 类型面 | `pnpm typecheck` | 四面 tsc 全绿（127 处 import 全解析） |
 | 结构门禁 | `pnpm verify` | ALL PASS（2 门无对象） |
-| 生成物 | `node tools/test-census.mjs --write` + `node tools/bug-coverage.mjs --write` | census 249 spec |
+| 生成物 | `node tools/repo/test-census.mjs --write` + `node tools/repo/bug-coverage.mjs --write` | census 249 spec |
 | lint | `pnpm lint` | 干净（盲审后补跑抓到 `mirror.spec.ts` 一个未用 helper，已删） |
 | 门禁自测 | `pnpm test:checks` | 10 PASS / 0 FAIL |
 | 快车道 | `pnpm smoke:fast` | 4/4 ALL PASS（5.86s） |

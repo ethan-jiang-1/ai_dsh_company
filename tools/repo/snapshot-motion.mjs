@@ -6,15 +6,15 @@
 // 形状沿用 R1（`snapshots/replay/r1-motion/`）与 vendor `snapshots/AGENTS.md`：一场景一目录 + snapshot.yml；
 // replay harness 已交付（checks/lanes/replay.e2e.mjs）；本目录用途 = **基线对照**（行为变了就 diff）。
 //
-// 用法：source run/env.sh && node tools/snapshot-motion.mjs \
+// 用法：source run/env.sh && node tools/repo/snapshot-motion.mjs \
 //         --session session-<lead-id> --out snapshots/replay/<场景名> --motion "动议原文" [--cwd company-workspace]
-import { repositoryRoot as ROOT, snapshotOutputPath } from './lib/repository-layout.mjs'
-import { pickSessionLog } from './lib/session-log-generation.mjs'
-import { zstdText } from './drivers/zstd.mjs'
+import { repositoryRoot as ROOT, snapshotOutputPath } from '../lib/repository-layout.mjs'
+import { pickSessionLog } from '../lib/session-log-generation.mjs'
+import { zstdText } from '../drivers/zstd.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { requireDevHome } from './lib/runtime-home.mjs'
-import { captureWorkspace } from './lib/workspace-oracle.mjs'
+import { requireDevHome } from '../lib/runtime-home.mjs'
+import { captureWorkspace } from '../lib/workspace-oracle.mjs'
 import { join, resolve } from 'node:path'
 
 const { dump } = createRequire(join(ROOT, 'vendor/dsh/package.json'))('js-yaml')

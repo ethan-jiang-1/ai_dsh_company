@@ -8,9 +8,9 @@
 ## 决定
 
 1. **`npm pack` 缺 `lib/` 必须 fail-loud。** pack 新增 `scripts/prepack-check.mjs`（prepack），检查
-   `lib/index.js`/`lib/client.js`；缺则退出 1 并提示 `pnpm setup`。发布路径（`tools/export-dist.mjs`）
+   `lib/index.js`/`lib/client.js`；缺则退出 1 并提示 `pnpm setup`。发布路径（`tools/release/export-dist.mjs`）
    本来先 build，本守护只堵手工打包：`lib/` 是 gitignored，clean clone 直接 pack 会静默打出空壳。
-2. **pre-push 接线前移到 `pnpm install` 的 prepare。** 唯一实现 = `tools/hooks-install.mjs`；
+2. **pre-push 接线前移到 `pnpm install` 的 prepare。** 唯一实现 = `tools/dev/hooks-install.mjs`；
    根 `package.json` 的 `prepare` 与 `run/env.sh` 都调用它，不再各写一份 `git config core.hooksPath`。
    原因：core.hooksPath 不随 clone 走，只在 `source run/env.sh` 里接线会让忘 source 的 agent 静默跳过 verify/test。
 3. **卸载残留清单两处对账，不删 README 的可执行清单。** pack README 补齐 lease/日志/检索索引 3 条，
@@ -28,11 +28,11 @@
    `_dist`（tarball + 手册 + manifest）；市场索引与 staged 同步 0.11.4。
 8. **clean clone 的 setup 补齐 Typert pass。** clean clone 实测 `pnpm run setup` 在
    `vendor client types` 失败：`/typert` 与 `/remote` 声明不是 tsc 产物，warm checkout 的 `lib/`
-   掩盖了缺口。`tools/setup.mjs` 的 `types()` 在 host types 后加
+   掩盖了缺口。`tools/dev/setup.mjs` 的 `types()` 在 host types 后加
    vendor `scripts/generate-typert.ts`（bundle-free，30 artifacts / 3.7s），再跑 client types；
    顺序对齐 vendor `scripts/build.ts` 的 `host-src → host-typert → client-src`。
 9. **带参数的 setup 一律走 node 入口。** `pnpm setup` 是 pnpm 内置命令，`pnpm setup --check` 实测
-   `[ERROR] Unknown option: 'check'`；CI/文档/帮助文本统一 `node tools/setup.mjs --check|--types`，
+   `[ERROR] Unknown option: 'check'`；CI/文档/帮助文本统一 `node tools/dev/setup.mjs --check|--types`，
    并加 `tests/repo/release/setup-invocation.spec.ts` 防回退。
 10. **冻结层链接到 runtime/company-workspace/snapshots 不计死链。** clean clone 没有这些 gitignored
    证据树，`notes-archived-links`/`link-debt` 原按 warm 盘判定，clone 上必红（实测 2 处 + archived 23 > 20）。
@@ -57,7 +57,7 @@
 
 ## 证据
 
-- `node tools/release.mjs --prepare --allow-dirty` → `export-dist: ALL PASS`；tarball `0.11.4` 259 entries；
+- `node tools/release/release.mjs --prepare --allow-dirty` → `export-dist: ALL PASS`；tarball `0.11.4` 259 entries；
   sha `cd4beea4e440697cc7cc20de62870a89f1dd5d582fe74f33705f0aad52b43248`；手册 0.11.4。
 - `pnpm verify` → `verify: ALL PASS；2 门无对象`（replay-fixture / replay-ui 显式 SKIP）。
 - `pnpm test` → `Test Files 192 passed (192)` / `Tests 1552 passed (1552)`。
@@ -68,9 +68,9 @@
   还原 → 同 spec 绿。
 - YAML 指针红/绿：把 `docs/contracts/release.md` 临时改回 docs/release.md →
   `packages/company-pack/cordis.patch.yml:8 → docs/release.md`；还原 → 绿。
-- hook 接线：`node tools/hooks-install.mjs` → `hooks: pre-push 已接线（.githooks）`；
+- hook 接线：`node tools/dev/hooks-install.mjs` → `hooks: pre-push 已接线（.githooks）`；
   `git config --get core.hooksPath` → `<repo>/.githooks`（本机绝对值）。
-- `node tools/release.mjs --verify --allow-dirty` → verify / test / release-smoke / company-entry-smoke /
+- `node tools/release/release.mjs --verify --allow-dirty` → verify / test / release-smoke / company-entry-smoke /
   client-load-smoke / preset-smoke / present-catalog-smoke 全 pass；preset-smoke 11/11 可挂载。
 - clean clone 首轮（`0ffe4547`）`pnpm run setup` 在 vendor client types 失败：
   `Cannot find module '@deepseek-ai/dsh-api-job-controller/remote'` / `ClientRemote` 缺属性；
@@ -78,14 +78,14 @@
   再跑 setup → `SETUP_DONE=51s`；`pnpm setup --check` → `[ERROR] Unknown option: 'check'`（pnpm 内置命令）。
   修法 = setup 的 types() 加 typert pass + 带参统一 node 入口（本文决定 8/9）。
 - clean clone 终轮（`337c2db6`，本地 submodule + `bundle:init`）：clone 3s / install 13s /
-  setup 137s（含 bundle:init；`node tools/setup.mjs --check` → 产物齐全）；verify 143s →
+  setup 137s（含 bundle:init；`node tools/dev/setup.mjs --check` → 产物齐全）；verify 143s →
   `ALL PASS；3 门无对象`；test 153s → `Test Files 192 passed (192)` / `Tests 1549 passed | 3 skipped (1552)`。
   前两轮红：`0ffe4547` 缺 Typert（vendor client types 报 `/remote` 缺模块）；`4f544a8b` 缺 runtime 证据树
   （`notes-archived-links` 2 处 + `link-debt archived 23 > 20`）与 /tmp 下 sandbox 反例误判；
   修法 = 决定 8–11。此轮证明 clean clone 的 `setup → verify → test` 可复跑。
-- setup-invocation spec 红/绿：修前 `tools/setup.mjs`/bootstrap/workflow 出现 `pnpm setup --...` →
-  测试红（`tools/setup.mjs 不应出现 pnpm setup --...`）；修后同 spec 绿。
-- `node tools/release.mjs --stamp` → `stamp 0.11.4 @ 0ffe4547`；`--check --allow-pre-publish-index` →
+- setup-invocation spec 红/绿：修前 `tools/dev/setup.mjs`/bootstrap/workflow 出现 `pnpm setup --...` →
+  测试红（`tools/dev/setup.mjs 不应出现 pnpm setup --...`）；修后同 spec 绿。
+- `node tools/release/release.mjs --stamp` → `stamp 0.11.4 @ 0ffe4547`；`--check --allow-pre-publish-index` →
   `release: READY 0.11.4 @ 0ffe4547（tgz 259 条目；7 项检查 pass）`（代码提交点；最终 commit 的 READY 见当轮回执）。
 
 ## 未验

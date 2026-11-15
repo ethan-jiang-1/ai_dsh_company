@@ -17,7 +17,7 @@ const SKIP_REL_DIRS = new Set(['tools/lib'])
 const SELF = new Set([
   'tools/lib/asset-lanes.mjs',
   'tools/lib/test-census.mjs',
-  'tools/test-census.mjs',
+  'tools/repo/test-census.mjs',
   'tests/CENSUS.generated.md',
   'checks/lanes/probe.entry.mjs',
 ])

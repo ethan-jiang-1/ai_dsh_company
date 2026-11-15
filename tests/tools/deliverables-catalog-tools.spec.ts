@@ -5,7 +5,7 @@ import { buildDeliverablesCatalog } from '../../tools/lib/deliverables-catalog.m
  * 成品目录的 keyless 形状判据（2026-10-19 成品台账卡）。
  *
  * 只钉纯逻辑：有无 final、排序、活跃/归档、台账外、slug 回落。盘上扫描与页签渲染
- * 各自有 owner（`tools/deliverables-index.mjs` / `DeliverablesTab` spec）。
+ * 各自有 owner（`tools/repo/deliverables-index.mjs` / `DeliverablesTab` spec）。
  */
 const fields = (record: Record<string, string>): Map<string, string> => new Map(Object.entries(record))
 

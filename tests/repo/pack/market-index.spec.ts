@@ -33,7 +33,7 @@ describe('插件市场 index（format 1）', () => {
     const parsed = parseMarketIndex(tracked, 'https://example.invalid/market-index.json')
     const plugin = parsed.plugins.find((item: { name: string }) => item.name === manifest.name)
     expect(plugin, 'tracked index 缺本包条目').toBeDefined()
-    expect(plugin?.versions.some((version: { version: string }) => version.version === manifest.version), 'tracked index 版本落后于 package.json（先跑 node tools/market-index.mjs --prepare）').toBe(true)
+    expect(plugin?.versions.some((version: { version: string }) => version.version === manifest.version), 'tracked index 版本落后于 package.json（先跑 node tools/release/market-index.mjs --prepare）').toBe(true)
     expect(plugin?.icon?.startsWith('data:image/svg+xml;base64,'), 'tracked index 图标应内联，单文件可托管').toBe(true)
     expect(plugin?.metadata.category).toBe('company')
   })

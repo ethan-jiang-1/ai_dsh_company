@@ -8,11 +8,11 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'
-import { ASSETS, PROBES, FAILURE_CLASSES, failureClassOf } from './lib/asset-lanes.mjs'
-import { buildCensus, countProjectSurface, renderCensus } from './lib/test-census.mjs'
-import { consumerCount } from './lib/asset-consumers.mjs'
+import { ASSETS, PROBES, FAILURE_CLASSES, failureClassOf } from '../lib/asset-lanes.mjs'
+import { buildCensus, countProjectSurface, renderCensus } from '../lib/test-census.mjs'
+import { consumerCount } from '../lib/asset-consumers.mjs'
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const target = join(root, 'tests/CENSUS.generated.md')
 const { gateCount, specCount } = countProjectSurface(root)
 const consumers = consumerCount(root, [...ASSETS, ...PROBES])
@@ -26,7 +26,7 @@ if (process.argv.includes('--write')) {
   if (current === text) {
     console.log('test-census: 与盘上一致')
   } else {
-    console.error('test-census: tests/CENSUS.generated.md 已漂——运行 node tools/test-census.mjs --write')
+    console.error('test-census: tests/CENSUS.generated.md 已漂——运行 node tools/repo/test-census.mjs --write')
     process.exitCode = 1
   }
 }

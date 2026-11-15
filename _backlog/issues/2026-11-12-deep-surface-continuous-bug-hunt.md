@@ -283,7 +283,7 @@ opened: 2026-11-12
 
 **证据：**
 
-- `tools/export-dist.mjs` 的清理块在 build/bundle 后、`npm pack` 前；`install-manual.md` 是 tracked 删除风险。
+- `tools/release/export-dist.mjs` 的清理块在 build/bundle 后、`npm pack` 前；`install-manual.md` 是 tracked 删除风险。
 - 当前源码 tarball 清单 = `tar -tzf` 实跑（含模板与共享 skill）；未在本轮重跑完整 `release-smoke`。
 
 **未跑：**
@@ -337,7 +337,7 @@ opened: 2026-11-12
 - `runtime/tmp/multi-install.log`（ALL PASS）。
 - `runtime/tmp/concurrent-home-keep.log`（FAIL 两项）。
 - `runtime/tmp/two-writer-check.mjs` 的 A/B 输出（B 打印 lease 告警）。
-- `_dist` 当前 tarball（gitignored）由本轮 `npm pack` 覆盖；为让 `_dist` 与当前 tarball 自洽，又跑了 `node tools/release.mjs --prepare --force --allow-dirty`：tracked `_dist/安装手册.md` 只更新 sha/日期两行，`release-manifest.json`（gitignored）重写；无源码改动。
+- `_dist` 当前 tarball（gitignored）由本轮 `npm pack` 覆盖；为让 `_dist` 与当前 tarball 自洽，又跑了 `node tools/release/release.mjs --prepare --force --allow-dirty`：tracked `_dist/安装手册.md` 只更新 sha/日期两行，`release-manifest.json`（gitignored）重写；无源码改动。
 
 ## Round 10（C7 补：upgrade-while-running / interrupted-install）
 
@@ -446,7 +446,7 @@ opened: 2026-11-12
 
 - `runtime/tmp/newbugs-export-preserve.mts`：旧 ledger 存在，corrupt 导出 → `ledger exists false`。
 - `runtime/tmp/newbugs-live-takeover.mts`：子进程 ACQUIRED，父进程 `now+130s` 接管 acquired。
-- `tools/export-dist.mjs` / `release-smoke` 清单静态对读；当前 tarball 实含模板与共享 skill（本轮 `tar -tzf`）。
+- `tools/release/export-dist.mjs` / `release-smoke` 清单静态对读；当前 tarball 实含模板与共享 skill（本轮 `tar -tzf`）。
 
 **判定：** 3 张新卡；S3/S6/C7 的修复没有覆盖「部分生成仍整体替换」「接管后 fencing」「非 manifest 内容清单」三个边界。修复 Note 已把 lease 双写仲裁列为剩余风险，本卡把它材料化。
 
@@ -1335,7 +1335,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 **判定：** 新卡 BUG-150 P2（测试资产）；product 147/148 已修、149 仍活跃。当前 full test **2 failed / 1869 passed**，红在 safety spec 的 2 条假红。
 
-**验证：** `pnpm test` 现 **240 files / 1874 tests passed**（A 已修 safety spec/149 相关测试）；`pnpm verify` 红在 guard-red-record（147/148/149 卡未归档）+ script-index（A 新增 71 门/128 入口，`checks/INDEX.generated.md` 需 `node tools/checks-index.mjs --write`）。这是 A 的收口未完成态，不是产品行为红。
+**验证：** `pnpm test` 现 **240 files / 1874 tests passed**（A 已修 safety spec/149 相关测试）；`pnpm verify` 红在 guard-red-record（147/148/149 卡未归档）+ script-index（A 新增 71 门/128 入口，`checks/INDEX.generated.md` 需 `node tools/repo/checks-index.mjs --write`）。这是 A 的收口未完成态，不是产品行为红。
 
 **未跑：** spec 修后 full green；149 实写 revoke/log。
 

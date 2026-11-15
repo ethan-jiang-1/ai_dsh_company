@@ -9,7 +9,7 @@ import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const dir = join(root, 'tests/checks')
 const files = readdirSync(dir).filter(name => name.endsWith('.test.mjs')).sort()
 if (files.length === 0) {

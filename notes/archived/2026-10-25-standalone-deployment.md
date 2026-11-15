@@ -14,7 +14,7 @@
 
 - [run/env.sh](../../run/env.sh) 无条件导出 `DSH_HOME` 到 `runtime/harness-home`、`DSH_COMPANY_HOME` 到仓库 `company-workspace`，并 `DSH_COMPANY_BOOTSTRAP=off`。
 - dev profile 的 pack 依赖是绝对 `link:`（runtime 状态，gitignored）；没有 relink/repair。
-- [bundle-init.mjs](../../tools/bundle-init.mjs) 用符号链接把制度件指回 pack；这是维护者 single-source，不是可移植部署。
+- [bundle-init.mjs](../../tools/dev/bundle-init.mjs) 用符号链接把制度件指回 pack；这是维护者 single-source，不是可移植部署。
 - [bootstrap.md](../../docs/guides/bootstrap.md) 是长配方；[fresh-clone.yml](../../.github/workflows/fresh-clone.yml) 只跑 install + bundle:init + verify，不构建/不启动。
 - DSH 源码直跑 = 先 `pnpm run build`，再 `pnpm dsh`；launcher 不检查产物新鲜度。
 - 品牌硬编码在 [Brand.tsx](../../packages/company-pack/src/client/ui/Brand.tsx)；出厂 org 是样例；没有“会话 cwd 是不是公司盘”的守卫。

@@ -2,7 +2,7 @@
 // 状态：常驻
 // 何时跑：fresh clone 首跑、vendor pin 变后、或 `pnpm company` 报 “vendor CLI 未构建” 时。
 // 成本：全量首次分钟级（取决于机器）；`--types` 只编类型；`--check` 秒级。
-// 用法：node tools/setup.mjs [--check|--types] [--skip-install]
+// 用法：node tools/dev/setup.mjs [--check|--types] [--skip-install]
 //       （pnpm 有内置 `setup` 命令；带参数必须用 node 入口——pnpm 的 setup 会吞掉 --check）
 //
 // 这是 docs/guides/bootstrap.md 的机器入口：vendor host/client、native、web 与 pack 构建
@@ -14,7 +14,7 @@ import { existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const vendor = join(root, 'vendor/dsh')
 const pack = join(root, 'packages/company-pack')
 const args = process.argv.slice(2)
@@ -51,7 +51,7 @@ function run(label, command, argv = [], options = {}) {
     process.exit(1)
   }
   if (result.status !== 0) {
-    console.error(`setup: ${label} 退出 ${String(result.status)}；修好后重跑 node tools/setup.mjs`)
+    console.error(`setup: ${label} 退出 ${String(result.status)}；修好后重跑 node tools/dev/setup.mjs`)
     process.exit(result.status ?? 1)
   }
 }
@@ -59,7 +59,7 @@ function run(label, command, argv = [], options = {}) {
 function check() {
   const missing = required.filter(([, path]) => !existsSync(path)).map(([label]) => label)
   if (missing.length > 0) {
-    console.error(`setup: 缺 ${missing.join(' / ')}；跑 node tools/setup.mjs（或 node tools/setup.mjs --types）补齐`)
+    console.error(`setup: 缺 ${missing.join(' / ')}；跑 node tools/dev/setup.mjs（或 node tools/dev/setup.mjs --types）补齐`)
     process.exit(1)
   }
   console.log(`setup: 产物齐全（vendor CLI / client / web / pack）`)

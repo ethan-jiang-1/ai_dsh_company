@@ -34,7 +34,7 @@ if (!existsSync(CLI)) {
   process.exit(2)
 }
 if (!existsSync(TARBALL)) {
-  console.error(`company-entry-smoke: 缺 ${TARBALL}；先跑 node tools/export-dist.mjs（${PACK_VERSION}）`)
+  console.error(`company-entry-smoke: 缺 ${TARBALL}；先跑 node tools/release/export-dist.mjs（${PACK_VERSION}）`)
   process.exit(2)
 }
 

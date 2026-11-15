@@ -1,5 +1,5 @@
 // 成品目录的**形状**（纯逻辑，无 I/O）：把 `deliverables/` + `deliverables-archive/` 的
-// meta/final 折成一份可供页签渲染的目录。生成器 = `tools/deliverables-index.mjs`；
+// meta/final 折成一份可供页签渲染的目录。生成器 = `tools/repo/deliverables-index.mjs`；
 // 消费方 = `packages/company-pack/src/client/tabs/DeliverablesTab.tsx`（只读生成结果，不自己扫盘）。
 //
 // 口径（2026-10-19 成品台账卡）：

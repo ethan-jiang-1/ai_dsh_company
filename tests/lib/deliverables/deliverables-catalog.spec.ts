@@ -5,7 +5,7 @@
  * 目录名去日期前缀成 slug；路径归一成工作区相对正斜杠；文件地址段级 encode 且保留盘符冒号。
  * 为什么这条 spec 存在：`tests/lib/deliverables/` 要与 `src/lib/deliverables/` 同名——目录对齐
  * 不能靠 `.gitkeep` 占位，得有一条真断言。
- * 不证明：生成器 `tools/deliverables-index.mjs` 的产物形状（那在 tests/tools）。
+ * 不证明：生成器 `tools/repo/deliverables-index.mjs` 的产物形状（那在 tests/tools）。
  */
 import { describe, expect, it } from 'vitest'
 import { parseMeta, slugFromDirName, normalizeRel } from '../../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts'

@@ -2,7 +2,7 @@
 // 状态：常驻
 // 何时跑：profile 组合/安装形状/多 pack 共存/自定义 profile 改动后；发布前手动
 // 成本：~3-4 分钟 keyless（真 tarball 安装 + 两次 boot + RPC + 一次预期失败）；不进 pnpm test
-// 前置：已导出 `_dist/dsh-company-pack-<version>.tgz`（pnpm release --prepare 或 tools/export-dist.mjs）
+// 前置：已导出 `_dist/dsh-company-pack-<version>.tgz`（pnpm release --prepare 或 tools/release/export-dist.mjs）
 //
 // 证明形状：
 // A 两个 home 各一个 web profile：bundle id / company.md / catalog / journal 不串。

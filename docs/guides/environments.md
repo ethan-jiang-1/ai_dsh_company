@@ -27,7 +27,7 @@
    解析，公司状态在 `<workspace>/.dsh-company/`（`bundle.json` v3，legacy 文件名）；home 只留 sessions/凭据/登记/方法层/
    账本/lease。一个安装 = 一个公司，可顺序服务多个 workspace；不同公司新开 home。dev 用 `pnpm company --no-open`。
 
-8. **排练场 ≠ 运行场**：排练/探针会话的默认 cwd 是 `runtime/rehearsal-workspace/`（`node tools/rehearsal-init.mjs`
+8. **排练场 ≠ 运行场**：排练/探针会话的默认 cwd 是 `runtime/rehearsal-workspace/`（`node tools/dev/rehearsal-init.mjs`
    幂等成型；preset/probe/handbook/delegation 探针已默认指这里并会自建，`--cwd` 可显式覆盖）。
    **真盘 `company-workspace/` 只收真实动议的产物**——排练产物不受三态判据约束（`drafts/` 本就不需要
    `present`），跑在真盘会安静积污（实测删过 15 份）；验收判据 = 新默认跑一次探针后

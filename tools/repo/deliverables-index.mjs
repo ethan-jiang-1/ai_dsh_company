@@ -5,14 +5,14 @@
 //   生成 `company-workspace/.dsh-company/kb/deliverables-index.json`；公司页签「成品」只读这份索引。
 // 口径：成品 = 有 final.md；present 状态**复用** checks/audit/deliverables-check.mjs --json 的判据（不另写一套）；
 //   审计不可得（未 source run/env.sh 等）时 presented=null，面板显示「未核」，不冒充已 present。
-// 用法：node tools/deliverables-index.mjs
+// 用法：node tools/repo/deliverables-index.mjs
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { join, relative } from 'node:path'
-import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { parseAuditVerdict } from './lib/audit-verdict.mjs'
-import { parseMeta, slugFromDirName } from './lib/deliverables.mjs'
-import { buildDeliverablesCatalog, CATALOG_ROOTS } from './lib/deliverables-catalog.mjs'
+import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { parseAuditVerdict } from '../lib/audit-verdict.mjs'
+import { parseMeta, slugFromDirName } from '../lib/deliverables.mjs'
+import { buildDeliverablesCatalog, CATALOG_ROOTS } from '../lib/deliverables-catalog.mjs'
 
 // 测试缝（2026-10-23）：converge 的端到端探针把工作区重定向到 runtime/ 下的临时目录。
 // 默认值不变；只有显式设了 DELIVERABLES_WS_REL 才重定向（converge 会把它传给本生成器）。

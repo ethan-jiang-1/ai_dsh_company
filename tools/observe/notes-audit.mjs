@@ -10,7 +10,7 @@
 // 语义分诊 = `.agents/skills/notes-consistency-audit/SKILL.md`。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { auditNotes } from './lib/notes-audit.mjs'
+import { auditNotes } from '../lib/notes-audit.mjs'
 
 const argv = process.argv.slice(2)
 const KNOWN = new Set(['--json', '--strict', '--root'])
@@ -22,7 +22,7 @@ for (let i = 0; i < argv.length; i++) {
   }
   if (argv[i] === '--root') {
     if (i + 1 >= argv.length || argv[i + 1].startsWith('--')) {
-      console.error('用法：node tools/notes-audit.mjs [--root <仓库根>] [--json] [--strict]')
+      console.error('用法：node tools/observe/notes-audit.mjs [--root <仓库根>] [--json] [--strict]')
       process.exit(2)
     }
     i++

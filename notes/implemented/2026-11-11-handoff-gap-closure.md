@@ -6,10 +6,10 @@
 
 ## 决定
 
-- **首跑入口 = `pnpm setup`**（实现 [`tools/setup.mjs`](../../tools/setup.mjs)）：按 vendor lock 安装、构建 vendor host/client 类型与 runtime、native、web 前端与 pack；`pnpm company` 缺 vendor CLI 时直接指向它。vendor 构建用 vendor 自己的 tsc/tsdown（根 tsdown 0.22.14 与 vendor 0.22.2 会漂移；实测一次 client runtime 构建失败，切回 vendor 产物后通过）。
+- **首跑入口 = `pnpm setup`**（实现 [`tools/dev/setup.mjs`](../../tools/dev/setup.mjs)）：按 vendor lock 安装、构建 vendor host/client 类型与 runtime、native、web 前端与 pack；`pnpm company` 缺 vendor CLI 时直接指向它。vendor 构建用 vendor 自己的 tsc/tsdown（根 tsdown 0.22.14 与 vendor 0.22.2 会漂移；实测一次 client runtime 构建失败，切回 vendor 产物后通过）。
 - **安装手册指针 = 绝对仓库 URL**：tarball 与手册仍是同目录两件套；[`dist-manual`](../../checks/gates/dist-manual.mjs) 断言 pack README 不再依赖包内不可达的相对 `_dist/安装手册.md`。
-- **发布证据带 vendor 身份**：[`tools/release.mjs`](../../tools/release.mjs) 在 manifest 记录 `vendor.head`、`vendor.dirty`、CLI sha256 与 mtime；`release --check` 对不上即红，避免“7 项 pass 但 vendor build 已换”的静默漂移。
-- **CI 回到台账内版本**：`fresh-clone` 的 global 通道钉 `@deepseek-ai/dsh@0.2.1-rc.5`；导出前跑 `node tools/setup.mjs --types` 补 vendor 类型面。
+- **发布证据带 vendor 身份**：[`tools/release/release.mjs`](../../tools/release/release.mjs) 在 manifest 记录 `vendor.head`、`vendor.dirty`、CLI sha256 与 mtime；`release --check` 对不上即红，避免“7 项 pass 但 vendor build 已换”的静默漂移。
+- **CI 回到台账内版本**：`fresh-clone` 的 global 通道钉 `@deepseek-ai/dsh@0.2.1-rc.5`；导出前跑 `node tools/dev/setup.mjs --types` 补 vendor 类型面。
 - **版本 = 0.11.3**：pack README/手册/市场索引/CHANGELOG 同步；`link-debt` 基线从 32 降到 20（实测 archived 20）。
 
 ## 输掉的方案
@@ -21,12 +21,12 @@
 
 ## 证据
 
-- `node tools/setup.mjs --skip-install` → 全量通过（vendor host/client、native、web、pack；`SETUP_FULL_EXIT:0`，2026-11-11）。首次用根 tsdown 时 client runtime 报 `Missing field code`；改用 vendor `node_modules/.bin/tsdown` 后通过。
-- `node tools/setup.mjs --check` → `setup: 产物齐全（vendor CLI / client / web / pack）`。
-- `node tools/release.mjs --prepare` → `0.11.3`；tarball 259 entries；`export-dist: ALL PASS`；manifest 写入 vendor 指纹。
-- `node tools/release.mjs --verify` → `verify`/`test`/`release-smoke`/`company-entry-smoke`/`client-load-smoke`/`preset-smoke`/`present-catalog-smoke` 全 pass；`pnpm test` 187 文件 / 1546 tests；`release-smoke: ALL PASS`。
+- `node tools/dev/setup.mjs --skip-install` → 全量通过（vendor host/client、native、web、pack；`SETUP_FULL_EXIT:0`，2026-11-11）。首次用根 tsdown 时 client runtime 报 `Missing field code`；改用 vendor `node_modules/.bin/tsdown` 后通过。
+- `node tools/dev/setup.mjs --check` → `setup: 产物齐全（vendor CLI / client / web / pack）`。
+- `node tools/release/release.mjs --prepare` → `0.11.3`；tarball 259 entries；`export-dist: ALL PASS`；manifest 写入 vendor 指纹。
+- `node tools/release/release.mjs --verify` → `verify`/`test`/`release-smoke`/`company-entry-smoke`/`client-load-smoke`/`preset-smoke`/`present-catalog-smoke` 全 pass；`pnpm test` 187 文件 / 1546 tests；`release-smoke: ALL PASS`。
 - `pnpm verify` → `ALL PASS；2 门无对象`（replay-fixture / replay-ui 显式 SKIP）。
-- `node tools/release.mjs --check --allow-pre-publish-index` → `READY 0.11.3 @ 26cd365e（tgz 259 条目；7 项检查 pass）`；仅 WARN staged 未发布。
+- `node tools/release/release.mjs --check --allow-pre-publish-index` → `READY 0.11.3 @ 26cd365e（tgz 259 条目；7 项检查 pass）`；仅 WARN staged 未发布。
 - vendor 指纹漂移反证：把 manifest 的 `vendor.cli.sha256` 改成 `deadbeef` → `release: manifest vendor CLI sha deadbeef ≠ 当前 …；重建过 vendor，重跑 --prepare/--verify`（exit 1）；还原 → READY 绿。
 - `dist-manual` 红/绿：把 pack README 的绝对手册 URL 改回相对 `_dist/安装手册.md` → `FAIL dist-manual pack README 缺指向仓库绝对 URL 的《安装手册》指针`；还原 → `OK dist-manual（版本 0.11.3 …）`。
 - `link-debt` → `archived 20 / moved 0 / live 0；基线 20/0/0`。

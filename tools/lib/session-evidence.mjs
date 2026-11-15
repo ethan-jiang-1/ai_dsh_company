@@ -2,7 +2,7 @@
 //
 // 为什么（BUG-046 / OBS-1 教训）：此前每个 probe 各写一份 rawHeader/readChild（3 份拷贝），
 // 卡内证据靠手抄 session id 与 JSON 片段；team member 又读不到 session/page，只能手解 zstd。
-// 本模块只做**纯解析与折叠**（输入是已经解压的 JSONL 文本）；读盘/zstd 由调用方（tools/explore-evidence.mjs）
+// 本模块只做**纯解析与折叠**（输入是已经解压的 JSONL 文本）；读盘/zstd 由调用方（tools/observe/explore-evidence.mjs）
 // 用 drivers/zstd.mjs 注入——tools/lib 保持 keyless（layering.spec 强制）。
 //
 // 判据只读类型化字段：事件 `type`、`data.source.kind`、`data.header.tools[].name`、

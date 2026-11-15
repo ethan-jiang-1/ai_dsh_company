@@ -65,7 +65,7 @@ describe('dev 启动器安装规划（dev/产品路径 parity）', () => {
   })
 
   it('dev 启动器默认路径包含 pack + plugin add file:（门禁同判据）', () => {
-    const launcher = readFileSync(join(ROOT, 'tools/company.mjs'), 'utf8')
+    const launcher = readFileSync(join(ROOT, 'tools/dev/company.mjs'), 'utf8')
     expect(launcher, '缺 npm pack').toMatch(/npm'\s*,\s*\['pack'/)
     expect(launcher, '缺 plugin add file:').toMatch(/'plugin', '--profile', 'company', 'add'/)
     expect(launcher, '默认模式必须从 resolveDevMode 来').toContain('resolveDevMode(args)')
@@ -103,7 +103,7 @@ describe('构建缓存判据（源未变才复用 tarball）', () => {
   })
 
   it('company.mjs 真的调用了判据与指纹（wiring）', () => {
-    const launcher = readFileSync(join(ROOT, 'tools/company.mjs'), 'utf8')
+    const launcher = readFileSync(join(ROOT, 'tools/dev/company.mjs'), 'utf8')
     expect(launcher).toContain('shouldReuseBuild')
     expect(launcher).toContain('devBuildFingerprint')
     expect(launcher).toContain('--rebuild')
@@ -112,7 +112,7 @@ describe('构建缓存判据（源未变才复用 tarball）', () => {
 
 describe('dev 初始化工具与角色唯一事实家', () => {
   it('bundle:init 覆盖全部公司角色（含 2026-11-05 新增的 CMO）', () => {
-    const launcher = readFileSync(join(ROOT, 'tools/bundle-init.mjs'), 'utf8')
+    const launcher = readFileSync(join(ROOT, 'tools/dev/bundle-init.mjs'), 'utf8')
     for (const role of COMPANY_ROLE_IDS) expect(launcher, role).toContain(`'${role}'`)
   })
 })

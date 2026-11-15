@@ -19,7 +19,7 @@ opened: 2026-10-12
 
 ## 根因（假设→已证）
 
-[tools/converge.mjs:217](../../../tools/converge.mjs) 的查重判据 = `ct.includes(slug)`（整文件子串包含）。
+[tools/converge.mjs:217](../../../tools/repo/converge.mjs) 的查重判据 = `ct.includes(slug)`（整文件子串包含）。
 缺陷 3 的引用重指把含 slug 字样的**证据路径**写进了 CHARTER——coo/CHARTER.md L14 有
 `…/convergence-2026-10-12/2026-10-10-ai-sprint-2026/journal/coo/…`，子串 `ai-sprint-2026` 命中 →
 backfill 误判「已登记」。子串查重对「路径恰好含 slug」零免疫力；COO 恰好是缺陷 3 重指的受害者。

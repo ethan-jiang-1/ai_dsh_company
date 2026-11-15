@@ -9,7 +9,7 @@ describe('历史缺陷 → 具名守卫覆盖（生成物）', () => {
   it('tests/BUG-COVERAGE.generated.md 与盘面一致（漂了就跑 --write）', () => {
     const expected = renderCoverage(coverageReport(ROOT))
     const current = readFileSync(join(ROOT, 'tests/BUG-COVERAGE.generated.md'), 'utf8')
-    expect(current, 'bug-coverage 是生成物：运行 node tools/bug-coverage.mjs --write').toBe(expected)
+    expect(current, 'bug-coverage 是生成物：运行 node tools/repo/bug-coverage.mjs --write').toBe(expected)
   })
 
   it('覆盖率是保守下界：已修卡与守卫两向都能解析', () => {

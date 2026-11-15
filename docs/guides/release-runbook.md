@@ -1,7 +1,7 @@
 # 发布 runbook
 
 > 什么时候读：每次发布/导出/升 pin 前。性质：操作步骤（how）。合同（发布形态 / 兼容 / 版本政策）唯一家 = [release.md](../contracts/release.md)；
-> 本文只把“每次发布到底做什么”固定成一条可执行路径。命令入口 = `tools/release.mjs`。
+> 本文只把“每次发布到底做什么”固定成一条可执行路径。命令入口 = `tools/release/release.mjs`。
 
 ## 0. 先决
 

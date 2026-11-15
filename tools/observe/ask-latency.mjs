@@ -5,7 +5,7 @@
 //
 // 何时跑：要改六角色 preset 的 `tool-ask-user.timeout`、或复核该窗口是否仍合适时；升 pin 触碰
 //   tool-ask-user / user-questions 后复核（事件形状变了本器要跟着改）。
-// 成本：纯只读 + zstd 解日志，秒级，无模型无浏览器。用法：source run/env.sh && node tools/ask-latency.mjs [--json]
+// 成本：纯只读 + zstd 解日志，秒级，无模型无浏览器。用法：source run/env.sh && node tools/observe/ask-latency.mjs [--json]
 //
 // 分类（按**载荷**分，不按时间猜——首轮就把"会话恢复补的合成结果"误当人答了，案子 2026-10-18）：
 //   · 真人作答 = 工具结果的正文里带 `answers`/`selected`；
@@ -15,9 +15,9 @@
 // 判读：本器只报数，**不改任何配置**；改窗口 = 改 preset 行（属于 pack 公开行为）。
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { requireDevHome } from './lib/runtime-home.mjs'
-import { zstdText } from './drivers/zstd.mjs'
+import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { requireDevHome } from '../lib/runtime-home.mjs'
+import { zstdText } from '../drivers/zstd.mjs'
 
 const JSON_OUT = process.argv.includes('--json')
 const home = (() => {

@@ -4,9 +4,9 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'
-import { coverageReport, renderCoverage } from './lib/bug-coverage.mjs'
+import { coverageReport, renderCoverage } from '../lib/bug-coverage.mjs'
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const target = join(root, 'tests/BUG-COVERAGE.generated.md')
 const text = renderCoverage(coverageReport(root))
 
@@ -16,5 +16,5 @@ if (process.argv.includes('--write')) {
 } else {
   const current = readFileSync(target, 'utf8')
   if (current === text) console.log('bug-coverage: 与盘上一致')
-  else { console.error('bug-coverage: 已漂——运行 node tools/bug-coverage.mjs --write'); process.exitCode = 1 }
+  else { console.error('bug-coverage: 已漂——运行 node tools/repo/bug-coverage.mjs --write'); process.exitCode = 1 }
 }

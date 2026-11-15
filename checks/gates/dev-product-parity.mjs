@@ -28,9 +28,9 @@ export function run({ root, ok, fail }) {
   const problems = []
 
   // ① 启动器：默认 tarball + pack/add 都在
-  const launcherPath = join(root, 'tools/company.mjs')
+  const launcherPath = join(root, 'tools/dev/company.mjs')
   if (!existsSync(launcherPath)) {
-    problems.push('缺 tools/company.mjs（dev 启动器）')
+    problems.push('缺 tools/dev/company.mjs（dev 启动器）')
   } else {
     const launcher = readFileSync(launcherPath, 'utf8')
     if (!/resolveDevMode\(args\)/.test(launcher)) problems.push('dev 启动器没有从 resolveDevMode 取安装模式')

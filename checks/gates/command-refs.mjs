@@ -36,6 +36,9 @@ function activeDocs(root) {
     }
   }
   walk('docs')
+  // 2026-11-15：skills 是 live 指令（模型会照做），工具面重排后 close-out-definition 里一条旧
+  // 发布检查命令就是这么漏掉的（verify 全绿、照做即 MODULE_NOT_FOUND）。
+  walk('.agents')
   return files.filter(rel => existsSync(join(root, rel)))
 }
 

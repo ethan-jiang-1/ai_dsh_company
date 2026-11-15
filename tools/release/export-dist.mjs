@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻
 // 何时跑：需要交付 tarball 给仓库外的人时（版本号变动后、给无仓库权限者、风险变更前快照）；无 key，构建+打包秒级。
-// 用法：node tools/export-dist.mjs
+// 用法：node tools/release/export-dist.mjs
 //
 // 手动分发导出（精神借 ai_dsh_architect 的 export-dist，2026-09-28）：把 company-pack 打成
 // _dist/ 下的 tarball + 同目录生成《安装手册》。三条规矩照搬：
@@ -10,8 +10,8 @@
 //      导出后对产物本体再跑一遍清单边界断言（必备条目在场、无 package/ 外文件）；
 //   ③ 手册由脚本生成、注入版本与日期，永不手改——手册和旁边的 tarball 不可能漂。
 // 导出 ≠ 发布：不 bump 版本、不跑门禁（除清单）、不发布任何 registry——按工作树现状打包。
-import { repositoryRoot as repoRoot } from './lib/repository-layout.mjs'
-import { renderInstallManual } from './lib/install-manual.mjs'
+import { repositoryRoot as repoRoot } from '../lib/repository-layout.mjs'
+import { renderInstallManual } from '../lib/install-manual.mjs'
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'

@@ -54,7 +54,7 @@
 
 - `pnpm verify` → `verify: ALL PASS；2 门无对象（replay-fixture-freshness / replay-ui-freshness）`；
   新门 PASS 行 = `charter-entry（宪章在场 + 四处入口：文档链 3 + 归位 skill 1）`。首跑红在 `script-index`
-  （生成库存未随新门更新），`node tools/checks-index.mjs --write` 后绿。
+  （生成库存未随新门更新），`node tools/repo/checks-index.mjs --write` 后绿。
 - `pnpm test` → `Test Files 167 passed (167)` / `Tests 1347 passed (1347)`。
 - **造红（逐条破坏真东西 → 红 → 还原 → 绿）**：
   - 删 `AGENTS.md` 的宪章链接 → `FAIL charter-entry: AGENTS.md 未以 Markdown 链接指向 content-charter.md（开工最小路径；纯文本提及不算入口）`

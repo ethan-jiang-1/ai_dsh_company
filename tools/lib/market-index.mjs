@@ -4,7 +4,7 @@
  * 形状的唯一权威 = DSH 的 `@deepseek-ai/dsh-plugin-market-index`（vendor 内 built lib）；
  * 字段来源照 vendor 的 plugin-market-generator README：locale `meta`、manifest author/homepage/
  * repository/keywords、`engines.dsh`。这里不发明格式，只把本包 manifest 映射成条目；
- * 真校验在 `tools/market-index.mjs`（用 vendor 的 parseMarketIndex）。
+ * 真校验在 `tools/release/market-index.mjs`（用 vendor 的 parseMarketIndex）。
  */
 
 /** 市场声明的分类/标签/排序键；插件引用前必须先在这里声明。 */

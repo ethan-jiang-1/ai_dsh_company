@@ -5,7 +5,7 @@
 > 生命周期。**发布物（release artifact）** 只是可下载的 tarball/安装手册；发行版包含六轴。
 > 每次发布的操作步骤 = [guides/release-runbook.md](../guides/release-runbook.md)；一条命令入口 = `pnpm release`。
 > 外部规范 = `_faq_on_digested/26_harness-release`（研究材料，不是 DSH 合同）；DSH 合同仍以
-> `vendor/dsh` 钉住 tag 为准。执行器 = `release-smoke` / `tools/sync-dsh.mjs`。
+> `vendor/dsh` 钉住 tag 为准。执行器 = `release-smoke` / `tools/repo/sync-dsh.mjs`。
 
 ## 六轴 owner
 
@@ -64,7 +64,7 @@ tag（升 pin 走 sync-dsh，冒烟过了才加列）；`sync-dsh` 检查模式�
 | 想要 | 正路 |
 |---|---|
 | 组合/配置差异 | 本 pack 的 bundle `cordis.patch.yml`（`- id:` 替换 / `- insert:` 新增）或 profile patch |
-| 需要上游修 | 改 **DSH upstream** → 升 pin（`tools/sync-dsh.mjs`）；期间记入 `notes/` |
+| 需要上游修 | 改 **DSH upstream** → 升 pin（`tools/repo/sync-dsh.mjs`）；期间记入 `notes/` |
 | 上游功能在本形态不可用 | **先证伪“不可用”再自建**（postmortem 0003；`dsh.client.inject` 不排 Cordis 激活，但排浏览器模块 factory arrival——准确语义见 [pack README](../../packages/company-pack/README.md)）。确属不可用才在本 pack 实现等价面 |
 
 - **为什么用 SHA 而不用 tag**：tag 可被移动/别名，SHA 才是钉住的合同。
@@ -96,12 +96,12 @@ roster 与 `session/create`；`--with-browser` 另验 browser 两包后自动启
 落点不安全、相对/`~` 归一、旧布局告警不迁移。它不证明搬家后 DSH 的 `storages/workspace.json`/session
 cwd 会自动迁移。
 
-## 升 pin 程序（`node tools/sync-dsh.mjs`，认证档）
+## 升 pin 程序（`node tools/repo/sync-dsh.mjs`，认证档）
 
 **触发政策**：升 pin = **用户策动制**——agent 不主动盯上游 tag、不评估、不建议、不记录候选；只有用户
 明确指示升 pin 才进本节程序。渠道只认 RC 与正式版；alpha/beta 及其他预发布 tag 通通不管（改政策须新 Note，见 D42）。
 
-默认只读核对四处簿记，不做流程语义审计。升级使用 `source run/env.sh && node tools/sync-dsh.mjs --pin <tag>
+默认只读核对四处簿记，不做流程语义审计。升级使用 `source run/env.sh && node tools/repo/sync-dsh.mjs --pin <tag>
 --process-review <repo-relative.json>`；证据文件先经人审提交，两个工作树须干净。
 
 **证据文件** = `notes/archived/<YYYY-MM-DD>-pin-review-<目标 tag>.json`；人审 JSON 必含 `fromSha`、
@@ -144,7 +144,7 @@ reset/clean，不覆盖并发修改。安装限 180 秒、vendor build 与 relea
   **不跑 release**。干净 clone 上重放 release 仍是已知缺口，不冒充 READY 的承诺。
 - **升级既有 workspace**：新增的状态默认值（如 `.dsh-company/kb/process-docs.md`）只在缺失时补种，用户改过的版本一个字节不覆盖；旧动议无 `编号体系:` 标记 = `/req check` 只读豁免（`skipped`），不回溯改历史。
 
-## 手动分发（`node tools/export-dist.mjs`）
+## 手动分发（`node tools/release/export-dist.mjs`）
 
 一条命令产出仓库外可装的两件套到 `_dist/`：`dsh-company-pack-<version>.tgz` + 生成式《安装手册》。
 `_dist/` 是导出目的地不是源：tgz 全 gitignore；手册是唯一 tracked 例外，由脚本生成、永不手改；

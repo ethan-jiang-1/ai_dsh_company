@@ -181,7 +181,7 @@ async function runCase(name, channel, browser) {
 }
 
 try {
-  if (!existsSync(PACK)) throw new Error(`缺 tarball：${PACK}（先 pnpm release --prepare 或 tools/export-dist.mjs）`)
+  if (!existsSync(PACK)) throw new Error(`缺 tarball：${PACK}（先 pnpm release --prepare 或 tools/release/export-dist.mjs）`)
   console.log(`channel-matrix-smoke：base=${BASE} pack=${PACK.split('/').pop()} channel=${CHANNEL} browser=${BROWSER}${WITH_BROWSER ? ' +with-browser' : ''}`)
   const channels = CHANNEL === 'all' ? ['vendor', 'global'] : [CHANNEL]
   for (const channel of channels) {

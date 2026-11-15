@@ -14,10 +14,10 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { repositoryRoot } from './lib/repository-layout.mjs'
-import { zstdText } from './drivers/zstd.mjs'
-import { homeStatus, listSessions, listSlugSessions, orientState, parseSessionHead, renderOrient, renderRunBundle, renderSessionView, runBundleView } from './lib/orient.mjs'
-import { pickSessionLog } from './lib/session-log-generation.mjs'
+import { repositoryRoot } from '../lib/repository-layout.mjs'
+import { zstdText } from '../drivers/zstd.mjs'
+import { homeStatus, listSessions, listSlugSessions, orientState, parseSessionHead, renderOrient, renderRunBundle, renderSessionView, runBundleView } from '../lib/orient.mjs'
+import { pickSessionLog } from '../lib/session-log-generation.mjs'
 
 const ROOT = repositoryRoot
 
@@ -59,7 +59,7 @@ function sessionPresetFor(homePath, slug) {
 }
 
 const args = process.argv.slice(2)
-const USAGE = `用法：node tools/orient.mjs [--scenario <kind>/<场景> | --session <slug>[/<id前缀>]] [--workspace <dir>]
+const USAGE = `用法：node tools/observe/orient.mjs [--scenario <kind>/<场景> | --session <slug>[/<id前缀>]] [--workspace <dir>]
 
   （无参数）                 运行态全景（home / profiles / 会话 / 公司盘 / run trace / 真页面与诊断入口）
   --scenario <kind>/<场景>   run trace 视图（清单 = snapshots/README）

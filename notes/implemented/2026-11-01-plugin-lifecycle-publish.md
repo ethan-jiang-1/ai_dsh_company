@@ -62,7 +62,7 @@
 | sha256 | `abef80f4f55c78de8118ab9d0704777952b38b982ffdab83439d64ab73dc55ff` |
 | 手册 | `_dist/安装手册.md`（生成；MIT/精确卸载面/市场开关） |
 | manifest | `_dist/release-manifest.json`（`pnpm release --verify` 全绿后写） |
-| market index | `market-index.json`（仓库根，tracked；图标内联）；`node tools/market-index.mjs --check` → `dsh-company-pack@0.7.0`，DSH 校验器通过 |
+| market index | `market-index.json`（仓库根，tracked；图标内联）；`node tools/release/market-index.mjs --check` → `dsh-company-pack@0.7.0`，DSH 校验器通过 |
 
 认证档（实跑）：`pnpm release --verify` 全绿（verify / test 1027 passed / release-smoke /
 client-load-smoke / preset-smoke / present-catalog-smoke）；`interrupted-install-smoke` ALL PASS

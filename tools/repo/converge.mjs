@@ -6,14 +6,14 @@
 // 真实部署证据归部署盘/归档件。政策 = notes/implemented/2026-10-30-converge-evidence-home.md。
 // 何时跑：用户说「收敛/清理工作区」时；或轮末维护者收敛已闭合动议时（维护者专用——分身不自行删改，见手册「轮末收敛」）。
 // 用法（参数唯一源 = 本头注；未知旗标 = 退出 1——`--plan` 不是旗标，无参即计划模式）：
-//   node tools/converge.mjs                     # 计划模式：列出可收敛/未闭合 slug + journal 收割预览（放行旗标此档也生效）
-//   node tools/converge.mjs --slug <目录名>     # 收敛单个（前提：final + meta.closed + 一句话结论 + 至少一篇 journal + **无未结审计发现**）
-//   node tools/converge.mjs --slug <目录名> --allow-no-journal  # 显式接受零 journal 缺口（照记，不静默放行）
-//   node tools/converge.mjs --slug <目录名> --allow-open-findings # 显式接受未结审计发现（照记，不静默放行）
-//   node tools/converge.mjs --slug <目录名> --dry-run  # 只打印动作清单，不动盘
-//   node tools/converge.mjs --charter-backfill <目录名>  # 为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步）
-//   node tools/converge.mjs --resume <目录名>   # **半态续跑**：交付物已在归档家但 journal/台账未做完时接手（BUG-020；不搬移交付物）
-//   node tools/converge.mjs --rebuild-index    # 只重建成品索引（等价于收敛末尾那一步；生成器跑完后重读）
+//   node tools/repo/converge.mjs                     # 计划模式：列出可收敛/未闭合 slug + journal 收割预览（放行旗标此档也生效）
+//   node tools/repo/converge.mjs --slug <目录名>     # 收敛单个（前提：final + meta.closed + 一句话结论 + 至少一篇 journal + **无未结审计发现**）
+//   node tools/repo/converge.mjs --slug <目录名> --allow-no-journal  # 显式接受零 journal 缺口（照记，不静默放行）
+//   node tools/repo/converge.mjs --slug <目录名> --allow-open-findings # 显式接受未结审计发现（照记，不静默放行）
+//   node tools/repo/converge.mjs --slug <目录名> --dry-run  # 只打印动作清单，不动盘
+//   node tools/repo/converge.mjs --charter-backfill <目录名>  # 为已收敛 slug 补登 CHARTER 历史纪要（归档动作第 3 步）
+//   node tools/repo/converge.mjs --resume <目录名>   # **半态续跑**：交付物已在归档家但 journal/台账未做完时接手（BUG-020；不搬移交付物）
+//   node tools/repo/converge.mjs --rebuild-index    # 只重建成品索引（等价于收敛末尾那一步；生成器跑完后重读）
 // 成本：秒级~十秒级、无模型；交付物走 fs rename（不再 git add）；journal 已跟踪的走 git rm、**未跟踪的走 rmSync**
 //   （角色刚写、尚未入库的 journal 是常态；2026-10-16 实测 git rm 会以 pathspec 不匹配中断收敛）。
 // ⚠ 环境：需 **`source run/env.sh`**（DSH_HOME 指向开发 home）——「无未结审计发现」这道前置要调
@@ -22,10 +22,10 @@
 // 退出码：0 = 成功（计划或执行）；1 = 前置不满足/用法错误。
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
 import { join, basename, relative, resolve, sep } from 'node:path'
-import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { assess, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalSlug, parseFlags, steps } from './lib/converge-rules.mjs'
-import { parseAuditVerdict } from './lib/audit-verdict.mjs'
-import { COMPANY_ROLE_IDS } from './lib/company-roles.mjs'
+import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { assess, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalSlug, parseFlags, steps } from '../lib/converge-rules.mjs'
+import { parseAuditVerdict } from '../lib/audit-verdict.mjs'
+import { COMPANY_ROLE_IDS } from '../lib/company-roles.mjs'
 import { spawnSync } from 'node:child_process'
 
 const args = process.argv.slice(2)
@@ -83,7 +83,7 @@ const checkSlugFindings = slug => {
  * 收敛/续跑后重建成品索引（2026-10-20；成品目录卡「未接 converge」的收口）。
  *
  * 收敛改变了 `deliverables/` 根与台账 slug，`kb/deliverables-index.json` 必须同轮重建，
- * 否则「成品」页签读旧盘。生成器是唯一扫描逻辑（`tools/deliverables-index.mjs`），
+ * 否则「成品」页签读旧盘。生成器是唯一扫描逻辑（`tools/repo/deliverables-index.mjs`），
  * 这里只起子进程；失败 fail-loud（盘上收敛可能已完成，索引可单独重跑）。
  * @returns 无。
  */
@@ -92,7 +92,7 @@ const rebuildCatalogIndex = () => {
   const r = spawnSync(invocation.command, invocation.args, { cwd: invocation.cwd, encoding: 'utf8', env: { ...process.env, DELIVERABLES_WS_REL: WS_REL } })
   if (r.status !== 0) {
     console.error(`✗ 成品索引重建失败（exit ${String(r.status)}）：${(r.stderr ?? '').trim().slice(0, 300)}`)
-    console.error('  盘上收敛可能已完成；索引可单独重跑：node tools/deliverables-index.mjs')
+    console.error('  盘上收敛可能已完成；索引可单独重跑：node tools/repo/deliverables-index.mjs')
     process.exit(1)
   }
   const summary = (r.stdout ?? '').trim().split('\n').slice(0, 6).join(' ')
@@ -209,7 +209,7 @@ const resume = (dirName) => {
   })
   if (!state.resumable) {
     console.error(`✗ ${dirName}: 不可续跑（${state.reason}）——` + (state.reason === 'still-active'
-      ? `交付物还在活跃区，请走正常收敛：node tools/converge.mjs --slug ${dirName}`
+      ? `交付物还在活跃区，请走正常收敛：node tools/repo/converge.mjs --slug ${dirName}`
       : '活跃区与归档家都没有它：核对目录名，或从未收敛过'))
     process.exit(1)
   }
@@ -233,7 +233,7 @@ const resume = (dirName) => {
   appendLedger(fields)
   rebuildCatalogIndex()
   console.log('✓ 续跑完成：交付物仍在归档家（本命令不搬移）、台账行已处理')
-  console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/converge.mjs --charter-backfill ${dirName}`)
+  console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/repo/converge.mjs --charter-backfill ${dirName}`)
 }
 
 /**
@@ -349,7 +349,7 @@ const converge = (dirName) => {
   const ctx = { dirName, journal, fields }
   for (const step of plan) executeStep(step, ctx)
   console.log(`✓ 收敛完成：交付物已入归档家（含 ${journal.length} 篇 journal 副本）、live journal 已清、台账行已追加`)
-  console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/converge.mjs --charter-backfill ${dirName}（教训性文字仍由人把守——纪要素材逐字取 meta）`)
+  console.log(`  收尾：CHARTER 历史纪要补登跑 node tools/repo/converge.mjs --charter-backfill ${dirName}（教训性文字仍由人把守——纪要素材逐字取 meta）`)
 }
 
 const ROLE_KEY = { CEO: 'ceo', 'VP-Eng': 'vp-eng', 'VP-Sales': 'vp-sales', COO: 'coo', CFO: 'cfo', CMO: 'cmo' }
@@ -410,4 +410,4 @@ for (const s of ready) for (const j of harvestJournal(s.dir.replace(/^\d{4}-\d{2
   tally[j.role] = (tally[j.role] ?? 0) + 1
 }
 for (const [r, n] of Object.entries(tally)) console.log(`  ${r}: ${n} 篇`)
-console.log(`\n执行：node tools/converge.mjs --slug <目录名>   （--dry-run 先看清单）`)
+console.log(`\n执行：node tools/repo/converge.mjs --slug <目录名>   （--dry-run 先看清单）`)

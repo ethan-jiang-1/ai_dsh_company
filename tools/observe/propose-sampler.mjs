@@ -5,7 +5,7 @@
 //
 // 何时跑：复核「自发提案」这条 ⚠ 时；或决定要不要在 preset 的 persona/技能里加一句引导之前
 //   （先看真实会话里到底有没有自发行为，别为不存在的需求加 prompt 税）。
-// 成本：纯只读 + zstd 解日志，秒级，无模型无浏览器。用法：source run/env.sh && node tools/propose-sampler.mjs [--json]
+// 成本：纯只读 + zstd 解日志，秒级，无模型无浏览器。用法：source run/env.sh && node tools/observe/propose-sampler.mjs [--json]
 //
 // 分类口径（诚实版，不做"意图识别"）：
 //   · 被要求 = 该会话里**调用之前**出现过人侧 `user/message`，且文本里提到 `cultivation_propose` / 提案 / propose；
@@ -14,8 +14,8 @@
 // 判读：本器只报数与人话证据，**不改配置**；要加 persona 引导 = 改 preset（属产品决策）。
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { requireDevHome } from './lib/runtime-home.mjs'
-import { zstdText } from './drivers/zstd.mjs'
+import { requireDevHome } from '../lib/runtime-home.mjs'
+import { zstdText } from '../drivers/zstd.mjs'
 
 const JSON_OUT = process.argv.includes('--json')
 const home = (() => {

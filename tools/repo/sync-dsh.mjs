@@ -4,12 +4,12 @@
 // 认证档（不进 pnpm test）：检查模式只读；--pin 在验证候选后发布簿记/兼容矩阵。
 // 失败恢复受控元数据和原 HEAD，不 reset/clean。依赖和 ignored 构建产物不在回滚范围。
 // 人审证据只作声明校验，不声称脚本能语义审计流程合同。完整合同见 docs/contracts/release.md。
-import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 import { readFileSync, realpathSync } from 'node:fs'
 import { isAbsolute, join, relative, resolve } from 'node:path'
-import { requireDevHome } from './lib/runtime-home.mjs'
-import { assertProcessReview, pinTransaction, replaceOne } from './lib/pin-transaction.mjs'
-import { plainNodeEnv, releaseProcesses } from './drivers/release-process.mjs'
+import { requireDevHome } from '../lib/runtime-home.mjs'
+import { assertProcessReview, pinTransaction, replaceOne } from '../lib/pin-transaction.mjs'
+import { plainNodeEnv, releaseProcesses } from '../drivers/release-process.mjs'
 
 const VENDOR = join(ROOT, 'vendor/dsh')
 const args = process.argv.slice(2)

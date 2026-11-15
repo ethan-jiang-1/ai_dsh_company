@@ -211,7 +211,7 @@ async function moveHomeCase() {
 }
 
 try {
-  if (!existsSync(PACK)) throw new Error(`缺 tarball：${PACK}（先 pnpm release --prepare 或 tools/export-dist.mjs）`)
+  if (!existsSync(PACK)) throw new Error(`缺 tarball：${PACK}（先 pnpm release --prepare 或 tools/release/export-dist.mjs）`)
   const version = spawnSync('dsh', ['--version'], { encoding: 'utf8' })
   console.log(`isolation-matrix-smoke：base=${BASE} pack=${PACK.split('/').pop()} dsh=${(version.stdout ?? '').trim()}`)
   check('global dsh present', version.status === 0)

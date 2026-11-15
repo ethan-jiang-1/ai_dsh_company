@@ -10,8 +10,8 @@
 | 当前目标 | 入口 |
 |---|---|
 | 检查结构、引用与簿记 | `pnpm verify` → [run-gates](run-gates.mjs) |
-| 看运行态全景 / 场景 / 会话历史 | `pnpm orient` → [orient](../tools/orient.mjs) |
-| 看最近会话的失败摘要（中断轮、非零 bash、待审批也算） | `pnpm diagnose [--strict]` → [diagnose](../tools/diagnose.mjs) |
+| 看运行态全景 / 场景 / 会话历史 | `pnpm orient` → [orient](../tools/observe/orient.mjs) |
+| 看最近会话的失败摘要（中断轮、非零 bash、待审批也算） | `pnpm diagnose [--strict]` → [diagnose](../tools/observe/diagnose.mjs) |
 | 检查密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs) · [tracked-token](gates/tracked-token.mjs) · [tracked-secrets](gates/tracked-secrets.mjs) |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；分层守卫 = [layering.spec](../tests/repo/structure/layering.spec.ts) |
 | 确认测试资产还活着 | `pnpm smoke:fast` → [fast](lanes/fast-lane.mjs)（4 条，~2.2s；pre-push）；全量 = `pnpm smoke:all` → [keyless-lane](lanes/keyless-lane.mjs)（每周 CI 跑 `--ci`；成员唯一家 = [lane 注册表](../tools/lib/asset-lanes.mjs)） |
@@ -24,8 +24,8 @@
 | 确认录制行为与工作区判据 | [replay-smoke](lanes/replay.e2e.mjs)（当前仅 headless 合成场景） |
 | 确认 workflow 引擎机制（失败重试/fatal/null/回执拼接） | [workflow-contract-smoke](lanes/workflow-contract.e2e.mjs)（keyless ~2s，fake provider + 真引擎） |
 | 审计动议输出与角色留痕 | [deliverables-check](audit/deliverables-check.mjs) · [authorship-audit](audit/authorship-audit.mjs) · [journal-audit](audit/journal-audit.mjs) |
-| 核对发布链或导出交付包 | [release-smoke](lanes/release.entry.mjs) · [channel-matrix-smoke](lanes/channel-matrix.entry.mjs) · [export-dist](../tools/export-dist.mjs) · [market-index](../tools/market-index.mjs) |
-| **dev 启动** | `pnpm company --no-open` → [company](../tools/company.mjs)：缺 profile 时初始化；默认构建 + `npm pack` + `plugin add file:<tgz>` → exec `dsh --profile company`；`--link` 快速通道 |
+| 核对发布链或导出交付包 | [release-smoke](lanes/release.entry.mjs) · [channel-matrix-smoke](lanes/channel-matrix.entry.mjs) · [export-dist](../tools/release/export-dist.mjs) · [market-index](../tools/release/market-index.mjs) |
+| **dev 启动** | `pnpm company --no-open` → [company](../tools/dev/company.mjs)：缺 profile 时初始化；默认构建 + `npm pack` + `plugin add file:<tgz>` → exec `dsh --profile company`；`--link` 快速通道 |
 | 启动入口端到端（真 tarball 装 profile → `dsh --profile company` → workspace/公司状态） | [company-entry-smoke](lanes/company-entry.entry.mjs)（keyless，~1-2 分钟） |
 
 ## 清单
@@ -33,7 +33,7 @@
 分区 = 目录本身；逐脚本的触发条件、成本与状态 = **各自头注**（`script-triggers` / `script-status` 门禁强制）。
 
 - **公开入口自动库存** = [INDEX.generated.md](INDEX.generated.md)（生成物，勿手改；
-  `node tools/checks-index.mjs --write` 更新，`script-index` 门禁校验它与目录一致）。
+  `node tools/repo/checks-index.mjs --write` 更新，`script-index` 门禁校验它与目录一致）。
 - **结构门禁** = `checks/gates/` 目录（清单唯一源；装配 = [run-gates](run-gates.mjs)，
   `gate-wiring` 强制接线一致；pin 常量 = [gates/lib/pin.mjs](gates/lib/pin.mjs)）。
 
@@ -53,7 +53,7 @@
 | 触发条件 | 该做什么 |
 |---|---|
 | 真实盘**待处理 > 30 条**（或已采纳 > 5 个） | 折叠开始挡东西 ⇒ 先决定上**筛选**（优先于分页）。量法 `ls company-workspace/.dsh-company/cultivation/records \| wc -l`；依据 = [场景轮 Note](../notes/archived/2026-10-18-cultivation-scenario-audit.md) 追加十四 |
-| 再攒 **~20 场真实收口仍 0 次自发提案** | 考虑在 persona/技能加一句引导（先查是不是被别的机制压住）。先跑 [propose-sampler](../tools/propose-sampler.mjs) 看分箱；依据 = 同上 追加十六 |
+| 再攒 **~20 场真实收口仍 0 次自发提案** | 考虑在 persona/技能加一句引导（先查是不是被别的机制压住）。先跑 [propose-sampler](../tools/observe/propose-sampler.mjs) 看分箱；依据 = 同上 追加十六 |
 | **升 pin** 或动培养面（面板 / host / preset 工具行） | 复跑三档真入口：[cultivation-ux-walkthrough-probe](../probes/browser-visual/cultivation-ux-walkthrough-probe.mjs)、[cultivation-ux-scenarios-probe](../probes/browser-visual/cultivation-ux-scenarios-probe.mjs)、[cultivation-method-layer](../probes/session-context/cultivation-method-layer-probe.mjs)；培养页点击交互另用 [ui-scene-smoke](lanes/ui-scene.entry.mjs) `--steps`；动 preset 另跑 [preset-smoke](lanes/preset.entry.mjs) |
-| 想复核**问询窗口 120s** 还要不要改 | `node tools/ask-latency.mjs`（只读报数，不改配置）；依据 = [BUG-021 Note](../notes/archived/2026-10-18-bug021-timed-user-question.md) |
+| 想复核**问询窗口 120s** 还要不要改 | `node tools/observe/ask-latency.mjs`（只读报数，不改配置）；依据 = [BUG-021 Note](../notes/archived/2026-10-18-bug021-timed-user-question.md) |
 | 命令面行为 / 事件形状要变 | 先看 S12（故障注入恢复）与 `tools/lib/question-stop.mjs` 的形状漂移判据——它们会先红；依据 = [BUG-022 Note](../notes/archived/2026-10-18-bug022-question-stop-guard.md) |

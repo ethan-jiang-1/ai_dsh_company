@@ -12,7 +12,7 @@
 4. **交接物边界写进根 README。** 根 [README.md](../../README.md) 明说：本仓库是维护者源码 handoff，不产出可安装 tarball；收件人两件套由 `pnpm release --prepare` 生成；[安装手册](../../_dist/安装手册.md)与最新导出版同版本，HEAD 未导出的改动以 README / [pack README](../../packages/company-pack/README.md) 为准；维护者首跑含 vendor 构建（分钟级），与收件人 5 分钟安装是两条路。inject 边数不再写死（条数以 `package.json` 为准）。
 5. **干净 clone 验收暴露的死指针收口。** 在 `/tmp` 做真 clean clone（`git clone --no-hardlinks` + submodule + `pnpm install` + vendor install + `bundle:init` + `pnpm run setup`）：`pnpm verify` 首跑 **5 FAIL**，全是 tests/harness（已退役）死指针——[testing.md](../../docs/testing.md) 与旧 Note [test-asset-naming](./2026-11-13-test-asset-naming.md) 把它当活指针；暖树没红是因为本地留了空目录 tests/harness/（git 不跟踪空目录，clean clone 没有）。修：testing / dev-loop 的现行目录清单更新到 `tests/{host,lib,content}` 与 `tests/{repo,contract,tools,session,evidence,ui}`；旧 Note 的历史名改为非反引号叙述；删空目录。clean clone 重跑 verify 红→绿。
 6. **tests/presets 纳入类型面（2026-11-15 追补）。** 把 `tests/presets/**/*.ts` 加进 `tsconfig.test-company.json` 后首跑暴露 **24 个类型错误**（8 个 spec：字面对象按 string 索引、`Set<never>`、可能 undefined 的数组下标/捕获组）；逐文件加类型表与非空断言/守卫，不改测试语义。覆盖从 213→**226/244**；未接 18 = contract 5 + pack-exports 1 + client 4 + host 8。AGENTS / tests README / testing / dev-loop 四处数字同步。
-7. **生成物随行号漂移 + 配置计数纠偏。** 类型修让 delegation spec 行号下移，`tests/BUG-COVERAGE.generated.md` 必须 `node tools/bug-coverage.mjs --write` 重生成（204 行），否则 `tests/repo/budget/bug-coverage.spec.ts` 逐字比对红。另把四份文档里的「四个 tsconfig.test-*」改为盘上实数**三个**，并修 tests/README 的两处旧枚举。
+7. **生成物随行号漂移 + 配置计数纠偏。** 类型修让 delegation spec 行号下移，`tests/BUG-COVERAGE.generated.md` 必须 `node tools/repo/bug-coverage.mjs --write` 重生成（204 行），否则 `tests/repo/budget/bug-coverage.spec.ts` 逐字比对红。另把四份文档里的「四个 tsconfig.test-*」改为盘上实数**三个**，并修 tests/README 的两处旧枚举。
 8. **0.11.7 发布准备（本地，不 publish）。** `pnpm release --bump patch` → CHANGELOG 填 0.11.7 用户可见变化 → `--prepare`（268 条目，tgz sha `3f797ca4…`）→ `--verify` **7/7 pass**（verify/test/release-smoke/company-entry/client-load/preset/present-catalog）；`market-index.staged.json` 同步 0.11.7。**不 npm publish**：publish 是人工 handoff，staged 保持在场；READY 只按 pre-publish 口径核对。READY 原话（a79491eb）：`release: READY 0.11.7 @ a79491eb（tgz 268 条目；7 项检查 pass）`。
 9. **18 个混面/直引 vendor spec 不新增类型工程（试过并证伪）。** 合同-only 工程在 root strict 配置下编译 vendor cordis 源触发 `exactOptionalPropertyTypes` / `noImplicitThis` / `override` 等错误；全 18 的混合工程另有 20 个 mock 类型错（client/host）。结论 = 现有 exclusion 是结构性的，不新增第四个 tsconfig；缺口按 [testing.md](../../docs/testing.md) 记。
 
@@ -55,11 +55,11 @@
 | 干净 clone | `git clone --no-hardlinks` + submodule + `pnpm install` + vendor install + `bundle:init` + `pnpm run setup` → 构建成功；verify 红→绿；test 绿；0fb6256c 仅 install+verify 亦 **ALL PASS** | `/tmp` 独立树，不碰工作区 |
 | 类型 | `pnpm typecheck` → exit 0（含新纳入的 tests/presets 13 spec） | 改前 / 改后各一次；新增覆盖抓到 24 个类型错误并修 |
 | presets 类型面 | 加 `tests/presets` 后首跑 **24 errors / 8 files**；修 typings 后 exit 0；`pnpm test tests/presets` **13 files / 138 tests passed** | 类型断言不改测试语义；lint 0 |
-| 生成物 | 行号漂移后 `node tools/bug-coverage.mjs --write` → **204 行**；`pnpm test tests/repo/budget/bug-coverage.spec.ts` 绿（逐字比对） | 不重生成时该 spec 必红 |
+| 生成物 | 行号漂移后 `node tools/repo/bug-coverage.mjs --write` → **204 行**；`pnpm test tests/repo/budget/bug-coverage.spec.ts` 绿（逐字比对） | 不重生成时该 spec 必红 |
 | 发布准备 | `pnpm release --bump patch` → 0.11.7；`--prepare` → **268 entries / sha 3f797ca4…**；`--verify` → **7/7 pass**（verify/test/release-smoke/company-entry/client-load/preset/present-catalog） | 未 npm publish；staged 0.11.7 在场 |
 | 混面类型试验 | 合同-only tsc → vendor cordis 源 strict 错；全 18 混合 → 20 个 mock 类型错；试验配置已删除、未提交 | 不算覆盖；只作为 exclusion 的结构性证据 |
 | 源码面 | `pnpm lint` 0 warnings / 0 errors；`pnpm dup` 0 clones | 注释与 tsconfig 改动 |
 | 真挂载 | `node checks/lanes/preset.entry.mjs` → **preset-smoke: ALL PASS**（11 preset 逐个 session/create、skills 隔离、client 闭包） | 真 company profile，不是 roster 扫描 |
 | 真页面 | `node checks/lanes/client-load.entry.mjs` → **ALL PASS**（零挂载失败 / 零 loader 错误 / 品牌槽在场） | 真浏览器 |
 | 安装生命周期 | `node checks/lanes/release.entry.mjs`（现场 build + npm pack）→ **ALL PASS**：应用内安装 applied → 干净 profile boot（11 roster 零 broken、session/create）→ 首启落盘 46 件 → 二次 boot 零变更 → remove 摘净且公司状态字节不变 → 重装恢复 | 新字节、干净 profile；不覆盖 Desktop 真机与浏览器首屏 |
-| 发布就绪 | `node tools/release.mjs --check` 仍红（源码面已变但 `_dist` 没重打） | 未 bump / 未重导，按决定 4 属未准备发布 |
+| 发布就绪 | `node tools/release/release.mjs --check` 仍红（源码面已变但 `_dist` 没重打） | 未 bump / 未重导，按决定 4 属未准备发布 |

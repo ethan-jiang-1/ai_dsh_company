@@ -14,7 +14,7 @@ opened: 2026-10-25
 **当前情况：**
 - 包声明（[package.json](../../../packages/company-pack/package.json)）有 `private: true`，没有 `engines`、`license`、`repository`；`dsh.compatibility.dshReleases` 是本地台账，DSH 运行时不读它，真正拦安装的是 peer 范围。
 - 手册（[_dist/安装手册.md](../../../_dist/安装手册.md)）假设收件人已有 `dsh`，只写“验证基线”，没有获取方式、sha256、降级/回滚、支持窗口。
-- 导出器（[tools/export-dist.mjs](../../../tools/export-dist.mjs)）生成手册与 tgz，但没有产物指纹。
+- 导出器（[tools/export-dist.mjs](../../../tools/release/export-dist.mjs)）生成手册与 tgz，但没有产物指纹。
 - DSH 官方兼容字段是 `engines.dsh`（[publish.md](../../../vendor/dsh/docs/user/develop/basic/publish.md)）；安装期/启动期拒绝不兼容包（[app-boot](../../../vendor/dsh/packages/boot/app-boot/README.md)）。
 - 包内没有面向最终用户的 README；pack README 是维护者视角。
 

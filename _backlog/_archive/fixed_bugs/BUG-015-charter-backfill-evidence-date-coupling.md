@@ -19,7 +19,7 @@ opened: 2026-10-12
 
 ## 根因（假设→已证）
 
-[tools/converge.mjs](../../../tools/converge.mjs) 的 `today` 常量（:27）同时服务两个语义：
+[tools/converge.mjs](../../../tools/repo/converge.mjs) 的 `today` 常量（:27）同时服务两个语义：
 证据目录按**收敛日**创建（copyEvidence :85），backfill 指针按**运行日**书写（charterBackfill :219）。
 两日不同即断链。`convergence-${today}/` 路径串在文件内 5 处内联（copyEvidence/计划行/CHARTER 重指/
 notes 重指/backfill），无单一出处。

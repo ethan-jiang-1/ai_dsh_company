@@ -22,12 +22,12 @@ corepack enable pnpm
 pnpm install
 pnpm bundle:init
 pnpm setup                 # vendor host/client/native/web + pack；首次分钟级
-node tools/setup.mjs --check
+node tools/dev/setup.mjs --check
 pnpm verify && pnpm test
 pnpm typecheck
 ```
 
-- `pnpm setup` 无参数；`--check/--types` 用 `node tools/setup.mjs ...`。
+- `pnpm setup` 无参数；`--check/--types` 用 `node tools/dev/setup.mjs ...`。
 - `lib/`、`_dist/*.tgz`、`runtime/` 都是 gitignored：clean clone 没有它们，`npm pack` 会被
   `prepack-check` 拒绝空包。
 - 验收：`setup --check` 全产物、`verify` ALL PASS、`test` 全绿；这就是「源码 handoff 可跑」的证据。

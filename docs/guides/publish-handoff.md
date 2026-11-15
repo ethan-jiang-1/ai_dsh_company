@@ -16,7 +16,7 @@
 ```sh
 shasum -a 256 _dist/dsh-company-pack-<version>.tgz
 cat _dist/release-manifest.json            # artifact.sha256 / sourceFingerprint / gitSha / dirty
-node tools/market-index.mjs --check
+node tools/release/market-index.mjs --check
 ```
 
 发布字节 = `release --check` 验过的 **_dist tarball**；**不要**为了发布另打一次包，也不要 `cd` 进包目录发布。
@@ -40,8 +40,8 @@ npm view dsh-company-pack@<version> version
 （`requiresPublish: true`）；发布成功后：刷新一次 → 删除 staged → 提交。
 
 ```sh
-node tools/market-index.mjs --prepare
-node tools/market-index.mjs --check
+node tools/release/market-index.mjs --prepare
+node tools/release/market-index.mjs --check
 rm market-index.staged.json
 git add market-index.json market-index.staged.json && git commit -m "chore(market): <version>"
 ```
@@ -62,7 +62,7 @@ pnpm --filter @deepseek-ai/dsh-plugin-market-generator start -- \
   它是单文件、图标内联，不需要额外 `icons/` 目录。
 - 例：`https://cdn.jsdelivr.net/gh/ethan-jiang-1/ai_dsh_company@<ref>/market-index.json`
   （`<ref>` 用发布 commit/tag；raw.githubusercontent 同理）。
-- 校验：`node tools/market-index.mjs --check --hosted`（默认读仓库根；名称/版本/图标与包 manifest 一致，
+- 校验：`node tools/release/market-index.mjs --check --hosted`（默认读仓库根；名称/版本/图标与包 manifest 一致，
   DSH 校验器通过，且 served index 不含 `market-index.staged.json` 标记的未发布版本）。自定义位置用 `--out <file-or-dir>`。
   **托管前必须先跑 `--hosted`**：没有它，`--check` 只证形状，不证版本在 registry 里真的存在。
 - 跨源图标必须是 https；本索引用内联 `data:`，不受此限。

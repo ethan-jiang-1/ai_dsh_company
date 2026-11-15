@@ -2,23 +2,23 @@
 // 状态：常驻
 // 何时跑：跑过任何真模型会话后要收口证据、或要把一次 live run 变成可复判的 JSON/markdown 时。
 //   成本：keyless（只读盘 + zstd 解压），秒级；不调模型、不碰网络。
-// 用法：node tools/explore-evidence.mjs --session <rootId> [--home <DSH_HOME>] [--json-out <path>] [--md-out <path>] [--depth 4]
-//       node tools/explore-evidence.mjs --latest [--home <DSH_HOME>]
+// 用法：node tools/observe/explore-evidence.mjs --session <rootId> [--home <DSH_HOME>] [--json-out <path>] [--md-out <path>] [--depth 4]
+//       node tools/observe/explore-evidence.mjs --latest [--home <DSH_HOME>]
 // 判据：首帧 session（preset/depth）、request/header（工具面）、system/message（handbook/workflow 标记）、
 //   skill-catalog、turn/end（终态）、tool/call+tool/result、子代链接、显式 write/edit。
 //   缺首帧显式 `unavailable`，不默认 worker/0；`session/page` 读不到的 team member 直接读盘。
 // 不证明：语义正确、模型判断、UI 渲染；最终正文只作诊断，不参与 PASS。
 import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { zstdText } from './drivers/zstd.mjs'
+import { zstdText } from '../drivers/zstd.mjs'
 import {
   buildSessionEvidence,
   buildSessionTree,
   parseSessionRecords,
   renderSessionTreeMarkdown,
   shortSessionId,
-} from './lib/session-evidence.mjs'
-import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
+} from '../lib/session-evidence.mjs'
+import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 
 const args = process.argv.slice(2)
 const valueOf = (name) => {

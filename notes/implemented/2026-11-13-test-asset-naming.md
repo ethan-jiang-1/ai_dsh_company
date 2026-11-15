@@ -21,7 +21,7 @@
    - `golden → expected`：`ui.expected.json`、`ui-expected-freshness.mjs`、`ui-expected.mjs`、`ui-expected.spec.ts`、
      `--expected` / `--refresh-expected`。理由 = 同仓 `workspace.expected/` 已用 expected；DSH 亦有禁 golden 的门。
    - runner 正名：`fast-lane.mjs` / `keyless-lane.mjs`（名字说明"只调度"）。
-   - `refactor-drift-oracle.mjs` → `tools/refactor-drift.mjs`（工具，不是冒烟；移出注册表）。
+   - `refactor-drift-oracle.mjs` → `tools/repo/refactor-drift.mjs`（工具，不是冒烟；移出注册表）。
    - probes/team/quality-loop-audit.mjs（旧名） → `checks/audit/quality-loop-audit.mjs`（只读审计归位）。
    - 三个浏览器探针 → `*-probe.mjs`；`read-barrier/index.mjs` 是 fixture 入口，不再是"第 69 个探针"（从 PROBES/census 摘出）。
 6. **`naming-contract` 门禁**（`checks/gates/naming-contract.mjs`，已接线）：smoke 根文件只许 `-smoke` / `-lane`；
@@ -62,7 +62,7 @@
 | naming-contract 负例① | checks/lanes/foo-oracle.mjs（负例假路径） 临时落盘 + verify | `FAIL naming-contract: checks/lanes/foo-oracle.mjs → 期望 -smoke.mjs（资产）或 -lane.mjs（runner）`；删除 → 绿 |
 | 负例② | probes/bar-e2e.mjs（负例假路径） | `FAIL naming-contract: probes/bar-e2e.mjs → 期望 -probe.mjs（fixture 入口只允许 <域>/<fixture>/index.mjs）`；删除 → 绿 |
 | 负例③ | checks/lanes/golden-thing-smoke.mjs（负例假路径） | `FAIL naming-contract: … 文件名含禁用词 golden（改用准确的词，如 expected）`；删除 → 绿 |
-| 注册表/census | `node tools/test-census.mjs --write` | 冒烟 31 / 探针 67（工具移出、审计移出、fixture 摘出） |
+| 注册表/census | `node tools/repo/test-census.mjs --write` | 冒烟 31 / 探针 67（工具移出、审计移出、fixture 摘出） |
 | 执行下限 | `node checks/audit/coverage-ratchet.mjs --update` | 191 文件、5 豁免；新路径进入基线，PASS |
 | 全链 | test / typecheck / lint / dup / verify | 2017 passed；0；0；0 clones；ALL PASS |
 

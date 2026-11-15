@@ -61,7 +61,7 @@ try {
     npm_config_verify_deps_before_run: 'false',
   })
   processes = releaseProcesses({ cwd: ROOT, env })
-  if (!existsSync(pack)) throw new Error(`缺 tarball：${pack}；先跑 tools/export-dist.mjs`)
+  if (!existsSync(pack)) throw new Error(`缺 tarball：${pack}；先跑 tools/release/export-dist.mjs`)
   await processes.run(process.execPath, [cli, '--profile', PROFILE, '--from-default-profile', 'web',
     '--dump-default-config'], { cwd: home, timeoutMs: 120_000 })
   writeFileSync(join(profileDir, '.npmrc'), `store-dir=${join(ROOT, '.pnpm-store')}\ncache-dir=${join(home, 'cache/pnpm')}\n`)

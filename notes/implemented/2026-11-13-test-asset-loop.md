@@ -45,7 +45,7 @@
    （上一轮已否决「检查 Note 有没有某节」的重门禁）。
 
 10. **A 件：盘子是生成物，探针也登记，失败类先显式「未分类」。**
-    `tools/lib/test-census.mjs` 建模/渲染 + `tools/test-census.mjs` 写 `tests/CENSUS.generated.md`；
+    `tools/lib/test-census.mjs` 建模/渲染 + `tools/repo/test-census.mjs` 写 `tests/CENSUS.generated.md`；
     数据 = 注册表（32 冒烟 + 69 探针）+ 盘上目录计数（71 门禁 / 246 spec）。32 个冒烟的失败类人工判定进
     `FAILURE_CLASS_BY_NAME`；69 个探针显式记「未分类」并在汇总里报数——**不假装已分类**，下一轮收敛。
 11. **出生登记 = 注册表，不是头注。** 卡里原计划在头注加「失败类 / lane」两行；实作改为注册表字段：
@@ -95,8 +95,8 @@
 | 判据纯逻辑 | `pnpm vitest run tests/tools/coverage-baseline.spec.ts` | 6 passed（回归/新文件/空洞/过期豁免/nextBaseline/index） |
 | pre-push 集成 | `sh .githooks/pre-push < /dev/null` | 全链实跑（verify + typecheck×4 + lint + dup + smoke:fast + surface 未触发 + coverage 棘轮） |
 
-| census 漂移（红） | 手改 `tests/CENSUS.generated.md` 的「冒烟 32 → 99」后跑 spec | `AssertionError: census 是生成物：运行 node tools/test-census.mjs --write`；重新生成 → `Tests 3 passed` |
-| census 一致性（绿） | `node tools/test-census.mjs --write` | `已写 144 行（冒烟 32 / 探针 69 / 门禁 71 / spec 246；未分类 69 = 全部探针）` |
+| census 漂移（红） | 手改 `tests/CENSUS.generated.md` 的「冒烟 32 → 99」后跑 spec | `AssertionError: census 是生成物：运行 node tools/repo/test-census.mjs --write`；重新生成 → `Tests 3 passed` |
+| census 一致性（绿） | `node tools/repo/test-census.mjs --write` | `已写 144 行（冒烟 32 / 探针 69 / 门禁 71 / spec 246；未分类 69 = 全部探针）` |
 | 探针登记 | `pnpm vitest run tests/repo/budget/test-census.spec.ts` | 3 passed（探针双向一致、失败类词表、冒烟 0 未分类） |
 
 ## 状态事实与载体
@@ -105,7 +105,7 @@
 - 唯一入口：`tools/lib/asset-lanes.mjs`（lane 成员 + 规则 + 纯匹配）、`checks/pre-push-surfaces.mjs`（取范围 + 跑）、
   `checks/lanes/keyless-lane.mjs`（全量）、`tests/repo/budget/asset-lanes.spec.ts`（空间完备门）；
   执行下限的唯一入口 = `checks/audit/coverage-ratchet.mjs` + `tools/lib/coverage-baseline.mjs` + `tests/support/coverage-baseline.json`；
-  失败类决策表 = `tests/failure-classes.md`；账本三列 = `close-out-definition` / `agent-note-definition` skill；盘子 = `tools/test-census.mjs` → `tests/CENSUS.generated.md`（生成物），一致性 = `tests/repo/budget/test-census.spec.ts`。
+  失败类决策表 = `tests/failure-classes.md`；账本三列 = `close-out-definition` / `agent-note-definition` skill；盘子 = `tools/repo/test-census.mjs` → `tests/CENSUS.generated.md`（生成物），一致性 = `tests/repo/budget/test-census.spec.ts`。
 - 读载体：`tests/README.md`「按面触发」一段、`checks/README.md` quick-select、`.githooks/pre-push` 头注、
   `checks/INDEX.generated.md`（生成物）。
 - 一致性判据：`fast-lane.mjs` 从注册表派生；spec 双向校验；weekly 成员 = `laneOf('weekly')` 的 classic 子集。

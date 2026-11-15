@@ -13,7 +13,7 @@
 3. checks/smoke/（旧目录，已删） → `checks/lanes/`；29 个资产按证据类型改为 `.e2e.mjs`（5）/ `.entry.mjs`（24）；
    runner `fast-lane.mjs` / `keyless-lane.mjs` 留下；两条门禁自测 → `tests/checks/*.test.mjs`。
 4. 四条命令：`test:spec` / `test:e2e` / `test:entry` / `test:checks`；`pnpm test` 保留兼容（= vitest）。
-   `keyless-lane --suffix` 是 e2e/entry 的分派器；`test:checks` 由 `tools/run-check-tests.mjs` 发现执行。
+   `keyless-lane --suffix` 是 e2e/entry 的分派器；`test:checks` 由 `tools/repo/run-check-tests.mjs` 发现执行。
 5. 注册表加 `SUFFIX_BY_NAME` / `suffixOf()`；资产名 = base，文件 = `<name>.<suffix>.mjs`。census 冒烟 29。
 
 ## 输掉的方案

@@ -188,7 +188,7 @@ export function archiveMovePlan(dirName, wsRel = 'company-workspace') {
 /**
  * 收敛/续跑后重建成品索引的**命令形状**（2026-10-20；成品目录卡的「未接 converge」）。
  * 为什么只给形状、不在这里起进程：回归层不许起子进程（layering 守卫），真执行留在
- * `tools/converge.mjs` 驱动层；生成器是单一来源（`tools/deliverables-index.mjs`），
+ * `tools/repo/converge.mjs` 驱动层；生成器是单一来源（`tools/repo/deliverables-index.mjs`），
  * 收敛器不重写扫描逻辑。
  * @param {object} input
  * @param {string} input.root - 仓库根。
@@ -196,7 +196,7 @@ export function archiveMovePlan(dirName, wsRel = 'company-workspace') {
  * @returns {{ command: string, args: string[], cwd: string }} spawnSync 参数。
  */
 export function catalogIndexInvocation({ root, execPath = process.execPath }) {
-  return { command: execPath, args: [join(root, 'tools', 'deliverables-index.mjs')], cwd: root }
+  return { command: execPath, args: [join(root, 'tools', 'repo', 'deliverables-index.mjs')], cwd: root }
 }
 
 /**
@@ -270,7 +270,7 @@ export function steps(state) {
     { kind: 'archive-move', label: `fs rename ${wsRel}/deliverables/${state.dirName} → ${wsRel}/deliverables-archive/${state.dirName}`, ...move },
     ...journal.map(entry => ({ kind: 'clear-journal', label: `清 live journal kb/${entry.role}/journal/${entry.file}（副本已入归档件 journal/）`, entry })),
     { kind: 'ledger-append', label: `台账追加一行（逐字取 meta：${state.conclusion.slice(0, 40)}…）` },
-    { kind: 'rebuild-index', label: '成品索引重建（node tools/deliverables-index.mjs）' },
-    { kind: 'backfill-hint', label: `CHARTER 历史纪要补登：node tools/converge.mjs --charter-backfill ${state.dirName}（结论逐字取 meta）` },
+    { kind: 'rebuild-index', label: '成品索引重建（node tools/repo/deliverables-index.mjs）' },
+    { kind: 'backfill-hint', label: `CHARTER 历史纪要补登：node tools/repo/converge.mjs --charter-backfill ${state.dirName}（结论逐字取 meta）` },
   ]
 }

@@ -14,7 +14,7 @@ opened: 2026-10-25
 **当前情况：**
 - [run/env.sh](../../../run/env.sh) 无条件导出 `DSH_HOME` 到 `runtime/harness-home`、`DSH_COMPANY_HOME` 到仓库 `company-workspace`，并 `DSH_COMPANY_BOOTSTRAP=off`。
 - dev profile 的 pack 依赖是绝对 `link:`（runtime 状态，gitignored）；仓库搬家后没有 relink/repair。
-- [bundle-init.mjs](../../../tools/bundle-init.mjs) 把制度件做成指回 pack 的符号链接；这是维护者 single-source，不是可移植部署。
+- [bundle-init.mjs](../../../tools/dev/bundle-init.mjs) 把制度件做成指回 pack 的符号链接；这是维护者 single-source，不是可移植部署。
 - [bootstrap.md](../../../docs/guides/bootstrap.md) 是长配方；fresh-clone CI 只跑 install + bundle:init + verify，不构建 host/native/pack、不起 web（[fresh-clone.yml](../../../.github/workflows/fresh-clone.yml)）。
 - DSH 官方源码直跑 = 先 `pnpm run build`，再 `pnpm dsh`；launcher 不检查产物新鲜度。
 - 没有 doctor/preflight、`--home`/`--reset`、迁移检测。

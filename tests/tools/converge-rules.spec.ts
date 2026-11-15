@@ -232,7 +232,7 @@ describe('converge-rules · 成品索引重建命令（2026-10-20；收敛后自
   it('命令指向生成器，cwd = 仓库根；收敛器不重写扫描逻辑', () => {
     const invocation = catalogIndexInvocation({ root: '/repo', execPath: '/node' })
     expect(invocation.command).toBe('/node')
-    expect(invocation.args).toEqual(['/repo/tools/deliverables-index.mjs'])
+    expect(invocation.args).toEqual(['/repo/tools/repo/deliverables-index.mjs'])
     expect(invocation.cwd).toBe('/repo')
   })
 })
@@ -346,8 +346,8 @@ describe('converge-rules · 收敛动作序列 steps（计划与执行同源；2
       'fs rename company-workspace/deliverables/2026-10-20-demo → company-workspace/deliverables-archive/2026-10-20-demo',
       '清 live journal kb/ceo/journal/2026-10-20-demo.md（副本已入归档件 journal/）',
       '台账追加一行（逐字取 meta：做完了这件事…）',
-      '成品索引重建（node tools/deliverables-index.mjs）',
-      'CHARTER 历史纪要补登：node tools/converge.mjs --charter-backfill 2026-10-20-demo（结论逐字取 meta）',
+      '成品索引重建（node tools/repo/deliverables-index.mjs）',
+      'CHARTER 历史纪要补登：node tools/repo/converge.mjs --charter-backfill 2026-10-20-demo（结论逐字取 meta）',
     ])
   })
 

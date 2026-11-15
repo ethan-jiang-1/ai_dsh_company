@@ -4,13 +4,13 @@
 // 作用：清 `runtime/` 下 >N 天（默认 7）的**生成物**——会话日志、探针证据、诊断现场、e2e 残留、tmp。
 //   四条留人：① 被 tracked markdown 引用的（删了会断链/失真）；② git tracked 的；③ README；④ 未到天数。
 //   插件内容（packages/company-pack）、docs/、tests/、checks/、probes/ 全不在射程。
-// 用法：node tools/prune-runtime.mjs [--days 7] [--apply]
+// 用法：node tools/repo/prune-runtime.mjs [--days 7] [--apply]
 // 退出码：0 = 正常；2 = 环境不满足（git 不可用）。
 import { spawnSync } from 'node:child_process'
 import { existsSync, lstatSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
-import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { selectPrunable } from './lib/prune-runtime.mjs'
+import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { selectPrunable } from '../lib/prune-runtime.mjs'
 
 const arg = (name, fallback) => {
   const index = process.argv.indexOf(`--${name}`)

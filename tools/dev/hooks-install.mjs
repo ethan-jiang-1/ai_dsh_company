@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：`pnpm install` 后自动（prepare）；也可手动 `node tools/hooks-install.mjs`。改动 hook 接线逻辑后同跑。
+// 何时跑：`pnpm install` 后自动（prepare）；也可手动 `node tools/dev/hooks-install.mjs`。改动 hook 接线逻辑后同跑。
 //
 // 为什么：core.hooksPath 是本地 git config，不随 clone 走；只在 `source run/env.sh` 里接线，
 // 会让“忘了 source”的 agent 在 push 时静默跳过 verify/test。prepare 把接线前移到 install，
@@ -8,7 +8,7 @@
 import { existsSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { join } from 'node:path'
-import { repositoryRoot } from './lib/repository-layout.mjs'
+import { repositoryRoot } from '../lib/repository-layout.mjs'
 
 const hooks = join(repositoryRoot, '.githooks')
 const prePush = join(hooks, 'pre-push')

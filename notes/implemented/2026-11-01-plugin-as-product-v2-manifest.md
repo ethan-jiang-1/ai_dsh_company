@@ -17,7 +17,7 @@
 
 1. **产品入口 = 独立 `company` profile**：`dsh-company` 启动器（packages/company-pack/bin/dsh-company.mjs（0.6.0 已删除），
    pack `bin` 字段 → 安装后落在 profile 的 `node_modules/.bin`）与 repo 形态转发器
-   （`tools/company.mjs` → `pnpm company`）。形状 = 解析/询问 workspace → 建/验 profile → 装/修 pack →
+   （`tools/dev/company.mjs` → `pnpm company`）。形状 = 解析/询问 workspace → 建/验 profile → 装/修 pack →
    写 seed consent → 设 `DSH_HOME`/`DSH_COMPANY_HOME` → spawn `dsh --profile company`。
 2. **workspace 必须显式**：取消默认 `<DSH_HOME>/company-workspace`。来源顺序 = `--workspace` /
    `DSH_COMPANY_HOME` / 最近一次 / TTY 询问；无值且非交互 ⇒ 退出码 2 + 两条可执行命令。`--print` 只打印解析结果。
@@ -51,7 +51,7 @@
 
 ## 实现与落点
 
-- packages/company-pack/bin/dsh-company.mjs（0.6.0 已删除）（唯一启动器实现）+ `tools/company.mjs`（repo 形态转发，`pnpm company`）。
+- packages/company-pack/bin/dsh-company.mjs（0.6.0 已删除）（唯一启动器实现）+ `tools/dev/company.mjs`（repo 形态转发，`pnpm company`）。
 - `packages/company-pack/src/host/run-bundle/bootstrap.ts`：`planBootstrap` / `applyBootstrap` / `seedAllowed` /
   `validateCompanyHome` / `chooseHandbookTarget` / consent 读写。
 - `packages/company-pack/src/host/run-bundle/bundle-manifest.ts`：`BUNDLE_MANIFEST_VERSION = 2`、`bundleManifestPath(workspace)`、
@@ -62,7 +62,7 @@
 - packages/company-pack/src/host/register-workspace.ts（0.6.0 已删除）（新）：boot 登记 row；**不放进 pack bundle**（会被
   Client 组合加载），由启动器写进 profile 的 `cordis.patch.yml`（`company-workspace-register`）。
 - `presets/*/agent.cordis.yml`：`instructionFileCandidates` 五角色同加。
-- 门禁/索引：`checks/README.md` 增 `pnpm company` 入口行；`tools/company.mjs` 补「状态：常驻」头注。
+- 门禁/索引：`checks/README.md` 增 `pnpm company` 入口行；`tools/dev/company.mjs` 补「状态：常驻」头注。
 
 ## 验证（真跑过的命令与形态）
 
@@ -82,10 +82,10 @@
 | `tests/host/run-bundle/untrusted-project.spec.ts` | 5/5 PASS（恶意 AGENTS 不覆盖、symlink 不写穿、伪造 consent/危险落点拒绝） |
 
 **红证（本 Note 覆盖的机械面）**
-- `script-index`：`tools/company.mjs` 未进 `checks/README.md` ⇒
-  `FAIL script-index: 未入索引的公开入口：tools/company.mjs`；补索引行后
+- `script-index`：`tools/dev/company.mjs` 未进 `checks/README.md` ⇒
+  `FAIL script-index: 未入索引的公开入口：tools/dev/company.mjs`；补索引行后
   `PASS script-index ×108`。
-- `script-status`：`tools/company.mjs` 缺状态头注 ⇒ `FAIL script-status: … 缺 = tools/company.mjs`；补
+- `script-status`：`tools/dev/company.mjs` 缺状态头注 ⇒ `FAIL script-status: … 缺 = tools/dev/company.mjs`；补
   `// 状态：常驻` 后 `PASS script-status ×163`。
 - `release-ready`：pack 版本 0.5.0 而 CHANGELOG 顶部仍 0.4.6 ⇒ `FAIL release-ready: CHANGELOG.md:5 顶部条目是 0.4.6`；
   补 0.5.0 条目后 `PASS release-ready（0.5.0；条目 2026-11-01）`。

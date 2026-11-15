@@ -8,7 +8,7 @@
 
 两条互相独立的断裂叠在同一个工具上：
 
-1. **证据落点已死**：`tools/converge.mjs` 仍把 journal 副本写到
+1. **证据落点已死**：`tools/repo/converge.mjs` 仍把 journal 副本写到
    `snapshots/archive/convergence-<日期>/<slug>/`，但 [snapshots/README](../../snapshots/README.md)
    自 2026-10-25 起声明产品仓**只留合成场景**，且 `snapshot-index` 门禁把 `archive` 桶里未登记的目录判红。
    真收敛一次 = 盘上多一个未登记场景 = `pnpm verify` 红。10-25 后没真收敛过，所以一直绿。

@@ -21,7 +21,7 @@
 3. **catalog 的 node:fs 是显式例外**：bootstrap/catalog 是部署 provisioning 与 UI 派生索引，不是模型文件访问；模型文件访问仍走 `ctx.fs`。README Data 写明；若未来要进 model 可见面，另立 RFC 迁 `ctx.fs`。
 4. **preset 文件名保留 `agent.cordis.yml`**：它由 `dsh.bundle.patch` 显式引用，不是旧 `.agent-presets/` 目录扫描；改名到 `preset.patch.yml` 只影响可读性、会牵动大量历史指针，本轮不做，README 说明。
 5. **locale/icon 补上**：`locale/en.json`、`zh.json` 与原创 `icon.svg`，`exports`/`files` 同步；Config 本轮不引入（只有一个可选 `cultivationRoot`，引入 schemastery peer 会扩大依赖面，记录为显式例外）。
-6. **发布知识内化**：`docs/contracts/release.md` 收敛为合同；[发布 runbook](../../docs/guides/release-runbook.md)、[CHANGELOG](../../CHANGELOG.md)、[release.mjs](../../tools/release.mjs)、`_dist/release-manifest.json`、[release-ready](../../checks/gates/release-ready.mjs) 与 `pnpm release` 已落树。
+6. **发布知识内化**：`docs/contracts/release.md` 收敛为合同；[发布 runbook](../../docs/guides/release-runbook.md)、[CHANGELOG](../../CHANGELOG.md)、[release.mjs](../../tools/release/release.mjs)、`_dist/release-manifest.json`、[release-ready](../../checks/gates/release-ready.mjs) 与 `pnpm release` 已落树。
 7. **FAQ 24 登记**：`docs/reference/external-research.md` 增加一行，指向该目录与吸收落点。
 
 ## 验收
@@ -52,7 +52,7 @@
 - README 六节（Install / What / Configuration / Data / Compatibility / Uninstall）；Data 节写明 D/C/W/U/S/H/X 边界与 node:fs 例外。
 - `locale/en.json`、`locale/zh.json`、`icon.svg`；`pack-meta` 门禁 + `export-dist` 清单 + `pack-metadata` 测试。
 - `dsh.compatibility` 从 package 移除；[checks/gates/lib/compat-tags.json](../../checks/gates/lib/compat-tags.json) 成为唯一台账；`pack-compat` / `sync-dsh` / release-smoke 同步。
-- `CHANGELOG.md`、[release-ready](../../checks/gates/release-ready.mjs)、[release.mjs](../../tools/release.mjs)、[runbook](../../docs/guides/release-runbook.md)；`pnpm release` 的 bump/prepare/verify/check 已实跑。
+- `CHANGELOG.md`、[release-ready](../../checks/gates/release-ready.mjs)、[release.mjs](../../tools/release/release.mjs)、[runbook](../../docs/guides/release-runbook.md)；`pnpm release` 的 bump/prepare/verify/check 已实跑。
 - 0.3.4 tarball 272 条目、sha256 `41a20619b7f8fe0b828eb0108ecb0d90a1490d6c4b8e1a74a784792ea5217e1f`；手册 0.3.4；`_dist/release-manifest.json` 记录 gitSha/各级检查。
 - 0.3.6 补齐：真 vendor `present` → session event → catalog 的 [present-catalog-smoke](../../checks/lanes/present-catalog.e2e.mjs)（并修 `/var`→`/private/var` symlink 匹配 bug）；host cwd guard；lifecycle 单字节篡改拒绝；standalone 缺 pnpm doctor 负例 + 入口搬迁（vendor/packages symlink）测试；T4/T6 断言 + T8 runbook；preset-smoke 增加并发两会话创建不串。0.3.6 曾导出 272 条目，但因 test-only commit 后误重打包导致同版本字节漂移；已加「同版本拒绝重打」护栏，0.3.6 不再作为 handoff。0.3.7 为重新导出的交付字节：272 条目、sha256 `b808012b99ece8f59a1024767b765d5232bd48730938bc2ec4a18df573b398a3`，release --check 9 项 pass。
 

@@ -14,12 +14,12 @@ import { createHash } from 'node:crypto'
 import { createWriteStream, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { devTarballName, ensureDefaultPort, migrationNotice, planDevStart, resolveDevMode, shouldReuseBuild } from './lib/dev-install.mjs'
-import { devBuildFingerprint } from './lib/pack-source.mjs'
-import { redactTokenUrls } from './lib/session-diagnose.mjs'
+import { devTarballName, ensureDefaultPort, migrationNotice, planDevStart, resolveDevMode, shouldReuseBuild } from '../lib/dev-install.mjs'
+import { devBuildFingerprint } from '../lib/pack-source.mjs'
+import { redactTokenUrls } from '../lib/session-diagnose.mjs'
 
 const here = fileURLToPath(import.meta.url)
-const root = resolve(dirname(here), '..')
+const root = resolve(dirname(here), '../..')
 const args = process.argv.slice(2)
 const valueOf = (name) => {
   const index = args.indexOf(name)
@@ -44,7 +44,7 @@ if (!existsSync(workspace)) {
 }
 const cli = join(root, 'vendor/dsh/apps/cli/lib/bin.js')
 if (!existsSync(cli)) {
-  console.error('company(dev): vendor CLI 未构建；先跑 `pnpm setup`（入口 = tools/setup.mjs）')
+  console.error('company(dev): vendor CLI 未构建；先跑 `pnpm setup`（入口 = tools/dev/setup.mjs）')
   process.exit(2)
 }
 const packDir = join(root, 'packages/company-pack')

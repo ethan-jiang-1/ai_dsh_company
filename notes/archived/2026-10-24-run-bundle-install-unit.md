@@ -58,9 +58,9 @@
   `drafts-untracked`）；`company-skeleton` 改为“pack 单源恒查 + dev 盘在场才查符号链接”；
   `handbook-budget` / `doc-budget` / `bare-path` 改读 pack 骨架；`ledger-participation` 在无 dev bundle 时
   如实跳过；`security-scan` 扫描面改 pack 出厂骨架；`dist-manual` 扩内容断言。
-- **dev 入口**：[`tools/bundle-init.mjs`](../../tools/bundle-init.mjs)（`pnpm bundle:init`；已有盘一个字节不动；
+- **dev 入口**：[`tools/bundle-init.mjs`](../../tools/dev/bundle-init.mjs)（`pnpm bundle:init`；已有盘一个字节不动；
   制度件 3 处符号链接指回 pack（`AGENTS.md` / `templates` / `kb/org.md`），5 份 CHARTER 是基部实文件）；[`run/env.sh`](../../run/env.sh) 导出 `DSH_COMPANY_HOME` 并在缺盘时提示。
-- **分发**：[`tools/export-dist.mjs`](../../tools/export-dist.mjs) 手册重写 + 清单加
+- **分发**：[`tools/export-dist.mjs`](../../tools/release/export-dist.mjs) 手册重写 + 清单加
   `workspace/AGENTS.md`/`kb/org.md`/`kb/owners.md` 与禁项（不允许 `company-workspace|sessions|deliverables|cultivation|profiles|credentials`）。
 - **安装冒烟**：[`checks/lanes/release.entry.mjs`](../../checks/lanes/release.entry.mjs) ⑥ 新增
   bundle.json / 干净底座 / 二次启动 manifest 字节不变；并修掉“release-smoke 直接用 dev home → 把临时

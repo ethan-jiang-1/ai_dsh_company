@@ -8,9 +8,9 @@
 // 镜像什么、不动什么（详见 tools/lib/rehearsal.mjs 头注）：
 //   刷新 = seed.json 的公司事实/章程（`kb/`，含 policy-lines / review-protocol / process-docs）
 //   不动 = journal/（不镜像真实 journal）、deliverables/、排练会话写出的任何文件
-// 真盘 company-workspace/ 零写入。用法：node tools/rehearsal-init.mjs
-import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
-import { ensureRehearsalWorkspace, REHEARSAL_REL } from './lib/rehearsal.mjs'
+// 真盘 company-workspace/ 零写入。用法：node tools/dev/rehearsal-init.mjs
+import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../lib/rehearsal.mjs'
 
 ensureRehearsalWorkspace(ROOT)
 console.log(`rehearsal-init: 排练场就绪 ${REHEARSAL_REL}（参考镜像已刷新；排练产物未动；真盘零写入）`)

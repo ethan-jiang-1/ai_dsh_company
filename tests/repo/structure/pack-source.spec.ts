@@ -54,8 +54,8 @@ describe('包源指纹（release 与 dev 缓存共用）', () => {
   })
 
   it('release 的唯一 owner 是 pack-source（不许再私藏第二份清单）', () => {
-    const release = readFileSync(join(ROOT, 'tools/release.mjs'), 'utf8')
-    expect(release).toContain("from './lib/pack-source.mjs'")
+    const release = readFileSync(join(ROOT, 'tools/release/release.mjs'), 'utf8')
+    expect(release).toContain("from '../lib/pack-source.mjs'")
     expect(release).not.toContain('const PACKAGE_SOURCE_DIRS')
   })
 })

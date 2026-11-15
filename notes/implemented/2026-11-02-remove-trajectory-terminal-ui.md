@@ -18,7 +18,7 @@
    CSS/slot 覆盖是脆弱的第二套，不用。
 4. **dev 与产品同形**：改的是包内 patch，dev home 的 tarball 安装与产品用户装同一 tarball 得到同样结果；
    不改 dev 专用 profile patch。
-5. **附带修复启动器清理顺序**：[`tools/company.mjs`](../../tools/company.mjs) 原来在 `plugin add` 之前
+5. **附带修复启动器清理顺序**：[`tools/dev/company.mjs`](../../tools/dev/company.mjs) 原来在 `plugin add` 之前
    删旧 tarball；换内容时 profile 的旧 spec 还要读旧文件，pnpm 报 ENOENT（实测 `abef80f4` → `5fe5f189`
    时 `plugin add` exit 254）。清理移到 add 成功之后；安装失败时旧 tarball 保留，便于重试。
 
@@ -38,7 +38,7 @@
 | 断言 | 命令/环境 | 结果 |
 |---|---|---|
 | patch 形状 | `pnpm test tests/host/ui-surface.spec.ts` | 5 passed：两条行 `disabled: true`、web-app 真行存在、controller 未禁用 |
-| 干净 home 产品形安装 | `tools/company.mjs --home <tmp> --workspace company-workspace --port 0 --no-open` | `dep=file:…dsh-company-pack-0.7.0-5fe5f189.tgz`；banner 出 |
+| 干净 home 产品形安装 | `tools/dev/company.mjs --home <tmp> --workspace company-workspace --port 0 --no-open` | `dep=file:…dsh-company-pack-0.7.0-5fe5f189.tgz`；banner 出 |
 | 真挂载 | 同上 home + `preset-smoke` | ALL PASS（5 角色 + researcher；client 闭包 lint 69 模块） |
 | 运行态行状态 | 运行实例 `pluginInventory/list` | `ui-trajectory` / `ui-sidebar-terminal` `enabled:false`；`terminal-controller`/`ui-attachment`/`ui-chat`/`ui-conversation` `active` |
 | 真页面 | Playwright 打开 company profile 会话 | 主区 tab = `Chat` + `培养`（无 Trajectory）；右栏 guide = 9 个公司页签（待办/看板/依赖图/在场/用量/任务板/培养/台账/成品），无 New terminal；品牌在场、loader 错误 0 |

@@ -47,7 +47,7 @@ export function run({ root, ok, fail }) {
     return
   }
   if (!existsSync(join(root, MANUAL_REL))) {
-    fail('readme-manual-commands', `${MANUAL_REL} 不在盘上——跑 node tools/export-dist.mjs 生成（手册是 README 命令的事实家）`)
+    fail('readme-manual-commands', `${MANUAL_REL} 不在盘上——跑 node tools/release/export-dist.mjs 生成（手册是 README 命令的事实家）`)
     return
   }
   const readmeCommands = dshCommands(readFileSync(join(root, README_REL), 'utf8'))

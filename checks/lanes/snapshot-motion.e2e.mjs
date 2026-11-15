@@ -42,7 +42,7 @@ try {
   const compressed = run('zstd', ['-q', '-c'], { input: '{"type":"session","version":3,"agentPreset":"ceo"}\n', encoding: undefined })
   writeFileSync(join(sessionDir, 'session.v3.jsonl.zstd'), compressed.stdout)
 
-  const cli = join(ROOT, 'tools/snapshot-motion.mjs')
+  const cli = join(ROOT, 'tools/repo/snapshot-motion.mjs')
   const cliArgs = ['--session', sessionId, '--cwd', cwd, '--out', out]
   const env = { ...process.env, DSH_HOME: home }
   run(process.execPath, [cli, ...cliArgs], { cwd: ROOT, env })

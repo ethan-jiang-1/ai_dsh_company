@@ -3,7 +3,7 @@
 梦之队（Dream Team）虚拟公司 DSH 插件（DSH = DeepSeek Harness，唯一权威 = `vendor/dsh` 钉 SHA 子模块，见下「DSH 源码」节）：一个 company pack 提供六个公司角色 preset + 五个 support preset（共 11 个），以及 host/client 面。
 **开工最小路径**（读完这三样就够开工，其余按需；feature 任务先 Plan Mode，规则 = [policy P1](docs/policy.md)）：① 本文件（纪律 + 命令表）；② 你任务那一份 owner——改角色内容 = [presets.md](./docs/contracts/presets.md)、改 host/Web 代码 = [src/README](packages/company-pack/src/README.md)、改文档 = [docs/AGENTS.md](docs/AGENTS.md)、新增/搬内容 = [content-charter](./docs/content-charter.md)、改机制/组合 = [profile.md](./docs/contracts/profile.md)；③ [tests/README.md](tests/README.md) 的「改动面 → 最窄检查」对应行；**接手源码仓 = [源码 handoff](docs/guides/repo-handoff.md)**。**任务源 = 用户点名或已批 RFC；`待落地` 卡不是任务源。** **“落地”= 系统里出现可验证的变更（代码/文档/门禁/模板/技能）+ 实跑证据；写 RFC、搬卡、归档、做计划都不算落地；只产出文档时必须明说“这是立项/交接，不是落地”。缺陷轨同一判据：修 = 改动面 + 红→绿 + 可对账的提交，只翻状态/`git mv` 不算修复（机械门 = `fix-evidence`；细则 = [_backlog 章程](_backlog/README.md)「缺陷的通道」）。**
 **按需**：[项目地图](docs/project-map.md)（空间）、[运行态地图](docs/runtime-map.md)（时序与四轴）、[开发环 §0.5](docs/guides/dev-loop.md#05-任务入口与交接) / [§1](docs/guides/dev-loop.md#1-执行链从授权到有证据交接)（流程细节）、[policy](docs/policy.md)（授权与常设边界）、[测试宪法](docs/testing.md)（证据边界）、[脚本索引](checks/README.md)（逐脚本）、[orient 七问](docs/orient.md)（白话速读）。
-**五条命令**：`pnpm setup`（fresh clone / vendor pin 变后：vendor host/client/native/web + pack 一条命令；入口 = [tools/setup.mjs](tools/setup.mjs)）/ `source run/env.sh && pnpm company --no-open`（repo dev-only；默认 pack + `plugin add file:`，默认 `--port 0`（URL 读启动横幅），`--link` 快速通道；启动入口 = `dsh --profile company`）/ `pnpm verify`（结构门禁）/ `pnpm test`（keyless 回归）/ `pnpm typecheck`（类型面）。新 Agent 首跑验收 = [tests/README.md](tests/README.md) 首跑节；fresh clone 顺序唯一家 = [bootstrap](docs/guides/bootstrap.md)（`pnpm install` → `bundle:init` → `setup` → 验收），本节不复述。`pnpm setup` 无参数；`--check/--types` 用 `node tools/setup.mjs ...`。
+**五条命令**：`pnpm setup`（fresh clone / vendor pin 变后：vendor host/client/native/web + pack 一条命令；入口 = [tools/dev/setup.mjs](tools/dev/setup.mjs)）/ `source run/env.sh && pnpm company --no-open`（repo dev-only；默认 pack + `plugin add file:`，默认 `--port 0`（URL 读启动横幅），`--link` 快速通道；启动入口 = `dsh --profile company`）/ `pnpm verify`（结构门禁）/ `pnpm test`（keyless 回归）/ `pnpm typecheck`（类型面）。新 Agent 首跑验收 = [tests/README.md](tests/README.md) 首跑节；fresh clone 顺序唯一家 = [bootstrap](docs/guides/bootstrap.md)（`pnpm install` → `bundle:init` → `setup` → 验收），本节不复述。`pnpm setup` 无参数；`--check/--types` 用 `node tools/dev/setup.mjs ...`。
 
 **你（读者）= 维护本 repo 的开发 agent**；六个公司角色 + 五个 support preset 是你**维护的产物**（跑在 DSH 会话里，由 `pnpm dsh` / web 观察窗驱动）——别把自己混进公司角色，也别替角色执行公司手册。
 
@@ -21,7 +21,7 @@ _backlog/               推敲层：issues/bugs/research/methods/_archive + trig
 checks/                 验证面：run-gates 门禁；smoke/（真实入口冒烟）+ audit/（盘面日志判据）
 tests/                  keyless 回归（按面分区 spec，导航 = tests/README.md）；真模型/浏览器不进本树——分区导航 = tests/README.md
 probes/                 调试面：窄机制与视觉探针，按机制域四子目录（team/fs-taskboard/browser-visual/session-context）
-tools/                  工具面：维护工具；lib/ 纯逻辑、drivers/ 真实驱动、archive/ 已耗仪器
+tools/                  工具面：dev/ 装环境、observe/ 看运行态、repo/ 维护仓库、release/ 产发布字节；lib/ 纯逻辑、drivers/ 真实驱动、archive/ 已耗仪器
 _dist/                  导出目的地：tarball（gitignored）+ 生成式《安装手册》（唯一 tracked 例外）；owner = docs/contracts/release.md
 run/                    运行面（tracked 启动配置）：env.sh（双 home+裸 dsh 拦截）+ README + company/entry-probe 两 overlay
 runtime/                运行残留家（默认整树 gitignored + 极少数 tracked 白名单；白名单唯一家 = runtime/README.md，本节不复述）：harness-home（开发 DSH_HOME）、第二 home、pw-browsers、排练盘、web-logs（含 token 绝不入库）
@@ -70,7 +70,7 @@ source run/env.sh && node checks/lanes/preset.entry.mjs    # preset 改动的真
 | docs = 当前合同（一处事实一个家，只写 now）；文档卫生 | `docs/AGENTS.md` | docs/ 分层；行预算 = doc-budget 门禁 `DOC_LINE_BUDGETS`；细则 = [docs/AGENTS.md](docs/AGENTS.md) |
 | 非平凡变更同 diff 带 Note（决定/输掉的方案/验证什么）；日志税 | `.agents/notes/README.md` / `AGENTS.md` Conventions | notes/proposed/ → notes/implemented/；写什么 = [notes/README.md](notes/README.md) |
 | 完成定义 = 最小真检查；测试分层；**文件名 = 证据类型**（naming-contract）；真实入口与安装形状 | `docs/testing.md` / `docs/postmortem/0003-web-agent-gui-feedback-loop.md` | 本仓 [测试宪法](docs/testing.md) + layering 守卫；preset = preset-smoke；安装 = release-smoke（[release.md](./docs/contracts/release.md)） |
-| 源码/产物面不混；vendor 钉版本，升 pin 时流程合同重校 | `AGENTS.md` Conventions / [release.md §vendor 政策](./docs/contracts/release.md) | 根 tsconfig extends vendor base；簿记见下节 + `tools/sync-dsh.mjs` |
+| 源码/产物面不混；vendor 钉版本，升 pin 时流程合同重校 | `AGENTS.md` Conventions / [release.md §vendor 政策](./docs/contracts/release.md) | 根 tsconfig extends vendor base；簿记见下节 + `tools/repo/sync-dsh.mjs` |
 | 机械不变量进执行门禁 + 每门带反证（红→还原→绿） | `AGENTS.md` Conventions | `checks/gates/` 目录（清单唯一源；装配 = run-gates.mjs；本表不复述） |
 
 ### vendor 铁律（`pnpm verify` 双门禁强制）

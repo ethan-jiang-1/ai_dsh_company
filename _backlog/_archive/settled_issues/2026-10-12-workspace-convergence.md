@@ -7,7 +7,7 @@ opened: 2026-10-12
 
 > 立卡：2026-10-12 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做（已落地） ｜ 可关闭：是
 > 结论与去向：执行器 = tools/converge.mjs；常态化 = dev-loop §12 收尾清单；政策家不变 = snapshots/README §归档动作。
-> 结论与去向：**做，已落地**（2026-10-12）——执行器 = [tools/converge.mjs](../../../tools/converge.mjs)（政策家 = snapshots/README §归档动作）；常态化入 dev-loop §12 收尾清单；首轮全量收敛 4 slug / journal 39→12 / snapshots 回预算；五缺陷红绿记录见下方推敲与验收表。
+> 结论与去向：**做，已落地**（2026-10-12）——执行器 = [tools/converge.mjs](../../../tools/repo/converge.mjs)（政策家 = snapshots/README §归档动作）；常态化入 dev-loop §12 收尾清单；首轮全量收敛 4 slug / journal 39→12 / snapshots 回预算；五缺陷红绿记录见下方推敲与验收表。
 
 **问题与期望结果：** 用户 2026-10-12 现场指出（原话大意）：「内容不断往上堆，堆到一定程度整个上下文就可能很复杂了」——live 公司盘（deliverables/、kb/<角色>/journal/）随动议持续增长，journal 曾达 39 篇跨 5 角色、live deliverables 曾达 7 slug。堆积的直接代价：角色开工动作（读最近 3 篇 journal）的上下文被历史噪声稀释、live 目录扫盘变慢变吵。期望结果：**堆积有常态化出口**——已闭合动议按结构迁入归档（deliverables-archive + snapshots 证据副本 + journal 清出），且收敛动作低摩擦到「给 agent 说一句话就能清理」。
 

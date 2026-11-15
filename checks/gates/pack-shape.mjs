@@ -19,7 +19,7 @@ if (patchRels.length === 0 || badPatch.length > 0) fail('pack-bundle', `dsh.bund
 else ok(`pack-bundle ×${patchRels.length}`)
 // 已认证 tag 台账（FAQ 24 §9.2：DSH 不读 `dsh.compatibility`；台账住仓库内，不随包分发）。
 // 必须包含当前钉住的 vendor tag——升 pin 不加列 = 没验证过就装作验证过。升 pin 走
-// tools/sync-dsh.mjs（它会同步加列），这条门禁保证忘加就红。
+// tools/repo/sync-dsh.mjs（它会同步加列），这条门禁保证忘加就红。
 let compat
 try {
   compat = JSON.parse(readFileSync(join(root, 'checks/gates/lib/compat-tags.json'), 'utf8'))
@@ -28,7 +28,7 @@ try {
 }
 const compatReleases = compat?.dshReleases
 if (compat !== undefined && (!Array.isArray(compatReleases) || !compatReleases.includes(expectedTag))) {
-  fail('pack-compat', `checks/gates/lib/compat-tags.json 的 dshReleases 必须包含当前钉住的 ${expectedTag}（升 pin 走 tools/sync-dsh.mjs 并同步加列）`)
+  fail('pack-compat', `checks/gates/lib/compat-tags.json 的 dshReleases 必须包含当前钉住的 ${expectedTag}（升 pin 走 tools/repo/sync-dsh.mjs 并同步加列）`)
 } else if (compat !== undefined) {
   ok(`pack-compat (${expectedTag} ×${String(compatReleases.length)})`)
 }

@@ -8,7 +8,7 @@
 // 负例留证 2026-11-14（BUG-163/167）：把 rejected 从 lifecycle 循环删掉 → rejected 缺状态用例变绿（红）；
 //   把日期判据还原成纯形状正则 → 「2026-13-01」用例变绿（红）。
 // 为什么在 tests/checks/ 而不是 tests/：门禁读的是根驱动面（checks/gates），门禁自测统一住这里
-// （同一发现器 = `tools/run-check-tests.mjs`，文件即清单）。
+// （同一发现器 = `tools/repo/run-check-tests.mjs`，文件即清单）。
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'

@@ -13,7 +13,7 @@
 ## 当前事实
 
 - 包声明 [package.json](../../packages/company-pack/package.json) 有 `private: true`，无 `engines`、`license`、`repository`；DSH 运行时不读 `dsh.compatibility.dshReleases`，真正拦安装的是 peers。
-- 手册 [_dist/安装手册.md](../../_dist/安装手册.md) 由 [tools/export-dist.mjs](../../tools/export-dist.mjs) 生成，没有 sha256/前置/回退。
+- 手册 [_dist/安装手册.md](../../_dist/安装手册.md) 由 [tools/export-dist.mjs](../../tools/release/export-dist.mjs) 生成，没有 sha256/前置/回退。
 - [release.entry.mjs](../../checks/lanes/release.entry.mjs) 只覆盖首启/二启；升级只有 [bundle-manifest.spec.ts](../../tests/host/run-bundle/bundle-manifest.spec.ts) 的单测。
 - 门禁 [pack-shape.mjs](../../checks/gates/pack-shape.mjs) 只查 patch 与台账；[dist-manual.mjs](../../checks/gates/dist-manual.mjs) 只查版本/keywords/pin。
 
@@ -79,7 +79,7 @@ node checks/lanes/lifecycle-smoke.mjs
 已落树：
 
 - manifest：`engines.node >=22.19.0`、`engines.dsh >=0.2.1-rc.2 <0.3.0`、`license: UNLICENSED`、`repository`；`private: true` 保留。`pack-shape` 新增 `pack-engines`（semver 从 vendor app-boot 解析；窗口不覆盖当前 pin 即红）。
-- 手册生成器 [tools/export-dist.mjs](../../tools/export-dist.mjs)：算 tgz sha256、写 `*.tgz.sha256`、注入前置/校验/卸载/失败与回退/许可；[dist-manual](../../checks/gates/dist-manual.mjs) 在本体在场时逐字节核对。
+- 手册生成器 [tools/export-dist.mjs](../../tools/release/export-dist.mjs)：算 tgz sha256、写 `*.tgz.sha256`、注入前置/校验/卸载/失败与回退/许可；[dist-manual](../../checks/gates/dist-manual.mjs) 在本体在场时逐字节核对。
 - [lifecycle-smoke.mjs](../../checks/lanes/lifecycle-smoke.mjs)：v1 真装 → 改 `AGENTS.md`/`kb/org.md` + 加 journal/交付物 → v2 真装 → 启动；断言保留/替换/扩张不动/`bundle.json` 前移/二启零变更；卸载后数据仍在；搬 home 后重装启动。另含“bad engines.dsh 真装被拒绝”与 profile 未被污染。
 - 合同：[docs/contracts/release.md](../../docs/contracts/release.md) 写明 engines 是运行时窗口、台账是认证记录、sha256 是产物身份；[checks/README.md](../../checks/README.md) 登记新 smoke；pack README 顶部给收件人入口。
 

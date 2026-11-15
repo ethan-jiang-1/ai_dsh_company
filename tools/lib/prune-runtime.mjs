@@ -1,4 +1,4 @@
-// 运行时数据清扫的**纯判据**（2026-10-23 P7）。IO 留给 tools/prune-runtime.mjs。
+// 运行时数据清扫的**纯判据**（2026-10-23 P7）。IO 留给 tools/repo/prune-runtime.mjs。
 //
 // 用户口径（2026-10-23）：「7 天前的数据都不需要了」——插件内容（packages/company-pack）除外，
 // 其余「过分老的数据」可以清；但先证明没人引用：被 markdown 指着的东西删了会断链/失真，

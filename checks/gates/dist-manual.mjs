@@ -14,14 +14,14 @@ export function run({ root, ok, fail }) {
   const packVersion = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.json'), 'utf8')).version
   const manualPath = join(root, '_dist', '安装手册.md')
   if (!existsSync(manualPath)) {
-    fail('dist-manual', '_dist/安装手册.md 缺失——跑 `node tools/export-dist.mjs` 生成（tracked 生成物，随版本变更同 diff 重导）')
+    fail('dist-manual', '_dist/安装手册.md 缺失——跑 `node tools/release/export-dist.mjs` 生成（tracked 生成物，随版本变更同 diff 重导）')
     return
   }
   const manual = readFileSync(manualPath, 'utf8')
   const header = manual.split('| 版本 |')[1]?.split('|')[0]?.trim()
   const problems = []
   if (header !== packVersion) {
-    problems.push(`表头版本（${header ?? '解析不到'}）≠ pack package.json（${packVersion}）——重跑 \`node tools/export-dist.mjs\` 再提交，别手改手册`)
+    problems.push(`表头版本（${header ?? '解析不到'}）≠ pack package.json（${packVersion}）——重跑 \`node tools/release/export-dist.mjs\` 再提交，别手改手册`)
   }
   const required = ['Plugins', 'dsh --profile company', '.dsh-company/bundle.json', 'content/', 'kb/',
     'deliverables/', 'exports', 'company/ledger', 'sha256', 'DSH', 'dsh --version', '卸载', '回退',
@@ -38,14 +38,14 @@ export function run({ root, ok, fail }) {
   if (!/仅 `dsh web`/.test(manual)) problems.push('手册的 CLI 段缺「仅 `dsh web`」边界')
   if (!manual.includes(expectedTag)) problems.push(`手册缺验证基线 \`${expectedTag}\`（pin 漂了或没重导）`)
   const manualHash = /[0-9a-f]{64}/.exec(manual)?.[0]
-  if (manualHash === undefined) problems.push('手册缺 tgz 的 sha256（64 位十六进制）——重跑 `node tools/export-dist.mjs`')
+  if (manualHash === undefined) problems.push('手册缺 tgz 的 sha256（64 位十六进制）——重跑 `node tools/release/export-dist.mjs`')
   const tarball = join(root, '_dist', `dsh-company-pack-${packVersion}.tgz`)
   if (existsSync(tarball) && manualHash !== undefined) {
     const digest = createHash('sha256').update(readFileSync(tarball)).digest('hex')
-    if (digest !== manualHash) problems.push(`手册 sha256（${manualHash}）≠ tgz 本体（${digest}）——重跑 \`node tools/export-dist.mjs\``)
+    if (digest !== manualHash) problems.push(`手册 sha256（${manualHash}）≠ tgz 本体（${digest}）——重跑 \`node tools/release/export-dist.mjs\``)
     const sidecar = `${tarball}.sha256`
-    if (!existsSync(sidecar)) problems.push('_dist 缺 tgz 的 .sha256 旁文件——重跑 `node tools/export-dist.mjs`')
-    else if (!readFileSync(sidecar, 'utf8').trim().startsWith(digest)) problems.push('_dist 的 .sha256 旁文件与 tgz 本体不一致——重跑 `node tools/export-dist.mjs`')
+    if (!existsSync(sidecar)) problems.push('_dist 缺 tgz 的 .sha256 旁文件——重跑 `node tools/release/export-dist.mjs`')
+    else if (!readFileSync(sidecar, 'utf8').trim().startsWith(digest)) problems.push('_dist 的 .sha256 旁文件与 tgz 本体不一致——重跑 `node tools/release/export-dist.mjs`')
   }
   // 2026-11-11 接手 gap：pack README 随 tarball/npm 分发，指向仓库内相对 `_dist/安装手册.md`
   // 在包外不可达；必须有绝对仓库 URL（tarball 与手册仍为两件套）。负例留证 2026-11-11：
@@ -86,7 +86,7 @@ export function run({ root, ok, fail }) {
       while (at < rendered.length && at < manual.length && rendered[at] === manual[at]) at += 1
       const around = (text) => JSON.stringify(text.slice(Math.max(0, at - 40), at + 60))
       problems.push(`手册不是当前模板的产物（${'tools/lib/install-manual.mjs'} 改了而手册没重生成）：`
-        + `首处差异 @${String(at)} 模板=${around(rendered)} 手册=${around(manual)}——重跑 \`node tools/export-dist.mjs\`（或 release --prepare）`)
+        + `首处差异 @${String(at)} 模板=${around(rendered)} 手册=${around(manual)}——重跑 \`node tools/release/export-dist.mjs\`（或 release --prepare）`)
     }
   } else {
     problems.push('手册头部缺「安装包 / 校验（sha256）/ 打包日期」行——无法复核是否为当前模板产物（重跑 export-dist 再提交）')

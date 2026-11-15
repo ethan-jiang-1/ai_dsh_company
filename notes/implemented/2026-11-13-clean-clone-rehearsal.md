@@ -42,7 +42,7 @@
 |---|---|
 | clean clone `pnpm install` / vendor install / `pnpm bundle:init` | 根 22.7s / vendor 10.8s / seed kb ×16；exit 0（有网络补包） |
 | clean clone `pnpm setup` | exit 0（vendor host types → typert → client types → native → web → pack；约 5 分钟） |
-| clean clone `node tools/setup.mjs --check` | `setup: 产物齐全（vendor CLI / client / web / pack）` |
+| clean clone `node tools/dev/setup.mjs --check` | `setup: 产物齐全（vendor CLI / client / web / pack）` |
 | clean clone `pnpm verify`（修前） | `verify: 3 FAILURE(S)`：`bare-path` 三处（hooks 组 / vendor 根 lib / tool-session-query） |
 | clean clone `pnpm test`（修前） | `1 failed / 241 passed`；`TypeError: Cannot read properties of null (reading 'useId')` @ tab-copy |
 | clean clone `pnpm verify`（修后） | `verify: ALL PASS；3 门无对象（dist-freshness / replay-fixture-freshness / replay-ui-freshness）` |

@@ -106,7 +106,7 @@ describe('kb 旁路装配与生产 seed 同形（BUG-054）', () => {
   })
 
   it('bundle:init 从 seed.json 复制 kb 文件，不再维护第二份清单', () => {
-    const source = readFileSync(join(ROOT, 'tools/bundle-init.mjs'), 'utf8')
+    const source = readFileSync(join(ROOT, 'tools/dev/bundle-init.mjs'), 'utf8')
     expect(source, 'bundle:init 必须走共享 seed 复制面（BUG-054 的根因是旁路清单各自维护）')
       .toContain('seedKbFiles')
     expect(source, '旧固定清单不得残留（它与 seed.json 漂移）')

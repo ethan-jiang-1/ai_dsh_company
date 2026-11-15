@@ -61,8 +61,8 @@
 - `node checks/lanes/preset.entry.mjs`：ALL PASS（五角色 + researcher 可挂载；排练场 v3 镜像）。
 - `node checks/lanes/present-catalog.e2e.mjs`：ALL PASS（present 事件 → `.dsh-company/kb` catalog +
   host-only 账本；workspace 不写旧 W 账本）。
-- `node tools/release.mjs --verify`：全绿（verify/test/release-smoke/client-load/preset/present-catalog）。
-- `_dist/dsh-company-pack-0.6.0.tgz` + 安装手册：`node tools/export-dist.mjs` 生成；sha256 与 manifest 一致。
+- `node tools/release/release.mjs --verify`：全绿（verify/test/release-smoke/client-load/preset/present-catalog）。
+- `_dist/dsh-company-pack-0.6.0.tgz` + 安装手册：`node tools/release/export-dist.mjs` 生成；sha256 与 manifest 一致。
 
 **红→绿证据（改造现场）**：
 - `company-entry-smoke` 首版 workspace 登记偶发失败（banner 已出、登记未完成）→ 把 `apply` 改 async 并

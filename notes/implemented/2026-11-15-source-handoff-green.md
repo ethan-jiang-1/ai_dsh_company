@@ -53,7 +53,7 @@
 
 | 层 | 实跑命令 | 结果 |
 |---|---|---|
-| clean clone 构建 | `git clone --recurse-submodules --no-hardlinks` → `pnpm install` → `bundle:init` → `pnpm setup` → `node tools/setup.mjs --check` | 产物齐全（vendor CLI / client / web / pack） |
+| clean clone 构建 | `git clone --recurse-submodules --no-hardlinks` → `pnpm install` → `bundle:init` → `pnpm setup` → `node tools/dev/setup.mjs --check` | 产物齐全（vendor CLI / client / web / pack） |
 | clean clone 门禁 | `pnpm verify` | **ALL PASS**；3 门无对象（dist-freshness / replay-fixture / replay-ui） |
 | clean clone 回归 | `pnpm test` | **249 files / 2117 passed + 3 skipped**（dev-only 台账） |
 | clean clone 类型 | `pnpm typecheck` | exit 0 |

@@ -56,7 +56,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm bundle:init
       - run: pnpm run setup
-      - run: node tools/setup.mjs --check
+      - run: node tools/dev/setup.mjs --check
       - run: pnpm verify
       - run: pnpm test
       # 2026-11-13（研究 B 件）：环外资产的每周新鲜度回路。真入口证据不在 push 时必跑链里，
@@ -80,8 +80,8 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: node tools/setup.mjs --types
+      - run: node tools/dev/setup.mjs --types
       # 固定已实测的 npm 发布版；pack 的 install 锚必须走全局包，而不是 repo vendor。
       - run: npm install -g @deepseek-ai/dsh@0.2.1-rc.5
-      - run: node tools/export-dist.mjs
+      - run: node tools/release/export-dist.mjs
       - run: node checks/lanes/channel-matrix.entry.mjs --channel global --browser auto

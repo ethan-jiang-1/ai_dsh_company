@@ -4,8 +4,8 @@
 // 成本：秒级 keyless（只读包 manifest/locale/icon + 真校验器）
 // 前置：vendor 已按 bootstrap 构建（校验器在 vendor/dsh/packages/util/plugin-market-index/lib/）；
 //       `--prepare` 读当前包 manifest，不要求 _dist 先在
-// 用法：node tools/market-index.mjs --prepare [--out market-index.json]
-//       node tools/market-index.mjs --check   [--out market-index.json]
+// 用法：node tools/release/market-index.mjs --prepare [--out market-index.json]
+//       node tools/release/market-index.mjs --check   [--out market-index.json]
 //
 // 为什么不是手写 index：形状的唯一权威 = DSH 的 @deepseek-ai/dsh-plugin-market-index。
 // 本工具只做 manifest→条目的映射（字段来源 = vendor apps/plugin-market-generator README），
@@ -14,8 +14,8 @@
 // publishTimestamp 生成时刻；真实 publish 后可用 vendor generator 读 registry 的发布时间再生成。
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { buildMarketIndex, stablePublishTimestamp, unpublishedVersionInIndex } from './lib/market-index.mjs'
-import { repositoryRoot as ROOT } from './lib/repository-layout.mjs'
+import { buildMarketIndex, stablePublishTimestamp, unpublishedVersionInIndex } from '../lib/market-index.mjs'
+import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
 
 const args = process.argv.slice(2)
 const has = flag => args.includes(flag)
@@ -25,8 +25,8 @@ const valueOf = flag => {
 }
 if (has('--help') || has('-h') || (!has('--prepare') && !has('--check'))) {
   console.log(`用法：
-  node tools/market-index.mjs --prepare [--refresh] [--out market-index.json]
-  node tools/market-index.mjs --check   [--out market-index.json] [--hosted]
+  node tools/release/market-index.mjs --prepare [--refresh] [--out market-index.json]
+  node tools/release/market-index.mjs --check   [--out market-index.json] [--hosted]
 
 --prepare：从 packages/company-pack 的 manifest/locale/icon 生成单文件 index（图标内联），并用 DSH 校验器验。
            同版本重复执行字节稳定；发布后加 --refresh 用真实时间。
@@ -38,7 +38,7 @@ if (has('--help') || has('-h') || (!has('--prepare') && !has('--check'))) {
 const VALIDATOR_REL = 'vendor/dsh/packages/util/plugin-market-index/lib/index.js'
 /** 真校验：DSH 的 parseMarketIndex；失败抛带 JSON path 的 MarketIndexError。 */
 const parseWithDshValidator = async (index, indexUrl = 'https://example.invalid/index.json') => {
-  const { parseMarketIndex } = await import('../vendor/dsh/packages/util/plugin-market-index/lib/index.js')
+  const { parseMarketIndex } = await import('../../vendor/dsh/packages/util/plugin-market-index/lib/index.js')
   return parseMarketIndex(index, indexUrl)
 }
 

@@ -1,6 +1,6 @@
 # 公开入口库存（生成物，勿手改）
 
-> 生成：`node tools/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。
+> 生成：`node tools/repo/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。
 > 触发条件/成本/状态唯一源 = 各脚本头注；本文件只回答“有哪些公开入口、在哪”。
 
 ## 冒烟 / 真实入口（checks/lanes/，32）
@@ -110,20 +110,32 @@
 
 ## 维护工具（tools/，27）
 
-[ask-latency](../tools/ask-latency.mjs) · [bug-coverage](../tools/bug-coverage.mjs)
-[bundle-init](../tools/bundle-init.mjs) · [checks-index](../tools/checks-index.mjs)
-[company](../tools/company.mjs) · [converge](../tools/converge.mjs)
-[deliverables-index](../tools/deliverables-index.mjs) · [diagnose](../tools/diagnose.mjs)
-[explore-evidence](../tools/explore-evidence.mjs) · [export-dist](../tools/export-dist.mjs)
-[hooks-install](../tools/hooks-install.mjs) · [market-index](../tools/market-index.mjs)
-[methods-init](../tools/methods-init.mjs) · [notes-audit](../tools/notes-audit.mjs)
-[orient](../tools/orient.mjs) · [propose-sampler](../tools/propose-sampler.mjs)
-[prune-runtime](../tools/prune-runtime.mjs) · [refactor-drift](../tools/refactor-drift.mjs)
-[rehearsal-init](../tools/rehearsal-init.mjs) · [release](../tools/release.mjs)
-[run-check-tests](../tools/run-check-tests.mjs) · [session-log-export](../tools/session-log-export.mjs)
-[setup](../tools/setup.mjs) · [snapshot-motion](../tools/snapshot-motion.mjs)
-[snapshot-path](../tools/snapshot-path.mjs) · [sync-dsh](../tools/sync-dsh.mjs)
-[test-census](../tools/test-census.mjs)
+### dev/（6）
+
+[bundle-init](../tools/dev/bundle-init.mjs) · [company](../tools/dev/company.mjs)
+[hooks-install](../tools/dev/hooks-install.mjs) · [methods-init](../tools/dev/methods-init.mjs)
+[rehearsal-init](../tools/dev/rehearsal-init.mjs) · [setup](../tools/dev/setup.mjs)
+
+### observe/（7）
+
+[ask-latency](../tools/observe/ask-latency.mjs) · [diagnose](../tools/observe/diagnose.mjs)
+[explore-evidence](../tools/observe/explore-evidence.mjs) · [notes-audit](../tools/observe/notes-audit.mjs)
+[orient](../tools/observe/orient.mjs) · [propose-sampler](../tools/observe/propose-sampler.mjs)
+[session-log-export](../tools/observe/session-log-export.mjs)
+
+### release/（3）
+
+[export-dist](../tools/release/export-dist.mjs) · [market-index](../tools/release/market-index.mjs)
+[release](../tools/release/release.mjs)
+
+### repo/（11）
+
+[bug-coverage](../tools/repo/bug-coverage.mjs) · [checks-index](../tools/repo/checks-index.mjs)
+[converge](../tools/repo/converge.mjs) · [deliverables-index](../tools/repo/deliverables-index.mjs)
+[prune-runtime](../tools/repo/prune-runtime.mjs) · [refactor-drift](../tools/repo/refactor-drift.mjs)
+[run-check-tests](../tools/repo/run-check-tests.mjs) · [snapshot-motion](../tools/repo/snapshot-motion.mjs)
+[snapshot-path](../tools/repo/snapshot-path.mjs) · [sync-dsh](../tools/repo/sync-dsh.mjs)
+[test-census](../tools/repo/test-census.mjs)
 
 ## 结构门禁（checks/gates/，75 个模块）
 

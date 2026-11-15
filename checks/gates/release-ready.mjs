@@ -1,6 +1,6 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 // 发布就绪的**源码面**判据（FAQ 24 §6/§9.2）：版本必须有 CHANGELOG 条目，且 package 不再携带
-// DSH 不读的 `dsh.compatibility`。制品/手册/sha 的核对在 `node tools/release.mjs --check`（需要 _dist），
+// DSH 不读的 `dsh.compatibility`。制品/手册/sha 的核对在 `node tools/release/release.mjs --check`（需要 _dist），
 // 这里不依赖 _dist，所以每次 verify 都能跑。
 // 负例留证 2026-10-26：删掉 `## 0.3.3` 整段 → release-ready 红；还原 → 绿。
 import { existsSync, readFileSync } from 'node:fs'

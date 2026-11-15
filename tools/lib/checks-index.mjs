@@ -10,6 +10,23 @@ import { extname, join } from 'node:path'
 
 /** 公开入口所在目录（相对仓库根）。 */
 export const PUBLIC_DIRS = ['checks/lanes', 'checks/audit', 'probes']
+/** 工具面的四个用途组（目录 = 何时进这个门；清单 = 目录本身）。 */
+export const TOOL_GROUPS = ['dev', 'observe', 'repo', 'release']
+/** 工具面顶层允许项：四组 + 实现层三目录 + README。其余一律算散件（文件 / 未知目录 / symlink）。 */
+export const TOOL_TOP_ALLOWED = new Set([...TOOL_GROUPS, 'lib', 'drivers', 'archive', 'README.md'])
+
+/**
+ * 工具面顶层散件：不在 TOOL_TOP_ALLOWED 里的任何 entry。
+ * 为什么：入口只许进四组；散在顶层的新入口会逃出生成库存与「组」的语义。
+ */
+export function strayToolEntries(root) {
+  const dir = join(root, 'tools')
+  if (!existsSync(dir)) return ['tools（目录缺失）']
+  return readdirSync(dir, { withFileTypes: true })
+    .filter(entry => !TOOL_TOP_ALLOWED.has(entry.name))
+    .map(entry => `tools/${entry.name}`)
+    .sort()
+}
 /** 内部实现前缀：不要求进公开库存。 */
 export const EXCLUDED_PREFIXES = ['checks/gates/', 'checks/lib/', 'checks/lanes/lib/', 'tools/drivers/', 'tools/lib/', 'tools/archive/']
 
@@ -27,19 +44,14 @@ function walk(root, rel) {
 }
 
 /**
- * 扫描公开入口：smoke/audit/probes 全树 + tools 顶层；排除内部实现前缀。
+ * 扫描公开入口：smoke/audit/probes 全树 + tools 四个用途组；排除内部实现前缀。
  * @param {string} root 仓库根。
  * @returns {ReadonlyArray<string>} 排序后的仓库相对路径。
  */
 export function scanPublicScripts(root) {
   const scripts = []
   for (const dir of PUBLIC_DIRS) scripts.push(...walk(root, dir))
-  const toolsDir = join(root, 'tools')
-  if (existsSync(toolsDir)) {
-    for (const entry of readdirSync(toolsDir, { withFileTypes: true })) {
-      if (entry.isFile() && entry.name.endsWith('.mjs')) scripts.push(`tools/${entry.name}`)
-    }
-  }
+  for (const group of TOOL_GROUPS) scripts.push(...walk(root, `tools/${group}`))
   return scripts.filter(rel => !EXCLUDED_PREFIXES.some(prefix => rel.startsWith(prefix))).sort()
 }
 
@@ -92,7 +104,7 @@ export function renderScriptInventory(scripts, { gateCount } = {}) {
   const out = [
     '# 公开入口库存（生成物，勿手改）',
     '',
-    '> 生成：`node tools/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。',
+    '> 生成：`node tools/repo/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。',
     '> 触发条件/成本/状态唯一源 = 各脚本头注；本文件只回答“有哪些公开入口、在哪”。',
     '',
     `## 冒烟 / 真实入口（checks/lanes/，${String(laneFiles.length)}）`,
@@ -109,11 +121,22 @@ export function renderScriptInventory(scripts, { gateCount } = {}) {
   for (const [domain, list] of [...probeGroups.entries()].sort(([a], [b]) => a.localeCompare(b))) {
     out.push(`### ${domain}（${String(list.length)}）`, '', ...wrap(links(list)), '')
   }
+  const toolGroups = new Map()
+  for (const rel of tools) {
+    const rest = rel.slice('tools/'.length)
+    const group = rest.includes('/') ? `${rest.split('/')[0]}/` : '（未分组）'
+    const list = toolGroups.get(group) ?? []
+    list.push(rel)
+    toolGroups.set(group, list)
+  }
   out.push(
     `## 维护工具（tools/，${String(tools.length)}）`,
     '',
-    ...wrap(links(tools)),
-    '',
+  )
+  for (const [group, list] of [...toolGroups.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    out.push(`### ${group}（${String(list.length)}）`, '', ...wrap(links(list)), '')
+  }
+  out.push(
     `## 结构门禁（checks/gates/，${String(gateCount ?? '?')} 个模块）`,
     '',
     '清单唯一源 = 目录本身；装配 = [run-gates](run-gates.mjs)，接线一致性由 `gate-wiring` 门禁强制。',

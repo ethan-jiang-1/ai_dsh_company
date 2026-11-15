@@ -35,7 +35,7 @@
 
 | 断言 | 命令/环境 | 结果 |
 |---|---|---|
-| 默认 tarball | 干净 dev home：`tools/company.mjs --home … --workspace company-workspace --port 0 --no-open` | `dep=file:…dsh-company-pack-0.7.0-abef80f4.tgz`；banner；六角色零 broken；`session/create` ceo；无 `did not activate` |
+| 默认 tarball | 干净 dev home：`tools/dev/company.mjs --home … --workspace company-workspace --port 0 --no-open` | `dep=file:…dsh-company-pack-0.7.0-abef80f4.tgz`；banner；六角色零 broken；`session/create` ceo；无 `did not activate` |
 | `--link` 快速通道 | 干净 dev home `--link` | `dep=link:/…/packages/company-pack`；banner |
 | link→tarball 迁移 | 已 link 的 home 再跑默认 | 打印迁移提示后切到 `file:` |
 | 二启幂等 | 同内容再跑 | `安装副本已是最新（file:…abef80f4.tgz）`，不重复 add |

@@ -77,7 +77,7 @@ export function renderCoverage(model) {
   const lines = []
   lines.push('# 历史缺陷 → 具名守卫覆盖（生成物，勿手改）')
   lines.push('')
-  lines.push('> 生成 = `node tools/bug-coverage.mjs --write`；一致门 = `tests/repo/budget/bug-coverage.spec.ts`。')
+  lines.push('> 生成 = `node tools/repo/bug-coverage.mjs --write`；一致门 = `tests/repo/budget/bug-coverage.spec.ts`。')
   lines.push('> 口径 = `it/test/describe` 标题里的 `BUG-<nnn>`；标题没写 BUG 的守卫不计入——「无守卫」是候选缺口，不是「一定没测」。')
   lines.push('')
   lines.push('## 汇总')

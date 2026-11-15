@@ -30,7 +30,7 @@ describe('资产盘子与负债上限棘轮（census + P2 硬顶）', () => {
     const consumers = consumerCount(ROOT, [...ASSETS, ...PROBES])
     const expected = renderCensus(buildCensus({ smokes: ASSETS, probes: PROBES, gateCount, specCount, failureClassOf, consumers }))
     const current = readFileSync(join(ROOT, 'tests/CENSUS.generated.md'), 'utf8')
-    expect(current, 'census 是生成物：运行 node tools/test-census.mjs --write').toBe(expected)
+    expect(current, 'census 是生成物：运行 node tools/repo/test-census.mjs --write').toBe(expected)
   })
 
   it('每个探针都登记且只登记一次', () => {
