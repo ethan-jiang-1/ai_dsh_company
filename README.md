@@ -2,7 +2,8 @@
 
 给一个项目配一间**六人虚拟公司**：CEO 接你的动议，按需要叫上工程、销售、运营、财务、市场，
 开一场会式的经营判断，最后把可交付的成品写进你的项目目录。它装在 DSH 里用——不是独立 App，
-也不是一键托管的全自动公司。
+也不是一键托管的全自动公司。**接手本仓库？** 这是维护者源码 handoff，不是收件人安装包：先读
+[源码 handoff](./docs/guides/repo-handoff.md)；收件人安装看 [_dist/安装手册.md](./_dist/安装手册.md)。
 
 ![梦之队首屏：左侧是公司会话与工作目录，右侧是公司页签菜单](docs/assets/readme-first-screen.png)
 
@@ -85,5 +86,5 @@ Desktop 自带 Node/pnpm；命令行版 DSH 需 pnpm 在 PATH（或 `corepack en
 
 - **完整安装与使用手册**：[安装手册](./_dist/安装手册.md)（与最新导出的发布版同版本；HEAD 未导出的改动以本 README / pack README 为准；tarball 与手册同目录分发，两件套）
 - **出问题了**：先看手册 §九；仍不行去 [仓库 issue](https://github.com/ethan-jiang-1/ai_dsh_company/issues) 提问
-- **开发者**（从源码构建、跑门禁、改角色内容）：[bootstrap](./docs/guides/bootstrap.md)；**本仓库是维护者源码 handoff，不随仓库分发可安装 tarball**（`_dist/*.tgz` gitignored）——收件人两件套由 `pnpm release --prepare` 生成；维护者首跑含 vendor 构建（分钟级），与收件人的 5 分钟安装是两条路。
+- **开发者 / 维护者**（从源码构建、跑门禁、改角色内容）：先读 [源码 handoff](./docs/guides/repo-handoff.md)；**本仓库是维护者源码 handoff，不随仓库分发可安装 tarball**（`_dist/*.tgz` gitignored）——收件人两件套由 `pnpm release --prepare` 生成；维护者首跑含 vendor 构建（分钟级），与收件人的 5 分钟安装是两条路。
 - **Agent / 机制**：[AGENTS.md](./AGENTS.md) · [文档地图](./docs/index.md) · License: MIT

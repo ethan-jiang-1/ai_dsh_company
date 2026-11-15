@@ -2,7 +2,7 @@
 
 > 性质：指南层 runbook——[开发环](./dev-loop.md)管「一笔任务怎么走」，本篇管「环境怎么立起来」。
 > 何时读：新 clone、重建 dev home、vendor 换 tag、任何「跑不起来」的第一站。
-> 出生：2026-09-27 自 dev-loop §7 整段迁入（常驻层瘦身轮；dev-loop §7 留指针、编号不动防既有引用断链）；配方与坑均在钉住 vendor 基线实证（R0/R1，2026-09-22），机制结论以 vendor/dsh 工作树为权威。
+> 出生：2026-09-27 自 dev-loop §7 整段迁入（常驻层瘦身轮；dev-loop §7 留指针、编号不动防既有引用断链）；配方与坑均在钉住 vendor 基线实证（R0/R1，2026-09-22），机制结论以 vendor/dsh 工作树为权威；本源 handoff 构建入口，收件人安装 = [_dist/安装手册.md](../../_dist/安装手册.md)。
 
 ## 先选形状（真插件安装 vs 维护者 dev）
 
@@ -65,7 +65,7 @@ node ./node_modules/typescript/bin/tsc -b packages/company-pack
 #   bundles 列表里若还留着已退役的 schedule bundle，删掉那一项即可。
 #   历史：file: 拷贝时代，presets/*.yml 用编辑工具改会换 inode、安装副本是真拷贝（link count 1），
 #   不重装则改动不可见——默认 tarball 按内容寻址（内容变 → spec 变 → 重装），启动器吸收该坑。
-node checks/lanes/client-load.entry.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位）
+node checks/lanes/client-load.entry.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位；需 chromium：pnpm dlx playwright install chromium，setup 不装）
 pnpm test tests/host/prompt/handbook.spec.ts    # 手册注入完成定义（keyless：content/override/systemPrompt section）
 node checks/lanes/delegation.entry.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
 ```

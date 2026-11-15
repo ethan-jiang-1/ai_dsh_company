@@ -8,7 +8,7 @@
 
 | 我要… | 先读 | 再读 |
 |---|---|---|
-| 第一次接管 / 看全貌 | [orient.md](./orient.md) | [project-map.md](./project-map.md) |
+| 第一次接管 / 看全貌 | [源码 handoff](./guides/repo-handoff.md) · [orient.md](./orient.md) | [project-map.md](./project-map.md) |
 | 跑起来 / 演示 | [演示 runbook](./guides/demo-scenes.md#前置本机) | [guides/bootstrap.md](./guides/bootstrap.md) |
 | 改代码 / 改角色 | [project-map.md](./project-map.md) | [contracts/presets.md](./contracts/presets.md) / [src/README](../packages/company-pack/src/README.md) |
 | 交证据 / 收尾 | [testing.md](./testing.md) | [guides/dev-loop.md](./guides/dev-loop.md) §1/§12 |

@@ -48,7 +48,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 
 - **有 `DEEPSEEK_API_KEY`**：`source run/env.sh && node checks/lanes/entry-probe.entry.mjs`——真模型认证档，
   逐题验证入口链路由与证据（机器分 + 来源哈希；成本与触发见头注）；不进 `pnpm test`、**不作门禁**。
-- **无 key**：`pnpm verify` + `pnpm test` + `node checks/lanes/client-load.entry.mjs`——结构门禁 + keyless 回归 + client 真挂载三件套（前置：`pnpm setup` 已跑完——pack 已装、client/前端 dist 已构建，否则末件报 client bundles not found）。
+- **无 key**：`pnpm verify` + `pnpm test` + `node checks/lanes/client-load.entry.mjs`——结构门禁 + keyless 回归 + client 真挂载三件套（前置：`pnpm setup` 已跑完——pack 已装、client/前端 dist 已构建，否则末件报 client bundles not found；另需 chromium，`pnpm dlx playwright install chromium`，setup 不装）。
 
 ## 验证分层与预算（命令速查；2026-10-27 自开发环 §9.1 迁出）
 
