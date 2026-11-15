@@ -242,7 +242,7 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     index('bugs', 'BUG-013-old.md')
     expect(check(root).join('\n')).toContain('status "活跃" 不属于此桶')
     for (const [id, value] of [['014', '调查中'], ['015', '修复就绪'], ['016', '修复已落地'], ['017', '等人拍板']]) {
-      put(`bugs/BUG-${id}-demo.md`, `---\nstatus: ${value}\nseverity: P2\nopened: 2026-10-09\n---\n\n# Bug\n\n> 严重级别：P2（次要）｜发现：2026-10-09｜状态：${value}\n\n## 已修判定\n\n- [ ] 判据\n`)
+      put(`bugs/BUG-${id}-demo.md`, `---\nstatus: ${value}\nseverity: P2\nopened: 2026-10-09\n---\n\n# Bug\n\n> 严重级别：P2（次要）｜发现：2026-10-09｜状态：${value}\n\n## 复现\n\n\`pnpm test tests/host/demo.spec.ts\`\n\n## 根因与证据\n\n- 证据\n\n## 失败类与同类排查\n\n- 扫过\n\n## 已修判定\n\n- [ ] 判据\n`)
     }
     put('bugs/README.md', '# Index\n\n' + ['BUG-013-old.md', 'BUG-014-demo.md', 'BUG-015-demo.md', 'BUG-016-demo.md', 'BUG-017-demo.md'].map(name => `[material](<${name}>)`).join('\n') + '\n')
     expect(check(root).filter(problem => problem.includes('BUG-0'))).toEqual(['_backlog/bugs/BUG-013-old.md:2 status "活跃" 不属于此桶'])
@@ -308,16 +308,105 @@ describe('backlog institution, migrated headers and recursive membership', () =>
   })
 
   // 2026-11-02（五道门）：缺陷轨两张门票——修复就绪/修复已落地缺判据 = 门没造好。
-  it('requires 已修判定 on a bug at the fix gates', () => {
+  // 2026-11-15（bug-fix 方法显性化）：门票还要求 复现 / 根因与证据 / 失败类与同类排查 在场——
+  //   为什么：修复就绪 = 自授权例外，卡是唯一的事前证据面；只写判据会让「没复现 / 猜根因 / 没扫同类」
+  //   拿到自授权。门只查形状，证据为真仍靠 fix-evidence 与独立盲审。
+  it('requires the pre-ready evidence sections and the judgment on a bug at the fix gates', () => {
     const bug = (id: string, status: string, body = '') =>
       `---\nstatus: ${status}\nseverity: P1\nopened: 2026-11-02\n---\n\n# Bug ${id}\n\n> 严重级别：P1（重要）｜发现：2026-11-02｜状态：${status}\n\n${body}`
+    const bug15 = (id: string, status: string, body = '') =>
+      `---\nstatus: ${status}\nseverity: P1\nopened: 2026-11-15\n---\n\n# Bug ${id}\n\n> 严重级别：P1（重要）｜发现：2026-11-15｜状态：${status}\n\n${body}`
+    const ready = [
+      '## 运行面', '', 'host', '',
+      '## 复现', '', '`pnpm test tests/host/demo.spec.ts`', '',
+      '## 根因与证据', '', '- 会话日志帧 + 对照实验', '',
+      '## 失败类与同类排查', '', '- 扫过 host 同组调用点', '',
+      '## 修复方案与范围', '', '- 根因修法；不改 client', '',
+      '## 已修判定', '', '- [ ] 判据', '',
+    ].join('\n')
+    const minimal = [
+      '## 复现', '', '`pnpm test tests/host/demo.spec.ts`', '',
+      '## 根因与证据', '', '- 证据', '',
+      '## 失败类与同类排查', '', '- 扫过', '',
+      '## 已修判定', '', '- [ ] 判据', '',
+    ].join('\n')
+    const prose = [
+      '## 复现', '', '偶发，见过一次。', '',
+      '## 根因与证据', '', '- 证据', '',
+      '## 失败类与同类排查', '', '- 扫过', '',
+      '## 已修判定', '', '- [ ] 判据', '',
+    ].join('\n')
+    const fenced = [
+      '## 复现', '', '```sh', 'pnpm test tests/host/demo.spec.ts', '```', '',
+      '## 根因与证据', '', '- 证据', '',
+      '## 失败类与同类排查', '', '- 扫过', '',
+      '## 已修判定', '', '- [ ] 判据', '',
+    ].join('\n')
+    const empty = [
+      '## 复现', '',
+      '## 根因与证据', '', '- 证据', '',
+      '## 失败类与同类排查', '', '- 扫过', '',
+      '## 已修判定', '', '- [ ] 判据', '',
+    ].join('\n')
+    const outputOnly = [
+      '## 复现', '', '```text', 'FAIL backlog-liveness: 旧输出', '```', '',
+      '## 根因与证据', '', '- 证据', '',
+      '## 失败类与同类排查', '', '- 扫过', '',
+      '## 已修判定', '', '- [ ] 判据', '',
+    ].join('\n')
+    const stack = [
+      '## 复现', '', '```text', 'node:internal/modules/cjs/loader:1215', '```', '',
+      '## 根因与证据', '', '- 证据', '',
+      '## 失败类与同类排查', '', '- 扫过', '',
+      '## 已修判定', '', '- [ ] 判据', '',
+    ].join('\n')
+    const inlineCd = [
+      '## 复现', '', '`cd company-workspace && pnpm dsh --profile company`', '',
+      '## 根因与证据', '', '- 证据', '',
+      '## 失败类与同类排查', '', '- 扫过', '',
+      '## 已修判定', '', '- [ ] 判据', '',
+    ].join('\n')
+    const fencedBin = [
+      '## 复现', '', '```sh', './node_modules/.bin/tsdown', '```', '',
+      '## 根因与证据', '', '- 证据', '',
+      '## 失败类与同类排查', '', '- 扫过', '',
+      '## 已修判定', '', '- [ ] 判据', '',
+    ].join('\n')
+    const bare = [
+      '## 复现', '', 'pnpm test tests/host/demo.spec.ts', '',
+      '## 根因与证据', '', '- 证据', '',
+      '## 失败类与同类排查', '', '- 扫过', '',
+      '## 已修判定', '', '- [ ] 判据', '',
+    ].join('\n')
     put('bugs/BUG-040-ready.md', bug('040', '修复就绪'))
-    put('bugs/BUG-041-landed.md', bug('041', '修复已落地', '## 已修判定\n\n- [ ] 判据\n'))
+    put('bugs/BUG-041-landed.md', bug('041', '修复已落地', ready))
     put('bugs/BUG-042-investigating.md', bug('042', '调查中'))
-    put('bugs/README.md', '# Index\n\n' + ['BUG-040-ready.md', 'BUG-041-landed.md', 'BUG-042-investigating.md'].map(name => `[material](<${name}>)`).join('\n') + '\n')
+    put('bugs/BUG-043-ready.md', bug('043', '修复就绪', ready))
+    put('bugs/BUG-044-landed-bad.md', bug('044', '修复已落地', '## 已修判定\n\n- [ ] 判据\n'))
+    put('bugs/BUG-045-min.md', bug('045', '修复就绪', minimal))
+    put('bugs/BUG-050-prose.md', bug15('050', '修复就绪', prose))
+    put('bugs/BUG-051-fenced.md', bug15('051', '修复就绪', fenced))
+    put('bugs/BUG-052-empty.md', bug15('052', '修复就绪', empty))
+    put('bugs/BUG-053-output.md', bug15('053', '修复就绪', outputOnly))
+    put('bugs/BUG-054-stack.md', bug15('054', '修复就绪', stack))
+    put('bugs/BUG-055-inline-cd.md', bug15('055', '修复就绪', inlineCd))
+    put('bugs/BUG-056-fenced-bin.md', bug15('056', '修复就绪', fencedBin))
+    put('bugs/BUG-057-bare.md', bug15('057', '修复就绪', bare))
+    put('bugs/README.md', '# Index\n\n' + ['BUG-040-ready.md', 'BUG-041-landed.md', 'BUG-042-investigating.md', 'BUG-043-ready.md', 'BUG-044-landed-bad.md', 'BUG-045-min.md', 'BUG-050-prose.md', 'BUG-051-fenced.md', 'BUG-052-empty.md', 'BUG-053-output.md', 'BUG-054-stack.md', 'BUG-055-inline-cd.md', 'BUG-056-fenced-bin.md', 'BUG-057-bare.md'].map(name => `[material](<${name}>)`).join('\n') + '\n')
     const problems = check(root).join('\n')
     expect(problems).toContain('_backlog/bugs/BUG-040-ready.md:1 「修复就绪」卡缺非空 ## 已修判定')
+    for (const heading of ['复现', '根因与证据', '失败类与同类排查'])
+      expect(problems).toContain(`_backlog/bugs/BUG-040-ready.md:1 「修复就绪」卡缺非空 ## ${heading}`)
+    expect(problems).toContain('_backlog/bugs/BUG-044-landed-bad.md:1 「修复已落地」卡缺非空 ## 复现')
+    for (const id of ['BUG-050-prose', 'BUG-053-output', 'BUG-054-stack', 'BUG-057-bare'])
+      expect(problems).toContain(`_backlog/bugs/${id}.md:11 「修复就绪」卡 ## 复现 没有可执行的命令/脚本`)
+    expect(problems).toContain('_backlog/bugs/BUG-052-empty.md:11 「修复就绪」卡缺非空 ## 复现')
     expect(problems).not.toContain('BUG-041-landed')
+    expect(problems).not.toContain('BUG-043-ready')
+    expect(problems).not.toContain('BUG-045-min')
+    expect(problems).not.toContain('BUG-051-fenced')
+    expect(problems).not.toContain('BUG-055-inline-cd')
+    expect(problems).not.toContain('BUG-056-fenced-bin')
     expect(problems).not.toContain('BUG-042-investigating')
   })
 

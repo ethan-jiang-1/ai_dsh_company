@@ -96,7 +96,17 @@ export function backlogLivenessProblems(backlogRoot) {
   }
   // 「非空 ## 节」= 门票的形状锚：统一消费 `repo-markdown` 的 GFM AST 结构节读取（围栏示例内的标题与字段不算）。
   const EXECUTABLE = /`(?:pnpm|node|git|rg|source|npx)\s+[^`\n]+`|Given\/When\/Then|\bassert\b/
-  const sectionBody = (text, heading) => (readSectionBody(text, heading) ?? '').trim()
+  // 复现节的形状锚：命令住围栏或行内 code；命令词后带 `:` 的是输出（node:/sh:/curl:/git:），不算。
+  //   裸命令行不算——模板要求放进围栏/行内 code；纯散文 / 常见输出前缀同样不算（opened ≥ 2026-11-15）。
+  //   已知边界：`git version …` / `npm ERR! …` 这类命令词+空格的 output 行仍可能过——门只查形状，语义靠人/盲审。
+  const REPRO_WORD = String.raw`(?:pnpm|npm|node|npx|tsc|tsdown|vitest|sh|source|git|rg|curl|dsh|bash|python3?)`
+  const REPRO_BIN = String.raw`(?:[^\s]*\/)?node_modules\/\.bin\/[^\s]+`
+  const REPRO_CMD = String.raw`(?:${REPRO_WORD}(?![:\w.-])|${REPRO_BIN}(?![:\w.-]))(?:[ \t]+\S)?`
+  const REPRO_ARTIFACT = new RegExp(
+    String.raw`(?:^|\n)[ \t]*\x60{3}[^\n]*\n(?:[^\n]*\n)*?[ \t]*(?:\$ |PS> )?(?:(?:cd[ \t]+[^\n&]+[ \t]*&&[ \t]*)*)${REPRO_CMD}` +
+    '|\\x60[^\\x60\\n]*?' + REPRO_CMD + '[^\\x60\\n]*\\x60|Given\\/When\\/Then|\\bassert\\b',
+  )
+  const sectionBody = (text, heading, options) => (readSectionBody(text, heading, options) ?? '').trim()
   // Source graduation checks inspect only the first 12 lines: historical discussion is not a verdict.
   const closureSignals = [
     /可关闭\s*[：:=＝]\s*是\s*(?=[｜|\n（(]|$)/,
@@ -238,6 +248,19 @@ export function backlogLivenessProblems(backlogRoot) {
       if (pool === 'bugs' && (data.status === '修复就绪' || data.status === '修复已落地')) {
         if (!sectionBody(text, '已修判定'))
           problems.push(`${where}:${lineOf(text, '## 已修判定')} 「${data.status}」卡缺非空 ## 已修判定——该翻转即门票，先写判据再翻`)
+        // 2026-11-15（缺陷修复方法显性化）：翻修复就绪前，复现/根因证据/同类排查也必须在场。
+        //   为什么：修复就绪 = 自授权例外，卡是唯一的事前证据面；只写「已修判定」会让「没复现 /
+        //   猜根因 / 没扫同类」照样拿到自授权。门只查形状，不证明证据为真（真证据仍靠 fix-evidence
+        //   与独立盲审）。规则唯一家 = _backlog/README.md「缺陷的通道」；步骤 = _backlog/methods/bug-fix.md；模板 = _backlog/bugs/README.md。
+        //   复现/根因/同类排查的证据常住房围栏（命令/日志/JSON）；这三节按 raw body 判非空，围栏内容
+        //   也算，否则合法卡会被假红。已修判定仍按结构行（判据应是可读的一句，不是示例块）。
+        const repro = sectionBody(text, '复现', { structuralOnly: false })
+        for (const [heading, label] of [['复现', '红色复现'], ['根因与证据', '根因证据'], ['失败类与同类排查', '同类排查']]) {
+          if (!sectionBody(text, heading, { structuralOnly: false }))
+            problems.push(`${where}:${lineOf(text, `## ${heading}`)} 「${data.status}」卡缺非空 ## ${heading}——翻门票前先把${label}写在卡上`)
+        }
+        if (repro && String(data.opened ?? '') >= '2026-11-15' && !REPRO_ARTIFACT.test(repro))
+          problems.push(`${where}:${lineOf(text, '## 复现')} 「${data.status}」卡 ## 复现 没有可执行的命令/脚本——命令放进围栏或行内 code；纯散文 / 只贴输出不算`)
       }
       // 2026-11-02（五道门落地）：归档「毕业：做」卡的去向升级为封闭集值 + 审查记录在场。
       //   生效日 = 2026-11-03：规则落地当天及以前的卡按原契约（去向在场即可），不追改已归档正文。
@@ -278,7 +301,8 @@ export function backlogLivenessProblems(backlogRoot) {
       //   ② 状态行「毕业：马上做」→ `「毕业：马上做」头不在封闭集（未定|做|以后做|不做|消化）` 红；
       //   ③ 活跃卡无 > 状态行 → `缺状态行（> … ｜ 状态：<frontmatter 值> ｜ …）` 红；
       //   ④ 缺陷卡 frontmatter 旧值 活跃 → `status "活跃" 不属于此桶` 红；
-      //   ⑤ 修复就绪卡缺 ## 已修判定 → 不报警（验收在场检查族按用户裁定延后，记承压候选——如实不查）。
+      //   ⑤ 修复就绪卡缺 ## 已修判定 → 当时不报警（承压候选）；2026-11-02 起成为门票检查，
+      //      2026-11-15 起还要求 复现/根因与证据/失败类与同类排查（见上方检查块）。
       if (pool === 'issues' || pool === 'bugs') {
         const statusLine = findStatusLine(text)
         if (!statusLine) problems.push(`${where}:1 缺状态行（> … ｜ 状态：<frontmatter 值> ｜ …）`)

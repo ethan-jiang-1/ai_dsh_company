@@ -28,9 +28,21 @@ import { backlogLivenessProblems } from '../../tools/lib/backlog-liveness.mjs'
 //     删卡与索引行 → `verify: ALL PASS`。spec 正负例 = tests/tools/backlog-liveness.spec.ts。
 // 留在本文件的是调用与上面这段「为什么」——判据正文只有一份实现，spec 改为直接 import 该模块
 // （原先 spec 靠切本文件源码 + vm 求值，改这里的注释就会假红，已实测证伪后拆除）。
+// 2026-11-15（缺陷修复方法显性化）：`修复就绪`/`修复已落地` 除 `## 已修判定` 外，还要求
+//   `## 复现` / `## 根因与证据` / `## 失败类与同类排查` 非空——修复就绪是自授权例外，卡是唯一的事前
+//   证据面；没复现 / 猜根因 / 没扫同类照样拿自授权是复发风险。规则唯一家 =
+//   _backlog/README.md「缺陷的通道」；步骤唯一家 = _backlog/methods/bug-fix.md；模板 = _backlog/bugs/README.md。
+//   负例留证 2026-11-15（真树植入 BUG-999 zz-probe，实跑原话）：
+//     `FAIL backlog-liveness: _backlog/bugs/BUG-999-zz-probe.md:1 「修复就绪」卡缺非空 ## 复现——翻门票前先把红色复现写在卡上；… ## 根因与证据——…；… ## 失败类与同类排查——…`；
+//     删卡 + 索引行 → `verify: ALL PASS`。
+//   负例留证 2026-11-15（复现没有围栏/行内命令，opened ≥ 2026-11-15；真树植入 BUG-997 zz-prose）：
+//     `FAIL backlog-liveness: _backlog/bugs/BUG-997-zz-prose.md:11 「修复就绪」卡 ## 复现 没有可执行的命令/脚本——命令放进围栏或行内 code；纯散文 / 只贴输出不算`；
+//     删卡 + 索引行 → `verify: ALL PASS`。围栏命令、行内命令、`cd … && …`、`./node_modules/.bin/tsdown` 在 spec 正例里绿；
+//     只贴输出（`node:` 堆栈）、裸行在 spec 负例里红。spec 正负例 = tests/tools/backlog-liveness.spec.ts。
+//   已知边界：`git version …` / `npm ERR! …` 这类命令词+空格的 output 行仍可能过——门只查形状，语义靠人/盲审。
 export function run({ root, ok, fail }) {
   const problems = backlogLivenessProblems(join(root, '_backlog'))
   problems.length === 0
-    ? ok('backlog-liveness（制度目录/README、卡头、关闭判断、method 形状、递归索引、研究题两级索引、归档做卡去向、五道门门票/去向/审查）')
+    ? ok('backlog-liveness（制度目录/README、卡头、关闭判断、method 形状、递归索引、研究题两级索引、归档做卡去向、五道门门票/去向/审查、修复就绪证据节）')
     : fail('backlog-liveness', problems.join('；'))
 }

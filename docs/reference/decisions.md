@@ -61,6 +61,7 @@
 | <a id="d58"></a>D58 | VP-Eng 三门：根门=Lead（带小队）；命名 child 按 agentPreset 请 CMO；CEO teammate 受 maxDepth 1 | [teaming Note](../../notes/archived/2026-11-07-requirements-teaming-program.md) |
 | <a id="d60"></a>D60 | 质量环 = 两个 support 能力档 + 流程 skill + 角色方法层（任务书点名 `<pack>@<version>`）+ 事后审计；对外签字归人 | [Note](../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md) · [卡](../../_backlog/_archive/settled_issues/2026-11-10-producer-verifier-quality-loop.md) |
 | <a id="d61"></a>D61 | PRD 定义形态 = headings（`### REQ-###` 小节 + 行首字段）；旧 json-ledger 只读兼容；`present` 前自动 `/prd check`，红则拒绝交付 | [PRD headings Note](../../notes/implemented/2026-11-13-prd-headings-definition.md) |
+| <a id="d62"></a>D62 | 缺陷修复轨显性化：bug-fix 方法 + 按根因成批 + 修复就绪四节证据门 | [Note](../../notes/implemented/2026-11-15-defect-fix-method.md) |
 
 ## 已退役
 
