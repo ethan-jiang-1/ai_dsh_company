@@ -877,7 +877,7 @@ CMO 深度门都正确。
 | [delegation 合同](../../../docs/contracts/delegation.md) / [presets 合同](../../../docs/contracts/presets.md) | 当前人读合同；tool 行以 preset 为准 |
 | [presets](../../../packages/company-pack/presets) | vp-eng / CEO / worker family 的声明面 |
 | [subagent-retry.ts](../../../packages/company-pack/src/host/delegation/subagent-retry.ts) / [spec](../../../tests/host/delegation/subagent-retry.spec.ts) | 重试原语与 keyless 分类 |
-| [delegation-tree.ts](../../../packages/company-pack/src/lib/delegation-tree.ts) / [DelegationFlowPanel](../../../packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx) | 图/UI 投影与终态 |
+| [delegation-tree.ts](../../../packages/company-pack/src/lib/delegation/delegation-tree.ts) / [DelegationFlowPanel](../../../packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx) | 图/UI 投影与终态 |
 | [vendor/dsh](../../../vendor/dsh) | workflow/subagent/team 机制一手来源；只读 |
 
 ## 范围与排除项

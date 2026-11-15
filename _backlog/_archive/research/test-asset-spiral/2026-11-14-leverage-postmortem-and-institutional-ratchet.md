@@ -19,7 +19,7 @@ intent: 实测审计 2b155ea4..95d05326 的缩水根因与残余漏洞，盘清�
 
 ### 1.1 活漏洞 A：`markdown-shape-core.js` 内部自带两套分叉状态机
 
-首轮声称“markdown 形状 4→1 收口”，但打开 [markdown-shape-core.js](../../../../packages/company-pack/src/lib/markdown-shape-core.js) 可见文件内部并存两套独立扫描器：
+首轮声称“markdown 形状 4→1 收口”，但打开 [markdown-shape-core.js](../../../../packages/company-pack/src/lib/docs/markdown-shape-core.js) 可见文件内部并存两套独立扫描器：
 - `scanDocumentDetailed`（第 91–169 行）：处理围栏、跨行 code span、行内与跨行 HTML 注释；
 - `sectionRange`（第 190–258 行）：专门为门禁新写的一套简化扫描器，**不处理跨行 code span，也不剥离同行行内注释**。
 

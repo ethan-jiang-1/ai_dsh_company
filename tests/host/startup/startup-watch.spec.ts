@@ -16,7 +16,7 @@ import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { StartupOptionsWatch, type WatchHandle, type WatchPort } from '../../../packages/company-pack/src/host/startup/startup-watch.ts'
 import { readStartupOptions, writeStartupSettings } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
-import { EMPTY_STARTUP_SETTINGS } from '../../../packages/company-pack/src/lib/startup-settings.ts'
+import { EMPTY_STARTUP_SETTINGS } from '../../../packages/company-pack/src/lib/startup/startup-settings.ts'
 
 const roots: string[] = []
 

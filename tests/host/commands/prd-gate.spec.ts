@@ -15,7 +15,7 @@ import type { PreToolDecision } from '@deepseek-ai/dsh-tools'
 import { deliverableOf, gateToolCall, registerPrdGate } from '../../../packages/company-pack/src/host/commands/prd-gate.ts'
 import { readCompanyFileAt } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
 import type { CompanyFileRead } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
-import { validateProductDocs } from '../../../packages/company-pack/src/lib/prd-check.ts'
+import { validateProductDocs } from '../../../packages/company-pack/src/lib/docs/prd-check.ts'
 
 const MRD = `---\nlayer: MRD\ndefinition: json-ledger\n---\n\n\`\`\`json\n{"mrd":{"version":"0.1","status":"draft","opportunities":[{"id":"MR-001","title":"机会","segment":"细分","pain":"痛点","evidence":[{"kind":"fact","source":"访谈"}],"recommendation":"go"}]}}\n\`\`\`\n`
 const PRD = `---\nlayer: PRD\ndefinition: headings\n---\n\n# PRD\n\n## Slices\n\n| slice | Goal | Requirements (explicit ids) | Exit condition |\n|---|---|---|---|\n| S1 | 端到端 | REQ-001 | ok |\n\n## Requirements (definition point)\n\n### REQ-001 需求\n\n- userStory: 作为用户我要它\n- acceptance:\n  - AC-001-1\n    - given: g\n    - when: w\n    - then: t\n- source: [MR-001]\n- traces: [REQ-001]\n- slice: S1\n- type: functional\n- priority: P0\n- status: draft\n- verification: test\n- dependsOn: []\n- openQuestions: []\n- changeLog: []\n`

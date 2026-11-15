@@ -1,7 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { sectionStructuralText } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
+import { sectionStructuralText } from '../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
 import { noteStatusLines } from '../../tools/lib/repo-markdown.mjs'
 
 // ── 9-bis. Note 活状态门禁（notes-liveness，2026-10-05 D35 立；notes/ 分类 owner = notes/README.md）──

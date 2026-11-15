@@ -15,8 +15,8 @@ import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { DagPanel } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
-import { layoutDag } from '../../../packages/company-pack/src/lib/dag.ts'
-import type { TaskRow } from '../../../packages/company-pack/src/lib/board.ts'
+import { layoutDag } from '../../../packages/company-pack/src/lib/presence/dag.ts'
+import type { TaskRow } from '../../../packages/company-pack/src/lib/presence/board.ts'
 
 const task = (id: string, blockedBy: readonly string[] = [], status: TaskRow['status'] = 'pending', ownerName = 'vp-eng'): TaskRow =>
   ({ id, subject: `T${id} 任务标题示例`, status, blockedBy, ownerName, description: '', ready: false, revision: 1 })

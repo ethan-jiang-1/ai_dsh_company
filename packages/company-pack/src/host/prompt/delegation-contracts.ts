@@ -18,7 +18,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { scopeOf } from '@deepseek-ai/dsh-scope'
-import { delegationCapabilitiesOf } from '../../lib/delegation-capabilities.ts'
+import { delegationCapabilitiesOf } from '../../lib/delegation/delegation-capabilities.ts'
 import { delegationSeatOf } from '../delegation/seat.ts'
 import { composedPresetOf } from './handbook.ts'
 

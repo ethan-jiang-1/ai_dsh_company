@@ -9,7 +9,7 @@ import {
   type CultivationActionsFactory,
 } from '../cultivation/cultivation-actions.ts'
 import type { FollowLike } from '../cultivation/cultivation-context-data.ts'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 import { makeCultivationFiles, makeWorkspaceTextReader, type CultivationFiles } from '../cultivation/cultivation-data.ts'
 
 type CompanyRemote = Parameters<typeof makeCultivationFiles>[0]

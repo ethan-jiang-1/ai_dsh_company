@@ -7,7 +7,7 @@
 import { useEffect, useSyncExternalStore, type ReactNode } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { InjectFace } from '@deepseek-ai/dsh-client-ui-slots'
-import { overriddenEntries, startupRows } from '../../lib/startup-settings.ts'
+import { overriddenEntries, startupRows } from '../../lib/startup/startup-settings.ts'
 import type { CompanyKey, CompanyT } from '../locales.ts'
 import type { StartupStore } from './startup-store.ts'
 

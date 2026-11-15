@@ -38,7 +38,7 @@
 3. **L：表达层只留一份**
    - `parseCompanyTabCatalog` 同时从 `locales.ts` 的 zh/en 块派生 `title` / `enTitle`；缺任一语言 label
      整体返回空（探针 exit 2），手维护的 `EN_TAB_TITLES` 删除。
-   - 新增 `src/lib/startup-command-copy.ts`（zh/en typed copy）；`/company-settings` 的 description / hint /
+   - 新增 `src/lib/startup/startup-command-copy.ts`（zh/en typed copy）；`/company-settings` 的 description / hint /
      usage / 未知字段错误都从它取当前语言；语言切换时 dispose 旧注册并重注册 description（vendor 注册面
      没有 per-locale provider）。解析器只返回结构化错误码，文案在 handler 里取。
 4. **V：换基准，不关扫描；测承诺，不测在场**
@@ -60,7 +60,7 @@
 
 ## 后果
 
-- 新增 `src/host/startup/startup-watch.ts`、`src/lib/startup-command-copy.ts`、
+- 新增 `src/host/startup/startup-watch.ts`、`src/lib/startup/startup-command-copy.ts`、
   `tests/host/startup/startup-watch.spec.ts`、`tests/client/startup/strategy-panel.spec.ts`、
   `tests/content/startup-options-budget.spec.ts`。
 - `StartupOptions` 增 `wikiTemplate`；`WikiCheck` 增 `checkedAt`；`STARTUP_OPTIONS_READ_LIMIT` 64 → 288。
@@ -76,7 +76,7 @@
 
 | 面 | 命令 | 结果 |
 |---|---|---|
-| W 081 | 把 `startupWorkspace` 改回 boot 优先 → `pnpm vitest run tests/lib/startup-settings.spec.ts tests/host/startup/startup-prompt.spec.ts tests/host/commands/settings-command.spec.ts` | 红 **3 failed**；复原 **42 passed** |
+| W 081 | 把 `startupWorkspace` 改回 boot 优先 → `pnpm vitest run tests/lib/startup/startup-settings.spec.ts tests/host/startup/startup-prompt.spec.ts tests/host/commands/settings-command.spec.ts` | 红 **3 failed**；复原 **42 passed** |
 | W 089 | 恢复 `if (hasWorkspace) register...` → `pnpm vitest run tests/host/index/apply-lifecycle.spec.ts` | 红 **1 failed**（0 section）；复原 **4 passed** |
 | W 082 | 去掉 watcher 重算 / 面板 `checkCurrent` 恒真 → startup-watch + strategy-panel specs | 各红 **2 failed**；复原 **12 passed** |
 | F 084 | 词法 `wikiLocation` + `existsSync(index)` → startup-store + settings-command specs | 红 **4 failed**；复原 **25 passed** |

@@ -12,7 +12,7 @@
 // ⇒「abort parent signal」用例在 1s 守卫上红（hung）；还原 ⇒ 绿。BUG-053
 import { describe, expect, it } from 'vitest'
 import { registerSubagentRetry } from '../../../packages/company-pack/src/host/delegation/subagent-retry.ts'
-import { SUBAGENT_RETRY_SURFACE } from '../../../packages/company-pack/src/lib/retry-policy.ts'
+import { SUBAGENT_RETRY_SURFACE } from '../../../packages/company-pack/src/lib/delegation/retry-policy.ts'
 
 interface FakeResult {
   output: Array<{ type: 'text'; text: string }>

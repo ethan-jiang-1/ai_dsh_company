@@ -17,7 +17,7 @@
  * keyless 判据 = `tests/client/cultivation/cultivation-actions.spec.ts`；真机制（真命令、真落盘）= browser-visual 探针。
  */
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import { CULTIVATION_ROLES, WORK_TEXT_LIMIT } from '../../lib/cultivation.ts'
+import { CULTIVATION_ROLES, WORK_TEXT_LIMIT } from '../../lib/cultivation/cultivation.ts'
 
 /**
  * 面向人的文案（面板按钮、表单、校验提示、通道降级）。**迭代里改得最多的就是这里**——

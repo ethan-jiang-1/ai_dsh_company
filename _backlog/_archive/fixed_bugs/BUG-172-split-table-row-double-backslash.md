@@ -68,11 +68,11 @@ node --import tsx/esm runtime/tmp/c8c-more-shape.mts
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/markdown-shape.ts`、`tests/lib/prd-check.spec.ts`
-- 红：还原旧转义顺序（先竖线后反斜杠）→ `npx vitest run tests/lib/prd-check.spec.ts` 红（双反斜杠少一列）
-- 绿：接回「先双反斜杠（字面反斜杠）再单转义竖线」的顺序 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（33 passed）
+- 红：还原旧转义顺序（先竖线后反斜杠）→ `npx vitest run tests/lib/docs/prd-check.spec.ts` 红（双反斜杠少一列）
+- 绿：接回「先双反斜杠（字面反斜杠）再单转义竖线」的顺序 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 绿（33 passed）
 - 提交：commit d6aa860d
 
 ## 证据
 
 - `runtime/tmp/c8c-more-shape.mts` / `.log`：`row double` 少切一列。
-- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/markdown-shape.ts) 的 `splitTableRow()`。
+- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/docs/markdown-shape.ts) 的 `splitTableRow()`。

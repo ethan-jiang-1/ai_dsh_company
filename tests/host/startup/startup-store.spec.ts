@@ -25,7 +25,7 @@ import {
   startupSettingsPath,
   writeStartupSettings,
 } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
-import { EMPTY_STARTUP_SETTINGS } from '../../../packages/company-pack/src/lib/startup-settings.ts'
+import { EMPTY_STARTUP_SETTINGS } from '../../../packages/company-pack/src/lib/startup/startup-settings.ts'
 
 const roots: string[] = []
 

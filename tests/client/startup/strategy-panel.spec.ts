@@ -24,7 +24,7 @@ import {
   EMPTY_STARTUP_SETTINGS,
   type StartupOptions,
   type StartupSettings,
-} from '../../../packages/company-pack/src/lib/startup-settings.ts'
+} from '../../../packages/company-pack/src/lib/startup/startup-settings.ts'
 
 function translator(dict: Record<CompanyKey, string>): CompanyT {
   return ((key: CompanyKey, params?: Record<string, string | number>) => {

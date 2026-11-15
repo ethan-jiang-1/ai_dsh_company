@@ -237,7 +237,7 @@ intent: 给下一个 Agent 的问题理解 brief：capture 2026-11-07 对话里�
 
 ### 3.8 `/prd check` 的能力与边界（现有唯一机械检查器）
 
-**它已经做的**（[prd-check.ts](../../../../../packages/company-pack/src/lib/prd-check.ts)）：
+**它已经做的**（[prd-check.ts](../../../../../packages/company-pack/src/lib/docs/prd-check.ts)）：
 
 - `MR-###` / `REQ-###` / `AC-###-#` 文法与重号；
 - REQ 的 `source` 指向存在的 MR；no-go 不得进 PRD；defer 不得进 P0；

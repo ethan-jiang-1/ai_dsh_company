@@ -16,8 +16,8 @@
  */
 import { Button, Input, Pill } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useRef, useState } from 'react'
-import { CULTIVATION_ROLES, roleLabel as defaultRoleLabel } from '../../lib/cultivation.ts'
-import { clipExcerpt, encodeContextToken, secretLikeFindings, type CultivationContextRef } from '../../lib/cultivation-context.ts'
+import { CULTIVATION_ROLES, roleLabel as defaultRoleLabel } from '../../lib/cultivation/cultivation.ts'
+import { clipExcerpt, encodeContextToken, secretLikeFindings, type CultivationContextRef } from '../../lib/cultivation/cultivation-context.ts'
 import {
   CULTIVATION_COPY,
   correctLine,

@@ -9,7 +9,7 @@
  * 这样 `ctx.locale.register(NS, { zh, en })` 和 slot 的 `locale: NS` 都是 typed 的。
  */
 import type { TranslateNS } from '@deepseek-ai/dsh-client-locale/client'
-import { ROLE_COPY } from '../lib/role-copy.ts'
+import { ROLE_COPY } from '../lib/shared/role-copy.ts'
 
 export const COMPANY_NS = 'company'
 

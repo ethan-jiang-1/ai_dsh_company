@@ -11,7 +11,7 @@
 
 ## 决定
 
-1. **通道能力表进 pack**：`src/lib/delegation-capabilities.ts` 逐 preset 声明 spawn/fork/workflow/retry；`tests/presets/delegation-capabilities.spec.ts` 钉它 == `tools/lib/delegation-model.mjs` 的 `COMPOSITIONS[*].channels/workflow` + `retrySurface()`。team 不进表——它是运行时座位，任何 root 都是 Lead。
+1. **通道能力表进 pack**：`src/lib/delegation/delegation-capabilities.ts` 逐 preset 声明 spawn/fork/workflow/retry；`tests/presets/delegation-capabilities.spec.ts` 钉它 == `tools/lib/delegation-model.mjs` 的 `COMPOSITIONS[*].channels/workflow` + `retrySurface()`。team 不进表——它是运行时座位，任何 root 都是 Lead。
 2. **host 按能力/权限注入**：`src/host/prompt/delegation-contracts.ts` 在 `agent/created` 时注入 `company:delegation-capabilities` header + `company:delegation-<channel>` section（spawn/fork/workflow/team/retry）。spawn 用能力表；fork/workflow 用工具在场；team 用 `agentTeams.membership(agent)?.role === 'lead'`（fallback `header.parentSession`），**不能**只用 `tools.get('spawn_teammate')`（teammate 也看得见工具）。
 3. **内容拆家**：新增 `content/contracts/delegation/{spawn,fork,workflow,team,retry}.md`；`delegation-policy` skill 缩成 core（默认自己做/brief/effort/链/结果/硬规则，1,454 code points）；`eng-teaming` 的 schema/截断/spill/重启等引擎事实移回 `company:workflow-contract`/section，只留五档判据/角色边界/交稿。
 4. **`workflow_runs` per-agent**：只在工具面有 `workflow` 的 Agent 注册（vp-eng root、vp-eng 命名 child、vp-eng teammate、workflow 分支）；CEO/COO/worker 不再看见。host 全局工具面从 4 件降为 3 件。
@@ -64,7 +64,7 @@
 ## 现行语义（canonical）
 
 - [delegation 合同](../../docs/contracts/delegation.md) · [presets 工具面/政策载体](../../docs/contracts/presets.md) · [architecture](../../docs/architecture.md)
-- host：[delegation-contracts.ts](../../packages/company-pack/src/host/prompt/delegation-contracts.ts)、[delegation-capabilities.ts](../../packages/company-pack/src/lib/delegation-capabilities.ts)、[workflow-runs.ts](../../packages/company-pack/src/host/delegation/workflow-runs.ts)
+- host：[delegation-contracts.ts](../../packages/company-pack/src/host/prompt/delegation-contracts.ts)、[delegation-capabilities.ts](../../packages/company-pack/src/lib/delegation/delegation-capabilities.ts)、[workflow-runs.ts](../../packages/company-pack/src/host/delegation/workflow-runs.ts)
 - content：[delegation sections](../../packages/company-pack/content/contracts/delegation/) · core：[delegation-policy](../../packages/company-pack/presets/_shared/delegation/skills/delegation-policy/SKILL.md)
 
 ## 相关

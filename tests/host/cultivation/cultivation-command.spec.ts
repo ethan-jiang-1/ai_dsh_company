@@ -4,7 +4,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { parseRecord, recordText } from '../../../packages/company-pack/src/lib/cultivation.ts'
+import { parseRecord, recordText } from '../../../packages/company-pack/src/lib/cultivation/cultivation.ts'
 
 import { cultivationRegistrations, invokeCultivation, withCultivationWorkspace } from '../../support/cultivation-harness.ts'
 

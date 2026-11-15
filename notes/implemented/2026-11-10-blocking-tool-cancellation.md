@@ -17,7 +17,7 @@
 
 ## 决定
 
-1. **抽出可取消 await 的缝**：[`abortable.ts`](../../packages/company-pack/src/lib/abortable.ts) 把
+1. **抽出可取消 await 的缝**：[`abortable.ts`](../../packages/company-pack/src/lib/shared/abortable.ts) 把
    `operation` 与 `signal` race，abort 即抛 `signal.reason`（非 Error 包成 `<label> aborted`），
    `finally` 摘监听。语义对齐 vendor `agent-loop` 的 `raceAbort`；任何未来 `await` 子代结果的
    host 工具都走它，不各自手写 race。
@@ -57,7 +57,7 @@
 **keyless（红→绿）**：
 
 ```sh
-pnpm exec vitest run tests/lib/abortable.spec.ts tests/host/delegation/subagent-retry.spec.ts
+pnpm exec vitest run tests/lib/shared/abortable.spec.ts tests/host/delegation/subagent-retry.spec.ts
 # 绿：4 + 15 passed
 ```
 

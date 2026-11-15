@@ -8,9 +8,9 @@
  * - 根目录不再出现 `AGENTS.md` / `COMPANY.md` / `kb/` / `templates/` / `deliverables/` / `cultivation/`。
  *
  * 路径一律**相对 workspace 的 POSIX 字符串**给模型/remote 用；host 落盘再用 `join`。
- * 字符串常量唯一家 = `src/lib/run-bundle-paths.ts`（client 也读同一份）。
+ * 字符串常量唯一家 = `src/lib/shared/run-bundle-paths.ts`（client 也读同一份）。
  */
-import { RUN_BUNDLE_DIR, RUN_BUNDLE_PATHS, runBundleRel } from '../../lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_DIR, RUN_BUNDLE_PATHS, runBundleRel } from '../../lib/shared/run-bundle-paths.ts'
 
 export { RUN_BUNDLE_DIR, runBundleRel }
 export const RUN_BUNDLE_REL = {

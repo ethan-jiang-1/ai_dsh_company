@@ -409,131 +409,131 @@
       "statements": 90.56,
       "branches": 86
     },
-    "packages/company-pack/src/lib/abortable.ts": {
+    "packages/company-pack/src/lib/shared/abortable.ts": {
       "statements": 100,
       "branches": 80
     },
-    "packages/company-pack/src/lib/attention.ts": {
+    "packages/company-pack/src/lib/presence/attention.ts": {
       "statements": 97.29,
       "branches": 95.83
     },
-    "packages/company-pack/src/lib/board.ts": {
+    "packages/company-pack/src/lib/presence/board.ts": {
       "statements": 100,
       "branches": 92.72
     },
-    "packages/company-pack/src/lib/budget.ts": {
+    "packages/company-pack/src/lib/accounting/budget.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/cultivation-context.ts": {
+    "packages/company-pack/src/lib/cultivation/cultivation-context.ts": {
       "statements": 87.08,
       "branches": 80.29
     },
-    "packages/company-pack/src/lib/cultivation-feedback.ts": {
+    "packages/company-pack/src/lib/cultivation/cultivation-feedback.ts": {
       "statements": 100,
       "branches": 96
     },
-    "packages/company-pack/src/lib/cultivation-inbox.ts": {
+    "packages/company-pack/src/lib/cultivation/cultivation-inbox.ts": {
       "statements": 100,
       "branches": 91.66
     },
-    "packages/company-pack/src/lib/cultivation-record.ts": {
+    "packages/company-pack/src/lib/cultivation/cultivation-record.ts": {
       "statements": 94.01,
       "branches": 91.73
     },
-    "packages/company-pack/src/lib/cultivation.ts": {
+    "packages/company-pack/src/lib/cultivation/cultivation.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/dag.ts": {
+    "packages/company-pack/src/lib/presence/dag.ts": {
       "statements": 99.29,
       "branches": 84.05
     },
-    "packages/company-pack/src/lib/delegation-capabilities.ts": {
+    "packages/company-pack/src/lib/delegation/delegation-capabilities.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/delegation-surface.ts": {
+    "packages/company-pack/src/lib/delegation/delegation-surface.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/delegation-tree.ts": {
+    "packages/company-pack/src/lib/delegation/delegation-tree.ts": {
       "statements": 100,
       "branches": 95.83
     },
-    "packages/company-pack/src/lib/deliverables-address.ts": {
+    "packages/company-pack/src/lib/deliverables/deliverables-address.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/deliverables-catalog.ts": {
+    "packages/company-pack/src/lib/deliverables/deliverables-catalog.ts": {
       "statements": 98.61,
       "branches": 86.36
     },
-    "packages/company-pack/src/lib/doors.ts": {
+    "packages/company-pack/src/lib/presence/doors.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/guards.ts": {
+    "packages/company-pack/src/lib/shared/guards.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/ledger.ts": {
+    "packages/company-pack/src/lib/accounting/ledger.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/markdown-shape.ts": {
+    "packages/company-pack/src/lib/docs/markdown-shape.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/prd-check.ts": {
+    "packages/company-pack/src/lib/docs/prd-check.ts": {
       "statements": 85.18,
       "branches": 73.49
     },
-    "packages/company-pack/src/lib/presence-status.ts": {
+    "packages/company-pack/src/lib/presence/presence-status.ts": {
       "statements": 95.83,
       "branches": 88.23
     },
-    "packages/company-pack/src/lib/presence.ts": {
+    "packages/company-pack/src/lib/presence/presence.ts": {
       "statements": 94.16,
       "branches": 80.31
     },
-    "packages/company-pack/src/lib/requirements-check.ts": {
+    "packages/company-pack/src/lib/docs/requirements-check.ts": {
       "statements": 94.06,
       "branches": 76.89
     },
-    "packages/company-pack/src/lib/retry-policy.ts": {
+    "packages/company-pack/src/lib/delegation/retry-policy.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/role-copy.ts": {
+    "packages/company-pack/src/lib/shared/role-copy.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/run-bundle-paths.ts": {
+    "packages/company-pack/src/lib/shared/run-bundle-paths.ts": {
       "statements": 75,
       "branches": 0
     },
-    "packages/company-pack/src/lib/signoff.ts": {
+    "packages/company-pack/src/lib/accounting/signoff.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/startup-command-copy.ts": {
+    "packages/company-pack/src/lib/startup/startup-command-copy.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/startup-settings.ts": {
+    "packages/company-pack/src/lib/startup/startup-settings.ts": {
       "statements": 96.47,
       "branches": 94.62
     },
-    "packages/company-pack/src/lib/text.ts": {
+    "packages/company-pack/src/lib/shared/text.ts": {
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/tool-card.ts": {
+    "packages/company-pack/src/lib/presence/tool-card.ts": {
       "statements": 100,
       "branches": 90.9
     },
-    "packages/company-pack/src/lib/yaml-scalar.ts": {
+    "packages/company-pack/src/lib/docs/yaml-scalar.ts": {
       "statements": 100,
       "branches": 90
     },

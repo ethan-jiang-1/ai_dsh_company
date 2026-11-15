@@ -21,7 +21,7 @@ import {
   type AttentionEventLike,
   type AttentionItem,
   type LivePending,
-} from '../../lib/attention.ts'
+} from '../../lib/presence/attention.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
 import type { CompanyDataInjected } from '../data/use-company-data.ts'

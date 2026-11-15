@@ -7,7 +7,7 @@ import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
-import { roleLabel } from '../../lib/cultivation.ts'
+import { roleLabel } from '../../lib/cultivation/cultivation.ts'
 import { setCultivationLanguage } from '../cultivation/cultivation-actions.ts'
 import type { CompanyT } from '../locales.ts'
 import { roleText } from '../roles.ts'
@@ -15,7 +15,7 @@ import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { CultivationBoard } from '../cultivation/CultivationBoard.tsx'
 import type { CultivationActionsFactory } from '../cultivation/cultivation-actions.ts'
 import type { CultivationContextSources } from '../cultivation/cultivation-context-data.ts'
-import type { CultivationContext } from '../../lib/cultivation-context.ts'
+import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
 import {
   CULTIVATION_REFRESH_MS,
   useCultivationFeedback,

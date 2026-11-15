@@ -2,7 +2,7 @@
  * `workspace_doors` 工具与门投影接线（2026-11-03 第六轮 F 批）。
  *
  * 为什么补：`src/host/workspace/workspace-doors.ts`（87 行，BUG-002 的双 CEO 检测面）此前只在
- * `host-composition.spec.ts` 里被**点名**（工具名在场），行为没有直接判据；`tests/lib/doors.spec.ts`
+ * `host-composition.spec.ts` 里被**点名**（工具名在场），行为没有直接判据；`tests/lib/presence/doors.spec.ts`
  * 只测纯函数 `doorsFromSessions`。本 spec 把「会话事件 → 进程内事实表 → 工具按当前 cwd 过滤 → 输出
  * preset 行与 duplicateWarning」整条接线钉住。
  *

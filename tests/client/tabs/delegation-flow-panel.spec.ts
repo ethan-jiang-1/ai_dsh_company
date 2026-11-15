@@ -3,7 +3,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { DelegationFlowPanel } from '../../../packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx'
-import { buildDelegationTree } from '../../../packages/company-pack/src/lib/delegation-tree.ts'
+import { buildDelegationTree } from '../../../packages/company-pack/src/lib/delegation/delegation-tree.ts'
 
 const tree = buildDelegationTree({
   byId: {

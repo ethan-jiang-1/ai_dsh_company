@@ -16,7 +16,7 @@ import {
   type StartupAgentLike,
   type StartupField,
   type StartupSettings,
-} from '../../lib/startup-settings.ts'
+} from '../../lib/startup/startup-settings.ts'
 import {
   checkWikiPointer,
   enumerateStartupOptions,
@@ -24,8 +24,8 @@ import {
   refreshStartupOptions,
   writeStartupSettings,
 } from '../startup/startup-store.ts'
-import { STARTUP_COMMAND_COPY } from '../../lib/startup-command-copy.ts'
-import type { WikiProblem } from '../../lib/startup-settings.ts'
+import { STARTUP_COMMAND_COPY } from '../../lib/startup/startup-command-copy.ts'
+import type { WikiProblem } from '../../lib/startup/startup-settings.ts'
 
 export type ParsedSettingsCommand =
   | { readonly kind: 'show' }

@@ -9,8 +9,8 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { BudgetPanel, PresencePanel, StreamErrorNotice } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
-import type { BudgetSummary } from '../../../packages/company-pack/src/lib/budget.ts'
-import type { ActivityEntry, PresenceRow } from '../../../packages/company-pack/src/lib/presence.ts'
+import type { BudgetSummary } from '../../../packages/company-pack/src/lib/accounting/budget.ts'
+import type { ActivityEntry, PresenceRow } from '../../../packages/company-pack/src/lib/presence/presence.ts'
 
 describe('在场面板', () => {
   it('空团队给空态，不渲染一张假名单', () => {

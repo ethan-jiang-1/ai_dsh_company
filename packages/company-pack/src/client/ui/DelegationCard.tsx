@@ -2,8 +2,8 @@
 import { useState, type KeyboardEvent, type ReactNode } from 'react'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
-import { cardStateOf, parseArgsObject, resultTextOf, textOf, type CardState } from '../../lib/tool-card.ts'
-import { DELEGATION_TOOL_ROLES, type RoleId } from '../../lib/role-copy.ts'
+import { cardStateOf, parseArgsObject, resultTextOf, textOf, type CardState } from '../../lib/presence/tool-card.ts'
+import { DELEGATION_TOOL_ROLES, type RoleId } from '../../lib/shared/role-copy.ts'
 import type { CompanyKey, CompanyT } from '../locales.ts'
 import { roleText } from '../roles.ts'
 

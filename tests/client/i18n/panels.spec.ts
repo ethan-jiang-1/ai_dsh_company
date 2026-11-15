@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { BoardPanel, DagPanel } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
 import { en, type CompanyKey, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
-import type { BoardColumn } from '../../../packages/company-pack/src/lib/board.ts'
+import type { BoardColumn } from '../../../packages/company-pack/src/lib/presence/board.ts'
 
 const tEn = ((key: CompanyKey, params?: Record<string, string | number>) => {
   const template = en[key]

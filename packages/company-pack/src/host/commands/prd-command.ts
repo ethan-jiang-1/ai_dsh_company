@@ -10,7 +10,7 @@ import { join } from 'node:path'
 import { blockedCompanyText } from './blocked-text.ts'
 import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
-import { validateProductDocs } from '../../lib/prd-check.ts'
+import { validateProductDocs } from '../../lib/docs/prd-check.ts'
 
 export const PRD_USAGE = '用法：/prd check <deliverables 目录名>（读 .dsh-company/deliverables/<name>/drafts/{mrd,prd}.md）'
 

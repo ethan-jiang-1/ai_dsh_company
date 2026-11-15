@@ -10,8 +10,8 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { DagPanel, fitScale, wrapTitle } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
 import { PanelFrame } from '../../../packages/company-pack/src/client/tabs/company-tabs.tsx'
-import { layoutDag } from '../../../packages/company-pack/src/lib/dag.ts'
-import type { TaskRow } from '../../../packages/company-pack/src/lib/board.ts'
+import { layoutDag } from '../../../packages/company-pack/src/lib/presence/dag.ts'
+import type { TaskRow } from '../../../packages/company-pack/src/lib/presence/board.ts'
 
 const task = (id: string, blockedBy: readonly string[] = [], status: TaskRow['status'] = 'pending'): TaskRow =>
   ({ id, subject: `任务 ${id}`, status, blockedBy, ownerName: 'vp-eng', description: '', ready: blockedBy.length === 0, revision: 1 })

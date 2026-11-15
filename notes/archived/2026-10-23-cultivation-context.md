@@ -191,7 +191,7 @@ export interface CultivationContext {
   材质优先用 `MenuSurface`（`@deepseek-ai/dsh-client-ui-primitives`，本包已依赖）；若其锚定/floating
   形态不适配内联面板，用现有 token 自绘并在代码注释说明理由。
 - 成品源：复用 `readCatalog` + `parseCatalog`（[DeliverablesTab.tsx](../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx)）
-  与 `sessionFileAddress`（[deliverables-address.ts](../../packages/company-pack/src/lib/deliverables-address.ts)），不写第二份解析器。
+  与 `sessionFileAddress`（[deliverables-address.ts](../../packages/company-pack/src/lib/deliverables/deliverables-address.ts)），不写第二份解析器。
 - 读取文本复用 `makeWorkspaceTextReader`（[cultivation-data.ts](../../packages/company-pack/src/client/cultivation/cultivation-data.ts)）。
 
 **teammate 明说**

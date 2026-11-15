@@ -32,7 +32,7 @@
    注册面 = **full role 且有通用 `subagent` 行**（CEO 是 lead、worker family 是执行手，都不挂）；
    深度 = 那一行的 `maxDepth`（vp-eng 3 / vp-sales、coo、cfo、cmo 2）。
 3. **运行时唯一表**：pack 的 `SUBAGENT_RETRY_SURFACE`
-   （[`retry-policy.ts`](../../packages/company-pack/src/lib/retry-policy.ts)）是 host 唯一注册来源，
+   （[`retry-policy.ts`](../../packages/company-pack/src/lib/delegation/retry-policy.ts)）是 host 唯一注册来源，
    `src/index.ts` 不再写第二份 preset 列表；`tests/presets/delegation-retry.spec.ts` 钉三边一致：
    运行时表 == 模型 `retrySurface()` == 各 preset YAML 通用 `subagent` 行的 `maxDepth`。
 4. **越界是可见拒绝，不是静默起 child**：`subagent_retry` 在调用前按

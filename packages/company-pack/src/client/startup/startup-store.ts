@@ -10,7 +10,7 @@ import {
   EMPTY_STARTUP_SETTINGS,
   type StartupOptions,
   type StartupSettings,
-} from '../../lib/startup-settings.ts'
+} from '../../lib/startup/startup-settings.ts'
 
 /** 一次读盘的结果。 */
 export interface StartupFace {

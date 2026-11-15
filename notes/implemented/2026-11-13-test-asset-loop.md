@@ -89,7 +89,7 @@
 
 
 | 棘轮绿 | `node checks/audit/coverage-ratchet.mjs` | `coverage-ratchet: PASS（190 文件；基线 2026-11-13；豁免 5 条）` |
-| 棘轮回归（红） | 基线临时把 `src/lib/run-bundle-paths.ts` 抬到 100 后重跑 | `FAIL [regressed] … statements 75% < 基线 100%` / `branches 0% < 基线 100%`；还原 → PASS |
+| 棘轮回归（红） | 基线临时把 `src/lib/shared/run-bundle-paths.ts` 抬到 100 后重跑 | `FAIL [regressed] … statements 75% < 基线 100%` / `branches 0% < 基线 100%`；还原 → PASS |
 | 新文件下限（红） | 临时建 tools/lib/zz-new-untested.mjs 后 `--run` | `FAIL [new-below-floor] tools/lib/zz-new-untested.mjs — 新文件 statements 0% / branches 0%（下限 80/70）`；删除 → PASS |
 | 过期豁免（红） | 基线临时加 `tools/lib/zz-gone.mjs` 豁免后重跑 | `FAIL [stale-exemption] tools/lib/zz-gone.mjs — 豁免指向的文件已不存在`；还原 → PASS |
 | 判据纯逻辑 | `pnpm vitest run tests/tools/coverage-baseline.spec.ts` | 6 passed（回归/新文件/空洞/过期豁免/nextBaseline/index） |

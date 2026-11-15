@@ -50,7 +50,7 @@
 | 事实 | 文档结构 = 归一化后「围栏/注释/跨行行内代码」之外的行；顶层围栏块是 JSON 账本的唯一来源；company 路径的段 = 平台无关分隔符 + 栈式消解；门禁证据命令须可解析且非空操作 |
 | 唯一入口 | `lib/markdown-shape.ts`（围栏块/跨行 code span）、`host/run-bundle/company-root.ts`（段语义）、`checks/gates/fix-evidence.mjs`（读卡 + 命令语法）、`checks/gates/notes-tree.mjs`（根形状） |
 | 读载体 | `/prd check`、`/req check`、present 闸门、`pnpm verify` |
-| 契约测试 | `tests/lib/prd-check.spec.ts`、`tests/lib/requirements-check.spec.ts`、`tests/host/contract/file-shape-agreement.spec.ts`、`tests/checks/fix-evidence.test.mjs`、`tests/checks/notes-tree.test.mjs` |
+| 契约测试 | `tests/lib/docs/prd-check.spec.ts`、`tests/lib/docs/requirements-check.spec.ts`、`tests/host/contract/file-shape-agreement.spec.ts`、`tests/checks/fix-evidence.test.mjs`、`tests/checks/notes-tree.test.mjs` |
 
 ## 验证
 
@@ -65,7 +65,7 @@
 ## 未覆盖轴
 
 - [environment-gap] **Windows 实机/CI 未跑**：反斜杠与越界段已在契约矩阵覆盖，待跨平台 runner 触发实跑 → `_backlog/triggers.md`、`tests/host/contract/file-shape-agreement.spec.ts`
-- [covered] **跨行 code span 与缩进围栏边界**：单状态机已与 `mdast` 500/1000 种子差分对齐 → `packages/company-pack/src/lib/markdown-shape-core.js`、`tests/lib/markdown-shape.property.spec.ts`
-- [policy] **同长度同字符围栏嵌套**：CommonMark 规范按提前闭合解析，嵌套须外层用更长围栏 → `packages/company-pack/src/lib/markdown-shape-core.js`
+- [covered] **跨行 code span 与缩进围栏边界**：单状态机已与 `mdast` 500/1000 种子差分对齐 → `packages/company-pack/src/lib/docs/markdown-shape-core.js`、`tests/lib/docs/markdown-shape.property.spec.ts`
+- [policy] **同长度同字符围栏嵌套**：CommonMark 规范按提前闭合解析，嵌套须外层用更长围栏 → `packages/company-pack/src/lib/docs/markdown-shape-core.js`
 - [policy] **命令解析只验可解析且非空操作**：真跑留证归 `pnpm test` / pre-push → `checks/gates/fix-evidence.mjs`
 - [policy] **notes 根 symlink 一律红**：防止软链绕过形状与状态门禁 → `checks/gates/notes-tree.mjs`

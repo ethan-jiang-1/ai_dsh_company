@@ -33,7 +33,7 @@ import {
   writeCompanyAtomicAt,
 } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
 import { plainFileProblem } from '../../../packages/company-pack/src/host/fs/safe-file.ts'
-import { validateProductDocs } from '../../../packages/company-pack/src/lib/prd-check.ts'
+import { validateProductDocs } from '../../../packages/company-pack/src/lib/docs/prd-check.ts'
 import { ALL_SHAPES, makeWorld, outsideSnapshot, type World } from '../../support/world-shapes.ts'
 
 const TARGET = 'kb/company.md'

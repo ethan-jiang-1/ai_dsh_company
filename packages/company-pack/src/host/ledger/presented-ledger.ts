@@ -5,12 +5,12 @@
  * catalog.ts 保留目录扫描/生成；账本 I/O、迁移、观测抽取归本文件。
  */
 import { isAbsolute, join, relative, resolve } from 'node:path'
-import { normalizeRel, slugFromDirName, type DeliverablesCatalog } from '../../lib/deliverables-catalog.ts'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
-import { isRecord } from '../../lib/guards.ts'
+import { normalizeRel, slugFromDirName, type DeliverablesCatalog } from '../../lib/deliverables/deliverables-catalog.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
+import { isRecord } from '../../lib/shared/guards.ts'
 import { companyFileProblem, readCompanyText, writeCompanyAtomic } from '../run-bundle/company-root.ts'
 import { canonicalPath } from '../run-bundle/paths.ts'
-import { readCatalog } from '../ledger/catalog-state.ts'
+import { readCatalog } from './catalog-state.ts'
 
 export const PRESENTED_LEDGER_REL = RUN_BUNDLE_PATHS.presented
 export const presentedLedgerPath = (companyHome: string): string => join(companyHome, PRESENTED_LEDGER_REL)

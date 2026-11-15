@@ -4,7 +4,7 @@
  */
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useState } from 'react'
-import { roleLabel as defaultRoleLabel, timeLabel, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../../lib/cultivation.ts'
+import { roleLabel as defaultRoleLabel, timeLabel, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../../lib/cultivation/cultivation.ts'
 import { CULTIVATION_COPY, revokeLine, verifyLine } from './cultivation-actions.ts'
 import type { CultivationBoardState } from './use-cultivation-board.tsx'
 

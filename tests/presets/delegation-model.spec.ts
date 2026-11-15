@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { NON_ROLE_PRESETS } from '../../packages/company-pack/src/lib/delegation-surface.ts'
+import { NON_ROLE_PRESETS } from '../../packages/company-pack/src/lib/delegation/delegation-surface.ts'
 import {
   CHANNELS,
   COMPOSITIONS,

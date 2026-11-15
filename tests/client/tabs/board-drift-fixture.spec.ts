@@ -16,8 +16,8 @@ import { describe, expect, it } from 'vitest'
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { BoardPanel } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
-import { boardColumns, tasksFromTeamView } from '../../../packages/company-pack/src/lib/board.ts'
-import type { TeamViewLike } from '../../../packages/company-pack/src/lib/presence.ts'
+import { boardColumns, tasksFromTeamView } from '../../../packages/company-pack/src/lib/presence/board.ts'
+import type { TeamViewLike } from '../../../packages/company-pack/src/lib/presence/presence.ts'
 
 /** 真事故板面 + 一个健康对照（task-4：声明了依赖且板面有边）。 */
 export const FIXTURE_VIEW: TeamViewLike = {

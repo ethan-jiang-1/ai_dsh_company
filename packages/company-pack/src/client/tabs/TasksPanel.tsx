@@ -6,8 +6,8 @@ import { Button, IconChecklistOutlineMedium } from '@deepseek-ai/dsh-client-ui-p
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
-import { presenceStatusFromPhase, type TeamViewLike } from '../../lib/presence.ts'
-import { tasksFromTeamView, type TaskRow } from '../../lib/board.ts'
+import { presenceStatusFromPhase, type TeamViewLike } from '../../lib/presence/presence.ts'
+import { tasksFromTeamView, type TaskRow } from '../../lib/presence/board.ts'
 import { StateNote } from './company-panels.tsx'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 

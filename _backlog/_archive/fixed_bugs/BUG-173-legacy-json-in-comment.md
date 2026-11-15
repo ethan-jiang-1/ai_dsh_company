@@ -60,11 +60,11 @@ HTML 注释里的 json 围栏块不被提取：legacy PRD 的注释账本不再�
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/prd-check.ts`、`packages/company-pack/src/lib/markdown-shape.ts`、`tests/lib/prd-check.spec.ts`
-- 红：去掉 `maskHtmlComments` → `npx vitest run tests/lib/prd-check.spec.ts` 红（注释 JSON 生效）
-- 绿：接回注释掩码 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（33 passed）
+- 红：去掉 `maskHtmlComments` → `npx vitest run tests/lib/docs/prd-check.spec.ts` 红（注释 JSON 生效）
+- 绿：接回注释掩码 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 绿（33 passed）
 - 提交：commit d6aa860d
 
 ## 证据
 
 - `runtime/tmp/c8c-more-shape.mts` / `.log`：注释 JSON → `true [] 1`。
-- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts) 的 `extractJsonBlock()`；[requirements-check.ts](../../../packages/company-pack/src/lib/requirements-check.ts) 的 `jsonLedgerDefinitions()`。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts) 的 `extractJsonBlock()`；[requirements-check.ts](../../../packages/company-pack/src/lib/docs/requirements-check.ts) 的 `jsonLedgerDefinitions()`。

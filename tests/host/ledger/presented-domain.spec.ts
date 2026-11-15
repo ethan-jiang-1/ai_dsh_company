@@ -18,7 +18,7 @@ import {
   recordLedger,
   type PresentedLedgerStore,
 } from '../../../packages/company-pack/src/host/ledger/presented-domain.ts'
-import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 import { createTempEnv, type TempEnv } from '../../support/temp-env.ts'
 
 let env: TempEnv

@@ -10,7 +10,7 @@ import { createTempEnv, type TempEnv } from '../../support/temp-env.ts'
 import { catalogPath } from '../../../packages/company-pack/src/host/ledger/catalog.ts'
 import { ledgerFilePath, ledgerKey } from '../../../packages/company-pack/src/host/ledger/presented-domain.ts'
 import { canonicalPath } from '../../../packages/company-pack/src/host/run-bundle/paths.ts'
-import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 
 let root: string
 let workspace: string

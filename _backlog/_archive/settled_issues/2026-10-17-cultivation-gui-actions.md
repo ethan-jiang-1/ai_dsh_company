@@ -144,7 +144,7 @@ UI→host 动作通道（remotes 选择面由 vendor 组装、dynamic cordis = s
 - **G1 创作没有入口**（判据 ①）：纠正/建议只能敲命令。**我上一轮建议"v1 不做创作面"是错的判断**——它把
   「人给分身输入」的一半留在命令里，正是判据 ① 要消掉的东西。⇒ 创作面进 v1。
 - **G2 判断没有材料**（判据 ②③）：正文（提案全文）**被读模型刻意挡在客户端之外**——
-  [cultivation.ts](../../../packages/company-pack/src/lib/cultivation.ts) 的 `recordBody` 注记写着
+  [cultivation.ts](../../../packages/company-pack/src/lib/cultivation/cultivation.ts) 的 `recordBody` 注记写着
   「Return the persisted proposal body without exposing it in the Client record view」，所以面板只能显示正文首句
   （`title`）。人只能盲判。⇒ v1 要把正文带进读模型 + 就地展开；这条要**修订那条设计注记**，理由写进 Note。
 - **G3 不需要你动的条目没有标注**（判据 ②）：journal 素材块和「我提交的 · 待对方处理」行看起来都像待办，

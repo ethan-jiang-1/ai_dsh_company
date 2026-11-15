@@ -67,4 +67,4 @@ node --import tsx/esm runtime/tmp/c8-structural.mts
 ## 证据
 
 - `runtime/tmp/c8-structural.mts`：`dup AC true []`、`dup slice true []`。
-- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts#L407)（AC 解析）、[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts#L452)（REQ 重号只覆盖 REQ）。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts#L407)（AC 解析）、[prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts#L452)（REQ 重号只覆盖 REQ）。

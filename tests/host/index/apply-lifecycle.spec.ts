@@ -14,7 +14,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
 import { apply } from '../../../packages/company-pack/src/index.ts'
 import { writeStartupSettings } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
-import { EMPTY_STARTUP_SETTINGS } from '../../../packages/company-pack/src/lib/startup-settings.ts'
+import { EMPTY_STARTUP_SETTINGS } from '../../../packages/company-pack/src/lib/startup/startup-settings.ts'
 import { createTempEnv, type TempEnv } from '../../support/temp-env.ts'
 
 let env: TempEnv

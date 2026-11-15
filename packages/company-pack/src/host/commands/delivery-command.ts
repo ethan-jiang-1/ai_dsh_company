@@ -13,7 +13,7 @@ import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { contentMemberFile, isSafeContentId } from './content-id.ts'
 import { isPlainFileInside, readTextInside } from '../fs/safe-file.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
-import { yamlScalar } from '../../lib/yaml-scalar.ts'
+import { yamlScalar } from '../../lib/docs/yaml-scalar.ts'
 
 export const DELIVERY_USAGE = '用法：/delivery check <deliverables 目录名>（读 meta.md 的 交付模式 + content/delivery-modes/<id>/delivery-rules.json）'
 

@@ -12,7 +12,7 @@ import {
   recordStampOf,
   timeLabel,
   type CultivationRecord,
-} from '../../lib/cultivation.ts'
+} from '../../lib/cultivation/cultivation.ts'
 import {
   CULTIVATION_COPY,
   rejectLine,
@@ -20,7 +20,7 @@ import {
   type ActionOutcome,
   type CultivationActions,
 } from './cultivation-actions.ts'
-import type { CultivationContext } from '../../lib/cultivation-context.ts'
+import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
 
 /** 正文折叠阈值：超过这么多行就先只展前几行（长正文不该把别的待办顶走）。 */
 export const BODY_PREVIEW_LINES = 4

@@ -76,7 +76,7 @@ spec，没有进“唯一期望源”的模型字段；`src/index.ts` 的注册�
   （`engine.subagent` → `policy.delegation`）；`RETRY.subagent` 声明 `childPreset` 与
   `depth: 'caller-generic-subagent-row'`；新增 `retrySurface()`，只从
   `COMPOSITIONS.*.depthRows.subagent` 派生（full role）。
-- **运行时**：[`retry-policy.ts`](../../../packages/company-pack/src/lib/retry-policy.ts) 的
+- **运行时**：[`retry-policy.ts`](../../../packages/company-pack/src/lib/delegation/retry-policy.ts) 的
   `SUBAGENT_RETRY_SURFACE` 是唯一注册来源；[`src/index.ts`](../../../packages/company-pack/src/index.ts)
   不再硬编码 preset 列表。
 - **parity spec**：[`delegation-retry.spec.ts`](../../../tests/presets/delegation-retry.spec.ts) 钉

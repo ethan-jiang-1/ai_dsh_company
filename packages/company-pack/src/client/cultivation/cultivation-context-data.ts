@@ -10,16 +10,16 @@
  *
  * host 仍是记录证据的唯一来源：本模块只做预览，命令只带 ref。
  */
-import { CULTIVATION_ROLES, roleLabel as defaultRoleLabel } from '../../lib/cultivation.ts'
+import { CULTIVATION_ROLES, roleLabel as defaultRoleLabel } from '../../lib/cultivation/cultivation.ts'
 import {
   pickSessionTurn,
   type CultivationContextRef,
   type SessionEventLike,
   type SessionTurnPick,
   type SubagentMode,
-} from '../../lib/cultivation-context.ts'
+} from '../../lib/cultivation/cultivation-context.ts'
 import { parseCatalog } from '../data/deliverables-index.ts'
-import { isRecord } from '../../lib/guards.ts'
+import { isRecord } from '../../lib/shared/guards.ts'
 
 /** 客户端 sessions store 的行（`SessionListState.byId` 的读子集）。 */
 export interface ContextSessionRowLike {

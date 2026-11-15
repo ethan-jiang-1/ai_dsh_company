@@ -4,9 +4,9 @@ import { existsSync, lstatSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 // ── 测试文件重复门禁（spec-duplicates，2026-11-03 第六轮立）──────────────────────
-// 为什么：2026-11-03 `d6d1f92`（tests/host 进 tsc）把 `tests/lib/dag.spec.ts` **整文件覆盖**
-// 成 `tests/lib/cultivation-lib.spec.ts` 的字节副本（md5 同为 3255b4ce…）：DAG 布局算法
-// （`src/lib/dag.ts`，261 行）失去唯一单测，套件多出 21 条重复用例，而 `pnpm test` 全绿、`verify`
+// 为什么：2026-11-03 `d6d1f92`（tests/host 进 tsc）把当时的 tests/company/dag.spec.ts **整文件覆盖**
+// 成 cultivation-lib spec 的字节副本（md5 同为 3255b4ce…）：DAG 布局算法（今天是 `src/lib/presence/dag.ts`，
+// 261 行）失去唯一单测，套件多出 21 条重复用例，而 `pnpm test` 全绿、`verify`
 // 全绿、复核轮也全绿——**没有任何门禁看"两份 spec 是同一份内容"**。这不是过期，是内容被顶替：
 // 旧文还在被引用、新文看起来合理，正是本仓最怕的腐化形态。
 // 判据（机械、窄）：`tests/**/*.spec.ts` 的**归一化正文**（去行尾空白与首尾空行）做 sha256；
@@ -14,9 +14,10 @@ import { join } from 'node:path'
 //   不判"语义相似"（那会误伤平行的跨面守卫，见 tasks-table / board-panel 的 BUG-027 双守卫）。
 // 不查的反面（明说）：① 从别处粘贴的**片段**（不是整文件）不红；② 生成式 fixture 内容相同但
 //   文件名不同仍红——真要两份相同内容，抽共享 helper 而不是复制文件。
-// 负例留证 2026-11-03（实地造红→还原→绿）：`cp tests/lib/dag.spec.ts tests/host/zz-copy.spec.ts`
-//   → `FAIL spec-duplicates: 2 份 spec 内容完全相同（sha256:fdbe9b51…）：tests/lib/dag.spec.ts；
-//   tests/host/zz-copy.spec.ts`；删除副本 → 绿 ×139。
+// 负例留证 2026-11-03（实地造红→还原→绿）：cp 一份 spec 到任意 tests/ 路径
+//   → `FAIL spec-duplicates: 2 份 spec 内容完全相同（当时读数 sha256:fdbe9b51…）`；删除副本 → 绿。
+//   ⚠ 该哈希是 2026-11-03 的读数：2026-11-15 测试树搬家后 spec 的 import 深度变了，正文哈希已不是它；
+//   配方（cp 一份 spec）不变，读数以当次实跑为准。
 export function run({ root, ok, fail }) {
   const testsDir = join(root, 'tests')
   if (!existsSync(testsDir) || !lstatSync(testsDir).isDirectory()) {

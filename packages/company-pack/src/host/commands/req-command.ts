@@ -16,9 +16,9 @@ import { contentMemberFile, isSafeContentId } from './content-id.ts'
 import { isPlainFileInside, readTextInside } from '../fs/safe-file.ts'
 import { ensureCompanyRoot } from '../run-bundle/company-root.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
-import { checkRequirements, isLayer, type MotionDoc } from '../../lib/requirements-check.ts'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
-import { yamlScalar } from '../../lib/yaml-scalar.ts'
+import { checkRequirements, isLayer, type MotionDoc } from '../../lib/docs/requirements-check.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
+import { yamlScalar } from '../../lib/docs/yaml-scalar.ts'
 
 export const REQ_USAGE = '用法：/req check <deliverables 目录名>（读 .dsh-company/deliverables/<name>/drafts/{mrd,strs,prd,syrs,irs,vv-plan}.md + meta.md）'
 

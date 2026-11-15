@@ -40,9 +40,9 @@
 5. **守卫**：`seed-integrity` 增三条——process-docs 的 source 必须含 `{productType}`；每个类型包
    都能解析到该 source；`company.md` 默认类型在盘上。
 6. **YAML 标量口径**（red-team E16 反馈，同轮修）：`/req check`、bootstrap、`kb-seeds` 与两道门禁
-   统一经 `packages/company-pack/src/lib/yaml-scalar.ts` 的 `yamlScalar` 解析产品类型字段（去成对引号、
+   统一经 `packages/company-pack/src/lib/docs/yaml-scalar.ts` 的 `yamlScalar` 解析产品类型字段（去成对引号、
    去行尾 ` #` 注释）；`productType: "business-software" # 默认` 不再被误判。E16 的 C2/C3 由 RED 转
-   GREEN；回归 = `tests/lib/yaml-scalar.spec.ts` + 三处调用面 spec。
+   GREEN；回归 = `tests/lib/docs/yaml-scalar.spec.ts` + 三处调用面 spec。
 
 ## 输掉的方案
 
@@ -67,7 +67,7 @@
   `product-types/{productType}/requirements-model.md`；`bootstrap.ts` 新增
   `resolveCompanyProductType` 与 `BootstrapPlan.warnings`；`tools/lib/kb-seeds.mjs` 接受 `productType`。
 - `project-services` playbook 不再是可选值；有真实动议时随类型包发布再接入。
-- 新增 `packages/company-pack/src/lib/yaml-scalar.ts`（共享 YAML 标量解析）；`req-command` / `bootstrap`
+- 新增 `packages/company-pack/src/lib/docs/yaml-scalar.ts`（共享 YAML 标量解析）；`req-command` / `bootstrap`
   改调它，避免两份实现漂移（`pnpm dup` 从 1 clone 回到 0）。
 - 旧部署（only-fill）不受影响：已有 `process-docs.md` 不被覆盖；缺 process-docs 但 `company.md`
   无类型的部署会拿到 warning，而不是猜测。
@@ -96,7 +96,7 @@
   （`类型包 business-software 解析不到 ...`）；默认改 `nope` → 红；还原 → PASS。
 - `pnpm test`：**174 files / 1455 tests passed**（含 `tests/host/run-bundle/bootstrap.spec.ts`
   13 项、`tests/tools/kb-seeds.spec.ts` 8 项、`tests/presets/presets.spec.ts` 43 项、
-  `tests/host/commands/req-command.spec.ts` 17 项、`tests/lib/yaml-scalar.spec.ts` 2 项）。
+  `tests/host/commands/req-command.spec.ts` 17 项、`tests/lib/docs/yaml-scalar.spec.ts` 2 项）。
 - `pnpm typecheck`：绿（pack + tests/client + tests/company + tests/harness；当轮旧分区名）。
 - `pnpm lint`：0 warnings / 0 errors；`pnpm dup`：0 clones。
 - `source run/env.sh && node checks/lanes/preset.entry.mjs`：

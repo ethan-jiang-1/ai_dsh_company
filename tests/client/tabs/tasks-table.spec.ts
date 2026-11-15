@@ -18,7 +18,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
 import { TasksTableView } from '../../../packages/company-pack/src/client/tabs/TasksPanel.tsx'
-import type { TeamViewLike } from '../../../packages/company-pack/src/lib/presence.ts'
+import type { TeamViewLike } from '../../../packages/company-pack/src/lib/presence/presence.ts'
 import { en, type CompanyKey, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 
 /** 真 wire 形状（`TeamTaskView`）：带 ownerName / ready / revision / blockedBy。 */

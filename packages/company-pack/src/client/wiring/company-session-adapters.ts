@@ -2,7 +2,7 @@
 import type { ISessions, SessionRemote } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionFollowFrame } from '@deepseek-ai/dsh-api-session-controller/types'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import type { TeamStreamFrame } from '../../lib/presence.ts'
+import type { TeamStreamFrame } from '../../lib/presence/presence.ts'
 
 /** Minimum session lookup consumed by the company session adapters. */
 type CompanySessions = Pick<ISessions, 'subagentAddress'>

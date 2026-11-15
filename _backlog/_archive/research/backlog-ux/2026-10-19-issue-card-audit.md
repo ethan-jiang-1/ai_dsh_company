@@ -50,7 +50,7 @@ intent: "为 issue 卡质量审与 DSH-native 收口提供逐条证据：四张�
 
 | # | 严重度 | 位置 | 问题 | 证据 / 建议 |
 |---|---|---|---|---|
-| C1 | P1 | [看板卡](../../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §验证计划 + [研究 §五](../company-panels-ux/2026-10-19-panel-truth-audit.md) | 把 `record.rows.agentTeam.val`（state）原样当 golden，又用 `ownerId` 反推 owner | 生产读模型 `tasksFromTeamView` 读的是 wire 的 `ownerName`（[board.ts](../../../../packages/company-pack/src/lib/board.ts)，形状见 [presence.ts](../../../../packages/company-pack/src/lib/presence.ts) 的 `TeamViewLike`）。测试会再造一条生产不走的 owner 解析路径，可能再次假绿。golden 应存 wire，或测试先跑与 host 相同的 `projectTaskView` |
+| C1 | P1 | [看板卡](../../../_archive/settled_issues/2026-10-19-board-dag-ux-deep-dive.md) §验证计划 + [研究 §五](../company-panels-ux/2026-10-19-panel-truth-audit.md) | 把 `record.rows.agentTeam.val`（state）原样当 golden，又用 `ownerId` 反推 owner | 生产读模型 `tasksFromTeamView` 读的是 wire 的 `ownerName`（[board.ts](../../../../packages/company-pack/src/lib/presence/board.ts)，形状见 [presence.ts](../../../../packages/company-pack/src/lib/presence/presence.ts) 的 `TeamViewLike`）。测试会再造一条生产不走的 owner 解析路径，可能再次假绿。golden 应存 wire，或测试先跑与 host 相同的 `projectTaskView` |
 | C2 | P2 | 看板卡 §已确立的事实 / 任务板卡 §本轮范围 / 台账卡 §已确立的事实、验收标准 | “每 5 秒刷新”三张卡各写一遍 | 一个事实三个 owner；如果没先选看板卡，台账的验收条就满足不了。应合成一张小卡或明确归一个 owner |
 | C3 | P2 | 看板卡 §这是什么 / 任务板卡 §这是什么 / [盘点](../company-panels-ux/2026-10-19-panel-inventory-and-priority.md) §一 | 行数 374/379、99/105、162/105；`styles.ts:179` 实际 184 | 引用已漂移；数字本身可能都对，但读者无法复算。改引用符号/命令，别只写行号 |
 | C4 | P2 | 研究文首 | 同时出现 61 板/298 任务、379 行/344 owner、273/273 ownerName | 没标各自样本：全量 state、`ver === 4` wire、读模型全量。没有“样本/层”列，数字越多越像噪声 |

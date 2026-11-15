@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { readCompanyFileAt } from '../../packages/company-pack/src/host/run-bundle/company-root.ts'
-import { extractJsonBlock } from '../../packages/company-pack/src/lib/prd-check.ts'
+import { extractJsonBlock } from '../../packages/company-pack/src/lib/docs/prd-check.ts'
 
 describe('v6 dry-run：已分类轴的本地证据', () => {
   it('Windows `..\\` 越界 → unsafe（不是 missing）', () => {

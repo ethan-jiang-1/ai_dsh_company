@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest'
 import { COMPOSITIONS, PRESET_IDS, retrySurface } from '../../tools/lib/delegation-model.mjs'
 import {
   DELEGATION_CAPABILITIES, delegationCapabilitiesOf, type DelegationCapabilities,
-} from '../../packages/company-pack/src/lib/delegation-capabilities.ts'
+} from '../../packages/company-pack/src/lib/delegation/delegation-capabilities.ts'
 
 interface CompositionSpec {
   readonly channels: readonly string[]

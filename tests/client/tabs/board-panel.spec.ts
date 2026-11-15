@@ -16,8 +16,8 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { BoardPanel } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
-import { boardColumns, tasksFromTeamView } from '../../../packages/company-pack/src/lib/board.ts'
-import type { TeamViewLike } from '../../../packages/company-pack/src/lib/presence.ts'
+import { boardColumns, tasksFromTeamView } from '../../../packages/company-pack/src/lib/presence/board.ts'
+import type { TeamViewLike } from '../../../packages/company-pack/src/lib/presence/presence.ts'
 
 /** 真事故的板面（task-3 声明了依赖 T1,T2，板面 blockedBy 为空）。 */
 const INCIDENT: TeamViewLike = {

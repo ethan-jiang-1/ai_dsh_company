@@ -32,7 +32,7 @@ import {
   type PresentedLedger,
   type PresentedLedgerState,
   type PresentedObservation,
-} from '../ledger/presented-ledger.ts'
+} from './presented-ledger.ts'
 
 /** 新 domain 的存储文件名。 */
 export const PRESENTED_DOMAIN_FILE = 'company_run_bundle_ledger.json'

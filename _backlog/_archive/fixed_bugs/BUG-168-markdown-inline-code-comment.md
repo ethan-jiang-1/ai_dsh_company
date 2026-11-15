@@ -64,11 +64,11 @@ node --import tsx/esm runtime/tmp/c8c-markdown-shape.mts
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/markdown-shape.ts`、`tests/lib/prd-check.spec.ts`
-- 红：去掉 `codeSpanEnd` 分支 → `npx vitest run tests/lib/prd-check.spec.ts` 红（行内注释开头吞后文，6 条字段缺失）
-- 绿：接回 code span 状态 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（33 passed）
+- 红：去掉 `codeSpanEnd` 分支 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 红（行内注释开头吞后文，6 条字段缺失）
+- 绿：接回 code span 状态 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 绿（33 passed）
 - 提交：commit d6aa860d
 
 ## 证据
 
 - `runtime/tmp/c8c-markdown-shape.mts` / `.log`：行内 `<!--` → 6 条字段错误；成对 → `true []`。
-- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/markdown-shape.ts) 的 `scanDocument()`。
+- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/docs/markdown-shape.ts) 的 `scanDocument()`。

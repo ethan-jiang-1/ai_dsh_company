@@ -5,7 +5,7 @@
 
 ## 决定
 
-1. **角色名 = 表达层，canonical 英文**：role id + 英文名住 `src/lib/role-copy.ts`；
+1. **角色名 = 表达层，canonical 英文**：role id + 英文名住 `src/lib/shared/role-copy.ts`；
    zh 可见名用 `CEO · 首席执行官` 混排，en 用 `CEO`；徽标/窗口标题用短标签（CEO/VPE/VPS）；
    委派卡用 `VP-Eng · 研发` / `VP-Eng · Engineering`。数据/日志/API/preset id 不变。
 2. **不再问用户角色名细节**：视觉统一 + 一眼看懂；picker name 用英文缩写，六个公司角色

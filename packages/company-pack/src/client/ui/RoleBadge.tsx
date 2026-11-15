@@ -29,7 +29,7 @@ import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { CompanyT } from '../locales.ts'
 import { roleText } from '../roles.ts'
-import { ROLE_COPY } from '../../lib/role-copy.ts'
+import { ROLE_COPY } from '../../lib/shared/role-copy.ts'
 
 /**
  * 会话列表快照的最小结构面（本地声明，照 `use-company-data.ts` 的 `SessionsStoreLike`

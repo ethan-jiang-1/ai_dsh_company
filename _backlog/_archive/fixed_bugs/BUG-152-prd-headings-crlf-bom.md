@@ -62,4 +62,4 @@ BOM+CRLF    validateProductDocs(mrd, prd) === { ok: true }   ← 现在 false「
 
 - `runtime/tmp/c8-round1.mts`：LF baseline `true 0 1`；CRLF PRD `false` + 两条错误；CRLF MRD 仍 `true`（MRD 的 JSON 块兼容 CRLF）。
 - `runtime/tmp/c8-structural.mts`：BOM PRD `false`，错误「缺 definition 头」。
-- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts#L358) / [prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts#L293)。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts#L358) / [prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts#L293)。

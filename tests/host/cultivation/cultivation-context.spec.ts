@@ -2,8 +2,8 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { encodeContextToken } from '../../../packages/company-pack/src/lib/cultivation-context.ts'
-import { parseRecord, recordText, WORK_TEXT_LIMIT } from '../../../packages/company-pack/src/lib/cultivation.ts'
+import { encodeContextToken } from '../../../packages/company-pack/src/lib/cultivation/cultivation-context.ts'
+import { parseRecord, recordText, WORK_TEXT_LIMIT } from '../../../packages/company-pack/src/lib/cultivation/cultivation.ts'
 
 import { cultivationRegistrations, invokeCultivation, withCultivationWorkspace } from '../../support/cultivation-harness.ts'
 

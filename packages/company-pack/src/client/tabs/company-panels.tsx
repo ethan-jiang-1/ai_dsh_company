@@ -6,13 +6,13 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
-import type { BoardCard, BoardColumn, TaskRow } from '../../lib/board.ts'
-import { UNASSIGNED_LABEL } from '../../lib/board.ts'
-import type { BudgetSummary } from '../../lib/budget.ts'
-import { formatTokens } from '../../lib/budget.ts'
-import type { DagLayout } from '../../lib/dag.ts'
-import type { ActivityEntry, PresenceRow } from '../../lib/presence.ts'
-import { memberDot } from '../../lib/presence-status.ts'
+import type { BoardCard, BoardColumn, TaskRow } from '../../lib/presence/board.ts'
+import { UNASSIGNED_LABEL } from '../../lib/presence/board.ts'
+import type { BudgetSummary } from '../../lib/accounting/budget.ts'
+import { formatTokens } from '../../lib/accounting/budget.ts'
+import type { DagLayout } from '../../lib/presence/dag.ts'
+import type { ActivityEntry, PresenceRow } from '../../lib/presence/presence.ts'
+import { memberDot } from '../../lib/presence/presence-status.ts'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 
 const defaultT = ((key: CompanyKey, params?: Record<string, string | number>) => {

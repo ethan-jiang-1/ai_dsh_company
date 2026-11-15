@@ -65,7 +65,7 @@
 
 ## 现行语义（canonical）
 
-- 能力表：[delegation-capabilities.ts](../../packages/company-pack/src/lib/delegation-capabilities.ts)
+- 能力表：[delegation-capabilities.ts](../../packages/company-pack/src/lib/delegation/delegation-capabilities.ts)
 - 座位：[seat.ts](../../packages/company-pack/src/host/delegation/seat.ts) ·
   [delegation-contracts.ts](../../packages/company-pack/src/host/prompt/delegation-contracts.ts) ·
   [delegation-control.ts](../../packages/company-pack/src/host/delegation/delegation-control.ts)

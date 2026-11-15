@@ -25,8 +25,8 @@ import {
 } from 'node:fs'
 import { dirname, isAbsolute, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { isRecord } from '../../lib/guards.ts'
-import { RUN_BUNDLE_REL } from '../run-bundle/run-bundle.ts'
+import { isRecord } from '../../lib/shared/guards.ts'
+import { RUN_BUNDLE_REL } from './run-bundle.ts'
 import { appendRotatingLine } from '../logging/rotating-log.ts'
 
 /** 当前 manifest 形状版本。 */

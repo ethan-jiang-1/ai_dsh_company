@@ -32,7 +32,7 @@ import {
   contextSummary,
   decodeContextToken,
   type CultivationContext,
-} from '../../lib/cultivation-context.ts'
+} from '../../lib/cultivation/cultivation-context.ts'
 import {
   CULTIVATION_ROLES,
   methodSkillText,
@@ -47,13 +47,13 @@ import {
   WORK_TEXT_LIMIT,
   VERIFICATION_EVIDENCE_LIMIT,
   VERIFICATION_HISTORY_LIMIT,
-} from '../../lib/cultivation.ts'
+} from '../../lib/cultivation/cultivation.ts'
 import {
   clearPendingRevoke,
   recoverPendingRevoke,
   writePendingRevoke,
-} from '../cultivation/revoke-journal.ts'
-import { readContext } from '../cultivation/cultivation-context-read.ts'
+} from './revoke-journal.ts'
+import { readContext } from './cultivation-context-read.ts'
 import {
   ROSTER,
   SLUG_RE,
@@ -62,10 +62,10 @@ import {
   writeRecordViaFs,
   type CultivationStorage,
   type FsWriteLike,
-} from '../cultivation/cultivation-storage.ts'
+} from './cultivation-storage.ts'
 import { canonicalPath } from '../run-bundle/paths.ts'
 import { CompanyWriteBlockedError } from '../run-bundle/write-gate.ts'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 
 /** bundle patch 行注入的 host config（cordis.patch.yml `company-client` 行）。 */
 export interface CultivationHostConfig {

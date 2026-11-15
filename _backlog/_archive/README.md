@@ -1,5 +1,6 @@
 # _archive/ · 离开活跃区
 
+- [2026-11-15-src-tests-dir-alignment.md](settled_issues/2026-11-15-src-tests-dir-alignment.md) — src↔tests 目录名对齐：host 例外清零 + `src/lib` 八组镜像；去向 = [Note](../../notes/implemented/2026-11-15-src-tests-dir-alignment.md)。
 - [2026-11-15-tests-tree-axis.md](settled_issues/2026-11-15-tests-tree-axis.md) — 测试树分轴：镜像断言 + `tests/repo` 六个 owner 子目录 + 去组数枚举；去向 = [Note](../../notes/implemented/2026-11-15-tests-tree-axis.md)。
 - [2026-11-13-suffix-lane-alignment.md](settled_issues/2026-11-13-suffix-lane-alignment.md) — spec/e2e/entry/checks 四层 + 四条命令；去向 = note。
 - [2026-11-13-test-asset-naming-contract.md](settled_issues/2026-11-13-test-asset-naming-contract.md) — 目标树 + 资产正名 + naming-contract 门禁；去向 = note。
@@ -20,6 +21,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-15-src-tests-dir-alignment.md](settled_issues/2026-11-15-src-tests-dir-alignment.md) | 已结；host 两条源侧例外清零（fs/logging 各配测试目录）、`src/lib` 按域分八组且 `tests/lib` 同名镜像、mirror 升级为三处目录名集合相等（249 files / 2118 tests、verify ALL PASS、四面 tsc 绿）；去向 = [Note](../../notes/implemented/2026-11-15-src-tests-dir-alignment.md) | 2026-11-15 |
 | [2026-11-15-tests-tree-axis.md](settled_issues/2026-11-15-tests-tree-axis.md) | 已结；镜像成为断言（`tests/repo/structure/` 下的 set-equality + 五条例外防腐化）、`tests/repo` 35 个 spec 换 owner 轴分六组、三份 README 去组数枚举并补 host 组表两行（245 files / 2099 tests、verify ALL PASS、四面 tsc 绿）；去向 = [Note](../../notes/implemented/2026-11-15-tests-tree-axis.md) | 2026-11-15 |
 | [BUG-176（已修）](fixed_bugs/BUG-176-json-fence-example-extracted.md) | 已修：示例围栏里的 json 块被当账本；顶层围栏块成为唯一来源 | 2026-11-14 |
 | [BUG-177（已修）](fixed_bugs/BUG-177-fix-evidence-valid-command-forms.md) | 已修：合法命令形态（`pnpm run`/`--filter`/`node --import`）被拒；按语法解析选项+值 | 2026-11-14 |
@@ -242,7 +244,7 @@
 | [BUG-059-quality-loop-audit-r2-session-index.md](fixed_bugs/BUG-059-quality-loop-audit-r2-session-index.md) | 质量环 audit 原文索引按 session 隔离（R2 新 verifier session 不再误报 `not-verbatim`）；合成红→绿 + 真盘 R2 audit ALL PASS | 2026-11-10 |
 | [BUG-058-command-datablocked-reason.md](fixed_bugs/BUG-058-command-datablocked-reason.md) | `dataBlocked` 回执点名真实原因（workspace/lease/bundle/落点）+ 重启提示；四命令共用 `blockedCompanyText`；不改变停写守卫 | 2026-11-10 |
 | [BUG-057-command-slug-path-traversal.md](fixed_bugs/BUG-057-command-slug-path-traversal.md) | `/req`/`/prd` 的 slug 越界读：共享 host-only `resolveDeliverablePath`（单段正则 + `relative` 纵深）；两 spec 红→绿 + 真入口复跑 | 2026-11-10 |
-| [BUG-026-owner-missing-from-team-projection.md](fixed_bugs/BUG-026-owner-missing-from-team-projection.md) | 误报证伪（wire 视图 ownerName 齐全，卡读的是 projcache state 行）→ 防复发判据 = `tests/lib/board.spec.ts` 真 wire 形状断言；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-19 |
+| [BUG-026-owner-missing-from-team-projection.md](fixed_bugs/BUG-026-owner-missing-from-team-projection.md) | 误报证伪（wire 视图 ownerName 齐全，卡读的是 projcache state 行）→ 防复发判据 = `tests/lib/presence/board.spec.ts` 真 wire 形状断言；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-19 |
 | [BUG-023-cultivation-float-actions-dead.md](fixed_bugs/BUG-023-cultivation-float-actions-dead.md) | 误报证伪（浮窗正常；真凶 = 探针跨轮复用 id 撞遗留方法目录）→ 修复落探针卫生，S4b 恢复硬判 PASS；2026-11-09 由 `settled_issues` 改归本表 | 2026-10-18 |
 
 | [BUG-061-product-type-allowed-values-drift.md](fixed_bugs/BUG-061-product-type-allowed-values-drift.md) | 产品类型允许值单一来源：类型目录 = 唯一枚举 + `product-type-sources` 门禁；`project-services` 标未来类型 | 2026-11-11 |

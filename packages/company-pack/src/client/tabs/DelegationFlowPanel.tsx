@@ -9,7 +9,7 @@
  * 有投影才显示精确终态；缺数据标 missing，不伪造 completed/interrupted/lost。
  */
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
-import type { DelegationNode, DelegationTree } from '../../lib/delegation-tree.ts'
+import type { DelegationNode, DelegationTree } from '../../lib/delegation/delegation-tree.ts'
 import { StateNote } from './company-panels.tsx'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 

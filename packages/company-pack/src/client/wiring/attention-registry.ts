@@ -4,7 +4,7 @@
  * 在 `apply()` 闭包内创建（client 纪律：模块级句柄被禁——避免 de-facto 单例）；
  * 观察者登记 / 销账都走它，面板每 2s 读一次快照（本地内存，零成本轮询）。
  */
-import type { LivePending } from '../../lib/attention.ts'
+import type { LivePending } from '../../lib/presence/attention.ts'
 
 /** 登记处实例（`begin` 返回销账函数；list 返回当前挂起快照）。 */
 export interface AttentionRegistry {

@@ -17,7 +17,7 @@
  * `agent/created` 用 WeakSet 去重，service re-provide 的 callback 重跑由 fiber 负责（BUG-074）。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { isSupportPreset } from '../../lib/delegation-surface.ts'
+import { isSupportPreset } from '../../lib/delegation/delegation-surface.ts'
 import { composedPresetOf } from '../prompt/handbook.ts'
 import { TEAM_SURFACE_TOOLS } from './seat.ts'
 

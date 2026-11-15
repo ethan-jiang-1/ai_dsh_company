@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, vi } from 'vitest'
 import { makeContextWiring } from '../../../packages/company-pack/src/client/wiring/context-wiring.ts'
-import { sessionFileAddress } from '../../../packages/company-pack/src/lib/deliverables-address.ts'
+import { sessionFileAddress } from '../../../packages/company-pack/src/lib/deliverables/deliverables-address.ts'
 
 function makeScoped(over = {}) {
   return {

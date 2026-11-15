@@ -59,4 +59,4 @@ meta 写 numbering: identity + 坏 PRD → deny（现有行为不回归）
 ## 证据
 
 - `runtime/tmp/c8-round1.mts`：`gate numbering-empty allow validate: false`；`gate numbering-identity deny`。
-- 代码：[prd-gate.ts](../../../packages/company-pack/src/host/commands/prd-gate.ts#L65)；对照 [requirements-check.ts](../../../packages/company-pack/src/lib/requirements-check.ts#L364)。
+- 代码：[prd-gate.ts](../../../packages/company-pack/src/host/commands/prd-gate.ts#L65)；对照 [requirements-check.ts](../../../packages/company-pack/src/lib/docs/requirements-check.ts#L364)。

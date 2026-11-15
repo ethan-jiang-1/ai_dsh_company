@@ -9,7 +9,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
 import { CultivationCompose } from '../../../packages/company-pack/src/client/cultivation/CultivationCompose.tsx'
 import { CULTIVATION_COPY, type ActionOutcome, type CultivationActions } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
-import { decodeContextToken } from '../../../packages/company-pack/src/lib/cultivation-context.ts'
+import { decodeContextToken } from '../../../packages/company-pack/src/lib/cultivation/cultivation-context.ts'
 import type {
   ContextSessionRow,
   CultivationContextSources,

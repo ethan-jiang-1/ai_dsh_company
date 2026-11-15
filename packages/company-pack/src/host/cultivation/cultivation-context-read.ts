@@ -7,7 +7,7 @@
  *
  * 边界：只读（sessionQuery 观测 / `RUN_BUNDLE_PATHS.catalog`），不写任何文件、不碰方法层。
  */
-import { isRecord } from '../../lib/guards.ts'
+import { isRecord } from '../../lib/shared/guards.ts'
 import type { Context } from '@deepseek-ai/cordis'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -17,10 +17,10 @@ import {
   type CultivationContext,
   type CultivationContextRef,
   type SessionEventLike,
-} from '../../lib/cultivation-context.ts'
-import { roleLabel as defaultRoleLabel } from '../../lib/cultivation.ts'
-import { ROSTER } from '../cultivation/cultivation-storage.ts'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
+} from '../../lib/cultivation/cultivation-context.ts'
+import { roleLabel as defaultRoleLabel } from '../../lib/cultivation/cultivation.ts'
+import { ROSTER } from './cultivation-storage.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 
 /** 背景读取的 host 最小读面（sessionQuery 懒取；缺席 = 明确报错，不静默降级）。 */
 interface SessionObservationLike {

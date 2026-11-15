@@ -49,7 +49,7 @@
 
 ## 后果
 
-- 新增 `src/lib/startup-settings.ts`（纯模型）、`src/host/startup/{startup-store,startup-prompt}.ts`、
+- 新增 `src/lib/startup/startup-settings.ts`（纯模型）、`src/host/startup/{startup-store,startup-prompt}.ts`、
   `src/host/commands/settings-command.ts`、`src/client/startup/{startup-store,StrategyButton,StrategyPanel}.tsx|ts`；
   右栏页签目录 +1（`dsh-company-pack/strategy`）、composer 槽 +1、命令族 +1（`/company-settings`）。
 - `RUN_BUNDLE_PATHS` 增 `startup` / `startup-options`；`docs/contracts/profile.md` 增「项目启动策略」一节。
@@ -70,7 +70,7 @@
 实测 2026-11-12（全部本轮跑过）：
 
 - `pnpm typecheck`：绿（pack 两面 + tests/client/host/lib/content/harness）。
-- `pnpm test`：**231 files / 1704 tests passed**（新增 5 个 spec：`tests/lib/startup-settings.spec.ts` 13 项、
+- `pnpm test`：**231 files / 1704 tests passed**（新增 5 个 spec：`tests/lib/startup/startup-settings.spec.ts` 13 项、
   `tests/host/startup/startup-store.spec.ts` 8 项、`tests/host/startup/startup-prompt.spec.ts` 4 项、
   `tests/host/commands/settings-command.spec.ts` 8 项、`tests/client/startup/strategy-button.spec.ts` 4 项）。
 - `pnpm verify`：ALL PASS（含 `ui-expected-freshness` 刷新后复跑）。

@@ -13,9 +13,9 @@
 import { readdirSync, realpathSync, statSync } from 'node:fs'
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { expandHomePath } from '@deepseek-ai/dsh-home-paths'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 import { companyFileProblem, readCompanyText, writeCompanyAtomic } from '../run-bundle/company-root.ts'
-import type { StartupSettingsProblem } from '../../lib/startup-settings.ts'
+import type { StartupSettingsProblem } from '../../lib/startup/startup-settings.ts'
 import {
   EMPTY_STARTUP_OPTIONS,
   EMPTY_WIKI_CHECK,
@@ -28,7 +28,7 @@ import {
   type StartupOptions,
   type StartupSettings,
   type WikiCheck,
-} from '../../lib/startup-settings.ts'
+} from '../../lib/startup/startup-settings.ts'
 
 /** 隐式交付模式：`productized` 是缺省，不建内容包（见 delivery-mode 轴决定）。 */
 const IMPLICIT_DELIVERY_MODE = 'productized'

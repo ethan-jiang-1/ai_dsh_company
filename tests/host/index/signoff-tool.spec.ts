@@ -14,7 +14,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { apply } from '../../../packages/company-pack/src/index.ts'
-import { signoffDecisionNote, signoffReason } from '../../../packages/company-pack/src/lib/signoff.ts'
+import { signoffDecisionNote, signoffReason } from '../../../packages/company-pack/src/lib/accounting/signoff.ts'
 
 /** 只实现 apply/execute 用到的面（tools/approval/commands）；其余 cast 掉——stand-in 的是 ctx 壳，不是被测逻辑。 */
 function harness(approve: 'allowed-once' | 'denied') {

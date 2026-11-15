@@ -18,8 +18,8 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { composedPresetOf } from '../prompt/handbook.ts'
-import { abortable } from '../../lib/abortable.ts'
-import { SUBAGENT_RETRY, subagentRetryDecision, type SubagentRetrySurface } from '../../lib/retry-policy.ts'
+import { abortable } from '../../lib/shared/abortable.ts'
+import { SUBAGENT_RETRY, subagentRetryDecision, type SubagentRetrySurface } from '../../lib/delegation/retry-policy.ts'
 
 interface TextBlock {
   readonly type: string

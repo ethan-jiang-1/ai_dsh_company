@@ -7,7 +7,7 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
-import { signoffDecisionNote, signoffReason } from '../../lib/signoff.ts'
+import { signoffDecisionNote, signoffReason } from '../../lib/accounting/signoff.ts'
 
 /** 注册签字工具；无 agent 会话时回 unavailable（不抛错、不发审批）。 */
 export function registerSignoffTool(ctx: Context): void {

@@ -15,7 +15,7 @@ import { join } from 'node:path'
 import { apply } from '../../packages/company-pack/src/index.ts'
 import { ledgerFilePath } from '../../packages/company-pack/src/host/ledger/presented-domain.ts'
 import { canonicalPath } from '../../packages/company-pack/src/host/run-bundle/paths.ts'
-import { RUN_BUNDLE_PATHS } from '../../packages/company-pack/src/lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_PATHS } from '../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
 const failures = []

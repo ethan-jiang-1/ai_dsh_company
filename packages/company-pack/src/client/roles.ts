@@ -5,7 +5,7 @@
  * host 的人可见回执。
  */
 import type { CompanyKey, CompanyT } from './locales.ts'
-import { DELEGATION_TOOL_ROLES, isRoleId, ROLE_CANONICAL, ROLE_IDS, type RoleId } from '../lib/role-copy.ts'
+import { DELEGATION_TOOL_ROLES, isRoleId, ROLE_CANONICAL, ROLE_IDS, type RoleId } from '../lib/shared/role-copy.ts'
 
 export type RoleField = 'label' | 'full' | 'short' | 'delegation'
 

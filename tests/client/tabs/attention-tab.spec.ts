@@ -12,7 +12,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AttentionTab } from '../../../packages/company-pack/src/client/tabs/AttentionTab.tsx'
 import { createAttentionRegistry } from '../../../packages/company-pack/src/client/wiring/attention-registry.ts'
-import type { LivePending } from '../../../packages/company-pack/src/lib/attention.ts'
+import type { LivePending } from '../../../packages/company-pack/src/lib/presence/attention.ts'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 

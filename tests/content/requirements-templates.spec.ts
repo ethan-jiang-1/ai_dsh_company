@@ -12,7 +12,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { validateProductDocs } from '../../packages/company-pack/src/lib/prd-check.ts'
+import { validateProductDocs } from '../../packages/company-pack/src/lib/docs/prd-check.ts'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 
 const TEMPLATES = join(ROOT, 'packages/company-pack/content/templates')

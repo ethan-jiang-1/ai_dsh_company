@@ -57,10 +57,10 @@ node --import tsx/esm runtime/tmp/c8b-more-shapes.mts
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/prd-check.ts`、`tests/lib/prd-check.spec.ts`
-- 红：去掉 slice 解析里的 `reqOwner` 映射 → `npx vitest run tests/lib/prd-check.spec.ts` 红（跨 slice / 同 slice 重复两条）
-- 绿：接回归属映射 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（29 passed，单归属不误判）
+- 红：去掉 slice 解析里的 `reqOwner` 映射 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 红（跨 slice / 同 slice 重复两条）
+- 绿：接回归属映射 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 绿（29 passed，单归属不误判）
 - 提交：commit 85e6fec9
 ## 证据
 
 - `runtime/tmp/c8b-more-shapes.mts` / `.log`：`REQ in two slices true []`。
-- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts) 的 `validateProductDocs()` / `parsePrdSlices()`。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts) 的 `validateProductDocs()` / `parsePrdSlices()`。

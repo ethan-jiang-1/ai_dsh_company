@@ -8,8 +8,8 @@
  * 只给公司 preset（6 角色 + 5 support）注入；standard/其他组合不受影响。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { NON_ROLE_PRESETS } from '../../lib/delegation-surface.ts'
-import { PRESET_KEYS } from '../../lib/presence-status.ts'
+import { NON_ROLE_PRESETS } from '../../lib/delegation/delegation-surface.ts'
+import { PRESET_KEYS } from '../../lib/presence/presence-status.ts'
 import { composedPresetOf } from './handbook.ts'
 import type { CompanyLanguage, CompanyLanguageState } from '../language/company-language.ts'
 

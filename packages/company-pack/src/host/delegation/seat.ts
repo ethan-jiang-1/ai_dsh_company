@@ -14,8 +14,8 @@
  *   CEO teammate 没有，vp-eng teammate 有 `subagent`，不能按角色一刀切）。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { delegationCapabilitiesOf } from '../../lib/delegation-capabilities.ts'
-import { isSupportPreset } from '../../lib/delegation-surface.ts'
+import { delegationCapabilitiesOf } from '../../lib/delegation/delegation-capabilities.ts'
+import { isSupportPreset } from '../../lib/delegation/delegation-surface.ts'
 import { composedPresetOf } from '../prompt/handbook.ts'
 
 /** Agent Teams 名册里的角色；undefined = 不在名册。 */

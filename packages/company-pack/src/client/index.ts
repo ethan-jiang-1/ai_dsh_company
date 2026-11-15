@@ -22,7 +22,7 @@ import { installAttentionObservers } from './wiring/attention-observers.ts'
 import { createCultivationView } from './cultivation/CultivationView.tsx'
 import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './data/company-data-plane.ts'
 import { parseCompanyIdentity, setCompanyIdentity } from './data/company-identity.ts'
-import { RUN_BUNDLE_PATHS } from '../lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_PATHS } from '../lib/shared/run-bundle-paths.ts'
 import { makeContextWiring, type ContextWiringScoped } from './wiring/context-wiring.ts'
 import { makeOpenMember } from './wiring/member-navigation.ts'
 import { titleUpdateFor } from './wiring/title-state.ts'
@@ -39,7 +39,7 @@ import {
   STARTUP_OPTIONS_READ_LIMIT,
   STARTUP_SETTINGS_READ_LIMIT,
   type StartupField,
-} from '../lib/startup-settings.ts'
+} from '../lib/startup/startup-settings.ts'
 import type { SaveResult } from './startup/StrategyPanel.tsx'
 import { createErrorRelay, installErrorCapture, type ClientErrorEntry, type ErrorCaptureTarget } from './wiring/error-ring.ts'
 import { ROLE_SHORT, RoleBadge, readPresetOf, sessionTitleOf } from './ui/RoleBadge.tsx'

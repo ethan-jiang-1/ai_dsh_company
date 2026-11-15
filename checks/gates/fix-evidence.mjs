@@ -2,7 +2,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { sectionStructuralText } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
+import { sectionStructuralText } from '../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
 import { parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
 
 // ── 修复证据门（fix-evidence，2026-11-14 立）──────────────────────────────────────

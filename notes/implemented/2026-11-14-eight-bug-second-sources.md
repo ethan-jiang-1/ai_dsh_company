@@ -12,7 +12,7 @@
 收成一处，再让所有载体消费它；不按症状各打一个补丁。
 
 1. **headings PRD 的文本形状层**（152/153/157）：解析器此前把原始字节当文档结构。现在扫描层住在
-   `packages/company-pack/src/lib/markdown-shape.ts`（2026-11-14 后续抽出并与 `/req check` 共享；
+   `packages/company-pack/src/lib/docs/markdown-shape.ts`（2026-11-14 后续抽出并与 `/req check` 共享；
    见 [形状层 Note](2026-11-14-shape-layer-and-structure-semantics.md)）：入口 `normalizeDocument()`（去 BOM、
    CRLF/lone-CR → LF）、`scanDocument()` 维护围栏状态（三反引号 / 三波浪号，开合行本身也算围栏内），
    AC 与 slice 各自维护 `seen` 集合。Slices 表、`### REQ-###` 定义块、REQ 字段行都只读这个层。
@@ -61,15 +61,15 @@ hook 没有第二套范围语义，错误环没有第二套取文顺序**。
 | 唯一入口 | `lib/markdown-shape.ts`（扫描层）、`lib/prd-check.ts`（PRD 判据）/ `lib/requirements-check.ts` 的 `numberingMarker` / `host/commands/prd-gate.ts` / `checks/pre-push-surfaces.mjs` / `client/wiring/error-ring.ts` |
 | 读载体 | `/prd check`、present 闸门、`/req check`；push hook；错误环与 cdp-probe |
 | 写载体 | 新增 PRD 解析、闸门判据、push 范围或错误取文时先改上述唯一入口，再改 spec |
-| 契约测试 | `tests/lib/prd-check.spec.ts`、`tests/lib/requirements-check.spec.ts`、`tests/host/commands/prd-gate.spec.ts`、`tests/host/contract/file-shape-agreement.spec.ts`、`tests/client/wiring/error-ring.spec.ts`、`tests/checks/pre-push-surfaces.test.mjs` |
+| 契约测试 | `tests/lib/docs/prd-check.spec.ts`、`tests/lib/docs/requirements-check.spec.ts`、`tests/host/commands/prd-gate.spec.ts`、`tests/host/contract/file-shape-agreement.spec.ts`、`tests/client/wiring/error-ring.spec.ts`、`tests/checks/pre-push-surfaces.test.mjs` |
 
 ## 验证
 
 | 层 | 失败类 | 负控（见过红） |
 |---|---|---|
-| keyless unit `tests/lib/prd-check.spec.ts`（21 passed） | 1 / 6 | 拆 `normalizeDocument` → CRLF/BOM 用例红；拆 fence 状态 → 围栏 3 条红；拆 AC/slice `seen` → 重号 2 条红 |
+| keyless unit `tests/lib/docs/prd-check.spec.ts`（21 passed） | 1 / 6 | 拆 `normalizeDocument` → CRLF/BOM 用例红；拆 fence 状态 → 围栏 3 条红；拆 AC/slice `seen` → 重号 2 条红 |
 | keyless unit `tests/host/commands/prd-gate.spec.ts`（9 passed） | 2 / 6 | 闸门改回 `header.cwd` → 「cd 后」红；改回 `/^numbering:\s*\S/m` → 空值形状红；`unsafe` 改 `continue` → 三种 symlink 形状红 |
-| keyless unit `tests/lib/requirements-check.spec.ts`（22 passed） | 2 | `numberingMarker` 四形状同源断言（missing/empty/invalid/identity） |
+| keyless unit `tests/lib/docs/requirements-check.spec.ts`（22 passed） | 2 | `numberingMarker` 四形状同源断言（missing/empty/invalid/identity） |
 | contract 矩阵 `tests/host/contract/file-shape-agreement.spec.ts` + `company-root-safety`（147 passed） | 6 / 8 | 新读载体 `company.readFileAt` 入 READERS；`carrier-registry` 登记后 `company-root-carriers` 绿 |
 | keyless unit `tests/client/wiring/error-ring.spec.ts`（8 passed） | 9 | 拆 `textOf` 对象字段分支 → `{}` 用例的 message 变 `"{}"` |
 | checks 自测 `tests/checks/pre-push-surfaces.test.mjs`（3 passed） | 8 / 12 | 还原旧范围分支 → 新分支与删除 ref 两条红（`not ok 1/2`） |
@@ -79,5 +79,5 @@ hook 没有第二套范围语义，错误环没有第二套取文顺序**。
 
 - [environment-gap] **真浏览器跨 realm 错误源**（iframe / worker 抛错）：五种形状已由 keyless 覆盖，等有跨 realm 页面场景时跑 UI 冒烟 → `tests/client/wiring/error-ring.spec.ts`、`checks/lanes/ui-scene.entry.mjs`
 - [environment-gap] **真实远端新分支 pre-push 横幅**：三条形状已由临时 git 仓库 + 真脚本子进程覆盖 → `tests/checks/pre-push-surfaces.test.mjs`、`.githooks/pre-push`
-- [covered] **`/prd check` 命令面 CRLF/BOM**：命令与闸门共用同一 `validateProductDocs` 实现 → `packages/company-pack/src/lib/prd-check.ts`、`tests/lib/prd-check.spec.ts`
-- [policy] **`parsePrdSlices` 在首个 `## ` 标题处截断**：现行模板在 `## ` 之后不放 slice 行 → `packages/company-pack/src/lib/prd-check.ts`
+- [covered] **`/prd check` 命令面 CRLF/BOM**：命令与闸门共用同一 `validateProductDocs` 实现 → `packages/company-pack/src/lib/docs/prd-check.ts`、`tests/lib/docs/prd-check.spec.ts`
+- [policy] **`parsePrdSlices` 在首个 `## ` 标题处截断**：现行模板在 `## ` 之后不放 slice 行 → `packages/company-pack/src/lib/docs/prd-check.ts`

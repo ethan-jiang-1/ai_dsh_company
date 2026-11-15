@@ -49,7 +49,7 @@
 
 ## 现行语义（canonical）
 
-- host：[delegation-contracts.ts](../../packages/company-pack/src/host/prompt/delegation-contracts.ts) · [team-seat-guard.ts](../../packages/company-pack/src/host/delegation/team-seat-guard.ts) · [delegation-surface.ts](../../packages/company-pack/src/lib/delegation-surface.ts)
+- host：[delegation-contracts.ts](../../packages/company-pack/src/host/prompt/delegation-contracts.ts) · [team-seat-guard.ts](../../packages/company-pack/src/host/delegation/team-seat-guard.ts) · [delegation-surface.ts](../../packages/company-pack/src/lib/delegation/delegation-surface.ts)
 - 合同：[delegation](../../docs/contracts/delegation.md) §2.1 · [presets](../../docs/contracts/presets.md) 工具面
 - 内容：[delegation core skill](../../packages/company-pack/presets/_shared/delegation/skills/delegation-policy/SKILL.md) · [eng-teaming](../../packages/company-pack/presets/vp-eng/skills/eng-teaming/SKILL.md) · [README 已知限制](../../packages/company-pack/README.md)
 - 前置 Note：[委派政策能力域化](./2026-11-11-delegation-policy-capability-scoped.md)（本 Note 部分取代其 item 6）

@@ -5,7 +5,7 @@
  * 这里是 client 侧读模型：只做 JSON → 目录 → 筛选，不 import React、不做 I/O。
  * host 侧生成器仍是 `lib/deliverables-catalog.ts`（build from disk），两者没有互相依赖。
  */
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 
 /** 一条成品目录项（与 `tools/lib/deliverables-catalog.mjs` 同形）。 */
 export interface DeliverablesCatalogEntry {

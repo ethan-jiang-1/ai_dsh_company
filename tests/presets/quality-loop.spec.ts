@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
 import { handbookSkipPresets } from '../../tools/lib/delegation-model.mjs'
-import { NON_ROLE_PRESETS } from '../../packages/company-pack/src/lib/delegation-surface.ts'
+import { NON_ROLE_PRESETS } from '../../packages/company-pack/src/lib/delegation/delegation-surface.ts'
 import { allRows, loadPresetDoc, pluginConfig, rowById } from './preset-yaml.ts'
 
 const PACK = join(ROOT, 'packages/company-pack')

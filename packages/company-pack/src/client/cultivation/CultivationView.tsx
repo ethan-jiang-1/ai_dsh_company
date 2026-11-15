@@ -13,7 +13,7 @@ import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
-import { roleLabel } from '../../lib/cultivation.ts'
+import { roleLabel } from '../../lib/cultivation/cultivation.ts'
 import type { CompanyT } from '../locales.ts'
 import { setCultivationLanguage } from './cultivation-actions.ts'
 import { roleText } from '../roles.ts'
@@ -21,7 +21,7 @@ import { CultivationBoard } from './CultivationBoard.tsx'
 import { CultivationChatPanel } from './CultivationChatPanel.tsx'
 import type { CultivationActionsFactory } from './cultivation-actions.ts'
 import type { CultivationContextSources } from './cultivation-context-data.ts'
-import type { CultivationContext } from '../../lib/cultivation-context.ts'
+import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
 import {
   useCultivationFeedback,
   useCultivationPanelData,

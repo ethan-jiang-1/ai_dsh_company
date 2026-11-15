@@ -82,7 +82,7 @@ intent: 给下一位执行者一份重构后 delta、入口矩阵、charters、�
   `turn/end.reason.kind` 折成 `lastTurnEnd`；客户端 `delegation-tree` 优先读它，缺失回退
   `subagentTiming`，再缺标 `unavailable`。见
   [`delegation-terminal.ts`](../../../../packages/company-pack/src/host/delegation/delegation-terminal.ts) 与
-  [`delegation-tree.ts`](../../../../packages/company-pack/src/lib/delegation-tree.ts)。
+  [`delegation-tree.ts`](../../../../packages/company-pack/src/lib/delegation/delegation-tree.ts)。
 - UI 的 `DelegationFlowPanel` 落在现有 DagTab 体内；九页签不变；终态显示 completed / failed /
   interrupted / aborted / max-tokens / refusal / lost（lost 仅当投影提供）。workflow run 的 `lost`
   不在 session tree，属 `workflow_runs` 的域。
@@ -451,7 +451,7 @@ coo/cfo root 的逐个 retry 采用；长期采纳/workspace-write/release。
 - 本仓合同：[delegation](../../../../docs/contracts/delegation.md)、[presets](../../../../docs/contracts/presets.md)、
   [testing](../../../../docs/testing.md)、[tests README](../../../../tests/README.md)。
 - 模型/资产：[delegation-model.mjs](../../../../tools/lib/delegation-model.mjs)、
-  [delegation-tree.ts](../../../../packages/company-pack/src/lib/delegation-tree.ts)、
+  [delegation-tree.ts](../../../../packages/company-pack/src/lib/delegation/delegation-tree.ts)、
   [DelegationFlowPanel.tsx](../../../../packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx)、
   [subagent-retry.ts](../../../../packages/company-pack/src/host/delegation/subagent-retry.ts)。
 - 探针：[delegation-contract-probe](../../../../probes/team/delegation-contract-probe.mjs)、

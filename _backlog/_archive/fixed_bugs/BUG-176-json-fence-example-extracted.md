@@ -64,11 +64,11 @@ node --import tsx/esm runtime/tmp/c8d-json-fence.mts
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/prd-check.ts`、`packages/company-pack/src/lib/markdown-shape.ts`、`tests/lib/prd-check.spec.ts`
-- 红：还原整篇 json 正则 → `npx vitest run tests/lib/prd-check.spec.ts` 红（示例围栏被当账本）
-- 绿：改读顶层围栏块 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（35 passed）
+- 红：还原整篇 json 正则 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 红（示例围栏被当账本）
+- 绿：改读顶层围栏块 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 绿（35 passed）
 - 提交：commit 8a95fc51
 
 ## 证据
 
 - `runtime/tmp/c8d-json-fence.mts` / `.log`：返回示例的空 opportunities。
-- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts) 的 `extractJsonBlock()`；[markdown-shape.ts](../../../packages/company-pack/src/lib/markdown-shape.ts) 的 `maskHtmlComments()`。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts) 的 `extractJsonBlock()`；[markdown-shape.ts](../../../packages/company-pack/src/lib/docs/markdown-shape.ts) 的 `maskHtmlComments()`。

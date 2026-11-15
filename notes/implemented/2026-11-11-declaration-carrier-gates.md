@@ -35,7 +35,7 @@
    `policy-lines.md` 的 `- **Key**：...` 行派生数字 token（%、$、个、折、区间），扫描
    content + presets + src；新增政策数字不用再改门禁。
    “服务类附赠 / 服务信用”整块从 CFO 章程搬进 `policy-lines.md`（10% 有了唯一家）；
-   `vp-eng.md` 的 `$200`、`org.md` 的 `$2,000`、CFO 章程的 `10%` 指针、`src/lib/text.ts` 的
+   `vp-eng.md` 的 `$200`、`org.md` 的 `$2,000`、CFO 章程的 `10%` 指针、`src/lib/shared/text.ts` 的
    `30%` 注释改为指针 / 中性措辞。
 4. **章程个案语言进 denylist**：`base-clean` 在 charter 的 `## 历史纪要` 之前扫描
    `公司/客户…agent…案`、`内部…动议`、`日期待核`；页脚“本部署的动议纪要…”与 CMO 章程的

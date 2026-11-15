@@ -40,7 +40,7 @@ import {
   recordStampOf,
   recordText,
   type CultivationRecord,
-} from '../../lib/cultivation.ts'
+} from '../../lib/cultivation/cultivation.ts'
 
 /** 名册集合（提案目标必须是五角色）。 */
 export const ROSTER = new Set<string>(CULTIVATION_ROLES)

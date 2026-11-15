@@ -10,8 +10,8 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { CultivationBoard } from '../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx'
-import type { CultivationRecord, CultivationRow } from '../../../packages/company-pack/src/lib/cultivation.ts'
-import type { CultivationContext } from '../../../packages/company-pack/src/lib/cultivation-context.ts'
+import type { CultivationRecord, CultivationRow } from '../../../packages/company-pack/src/lib/cultivation/cultivation.ts'
+import type { CultivationContext } from '../../../packages/company-pack/src/lib/cultivation/cultivation-context.ts'
 
 /** 最小行/记录 fixture（形状见 lib/cultivation.ts）。 */
 const journalRow = (over: Partial<CultivationRow> = {}): CultivationRow => ({

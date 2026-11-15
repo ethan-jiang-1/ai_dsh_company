@@ -16,7 +16,7 @@ import { describe, expect, it } from 'vitest'
 import { StrategyButton } from '../../../packages/company-pack/src/client/startup/StrategyButton.tsx'
 import { createStartupStore } from '../../../packages/company-pack/src/client/startup/startup-store.ts'
 import { en, zh, type CompanyKey, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
-import { EMPTY_STARTUP_OPTIONS, EMPTY_STARTUP_SETTINGS, type StartupSettings } from '../../../packages/company-pack/src/lib/startup-settings.ts'
+import { EMPTY_STARTUP_OPTIONS, EMPTY_STARTUP_SETTINGS, type StartupSettings } from '../../../packages/company-pack/src/lib/startup/startup-settings.ts'
 
 function translator(dict: Record<CompanyKey, string>): CompanyT {
   return ((key: CompanyKey, params?: Record<string, string | number>) => {

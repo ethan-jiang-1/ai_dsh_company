@@ -15,7 +15,7 @@ const propResult = spawnSync(
   [
     vitest,
     'run',
-    'tests/lib/markdown-shape.property.spec.ts',
+    'tests/lib/docs/markdown-shape.property.spec.ts',
     'tests/host/contract/structure-agreement.spec.ts',
     '--reporter=dot',
   ],

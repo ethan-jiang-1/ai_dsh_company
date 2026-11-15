@@ -10,11 +10,11 @@
  */
 import { assertCompanyWritesAllowed } from '../run-bundle/write-gate.ts'
 import { ensureCompanyDir, readCompanyText, writeCompanyAtomic } from '../run-bundle/company-root.ts'
-import { isRecord } from '../../lib/guards.ts'
+import { isRecord } from '../../lib/shared/guards.ts'
 import { existsSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
-import { applyRecordUpdates, type CultivationStorage } from '../cultivation/cultivation-storage.ts'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
+import { applyRecordUpdates, type CultivationStorage } from './cultivation-storage.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 
 export interface PendingRevokeRecord {
   readonly id: string

@@ -11,7 +11,7 @@ const note = (body) => `状态：implemented\n\n## 决定\n做。\n\n## 未覆�
 
 test('四分类前缀 + 真实仓库反引号路径或有效相对链接 → 绿', () => {
   const okBody = [
-    '- [covered] 跨行 span 已对齐 → `packages/company-pack/src/lib/markdown-shape-core.js`',
+    '- [covered] 跨行 span 已对齐 → `packages/company-pack/src/lib/docs/markdown-shape-core.js`',
     '- [environment-gap] Windows 真机待触发 → [triggers](../../_backlog/triggers.md)',
     '- [policy] 存量不回填 → `checks/gates/notes-axes.mjs:18`',
     '- [unprovable] 静态门不证历史执行 → `.agents/skills/close-out-definition/SKILL.md#L1`',

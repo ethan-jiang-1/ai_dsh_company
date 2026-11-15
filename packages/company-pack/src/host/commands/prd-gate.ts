@@ -19,8 +19,8 @@ import { lstatSync } from 'node:fs'
 import { join } from 'node:path'
 import { readCompanyFileAt, resolveCompanySegments, verifyCompanySubpathAt } from '../run-bundle/company-root.ts'
 import type { CompanyFileRead } from '../run-bundle/company-root.ts'
-import { numberingMarker, numberingVocabularyError } from '../../lib/requirements-check.ts'
-import { validateProductDocs } from '../../lib/prd-check.ts'
+import { numberingMarker, numberingVocabularyError } from '../../lib/docs/requirements-check.ts'
+import { validateProductDocs } from '../../lib/docs/prd-check.ts'
 
 /** 闸门只读这次调用的几件事（结构最小面，测试可直接构造）。 */
 export interface GateToolCall {

@@ -6,9 +6,12 @@
  *   只扫「页签」，组数不在任何门禁的射程。镜像的收益只有一个：维护者的检索反射「改了 src/X → 去 tests/X 找证据」。
  *   把这条反射变成断言，才算接缝而不是口号。
  * 判据：两侧目录名集合相等；对不上的必须在 EXCEPTIONS 里带理由登记；**登记过的例外必须真的对不上**
- *   （源组补齐了而例外没删 = 红），例外表因此不会腐化成第二份过期清单。
+ *   （源组补齐了而例外没删 = 红），例外表因此不会腐化成第二份过期清单。例外只服务 host/client——
+ *   lib 两侧没有例外，且顶层不许留散件（`src/lib/x.ts` 或 `tests/lib/x.spec.ts` 都会红）。
  * 不证明：目录里的 spec 是否真覆盖了对应模块（那是各区自己的事）；属性轴（i18n、presets 的一次扫全量）
  *   不在镜像判据内——它按「属性」组织，按单位拆会把一条属性碎成 N 份。
+ * 2026-11-15 扩展：lib 也从「都平铺」升级成「两侧目录名集合相等」——src/lib 按域分八组后，
+ *   镜像统一成同一条规则；例外只剩三条「另一种单位」（contract/ index/ i18n/）。
  */
 import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
@@ -23,12 +26,15 @@ type Side = 'src-only' | 'tests-only'
  * 新增例外前先问：这个目录是「另一种单位」还是「少了一个测试家」？少测试家就补，不要登记。
  */
 const EXCEPTIONS = new Map<string, { side: Side; reason: string }>([
-  ['src/host/fs', { side: 'src-only', reason: '叶子模块（safe-file），唯一证据由调用方 spec 带' }],
-  ['src/host/logging', { side: 'src-only', reason: '叶子模块（rotating-log），同上' }],
   ['tests/host/contract', { side: 'tests-only', reason: '跨载体不变量，不对应单一源组' }],
   ['tests/host/index', { side: 'tests-only', reason: '根组合面，对应 src/index.ts 而不是某个组' }],
   ['tests/client/i18n', { side: 'tests-only', reason: '属性区（字典/页签壳/缺省 locale），一次扫多组' }],
 ])
+
+const orphans = (rel: string): string[] => readdirSync(join(ROOT, rel), { withFileTypes: true })
+  .filter(entry => entry.isFile() && !entry.name.startsWith('.'))
+  .map(entry => entry.name)
+  .sort()
 
 const dirs = (rel: string): string[] =>
   readdirSync(join(ROOT, rel), { withFileTypes: true })
@@ -89,8 +95,12 @@ describe('测试树 ↔ 源码树：目录镜像', () => {
     expect(rotten).toEqual([])
   })
 
-  it('src/lib 与 tests/lib 同为平铺（不造 33 个子目录）', () => {
-    expect(dirs('packages/company-pack/src/lib')).toEqual([])
-    expect(dirs('tests/lib')).toEqual([])
+  it('src/lib 与 tests/lib 目录名集合相等（按域分八组）', () => {
+    expect(dirs('tests/lib')).toEqual(dirs('packages/company-pack/src/lib'))
+  })
+
+  it('两侧顶层都不留散件（模块与 spec 都必须归组）', () => {
+    expect(orphans('packages/company-pack/src/lib')).toEqual([])
+    expect(orphans('tests/lib')).toEqual([])
   })
 })

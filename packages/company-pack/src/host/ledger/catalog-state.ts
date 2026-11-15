@@ -5,9 +5,9 @@
  * 拆出原因：ledger 的旧索引迁移要读 catalog，若 ledger 反向 import catalog 会成环；读取面独立成叶。
  */
 import { join } from 'node:path'
-import type { DeliverablesCatalog } from '../../lib/deliverables-catalog.ts'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
-import { isRecord } from '../../lib/guards.ts'
+import type { DeliverablesCatalog } from '../../lib/deliverables/deliverables-catalog.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
+import { isRecord } from '../../lib/shared/guards.ts'
 import { companyFileProblem, readCompanyText } from '../run-bundle/company-root.ts'
 
 export const CATALOG_REL = RUN_BUNDLE_PATHS.catalog

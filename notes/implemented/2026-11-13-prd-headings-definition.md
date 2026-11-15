@@ -42,16 +42,16 @@
 
 - 事实：新 PRD 的定义点 = `### REQ-###` 小节 + 行首字段；JSON 账本只有旧动议可读，不再新写。
 - 唯一入口：模板 [prd.md](../../packages/company-pack/content/templates/prd.md)；解析/校验
-  [prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts)；层↔形态合同
+  [prd-check.ts](../../packages/company-pack/src/lib/docs/prd-check.ts)；层↔形态合同
   [requirements-model.md](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)
   （business-software 同改）；闸门 [prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts)，注册在
   [index.ts](../../packages/company-pack/src/index.ts)。
 - 读载体：[product-definition 指南](../../docs/guides/product-definition.md)、VP-Eng `prd-playbook`、
   共享 `product-definition` 技能、[D61](../../docs/reference/decisions.md)。
 - 写载体：模板（模型写 PRD 时注入）、`/prd check` 命令、`present` 闸门。
-- 测试：[prd-check.spec](../../tests/lib/prd-check.spec.ts)、
+- 测试：[prd-check.spec](../../tests/lib/docs/prd-check.spec.ts)、
   [prd-gate.spec](../../tests/host/commands/prd-gate.spec.ts)、
-  [requirements-check.spec](../../tests/lib/requirements-check.spec.ts)、
+  [requirements-check.spec](../../tests/lib/docs/requirements-check.spec.ts)、
   [requirements-templates.spec](../../tests/content/requirements-templates.spec.ts)、
   prd/req/scenario 命令 spec、[presets.spec](../../tests/presets/presets.spec.ts)。
 
@@ -61,7 +61,7 @@
 |---|---|---|
 | 修前红（真现场） | 用 pack 校验器跑现场那对 MRD/PRD | `ok=false`、**33 条错**；旧 PRD `reqCount=18/32`、`acCount=35/62` |
 | 新模板自洽 | `validateProductDocs(content/templates/{mrd,prd}.md)` | `ok=true`、0 错、1 需求 / 1 AC |
-| keyless 新形状 | `npx vitest run tests/lib/prd-check.spec.ts` | 15 passed（缺 userStory / 非法 type / 缺 then / 重号 / 无 changeLog / 悬空 / 环 / 区间 / 缺表 均红；legacy 兼容绿） |
+| keyless 新形状 | `npx vitest run tests/lib/docs/prd-check.spec.ts` | 15 passed（缺 userStory / 非法 type / 缺 then / 重号 / 无 changeLog / 悬空 / 环 / 区间 / 缺表 均红；legacy 兼容绿） |
 | keyless 闸门 | `npx vitest run tests/host/commands/prd-gate.spec.ts` | 5 passed（present 坏 PRD → deny；旧动议 / 缺文件 / 内部异常 → 放行） |
 | 旧形状兼容 | legacy PRD 样例 + 现场 PRD 重跑 | 旧样例绿；现场仍 33 条（只读兼容，不静默改判） |
 | 全量回归 | `pnpm test` | 247 files / 2034 tests passed |

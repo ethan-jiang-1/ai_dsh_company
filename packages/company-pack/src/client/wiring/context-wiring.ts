@@ -12,8 +12,8 @@ import {
   type CultivationContextSources,
   type FollowLike,
 } from '../cultivation/cultivation-context-data.ts'
-import type { CultivationContext } from '../../lib/cultivation-context.ts'
-import { sessionFileAddress } from '../../lib/deliverables-address.ts'
+import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
+import { sessionFileAddress } from '../../lib/deliverables/deliverables-address.ts'
 
 /** 背景读/开的最小结构面（两个注入块共用；预检与导航都在容器，领域视图不碰 RPC）。 */
 export interface ContextWiringScoped {

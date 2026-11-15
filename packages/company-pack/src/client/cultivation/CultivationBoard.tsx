@@ -20,7 +20,7 @@ import {
   type CultivationRecord,
   type CultivationRow,
   type FeedbackItem,
-} from '../../lib/cultivation.ts'
+} from '../../lib/cultivation/cultivation.ts'
 import {
   CULTIVATION_COPY,
   type CultivationActions,
@@ -28,10 +28,10 @@ import {
 import { CultivationCompose } from './CultivationCompose.tsx'
 import { useCultivationBoard } from './use-cultivation-board.tsx'
 import { CultivationInbox } from './CultivationInbox.tsx'
-import { roleLabel as defaultRoleLabel } from '../../lib/cultivation.ts'
+import { roleLabel as defaultRoleLabel } from '../../lib/cultivation/cultivation.ts'
 import { CultivationAdopted, CultivationFeedback, CultivationJournal, CultivationMine } from './CultivationBoardSections.tsx'
 import type { CultivationContextSources } from './cultivation-context-data.ts'
-import type { CultivationContext } from '../../lib/cultivation-context.ts'
+import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
 
 /** 页签体注入面。 */
 

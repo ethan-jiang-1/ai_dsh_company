@@ -7,7 +7,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { readHandbook, registerHandbook, HANDBOOK_SECTION } from '../../../packages/company-pack/src/host/prompt/handbook.ts'
 import { handbookSkipPresets } from '../../../tools/lib/delegation-model.mjs'
-import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 
 function content(): string {
   const dir = mkdtempSync(join(tmpdir(), 'handbook-content-'))

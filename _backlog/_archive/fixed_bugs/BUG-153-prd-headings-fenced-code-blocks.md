@@ -54,4 +54,4 @@ node --import tsx/esm runtime/tmp/c8-round1.mts
 ## 证据
 
 - `runtime/tmp/c8-round1.mts`：`fenced REQ false [...]`、`fenced Slices false [...]`；baseline `true 0 1`。
-- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts#L358) / [prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts#L293)。
+- 代码：[prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts#L358) / [prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts#L293)。

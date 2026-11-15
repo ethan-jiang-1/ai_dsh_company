@@ -9,7 +9,7 @@ import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs
 import { bootstrapCompanyWorkspace } from '../../../packages/company-pack/src/host/run-bundle/bootstrap.ts'
 import { planBundleManifest } from '../../../packages/company-pack/src/host/run-bundle/bundle-manifest.ts'
 import { regenerateCatalog } from '../../../packages/company-pack/src/host/ledger/catalog.ts'
-import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 import { makeTempDir } from '../../support/temp-env.ts'
 
 const PACK = { name: 'dsh-company-pack', version: '0.6.0' }

@@ -11,7 +11,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'reac
 import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionBinding, SessionReference } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import type { CultivationRecord } from '../../lib/cultivation.ts'
+import type { CultivationRecord } from '../../lib/cultivation/cultivation.ts'
 import { CULTIVATION_COPY } from './cultivation-actions.ts'
 
 type EventWindow = ReturnType<SessionBinding['eventSource']['getSnapshot']>

@@ -31,7 +31,7 @@
 
 ## 未覆盖轴
 
-- clean clone 的 3 个 skip = `tests/lib/ledger.spec.ts` 的 dev-only 真台账用例（clean clone 无 dev 台账；skip-budget 已登记，属预期）。
+- clean clone 的 3 个 skip = `tests/lib/accounting/ledger.spec.ts` 的 dev-only 真台账用例（clean clone 无 dev 台账；skip-budget 已登记，属预期）。
 - clean clone 不产出 `_dist` tarball（`pnpm setup` 不跑 export-dist）；READY 仍只对暖树成立（release 合同边界）。
 - `npm publish` / `channel-matrix-smoke --channel all`（人工 handoff）。
 - 浏览器的任意交互路径：本次是 10 页签 + 错误环 + 金样，不是全点击路径。

@@ -7,7 +7,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-api-session-controller/types'
 import { defineTool } from '@deepseek-ai/dsh-tools'
-import { doorsFromSessions } from '../../lib/doors.ts'
+import { doorsFromSessions } from '../../lib/presence/doors.ts'
 
 /** 门投影需要的会话事实（api-session/added|removed|status 维护）。 */
 interface DoorFact {

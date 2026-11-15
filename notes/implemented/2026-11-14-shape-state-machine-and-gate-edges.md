@@ -52,7 +52,7 @@
 | 事实 | 结构 = 归一化后「围栏/注释/行内代码」之外的行；未闭合注释是根因错误；company 路径的 `..` 一律 unsafe；门禁证据要能被提交/命令真实解析 |
 | 唯一入口 | `lib/markdown-shape.ts`（三种容器）、`host/run-bundle/company-root.ts`（段校验）、`checks/gates/fix-evidence.mjs`、`checks/gates/notes-tree.mjs` |
 | 读载体 | `/prd check`、`/req check`、present 闸门、`pnpm verify` |
-| 契约测试 | `tests/lib/prd-check.spec.ts`、`tests/lib/requirements-check.spec.ts`、`tests/host/contract/file-shape-agreement.spec.ts`、`tests/checks/fix-evidence.test.mjs`、`tests/checks/notes-tree.test.mjs` |
+| 契约测试 | `tests/lib/docs/prd-check.spec.ts`、`tests/lib/docs/requirements-check.spec.ts`、`tests/host/contract/file-shape-agreement.spec.ts`、`tests/checks/fix-evidence.test.mjs`、`tests/checks/notes-tree.test.mjs` |
 
 ## 验证
 
@@ -66,8 +66,8 @@
 
 ## 未覆盖轴
 
-- [covered] **行内/跨行代码 span 与 HTML 注释交错**：单状态机已与 `mdast` 差分对齐 → `packages/company-pack/src/lib/markdown-shape-core.js`、`tests/lib/markdown-shape.property.spec.ts`
-- [covered] **围栏内未闭合 `<!--` 字面量**：围栏优先语义已由单测与属性差分覆盖 → `tests/lib/prd-check.spec.ts`、`tests/lib/markdown-shape.property.spec.ts`
+- [covered] **行内/跨行代码 span 与 HTML 注释交错**：单状态机已与 `mdast` 差分对齐 → `packages/company-pack/src/lib/docs/markdown-shape-core.js`、`tests/lib/docs/markdown-shape.property.spec.ts`
+- [covered] **围栏内未闭合 `<!--` 字面量**：围栏优先语义已由单测与属性差分覆盖 → `tests/lib/docs/prd-check.spec.ts`、`tests/lib/docs/markdown-shape.property.spec.ts`
 - [covered] **中间段 symlink + `..` 与混合分隔符越界**：读写目录与 `prd-gate` 全通道同判据矩阵已覆盖 → `packages/company-pack/src/host/run-bundle/company-root.ts`、`tests/host/contract/file-shape-agreement.spec.ts`
 - [policy] **notes 软链禁令**：活跃与归档层只许仓内普通文件与目录 → `checks/gates/notes-tree.mjs`
 - [policy] **命令解析只证静态可解析**：执行证据归 `pnpm test` / pre-push 与收尾留证 → `checks/gates/fix-evidence.mjs`

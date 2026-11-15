@@ -8,7 +8,7 @@ import {
   SUBAGENT_RETRY,
   SUBAGENT_RETRY_SURFACE,
   subagentRetryDecision,
-} from '../../packages/company-pack/src/lib/retry-policy.ts'
+} from '../../packages/company-pack/src/lib/delegation/retry-policy.ts'
 
 interface CompositionSpec {
   readonly archetype: string

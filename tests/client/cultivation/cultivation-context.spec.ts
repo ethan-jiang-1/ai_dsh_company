@@ -26,13 +26,13 @@ import {
   pickSessionTurn,
   type CultivationContext,
   type CultivationContextRef,
-} from '../../../packages/company-pack/src/lib/cultivation-context.ts'
+} from '../../../packages/company-pack/src/lib/cultivation/cultivation-context.ts'
 import {
   methodSkillText,
   parseRecord,
   recordText,
   type RecordDraft,
-} from '../../../packages/company-pack/src/lib/cultivation-record.ts'
+} from '../../../packages/company-pack/src/lib/cultivation/cultivation-record.ts'
 
 const sessionRef: CultivationContextRef = {
   kind: 'session',

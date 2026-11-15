@@ -31,7 +31,7 @@ import { exportGovernance } from '../../../packages/company-pack/src/host/ledger
 import { writePresentedLedger, type PresentedLedger } from '../../../packages/company-pack/src/host/ledger/presented-ledger.ts'
 import { writeStartupSettings } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
 import { applyBootstrap, planBootstrap } from '../../../packages/company-pack/src/host/run-bundle/bootstrap.ts'
-import type { StartupSettings } from '../../../packages/company-pack/src/lib/startup-settings.ts'
+import type { StartupSettings } from '../../../packages/company-pack/src/lib/startup/startup-settings.ts'
 import { ALL_SHAPES, makeWorld, outsideSnapshot } from '../../support/world-shapes.ts'
 
 const ROLES = ['ceo', 'cfo', 'coo', 'cmo', 'vp-eng', 'vp-sales'] as const

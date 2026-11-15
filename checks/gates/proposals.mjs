@@ -1,7 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { sectionStructuralText } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
+import { sectionStructuralText } from '../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
 import { noteStatusBlock, structuralLines } from '../../tools/lib/repo-markdown.mjs'
 
 // ── 9. 提案纪律：notes/proposed/ 只收已批 RFC，且该毕业的必须毕业 ─────────────

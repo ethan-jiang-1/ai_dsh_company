@@ -21,7 +21,7 @@ import {
   parseSettingsCommand,
   registerSettingsCommand,
 } from '../../../packages/company-pack/src/host/commands/settings-command.ts'
-import { STARTUP_COMMAND_COPY } from '../../../packages/company-pack/src/lib/startup-command-copy.ts'
+import { STARTUP_COMMAND_COPY } from '../../../packages/company-pack/src/lib/startup/startup-command-copy.ts'
 import { readStartupSettings } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
 import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
 

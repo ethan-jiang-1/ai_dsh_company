@@ -4,7 +4,7 @@
 
 ## 决定
 
-1. **adopt 部署持久化正文**：`host/cultivation.ts` 采纳建议时，方法 `SKILL.md` 正文改取记录文件里的提案正文（[lib/cultivation.ts](../../packages/company-pack/src/lib/cultivation.ts) 新增 `recordBody`，`parseRecord` 复用同一 frontmatter 解析），不再取命令行局部 body——`adopt <id>` 不带 `::` 正文，旧实现部署出空正文方法（review 抓出的行为 bug：红 = 期望含提案正文、收到空串）。
+1. **adopt 部署持久化正文**：`host/cultivation.ts` 采纳建议时，方法 `SKILL.md` 正文改取记录文件里的提案正文（[lib/cultivation.ts](../../packages/company-pack/src/lib/cultivation/cultivation.ts) 新增 `recordBody`，`parseRecord` 复用同一 frontmatter 解析），不再取命令行局部 body——`adopt <id>` 不带 `::` 正文，旧实现部署出空正文方法（review 抓出的行为 bug：红 = 期望含提案正文、收到空串）。
 2. **存储适配器路径安全**（单进程威胁模型：无对抗性并发改动，check-then-use 竞态不声称免疫）：
    - 记录 id 只拒绝路径语义——`/`、`\`、NUL、`:`、绝对路径/盘符、`.`/`..`、超 128 字符；任意非路径 legacy id（如 `r1`）继续可读。
    - 培养目录 / 记录目录 / 方法层根 / 角色方法目录 / 方法目录逐组件 `lstat`，symlink 或非目录即拒（配置的 profile 根之上视为信任锚）。记录文件本体读写同样拒 symlink，清单枚举跳过并计入 broken。

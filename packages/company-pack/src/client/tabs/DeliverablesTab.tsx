@@ -29,7 +29,7 @@ import {
   type DeliverablesCatalog,
   type DeliverablesCatalogEntry,
 } from '../data/deliverables-index.ts'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 
 /** 页签体注入面。 */
 export interface DeliverablesTabInjected {

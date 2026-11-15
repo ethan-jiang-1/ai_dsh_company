@@ -9,7 +9,7 @@
 ## 决定
 
 1. **先收口第二事实源，再加资产。** markdown 形状从「pack TS 一份 + fix-evidence 简化版 + 各门禁 sectionBody」收成两层授权单原语：
-   pack 与门禁消费 `packages/company-pack/src/lib/markdown-shape-core.js` 单一状态机（`markdown-shape.ts` 只做类型包装），
+   pack 与门禁消费 `packages/company-pack/src/lib/docs/markdown-shape-core.js` 单一状态机（`markdown-shape.ts` 只做类型包装），
    keyless 治理层（`backlog-liveness` / `notes-audit` / `bug-coverage` / `notes-tree` / `proposals`）统一消费
    `tools/lib/repo-markdown.mjs`（复用 `vendor/dsh` `mdast` GFM + `js-yaml`），并由 `company-root-carriers` AST 扫描静态禁绝手写裸解析。
 2. **退役优先于新增。** 删 8 份 content english spec（超集 `content-english` + 3 份唯一文件清单合并）、
@@ -22,7 +22,7 @@
 4. **证明层：历史 BUG 覆盖 + 组合语法差分 + 4 消费者契约。**
    - `tools/lib/bug-coverage.mjs`：181 张已修卡 → **76 有具名守卫（42.0%）**，105 无（保守下界）；baseline 只升不降，
      新修 BUG（opened ≥ 2026-11-15）缺具名守卫即红。
-   - `tests/lib/markdown-shape.property.spec.ts`：500 个组合语法 seeded 文档（weekly lane 1000）× `mdast` GFM 独立真值差分，
+   - `tests/lib/docs/markdown-shape.property.spec.ts`：500 个组合语法 seeded 文档（weekly lane 1000）× `mdast` GFM 独立真值差分，
      证归一化幂等、顶层围栏载荷、4+ 空格缩进代码块、行首/行内注释与 GFM 表格逐单元格转义还原一致。
    - `tests/host/contract/structure-agreement.spec.ts`：500 个生成文档对齐二级节定位 + 90 组同源语料对齐 4 消费者（`prd-check` × `requirements-check` × `prd-gate` × 读卡原语）；
      `file-shape-agreement` 覆盖 16 条路径等价类的读/写/建目录/`prd-gate` 全通道同判据矩阵。

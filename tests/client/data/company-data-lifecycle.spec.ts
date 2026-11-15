@@ -15,7 +15,7 @@ import {
   type SessionsStoreLike,
   type UseSessions,
 } from '../../../packages/company-pack/src/client/data/use-company-data.ts'
-import type { TeamEventLike, TeamStreamFrame, TeamViewLike } from '../../../packages/company-pack/src/lib/presence.ts'
+import type { TeamEventLike, TeamStreamFrame, TeamViewLike } from '../../../packages/company-pack/src/lib/presence/presence.ts'
 import type { UseProjection } from '@deepseek-ai/dsh-api-session-controller/client'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true

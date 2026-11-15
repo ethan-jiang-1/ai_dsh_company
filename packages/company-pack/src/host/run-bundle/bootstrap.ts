@@ -11,9 +11,9 @@ import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSy
 import { homedir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import { isAbsolute, join, relative, resolve, sep } from 'node:path'
-import { yamlScalar } from '../../lib/yaml-scalar.ts'
-import { ROLE_CANONICAL } from '../../lib/role-copy.ts'
-import { RUN_BUNDLE_DIR, RUN_BUNDLE_REL } from '../run-bundle/run-bundle.ts'
+import { yamlScalar } from '../../lib/docs/yaml-scalar.ts'
+import { ROLE_CANONICAL } from '../../lib/shared/role-copy.ts'
+import { RUN_BUNDLE_DIR, RUN_BUNDLE_REL } from './run-bundle.ts'
 import { isDangerousRoot } from '../workspace/dangerous-roots.ts'
 import { assertCompanyWritesAllowed } from './write-gate.ts'
 

@@ -13,8 +13,8 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { NON_ROLE_PRESETS } from '../../lib/delegation-surface.ts'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
+import { NON_ROLE_PRESETS } from '../../lib/delegation/delegation-surface.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 
 export const HANDBOOK_SECTION = 'company:handbook'
 /** 注入预算：build gate 核 `content/AGENTS.md` 字节数；运行时超限只告警，不静默截断。 */

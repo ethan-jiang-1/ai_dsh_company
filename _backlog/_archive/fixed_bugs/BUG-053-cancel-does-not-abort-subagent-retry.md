@@ -80,7 +80,7 @@ parent turn 后：
 
 ## 修复落地（2026-11-10）
 
-- **可取消 await**：新增 [`abortable.ts`](../../../packages/company-pack/src/lib/abortable.ts)（promise 与
+- **可取消 await**：新增 [`abortable.ts`](../../../packages/company-pack/src/lib/shared/abortable.ts)（promise 与
   `AbortSignal` race、原样抛 `signal.reason`、`finally` 摘监听，对齐 vendor `agent-loop.raceAbort`）。
 - **工具接入**：[`subagent-retry.ts`](../../../packages/company-pack/src/host/delegation/subagent-retry.ts)
   的 `startActivation` 与 `activation.result` 都经 `abortable`；已 abort 时不起 child；

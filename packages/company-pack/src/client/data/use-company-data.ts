@@ -20,9 +20,9 @@ import type {} from '@deepseek-ai/dsh-token-meter/client'
 // `agentTeam` 是 agent-team 通过 module augmentation 加进 SessionProjectionMap 的；不引这个 type
 // 时 `useSessions` 的 store 快照与本地 SessionsStoreLike 结构不兼容（2026-11-03 client test project 现场）。
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
-import { boardColumns, tasksFromTeamView, type BoardColumn, type TaskRow } from '../../lib/board.ts'
-import { budgetSummary, type BudgetSummary } from '../../lib/budget.ts'
-import { layoutDag, type DagLayout } from '../../lib/dag.ts'
+import { boardColumns, tasksFromTeamView, type BoardColumn, type TaskRow } from '../../lib/presence/board.ts'
+import { budgetSummary, type BudgetSummary } from '../../lib/accounting/budget.ts'
+import { layoutDag, type DagLayout } from '../../lib/presence/dag.ts'
 import {
   activityFromEvents,
   memberNames,
@@ -33,7 +33,7 @@ import {
   type TeamEventLike,
   type TeamStreamFrame,
   type TeamViewLike,
-} from '../../lib/presence.ts'
+} from '../../lib/presence/presence.ts'
 
 /**
  * 会话 store 快照里本 hook 需要的部分（结构型声明：只依赖 wire 形状，不引 vendor 内部类型）。

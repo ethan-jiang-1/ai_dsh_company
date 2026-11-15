@@ -20,9 +20,9 @@ import {
   scanDocumentDetailed,
   sectionRange,
   sectionStructuralText,
-} from '../../../packages/company-pack/src/lib/markdown-shape'
-import { validateProductDocs } from '../../../packages/company-pack/src/lib/prd-check'
-import { checkRequirements } from '../../../packages/company-pack/src/lib/requirements-check'
+} from '../../../packages/company-pack/src/lib/docs/markdown-shape'
+import { validateProductDocs } from '../../../packages/company-pack/src/lib/docs/prd-check'
+import { checkRequirements } from '../../../packages/company-pack/src/lib/docs/requirements-check'
 import { headingSections, parseFrontmatter, sectionBody } from '../../../tools/lib/repo-markdown.mjs'
 import { makeDeliverableBundle, makeDocDetailed } from '../../support/doc-grammar'
 

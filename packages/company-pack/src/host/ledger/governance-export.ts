@@ -13,7 +13,7 @@ import { join } from 'node:path'
 import { assertCompanyWritesAllowed } from '../run-bundle/write-gate.ts'
 import { ensureCompanyRoot, readCompanyText } from '../run-bundle/company-root.ts'
 import { randomUUID } from 'node:crypto'
-import type { PresentedLedger, PresentedLedgerState } from '../ledger/presented-ledger.ts'
+import type { PresentedLedger, PresentedLedgerState } from './presented-ledger.ts'
 
 const EXPORT_README = `# 治理导出（derived）
 

@@ -58,11 +58,11 @@ node --import tsx/esm runtime/tmp/c8d-multiline-span.mts
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/markdown-shape.ts`、`tests/lib/prd-check.spec.ts`
-- 红：去掉跨行 span 状态 → `npx vitest run tests/lib/prd-check.spec.ts` 红（REQ-999 幽灵 + 字段截断）
-- 绿：接回跨行状态 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（35 passed）
+- 红：去掉跨行 span 状态 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 红（REQ-999 幽灵 + 字段截断）
+- 绿：接回跨行状态 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 绿（35 passed）
 - 提交：commit 8a95fc51
 
 ## 证据
 
 - `runtime/tmp/c8d-multiline-span.mts` / `.log`：`false 2`，幽灵 `REQ-999`。
-- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/markdown-shape.ts) 的 `codeSpanEnd()` / `scanDocumentDetailed()`。
+- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/docs/markdown-shape.ts) 的 `codeSpanEnd()` / `scanDocumentDetailed()`。

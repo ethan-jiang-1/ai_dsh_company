@@ -11,7 +11,7 @@ import { useCallback, useEffect, useSyncExternalStore, useState, type ReactNode 
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
-import { startupRows, type StartupField, type StartupRow, type WikiCheck } from '../../lib/startup-settings.ts'
+import { startupRows, type StartupField, type StartupRow, type WikiCheck } from '../../lib/startup/startup-settings.ts'
 import type { CompanyKey, CompanyT } from '../locales.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
 import { PanelFrame } from '../tabs/company-tabs.tsx'

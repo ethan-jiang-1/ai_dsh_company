@@ -13,8 +13,8 @@
 
 | 区 | 测什么 | 不证明什么 |
 |---|---|---|
-| [tests/host](./host/) | `src/host/` 的 keyless 逻辑与真文件集成；**目录名镜像 `src/host` 的组名**（同名对应；未对应的两侧目录在 [tests/repo/structure](./repo/structure/) 的镜像断言里带理由登记——本轮登记五条：源侧 fs、logging，测试侧 contract、index、i18n） | Cordis 真装配、profile 挂载、会话级行为 |
-| [tests/lib](./lib/) · [tests/content](./content/) | `src/lib/` 纯逻辑 + `content/` 形状与合同（模板头、产品类型包、交付模式包、编号合同、两轴 scenario） | Host 注册/装配、运行时注入行为 |
+| [tests/host](./host/) | `src/host/` 的 keyless 逻辑与真文件集成；**目录名镜像 `src/host` 的组名**（同名对应；未对应的两侧目录在 [tests/repo/structure](./repo/structure/) 的镜像断言里带理由登记——目前只剩三条：`contract/`、`index/`、`i18n/`） | Cordis 真装配、profile 挂载、会话级行为 |
+| [tests/lib](./lib/) · [tests/content](./content/) | `src/lib/` 纯逻辑（**目录名镜像 `src/lib` 的八组**：presence、cultivation、docs、deliverables、delegation、startup、accounting、shared）+ `content/` 形状与合同（模板头、产品类型包、交付模式包、编号合同、两轴 scenario） | Host 注册/装配、运行时注入行为 |
 | [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫；Lead/follow 适配器与 tab 注册目录（真实 Cordis `Context`/`SlotRegistry`）；多实例探活 disposer 契约；whole-client 档（真 `bootClient` × web profile bundle roster）覆盖 `apply` 组合与 fiber 卸载/重载。**目录名镜像 `src/client` 的组名**（同名对应；根只留 whole-client 组合 spec）；另有 `i18n/` 快速回归（字典/页签壳/缺省 locale），属性区，不镜像源码组 | 真浏览器渲染交互（→ client-load-smoke；真页面页签/错误环 → ui-scene-smoke） |
 | [tests/presets](./presets/) | persona / skills 声明内容；两轴 coverage（product-type 五件齐 + playbook + fixture / delivery-mode 经营侧方法 + workflow 分派 + awareness） | 组合装配与工具行实际生效（→ preset-smoke + 会话日志证据） |
 | [tests/repo](./repo/) · [tests/contract](./contract/) · [tests/tools](./tools/) · [tests/session](./session/) · [tests/evidence](./evidence/) · [tests/ui](./ui/) | 仓库合同（**按 owner 分六个子目录**：structure、pack、release、docs、budget、security——钉的是 `docs/`、`package.json`、`checks/` 与生成物，**没有单一的源码对象，所以不按源码分**；清单 = 目录本身）· 引擎合同与真值表 · `tools/lib` 纯逻辑 · 会话日志/诊断/探针驱动 · 协作与证据判据 · 页签目录（Phase 2 后叫 expected） | 运行时或 CLI 端到端行为 |
@@ -34,7 +34,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | company 读模型逻辑（`src/lib/` 判据：deliverables / authorship / ledger） | `pnpm test tests/lib`（按模块点名 spec；content 面用 `tests/content`） | oracle 反证（真样本钉列）；**新增模块/影响导出面 → 加 `pnpm test tests/repo`（pack-exports 守卫）** | 改**用户可见文案/显示名**（如 `presence-status.ts` 的 `PRESET_DISPLAY_NAMES`）⇒ 同 diff 刷 UI 金样（`ui-scene-smoke --isolated --refresh-expected` 后 `--expected` 复核；BUG-048 教训） |
 | host 逻辑（`src/host/`：bootstrap / workspace-resolution / handbook / catalog / catalog-state / presented-ledger / cultivation / lease / bundle-manifest / governance-export / revoke-journal） | `pnpm test tests/host`（按模块点名 spec；真文件集成）；**跨载体不变量 → `pnpm test tests/host/contract`** | `pnpm test tests/repo`（导出/布局）+ `pnpm typecheck`；新写入口不登记 → `pnpm verify` 红 | 新持久化路径 → 加 shape / 登记 `tools/lib/carrier-registry.mjs`，同 diff；不要只加模块 spec |
 | 启动入口 / workspace 解析 / 公司状态（`src/host/startup*`、`tools/company.mjs` dev-only） | `pnpm test tests/host`（bootstrap/manifest/presented-domain） | [company-entry-smoke](../checks/lanes/company-entry.entry.mjs) + [release-smoke](../checks/lanes/release.entry.mjs) + [client-load-smoke](../checks/lanes/client-load.entry.mjs) | 新入口同 diff 进 checks/README；`pnpm verify` script-index/status |
-| 类型面（改 `src/**` 的导出/导入签名） | `pnpm typecheck`（三个 tsconfig.test-*；覆盖 227/245 spec，未接 18 = `tests/contract` 5 + `pack-exports` 1 + client 4 + host 8，清单 = 各 exclude；fresh clone 需先按 [bootstrap](../docs/guides/bootstrap.md) 构建 vendor client 类型） | [release-smoke](../checks/lanes/release.entry.mjs)（发布前）；`verify` 的 src-layering 只守方向不守类型 | — |
+| 类型面（改 `src/**` 的导出/导入签名） | `pnpm typecheck`（三个 tsconfig.test-*；覆盖 = include 减 exclude（未接 18 = `tests/contract` 5 + `pack-exports` 1 + client 4 + host 8，清单 = 各 exclude；fresh clone 需先按 [bootstrap](../docs/guides/bootstrap.md) 构建 vendor client 类型） | [release-smoke](../checks/lanes/release.entry.mjs)（发布前）；`verify` 的 src-layering 只守方向不守类型 | — |
 | pack 导出/注册面（Host / Client 注册改动） | `pnpm test tests/repo`（导出形态）+ `pnpm test tests/host`（Host 注册回调行为）+ `pnpm test tests/client`（Client 槽注册） | [release-smoke](../checks/lanes/release.entry.mjs)（真实安装形状；含 researcher） | — |
 | 发布 / 升 pin | `pnpm test tests/repo`（release-foundation 等） | [release-smoke](../checks/lanes/release.entry.mjs) + 升 pin 程序（合同 = [release.md](../docs/contracts/release.md)；**本仓只有不加载 pack 的合成回放，只证管线可跑，不是升 pin 第一道**） | — |
 | 检查与工具入口（`checks/**`、`probes/**`、`tools/**`） | 消费它的 keyless spec + `pnpm verify`（头注/结构门禁） | 真实入口冒烟按脚本头注「何时跑」 | — |
@@ -61,7 +61,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 |---|---|---|
 | **四层命令** | spec/checks 秒级；e2e/entry 按面或每周 | test:spec / test:e2e / test:entry / test:checks（后缀 = lane；e2e/entry 由 keyless-lane 分派） |
 | 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接、物理行预算、裸路径、分层方向与 pin 一致性门禁） |
-| **类型面 keyless** | 秒级（增量） | `pnpm typecheck`（三个 tsconfig.test-*；覆盖 227/245 spec，未接 18 = `tests/contract` 5 + `pack-exports` 1 + client 4 + host 8，清单 = 各 exclude；改导出/导入签名或测试类型时跑——verify 与 test 都不做类型检查） |
+| **类型面 keyless** | 秒级（增量） | `pnpm typecheck`（三个 tsconfig.test-*；覆盖 = include 减 exclude（未接 18 = `tests/contract` 5 + `pack-exports` 1 + client 4 + host 8，清单 = 各 exclude；改导出/导入签名或测试类型时跑——verify 与 test 都不做类型检查） |
 | **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器）；便宜 smoke lane = `pnpm smoke:fast`（4 条，~2.2s；pre-push；只证明资产还活着） |
 | 装配 keyless | ~25s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
@@ -93,7 +93,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 
 ## 新 spec 落点
 
-keyless 单测唯一后缀 `*.spec.ts`（[testing.md §1.1](../docs/testing.md)）；按**区**归位，区内再看轴：**有源码组的区**跟组名同名（`tests/host/`、`tests/client/` 下的同名目录，镜像由 [tests/repo/structure](./repo/structure/) 的断言守），**没有源码对象的区**按 owner 或消费者归（`tests/repo/` 的六个 owner 子目录、`tests/session/`、`tests/evidence/`、`tests/ui/`）。需要真进程 / 浏览器 / 模型的检查写 `checks/lanes/` 或 `probes/` 下的 `.mjs` 并在头注自述「何时跑 / 成本 / 状态」——不塞进 tests/（layering 守卫拦截）。
+keyless 单测唯一后缀 `*.spec.ts`（[testing.md §1.1](../docs/testing.md)）；按**区**归位，区内再看轴：**有源码组的区**跟组名同名（`tests/host/`、`tests/client/`、`tests/lib/` 下的同名目录，镜像由 [tests/repo/structure](./repo/structure/) 的断言守），**没有源码对象的区**按 owner 或消费者归（`tests/repo/` 的六个 owner 子目录、`tests/session/`、`tests/evidence/`、`tests/ui/`）。需要真进程 / 浏览器 / 模型的检查写 `checks/lanes/` 或 `probes/` 下的 `.mjs` 并在头注自述「何时跑 / 成本 / 状态」——不塞进 tests/（layering 守卫拦截）。
 本文件骨架由 [repo/navigation-assets.spec](./repo/docs/navigation-assets.spec.ts) 钉进回归（2026-10-05 红→绿落地）。
 
 > ⚠ 类型面 = `tsconfig.test-client.json`（tests/client）+ `tsconfig.test-company.json`（tests/host、tests/lib、tests/content、tests/presets）+ `tsconfig.test-harness.json`（tests/repo、tests/tools、tests/session、tests/evidence、tests/ui；contract 被 exclude）；未接 18 个 spec = contract 5 + pack-exports 1 + client 4 + host 8。

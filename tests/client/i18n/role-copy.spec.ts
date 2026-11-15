@@ -8,11 +8,11 @@
 import { describe, expect, it } from 'vitest'
 import {
   DELEGATION_TOOL_ROLES, ROLE_CANONICAL, ROLE_COPY, ROLE_IDS, roleCopyOf, roleLabelFor,
-} from '../../../packages/company-pack/src/lib/role-copy.ts'
+} from '../../../packages/company-pack/src/lib/shared/role-copy.ts'
 import {
   delegationRoleText, presenceRoleText, roleText,
 } from '../../../packages/company-pack/src/client/roles.ts'
-import { PRESET_DISPLAY_NAMES, PRESET_KEYS, PRESET_SHORT_LABELS } from '../../../packages/company-pack/src/lib/presence-status.ts'
+import { PRESET_DISPLAY_NAMES, PRESET_KEYS, PRESET_SHORT_LABELS } from '../../../packages/company-pack/src/lib/presence/presence-status.ts'
 import { en, zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 
 const CJK = /[\u3400-\u9fff]/u

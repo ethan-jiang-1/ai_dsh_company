@@ -20,7 +20,7 @@ opened: 2026-11-14
 
 ## 根因（假设）
 
-- [requirements-check.ts](../../../packages/company-pack/src/lib/requirements-check.ts) 的 `parseHeader()` 用 `/^---\r?\n/`，不剥 BOM；`headingDefinitions()` 用 `text.split('\n')` + `line.trim()`，没有围栏状态。
+- [requirements-check.ts](../../../packages/company-pack/src/lib/docs/requirements-check.ts) 的 `parseHeader()` 用 `/^---\r?\n/`，不剥 BOM；`headingDefinitions()` 用 `text.split('\n')` + `line.trim()`，没有围栏状态。
 - `prd-check.ts` 的 `normalizeDocument()` / `scanLines()` 只服务 `/prd check`；两个命令各有一套「什么是文档结构」的解释，同一份文件在两边结果不同。
 
 ## 复现
@@ -55,10 +55,10 @@ BOM PRD        checkRequirements 不再报缺头/缺层；REQ 计数与 LF 版�
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/markdown-shape.ts`、`packages/company-pack/src/lib/requirements-check.ts`、`tests/lib/requirements-check.spec.ts`
-- 红：`parseHeader` 改回原始文本 → `npx vitest run tests/lib/requirements-check.spec.ts` 红（BOM 用例缺 layer/definition 头）；`headingDefinitions` 回退 `split('\n')` → 同命令红（围栏幽灵 REQ）
-- 绿：接回共享形状层 → `npx vitest run tests/lib/requirements-check.spec.ts` 绿（25 passed；BOM/围栏/注释与 LF 版结论一致）
+- 红：`parseHeader` 改回原始文本 → `npx vitest run tests/lib/docs/requirements-check.spec.ts` 红（BOM 用例缺 layer/definition 头）；`headingDefinitions` 回退 `split('\n')` → 同命令红（围栏幽灵 REQ）
+- 绿：接回共享形状层 → `npx vitest run tests/lib/docs/requirements-check.spec.ts` 绿（25 passed；BOM/围栏/注释与 LF 版结论一致）
 - 提交：commit 85e6fec9
 ## 证据
 
 - `runtime/tmp/c8b-reqcheck.mts` / `.log`：BOM `REQ:1/AC:0`；围栏 `REQ:3` + 孤儿 REQ-999。
-- 代码：[requirements-check.ts](../../../packages/company-pack/src/lib/requirements-check.ts)；对照 [prd-check.ts](../../../packages/company-pack/src/lib/prd-check.ts)。
+- 代码：[requirements-check.ts](../../../packages/company-pack/src/lib/docs/requirements-check.ts)；对照 [prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts)。

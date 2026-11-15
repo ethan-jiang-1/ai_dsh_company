@@ -40,7 +40,7 @@ opened: 2026-11-12
 
 1. **形状轴由对抗矩阵接管**：`company-root-safety.spec.ts`（10 写入口 × 13 shape = 134 例）、`file-shape-agreement.spec.ts`、`startup-state-agreement.spec.ts`、`ledger-state-agreement.spec.ts`、`company-root-process.e2e.mjs`（16 项）、`tools/lib/carrier-registry.mjs`（15 载体 / `KNOWN_GAP = 0`）+ `company-root-carriers` 门禁；BUG-151 就是矩阵首跑抓的。剩余缺口只列四个：TOCTOU 窗口（recheck 后/rename 前）、真崩溃/fsync、读载体未进矩阵、内容解析器语义（startup/ledger 之外）。
 2. **测试资产改了证据规则**：`tests/` 六面 + 四后缀 lane（`*.spec.ts` / `*.e2e.mjs` / `*.entry.mjs` / `tests/checks/*.test.mjs`）；[asset-lanes.mjs](../../tools/lib/asset-lanes.mjs) 是唯一注册表；census = 29 冒烟 / 67 探针 / 72 门禁 / 247 spec；pre-push 按面 + 覆盖率棘轮。旧的 `*-smoke` / `golden` 名只作历史；新探索脚本留 `runtime/tmp/`，升常驻必须登记。
-3. **新产品面：PRD headings + present 闸门**：[prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts) 新 parser；[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts) 在 `present` 前 deny；[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts) 只有 5 个用例；[PRD headings Note](../../notes/implemented/2026-11-13-prd-headings-definition.md) 明确「真模型 present deny 端到端未跑」。这是 C1–C7 没覆盖的交付阻断面。
+3. **新产品面：PRD headings + present 闸门**：[prd-check.ts](../../packages/company-pack/src/lib/docs/prd-check.ts) 新 parser；[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts) 在 `present` 前 deny；[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts) 只有 5 个用例；[PRD headings Note](../../notes/implemented/2026-11-13-prd-headings-definition.md) 明确「真模型 present deny 端到端未跑」。这是 C1–C7 没覆盖的交付阻断面。
 4. **新验证/客户端面**：client 错误环（[error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts)）刚改；lane/pre-push/census 是新系统。错误环可能滤掉真错误；验证系统可能假绿——后者是「元 bug」，仍在本卡射程。
 
 **执行规则：**
@@ -68,7 +68,7 @@ opened: 2026-11-12
 | C5 | **任务板 / 在场 / DAG / 客户端流** | 文件派生 + 实时 follow + 多窗口/浮动/会话切换；stale/empty/error 三态 | `probes/fs-taskboard/`、`tests/client/`、`checks/lanes/ui-scene.entry.mjs`（`--isolated --steps`） |
 | C6 | **命令 / 解析 / 数据命令的 workspace** | `/req` `/prd` `/delivery` `/deliverables` 仍在 boot 优先；解析器与回执/locale 各写一份；**C8 管 prd 闸门，C6 管命令面** | `tests/host/commands/`、`tests/content/`、`checks/lanes/company-entry.entry.mjs`、`tests/host/commands/prd-command.spec.ts` |
 | C7 | **发布 / 安装 / 隔离** | tarball、plugin add/remove/upgrade、多 home、profile 共享、content 打包；用 0.11.6 当前产物重跑 | `checks/lanes/release.entry.mjs`、`checks/lanes/multi-install.entry.mjs`、`checks/lanes/isolation-matrix.entry.mjs`、`checks/lanes/concurrent-home.entry.mjs` |
-| **C8** | **PRD headings / present 闸门 / requirements-check** | 新交付阻断面：新 parser + 新旧兼容 + 模型可写输入；`present` 前 deny；只有 5 个 gate spec；Note 的 live deny 未跑；解析器对 CRLF/围栏/缩进的容错未证 | [prd-check.ts](../../packages/company-pack/src/lib/prd-check.ts)、[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts)、[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts)、[prd 模板](../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../docs/reference/decisions.md) |
+| **C8** | **PRD headings / present 闸门 / requirements-check** | 新交付阻断面：新 parser + 新旧兼容 + 模型可写输入；`present` 前 deny；只有 5 个 gate spec；Note 的 live deny 未跑；解析器对 CRLF/围栏/缩进的容错未证 | [prd-check.ts](../../packages/company-pack/src/lib/docs/prd-check.ts)、[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts)、[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts)、[prd 模板](../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../docs/reference/decisions.md) |
 | **C9** | **测试资产 / 验证元面**（lane 注册、pre-push、census、覆盖率） | 新「绿灯」的制造者：假绿/假跳过不会被产品 spec 抓到；新分支 zero-SHA 只 diff tip 已复现 | [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs)、[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs)、[CENSUS](../../tests/CENSUS.generated.md) |
 | **C10** | **client 错误环** | 新增过滤/持久化/上报；可能把真错误滤掉；真页面 lane 只在 weekly | [error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts)、`tests/client/wiring/error-ring.spec.ts`、`checks/lanes/client-error-chain.entry.mjs` |
 
@@ -110,7 +110,7 @@ opened: 2026-11-12
 | H9 | 模型提案（`cultivation_propose`）可越权：目标角色/来源角色/正文自由字段没有 guard，或 support/child 能提案到名册角色 | 合同「分身只能提案；CEO 仅建议权」+ 名册 |
 | H10 | 同一 home 顺序服务多个 workspace 时，records（workspace）与方法层（home）的归属错位：A 项目的采纳出现在 B 项目，或 lead 映射把 teammate 的记录记到错的角色 | 合同「记录 = 公司盘；方法层 = home；teammate 按 Lead 记账」 |
 
-**首批证据入口：** `docs/contracts/cultivation.md`、`tests/host/cultivation/`、`tests/client/cultivation/`、`tests/lib/cultivation.spec.ts`、`tests/support/cultivation-harness.ts`、`probes/session-context/cultivation-{propose,method-layer,context}-probe.mjs`。先静态逐条对照，再 keyless 对抗夹具；live 只用于 H8/H9 的模型行为（小预算）。
+**首批证据入口：** `docs/contracts/cultivation.md`、`tests/host/cultivation/`、`tests/client/cultivation/`、`tests/lib/cultivation/cultivation.spec.ts`、`tests/support/cultivation-harness.ts`、`probes/session-context/cultivation-{propose,method-layer,context}-probe.mjs`。先静态逐条对照，再 keyless 对抗夹具；live 只用于 H8/H9 的模型行为（小预算）。
 
 **结果：** 跑后在此追加；BUG 卡从 BUG-090 起。
 
@@ -1040,7 +1040,7 @@ task-2@1 复核 PRD → 写 PRD → 待办（阻塞）/ 未分配
 
 ```
 TypeError: Cannot read properties of undefined (reading 'map')
- ❯ memberNames packages/company-pack/src/lib/presence.ts:428
+ ❯ memberNames packages/company-pack/src/lib/presence/presence.ts:428
 ```
 
 即同一张 **BUG-145**（partial view 消费方未全部兜底），不是新卡；A 的修复只修了 merge 的第一层，`memberNames`/rows/tasks 等下游仍假定 members/tasks 必有。测试 1（stream:false + full teamView）通过，其余 partial/stream 场景红。
@@ -1517,7 +1517,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 | H9 | 新动议忘写 `numbering` 即被当旧动议豁免，闸门形同虚设 | 闸门的 stated boundary：兼容还是漏洞 |
 | H10 | 真模型 `present` 被 deny 后能否读懂错误并在下一轮修好 | Note 未跑的端到端；小预算 1 条 prompt |
 
-**首批入口：** `tests/lib/prd-check.spec.ts`、`tests/host/commands/prd-gate.spec.ts`、`tests/host/commands/prd-command.spec.ts`、[prd 模板](../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../docs/reference/decisions.md)；keyless 脚本留 `runtime/tmp/`；live 用隔离 workspace/home。
+**首批入口：** `tests/lib/docs/prd-check.spec.ts`、`tests/host/commands/prd-gate.spec.ts`、`tests/host/commands/prd-command.spec.ts`、[prd 模板](../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../docs/reference/decisions.md)；keyless 脚本留 `runtime/tmp/`；live 用隔离 workspace/home。
 
 **首跑结果（2026-11-13 keyless）：**
 

@@ -3,7 +3,7 @@ import {
   buildDelegationTree,
   type DelegationSessionStoreLike,
   type DelegationSessionSummaryLike,
-} from '../../../packages/company-pack/src/lib/delegation-tree.ts'
+} from '../../../packages/company-pack/src/lib/delegation/delegation-tree.ts'
 
 const store = (entries: Record<string, DelegationSessionSummaryLike>): DelegationSessionStoreLike => ({ byId: entries })
 

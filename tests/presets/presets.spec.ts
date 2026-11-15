@@ -373,7 +373,7 @@ describe('company roster（R1 回归：preset 必须可挂载）', () => {
 
   it('交付物三态（R4）：手册写清成品归 CEO、职能写 drafts；模板不再是占位', () => {
     const handbook = handbookSurface()
-    // 三态的字面形状必须与产品内词表一致（src/lib/deliverables-catalog.ts 的 META_TYPES/META_RESULTS）
+    // 三态的字面形状必须与产品内词表一致（src/lib/deliverables/deliverables-catalog.ts 的 META_TYPES/META_RESULTS）
     expect(handbook, '三态必须点明成品路径').toContain('deliverables/<date>-<slug>/final.md')
     expect(handbook, '三态必须点明过程稿路径').toContain('deliverables/<date>-<slug>/drafts/<role>.md')
     expect(handbook, '必须写明成品只归 CEO').toMatch(/Only the CEO/i)

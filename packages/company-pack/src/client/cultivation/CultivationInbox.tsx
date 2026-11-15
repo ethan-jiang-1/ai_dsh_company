@@ -3,7 +3,7 @@
  * 只读 board 状态；控件/文案/错误原话与拆前逐字一致。
  */
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
-import { roleLabel as defaultRoleLabel, type CultivationRecord } from '../../lib/cultivation.ts'
+import { roleLabel as defaultRoleLabel, type CultivationRecord } from '../../lib/cultivation/cultivation.ts'
 import { CULTIVATION_COPY, adoptLine } from './cultivation-actions.ts'
 import { BODY_PREVIEW_LINES, type CultivationBoardState } from './use-cultivation-board.tsx'
 

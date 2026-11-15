@@ -12,12 +12,13 @@
   公开入口 = `index.ts`。
   **为什么单开一层**：`src/lib/` 同时被 client 叶编译（`tsconfig.client.json`），带 node 内建的模块住那儿
   会让 client 叶报 TS2591（2026-10-13 现场）——host-only 的东西住 `host/`。
-- `lib/` —— **host/client 共享读模型与纯逻辑**，keyless 单测的直接对象（`tests/lib/`；另有大量经
-  `tests/host/`、`tests/client/` 立面覆盖）。
-  **模块清单 = `src/lib/` 目录本身**（D28：不再手抄枚举；2026-10-20 审计抓到「十一模块」漏
-  `deliverables-catalog`，10-21 又抓到消费面句过期——枚举必漂）。已知依赖链 =
-  `dag → board → presence`、`presence → presence-status`（`presence` 是 facade）；
-  host/client 各消费哪些**以各文件 import 为准**（host 面偏 signoff/doors，client 面占大多数）。
+- `lib/` —— **host/client 共享读模型与纯逻辑**，按域分八组，**组清单 = `src/lib/` 目录本身**
+  （D28：不抄枚举——本行曾写「十一模块」漏 `deliverables-catalog`）：presence（在场/看板/依赖图/工卡/门投影）·
+  cultivation（培养）· docs（PRD、需求、文档形状、YAML）· deliverables（成品目录与地址）· delegation（委派能力/面/树/重试）·
+  startup（启动策略）· accounting（账本/预算/签署）· shared（跨域叶子：不随单一域而变的小件，准入 = 删除后复杂度散回 ≥2 个域）。
+  `tests/lib/` 与这八组同名对应，镜像由 [mirror.spec.ts](../../../tests/repo/structure/mirror.spec.ts) 的断言守；
+  已知依赖链 = `dag → board → presence`、`presence → presence-status`（`presence` 是 facade），跨组依赖以各文件 import 为准；
+  另有大量模块经 `tests/host/`、`tests/client/` 的立面覆盖。
   （`client/cultivation/` 下另有 `cultivation-actions`＝人侧动作面纯模块：命令线构造 + host 结果折算 + 文案表；
   `CultivationCompose.tsx`＝创作面表单——2026-10-17 培养 GUI 卡）
 - `client/` —— **client 注册入口与浏览器面**，顶层只留 `index.ts`（`dsh.client` 注入面及组合）、`locales.ts`（typed `company` 字典）与 `roles.ts`（角色表达层取用缝），其余按关切分目录

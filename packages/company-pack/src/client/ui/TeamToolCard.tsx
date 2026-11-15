@@ -16,7 +16,7 @@ import {
   stringListOf,
   textOf,
   type CardState,
-} from '../../lib/tool-card.ts'
+} from '../../lib/presence/tool-card.ts'
 
 /**
  * 官方团队工具名（`vendor/dsh/packages/experimental/tool-agent-team/src/index.ts`）——

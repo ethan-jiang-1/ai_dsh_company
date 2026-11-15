@@ -80,7 +80,7 @@ researcher `9e7b0406-…`（preset `worker-researcher`）的 system prompt 含 `
 
 - **模型**：[`delegation-model.mjs`](../../../tools/lib/delegation-model.mjs) 新增
   `handbookSkipPresets()`：`archetype === 'worker'` 的全部 preset（三个）；不按 ID 列表。
-- **运行时**：[`delegation-surface.ts`](../../../packages/company-pack/src/lib/delegation-surface.ts) 的
+- **运行时**：[`delegation-surface.ts`](../../../packages/company-pack/src/lib/delegation/delegation-surface.ts) 的
   `WORKER_FAMILY_PRESETS` 是 pack 唯一运行时表；[`handbook.ts`](../../../packages/company-pack/src/host/prompt/handbook.ts)
   默认 `skipPresets = WORKER_FAMILY_PRESETS`；`src/index.ts` 只在部署显式配置时覆盖；
   [`cordis.patch.yml`](../../../packages/company-pack/cordis.patch.yml) 删掉窄覆盖 `['worker']`。

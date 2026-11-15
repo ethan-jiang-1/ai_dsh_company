@@ -19,7 +19,7 @@ import {
   startupSettingsText,
 } from '../../../packages/company-pack/src/host/startup/startup-prompt.ts'
 import { writeStartupSettings } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
-import { EMPTY_STARTUP_SETTINGS, EMPTY_WIKI_CHECK } from '../../../packages/company-pack/src/lib/startup-settings.ts'
+import { EMPTY_STARTUP_SETTINGS, EMPTY_WIKI_CHECK } from '../../../packages/company-pack/src/lib/startup/startup-settings.ts'
 
 describe('startupSettingsText', () => {
   it('全自动 → 空串', () => {

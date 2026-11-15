@@ -6,7 +6,7 @@
 #   方法住角色方法层 `<DSH_HOME>/company/methods/quality-loop-producer/<pack>/`（任务书点名 `<pack>@<version>`，缺了 fail-closed）；
 #   强制范围与升级线在公司层（`content/company/review-protocol.md`）。
 # 能力是"缺行"表达的：没有 subagent/team/workflow/control/ask-user/present/agent-instructions
-#   （不是公司角色 ⇒ 不注入公司手册；unload 面见 `src/lib/delegation-surface.ts`）。
+#   （不是公司角色 ⇒ 不注入公司手册；unload 面见 `src/lib/delegation/delegation-surface.ts`）。
 # 文案纪律：不写方法名、不写公司事实、不复述流程（流程唯一家 = quality-loop skill）。
 
 - insert:

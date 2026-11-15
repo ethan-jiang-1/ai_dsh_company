@@ -11,7 +11,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, isAbsolute, join, normalize, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { scanDocumentDetailed, sectionRange } from '../../packages/company-pack/src/lib/markdown-shape-core.js'
+import { scanDocumentDetailed, sectionRange } from '../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
 
 const defaultRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 export const EFFECTIVE = '2026-11-14'

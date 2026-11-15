@@ -14,7 +14,7 @@
  */
 import { existsSync, statSync, watch as fsWatch } from 'node:fs'
 import { basename, dirname, resolve } from 'node:path'
-import type { StartupOptions, WikiCheck } from '../../lib/startup-settings.ts'
+import type { StartupOptions, WikiCheck } from '../../lib/startup/startup-settings.ts'
 import { isDangerousRoot } from '../workspace/dangerous-roots.ts'
 import {
   checkWikiPointer,

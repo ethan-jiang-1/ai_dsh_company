@@ -106,7 +106,7 @@ B = **3**（`STR` string、`SYR` 叙利亚、`IFR` 航空）。唯一**实测**�
 不是"少见的词"，是**高风险词**——它在两边都退役，但先验账告诉我们别的。
 
 **(d) 已经装上的那一半不用动。** `/prd check` 与两份模板的现行文法就是 `MR / REQ / AC`
-（[prd-check.ts:132-236](../../../../packages/company-pack/src/lib/prd-check.ts)、`content/templates/{mrd,prd}.md`）。
+（[prd-check.ts:132-236](../../../../packages/company-pack/src/lib/docs/prd-check.ts)、`content/templates/{mrd,prd}.md`）。
 A **只退役 `VP`、不改检查器文法**；B 要 `IF→IFR` 全量重键 + 改 3 份 preset 里 7 处文案（SA 的 `agent.cordis.yml` 与 systems-architecture SKILL、SQA 的 vv-playbook）。
 
 ## 5. 方案 B（诚实的对手）：层码六词

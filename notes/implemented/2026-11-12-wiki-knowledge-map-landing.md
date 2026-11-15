@@ -55,7 +55,7 @@
 - 新增 `packages/company-pack/content/wiki-template/`（6 份：协议、索引、历史、示例页、sources 说明、上手 README）。
 - 新增 `packages/company-pack/presets/_shared/wiki/skills/consulting-the-knowledge-map/SKILL.md`；六个角色 preset 各加一行
   `customSkillDirs`（`_shared/wiki/skills/`）——一处内容、全员可见。
-- `src/lib/startup-settings.ts`：`StartupOptions` 增 `wikiCheck`（`value/ok/problem/location`），`startupRows` 对 wiki
+- `src/lib/startup/startup-settings.ts`：`StartupOptions` 增 `wikiCheck`（`value/ok/problem/location`），`startupRows` 对 wiki
   按检查结果判失效（检查落后于设置时不谎报）。
 - `src/host/startup/startup-store.ts`：`checkWikiPointer` / `resolveWikiDir` / `wikiLocation`；`refreshStartupOptions` 连带重算 wiki 检查。
 - `src/host/startup/startup-prompt.ts`：`wikiRule` 三档；`startupSettingsText(settings, wikiCheck)`。
@@ -81,7 +81,7 @@
 - `pnpm test`：**233 files / 1723 tests passed**。新增 2 个 spec：
   `tests/content/wiki-template.spec.ts`（6 条：五件齐全 / 示例页 `type`+`description` / index 链接目标在盘 / log 有 ISO 日期 /
   协议含 index·log·ingest·query·lint / 无绝对 home 路径）、`tests/presets/wiki-skill.spec.ts`（4 条：frontmatter 形状 /
-  body 五要素 / 六 preset 都挂共享根 / 角色目录下无副本）。另扩 `tests/lib/startup-settings.spec.ts`（wiki 三态）、
+  body 五要素 / 六 preset 都挂共享根 / 角色目录下无副本）。另扩 `tests/lib/startup/startup-settings.spec.ts`（wiki 三态）、
   `tests/host/startup/startup-store.spec.ts`（检查三档 + 位置 + refresh 落盘）、`tests/host/startup/startup-prompt.spec.ts`（A4 三档 + 失效三因）。
 - `pnpm verify`：ALL PASS（含 `shipped-links`：content 73 份 + skill 27 份 + persona 11 份）。
 - `source run/env.sh && node checks/lanes/preset.entry.mjs`：**ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）**，

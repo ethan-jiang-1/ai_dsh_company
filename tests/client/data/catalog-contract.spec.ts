@@ -7,8 +7,8 @@ import { META_RESULTS } from '../../../tools/lib/deliverables.mjs'
 import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
 import { parseCatalog } from '../../../packages/company-pack/src/client/data/deliverables-index.ts'
 import { resultTone } from '../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx'
-import { metaProblemsOf as metaProblemsTs } from '../../../packages/company-pack/src/lib/deliverables-catalog.ts'
-import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/run-bundle-paths.ts'
+import { metaProblemsOf as metaProblemsTs } from '../../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts'
+import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 
 /**
  * 成品目录的**契约夹具**（2026-10-23 架构评审候选 2）。

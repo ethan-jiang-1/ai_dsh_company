@@ -14,13 +14,13 @@
  * （否则模型会去 read 一个不存在的目录，再凭记忆编）。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { NON_ROLE_PRESETS } from '../../lib/delegation-surface.ts'
+import { NON_ROLE_PRESETS } from '../../lib/delegation/delegation-surface.ts'
 import {
   overriddenEntries,
   type StartupAgentLike,
   type StartupSettings,
   type WikiCheck,
-} from '../../lib/startup-settings.ts'
+} from '../../lib/startup/startup-settings.ts'
 import { resolveStartupWorkspace } from './startup-workspace.ts'
 import { composedPresetOf } from '../prompt/handbook.ts'
 import { checkWikiPointer, readStartupSettingsState } from './startup-store.ts'

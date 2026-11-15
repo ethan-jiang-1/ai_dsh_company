@@ -9,7 +9,7 @@ import {
   streamAttention,
   type AttentionEventLike,
   type LivePending,
-} from '../../../packages/company-pack/src/lib/attention.ts'
+} from '../../../packages/company-pack/src/lib/presence/attention.ts'
 import { createAttentionRegistry } from '../../../packages/company-pack/src/client/wiring/attention-registry.ts'
 
 /**

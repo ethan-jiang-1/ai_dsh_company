@@ -16,7 +16,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { scopeOf } from '@deepseek-ai/dsh-scope'
-import { composedPresetOf } from '../prompt/handbook.ts'
+import { composedPresetOf } from './handbook.ts'
 
 export const WORKFLOW_CONTRACT_SECTION = 'company:workflow-contract'
 

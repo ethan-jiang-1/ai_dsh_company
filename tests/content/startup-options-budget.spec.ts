@@ -18,7 +18,7 @@ import {
   serializeStartupOptions,
   STARTUP_OPTIONS_MAX_ENTRIES,
   STARTUP_OPTIONS_READ_LIMIT,
-} from '../../packages/company-pack/src/lib/startup-settings.ts'
+} from '../../packages/company-pack/src/lib/startup/startup-settings.ts'
 
 const CONTENT = join(repositoryRoot, 'packages/company-pack/content')
 

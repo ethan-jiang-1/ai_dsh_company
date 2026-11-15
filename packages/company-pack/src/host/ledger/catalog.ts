@@ -16,22 +16,22 @@ import {
   type CatalogRoot,
   type CatalogScanEntry,
   type DeliverablesCatalog,
-} from '../../lib/deliverables-catalog.ts'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
-import { catalogPath, readCatalogState } from '../ledger/catalog-state.ts'
+} from '../../lib/deliverables/deliverables-catalog.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
+import { catalogPath, readCatalogState } from './catalog-state.ts'
 import { plainFileProblem } from '../fs/safe-file.ts'
 import { ensureCompanyDir, writeCompanyAtomic } from '../run-bundle/company-root.ts'
-import { emptyPresentedLedger, presentedOf, readPresentedLedger, type PresentedLedger } from '../ledger/presented-ledger.ts'
+import { emptyPresentedLedger, presentedOf, readPresentedLedger, type PresentedLedger } from './presented-ledger.ts'
 
-export { CATALOG_REL, catalogPath, readCatalog, readCatalogState, type CatalogReadState } from '../ledger/catalog-state.ts'
-export { PRESENTED_LEDGER_REL, presentedLedgerPath } from '../ledger/presented-ledger.ts'
+export { CATALOG_REL, catalogPath, readCatalog, readCatalogState, type CatalogReadState } from './catalog-state.ts'
+export { PRESENTED_LEDGER_REL, presentedLedgerPath } from './presented-ledger.ts'
 export {
   auditRelPath, emptyPresentedLedger, ensurePresentedLedger, mergePresented, presentedFromEvent,
   presentedFromLegacyCatalog, presentedFromSessions, presentedOf, readPresentedLedger,
   recordPresented, setPresentedAudit, writePresentedLedger,
   type LedgerBootstrap, type PresentedLedger, type PresentedLedgerState, type PresentedObservation,
   type PresentedScanResult, type PresentedSessionQuery,
-} from '../ledger/presented-ledger.ts'
+} from './presented-ledger.ts'
 
 /** 成品文件必须可读且不越出 company root（symlink 不跟随，BUG-108）。 */
 /** 坏形状的人话标签。 */

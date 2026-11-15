@@ -26,7 +26,7 @@ import {
   type ActionOutcome,
   type CultivationActions,
 } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
-import type { CultivationRecord } from '../../../packages/company-pack/src/lib/cultivation.ts'
+import type { CultivationRecord } from '../../../packages/company-pack/src/lib/cultivation/cultivation.ts'
 
 // React 18 的 act 语义开关（不设它 act 会告警、更新时机也不受控）。
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true

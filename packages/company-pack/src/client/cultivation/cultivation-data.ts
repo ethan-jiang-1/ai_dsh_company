@@ -19,8 +19,8 @@ import {
   type CultivationRecord,
   type CultivationRow,
   type FeedbackItem,
-} from '../../lib/cultivation.ts'
-import { RUN_BUNDLE_PATHS } from '../../lib/run-bundle-paths.ts'
+} from '../../lib/cultivation/cultivation.ts'
+import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 
 /** `workspaceFiles` remote 的最小结构面（本地声明——照 RoleBadge 惯例不为此引包）。 */
 export interface WorkspaceFilesFace {

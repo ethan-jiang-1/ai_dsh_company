@@ -8,7 +8,7 @@
 
 ## 决定
 
-1. **文档形状层独立成 `packages/company-pack/src/lib/markdown-shape.ts`**（160/162）：`normalizeDocument`
+1. **文档形状层独立成 `packages/company-pack/src/lib/docs/markdown-shape.ts`**（160/162）：`normalizeDocument`
    （去 BOM、CRLF→LF）+ `scanDocument`（围栏 + HTML 注释两种非定义容器）+ `splitTableRow`（转义竖线）。
    `/prd check` 与 `/req check` 同读这一份，`prd-check.ts` 删掉本地副本。行的可见文本 = 移除 HTML 注释
    片段后的剩余内容（不是整行丢弃），围栏内的行 `structural: false`。
@@ -46,13 +46,13 @@
 | 事实 | 文档结构 = 归一化后围栏/注释之外的行；push 的 merge 变更 = 合并结果 vs 第一父；一个 REQ 只能属一个 slice；表格 `\|` 是字面竖线；Note 文件名日期必须是真实日历 |
 | 唯一入口 | `lib/markdown-shape.ts` / `lib/prd-check.ts` / `lib/requirements-check.ts` / `checks/pre-push-surfaces.mjs` / `checks/gates/notes-tree.mjs` |
 | 读载体 | `/prd check`、`/req check`、present 交付闸门、pre-push hook、`pnpm verify` |
-| 契约测试 | `tests/lib/prd-check.spec.ts`、`tests/lib/requirements-check.spec.ts`、`tests/checks/pre-push-surfaces.test.mjs`、`tests/checks/notes-tree.test.mjs` |
+| 契约测试 | `tests/lib/docs/prd-check.spec.ts`、`tests/lib/docs/requirements-check.spec.ts`、`tests/checks/pre-push-surfaces.test.mjs`、`tests/checks/notes-tree.test.mjs` |
 
 ## 验证
 
 | 层 | 失败类 | 负控（见过红） |
 |---|---|---|
-| keyless unit `tests/lib/prd-check.spec.ts` + `tests/lib/requirements-check.spec.ts`（54 passed） | 1 / 6 | 拆 `normalizeDocument` → BOM 两条红；注释状态置空 → 注释用例红；`headingDefinitions` 回退 `split('\n')` → 围栏/注释幽灵 REQ 红；去掉 `reqOwner` → 跨 slice 两条红；还原 `split('|')` → 转义竖线红；去掉 changeLog 校验 → 假日期红（合计 8 红） |
+| keyless unit `tests/lib/docs/prd-check.spec.ts` + `tests/lib/docs/requirements-check.spec.ts`（54 passed） | 1 / 6 | 拆 `normalizeDocument` → BOM 两条红；注释状态置空 → 注释用例红；`headingDefinitions` 回退 `split('\n')` → 围栏/注释幽灵 REQ 红；去掉 `reqOwner` → 跨 slice 两条红；还原 `split('|')` → 转义竖线红；去掉 changeLog 校验 → 假日期红（合计 8 红） |
 | checks 自测 `tests/checks/pre-push-surfaces.test.mjs`（4 passed） | 8 / 12 | 删 `commitPaths` 的 merge 分支 → merge 用例 `not ok 4`（其余 3 条仍绿，证明只打中 merge 形状） |
 | checks 自测 `tests/checks/notes-tree.test.mjs`（ALL PASS） | 12 | `rejected` 移出 lifecycle 循环 + 日期回退形状正则 → 5 FAIL（缺状态/计数/错词/越界月/非闰年） |
 | 全量 | — | `pnpm test` 247 files / 2057 tests；`pnpm typecheck`、`pnpm lint`、`pnpm dup`、`pnpm test:checks` 全绿；归档后 `pnpm verify` ALL PASS |
@@ -61,5 +61,5 @@
 
 - [environment-gap] **真实远端含 merge 分支的 push 横幅**：merge 路径集合已由临时仓库 + 真脚本子进程覆盖 → `tests/checks/pre-push-surfaces.test.mjs`、`.githooks/pre-push`
 - [covered] **4 消费者跨层契约一致性**（`prd-check` / `requirements-check` / `prd-gate` / 读卡原语）→ `tests/host/contract/structure-agreement.spec.ts`
-- [covered] **注释与围栏嵌套交错形状**：已由语法生成器与 `mdast` 独立真值差分覆盖 → `tests/support/doc-grammar.ts`、`tests/lib/markdown-shape.property.spec.ts`
-- [policy] **GFM 表格行内代码 span 内裸 `|`**：GFM 规范要求转义 `\|`，与 `mdast` 行为一致 → `packages/company-pack/src/lib/markdown-shape-core.js`
+- [covered] **注释与围栏嵌套交错形状**：已由语法生成器与 `mdast` 独立真值差分覆盖 → `tests/support/doc-grammar.ts`、`tests/lib/docs/markdown-shape.property.spec.ts`
+- [policy] **GFM 表格行内代码 span 内裸 `|`**：GFM 规范要求转义 `\|`，与 `mdast` 行为一致 → `packages/company-pack/src/lib/docs/markdown-shape-core.js`

@@ -66,11 +66,11 @@ node --import tsx/esm runtime/tmp/c8c-markdown-shape.mts
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/lib/prd-check.ts`、`packages/company-pack/src/lib/requirements-check.ts`、`tests/lib/prd-check.spec.ts`
-- 红：去掉 EOF 未闭合检测 → `npx vitest run tests/lib/prd-check.spec.ts` 红（两条「注释未闭合」用例）
-- 绿：接回 `scanDocumentDetailed` 的未闭合行号 → `npx vitest run tests/lib/prd-check.spec.ts` 绿（33 passed）
+- 红：去掉 EOF 未闭合检测 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 红（两条「注释未闭合」用例）
+- 绿：接回 `scanDocumentDetailed` 的未闭合行号 → `npx vitest run tests/lib/docs/prd-check.spec.ts` 绿（33 passed）
 - 提交：commit d6aa860d
 
 ## 证据
 
 - `runtime/tmp/c8c-markdown-shape.mts` / `.log`：`unclosed comment false [...]`。
-- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/markdown-shape.ts) 的 `scanDocument()`。
+- 代码：[markdown-shape.ts](../../../packages/company-pack/src/lib/docs/markdown-shape.ts) 的 `scanDocument()`。
