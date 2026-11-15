@@ -2,6 +2,12 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.11.8 — 2026-11-15
+
+### Changed
+
+- 维护者内部重构，**无用户可见行为变化**：company pack 源码按域分成八组（presence / cultivation / docs / deliverables / delegation / startup / accounting / shared），测试目录与源码目录同名对应（agent 找测试证据更快）；安装形状、命令、工具、页签与公司数据均不变。本次 bump 只为重打发布字节（源码面变了）。
+
 ## 0.11.7 — 2026-11-15
 
 ### Fixed
