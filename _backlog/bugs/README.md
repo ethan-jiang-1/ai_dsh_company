@@ -2,19 +2,51 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 184；已分配 BUG-001..183。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 192；已分配 BUG-001..191。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**：2026-11-14 focus v5 的 8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-176..183）」）。
+**活跃 8 张**：2026-11-15 C11 搬移副作用探索（focus v6）；本轮（2026-11-16）已全部翻 `修复就绪` 并在修，见下方「## 2026-11-16 修复交接（根因组 A–D：BUG-184..191）」。上一轮 focus v5 的 8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-176..183）」）。
+
+- [BUG-184](BUG-184-vitest-coverage-thresholds-stale-host-paths.md) · [BUG-185](BUG-185-replay-lane-stale-built-presence-import.md) · [BUG-186](BUG-186-pre-push-surface-rules-miss-src-lib-tools.md) · [BUG-187](BUG-187-module-comments-stale-spec-paths.md)
+- [BUG-188](BUG-188-implemented-note-ui-surface-stale-command.md) · [BUG-189](BUG-189-implemented-note-generic-english-stale-path.md) · [BUG-190](BUG-190-candidate-scan-comment-stale-spec.md) · [BUG-191](BUG-191-typecheck-coverage-counts-stale-docs.md)
 
 **上一轮收口**（2026-11-14 focus v4）：8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–C：BUG-168..175）」）。
 
 **更早收口**（2026-11-14 focus v3）：8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）」）。
 
 **最早收口**（2026-11-13 focus v2）：8 张已于 2026-11-14 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接」）。
+
+## 2026-11-16 修复交接（根因组 A–D：BUG-184..191）
+
+**用户指令（2026-11-16）**：「_backlog/bugs 这里头有不少当借助 exploratory test 发现的 bug，你系统性地看一看，考虑考虑怎么修复，他们给你 setup goal 目标是修复所有的 bug，你有足够的预算」——本句即本轮授权（材料性：docs 合同 `docs/testing.md` + `notes/implemented` 活文档 + pre-push 面规则；留痕 = 一篇批次 Note）。
+终点 = 活跃清单清零、8 张卡全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` 与 `## 修复证据`（改动面/红/绿/提交）齐。
+
+这八张是 C11 首轮的产出，**共同根因**：三批纯搬移（`29ae8c94` tests 分轴 → `1eb14f46` src↔tests 对齐 → `57d34a34` tools 四组）之后，静态 import 之外的四类消费者——配置键（阈值 / 面规则）、动态 import 字面量、注释与 Note 里的路径、文档里的手写计数——没有随迁，而门禁的扫描面不覆盖它们；消费者对未命中一律静默。
+
+| 组 | 卡 | 同一根因 | 修法（唯一事实源） |
+|---|---|---|---|
+| **A 验证面静默失效** | [184](BUG-184-vitest-coverage-thresholds-stale-host-paths.md) / [186](BUG-186-pre-push-surface-rules-miss-src-lib-tools.md) | 配置注册表随文件搬移漂移，消费者对缺失键/未命中静默 | 阈值键改现行路径 + `tests/repo/budget/vitest-coverage-thresholds.spec.ts`；`SURFACE_RULES` 补 `src/lib → replay`、其余面用 `coveredBy` 申报无条件证据 + `selectSurfaces` 返回 `covered/unseen` + `asset-lanes.spec.ts` 覆盖面判据 |
+| **B 真入口** | [185](BUG-185-replay-lane-stale-built-presence-import.md) | 构建产物路径字面量未随 src/lib 分组更新 | replay 动态 import 指到 `lib/types/lib/presence/presence.js` + `tests/repo/structure/built-path-literals.spec.ts` |
+| **C 活指针** | [187](BUG-187-module-comments-stale-spec-paths.md) / [188](BUG-188-implemented-note-ui-surface-stale-command.md) / [189](BUG-189-implemented-note-generic-english-stale-path.md) / [190](BUG-190-candidate-scan-comment-stale-spec.md) | spec 搬移/退役后，注释与决策记忆里的路径未更新；门禁不扫这些载体 | 5 条源码注释 + 2 条 Note + 1 条 audit 注释改现行家 + `tests/repo/docs/live-pointer-paths.spec.ts`（src / notes/implemented / checks/audit 三面） |
+| **D 文档计数** | [191](BUG-191-typecheck-coverage-counts-stale-docs.md) | 会漂的分数字面量无单一来源 | 两处 `x/y spec` 改成 include 减 exclude 公式 + `tests/repo/docs/typecheck-coverage-claim.spec.ts` |
+
+**次序 = B → A1 → A2 → C → D**：B 是 P1 真入口（确定性红）；A1 是 A2 的同类存量（配置键）；A2 用 A1 的「登记表必须命中消费者」语义扩到面规则；C、D 独立但共用同一「活载体不在扫描面」诊断。共享机制决定一篇 Note，独立机械修复用 commit——本批只剩一篇批次 Note。
+噪声/陷阱：**不**把 weekly 慢档（company-entry / release）塞进 pre-push——`company-entry` 要 `_dist` tarball（缺则 exit 2）且 ~1–2 min，成本边界与开发树可用性都否掉它；无额外 lane 的面写 `coveredBy`（词表 + hook 原文核对），不写空规则。
+**证据口径**：先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；每卡红/绿写同一条可执行命令。
+
+## 2026-11-15 C11 搬移副作用探索（focus v6）
+
+**用户指令（2026-11-15）**：「用这个新的 exploratory test 来做寻找 bug……找到 bug 就直接报，希望你能找到七八个吧」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 92](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+
+| 组 | 卡 | 共同根因 | 一句话 | 级别 |
+|---|---|---|---|---|
+| A 验证面静默失效 | [184](BUG-184-vitest-coverage-thresholds-stale-host-paths.md) / [186](BUG-186-pre-push-surface-rules-miss-src-lib-tools.md) | 配置注册表（阈值键 / 面规则）未随搬移扩面，消费者对未命中静默 | 5 个覆盖率阈值死键；pre-push 对 src/lib / tools 零真入口 | P2 ×2 |
+| B 真入口 | [185](BUG-185-replay-lane-stale-built-presence-import.md) | 构建产物路径字面量未随 src/lib 分组更新 | replay 车道确定性 MODULE_NOT_FOUND | P1 |
+| C 搬移后活指针 | [187](BUG-187-module-comments-stale-spec-paths.md) / [188](BUG-188-implemented-note-ui-surface-stale-command.md) / [189](BUG-189-implemented-note-generic-english-stale-path.md) / [190](BUG-190-candidate-scan-comment-stale-spec.md) | spec 搬移/退役后，注释/Note/审计脚本里的路径未更新；门禁不扫这些载体 | 3 条模块头注 + 2 条 Note + 1 条 audit 注释 | P2 ×4 |
+| D 文档计数 | [191](BUG-191-typecheck-coverage-counts-stale-docs.md) | 会漂的分数字面量无单一来源 | 两份 live 文档停在 227/245、226/244（实测 231/249） | P2 |
 
 ## 2026-11-14 focus v5 探索（post-fix 3）
 

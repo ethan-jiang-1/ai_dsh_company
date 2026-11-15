@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-- [2026-11-12 高复杂度面持续探索（培养/委派/run-bundle/账本/客户端流）](2026-11-12-deep-surface-continuous-bug-hunt.md) — C1–C7 + focus v2/v3/v4/v5（v2–v5 已修复归档；活跃 0，Next BUG-184）；C1–C4 形状轴由矩阵接管；不修产品代码。
+- [2026-11-12 高复杂度面持续探索（培养/委派/run-bundle/账本/客户端流/搬移副作用）](2026-11-12-deep-surface-continuous-bug-hunt.md) — C1–C10 + focus v2–v6；**focus v6（2026-11-15）= C11 搬移副作用**（三批纯搬移的等价性 / 活指针 / 真入口 / 静默弱化；C1–C10 冻结）；v2–v5 已修复归档；focus v6 首轮开 BUG-184..191（活跃 8，只开卡不修，Next 192）；不修产品代码。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 

@@ -3,17 +3,19 @@ status: 待落地
 opened: 2026-11-12
 ---
 
-# 推敲：高复杂度面的持续探索（培养 / 委派 / run-bundle / 账本 / 客户端流 / PRD 闸门 / 验证元面）
+# 推敲：高复杂度面的持续探索（培养 / 委派 / run-bundle / 账本 / 客户端流 / PRD 闸门 / 验证元面 / 搬移副作用）
 
 > 立卡：2026-11-12 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
 >
-> **结论/去向**：implementation — 本卡执行多轮探索 + 证据（发现缺陷另开 `_backlog/bugs/` 卡；编号唯一源 = [bugs/README](../bugs/README.md) 的 Next BUG ID，2026-11-14 = BUG-176..183，Next = 184）；本卡不改产品代码。
+> **结论/去向**：implementation — 本卡执行多轮探索 + 证据（发现缺陷另开 `_backlog/bugs/` 卡；编号唯一源 = [bugs/README](../bugs/README.md) 的 Next BUG ID，2026-11-15 = BUG-184..191，Next = 192）；本卡不改产品代码。
 >
 > **授权边界**：静态 / keyless / 真挂载 / 真页面可自主；live 模型轮按每轮小预算、隔离 workspace 跑（入口与预算写在 Round 头）。不修产品代码；不改 vendor。
 >
 > **2026-11-13 焦点调整（focus v2）**：Round 85 后按新宪章执行——C1–C4 的文件形状轴由对抗矩阵接管；新增 C8（PRD headings / present 闸门）、C9（测试资产/验证元面）、C10（client 错误环）；见下方同名节。旧 Round 1–85 保留为历史，不改写。
 >
 > **2026-11-14 post-fix 回归（focus v3/v4/v5）**：v3 = BUG-152..159 修复后的回归（Round 89，开 BUG-160..167）；v4 = BUG-160..167 修复后的回归（Round 90，开 BUG-168..175）；v5 = BUG-168..175 修复后的回归（Round 91，开 BUG-176..183）。这是**修复后新面**，不是重复 focus v2 首轮；C9 的新门禁/资产按新预算计。
+>
+> **2026-11-15 焦点调整（focus v6：搬移副作用）**：三批纯搬移（`29ae8c94` tests 分轴 → `1eb14f46` src↔tests 对齐 → `57d34a34` tools 四组）之后，主面切到 **C11 搬移副作用**——用可复跑的 exploratory test 证「位置变了、行为没变」，并抓住「全绿但仍有残留」的副作用。C1–C10 暂停常规轮转，只接受与搬移相交的假设。C11 的 oracle = 搬移父提交基线 + 声明面 + 真入口 + 负控；**不把 `pnpm test` 全绿当等价证明**。见下方「2026-11-15 调整（focus v6）」节。
 
 ## 问题与期望结果
 
@@ -21,16 +23,16 @@ opened: 2026-11-12
 
 **期望结果：** 每轮有：选面理由、期望表（独立 oracle）、实跑证据、H 判决（confirmed / refuted / unverified）、缺陷卡或观察、未跑面与 owner。没有「没有 bug」的结论；单场 live 不写稳定。
 
-**当前情况（2026-11-14 focus v5 基线）：**
+**当前情况（2026-11-15 focus v6 基线）：**
 
-- **当前基线（2026-11-14 11:01 实跑）**：`pnpm test` 247 files / 2072 tests；`pnpm verify` ALL PASS（2 门无对象）；活跃缺陷 = **8**（BUG-176..183，2026-11-14 focus v5 回归；只报不修）；focus v4 的 BUG-168..175 已修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；对抗矩阵 `KNOWN_GAP = 0`；`packages/company-pack` version 0.11.6；census = 29 冒烟 / 67 探针 / 72 门禁 / 247 spec。
-- **上一轮基线（2026-11-14 10:17）**：`pnpm test` 247 files / 2066 tests；活跃缺陷 8（BUG-168..175）；该批已修复。
-- **更早基线（2026-11-14 08:45）**：`pnpm test` 247 files / 2046 tests；活跃缺陷 8（BUG-160..167）；该批已修复。
-- **最早基线（2026-11-13 19:26）**：`pnpm test` 247 files / 2034 tests；活跃缺陷 8（BUG-152..159）；该批已修复。
+- **当前基线（2026-11-16 02:24，HEAD `f684d6ea` 实测）**：`pnpm test` 249 files / 2122 tests；`pnpm verify` ALL PASS（2 门无对象）；`pnpm typecheck` exit 0；活跃缺陷 = **8**（BUG-184..191，2026-11-15 C11 首轮；只开卡不修）；Next BUG = 192；`packages/company-pack` version 0.11.8；census = 30 冒烟 / 59 探针 / 75 门禁 / 249 spec；对抗矩阵 `KNOWN_GAP = 0`。
+- **当前主面 = C11 搬移副作用**（focus v6，2026-11-15）：三批纯搬移 = `29ae8c94`（tests 分轴）→ `1eb14f46`（src↔tests 对齐）→ `57d34a34`（tools 四组；原 `5c2c0796` 于 2026-11-15 深夜 amend，补 skill / command-refs / 散件门禁 / refactor-drift / sync-dsh）；C1–C10 冻结。首轮（Round 92）已跑，8 张卡见 [bugs/README](../bugs/README.md)。
+- **上一轮基线（2026-11-14 11:01）**：`pnpm test` 247 files / 2072 tests；活跃缺陷 8（BUG-176..183，focus v5；该批已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）；version 0.11.6。
+- **更早四轮基线（2026-11-13 19:26 – 2026-11-14 10:17）**：247 files / 2034–2066 tests；每轮 8 张 BUG 均已修复归档（BUG-152..175）。
 - **历史起点（2026-11-12）**：`50878cd6`（BUG-080..089 修复）｜Note = [startup/wiki bug sweep](../../notes/implemented/2026-11-12-startup-strategy-wiki-bug-sweep.md)｜十张卡已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)｜当时基线 236 files / 1761 tests。该基线只作历史，不再当当前事实。
-- **后续已收口**：Round 15–85 找到 BUG-104..151（BUG-140 撤回、BUG-150 复核不成立）；focus v2 开 BUG-152..159；focus v3 开 BUG-160..167；focus v4 开 BUG-168..175；focus v5 开 BUG-176..183（Round 91）。
-- **已知开放点（历史 Note「剩余风险」）**：`fs.watch` 平台降级；内容包新增类型仍需重启；其它 host 命令仍中文；`/req` `/prd` 的 workspace 仍 boot 优先——保留为观察，不在 focus v5 首轮抢修。
-- **宪章的「低置信」判据**：代码体量大 / 状态跨 home+workspace / 派生文件无新鲜度契约 / 有多进程或并发 / 测试只固定夹具 / 只在真页面或真 team 才暴露。
+- **后续已收口**：Round 15–85 找到 BUG-104..151（BUG-140 撤回、BUG-150 复核不成立）；focus v2–v5 开 BUG-152..183，全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+- **已知开放点（历史 Note「剩余风险」）**：`fs.watch` 平台降级；内容包新增类型仍需重启；其它 host 命令仍中文；`/req` `/prd` 的 workspace 仍 boot 优先——保留为观察，不在 C11 首轮抢修。另：C8-H10 真模型 present deny、Windows 实机、三批搬移后的 clean clone / Linux 全量、C11 的 company-entry / release / client-load 真入口仍 `unverified`。
+- **宪章的「低置信」判据**：代码体量大 / 状态跨 home+workspace / 派生文件无新鲜度契约 / 有多进程或并发 / 测试只固定夹具 / 只在真页面或真 team 才暴露。**focus v6 追加搬移判据**：位置是唯一变量 / 引用住注释、技能、头注、生成物 / 门禁扫描面靠 glob 与登记表 / `pnpm test` 全绿不等于零漂移。
 
 ## 2026-11-13 调整（focus v2）
 
@@ -53,11 +55,92 @@ opened: 2026-11-12
 
 **C8 首轮假设（keyless 已跑，完整表见 `## Round 86`）：** CRLF、围栏代码块、`numbering:` 空值、drafts vs final、meta 坏形状、路径别名、多 slug、AC 缩进、legacy 豁免、live present deny。首轮先跑 keyless；live 只用于 H10。
 
+## 2026-11-15 调整（focus v6：搬移副作用）
+
+> 触发 = 用户 2026-11-15：「我们最近做了大量的调整，都主要是腾挪文件……虽然我喊着说移动不许破坏原来的行为，不能引入副作用，但我觉得最合理的方法还是用 exploratory test 去盯着这一块，看我们挪动是不是真正的出现过副作用。」本卡因此把主面切到 **C11 搬移副作用**；C1–C10 暂停常规轮转。
+
+**三批搬移（变量 = 位置，不是机制）：**
+
+| 提交 | 时间 | 搬了什么 | 声称的等价 / 机械面 |
+|---|---|---|---|
+| `29ae8c94` | 11-15 14:08 | `tests/repo` 35 spec → 六个 owner 子目录；新增镜像 spec | 34/35 只有 import 行不同；唯一例外 = skip-budget 自指路径 |
+| `1eb14f46` | 11-15 14:47 | `src/lib` 33 模块 → 八组；`tests/lib` 同名镜像；host 例外 5→3；+4 spec（host fs/logging、lib deliverables/delegation） | 127 importer、6 个 checks import、40 张冻结卡命令、类型面 / census 一次改齐 |
+| `57d34a34` | 11-15 22:50（深夜 amend） | `tools` 27 入口 → dev / observe / repo / release 四组 | 64 条相对 import、4 处 root、1 处动态 import、1 处分段拼路径、约 44 文件引用 |
+
+**为什么「我说过不许破坏」不够——最近这一轮腾挪已经出现过副作用（有据）：**
+
+- `57d34a34`（原 `5c2c0796`）迁移中抓到并修掉 4 个真回归：`market-index` 的动态 import 未被静态扫描覆盖、`converge-rules` 分段拼路径、`pack-source.spec` 的 import 字面量、`runtime/README.md` 的 tracked 链接（见 [tools 四组 Note](../../notes/implemented/2026-11-15-tools-purpose-groups.md)）。
+- `0ec98374` 刚修好的模块注释（ledger / signoff / presence-status 指向的 spec），在 `1eb14f46` 再次搬测试后**又指回旧家**——见下方预检表第 1–3 行。
+- 测试树分轴前的 clean clone：`pnpm verify` 首跑 5 FAIL，全是已退役 tests/harness 的死指针；暖树因本地留空目录而全绿（`51a1c61b`）。
+- `tests/presets` 未进类型面：补进后首跑 24 个类型错误（`0fb6256c`）。
+- `1eb14f46` 的独立盲审 2 个 blocker：`tests/README.md` 仍写五条例外且新 spec 落点漏 lib、冻结层 36 个文件白改。
+- 三批搬移的 Note / 提交都**未见记录使用**本仓现成的纯搬移等价 oracle [refactor-drift.mjs](../../tools/repo/refactor-drift.mjs)；等价性靠「逐文件对读 + 全绿」证明。而它自己的用法头注还写着过期路径（预检表第 6 行）。
+
+**结论：搬移的机械面是已知的（import / 显式引用 / 生成物），但「活指针的载体分类」「门禁扫描面是否被搬空」「真入口是否仍通」不在任何单一门禁的射程；`pnpm test` 全绿只证明跑过的没红，不证明没被删、没改名、没弱化。**
+
+### C11 的四个子面
+
+| ID | 子面 | 问题 | oracle（不拿实现当 oracle） |
+|---|---|---|---|
+| M1 | **等价性** | 搬移前后，测试全名 / 测试体指纹、spec 数、lane / 门禁清单、覆盖率基线数值、类型面 include-exclude 是否只发生声明过的变化 | 搬移父提交 + [refactor-drift.mjs](../../tools/repo/refactor-drift.mjs) 的 `--hashes` + `git show --name-status -M` + 提交声明面 |
+| M2 | **活指针** | 代码注释、README、docs、`.agents/skills/**`、SKILL / 头注、生成物是否还指向搬移前的家；哪些是 frozen / fixture，哪些是 live | 路径存在性 + 载体是否会被 agent / 人读到 + 搬移提交的 changed files；frozen 规则见 [notes/archived AGENTS](../../notes/archived/AGENTS.md) |
+| M3 | **真入口** | 被搬移的工具 / 脚本，经真实入口跑（`pnpm company`、`pnpm setup`、release lane、company-entry、preset、hooks / pre-push）是否仍按设计工作 | 退出码 + 启动横幅 + 真安装 / 真会话；`--help` / `--check` 不算「真入口已通」 |
+| M4 | **静默弱化** | 门禁 / 类型 / 覆盖率 / 生成物 / 注册表在搬移后是否变成空扫、漏扫或指向旧家；绿灯是否因此变假 | 声明扫描面 × 盘面；负控 = 人为把被搬文件放回旧家或改一个引用，看门禁是否真红 |
+
+**与 C9 的分界：** C9 管「假绿机制」本身（任意原因）；C11 只吃「搬移」这个变量——同一份探针可复用，但不重跑 C9 的旧假设，也不把 C9 的旧结论当 C11 已证。
+
+### 2026-11-15 预检（只读探查，未修；开卡留首轮）
+
+调卡时用「路径存在性 × 载体分类」扫了一遍 live 面。以下坐标是 C11 首轮的起点，不是本轮结论：
+
+| # | 载体 | 现指向（旧家） | 现行家 | 分类 |
+|---|---|---|---|---|
+| 1 | `packages/company-pack/src/lib/accounting/ledger.ts` 第 5 行 | tests/lib/ledger.spec.ts | `tests/lib/accounting/ledger.spec.ts` | **真残留**（`1eb14f46` 后未随迁） |
+| 2 | `packages/company-pack/src/lib/accounting/signoff.ts` 第 4 行 | tests/lib/signoff.spec.ts | `tests/lib/accounting/signoff.spec.ts` | **真残留**（同上） |
+| 3 | `packages/company-pack/src/lib/presence/presence-status.ts` 第 72 行 | tests/lib/presence-board.spec.ts | `tests/lib/presence/presence-board.spec.ts` | **真残留**（同上） |
+| 4 | [close-out-definition SKILL](../../.agents/skills/close-out-definition/SKILL.md) 第 25 行 | node tools/release.mjs --check | `node tools/release/release.mjs --check` | **已修**（`57d34a34` 修正路径并把 `.agents` 纳入 `command-refs`） |
+| 5 | `packages/company-pack/src/lib/deliverables/deliverables-address.ts` 第 6 行 | tools/deliverables-index.mjs | `tools/repo/deliverables-index.mjs` | **有意保留**（发布源指纹；下次 bump 同 diff 修，见 tools Note） |
+| 6 | `tools/repo/refactor-drift.mjs` 第 14–18 行 | checks/lanes/refactor-drift.mjs | `tools/repo/refactor-drift.mjs` | **已修**（`57d34a34` 把用法头注改成现行家） |
+| 7 | `packages/company-pack/src/client/cultivation/cultivation-data.ts` 第 8 行、`packages/company-pack/src/host/cultivation/cultivation.ts` 第 22 行 | tests/host/cultivation.spec.ts | `tests/host/cultivation/` 三份 | **同类但非本批**（更早的 spec 拆分残留） |
+
+> 旧值一律写成纯文本，避免本卡自己被 bare-path 判红；现行家才用反引号。第 7 行的旧值在更早的 spec 拆分时就已失效（`1eb14f46` 只是又碰过这两个文件），所以列为「同类但非本批」，首轮复核是否仍算 live。
+>
+> 第 4 条当时存活的直接原因：`command-refs` 的扫描面 = AGENTS / README / tests、checks、run、runtime、pack 的 README + `docs/**`，**不含 `.agents/skills/**`**；`retired-path` 虽扫 skills，但只认已登记的退役前缀，本批搬移没有登记新前缀；`bare-path` 也不把技能、预设、源码注释当扫描面。`57d34a34` 已把 `.agents` 纳入 `command-refs`，但**源码注释 / implemented Note 普通文本 / audit 注释**仍不在射程——这是 BUG-187..190 的根。
+>
+> 第 1–3 条由存在性检查确认是真残留；第 4/6 条已在 `57d34a34` 修复；第 5/7 条是有意保留 / 同类非本批。开卡与修复已由 Round 92 分诊：材料性进 BUG-184..191。
+
+### C11 首轮假设（先写死，2026-11-15）
+
+| ID | 假设 | oracle | 入口 |
+|---|---|---|---|
+| C11-1 | 三批搬移**改过测试体**（不止 import / 路径行），或改了测试名 / describe 归属而没有声明 | `refactor-drift --hashes` 对每个搬移父提交 vs HEAD；指纹有变且提交未声明 = 缺口 | [refactor-drift.mjs](../../tools/repo/refactor-drift.mjs)、vitest JSON（两个 worktree） |
+| C11-2 | 有 spec 在搬移后掉出类型面 / 覆盖率面（tsconfig include-exclude 或 vitest glob 不再命中） | 盘上 spec 清单 × `tsconfig.test-*.json` include-exclude 求差；负控 = 移一个 spec 到未覆盖目录，看 typecheck 是否仍绿 | `tsconfig.test-*.json`、`pnpm typecheck` |
+| C11-3 | `asset-lanes` / census / checks 索引有陈旧路径：登记项指向搬移前的家或已消失的资产 | 注册表 × 盘面；`node tools/repo/test-census.mjs --check`、`node tools/repo/checks-index.mjs --check`；负控 = 改一个登记路径，看 spec / gate 是否红 | [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs)、[CENSUS](../../tests/CENSUS.generated.md)、[checks/INDEX](../../checks/INDEX.generated.md) |
+| C11-4 | 覆盖率基线在搬移中被改过数值（静默降标），或键名改了但文件不再被覆盖率面覆盖 | baseline 数值集合 vs 搬移父提交；`coverage-ratchet` 的输入面 | [coverage-baseline.json](../../tests/support/coverage-baseline.json)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs) |
+| C11-5 | 门禁的扫描面 / 登记表在搬移后变成空集合或旧路径（bare-path 的 NOW_FILES、retired-path 前缀、tests-literals ALLOW、carrier 表、spec-duplicates 哈希、naming-contract） | 门禁声明面 × 盘面；逐门一次负控（把一条登记改回旧家 → 应红） | `checks/gates/**`、`pnpm verify` |
+| C11-6 | live 载体仍有搬移前路径（本次预检已 4 处；假设还有未扫到的载体：presets、content、SKILL、tool 头注、生成物） | 全 live 面路径存在性 + 载体分类；排除 frozen / fixture / deliberate | `.agents/skills/**`、`packages/company-pack/{presets,content,src}/**`、`tools/**` 头注 |
+| C11-7 | 真入口在搬移后未全跑：`pnpm company`、`pnpm setup`、hooks / pre-push、release / company-entry / preset / client-load 至少一项在 HEAD 上会因路径而红 | 逐入口实跑；`--help` / `--check` 不算；至少一个真 boot + 一个真安装 | `checks/lanes/{company-entry,release,preset,client-load}.entry.mjs`、`run/env.sh` |
+| C11-8 | pre-push 面映射在搬移后漏掉某些改动面（例如 tools 四组、src/lib 八组、tests/repo 六组不在 SURFACE_RULES 的 glob 里） | [pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs) 的规则 × 三批搬移的 changed files；负控 = staged 一个搬移文件，看触发的 lane | [pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)、pre-push dry-run |
+| C11-9 | 冻结层在搬移中被改了不允许的字节（散文 / 历史结论，而非链接目标或命令路径） | `git show` 对读三批提交在 `_backlog/_archive/` / `notes/archived/` 的 diff；允许面 = Markdown 链接目标 + fix-evidence 可执行命令路径 | 三批提交、[fix-evidence](../../checks/gates/fix-evidence.mjs) |
+| C11-10 | 搬移引入了「只在真安装 / 真挂载才暴露」的路径问题：tarball 安装副本、preset skill 路径、client 模块闭包 | `release.entry.mjs` + `preset.entry.mjs` + `client-load.entry.mjs` 在搬移后的 HEAD 实跑；安装形状 vs dev 形状 | `checks/lanes/{release,preset,client-load}.entry.mjs` |
+
+**执行规则（C11）：**
+
+- 每轮先写 **move set**（`git show --name-status -M <base>..<head>` + 被移动文件数）与 **等价判据**；提交正文 / Note 只算「声称」，不算证据。
+- 每条假设必须点名 **载体分类**（live / frozen / fixture / deliberate）；只有 live 才能判缺陷；frozen 只许路径修复，fixture 不算。
+- 每个「门禁仍有效 / 搬移等价」的结论必须有 **负控**（人为破坏 → 红 → 还原 → 绿）；没有负控的结论写 `unverified`。
+- 真入口优先搬移影响链上的入口；`--help` / `--check` 只算前置，不算「真入口已通」。
+- 发现材料性缺陷 → 开 `_backlog/bugs/` 卡（Next = 184），本卡不修；非材料性 → 观察 + owner。
+- 搬移前基线清单可落 `runtime/tmp/move-baseline-<base-sha>/`（gitignored）；证据 ≤ 8 MiB。
+- **停止规则：** C11 ≤ 3 轮；首轮覆盖 M1+M2，第二轮覆盖 M3+M4；到期没有新材料 → 收口。用户叫停优先。
+
 ## 范围与排除项
 
-**范围（轮转宪章 v2，2026-11-13；C1–C4 的形状轴 = matrix-owned）：**
+**范围（轮转宪章 v3，2026-11-15；主面 = C11 搬移副作用，C1–C10 冻结）：**
 
-> C1–C4 只打矩阵未覆盖的命名缺口或行为/生命周期；C5–C7 保留残余行为/真入口；C8–C10 是 focus v2 新增。形状矩阵 = [Note](../../notes/implemented/2026-11-13-adversarial-shape-matrix.md)。
+> C1–C4 只打矩阵未覆盖的命名缺口或行为/生命周期；C5–C7 保留残余行为/真入口；C8–C10 是 focus v2 新增；C11 是 focus v6 新增。形状矩阵 = [Note](../../notes/implemented/2026-11-13-adversarial-shape-matrix.md)。
+>
+> **focus v6 的冻结规则：** C1–C10 暂停常规轮转；只有「与三批搬移相交」的假设可以开（例如 C9 的假绿判据被搬移利用、C5 的真页面路径被搬移影响）。C11 不重跑 C1–C10 已闭合的形状枚举，也不把旧结论当新面已证。
 
 | ID | 面 | 为什么低置信 | 首批入口 |
 |---|---|---|---|
@@ -67,10 +150,11 @@ opened: 2026-11-12
 | C4 | **账本 / 成品 / 治理导出** | presented ledger 派生、catalog、final.md、审计哈希、治理导出幂等/重建；**shape = matrix-owned**（10 写入口 × 13 shape + 4 读载体）；只打跨来源一致性/导出中断/账本降级 | `tests/host/ledger/`、`tests/host/contract/company-root-safety.spec.ts`、`probes/browser-visual/deliverables-catalog-probe.mjs`、[data-model](./../../docs/contracts/data-model.md) |
 | C5 | **任务板 / 在场 / DAG / 客户端流** | 文件派生 + 实时 follow + 多窗口/浮动/会话切换；stale/empty/error 三态 | `probes/fs-taskboard/`、`tests/client/`、`checks/lanes/ui-scene.entry.mjs`（`--isolated --steps`） |
 | C6 | **命令 / 解析 / 数据命令的 workspace** | `/req` `/prd` `/delivery` `/deliverables` 仍在 boot 优先；解析器与回执/locale 各写一份；**C8 管 prd 闸门，C6 管命令面** | `tests/host/commands/`、`tests/content/`、`checks/lanes/company-entry.entry.mjs`、`tests/host/commands/prd-command.spec.ts` |
-| C7 | **发布 / 安装 / 隔离** | tarball、plugin add/remove/upgrade、多 home、profile 共享、content 打包；用 0.11.6 当前产物重跑 | `checks/lanes/release.entry.mjs`、`checks/lanes/multi-install.entry.mjs`、`checks/lanes/isolation-matrix.entry.mjs`、`checks/lanes/concurrent-home.entry.mjs` |
+| C7 | **发布 / 安装 / 隔离** | tarball、plugin add/remove/upgrade、多 home、profile 共享、content 打包；用 0.11.8 当前产物重跑 | `checks/lanes/release.entry.mjs`、`checks/lanes/multi-install.entry.mjs`、`checks/lanes/isolation-matrix.entry.mjs`、`checks/lanes/concurrent-home.entry.mjs` |
 | **C8** | **PRD headings / present 闸门 / requirements-check** | 新交付阻断面：新 parser + 新旧兼容 + 模型可写输入；`present` 前 deny；只有 5 个 gate spec；Note 的 live deny 未跑；解析器对 CRLF/围栏/缩进的容错未证 | [prd-check.ts](../../packages/company-pack/src/lib/docs/prd-check.ts)、[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts)、[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts)、[prd 模板](../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../docs/reference/decisions.md) |
 | **C9** | **测试资产 / 验证元面**（lane 注册、pre-push、census、覆盖率） | 新「绿灯」的制造者：假绿/假跳过不会被产品 spec 抓到；新分支 zero-SHA 只 diff tip 已复现 | [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs)、[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs)、[CENSUS](../../tests/CENSUS.generated.md) |
 | **C10** | **client 错误环** | 新增过滤/持久化/上报；可能把真错误滤掉；真页面 lane 只在 weekly | [error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts)、`tests/client/wiring/error-ring.spec.ts`、`checks/lanes/client-error-chain.entry.mjs` |
+| **C11** | **搬移副作用 / 等价性**（三批纯搬移：tests 分轴、src↔tests 对齐、tools 四组） | 变量 = 位置：机械面（import / 显式引用 / 生成物）已改齐，但注释、技能、头注、门禁扫描面、注册表、类型面、覆盖率基线不在任何单一门禁的射程；全绿 ≠ 零漂移；搬移等价 oracle 未进任何 lane | 三批提交 `29ae8c94` / `1eb14f46` / `57d34a34`；[refactor-drift](../../tools/repo/refactor-drift.mjs)；[mirror.spec.ts](../../tests/repo/structure/mirror.spec.ts)；[CENSUS](../../tests/CENSUS.generated.md)；[checks/INDEX](../../checks/INDEX.generated.md)；[coverage-baseline.json](../../tests/support/coverage-baseline.json)；[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)；`checks/lanes/{company-entry,release,preset,client-load}.entry.mjs`；`.agents/skills/**`、`packages/company-pack/{presets,content,src}/**` 的头注 |
 
 **排除：**
 
@@ -81,14 +165,20 @@ opened: 2026-11-12
 - 把「跑绿」当结论；把单场 live 写成稳定；把未跑折成 PASS。
 - 发布声明 / 公有 registry；release-smoke 只作安装形状证据。
 - C9 的测试资产缺口只开卡/记观察，不在本卡修；C8/C10 的产品缺陷只开卡，不在本卡修。
+- **不把 `pnpm test` / `pnpm verify` 全绿当「搬移无副作用」**；也不把「grep 零命中」当「活指针已清」——先分 live / frozen / fixture / deliberate。
+- **不改冻结层的历史路径**（`notes/archived/`、`_backlog/_archive/`、`CHANGELOG.md`）；只读对比；允许面 = Markdown 链接目标与可执行命令路径（`fix-evidence` 判据）。
+- **不把夹具 / 负向样本里的不存在路径当缺陷**（如 [doc-grammar.ts](../../tests/support/doc-grammar.ts) 的样本）；先分类再判。
+- **不重做搬移**：本卡只取证；发现搬移本身错了 → 开 BUG 卡，不在卡里改文件。
+- **不为「再列一遍文件清单」开轮次**；C11 只打「等价 / 活指针 / 真入口 / 静默弱化」四个子面。
 
 ## 方法（每轮固定）
 
-1. **选面 + 写期望**：从宪章 v2 选一个面，先写 8–12 条可证伪假设与独立 oracle（合同/归档验收/内容文件/vendor 行为），不拿实现当 oracle。C8 的 oracle = PRD 模板 / requirements-model / D61 / `/prd check` 合同；C9 的 oracle = 声明面与实际行为；C10 的 oracle = 错误环的可见性/证据合同。
-2. **静态取证**：读代码、测试、probe、Note 的「未跑/剩余风险」；列出测试只在固定夹具上成立的判据。
-3. **对抗夹具**：优先 keyless 真文件/真 Cordis/真装配；为每条关键断言做一次最小破坏，看现有 spec/门禁是否真会红。
-4. **真实入口**：`checks/lanes/preset.entry.mjs` / `client-load.entry.mjs` / `ui-scene.entry.mjs` / `release.entry.mjs` / `company-root-process.e2e.mjs` 按面选择；C8 live 只用于 `present` deny 端到端；live 用隔离 workspace/home。
-5. **判决 + 证据**：每格 PASS / FAIL / 未证 + 原因；FAIL 立刻开 `_backlog/bugs/` 卡（编号 = [bugs/README](../bugs/README.md) 的 Next，当前 152）；C9 的假绿/假跳过同样开卡或观察；观察标 owner。
+0. **取 move set**（focus v6 专属）：`git show --name-status -M <base>..<head>` + `git diff --stat`，把「搬了什么 / 声称等价什么 / 允许改什么」写成表。提交正文与 Note 只算「声称」，不作证据；搬移前基线落 `runtime/tmp/`（gitignored）。
+1. **选面 + 写期望**：从宪章 v3 选一个面，先写 8–12 条可证伪假设与独立 oracle（合同 / 归档验收 / 内容文件 / vendor 行为），不拿实现当 oracle。C8 的 oracle = PRD 模板 / requirements-model / D61 / `/prd check` 合同；C9 的 oracle = 声明面与实际行为；C10 的 oracle = 错误环的可见性 / 证据合同；**C11 的 oracle = 搬移父提交 + 声明面 + 真入口 + 负控**。
+2. **静态取证**：读代码、测试、probe、Note 的「未跑 / 剩余风险」；列出测试只在固定夹具上成立的判据。C11 另加：把引用按 live / frozen / fixture / deliberate 分类，只有 live 可判。
+3. **对抗夹具 + 负控**：优先 keyless 真文件 / 真 Cordis / 真装配；为每条关键断言做一次最小破坏，看现有 spec / 门禁是否真会红。**C11 的「门禁仍有效 / 搬移等价」结论必须有负控**（破坏 → 红 → 还原 → 绿）；没有负控就写 `unverified`。
+4. **真实入口**：`checks/lanes/preset.entry.mjs` / `client-load.entry.mjs` / `ui-scene.entry.mjs` / `release.entry.mjs` / `company-entry.entry.mjs` / `company-root-process.e2e.mjs` 按面选择；C8 live 只用于 `present` deny 端到端；live 用隔离 workspace/home。**C11 优先搬移影响链上的入口**（`pnpm company`、`pnpm setup`、hooks / pre-push、release / preset / client-load）；`--help` / `--check` 只算前置。
+5. **判决 + 证据**：每格 PASS / FAIL / 未证 + 原因；FAIL 立刻开 `_backlog/bugs/` 卡（编号 = [bugs/README](../bugs/README.md) 的 Next，当前 192）；C9 的假绿 / 假跳过同样开卡或观察；观察标 owner。C11 的格必须带「旧家 → 新家」「载体分类」「等价判据」「负控」四列。
 6. **回填**：本卡追加 `## Round N`（已跑面、H 判决、BUG 卡、未跑面）；不覆盖旧结论；新探索脚本留 `runtime/tmp/`，升常驻必须登记 [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs)。
 
 ## Round 1（C1 培养状态机/存储）
@@ -1645,9 +1735,67 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 **本轮开卡：** BUG-176..183（8 张）。**未跑：** C8-H10 live present deny；C10 console/rejection；C2/C5/C7 残余真入口；Windows 实机。**证据：** `runtime/tmp/c8d-*.mts`、`c9d-*.mts` 与对应 `.log`。
 
+## Round 92（2026-11-15/16 C11 首轮 · 搬移副作用）
+
+**状态：** keyless 已跑；真入口跑 2 条（replay FAIL、preset PASS）；company-entry / release / client-load / Windows / clean clone / live 未跑。
+
+**Move set（git 实测）：**
+
+| 提交 | changed files | `selectSurfaces` 命中 |
+|---|---|---|
+| `29ae8c94` tests 分轴 | 80 | `[]` |
+| `1eb14f46` src↔tests 对齐 | 251 | `client-load`、`preset`（因顺手改了 client/preset 面，不是 src/lib 映射） |
+| `57d34a34` tools 四组（原 `5c2c0796` amend） | 127 | `[]` |
+
+**C11 假设判决：**
+
+| ID | 判决 | 证据 / BUG |
+|---|---|---|
+| C11-1 测试体等价 | **refuted（本批）** | 逐文件对读 parent vs HEAD（过滤 import / `from` / `require` 行）：只剩路径/注释行与声明内的测试标题变更（mirror / checks-index / hooks-wiring）；无静默删除、改名或断言弱化。未跑 `refactor-drift --hashes`（需两棵 worktree 的 vitest JSON，成本高；git-diff 等价近似，缺口保留）。 |
+| C11-2 类型面漏扫 | **refuted** | 三份 `tsconfig.test-*` 的 `--listFilesOnly` 并集 = 231 / 盘上 249；未接 18 与文档声明一致；本轮新增的 mirror、host fs/logging、lib deliverables/delegation spec 都在类型面内。 |
+| C11-3 lane/census/索引 | **refuted** | `asset-lanes` 30 资产 + 59 探针路径全在盘；`test-census` / `checks-index` 生成物与盘一致（verify 绿）；`tools` 顶层散件门禁已在 `57d34a34` 加。 |
+| C11-4 覆盖率基线 | **pass（数值）+ confirmed（阈值键）** | `coverage-baseline.json` 的 197 文件键 + 5 豁免全在盘；`1eb14f46` 只改键名不改数值。但 `vitest.config.ts` 的 5 个 host threshold 键死 → [BUG-184](../bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md)。 |
+| C11-5 门禁扫描面 | **confirmed（部分）** | `command-refs` 已由 `57d34a34` 纳入 `.agents`（close-out skill 修复）；但源码注释 / implemented Note 普通文本 / audit 注释仍不在射程 → BUG-187..190；pre-push 面规则缺 `src/lib` / `tools` → [BUG-186](../bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md)。 |
+| C11-6 live 活指针 | **confirmed** | 扫 761 个 live 文件：6 处真残留（3 条模块头注 + 2 条 Note + 1 条 audit 注释）；其余命中为 frozen / fixture / 负例 / 有意保留（`deliverables-address.ts` 的发布指纹）。 |
+| C11-7 真入口 | **confirmed（replay）/ pass（preset）** | `node checks/lanes/replay.e2e.mjs` FAIL（MODULE_NOT_FOUND）→ [BUG-185](../bugs/BUG-185-replay-lane-stale-built-presence-import.md)；`preset.entry` ALL PASS（6 角色 + 5 非角色）；`pnpm smoke:fast` 4/4、`pnpm test:checks` 10/10。 |
+| C11-8 pre-push 面映射 | **confirmed** | 三批命中表；`src/lib` / `tools` / `tests` / `checks` 零命中 → BUG-186。 |
+| C11-9 冻结层 | **pass（抽样）** | `1eb14f46` / `57d34a34` 的冻结层改动只修链接目标 / 命令路径；本卡未改 frozen。40 张卡未逐字节全审，保留。 |
+| C11-10 真安装 / 真挂载 | **部分** | preset 真挂载 PASS；replay FAIL；tarball / release / client-load 未跑。 |
+
+**本轮开卡（8 张）：**
+
+| BUG | 面 | 一句话 | 级别 |
+|---|---|---|---|
+| [184](../bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md) | 验证面 | vitest 5 个 host 覆盖率阈值键死，floor 静默失效 | P2 |
+| [185](../bugs/BUG-185-replay-lane-stale-built-presence-import.md) | 真入口 | replay 车道 import 搬移前 built presence 路径，确定性失败 | P1 |
+| [186](../bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md) | 验证面 | pre-push 面规则缺 src/lib / tools / tests / checks，搬移面零真入口 | P2 |
+| [187](../bugs/BUG-187-module-comments-stale-spec-paths.md) | 活指针 | 3 条模块头注仍指 tests/lib 扁平 spec | P2 |
+| [188](../bugs/BUG-188-implemented-note-ui-surface-stale-command.md) | 活指针 | implemented Note 的 ui-surface 命令指向 tests/host 旧家 | P2 |
+| [189](../bugs/BUG-189-implemented-note-generic-english-stale-path.md) | 活指针 | implemented Note 指向已退役 generic-english spec | P2 |
+| [190](../bugs/BUG-190-candidate-scan-comment-stale-spec.md) | 活指针 | audit 注释指向不存在的 candidate-scan-labels spec | P2 |
+| [191](../bugs/BUG-191-typecheck-coverage-counts-stale-docs.md) | 文档计数 | 两份 live 文档停在 227/245、226/244（实测 231/249） | P2 |
+
+**证据（gitignored，可复跑）：**
+
+- `runtime/tmp/c11/live-pointer-sweep.mjs` / `.json`：761 live 文件，54 命中，分类后 6 真残留。
+- `runtime/tmp/c11/live-pointer-check.mjs` / `.log`：6 条逐条 `STALE`。
+- `runtime/tmp/c11/vitest-threshold-check.mjs` / `.log`：`thresholds=10 missing=5`。
+- `runtime/tmp/c11/coverage-thresholds.log`：覆盖率 ERROR 只点名 client 阈值，5 个 host 死键无一行。
+- `runtime/tmp/c11/replay-fail.log`：replay `MODULE_NOT_FOUND` + 1 FAILURE。
+- `runtime/tmp/c11/pre-push-surface-check.mjs` / `.log`：三批命中表。
+- `runtime/tmp/c11/typecheck-count-check.mjs` / `.log`：`actual=231/249`，两处 STALE。
+- `runtime/tmp/c11/preset-entry.log`：preset ALL PASS；`pnpm-test.log`：249/2122；`pnpm-typecheck.log`：exit 0。
+
+**未跑：** `refactor-drift --hashes` 双 worktree 实测；company-entry / release / client-load 真入口；Windows 实机；clean clone；真实 pre-push dry-run（用 `selectSurfaces` 直调代替）；冻结层 40 卡逐字节审计；live 模型；真页面。
+
+**判定：** 首轮抓到 8 张卡（10 个具体坐标）；最硬 = BUG-185（真入口红），主根因 = BUG-184/186（验证面静默失效）。没有「搬移无副作用」结论；未跑面保留。
+
 ## 证据、判据与处置
 
 - **oracle 纪律**：先写期望，再看实现；不拿实现当 oracle；spec 绿只说明覆盖，不说明行为正确。
+- **搬移类证据坐标**（focus v6）：base/head SHA、`git show -M --name-status`、被移动文件数、搬移前后的 spec / lane / gate 计数、`refactor-drift` 指纹清单、门禁负控（红 → 还原 → 绿）、真入口原始 stdout。
+- **等价判据的边界**：`refactor-drift` 证「测试体一字未动」，不证「体里的断言仍有意义」；`pnpm test` 证「跑过的没红」，不证「没被删 / 改名 / 弱化」；`pnpm verify` 证「门禁声明的面绿」，不证「扫描面没被搬空」。
+- **载体分类**：live（agent / 人会照着做）/ frozen（记录当时事实）/ fixture（负向样本）/ deliberate（有意保留，须有 Note 与「何时修」）。只有 live 可判缺陷；frozen 只许改链接目标与命令路径；fixture 不判。
 - **证据落点**：卡内 Round + `runtime/tmp/explore/`（gitignored）+ 需要的真页面/会话 id；文件面记路径/大小/哈希/mtime；命令面记原文。
 - **处置**：材料性真缺陷 → `_backlog/bugs/` 卡（severity、复现、红→绿、影响面、与哪个 oracle 冲突）；非材料性 → 记录 + 请示；合同/文档漂移 → 观察 + owner；测试资产缺口 → 记缺口与建议门，不碰产品代码。
 - **不写「没有 bug」**：只写已跑面未见 / 未跑面保留。
@@ -1661,18 +1809,23 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 1. 每个宪章至少跑一轮，或逐项写「未跑 + 原因 + owner」；每轮有期望 vs 实测与证据坐标。
 2. 每轮假设全部判决（confirmed / refuted / unverified + 原因）；confirmed 有 BUG 卡或观察落点；不写「没有 bug」。
-3. 发现缺陷立即开 `_backlog/bugs/` 卡（编号唯一源 = [bugs/README](../bugs/README.md) 的 Next，当前 184），本卡不改产品代码。
+3. 发现缺陷立即开 `_backlog/bugs/` 卡（编号唯一源 = [bugs/README](../bugs/README.md) 的 Next，当前 192），本卡不改产品代码。
 4. 每轮回填 `## Round N`，并同步 `_backlog/issues/README.md` 活跃索引；`pnpm verify` 保持 ALL PASS。
 5. focus v2：C8–C10 每面至少一轮，或逐项写「未跑 + 原因」；C8 的 H10（真模型 present deny）若未跑，必须写未跑，不能折成 PASS。
 6. 用户叫停或所有宪章有明确结论时，按关闭条件收口；审查记录写 `审查：agent｜用户｜跳过 — 理由`。
+7. **focus v6**：C11 至少一轮，或逐项写「未跑 + 原因 + owner」；每轮必须有 move set、等价判据、至少一个真入口、至少一个负控（红 → 还原 → 绿）。
+8. **预检坐标分诊**：本卡 2026-11-15 预检的 7 条必须逐条分诊（confirmed → BUG 卡；deliberate / frozen / fixture → 观察 + owner）；不得只写「已扫」。
+9. 不把 `pnpm test` / `pnpm verify` 全绿写成「搬移无副作用」；单场真入口不写稳定。
 
 ## 关闭条件
 
-- C1–C7 每面至少一轮，或逐项写未跑原因；C8–C10 各至少一轮，或逐项写未跑原因；每轮 H 全部判决；所有 finding 已分诊。
+- C1–C7 每面至少一轮，或逐项写未跑原因；C8–C10 各至少一轮，或逐项写未跑原因（focus v6 冻结 C1–C10 时，改为逐项写「暂停 + 与搬移不相交」）；每轮 H 全部判决；所有 finding 已分诊。
 - **停止规则（focus v2）**：C8 ≤ 2 轮，C9/C10 各 ≤ 1 轮；到期未发现新材料即收口归档。没有命名的矩阵缺口，不再开「换个文件形状试试」的轮次。
 - **focus v3（2026-11-14）**：这是 BUG-152..159 修复后的 post-fix 回归；C8 第 2 轮、C9 额外 1 轮按用户新预算计，不算重复 v2 首轮。C8-H10 live 仍未跑，保持 `unverified`。
 - **focus v4（2026-11-14）**：这是 BUG-160..167 修复后的第二轮回归；新门禁 `fix-evidence` 与共享形状层按新预算计；C8-H10 live 仍未跑。
 - **focus v5（2026-11-14）**：这是 BUG-168..175 修复后的第三轮回归；新层（code span / JSON 掩码 / `..` 闸 / fix-evidence 命令与节解析 / notes-tree 根 symlink）按新预算计；Windows 实机仍未跑。
+- **focus v6（2026-11-15）**：C11 至少覆盖 M1–M4 各一次，或逐项写未跑原因；预检 7 条有分诊结论；[refactor-drift](../../tools/repo/refactor-drift.mjs) 至少实跑一次（或写「不能跑」的证据）；C11 ≤ 3 轮。
+- **停止规则（focus v6）**：一轮没有新 material → 收口；用户叫停优先。
 - 不写「没有 bug」；未覆盖面保留并标 owner；单场 live 不写成稳定。
 - 证据可复读；`pnpm verify` + `pnpm test` 绿；审查记录齐后归档。
 
@@ -1684,5 +1837,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 - 2026-11-14 ｜ Round 89（post-fix C8/C9）｜ `c8b-reqcheck` / `c8b-html-comment` / `c8b-more-shapes` / `c9-merge-probe.sh` / `c9b-notes-tree` / `c9b-notes-date` ｜ `/req check` 原文本、merge 漏检、HTML 注释、slice 归属、转义竖线、changeLog、notes-tree lifecycle/日期 八项 confirmed ｜ BUG-160..167 ｜ `pnpm test` 247/2046、`pnpm verify` ALL PASS；live H10 未跑。
 - 2026-11-14 ｜ Round 90（post-fix 2 C8/C9）｜ `c8c-markdown-shape` / `c8c-more-shape` / `c9c-fix-evidence` / `c9c-gate-edges` ｜ 行内代码注释、未闭合注释、双反斜杠、legacy JSON、`../` 子类、fix-evidence 删除/假命令、notes-tree symlink 八项 confirmed ｜ BUG-168..175 ｜ `pnpm test` 247/2066、`pnpm verify` ALL PASS；live H10 未跑。
 - 2026-11-14 ｜ Round 91（post-fix 3 C8/C9）｜ `c8d-json-fence` / `c8d-multiline-span` / `c9d-fix-evidence-command` / `c9d-section-codeblock` / `c9d-read-internal-dotdot` / `c9d-win-dotdot` / `c9d-noop-command` / `c9d-notes-root-symlink` ｜ JSON 围栏示例、跨行 code span、内部 `..`、Windows `..\`、fix-evidence 合法命令/节/空命令、notes-tree 根 symlink 八项 confirmed ｜ BUG-176..183 ｜ `pnpm test` 247/2072、`pnpm verify` ALL PASS；Windows 实机/live H10 未跑。
+- 2026-11-15 ｜ focus v6 调整（非 Round）｜ 本卡 + issues/README ｜ 三批搬移基线（`29ae8c94` / `1eb14f46` / `57d34a34`）+ C11 四子面 + 10 条首轮假设 + 7 条预检坐标 ｜ `pnpm verify` ALL PASS（调卡后实跑）｜ 首轮分诊在 Round 92 落卡（BUG-184..191）。
+- 2026-11-16 ｜ Round 92（C11 首轮）｜ `runtime/tmp/c11/{live-pointer-sweep,live-pointer-check,vitest-threshold-check,pre-push-surface-check,typecheck-count-check}.mjs`、`replay-fail.log`、`preset-entry.log` ｜ 6 处活指针、5 个覆盖率死键、pre-push 面缺口、replay 真入口红、两份文档计数漂移；10 条假设全部判决 ｜ BUG-184..191（8 张）｜ `pnpm test` 249/2122、`pnpm verify` ALL PASS、`pnpm typecheck` exit 0；`preset.entry` PASS、`replay` FAIL ｜ 未跑 company-entry/release/client-load/Windows/clean clone/live。
 - 每轮：日期 ｜ 宪章 ｜ 命令/会话 id ｜ 期望 vs 实测 ｜ 证据坐标 ｜ 判定。
 - BUG 卡链接放这里；未跑面逐条保留。
