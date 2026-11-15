@@ -2,6 +2,21 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.11.7 — 2026-11-15
+
+### Fixed
+
+- PRD 定义点统一到 headings；`/prd check` 与 present 交付闸门共用编号/cwd/文件形状事实源，修复定义点与闸门不同源。
+- 错误环不再把浏览器良性通知记为 client 错误；错误环文本回退与 headings 解析的文本形状层修复。
+- 5 份 preset `SKILL.md` 的 YAML 头静默损坏修复（模型可见技能声明恢复）。
+
+### Changed
+
+- 文档/PRD 形状解析统一为 `markdown-shape-core`：门禁与 pack 共用同一状态机，围栏块/跨行代码/段语义按同一判据。
+- 需求与 PRD 校验共用一套编号/追溯/退役词/计数判据（四消费者契约 + 路径读写闸门同判据矩阵）。
+- 产品定义模板与 `product-definition` / `prd-playbook` 对齐 MRD → StRS → PRD 链。
+- 包 README 与安装手册同步：repo handoff 不随仓库分发 tarball；`dsh.client.inject` 条数以 `package.json` 为准。
+
 ## 0.11.6 — 2026-11-13
 
 ### Fixed
