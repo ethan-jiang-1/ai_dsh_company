@@ -1,19 +1,19 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-15
 ---
 
 # BUG-186：pre-push 的面规则只覆盖 client/presets/content，搬移面触发不到真入口
 
-> 严重级别：P2（次要）｜发现：2026-11-15｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-15｜状态：已修｜修复：2026-11-16｜审查：agent（独立盲审）— 2 blocker（typecheck 规则类型互斥；归档后 bug-coverage 缺具名守卫）已修复；建议 S1–S8 全部处置（根配置覆盖、tools coveredBy 补 coverage-ratchet、tests/README 同 diff、阈值判据口径、负例过滤、词表全量核对、计数校正、删「未接 N」数字）
 >
-> **关联**：[探索卡 Round 92](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M4（静默弱化）；与 [BUG-185](BUG-185-replay-lane-stale-built-presence-import.md) 同族（后者就是这条规则漏掉的真实后果）。
-> **留痕**：Note（本批共用；落地同 diff 写 `notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md`）。
+> **关联**：[探索卡 Round 92](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M4（静默弱化）；与 [BUG-185](BUG-185-replay-lane-stale-built-presence-import.md) 同族（后者就是这条规则漏掉的真实后果）。
+> **留痕**：Note [2026-11-16-move-side-effects-and-live-pointers.md](../../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)（本批共用）。
 
 ## 症状
 
-`.githooks/pre-push` 调用 [pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)，按 [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs) 的 `SURFACE_RULES` 选真入口检查。规则只有三条：
+`.githooks/pre-push` 调用 [pre-push-surfaces.mjs](../../../checks/pre-push-surfaces.mjs)，按 [asset-lanes.mjs](../../../tools/lib/asset-lanes.mjs) 的 `SURFACE_RULES` 选真入口检查。规则只有三条：
 
 - `packages/company-pack/src/client/**` → `client-load`
 - `packages/company-pack/presets/**` → `preset`
@@ -59,11 +59,18 @@ node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/src/li
 
 - `SURFACE_RULES` 增 `src/lib/**` → `replay`（replay 直接 import lib 的构建产物；这是 BUG-185 的实际缺失面）。
 - 增 `src/index.ts` / `cordis.patch.yml` → `preset`（包入口与组合行 → 真挂载）。
-- 其余面用 `coveredBy`（词表 = `UNCONDITIONAL_STEPS`，spec 读 `.githooks/pre-push` 原文核对）：`src/host/**` → smoke:fast + coverage-ratchet + typecheck + verify；`tools/**`、`checks/**` → test:checks + verify；`tests/**` → coverage-ratchet；文档/技能/运行配置/探针/快照 → verify；根配置/CI/hook/vendor 指针 → verify + typecheck。
+- 其余面用 `coveredBy`（词表 = `UNCONDITIONAL_STEPS`，spec 读 `.githooks/pre-push` 原文核对）：`src/host/**` → smoke:fast + coverage-ratchet + typecheck + verify；`tools/**`、`checks/**` → test:checks + coverage-ratchet + verify；`tests/**` → coverage-ratchet；文档/技能/运行配置/探针/快照 → verify；根配置/CI/hook/vendor 指针 → verify + typecheck。
 - `selectSurfaces` 返回 `covered` / `unseen`；`pre-push-surfaces.mjs` 逐条打印显式豁免，并把既无规则也无申报的路径打印为「未分类」，不再静默。
 - 防复发：`tests/repo/budget/asset-lanes.spec.ts` 断言每个改动面都有证据、src 分组与仓库顶层目录都登记、`coveredBy` 只引用 hook 真跑的步骤；负控 = 删掉 `src/lib` 规则 → `--dry-run --paths` 不再打印 replay 且 spec 红。
 - 明确不改：不把 weekly 慢档（company-entry / release）塞进 pre-push；不改已经登记的资产本身。
 
 ## 已修判定
 
-`node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/src/lib/presence/presence.ts` 打印 `→ replay`；`node checks/pre-push-surfaces.mjs --dry-run --paths tools/dev/company.mjs` 打印「无额外 lane；证据 = 无条件 test:checks + verify」；三批提交用 `selectSurfaces` 复跑都非空且 `unseen=0`（runtime 脚本实跑）；`pnpm test tests/repo/budget/asset-lanes.spec.ts` 退出 0。负控 = 删掉 `src/lib` 规则 → 同一 `--dry-run` 命令退回「未分类」且 spec 红；还原 → 绿。
+`node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/src/lib/presence/presence.ts` 打印 `→ replay`；`node checks/pre-push-surfaces.mjs --dry-run --paths tools/dev/company.mjs` 打印「无额外 lane；证据 = 无条件 test:checks + coverage-ratchet + verify」；三批提交用 `selectSurfaces` 复跑都非空且 `unseen=0`（runtime 脚本实跑）；`pnpm test tests/repo/budget/asset-lanes.spec.ts` 退出 0。负控 = 删掉 `src/lib` 规则 → 同一 `--dry-run` 命令退回「未分类」且 spec 红；还原 → 绿。
+
+## 修复证据
+
+- 改动面：`tools/lib/asset-lanes.mjs`、`checks/pre-push-surfaces.mjs`、`tests/repo/budget/asset-lanes.spec.ts`
+- 红：`pnpm test tests/repo/budget/asset-lanes.spec.ts`（3 例红：src/lib 不触发 replay、多数改动面无证据、顶层目录未登记）
+- 绿：`pnpm test tests/repo/budget/asset-lanes.spec.ts`（13 passed；三批提交复跑 unseen=0，dry-run 对 src/lib 打印 replay）
+- 提交：commit 713acc60

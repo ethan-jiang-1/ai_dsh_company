@@ -12,7 +12,7 @@
 
 1. **配置键必须命中文件**（184/186）。`vitest.config.ts` 的 `coverage.thresholds` 是路径键表，vitest 对
    不存在的键不报错；host 分组搬移后 5 条 floor 静默失效。新 spec
-   `tests/repo/budget/vitest-coverage-thresholds.spec.ts` 断言每个键存在、落在 `coverage.include` 的自写源面内、
+   `tests/repo/budget/vitest-coverage-thresholds.spec.ts` 断言每个键存在、落在 pack 源码面（`packages/company-pack/src/`）内、
    同时给 statements 与 branches，且阈值表非空。同一语义扩到 pre-push 面规则：`tools/lib/asset-lanes.mjs` 的
    `SURFACE_RULES` 增 `src/lib/** → replay`（lib 的构建产物由 replay 直接 import）、`src/index.ts` /
    `cordis.patch.yml → preset`；**没有额外 lane 的面必须写 `coveredBy`**（词表 = `UNCONDITIONAL_STEPS`），
@@ -42,7 +42,7 @@
   独立 keyless spec 才能按载体排除冻结层。
 - **保留文档分数并加一致性断言**：断言要绑 `tsc --listFilesOnly`（慢、环境耦合），且每次搬移仍需人同步；
   公式没有数字可漂。
-- **把 191 同步成 231/249**：本批新增 spec 后立刻变 235/249，证明「同步分数」是错误方向。
+- **把 191 同步成 231/249**：本批新增 spec 后立刻变 235/253，证明「同步分数」是错误方向。
 
 ## 状态事实与载体
 
@@ -52,16 +52,16 @@
 | 唯一入口 | `vitest.config.ts`（阈值键）；`tools/lib/asset-lanes.mjs`（`SURFACE_RULES` / `UNCONDITIONAL_STEPS` / `selectSurfaces`）；`checks/pre-push-surfaces.mjs`（打印与 `--paths`）；`checks/lanes/replay.e2e.mjs`（动态 import） |
 | 读载体 | `.githooks/pre-push`、`pnpm test`、`pnpm typecheck`、`pnpm verify`（bare-path / command-refs / script-index） |
 | 契约测试 | `tests/repo/budget/vitest-coverage-thresholds.spec.ts`、`tests/repo/structure/built-path-literals.spec.ts`、`tests/repo/docs/live-pointer-paths.spec.ts`、`tests/repo/docs/typecheck-coverage-claim.spec.ts`、`tests/repo/budget/asset-lanes.spec.ts`、`tests/tools/lane-match.spec.ts` |
-| 活载体修订 | 5 条源码注释 + 2 篇 implemented Note + 1 条 audit 注释 + 2 份 live 文档（`docs/testing.md` / `docs/guides/dev-loop.md`） |
+| 活载体修订 | 5 条源码注释 + 2 篇 implemented Note + 1 条 audit 注释 + 2 份 live 文档（`docs/testing.md` / `docs/guides/dev-loop.md` / `tests/README.md`） |
 
 ## 验证
 
 | 层 | 失败类 | 负控（见过红） |
 |---|---|---|
-| keyless unit ×4 新 spec + 两个消费 spec（24 + 13 + 2 passed） | 配置组合 / 导出形态 / 文档指针 | 阈值键留旧路径 → 5 `MISSING`；replay 留旧字面量 → `MODULE_NOT_FOUND` + spec 红；`src/**` 5 条 + notes 2 条 + audit 1 条旧指针 → 红；两份文档分数 → 2 条红；删 `src/lib` 规则 → `unseen` 非空 + spec 红 |
+| keyless unit（4 份新 spec + 扩展的 asset-lanes = 26 passed；lane-match 10 passed；backlog-liveness 36 passed） | 配置组合 / 导出形态 / 文档指针 | 阈值键留旧路径 → 5 `MISSING`；replay 留旧字面量 → `MODULE_NOT_FOUND` + spec 红；`src/**` 5 条 + notes 2 条 + audit 1 条旧指针 → 红；两份文档分数 → 2 条红；删 `src/lib` 规则 → `unseen` 非空 + spec 红 |
 | 真入口 `node checks/lanes/replay.e2e.mjs` | 导出形态 | 修前 `1 FAILURE(S)`（`Cannot find module …/lib/types/lib/presence.js`）；修后 `ALL PASS`（11s，归一化日志零 diff） |
-| pre-push dry-run `--paths` | 配置组合 | `src/lib/presence/presence.ts` → 修前「未触发」、修后 `→ replay`；`tools/dev/company.mjs` → 「无额外 lane；证据 = 无条件 test:checks + verify」 |
-| 全量 `pnpm test` | — | 253 files / 2143 tests 全绿；`pnpm verify` ALL PASS；`pnpm typecheck` exit 0；`pnpm lint` / `pnpm dup` / `pnpm smoke:fast` / `pnpm test:checks` 全绿 |
+| pre-push dry-run `--paths` | 配置组合 | `src/lib/presence/presence.ts` → 修前「未触发」、修后 `→ replay`；`tools/dev/company.mjs` → 「无额外 lane；证据 = 无条件 test:checks + coverage-ratchet + verify」 |
+| 全量 `pnpm test` | — | 253 files / 2145 tests 全绿；`pnpm verify` ALL PASS；`pnpm typecheck` exit 0；`pnpm lint` / `pnpm dup` / `pnpm smoke:fast` / `pnpm test:checks` 全绿 |
 | `pnpm coverage:ratchet` | — | PASS（197 文件）；`tools/lib/asset-lanes.mjs` 100/98.33、`tools/lib/backlog-liveness.mjs` 98.29/93.89 均高于基线（后者顺带补了 2026-11-15 新增分支的负例） |
 
 ## 未覆盖轴

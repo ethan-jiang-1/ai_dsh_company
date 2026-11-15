@@ -25,8 +25,8 @@ opened: 2026-11-12
 
 **当前情况（2026-11-15 focus v6 基线）：**
 
-- **当前基线（2026-11-16 02:24，HEAD `f684d6ea` 实测）**：`pnpm test` 249 files / 2122 tests；`pnpm verify` ALL PASS（2 门无对象）；`pnpm typecheck` exit 0；活跃缺陷 = **8**（BUG-184..191，2026-11-15 C11 首轮；只开卡不修）；Next BUG = 192；`packages/company-pack` version 0.11.8；census = 30 冒烟 / 59 探针 / 75 门禁 / 249 spec；对抗矩阵 `KNOWN_GAP = 0`。
-- **当前主面 = C11 搬移副作用**（focus v6，2026-11-15）：三批纯搬移 = `29ae8c94`（tests 分轴）→ `1eb14f46`（src↔tests 对齐）→ `57d34a34`（tools 四组；原 `5c2c0796` 于 2026-11-15 深夜 amend，补 skill / command-refs / 散件门禁 / refactor-drift / sync-dsh）；C1–C10 冻结。首轮（Round 92）已跑，8 张卡见 [bugs/README](../bugs/README.md)。
+- **当前基线（2026-11-16 03:45，收口工作树实测）**：`pnpm test` 253 files / 2145 tests；`pnpm verify` ALL PASS（2 门无对象）；`pnpm typecheck` exit 0；活跃缺陷 = **0**（BUG-184..191 已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）；Next BUG = 192；`packages/company-pack` version 0.11.8；census = 30 冒烟 / 59 探针 / 74 门禁 / 253 spec；对抗矩阵 `KNOWN_GAP = 0`。
+- **当前主面 = C11 搬移副作用**（focus v6，2026-11-15）：三批纯搬移 = `29ae8c94`（tests 分轴）→ `1eb14f46`（src↔tests 对齐）→ `57d34a34`（tools 四组；原 `5c2c0796` 于 2026-11-15 深夜 amend，补 skill / command-refs / 散件门禁 / refactor-drift / sync-dsh）；C1–C10 冻结。首轮（Round 92）已跑，8 张卡 2026-11-16 全部修复（见 [bugs/README「2026-11-16 修复交接」](../bugs/README.md) 与 [批次 Note](../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)）。
 - **上一轮基线（2026-11-14 11:01）**：`pnpm test` 247 files / 2072 tests；活跃缺陷 8（BUG-176..183，focus v5；该批已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）；version 0.11.6。
 - **更早四轮基线（2026-11-13 19:26 – 2026-11-14 10:17）**：247 files / 2034–2066 tests；每轮 8 张 BUG 均已修复归档（BUG-152..175）。
 - **历史起点（2026-11-12）**：`50878cd6`（BUG-080..089 修复）｜Note = [startup/wiki bug sweep](../../notes/implemented/2026-11-12-startup-strategy-wiki-bug-sweep.md)｜十张卡已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)｜当时基线 236 files / 1761 tests。该基线只作历史，不再当当前事实。
@@ -1754,10 +1754,10 @@ TypeError: Cannot read properties of undefined (reading 'map')
 | C11-1 测试体等价 | **refuted（本批）** | 逐文件对读 parent vs HEAD（过滤 import / `from` / `require` 行）：只剩路径/注释行与声明内的测试标题变更（mirror / checks-index / hooks-wiring）；无静默删除、改名或断言弱化。未跑 `refactor-drift --hashes`（需两棵 worktree 的 vitest JSON，成本高；git-diff 等价近似，缺口保留）。 |
 | C11-2 类型面漏扫 | **refuted** | 三份 `tsconfig.test-*` 的 `--listFilesOnly` 并集 = 231 / 盘上 249；未接 18 与文档声明一致；本轮新增的 mirror、host fs/logging、lib deliverables/delegation spec 都在类型面内。 |
 | C11-3 lane/census/索引 | **refuted** | `asset-lanes` 30 资产 + 59 探针路径全在盘；`test-census` / `checks-index` 生成物与盘一致（verify 绿）；`tools` 顶层散件门禁已在 `57d34a34` 加。 |
-| C11-4 覆盖率基线 | **pass（数值）+ confirmed（阈值键）** | `coverage-baseline.json` 的 197 文件键 + 5 豁免全在盘；`1eb14f46` 只改键名不改数值。但 `vitest.config.ts` 的 5 个 host threshold 键死 → [BUG-184](../bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md)。 |
-| C11-5 门禁扫描面 | **confirmed（部分）** | `command-refs` 已由 `57d34a34` 纳入 `.agents`（close-out skill 修复）；但源码注释 / implemented Note 普通文本 / audit 注释仍不在射程 → BUG-187..190；pre-push 面规则缺 `src/lib` / `tools` → [BUG-186](../bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md)。 |
+| C11-4 覆盖率基线 | **pass（数值）+ confirmed（阈值键）** | `coverage-baseline.json` 的 197 文件键 + 5 豁免全在盘；`1eb14f46` 只改键名不改数值。但 `vitest.config.ts` 的 5 个 host threshold 键死 → [BUG-184](../_archive/fixed_bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md)。 |
+| C11-5 门禁扫描面 | **confirmed（部分）** | `command-refs` 已由 `57d34a34` 纳入 `.agents`（close-out skill 修复）；但源码注释 / implemented Note 普通文本 / audit 注释仍不在射程 → BUG-187..190；pre-push 面规则缺 `src/lib` / `tools` → [BUG-186](../_archive/fixed_bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md)。 |
 | C11-6 live 活指针 | **confirmed** | 扫 761 个 live 文件：6 处真残留（3 条模块头注 + 2 条 Note + 1 条 audit 注释）；其余命中为 frozen / fixture / 负例 / 有意保留（`deliverables-address.ts` 的发布指纹）。 |
-| C11-7 真入口 | **confirmed（replay）/ pass（preset）** | `node checks/lanes/replay.e2e.mjs` FAIL（MODULE_NOT_FOUND）→ [BUG-185](../bugs/BUG-185-replay-lane-stale-built-presence-import.md)；`preset.entry` ALL PASS（6 角色 + 5 非角色）；`pnpm smoke:fast` 4/4、`pnpm test:checks` 10/10。 |
+| C11-7 真入口 | **confirmed（replay）/ pass（preset）** | `node checks/lanes/replay.e2e.mjs` FAIL（MODULE_NOT_FOUND）→ [BUG-185](../_archive/fixed_bugs/BUG-185-replay-lane-stale-built-presence-import.md)；`preset.entry` ALL PASS（6 角色 + 5 非角色）；`pnpm smoke:fast` 4/4、`pnpm test:checks` 10/10。 |
 | C11-8 pre-push 面映射 | **confirmed** | 三批命中表；`src/lib` / `tools` / `tests` / `checks` 零命中 → BUG-186。 |
 | C11-9 冻结层 | **pass（抽样）** | `1eb14f46` / `57d34a34` 的冻结层改动只修链接目标 / 命令路径；本卡未改 frozen。40 张卡未逐字节全审，保留。 |
 | C11-10 真安装 / 真挂载 | **部分** | preset 真挂载 PASS；replay FAIL；tarball / release / client-load 未跑。 |
@@ -1766,14 +1766,14 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | BUG | 面 | 一句话 | 级别 |
 |---|---|---|---|
-| [184](../bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md) | 验证面 | vitest 5 个 host 覆盖率阈值键死，floor 静默失效 | P2 |
-| [185](../bugs/BUG-185-replay-lane-stale-built-presence-import.md) | 真入口 | replay 车道 import 搬移前 built presence 路径，确定性失败 | P1 |
-| [186](../bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md) | 验证面 | pre-push 面规则缺 src/lib / tools / tests / checks，搬移面零真入口 | P2 |
-| [187](../bugs/BUG-187-module-comments-stale-spec-paths.md) | 活指针 | 3 条模块头注仍指 tests/lib 扁平 spec | P2 |
-| [188](../bugs/BUG-188-implemented-note-ui-surface-stale-command.md) | 活指针 | implemented Note 的 ui-surface 命令指向 tests/host 旧家 | P2 |
-| [189](../bugs/BUG-189-implemented-note-generic-english-stale-path.md) | 活指针 | implemented Note 指向已退役 generic-english spec | P2 |
-| [190](../bugs/BUG-190-candidate-scan-comment-stale-spec.md) | 活指针 | audit 注释指向不存在的 candidate-scan-labels spec | P2 |
-| [191](../bugs/BUG-191-typecheck-coverage-counts-stale-docs.md) | 文档计数 | 两份 live 文档停在 227/245、226/244（实测 231/249） | P2 |
+| [184](../_archive/fixed_bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md) | 验证面 | vitest 5 个 host 覆盖率阈值键死，floor 静默失效 | P2 |
+| [185](../_archive/fixed_bugs/BUG-185-replay-lane-stale-built-presence-import.md) | 真入口 | replay 车道 import 搬移前 built presence 路径，确定性失败 | P1 |
+| [186](../_archive/fixed_bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md) | 验证面 | pre-push 面规则缺 src/lib / tools / tests / checks，搬移面零真入口 | P2 |
+| [187](../_archive/fixed_bugs/BUG-187-module-comments-stale-spec-paths.md) | 活指针 | 3 条模块头注仍指 tests/lib 扁平 spec | P2 |
+| [188](../_archive/fixed_bugs/BUG-188-implemented-note-ui-surface-stale-command.md) | 活指针 | implemented Note 的 ui-surface 命令指向 tests/host 旧家 | P2 |
+| [189](../_archive/fixed_bugs/BUG-189-implemented-note-generic-english-stale-path.md) | 活指针 | implemented Note 指向已退役 generic-english spec | P2 |
+| [190](../_archive/fixed_bugs/BUG-190-candidate-scan-comment-stale-spec.md) | 活指针 | audit 注释指向不存在的 candidate-scan-labels spec | P2 |
+| [191](../_archive/fixed_bugs/BUG-191-typecheck-coverage-counts-stale-docs.md) | 文档计数 | 两份 live 文档停在 227/245、226/244（实测 231/249） | P2 |
 
 **证据（gitignored，可复跑）：**
 

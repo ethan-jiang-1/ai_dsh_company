@@ -4,6 +4,18 @@
 
 ## 修复流水（倒序）
 
+- **BUG-184..191**（2026-11-16，根因组 A–D，P1×1 + P2×7）：C11 搬移副作用首轮（Round 92）——
+  三批纯搬移后四类非静态消费者未随迁且对未命中静默：
+  **A** 配置键：[184](BUG-184-vitest-coverage-thresholds-stale-host-paths.md) vitest 5 个死阈值键、
+  [186](BUG-186-pre-push-surface-rules-miss-src-lib-tools.md) pre-push 面规则缺 src/lib/tools → `coveredBy` 申报 + 覆盖面 spec；
+  **B** 真入口：[185](BUG-185-replay-lane-stale-built-presence-import.md) replay 动态 import 旧 built presence → MODULE_NOT_FOUND；
+  **C** 活指针：[187](BUG-187-module-comments-stale-spec-paths.md) / [188](BUG-188-implemented-note-ui-surface-stale-command.md) /
+  [189](BUG-189-implemented-note-generic-english-stale-path.md) / [190](BUG-190-candidate-scan-comment-stale-spec.md)
+  5 条源码注释 + 2 篇 Note + 1 条 audit 注释；
+  **D** [191](BUG-191-typecheck-coverage-counts-stale-docs.md) 两份 docs 手写覆盖分数 → 公式。
+  证据提交 = `713acc60`；`pnpm test` 253 files / 2145 tests、`verify`/`typecheck`/`lint`/`dup`/`coverage:ratchet`/`replay` 全绿。
+  详见 [搬移副作用 Note](../../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)。
+
 - **BUG-176..183**（2026-11-14，根因组 A–D，P1×1 + P2×7）：Round 91 回归扫，同一批层再推一层——
   **A** 形状层容器：[176](BUG-176-json-fence-example-extracted.md) 顶层围栏块成为 JSON 账本唯一来源、
   [181](BUG-181-multiline-code-span.md) 跨行行内代码状态；

@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P1
 opened: 2026-11-15
 ---
 
 # BUG-185：replay 车道仍 import 搬移前的 built presence 路径，真入口确定性失败
 
-> 严重级别：P1（重要）｜发现：2026-11-15｜状态：修复就绪
+> 严重级别：P1（重要）｜发现：2026-11-15｜状态：已修｜修复：2026-11-16｜审查：agent（独立盲审）— 2 blocker（typecheck 规则类型互斥；归档后 bug-coverage 缺具名守卫）已修复；建议 S1–S8 全部处置（根配置覆盖、tools coveredBy 补 coverage-ratchet、tests/README 同 diff、阈值判据口径、负例过滤、词表全量核对、计数校正、删「未接 N」数字）
 >
-> **关联**：[探索卡 Round 92](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M3（真入口）。
-> **留痕**：Note（本批共用；落地同 diff 写 `notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md`）。
+> **关联**：[探索卡 Round 92](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M3（真入口）。
+> **留痕**：Note [2026-11-16-move-side-effects-and-live-pointers.md](../../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)（本批共用）。
 
 ## 症状
 
@@ -36,7 +36,7 @@ node checks/lanes/replay.e2e.mjs
 
 ## 根因与证据
 
-- **根因**：`1eb14f46` 把 `src/lib/presence.ts` 搬进 `src/lib/presence/presence.ts`；TypeScript 构建产物随之变成 `lib/types/lib/presence/presence.js`，但 [replay.e2e.mjs](../../checks/lanes/replay.e2e.mjs) 的动态 import 仍拼旧扁平路径。动态 import 的路径是字符串，不在任何静态 import / tsconfig 解析面。
+- **根因**：`1eb14f46` 把 `src/lib/presence.ts` 搬进 `src/lib/presence/presence.ts`；TypeScript 构建产物随之变成 `lib/types/lib/presence/presence.js`，但 [replay.e2e.mjs](../../../checks/lanes/replay.e2e.mjs) 的动态 import 仍拼旧扁平路径。动态 import 的路径是字符串，不在任何静态 import / tsconfig 解析面。
 - **为什么当时的验收是绿的**：搬移 Note 的「重放」一行写 PASS；当时盘上还留着搬移前的 lib/types/lib/presence.js 旧构建产物，动态 import 命中了它。一次干净重建之后旧文件消失，失败才显形——**这是「绿建立在陈旧产物上」的典型**。
 - **确认**：`ls` 显示 `lib/types/lib/presence/presence.js` 存在、lib/types/lib/presence.js 不存在；`pnpm typecheck`（tsc -b）之后重跑仍失败，排除「构建没做」。
 - **同类扫描**：全仓 `lib/types/...js` 路径字面量逐条解析；活面只有这一处缺失（archived research 与 frozen pin 记录不算）。
@@ -56,3 +56,10 @@ node checks/lanes/replay.e2e.mjs
 ## 已修判定
 
 `node checks/lanes/replay.e2e.mjs` 退出 0 且 `归一化日志零 diff` 仍 PASS；`pnpm test tests/repo/structure/built-path-literals.spec.ts` 绿。负控 = 把 import 临时改回旧的扁平路径 → 同一条车道命令红（MODULE_NOT_FOUND）且 spec 红，还原 → 绿。
+
+## 修复证据
+
+- 改动面：`checks/lanes/replay.e2e.mjs`、`tests/repo/structure/built-path-literals.spec.ts`
+- 红：`node checks/lanes/replay.e2e.mjs`（MODULE_NOT_FOUND：旧扁平 presence.js；replay-smoke 1 FAILURE）
+- 绿：`node checks/lanes/replay.e2e.mjs`（ALL PASS，归一化零 diff，11s）
+- 提交：commit 713acc60

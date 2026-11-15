@@ -15,6 +15,7 @@
  *
  * 证明不了：车道真的跑通——那是车道自己的判据（本卡 = `node checks/lanes/replay.e2e.mjs`）。
  */
+// 负例留证 2026-11-16：把 replay.e2e.mjs 的动态 import 改回旧扁平 `lib/types/lib/presence.js` → 「每个 lib/types 字面量都对到现行源码与产物（BUG-185）」红（无现行源码对应）；还原 → 绿。
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -66,7 +67,7 @@ function findings(): string[] {
 }
 
 describe('构建产物路径字面量（checks/tools/probes）', () => {
-  it('每个 packages/company-pack/lib/types/*.js 字面量都对到现行源码与产物', () => {
+  it('每个 packages/company-pack/lib/types/*.js 字面量都对到现行源码与产物（BUG-185）', () => {
     expect(findings(), '改源码分组后必须同 diff 改这些字面量（或在车道里用稳定入口）').toEqual([])
   })
 

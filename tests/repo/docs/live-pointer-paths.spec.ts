@@ -20,12 +20,18 @@
  * 证明不了：路径指向的 spec 语义上仍是那条判据（搬移可能把断言带偏）——那要靠各 spec 自己的
  * 断言与真入口；本 spec 只保证「指针不断」。
  */
+// 负例留证 2026-11-16：把 ledger.ts 头注改回旧扁平 tests/lib/ledger.spec.ts → 「源码注释里的 spec 路径（BUG-187）」红；还原 → 绿。
+// 负例留证 2026-11-16：把 ui-trajectory Note 的命令改回 tests/host/ui-surface.spec.ts → 「ui-trajectory Note 的验证命令（BUG-188）」与决策记忆用例红；还原 → 绿。
+// 负例留证 2026-11-16：把 i18n Note 的落点改回 generic-english.spec.ts → 「i18n Note 的落点（BUG-189）」与决策记忆用例红；还原 → 绿。
+// 负例留证 2026-11-16：把 audit 注释改回 tests/tools/candidate-scan-labels.spec.ts → 「审计脚本注释里的 spec 路径（BUG-190）」红；还原 → 绿。
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
 
 const TEST_PATH = /tests\/[A-Za-z0-9_./-]+\.spec\.ts/g
+/** 故意写坏的负例/夹具名（`zz-` / `nonexistent`）不判：它们是负例留证，不是活指针。 */
+const IGNORED = /(?:^|\/)(?:zz-|nonexistent)/
 
 /** 递归收集面内满足后缀的文件（跳过隐藏目录与 node_modules）。 */
 function filesUnder(rel: string, suffixes: readonly string[]): string[] {
@@ -47,6 +53,7 @@ function stalePointers(rel: string, suffixes: readonly string[]): string[] {
   for (const file of filesUnder(rel, suffixes)) {
     readFileSync(join(ROOT, file), 'utf8').split('\n').forEach((line, index) => {
       for (const match of line.matchAll(TEST_PATH)) {
+        if (IGNORED.test(match[0])) continue
         if (!existsSync(join(ROOT, match[0]))) stale.push(`${file}:${String(index + 1)} → ${match[0]}`)
       }
     })
@@ -55,7 +62,7 @@ function stalePointers(rel: string, suffixes: readonly string[]): string[] {
 }
 
 describe('live 指针：tests/*.spec.ts 字面量必须现行', () => {
-  it('源码注释（src/**）里的 spec 路径', () => {
+  it('源码注释（src/**）里的 spec 路径（BUG-187）', () => {
     expect(stalePointers('packages/company-pack/src', ['.ts', '.tsx']), '源码注释是 agent 找证据的活指针；搬移同 diff 改新').toEqual([])
   })
 
@@ -63,7 +70,21 @@ describe('live 指针：tests/*.spec.ts 字面量必须现行', () => {
     expect(stalePointers('notes/implemented', ['.md']), 'implemented Note 是活文档：命令与普通文本里的落点都要现行（N5）').toEqual([])
   })
 
-  it('审计脚本注释（checks/audit/**）里的 spec 路径', () => {
+  it('ui-trajectory Note 的验证命令指到现行 spec（BUG-188）', () => {
+    const note = readFileSync(join(ROOT, 'notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md'), 'utf8')
+    expect(note).toContain('tests/ui/ui-surface.spec.ts')
+    expect(note).not.toContain('tests/host/ui-surface.spec.ts')
+    expect(existsSync(join(ROOT, 'tests/ui/ui-surface.spec.ts'))).toBe(true)
+  })
+
+  it('i18n Note 的 generic-english 落点指到现行 spec（BUG-189）', () => {
+    const note = readFileSync(join(ROOT, 'notes/implemented/2026-11-12-i18n-expression-role-pilot.md'), 'utf8')
+    expect(note).toContain('tests/content/content-english.spec.ts')
+    expect(note).not.toContain('tests/content/generic-english.spec.ts')
+    expect(existsSync(join(ROOT, 'tests/content/content-english.spec.ts'))).toBe(true)
+  })
+
+  it('审计脚本注释（checks/audit/**）里的 spec 路径（BUG-190）', () => {
     expect(stalePointers('checks/audit', ['.mjs']), '审计脚本注释里的测试路径要能直接跑（2026-11-15 candidate-scan 实例）').toEqual([])
   })
 

@@ -1,19 +1,19 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-15
 ---
 
 # BUG-188：implemented Note 里的 ui-surface 验证命令指向已搬走的 tests/host 路径
 
-> 严重级别：P2（次要）｜发现：2026-11-15｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-15｜状态：已修｜修复：2026-11-16｜审查：agent（独立盲审）— 2 blocker（typecheck 规则类型互斥；归档后 bug-coverage 缺具名守卫）已修复；建议 S1–S8 全部处置（根配置覆盖、tools coveredBy 补 coverage-ratchet、tests/README 同 diff、阈值判据口径、负例过滤、词表全量核对、计数校正、删「未接 N」数字）
 >
-> **关联**：[探索卡 Round 92](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M2（活指针）；[BUG-189](BUG-189-implemented-note-generic-english-stale-path.md) 同族（implemented Note 的事实落点未随测试树搬移）。
-> **留痕**：Note（本批共用；落地同 diff 写 `notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md`）。
+> **关联**：[探索卡 Round 92](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M2（活指针）；[BUG-189](BUG-189-implemented-note-generic-english-stale-path.md) 同族（implemented Note 的事实落点未随测试树搬移）。
+> **留痕**：Note [2026-11-16-move-side-effects-and-live-pointers.md](../../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)（本批共用）。
 
 ## 症状
 
-[notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md](../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md) 第 40 行仍写：
+[notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md](../../../notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md) 第 40 行仍写：
 
 ```text
 | patch 形状 | `pnpm test tests/host/ui-surface.spec.ts` | 5 passed：两条行 `disabled: true`、web-app 真行存在、controller 未禁用 |
@@ -55,3 +55,10 @@ pnpm test tests/host/ui-surface.spec.ts   # 旧命令：exit=1，No test files f
 ## 已修判定
 
 `pnpm test tests/repo/docs/live-pointer-paths.spec.ts -t 决策记忆` 退出 0；`rg -n 'tests/host/ui-surface\.spec\.ts' notes/implemented` 零命中；`pnpm test tests/ui/ui-surface.spec.ts` 5 passed。
+
+## 修复证据
+
+- 改动面：`tests/repo/docs/live-pointer-paths.spec.ts`
+- 红：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts -t 决策记忆`（Note 的 ui-surface 命令指向不存在的 tests/host 路径）
+- 绿：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts -t 决策记忆`（1 passed / 5 skipped）
+- 提交：commit 713acc60

@@ -351,8 +351,8 @@ export const SURFACE_RULES = [
   },
   {
     globs: ['tools/**', 'checks/**'],
-    coveredBy: ['test:checks', 'verify'],
-    why: '工具/门禁面的证据 = 门禁自测 test:checks + 结构门禁 verify；盘上没有更便宜的真入口',
+    coveredBy: ['test:checks', 'coverage-ratchet', 'verify'],
+    why: '工具/门禁面：门禁自测 test:checks + 消费 tools/lib 的全量 test + 结构门禁 verify；盘上没有更便宜的真入口',
   },
   {
     globs: ['tests/**'],
@@ -365,7 +365,7 @@ export const SURFACE_RULES = [
     why: '文档/指针/技能/运行配置/探针/快照 = 结构门禁 verify 的射程；探针与真模型档按头注手动跑',
   },
   {
-    globs: ['package.json', 'pnpm-lock.yaml', 'tsconfig*.json', '.github/**', '.githooks/**', 'runtime/README.md', 'packages/company-pack/src/README.md', 'vendor/**'],
+    globs: ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'tsconfig*.json', 'vitest.config.ts', 'CHANGELOG.md', 'market-index.json', '.github/**', '.githooks/**', 'runtime/README.md', 'packages/company-pack/src/README.md', 'vendor/**'],
     coveredBy: ['verify', 'typecheck'],
     why: '根配置/锁文件/CI/hook/README/vendor 指针 = verify + typecheck 的射程；vendor 内容只读（双门禁），没有独立真入口',
   },
@@ -412,7 +412,7 @@ export function matchesAny(globs, path) {
 /**
  * 从变更路径选出要跑的 surface 资产，并返回「显式豁免」与「完全未分类」两种结果。
  * @param {string[]} paths 变更路径。
- * @param {typeof SURFACE_RULES} [rules] 规则表（spec 注入用）。
+ * @param {{ globs: string[], assets?: string[], coveredBy?: string[], why?: string }[]} [rules] 规则表（spec 注入用）。
  * @returns {{
  *   assets:string[],
  *   matches:{asset:string, glob:string, path:string, why?:string}[],

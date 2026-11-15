@@ -1,19 +1,19 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-15
 ---
 
 # BUG-189：implemented Note 仍指向已退役的 tests/content/generic-english.spec.ts
 
-> 严重级别：P2（次要）｜发现：2026-11-15｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-15｜状态：已修｜修复：2026-11-16｜审查：agent（独立盲审）— 2 blocker（typecheck 规则类型互斥；归档后 bug-coverage 缺具名守卫）已修复；建议 S1–S8 全部处置（根配置覆盖、tools coveredBy 补 coverage-ratchet、tests/README 同 diff、阈值判据口径、负例过滤、词表全量核对、计数校正、删「未接 N」数字）
 >
-> **关联**：[探索卡 Round 92](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M2（活指针）；[BUG-188](BUG-188-implemented-note-ui-surface-stale-command.md) 同族。
-> **留痕**：Note（本批共用；落地同 diff 写 `notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md`）。
+> **关联**：[探索卡 Round 92](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M2（活指针）；[BUG-188](BUG-188-implemented-note-ui-surface-stale-command.md) 同族。
+> **留痕**：Note [2026-11-16-move-side-effects-and-live-pointers.md](../../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)（本批共用）。
 
 ## 症状
 
-[notes/implemented/2026-11-12-i18n-expression-role-pilot.md](../../notes/implemented/2026-11-12-i18n-expression-role-pilot.md) 第 280 行写：
+[notes/implemented/2026-11-12-i18n-expression-role-pilot.md](../../../notes/implemented/2026-11-12-i18n-expression-role-pilot.md) 第 280 行写：
 
 ```text
 - 新增 tests/content/generic-english.spec.ts；注入中文 → 红，还原 → 绿。
@@ -54,3 +54,10 @@ pnpm test tests/content/generic-english.spec.ts   # 旧路径：exit=1，No test
 ## 已修判定
 
 `pnpm test tests/repo/docs/live-pointer-paths.spec.ts -t 决策记忆` 退出 0；`rg -n 'generic-english\.spec\.ts' notes/implemented` 零命中；`pnpm test tests/content/content-english.spec.ts` 4 passed。
+
+## 修复证据
+
+- 改动面：`tests/repo/docs/live-pointer-paths.spec.ts`
+- 红：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts -t 决策记忆`（Note 的纯文本路径指向已退役 generic-english spec）
+- 绿：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts -t 决策记忆`（1 passed / 5 skipped）
+- 提交：commit 713acc60

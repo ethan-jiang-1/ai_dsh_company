@@ -13,6 +13,7 @@
  * 证明不了：阈值数值本身够不够严——那是 `pnpm coverage:ratchet` 与真实覆盖率运行的判据。
  * 本 spec 只保证「这些 floor 真的挂在文件上」。
  */
+// 负例留证 2026-11-16：把 workspace-resolution 的键改回旧扁平 `src/host/workspace-resolution.ts` → 「每条阈值键都命中真实文件（BUG-184）」红（1 MISSING）；还原 → 绿。
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -43,11 +44,13 @@ describe('vitest 覆盖率阈值键', () => {
     expect(rows.length, '阈值表解析为 0 条——读格式变了就更新本 spec，不许静默放过').toBeGreaterThan(0)
   })
 
-  it('每条阈值键都命中真实文件，且落在 coverage.include 的自写面内', () => {
+  it('每条阈值键都命中真实文件，且落在 coverage.include 的自写面内（BUG-184）', () => {
     const missing = rows.filter(row => !existsSync(join(ROOT, row.path))).map(row => row.path)
     expect(missing, '这些阈值键指向不存在的文件：vitest 静默忽略死键（阈值失效）。改成现行路径').toEqual([])
+    // 目前 threshold 只给 pack 源码（coverage.include 还含 tools/lib，但那里没有阈值档）；
+    // 若将来给 tools/lib 加下限，同 diff 放宽本判据并写清理由。
     const outside = rows.filter(row => !row.path.startsWith('packages/company-pack/src/')).map(row => row.path)
-    expect(outside, '阈值键必须在 coverage.include 覆盖的自写源面内（packages/company-pack/src/）').toEqual([])
+    expect(outside, '阈值键必须在 pack 源码面内（packages/company-pack/src/）').toEqual([])
   })
 
   it('每条阈值同时声明 statements 与 branches', () => {

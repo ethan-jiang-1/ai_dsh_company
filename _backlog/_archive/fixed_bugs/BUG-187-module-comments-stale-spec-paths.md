@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-15
 ---
 
 # BUG-187：模块头注仍把 keyless spec 指向搬移前的扁平 tests/lib 路径
 
-> 严重级别：P2（次要）｜发现：2026-11-15｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-15｜状态：已修｜修复：2026-11-16｜审查：agent（独立盲审）— 2 blocker（typecheck 规则类型互斥；归档后 bug-coverage 缺具名守卫）已修复；建议 S1–S8 全部处置（根配置覆盖、tools coveredBy 补 coverage-ratchet、tests/README 同 diff、阈值判据口径、负例过滤、词表全量核对、计数校正、删「未接 N」数字）
 >
-> **关联**：[探索卡 Round 92](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M2（活指针）。
-> **留痕**：Note（本批共用；落地同 diff 写 `notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md`）。
+> **关联**：[探索卡 Round 92](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M2（活指针）。
+> **留痕**：Note [2026-11-16-move-side-effects-and-live-pointers.md](../../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)（本批共用）。
 
 ## 症状
 
@@ -65,3 +65,10 @@ pnpm test tests/repo/docs/live-pointer-paths.spec.ts -t 源码注释
 ## 已修判定
 
 `pnpm test tests/repo/docs/live-pointer-paths.spec.ts -t 源码注释` 退出 0；`rg 'tests/lib/(ledger|signoff|presence-board)\.spec\.ts' packages/company-pack/src` 零命中；`pnpm test tests/lib` 仍绿。负控 = 把任一注释改回旧路径 → 同一命令红；还原 → 绿。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/accounting/ledger.ts`、`packages/company-pack/src/lib/accounting/signoff.ts`、`packages/company-pack/src/lib/presence/presence-status.ts`、`packages/company-pack/src/client/cultivation/cultivation-data.ts`、`packages/company-pack/src/host/cultivation/cultivation.ts`、`tests/repo/docs/live-pointer-paths.spec.ts`
+- 红：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts -t 源码注释`（5 条旧指针：3 lib + 2 cultivation）
+- 绿：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts -t 源码注释`（1 passed / 5 skipped）
+- 提交：commit 713acc60

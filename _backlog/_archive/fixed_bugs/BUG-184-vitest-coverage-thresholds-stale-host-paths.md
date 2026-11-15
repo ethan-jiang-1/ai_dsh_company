@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-15
 ---
 
 # BUG-184：vitest 覆盖率阈值仍指向搬移前的 5 个 host 路径，阈值静默失效
 
-> 严重级别：P2（次要）｜发现：2026-11-15｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-15｜状态：已修｜修复：2026-11-16｜审查：agent（独立盲审）— 2 blocker（typecheck 规则类型互斥；归档后 bug-coverage 缺具名守卫）已修复；建议 S1–S8 全部处置（根配置覆盖、tools coveredBy 补 coverage-ratchet、tests/README 同 diff、阈值判据口径、负例过滤、词表全量核对、计数校正、删「未接 N」数字）
 >
-> **关联**：[探索卡 Round 92](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M4（静默弱化）。
-> **留痕**：Note（本批共用；落地同 diff 写 `notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md`）。
+> **关联**：[探索卡 Round 92](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 子面 M4（静默弱化）。
+> **留痕**：Note [2026-11-16-move-side-effects-and-live-pointers.md](../../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)（本批共用）。
 
 ## 症状
 
@@ -51,9 +51,16 @@ pnpm test tests/repo/budget/vitest-coverage-thresholds.spec.ts
 ## 修复方案与范围
 
 - 把 5 个键改成现行路径：`src/host/workspace/workspace-resolution.ts`、`src/host/run-bundle/runtime-guard.ts`、`src/host/commands/deliverables-command.ts`、`src/host/ledger/catalog-state.ts`、`src/host/ledger/presented-ledger.ts`。
-- 防复发：新增 keyless spec（`tests/repo/budget/vitest-coverage-thresholds.spec.ts`）断言每个键命中文件、落在 `coverage.include` 的自写源面内、同时给 statements 与 branches、阈值表非空。
+- 防复发：新增 keyless spec（`tests/repo/budget/vitest-coverage-thresholds.spec.ts`）断言每个键命中文件、落在 pack 源码面（`packages/company-pack/src/`）内、同时给 statements 与 branches、阈值表非空。
 - 明确不改：不调整任何 threshold 数值，不扩大/缩小 include 面，不动 vendor。
 
 ## 已修判定
 
 `pnpm test tests/repo/budget/vitest-coverage-thresholds.spec.ts` 退出 0；`node runtime/tmp/c11/vitest-threshold-check.mjs` 退出 0（`missing=0`）。负控 = 把一条键临时改回旧扁平路径 → 同一命令红；还原 → 绿。
+
+## 修复证据
+
+- 改动面：`vitest.config.ts`、`tests/repo/budget/vitest-coverage-thresholds.spec.ts`
+- 红：`pnpm test tests/repo/budget/vitest-coverage-thresholds.spec.ts`（5 个阈值键 MISSING、spec 红）
+- 绿：`pnpm test tests/repo/budget/vitest-coverage-thresholds.spec.ts`（exit 0；独立探针 missing=0）
+- 提交：commit 713acc60

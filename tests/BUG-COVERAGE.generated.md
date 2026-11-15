@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 181 |
-| 有具名守卫 | 76 |
+| 已修卡 | 189 |
+| 有具名守卫 | 84 |
 | 无具名守卫 | 105 |
-| 覆盖率 | 42.0% |
+| 覆盖率 | 44.4% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -202,3 +202,11 @@
 | 178 | 2026-11-14 | tests/checks/fix-evidence.test.mjs:194 |
 | 181 | 2026-11-14 | tests/checks/fix-evidence.test.mjs:254；tests/host/contract/structure-agreement.spec.ts:34；tests/lib/docs/markdown-shape.property.spec.ts:85 |
 | 182 | 2026-11-14 | tests/checks/fix-evidence.test.mjs:236 |
+| 184 | 2026-11-15 | tests/repo/budget/vitest-coverage-thresholds.spec.ts:47 |
+| 185 | 2026-11-15 | tests/repo/structure/built-path-literals.spec.ts:70 |
+| 186 | 2026-11-15 | tests/repo/budget/asset-lanes.spec.ts:104 |
+| 187 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:65 |
+| 188 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:73 |
+| 189 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:80 |
+| 190 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:87 |
+| 191 | 2026-11-15 | tests/repo/docs/typecheck-coverage-claim.spec.ts:52 |

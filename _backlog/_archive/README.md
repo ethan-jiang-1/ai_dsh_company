@@ -21,6 +21,14 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-184（已修）](fixed_bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md) | 已修：vitest 5 个 host 覆盖率阈值键指向搬移前路径、阈值静默失效；改现行路径 + 键命中 spec | 2026-11-16 |
+| [BUG-185（已修）](fixed_bugs/BUG-185-replay-lane-stale-built-presence-import.md) | 已修：replay 动态 import 旧 built presence 路径（MODULE_NOT_FOUND）；指到 presence/presence.js + 构建字面量 spec | 2026-11-16 |
+| [BUG-186（已修）](fixed_bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md) | 已修：pre-push 面规则缺 src/lib/tools，搬移面零真入口；src/lib→replay + `coveredBy` 申报 + 覆盖面 spec | 2026-11-16 |
+| [BUG-187（已修）](fixed_bugs/BUG-187-module-comments-stale-spec-paths.md) | 已修：5 条源码注释仍指搬移前 spec 路径（含 2 处 cultivation 同类补漏）；活指针 spec | 2026-11-16 |
+| [BUG-188（已修）](fixed_bugs/BUG-188-implemented-note-ui-surface-stale-command.md) | 已修：implemented Note 的 ui-surface 命令指向 tests/host 旧家；改 tests/ui + 活指针 spec | 2026-11-16 |
+| [BUG-189（已修）](fixed_bugs/BUG-189-implemented-note-generic-english-stale-path.md) | 已修：implemented Note 指向已退役 generic-english spec；改 content-english + 活指针 spec | 2026-11-16 |
+| [BUG-190（已修）](fixed_bugs/BUG-190-candidate-scan-comment-stale-spec.md) | 已修：audit 注释指向不存在的 candidate-scan-labels spec；改 assignments + 活指针 spec | 2026-11-16 |
+| [BUG-191（已修）](fixed_bugs/BUG-191-typecheck-coverage-counts-stale-docs.md) | 已修：两份 live 文档手写覆盖分数停在搬移前；改 include 减 exclude 公式 + 计数声明 spec | 2026-11-16 |
 | [2026-11-15-src-tests-dir-alignment.md](settled_issues/2026-11-15-src-tests-dir-alignment.md) | 已结；host 两条源侧例外清零（fs/logging 各配测试目录）、`src/lib` 按域分八组且 `tests/lib` 同名镜像、mirror 升级为三处目录名集合相等（249 files / 2118 tests、verify ALL PASS、四面 tsc 绿）；去向 = [Note](../../notes/implemented/2026-11-15-src-tests-dir-alignment.md) | 2026-11-15 |
 | [2026-11-15-tests-tree-axis.md](settled_issues/2026-11-15-tests-tree-axis.md) | 已结；镜像成为断言（`tests/repo/structure/` 下的 set-equality + 五条例外防腐化）、`tests/repo` 35 个 spec 换 owner 轴分六组、三份 README 去组数枚举并补 host 组表两行（245 files / 2099 tests、verify ALL PASS、四面 tsc 绿）；去向 = [Note](../../notes/implemented/2026-11-15-tests-tree-axis.md) | 2026-11-15 |
 | [BUG-176（已修）](fixed_bugs/BUG-176-json-fence-example-extracted.md) | 已修：示例围栏里的 json 块被当账本；顶层围栏块成为唯一来源 | 2026-11-14 |

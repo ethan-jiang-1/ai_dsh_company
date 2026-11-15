@@ -1,3 +1,4 @@
+// 负例留证 2026-11-16：删掉 SURFACE_RULES 的 `src/lib/** → replay` 规则 → 「每个改动面都有证据（BUG-186）」与「src/lib 搬移会触发 replay」红，dry-run 退回「未分类」；还原 → 绿。
 import { describe, expect, it } from 'vitest'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -49,6 +50,7 @@ const SURFACE_SAMPLES = [
   'snapshots/README.md',
   'tests/repo/budget/asset-lanes.spec.ts',
   'tools/lib/asset-lanes.mjs',
+  'vitest.config.ts',
 ]
 
 describe('资产 lane 注册表（空间完备）', () => {
@@ -99,7 +101,7 @@ describe('资产 lane 注册表（空间完备）', () => {
     }
   })
 
-  it('每个改动面都有证据：surface lane 或显式无条件覆盖（选择器不再静默返回空）', () => {
+  it('每个改动面都有证据：surface lane 或显式无条件覆盖（选择器不再静默返回空，BUG-186）', () => {
     const unclassified = SURFACE_SAMPLES.filter(sample => {
       const { assets, covered } = selectSurfaces([sample])
       return assets.length === 0 && covered.length === 0
@@ -128,6 +130,7 @@ describe('资产 lane 注册表（空间完备）', () => {
 
   it('coveredBy 只引用 hook 真跑的无条件步骤（申报一条不存在的步骤 = 假豁免）', () => {
     const hook = readFileSync(join(ROOT, '.githooks/pre-push'), 'utf8')
+    const executed = hook.split('\n').filter(line => !/^\s*#/.test(line)).join('\n')
     const command: Record<string, string> = {
       verify: 'node checks/run-gates.mjs',
       typecheck: 'tsc -p tsconfig.test-harness.json',
@@ -137,12 +140,15 @@ describe('资产 lane 注册表（空间完备）', () => {
       'test:checks': 'pnpm -s test:checks',
       'coverage-ratchet': 'node checks/audit/coverage-ratchet.mjs',
     }
+    // 词表与 hook 一一对应：不只查被引用的步骤，否则删掉 hook 里的 lint/dup 也不会红。
+    for (const step of UNCONDITIONAL_STEPS) {
+      const expected = command[step]
+      expect(expected, `UNCONDITIONAL_STEPS 里的「${step}」缺 hook 命令映射`).toBeTruthy()
+      expect(executed, `「${step}」在 .githooks/pre-push 的可执行行里找不到——词表与 hook 已漂`).toContain(expected)
+    }
     for (const rule of SURFACE_RULES) {
       for (const step of rule.coveredBy ?? []) {
         expect(UNCONDITIONAL_STEPS, `${rule.globs.join(',')} 的 coveredBy「${step}」不在词表`).toContain(step)
-        const expected = command[step]
-        expect(expected, `coveredBy「${step}」缺 hook 命令映射`).toBeTruthy()
-        expect(hook, `coveredBy「${step}」在 .githooks/pre-push 里找不到对应命令——豁免必须有真步骤承接`).toContain(expected)
       }
     }
   })
