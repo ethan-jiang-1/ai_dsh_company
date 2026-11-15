@@ -1,11 +1,17 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：pre-push 自动（`.githooks/pre-push` 传 `--stdin <file>`）；也可手动 `node checks/pre-push-surfaces.mjs --dry-run`。
+// 何时跑：pre-push 自动（`.githooks/pre-push` 传 `--stdin <file>`）；也可手动
+//   `node checks/pre-push-surfaces.mjs --dry-run`，或给单点改动面试跑：
+//   `node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/src/lib/presence/presence.ts`。
 //
 // 为什么：真入口证据（client 装配 / preset 挂载 / 回放 / 进程级写面）不在任何 required lane 里，
 // 只能靠人记得跑（2026-11-13 研究：33 个冒烟只有 6 条在 push 时自动跑；发布验收曾静默红）。
 // 本脚本把「改到哪个面就必须跑哪条真入口检查」变成 push 前的机械动作：规则住
 // `tools/lib/asset-lanes.mjs` 的 SURFACE_RULES（一处事实一个家），这里只做取范围 + 匹配 + 跑。
+//
+// 没有匹配到 asset ≠ 无话可说（BUG-186）：规则里没有额外 lane 的面用 `coveredBy` 申报「由哪条
+// 无条件步骤覆盖」，本脚本逐条打印；两者都没有的路径打印「未分类」。覆盖面完备由
+// `tests/repo/budget/asset-lanes.spec.ts` 机械判红——这里只负责不静默。
 //
 // 取范围不猜 base：pre-push hook 自带 `<local ref> <local sha> <remote ref> <remote sha>` 四元组。
 // 三种形状各有一条明确语义（2026-11-14，BUG-158）：
@@ -95,9 +101,31 @@ function changedPaths() {
   return [...paths]
 }
 
-const { assets, matches } = selectSurfaces(changedPaths())
+const { assets, matches, covered, unseen } = selectSurfaces(
+  valueOf('--paths') === undefined
+    ? changedPaths()
+    : (valueOf('--paths') ?? '').split(',').map(path => path.trim()).filter(Boolean),
+)
+
+const coveredByRule = new Map()
+for (const entry of covered) {
+  const key = `${entry.glob}\u0000${entry.coveredBy.join('+')}`
+  if (!coveredByRule.has(key)) coveredByRule.set(key, { ...entry, count: 0 })
+  coveredByRule.get(key).count += 1
+}
+for (const entry of coveredByRule.values()) {
+  const extra = entry.count > 1 ? `（另有 ${String(entry.count - 1)} 个同面文件）` : ''
+  const rule = entry.why ? `；${entry.why}` : ''
+  console.log(`pre-push surfaces: 改了 ${entry.path}${extra}（命中 ${entry.glob}${rule}）→ 无额外 lane；证据 = 无条件 ${entry.coveredBy.join(' + ')}`)
+}
+if (unseen.length > 0) {
+  console.log(`pre-push surfaces: 未分类改动面（既没有 surface 规则，也没有 coveredBy 申报）——新目录要登记 SURFACE_RULES：${unseen.join('、')}`)
+}
+
 if (assets.length === 0) {
-  console.log('pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/asset-lanes.mjs SURFACE_RULES）')
+  console.log(covered.length > 0
+    ? 'pre-push surfaces: 本次没有额外真入口（命中面由无条件步骤覆盖，见上）'
+    : 'pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/asset-lanes.mjs SURFACE_RULES）')
   process.exit(0)
 }
 

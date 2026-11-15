@@ -307,6 +307,23 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     expect(problems).not.toContain('issues/ready.md')
   })
 
+  // 2026-11-16：待落地的「去向必填」与「落地证据」分支（门禁新增逻辑必须有正负例，避免覆盖率棘轮
+  //   靠豁免续命）。生效日 opened ≥ 2026-11-14 才要求 ## 落地证据。
+  it('requires a destination and executable landing evidence on ready cards opened on/after 2026-11-14', () => {
+    const ready = (id: string, destLine: string, evidence = '', acceptance = '- [ ] `pnpm test tests/host/demo.spec.ts`') =>
+      `---\nstatus: 待落地\nopened: 2026-11-14\n---\n\n# Issue ${id}\n\n> 立卡：2026-11-14 ｜ 状态：待落地 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：否\n${destLine}\n\n## 验收标准\n\n${acceptance}\n${evidence}`
+    put('issues/no-dest.md', ready('nodest', ''))
+    put('issues/no-evidence.md', ready('noev', '> **结论/去向**：note — `notes/implemented/x.md`'))
+    put('issues/prose-evidence.md', ready('prose', '> **结论/去向**：note — `notes/implemented/x.md`', '\n## 落地证据\n\n改了实现，跑过测试。\n'))
+    put('issues/prose-acceptance.md', ready('prose-acceptance', '> **结论/去向**：note — `notes/implemented/x.md`', '\n## 落地证据\n\n`pnpm test tests/host/demo.spec.ts`\n', '- [ ] 测试通过'))
+    put('issues/README.md', '# Index\n\n' + ['no-dest.md', 'no-evidence.md', 'prose-evidence.md', 'prose-acceptance.md'].map(name => `[material](<${name}>)`).join('\n') + '\n')
+    const problems = check(root).join('\n')
+    expect(problems).toContain('_backlog/issues/no-dest.md:1 「待落地」卡缺去向值')
+    expect(problems).toContain('「待落地」+ 去向 note 缺非空 ## 落地证据')
+    expect(problems).toContain('## 落地证据 没有可执行标记')
+    expect(problems).toContain('「待落地」卡的 ## 验收标准 没有可执行标记')
+  })
+
   // 2026-11-02（五道门）：缺陷轨两张门票——修复就绪/修复已落地缺判据 = 门没造好。
   // 2026-11-15（bug-fix 方法显性化）：门票还要求 复现 / 根因与证据 / 失败类与同类排查 在场——
   //   为什么：修复就绪 = 自授权例外，卡是唯一的事前证据面；只写判据会让「没复现 / 猜根因 / 没扫同类」

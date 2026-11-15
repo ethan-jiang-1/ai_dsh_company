@@ -297,9 +297,26 @@ export const ASSETS = [
 export const FAST = ['workflow-contract', 'present-catalog', 'company-root-process', 'snapshot-motion']
 
 /**
- * 按面触发规则：改到 globs 命中的路径时，pre-push 跑 assets。
+ * pre-push hook 每次都跑的无条件步骤（封闭词表；面规则可以据此声明「不需要额外 lane」）。
+ *
+ * 为什么要有这张表：选择器对「没有规则命中」的改动面静默返回空集——「忘了登记新目录」与
+ * 「有意不跑额外检查」长得一模一样（2026-11-15 三批搬移后 src/lib、tools 零命中，replay 的
+ * 坏 import 因此活到手工跑才暴露，BUG-186）。把「由哪条无条件步骤覆盖」写成显式值，
+ * `tests/repo/budget/asset-lanes.spec.ts` 才能机械检查「每个改动面都有证据」。
+ * 词表与 `.githooks/pre-push` 一一对应（spec 读 hook 原文核对；改 hook 不改进表 = 红）。
+ */
+export const UNCONDITIONAL_STEPS = ['verify', 'typecheck', 'lint', 'dup', 'smoke:fast', 'test:checks', 'coverage-ratchet']
+
+/**
+ * 按面触发规则：改到 globs 命中的路径时，pre-push 跑 assets；没有额外 lane 的面必须写
+ * `coveredBy`（取自 UNCONDITIONAL_STEPS）+ `why`，不许留空。
+ *
+ * 为什么有两种证据而不是只有 assets：选择器对未命中**静默返回空**，于是「这个面不需要额外
+ * 真入口」与「这个面忘了登记」同形（BUG-186：src/lib 搬移没有触发 replay）。`coveredBy`
+ * 让豁免也变成登记项：每条都要能对到 hook 真跑的无条件步骤，spec 核对覆盖面完备。
  * 规则从窄到宽排列；同一 asset 被多条命中只跑一次。
- * 成本纪律：每条规则的 assets 合计应 ≤ 30s，否则放 weekly 而不是 push。
+ * 成本纪律：assets 合计应 ≤ 30s；更贵的真入口（company-entry ~1–2 min、release 分钟级）
+ * 留在 weekly / 手动档，用 coveredBy 写清「为什么不进 push」，不许把慢档塞进 hook。
  */
 export const SURFACE_RULES = [
   {
@@ -317,10 +334,46 @@ export const SURFACE_RULES = [
     assets: ['replay'],
     why: '只读注入面改动 → 合成回放场景的注入/世界判据',
   },
+  {
+    globs: ['packages/company-pack/src/lib/**'],
+    assets: ['replay'],
+    why: 'lib 是回放车道的读模型来源（replay 直接 import presence 构建产物）；源码分组搬移会在这里炸（BUG-185）',
+  },
+  {
+    globs: ['packages/company-pack/src/index.ts', 'packages/company-pack/cordis.patch.yml'],
+    assets: ['preset'],
+    why: '包入口 / bundle 组合行改动 → preset 真挂载（注册面/组合行的完成定义）',
+  },
+  {
+    globs: ['packages/company-pack/src/host/**'],
+    coveredBy: ['smoke:fast', 'coverage-ratchet', 'typecheck', 'verify'],
+    why: 'host 由 fast lane 的 present-catalog / company-root-process（直接加载 host src）+ 全量 test + typecheck 覆盖；真安装档 company-entry 要 _dist tarball 且 ~1–2 min（weekly），不进 push',
+  },
+  {
+    globs: ['tools/**', 'checks/**'],
+    coveredBy: ['test:checks', 'verify'],
+    why: '工具/门禁面的证据 = 门禁自测 test:checks + 结构门禁 verify；盘上没有更便宜的真入口',
+  },
+  {
+    globs: ['tests/**'],
+    coveredBy: ['coverage-ratchet'],
+    why: '测试树改动由 pre-push 的全量 vitest（coverage-ratchet = test + 覆盖率棘轮）覆盖；再加 lane = 同一检查跑两遍',
+  },
+  {
+    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', '.agents/**', 'run/**', 'probes/**', 'snapshots/**'],
+    coveredBy: ['verify'],
+    why: '文档/指针/技能/运行配置/探针/快照 = 结构门禁 verify 的射程；探针与真模型档按头注手动跑',
+  },
+  {
+    globs: ['package.json', 'pnpm-lock.yaml', 'tsconfig*.json', '.github/**', '.githooks/**', 'runtime/README.md', 'packages/company-pack/src/README.md', 'vendor/**'],
+    coveredBy: ['verify', 'typecheck'],
+    why: '根配置/锁文件/CI/hook/README/vendor 指针 = verify + typecheck 的射程；vendor 内容只读（双门禁），没有独立真入口',
+  },
 ]
-// 为什么只有三条：fast lane 已经每次 push 都跑（workflow-contract / present-catalog /
-// company-root-process / snapshot-motion），surface 再列它们 = 同一检查跑两遍。surface 只收
-// 「不在 fast 里、但改到对应面必须跑」的真入口证据；成本纪律同文件头注。
+// 为什么后三条用 coveredBy 而不是 assets：它们的证据本来就是 hook 每次都跑的步骤（fast lane /
+// verify / test:checks / coverage-ratchet），再列一次 = 同一检查跑两遍；而昂贵的真入口
+// （company-entry 要 _dist tarball 且 ~1–2 min、release 分钟级）属 weekly/手动档，塞进 push
+// 违背成本边界。写下 `coveredBy` 是为了让「有意不进 push」不再与「忘了登记」同形。
 
 /** 把 glob 转成锚定的正则；支持 `**`（跨段）、`*`（段内）、`?`（单字符）。 */
 export function globToRegExp(glob) {
@@ -357,27 +410,40 @@ export function matchesAny(globs, path) {
 }
 
 /**
- * 从变更路径选出要跑的 surface 资产。
- * @returns {{assets:string[], matches:{asset:string, glob:string, path:string, why?:string}[]}}
+ * 从变更路径选出要跑的 surface 资产，并返回「显式豁免」与「完全未分类」两种结果。
+ * @param {string[]} paths 变更路径。
+ * @param {typeof SURFACE_RULES} [rules] 规则表（spec 注入用）。
+ * @returns {{
+ *   assets:string[],
+ *   matches:{asset:string, glob:string, path:string, why?:string}[],
+ *   covered:{glob:string, path:string, coveredBy:string[], why?:string}[],
+ *   unseen:string[],
+ * }}
  */
 export function selectSurfaces(paths, rules = SURFACE_RULES) {
   const assets = []
   const matches = []
+  const covered = []
   const seen = new Set()
   for (const rule of rules) {
     for (const path of paths) {
       if (!matchesAny(rule.globs, path)) continue
       const glob = rule.globs.find(entry => globToRegExp(entry).test(path))
-      for (const asset of rule.assets) {
+      for (const asset of rule.assets ?? []) {
         const key = `${asset}\u0000${path}`
         if (seen.has(key)) continue
         seen.add(key)
         matches.push({ asset, glob, path, ...(rule.why ? { why: rule.why } : {}) })
         if (!assets.includes(asset)) assets.push(asset)
       }
+      if (rule.coveredBy && rule.coveredBy.length > 0) {
+        covered.push({ glob, path, coveredBy: [...rule.coveredBy], ...(rule.why ? { why: rule.why } : {}) })
+      }
     }
   }
-  return { assets, matches }
+  const classified = new Set([...matches.map(match => match.path), ...covered.map(entry => entry.path)])
+  const unseen = paths.filter(path => !classified.has(path))
+  return { assets, matches, covered, unseen }
 }
 
 /** 按名字取注册项；未登记返回 undefined（调用方据此报错，不猜）。 */

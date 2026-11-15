@@ -277,7 +277,7 @@
 ## P1 第一片（content/generic）
 
 - generic 6/6 英文；heading 与手册断言同步英文。
-- 新增 tests/content/generic-english.spec.ts；注入中文 → 红，还原 → 绿。
+- 新增 tests/content/content-english.spec.ts；注入中文 → 红，还原 → 绿。
 - collaboration 英文膨胀超 T2 6KB，压缩到 6141B；content-manifest 仍过。
 - 全量 1657 tests；preset-smoke ALL PASS；verify ALL PASS。
 

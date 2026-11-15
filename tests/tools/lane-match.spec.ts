@@ -43,7 +43,41 @@ describe('lane 匹配纯逻辑（按面触发的判据）', () => {
     ])
   })
 
-  it('无命中返回空（不触发 = 明确打印，不是猜）', () => {
-    expect(selectSurfaces(['README.md'], [{ globs: ['src/**'], assets: ['a'], why: 'src' }])).toEqual({ assets: [], matches: [] })
+  it('无命中返回空 assets/matches/covered，并把路径落 unseen（不触发 = 明确打印，不是猜）', () => {
+    expect(selectSurfaces(['README.md'], [{ globs: ['src/**'], assets: ['a'], why: 'src' }])).toEqual({
+      assets: [],
+      matches: [],
+      covered: [],
+      unseen: ['README.md'],
+    })
+  })
+
+  it('coveredBy 规则产出显式豁免，且不重复产出 asset', () => {
+    const rules = [{ globs: ['docs/**'], coveredBy: ['verify'], why: 'docs' }]
+    const { assets, matches, covered, unseen } = selectSurfaces(['docs/index.md'], rules)
+    expect(assets).toEqual([])
+    expect(matches).toEqual([])
+    expect(covered).toEqual([{ glob: 'docs/**', path: 'docs/index.md', coveredBy: ['verify'], why: 'docs' }])
+    expect(unseen).toEqual([])
+  })
+
+  it('同一条规则里的 asset 与 coveredBy 各走各的（资产仍去重）', () => {
+    const rules = [{ globs: ['src/**'], assets: ['a'], coveredBy: ['verify'], why: 'both' }]
+    const { assets, covered, unseen } = selectSurfaces(['src/x.ts'], rules)
+    expect(assets).toEqual(['a'])
+    expect(covered).toHaveLength(1)
+    expect(unseen).toEqual([])
+  })
+
+  it('规则没写 why 时不造 why 字段（可选字段不虚构）', () => {
+    const { matches, covered } = selectSurfaces(['src/x.ts'], [{ globs: ['src/**'], assets: ['a'], coveredBy: ['verify'] }])
+    expect(matches[0]).toEqual({ asset: 'a', glob: 'src/**', path: 'src/x.ts' })
+    expect(covered[0]).toEqual({ glob: 'src/**', path: 'src/x.ts', coveredBy: ['verify'] })
+  })
+
+  it('coveredBy 空数组不算豁免（不产出空 covered 行，路径落 unseen）', () => {
+    const { covered, unseen } = selectSurfaces(['src/x.ts'], [{ globs: ['src/**'], coveredBy: [], why: 'empty' }])
+    expect(covered).toEqual([])
+    expect(unseen).toEqual(['src/x.ts'])
   })
 })

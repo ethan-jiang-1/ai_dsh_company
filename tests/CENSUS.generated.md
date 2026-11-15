@@ -10,7 +10,7 @@
 | 冒烟 | 30 |
 | 探针 | 59 |
 | 结构门禁 | 74 |
-| keyless spec 文件 | 249 |
+| keyless spec 文件 | 253 |
 | fast lane | 4 |
 | surface lane | 6 |
 | weekly lane | 21 |
@@ -46,7 +46,7 @@
 | snapshot-motion | classic | fast + weekly | 会话持久化 | example | 2 |
 | client-load | browser | surface + weekly | client UI | example | 6 |
 | preset | classic | surface + weekly | 配置组合 | example | 8 |
-| replay | classic | surface + weekly | 会话持久化 | example | 9 |
+| replay | classic | surface + weekly | 会话持久化 | example | 11 |
 | company-entry | classic | weekly | 配置组合 | example | 2 |
 | concurrent-home | classic | weekly | 子进程并发 | example | 1 |
 | external-workspace | classic | weekly | 子进程并发 | example | 1 |
@@ -79,7 +79,7 @@
 | board-drift-probe | browser-visual | client UI | example | 2 |
 | browser-behavior-probe | browser-visual | client UI | example | 0 |
 | budget-panel-probe | browser-visual | client UI | example | 0 |
-| cdp-probe | browser-visual | client UI | example | 4 |
+| cdp-probe | browser-visual | client UI | example | 5 |
 | cultivation-ux-scenarios-probe | browser-visual | client UI | example | 0 |
 | cultivation-ux-walkthrough-probe | browser-visual | client UI | example | 1 |
 | dag-midflight-probe | browser-visual | client UI | example | 0 |
