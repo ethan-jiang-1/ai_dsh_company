@@ -7,7 +7,7 @@
 ## 决定
 
 1. **lane 注册表住 `tools/lib/asset-lanes.mjs`，不是卡里计划的 checks/lanes/lanes.mjs。**
-   理由：`tests/repo/layering.spec.ts` 禁止 spec import `checks|probes|tools` 下的驱动脚本，
+   理由：`tests/repo/structure/layering.spec.ts` 禁止 spec import `checks|probes|tools` 下的驱动脚本，
    而注册表必须被 spec 机械校验；`tools/lib/` 是唯一允许的 keyless seam。注册表是纯数据 + 纯函数，
    import 无副作用、不起进程、不读盘。
 2. **fast 成员从注册表派生（仍是 6 条），surface 只收 fast 之外的三条真入口。**
@@ -25,7 +25,7 @@
    CI 挂在 `fresh-clone.yml` 的 macOS 全量 setup 之后（每周一 + 手动）。首几周允许红——那是环境诊断信号，
    处置是修环境或把资产标 `ciSafe:false` + 理由，不删资产。skip 清单每次打印：资产可以手动，但不许静默消失。
 5. **空间完备做成 spec，而不是靠自觉。**
-   `tests/repo/asset-lanes.spec.ts` 双向校验「盘上每个冒烟都登记 / 注册表每个名字都有文件」，
+   `tests/repo/budget/asset-lanes.spec.ts` 双向校验「盘上每个冒烟都登记 / 注册表每个名字都有文件」，
    并要求无 lane 的条目必须写 `manualReason`、fast 固定 6 条。这是研究 M1「后缀即层」在本仓的可判形状。
 
 
@@ -77,7 +77,7 @@
 
 | 判据 | 命令 | 原话 |
 |---|---|---|
-| 空间完备负例（红） | 临时建 checks/lanes/zz-unregistered.mjs + `pnpm vitest run tests/repo/asset-lanes.spec.ts` | `AssertionError: 这些 checks/lanes/*.mjs 没进 tools/lib/asset-lanes.mjs——新资产必须选 lane（或写 manualReason）: expected [ 'zz-unregistered' ] to deeply equal []` |
+| 空间完备负例（红） | 临时建 checks/lanes/zz-unregistered.mjs + `pnpm vitest run tests/repo/budget/asset-lanes.spec.ts` | `AssertionError: 这些 checks/lanes/*.mjs 没进 tools/lib/asset-lanes.mjs——新资产必须选 lane（或写 manualReason）: expected [ 'zz-unregistered' ] to deeply equal []` |
 | 还原（绿） | 删除临时文件 + 重跑 | `Tests 5 passed (5)` |
 | 按面选面（命中） | `node checks/pre-push-surfaces.mjs --stdin /tmp/refs-client --dry-run`（真实历史 commit `d31d8366` 的 parent..commit） | `因为改了 packages/company-pack/src/client/data/use-company-data.ts（命中 packages/company-pack/src/client/**；client 装配/入口改动 → 真页面零挂载失败）→ client-load-smoke` |
 | 按面选面（不命中） | 同上换 docs-only 范围 | `本次未触发面级检查（规则表 = tools/lib/asset-lanes.mjs SURFACE_RULES）` |
@@ -97,15 +97,15 @@
 
 | census 漂移（红） | 手改 `tests/CENSUS.generated.md` 的「冒烟 32 → 99」后跑 spec | `AssertionError: census 是生成物：运行 node tools/test-census.mjs --write`；重新生成 → `Tests 3 passed` |
 | census 一致性（绿） | `node tools/test-census.mjs --write` | `已写 144 行（冒烟 32 / 探针 69 / 门禁 71 / spec 246；未分类 69 = 全部探针）` |
-| 探针登记 | `pnpm vitest run tests/repo/test-census.spec.ts` | 3 passed（探针双向一致、失败类词表、冒烟 0 未分类） |
+| 探针登记 | `pnpm vitest run tests/repo/budget/test-census.spec.ts` | 3 passed（探针双向一致、失败类词表、冒烟 0 未分类） |
 
 ## 状态事实与载体
 
 - 事实：**资产 lane 的唯一家 = lane 注册表**；pre-push 按面补跑；每周全量 keyless。
 - 唯一入口：`tools/lib/asset-lanes.mjs`（lane 成员 + 规则 + 纯匹配）、`checks/pre-push-surfaces.mjs`（取范围 + 跑）、
-  `checks/lanes/keyless-lane.mjs`（全量）、`tests/repo/asset-lanes.spec.ts`（空间完备门）；
+  `checks/lanes/keyless-lane.mjs`（全量）、`tests/repo/budget/asset-lanes.spec.ts`（空间完备门）；
   执行下限的唯一入口 = `checks/audit/coverage-ratchet.mjs` + `tools/lib/coverage-baseline.mjs` + `tests/support/coverage-baseline.json`；
-  失败类决策表 = `tests/failure-classes.md`；账本三列 = `close-out-definition` / `agent-note-definition` skill；盘子 = `tools/test-census.mjs` → `tests/CENSUS.generated.md`（生成物），一致性 = `tests/repo/test-census.spec.ts`。
+  失败类决策表 = `tests/failure-classes.md`；账本三列 = `close-out-definition` / `agent-note-definition` skill；盘子 = `tools/test-census.mjs` → `tests/CENSUS.generated.md`（生成物），一致性 = `tests/repo/budget/test-census.spec.ts`。
 - 读载体：`tests/README.md`「按面触发」一段、`checks/README.md` quick-select、`.githooks/pre-push` 头注、
   `checks/INDEX.generated.md`（生成物）。
 - 一致性判据：`fast-lane.mjs` 从注册表派生；spec 双向校验；weekly 成员 = `laneOf('weekly')` 的 classic 子集。

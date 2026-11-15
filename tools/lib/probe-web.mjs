@@ -6,7 +6,7 @@
 // 为什么收成模块：每个探针各抄一份「起 web → 等 banner → 取 cookie → 发 client-request」，
 //   同一段启动代码在 24 个文件里漂移（改一处 banner 正则要爬 24 遍）。
 //
-// **为什么 spawn/fetch 一律注入、本模块零 import**：`tests/repo/layering.spec.ts` 把
+// **为什么 spawn/fetch 一律注入、本模块零 import**：`tests/repo/structure/layering.spec.ts` 把
 //   `tools/lib/` 定为 keyless 纯逻辑缝（禁 child_process/http 等 builtin、禁 spawn/fetch 调用）。
 //   本模块只造参数、解析 banner、拼请求体——真进程/真网络由调用方（probes/，本来就是驱动层）注入。
 //   这不是妥协：spec 因此能直接 import 本模块做形状断言（卡内验收第 3 行）。

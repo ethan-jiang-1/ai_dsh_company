@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：新增/归档缺陷卡、加/删 BUG 守卫后跑 --write；不一致由 tests/repo/bug-coverage.spec.ts 在 pnpm test 里报红。
+// 何时跑：新增/归档缺陷卡、加/删 BUG 守卫后跑 --write；不一致由 tests/repo/budget/bug-coverage.spec.ts 在 pnpm test 里报红。
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'

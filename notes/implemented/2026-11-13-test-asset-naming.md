@@ -70,7 +70,7 @@
 
 - 事实：测试树按**被测面**分区（product 五面 + 仓库六面 + support/fixtures）；不再有 meta 桶 tests/harness。
 - 唯一入口：`tests/README.md` 的「分区」表（导航）+ 各目录本身（无集中清单）。
-- 类型面：`tsconfig.test-harness.json` 的 include = 六个面 + `tests/support/temp-env.ts`；exclude = `tests/repo/pack-exports.spec.ts`、`tests/contract/**`。
+- 类型面：`tsconfig.test-harness.json` 的 include = 六个面 + `tests/support/temp-env.ts`；exclude = `tests/repo/pack/pack-exports.spec.ts`、`tests/contract/**`。
 - 门禁：`nav-enumeration` 的锚改为 `## 分区`；`navigation-assets.spec` 点名的领域列表同步为新六面。
 - 环境坏法：相对导入按"少一层"机械改，嵌套目录同样成立；`import.meta.url` 深度根不在导入语法内，靠 test 红抓。
 

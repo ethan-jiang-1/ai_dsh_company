@@ -1,6 +1,6 @@
 # 测试资产盘子（生成物，勿手改）
 
-> 生成 = `node tools/test-census.mjs --write`；一致性门 = `tests/repo/test-census.spec.ts`（不一致即红）。
+> 生成 = `node tools/test-census.mjs --write`；一致性门 = `tests/repo/budget/test-census.spec.ts`（不一致即红）。
 > 数据源 = `tools/lib/asset-lanes.mjs`（登记 + lane）+ 盘上目录计数；失败类词表 = `tests/failure-classes.md`。
 
 ## 汇总
@@ -10,7 +10,7 @@
 | 冒烟 | 30 |
 | 探针 | 59 |
 | 结构门禁 | 75 |
-| keyless spec 文件 | 244 |
+| keyless spec 文件 | 245 |
 | fast lane | 4 |
 | surface lane | 6 |
 | weekly lane | 21 |

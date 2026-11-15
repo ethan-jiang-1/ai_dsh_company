@@ -1,5 +1,6 @@
 # _archive/ · 离开活跃区
 
+- [2026-11-15-tests-tree-axis.md](settled_issues/2026-11-15-tests-tree-axis.md) — 测试树分轴：镜像断言 + `tests/repo` 六个 owner 子目录 + 去组数枚举；去向 = [Note](../../notes/implemented/2026-11-15-tests-tree-axis.md)。
 - [2026-11-13-suffix-lane-alignment.md](settled_issues/2026-11-13-suffix-lane-alignment.md) — spec/e2e/entry/checks 四层 + 四条命令；去向 = note。
 - [2026-11-13-test-asset-naming-contract.md](settled_issues/2026-11-13-test-asset-naming-contract.md) — 目标树 + 资产正名 + naming-contract 门禁；去向 = note。
 - [2026-11-13-test-asset-loop.md](settled_issues/2026-11-13-test-asset-loop.md) — 测试资产自校正系统 B/C/A（lane 注册表/按面 pre-push/覆盖率棘轮/失败类表/census）；去向 = note。
@@ -19,6 +20,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-15-tests-tree-axis.md](settled_issues/2026-11-15-tests-tree-axis.md) | 已结；镜像成为断言（`tests/repo/structure/` 下的 set-equality + 五条例外防腐化）、`tests/repo` 35 个 spec 换 owner 轴分六组、三份 README 去组数枚举并补 host 组表两行（245 files / 2099 tests、verify ALL PASS、四面 tsc 绿）；去向 = [Note](../../notes/implemented/2026-11-15-tests-tree-axis.md) | 2026-11-15 |
 | [BUG-176（已修）](fixed_bugs/BUG-176-json-fence-example-extracted.md) | 已修：示例围栏里的 json 块被当账本；顶层围栏块成为唯一来源 | 2026-11-14 |
 | [BUG-177（已修）](fixed_bugs/BUG-177-fix-evidence-valid-command-forms.md) | 已修：合法命令形态（`pnpm run`/`--filter`/`node --import`）被拒；按语法解析选项+值 | 2026-11-14 |
 | [BUG-178（已修）](fixed_bugs/BUG-178-fix-evidence-section-in-code-block.md) | 已修：代码块里的节标题截错；节标题只在非围栏行匹配 | 2026-11-14 |

@@ -4,7 +4,6 @@
 
 ## 活跃清单
 
-- [2026-11-15 测试树分轴：镜像轴 + owner 轴](2026-11-15-tests-tree-axis.md) — 毕业：做（等用户点名翻 `待落地`）；一条 set-equality spec 让镜像变不变量、`tests/repo` 35 个 spec 换 owner 轴分六组、删组数枚举（空壳 harness 目录已删）；证据 = [research/tests-src-correspondence](../research/tests-src-correspondence/README.md)。
 - [2026-11-12 高复杂度面持续探索（培养/委派/run-bundle/账本/客户端流）](2026-11-12-deep-surface-continuous-bug-hunt.md) — C1–C7 + focus v2/v3/v4/v5（v2–v5 已修复归档；活跃 0，Next BUG-184）；C1–C4 形状轴由矩阵接管；不修产品代码。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）

@@ -1,6 +1,6 @@
 # 历史缺陷 → 具名守卫覆盖（生成物，勿手改）
 
-> 生成 = `node tools/bug-coverage.mjs --write`；一致门 = `tests/repo/bug-coverage.spec.ts`。
+> 生成 = `node tools/bug-coverage.mjs --write`；一致门 = `tests/repo/budget/bug-coverage.spec.ts`。
 > 口径 = `it/test/describe` 标题里的 `BUG-<nnn>`；标题没写 BUG 的守卫不计入——「无守卫」是候选缺口，不是「一定没测」。
 
 ## 汇总
@@ -131,7 +131,7 @@
 | 004 | — | tests/tools/deliverables-audit.spec.ts:546 |
 | 008 | 2026-10-10 | tests/tools/deliverables-audit.spec.ts:294 |
 | 011 | 2026-10-11 | tests/tools/candidate-scan-assignments.spec.ts:49 |
-| 013 | 2026-10-12 | tests/repo/tracked-secrets.spec.ts:22；tests/repo/tracked-token.spec.ts:20 |
+| 013 | 2026-10-12 | tests/repo/security/tracked-secrets.spec.ts:22；tests/repo/security/tracked-token.spec.ts:20 |
 | 014 | 2026-10-12 | tests/tools/converge-rules.spec.ts:149 |
 | 016 | 2026-10-12 | tests/tools/converge-rules.spec.ts:177 |
 | 018 | 2026-10-16 | tests/tools/authorship.spec.ts:19；tests/tools/authorship.spec.ts:29 |

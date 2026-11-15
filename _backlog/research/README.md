@@ -58,7 +58,7 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-- [tests-src-correspondence](tests-src-correspondence/README.md) — 测试树能不能跟源码树一一对应：盘面实测、四根轴打架、两个独立子代理复核；产出卡 [2026-11-15-tests-tree-axis](../issues/2026-11-15-tests-tree-axis.md)（2026-11-15）
+（2026-11-15 tests-src-correspondence 随 tests-tree-axis 卡落地迁入[研究归档](../_archive/research/README.md)。）
 
 （2026-11-14 dsh-notes-flow-borrow 与 test-asset-spiral 随其卡结项迁入[研究归档](../_archive/research/README.md)。）
 

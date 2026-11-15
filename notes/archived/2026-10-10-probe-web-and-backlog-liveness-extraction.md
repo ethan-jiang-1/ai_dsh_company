@@ -60,5 +60,5 @@
 ## 指针
 
 - 卡：[_backlog/issues/2026-10-10-extract-without-behavior-change.md](../../_backlog/_archive/settled_issues/2026-10-10-extract-without-behavior-change.md)（实施后按其关闭条件归档）
-- keyless 缝规则：[tests/repo/layering.spec.ts](../../tests/repo/layering.spec.ts)
+- keyless 缝规则：[tests/repo/layering.spec.ts](../../tests/repo/structure/layering.spec.ts)
 - 形状 spec：[tests/session/probe-web.spec.ts](../../tests/session/probe-web.spec.ts)

@@ -84,7 +84,7 @@ opened: 2026-11-09
 | F6 | 现有观测是分通道的；没有混合链的统一图 | `list_subagents` / `workflow_runs` / team roster |
 | F7 | 共享 skill 目录机制已有先例（`_shared/skills/product-definition` 被 4 角色共用） | preset 的 `customSkillDirs` |
 | F8 | host 插件可在 `agent/created` 注册 per-agent `systemPrompt.section` | [handbook.ts](../../../packages/company-pack/src/host/prompt/handbook.ts)；`tool-workflow` 同款 |
-| F9 | `--dump-config` 可读声明面，但不能进 `pnpm test`（`tests/` 禁子进程） | [layering.spec.ts](../../../tests/repo/layering.spec.ts) |
+| F9 | `--dump-config` 可读声明面，但不能进 `pnpm test`（`tests/` 禁子进程） | [layering.spec.ts](../../../tests/repo/structure/layering.spec.ts) |
 
 ### 未决（需要 spike，不是拍脑袋）
 

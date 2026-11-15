@@ -1,7 +1,7 @@
 # tests/fixtures/ —— keyless 夹具的出处登记
 
 > 每个夹具**必须**在这里有一行：来源性质（authored / derived）、生成方式、用途、更新触发。
-> 本文件是出处唯一家；`tests/repo/fixture-provenance.spec.ts` 机械校验"盘上每个顶层夹具都有行"。
+> 本文件是出处唯一家；`tests/repo/budget/fixture-provenance.spec.ts` 机械校验"盘上每个顶层夹具都有行"。
 > 硬规矩：**真实部署数据不进本目录**（客户/动议/会话正文都不行）；只收合成或脱敏派生夹具。
 
 | 夹具 | 来源 | 生成 / 更新方式 | 用途 |

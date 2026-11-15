@@ -71,4 +71,4 @@
 - [covered] **R2 collaboration verdict 纯逻辑抽离**（拆除源码切片 `vm.runInNewContext`）→ `tools/lib/collaboration-oracle-verdict.mjs`、`tests/evidence/collaboration-probe-verdict.spec.ts`
 - [environment-gap] **Windows 实机/CI runner** → `_backlog/triggers.md`、`tests/host/contract/file-shape-agreement.spec.ts`
 - [unprovable] **静态门禁内证明测试命令“历史上真红过”** → `checks/gates/fix-evidence.mjs`、`.agents/skills/close-out-definition/SKILL.md`
-- [policy] **失败类跨轮复发轮次不单造假精确字段**：以具名守卫棘轮与生成式差分承接 → `tests/failure-classes.md`、`tests/repo/bug-coverage.spec.ts`
+- [policy] **失败类跨轮复发轮次不单造假精确字段**：以具名守卫棘轮与生成式差分承接 → `tests/failure-classes.md`、`tests/repo/budget/bug-coverage.spec.ts`
