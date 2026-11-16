@@ -15,6 +15,8 @@
 2. **`!!js` 加载器住 YAML 原语，不住门禁**：[repo-markdown](../../tools/lib/repo-markdown.mjs) 增 `loadCordisYaml`
    （CORE_SCHEMA + `tag:yaml.org,2002:js` scalar）与 `flattenCordisRows`（insert/group config/preset plugins 三处展平）。
    两门禁共用同一加载器；门禁内不再手写 schema 扩展（`!!js` 是 DSH 组合方言，两处手写必漂）。
+   js-yaml 只解析一次（原两个加载器各带一份 fallback 循环）；**不保留永不可达的「友好错误」throw**——
+   覆盖率棘轮当场拦下过一次（见验证表），死语句只会永久压低覆盖。
 3. **dim6 常驻上下文补字节账本，并入注入面预算 owner**：[handbook-budget](../../checks/gates/handbook-budget.mjs) 增两轴
    `persona-budget`（每 preset `config.prefix` 字节 ≤ 5120，实测最大 ceo 4612B）与 `skill-catalog-budget`
    （每 preset 可达 skills 根的 SKILL.md frontmatter `name`+`description` 字节 ≤ 2304，实测最大 vp-eng 2082B）。
@@ -74,6 +76,7 @@
 | 静态门 persona-budget | #12 文档/生成物/指针 | ceo prefix 追加 600B → `FAIL persona-budget: 常驻 persona 超预算…：ceo 5212B > 5120B`；还原 → `PASS persona-budget 常驻 persona 最大 4612B（ceo）≤ 5120B` |
 | 静态门 skill-catalog-budget | #12 | 实测尺 `PASS skill-catalog-budget 常驻目录最大 2082B（vp-eng）≤ 2304B`（红侧与 persona 同构：超限点名 preset） |
 | 原语/一致性 | #1 结构/回归 | `pnpm test tests/tools/repo-markdown.spec.ts` 6 passed；`pnpm test:checks` 10 PASS / 0 FAIL |
+| 覆盖率棘轮（pre-push 门） | #1 结构/回归 | 扩 `repo-markdown` 后实红：`coverage-ratchet FAIL [regressed] tools/lib/repo-markdown.mjs — branches 76.42% < 基线 87.7%`；补原语 spec + 合并为单次解析后，仍 `statements 98.19% < 98.65%`（未覆盖行 = 不可达 throw）；删死分支 → `coverage-ratchet: PASS（197 文件；基线 2026-11-14；豁免 5 条）` |
 | 死 lane 复活 | #4 落点/生命周期 | 修前 `ENOENT … company-workspace/kb/company.md`（恒红）；改为 RUN_BUNDLE_PATHS 后 `permissions-recovery-smoke: ALL PASS`（只读 workspace 可建会话/不破坏 company.md；缺 kb/ceo 补建；坏 catalog 重建 schema 1） |
 | 隔离矩阵 | #4 | 冷缓存并发时 3→5 FAIL（形态每次不同 + corepack 并发下载）；暖缓存 solo `isolation-matrix-smoke: ALL PASS` |
 | 暖树全量 | #12 / #1 | `pnpm verify` ALL PASS；`pnpm test` 253 文件 / 2155 用例绿；`pnpm typecheck` exit 0；`pnpm smoke:fast` 4 条绿 |

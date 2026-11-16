@@ -11,49 +11,40 @@
 import { createRequire } from 'node:module'
 import { parseMarkdownAst, renderedNodeText } from './markdown-links.mjs'
 
-const loadYaml = (() => {
-  for (const base of ['../../vendor/dsh/package.json', '../../vendor/dsh/packages/preset/agent-preset/package.json']) {
-    try {
-      const yaml = createRequire(new URL(base, import.meta.url))('js-yaml')
-      return text => yaml.load(text, { schema: yaml.CORE_SCHEMA })
-    } catch { /* next declared owner */ }
-  }
-  throw new Error('js-yaml 缺失：先按 bootstrap 安装 workspace 依赖')
-})()
+// js-yaml 由 vendor 根声明（根 install 后 hoisted 亦可解析）；解析一次、两个 schema 共用。
+// 解析不到 = install 未完成：让 Node 抛 MODULE_NOT_FOUND（报错点名 js-yaml 与下面的解析基），
+// 不另造一条永远不可达的「友好错误」分支——死语句会永久压低本文件覆盖且从不被执行。
+const yamlJs = createRequire(new URL('../../vendor/dsh/package.json', import.meta.url))('js-yaml')
+
+const loadYaml = text => yamlJs.load(text, { schema: yamlJs.CORE_SCHEMA })
+
+/** Cordis 组合方言：`!!js` Loader 表达式收成标量字符串（门禁只做结构/依赖判断，不求值）。 */
+const CORDIS_SCHEMA = yamlJs.CORE_SCHEMA.extend({
+  explicit: [new yamlJs.Type('tag:yaml.org,2002:js', { kind: 'scalar', construct: s => s })],
+})
 
 /**
  * Cordis 组合 YAML（bundle patch / preset `agent.cordis.yml`）的**唯一**加载器。
- * 与文档 frontmatter 的区别只有一处：组合文件带 `!!js` Loader 表达式（`tag:yaml.org,2002:js`），
- * `CORE_SCHEMA` 会直接抛错；这里把 `!!js` 收成标量字符串（门禁只做结构/依赖判断，不求值）。
- * 为什么住这里而不是各门禁各写一份：`!!js` 是 DSH 组合方言（Loader 契约），两处手写必漂。
+ * 与文档 frontmatter 的区别只有一处：组合文件带 `!!js`（`tag:yaml.org,2002:js`），
+ * `CORE_SCHEMA` 会直接抛错。为什么住这里而不是各门禁各写一份：`!!js` 是 DSH 组合方言
+ * （Loader 契约），两处手写必漂。
  */
 export function loadCordisYaml(text) {
-  for (const base of ['../../vendor/dsh/package.json', '../../vendor/dsh/packages/boot/app-boot/package.json']) {
-    try {
-      const yaml = createRequire(new URL(base, import.meta.url))('js-yaml')
-      const schema = yaml.CORE_SCHEMA.extend({
-        explicit: [new yaml.Type('tag:yaml.org,2002:js', { kind: 'scalar', construct: s => s })],
-      })
-      return yaml.load(text, { schema })
-    } catch (error) {
-      if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND') continue
-      throw error
-    }
-  }
-  throw new Error('js-yaml 缺失：先按 bootstrap 安装 workspace 依赖')
+  return yamlJs.load(text, { schema: CORDIS_SCHEMA })
 }
 
 /** 组合条目树展平：`insert` 行、group 的 `config` 子条目、preset 行的 `config.plugins` 都算行。 */
 export function flattenCordisRows(operations) {
+  if (!Array.isArray(operations)) return []
   const rows = []
   const walk = list => {
-    for (const row of Array.isArray(list) ? list : []) {
+    for (const row of list) {
       rows.push(row)
       if (row?.group === true && Array.isArray(row.config)) walk(row.config)
       if (Array.isArray(row?.config?.plugins)) walk(row.config.plugins)
     }
   }
-  for (const op of Array.isArray(operations) ? operations : []) {
+  for (const op of operations) {
     if (Array.isArray(op?.insert)) walk(op.insert)
     if (Array.isArray(op?.config?.plugins)) walk(op.config.plugins)
   }

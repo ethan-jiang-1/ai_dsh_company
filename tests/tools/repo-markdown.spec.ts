@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  flattenCordisRows,
   headingSections,
+  loadCordisYaml,
   normalizeMarkdown,
   noteStatusBlock,
   noteStatusLines,
@@ -115,6 +117,38 @@ describe('tools/lib/repo-markdown 单原语契约', () => {
     expect(statuses[0]?.lineNumber).toBe(3)
     expect(noteStatusBlock(note)).toBe('状态：proposed（批准：2026-11-14）\n  续行：部分交付')
     expect(noteStatusBlock('# 无状态\n')).toBe('')
+  })
+
+  it('loadCordisYaml 把 !!js Loader 表达式收成标量字符串（CORE_SCHEMA 会抛错）', () => {
+    const text = [
+      '- insert:',
+      "    - id: probe-row",
+      "      name: '@scope/pkg'",
+      '      config:',
+      '        path: !!js "process.getBuiltinModule(\'node:url\').fileURLToPath(new URL(\'../../x\', baseUrl))"',
+      '        disabled: !!js "process.env.X === \'off\'"',
+    ].join('\n')
+    const document = loadCordisYaml(text) as Array<Record<string, unknown>>
+    const row = (document[0]?.insert as Array<Record<string, unknown>>)[0]
+    const config = row?.config as Record<string, unknown>
+    expect(config.path).toContain('baseUrl')
+    expect(config.disabled).toContain("process.env.X === 'off'")
+    // 同一份文本在 CORE_SCHEMA（文档 frontmatter 面）下必须抛错——证明 !!js 是组合方言而非普通 YAML。
+    expect(() => parseFrontmatter(`---\n${text.replace(/^- /, 'x: "')}\n---\n`)).not.toThrow()
+  })
+
+  it('flattenCordisRows 展平 insert 行 / group 嵌套 config / preset 的 config.plugins', () => {
+    const operations = [
+      { insert: [{ id: 'plain' }, { id: 'grouped', group: true, config: [{ id: 'inner' }] }] },
+      { id: 'replace-row', name: '@scope/replaced' },
+      { config: { plugins: [{ id: 'plugin-child' }] } },
+    ]
+    expect(flattenCordisRows(operations).map(row => row.id)).toEqual(['plain', 'grouped', 'inner', 'plugin-child'])
+    expect(flattenCordisRows(undefined)).toEqual([])
+    expect(flattenCordisRows([{ id: 'no-insert' }])).toEqual([])
+    // group 的 config 不是数组 → 不下钻；config.plugins 不是数组 → 不下钻（两条守卫的负侧）。
+    expect(flattenCordisRows([{ insert: [{ id: 'g', group: true, config: {} }, { id: 'p', config: { plugins: 'x' } }] }])
+      .map(row => row.id)).toEqual(['g', 'p'])
   })
 
   it('splitGfmTableCells 正确处理转义竖线、双反斜杠与行尾转义', () => {
