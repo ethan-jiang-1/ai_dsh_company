@@ -26,6 +26,7 @@ const DOC_LINE_BUDGETS = [
   ['AGENTS.md', 84],             // 2026-09-23 二次收口；2026-09-27 瘦身轮 108→100、棘轮 115→105；2026-10-06 条目 D 纯路由化（删复述与括号链，纪律指针化；当时 95→72），棘轮 105→84
   ['docs/index.md', 48],         // 2026-10-20 台账/外部材料迁出：131→70；2026-11-10 DSH 步 2：逐文档登记 → 书架（树即 inventory），内容 +5% = 48
   ['docs/surface-contract.md', 28], // 2026-11-16 立（maintenance-surface-taxonomy）：两层×三面×两轴合同；24 行，cap 28（handoff 指定；headroom 14% 仍在 20% 反向棘轮内）。例外表住 docs/reference/（查表登记层），合同保持短页。负例留证 2026-11-16：上限临时 23 → 24 行超限红；还原 28 → PASS
+  ['docs/reference/surface-exceptions.md', 16], // 2026-11-16 立：面例外登记（查表）；13 行，cap 16 = 20% 反向棘轮上限（reference 不设 5% headroom）。新增例外行先按表增长；越过 cap 须 Note 论证。负例留证 2026-11-16：上限临时 12 → 13 行超限红；还原 16 → PASS
   ['docs/decisions.md', 9],      // 2026-11-14 立（decision-ledger-unification）：三仓统一顶层门牌，零事实复述、只导航至 reference/decisions.md；台账真身因随 D 号线性追加不再设固定行死卡，改由 ledger-routing 守单格 ≤100 字 + 表外散文 ≤10 行 + 禁代码块/H3+
   ['docs/reference/external-research.md', 30], // 2026-10-20 自 index 迁出（外部材料登记；只登记吸收落点，不承载合同事实）
   ['docs/repo-hygiene.md', 80], // 2026-10-25 立：git 边界与跨环境合同（新增门禁 tracked-portability 的解释面）

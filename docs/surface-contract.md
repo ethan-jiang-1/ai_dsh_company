@@ -5,7 +5,7 @@
 
 ## 两层（先判在不在面内）
 
-- **oracle**：由 `pnpm test` 的 runner 跑（vitest / node:test）→ `tests/`。不是面；判 runner，不判进程数。
+- **oracle**：由 `pnpm test`（vitest，`tests/**/*.spec.ts`）或 `pnpm test:checks`（node:test）的 runner 跑 → `tests/`。不是面；判 runner，不判进程数。
 - **entry**：要自己起命令/进程/浏览器 → 下面三面。
 
 ## 三面（只对 live entry）

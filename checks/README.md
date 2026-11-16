@@ -1,4 +1,4 @@
-# 检查与工具索引（验证 · 调试 · 工具三面）
+# 检查与工具索引（judge · show · operate 三面）
 
 > 面：judge（会拦人的判断）。规则与例外 = [surface-contract](../docs/surface-contract.md)。
 

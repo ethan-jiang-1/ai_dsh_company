@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-16 落地；任务源 = 用户点名 [reorg-company handoff](../../_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-company.md) 并授权静默自主）
 
-> 上游 = 用户 2026-11-16 原话：「你应该汲取了这个内容之后落地……除非有什么东西对你来说是荒唐的……Goal 之后静默自主」。handoff 的授权边界是 P0 已点名、P1 需 A/B 裁决；本轮按授权取文档建议的 A（P2 抬顶），B 未取。
+> 上游 = 用户 2026-11-16 原话：「你应该汲取了这个内容之后落地……除非有什么东西对你来说是荒唐的……Goal 之后静默自主」。handoff 的授权边界：P0 已点名、P1 需 A/B **明示答复**；用户本轮只给「落地 + 静默自主」总授权，**未对 A/B 作答**。据此按 handoff §4.2 建议取 A（抬顶 59→66 + Note 论证），B 未取——这不是「用户裁决 A」；若改 B 需新决定。
 > 部分取代 [2026-11-15-tools-purpose-groups](./2026-11-15-tools-purpose-groups.md)（observe 组解散、工具面四组→三组）；其核心决定（保留 `tools/` 名、按用途分组）仍现行。
 > 决策台账 = [D63](../../docs/reference/decisions.md)。
 
@@ -38,11 +38,16 @@
 - [covered] 资产对齐与棘轮：census 双向对齐、cap 66、失败类零未分类 → `tests/repo/budget/test-census.spec.ts`
 - [covered] 行为面：`pnpm orient` / `pnpm diagnose` / `pnpm notes:audit` 均 exit 0；orient 首跑暴露的 import 深度错已修 → `probes/analyze/orient-probe.mjs`
 - [covered] 覆盖率：`pnpm coverage:ratchet` PASS（197 文件；asset-lanes 覆盖变好） → `tests/support/coverage-baseline.json`
-- [policy] `MAX_PROBES` 抬顶属 P2 口径变更，按 handoff 建议取 A；B（退役换 cap）未取，理由见「输掉的方案」 → `tests/repo/budget/test-census.spec.ts`
+- [policy] `MAX_PROBES` 抬顶属 P2 口径变更：按 handoff §4.2 建议取 A（用户未对 A/B 作答，授权依据见状态行）；B（退役换 cap）未取，理由见「输掉的方案」 → `tests/repo/budget/test-census.spec.ts`
 - [environment-gap] 未跑真模型 / 浏览器 / 真页面：本轮只动维护面文件与文档，不触 preset、host、client 面 → `checks/lanes/preset.entry.mjs`
 - [environment-gap] 未重跑 clean clone：无新依赖、无构建面变化，仅仓内路径与注册表 → `docs/guides/bootstrap.md`
 - [policy] 库存口径分裂（INDEX 67 = 66 探针 + 1 fixture；census 66 = 注册探针）保持现状：handoff §2 只把它列为既有事实、未列入 P0/P1；修它要先决定「fixture 算不算公开入口」，属独立决定 → `tools/lib/checks-index.mjs`
-- [unprovable] 仓库外书签/外部仓对旧扁平常量 tools/observe 的引用，本仓观测不到 → `AGENTS.md`
+- [unprovable] 仓库外书签/外部仓对旧扁平常量 tools/observe 的引用，本仓观测不到 → `docs/reference/external-research.md`
+
+## 独立盲审
+
+- 无历史上下文的只读子代理审 `b396d051..bfc44ede`（P0 + P1 + policy + 文档收口 + 预算注释），实跑 verify / test / test:checks / coverage / 三行为面 / 两生成物核对；**BLOCKER = 0**。
+- 8 条建议，处置：①授权措辞写死「用户未对 A/B 作答」；②合同 oracle 改绑 `pnpm test`（vitest）与 `pnpm test:checks`（node:test）；③checks/README 标题「三面」改 judge/show/operate；④`[unprovable]` 锚点改外部材料登记；⑤研究材料 `orient.mjs` 旧文件名的反引号去掉；⑥spec 标题改成「smoke/audit/probes 全树 + tools 三组」；⑦例外表补 doc-budget cap 16（含红证）。**未取 ⑧**：归档链接标签仍写旧名——`notes/archived/AGENTS.md` 只许改链接那一行路径、正文与标签不动（冻结层）。
 
 ## 验证
 

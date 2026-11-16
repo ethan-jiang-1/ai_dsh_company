@@ -34,7 +34,7 @@ describe('checks-index 纯逻辑', () => {
     expect(text).toContain('checks/gates/，53')
   })
 
-  it('扫描公开入口：含 smoke/audit/probes/tools 三组，排除内部实现', () => {
+  it('扫描公开入口：含 smoke/audit/probes 全树 + tools 三组，排除内部实现', () => {
     const scripts = scanPublicScripts(ROOT)
     expect(scripts).toContain('checks/lanes/client-load.entry.mjs')
     expect(scripts).toContain('probes/browser-visual/cdp-probe.mjs')

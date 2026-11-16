@@ -129,7 +129,7 @@ pnpm verify          # 预期 ALL PASS（doc-taxonomy / doc-budget / md-links / 
 | 墙 | 事实 | 处置 |
 |---|---|---|
 | **P2 探针棘轮** | `tests/repo/budget/test-census.spec.ts:16` `MAX_PROBES = 59`，当前正好 59；迁 7 件 → 66 必红 | **需用户裁**：A 一次性抬顶 59→66 + 同 diff Note（移动不是新增，建议把 P2 口径改成「登记能力」）；B 同批退役 7 支同族探针（风险大，不建议捆绑） |
-| **script-triggers 头注** | 改名后 7 件全部新匹配 `-(probe)\.mjs$` 触发正则；`orient.mjs` 的「何时跑」在第 10 行（门禁只查前 8 行）→ **orient-probe 必红** | 同 diff 把 orient 的「何时跑」提到前 8 行；其余 6 件已合规 |
+| **script-triggers 头注** | 改名后 7 件全部新匹配 `-(probe)\.mjs$` 触发正则；orient.mjs 的「何时跑」在第 10 行（门禁只查前 8 行）→ **orient-probe 必红** | 同 diff 把 orient 的「何时跑」提到前 8 行；其余 6 件已合规 |
 | **script-index 扫描面** | `tools/lib/checks-index.mjs:14` `TOOL_GROUPS = ['dev','observe','repo','release']`；observe 删掉后顶层散件检查会红 | 同 diff 改 TOOL_GROUPS 为三组 + 重生成 INDEX |
 | **注册表** | `tools/lib/asset-lanes.mjs` PROBES 需 +7 条（domain: 'analyze'）+ FAILURE_CLASS_BY_NAME +7 条 | 候选失败类：orient/ask-latency/diagnose/explore-evidence/session-log-export = 会话持久化；notes-audit = 文档指针；propose-sampler = 模型可见文本 |
 | **refactor-drift 命名** | `checks/audit/` 只许 `-(audit\|check\|eval\|ratchet).mjs` | 改名 `refactor-drift-audit.mjs`；头注已有 状态+何时跑，合规 |
