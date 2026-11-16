@@ -16,4 +16,4 @@
 
 ## 门禁
 
-- layering / spec-duplicates / guard-red-record / company-root-carriers
+- layering / spec-duplicates / guard-red-record / company-root-carriers；门禁自测 = [tests/checks](./checks/)（node:test，`pnpm test:checks`）
