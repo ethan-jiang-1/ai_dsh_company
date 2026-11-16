@@ -9,6 +9,7 @@ intent: ai_dsh_bsimulation 维护面整理单（自包含 handoff，含完整决
 > **授权边界**：P0（§3）是声明层改动；P1（§4）涉及搬家与行为改动，**动手前必须拿到用户明确批准**。本文不是 P1 的授权。
 > **来源**：2026-11-16 三仓维护面分类法研究（宿主 = `ai_dsh_company` 的 `_backlog/research/maintenance-surface-taxonomy/`）。本仓的组级分类经独立盲审复核，数字已按盘上重新核实。
 > **方向更新（2026-11-16，D64）**：三仓根目录统一为 checks/probes/tools 已由「可选远期」升为**承诺方向**（用户裁决：人仍驾驭 AI，根名不一致 → 理解差异 → 驱动出错；先满足人 + 极度满足 fresh agent 可并存）。**硬顺序：先纯化（每目录一个动词）后统一**，或同批；先改名后拆组 = 给 mixed 目录假保证。本仓 operate 家 dev/ 最终迁 tools/。仍是独立迁移项目（gate 输入 + hooksPath 重装 + 引用 + 冻结归档 redirect 一起做），需用户批准；P0/P1 范围不变。决策家 = [surface-root-unification-direction](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。**落地纪律（用户追加）**：调整时每个根目录的定位（面 = judge/show/operate + 装什么/不装什么 + 例外）必须写进该仓自己的 surface-contract 与 README 首屏，一眼可判、不含糊；共识随本自包含 handoff 携带，实施 agent 不回看宿主仓对话——含糊定位 = 共识跨仓蒸发。
+> **落地状态（2026-11-17）：已完成（维护者在目标仓实施，本仓不代管）。** 目标仓已把入口树收敛到 checks / probes / tools、声明三面，并新增 surface 门禁强制「合同 ↔ 树」对账（组表 / 例外 / redirect 账本）。本文保留**实施前**时点文本——实施 agent **勿按本文重做迁移**；现行事实以目标仓的维护面合同与其根 README 首屏为准。审计 / 组级分类里与盘上不同处（例如 release 的 tag-* 按产物判为 judge 而非 operate），已在目标仓合同就地更正。
 
 ## 目标根布局（统一后，实施对照）
 

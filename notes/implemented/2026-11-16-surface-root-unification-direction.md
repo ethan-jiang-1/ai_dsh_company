@@ -1,6 +1,6 @@
 # 2026-11-16 · 维护面根目录三仓统一：从可选远期升为承诺方向
 
-状态：implemented（2026-11-16 方向承诺交付；任务源 = 用户本会话点名「三仓根目录最好一致」并选「先记方向」；**物理迁移未实施**，见未覆盖轴）
+状态：implemented（2026-11-16 方向承诺交付；任务源 = 用户本会话点名「三仓根目录最好一致」并选「先记方向」。**本仓只管 company**：另两仓的拆组与改名由维护者在目标仓实施（用户 2026-11-17 明确「另外两个 repo 你别管」），本仓只承载方向、自包含 handoff 与对账）
 
 > 上游 = 用户 2026-11-16 原话：「最好是调整的一致……不一致的话，人的理解很有可能会有差异……驱动上就可能会出问题」「至少根目录底下的目录是一致的，里头灵活性容许给不同项目」「现在 AI 这边驾驭的还是人……先满足人，同时极度的满足 fresh agent，可以同时存在」「记着我们要调整的时候，每个目录底下定位一定要说清楚，免得含含糊糊的。我们在这儿达成了共识，跑到不同的项目里头，这共识就不见了」。
 > 部分取代 [maintenance-surface-declaration-and-migration](./2026-11-16-maintenance-surface-declaration-and-migration.md) 的**改名处置**（「三仓统一改名」由输掉的方案/可选远期 → 承诺方向）；其核心分类法（两层×三面×两轴）与 company P0+P1 落地仍现行。
@@ -43,7 +43,7 @@
 
 ## 状态事实与载体
 
-- **事实**：维护面分类法 = 两层×三面×两轴（D63 现行）；根目录目标名 checks/probes/tools 三仓统一 = 承诺方向（D64）；company 已达标，另两仓待迁移。
+- **事实**：维护面分类法 = 两层×三面×两轴（D63 现行）；根目录目标名 checks/probes/tools 三仓统一 = 承诺方向（D64）。company 侧已达标；另两仓的落地归各自目标仓（维护者实施，本仓不代管），本仓只保「方向 + 自包含 handoff + 对账」。
 - **唯一入口**：规则 = [surface-contract](../../docs/surface-contract.md)；方向 = 本 Note + D64；施工 = 三份 reorg handoff（[company](../../_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-company.md) / [bsimulation](../../_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-bsimulation.md) / [deep-research](../../_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-deep-research.md)）。
 - **读载体 / 写载体**：读 = 人跨仓指挥 + 跨仓 fresh agent（根名）、每仓 fresh agent（面声明 + 例外表）；写 = 另两仓迁移项目同 diff 改 gate 输入 / hooksPath / 引用 / redirect ledger + 重生成库存。
 - **环境坏法**：来源 = 先改名后拆组（假保证）；生命周期 = 老 clone hooksPath 静默丢 hooks（迁移须带重装步骤）；内容 = 冻结归档被 sed 改写（须走 redirect ledger）；扫描面 = gate 硬编码路径漏改（红→绿兜底）；便携 = 共识蒸发（handoff 未携带每目录定位 → 各仓含糊落地；banner + 该仓 surface-contract/README 首屏写清挡）。
@@ -52,7 +52,7 @@
 
 - [covered] 结构 / 文档指针门禁：`pnpm verify` 全绿（notes-liveness / notes-tree / notes-supersession / notes-axes / bare-path / md-links / ledger-routing） → `checks/run-gates.mjs`
 - [covered] 取代回链：旧 Note 文首出现本 Note 文件名（notes-supersession 红→绿见验证） → `checks/gates/notes-supersession.mjs`
-- [policy] **方向承诺已交付，物理迁移未实施**：本 Note 的验收 = 方向记录一致 + 门禁绿，**不是迁移完成**；bsimulation / deep-research 的拆组 + 改名是下游独立项目，需各仓授权 → `_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-bsimulation.md`
+- [policy] **本仓验收 = 方向与记录一致 + 门禁绿，不含另两仓的树**：另两仓的拆组、改名与门禁红证由各目标仓自己的实现轮留证；用户 2026-11-17 划定「另外两个 repo 你别管」，本仓不代管、不验证其树 → `_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-bsimulation.md`
 - [environment-gap] 另两仓的实际盘面与迁移本仓观测不到（跨仓）；company 仓只能改 hosting 在此的 handoff 与决策记忆 → `docs/reference/external-research.md`
 - [unprovable] 「统一根名后人跨仓指挥不再漂移」无机械 oracle；这是价值判断，靠迁移后实际驾驭反馈验证 → `_backlog/research/maintenance-surface-taxonomy/README.md`
 
