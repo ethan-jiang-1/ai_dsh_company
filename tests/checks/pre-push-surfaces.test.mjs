@@ -112,3 +112,42 @@ test('merge 提交（remote 全零）：合并结果里的 surface 改动必须�
     assert.match(out, /client-load/, `merge 合并结果的 client 改动必须带出 client-load：${out}`)
   } finally { cleanup() }
 })
+
+// 判据（2026-11-16 二轮，BUG-199/201）：
+//   ⑤ 未登记改动面（既无 asset 也无 coveredBy）必须阻断：--dry-run 也退出非零；
+//   ⑥ `--paths` 入口必须归一 `./` 与 Windows 反斜杠，否则维护者复制来的路径会假阴性。
+// 负例留证 2026-11-16（二轮）：删掉 unseen → exitCode 1 的分支 → ⑤ 红（exit 0）；
+//   去掉 normalizePath → ⑥ 红（`./` 打印未分类、无反斜杠命中）。
+test('未登记改动面：--dry-run 退出非零并点名登记（2026-11-16 二轮）', () => {
+  const result = spawnSync(process.execPath, [SCRIPT, '--dry-run', '--paths', 'zz-unregistered/file.txt'], { encoding: 'utf8' })
+  const out = `${result.stdout}${result.stderr}`
+  assert.notEqual(result.status, 0, `未分类必须阻断（不能只打印）：${out}`)
+  assert.match(out, /未分类改动面/, out)
+  assert.match(out, /登记 SURFACE_RULES/, out)
+})
+
+test('--paths 归一 ./ 与反斜杠：与裸路径同一结论（2026-11-16 二轮）', () => {
+  const runPaths = paths => spawnSync(process.execPath, [SCRIPT, '--dry-run', '--paths', paths], { encoding: 'utf8' })
+  const bare = runPaths('packages/company-pack/src/lib/presence/presence.ts')
+  const dot = runPaths('./packages/company-pack/src/lib/presence/presence.ts')
+  const win = runPaths('packages\\company-pack\\src\\lib\\presence\\presence.ts')
+  for (const [label, result] of [['./ 前缀', dot], ['反斜杠', win]]) {
+    const out = `${result.stdout}${result.stderr}`
+    assert.equal(result.status, bare.status, `${label} 与裸路径退出码应一致：${out}`)
+    assert.match(out, /→ replay/, `${label} 应命中 replay：${out}`)
+  }
+})
+
+// 判据（2026-11-16 二轮·盲审 B1）：git 默认对非 ASCII 路径做 C-quote（`"_dist/\345…md"`），
+//   引号字符串不命中锚定 glob → 合法路径在 fail-closed 下被误判「未分类」。三处 diff 必须 `-z`。
+// 负例留证 2026-11-16（二轮）：把 `pathsOfRef` 的 `-z` 去掉 → 非 ASCII 用例红（未分类 + exit 1）。
+test('非 ASCII 路径不被 git 的 C-quote 误判未分类（2026-11-16 二轮）', () => {
+  const { dir, commit, cleanup } = repo()
+  try {
+    const base = commit(DOC_FILE, '# docs\n', 'docs: base')
+    const tip = commit('docs/中文说明.md', '# 中文\n', 'docs: non-ascii')
+    const { status, out } = run(dir, [`refs/heads/feat ${tip} refs/heads/feat ${base}`])
+    assert.equal(status, 0, `非 ASCII docs 路径必须命中 docs/** 且不阻断：${out}`)
+    assert.doesNotMatch(out, /未分类/, out)
+  } finally { cleanup() }
+})

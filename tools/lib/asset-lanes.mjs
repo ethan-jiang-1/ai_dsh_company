@@ -305,7 +305,7 @@ export const FAST = ['workflow-contract', 'present-catalog', 'company-root-proce
  * `tests/repo/budget/asset-lanes.spec.ts` 才能机械检查「每个改动面都有证据」。
  * 词表与 `.githooks/pre-push` 一一对应（spec 读 hook 原文核对；改 hook 不改进表 = 红）。
  */
-export const UNCONDITIONAL_STEPS = ['verify', 'typecheck', 'lint', 'dup', 'smoke:fast', 'test:checks', 'coverage-ratchet']
+export const UNCONDITIONAL_STEPS = ['verify', 'typecheck', 'lint', 'dup', 'smoke:fast', 'test:checks', 'coverage:ratchet']
 
 /**
  * 按面触发规则：改到 globs 命中的路径时，pre-push 跑 assets；没有额外 lane 的面必须写
@@ -346,18 +346,38 @@ export const SURFACE_RULES = [
   },
   {
     globs: ['packages/company-pack/src/host/**'],
-    coveredBy: ['smoke:fast', 'coverage-ratchet', 'typecheck', 'verify'],
+    coveredBy: ['smoke:fast', 'coverage:ratchet', 'typecheck', 'verify'],
     why: 'host 由 fast lane 的 present-catalog / company-root-process（直接加载 host src）+ 全量 test + typecheck 覆盖；真安装档 company-entry 要 _dist tarball 且 ~1–2 min（weekly），不进 push',
   },
   {
     globs: ['tools/**', 'checks/**'],
-    coveredBy: ['test:checks', 'coverage-ratchet', 'verify'],
+    coveredBy: ['test:checks', 'coverage:ratchet', 'verify'],
     why: '工具/门禁面：门禁自测 test:checks + 消费 tools/lib 的全量 test + 结构门禁 verify；盘上没有更便宜的真入口',
   },
   {
     globs: ['tests/**'],
-    coveredBy: ['coverage-ratchet'],
-    why: '测试树改动由 pre-push 的全量 vitest（coverage-ratchet = test + 覆盖率棘轮）覆盖；再加 lane = 同一检查跑两遍',
+    coveredBy: ['coverage:ratchet'],
+    why: '测试树改动由 pre-push 的全量 vitest（coverage:ratchet = test + 覆盖率棘轮）覆盖；再加 lane = 同一检查跑两遍',
+  },
+  {
+    globs: ['packages/company-pack/locale/**'],
+    assets: ['client-load'],
+    why: '用户可见文案面：真页面仍要零挂载失败；文案断言在 tests/client/i18n（全量 test）',
+  },
+  {
+    globs: ['packages/company-pack/package.json', 'packages/company-pack/tsconfig*.json', 'packages/company-pack/tsdown.config.ts', 'packages/company-pack/scripts/**'],
+    coveredBy: ['coverage:ratchet', 'typecheck', 'verify'],
+    why: '包元数据/构建配置/发布前脚本：全量 test（导出/包形状）+ 类型面 + 结构门禁；发布档 release 是手动分钟级',
+  },
+  {
+    globs: ['packages/company-pack/LICENSE', 'packages/company-pack/icon.svg'],
+    coveredBy: ['verify'],
+    why: '随包静态资产：pack-shape 与发布面门禁',
+  },
+  {
+    globs: ['market-index*.json', '_dist/**', 'runtime/harness-home/README.md', '.*'],
+    coveredBy: ['lint', 'dup', 'verify'],
+    why: '市场索引暂存/生成手册/runtime 白名单/根 dotfile 与 lint-dup 配置：改这些跑对应工具 + 结构门禁',
   },
   {
     globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', '.agents/**', 'run/**', 'probes/**', 'snapshots/**'],
@@ -365,13 +385,13 @@ export const SURFACE_RULES = [
     why: '文档/指针/技能/运行配置/探针/快照 = 结构门禁 verify 的射程；探针与真模型档按头注手动跑',
   },
   {
-    globs: ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'tsconfig*.json', 'vitest.config.ts', 'CHANGELOG.md', 'market-index.json', '.github/**', '.githooks/**', 'runtime/README.md', 'packages/company-pack/src/README.md', 'vendor/**'],
+    globs: ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'tsconfig*.json', 'vitest.config.ts', 'CHANGELOG.md', '.github/**', '.githooks/**', 'runtime/README.md', 'packages/company-pack/src/README.md', 'vendor/**'],
     coveredBy: ['verify', 'typecheck'],
     why: '根配置/锁文件/CI/hook/README/vendor 指针 = verify + typecheck 的射程；vendor 内容只读（双门禁），没有独立真入口',
   },
 ]
 // 为什么后三条用 coveredBy 而不是 assets：它们的证据本来就是 hook 每次都跑的步骤（fast lane /
-// verify / test:checks / coverage-ratchet），再列一次 = 同一检查跑两遍；而昂贵的真入口
+// verify / test:checks / coverage:ratchet），再列一次 = 同一检查跑两遍；而昂贵的真入口
 // （company-entry 要 _dist tarball 且 ~1–2 min、release 分钟级）属 weekly/手动档，塞进 push
 // 违背成本边界。写下 `coveredBy` 是为了让「有意不进 push」不再与「忘了登记」同形。
 

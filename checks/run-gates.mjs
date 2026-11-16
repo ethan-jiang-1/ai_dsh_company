@@ -87,6 +87,7 @@ import * as trackedSecrets from './gates/tracked-secrets.mjs'
 import * as trackedPortability from './gates/tracked-portability.mjs'
 import * as scriptIndex from './gates/script-index.mjs'
 import * as devProductParity from './gates/dev-product-parity.mjs'
+import * as surfaceCoverage from './gates/surface-coverage.mjs'
 import * as replayFixtureFreshness from './gates/replay-fixture-freshness.mjs'
 import * as replayUiFreshness from './gates/replay-ui-freshness.mjs'
 import * as gateWiring from './gates/gate-wiring.mjs'
@@ -178,6 +179,7 @@ trackedSecrets.run(ctx)
 trackedPortability.run(ctx)
 scriptIndex.run(ctx)
 devProductParity.run(ctx)
+surfaceCoverage.run(ctx)
 replayFixtureFreshness.run(ctx)
 replayUiFreshness.run(ctx)
 companyRootCarriers.run(ctx)

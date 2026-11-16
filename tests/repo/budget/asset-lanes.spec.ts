@@ -1,4 +1,6 @@
 // 负例留证 2026-11-16：删掉 SURFACE_RULES 的 `src/lib/** → replay` 规则 → 「每个改动面都有证据（BUG-186）」与「src/lib 搬移会触发 replay」红，dry-run 退回「未分类」；还原 → 绿。
+// 负例留证 2026-11-16（二轮）：删掉 `packages/company-pack/locale/**` 规则 → 「全 tracked 代表路径都有证据（BUG-192）」红，verify 的 surface-coverage 也红；还原 → 绿。
+// 负例留证 2026-11-16（二轮）：把 UNCONDITIONAL_STEPS 的 coverage:ratchet 改回 coverage-ratchet → 「每个无条件步骤都是可直接复跑的 pnpm 脚本（BUG-200）」红；还原 → 绿。
 import { describe, expect, it } from 'vitest'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -51,6 +53,12 @@ const SURFACE_SAMPLES = [
   'tests/repo/budget/asset-lanes.spec.ts',
   'tools/lib/asset-lanes.mjs',
   'vitest.config.ts',
+  '.gitignore',
+  '_dist/安装手册.md',
+  'market-index.staged.json',
+  'packages/company-pack/package.json',
+  'packages/company-pack/locale/zh.json',
+  'packages/company-pack/icon.svg',
 ]
 
 describe('资产 lane 注册表（空间完备）', () => {
@@ -113,6 +121,23 @@ describe('资产 lane 注册表（空间完备）', () => {
     expect(selectSurfaces(['packages/company-pack/src/lib/presence/presence.ts']).assets).toEqual(['replay'])
   })
 
+  it('全 tracked 代表路径都有证据（全集判据 = verify 的 surface-coverage 门禁）', () => {
+    // 全集由 checks/gates/surface-coverage.mjs 用 git ls-files 判；这里守它依赖的代表路径不退登记
+    //（第二轮实证：19 条 tracked 路径 unseen 时，样本判据仍绿）。
+    const trackedSamples = [
+      '.gitignore', '_dist/安装手册.md', 'market-index.staged.json',
+      'packages/company-pack/LICENSE', 'packages/company-pack/icon.svg', 'packages/company-pack/package.json',
+      'packages/company-pack/locale/en.json', 'packages/company-pack/locale/zh.json',
+      'packages/company-pack/scripts/prepack-check.mjs', 'packages/company-pack/tsconfig.json',
+      'packages/company-pack/tsdown.config.ts', 'runtime/harness-home/README.md',
+    ]
+    const unclassified = trackedSamples.filter(sample => {
+      const { assets, covered } = selectSurfaces([sample])
+      return assets.length === 0 && covered.length === 0
+    })
+    expect(unclassified, '这些 tracked 路径没有证据映射——surface-coverage 门禁会红，样本也不许先绿').toEqual([])
+  })
+
   it('仓库顶层目录与 src 分组都在登记面内（新目录不许静默出界）', () => {
     const notSurfaces = new Set(['vendor', 'node_modules', 'runtime', '_dist', 'company-workspace', 'coverage'])
     const rootSamples = readdirSync(ROOT, { withFileTypes: true })
@@ -138,7 +163,7 @@ describe('资产 lane 注册表（空间完备）', () => {
       dup: 'pnpm -s dup',
       'smoke:fast': 'pnpm -s smoke:fast',
       'test:checks': 'pnpm -s test:checks',
-      'coverage-ratchet': 'node checks/audit/coverage-ratchet.mjs',
+      'coverage:ratchet': 'node checks/audit/coverage-ratchet.mjs',
     }
     // 词表与 hook 一一对应：不只查被引用的步骤，否则删掉 hook 里的 lint/dup 也不会红。
     for (const step of UNCONDITIONAL_STEPS) {
@@ -151,6 +176,12 @@ describe('资产 lane 注册表（空间完备）', () => {
         expect(UNCONDITIONAL_STEPS, `${rule.globs.join(',')} 的 coveredBy「${step}」不在词表`).toContain(step)
       }
     }
+  })
+
+  it('每个无条件步骤都是可直接复跑的 pnpm 脚本（证据标签可执行，2026-11-16 二轮）', () => {
+    const scripts = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).scripts ?? {}
+    const missing = UNCONDITIONAL_STEPS.filter(step => typeof scripts[step] !== 'string')
+    expect(missing, 'pre-push 把 coveredBy 标签打印成「证据」；标签必须能直接跑（pnpm <label>），否则是假证据').toEqual([])
   })
 
   it('未知路径落 unseen（选择器不静默吞掉未登记面）', () => {

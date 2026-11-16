@@ -10,8 +10,12 @@
 // `tools/lib/asset-lanes.mjs` 的 SURFACE_RULES（一处事实一个家），这里只做取范围 + 匹配 + 跑。
 //
 // 没有匹配到 asset ≠ 无话可说（BUG-186）：规则里没有额外 lane 的面用 `coveredBy` 申报「由哪条
-// 无条件步骤覆盖」，本脚本逐条打印；两者都没有的路径打印「未分类」。覆盖面完备由
-// `tests/repo/budget/asset-lanes.spec.ts` 机械判红——这里只负责不静默。
+// 无条件步骤覆盖」，本脚本逐条打印；两者都没有的路径打印「未分类」并**退出非零**（BUG-199）：
+// 未登记面不许静默 push；覆盖面完备另由 `checks/gates/surface-coverage.mjs`（全 tracked 全集）
+// 与 `asset-lanes.spec`（样本）机械判红。
+//
+// `--paths` 是手工预检入口，路径先归一（反斜杠 → `/`、`./` 与 `a//b` 消解；BUG-201），
+// 否则从 shell 复制来的合法路径会假阴性。
 //
 // 取范围不猜 base：pre-push hook 自带 `<local ref> <local sha> <remote ref> <remote sha>` 四元组。
 // 三种形状各有一条明确语义（2026-11-14，BUG-158）：
@@ -24,7 +28,7 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join, posix, resolve } from 'node:path'
 import { assetByName, selectSurfaces, suffixOf } from '../tools/lib/asset-lanes.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -46,6 +50,24 @@ const git = args => {
 const isZero = sha => /^0+$/.test(sha)
 
 /**
+ * `--paths` 手工入口的路径归一（BUG-201）：反斜杠 → `/`，`./` 前缀与 `a//b` / `a/./b` 消解。
+ * 为什么：维护者从 shell 补全或 `git status` 复制来的路径常带 `./`；锚定 glob 不命中会假阴性。
+ * 不支持：绝对路径、目录路径、含逗号的文件名（逗号是 `--paths` 分隔符）——它们会落「未分类」
+ * 并按 BUG-199 的 fail-closed 阻断，不会静默通过。
+ */
+const normalizePath = path => {
+  const unix = path.trim().replace(/\\/g, '/')
+  return unix === '' ? '' : posix.normalize(unix).replace(/^\.\//, '')
+}
+
+/**
+ * `git ... -z` 的 NUL 分隔输出 → 路径数组（BUG-199 二轮）。
+ * 为什么必须 `-z`：git 默认对非 ASCII 路径做 C-quote（`"_dist/\345…md"`），引号字符串不命中
+ * 任何锚定 glob，会让合法的非 ASCII tracked 路径在 fail-closed 下被误判「未分类」。
+ */
+const splitZ = text => text.split('\0').filter(Boolean)
+
+/**
  * 单个提交引入的文件。
  *
  * merge 提交要按「合并结果相对第一父提交」取：`git diff-tree` 对 merge 默认没有输出（除非 -m/-c），
@@ -55,9 +77,9 @@ function commitPaths(sha) {
   const parents = git(['rev-list', '--parents', '-n', '1', sha]).trim().split(/\s+/).slice(1)
   const first = parents[0]
   if (parents.length > 1 && first !== undefined) {
-    return git(['diff', '--name-only', first, sha]).split('\n').filter(Boolean)
+    return splitZ(git(['diff', '-z', '--name-only', first, sha]))
   }
-  return git(['diff-tree', '--root', '--no-commit-id', '--name-only', '-r', sha]).split('\n').filter(Boolean)
+  return splitZ(git(['diff-tree', '-z', '--root', '--no-commit-id', '--name-only', '-r', sha]))
 }
 
 /** 一条 ref 四元组 → 该 ref 本次 push 带出的变更文件。 */
@@ -67,7 +89,7 @@ function pathsOfRef(localRef, localSha, remoteSha) {
     return []
   }
   if (remoteSha && !isZero(remoteSha)) {
-    return git(['diff', '--name-only', remoteSha, localSha]).split('\n').filter(Boolean)
+    return splitZ(git(['diff', '-z', '--name-only', remoteSha, localSha]))
   }
   // 新分支/远端还没有这个 sha：整条出站提交集，而不是只看 tip。
   const commits = git(['rev-list', localSha, '--not', '--remotes']).split('\n').filter(Boolean)
@@ -89,7 +111,7 @@ function changedPaths() {
 
   if (refs.length === 0) {
     console.log('pre-push surfaces: 未收到 hook 范围（手动直跑？）——退化为 HEAD~1 的变更')
-    return git(['diff', '--name-only', 'HEAD~1', 'HEAD']).split('\n').filter(Boolean)
+    return splitZ(git(['diff', '-z', '--name-only', 'HEAD~1', 'HEAD']))
   }
 
   const paths = new Set()
@@ -104,7 +126,7 @@ function changedPaths() {
 const { assets, matches, covered, unseen } = selectSurfaces(
   valueOf('--paths') === undefined
     ? changedPaths()
-    : (valueOf('--paths') ?? '').split(',').map(path => path.trim()).filter(Boolean),
+    : (valueOf('--paths') ?? '').split(',').map(normalizePath).filter(Boolean),
 )
 
 const coveredByRule = new Map()
@@ -119,14 +141,14 @@ for (const entry of coveredByRule.values()) {
   console.log(`pre-push surfaces: 改了 ${entry.path}${extra}（命中 ${entry.glob}${rule}）→ 无额外 lane；证据 = 无条件 ${entry.coveredBy.join(' + ')}`)
 }
 if (unseen.length > 0) {
-  console.log(`pre-push surfaces: 未分类改动面（既没有 surface 规则，也没有 coveredBy 申报）——新目录要登记 SURFACE_RULES：${unseen.join('、')}`)
+  console.log(`pre-push surfaces: 未分类改动面（既没有 surface 规则，也没有 coveredBy 申报）——登记 SURFACE_RULES（asset 或 coveredBy）后才许通过：${unseen.join('、')}`)
 }
 
 if (assets.length === 0) {
   console.log(covered.length > 0
     ? 'pre-push surfaces: 本次没有额外真入口（命中面由无条件步骤覆盖，见上）'
     : 'pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/asset-lanes.mjs SURFACE_RULES）')
-  process.exit(0)
+  process.exit(unseen.length > 0 ? 1 : 0)
 }
 
 const matchesByAsset = new Map()
@@ -144,7 +166,7 @@ for (const name of assets) {
 }
 if (dryRun) {
   console.log(`pre-push surfaces: --dry-run，应跑 ${assets.join('、')}`)
-  process.exit(0)
+  process.exit(unseen.length > 0 ? 1 : 0)
 }
 
 const failures = []
@@ -170,8 +192,9 @@ for (const name of assets) {
 }
 
 const total = ((Date.now() - started) / 1000).toFixed(2)
-if (failures.length > 0) {
-  console.error(`pre-push surfaces: ${String(failures.length)} FAILURE(S)（${failures.join('、')}，${total}s）`)
+if (failures.length > 0 || unseen.length > 0) {
+  const reasons = [...failures, ...(unseen.length > 0 ? [`未分类改动面 ${String(unseen.length)} 条（登记 SURFACE_RULES 或 coveredBy）`] : [])]
+  console.error(`pre-push surfaces: ${String(reasons.length)} FAILURE(S)（${reasons.join('、')}，${total}s）`)
   console.error('  这些检查是改动面的完成定义，不是可选建议；`git push --no-verify` 逃生后要在收尾 Note 写原因。')
   process.exitCode = 1
 } else {
