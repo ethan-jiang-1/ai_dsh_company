@@ -60,7 +60,7 @@ intent: "把插件即产品的分发、版本兼容、构建产物、手册/READ
   “已认证”。
 - peerDependencies：声明验证过的宿主 API 面；profile 的 `autoInstallPeers:false` + hoisted
   让 peers 由安装锚解析；peers 不是安装要求。
-- 已认证 tag 台账：`checks/gates/lib/compat-tags.json`；只住维护者仓、不随包分发；
+- 已认证 tag 台账：`tools/lib/core/compat-tags.json`；只住维护者仓、不随包分发；
   `pack-compat` 强制当前 pin 在列；升 pin 走 `sync-dsh`（用户策动制）。
 - 版本纪律：改内容必 bump；发布字节 = 冒烟字节；`0.5.0` 是破坏性（profile 入口、bundle v2、
   路径、手册）；`CHANGELOG` 写迁移；降级/回滚要有旧 tarball。

@@ -38,7 +38,7 @@
 - [covered] 结构门禁 + 生成物：`pnpm verify` 全绿（含 link / bare-path / script-index / script-triggers / doc-budget） → `checks/run-gates.mjs`
 - [covered] 资产对齐与棘轮：census 双向对齐、cap 66、失败类零未分类 → `tests/repo/budget/test-census.spec.ts`
 - [covered] 行为面：`pnpm orient` / `pnpm diagnose` / `pnpm notes:audit` 均 exit 0；orient 首跑暴露的 import 深度错已修 → `probes/analyze/orient-probe.mjs`
-- [covered] 覆盖率：`pnpm coverage:ratchet` PASS（197 文件；asset-lanes 覆盖变好） → `tests/support/coverage-baseline.json`
+- [covered] 覆盖率：`pnpm coverage:ratchet` PASS（197 文件；asset-lanes 覆盖变好） → `checks/lib/coverage-baseline.json`
 - [policy] `MAX_PROBES` 抬顶属 P2 口径变更：按 handoff §4.2 建议取 A（用户未对 A/B 作答，授权依据见状态行）；B（退役换 cap）未取，理由见「输掉的方案」 → `tests/repo/budget/test-census.spec.ts`
 - [environment-gap] 未跑真模型 / 浏览器 / 真页面：本轮只动维护面文件与文档，不触 preset、host、client 面 → `checks/lanes/preset.entry.mjs`
 - [environment-gap] 未重跑 clean clone：无新依赖、无构建面变化，仅仓内路径与注册表 → `docs/guides/bootstrap.md`

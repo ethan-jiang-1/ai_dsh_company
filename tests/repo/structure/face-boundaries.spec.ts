@@ -22,8 +22,10 @@ import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layou
  *
  * 负例留证 2026-11-17：往 tools/lib/core 加 `import '../../../checks/lib/entry-probe.mjs'`
  *   → 共享地基→judge 边红；删除 → 绿。
- * 负例留证 2026-11-17（tests 源）：tests/support 加 `import '../../checks/lanes/lib/company-root-probe.mjs'`
- *   → lane-local 支撑只许 checks/lanes/** 消费；删除 → 绿。
+ * 负例留证 2026-11-17（tests 源）：tests/support 加一条指向
+ *   `../../checks/lanes/lib/company-root-probe.mjs` 的 import → lane-local 支撑只许 checks/lanes/** 消费；删除 → 绿。
+ * 负例留证 2026-11-17（路径字面量）：coverage-ratchet 读 `tests/support/coverage-baseline.json`
+ *   → “test-only 只许 tests/** 引用”红；基线搬到 `checks/lib/` 后绿。
  */
 
 const ZONE_ROOTS = ['tools/lib', 'checks/lib', 'checks/gates/lib', 'checks/lanes/lib', 'probes/lib']
@@ -87,6 +89,28 @@ describe('面库依赖方向（归属不是目录位置，是 import 方向）',
       }
     }
     expect(problems, '违反归属规则的 import 边（修家或搬模块，不要加豁免）').toEqual([])
+  })
+
+
+  it('local support 的路径字面量只许各自子树引用（非 tests 源；tests 由 import 守卫）', () => {
+    const rules = [
+      { prefix: 'checks/gates/lib/', allowed: /^checks\/gates\//, why: 'gate-local 只许 checks/gates/** 引用' },
+      { prefix: 'checks/lanes/lib/', allowed: /^checks\/lanes\//, why: 'lane-local 只许 checks/lanes/** 引用' },
+      { prefix: 'tests/support/', allowed: /^tests\//, why: 'test-only 只许 tests/** 引用' },
+    ]
+    // 两个豁免都是“点名/注释”，不是消费：checks-index 排除前缀；naming-contract 注释说明不扫 tests/support。
+    const allow = new Set(['tools/lib/core/checks-index.mjs', 'checks/gates/naming-contract.mjs'])
+    const problems: string[] = []
+    for (const file of files) {
+      const source = relative(ROOT, file).split(sep).join('/')
+      if (source.startsWith('tests/') || allow.has(source)) continue
+      const text = readFileSync(file, 'utf8')
+      for (const rule of rules) {
+        if (!text.includes(rule.prefix)) continue
+        if (!rule.allowed.test(source)) problems.push(`${source} → ${rule.prefix}：${rule.why}`)
+      }
+    }
+    expect(problems).toEqual([])
   })
 
   it('gate-local / lane-local / test-only 支撑只许各自子树消费', () => {

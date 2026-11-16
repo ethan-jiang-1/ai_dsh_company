@@ -162,7 +162,7 @@ pnpm verify          # 预期 ALL PASS（doc-taxonomy / doc-budget / md-links / 
 | **注册表** | `tools/lib/core/asset-lanes.mjs` PROBES 需 +7 条（domain: 'analyze'）+ FAILURE_CLASS_BY_NAME +7 条 | 候选失败类：orient/ask-latency/diagnose/explore-evidence/session-log-export = 会话持久化；notes-audit = 文档指针；propose-sampler = 模型可见文本 |
 | **refactor-drift 命名** | `checks/audit/` 只许 `-(audit\|check\|eval\|ratchet).mjs` | 改名 `refactor-drift-audit.mjs`；头注已有 状态+何时跑，合规 |
 | **冻结层链接** | `notes/archived/2026-10-16-deliverables-audit-seam.md:35` 有一条 `.md` 链接指向 refactor-drift；`notes-archived-links` 门禁会红 | 按 `notes/archived/AGENTS.md` 的唯一例外：**只修链接路径那一行，正文不动** |
-| **覆盖率基线** | `tests/support/coverage-baseline.json:801` 豁免 reason 提到 diagnose 路径（键 `tools/lib/probe/diagnosis.mjs` 不动）；入口脚本本身不在 coverage include（只含 `tools/lib/**`） | 只改 reason 文字；`pnpm coverage:ratchet` 应不受影响 |
+| **覆盖率基线** | `checks/lib/coverage-baseline.json:801` 豁免 reason 提到 diagnose 路径（键 `tools/lib/probe/diagnosis.mjs` 不动）；入口脚本本身不在 coverage include（只含 `tools/lib/**`） | 只改 reason 文字；`pnpm coverage:ratchet` 应不受影响 |
 
 ### 4.3 引用替换清单（live 面，8 个文件 18 处；已排除归档与本题材料）
 
@@ -172,7 +172,7 @@ pnpm verify          # 预期 ALL PASS（doc-taxonomy / doc-budget / md-links / 
 | `checks/README.md` | 4 | 第 13、14、56、58 行的链接与命令 |
 | `notes/implemented/2026-10-30-notes-consistency-governance.md` | 1 | 第 21 行 notes-audit 链接 |
 | `notes/implemented/2026-11-10-exploration-asset-strategy.md` | 3 | 第 31、59、72 行 explore-evidence 路径 |
-| `tests/support/coverage-baseline.json` | 1 | 第 801 行 reason 文字 |
+| `checks/lib/coverage-baseline.json` | 1 | 第 801 行 reason 文字 |
 | `probes/lib/orient.mjs` | 1 | 第 3 行注释 |
 | `tools/lib/session/session-evidence.mjs` | 1 | 第 5 行注释 |
 | `checks/INDEX.generated.md` | 重生成 | `node tools/repo/checks-index.mjs --write` |

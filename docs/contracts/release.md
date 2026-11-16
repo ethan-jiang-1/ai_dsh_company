@@ -30,7 +30,7 @@ home/数据策略和生命周期承诺。六轴任一格写“默认应该有”
   插件的 peers 由安装锚解析，共享 dsh 安装侧的 cordis/工具包，不产生第二份单例。
 - **兼容窗口 = `engines.dsh`**：DSH 安装/启动只读这一行（存在即忽略 peers）。窗口是“可安装”，不是
   “已认证”；已认证 tag 台账住 repo，不随包分发。当前窗口与实测见 `package.json` 与
-  `checks/gates/lib/compat-tags.json`；`pack-engines` + `pack-compat` 各查一边。
+  `tools/lib/core/compat-tags.json`；`pack-engines` + `pack-compat` 各查一边。
 - **browser 两包条件启用**：npm 的 `@deepseek-ai/dsh` 不含 `dsh-browser-use` 与
   `dsh-experimental-browser-use-playwright-mcp`；六角色 preset 的 browser 组在可解析时启用、
   `DSH_COMPANY_BROWSER=on/off` 强制；两包不进 `dependencies`，保持离线/零 runtime 依赖姿态。
@@ -40,7 +40,7 @@ home/数据策略和生命周期承诺。六轴任一格写“默认应该有”
   模块表 require；其余内联，tarball 的浏览器半零 runtime 依赖。
 - **exports 不说谎**：`./src/*` 已摘；`files` 只发 runtime 两半与 `lib/types/**/*.d.ts`；tsc 中间物不进包。
 
-## 兼容台账（`checks/gates/lib/compat-tags.json`）
+## 兼容台账（`tools/lib/core/compat-tags.json`）
 
 ```json
 { "dshReleases": ["<历史 tag>", "<当前钉住 tag>"] }

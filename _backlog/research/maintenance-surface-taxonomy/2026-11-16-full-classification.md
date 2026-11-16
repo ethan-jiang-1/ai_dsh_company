@@ -62,7 +62,7 @@ intent: 126 条入口的全量判定结果、7 个冲突，以及三面迁移撞
 
 | 动作 | 文件 | 引用面 |
 |---|---|---|
-| 6 件迁 probes/analyze（拟建）+ 改名 -probe | tools/observe/ 6 个 .mjs | `package.json` 3 条脚本（orient / notes:audit / diagnose）、`checks/README.md` 3 处、2 篇 implemented Note、`tests/support/coverage-baseline.json` 1 条 reason、`tools/lib/{orient,session-evidence}.mjs` 2 处注释 |
+| 6 件迁 probes/analyze（拟建）+ 改名 -probe | tools/observe/ 6 个 .mjs | `package.json` 3 条脚本（orient / notes:audit / diagnose）、`checks/README.md` 3 处、2 篇 implemented Note、`checks/lib/coverage-baseline.json` 1 条 reason、`tools/lib/{orient,session-evidence}.mjs` 2 处注释 |
 | `refactor-drift` 迁 `checks/audit/` | 1 个 .mjs | 头注自述、可能的文档引用（待数） |
 | `session-log-export` 留在 `tools/`、离开 observe 组 | 1 个 .mjs | `tools/README.md` 组表、可能的 Note 引用 |
 | fixture 从探针计数摘出 | `checks-index` 的扫描规则或 `INDEX` 渲染 | 1 个生成器 + 重生成 |

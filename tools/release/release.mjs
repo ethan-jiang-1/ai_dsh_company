@@ -152,11 +152,11 @@ function sourceCheck(allowDirtyTree = allowDirty) {
       }
     }
   }
-  if (manifest?.dsh?.compatibility !== undefined) errors.push('package.json 仍携带 dsh.compatibility（应在 checks/gates/lib/compat-tags.json）')
+  if (manifest?.dsh?.compatibility !== undefined) errors.push('package.json 仍携带 dsh.compatibility（应在 tools/lib/core/compat-tags.json）')
   for (const rel of ['locale/en.json', 'locale/zh.json', 'icon.svg']) {
     if (!existsSync(join(PACK, rel))) errors.push(`package 缺 ${rel}`)
   }
-  const compat = JSON.parse(readFileSync(join(ROOT, 'checks/gates/lib/compat-tags.json'), 'utf8'))
+  const compat = JSON.parse(readFileSync(join(ROOT, 'tools/lib/core/compat-tags.json'), 'utf8'))
   if (!Array.isArray(compat?.dshReleases) || !compat.dshReleases.includes(expectedTag)) {
     errors.push(`compat-tags 缺当前 pin ${expectedTag}`)
   }

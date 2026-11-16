@@ -33,7 +33,7 @@
    pre-push 最后一步从 `pnpm test` 换成 `node checks/audit/coverage-ratchet.mjs`（跑全量测试 + 覆盖率 + 比基线）；
    实测覆盖率运行 24s，与 test 同量级，不额外花时间。判据纯逻辑 = `checks/lib/coverage-baseline.mjs`：
    ① 任何文件低于基线 → 红；② 新文件 statements<80 / branches<70 → 红；③ statements<50 的已知空洞必须显式豁免；
-   ④ 豁免过期（文件没了或已到 50%）→ 红，逼人删配对。基线 = `tests/support/coverage-baseline.json`，只升不降。
+   ④ 豁免过期（文件没了或已到 50%）→ 红，逼人删配对。基线 = `checks/lib/coverage-baseline.json`，只升不降。
 7. **现有 5 个低覆盖文件登记为「已知空洞」而不是假装没看见。** 3 个 0% 的 tools/lib 文件
    （carrier-registry / diagnosis / probe-window）+ 2 个启动策略 UI 文件（startup-store 40% / StrategyPanel 44.8%），
    每条写 `reason` + `removeWhen`；下次动到对应面时补测并删豁免，否则棘轮会因「过期豁免」报红。
@@ -104,7 +104,7 @@
 - 事实：**资产 lane 的唯一家 = lane 注册表**；pre-push 按面补跑；每周全量 keyless。
 - 唯一入口：`tools/lib/core/asset-lanes.mjs`（lane 成员 + 规则 + 纯匹配）、`checks/pre-push-surfaces.mjs`（取范围 + 跑）、
   `checks/lanes/keyless-lane.mjs`（全量）、`tests/repo/budget/asset-lanes.spec.ts`（空间完备门）；
-  执行下限的唯一入口 = `checks/audit/coverage-ratchet.mjs` + `checks/lib/coverage-baseline.mjs` + `tests/support/coverage-baseline.json`；
+  执行下限的唯一入口 = `checks/audit/coverage-ratchet.mjs` + `checks/lib/coverage-baseline.mjs` + `checks/lib/coverage-baseline.json`；
   失败类决策表 = `tests/failure-classes.md`；账本三列 = `close-out-definition` / `agent-note-definition` skill；盘子 = `tools/repo/test-census.mjs` → `tests/CENSUS.generated.md`（生成物），一致性 = `tests/repo/budget/test-census.spec.ts`。
 - 读载体：`tests/README.md`「按面触发」一段、`checks/README.md` quick-select、`.githooks/pre-push` 头注、
   `checks/INDEX.generated.md`（生成物）。

@@ -31,7 +31,7 @@ try {
   const gitVendor = async argv => (await run('git', ['-C', VENDOR, ...argv])).trim()
   const verifyPath = join(ROOT, 'tools/lib/core/pin.mjs')
   const agentsPath = join(ROOT, 'AGENTS.md')
-  const compatPath = join(ROOT, 'checks/gates/lib/compat-tags.json')
+  const compatPath = join(ROOT, 'tools/lib/core/compat-tags.json')
   const lockPath = join(ROOT, 'pnpm-lock.yaml')
   const verifyText = readFileSync(verifyPath, 'utf8')
   const agentsText = readFileSync(agentsPath, 'utf8')

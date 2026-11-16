@@ -39,7 +39,7 @@ export function run({ root, ok, fail }) {
   }
   const compat = pack?.dsh?.compatibility
   if (compat !== undefined) {
-    fail('release-ready', `${packPath} 仍携带 dsh.compatibility（DSH 不读；台账应在 checks/gates/lib/compat-tags.json）`)
+    fail('release-ready', `${packPath} 仍携带 dsh.compatibility（DSH 不读；台账应在 tools/lib/core/compat-tags.json）`)
     return
   }
   ok(`release-ready（${version}；条目 ${top.match[2]}；源码指纹看 release --check）`)

@@ -22,13 +22,13 @@ else ok(`pack-bundle ×${patchRels.length}`)
 // tools/repo/sync-dsh.mjs（它会同步加列），这条门禁保证忘加就红。
 let compat
 try {
-  compat = JSON.parse(readFileSync(join(root, 'checks/gates/lib/compat-tags.json'), 'utf8'))
+  compat = JSON.parse(readFileSync(join(root, 'tools/lib/core/compat-tags.json'), 'utf8'))
 } catch (error) {
-  fail('pack-compat', `读不到 checks/gates/lib/compat-tags.json（${error instanceof Error ? error.message : String(error)}）；台账缺失不能静默通过`)
+  fail('pack-compat', `读不到 tools/lib/core/compat-tags.json（${error instanceof Error ? error.message : String(error)}）；台账缺失不能静默通过`)
 }
 const compatReleases = compat?.dshReleases
 if (compat !== undefined && (!Array.isArray(compatReleases) || !compatReleases.includes(expectedTag))) {
-  fail('pack-compat', `checks/gates/lib/compat-tags.json 的 dshReleases 必须包含当前钉住的 ${expectedTag}（升 pin 走 tools/repo/sync-dsh.mjs 并同步加列）`)
+  fail('pack-compat', `tools/lib/core/compat-tags.json 的 dshReleases 必须包含当前钉住的 ${expectedTag}（升 pin 走 tools/repo/sync-dsh.mjs 并同步加列）`)
 } else if (compat !== undefined) {
   ok(`pack-compat (${expectedTag} ×${String(compatReleases.length)})`)
 }

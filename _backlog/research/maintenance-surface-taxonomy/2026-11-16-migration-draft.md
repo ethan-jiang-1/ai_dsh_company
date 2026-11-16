@@ -64,7 +64,7 @@ rmdir tools/observe
 | `tools/README.md` | 12 行组表 | 删 observe 组，四组 → 三组 + 说明 |
 | `notes/implemented/2026-10-30-notes-consistency-governance.md` | 21 | notes-audit 路径 |
 | `notes/implemented/2026-11-10-exploration-asset-strategy.md` | 31、59、72 | explore-evidence 路径 |
-| `tests/support/coverage-baseline.json` | 801 | 豁免 reason 里的 diagnose 路径（键 `tools/lib/probe/diagnosis.mjs` 不动） |
+| `checks/lib/coverage-baseline.json` | 801 | 豁免 reason 里的 diagnose 路径（键 `tools/lib/probe/diagnosis.mjs` 不动） |
 | `probes/lib/orient.mjs` | 3 | 注释里的 CLI 面路径 |
 | `tools/lib/session/session-evidence.mjs` | 5 | 注释里的调用方路径 |
 | 本题研究材料 | 多篇 | 这是**自指成本**：research 材料在 bare-path 扫描面内，迁完必须同步改路径，否则它们会把迁移判红 |

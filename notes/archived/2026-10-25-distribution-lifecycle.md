@@ -22,7 +22,7 @@
 ### 1. 契约（manifest + 手册）
 
 - manifest 增加：`engines.node >=22.19.0`、`engines.dsh >=0.2.1-rc.2 <0.3.0`、`license: UNLICENSED`（内部交付；发布时再定）、`repository`（monorepo + directory）。`private: true` 保留到 publish。
-- `dsh.compatibility.dshReleases` 曾是“已认证 tag 台账”；2026-10-26 按 FAQ 24 §9.2 已迁到 [checks/gates/lib/compat-tags.json](../../checks/gates/lib/compat-tags.json) 并从 package manifest 移除。`engines.dsh` 是唯一运行时窗口；门禁只强制当前 pin 在台账内且在 engines 窗口内。
+- `dsh.compatibility.dshReleases` 曾是“已认证 tag 台账”；2026-10-26 按 FAQ 24 §9.2 已迁到 [tools/lib/core/compat-tags.json](../../tools/lib/core/compat-tags.json) 并从 package manifest 移除。`engines.dsh` 是唯一运行时窗口；门禁只强制当前 pin 在台账内且在 engines 窗口内。
 - 手册生成器：算 tgz sha256，写同目录 `*.tgz.sha256`，把 hash、Node/DSH 前置、获取方式、校验命令、安装失败/卸载/回退、许可与支持窗口注入手册。
 - 包内 README 顶部加“给收件人”的 5 行入口（版本/前置/手册位置/许可），维护者 owner 表留在下面。
 

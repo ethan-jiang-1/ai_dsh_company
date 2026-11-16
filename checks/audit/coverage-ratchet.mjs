@@ -4,7 +4,7 @@
 //
 // 为什么：覆盖率此前是「10 个手选模块的百分比阈值 + 手动跑」——低于阈值不挡提交，
 // 188 个插桩文件里 3 个 0%、30 个 <80%。本脚本把上限变成**棘轮**：每次 push 跑一次全量覆盖率，
-// 与 `tests/support/coverage-baseline.json` 比：只升不降；新文件有下限；已知空洞必须显式豁免
+// 与 `checks/lib/coverage-baseline.json` 比：只升不降；新文件有下限；已知空洞必须显式豁免
 // （reason + removeWhen）；豁免一旦过期（文件没了或已到 50%）就红，逼人删掉。
 // 判据纯逻辑 = checks/lib/coverage-baseline.mjs（有 spec），本文件只做跑/读/写。
 import { spawnSync } from 'node:child_process'
@@ -22,7 +22,7 @@ const valueOf = flag => {
   return index >= 0 ? argv[index + 1] : undefined
 }
 
-const baselinePath = join(root, 'tests/support/coverage-baseline.json')
+const baselinePath = join(root, 'checks/lib/coverage-baseline.json')
 const defaultSummary = join(root, 'runtime/coverage-ratchet/coverage-summary.json')
 const summaryPath = valueOf('--summary') ?? defaultSummary
 
@@ -64,5 +64,5 @@ if (has('--update')) {
   }
   const next = nextBaseline(current, baseline)
   writeFileSync(baselinePath, `${JSON.stringify(next, null, 2)}\n`)
-  console.log(`coverage-ratchet: baseline 已更新（${String(Object.keys(next.files).length)} 文件；豁免 ${String(next.exemptions.length)} 条）→ tests/support/coverage-baseline.json`)
+  console.log(`coverage-ratchet: baseline 已更新（${String(Object.keys(next.files).length)} 文件；豁免 ${String(next.exemptions.length)} 条）→ checks/lib/coverage-baseline.json`)
 }
