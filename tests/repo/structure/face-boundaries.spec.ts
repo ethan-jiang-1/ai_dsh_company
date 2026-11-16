@@ -22,10 +22,12 @@ import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layou
  *
  * 负例留证 2026-11-17：往 tools/lib/core 加 `import '../../../checks/lib/entry-probe.mjs'`
  *   → 共享地基→judge 边红；删除 → 绿。
+ * 负例留证 2026-11-17（tests 源）：tests/support 加 `import '../../checks/lanes/lib/company-root-probe.mjs'`
+ *   → lane-local 支撑只许 checks/lanes/** 消费；删除 → 绿。
  */
 
 const ZONE_ROOTS = ['tools/lib', 'checks/lib', 'checks/gates/lib', 'checks/lanes/lib', 'probes/lib']
-const SCAN_ROOTS = ['tools', 'checks', 'probes']
+const SCAN_ROOTS = ['tools', 'checks', 'probes', 'tests']
 
 type Edge = { source: string; target: string; sourceZone: string; targetZone: string }
 
