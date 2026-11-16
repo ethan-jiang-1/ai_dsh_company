@@ -10,6 +10,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { join, resolve } from 'node:path'
 import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
 import { companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { RUN_BUNDLE_PATHS } from '../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 
 const BASE = join(ROOT, 'runtime/permissions-recovery-smoke')
 const CLI = join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js')
@@ -37,38 +38,44 @@ const restore = () => { spawnSync('chmod', ['-R', 'u+rwX', BASE]); }
 
 try {
   rmSync(BASE, { recursive: true, force: true }); mkdirSync(join(BASE, 'bin'), { recursive: true }); mkdirSync(join(BASE, 'user'), { recursive: true })
+  // WS 必须先存在（2026-11-16 修）：runtime-guard 在「DSH_COMPANY_HOME 指向的目录不存在」时按设计
+  // **停写**（无 workspace 零写，2026-11-03 立）——不建它，首 boot 不落骨架。
+  // 同修：公司状态家已迁 `.dsh-company/`（旧布局 `WS/kb`），本 lane 的路径改消费 RUN_BUNDLE_PATHS
+  // （旧写死路径 = 搬移后静默漏迁的消费者，2026-11-16 实测恒红 ENOENT）。
+  // 负例留证 2026-11-16：路径回退为 `WS/kb/company.md` → `ENOENT …/company-workspace/kb/company.md` 恒红；改回 → ALL PASS。
+  mkdirSync(WS, { recursive: true })
   writeFileSync(join(BASE, 'bin/dsh'), `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(CLI)} "$@"\n`, { mode: 0o755 })
   if (!existsSync(TARBALL)) throw new Error(`缺 ${TARBALL}`)
   check('安装成功', dsh(['plugin', '--profile', 'web', 'add', `file:${TARBALL}`]).status === 0)
   const first = await boot(); const r = await rpc(first)
   await r('session/create', { request: { cwd: WS, agentPreset: 'ceo' } })
-  writeFileSync(join(WS, 'kb/company.md'), '公司名: Acme\n')
+  writeFileSync(join(WS, RUN_BUNDLE_PATHS.company), '公司名: Acme\n')
   await stop(first)
 
   console.log('① 只读 workspace：boot 应继续，catalog 写失败不应崩')
-  rmSync(join(WS, 'kb/deliverables-index.json'), { force: true })
+  rmSync(join(WS, RUN_BUNDLE_PATHS.catalog), { force: true })
   spawnSync('chmod', ['-R', 'a-w', WS])
   let readOnlyBoot
   try { readOnlyBoot = await boot() } catch (error) { check('只读 workspace boot', false, String(error.message).split('\n')[0]) }
   if (readOnlyBoot !== undefined) {
     const rr = await rpc(readOnlyBoot)
     check('只读 workspace 仍可建会话', (await rr('session/create', { request: { cwd: WS, agentPreset: 'ceo' } }))?.agentPreset === 'ceo')
-    check('只读 workspace 不破坏 company.md', readFileSync(join(WS, 'kb/company.md'), 'utf8').includes('Acme'))
+    check('只读 workspace 不破坏 company.md', readFileSync(join(WS, RUN_BUNDLE_PATHS.company), 'utf8').includes('Acme'))
     await stop(readOnlyBoot)
   }
   restore()
 
   console.log('② 缺骨架目录：下一 boot 补建')
-  rmSync(join(WS, 'kb/ceo'), { recursive: true, force: true })
+  rmSync(join(WS, RUN_BUNDLE_PATHS.kb, 'ceo'), { recursive: true, force: true })
   const missing = await boot(); await stop(missing)
-  check('缺 kb/ceo 后被补建', existsSync(join(WS, 'kb/ceo/CHARTER.md')))
-  check('补建不覆盖 company.md', readFileSync(join(WS, 'kb/company.md'), 'utf8').includes('Acme'))
+  check('缺 kb/ceo 后被补建', existsSync(join(WS, RUN_BUNDLE_PATHS.kb, 'ceo/CHARTER.md')))
+  check('补建不覆盖 company.md', readFileSync(join(WS, RUN_BUNDLE_PATHS.company), 'utf8').includes('Acme'))
 
   console.log('③ catalog 坏 JSON：下一 boot 重建')
-  mkdirSync(join(WS, 'kb'), { recursive: true })
-  writeFileSync(join(WS, 'kb/deliverables-index.json'), '{ definitely not json')
+  mkdirSync(join(WS, RUN_BUNDLE_PATHS.kb), { recursive: true })
+  writeFileSync(join(WS, RUN_BUNDLE_PATHS.catalog), '{ definitely not json')
   const corrupt = await boot(); await stop(corrupt)
-  const catalog = JSON.parse(readFileSync(join(WS, 'kb/deliverables-index.json'), 'utf8'))
+  const catalog = JSON.parse(readFileSync(join(WS, RUN_BUNDLE_PATHS.catalog), 'utf8'))
   check('坏 catalog 被重建为 schema 1', catalog?.schema === 1 && Array.isArray(catalog.entries))
 } catch (error) { failures.push(error.message); console.error(`permissions-recovery-smoke: ${error.stack ?? error.message}`) }
 finally {

@@ -22,10 +22,10 @@
 ```sh
 git submodule update --init             # vendor/dsh 钉 tag
 corepack enable pnpm                    # 一次性：pnpm 读根 packageManager（钉 11.28.5）
-pnpm install                            # 根 workspace（vendor/dsh 全树含 vendored cordis 与 native/system）
-(cd vendor/dsh && pnpm install --frozen-lockfile --ignore-scripts)  # vendor 自己的 lock：pi-ai 1.1.0 / vite 8.2.2 等；根 lock 会解析到更新版 → 类型漂移
+pnpm install                            # 根 workspace（vendor/dsh 全树含 vendored cordis 与 native/system）；经 prepare 接 .githooks/pre-push（core.hooksPath 本地配置不随 clone；唯一家 = tools/dev/hooks-install.mjs）
+(cd vendor/dsh && pnpm install --frozen-lockfile --ignore-scripts)  # vendor 自己的 lock：pi-ai 1.1.0 / vite 8.2.2 等；根 lock 会解析到更新版 → 类型漂移（= `setup` 内部步骤，幂等重跑；单跑仅为排障）
 pnpm bundle:init                        # dev 公司状态 的 workspace（company-workspace/ 整树 gitignored；只建 .dsh-company/——公司事实/章程按 seed.json 补缺，手册/模板不复制）
-# host 面最小 dev type graph（fresh-clone CI 跑这档；源码直跑需要的 typert 产物）：
+# host 面最小 dev type graph（fresh-clone CI 跑这档；源码直跑需要的 typert 产物；= `setup` 内部步骤的展开，幂等吸收，单跑仅为排障）：
 node ./node_modules/typescript/bin/tsc -b \
   vendor/dsh/packages/typert/generator \
   vendor/dsh/packages/llm/llm \
@@ -98,7 +98,7 @@ node checks/lanes/delegation.entry.mjs      # 汇报线边界守卫：控制名�
   ③ pack 装进 **company profile**（`pnpm company` 默认 pack + `plugin add file:`；`--link` 走符号
   链接快速通道。profile `.npmrc` 把 store/cache 钉在 repo 内，`~/Library` 不被碰。
   历史：file: 拷贝时代首次装会拦 koffi 构建审批 → profile 的 `pnpm-workspace.yaml` 改
-  `koffi: true` 再装；link: 下 profile 不再装 koffi，koffi 由源码域解析）。观察窗默认端口由 wrapper 交系统分配（`--port 0`）；3080 是本 GUI，**永不动**，要固定端口用
+  `koffi: true` 再装；link: 下 profile 不再装 koffi，koffi 由源码域解析）。观察窗默认端口由 wrapper 交系统分配（`--port 0`）；日用 GUI **永不动**（其端口是环境状态，判据见 [multi-human-runbook](./multi-human-runbook.md)），要固定端口用
   `-- --port <n>`（端口是环境状态，从启动横幅读）。preset roster 出现在 UI 的 Built-in 组（6 公司角色 + 5 support preset；trust 分组见上文 R1 坑注）。
 - **bundle 叠加的重复行 id**（R1 实证）：web-app 已 insert `agent-presets`，pack 再 insert 同 id
   → `duplicate loader entry id` 硬拒。修法：对已存在的行用**替换**语法（`- id:`），只有真正

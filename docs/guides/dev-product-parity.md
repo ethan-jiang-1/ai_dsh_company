@@ -32,7 +32,7 @@
 | 凭据 | dev home 的 `.credentials.yaml` | 用户 home / 环境变量 | 按 home 隔离；不共享 |
 | 浏览器两包 | dev 显式 `DSH_COMPANY_BROWSER=on` | 装了才开；`on/off` 强制 | 源码树可解析、npm 发行版不含两包 |
 | probe / 日志 | 调试工具可自选 profile（多数 `probes/` 仍 boot `web`）；`preset-smoke` / `client-load-smoke` 固定 `company` | 用户无 | 调试必需，不承担用户侧验收；用户侧验收走 `company` 档 |
-| 账户观察窗 | 3080 是日用 `~/.dsh` 的 `web` profile | 用户的 `company` profile | 日用 GUI 不承担验收；验收走 dev home 的 `company` |
+| 账户观察窗 | 日用 `~/.dsh` 的 `web` profile（端口是环境状态，`lsof` 查） | 用户的 `company` profile | 日用 GUI 不承担验收；验收走 dev home 的 `company` |
 
 ## 怎么验
 

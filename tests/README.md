@@ -18,7 +18,7 @@
 | [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫；Lead/follow 适配器与 tab 注册目录（真实 Cordis `Context`/`SlotRegistry`）；多实例探活 disposer 契约；whole-client 档（真 `bootClient` × web profile bundle roster）覆盖 `apply` 组合与 fiber 卸载/重载。**目录名镜像 `src/client` 的组名**（同名对应；根只留 whole-client 组合 spec）；另有 `i18n/` 快速回归（字典/页签壳/缺省 locale），属性区，不镜像源码组 | 真浏览器渲染交互（→ client-load-smoke；真页面页签/错误环 → ui-scene-smoke） |
 | [tests/presets](./presets/) | persona / skills 声明内容；两轴 coverage（product-type 五件齐 + playbook + fixture / delivery-mode 经营侧方法 + workflow 分派 + awareness） | 组合装配与工具行实际生效（→ preset-smoke + 会话日志证据） |
 | [tests/repo](./repo/) · [tests/contract](./contract/) · [tests/tools](./tools/) · [tests/session](./session/) · [tests/evidence](./evidence/) · [tests/ui](./ui/) | 仓库合同（**按 owner 分六个子目录**：structure、pack、release、docs、budget、security——钉的是 `docs/`、`package.json`、`checks/` 与生成物，**没有单一的源码对象，所以不按源码分**；清单 = 目录本身）· 引擎合同与真值表 · `tools/lib` 纯逻辑 · 会话日志/诊断/探针驱动 · 协作与证据判据 · 页签目录（Phase 2 后叫 expected） | 运行时或 CLI 端到端行为 |
-| [tests/support](./support/) · [tests/fixtures](./fixtures/) | 共享夹具/合成输入与 provenance（不是 spec；`fixture-provenance` 门禁） | 产品行为或运行时行为 |
+| [tests/support](./support/) · [tests/fixtures](./fixtures/) | 共享夹具/合成输入与 provenance（不是 spec；`fixture-provenance` spec 守卫，pnpm test） | 产品行为或运行时行为 |
 
 spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随仓库增长，写进文档必过期）；导航到区，不到件。
 
@@ -79,8 +79,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 
 **三条硬规矩**：
 
-1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `checks/lanes/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：[`repo/layering.spec.ts`](repo/structure/layering.spec.ts) 扫 `tests/**`，出现 `node:child_process` / `spawn(` / playwright /
-   `fetch(` / 密钥即红（已反证：塞一行 `import { spawn } from 'node:child_process'` 立刻变红）。**R5a 起另禁两条**（均双红证）：tests/
+1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `checks/lanes/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：[`repo/layering.spec.ts`](repo/structure/layering.spec.ts) 扫 `tests/**` spec 文本，命中 `node:child_process` import / playwright / 密钥（`DEEPSEEK_API_KEY`|`credentials.yaml`）即红（已反证：塞一行 `import { spawn } from 'node:child_process'` 立刻变红）；`spawn(`/`fetch(` 调用点**不**机械扫（raw-text 会误伤夹具字符串），由 import ban + 下条驱动 import 禁 + 分层纪律守。**R5a 起另禁两条**（均双红证）：tests/
    不得 import `tools/` 下的驱动脚本（`tools/lib/` 纯逻辑库除外）；任何 vitest 配置不得把
    `checks|probes|tools` 编进测试发现——重放 lane 是第三档，只由 `checks/lanes/replay.e2e.mjs` 驱动。
 2. **能做成纯函数就做成纯函数**：UI 组件把"展示事实"抽成纯函数（范本 `delegationCardModel`），

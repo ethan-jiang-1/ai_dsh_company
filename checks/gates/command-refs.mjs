@@ -12,6 +12,10 @@ import { join } from 'node:path'
 //   `node <tools|checks|probes 路径>`：路径必须存在。
 // 不查：`vendor/` 路径（DSH 上游自己的命令；本仓不拥有）、`dsh`/`npx`/`npm` 等其他启动器、
 //   纯散文里的 "pnpm exit 0"（不在反引号/围栏里，不是命令引用）。
+// 不查 notes/（2026-11-16 取证）：notes 是决策记忆，正文允许过去时（"当时的 `pnpm standalone`"）
+//   与负例（"改坏成 `pnpm bundle-init` → 红"）——实测扩扫得 27 命中，全部是历史/负例/`pnpm vitest`
+//   这类合法二进制快捷，无一真 stale（唯一像的两条是被否方案与被禁形状的原文）。可执行事实的家 =
+//   docs/ + README + .agents/（本门覆盖）；notes 的路径类引用由 bare-path 门守。
 // 负例留证 2026-11-03（实地造红→还原→绿）：① 在 `docs/orient.md` 加围栏 `pnpm nonexistent-script`
 //   → `FAIL command-refs: docs/orient.md:N → pnpm nonexistent-script 不是本仓脚本…`；② 加
 //   `` `node tools/nonexistent-tool.mjs` `` → `… node tools/nonexistent-tool.mjs 指向不存在的文件`。

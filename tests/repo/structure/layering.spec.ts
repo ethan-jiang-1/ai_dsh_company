@@ -12,8 +12,8 @@ import { describe, expect, it } from 'vitest'
  * 结论：`pnpm test` 是秒级 keyless 单元/纯逻辑层；需要子进程的 CLI 集成检查放独立 smoke，
  * 真模型/真浏览器才进认证档，均按改动面与验收要求运行。
  *
- * 散文会被忘掉，所以这里把它变成断言：**Vitest spec 里出现子进程 / playwright / fetch / 密钥，
- * 直接红。** 有副作用的 CLI 或真实入口检查 → 写 `checks/lanes/*-smoke.mjs`，别塞进 tests/。
+ * 散文会被忘掉，所以这里把它变成断言：**Vitest spec 里出现 child_process import / playwright / 密钥文本，
+ * 直接红**（fetch/spawn 调用点不机械扫——raw-text 误伤夹具，见 FORBIDDEN 注）。有副作用的 CLI 或真实入口检查 → 写 `checks/lanes/*-smoke.mjs`，别塞进 tests/。
  */
 
 const TESTS = join(ROOT, 'tests')

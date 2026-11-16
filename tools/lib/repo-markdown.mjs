@@ -21,6 +21,45 @@ const loadYaml = (() => {
   throw new Error('js-yaml 缺失：先按 bootstrap 安装 workspace 依赖')
 })()
 
+/**
+ * Cordis 组合 YAML（bundle patch / preset `agent.cordis.yml`）的**唯一**加载器。
+ * 与文档 frontmatter 的区别只有一处：组合文件带 `!!js` Loader 表达式（`tag:yaml.org,2002:js`），
+ * `CORE_SCHEMA` 会直接抛错；这里把 `!!js` 收成标量字符串（门禁只做结构/依赖判断，不求值）。
+ * 为什么住这里而不是各门禁各写一份：`!!js` 是 DSH 组合方言（Loader 契约），两处手写必漂。
+ */
+export function loadCordisYaml(text) {
+  for (const base of ['../../vendor/dsh/package.json', '../../vendor/dsh/packages/boot/app-boot/package.json']) {
+    try {
+      const yaml = createRequire(new URL(base, import.meta.url))('js-yaml')
+      const schema = yaml.CORE_SCHEMA.extend({
+        explicit: [new yaml.Type('tag:yaml.org,2002:js', { kind: 'scalar', construct: s => s })],
+      })
+      return yaml.load(text, { schema })
+    } catch (error) {
+      if (error?.code === 'MODULE_NOT_FOUND' || error?.code === 'ERR_MODULE_NOT_FOUND') continue
+      throw error
+    }
+  }
+  throw new Error('js-yaml 缺失：先按 bootstrap 安装 workspace 依赖')
+}
+
+/** 组合条目树展平：`insert` 行、group 的 `config` 子条目、preset 行的 `config.plugins` 都算行。 */
+export function flattenCordisRows(operations) {
+  const rows = []
+  const walk = list => {
+    for (const row of Array.isArray(list) ? list : []) {
+      rows.push(row)
+      if (row?.group === true && Array.isArray(row.config)) walk(row.config)
+      if (Array.isArray(row?.config?.plugins)) walk(row.config.plugins)
+    }
+  }
+  for (const op of Array.isArray(operations) ? operations : []) {
+    if (Array.isArray(op?.insert)) walk(op.insert)
+    if (Array.isArray(op?.config?.plugins)) walk(op.config.plugins)
+  }
+  return rows
+}
+
 const FRONTMATTER_BLOCK = /^---\n([\s\S]*?)\n---(?:\n|$)/
 const ATX_HEADING_PREFIX = /^\s{0,3}(#{1,6})(?:\s+(.*?))?\s*$/
 
