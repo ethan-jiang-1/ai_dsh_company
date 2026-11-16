@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-14",
+  "generatedAt": "2026-11-17",
   "files": {
     "packages/company-pack/src/index.ts": {
       "statements": 63.55,
@@ -561,10 +561,6 @@
       "statements": 100,
       "branches": 92.85
     },
-    "checks/lib/candidate-scan.mjs": {
-      "statements": 96.09,
-      "branches": 89.2
-    },
     "checks/lib/carrier-registry.mjs": {
       "statements": 0,
       "branches": 100
@@ -604,10 +600,6 @@
     "checks/lib/coverage-baseline.mjs": {
       "statements": 98.21,
       "branches": 84.9
-    },
-    "checks/lib/delegation-model.mjs": {
-      "statements": 72.82,
-      "branches": 69.86
     },
     "checks/lib/deliverables-audit.mjs": {
       "statements": 91.21,
@@ -788,6 +780,14 @@
     "tools/lib/core/workspace-oracle.mjs": {
       "statements": 96.29,
       "branches": 94.62
+    },
+    "tools/lib/company/candidate-scan.mjs": {
+      "statements": 96.09,
+      "branches": 89.2
+    },
+    "tools/lib/company/delegation-model.mjs": {
+      "statements": 72.82,
+      "branches": 69.86
     }
   },
   "exemptions": [
@@ -815,6 +815,11 @@
       "path": "packages/company-pack/src/client/startup/StrategyPanel.tsx",
       "reason": "启动策略面板组件，当前 44.8%（2026-11-13 实测）；静态渲染断言不全",
       "removeWhen": "下一次改启动策略面时补测并删除本豁免"
+    },
+    {
+      "path": "tools/lib/core/pin.mjs",
+      "reason": "只含 expectedTag/expectedSha 常量，无可执行语句；由 pin-currency / vendor-pin / release 间接消费",
+      "removeWhen": "pin 模块出现可执行逻辑或补直接 spec 时删除豁免"
     }
   ]
 }
