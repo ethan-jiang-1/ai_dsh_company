@@ -1,4 +1,6 @@
 // 状态：常驻
+// 何时跑：想看运行态全景 / 排查「现在到底跑在哪个 home」/ 查某 slug 历史会话口径 / 回查某场景证据链时；
+//   成本：纯 fs 只读 + zstd 解会话头部（前 64KB），秒级，无模型无浏览器。
 // Orient：keyless 只读运行态观测（RFC driver-surface-package 条目 B；preset 字段与
 // --session 历史会话口径 = observation-hardening 条目 B / observation-closeout 条目 A；
 // 「待核工作候选」扫描节 = RFC orient-scan-view——默认全景对 deliverables/ 跑已采用的
@@ -7,17 +9,15 @@
 // ——不开 web 会话就能看到当前 home（含「未 source run/env.sh = 日用 home」警告）、在场
 // profiles、最近会话（含 preset）、公司盘概览、待核工作候选与便宜检查清单；--session <slug>[/<id前缀>]
 // 列/查某 slug 历史会话的 preset·cwd·createdAt；--scenario <kind>/<场景> 按 snapshots/README
-// 「Run bundle 引用合同」计算 run bundle 视图（引用不复制，不落盘 manifest）。何时跑：想看
-// 运行态全景 / 排查「现在到底跑在哪个 home」/ 查某 slug 历史会话口径 / 回查某场景证据链时；
-// 成本：纯 fs 只读 + zstd 解会话头部（前 64KB），秒级，无模型无浏览器。
+// 「Run bundle 引用合同」计算 run bundle 视图（引用不复制，不落盘 manifest）。
 // 纯逻辑核心 = tools/lib/orient.mjs（keyless 测试面）；git / zstd 等真实进程效果只住本 CLI 侧。
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { repositoryRoot } from '../lib/repository-layout.mjs'
-import { zstdText } from '../drivers/zstd.mjs'
-import { homeStatus, listSessions, listSlugSessions, orientState, parseSessionHead, renderOrient, renderRunBundle, renderSessionView, runBundleView } from '../lib/orient.mjs'
-import { pickSessionLog } from '../lib/session-log-generation.mjs'
+import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
+import { zstdText } from '../../tools/drivers/zstd.mjs'
+import { homeStatus, listSessions, listSlugSessions, orientState, parseSessionHead, renderOrient, renderRunBundle, renderSessionView, runBundleView } from '../../tools/lib/orient.mjs'
+import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
 
 const ROOT = repositoryRoot
 
@@ -59,7 +59,7 @@ function sessionPresetFor(homePath, slug) {
 }
 
 const args = process.argv.slice(2)
-const USAGE = `用法：node tools/observe/orient.mjs [--scenario <kind>/<场景> | --session <slug>[/<id前缀>]] [--workspace <dir>]
+const USAGE = `用法：node probes/analyze/orient-probe.mjs [--scenario <kind>/<场景> | --session <slug>[/<id前缀>]] [--workspace <dir>]
 
   （无参数）                 运行态全景（home / profiles / 会话 / 公司盘 / run trace / 真页面与诊断入口）
   --scenario <kind>/<场景>   run trace 视图（清单 = snapshots/README）

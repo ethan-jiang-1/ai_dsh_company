@@ -1,6 +1,6 @@
 // Orient 的 keyless 纯核心（RFC driver-surface-package 条目 B）：一条命令看到运行态全景——
 // home 判定（devHomeStatus 同款、只警告不抛）/ profiles / 会话清单 / 公司盘概览 / 便宜检查 /
-// run bundle 视图。CLI 面 = tools/observe/orient.mjs（git 计数等真实进程效果只住在那一侧）。
+// run bundle 视图。CLI 面 = probes/analyze/orient-probe.mjs（git 计数等真实进程效果只住在那一侧）。
 //
 // ⚠ run bundle 字段读取是有界的行扫描（顶层标量 + session/workspace 一层嵌套）——它只服务
 // 「视图」，不解析完整 YAML；场景元数据的权威 = snapshots/README「Run bundle 引用合同」

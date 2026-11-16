@@ -28,7 +28,7 @@
    在 root/member 是宿主面，不当 preset control。handbook 跟 `handbookSkipPresets()`，
    workflow 合同跟 `workflow` 工具，skill catalog 跟 preset `skills/` + `_shared` + methods。
    审计必须 `--since`（历史日志会被当前模型判成旧状态误报）。
-3. **会话证据包（A2）**：`tools/lib/session-evidence.mjs` 纯解析 + `tools/observe/explore-evidence.mjs`
+3. **会话证据包（A2）**：`tools/lib/session-evidence.mjs` 纯解析 + `probes/analyze/explore-evidence-probe.mjs`
    一条命令出 JSON/markdown（树/header/终态/工具调用/写盘/catalog）；缺首帧显式 `unavailable`，
    不默认 worker/0。3 个 probe 的 `rawHeader` 暂保留（probe 走 `session/page` 的 mode fallback，
    evidence 包走盘上直读；输入面不同，统一另开）。
@@ -56,7 +56,7 @@
 
 - 组合/preset/handbook/skill 改动后，可先跑 `checks/audit/surface-matrix-audit.mjs` 看运行时面；
   它**不是门禁**，不进 `pnpm test`，也不证明模型行为/深度拒绝/UI。
-- 真跑后的取证从“手解 zstd + 手抄 session id”变成 `tools/observe/explore-evidence.mjs --session <root>`；
+- 真跑后的取证从“手解 zstd + 手抄 session id”变成 `probes/analyze/explore-evidence-probe.mjs --session <root>`；
   证据包与矩阵都读同一套日志，卡内只留结论与坐标。
 - UI 卡默认可见性留给产品决定（折叠策略）；本轮只证“卡在 DOM、默认不可见”，不把 OBS-5 升级成 bug。
 
@@ -69,7 +69,7 @@
   同一 audit 对 `--since 2026-11-09` 旧日志 **exit 1**，报 `worker d1 control=list_subagents,send_to_subagent`
   （BUG-052 同型）与旧 vp-eng 缺 `quality_loop_*` 行——红证在案。
 - `pnpm vitest run tests/session/session-evidence.spec.ts`：6 tests 绿；缺首帧 → `unavailable`。
-- `node tools/observe/explore-evidence.mjs --session session-2110bd4a… --home runtime/harness-home`：
+- `node probes/analyze/explore-evidence-probe.mjs --session session-2110bd4a… --home runtime/harness-home`：
   root + 2 children（80/71/71 工具、3 轮 completed）。
 - B1 cancel：child 的 `bash sleep 120` 起后 cancel → root/child `turn/end=aborted`、无 `sleep 120` 残留；
   B1 sigterm：SIGTERM + 同 home 重启 → root/child=`interrupted`。

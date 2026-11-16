@@ -8,27 +8,27 @@
 | 指标 | 数量 |
 |---|---|
 | 冒烟 | 30 |
-| 探针 | 59 |
+| 探针 | 66 |
 | 结构门禁 | 75 |
 | keyless spec 文件 | 253 |
 | fast lane | 4 |
 | surface lane | 6 |
 | weekly lane | 21 |
 | 未分类失败类 | 0 |
-| 无消费者资产 | 50 |
+| 无消费者资产 | 57 |
 
 ## 失败类分布
 
 | 失败类 | 资产数 |
 |---|---|
-| 模型可见文本 | 22 |
+| 模型可见文本 | 23 |
 | 配置组合 | 19 |
 | client UI | 18 |
+| 会话持久化 | 13 |
 | 子进程并发 | 10 |
-| 会话持久化 | 8 |
 | 工具定义 | 5 |
+| 文档指针 | 3 |
 | 注册生命周期 | 3 |
-| 文档指针 | 2 |
 | 导出形态 | 1 |
 | 纯逻辑 | 1 |
 
@@ -75,6 +75,13 @@
 
 | 资产 | 域 | 失败类 | shape | 消费者 |
 |---|---|---|---|---|
+| ask-latency-probe | analyze | 会话持久化 | example | 0 |
+| diagnose-probe | analyze | 会话持久化 | example | 0 |
+| explore-evidence-probe | analyze | 会话持久化 | example | 0 |
+| notes-audit-probe | analyze | 文档指针 | example | 0 |
+| orient-probe | analyze | 会话持久化 | example | 0 |
+| propose-sampler-probe | analyze | 模型可见文本 | example | 0 |
+| session-log-export-probe | analyze | 会话持久化 | example | 0 |
 | attention-panel-probe | browser-visual | client UI | example | 0 |
 | board-drift-probe | browser-visual | client UI | example | 2 |
 | browser-behavior-probe | browser-visual | client UI | example | 0 |

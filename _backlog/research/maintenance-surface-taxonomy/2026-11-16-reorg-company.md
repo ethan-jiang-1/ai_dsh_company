@@ -5,6 +5,7 @@ intent: 本仓维护面整理单（自包含 handoff，含完整决策上下文�
 
 # 本仓（ai_dsh_company）维护面整理单
 
+> **状态：已落地（2026-11-16）。** 本仓 P0 + P1 已实施并提交：P1 取文档建议的 A（MAX_PROBES 59→66，口径 = 分类变更、非能力增长），B（退役 7 支同族探针）未取；7 件迁 `probes/analyze/`、`refactor-drift` 迁 `checks/audit/`。下文保留执行前的时点文本，旧家路径一律以纯文本书写（反引号只留给现行家）；现行事实 = [surface-contract](../../../docs/surface-contract.md) + [例外登记](../../../docs/reference/surface-exceptions.md)。
 > **给实施 agent**：本文自包含——规则、为什么是这套规则、本仓现状的逐条证据、P0 的精确插入文本、P1 的成本与撞墙点、验收命令，全在这里。你不需要读研究过程的其他材料；需要反例来源时再看 [盲审记录](2026-11-16-blind-review.md)。
 > **授权边界**：P0（§3）是声明层改动，用户已点名要做；P1（§4）涉及搬家与预算裁决，**动手前必须拿到用户对 A/B 选项的明确答复**。本文不是 P1 的授权。
 
@@ -17,7 +18,7 @@ intent: 本仓维护面整理单（自包含 handoff，含完整决策上下文�
 3. **收敛出的规则**：两层 × 三面 × 两个前置轴（§1）。核心判据一句话：**「主要产出什么？」**——裁决→judge，证据→show，持久状态→operate。
 4. **落地策略**：P0 只做面声明（零搬家、零行为改动），先让 fresh agent 不按目录名猜错；P1 搬家是可选的后续，成本已算到文件级。
 
-**为什么值得做**：本仓的 `tools/observe/` 7 件全是「给人看的证据工具」，却住在「改世界的操作」目录下；fresh agent 按目录名选工具时会把只读分析器当成会动盘的操作。这不是审美问题，是选错工具的风险。
+**为什么值得做**：本仓的 tools/observe/ 7 件全是「给人看的证据工具」，却住在「改世界的操作」目录下；fresh agent 按目录名选工具时会把只读分析器当成会动盘的操作。这不是审美问题，是选错工具的风险。
 
 ## 1. 规则（v2，三仓同文）
 
@@ -117,9 +118,9 @@ pnpm verify          # 预期 ALL PASS（doc-taxonomy / doc-budget / md-links / 
 ## 4. P1：可选搬家（先拿用户裁决，再动手）
 
 ### 4.1 搬什么
-- `tools/observe/` 7 件 → probes/analyze/（新域），改名 `*-probe.mjs`。
-- `tools/repo/refactor-drift.mjs` → checks/audit/refactor-drift-audit.mjs。
-- `tools/observe/` 目录删除；`tools/README.md` 四组改三组。
+- tools/observe/ 7 件 → probes/analyze/（新域），改名 `*-probe.mjs`。
+- tools/repo/refactor-drift.mjs → checks/audit/refactor-drift-audit.mjs。
+- tools/observe/ 目录删除；`tools/README.md` 四组改三组。
 
 **为什么 analyze 是新域而不是塞进现有四域**：这 7 件共享同一套 harness（zstd + 会话日志/notes 读取）、同一数据源（既有日志，不 boot 世界）、同一失败模式（解析/折叠错误），符合「域 = 共享 harness + 证据源 + 失败模式」的定义；它们不启动浏览器也不起会话，塞进 browser-visual 或 session-context 都会让域定义失真。census 的 domain 列是自由文本，加 `analyze` 不会撞任何门禁。
 
@@ -150,7 +151,7 @@ pnpm verify          # 预期 ALL PASS（doc-taxonomy / doc-budget / md-links / 
 
 **不需要改的**：`pnpm orient` / `pnpm diagnose` 等命令别名在 40 个文件里出现，但它们走 package.json 间接引用，路径改了命令不变；归档区（`_backlog/_archive`、`notes/archived`）对 tools/observe 零 `.md` 链接、零裸路径提及（已 grep 核实）；本题研究材料是自指成本，实施同 diff 更新或接受 bare-path 观察档提醒。
 
-**相对 import 不用改**：`tools/observe/` 与 probes/analyze/ 同为两层深，`../lib/`、`../drivers/` 解析不变；`tools/repo/` 与 `checks/audit/` 同理。refactor-drift 只 import node:crypto/fs，无仓内依赖。
+**相对 import 不用改**：tools/observe/ 与 probes/analyze/ 同为两层深，`../lib/`、`../drivers/` 解析不变；`tools/repo/` 与 `checks/audit/` 同理。refactor-drift 只 import node:crypto/fs，无仓内依赖。
 
 ### 4.4 同 diff 义务
 - 新 Note（`notes/implemented/`）：记录决定、输掉的方案（B 退役路线）、红→绿证据；若取代 `2026-11-15-tools-purpose-groups.md` 的四组决定，按 `notes-supersession` 门禁在旧 Note 加回链。

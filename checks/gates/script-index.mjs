@@ -35,10 +35,10 @@ export function run({ root, ok, fail }) {
     fail('script-index', 'checks/README.md 未链接 INDEX.generated.md——清单一处家，README 只做指针')
     return
   }
-  // 工具面顶层散件：入口必须进四个用途组之一（生成库存只扫四组，散件会静默消失）。
+  // 工具面顶层散件：入口必须进三个用途组之一（生成库存只扫三组，散件会静默消失）。
   const stray = strayToolEntries(root)
   if (stray.length > 0) {
-    fail('script-index', `tools/ 顶层有散件（入口必须进四个用途组之一）：${stray.join('、')}`)
+    fail('script-index', `tools/ 顶层有散件（入口必须进三个用途组之一）：${stray.join('、')}`)
     return
   }
   ok(`script-index ×${String(scripts.length)}（生成库存与目录一致；README 已链接；tools 顶层无散件）`)

@@ -58,7 +58,7 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-- [maintenance-surface-taxonomy](maintenance-surface-taxonomy/README.md) — 三仓维护面顶层分类法比较（调研中，2026-11-16）
+- [maintenance-surface-taxonomy](maintenance-surface-taxonomy/README.md) — 三仓维护面顶层分类法比较（已定性；本仓 handoff 2026-11-16 已落地）
 
 （2026-11-15 tests-src-correspondence 随 tests-tree-axis 卡落地迁入[研究归档](../_archive/research/README.md)。）
 

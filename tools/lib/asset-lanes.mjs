@@ -80,6 +80,15 @@ export const FAILURE_CLASS_BY_NAME = {
   'entry-probe': '文档指针',
   'generative': '文档指针',
 
+  // ── analyze 探针（7，2026-11-16 自 tools/observe 迁入）────────────────────────
+  'ask-latency-probe': '会话持久化',
+  'diagnose-probe': '会话持久化',
+  'explore-evidence-probe': '会话持久化',
+  'notes-audit-probe': '文档指针',
+  'orient-probe': '会话持久化',
+  'propose-sampler-probe': '模型可见文本',
+  'session-log-export-probe': '会话持久化',
+
   // ── browser-visual 探针（14）────────────────────────────────────────────────
   'attention-panel-probe': 'client UI',
   'board-drift-probe': 'client UI',
@@ -471,8 +480,15 @@ export function assetByName(name) {
   return ASSETS.find(asset => asset.name === name)
 }
 
-// ── 探针（59 个；调试面，不进自动 lane；上限由 test-census.spec 棘轮封顶）─────
+// ── 探针（66 个；调试面，不进自动 lane；上限由 test-census.spec 棘轮封顶）─────
 export const PROBES = [
+  defineProbe('ask-latency-probe', 'analyze'),
+  defineProbe('diagnose-probe', 'analyze'),
+  defineProbe('explore-evidence-probe', 'analyze'),
+  defineProbe('notes-audit-probe', 'analyze'),
+  defineProbe('orient-probe', 'analyze'),
+  defineProbe('propose-sampler-probe', 'analyze'),
+  defineProbe('session-log-export-probe', 'analyze'),
   defineProbe('attention-panel-probe', 'browser-visual'),
   defineProbe('board-drift-probe', 'browser-visual'),
   defineProbe('browser-behavior-probe', 'browser-visual'),

@@ -45,7 +45,7 @@ git mv tools/repo/refactor-drift.mjs       checks/audit/refactor-drift-audit.mjs
 rmdir tools/observe
 ```
 
-相对 import 全部是 `../lib/...` / `../drivers/...`；`tools/observe/` 与 probes/analyze（拟建） 同为两层深，`tools/repo/` 与 `checks/audit/` 也同为两层深，**无需改 import**。
+相对 import 全部是 `../lib/...` / `../drivers/...`；tools/observe/ 与 probes/analyze（拟建） 同为两层深，`tools/repo/` 与 `checks/audit/` 也同为两层深，**无需改 import**。
 
 ## 3. 注册表、门禁与预算
 

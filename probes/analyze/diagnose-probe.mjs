@@ -5,20 +5,20 @@
 //   被拒/非 allow 或未 decided 的审批、待答问询、team failed、present 调用、最后 assistant 正文；中断轮（有 start 无 end）
 //   会按最后工具区分「等人回答/等审批/真崩溃」；tool 调用统计；只读、无模型、无浏览器。
 //   `--strict` = 有失败或非零 bash 即 exit 1（默认 0）；child 目录（无 `session-` 前缀）也可 `--session`。
-// 用法：source run/env.sh && node tools/observe/diagnose.mjs [--session <slug>[/<id前缀>]] [--json] [--home <路径>] [--strict]
+// 用法：source run/env.sh && node probes/analyze/diagnose-probe.mjs [--session <slug>[/<id前缀>]] [--json] [--home <路径>] [--strict]
 //   不给 --session = 选最近更新的会话；日志优先走 pickSessionLog（zstd 多帧用 CLI 解）。
 // 前置：dev home 有 sessions/；离开 dev home 时 fail-closed（requireDevHome）。
 // `--home <路径>`（2026-10-23）：显式读一个**非 dev home**（如日用 `~/.dsh`——Web GUI 会话就住那儿）的会话日志。
 //   只读、不加写；默认仍拒绝，必须显式点名——双 home 纪律不变，只是给「读一眼日用 home」一条正路。
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { requireDevHome } from '../lib/runtime-home.mjs'
-import { pickSessionLog } from '../lib/session-log-generation.mjs'
-import { zstdText } from '../drivers/zstd.mjs'
-import { redactTokenUrls, summarizeSessionEvents } from '../lib/session-diagnose.mjs'
+import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
+import { zstdText } from '../../tools/drivers/zstd.mjs'
+import { redactTokenUrls, summarizeSessionEvents } from '../../tools/lib/session-diagnose.mjs'
 
 const args = process.argv.slice(2)
-const USAGE = `用法：source run/env.sh && node tools/observe/diagnose.mjs [--session <slug>[/<id前缀>]] [--json] [--home <路径>] [--strict]
+const USAGE = `用法：source run/env.sh && node probes/analyze/diagnose-probe.mjs [--session <slug>[/<id前缀>]] [--json] [--home <路径>] [--strict]
 
   （无参数）        最近更新的会话
   --session <s>    指定会话（slug 路径；child 目录也可，无 session- 前缀）

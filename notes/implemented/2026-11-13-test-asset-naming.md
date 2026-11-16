@@ -21,7 +21,7 @@
    - `golden → expected`：`ui.expected.json`、`ui-expected-freshness.mjs`、`ui-expected.mjs`、`ui-expected.spec.ts`、
      `--expected` / `--refresh-expected`。理由 = 同仓 `workspace.expected/` 已用 expected；DSH 亦有禁 golden 的门。
    - runner 正名：`fast-lane.mjs` / `keyless-lane.mjs`（名字说明"只调度"）。
-   - `refactor-drift-oracle.mjs` → `tools/repo/refactor-drift.mjs`（工具，不是冒烟；移出注册表）。
+   - `refactor-drift-oracle.mjs` → `checks/audit/refactor-drift-audit.mjs`（工具，不是冒烟；移出注册表；2026-11-16 随后续面整理迁 checks/audit）。
    - probes/team/quality-loop-audit.mjs（旧名） → `checks/audit/quality-loop-audit.mjs`（只读审计归位）。
    - 三个浏览器探针 → `*-probe.mjs`；`read-barrier/index.mjs` 是 fixture 入口，不再是"第 69 个探针"（从 PROBES/census 摘出）。
 6. **`naming-contract` 门禁**（`checks/gates/naming-contract.mjs`，已接线）：smoke 根文件只许 `-smoke` / `-lane`；

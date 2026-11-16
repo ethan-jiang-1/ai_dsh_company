@@ -52,12 +52,12 @@ intent: 记录三仓维护面分类法的事实、三条轴与「一目录一动
 |---|---|---|---|
 | run | `run/` + `tools/dev/` | `dev/` | `dev/` |
 | assert | `checks/gates` `checks/lanes` 及会 gate 的 `checks/audit` | checks/verify、checks/gates、checks/test、checks/release（判据半） | `scripts/verify` `scripts/smoke` `scripts/test` `scripts/run-gates` |
-| observe | `probes/` + `tools/observe/` | `probes/` | `probes/` |
+| observe | `probes/` + tools/observe/ | `probes/` | `probes/` |
 | act | `tools/repo` `tools/release` | checks/build、checks/release、checks/backlog、checks/openspec、checks/evidence | `scripts/run-ops` `scripts/dist` |
 
 按「一个顶层目录只放一个动词」检查，三个仓各有一处（或两处）不满足：
 
-- **本仓**：`run` 被劈成 `run/` 与 `tools/dev/`；`observe` 被劈成 `probes/` 与 `tools/observe/`；`tools/` 自己又混了 observe 与 act。**三处**。
+- **本仓**：`run` 被劈成 `run/` 与 `tools/dev/`；`observe` 被劈成 `probes/` 与 tools/observe/；`tools/` 自己又混了 observe 与 act。**三处**。
 - **`bsimulation`**：`checks` 混了 assert 与 act（12 子目录就是后果）；run/observe 纯。**一处**。
 - **`deep_research`**：`scripts` 混了 assert 与 act；run/observe 纯。**一处**。
 
@@ -85,7 +85,7 @@ D 的判定表（建议作为下一轮的试验判据）：
 
 ## 6. 如果 D 成立，三仓各付什么
 
-- **本仓**：`tools/observe` 7 件 → observe 面；`checks/audit` 里不 gate 的纯报告 → observe；`tools/dev` → `run/`（或保留 `tools/` 但只放 act）。顶层仍是 3–4 个，成员变；引用面按 2026-10-07 的教训是大头。
+- **本仓**：tools/observe 7 件 → observe 面；`checks/audit` 里不 gate 的纯报告 → observe；`tools/dev` → `run/`（或保留 `tools/` 但只放 act）。顶层仍是 3–4 个，成员变；引用面按 2026-10-07 的教训是大头。
 - **`bsimulation`**：`build` / `release` / `backlog` / `openspec` 从 `checks` 提到 act 面，`checks` 回到纯 assert；2 → 3 面。
 - **`deep_research`**：`scripts` 拆 assert（verify/smoke/test/run-gates）与 act（run-ops/dist）+ 共用 lib；顶层 3 → 4 面，203 行索引重写。
 

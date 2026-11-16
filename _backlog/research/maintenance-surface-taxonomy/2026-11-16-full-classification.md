@@ -29,12 +29,12 @@ intent: 126 条入口的全量判定结果、7 个冲突，以及三面迁移撞
 
 **116/123 = 94.3% 一致。** 7 个冲突全部落在 `tools/`：
 
-1–6. `tools/observe/{ask-latency,diagnose,explore-evidence,notes-audit,orient,propose-sampler}` —— show 挂在 operate 面。
-7. `tools/repo/refactor-drift.mjs` —— judge 挂在 operate 面。
+1–6. tools/observe/{ask-latency,diagnose,explore-evidence,notes-audit,orient,propose-sampler} —— show 挂在 operate 面。
+7. tools/repo/refactor-drift.mjs —— judge 挂在 operate 面。
 
 另有一处**库存口径缺陷**（不算 face 冲突）：`read-barrier/index.mjs` 被 `INDEX.generated.md` 当第 60 个探针计数，而 `CENSUS` 按注册表数 59。上一轮说的 60 vs 59 到此坐实。
 
-**为什么抽样 66%、全量 94%**：抽样挑的是难例（audit / observe / 双模件），全量里绝大多数是同质的 lane 与 probe。结论不是"规则很准"，而是——**规则的难点高度集中在一个组（`tools/observe`）和一个文件（`refactor-drift`）**，不是弥散在全仓。这对迁移是好消息：改动面小且可枚举。
+**为什么抽样 66%、全量 94%**：抽样挑的是难例（audit / observe / 双模件），全量里绝大多数是同质的 lane 与 probe。结论不是"规则很准"，而是——**规则的难点高度集中在一个组（tools/observe）和一个文件（`refactor-drift`）**，不是弥散在全仓。这对迁移是好消息：改动面小且可枚举。
 
 ## 3. 迁移撞上的 P2 棘轮（关键约束）
 
@@ -53,7 +53,7 @@ intent: 126 条入口的全量判定结果、7 个冲突，以及三面迁移撞
 |---|---|---|---|
 | A 一次性抬顶 | `MAX_PROBES` 59 → 65，同 diff 写 Note，用户批准 | 破一次"只降不升"，需明确授权 | **最诚实**：移动不是新增，棘轮应数能力不数门牌 |
 | B 同批退役 6 支 | 合并/删除同族探针（claim-race / team-claim-loser / team-concurrency 一类） | 要另做证据与合并，风险大 | 方向对，但不该塞进分类法迁移 |
-| C 留在 tools 并登记例外 | `tools/observe` 作为 show  annex，文档写明 | 零迁移，边界继续脏 | 最省事，但等于承认规则管不了这一组 |
+| C 留在 tools 并登记例外 | tools/observe 作为 show  annex，文档写明 | 零迁移，边界继续脏 | 最省事，但等于承认规则管不了这一组 |
 | D 重新定义 show | 把日志分析器算 operate（产物 = 报告） | 不撞棘轮 | 与"红了谁动"矛盾：orient/diagnose 不改变世界 |
 
 **建议 A**，并把 P2 的口径改成"**新增探针能力**"而非"目录计数"：迁移/改名不占预算，新增才占。这样分类法可以自由收敛，预算仍然封顶。B 可作为下一轮独立清理，不与本次迁移捆绑。
@@ -62,13 +62,13 @@ intent: 126 条入口的全量判定结果、7 个冲突，以及三面迁移撞
 
 | 动作 | 文件 | 引用面 |
 |---|---|---|
-| 6 件迁 probes/analyze（拟建）+ 改名 -probe | `tools/observe/` 6 个 .mjs | `package.json` 3 条脚本（orient / notes:audit / diagnose）、`checks/README.md` 3 处、2 篇 implemented Note、`tests/support/coverage-baseline.json` 1 条 reason、`tools/lib/{orient,session-evidence}.mjs` 2 处注释 |
+| 6 件迁 probes/analyze（拟建）+ 改名 -probe | tools/observe/ 6 个 .mjs | `package.json` 3 条脚本（orient / notes:audit / diagnose）、`checks/README.md` 3 处、2 篇 implemented Note、`tests/support/coverage-baseline.json` 1 条 reason、`tools/lib/{orient,session-evidence}.mjs` 2 处注释 |
 | `refactor-drift` 迁 `checks/audit/` | 1 个 .mjs | 头注自述、可能的文档引用（待数） |
 | `session-log-export` 留在 `tools/`、离开 observe 组 | 1 个 .mjs | `tools/README.md` 组表、可能的 Note 引用 |
 | fixture 从探针计数摘出 | `checks-index` 的扫描规则或 `INDEX` 渲染 | 1 个生成器 + 重生成 |
 | 注册表 +6、失败类 +6、census 重生成 | `tools/lib/asset-lanes.mjs`、`tests/CENSUS.generated.md` | 与 A/B 决策绑定 |
 
-净搬家 ≈ 8 个文件，引用 ≈ 10 个文件 + 2 份生成物。比 2026-10-07 顶层化的 ~350 处小两个数量级，因为 `tools/observe` 不在 lane 注册表里、也没有脚本互相 spawn。
+净搬家 ≈ 8 个文件，引用 ≈ 10 个文件 + 2 份生成物。比 2026-10-07 顶层化的 ~350 处小两个数量级，因为 tools/observe 不在 lane 注册表里、也没有脚本互相 spawn。
 
 ## 5. 这一轮暴露的设计教训
 

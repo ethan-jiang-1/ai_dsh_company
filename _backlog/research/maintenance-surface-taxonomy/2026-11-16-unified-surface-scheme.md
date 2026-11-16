@@ -108,7 +108,7 @@ tools/             operate  dev(env/boot) / repo / release / build / bookkeeping
 
 | 仓 | 现状 | 目标 | 错位（估） | 代价 |
 |---|---|---|---|---|
-| company | checks / probes / tools | 名字已对；`tools/observe` 解散 | 7 条（6 show + 1 judge） | 8 次 mv，~10 引用，2 生成物 |
+| company | checks / probes / tools | 名字已对；tools/observe 解散 | 7 条（6 show + 1 judge） | 8 次 mv，~10 引用，2 生成物 |
 | bsimulation | checks / probes / dev | `dev/` → `tools/dev/`；checks 只留 judge | ~30/70 件（audit 是 show；release 混装；backlog/openspec/build/evidence 是 operate） | 1 次顶层改名 + 6 组搬家 + 命令字面量 |
 | deep_research | probes / scripts / dev | `scripts/` → `checks/`；`dev/` → `tools/dev/`；run-ops 拆 show/judge、dist 迁 tools | ~18/60 件 | 152 件改名 + 203 行 README + 命令字面量，**三仓最重** |
 
@@ -118,7 +118,7 @@ tools/             operate  dev(env/boot) / repo / release / build / bookkeeping
 
 ## 7. 怎么保证以后不烂（结构基石）
 
-1. **face = 目录默认 + 例外表**：目录动词就是默认面（checks=judge / probes=show / tools|dev=operate），**只登记不在默认面的例外**（如 `tools/observe` 的 6 件、`refactor-drift`）。新增条目默认随目录，破例要写一行理由；不搞 126 条逐条声明，也不给第二本账。
+1. **face = 目录默认 + 例外表**：目录动词就是默认面（checks=judge / probes=show / tools|dev=operate），**只登记不在默认面的例外**（如 tools/observe 的 6 件、`refactor-drift`）。新增条目默认随目录，破例要写一行理由；不搞 126 条逐条声明，也不给第二本账。
 2. **面纯度观察行**：CENSUS 增"该面里动词一致的条目数 / 总数"；先**只观察**，不设硬门（避免再造一条为指标服务的棘轮）。低于 80% 列"待收敛"。
 3. **预算与目录解耦**：P2 的 `MAX_PROBES` 数"登记能力"，迁移/改名不占预算，新增才占。否则任何分类法收敛都会撞顶。
 4. **一页合同，一处事实**：每个仓 `docs/` 放同一份 20 行规则（附录），README 只链接，不复制清单；跨仓不互链，靠同一文本与版本行。

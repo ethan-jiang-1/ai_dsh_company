@@ -10,14 +10,14 @@ import { extname, join } from 'node:path'
 
 /** 公开入口所在目录（相对仓库根）。 */
 export const PUBLIC_DIRS = ['checks/lanes', 'checks/audit', 'probes']
-/** 工具面的四个用途组（目录 = 何时进这个门；清单 = 目录本身）。 */
-export const TOOL_GROUPS = ['dev', 'observe', 'repo', 'release']
-/** 工具面顶层允许项：四组 + 实现层三目录 + README。其余一律算散件（文件 / 未知目录 / symlink）。 */
+/** 工具面的三个用途组（目录 = 何时进这个门；清单 = 目录本身）。 */
+export const TOOL_GROUPS = ['dev', 'repo', 'release']
+/** 工具面顶层允许项：三组 + 实现层三目录 + README。其余一律算散件（文件 / 未知目录 / symlink）。 */
 export const TOOL_TOP_ALLOWED = new Set([...TOOL_GROUPS, 'lib', 'drivers', 'archive', 'README.md'])
 
 /**
  * 工具面顶层散件：不在 TOOL_TOP_ALLOWED 里的任何 entry。
- * 为什么：入口只许进四组；散在顶层的新入口会逃出生成库存与「组」的语义。
+ * 为什么：入口只许进三组；散在顶层的新入口会逃出生成库存与「组」的语义。
  */
 export function strayToolEntries(root) {
   const dir = join(root, 'tools')
@@ -44,7 +44,7 @@ function walk(root, rel) {
 }
 
 /**
- * 扫描公开入口：smoke/audit/probes 全树 + tools 四个用途组；排除内部实现前缀。
+ * 扫描公开入口：smoke/audit/probes 全树 + tools 三个用途组；排除内部实现前缀。
  * @param {string} root 仓库根。
  * @returns {ReadonlyArray<string>} 排序后的仓库相对路径。
  */

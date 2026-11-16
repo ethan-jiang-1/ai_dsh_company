@@ -798,7 +798,7 @@
     },
     {
       "path": "tools/lib/diagnosis.mjs",
-      "reason": "诊断工具的纯逻辑，当前只被 tools/observe/diagnose.mjs 调用，无直接 spec",
+      "reason": "诊断工具的纯逻辑，当前只被 probes/analyze/diagnose-probe.mjs 调用，无直接 spec",
       "removeWhen": "下一次改诊断面时补 spec"
     },
     {

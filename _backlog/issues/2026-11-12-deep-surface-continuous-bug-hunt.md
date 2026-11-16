@@ -74,7 +74,7 @@ opened: 2026-11-12
 - 测试树分轴前的 clean clone：`pnpm verify` 首跑 5 FAIL，全是已退役 tests/harness 的死指针；暖树因本地留空目录而全绿（`51a1c61b`）。
 - `tests/presets` 未进类型面：补进后首跑 24 个类型错误（`0fb6256c`）。
 - `1eb14f46` 的独立盲审 2 个 blocker：`tests/README.md` 仍写五条例外且新 spec 落点漏 lib、冻结层 36 个文件白改。
-- 三批搬移的 Note / 提交都**未见记录使用**本仓现成的纯搬移等价 oracle [refactor-drift.mjs](../../tools/repo/refactor-drift.mjs)；等价性靠「逐文件对读 + 全绿」证明。而它自己的用法头注还写着过期路径（预检表第 6 行）。
+- 三批搬移的 Note / 提交都**未见记录使用**本仓现成的纯搬移等价 oracle [refactor-drift.mjs](../../checks/audit/refactor-drift-audit.mjs)；等价性靠「逐文件对读 + 全绿」证明。而它自己的用法头注还写着过期路径（预检表第 6 行）。
 
 **结论：搬移的机械面是已知的（import / 显式引用 / 生成物），但「活指针的载体分类」「门禁扫描面是否被搬空」「真入口是否仍通」不在任何单一门禁的射程；`pnpm test` 全绿只证明跑过的没红，不证明没被删、没改名、没弱化。**
 
@@ -82,7 +82,7 @@ opened: 2026-11-12
 
 | ID | 子面 | 问题 | oracle（不拿实现当 oracle） |
 |---|---|---|---|
-| M1 | **等价性** | 搬移前后，测试全名 / 测试体指纹、spec 数、lane / 门禁清单、覆盖率基线数值、类型面 include-exclude 是否只发生声明过的变化 | 搬移父提交 + [refactor-drift.mjs](../../tools/repo/refactor-drift.mjs) 的 `--hashes` + `git show --name-status -M` + 提交声明面 |
+| M1 | **等价性** | 搬移前后，测试全名 / 测试体指纹、spec 数、lane / 门禁清单、覆盖率基线数值、类型面 include-exclude 是否只发生声明过的变化 | 搬移父提交 + [refactor-drift.mjs](../../checks/audit/refactor-drift-audit.mjs) 的 `--hashes` + `git show --name-status -M` + 提交声明面 |
 | M2 | **活指针** | 代码注释、README、docs、`.agents/skills/**`、SKILL / 头注、生成物是否还指向搬移前的家；哪些是 frozen / fixture，哪些是 live | 路径存在性 + 载体是否会被 agent / 人读到 + 搬移提交的 changed files；frozen 规则见 [notes/archived AGENTS](../../notes/archived/AGENTS.md) |
 | M3 | **真入口** | 被搬移的工具 / 脚本，经真实入口跑（`pnpm company`、`pnpm setup`、release lane、company-entry、preset、hooks / pre-push）是否仍按设计工作 | 退出码 + 启动横幅 + 真安装 / 真会话；`--help` / `--check` 不算「真入口已通」 |
 | M4 | **静默弱化** | 门禁 / 类型 / 覆盖率 / 生成物 / 注册表在搬移后是否变成空扫、漏扫或指向旧家；绿灯是否因此变假 | 声明扫描面 × 盘面；负控 = 人为把被搬文件放回旧家或改一个引用，看门禁是否真红 |
@@ -100,7 +100,7 @@ opened: 2026-11-12
 | 3 | `packages/company-pack/src/lib/presence/presence-status.ts` 第 72 行 | tests/lib/presence-board.spec.ts | `tests/lib/presence/presence-board.spec.ts` | **真残留**（同上） |
 | 4 | [close-out-definition SKILL](../../.agents/skills/close-out-definition/SKILL.md) 第 25 行 | node tools/release.mjs --check | `node tools/release/release.mjs --check` | **已修**（`57d34a34` 修正路径并把 `.agents` 纳入 `command-refs`） |
 | 5 | `packages/company-pack/src/lib/deliverables/deliverables-address.ts` 第 6 行 | tools/deliverables-index.mjs | `tools/repo/deliverables-index.mjs` | **有意保留**（发布源指纹；下次 bump 同 diff 修，见 tools Note） |
-| 6 | `tools/repo/refactor-drift.mjs` 第 14–18 行 | checks/lanes/refactor-drift.mjs | `tools/repo/refactor-drift.mjs` | **已修**（`57d34a34` 把用法头注改成现行家） |
+| 6 | `checks/audit/refactor-drift-audit.mjs` 第 14–18 行 | checks/lanes/refactor-drift.mjs | `checks/audit/refactor-drift-audit.mjs` | **已修**（`57d34a34` 把用法头注改成现行家） |
 | 7 | `packages/company-pack/src/client/cultivation/cultivation-data.ts` 第 8 行、`packages/company-pack/src/host/cultivation/cultivation.ts` 第 22 行 | tests/host/cultivation.spec.ts | `tests/host/cultivation/` 三份 | **同类但非本批**（更早的 spec 拆分残留） |
 
 > 旧值一律写成纯文本，避免本卡自己被 bare-path 判红；现行家才用反引号。第 7 行的旧值在更早的 spec 拆分时就已失效（`1eb14f46` 只是又碰过这两个文件），所以列为「同类但非本批」，首轮复核是否仍算 live。
@@ -113,7 +113,7 @@ opened: 2026-11-12
 
 | ID | 假设 | oracle | 入口 |
 |---|---|---|---|
-| C11-1 | 三批搬移**改过测试体**（不止 import / 路径行），或改了测试名 / describe 归属而没有声明 | `refactor-drift --hashes` 对每个搬移父提交 vs HEAD；指纹有变且提交未声明 = 缺口 | [refactor-drift.mjs](../../tools/repo/refactor-drift.mjs)、vitest JSON（两个 worktree） |
+| C11-1 | 三批搬移**改过测试体**（不止 import / 路径行），或改了测试名 / describe 归属而没有声明 | `refactor-drift --hashes` 对每个搬移父提交 vs HEAD；指纹有变且提交未声明 = 缺口 | [refactor-drift.mjs](../../checks/audit/refactor-drift-audit.mjs)、vitest JSON（两个 worktree） |
 | C11-2 | 有 spec 在搬移后掉出类型面 / 覆盖率面（tsconfig include-exclude 或 vitest glob 不再命中） | 盘上 spec 清单 × `tsconfig.test-*.json` include-exclude 求差；负控 = 移一个 spec 到未覆盖目录，看 typecheck 是否仍绿 | `tsconfig.test-*.json`、`pnpm typecheck` |
 | C11-3 | `asset-lanes` / census / checks 索引有陈旧路径：登记项指向搬移前的家或已消失的资产 | 注册表 × 盘面；`node tools/repo/test-census.mjs --check`、`node tools/repo/checks-index.mjs --check`；负控 = 改一个登记路径，看 spec / gate 是否红 | [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs)、[CENSUS](../../tests/CENSUS.generated.md)、[checks/INDEX](../../checks/INDEX.generated.md) |
 | C11-4 | 覆盖率基线在搬移中被改过数值（静默降标），或键名改了但文件不再被覆盖率面覆盖 | baseline 数值集合 vs 搬移父提交；`coverage-ratchet` 的输入面 | [coverage-baseline.json](../../tests/support/coverage-baseline.json)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs) |
@@ -154,7 +154,7 @@ opened: 2026-11-12
 | **C8** | **PRD headings / present 闸门 / requirements-check** | 新交付阻断面：新 parser + 新旧兼容 + 模型可写输入；`present` 前 deny；只有 5 个 gate spec；Note 的 live deny 未跑；解析器对 CRLF/围栏/缩进的容错未证 | [prd-check.ts](../../packages/company-pack/src/lib/docs/prd-check.ts)、[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts)、[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts)、[prd 模板](../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../docs/reference/decisions.md) |
 | **C9** | **测试资产 / 验证元面**（lane 注册、pre-push、census、覆盖率） | 新「绿灯」的制造者：假绿/假跳过不会被产品 spec 抓到；新分支 zero-SHA 只 diff tip 已复现 | [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs)、[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs)、[CENSUS](../../tests/CENSUS.generated.md) |
 | **C10** | **client 错误环** | 新增过滤/持久化/上报；可能把真错误滤掉；真页面 lane 只在 weekly | [error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts)、`tests/client/wiring/error-ring.spec.ts`、`checks/lanes/client-error-chain.entry.mjs` |
-| **C11** | **搬移副作用 / 等价性**（三批纯搬移：tests 分轴、src↔tests 对齐、tools 四组） | 变量 = 位置：机械面（import / 显式引用 / 生成物）已改齐，但注释、技能、头注、门禁扫描面、注册表、类型面、覆盖率基线不在任何单一门禁的射程；全绿 ≠ 零漂移；搬移等价 oracle 未进任何 lane | 三批提交 `29ae8c94` / `1eb14f46` / `57d34a34`；[refactor-drift](../../tools/repo/refactor-drift.mjs)；[mirror.spec.ts](../../tests/repo/structure/mirror.spec.ts)；[CENSUS](../../tests/CENSUS.generated.md)；[checks/INDEX](../../checks/INDEX.generated.md)；[coverage-baseline.json](../../tests/support/coverage-baseline.json)；[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)；`checks/lanes/{company-entry,release,preset,client-load}.entry.mjs`；`.agents/skills/**`、`packages/company-pack/{presets,content,src}/**` 的头注 |
+| **C11** | **搬移副作用 / 等价性**（三批纯搬移：tests 分轴、src↔tests 对齐、tools 四组） | 变量 = 位置：机械面（import / 显式引用 / 生成物）已改齐，但注释、技能、头注、门禁扫描面、注册表、类型面、覆盖率基线不在任何单一门禁的射程；全绿 ≠ 零漂移；搬移等价 oracle 未进任何 lane | 三批提交 `29ae8c94` / `1eb14f46` / `57d34a34`；[refactor-drift](../../checks/audit/refactor-drift-audit.mjs)；[mirror.spec.ts](../../tests/repo/structure/mirror.spec.ts)；[CENSUS](../../tests/CENSUS.generated.md)；[checks/INDEX](../../checks/INDEX.generated.md)；[coverage-baseline.json](../../tests/support/coverage-baseline.json)；[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)；`checks/lanes/{company-entry,release,preset,client-load}.entry.mjs`；`.agents/skills/**`、`packages/company-pack/{presets,content,src}/**` 的头注 |
 
 **排除：**
 
@@ -1876,7 +1876,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 - **focus v3（2026-11-14）**：这是 BUG-152..159 修复后的 post-fix 回归；C8 第 2 轮、C9 额外 1 轮按用户新预算计，不算重复 v2 首轮。C8-H10 live 仍未跑，保持 `unverified`。
 - **focus v4（2026-11-14）**：这是 BUG-160..167 修复后的第二轮回归；新门禁 `fix-evidence` 与共享形状层按新预算计；C8-H10 live 仍未跑。
 - **focus v5（2026-11-14）**：这是 BUG-168..175 修复后的第三轮回归；新层（code span / JSON 掩码 / `..` 闸 / fix-evidence 命令与节解析 / notes-tree 根 symlink）按新预算计；Windows 实机仍未跑。
-- **focus v6（2026-11-15）**：C11 至少覆盖 M1–M4 各一次，或逐项写未跑原因；预检 7 条有分诊结论；[refactor-drift](../../tools/repo/refactor-drift.mjs) 至少实跑一次（或写「不能跑」的证据）；C11 ≤ 3 轮。
+- **focus v6（2026-11-15）**：C11 至少覆盖 M1–M4 各一次，或逐项写未跑原因；预检 7 条有分诊结论；[refactor-drift](../../checks/audit/refactor-drift-audit.mjs) 至少实跑一次（或写「不能跑」的证据）；C11 ≤ 3 轮。
 - **停止规则（focus v6）**：一轮没有新 material → 收口；用户叫停优先。
 - 不写「没有 bug」；未覆盖面保留并标 owner；单场 live 不写成稳定。
 - 证据可复读；`pnpm verify` + `pnpm test` 绿；审查记录齐后归档。

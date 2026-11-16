@@ -7,15 +7,15 @@
 //   ② 跨 home 聚合审计（每家 home 各跑一次本工具再合并目录）；
 //   ③ 要给别的工具喂明文日志时。成本：零模型；秒到分钟级（视日志量，zstd -dc 逐份解）。
 // 用法：
-//   source run/env.sh && node tools/observe/session-log-export.mjs --out <dir> [--workspace <绝对路径>] [--home <DSH_HOME>]
+//   source run/env.sh && node probes/analyze/session-log-export-probe.mjs --out <dir> [--workspace <绝对路径>] [--home <DSH_HOME>]
 //   不给 --workspace = 导出该 home 下全部 bucket（文件名带 bucket 前缀防撞）。
 // 退出码：0 = 导出完成；1 = 无可导日志或全部失败；2 = 参数/环境失败。
-import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
-import { pickSessionLog } from '../lib/session-log-generation.mjs'
-import { zstdText } from '../drivers/zstd.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
+import { zstdText } from '../../tools/drivers/zstd.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { requireDevHome } from '../lib/runtime-home.mjs'
+import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
 
 const arg = (name) => {
   const i = process.argv.indexOf(`--${name}`)

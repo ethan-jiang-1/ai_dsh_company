@@ -21,7 +21,7 @@ intent: 独立盲审的 19 条发现、采纳/驳回与由此产生的规则修�
 | 15 | 合同写了另两仓不存在的目录名 | 合同改为**面优先**；现状名与目标名分列，P0 不改名 |
 | 18/19 | `dev/`→`tools/dev/`、`scripts/`→`checks/` 会打断 gate 输入、hooksPath、注入面与 3093 处引用 | **撤回"必须改名"**；改名降为独立项目，handoff 写风险清单 |
 | 7 | lane runner 被 CSV 记成 judge | runner = **非面**；`fast-lane`/`keyless-lane` 改列非面，仍住 `checks/lanes` |
-| 9 | `session-log-export` 用"失败要重跑"判 operate，测试是空的 | 改用**产物**判：导出的是证据 → **show**；`tools/observe` 7 件全 show |
+| 9 | `session-log-export` 用"失败要重跑"判 operate，测试是空的 | 改用**产物**判：导出的是证据 → **show**；tools/observe 7 件全 show |
 | 10 | `terms.mjs` / `dist-cleanup` 这类 support 模块无处安放 | 非面清单加 **support / 数据 / 查询**；跟消费者住 |
 
 ## 2. 改写后采纳（结论不同）

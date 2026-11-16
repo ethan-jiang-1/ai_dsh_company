@@ -2,6 +2,8 @@
 
 状态：implemented（2026-11-15 落地；任务源 = 用户点名「工具也应当有目录结构」）
 
+> **被 [2026-11-16-maintenance-surface-declaration-and-migration](./2026-11-16-maintenance-surface-declaration-and-migration.md) 部分取代（2026-11-16）：** `observe/` 组解散（7 件迁 `probes/analyze/`），工具面四组 → 三组；其余决定（保留 `tools/` 名、按用途分组、lib/drivers/archive 实现层、默认 dry-run）仍现行。
+
 > 上游 = 用户 2026-11-15：`tools/` 平铺 27 个入口，fresh agent 看见一屏文件无法判断「该跑哪个、跑了会动什么」。上一轮 `tests/repo` 与 `src/lib` 的分组论证沿用：**目录回答「什么时候进这个门」，文件名回答「具体干什么」**。
 
 ## 决定

@@ -27,14 +27,25 @@
 [upgrade-while-running.entry](lanes/upgrade-while-running.entry.mjs)
 [workflow-contract.e2e](lanes/workflow-contract.e2e.mjs)
 
-## 盘面审计（checks/audit/，7）
+## 盘面审计（checks/audit/，8）
 
 [authorship-audit](audit/authorship-audit.mjs) · [candidate-scan-eval](audit/candidate-scan-eval.mjs)
 [coverage-ratchet](audit/coverage-ratchet.mjs) · [deliverables-check](audit/deliverables-check.mjs)
 [journal-audit](audit/journal-audit.mjs) · [quality-loop-audit](audit/quality-loop-audit.mjs)
+[refactor-drift-audit](audit/refactor-drift-audit.mjs)
 [surface-matrix-audit](audit/surface-matrix-audit.mjs)
 
-## 窄机制与视觉探针（probes/，60）
+## 窄机制与视觉探针（probes/，67）
+
+### analyze（7）
+
+[ask-latency-probe](../probes/analyze/ask-latency-probe.mjs)
+[diagnose-probe](../probes/analyze/diagnose-probe.mjs)
+[explore-evidence-probe](../probes/analyze/explore-evidence-probe.mjs)
+[notes-audit-probe](../probes/analyze/notes-audit-probe.mjs)
+[orient-probe](../probes/analyze/orient-probe.mjs)
+[propose-sampler-probe](../probes/analyze/propose-sampler-probe.mjs)
+[session-log-export-probe](../probes/analyze/session-log-export-probe.mjs)
 
 ### browser-visual（14）
 
@@ -108,7 +119,7 @@
 [worker-orchestrator-probe](../probes/team/worker-orchestrator-probe.mjs)
 [worker-researcher-probe](../probes/team/worker-researcher-probe.mjs)
 
-## 维护工具（tools/，27）
+## 维护工具（tools/，19）
 
 ### dev/（6）
 
@@ -116,26 +127,18 @@
 [hooks-install](../tools/dev/hooks-install.mjs) · [methods-init](../tools/dev/methods-init.mjs)
 [rehearsal-init](../tools/dev/rehearsal-init.mjs) · [setup](../tools/dev/setup.mjs)
 
-### observe/（7）
-
-[ask-latency](../tools/observe/ask-latency.mjs) · [diagnose](../tools/observe/diagnose.mjs)
-[explore-evidence](../tools/observe/explore-evidence.mjs) · [notes-audit](../tools/observe/notes-audit.mjs)
-[orient](../tools/observe/orient.mjs) · [propose-sampler](../tools/observe/propose-sampler.mjs)
-[session-log-export](../tools/observe/session-log-export.mjs)
-
 ### release/（3）
 
 [export-dist](../tools/release/export-dist.mjs) · [market-index](../tools/release/market-index.mjs)
 [release](../tools/release/release.mjs)
 
-### repo/（11）
+### repo/（10）
 
 [bug-coverage](../tools/repo/bug-coverage.mjs) · [checks-index](../tools/repo/checks-index.mjs)
 [converge](../tools/repo/converge.mjs) · [deliverables-index](../tools/repo/deliverables-index.mjs)
-[prune-runtime](../tools/repo/prune-runtime.mjs) · [refactor-drift](../tools/repo/refactor-drift.mjs)
-[run-check-tests](../tools/repo/run-check-tests.mjs) · [snapshot-motion](../tools/repo/snapshot-motion.mjs)
-[snapshot-path](../tools/repo/snapshot-path.mjs) · [sync-dsh](../tools/repo/sync-dsh.mjs)
-[test-census](../tools/repo/test-census.mjs)
+[prune-runtime](../tools/repo/prune-runtime.mjs) · [run-check-tests](../tools/repo/run-check-tests.mjs)
+[snapshot-motion](../tools/repo/snapshot-motion.mjs) · [snapshot-path](../tools/repo/snapshot-path.mjs)
+[sync-dsh](../tools/repo/sync-dsh.mjs) · [test-census](../tools/repo/test-census.mjs)
 
 ## 结构门禁（checks/gates/，75 个模块）
 

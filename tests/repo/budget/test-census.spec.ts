@@ -11,9 +11,11 @@ import { consumerCount } from '../../../tools/lib/asset-consumers.mjs'
  * ① `tests/CENSUS.generated.md` 是生成物——与注册表/盘面不一致即红（防手抄漂移）；
  * ② 探针与冒烟双向对齐，且全量显式失败类（`未分类 === 0`）；
  * ③ 结构门禁总数与活跃探针总数实行只降不升硬顶（`policy §P2`）。
+ *   2026-11-16 面整理：7 件只读分析入口由 tools/observe 迁入 probes/analyze（分类变更，
+ *   入口总数不变，非能力增长）——探针 cap 59→66 与迁移同 diff；此后新增仍只降不升。
  */
 const MAX_GATES = 75
-const MAX_PROBES = 59
+const MAX_PROBES = 66
 
 function probeFiles() {
   const walk = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
@@ -41,7 +43,7 @@ describe('资产盘子与负债上限棘轮（census + P2 硬顶）', () => {
     expect(new Set(registered).size).toBe(registered.length)
   })
 
-  it('门禁数与探针数只降不升（policy §P2 硬顶）', () => {
+  it('门禁数与探针数封顶（policy §P2；探针 cap 随分类口径同步，新增仍只降不升）', () => {
     const { gateCount } = countProjectSurface(ROOT)
     expect(gateCount, `结构门禁总数不得超过 ${String(MAX_GATES)}（新规则并入既有门禁或先合并旧门）`).toBeLessThanOrEqual(MAX_GATES)
     expect(PROBES.length, `活跃探针总数不得超过 ${String(MAX_PROBES)}（加一减一，禁止探针负债回潮）`).toBeLessThanOrEqual(MAX_PROBES)

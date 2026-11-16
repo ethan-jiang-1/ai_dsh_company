@@ -47,13 +47,13 @@ intent: 把第一轮的四动词收敛成可执行的判定程序，用三仓真
 | 2 | `checks/lanes/ui-scene.entry.mjs`（本仓） | 拦 surface / 演示前返工 | judge | checks | ✅ |
 | 3 | `checks/audit/deliverables-check.mjs`（本仓） | 退回交付物 | judge | checks | ✅ |
 | 4 | `checks/audit/coverage-ratchet.mjs`（本仓） | 拦 push | judge | checks | ✅ |
-| 5 | `tools/repo/refactor-drift.mjs`（本仓） | 退回重构（零漂移裁决） | judge | tools | ❌ |
+| 5 | tools/repo/refactor-drift.mjs（本仓） | 退回重构（零漂移裁决） | judge | tools | ❌ |
 | 6 | `probes/browser-visual/cdp-probe.mjs`（本仓） | 人来看页面 | show | probes | ✅ |
 | 7 | `probes/session-context/dual-ceo-probe.mjs`（本仓） | 人来看行为 | show | probes | ✅ |
-| 8 | `tools/observe/orient.mjs`（本仓） | 人来看运行态 | show | tools | ❌ |
-| 9 | `tools/observe/diagnose.mjs`（本仓） | 人来看失败摘要 | show | tools | ❌ |
-| 10 | `tools/observe/notes-audit.mjs`（本仓） | 人来看记忆漂移 | show | tools | ❌ |
-| 11 | `tools/observe/session-log-export.mjs`（本仓） | 重做导出 | operate | tools | ✅（组错） |
+| 8 | tools/observe/orient.mjs（本仓） | 人来看运行态 | show | tools | ❌ |
+| 9 | tools/observe/diagnose.mjs（本仓） | 人来看失败摘要 | show | tools | ❌ |
+| 10 | tools/observe/notes-audit.mjs（本仓） | 人来看记忆漂移 | show | tools | ❌ |
+| 11 | tools/observe/session-log-export.mjs（本仓） | 重做导出 | operate | tools | ✅（组错） |
 | 12 | `tools/repo/checks-index.mjs`（本仓） | 重生成库存 | operate | tools | ✅ |
 | 13 | `tools/repo/sync-dsh.mjs`（本仓） | 重做升级 | operate | tools | ✅ |
 | 14 | `tools/release/release.mjs`（本仓） | 重做发布 | operate | tools | ✅ |
@@ -73,13 +73,13 @@ intent: 把第一轮的四动词收敛成可执行的判定程序，用三仓真
 | 28 | `dev/run-driver`（dr） | 重起 run | operate | dev | ✅ |
 | 29 | `probes/behavior/*`（dr） | 人来看行为 | show | probes | ✅ |
 
-**19/29 = 66% 现址与判定一致**。10 个 ❌ 只有三类，且方向一致：① **show 被关进 operate**（本仓 `tools/observe` 3 件）；② **judge 被关进 operate**（本仓 `refactor-drift`）；③ **operate 被关进 judge**（bsim 的 release 的 act 半 / backlog / openspec / evidence，dr 的 run-ops / dist）。没有一条是规则判不出来——都是现址与规则冲突。这正是"哪个更有道理"的操作化答案：不是比谁的名字顺眼，而是数它有多少格与判定冲突；冲突又集中在两个方向，说明统一规则要治的就是这两种串味。
+**19/29 = 66% 现址与判定一致**。10 个 ❌ 只有三类，且方向一致：① **show 被关进 operate**（本仓 tools/observe 3 件）；② **judge 被关进 operate**（本仓 `refactor-drift`）；③ **operate 被关进 judge**（bsim 的 release 的 act 半 / backlog / openspec / evidence，dr 的 run-ops / dist）。没有一条是规则判不出来——都是现址与规则冲突。这正是"哪个更有道理"的操作化答案：不是比谁的名字顺眼，而是数它有多少格与判定冲突；冲突又集中在两个方向，说明统一规则要治的就是这两种串味。
 
 ## 4. 三仓体检
 
 | 仓 | 现状 | 与三面的差 | 结论 |
 |---|---|---|---|
-| 本仓 | `checks` / `probes` / `tools` | `tools/observe` 里 6 件 show、1 件 operate；`refactor-drift` 是 judge | **方向最对**：三面已具名，差两类小搬迁（6 件 show 出 operate，1 件 judge 进 checks） |
+| 本仓 | `checks` / `probes` / `tools` | tools/observe 里 6 件 show、1 件 operate；`refactor-drift` 是 judge | **方向最对**：三面已具名，差两类小搬迁（6 件 show 出 operate，1 件 judge 进 checks） |
 | `bsimulation` | `checks` / `probes` / `dev` | `checks` 里混了 operate（release 的 act 半、backlog、openspec、evidence）；`dev` 是 operate 的 run 组 | **两面半**：judge 与 operate 没分家，`checks` 的 12 子目录是后果 |
 | `deep_research` | `probes` / `scripts` / `dev` | `scripts` 里混了 operate（run-ops、dist）；`dev` 是 operate 的 run 组 | **两面半**：同病，且顶层 `scripts` 是形态词 |
 
@@ -94,7 +94,7 @@ tools/      operate  dev（run 组）/ repo / release
 非面：lib drivers fixtures runners reporters snapshots runtime tests run-config
 ```
 
-- **本仓最小迁移**：`tools/observe` 里 6 件 show 迁 `probes/`（新增 `ops` 或 `analyze` 域？见 §6）；`session-log-export` 留 `tools/` 但离开 observe 组（它是 operate）；`refactor-drift` 迁 `checks/audit/`（或登记为例外并写理由）。代价：命令字面量与文档引用 ~40 处（`checks/README.md`、`docs/guides`、`tools/README.md`），无门禁路径改动（`tools/observe` 不在 lane 注册表里）。
+- **本仓最小迁移**：tools/observe 里 6 件 show 迁 `probes/`（新增 `ops` 或 `analyze` 域？见 §6）；`session-log-export` 留 `tools/` 但离开 observe 组（它是 operate）；`refactor-drift` 迁 `checks/audit/`（或登记为例外并写理由）。代价：命令字面量与文档引用 ~40 处（`checks/README.md`、`docs/guides`、`tools/README.md`），无门禁路径改动（tools/observe 不在 lane 注册表里）。
 - **`bsimulation`**：`checks` 里的 operate 半（release 的 `export-dist`/`dist-refresh`/`market-index`、backlog、openspec、evidence）迁到 `dev/` 或新 `ops/`；`checks` 只留 verify/gates/quality/release 的判据半/audit/test/report。代价：12 子目录里的 5 个搬家 + 所有 checks 下命令字面量 + `doc-maps` 的 MAPS 清单。
 - **`deep_research`**：`scripts` 拆 judge（verify/smoke/test/run-gates）与 operate（run-ops/dist），共用 `scripts/lib`；`dev` 仍是 operate 的 run 组。代价：152 件里的分组与 203 行 `scripts/README` 重写。
 
