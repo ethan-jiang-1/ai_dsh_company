@@ -11,6 +11,11 @@
 > ⚠ 下面第 5 行那句「**本场不挂任何钩子**」是 **v2 场次**的事实陈述，**对当前挂载副本已不成立**——
 > 保留原文是为了让 v2 记录与本文档同源可核；**当前状态以本横幅与文末 §8 为准**。
 
+> ## ⚠ 当前运行面（2026-11-17）
+> 本 README 是 v2/v3 的交付记录。**当前运行面 = `checks/gates/security-scan.mjs`**：自 2026-10-24 起
+> 它扫描 `packages/company-pack/content`（不是 §2/§8 写的 `company-workspace`）；§6 的 `evidence/`
+> 未随迁；§7 的“未挂 CI”是 v2 事实，v3 已挂 `pnpm verify`。
+
 > 件的家与漂移判据：副本指纹 = 同目录 `MANIFEST.json`（`git hash-object` 逐件比对，漂移即红）。
 > 原文归 v2（`deliverables/2026-10-12-ai-coding-security-2026-v2/drafts/vp-eng/gates/`），随 v2 归档。
 
