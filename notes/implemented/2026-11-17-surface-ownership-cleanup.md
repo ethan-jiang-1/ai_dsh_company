@@ -47,6 +47,7 @@
 - [environment-gap] 真模型认证档未跑：本轮不改 AGENTS/index/dev-loop/preset 内容；入口链未动 → `checks/lanes/entry-probe.entry.mjs`
 - [policy] `probes` 五域与 `tests/*` 分区名不物理重排；只写判定规则，后续要重排另立 RFC → `probes/README.md`
 - [environment-gap] `release --check` 只到“源码面通过”；manifest gitSha 因发布后新增提交而滞后，未做 `--prepare/--verify` 重打 → `tools/release/release.mjs`
+- [policy] shipped src 的 delegation 注释仍指旧路径：不改，避免任何 pack 源码变更触发 `_dist` 重打；下次 release 重建时同步 → `packages/company-pack/src/lib/delegation/delegation-capabilities.ts`
 - [unprovable] 未来新增模块会放对家没有 oracle；由 `face-boundaries` + 三份 README 的判定规则兜底 → `docs/surface-contract.md`
 
 ## 验证
