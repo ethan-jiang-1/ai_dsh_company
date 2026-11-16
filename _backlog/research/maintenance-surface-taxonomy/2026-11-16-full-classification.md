@@ -3,6 +3,8 @@ topic: maintenance-surface-taxonomy
 intent: 126 条入口的全量判定结果、7 个冲突，以及三面迁移撞上 P2 探针棘轮的具体约束与选项
 ---
 
+> **状态：过程材料。** 全量分类报告（盲审前口径）；candidate-scan-eval 已改列非面、session-log-export 已改判 show，最终判定以 reorg-company §2 为准。
+
 # 全量分类：116/123，以及迁移撞上的 P2 棘轮
 
 > **后续更正（同日）**：`candidate-scan-eval.mjs` 状态 = 已耗，已改列非面（活条目 122）；`bsimulation` 的 `checks/audit` 复核为 show。以 [unified-surface-scheme](2026-11-16-unified-surface-scheme.md) §10 为准。

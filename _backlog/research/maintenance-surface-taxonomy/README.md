@@ -23,6 +23,6 @@ opened: 2026-11-16
 | [2026-11-16-unified-surface-scheme.md](2026-11-16-unified-surface-scheme.md) | 推理稿（盲审前；改名建议已撤回，结论以 reorg 三份为准） | 2026-11-16 |
 | [2026-11-16-p0-kit.md](2026-11-16-p0-kit.md) | P0 三仓插入包（v1；改名建议已被盲审修正，以 reorg 三份为准） | 2026-11-16 |
 | [2026-11-16-blind-review.md](2026-11-16-blind-review.md) | 独立盲审 19 条发现、采纳/改写/驳回与规则修订 | 2026-11-16 |
-| [2026-11-16-reorg-company.md](2026-11-16-reorg-company.md) | **本仓 handoff**：规则 v2、现状映射、P0 零搬家、可选 P1、验收 | 2026-11-16 |
-| [2026-11-16-reorg-bsimulation.md](2026-11-16-reorg-bsimulation.md) | **bsimulation handoff**：checks 混装、audit=show、改名风险清单 | 2026-11-16 |
-| [2026-11-16-reorg-deep-research.md](2026-11-16-reorg-deep-research.md) | **deep_research handoff**：scripts 混装、run-ops 多为 show、术语冲突 | 2026-11-16 |
+| [2026-11-16-reorg-company.md](2026-11-16-reorg-company.md) | **本仓 handoff（自包含）**：决策上下文、规则 v2、逐条核实的现状、P0 精确插入文本、P1 撞墙点与引用清单、验收 | 2026-11-16 |
+| [2026-11-16-reorg-bsimulation.md](2026-11-16-reorg-bsimulation.md) | **bsimulation handoff（自包含）**：决策上下文、checks 逐组明细、dom-replay CI judge 例外、P0 插入文本、P1 gate 输入清单 | 2026-11-16 |
+| [2026-11-16-reorg-deep-research.md](2026-11-16-reorg-deep-research.md) | **deep_research handoff（自包含）**：决策上下文、run-ops 逐件判定、stream tee 口径差、P0 插入文本、P1 b-pack gate 输入清单 | 2026-11-16 |

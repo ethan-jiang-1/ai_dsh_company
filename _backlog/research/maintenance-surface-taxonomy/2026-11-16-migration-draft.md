@@ -3,6 +3,8 @@ topic: maintenance-surface-taxonomy
 intent: 本仓最小迁移的可执行草案（只列动作与验证，不实施），含 P2 预算分叉与回滚
 ---
 
+> **状态：过程材料。** 早期草案（6 件版）；最终 P1 方案以 reorg-company §4 为准（7 件 + 完整撞墙点）。
+
 # 最小迁移草案（本仓，待批准后实施）
 
 > 目标：让 `checks/` 只放 judge、`probes/` 只放 show、`tools/` 只放 operate。只迁入口文件与引用，不改任何脚本行为、不改 gate 判据。**本文件是立项，不是落地**；实施需用户点名或已批 RFC。
