@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * lease 探针（被 company-root-process-smoke 调用；不单独跑）。
+ * lease 探针（被 company-root-process.e2e 调用；不单独跑）。
  * 用法：node --import tsx/esm lease-probe.mjs <dshHome>
  * 输出：{ acquired, warning?, reason? }；拿到锁后立即 release。
  */

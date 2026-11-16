@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * company-root 进程探针（被 company-root-process-smoke 调用；不单独跑）。
+ * company-root 进程探针（被 company-root-process.e2e 调用；不单独跑）。
  * 用法：node --import tsx/esm company-root-probe.mjs write <ws> <rel> <text> [delayMs]
  *      node --import tsx/esm company-root-probe.mjs read  <ws> <rel>
  */
