@@ -25,13 +25,13 @@ opened: 2026-11-12
 
 **当前情况（2026-11-15 focus v6 基线）：**
 
-- **当前基线（2026-11-16 03:45，收口工作树实测）**：`pnpm test` 253 files / 2145 tests；`pnpm verify` ALL PASS（2 门无对象）；`pnpm typecheck` exit 0；活跃缺陷 = **0**（BUG-184..191 已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）；Next BUG = 192；`packages/company-pack` version 0.11.8；census = 30 冒烟 / 59 探针 / 74 门禁 / 253 spec；对抗矩阵 `KNOWN_GAP = 0`。
-- **当前主面 = C11 搬移副作用**（focus v6，2026-11-15）：三批纯搬移 = `29ae8c94`（tests 分轴）→ `1eb14f46`（src↔tests 对齐）→ `57d34a34`（tools 四组；原 `5c2c0796` 于 2026-11-15 深夜 amend，补 skill / command-refs / 散件门禁 / refactor-drift / sync-dsh）；C1–C10 冻结。首轮（Round 92）已跑，8 张卡 2026-11-16 全部修复（见 [bugs/README「2026-11-16 修复交接」](../bugs/README.md) 与 [批次 Note](../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)）。
+- **当前基线（2026-11-16 08:12，HEAD `da746267` 实测）**：`pnpm test` 253 files / 2145 tests；`pnpm verify` ALL PASS（2 门无对象）；`pnpm typecheck` exit 0；活跃缺陷 = **10**（BUG-192..201，2026-11-16 C11 二轮；只开卡不修）；Next BUG = 202；`packages/company-pack` version 0.11.8；census = 30 冒烟 / 59 探针 / 74 门禁 / 253 spec；对抗矩阵 `KNOWN_GAP = 0`。
+- **当前主面 = C11 搬移副作用**（focus v6，2026-11-15）：三批纯搬移 = `29ae8c94`（tests 分轴）→ `1eb14f46`（src↔tests 对齐）→ `57d34a34`（tools 四组；原 `5c2c0796` amend）；C1–C10 冻结。首轮（Round 92）8 张已修；二轮（Round 93，2026-11-16）转到**修复后的守卫面**，开 BUG-192..201（10 张，见 [bugs/README「C11 二轮」](../bugs/README.md)）。
 - **上一轮基线（2026-11-14 11:01）**：`pnpm test` 247 files / 2072 tests；活跃缺陷 8（BUG-176..183，focus v5；该批已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）；version 0.11.6。
 - **更早四轮基线（2026-11-13 19:26 – 2026-11-14 10:17）**：247 files / 2034–2066 tests；每轮 8 张 BUG 均已修复归档（BUG-152..175）。
 - **历史起点（2026-11-12）**：`50878cd6`（BUG-080..089 修复）｜Note = [startup/wiki bug sweep](../../notes/implemented/2026-11-12-startup-strategy-wiki-bug-sweep.md)｜十张卡已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)｜当时基线 236 files / 1761 tests。该基线只作历史，不再当当前事实。
 - **后续已收口**：Round 15–85 找到 BUG-104..151（BUG-140 撤回、BUG-150 复核不成立）；focus v2–v5 开 BUG-152..183，全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
-- **已知开放点（历史 Note「剩余风险」）**：`fs.watch` 平台降级；内容包新增类型仍需重启；其它 host 命令仍中文；`/req` `/prd` 的 workspace 仍 boot 优先——保留为观察，不在 C11 首轮抢修。另：C8-H10 真模型 present deny、Windows 实机、三批搬移后的 clean clone / Linux 全量、C11 的 company-entry / release / client-load 真入口仍 `unverified`。
+- **已知开放点（历史 Note「剩余风险」）**：`fs.watch` 平台降级；内容包新增类型仍需重启；其它 host 命令仍中文；`/req` `/prd` 的 workspace 仍 boot 优先——保留为观察，不在 C11 首轮抢修。另：C8-H10 真模型 present deny、Windows 实机、C11 后的 clean clone / Linux 全量仍 `unverified`；Round 93 已实跑 company-entry / release / client-load / ui-scene / preset / replay，均 PASS。
 - **宪章的「低置信」判据**：代码体量大 / 状态跨 home+workspace / 派生文件无新鲜度契约 / 有多进程或并发 / 测试只固定夹具 / 只在真页面或真 team 才暴露。**focus v6 追加搬移判据**：位置是唯一变量 / 引用住注释、技能、头注、生成物 / 门禁扫描面靠 glob 与登记表 / `pnpm test` 全绿不等于零漂移。
 
 ## 2026-11-13 调整（focus v2）
@@ -1790,6 +1790,56 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 **判定：** 首轮抓到 8 张卡（10 个具体坐标）；最硬 = BUG-185（真入口红），主根因 = BUG-184/186（验证面静默失效）。没有「搬移无副作用」结论；未跑面保留。
 
+## Round 93（2026-11-16 C11 二轮 · 修复后的守卫面）
+
+**状态：** keyless + 真入口已跑；Windows / clean clone / live 未跑。
+
+**背景：** BUG-184..191 于 `713acc60` 修复、`da746267` 收口（Note = [搬移副作用的非静态消费者](../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)）后，本轮不再找「旧搬移残留」，而是打**修复自身造出的守卫面**：阈值键判据、面规则完备性、活指针/构建字面量/文档计数的扫描边界、以及 pre-push `--paths` 新入口。
+
+**真入口基线（本轮实跑）：**
+
+| 入口 | 结果 |
+|---|---|
+| `pnpm test` | 253 files / 2145 tests passed |
+| `pnpm verify` / `pnpm typecheck` / `pnpm coverage:ratchet` | ALL PASS / exit 0 / PASS（197 文件） |
+| `replay.e2e` / `preset.entry` / `client-load` / `ui-scene --isolated --expected` | ALL PASS |
+| `company-entry.entry` / `release.entry` | ALL PASS（tarball 安装、首启、重装） |
+| `smoke:fast` / `test:checks` | 4/4 · 10 PASS |
+
+**本轮开卡（10 张）：**
+
+| BUG | 守卫/入口 | 一句话 | 级别 |
+|---|---|---|---|
+| [192](../bugs/BUG-192-surface-rules-tracked-path-completeness.md) | `asset-lanes` 完备性 | 19 条 tracked 路径 unseen；spec 只抽样 21 条 | P2 |
+| [193](../bugs/BUG-193-vitest-threshold-guard-accepts-directory.md) | 阈值键 spec | `existsSync` 放过目录键，floor 仍可静默失效 | P2 |
+| [194](../bugs/BUG-194-live-pointer-guard-misses-js-source.md) | 活指针 spec | 不扫 `.js` 源码注释 | P2 |
+| [195](../bugs/BUG-195-live-pointer-guard-misses-presets-skills.md) | 活指针 spec | 不扫 presets / `.agents/skills` | P2 |
+| [196](../bugs/BUG-196-typecheck-claim-guard-misses-checks-readme.md) | 计数 spec | 不扫 `checks/README.md` 等导航文档 | P2 |
+| [197](../bugs/BUG-197-built-path-guard-misses-docs-ts.md) | built 字面量 spec | 不扫 docs / `.ts` | P2 |
+| [198](../bugs/BUG-198-built-path-guard-false-red-js-source.md) | built 字面量 spec | 合法 `.js` 源码产物被假红 | P2 |
+| [199](../bugs/BUG-199-pre-push-unseen-exits-zero.md) | pre-push | `unseen` 只打印，仍 exit 0 | P2 |
+| [200](../bugs/BUG-200-coveredby-coverage-ratchet-not-executable.md) | coveredBy 标签 | `coverage-ratchet` 不可执行 | P2 |
+| [201](../bugs/BUG-201-pre-push-paths-dot-prefix-unseen.md) | `--paths` | `./` 前缀被判 unseen，不触发 lane | P2 |
+
+**逐条证据（实跑）：**
+
+- 192：`node runtime/tmp/c11/unseen-paths-check.mjs` → `tracked=1912 unseen=19`，exit 1；`pre-push --dry-run --paths packages/company-pack/package.json,...` 打印未分类且 exit 0。
+- 193：把 `vitest.config.ts` 一个阈值键改成目录 `packages/company-pack/src/host` → `vitest-coverage-thresholds.spec.ts` **3 passed**；还原。
+- 194：向 `src/lib/docs/markdown-shape-core.js` 注入 tests/lib/ledger-legacy.spec.ts → `live-pointer-paths.spec.ts` **6 passed**；还原。
+- 195：向 preset SKILL 与 `.agents` SKILL 各注入旧 spec → 同一 spec **6 passed**；还原。
+- 196：向 `checks/README.md` 注入 `227/245 spec` → `typecheck-coverage-claim.spec.ts` **2 passed**；还原。
+- 197：向 `docs/testing.md` 注入 packages/company-pack/lib/types/lib/ghost.js → `built-path-literals.spec.ts` **2 passed**；还原。
+- 198：向 `checks/lanes/replay.e2e.mjs` 注入**合法**的 `.../lib/types/lib/docs/markdown-shape-core.js` → 同一 spec **1 failed**（false red）；还原。
+- 199：`node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/package.json` → 未分类 + `本次未触发面级检查` + exit 0。
+- 200：`pnpm coverage-ratchet` → `Command "coverage-ratchet" not found`（应 `coverage:ratchet`）；`pre-push --dry-run --paths tools/lib/asset-lanes.mjs` 把该标签打成「证据」。
+- 201：`--paths ./packages/company-pack/src/lib/presence/presence.ts` → 未分类 + exit 0；去掉 `./` → `→ replay`。
+
+**证据坐标（gitignored）：** `runtime/tmp/c11/unseen-paths-check.mjs` / `.log`、`mut-threshold-dir.log`、`mut-live-js.log`、`mut-live-preset.log`、`mut-live-skill.log`、`mut-typecheck-claim.log`、`mut-built-doc.log`、`mut-built-js-source.log`、`coverage-ratchet-label.log`、`paths-dot-prefix.log`、`company-entry.log`、`release-entry.log`、`client-load.log`、`ui-scene.log`、`post-fix-test.log`。
+
+**未跑：** Windows 实机、clean clone、live 模型 / 真页面（本轮真页面只跑 `ui-scene --isolated --expected` 与 `client-load`）；`pnpm lint` / `pnpm dup` 未重跑（批次 Note 已记）。
+
+**判定：** 10 张卡全部是**修复后的守卫面**缺陷（5 类载体覆盖 + 阈值键类型 + 选择器边界 + 证据标签），不是旧搬移残留复现；真入口全绿，没有发现产品行为回归。没有「守卫已完备」结论。
+
 ## 证据、判据与处置
 
 - **oracle 纪律**：先写期望，再看实现；不拿实现当 oracle；spec 绿只说明覆盖，不说明行为正确。
@@ -1839,5 +1889,6 @@ TypeError: Cannot read properties of undefined (reading 'map')
 - 2026-11-14 ｜ Round 91（post-fix 3 C8/C9）｜ `c8d-json-fence` / `c8d-multiline-span` / `c9d-fix-evidence-command` / `c9d-section-codeblock` / `c9d-read-internal-dotdot` / `c9d-win-dotdot` / `c9d-noop-command` / `c9d-notes-root-symlink` ｜ JSON 围栏示例、跨行 code span、内部 `..`、Windows `..\`、fix-evidence 合法命令/节/空命令、notes-tree 根 symlink 八项 confirmed ｜ BUG-176..183 ｜ `pnpm test` 247/2072、`pnpm verify` ALL PASS；Windows 实机/live H10 未跑。
 - 2026-11-15 ｜ focus v6 调整（非 Round）｜ 本卡 + issues/README ｜ 三批搬移基线（`29ae8c94` / `1eb14f46` / `57d34a34`）+ C11 四子面 + 10 条首轮假设 + 7 条预检坐标 ｜ `pnpm verify` ALL PASS（调卡后实跑）｜ 首轮分诊在 Round 92 落卡（BUG-184..191）。
 - 2026-11-16 ｜ Round 92（C11 首轮）｜ `runtime/tmp/c11/{live-pointer-sweep,live-pointer-check,vitest-threshold-check,pre-push-surface-check,typecheck-count-check}.mjs`、`replay-fail.log`、`preset-entry.log` ｜ 6 处活指针、5 个覆盖率死键、pre-push 面缺口、replay 真入口红、两份文档计数漂移；10 条假设全部判决 ｜ BUG-184..191（8 张）｜ `pnpm test` 249/2122、`pnpm verify` ALL PASS、`pnpm typecheck` exit 0；`preset.entry` PASS、`replay` FAIL ｜ 未跑 company-entry/release/client-load/Windows/clean clone/live。
+- 2026-11-16 ｜ Round 93（C11 二轮 · 修复后的守卫面）｜ `runtime/tmp/c11/{unseen-paths-check,guard-mutations}`、`company-entry.log`、`release-entry.log`、`client-load.log`、`ui-scene.log` ｜ 19 条 unseen、目录阈值键、3 类载体漏扫、2 类字面量边界、unseen/`./` 前缀、证据标签不可执行共 10 项 confirmed ｜ BUG-192..201（10 张）｜ `pnpm test` 253/2145、`pnpm verify` ALL PASS、`pnpm typecheck` exit 0、真入口全 PASS ｜ Windows/clean clone/live 未跑。
 - 每轮：日期 ｜ 宪章 ｜ 命令/会话 id ｜ 期望 vs 实测 ｜ 证据坐标 ｜ 判定。
 - BUG 卡链接放这里；未跑面逐条保留。
