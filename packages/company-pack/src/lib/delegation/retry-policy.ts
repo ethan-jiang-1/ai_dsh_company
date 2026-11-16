@@ -1,5 +1,5 @@
 /**
- * subagent 重试的运行时策略（pack 内；与 tools/lib/company/delegation-model.mjs 的 RETRY 是同一套语义）。
+ * subagent 重试的运行时策略（pack 内；与 checks/lib/delegation-model.mjs 的 RETRY 是同一套语义）。
  *
  * 为什么 pack 里要有一份：host `subagent_retry` 工具是随包发布的运行时，不能 import 仓内
  * `tools/lib`（发布面不自包含）；`tests/presets/delegation-retry.spec.ts` 会断言两份策略
@@ -35,7 +35,7 @@ export interface SubagentRetrySurface {
  * 运行时注册表（**唯一**注册来源；`src/index.ts` 不再另写 preset 列表）。
  *
  * 为什么 pack 里要有一份深度数字：host 工具随包发布，不能 import 仓内
- * `tools/lib/company/delegation-model.mjs`；但 BUG-045/049 的教训是“两份声明必然漂移”，所以
+ * `checks/lib/delegation-model.mjs`；但 BUG-045/049 的教训是“两份声明必然漂移”，所以
  * `tests/presets/delegation-retry.spec.ts` 钉本表 == 模型 `retrySurface()`；模型的 `depthRows`
  * 又由 `delegation-composition.spec.ts` 与各 preset YAML 的通用 `subagent` 行钉住。改任何一个都会红。
  */
