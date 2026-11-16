@@ -17,7 +17,10 @@ export function countProjectSurface(repoRoot) {
     if (entry.isDirectory()) return entry.name === 'node_modules' ? [] : walk(path)
     return entry.name.endsWith('.spec.ts') ? [path] : []
   })
-  return { gateCount, specCount: walk(join(repoRoot, 'tests')).length }
+  const gateTestDir = join(repoRoot, 'tests/checks')
+  const gateTestCount = readdirSync(gateTestDir, { withFileTypes: true })
+    .filter(entry => entry.isFile() && entry.name.endsWith('.test.mjs')).length
+  return { gateCount, specCount: walk(join(repoRoot, 'tests')).length, gateTestCount }
 }
 
 const LANE_ORDER = ['fast', 'surface', 'weekly']
@@ -28,9 +31,9 @@ function laneLabel(asset) {
 }
 
 /**
- * @param {{smokes: any[], probes: any[], gateCount: number, specCount: number, failureClassOf: (name: string) => string, consumers?: Record<string, number>}} input
+ * @param {{smokes: any[], probes: any[], gateCount: number, specCount: number, gateTestCount?: number, failureClassOf: (name: string) => string, consumers?: Record<string, number>}} input
  */
-export function buildCensus({ smokes, probes, gateCount, specCount, failureClassOf, consumers = {} }) {
+export function buildCensus({ smokes, probes, gateCount, specCount, gateTestCount = 0, failureClassOf, consumers = {} }) {
   const laneCounts = Object.fromEntries(LANE_ORDER.map(lane => [lane, smokes.filter(asset => asset.lanes.includes(lane)).length]))
   const classes = {}
   for (const asset of [...smokes, ...probes]) {
@@ -38,7 +41,7 @@ export function buildCensus({ smokes, probes, gateCount, specCount, failureClass
     classes[name] = (classes[name] ?? 0) + 1
   }
   const noConsumer = [...smokes, ...probes].filter(asset => (consumers[asset.name] ?? 0) === 0).length
-  return { smokes, probes, gateCount, specCount, laneCounts, classes, failureClassOf, consumers, noConsumer }
+  return { smokes, probes, gateCount, specCount, gateTestCount, laneCounts, classes, failureClassOf, consumers, noConsumer }
 }
 
 /** @param {ReturnType<typeof buildCensus>} model */
@@ -57,6 +60,7 @@ export function renderCensus(model) {
   lines.push(`| 探针 | ${model.probes.length} |`)
   lines.push(`| 结构门禁 | ${model.gateCount} |`)
   lines.push(`| keyless spec 文件 | ${model.specCount} |`)
+  lines.push(`| 门禁自测（tests/checks） | ${model.gateTestCount} |`)
   lines.push(`| fast lane | ${model.laneCounts.fast} |`)
   lines.push(`| surface lane | ${model.laneCounts.surface} |`)
   lines.push(`| weekly lane | ${model.laneCounts.weekly} |`)

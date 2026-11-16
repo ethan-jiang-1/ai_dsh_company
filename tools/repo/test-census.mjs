@@ -14,9 +14,9 @@ import { consumerCount } from '../lib/repo/asset-consumers.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const target = join(root, 'tests/CENSUS.generated.md')
-const { gateCount, specCount } = countProjectSurface(root)
+const { gateCount, specCount, gateTestCount } = countProjectSurface(root)
 const consumers = consumerCount(root, [...ASSETS, ...PROBES])
-const text = renderCensus(buildCensus({ smokes: ASSETS, probes: PROBES, gateCount, specCount, failureClassOf, consumers }))
+const text = renderCensus(buildCensus({ smokes: ASSETS, probes: PROBES, gateCount, specCount, gateTestCount, failureClassOf, consumers }))
 
 if (process.argv.includes('--write')) {
   writeFileSync(target, text)

@@ -9,6 +9,7 @@
 //   删除探针后生成物多一条 → 再红；--write 还原 → 绿。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { ASSETS, PROBES } from '../../tools/lib/core/asset-lanes.mjs'
 import { renderScriptInventory, scanPublicScripts, strayToolEntries } from '../../tools/lib/core/checks-index.mjs'
 
 export function run({ root, ok, fail }) {
@@ -25,7 +26,11 @@ export function run({ root, ok, fail }) {
   const gateCount = readdirSync(join(root, 'checks', 'gates'), { withFileTypes: true })
     .filter(entry => entry.isFile() && entry.name.endsWith('.mjs')).length
   const scripts = scanPublicScripts(root)
-  const expected = renderScriptInventory(scripts, { gateCount })
+  const expected = renderScriptInventory(scripts, {
+    gateCount,
+    assetNames: ASSETS.map(asset => asset.name),
+    probeNames: PROBES.map(probe => probe.name),
+  })
   const actual = readFileSync(generatedPath, 'utf8')
   if (actual !== expected) {
     fail('script-index', `checks/INDEX.generated.md 与目录不一致（${String(scripts.length)} 个公开入口 / ${String(gateCount)} 门）——运行 node tools/repo/checks-index.mjs --write（生成物勿手改）`)

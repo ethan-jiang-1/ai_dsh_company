@@ -28,9 +28,9 @@ function probeFiles() {
 
 describe('资产盘子与负债上限棘轮（census + P2 硬顶）', () => {
   it('tests/CENSUS.generated.md 与注册表/盘面一致（漂了就跑 --write）', () => {
-    const { gateCount, specCount } = countProjectSurface(ROOT)
+    const { gateCount, specCount, gateTestCount } = countProjectSurface(ROOT)
     const consumers = consumerCount(ROOT, [...ASSETS, ...PROBES])
-    const expected = renderCensus(buildCensus({ smokes: ASSETS, probes: PROBES, gateCount, specCount, failureClassOf, consumers }))
+    const expected = renderCensus(buildCensus({ smokes: ASSETS, probes: PROBES, gateCount, specCount, gateTestCount, failureClassOf, consumers }))
     const current = readFileSync(join(ROOT, 'tests/CENSUS.generated.md'), 'utf8')
     expect(current, 'census 是生成物：运行 node tools/repo/test-census.mjs --write').toBe(expected)
   })
@@ -70,6 +70,7 @@ describe('资产盘子与负债上限棘轮（census + P2 硬顶）', () => {
     expect(model.noConsumer).toBe(2)
     const rendered = renderCensus(model)
     expect(rendered).toContain('| 未分类失败类 | 1 |')
+    expect(rendered).toContain('| 门禁自测（tests/checks） | 0 |')
     expect(rendered).toContain('手动（未写理由）')
   })
 })

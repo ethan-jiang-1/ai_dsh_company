@@ -3,7 +3,7 @@
 > 生成：`node tools/repo/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。
 > 触发条件/成本/状态唯一源 = 各脚本头注；本文件只回答“有哪些公开入口、在哪”。
 
-## 冒烟 / 真实入口（checks/lanes/，32）
+## 冒烟 / 真实入口（checks/lanes/，32 = 30 assets + 2 runners）
 
 [attention-e2e.entry](lanes/attention-e2e.entry.mjs) · [channel-matrix.entry](lanes/channel-matrix.entry.mjs)
 [client-error-chain.entry](lanes/client-error-chain.entry.mjs)
@@ -35,7 +35,7 @@
 [refactor-drift-audit](audit/refactor-drift-audit.mjs)
 [surface-matrix-audit](audit/surface-matrix-audit.mjs)
 
-## 窄机制与视觉探针（probes/，67）
+## 窄机制与视觉探针（probes/，67 = 66 probes + 1 fixture）
 
 ### analyze（7）
 
@@ -119,7 +119,7 @@
 [worker-orchestrator-probe](../probes/team/worker-orchestrator-probe.mjs)
 [worker-researcher-probe](../probes/team/worker-researcher-probe.mjs)
 
-## 维护工具（tools/，19）
+## 维护工具（tools/，19 = 17 tools + 1 runner + 1 query）
 
 ### dev/（6）
 

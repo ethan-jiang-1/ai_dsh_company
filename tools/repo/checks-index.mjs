@@ -6,13 +6,18 @@
 //       node tools/repo/checks-index.mjs [--check] # 只校验（默认）
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { ASSETS, PROBES } from '../lib/core/asset-lanes.mjs'
 import { renderScriptInventory, scanPublicScripts } from '../lib/core/checks-index.mjs'
 import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 
 const OUT = join(ROOT, 'checks/INDEX.generated.md')
 const gateCount = readdirSync(join(ROOT, 'checks/gates'), { withFileTypes: true })
   .filter(entry => entry.isFile() && entry.name.endsWith('.mjs')).length
-const expected = renderScriptInventory(scanPublicScripts(ROOT), { gateCount })
+const expected = renderScriptInventory(scanPublicScripts(ROOT), {
+  gateCount,
+  assetNames: ASSETS.map(asset => asset.name),
+  probeNames: PROBES.map(probe => probe.name),
+})
 
 if (process.argv.includes('--write')) {
   writeFileSync(OUT, expected)

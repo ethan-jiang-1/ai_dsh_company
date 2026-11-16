@@ -82,17 +82,60 @@ function wrap(parts, width = 110) {
 
 const links = (scripts) => scripts.map(rel => `[${labelOf(rel)}](${indexTargetFor(rel)})`)
 
+const fmt = (n, one) => `${n} ${n === 1 ? one : `${one}s`}`
+
+function summaryOf(files, kindOf, labels) {
+  const counts = new Map()
+  for (const rel of files) {
+    const kind = kindOf(rel)
+    counts.set(kind, (counts.get(kind) ?? 0) + 1)
+  }
+  const parts = []
+  for (const kind of ['asset', 'tool', 'runner', 'probe', 'fixture', 'query'])  {
+    const count = counts.get(kind) ?? 0
+    if (count > 0) parts.push(fmt(count, labels[kind] ?? kind))
+  }
+  const other = counts.get('other') ?? 0
+  if (other > 0) parts.push(`${other} 未分类`)
+  return parts.length > 0 ? ` = ${parts.join(' + ')}` : ''
+}
+
 /**
  * 渲染公开入口库存（checks/INDEX.generated.md 全文）。
  * @param {ReadonlyArray<string>} scripts 仓库相对路径（scanPublicScripts 的输出）。
- * @param {{ gateCount?: number }} [options] 结构门禁模块数（只算数量，不逐个列；目录才是清单）。
+ * @param {{ gateCount?: number, assetNames?: ReadonlyArray<string>, probeNames?: ReadonlyArray<string> }} [options]
+ *   gateCount = 结构门禁模块数（只算数量，不逐个列；目录才是清单）；
+ *   assetNames/probeNames = asset-lanes 注册名，用来区分资产与 runner/fixture（计数口径的唯一锚）。
  * @returns {string} Markdown 全文（含生成说明）。
  */
-export function renderScriptInventory(scripts, { gateCount } = {}) {
+export function renderScriptInventory(scripts, { gateCount, assetNames = [], probeNames = [] } = {}) {
   const laneFiles = scripts.filter(rel => rel.startsWith('checks/lanes/'))
   const audit = scripts.filter(rel => rel.startsWith('checks/audit/'))
   const probes = scripts.filter(rel => rel.startsWith('probes/'))
   const tools = scripts.filter(rel => rel.startsWith('tools/'))
+  const assets = new Set(assetNames)
+  const probeRegistry = new Set(probeNames)
+
+  const laneKind = rel => {
+    const name = labelOf(rel).replace(/\.(e2e|entry)$/, '')
+    if (assets.has(name)) return 'asset'
+    if (name.endsWith('-lane')) return 'runner'
+    return 'other'
+  }
+  const probeKind = rel => {
+    const name = labelOf(rel)
+    if (name === 'index') return 'fixture'
+    if (probeRegistry.has(name) || probeRegistry.has(name.replace(/-probe$/, ''))) return 'probe'
+    return 'other'
+  }
+  const toolKind = rel => {
+    const name = labelOf(rel)
+    if (name === 'run-check-tests') return 'runner'
+    if (name === 'snapshot-path') return 'query'
+    return 'tool'
+  }
+  const labels = { asset: 'asset', runner: 'runner', probe: 'probe', fixture: 'fixture', tool: 'tool', query: 'query' }
+
   const probeGroups = new Map()
   for (const rel of probes) {
     const rest = rel.slice('probes/'.length)
@@ -107,7 +150,7 @@ export function renderScriptInventory(scripts, { gateCount } = {}) {
     '> 生成：`node tools/repo/checks-index.mjs --write`；门禁 `script-index` 校验新鲜度。',
     '> 触发条件/成本/状态唯一源 = 各脚本头注；本文件只回答“有哪些公开入口、在哪”。',
     '',
-    `## 冒烟 / 真实入口（checks/lanes/，${String(laneFiles.length)}）`,
+    `## 冒烟 / 真实入口（checks/lanes/，${String(laneFiles.length)}${summaryOf(laneFiles, laneKind, labels)}）`,
     '',
     ...wrap(links(laneFiles)),
     '',
@@ -115,7 +158,7 @@ export function renderScriptInventory(scripts, { gateCount } = {}) {
     '',
     ...wrap(links(audit)),
     '',
-    `## 窄机制与视觉探针（probes/，${String(probes.length)}）`,
+    `## 窄机制与视觉探针（probes/，${String(probes.length)}${summaryOf(probes, probeKind, labels)}）`,
     '',
   ]
   for (const [domain, list] of [...probeGroups.entries()].sort(([a], [b]) => a.localeCompare(b))) {
@@ -130,7 +173,7 @@ export function renderScriptInventory(scripts, { gateCount } = {}) {
     toolGroups.set(group, list)
   }
   out.push(
-    `## 维护工具（tools/，${String(tools.length)}）`,
+    `## 维护工具（tools/，${String(tools.length)}${summaryOf(tools, toolKind, labels)}）`,
     '',
   )
   for (const [group, list] of [...toolGroups.entries()].sort(([a], [b]) => a.localeCompare(b))) {

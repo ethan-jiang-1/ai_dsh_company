@@ -11,6 +11,7 @@
 | 探针 | 66 |
 | 结构门禁 | 75 |
 | keyless spec 文件 | 256 |
+| 门禁自测（tests/checks） | 10 |
 | fast lane | 4 |
 | surface lane | 6 |
 | weekly lane | 21 |

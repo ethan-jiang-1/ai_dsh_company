@@ -2,6 +2,7 @@ import { mkdtempSync, readdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
+import { ASSETS, PROBES, suffixOf } from '../../../tools/lib/core/asset-lanes.mjs'
 import { TOOL_GROUPS, indexTargetFor, renderScriptInventory, scanPublicScripts, strayToolEntries } from '../../../tools/lib/core/checks-index.mjs'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
@@ -22,8 +23,8 @@ describe('checks-index 纯逻辑', () => {
       'checks/audit/b.mjs',
       'probes/team/c.mjs',
       'tools/repo/d.mjs',
-    ], { gateCount: 53 })
-    expect(text).toContain('## 冒烟 / 真实入口（checks/lanes/，1）')
+    ], { gateCount: 53, assetNames: ['a'], probeNames: ['c'] })
+    expect(text).toContain('## 冒烟 / 真实入口（checks/lanes/，1 = 1 asset）')
     expect(text).toContain('[a](lanes/a.mjs)')
     expect(text).toContain('## 盘面审计（checks/audit/，1）')
     expect(text).toContain('[b](audit/b.mjs)')
@@ -45,6 +46,42 @@ describe('checks-index 纯逻辑', () => {
     expect(strayToolEntries(ROOT)).toEqual([])
     for (const group of TOOL_GROUPS) expect(readdirSync(join(ROOT, 'tools', group)).length).toBeGreaterThan(0)
     expect(scripts.some(rel => rel.startsWith('checks/gates/'))).toBe(false)
+  })
+
+  it('kind 计数：资产与 runner、probe 与 fixture、tool/runner/query 分开', () => {
+    const text = renderScriptInventory([
+      'checks/lanes/a.entry.mjs',
+      'checks/lanes/fast-lane.mjs',
+      'probes/team/p-probe.mjs',
+      'probes/team/f/index.mjs',
+      'tools/repo/run-check-tests.mjs',
+      'tools/repo/snapshot-path.mjs',
+      'tools/repo/checks-index.mjs',
+    ], { gateCount: 1, assetNames: ['a'], probeNames: ['p'] })
+    expect(text).toContain('checks/lanes/，2 = 1 asset + 1 runner')
+    expect(text).toContain('probes/，2 = 1 probe + 1 fixture')
+    expect(text).toContain('tools/，3 = 1 tool + 1 runner + 1 query')
+  })
+
+  it('真实库存与 asset-lanes 对账：资产/探针逐个在场，runner/fixture 不冒充资产', () => {
+    const scripts = scanPublicScripts(ROOT)
+    const laneFiles = scripts.filter(rel => rel.startsWith('checks/lanes/'))
+    const probeFiles = scripts.filter(rel => rel.startsWith('probes/'))
+    const toolFiles = scripts.filter(rel => rel.startsWith('tools/'))
+    for (const asset of ASSETS) {
+      expect(laneFiles, `${asset.name} 未出现在 lanes 库存`).toContain(`checks/lanes/${asset.name}.${suffixOf(asset.name)}.mjs`)
+    }
+    for (const probe of PROBES) {
+      expect(probeFiles, `${probe.name} 未出现在 probes 库存`).toContain(`probes/${probe.domain}/${probe.name}.mjs`)
+    }
+    const text = renderScriptInventory(scripts, {
+      gateCount: 0,
+      assetNames: ASSETS.map(asset => asset.name),
+      probeNames: PROBES.map(probe => probe.name),
+    })
+    expect(text).toContain(`checks/lanes/，${String(laneFiles.length)} = ${String(ASSETS.length)} assets + ${String(laneFiles.length - ASSETS.length)} runners`)
+    expect(text).toContain(`probes/，${String(probeFiles.length)} = ${String(PROBES.length)} probes + 1 fixture`)
+    expect(text).toContain(`tools/，${String(toolFiles.length)} = ${String(toolFiles.length - 2)} tools + 1 runner + 1 query`)
   })
 
   // 守：strayToolEntries 的早退分支（tools/ 目录缺失时不能抛，要如实报成散件）。
