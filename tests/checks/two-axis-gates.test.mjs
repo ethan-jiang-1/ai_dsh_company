@@ -14,7 +14,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import * as productGate from '../../checks/gates/product-type-sources.mjs'
 import * as deliveryGate from '../../checks/gates/delivery-mode-sources.mjs'
-import { mutateFile } from '../../checks/lanes/lib/mutation.mjs'
+import { mutateFile } from '../support/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
 

@@ -20,7 +20,7 @@ import * as contentSingleHome from '../../checks/gates/content-single-home.mjs'
 import * as methodContract from '../../checks/gates/method-contract.mjs'
 import * as packContentPaths from '../../checks/gates/pack-content-paths.mjs'
 import * as navCountClaims from '../../checks/gates/nav-count-claims.mjs'
-import { mutateFile } from '../../checks/lanes/lib/mutation.mjs'
+import { mutateFile } from '../support/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
 
