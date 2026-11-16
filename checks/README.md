@@ -1,9 +1,9 @@
 # 检查与工具索引（验证 · 调试 · 工具三面）
 
-> 什么时候读：要跑/新增门禁、冒烟、探针或审计时。
-按要证明的对象选下面的入口。本文件是**索引**（政策 = [测试宪法](../docs/testing.md)，改动面映射 = [tests/README](../tests/README.md)）；再读目标脚本的头注——**触发条件、成本、状态与参数的唯一家是脚本头注**；
-本文件只做分类与链接，不复述逐脚本说明（复述必漂）。证据政策 = [测试宪法](../docs/testing.md)；
-开发环境 = [开发环](../docs/guides/dev-loop.md)；验证分层/命令预算 = [tests/README](../tests/README.md)。
+> 面：judge（会拦人的判断）。规则与例外 = [surface-contract](../docs/surface-contract.md)。
+
+> 什么时候读：要跑/新增门禁、冒烟、探针或审计时。按要证明的对象选下面的入口。
+本文件是**索引**（政策 = [测试宪法](../docs/testing.md)；改动面映射/验证分层/命令预算 = [tests/README](../tests/README.md)）；**触发条件、成本、状态与参数的唯一家 = 脚本头注**，这里只分类与链接（复述必漂）；开发环境 = [开发环](../docs/guides/dev-loop.md)。
 
 ## 快速选择
 

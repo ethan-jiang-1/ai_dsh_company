@@ -1,8 +1,10 @@
 # tools/ · 维护工具面
 
+> 面：operate（改世界的操作）。observe/ 组是 show 例外，见 [surface-contract](../docs/surface-contract.md)。
+
 > 什么时候读：要手工跑一件维护工具、或给新工具选家时。
 > 本页是**目录规则**，不是文件清单（清单 = 目录本身，D28）；逐工具入口与链接 = [检查索引](../checks/INDEX.generated.md) 的「维护工具」一节。
-> 为什么叫 `tools/` 不叫 `scripts/`：本仓的「脚本」= 验证面入口（`checks/` 的 smoke / lane / audit / probe，四道 `script-*` 门禁管它们的头注）；工具面是维护者按任务挑的那一类，故叫 tools。
+> 为什么叫 `tools/` 不叫 `scripts/`：本仓的「脚本」= 验证面入口（`checks/` 的 lane / audit 与 `probes/` 的 probe，四道 `script-*` 门禁管它们的头注）；工具面是维护者按任务挑的那一类，故叫 tools。
 
 ## 四组 = 你正处在哪一步
 

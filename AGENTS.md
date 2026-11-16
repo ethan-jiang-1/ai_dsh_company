@@ -17,10 +17,10 @@ vendor/dsh/             DSH 源码 submodule（钉 SHA，只读铁律见下节�
 docs/                   当前合同与导航：index（地图）+ 顶层门/宪法（AGENTS / architecture / policy / testing / repo-hygiene）→ contracts/ guides/ + reference/（台账/术语/外部材料）
 notes/                  开发记忆：proposed/（RFC）→ implemented/（活跃决策记忆）；离场目录不复述于此——分类规则唯一家 = notes/README.md
 _backlog/               推敲层：issues/bugs/research/methods/_archive + triggers.md（触发器）；章程与账本 = 其 README；agent 门牌 = AGENTS.md
-checks/                 验证面：run-gates 门禁；smoke/（真实入口冒烟）+ audit/（盘面日志判据）
+checks/                 judge：会拦人的判断（gates/ lanes/ audit/）
 tests/                  keyless 回归（按面分区 spec，导航 = tests/README.md）；真模型/浏览器不进本树——分区导航 = tests/README.md
-probes/                 调试面：窄机制与视觉探针，按机制域四子目录（team/fs-taskboard/browser-visual/session-context）
-tools/                  工具面：dev/ 装环境、observe/ 看运行态、repo/ 维护仓库、release/ 产发布字节；lib/ 纯逻辑、drivers/ 真实驱动、archive/ 已耗仪器
+probes/                 show：给人看的证据（team/ fs-taskboard/ browser-visual/ session-context/）
+tools/                  operate：改世界的操作（dev/ repo/ release/；observe/ 是 show，见 docs/reference/surface-exceptions.md）；lib/ 纯逻辑、drivers/ 真实驱动、archive/ 已耗仪器
 _dist/                  导出目的地：tarball（gitignored）+ 生成式《安装手册》（唯一 tracked 例外）；owner = docs/contracts/release.md
 run/                    运行面（tracked 启动配置）：env.sh（双 home+裸 dsh 拦截）+ README + company/entry-probe 两 overlay
 runtime/                运行残留家（默认整树 gitignored + 极少数 tracked 白名单；白名单唯一家 = runtime/README.md，本节不复述）：harness-home（开发 DSH_HOME）、第二 home、pw-browsers、排练盘、web-logs（含 token 绝不入库）
