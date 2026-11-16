@@ -818,8 +818,8 @@
     },
     {
       "path": "tools/lib/core/pin.mjs",
-      "reason": "只含 expectedTag/expectedSha 常量，无可执行语句；由 pin-currency / vendor-pin / release 间接消费",
-      "removeWhen": "pin 模块出现可执行逻辑或补直接 spec 时删除豁免"
+      "reason": "无 keyless spec 直接 import：只被门禁装配、release、sync-dsh 在入口层消费，vitest 覆盖统计面加载不到；常量模块无可测分支",
+      "removeWhen": "补直接 spec，或 pin 出现可执行逻辑时删除豁免"
     }
   ]
 }

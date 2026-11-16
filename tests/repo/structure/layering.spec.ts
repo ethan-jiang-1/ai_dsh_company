@@ -79,7 +79,7 @@ describe('测试分层纪律（真模型/真浏览器不进回归）', () => {
       // （2026-11-08 合同钉子直引 vendor 源时实测假红）——它们不在本仓驱动面上。
       if (/(?:from|import)\s*\(?['"](?:\.\/|(?:\.\.\/)+)(?:checks|probes|tools)\/(?!lib\/)/.test(text)) importers.push(relative(ROOT, file))
     }
-    expect(importers, '驱动脚本（*-smoke / replay-smoke）不得被 tests/ import（tools/lib/ 纯逻辑库除外）').toEqual([])
+    expect(importers, '驱动脚本（*-smoke / replay-smoke）不得被 tests/ import（checks|probes|tools 的 lib/ 纯逻辑库除外）').toEqual([])
 
     // `tools/lib/` is the keyless seam. Follow the local graph, including
     // re-exports and literal dynamic imports; do not execute anything while scanning.

@@ -15,7 +15,7 @@
    - `checks/gates/lib/`（compat-tags）→ [`tools/lib/core/compat-tags.json`](../../tools/lib/core/compat-tags.json)：gates / release / sync-dsh 共用的兼容台账。
    - `tests/support/`（coverage-baseline）→ [`checks/lib/coverage-baseline.json`](../../checks/lib/coverage-baseline.json)：judge audit 读取的棘轮基线；tests 只消费纯函数。
 2. **保留 `candidate-scan-eval`**（不删除）：它是 `状态：已耗` 的可复跑仪器，[testing.md](../../docs/testing.md) 仍声明“恢复语料时重跑”；删除会让该声明失效。保留在 `checks/audit` + 例外表登记。
-3. **归属规则写成两轴**：落点（shared / judge / show / gate-local / lane-local / test-only）+ 依赖方向。新增 [`face-boundaries.spec.ts`](../../tests/repo/structure/face-boundaries.spec.ts)：遍历 `tools`/`checks`/`probes`/`tests` 全树，逐 import 边判方向；`checks/lanes/lib` 与 `tests/support` 只许各自子树消费。
+3. **归属规则写成两轴**：落点（shared / judge / show / gate-local / lane-local / test-only）+ 依赖方向。新增 [`face-boundaries.spec.ts`](../../tests/repo/structure/face-boundaries.spec.ts)：遍历 `tools`/`checks`/`probes`/`tests` 全树，逐 import / 路径字面量边判方向；`checks/lanes/lib` 与 `tests/support` 只许各自子树消费。
 4. **清单口径从实现生成**：`checks/INDEX.generated.md` 增加 asset/runner/probe/fixture/tool/query 分类；`CENSUS` 增加 `tests/checks` 的 10 个门禁自测。两处数字不再同名不同义。
 5. **文档是 agent 输入，不是普通注释**：README/合同改动同批做语义核对；不碰 `packages/company-pack/src/**`、`cordis.patch.yml` 与 preset 内容，避免改变运行时工具面。
 6. **纯移动与语义修改分开 commit**；每个移动一个可回滚提交，先修守卫再搬。
@@ -47,7 +47,7 @@
 - [environment-gap] 真模型认证档未跑：本轮不改 AGENTS/index/dev-loop/preset 内容；入口链未动 → `checks/lanes/entry-probe.entry.mjs`
 - [policy] `probes` 五域与 `tests/*` 分区名不物理重排；只写判定规则，后续要重排另立 RFC → `probes/README.md`
 - [environment-gap] `release --check` 只到“源码面通过”；manifest gitSha 因发布后新增提交而滞后，未做 `--prepare/--verify` 重打 → `tools/release/release.mjs`
-- [policy] shipped src 的 delegation 注释仍指旧路径：不改，避免任何 pack 源码变更触发 `_dist` 重打；下次 release 重建时同步 → `packages/company-pack/src/lib/delegation/delegation-capabilities.ts`
+- [policy] shipped pack 的旧指针暂不改：`cordis.patch.yml` 的兼容台账注释与 delegation src 注释仍指旧家；改任何 pack 源码都会触发 `_dist` 重打，本轮不做。触发线写入 [release.md](../../docs/contracts/release.md)：重建 `_dist` 时同批同步 → `packages/company-pack/cordis.patch.yml`
 - [unprovable] 未来新增模块会放对家没有 oracle；由 `face-boundaries` + 三份 README 的判定规则兜底 → `docs/surface-contract.md`
 
 ## 验证
@@ -72,5 +72,5 @@
 
 - 6 个文件均为 `git mv`；移动文件内容零改动（`pin`/`mutation`/`delegation-model`/`compat-tags`/`coverage-baseline` 100% similarity；`candidate-scan` 99%，唯一差异是内部 `repo-markdown` 相对路径一层）。
 - 消费者全部同 diff 改指新家：`pin` 9 处（含 `export-dist` / `sync-dsh` 的**路径字面量**）、`candidate-scan` 5 处、`delegation-model` 10 处、`mutation` 2 处、`compat-tags` 5 处（pack-shape/release-ready/release/sync-dsh/docs）、`coverage-baseline` 1 处 audit + 2 篇 Note + docs/testing。
-- archived / backlog 的 markdown/backtick 路径只做机械修复（delegation-model 16 条；compat-tags / coverage-baseline 随移动改指新家），正文/决定未改；`link-debt` 回到基线 4。
+- archived / backlog 的 markdown/backtick 路径只做机械修复（delegation-model 的 archived/backlog 链接逐条改；compat-tags / coverage-baseline 随移动改指新家），正文/决定未改；`link-debt` 回到基线 4。
 - `checks/lib/ci-security-gates/README.md` 只加当前运行面横幅；MANIFEST 同 diff 抬指纹。

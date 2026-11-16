@@ -20,7 +20,7 @@ import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layou
  * 不证明：运行时通过动态字符串/非字面量路径拼接的依赖（本仓禁手搓裸路径，但无法穷尽）；
  * 也不证明这些模块的行为正确。
  *
- * 负例留证 2026-11-17：往 tools/lib/core 加 `import '../../../checks/lib/entry-probe.mjs'`
+ * 负例留证 2026-11-17：往 tools/lib/core 加 `import '../../../checks/lib/zz-example.mjs'`
  *   → 共享地基→judge 边红；删除 → 绿。
  * 负例留证 2026-11-17（tests 源）：tests/support 加一条指向
  *   `../../checks/lanes/lib/company-root-probe.mjs` 的 import → lane-local 支撑只许 checks/lanes/** 消费；删除 → 绿。

@@ -16,7 +16,7 @@
 | surface lane | 6 |
 | weekly lane | 21 |
 | 未分类失败类 | 0 |
-| 无消费者资产 | 56 |
+| 无消费者资产 | 57 |
 
 ## 失败类分布
 
@@ -69,7 +69,7 @@
 | product-team-e2e | model | 手动（真模型 ~$1，按组队/判据面验收触发） | 模型可见文本 | example | 0 |
 | attention-e2e | model | 手动（真模型 + 多用户并发 lane，人工在场时跑） | 模型可见文本 | example | 0 |
 | human-loop-e2e | model | 手动（真模型 + 真浏览器 ~$1–2，人工在场时跑） | 模型可见文本 | example | 0 |
-| entry-probe | model | 手动（真模型认证档；入口链文档改动后手动跑） | 文档指针 | example | 1 |
+| entry-probe | model | 手动（真模型认证档；入口链文档改动后手动跑） | 文档指针 | example | 0 |
 | generative | classic | weekly | 文档指针 | generator | 2 |
 
 ## 探针（调试面，不进自动 lane）

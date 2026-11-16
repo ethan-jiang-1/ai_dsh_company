@@ -80,7 +80,7 @@ tag（升 pin 走 sync-dsh，冒烟过了才加列）；`sync-dsh` 检查模式�
 `did not activate`/`skipping profile bundle`、`_dist` sha 与 manifest 一致、`plugin remove` 后
 bundles 摘净且 `.dsh-company/` 字节不变（重装可恢复）。`release --verify` 同时跑
 `company-entry-smoke`（真 tarball + 第二 workspace）与 `sourceFingerprint` 核对；`release --check`
-拒绝“源已变但 `_dist` 未重打”。
+拒绝“源已变但 `_dist` 未重打”。重建 `_dist` 时同批同步 shipped 注释里的旧指针（`cordis.patch.yml` 的兼容台账路径与 delegation src 注释；2026-11-17 移动留下的 [policy] 取舍）。
 
 全绿证明发布字节可装、可启动；不证明 vendor 新鲜构建，也不覆盖完整浏览器交互。`--link` 快速通道不替代
 这条验证。
