@@ -14,14 +14,14 @@
 //   J3 lead 收口陈述提及成员评估或分歧（人端呈现）
 //   J4 lead 收口（turn/end）
 // 用法：source run/env.sh && node probes/team/dissent-preservation-probe.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const TARGET = join(REHEARSAL, 'journal', 'h7-dissent.md')
@@ -30,9 +30,9 @@ const check = makeCheck(results)
 
 try { rmSync(TARGET, { force: true }) } catch {}
 let home
-try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('dissent-preservation-probe') } catch (e) { console.error(e.message); process.exit(2) }
+try { home = (await import('../../tools/lib/core/runtime-home.mjs')).requireDevHome('dissent-preservation-probe') } catch (e) { console.error(e.message); process.exit(2) }
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `dpp-` 由调用方传入，不推导；
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `dpp-` 由调用方传入，不推导；
 // spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home })
 console.log(`web up: ${base}`)

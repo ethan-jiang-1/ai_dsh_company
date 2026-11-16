@@ -7,8 +7,8 @@
 //   - 回归层（vitest）守判据本身，只读**明文**归档日志，秒级、无 key；
 //   - 本脚本跑**运行场**——`company-workspace/` + `$DSH_HOME/sessions/`，那里的日志是
 //     多帧 zstd（Node 内置 zstd 只解首帧，实测 329KB 只吐出 1 行），所以这里起 `zstd` 解帧。
-//   判据逻辑一份，两处复用：形状与身份 = `tools/lib/deliverables.mjs`，
-//   声明对账 = `tools/lib/deliverables-audit.mjs`（2026-10-16 第三轮结构收敛按域拆出）。
+//   判据逻辑一份，两处复用：形状与身份 = `tools/lib/company/deliverables.mjs`，
+//   声明对账 = `checks/lib/deliverables-audit.mjs`（2026-10-16 第三轮结构收敛按域拆出）。
 //
 // 用法：
 //   source run/env.sh && node checks/audit/deliverables-check.mjs
@@ -25,15 +25,15 @@
 //   整盘审计请跑运行场（默认档：真日志全在 $DSH_HOME）。
 //
 // 退出码：0 = 零违规；1 = 有违规；2 = 无法判定（工作区缺失等，--json 时判词带 assessed:false + reason）。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { pickSessionLog } from '../../tools/lib/session/session-log-generation.mjs'
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 import { join, resolve } from 'node:path'
-import { WARNING, isPlaceholderClaim, validateMeta } from '../../tools/lib/deliverables.mjs'
-import { VIOLATION, auditDeliverables, metaLedgerFindings, parseSessionLog, partitionArchiveViolations, presentResultRows, uncoveredPendingMaterial } from '../../tools/lib/deliverables-audit.mjs'
-import { parseAssignments } from '../../tools/lib/candidate-scan.mjs'
+import { WARNING, isPlaceholderClaim, validateMeta } from '../../tools/lib/company/deliverables.mjs'
+import { VIOLATION, auditDeliverables, metaLedgerFindings, parseSessionLog, partitionArchiveViolations, presentResultRows, uncoveredPendingMaterial } from '../lib/deliverables-audit.mjs'
+import { parseAssignments } from '../lib/candidate-scan.mjs'
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -230,7 +230,7 @@ console.log(`  过程稿 ${result.drafts.length} 份`)
   }
 // 事实阻塞闸门④审计（2026-10-10）：drafts 出现「pending-sources」ASSIGN 行 ⇒ schedule.json 必须有
 // `pending-sources·<slug>·…` 任务为证（title/prompt 点名该 T 号，或写明"全部缺料"）——无锚 = 行动幻觉
-// （口头"已立提醒"，卡兹克案实证）。锚粒度 = 判据唯一家 tools/lib/deliverables-audit.mjs（BUG-028）。
+// （口头"已立提醒"，卡兹克案实证）。锚粒度 = 判据唯一家 checks/lib/deliverables-audit.mjs（BUG-028）。
 {
   let scheduleTasks = []
   try {

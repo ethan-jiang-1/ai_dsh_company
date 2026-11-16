@@ -49,7 +49,7 @@ intent: 解释“资产很多但 exploratory 每轮还能抓 8 个 bug”的机�
 
 | 事实 | 现有实现 | 症状 |
 |---|---|---|
-| “哪些行算 Markdown 结构” | `packages/company-pack/src/lib/markdown-shape.ts`、`checks/gates/fix-evidence.mjs:79-123`、`checks/gates/notes-tree.mjs`、`tools/lib/backlog-liveness.mjs` | **4 份实现**；两天 32 个缺陷（BUG-152..183）全在这一族；门禁是 `.mjs` 不引 TS，所以各自又写了一遍形状状态机 |
+| “哪些行算 Markdown 结构” | `packages/company-pack/src/lib/markdown-shape.ts`、`checks/gates/fix-evidence.mjs:79-123`、`checks/gates/notes-tree.mjs`、`checks/lib/backlog-liveness.mjs` | **4 份实现**；两天 32 个缺陷（BUG-152..183）全在这一族；门禁是 `.mjs` 不引 TS，所以各自又写了一遍形状状态机 |
 | 路径段 / 分隔符 | `company-root.ts:23-27`（分隔符）、`:40-62`（`..` 栈式消解）、`relToCompany` / `walkCompanyDirs` / POSIX `dirname` | 三处语义未交叉验证；`file-shape-agreement.spec.ts:174-190` 只枚举 5 条 rel，无属性矩阵 |
 | lane / 资产选择 | `tests/repo/asset-lanes.spec.ts`、`tests/tools/lane-match.spec.ts`、`tests/checks/pre-push-surfaces.test.mjs`、`tests/CENSUS.generated.md` | 4 处判据；散文已漂：`fast-lane.mjs:5` 说 6 条、`asset-lanes.mjs:153-154` 实为 4；`asset-lanes.mjs:274` 说 69 探针、实为 67 |
 | 覆盖率豁免 | `tests/support/coverage-baseline.json`（796 行） | 有 `removeWhen` 字段，但没有测试盯“到期/续命”；豁免可以永久 0% |
@@ -100,7 +100,7 @@ intent: 解释“资产很多但 exploratory 每轮还能抓 8 个 bug”的机�
 
 **判据：一个资产如果没有“独有失败类 + 消费者 + 最近红”，就是候选退役/合并。**
 
-- **探针**：67 个，67 个未分类；先做 A5 消费者图（`tools/lib/asset-lanes.mjs` / census 加 `consumer`）。无消费者的调试探针 → 删除或写 `manualReason`；有消费者的保留。
+- **探针**：67 个，67 个未分类；先做 A5 消费者图（`tools/lib/core/asset-lanes.mjs` / census 加 `consumer`）。无消费者的调试探针 → 删除或写 `manualReason`；有消费者的保留。
 - **一次性 shape spec**：v3/v4/v5 里为单个 CRLF/BOM/fence/comment/escape 加的手写用例，生成器覆盖后删重复；保留每类一条“命名回归”（带 BUG 号）证明生成器确实抓得到。
 - **重复门禁负例**：`gates-negative` / `two-axis-gates` 中被 mutation 覆盖的手写负例，保留端到端一条。
 - **重复冒烟**：census 里 fast+surface+weekly 三重登记的资产生检查；同一行为只留最便宜层，其余降 `manualReason`。

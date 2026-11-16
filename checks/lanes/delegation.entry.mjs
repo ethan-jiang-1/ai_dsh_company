@@ -30,13 +30,13 @@
 // 预算（[policy §P3](../..//docs/policy.md)）：墙钟 ≤ `--wall`（默认 300s）；模型 prompt 1 条（--delegate 档 2 条）。
 // 前置：DSH_HOME + 已装 pack + 模型凭据。
 // 用法：source run/env.sh && node checks/lanes/delegation.entry.mjs [--port 0] [--wall 300]
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { join, resolve } from 'node:path'
-import { collectText, readRecords } from '../../tools/lib/session-log.mjs'
-import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { collectText, readRecords } from '../../tools/lib/session/session-log.mjs'
+import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -62,7 +62,7 @@ if (!process.argv.includes('--cwd')) ensureRehearsalWorkspace(ROOT)
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 const deadline = Date.now() + WALL_MS
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
 // 既有差异当参数保留：空 cookie 即抛（onEmptyCookie: 'throw'）、rpcId 前缀 `deleg-` + 失败回退转储
 // 响应体（dumpBodyOnError；rpc 错误措辞统一为模块的 `${endpoint}: …`，boot 失败文案同——卡内
 // 接受的文本统一，判据标签与退出码不变）。askOnce 是模块顶层的既有调用点，用的是四参旧签名

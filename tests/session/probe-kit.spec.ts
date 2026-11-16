@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { makeCheck, makeFailingCheck, sleep } from '../../tools/lib/probe-kit.mjs'
+import { makeCheck, makeFailingCheck, sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 /**
  * 探针公共件的 keyless 直测（2026-10-14 重构轮立：33 探针的 sleep/check 从各自内联收敛到

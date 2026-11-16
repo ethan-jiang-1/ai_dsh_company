@@ -1,8 +1,8 @@
 import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { CHECKS, CREDENTIALS_FILE, DEEPSEEK_CREDENTIAL, LIVE_SURFACES, credentialsState, homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseCredentialKeys, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, scanDeliverables, scenarioVerification, workspaceOverview } from '../../tools/lib/orient.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { CHECKS, CREDENTIALS_FILE, DEEPSEEK_CREDENTIAL, LIVE_SURFACES, credentialsState, homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseCredentialKeys, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, scanDeliverables, scenarioVerification, workspaceOverview } from '../../probes/lib/orient.mjs'
 
 // 条目 B 判据（RFC driver-surface-package）：pnpm orient 的 keyless 只读核心——
 // home 判定（requireDevHome 同款但只警告不抛）/ profiles / 会话清单 / 公司盘概览 /

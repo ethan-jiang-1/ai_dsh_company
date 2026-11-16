@@ -4,16 +4,16 @@
 import { describe, expect, it } from 'vitest'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import {
   ASSETS, FAST, KINDS, LANES, SURFACE_RULES, UNCONDITIONAL_STEPS,
   assetByName, selectSurfaces, selectWeeklyAssets, suffixOf,
-} from '../../../tools/lib/asset-lanes.mjs'
+} from '../../../tools/lib/core/asset-lanes.mjs'
 
 /**
  * 「空间完备」的机械门（DSH M1 的本仓形状）。
  *
- * 判据：`checks/lanes/*.e2e.mjs|*.entry.mjs` 与 `tools/lib/asset-lanes.mjs` 的 ASSETS **双向一致**：
+ * 判据：`checks/lanes/*.e2e.mjs|*.entry.mjs` 与 `tools/lib/core/asset-lanes.mjs` 的 ASSETS **双向一致**：
  *   盘上有文件 → 必须登记；登记了 → 盘上必须有文件；手动条目必须写明理由。
  * 这个 spec 是唯一能挡住"新资产生下来就没人跑"的地方；runner 只消费注册表，不复判。
  *
@@ -51,7 +51,7 @@ const SURFACE_SAMPLES = [
   'run/env.sh',
   'snapshots/README.md',
   'tests/repo/budget/asset-lanes.spec.ts',
-  'tools/lib/asset-lanes.mjs',
+  'tools/lib/core/asset-lanes.mjs',
   'vitest.config.ts',
   '.gitignore',
   '_dist/安装手册.md',
@@ -67,7 +67,7 @@ describe('资产 lane 注册表（空间完备）', () => {
     const registered = ASSETS.map(asset => asset.name).sort()
     const unregistered = files.filter(name => !registered.includes(name))
     const ghosts = registered.filter(name => !files.includes(name))
-    expect(unregistered, '这些 checks/lanes/*.e2e|entry.mjs 没进 tools/lib/asset-lanes.mjs——新资产必须选 lane（或写 manualReason）').toEqual([])
+    expect(unregistered, '这些 checks/lanes/*.e2e|entry.mjs 没进 tools/lib/core/asset-lanes.mjs——新资产必须选 lane（或写 manualReason）').toEqual([])
     expect(ghosts, '注册表里有名字但盘上没有文件——删资产要同 diff 退登记').toEqual([])
     expect(new Set(registered).size, '同一个资产只能登记一次').toBe(registered.length)
   })

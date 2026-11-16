@@ -8,13 +8,13 @@
 //
 // 用法：source run/env.sh && node tools/repo/snapshot-motion.mjs \
 //         --session session-<lead-id> --out snapshots/replay/<场景名> --motion "动议原文" [--cwd company-workspace]
-import { repositoryRoot as ROOT, snapshotOutputPath } from '../lib/repository-layout.mjs'
-import { pickSessionLog } from '../lib/session-log-generation.mjs'
+import { repositoryRoot as ROOT, snapshotOutputPath } from '../lib/core/repository-layout.mjs'
+import { pickSessionLog } from '../lib/session/session-log-generation.mjs'
 import { zstdText } from '../drivers/zstd.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { requireDevHome } from '../lib/runtime-home.mjs'
-import { captureWorkspace } from '../lib/workspace-oracle.mjs'
+import { requireDevHome } from '../lib/core/runtime-home.mjs'
+import { captureWorkspace } from '../lib/core/workspace-oracle.mjs'
 import { join, resolve } from 'node:path'
 
 const { dump } = createRequire(join(ROOT, 'vendor/dsh/package.json'))('js-yaml')
@@ -49,7 +49,7 @@ const slug = `-${cwd.replaceAll('/', '-')}--`
 const sessionsDir = join(home, 'sessions', slug)
 if (!existsSync(sessionsDir)) throw new Error(`会话目录不存在：${sessionsDir}`)
 
-/** 读一个会话目录的 JSONL（世代选择唯一口径 = tools/lib/session-log-generation.mjs；zstd → 明文）。 */
+/** 读一个会话目录的 JSONL（世代选择唯一口径 = tools/lib/session/session-log-generation.mjs；zstd → 明文）。 */
 function readSession(sessionId) {
   const dir = join(sessionsDir, sessionId)
   const log = pickSessionLog(dir)

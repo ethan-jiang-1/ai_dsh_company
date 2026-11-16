@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { NEW_FILE_FLOOR, compareCoverage, indexCoverage, nextBaseline } from '../../tools/lib/coverage-baseline.mjs'
+import { NEW_FILE_FLOOR, compareCoverage, indexCoverage, nextBaseline } from '../../checks/lib/coverage-baseline.mjs'
 
 /**
  * 覆盖率棘轮的判据（研究 C 件）。四条规则各有负例——没有负例的阈值等于装饰：

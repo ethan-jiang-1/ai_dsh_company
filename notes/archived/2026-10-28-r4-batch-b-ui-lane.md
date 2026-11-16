@@ -15,7 +15,7 @@
 5. **启动失败可诊断**：`startWeb` 的错误消息带输出尾部（2k）；新增 `onOutput` 注入，调用方自己落盘。`ui-scene-smoke` 把 web stdout/stderr 写 `web.log`（token 脱敏），并在 `scene.json` 里给出 `webLog`。
 6. **回执在比对之后写**：`scene.json` 改 `goldenMode` + `goldenResult`（pass/fail/refresh/off/not-run）；fail 时带 `goldenProblems`（expected/actual）；不再出现“probeExit=0 但金样失败”却无机器可读证据。
 7. **`--keep` 打 URL**：保留实例时打印带 token 的 URL，写进回执（gitignored 诊断区）。
-8. **最小交互复现**：`cdp-probe --steps <file>` + `ui-scene-smoke --steps <file>`，受控动作 `clickText` / `waitText` / `expectText` / `typeText`；解析在 `tools/lib/probe-steps.mjs`（keyless spec），执行仍在 cdp-probe（不开任意 JS 执行面）。
+8. **最小交互复现**：`cdp-probe --steps <file>` + `ui-scene-smoke --steps <file>`，受控动作 `clickText` / `waitText` / `expectText` / `typeText`；解析在 `probes/lib/probe-steps.mjs`（keyless spec），执行仍在 cdp-probe（不开任意 JS 执行面）。
 9. **onboarding 模态收口**：隔离 home 无凭据时 “Get started” 可能晚于首屏 1–2s 出现；页签扫完再关一次，避免挡截图/点击。
 
 ## 输掉的方案

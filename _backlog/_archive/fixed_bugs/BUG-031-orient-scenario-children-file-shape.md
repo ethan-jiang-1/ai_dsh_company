@@ -20,7 +20,7 @@ orient 自己宣传的「深看某次运行」在 2 个 runnable 场景之一上
 
 ## 事实与根因
 
-- `tools/lib/orient.mjs` runBundleView 的 children 计数一律 `readdirSync(childrenRef)`——
+- `probes/lib/orient.mjs` runBundleView 的 children 计数一律 `readdirSync(childrenRef)`——
   但 snapshot.yml 的 `session.children` 有两种合法形状：目录（r2：`sessions/`）与单文件（r3：`sessions/vp-eng-child.jsonl`）。
   文件形状上 readdirSync 抛 ENOTDIR，CLI 层未捕获直接 exit 1。
 

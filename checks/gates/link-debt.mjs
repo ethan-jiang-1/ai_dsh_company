@@ -2,10 +2,10 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { join, relative, sep } from 'node:path'
-import { markdownLinkTargets } from '../../tools/lib/markdown-links.mjs'
+import { markdownLinkTargets } from '../../tools/lib/core/markdown-links.mjs'
 
 // ── 链接欠账棘轮门（link-debt，2026-11-03 第六轮立）──────────────────────────────
-// 为什么：`md-links` 对三类"缺失目标"直接 return（`tools/lib/markdown-links.mjs` 的本地证据引用豁免）：
+// 为什么：`md-links` 对三类"缺失目标"直接 return（`tools/lib/core/markdown-links.mjs` 的本地证据引用豁免）：
 // ① 目标在 `snapshots/`、`runtime/`、`company-workspace/` 下（证据已移出产品仓 / 运行残留）；
 // ② 源头在冻结层（`notes/archived/`、`_backlog/_archive/`，按政策不回写）；③ 归档修复门只查 `.md`。
 // 于是 2026-11-03 实测 **44 条死链全在豁免区，`md-links` 报 0**——豁免把"缺失"变成了"不看"。

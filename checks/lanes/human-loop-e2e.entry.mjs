@@ -15,13 +15,13 @@
 // 分层（guides/dev-loop §9.1）：认证档——真模型 + 真浏览器 + 起进程，不进 `pnpm test`。
 // 预算：CEO 三轮 + 一次问询应答 ≈ $1–2 / 3–6 分钟。排练场 cwd，真盘零接触。
 // 用法：source run/env.sh && node checks/lanes/human-loop-e2e.entry.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
@@ -38,7 +38,7 @@ const check = (label, ok, detail = '') => {
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('human-loop-e2e-smoke')
 } catch (error) {
   console.error(error.message); process.exit(2)
@@ -50,7 +50,7 @@ const MAGIC = '42719'
 const MAGIC2 = '18340'
 writeFileSync(join(INPUTS, 'b2-material.md'), `# 补料素材（e2e 生成）\n\n关键数字 A：${MAGIC}\n关键数字 B：${MAGIC2}\n`, 'utf8')
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless
 // 纯逻辑缝）；rpcId 前缀 `e2e-` 由调用方传入，不推导。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home })
 console.log(`web up: ${base}`)

@@ -152,6 +152,6 @@ CI 先按「全配方」跑，连续红，逐条暴露（都不是本仓 tracked
   [tracked-file-size.mjs](../../checks/gates/tracked-file-size.mjs)、
   [gitignore-shape.mjs](../../checks/gates/gitignore-shape.mjs)、
   [tracked-secrets.mjs](../../checks/gates/tracked-secrets.mjs)；
-  纯逻辑 = [tools/lib/tracked-secrets.mjs](../../tools/lib/tracked-secrets.mjs)。
+  纯逻辑 = [checks/lib/tracked-secrets.mjs](../../checks/lib/tracked-secrets.mjs)。
 - fresh-clone CI = [.github/workflows/fresh-clone.yml](../../.github/workflows/fresh-clone.yml)；
   配方 = [bootstrap.md](../../docs/guides/bootstrap.md)。

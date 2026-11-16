@@ -10,7 +10,7 @@
 2026-11-09 委派面重构后，`subagent_retry` 是 P4 新加的 host 原语：注册列表写在
 [`src/index.ts`](../../packages/company-pack/src/index.ts)、深度默认值写在
 [`subagent-retry.ts`](../../packages/company-pack/src/host/delegation/subagent-retry.ts)（`DEFAULT_MAX_DEPTH = 3`），
-两者都不在“唯一期望源” [`delegation-model.mjs`](../../tools/lib/delegation-model.mjs) 里。后果有两层：
+两者都不在“唯一期望源” [`delegation-model.mjs`](../../checks/lib/delegation-model.mjs) 里。后果有两层：
 
 1. **预算分裂**：一个 `delegationDepth: 2` 的 CMO 用普通 `subagent` 会被行级 `maxDepth: 2` 拒绝，
    换 `subagent_retry` 就能起 `depth: 3` 的 worker——深度预算变成“看用哪条工具”。

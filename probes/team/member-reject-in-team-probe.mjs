@@ -12,15 +12,15 @@
 //   ⚠ 「缺什么」这一件也在 J1 里打印成分项，供人核复核——机械只断前两件 + 去向。
 // 退出码：0 = 打回；1 = 硬接；2 = 无结论（超时/环境失败）。
 // 用法：source run/env.sh && node probes/team/member-reject-in-team-probe.mjs [--wall 900]
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { hasCompletedTurn, toolArguments } from '../../tools/lib/collaboration-evidence.mjs'
-import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { hasCompletedTurn, toolArguments } from '../lib/collaboration-evidence.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const arg = (name, fallback) => {
   const index = process.argv.indexOf(`--${name}`)
@@ -36,7 +36,7 @@ const check = makeCheck(results)
 
 let home
 try {
-  home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('member-reject-in-team-probe')
+  home = (await import('../../tools/lib/core/runtime-home.mjs')).requireDevHome('member-reject-in-team-probe')
 } catch (error) { console.error(error.message); process.exit(2) }
 const evidenceDir = mkdtempSync(join(home, 'member-reject-evidence-'))
 

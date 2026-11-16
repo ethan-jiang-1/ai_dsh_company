@@ -8,8 +8,8 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
 import { RUN_BUNDLE_PATHS } from '../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 
 const BASE = join(ROOT, 'runtime/permissions-recovery-smoke')

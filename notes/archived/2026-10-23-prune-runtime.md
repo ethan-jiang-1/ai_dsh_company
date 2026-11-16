@@ -8,7 +8,7 @@
    不在射程。四条留人：**被 tracked markdown 引用** / git tracked / README / 未到天数。
 2. **工具**：[prune-runtime.mjs](../../tools/repo/prune-runtime.mjs)：默认 dry-run，`--apply` 才删，`--days` 可调；
    候选 = 会话目录、诊断现场、tmp、replay 现场、探针证据、e2e 残留（含 `*-evidence-*` 目录）。
-   判据纯逻辑 = [prune-runtime.mjs](../../tools/lib/prune-runtime.mjs)（keyless 三用例）。
+   判据纯逻辑 = [prune-runtime.mjs](../../tools/lib/core/prune-runtime.mjs)（keyless 三用例）。
 3. **策略落 [runtime/README](../../runtime/README.md) §五**：口径、工具、为什么留引用、会话日志也在射程内。
 4. **首次 apply**：删 105 项 / 22.9M；留 referenced×17、fresh×39。
 

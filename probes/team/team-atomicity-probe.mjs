@@ -11,15 +11,15 @@
 //   C5a 成功team_task_list结果含scope重叠warning，指向另一项in_progress任务
 //   C5b Lead与两成员最新turn均completed；一次Lead轮足够，超时exit2，不以部分数据判绿
 // 用法：source run/env.sh && node probes/team/team-atomicity-probe.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { atomicityEvidence, teamRunComplete } from '../../tools/lib/collaboration-evidence.mjs'
-import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { atomicityEvidence, teamRunComplete } from '../lib/collaboration-evidence.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const TARGET = join(REHEARSAL, 'journal', 'atomicity-probe.md')
@@ -29,11 +29,11 @@ const check = makeCheck(results)
 
 try { rmSync(TARGET, { force: true }); rmSync(join(REHEARSAL, 'journal', 'w1-scope.md'), { force: true }); rmSync(join(REHEARSAL, 'journal', 'w2-scope.md'), { force: true }) } catch {}
 let home
-try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('team-atomicity-probe') } catch (e) { console.error(e.message); process.exit(2) }
+try { home = (await import('../../tools/lib/core/runtime-home.mjs')).requireDevHome('team-atomicity-probe') } catch (e) { console.error(e.message); process.exit(2) }
 
 let child
 try {
-  // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `tap-` 由调用方传入；spawn/fetch 注入
+  // 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `tap-` 由调用方传入；spawn/fetch 注入
   // （tools/lib 是 keyless 纯逻辑缝）。下方 finally 兜杀引用 child ⇒ 经注入的 spawn 顺手捕获：
   // startWeb 起进程先于等 banner，boot 失败时 child 已在手，清理路径与原实现一致。
   const { base, token } = await startWeb({ spawn: (...args) => (child = spawn(...args)), root: ROOT, home })

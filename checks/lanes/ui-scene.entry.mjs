@@ -24,11 +24,11 @@ import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb } from '../../tools/lib/probe-web.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
-import { diagnosisDir } from '../../tools/lib/diagnosis.mjs'
-import { buildGolden, compareGolden, firstTextDiff } from '../../tools/lib/ui-expected.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb } from '../../tools/lib/probe/probe-web.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
+import { diagnosisDir } from '../../tools/lib/probe/diagnosis.mjs'
+import { buildGolden, compareGolden, firstTextDiff } from '../lib/ui-expected.mjs'
 
 const args = process.argv.slice(2)
 const KEEP = args.includes('--keep')

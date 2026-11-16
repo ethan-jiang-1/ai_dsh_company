@@ -2,7 +2,7 @@
 // 何时跑：每次 verify；在 notes/ 下新增、移动文件或目录，或改 Note 状态行后。
 import { lstatSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { noteStatusLines } from '../../tools/lib/repo-markdown.mjs'
+import { noteStatusLines } from '../../tools/lib/core/repo-markdown.mjs'
 
 // ── notes 树形与状态行门禁（notes-tree，2026-11-14 立；卡 = _backlog/issues/2026-11-14-notes-tree-and-carrier-gates.md）──
 // 为什么：notes/ 的合法形状此前只写在 notes/README §一 的表里，没有任何门禁走查。2026-11-14 研究实测：

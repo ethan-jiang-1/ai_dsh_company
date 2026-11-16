@@ -56,7 +56,7 @@ node checks/audit/quality-loop-audit.mjs --workspace company-workspace    # 扫�
 node checks/audit/quality-loop-audit.mjs --deliverable <交付目录>          # 点名一份
 ```
 
-它核七件事（实现 = `tools/lib/quality-loop.mjs`）：两个独立 activation（session/preset/depth）、
+它核七件事（实现 = `tools/lib/company/quality-loop.mjs`）：两个独立 activation（session/preset/depth）、
 裁决原文（文件 == 头 == child 最终消息）、未被改、处置覆盖、方法配对、check-id 全覆盖、验证者没调 `write`/`edit`/`bash`。
 
 ## 4. 红怎么读（常见 code）

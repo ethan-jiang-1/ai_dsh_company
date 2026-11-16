@@ -9,7 +9,7 @@
  * 时把 `{ css, html }` 发射到该路径，供认证档注入真 web app（借真主题令牌）截图。
  * 图里的虚线框/标签是**图示层**（`DIAGRAM_CSS`，不随包发布），标记本体用的是发布 CSS。
  */
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { createElement } from 'react'

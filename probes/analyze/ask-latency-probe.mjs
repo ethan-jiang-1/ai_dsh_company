@@ -15,8 +15,8 @@
 // 判读：本器只报数，**不改任何配置**；改窗口 = 改 preset 行（属于 pack 公开行为）。
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 import { zstdText } from '../../tools/drivers/zstd.mjs'
 
 const JSON_OUT = process.argv.includes('--json')

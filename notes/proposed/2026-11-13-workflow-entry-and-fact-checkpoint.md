@@ -53,7 +53,7 @@ fresh-context 走查发现三层缺口，而不是一层：
 
 **P1-1 通用执行链**
 - `dev-loop §1` 的「定切片」加：`状态事实 / 唯一入口 / 读载体 / 环境轴`；写不出载体名单 = 切片没定清。
-- `dev-loop §3` 四问前加一段前置问题（不新增第五行，避免「四问」改名）：这次改动的事实是什么？唯一入口是谁？谁读它？哪条环境轴会坏？落点指 `tests/README.md` 与 `tools/lib/carrier-registry.mjs`。
+- `dev-loop §3` 四问前加一段前置问题（不新增第五行，避免「四问」改名）：这次改动的事实是什么？唯一入口是谁？谁读它？哪条环境轴会坏？落点指 `tests/README.md` 与 `checks/lib/carrier-registry.mjs`。
 
 **P1-2 模板**
 - `_backlog/issues/README.md` 卡模板加 `## 事实与读者`（新事实/写者/读者/环境坏法四行）+ `## 验收标准` 三列骨架（命令 | 断言 | 红形态），仅 `毕业：做` 的卡必填。
@@ -75,7 +75,7 @@ fresh-context 走查发现三层缺口，而不是一层：
 
 ### P2（半天）— 让验收可执行
 
-- `tools/lib/backlog-liveness.mjs` 的 `sectionBody` 与 `checks/gates/proposals.mjs` 从「非空」升级为「至少一个可执行标记」：反引号命令首词 ∈ `{pnpm,node,git,rg,source,npx}` 且脚本/路径存在，或 `Given/When/Then`，或 `assert`。配 `zz` 负例卡/RFC 写「测试通过」→ 红；写 `` `pnpm test tests/...` `` → 绿。
+- `checks/lib/backlog-liveness.mjs` 的 `sectionBody` 与 `checks/gates/proposals.mjs` 从「非空」升级为「至少一个可执行标记」：反引号命令首词 ∈ `{pnpm,node,git,rg,source,npx}` 且脚本/路径存在，或 `Given/When/Then`，或 `assert`。配 `zz` 负例卡/RFC 写「测试通过」→ 红；写 `` `pnpm test tests/...` `` → 绿。
 - `新建:checks/gates/acceptance-carrier.mjs`：每条验收 bullet 至少一个可解析载体（命令/现存路径/文件链接）；`command-refs` 扫描面扩到 `notes/proposed`、`notes/implemented`、`_backlog` 活区。
 - 另两条 handoff 检查（`新建:checks/gates/handoff-carrier.mjs`、`新建:checks/gates/env-bound-evidence.mjs`）**按复发再做**，不一次全上。
 

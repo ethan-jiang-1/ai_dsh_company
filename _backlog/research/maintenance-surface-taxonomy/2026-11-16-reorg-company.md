@@ -88,7 +88,7 @@ intent: 本仓维护面整理单（自包含 handoff，含完整决策上下文�
 | `run/` | 非面 | env.sh + 2 overlay + README | 启动配置，不是第四面 |
 
 **三个必须知道的既有事实**：
-1. **库存口径分裂**：`checks/INDEX.generated.md` 说探针 60（把 fixture 算进去了），`tests/CENSUS.generated.md` 说 59（按注册表）。根因 = `tools/lib/checks-index.mjs` 的 walk 没有排除 `probes/**/index.mjs`，而 census 的 `probeFiles()` 只匹配 `*-probe.mjs`。两个门禁各查各的源，所以都绿。
+1. **库存口径分裂**：`checks/INDEX.generated.md` 说探针 60（把 fixture 算进去了），`tests/CENSUS.generated.md` 说 59（按注册表）。根因 = `tools/lib/core/checks-index.mjs` 的 walk 没有排除 `probes/**/index.mjs`，而 census 的 `probeFiles()` 只匹配 `*-probe.mjs`。两个门禁各查各的源，所以都绿。
 2. **AGENTS.md 布局块有一处过时**：第 20 行写 `smoke/（真实入口冒烟）`，盘上是 `lanes/`。`layout-block` 门禁只查首列路径存在性，不查说明文字，所以漏过。P0 顺手修。
 3. **`tools/README.md` 第 5 行有一处错误**：说「本仓的『脚本』= `checks/` 的 smoke / lane / audit / probe」——probes 不在 checks 下。P0 顺手修。
 
@@ -158,11 +158,11 @@ pnpm verify          # 预期 ALL PASS（doc-taxonomy / doc-budget / md-links / 
 |---|---|---|
 | **P2 探针棘轮** | `tests/repo/budget/test-census.spec.ts:16` `MAX_PROBES = 59`，当前正好 59；迁 7 件 → 66 必红 | **需用户裁**：A 一次性抬顶 59→66 + 同 diff Note（移动不是新增，建议把 P2 口径改成「登记能力」）；B 同批退役 7 支同族探针（风险大，不建议捆绑） |
 | **script-triggers 头注** | 改名后 7 件全部新匹配 `-(probe)\.mjs$` 触发正则；orient.mjs 的「何时跑」在第 10 行（门禁只查前 8 行）→ **orient-probe 必红** | 同 diff 把 orient 的「何时跑」提到前 8 行；其余 6 件已合规 |
-| **script-index 扫描面** | `tools/lib/checks-index.mjs:14` `TOOL_GROUPS = ['dev','observe','repo','release']`；observe 删掉后顶层散件检查会红 | 同 diff 改 TOOL_GROUPS 为三组 + 重生成 INDEX |
-| **注册表** | `tools/lib/asset-lanes.mjs` PROBES 需 +7 条（domain: 'analyze'）+ FAILURE_CLASS_BY_NAME +7 条 | 候选失败类：orient/ask-latency/diagnose/explore-evidence/session-log-export = 会话持久化；notes-audit = 文档指针；propose-sampler = 模型可见文本 |
+| **script-index 扫描面** | `tools/lib/core/checks-index.mjs:14` `TOOL_GROUPS = ['dev','observe','repo','release']`；observe 删掉后顶层散件检查会红 | 同 diff 改 TOOL_GROUPS 为三组 + 重生成 INDEX |
+| **注册表** | `tools/lib/core/asset-lanes.mjs` PROBES 需 +7 条（domain: 'analyze'）+ FAILURE_CLASS_BY_NAME +7 条 | 候选失败类：orient/ask-latency/diagnose/explore-evidence/session-log-export = 会话持久化；notes-audit = 文档指针；propose-sampler = 模型可见文本 |
 | **refactor-drift 命名** | `checks/audit/` 只许 `-(audit\|check\|eval\|ratchet).mjs` | 改名 `refactor-drift-audit.mjs`；头注已有 状态+何时跑，合规 |
 | **冻结层链接** | `notes/archived/2026-10-16-deliverables-audit-seam.md:35` 有一条 `.md` 链接指向 refactor-drift；`notes-archived-links` 门禁会红 | 按 `notes/archived/AGENTS.md` 的唯一例外：**只修链接路径那一行，正文不动** |
-| **覆盖率基线** | `tests/support/coverage-baseline.json:801` 豁免 reason 提到 diagnose 路径（键 `tools/lib/diagnosis.mjs` 不动）；入口脚本本身不在 coverage include（只含 `tools/lib/**`） | 只改 reason 文字；`pnpm coverage:ratchet` 应不受影响 |
+| **覆盖率基线** | `tests/support/coverage-baseline.json:801` 豁免 reason 提到 diagnose 路径（键 `tools/lib/probe/diagnosis.mjs` 不动）；入口脚本本身不在 coverage include（只含 `tools/lib/**`） | 只改 reason 文字；`pnpm coverage:ratchet` 应不受影响 |
 
 ### 4.3 引用替换清单（live 面，8 个文件 18 处；已排除归档与本题材料）
 
@@ -173,8 +173,8 @@ pnpm verify          # 预期 ALL PASS（doc-taxonomy / doc-budget / md-links / 
 | `notes/implemented/2026-10-30-notes-consistency-governance.md` | 1 | 第 21 行 notes-audit 链接 |
 | `notes/implemented/2026-11-10-exploration-asset-strategy.md` | 3 | 第 31、59、72 行 explore-evidence 路径 |
 | `tests/support/coverage-baseline.json` | 1 | 第 801 行 reason 文字 |
-| `tools/lib/orient.mjs` | 1 | 第 3 行注释 |
-| `tools/lib/session-evidence.mjs` | 1 | 第 5 行注释 |
+| `probes/lib/orient.mjs` | 1 | 第 3 行注释 |
+| `tools/lib/session/session-evidence.mjs` | 1 | 第 5 行注释 |
 | `checks/INDEX.generated.md` | 重生成 | `node tools/repo/checks-index.mjs --write` |
 
 **不需要改的**：`pnpm orient` / `pnpm diagnose` 等命令别名在 40 个文件里出现，但它们走 package.json 间接引用，路径改了命令不变；归档区（`_backlog/_archive`、`notes/archived`）对 tools/observe 零 `.md` 链接、零裸路径提及（已 grep 核实）；本题研究材料是自指成本，实施同 diff 更新或接受 bare-path 观察档提醒。

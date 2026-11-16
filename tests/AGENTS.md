@@ -12,7 +12,7 @@
 ## 新持久化事实
 
 - 先加 shape（tests/support/world-shapes.ts），再加矩阵行；
-- 登记 tools/lib/carrier-registry.mjs；跑 `company-root-carriers`。
+- 登记 checks/lib/carrier-registry.mjs；跑 `company-root-carriers`。
 
 ## 门禁
 

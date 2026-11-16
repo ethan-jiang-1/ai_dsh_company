@@ -14,7 +14,7 @@ intent: "记录claim-loser有界探针的让位行为事实：owner-bound败者�
 - **owner-bound 主景**：任务一『owner-bound认领观察』，目标 `journal/claim-loser-owner.md` 仅 claim 成功者可写（任务 description 与成员任务书双重声明）；两名成员同以 `expected_revision=1` 首次 claim。
 - **shared 正对照**：任务二『shared共享对照』，目标 `journal/claim-loser-shared.md` 显式授权两名成员无论 claim 成败各写一行；同款同 revision claim 竞争。
 
-仪器落点：纯判据 [claim-loser evidence](../../../../tools/lib/claim-loser-evidence.mjs)，真实驱动 [team-claim-loser-probe](../../../../probes/team/team-claim-loser-probe.mjs)、keyless 回归 [spec](../../../../tests/evidence/claim-loser-evidence.spec.ts) 与判据↔退出码连接复用同一实现。判据只认配对工具 call/result、持久任务快照、投递消息与终态文件，不看模型正文。
+仪器落点：纯判据 [claim-loser evidence](../../../../probes/lib/claim-loser-evidence.mjs)，真实驱动 [team-claim-loser-probe](../../../../probes/team/team-claim-loser-probe.mjs)、keyless 回归 [spec](../../../../tests/evidence/claim-loser-evidence.spec.ts) 与判据↔退出码连接复用同一实现。判据只认配对工具 call/result、持久任务快照、投递消息与终态文件，不看模型正文。
 
 不需要 read 屏障 overlay：claim 竞争由任务书强制（首次 claim 必须 `expected_revision=1`、失败不重试），CAS 拒绝与提交时序无关——第二笔同 revision 提交必然 `TEAM_TASK_STALE_REVISION`。这与 freshness 类同轮读窗竞争不同（那类仍需屏障）。让位判据取**零 write/edit 调用**（含被拒尝试），不是零成功写。
 

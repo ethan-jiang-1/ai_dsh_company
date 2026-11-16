@@ -14,7 +14,7 @@
 // 判读：本器只报数与人话证据，**不改配置**；要加 persona 引导 = 改 preset（属产品决策）。
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 import { zstdText } from '../../tools/drivers/zstd.mjs'
 
 const JSON_OUT = process.argv.includes('--json')

@@ -13,10 +13,10 @@
 ## 当前事实
 
 - 手册 [AGENTS.md](../../packages/company-pack/content/AGENTS.md) 多处引用 `../docs/*`、`checks/audit/*`、`snapshots/README.md`、`runtime/rehearsal-workspace/`；13/14 份 skill 结尾写“归仓库的门禁/审计脚本”；CEO chairing skill 写 `node tools/converge.mjs`。
-- 模板 [meta.md](../../packages/company-pack/content/templates/meta.md) 把词表指向 `tools/lib/deliverables.mjs`。
+- 模板 [meta.md](../../packages/company-pack/content/templates/meta.md) 把词表指向 `tools/lib/company/deliverables.mjs`。
 - 客户端读 `kb/deliverables-index.json`（[company-data-plane.ts](../../packages/company-pack/src/client/data/company-data-plane.ts)）；错误文案在 [DeliverablesTab.tsx](../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx)。
 - 仓库生成器 [tools/deliverables-index.mjs](../../tools/repo/deliverables-index.mjs) 依赖 [checks/audit/deliverables-check.mjs](../../checks/audit/deliverables-check.mjs)，不在 pack `files`。
-- 现有 [markdown-links.mjs](../../tools/lib/markdown-links.mjs) 把 pack 骨架排除、只校验 dev 盘，安装形状的死链在结构上不可见。
+- 现有 [markdown-links.mjs](../../tools/lib/core/markdown-links.mjs) 把 pack 骨架排除、只校验 dev 盘，安装形状的死链在结构上不可见。
 - `present` 工具会向会话追加 `deliverables/presented` 事件（files 为绝对路径），host 可听 `session/event`。
 
 ## 方案
@@ -26,13 +26,13 @@
 - 逐个文件盘点 `workspace/**` 与 `presets/**/skills/**` 的 Markdown，把引用分成四类：`keep`（workspace 内可解析，如 `kb/...`、`templates/...`）、`inline`（把规则写进正文）、`move`（移到不注入的 `workspace/README.md` 操作员节）、`remove`（维护者专属）。
 - 手册：删除 `../docs`、`checks/`、`runtime/`、`snapshots/` 指针；把“维护者从仓库根跑审计”改成“操作员在本部署的检查点”（与成品 catalog 产品化对齐）或删掉；把“排练场”改成会话外的人工排练说明或删除。
 - 13 份 skill 的“归仓库的门禁/审计脚本”尾注：改成“可机械核对的部分由操作员在收口时核对（见 workspace/README 操作员节）”，或删除；chairing skill 的 `node tools/converge.mjs` 改为人工收口步骤。
-- 模板 `meta.md`：把 `类型` / `结果` 的枚举值直接写进模板；删除 `tools/lib/deliverables.mjs` 与 `deliverables-check` 的仓库路径引用，改指 `kb/motion-ledger.md` 与操作员节。
+- 模板 `meta.md`：把 `类型` / `结果` 的枚举值直接写进模板；删除 `tools/lib/company/deliverables.mjs` 与 `deliverables-check` 的仓库路径引用，改指 `kb/motion-ledger.md` 与操作员节。
 - 新增门禁 `shipped-links`：以“安装读者”视角扫描 pack 的 `workspace/**` 与 `presets/**/skills/**` Markdown；相对链接穿出 workspace 即红；`docs/`、`checks/`、`tools/`、`runtime/`、`snapshots/`、`notes/`、`_backlog/`、`vendor/` 等仓库顶目录在注入内容里出现即红（维护者附录文件除外，按路径白名单）。
 - 负例：往一份 skill 加 `../docs/contracts/release.md` → 红；删除 → 绿。把手册的 `snapshots/README.md` 恢复 → 红。
 
 ### 2. 成品目录 + present 投影
 
-- 新增 host 侧 catalog 模块（复用 [deliverables-catalog.mjs](../../tools/lib/deliverables-catalog.mjs) 的 schema 与 [deliverables.mjs](../../tools/lib/deliverables.mjs) 的 `parseMeta` 口径）：
+- 新增 host 侧 catalog 模块（复用 [deliverables-catalog.mjs](../../tools/lib/company/deliverables-catalog.mjs) 的 schema 与 [deliverables.mjs](../../tools/lib/company/deliverables.mjs) 的 `parseMeta` 口径）：
   - 扫描 `<workspace>/deliverables` 与 `deliverables-archive` 的 `final.md` + `meta.md`，生成 `kb/deliverables-index.json`（schema 1）。
   - `presented` 来源：监听 host `session/event` 的 `deliverables/presented` 事件，把绝对路径映射为 workspace 相对路径；读旧 catalog，保留已 `presented: true` 的路径；其余写 `null`（未核，不冒充 false）。
   - 启动时若 workspace 在场则生成；`present` 事件后重生成；失败只记日志，不连累应用。
@@ -87,14 +87,14 @@ node checks/lanes/preset.entry.mjs
 已落树：
 
 - 新增门禁 [shipped-links](../../checks/gates/shipped-links.mjs)：以安装读者视角扫描 31 份出厂 Markdown（17 workspace + 14 skills）+ 6 份 persona（`agent.cordis.yml` 非注释行）；链接/引用式定义/绝对路径穿出 workspace、指向仓库顶目录、fenced 代码块或裸路径出现 `checks/`/`tools/`/`runtime/`/`snapshots/` 即红。已接入 [run-gates](../../checks/run-gates.mjs)。
-- 内容：手册去掉 `../docs`、`checks/`、`snapshots/`、`runtime/rehearsal-workspace/` 指针，改成操作员/会话内动作；13 份 skill 的“归仓库的门禁/审计脚本”改成“操作员收口核对”；chairing skill 的 `node tools/converge.mjs` 改成人工收口；`templates/meta.md` 内联 `类型`/`结果` 词表，不再指向 `tools/lib/deliverables.mjs`。
+- 内容：手册去掉 `../docs`、`checks/`、`snapshots/`、`runtime/rehearsal-workspace/` 指针，改成操作员/会话内动作；13 份 skill 的“归仓库的门禁/审计脚本”改成“操作员收口核对”；chairing skill 的 `node tools/converge.mjs` 改成人工收口；`templates/meta.md` 内联 `类型`/`结果` 词表，不再指向 `tools/lib/company/deliverables.mjs`。
 - 成品目录产品化：新增 [src/lib/deliverables-catalog.ts](../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts)（纯逻辑）与 [src/host/ledger/catalog.ts](../../packages/company-pack/src/host/ledger/catalog.ts)（扫描/生成/幂等）；host 首启生成空 catalog，`session/event` 的 `deliverables/presented` 投影为 `presented=true`，未观测 = `null`；条目未变不重写（`generatedAt` 稳定，保二启零变更）。
 - 客户端 [DeliverablesTab.tsx](../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx)：空态/错误/页脚不再提维护者工具；present 未核与已 present 分开展示；新增 `metaProblem`（缺行/枚举外/日期格式）并在行上标「meta 形状错」。`src/lib` 与 `tools/lib` 的生成器同 schema，contract fixture 两侧共钉。
 - 证据：`release-smoke` 首启断言 `counts.total=0` 的 catalog 在场且二启零变更；[tests/host/ledger/catalog.spec.ts](../../tests/host/ledger/catalog.spec.ts) 覆盖空目录、幂等、present path/slug、归档后保留、false 保留、metaProblem、host→client parser 契约；[tests/host/ledger/catalog-wiring.spec.ts](../../tests/host/ledger/catalog-wiring.spec.ts) 用最小 ctx 桩跑真 `apply()`，证明 `session/event` 监听把 present 写进 catalog。
 
 红/绿收据（实跑）：
 
-- 红：只加 `shipped-links`、未改内容 → `FAIL shipped-links: …/AGENTS.md:23 链接指向仓库/穿出 workspace：../docs/contracts/demo.md；…templates/meta.md:3 裸路径指向仓库：tools/lib/deliverables.mjs；…chairing…:58 裸路径指向仓库：node tools/converge.mjs`。
+- 红：只加 `shipped-links`、未改内容 → `FAIL shipped-links: …/AGENTS.md:23 链接指向仓库/穿出 workspace：../docs/contracts/demo.md；…templates/meta.md:3 裸路径指向仓库：tools/lib/company/deliverables.mjs；…chairing…:58 裸路径指向仓库：node tools/converge.mjs`。
 - 红（审查轮，当前门禁）：往 chairing skill 植入 `../../docs/contracts/release.md` 与 fenced `node tools/x.mjs` → `FAIL shipped-links: …:72 链接指向仓库/穿出 workspace；…:75 代码块指向仓库`；还原 → `ALL PASS`。
 - 绿：改完内容后 `pnpm verify` → `ALL PASS`（含 `shipped-links`、`handbook-budget`、`gate-wiring ×46`）。
 - 绿：`node checks/lanes/release.entry.mjs` → `ALL PASS`，其中 `首启生成成品目录（空目录，不依赖仓库工具）` 与 `第二次启动零变更` 均 PASS。

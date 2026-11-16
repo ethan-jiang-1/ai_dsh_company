@@ -12,28 +12,28 @@
 //   ③ 不得为日期去问人（`ask_user_question` = 违规：注入在场，不该把日期问题推给人）。
 // 用法：source run/env.sh && node probes/session-context/date-rule-probe.mjs
 // 退出码：0 = PASS；1 = FAIL（红证，按「文案不够需机制」处置）；2 = 环境/启动失败。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { readdirSync, readFileSync, statSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const CEO_JOURNAL = join(REHEARSAL, 'kb/ceo/journal')
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('date-rule-probe')
 } catch (error) {
   console.error(error.message)
   process.exit(2)
 }
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `drp-` 由调用方传入，不推导；
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `drp-` 由调用方传入，不推导；
 // spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)

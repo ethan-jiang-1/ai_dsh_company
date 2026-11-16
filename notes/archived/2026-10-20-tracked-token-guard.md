@@ -15,7 +15,7 @@
 
 1. runtime/ 进 `.gitignore`（2026-10-25 起改为「默认拒绝 + 白名单」，见 [repo-hygiene-contract](./2026-10-25-repo-hygiene-contract.md)）；已 tracked 的两件 `git rm --cached` 后删除本地文件。
    根 `AGENTS.md` 与 `runtime/README.md` 的 tracked/ignored 说明同步。
-2. 纯逻辑 = `tools/lib/tracked-token.mjs`：只认 `https?://...?token=<20+ 字符>` 的 URL 查询串，
+2. 纯逻辑 = `checks/lib/tracked-token.mjs`：只认 `https?://...?token=<20+ 字符>` 的 URL 查询串，
    返回行号与 token 长度，**不回传 token 值**。
 3. 门禁 = `checks/gates/tracked-token.mjs`：扫 `git ls-files` 的 tracked 面（跳过只读 `vendor/`），
    装配进 `checks/run-gates.mjs`。`checks/README.md` 与 `security-scan.mjs` 头注补范围声明：

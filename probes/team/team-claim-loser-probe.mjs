@@ -17,16 +17,16 @@
 //   A5 lead 未写任何目标文件
 //   A6 lead 与双成员 turn 均正常结束
 // 用法：source run/env.sh && node probes/team/team-claim-loser-probe.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, existsSync, readFileSync, rmSync, writeFileSync, mkdtempSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { teamRunComplete } from '../../tools/lib/collaboration-evidence.mjs'
-import { claimLoserEvidence } from '../../tools/lib/claim-loser-evidence.mjs'
-import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { teamRunComplete } from '../lib/collaboration-evidence.mjs'
+import { claimLoserEvidence } from '../lib/claim-loser-evidence.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const OWNER_REL = 'journal/claim-loser-owner.md'
@@ -38,14 +38,14 @@ const results = []
 const check = makeCheck(results)
 try { rmSync(OWNER, { force: true }); rmSync(SHARED, { force: true }) } catch {}
 let home
-try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('team-claim-loser-probe') } catch (e) { console.error(e.message); process.exit(2) }
+try { home = (await import('../../tools/lib/core/runtime-home.mjs')).requireDevHome('team-claim-loser-probe') } catch (e) { console.error(e.message); process.exit(2) }
 
 const evidenceDir = mkdtempSync(join(home, 'claim-loser-evidence-'))
 writeFileSync(OWNER, '', 'utf8')
 writeFileSync(SHARED, '', 'utf8')
 let child
 try {
-  // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `cll-` 由调用方传入；spawn/fetch 注入
+  // 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `cll-` 由调用方传入；spawn/fetch 注入
   // （tools/lib 是 keyless 纯逻辑缝）。下方 finally 兜杀引用 child ⇒ 经注入的 spawn 顺手捕获：
   // startWeb 起进程先于等 banner，boot 失败时 child 已在手，清理路径与原实现一致。
   const { base, token } = await startWeb({ spawn: (...args) => (child = spawn(...args)), root: ROOT, home })

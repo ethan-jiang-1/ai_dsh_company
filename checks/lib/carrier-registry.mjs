@@ -37,8 +37,8 @@ export const FACTS = [
 
 /** 治理面唯一允许直接承载 Markdown/frontmatter 底层解析的原语模块（其余门禁与 tools/lib 禁裸解析）。 */
 export const MARKDOWN_PRIMITIVES = [
-  'tools/lib/repo-markdown.mjs',
-  'tools/lib/markdown-links.mjs',
+  'tools/lib/core/repo-markdown.mjs',
+  'tools/lib/core/markdown-links.mjs',
 ]
 
 /** 已收口载体：写入口与读载体共用一张表，`kind` 区分。 */
@@ -199,12 +199,12 @@ export const KNOWN_GAP = []
  */
 export const WORKSPACE_TOOLING = [
   {
-    module: 'tools/lib/rehearsal.mjs',
+    module: 'tools/lib/core/rehearsal.mjs',
     symbol: 'mirrorCompanyReference',
     reason: '演练盘镜像：只写 runtime/rehearsal-workspace（gitignored）的 .dsh-company 参考状态，不触达用户 workspace',
   },
   {
-    module: 'tools/lib/kb-seeds.mjs',
+    module: 'tools/lib/core/kb-seeds.mjs',
     symbol: 'RUN_BUNDLE_DIR',
     reason: 'kb 种子派生：bundle:init 与排练场按 seed.json 在建盘期写 .dsh-company 初始盘；bootstrap 工具，不是运行时写入口',
   },

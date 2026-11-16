@@ -1,7 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { headingSections } from '../../tools/lib/repo-markdown.mjs'
+import { headingSections } from '../../tools/lib/core/repo-markdown.mjs'
 
 // ── 2d-quater-2. 导航枚举复发门（nav-enumeration，2026-10-12 立）──────────────────
 // 为什么：增长型清单写进导航文档必漂（D28），本仓三代实证——2026-09-26 六份清单同病立教义、

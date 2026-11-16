@@ -93,7 +93,7 @@ persona/description 里，模型按 brief 的 4 件任务直接 spawn 4 次，�
 
 ## 修复落地（2026-11-10，选 2 = 改承诺）
 
-- **模型**：[`delegation-model.mjs`](../../../tools/lib/delegation-model.mjs) 的 `WORKER_PROFILES`
+- **模型**：[`delegation-model.mjs`](../../../checks/lib/delegation-model.mjs) 的 `WORKER_PROFILES`
   增 `fanOut`：worker/researcher `{ policy: 'none' }`，orchestrator
   `{ policy: 'parent-brief', hardMax: null }`；`modelProblems()` 拒绝 `parent-brief` 带数字。
 - **文案**：worker-orchestrator 的 description/persona/头注去掉“1–2 个”，改为“按 brief 分配，

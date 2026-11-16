@@ -4,7 +4,7 @@
 
 ## 决定
 
-1. **`steps(state)` 住 [converge-rules.mjs](../../tools/lib/converge-rules.mjs)，返回有序动作数据。**
+1. **`steps(state)` 住 [converge-rules.mjs](../../tools/lib/company/converge-rules.mjs)，返回有序动作数据。**
    每步 `{ kind, label?, ... }`：有 `label` = 进 dry-run 清单；`rewrite-refs` 无 label（历史行为：
    引用重指不进取景清单），但执行器仍按序消费它。序列 =
    证据副本 → 引用重指（静默）→ 归档搬移 → 清 journal（每篇一步）→ 台账 → 索引 → backfill 指引。

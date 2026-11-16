@@ -5,7 +5,7 @@
 // 负例留证 2026-10-26：删掉 `## 0.3.3` 整段 → release-ready 红；还原 → 绿。
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { headingSections } from '../../tools/lib/repo-markdown.mjs'
+import { headingSections } from '../../tools/lib/core/repo-markdown.mjs'
 
 export function run({ root, ok, fail }) {
   const packPath = join(root, 'packages/company-pack/package.json')

@@ -112,13 +112,13 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 
 ### R4-06（P1，D6）`diagnose` 仍有三类假绿/误诊
 
-1. **bash 非零退出不计失败**：`tools/lib/session-diagnose.mjs:95-103` 只看 `message.isError`；实测 `session-01b060a7` 有 8 个非零退出事件（按 callId 去重后 4 条命令），`toolErrors=0`、`FAILURES none`、exit 0。
+1. **bash 非零退出不计失败**：`tools/lib/session/session-diagnose.mjs:95-103` 只看 `message.isError`；实测 `session-01b060a7` 有 8 个非零退出事件（按 callId 去重后 4 条命令），`toolErrors=0`、`FAILURES none`、exit 0。
 2. **等用户回答/等审批被误诊为崩溃**：未闭合 turn 一律输出“进程被杀/崩溃”；`user-questions/request` 并不总在日志里，`approval/asked` 没有 `decided` 时也不计，`pendingQuestions=0`。
 3. **child 会话不可见**：`tools/diagnose.mjs:66` 与第 84-86 行只收 `session-` 前缀，而 child 目录是 `<childId>`；`team/member.phase=failed` 无分支。队友 provision/运行失败在 lead 摘要里零信号。
 
 ### R4-07（P1，D6）启动崩溃丢 stderr，且没有交互级复现
 
-`tools/lib/probe-web.mjs:36-60` 只在内存留 16k 输出；`startWeb` 失败只抛“web 提前退出 N”/“boot 超时”，`ui-scene-smoke` catch 后直接 exit 2 并提示“先构建”（`:77-80`）。非 `StartupError` 时盘上无日志，agent 被引向重建而不是读错。
+`tools/lib/probe/probe-web.mjs:36-60` 只在内存留 16k 输出；`startWeb` 失败只抛“web 提前退出 N”/“boot 超时”，`ui-scene-smoke` catch 后直接 exit 2 并提示“先构建”（`:77-80`）。非 `StartupError` 时盘上无日志，agent 被引向重建而不是读错。
 更强的缺口：`ui-scene-smoke` 只开页签、扫文本，不会点按钮/填表/复现用户步骤；`cdp-probe --ask` 只发一条 prompt。用户说“点这个按钮白了”，当前只能看一个**新开的、无关的**页面。
 
 ### R4-08（P1，D2）四个“入口即最胖模块”，层次在函数内部塌陷
@@ -142,7 +142,7 @@ GOLDEN FAIL 页签「成品」… 金样「读取团队状态…」/ 现在「�
 | R4-14 | P2 | D1 | `docs/AGENTS.md:30`、`checks/gates/doc-budget.mjs:15` | 文档称“留 ≥5% 头寸”，门禁只拒 >20% 空置；实测 11/32 篇 <5%（release-runbook 0%、presets 1.5%、decisions 1.7%、AGENTS 2.4%…）。`docs/guides/budget-and-ops.md`（68 行）与 `docs/guides/cdp-probe.md`（64 行）无预算，门禁无完整性断言。 |
 | R4-15 | P2 | D4 | `checks/README.md:56`；`checks/lanes/ui-scene.entry.mjs:8`；`checks/gates/ui-expected-freshness.mjs:8`；`packages/company-pack/README.md:23`；`CHANGELOG.md:23` | 索引写 48 门（实际 50）；两处金样路径写 `snapshots/ui/...`（实际 `snapshots/visual/...`）；包 README 枚举“关注”（实际标签是“待办”）；0.3.15 CHANGELOG 称失效引用已清，现场不符。 |
 | R4-16 | P2 | D2/D5 | `client/DeliverablesTab.tsx:98`；`host/bundle-manifest.ts:225`、`host/catalog.ts:43`、`client/cultivation-context-data.ts:89`；`lib/presence.ts:147`、`lib/cultivation-inbox.ts:59`、`lib/cultivation-context.ts:338`；`tests/{client,company}/deliverables-catalog.spec.ts` | `parseCatalog` 埋在 .tsx 却被数据模块与 company spec 反向依赖；`isRecord` 3 份逐字相同；`clip` 3 份语义不同；同名 spec + 同名对象（src/lib 与 tools/lib）并存。 |
-| R4-17 | P2 | D2 | `checks/gates/src-layering.mjs:25`；`tools/lib/src-layering.mjs` | 只守字面相对 import 的方向：模板串/计算式 dynamic import、`require()`、`import x = require()` 全不可见；注释里的 `from '../host/x.ts'` 会被扫成违规（假阳）；无环/导出面检查。 |
+| R4-17 | P2 | D2 | `checks/gates/src-layering.mjs:25`；`checks/lib/src-layering.mjs` | 只守字面相对 import 的方向：模板串/计算式 dynamic import、`require()`、`import x = require()` 全不可见；注释里的 `from '../host/x.ts'` 会被扫成违规（假阳）；无环/导出面检查。 |
 | R4-18 | P2 | D6 | `checks/lanes/ui-scene.entry.mjs` 第 128-139、162-177 行；另见第 81-82 行 | golden 失败时 `scene.json` 仍 `probeExit:0`、无 golden 结果；`--keep` 只打 base，不打带 token 的 URL；证据无 URL/home。 |
 | R4-19 | P3 | D4 | `docs/reference/decisions.md:51-53`；`docs/contracts/data-model.md:15`（另见第 67 行）；`AGENTS.md:40`；`docs/project-map.md:90` | D46 排在 D45 前；D44 指两个 Note 家；data-model 同一规则写 2 次；AGENTS 说“environments §6”而该文件只有 1 个标题；project-map 仍说“行为质量语料有独立标注”。 |
 | R4-20 | P3 | D1 | `docs/orient.md:42`；`checks/README.md:5`（另见第 16 行） | `orient` 说“不复制门名”后立刻复制四条，第四条写“批得下”（owner = “已获批”）；checks/README 把分层指向 dev-loop §9.1，而 §9.1 是三行转指 tests/README 的桩。 |

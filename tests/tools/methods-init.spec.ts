@@ -11,9 +11,9 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { METHOD_SIDES, STARTER_METHODS, seedMethods } from '../../tools/lib/methods-init.mjs'
-import { parseMethodSkill } from '../../tools/lib/quality-loop.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { METHOD_SIDES, STARTER_METHODS, seedMethods } from '../../tools/lib/core/methods-init.mjs'
+import { parseMethodSkill } from '../../tools/lib/company/quality-loop.mjs'
 
 const CONTENT = join(ROOT, 'packages/company-pack/content')
 

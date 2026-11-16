@@ -16,10 +16,10 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb } from '../../tools/lib/probe/probe-web.mjs'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
-import { diagnosisDir } from '../../tools/lib/diagnosis.mjs'
+import { diagnosisDir } from '../../tools/lib/probe/diagnosis.mjs'
 
 const cli = join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js')
 const PACK = join(ROOT, 'packages/company-pack')

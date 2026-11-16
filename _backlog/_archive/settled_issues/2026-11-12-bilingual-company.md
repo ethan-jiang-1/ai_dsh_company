@@ -133,7 +133,7 @@ opened: 2026-11-12
 8. **lib 展示事实**：`statusLabel` / `taskStatus` / 未分配 / 预算行 / 事件句 / 卡片抬头不再由纯函数返回中文，而是 token/enum；对应 keyless spec 断言 token/zh/en 两态。
 9. **纪律设施**：`docs/contracts/` 下 `language.md` 存在，写明默认 zh、唯一源、字典规则、Host 规则、阶段边界、例外；`packages/company-pack/src/README.md` 与 `tests/README.md` 有指针；`.agents/skills/company-ui-change-definition/SKILL.md` 的触发描述覆盖「任何 UI 文案/面板/页签/卡片/空态/错误」；根 `AGENTS.md` 若加行只加指针。
 10. **preset 描述**：11 个 preset 的 description 不是纯中文（双语一行或英文短句，按 RFC 决定）；picker 不出现纯中文描述；role name 不变。
-11. **文档/发行**：根 README 与 pack README 有语言说明（默认中文、Settings 切换、英文输出跟随）；`tools/lib/install-manual.mjs` 加语言段并重生成 `_dist/安装手册.md`；`dist-manual` 绿。
+11. **文档/发行**：根 README 与 pack README 有语言说明（默认中文、Settings 切换、英文输出跟随）；`tools/lib/release/install-manual.mjs` 加语言段并重生成 `_dist/安装手册.md`；`dist-manual` 绿。
 12. **检查**：`pnpm verify` ALL PASS；`pnpm test` 全绿（含新增 i18n spec）；`pnpm typecheck` 0；`client-load-smoke` ALL PASS；`ui-scene-smoke --isolated --golden` zh 与 en 都绿（en 金样新增或参数化）；`preset-smoke` ALL PASS。
 13. **兼容**：已有 `.dsh-company` 数据可读；没有数据迁移；没有把领域词/字段名改成英文。
 

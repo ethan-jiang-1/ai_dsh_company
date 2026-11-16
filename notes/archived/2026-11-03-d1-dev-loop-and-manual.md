@@ -11,7 +11,7 @@
   §0 导航表直接给现行家（debugging / bootstrap / release / environments / web-rpc / tests README / policy），
   正文 5 处 `§9.1` 改为 `tests/README.md`，`runtime-map` / `project-map` / `policy` 的旧节引用同步改指目标。
   行预算随内容下调 165→120（157→113 行；反向棘轮要求）。
-- **安装手册纠正**：模板 `tools/lib/install-manual.mjs` 的“包内内容”从 `src/**` 改为
+- **安装手册纠正**：模板 `tools/lib/release/install-manual.mjs` 的“包内内容”从 `src/**` 改为
   `lib/**`（runtime 两半 + 类型）+ `presets/**` + `content/**` + `locale/` + `icon.svg` + `cordis.patch.yml`。
   用 `renderInstallManual` 以 0.8.2 现有 digest/date **只重生成手册**（不重打 tgz、不改发布字节），
   并更新 gitignored manifest 的 `manualSha256`，`dist-manual` / `dist-freshness` 保持绿。

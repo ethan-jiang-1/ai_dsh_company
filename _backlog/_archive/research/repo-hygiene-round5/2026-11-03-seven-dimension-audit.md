@@ -42,7 +42,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 | R5-08 | D2 | **P1** | 分层守卫自称检查 fetch/spawn/exec「from parsed call expressions below」，实际文件里没有这段（`tests/repo/layering.spec.ts:28-29` vs 全体），守卫在说谎；动态 import 的 `spawn` 可穿。 |
 | R5-09 | D2/D5 | **P1** | 源码文本当行为断言至少 15 处（`client-face.spec.ts:21-39,63-88` 断 `useState(false)`/`ResizeObserver`；`panel-freshness.spec.ts:51-65` 断字面量）。行为保持的重构变红，行为回归只要拼写不变仍绿。 |
 | R5-10 | D7 | **P1** | 卸载承诺从未冒烟：`release-smoke` 有 install / 幂等重装 / 应用内安装 / 首启 / 二启，**没有 remove**；而 README/手册承诺「remove 只摘插件、数据全部留下」。这是用户点名的生命周期轴里唯一没证据的一格。 |
-| R5-30 | D6 | **P1** | `diagnose` 少报非零退出：`tools/lib/session-diagnose.mjs:110` 先把工具输出截到 400 字符再匹配 `[exit code: N]`，而 marker 在输出末尾。全 dev home 597 会话实测 **132 条真非零 / 只报 87 条（漏 34%）**；会话 `003d6306…` 有 2 条 exit 1，`diagnose` 打 `nonzero=0`。 |
+| R5-30 | D6 | **P1** | `diagnose` 少报非零退出：`tools/lib/session/session-diagnose.mjs:110` 先把工具输出截到 400 字符再匹配 `[exit code: N]`，而 marker 在输出末尾。全 dev home 597 会话实测 **132 条真非零 / 只报 87 条（漏 34%）**；会话 `003d6306…` 有 2 条 exit 1，`diagnose` 打 `nonzero=0`。 |
 
 ## 3. 分维发现
 
@@ -86,7 +86,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 
 **主形态 = 半应用改名 + 发布状态漂移。**
 
-- `workspace/` → `content/` 只改了一半（R5-11）：`shipped-links`（`:12`）、`nav-count-claims`（`:31`）、`tools/lib/markdown-links.mjs:39` 的 EXCLUDED_PATHS、`replay-fixture-freshness.mjs:4` 注释、`tests/content/templates.spec.ts:10`、`.gitignore:23`、`packages/company-pack/src/README.md:31-32` 都还写旧路径。
+- `workspace/` → `content/` 只改了一半（R5-11）：`shipped-links`（`:12`）、`nav-count-claims`（`:31`）、`tools/lib/core/markdown-links.mjs:39` 的 EXCLUDED_PATHS、`replay-fixture-freshness.mjs:4` 注释、`tests/content/templates.spec.ts:10`、`.gitignore:23`、`packages/company-pack/src/README.md:31-32` 都还写旧路径。
 - **tools/standalone.mjs**（已删除）的删除只改了产品面，没改浏览器检验消费者（R5-01）。
 - `retired-path` 门禁的退役前缀只有两个 `_backlog` 项，`workspace/`、`standalone.mjs`、`snapshots/ui` 都不在，所以这类残留全绿。
 - **发布状态**（R5-03 / R5-13 / R5-14）：`release --check` 红；`_dist` manifest 是 2026-11-02 22:21、tgz 21:11、手册 21:44（同代），但源码 HEAD 已前进 5 个提交；`market-index.json` 声明 0.7.1（npm 404，`market-index.staged.json` 自认未发布）；`compat-tags.json` 只到 rc.2，而 pack README 声称 rc.5 已验证。
@@ -120,7 +120,7 @@ intent: "第五轮七维打扫（2026-11-03）：接续 2026-10-27/28 两轮，�
 
 **不通的**：
 
-- **`diagnose` 少报非零退出**（R5-30，P1）：`tools/lib/session-diagnose.mjs:110` 先把工具输出截到 400 字符，再去匹配 `[exit code: N]`；bash 把 marker 放在输出末尾。全 dev home 597 个会话实测：**132 条真非零，只报 87 条（漏 34%）**；会话 `003d6306…` 有 2 条 `[exit code: 1]`，`diagnose` 打 `nonzero=0`。这正是「失败被读成 FAILURES none」的同类假绿。
+- **`diagnose` 少报非零退出**（R5-30，P1）：`tools/lib/session/session-diagnose.mjs:110` 先把工具输出截到 400 字符，再去匹配 `[exit code: N]`；bash 把 marker 放在输出末尾。全 dev home 597 个会话实测：**132 条真非零，只报 87 条（漏 34%）**；会话 `003d6306…` 有 2 条 `[exit code: 1]`，`diagnose` 打 `nonzero=0`。这正是「失败被读成 FAILURES none」的同类假绿。
 - **客户端错误到不了盘**（R5-31，P1）：错误环只活在页面内存，刷新即清（`error-ring.ts` 无 storage）；唯一的落盘 writer 要求 `dataBlocked===false` 且主视图保留会话（`host/client-diagnostics.ts:38`），实测在 dev home 触发真错误后 `$DSH_HOME/logs/company-client-errors.log` **仍不存在**，写失败还被 `.catch(() => {})` 吞掉。
 - **唯一确定性金样档不可启动**（R5-01）：`--isolated --golden` 是回归网里唯一能断言「页面里该出现什么」的 lane；它死了，而 `checks/README.md:22`、`tests/README.md:30`、`runtime/README.md:18` 仍在推荐。
 - **失败信息截断**（R5-32，P2）：`ui-scene` 的预置失败只打 stderr `.slice(-400)`，实测从单词中间开始（`esolveForCJSWithHooks…`），把真正缺失的模块路径切掉了。

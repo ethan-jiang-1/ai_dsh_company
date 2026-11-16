@@ -17,8 +17,8 @@ import {
   parseSessionRecords,
   renderSessionTreeMarkdown,
   shortSessionId,
-} from '../../tools/lib/session-evidence.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+} from '../../tools/lib/session/session-evidence.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const args = process.argv.slice(2)
 const valueOf = (name) => {

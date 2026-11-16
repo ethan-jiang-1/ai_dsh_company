@@ -7,11 +7,11 @@
 // 性质 = 收割台账（harvest-ledger）#8/#9 的证据采集：宽容式断言（找得到就 PASS、找不到如实记
 // "未定位入口"），截图留证；不是常驻回归 lane。真模型一轮 ≈ $0.5；排练场 cwd。
 // 用法：source run/env.sh && node tools/archive/harvest-probe.mjs
-import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../lib/session-log.mjs'
+import { readRecords } from '../lib/session/session-log.mjs'
 import { launchChromium, loadChromium } from '../drivers/playwright.mjs'
 
 const REHEARSAL = join(ROOT, 'runtime/rehearsal-workspace')
@@ -37,7 +37,7 @@ writeFileSync(PDF, `%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 ob
 
 let home
 try {
-  const { requireDevHome } = await import('../lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../lib/core/runtime-home.mjs')
   home = requireDevHome('harvest-probe')
 } catch (error) { console.error(error.message); process.exit(2) }
 

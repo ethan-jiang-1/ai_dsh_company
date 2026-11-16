@@ -16,7 +16,7 @@
 //       可查抢注在跨进程下不闭合——败者占位被静默顶替；E2 只测过覆盖写，创建竞态从未测过）。
 // 用法：node probes/fs-taskboard/cross-process-fs-probe.mjs
 // 退出码：0 = T1 过且 T2 实证互踩；1 = 任一判据翻车；2 = 环境失败。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 import { spawn } from 'node:child_process'
 import { mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'

@@ -11,7 +11,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot } from '../../tools/lib/core/repository-layout.mjs'
 
 const CJK = /[\u3400-\u9fff]/u
 const ROOT = repositoryRoot

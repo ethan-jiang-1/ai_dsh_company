@@ -19,7 +19,7 @@ notes/ 已经历多轮产品演进，三类东西混在同一层：
 ## 决定
 
 1. **机械面 `pnpm notes:audit`**（[probes/analyze/notes-audit-probe.mjs](../../probes/analyze/notes-audit-probe.mjs) +
-   [lib](../../tools/lib/notes-audit.mjs)）：只读工作表，枚举死路径、取代缺回链、收据特征、
+   [lib](../../tools/lib/session/notes-audit.mjs)）：只读工作表，枚举死路径、取代缺回链、收据特征、
    零活引用、状态行异常。**不是门禁**——它只出候选，不判语义、不删东西。
 2. **语义面 [notes-consistency-audit skill](../../.agents/skills/notes-consistency-audit/SKILL.md)**：
    固定步骤 = 机械基线 → 定现行真值 → 逐篇抽 claim → 六类分诊（KEEP / FIX-FACTS / SUPERSEDED /

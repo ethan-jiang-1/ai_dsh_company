@@ -9,7 +9,7 @@
    warnings 只剩 code——而 converge 恰恰需要 detail，于是它去正则扫人读报告。
 2. **人读报告是同一对象的 formatter**：观察项/违规两段直接遍历 `verdict.warnings` / `verdict.violations` 打印。
 3. **无法判定 = exit 2 + `assessed:false` + reason**：工作区缺失走这条；判词里说清原因，消费者不再嗅 stderr 词。
-4. **解析器唯一**：[audit-verdict.mjs](../../tools/lib/audit-verdict.mjs) 的 `parseAuditVerdict(stdout)`；
+4. **解析器唯一**：[audit-verdict.mjs](../../tools/lib/repo/audit-verdict.mjs) 的 `parseAuditVerdict(stdout)`；
    converge 与 deliverables-index 同 diff 改用它，各自的正则/前缀扫描删除。
 
 ## 输掉的方案

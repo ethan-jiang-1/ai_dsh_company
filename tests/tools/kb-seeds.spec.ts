@@ -3,9 +3,9 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { readSeeds } from '../../packages/company-pack/src/host/run-bundle/bootstrap.ts'
-import { readKbSeeds, readProductType, seedKbFiles } from '../../tools/lib/kb-seeds.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { mirrorCompanyReference } from '../../tools/lib/rehearsal.mjs'
+import { readKbSeeds, readProductType, seedKbFiles } from '../../tools/lib/core/kb-seeds.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { mirrorCompanyReference } from '../../tools/lib/core/rehearsal.mjs'
 
 const CONTENT = join(ROOT, 'packages/company-pack/content')
 const RUN_BUNDLE_DIR = '.dsh-company'
@@ -48,7 +48,7 @@ function kbFiles(workspace: string): string[] {
 // 负例留证 2026-11-10：BUG-054 —— 修前本文件第 2 条实跑红：
 //   `actual` 只有 10 个 kb 文件，缺 `policy-lines.md` / `review-protocol.md` /
 //   `process-docs.md` / `AGENTS.md`（mirror 抄的是固定 5 件状态清单，`content/state/process-docs.md`
-//   早已不存在）；把 seed 驱动复制接上后绿。红配方 = 还原 tools/lib/kb-seeds.mjs 的 seed 读取为
+//   早已不存在）；把 seed 驱动复制接上后绿。红配方 = 还原 tools/lib/core/kb-seeds.mjs 的 seed 读取为
 //   旧的固定清单，或删本 spec 的 policy-lines 断言。
 describe('kb 旁路装配与生产 seed 同形（BUG-054）', () => {
   it('维护工具读到的 kb seed 与生产 bootstrap 的 readSeeds 同清单', () => {

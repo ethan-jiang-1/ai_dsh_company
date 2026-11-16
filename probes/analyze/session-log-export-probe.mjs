@@ -10,12 +10,12 @@
 //   source run/env.sh && node probes/analyze/session-log-export-probe.mjs --out <dir> [--workspace <绝对路径>] [--home <DSH_HOME>]
 //   不给 --workspace = 导出该 home 下全部 bucket（文件名带 bucket 前缀防撞）。
 // 退出码：0 = 导出完成；1 = 无可导日志或全部失败；2 = 参数/环境失败。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { pickSessionLog } from '../../tools/lib/session/session-log-generation.mjs'
 import { zstdText } from '../../tools/drivers/zstd.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 
 const arg = (name) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -33,7 +33,7 @@ if (!existsSync(SESSIONS)) { console.error(`session-log-export: 会话根不存�
 const workspaceArg = arg('workspace')
 const wantedBucket = workspaceArg !== undefined ? `-${resolve(workspaceArg).replaceAll('/', '-')}--` : undefined
 
-/** 找一个会话目录里的日志（世代选择唯一口径 = tools/lib/session-log-generation.mjs：版本化数值取最高、同代 zstd 优先、child 排除）。 */
+/** 找一个会话目录里的日志（世代选择唯一口径 = tools/lib/session/session-log-generation.mjs：版本化数值取最高、同代 zstd 优先、child 排除）。 */
 const logOf = (sessionDir) => pickSessionLog(sessionDir)?.name
 
 /** 解一份日志：明文直读；zstd 多帧交给 CLI（Node 内置只解首帧）。 */

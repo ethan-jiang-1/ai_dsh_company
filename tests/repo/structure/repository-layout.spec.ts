@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { canonicalSnapshotScenes, inspectScripts, repositoryRoot, scriptEntries, snapshotOutput, snapshotOutputPath, snapshotReference, snapshotScene, snapshotScenes } from '../../../tools/lib/repository-layout.mjs'
+import { canonicalSnapshotScenes, inspectScripts, repositoryRoot, scriptEntries, snapshotOutput, snapshotOutputPath, snapshotReference, snapshotScene, snapshotScenes } from '../../../tools/lib/core/repository-layout.mjs'
 
 let root: string
 beforeEach(() => {

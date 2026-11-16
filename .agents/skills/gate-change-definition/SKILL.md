@@ -21,7 +21,7 @@ description: Use when adding or changing a gate in checks/gates/ (one gate per m
 ## 步骤
 
 1. **先确认该不该建（总量封顶，先并后加）。** 无复发证据不建门禁；能用现成载体就不自造；可机械判断的才进 gate（[policy.md §P2](../../../docs/policy.md)）。`checks/gates/` 文件总数受只降不升棘轮约束——新规则优先并入既有 owner 门禁，确需新建必须先合并/退役重叠旧门禁。
-2. **定位唯一家 + 严禁手搓裸解析。** 一条规则只住一道门禁；规则正文（为什么存在）写在门禁注释头。**严禁在门禁或 `tools/lib/` 手写裸 Markdown 节切分（`/^##\s+/`）、裸 YAML frontmatter 正则或裸 `.dsh-company` 路径拼接**——一律消费共享解析原语（`vendor/dsh` `mdast` + `js-yaml` / `markdown-shape-core` / `company-root`），防门禁自身沦为第二事实源 bug 工厂。
+2. **定位唯一家 + 严禁手搓裸解析。** 一条规则只住一道门禁；规则正文（为什么存在）写在门禁注释头。**严禁在门禁或各面 `lib/`（`tools/lib`、`checks/lib`、`probes/lib`）手写裸 Markdown 节切分（`/^##\s+/`）、裸 YAML frontmatter 正则或裸 `.dsh-company` 路径拼接**——一律消费共享解析原语（`vendor/dsh` `mdast` + `js-yaml` / `markdown-shape-core` / `company-root`），防门禁自身沦为第二事实源 bug 工厂。
 3. **写检查**，并让失败信息**点名具体位置**（文件:行、行号、文件名的清单）——
    否则实施者拿到"红了"却不知道改哪。
 4. **加形状锚。** 若门禁依赖某种文档/表格形状，锚住**表头或结构性标记**，

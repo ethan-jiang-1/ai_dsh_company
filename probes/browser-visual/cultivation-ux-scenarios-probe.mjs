@@ -38,10 +38,10 @@ import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { loadChromium, launchChromium } from '../../tools/drivers/playwright.mjs'
-import { companyCookie, companyRpc, startWeb } from '../../tools/lib/probe-web.mjs'
-import { dismissNotices } from '../../tools/lib/probe-window.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { companyCookie, companyRpc, startWeb } from '../../tools/lib/probe/probe-web.mjs'
+import { dismissNotices } from '../lib/probe-window.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 
 const SHOTS = process.argv.includes('--shots')
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))

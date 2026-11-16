@@ -13,14 +13,14 @@
 //   A3 完成闭环——completed 任务 ≥2 + journal 回执 .md 在场
 //   A4 排练不污染——final.md 落指定排练路径 + 公司共享盘 deliverables/ 零新增
 // 用法：source run/env.sh && node probes/fs-taskboard/motion-taskboard-probe.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readdir, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const MOTION_DIR = join(REHEARSAL, 'motion-taskboard')
@@ -44,9 +44,9 @@ const walk = (dir, out = []) => {
 const deliverablesBefore = existsSync(DELIVERABLES) ? readdirSync(DELIVERABLES).sort().join('|') : ''
 
 let home
-try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('motion-taskboard-probe') } catch (e) { console.error(e.message); process.exit(2) }
+try { home = (await import('../../tools/lib/core/runtime-home.mjs')).requireDevHome('motion-taskboard-probe') } catch (e) { console.error(e.message); process.exit(2) }
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `mtp-` 由调用方传入，不推导；
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `mtp-` 由调用方传入，不推导；
 // spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home })
 console.log(`web up: ${base}`)

@@ -8,14 +8,14 @@
 
 两处重复各收成一个可调用模块，**调用方观察到的行为不变**是唯一验收轴：
 
-1. **`tools/lib/probe-web.mjs`（新）**：探针 web 启动块的共用层，按现有分叉切三刀——
+1. **`tools/lib/probe/probe-web.mjs`（新）**：探针 web 启动块的共用层，按现有分叉切三刀——
    `startWeb`（起进程 + 等 banner；`patch` 参数供 team-concurrency 的读屏障 overlay）、
    `companyCookie`（15s token 交换）、`companyRpc`（`prefix` / `errorFallback` / 共享 `counter` 全由调用方传）。
    **`spawn` / `fetch` 一律注入、模块零 import**——不是妥协，是被两件事共同逼出来的正确形状：
    `tests/repo/layering.spec.ts` 把 `tools/lib/` 定为 keyless 纯逻辑缝（禁 child_process / spawn / fetch），
    而卡又要求 keyless spec 住在 `tests/` 并直接 import 帮助函数（layering 只放行 `tools/lib/`）。
    **25 个探针**（probes/ 下全部起 web 的文件）全部迁入；`checks/lanes/*` 不在本卡范围。
-2. **`tools/lib/backlog-liveness.mjs`（新）**：`backlogLivenessProblems` 从 `checks/run-gates.mjs`
+2. **`checks/lib/backlog-liveness.mjs`（新）**：`backlogLivenessProblems` 从 `checks/run-gates.mjs`
    **逐字节原样**挪入（`diff` 验证函数体与门禁原文完全一致）；门禁留下调用 + 「为什么」注释；
    `tests/tools/backlog-liveness.spec.ts` 从「切源码 + `vm` 求值」改为直接 import，期望字符串一字未动。
 
@@ -46,7 +46,7 @@
 
 | # | 命令 | 断言 | 红长什么样 |
 |---|---|---|---|
-| 1 | 先写 `tests/session/probe-web.spec.ts` 再建模块（TDD 顺序按卡） | 模块不存在 ⇒ spec 必须先红 | `Error: Cannot find module '../../tools/lib/probe-web.mjs'`（实跑得到） |
+| 1 | 先写 `tests/session/probe-web.spec.ts` 再建模块（TDD 顺序按卡） | 模块不存在 ⇒ spec 必须先红 | `Error: Cannot find module '../../tools/lib/probe/probe-web.mjs'`（实跑得到） |
 | 2 | `npx vitest run tests/session/probe-web.spec.ts` | 10/10 绿：argv/env/banner 正则/cookie 拼接/请求体/无默认 signal/errorFallback 两种/共享 counter/--patch 插入位置 | 任何自行推导前缀、默认加 signal、改 cookie 拼接 → 对应用例红 |
 | 3 | `npx vitest run tests/tools/backlog-liveness.spec.ts` | 22/22 绿且 spec diff 只有加载方式（git diff 逐行核对，期望字符串零改动） | 挪函数时改一句问题文本 → spec 红；修法是改回文本不是改期望 |
 | 4 | `node checks/run-gates.mjs \| grep backlog-liveness` | PASS 行逐字 = `backlog-liveness（制度目录/README、卡头、关闭判断、method 形状、递归索引）`，退出码 0 | 注入真缺陷（卡 frontmatter 重复 status 键）→ 实跑得 `FAIL … frontmatter YAML 不可解析：YAMLException: duplicated mapping key`；还原后 PASS（红→绿已实跑） |

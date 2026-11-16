@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { classifyAuthorship, citedVersionsOf, crossCheckVersions, currentVersionOf, nominalRoleOf, RECLAIM, SIG } from '../../tools/lib/authorship.mjs'
+import { classifyAuthorship, citedVersionsOf, crossCheckVersions, currentVersionOf, nominalRoleOf, RECLAIM, SIG } from '../../checks/lib/authorship.mjs'
 
 const BODY_SIGNED = (role: string) => `# 标题\n\n> 出稿：${role}｜版本 v1｜任务书 = deliverables/x/drafts/ceo.md\n\n正文`
 const BODY_LEGACY = '> 出稿：CFO（wochen 财务职能）｜正文 42 非空行｜状态：现行意见'
@@ -12,7 +12,7 @@ describe('署名行 canonical 形状', () => {
   })
 })
 
-describe('署名核对：档位判定（判据单一来源 = tools/lib/authorship.mjs）', () => {
+describe('署名核对：档位判定（判据单一来源 = checks/lib/authorship.mjs）', () => {
   // 负例留证 2026-10-16：把 baseRoleOf 改成恒等（`return preset`，即取消实例后缀规范化）→ BUG-018
   // 这条正例红（`expected 'fail' to be 'match'`，与真盘 10 条假阳性的失败面一致）；还原 → 绿。
   // 同一变异下「不吞跨角色差异」那条守卫仍绿——两条一起才钉住「只抹实例后缀」这个边界。
@@ -102,7 +102,7 @@ describe('RECLAIM 正则', () => {
   })
 })
 
-// 版本一致交叉核对（R0-3，2026-10-03；判据单一来源 = tools/lib/authorship.mjs）
+// 版本一致交叉核对（R0-3，2026-10-03；判据单一来源 = checks/lib/authorship.mjs）
 // fixture 形状 = quote-z-2026 盘上真实文本（引用行 4 连引 + 审批记录表两种引用形状）。
 describe('版本一致交叉核对（R0-3）', () => {
   const FINAL_QUOTEZ = [

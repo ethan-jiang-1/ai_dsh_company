@@ -3,6 +3,7 @@ import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync, statSyn
 import { dirname, extname, join, relative, resolve } from 'node:path'
 import { createRequire } from 'node:module'
 import { pathToFileURL } from 'node:url'
+import { repositoryRoot } from './repository-layout.mjs'
 
 // Reuse the pinned vendor gate's declared parser dependencies. Requires an installed
 // workspace; no transitive-store guessing or vendor writes.
@@ -11,9 +12,12 @@ import { pathToFileURL } from 'node:url'
 // 与 vendor 根 pin 逐字一致，root store 单一版本 2.0.3/3.1.0/3.0.0 两边相同），根 workspace
 // install 即覆盖（根 workspace 刻意不含 vendor/dsh 根包，只挂其子包——见 pnpm-workspace.yaml）。
 // CI 只跑根 install（.github/workflows/ci.yml）靠 ② 解析。
+// 仓库根按「向上找 workspace 根」解析，**不按固定深度**：lib 分组/搬家不得改变解析面；
+// 实现单源 = repository-layout 的 findRepositoryRoot（本文件不再各写一份）。
+const repoRoot = repositoryRoot
 const parserBases = [
-  new URL('../../vendor/dsh/package.json', import.meta.url),
-  new URL('../../vendor/dsh/packages/client/ui-primitives/package.json', import.meta.url),
+  pathToFileURL(join(repoRoot, 'vendor/dsh/package.json')),
+  pathToFileURL(join(repoRoot, 'vendor/dsh/packages/client/ui-primitives/package.json')),
 ]
 const resolveParser = (id) => {
   for (const base of parserBases) {

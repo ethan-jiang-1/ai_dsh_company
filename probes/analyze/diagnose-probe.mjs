@@ -12,10 +12,10 @@
 //   只读、不加写；默认仍拒绝，必须显式点名——双 home 纪律不变，只是给「读一眼日用 home」一条正路。
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
-import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
+import { pickSessionLog } from '../../tools/lib/session/session-log-generation.mjs'
 import { zstdText } from '../../tools/drivers/zstd.mjs'
-import { redactTokenUrls, summarizeSessionEvents } from '../../tools/lib/session-diagnose.mjs'
+import { redactTokenUrls, summarizeSessionEvents } from '../../tools/lib/session/session-diagnose.mjs'
 
 const args = process.argv.slice(2)
 const USAGE = `用法：source run/env.sh && node probes/analyze/diagnose-probe.mjs [--session <slug>[/<id前缀>]] [--json] [--home <路径>] [--strict]

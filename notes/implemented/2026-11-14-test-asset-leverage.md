@@ -11,16 +11,16 @@
 1. **先收口第二事实源，再加资产。** markdown 形状从「pack TS 一份 + fix-evidence 简化版 + 各门禁 sectionBody」收成两层授权单原语：
    pack 与门禁消费 `packages/company-pack/src/lib/docs/markdown-shape-core.js` 单一状态机（`markdown-shape.ts` 只做类型包装），
    keyless 治理层（`backlog-liveness` / `notes-audit` / `bug-coverage` / `notes-tree` / `proposals`）统一消费
-   `tools/lib/repo-markdown.mjs`（复用 `vendor/dsh` `mdast` GFM + `js-yaml`），并由 `company-root-carriers` AST 扫描静态禁绝手写裸解析。
+   `tools/lib/core/repo-markdown.mjs`（复用 `vendor/dsh` `mdast` GFM + `js-yaml`），并由 `company-root-carriers` AST 扫描静态禁绝手写裸解析。
 2. **退役优先于新增。** 删 8 份 content english spec（超集 `content-english` + 3 份唯一文件清单合并）、
    删 `gitignore-guards` spec（`gitignore-shape` 门补 `company-workspace`/`_dist`），
    删 candidate-scan-labels 的 321 行语料测试；把 BUG-011 的「假设段」、CMO、ASSIGN canonical 四个活守卫
    迁到 `tests/tools/candidate-scan-assignments.spec.ts`（带 `// 负例留证`）；合并/退役 8 个同构探针（67→59）。
-3. **census v2 回答“谁在用”。** `tools/lib/asset-consumers.mjs` 合并自动调度 lane 数与显式引用图（排除自身/README/generated 索引）；
+3. **census v2 回答“谁在用”。** `tools/lib/repo/asset-consumers.mjs` 合并自动调度 lane 数与显式引用图（排除自身/README/generated 索引）；
    现行盘面 30 冒烟 + 59 探针（`MAX_PROBES = 59`、`MAX_GATES = 75`、未分类失败类 **0**、**50 个 0 消费者**）。字段加 `shape`/`lastRed`/`replaceBy`/`retireWhen`；
    `lastRed` 未接运行日志，填 `—` 不伪造。
 4. **证明层：历史 BUG 覆盖 + 组合语法差分 + 4 消费者契约。**
-   - `tools/lib/bug-coverage.mjs`：181 张已修卡 → **76 有具名守卫（42.0%）**，105 无（保守下界）；baseline 只升不降，
+   - `tools/lib/repo/bug-coverage.mjs`：181 张已修卡 → **76 有具名守卫（42.0%）**，105 无（保守下界）；baseline 只升不降，
      新修 BUG（opened ≥ 2026-11-15）缺具名守卫即红。
    - `tests/lib/docs/markdown-shape.property.spec.ts`：500 个组合语法 seeded 文档（weekly lane 1000）× `mdast` GFM 独立真值差分，
      证归一化幂等、顶层围栏载荷、4+ 空格缩进代码块、行首/行内注释与 GFM 表格逐单元格转义还原一致。
@@ -44,7 +44,7 @@
 ## 输掉的方案
 
 - **继续一 bug 一 spec**：v2–v5 已证明 bug 率 8/8/8/8；例子型资产关实例不关类。
-- **在 `tools/lib` 反向 import `packages/company-pack`**：违反 `tools/lib` keyless seam；改为 `tools/lib/repo-markdown.mjs` 消费 `vendor/dsh` `mdast` + `js-yaml`，并与 `markdown-shape-core.js` 做 500 例跨层差分对齐。
+- **在 `tools/lib` 反向 import `packages/company-pack`**：违反 `tools/lib` keyless seam；改为 `tools/lib/core/repo-markdown.mjs` 消费 `vendor/dsh` `mdast` + `js-yaml`，并与 `markdown-shape-core.js` 做 500 例跨层差分对齐。
 - **全量字节码 mutation / 长时 soak**：慢、噪声、易 flaky；只对高风险门禁的核心拒绝/跳过分支做定向分支级 mutation。
 - **引 fast-check**：手写 seeded 生成器足够；不新增依赖。
 - **用覆盖率当改善指标**：线覆盖量执行，不量输入分布；改用 bug-coverage + 类复发 + 退役数。
@@ -68,7 +68,7 @@
 ## 未覆盖轴
 
 - [covered] **4 消费者跨层契约差分**（`prd-check` / `requirements-check` / `prd-gate` / 读卡原语同语料）→ `tests/host/contract/structure-agreement.spec.ts`
-- [covered] **R2 collaboration verdict 纯逻辑抽离**（拆除源码切片 `vm.runInNewContext`）→ `tools/lib/collaboration-oracle-verdict.mjs`、`tests/evidence/collaboration-probe-verdict.spec.ts`
+- [covered] **R2 collaboration verdict 纯逻辑抽离**（拆除源码切片 `vm.runInNewContext`）→ `probes/lib/collaboration-oracle-verdict.mjs`、`tests/evidence/collaboration-probe-verdict.spec.ts`
 - [environment-gap] **Windows 实机/CI runner** → `_backlog/triggers.md`、`tests/host/contract/file-shape-agreement.spec.ts`
 - [unprovable] **静态门禁内证明测试命令“历史上真红过”** → `checks/gates/fix-evidence.mjs`、`.agents/skills/close-out-definition/SKILL.md`
 - [policy] **失败类跨轮复发轮次不单造假精确字段**：以具名守卫棘轮与生成式差分承接 → `tests/failure-classes.md`、`tests/repo/budget/bug-coverage.spec.ts`

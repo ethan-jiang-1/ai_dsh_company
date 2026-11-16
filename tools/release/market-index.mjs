@@ -14,8 +14,8 @@
 // publishTimestamp 生成时刻；真实 publish 后可用 vendor generator 读 registry 的发布时间再生成。
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { buildMarketIndex, stablePublishTimestamp, unpublishedVersionInIndex } from '../lib/market-index.mjs'
-import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { buildMarketIndex, stablePublishTimestamp, unpublishedVersionInIndex } from '../lib/release/market-index.mjs'
+import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 
 const args = process.argv.slice(2)
 const has = flag => args.includes(flag)

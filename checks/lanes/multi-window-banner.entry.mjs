@@ -7,9 +7,9 @@
 // 可见护栏。它不证明 writer lease（那是 host 进程级），也不证明跨浏览器/跨端口检测。
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
-import { startWeb } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
+import { startWeb } from '../../tools/lib/probe/probe-web.mjs'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))

@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { sectionStructuralText } from '../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
-import { parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
+import { parseFrontmatter } from '../../tools/lib/core/repo-markdown.mjs'
 
 // ── 修复证据门（fix-evidence，2026-11-14 立）──────────────────────────────────────
 // 触发事故（用户亲述）：让 agent 批修一批缺陷，它只把卡的状态翻了、`git mv` 进已修区，**仓库一行没变**。

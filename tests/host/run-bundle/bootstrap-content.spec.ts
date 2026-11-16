@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { bootstrapCompanyWorkspace } from '../../../packages/company-pack/src/host/run-bundle/bootstrap.ts'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 const CONTENT_DIR = join(ROOT, 'packages/company-pack/content')
 

@@ -13,7 +13,7 @@
 // 用法：node tools/archive/migration-rehearsal.mjs            # 排练（staging，只读真盘）
 //       node tools/archive/migration-rehearsal.mjs --execute  # 真迁移（改真盘！先跑 git status 确认干净）
 // 退出码：0 = 判据满足；1 = 有判据未满足；2 = 环境失败。
-import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { join } from 'node:path'

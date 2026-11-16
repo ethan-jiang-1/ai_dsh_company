@@ -18,10 +18,10 @@ import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 import { plainNodeEnv } from '../../tools/drivers/release-process.mjs'
-import { COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
+import { COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company/company-roles.mjs'
 
 const KEEP = process.argv.includes('--keep')
 const CHANNEL = process.argv.includes('--channel') ? process.argv[process.argv.indexOf('--channel') + 1] : 'vendor'

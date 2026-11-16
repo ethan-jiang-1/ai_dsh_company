@@ -25,7 +25,7 @@
 - **让 `board.ts` 直连 `presence-status.ts`**：败于与本轮目标无关的额外改动——`board.ts` 的消费面（`TeamViewLike` 来自 presence、`displayNameFor` 来自词汇）本就跨两处，直连不减少任何 import 行数，只多一处需要同步的知识。
 - **词汇再拆两份（状态表 / 显示名表）**（来源卡输项，本段复核同意）：败于 76 行模块碎片化——两张表共享同一个「preset 名册」概念（`STATUS_LABEL` 键 = 状态、`PRESET_DISPLAY_NAMES` 键 = 角色），拆开会让「未知值落未知」这条纪律与它的姊妹表分家。
 - **把 `presenceStatusFromPhase` 留在 `presence.ts`**（照卡的字面清单）：败于它产出 `PresenceStatus`——留折算侧会让词汇模块只有表没有入口，`TasksPanel.tsx` 得同时 import 两个文件才能显示一行状态。
-- **引 `tools/lib/company-roles.mjs` 消掉 `PRESET_KEYS` 重复**：败于 pack 发布面自包含——见上「为什么留在 pack 内」。
+- **引 `tools/lib/company/company-roles.mjs` 消掉 `PRESET_KEYS` 重复**：败于 pack 发布面自包含——见上「为什么留在 pack 内」。
 
 ## 后果
 

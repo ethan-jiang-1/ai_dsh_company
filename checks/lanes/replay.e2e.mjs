@@ -33,20 +33,20 @@
 // 预算（§10）：墙钟 ≤ --wall。
 // 触发线（2026-10-16 立，来源 `_backlog/issues/2026-10-16-code-structure-round3.md` Item 3）：本文件 >800 行，
 //   或再增第 5 个 mode ⇒ 判据 / 驱动器分家（沿 2026-10-14 replay-ui 拆出先例，不再往本文件叠模式）。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
-import { makeFailingCheck, sleep } from '../../tools/lib/probe-kit.mjs'
-import { diagnosisDir } from '../../tools/lib/diagnosis.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { COMPANY_ROLE_IDS } from '../../tools/lib/company/company-roles.mjs'
+import { makeFailingCheck, sleep } from '../../tools/lib/probe/probe-kit.mjs'
+import { diagnosisDir } from '../../tools/lib/probe/diagnosis.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { createRequire } from 'node:module'
-import { compareWorkspace, seedWorkspace, workspaceOracle } from '../../tools/lib/workspace-oracle.mjs'
-import { mirrorCompanyReference } from '../../tools/lib/rehearsal.mjs'
-import { judgeReplaySessions, normalizeReplayTempPaths, normalizeReplayTimeContext } from '../../tools/lib/replay-logic.mjs'
+import { compareWorkspace, seedWorkspace, workspaceOracle } from '../../tools/lib/core/workspace-oracle.mjs'
+import { mirrorCompanyReference } from '../../tools/lib/core/rehearsal.mjs'
+import { judgeReplaySessions, normalizeReplayTempPaths, normalizeReplayTimeContext } from '../lib/replay-logic.mjs'
 import {
   normalizeSessionLog,
   normalizeSessionSnapshots,
@@ -57,7 +57,7 @@ import { redactSessionSnapshotIds } from '../../vendor/dsh/packages/test-support
 import { materializeProfilePatch } from '../../vendor/dsh/packages/test-support/session-snapshot/lib/types/launcher.js'
 import { prepareSessionSnapshotFixtureForComparison } from '../../vendor/dsh/packages/test-support/llm-replay/lib/index.js'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
-import { snapshotScene } from '../../tools/lib/repository-layout.mjs'
+import { snapshotScene } from '../../tools/lib/core/repository-layout.mjs'
 
 const { load } = createRequire(join(ROOT, 'vendor/dsh/package.json'))('js-yaml')
 const arg = (name, fallback) => {
@@ -333,7 +333,7 @@ async function driveScenario({ patchSource, env, tasks }) {
     copyFileSync(env.credentials, join(runRoot, '.dsh', '.credentials.yaml'))
     delete env.credentials
   }
-  // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+  // 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
   // 既有差异当参数保留：场景 patch + 五个预设行 ⇒ patch 数组；空 cookie 静默拼空串（companyCookie
   // 默认 'join'）；rpcId 前缀 `replay-` + 失败回退转储响应体（dumpBodyOnError）。banner 等待与
   // 600 上限的失败转储已收进模块：失败文案统一为模块款、输出上限 16000（卡内接受，报告已注记）。

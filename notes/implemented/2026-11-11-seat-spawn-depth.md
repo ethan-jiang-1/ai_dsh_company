@@ -7,7 +7,7 @@
 
 1. **能力表补 `childDepth`**：`DelegationCapabilities.childDepth` = 该 preset 的
    `depthRows` 里 spawn/fork 行的最大 `maxDepth`（`'default'` 读 1；无 child 行 = 0）。
-   运行时表仍与 `tools/lib/delegation-model.mjs` 的 `COMPOSITIONS[*].depthRows` 逐 preset 钉住。
+   运行时表仍与 `checks/lib/delegation-model.mjs` 的 `COMPOSITIONS[*].depthRows` 逐 preset 钉住。
 2. **座位补 `depth` / `childDepth` / `canStartChild`**：`DelegationSeat.depth` 读 durable
    `header.delegationDepth`，runtime `options.subagentDepth` 兜底，取较大值；`childDepth` 来自
    能力表；`canStartChild = childDepth > depth`。`controlsChildren = !support && canStartChild`。

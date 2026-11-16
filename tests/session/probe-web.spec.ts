@@ -7,11 +7,11 @@
 // 不证明什么：真 web 进程仍打印这条 banner（那条要一次真实启动，见卡内验收第 5 行）；也不证明
 //   探针在真模型下判对。
 // 成本：零模型、零进程——spawn/fetch 都是注入的假件。
-// 何时跑：改动 `tools/lib/probe-web.mjs` 或任何改用它的探针启动块后。
+// 何时跑：改动 `tools/lib/probe/probe-web.mjs` 或任何改用它的探针启动块后。
 import { describe, expect, it, vi } from 'vitest'
 import { EventEmitter } from 'node:events'
 
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
 
 /** 假 child：可写 stdout/stderr 的 EventEmitter，带 kill。 */
 function fakeChild() {

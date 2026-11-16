@@ -11,7 +11,7 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot } from '../../tools/lib/core/repository-layout.mjs'
 import { enumerateStartupOptions } from '../../packages/company-pack/src/host/startup/startup-store.ts'
 import {
   EMPTY_WIKI_CHECK,

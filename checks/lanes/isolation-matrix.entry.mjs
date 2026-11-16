@@ -19,7 +19,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, w
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 import { plainNodeEnv } from '../../tools/drivers/release-process.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const KEEP = process.argv.includes('--keep')
 const PACK = process.argv.includes('--pack')

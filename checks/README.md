@@ -14,7 +14,7 @@
 | 看最近会话的失败摘要（中断轮、非零 bash、待审批也算） | `pnpm diagnose [--strict]` → [diagnose](../probes/analyze/diagnose-probe.mjs) |
 | 检查密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs) · [tracked-token](gates/tracked-token.mjs) · [tracked-secrets](gates/tracked-secrets.mjs) |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；分层守卫 = [layering.spec](../tests/repo/structure/layering.spec.ts) |
-| 确认测试资产还活着 | `pnpm smoke:fast` → [fast](lanes/fast-lane.mjs)（4 条，~2.2s；pre-push）；全量 = `pnpm smoke:all` → [keyless-lane](lanes/keyless-lane.mjs)（每周 CI 跑 `--ci`；成员唯一家 = [lane 注册表](../tools/lib/asset-lanes.mjs)） |
+| 确认测试资产还活着 | `pnpm smoke:fast` → [fast](lanes/fast-lane.mjs)（4 条，~2.2s；pre-push）；全量 = `pnpm smoke:all` → [keyless-lane](lanes/keyless-lane.mjs)（每周 CI 跑 `--ci`；成员唯一家 = [lane 注册表](../tools/lib/core/asset-lanes.mjs)） |
 | 类型 / 导入签名改动 | `pnpm typecheck`（命令与预算 = [tests/README §验证分层与预算](../tests/README.md)） |
 | 确认角色真的挂载 | [preset-smoke](lanes/preset.entry.mjs) |
 | 确认 client 真的装配 | [client-load-smoke](lanes/client-load.entry.mjs) |
@@ -39,8 +39,7 @@
 
 ## 共享实现与目录选择
 
-[lib](../tools/lib/) 保存可由隔离夹具验证的纯逻辑（会话日志、workspace oracle、交付物/作者判据、
-发布事务、仓库布局、分层判据）；[drivers](../tools/drivers/) 保存真实进程/CDP/Playwright 驱动。
+[lib](./lib/) 保存 judge 专属判据（作者/交付物核对、覆盖基线、分层与面判据、回放与快照判据、密钥与 token 扫描）；跨面共享地基住 [tools/lib](../tools/lib/)（core/ 路径与会话、probe/ 探针骨架、注册表等）；真实驱动住 [tools/drivers](../tools/drivers/)。
 驱动不进入 keyless spec，准入由 [分层守卫](../tests/repo/structure/layering.spec.ts) 检查。
 
 目录取舍 = [driver-purpose-top-level](../notes/archived/2026-10-07-driver-purpose-top-level.md)
@@ -56,4 +55,4 @@
 | 再攒 **~20 场真实收口仍 0 次自发提案** | 考虑在 persona/技能加一句引导（先查是不是被别的机制压住）。先跑 [propose-sampler](../probes/analyze/propose-sampler-probe.mjs) 看分箱；依据 = 同上 追加十六 |
 | **升 pin** 或动培养面（面板 / host / preset 工具行） | 复跑三档真入口：[cultivation-ux-walkthrough-probe](../probes/browser-visual/cultivation-ux-walkthrough-probe.mjs)、[cultivation-ux-scenarios-probe](../probes/browser-visual/cultivation-ux-scenarios-probe.mjs)、[cultivation-method-layer](../probes/session-context/cultivation-method-layer-probe.mjs)；培养页点击交互另用 [ui-scene-smoke](lanes/ui-scene.entry.mjs) `--steps`；动 preset 另跑 [preset-smoke](lanes/preset.entry.mjs) |
 | 想复核**问询窗口 120s** 还要不要改 | `node probes/analyze/ask-latency-probe.mjs`（只读报数，不改配置）；依据 = [BUG-021 Note](../notes/archived/2026-10-18-bug021-timed-user-question.md) |
-| 命令面行为 / 事件形状要变 | 先看 S12（故障注入恢复）与 `tools/lib/question-stop.mjs` 的形状漂移判据——它们会先红；依据 = [BUG-022 Note](../notes/archived/2026-10-18-bug022-question-stop-guard.md) |
+| 命令面行为 / 事件形状要变 | 先看 S12（故障注入恢复）与 `probes/lib/question-stop.mjs` 的形状漂移判据——它们会先红；依据 = [BUG-022 Note](../notes/archived/2026-10-18-bug022-question-stop-guard.md) |

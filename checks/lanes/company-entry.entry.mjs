@@ -16,7 +16,7 @@ import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const KEEP = process.argv.includes('--keep')
 const CLI = join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js')

@@ -8,7 +8,7 @@
 import { existsSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { join } from 'node:path'
-import { repositoryRoot } from '../lib/repository-layout.mjs'
+import { repositoryRoot } from '../lib/core/repository-layout.mjs'
 
 const hooks = join(repositoryRoot, '.githooks')
 const prePush = join(hooks, 'pre-push')

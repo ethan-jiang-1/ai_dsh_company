@@ -1,12 +1,12 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { importProblem, importSpecifiers, layerOf } from '../../tools/lib/src-layering.mjs'
+import { importProblem, importSpecifiers, layerOf } from '../lib/src-layering.mjs'
 
 // ── 3. pack 源码面分层门禁（src-layering，2026-10-27 立，R3-01）────────────────────
 // 为什么：host/lib/client 的分层此前**只由 tsconfig include 保证**——`pnpm verify` 不跑 tsc、
 //   `pnpm test` 是裸 vitest。往 client 面板 import 一个 host 模块，两个标准命令全绿，构建时才炸
-//   （TS6307）。分层是地基，必须有默认回路守它。判据与层定义理由 = tools/lib/src-layering.mjs。
+//   （TS6307）。分层是地基，必须有默认回路守它。判据与层定义理由 = checks/lib/src-layering.mjs。
 // 边界：只查相对 import / 动态 import / require 的目标层 + lib/client 的 node: 内建；不做符号解析、不做类型检查
 //   （类型面仍归 tsc；本门禁在无构建的 fresh clone 上也必须能跑）。注释先剥离，注释里的示例 import 不假阳。
 // 负例留证 2026-10-27（破坏真文件，非构造夹具）：

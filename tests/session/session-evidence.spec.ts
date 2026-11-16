@@ -17,7 +17,7 @@ import {
   toolCatalog,
   toolCalls,
   turns,
-} from '../../tools/lib/session-evidence.mjs'
+} from '../../tools/lib/session/session-evidence.mjs'
 
 const FIXTURE = [
   '{"type":"session","version":4,"id":"child-1","createdAt":1,"cwd":"/tmp","parentSession":"root-1","origin":"subagent","delegationDepth":1,"agentPreset":"worker"}',

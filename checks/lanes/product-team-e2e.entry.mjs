@@ -16,12 +16,12 @@
 // 预算：~$1 / 3–7 分钟（--wall 封顶墙钟）。
 // 前置：DSH_HOME + 模型凭据（dev home）；cwd 写死 runtime/rehearsal-workspace（产物落排练场）。
 // 用法：source run/env.sh && node checks/lanes/product-team-e2e.entry.mjs [--wall 600]
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)

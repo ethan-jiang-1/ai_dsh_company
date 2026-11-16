@@ -10,13 +10,13 @@
 // 无人值守安全：动议文本明确禁止 `ask_user_question` / `request_signoff`（会挂住会话等真人），
 // 需要裁决的一律写「未决项」fail-closed。
 // 用法：source run/env.sh && node probes/browser-visual/dag-midflight-probe.mjs [--waves 6]
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const WORKSPACE = join(ROOT, 'company-workspace')
 const SHOTS = join(ROOT, 'snapshots/visual/dag-midflight')
@@ -33,7 +33,7 @@ const PROMPT_FILE = args.indexOf('--prompt-file') === -1 ? undefined : args[args
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('dag-midflight-probe')
 } catch (error) {
   console.error(error.message)
@@ -58,7 +58,7 @@ const MOTION = `动议（真盘评估，今天要结论）：**东南亚市场�
 每波只出一页纸（结论先行），互审一轮即可，别扩写。`
 
 // ── 起 web（真盘会话 + 浏览器截图共用）──
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `dm-` 由调用方传入，不推导；
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `dm-` 由调用方传入，不推导；
 // spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)

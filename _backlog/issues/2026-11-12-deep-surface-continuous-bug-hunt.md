@@ -40,8 +40,8 @@ opened: 2026-11-12
 
 **四处变化：**
 
-1. **形状轴由对抗矩阵接管**：`company-root-safety.spec.ts`（10 写入口 × 13 shape = 134 例）、`file-shape-agreement.spec.ts`、`startup-state-agreement.spec.ts`、`ledger-state-agreement.spec.ts`、`company-root-process.e2e.mjs`（16 项）、`tools/lib/carrier-registry.mjs`（15 载体 / `KNOWN_GAP = 0`）+ `company-root-carriers` 门禁；BUG-151 就是矩阵首跑抓的。剩余缺口只列四个：TOCTOU 窗口（recheck 后/rename 前）、真崩溃/fsync、读载体未进矩阵、内容解析器语义（startup/ledger 之外）。
-2. **测试资产改了证据规则**：`tests/` 六面 + 四后缀 lane（`*.spec.ts` / `*.e2e.mjs` / `*.entry.mjs` / `tests/checks/*.test.mjs`）；[asset-lanes.mjs](../../tools/lib/asset-lanes.mjs) 是唯一注册表；census = 29 冒烟 / 67 探针 / 72 门禁 / 247 spec；pre-push 按面 + 覆盖率棘轮。旧的 `*-smoke` / `golden` 名只作历史；新探索脚本留 `runtime/tmp/`，升常驻必须登记。
+1. **形状轴由对抗矩阵接管**：`company-root-safety.spec.ts`（10 写入口 × 13 shape = 134 例）、`file-shape-agreement.spec.ts`、`startup-state-agreement.spec.ts`、`ledger-state-agreement.spec.ts`、`company-root-process.e2e.mjs`（16 项）、`checks/lib/carrier-registry.mjs`（15 载体 / `KNOWN_GAP = 0`）+ `company-root-carriers` 门禁；BUG-151 就是矩阵首跑抓的。剩余缺口只列四个：TOCTOU 窗口（recheck 后/rename 前）、真崩溃/fsync、读载体未进矩阵、内容解析器语义（startup/ledger 之外）。
+2. **测试资产改了证据规则**：`tests/` 六面 + 四后缀 lane（`*.spec.ts` / `*.e2e.mjs` / `*.entry.mjs` / `tests/checks/*.test.mjs`）；[asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs) 是唯一注册表；census = 29 冒烟 / 67 探针 / 72 门禁 / 247 spec；pre-push 按面 + 覆盖率棘轮。旧的 `*-smoke` / `golden` 名只作历史；新探索脚本留 `runtime/tmp/`，升常驻必须登记。
 3. **新产品面：PRD headings + present 闸门**：[prd-check.ts](../../packages/company-pack/src/lib/docs/prd-check.ts) 新 parser；[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts) 在 `present` 前 deny；[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts) 只有 5 个用例；[PRD headings Note](../../notes/implemented/2026-11-13-prd-headings-definition.md) 明确「真模型 present deny 端到端未跑」。这是 C1–C7 没覆盖的交付阻断面。
 4. **新验证/客户端面**：client 错误环（[error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts)）刚改；lane/pre-push/census 是新系统。错误环可能滤掉真错误；验证系统可能假绿——后者是「元 bug」，仍在本卡射程。
 
@@ -115,7 +115,7 @@ opened: 2026-11-12
 |---|---|---|---|
 | C11-1 | 三批搬移**改过测试体**（不止 import / 路径行），或改了测试名 / describe 归属而没有声明 | `refactor-drift --hashes` 对每个搬移父提交 vs HEAD；指纹有变且提交未声明 = 缺口 | [refactor-drift.mjs](../../checks/audit/refactor-drift-audit.mjs)、vitest JSON（两个 worktree） |
 | C11-2 | 有 spec 在搬移后掉出类型面 / 覆盖率面（tsconfig include-exclude 或 vitest glob 不再命中） | 盘上 spec 清单 × `tsconfig.test-*.json` include-exclude 求差；负控 = 移一个 spec 到未覆盖目录，看 typecheck 是否仍绿 | `tsconfig.test-*.json`、`pnpm typecheck` |
-| C11-3 | `asset-lanes` / census / checks 索引有陈旧路径：登记项指向搬移前的家或已消失的资产 | 注册表 × 盘面；`node tools/repo/test-census.mjs --check`、`node tools/repo/checks-index.mjs --check`；负控 = 改一个登记路径，看 spec / gate 是否红 | [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs)、[CENSUS](../../tests/CENSUS.generated.md)、[checks/INDEX](../../checks/INDEX.generated.md) |
+| C11-3 | `asset-lanes` / census / checks 索引有陈旧路径：登记项指向搬移前的家或已消失的资产 | 注册表 × 盘面；`node tools/repo/test-census.mjs --check`、`node tools/repo/checks-index.mjs --check`；负控 = 改一个登记路径，看 spec / gate 是否红 | [asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs)、[CENSUS](../../tests/CENSUS.generated.md)、[checks/INDEX](../../checks/INDEX.generated.md) |
 | C11-4 | 覆盖率基线在搬移中被改过数值（静默降标），或键名改了但文件不再被覆盖率面覆盖 | baseline 数值集合 vs 搬移父提交；`coverage-ratchet` 的输入面 | [coverage-baseline.json](../../tests/support/coverage-baseline.json)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs) |
 | C11-5 | 门禁的扫描面 / 登记表在搬移后变成空集合或旧路径（bare-path 的 NOW_FILES、retired-path 前缀、tests-literals ALLOW、carrier 表、spec-duplicates 哈希、naming-contract） | 门禁声明面 × 盘面；逐门一次负控（把一条登记改回旧家 → 应红） | `checks/gates/**`、`pnpm verify` |
 | C11-6 | live 载体仍有搬移前路径（本次预检已 4 处；假设还有未扫到的载体：presets、content、SKILL、tool 头注、生成物） | 全 live 面路径存在性 + 载体分类；排除 frozen / fixture / deliberate | `.agents/skills/**`、`packages/company-pack/{presets,content,src}/**`、`tools/**` 头注 |
@@ -152,7 +152,7 @@ opened: 2026-11-12
 | C6 | **命令 / 解析 / 数据命令的 workspace** | `/req` `/prd` `/delivery` `/deliverables` 仍在 boot 优先；解析器与回执/locale 各写一份；**C8 管 prd 闸门，C6 管命令面** | `tests/host/commands/`、`tests/content/`、`checks/lanes/company-entry.entry.mjs`、`tests/host/commands/prd-command.spec.ts` |
 | C7 | **发布 / 安装 / 隔离** | tarball、plugin add/remove/upgrade、多 home、profile 共享、content 打包；用 0.11.8 当前产物重跑 | `checks/lanes/release.entry.mjs`、`checks/lanes/multi-install.entry.mjs`、`checks/lanes/isolation-matrix.entry.mjs`、`checks/lanes/concurrent-home.entry.mjs` |
 | **C8** | **PRD headings / present 闸门 / requirements-check** | 新交付阻断面：新 parser + 新旧兼容 + 模型可写输入；`present` 前 deny；只有 5 个 gate spec；Note 的 live deny 未跑；解析器对 CRLF/围栏/缩进的容错未证 | [prd-check.ts](../../packages/company-pack/src/lib/docs/prd-check.ts)、[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts)、[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts)、[prd 模板](../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../docs/reference/decisions.md) |
-| **C9** | **测试资产 / 验证元面**（lane 注册、pre-push、census、覆盖率） | 新「绿灯」的制造者：假绿/假跳过不会被产品 spec 抓到；新分支 zero-SHA 只 diff tip 已复现 | [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs)、[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs)、[CENSUS](../../tests/CENSUS.generated.md) |
+| **C9** | **测试资产 / 验证元面**（lane 注册、pre-push、census、覆盖率） | 新「绿灯」的制造者：假绿/假跳过不会被产品 spec 抓到；新分支 zero-SHA 只 diff tip 已复现 | [asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs)、[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs)、[CENSUS](../../tests/CENSUS.generated.md) |
 | **C10** | **client 错误环** | 新增过滤/持久化/上报；可能把真错误滤掉；真页面 lane 只在 weekly | [error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts)、`tests/client/wiring/error-ring.spec.ts`、`checks/lanes/client-error-chain.entry.mjs` |
 | **C11** | **搬移副作用 / 等价性**（三批纯搬移：tests 分轴、src↔tests 对齐、tools 四组） | 变量 = 位置：机械面（import / 显式引用 / 生成物）已改齐，但注释、技能、头注、门禁扫描面、注册表、类型面、覆盖率基线不在任何单一门禁的射程；全绿 ≠ 零漂移；搬移等价 oracle 未进任何 lane | 三批提交 `29ae8c94` / `1eb14f46` / `57d34a34`；[refactor-drift](../../checks/audit/refactor-drift-audit.mjs)；[mirror.spec.ts](../../tests/repo/structure/mirror.spec.ts)；[CENSUS](../../tests/CENSUS.generated.md)；[checks/INDEX](../../checks/INDEX.generated.md)；[coverage-baseline.json](../../tests/support/coverage-baseline.json)；[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)；`checks/lanes/{company-entry,release,preset,client-load}.entry.mjs`；`.agents/skills/**`、`packages/company-pack/{presets,content,src}/**` 的头注 |
 
@@ -179,7 +179,7 @@ opened: 2026-11-12
 3. **对抗夹具 + 负控**：优先 keyless 真文件 / 真 Cordis / 真装配；为每条关键断言做一次最小破坏，看现有 spec / 门禁是否真会红。**C11 的「门禁仍有效 / 搬移等价」结论必须有负控**（破坏 → 红 → 还原 → 绿）；没有负控就写 `unverified`。
 4. **真实入口**：`checks/lanes/preset.entry.mjs` / `client-load.entry.mjs` / `ui-scene.entry.mjs` / `release.entry.mjs` / `company-entry.entry.mjs` / `company-root-process.e2e.mjs` 按面选择；C8 live 只用于 `present` deny 端到端；live 用隔离 workspace/home。**C11 优先搬移影响链上的入口**（`pnpm company`、`pnpm setup`、hooks / pre-push、release / preset / client-load）；`--help` / `--check` 只算前置。
 5. **判决 + 证据**：每格 PASS / FAIL / 未证 + 原因；FAIL 立刻开 `_backlog/bugs/` 卡（编号 = [bugs/README](../bugs/README.md) 的 Next，当前 192）；C9 的假绿 / 假跳过同样开卡或观察；观察标 owner。C11 的格必须带「旧家 → 新家」「载体分类」「等价判据」「负控」四列。
-6. **回填**：本卡追加 `## Round N`（已跑面、H 判决、BUG 卡、未跑面）；不覆盖旧结论；新探索脚本留 `runtime/tmp/`，升常驻必须登记 [asset-lanes.mjs](../../tools/lib/asset-lanes.mjs)。
+6. **回填**：本卡追加 `## Round N`（已跑面、H 判决、BUG 卡、未跑面）；不覆盖旧结论；新探索脚本留 `runtime/tmp/`，升常驻必须登记 [asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs)。
 
 ## Round 1（C1 培养状态机/存储）
 
@@ -1831,7 +1831,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 - 197：向 `docs/testing.md` 注入 packages/company-pack/lib/types/lib/ghost.js → `built-path-literals.spec.ts` **2 passed**；还原。
 - 198：向 `checks/lanes/replay.e2e.mjs` 注入**合法**的 `.../lib/types/lib/docs/markdown-shape-core.js` → 同一 spec **1 failed**（false red）；还原。
 - 199：`node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/package.json` → 未分类 + `本次未触发面级检查` + exit 0。
-- 200：`pnpm coverage-ratchet` → `Command "coverage-ratchet" not found`（应 `coverage:ratchet`）；`pre-push --dry-run --paths tools/lib/asset-lanes.mjs` 把该标签打成「证据」。
+- 200：`pnpm coverage-ratchet` → `Command "coverage-ratchet" not found`（应 `coverage:ratchet`）；`pre-push --dry-run --paths tools/lib/core/asset-lanes.mjs` 把该标签打成「证据」。
 - 201：`--paths ./packages/company-pack/src/lib/presence/presence.ts` → 未分类 + exit 0；去掉 `./` → `→ replay`。
 
 **证据坐标（gitignored）：** `runtime/tmp/c11/unseen-paths-check.mjs` / `.log`、`mut-threshold-dir.log`、`mut-live-js.log`、`mut-live-preset.log`、`mut-live-skill.log`、`mut-typecheck-claim.log`、`mut-built-doc.log`、`mut-built-js-source.log`、`coverage-ratchet-label.log`、`paths-dot-prefix.log`、`company-entry.log`、`release-entry.log`、`client-load.log`、`ui-scene.log`、`post-fix-test.log`。

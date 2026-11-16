@@ -66,7 +66,7 @@ intent: 126 条入口的全量判定结果、7 个冲突，以及三面迁移撞
 | `refactor-drift` 迁 `checks/audit/` | 1 个 .mjs | 头注自述、可能的文档引用（待数） |
 | `session-log-export` 留在 `tools/`、离开 observe 组 | 1 个 .mjs | `tools/README.md` 组表、可能的 Note 引用 |
 | fixture 从探针计数摘出 | `checks-index` 的扫描规则或 `INDEX` 渲染 | 1 个生成器 + 重生成 |
-| 注册表 +6、失败类 +6、census 重生成 | `tools/lib/asset-lanes.mjs`、`tests/CENSUS.generated.md` | 与 A/B 决策绑定 |
+| 注册表 +6、失败类 +6、census 重生成 | `tools/lib/core/asset-lanes.mjs`、`tests/CENSUS.generated.md` | 与 A/B 决策绑定 |
 
 净搬家 ≈ 8 个文件，引用 ≈ 10 个文件 + 2 份生成物。比 2026-10-07 顶层化的 ~350 处小两个数量级，因为 tools/observe 不在 lane 注册表里、也没有脚本互相 spawn。
 

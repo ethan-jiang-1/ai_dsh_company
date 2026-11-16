@@ -7,7 +7,7 @@
 
 ## 决定
 
-1. **公开入口库存改为生成物**：`tools/lib/checks-index.mjs` 扫描 smoke/audit/probes/tools 顶层并渲染
+1. **公开入口库存改为生成物**：`tools/lib/core/checks-index.mjs` 扫描 smoke/audit/probes/tools 顶层并渲染
    `checks/INDEX.generated.md`；`tools/checks-index.mjs --write` 更新；`script-index` 门禁校验生成物与目录
    逐字一致，并检查 README 已链接它。`checks/README.md` 只留快速选择 + 清单指针（80→56 行）。
 2. **补齐 32/32 文档“什么时候读”**：9 份缺失文档各加一行（零头寸的 3 份合并进现有 `>` 首行，不增长行数）。

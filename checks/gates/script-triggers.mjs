@@ -1,7 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { inspectScripts } from '../../tools/lib/repository-layout.mjs'
+import { inspectScripts } from '../../tools/lib/core/repository-layout.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 

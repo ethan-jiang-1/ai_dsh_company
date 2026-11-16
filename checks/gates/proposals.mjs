@@ -2,7 +2,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { sectionStructuralText } from '../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
-import { noteStatusBlock, structuralLines } from '../../tools/lib/repo-markdown.mjs'
+import { noteStatusBlock, structuralLines } from '../../tools/lib/core/repo-markdown.mjs'
 
 // ── 9. 提案纪律：notes/proposed/ 只收已批 RFC，且该毕业的必须毕业 ─────────────
 // 负例留证 2026-09-27：无归宿提案 → proposal-scheduled 红；「已交付」状态滞留 proposed → proposal-graduated 红。

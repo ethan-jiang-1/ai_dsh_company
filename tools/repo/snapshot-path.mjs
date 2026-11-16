@@ -2,7 +2,7 @@
 // 状态：常驻
 // Resolve a current or frozen evidence reference; print its canonical path without reading or writing evidence.
 // Usage: node tools/repo/snapshot-path.mjs snapshots/replay/foundation-workspace/replay/raw/lead.jsonl
-import { repositoryRoot, snapshotReference } from '../lib/repository-layout.mjs'
+import { repositoryRoot, snapshotReference } from '../lib/core/repository-layout.mjs'
 import { existsSync } from 'node:fs'
 const reference = process.argv[2]
 try {

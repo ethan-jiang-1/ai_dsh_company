@@ -5,7 +5,7 @@
 // 成本：真实用例 keyless 秒级（只读盘与会话日志，不调模型）；`--self-test` 同档。
 // 用法：source run/env.sh && node checks/audit/quality-loop-audit.mjs [--workspace <dir>] [--deliverable <dir>]
 //       [--home <dir>] [--methods <dir>] [--self-test] [--json]
-// 判据（实现 = tools/lib/quality-loop.mjs，spec 钉同源）：
+// 判据（实现 = tools/lib/company/quality-loop.mjs，spec 钉同源）：
 //   ① 两个独立 activation：裁决头的 session/preset/depth/producer 对得上真实 child durable header；
 //   ⓪ 先生产再验证：验证者会话必须在产出者**首轮 turn/end 之后**才创建（顺序发工，不是并行）；
 //   ① 两个独立 activation：裁决头的 session/preset/depth 对得上真实 child durable header（preset=quality-loop-verifier）；
@@ -21,16 +21,16 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { pickSessionLog } from '../../tools/lib/session/session-log-generation.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 import {
   QUALITY_LOOP_DIR,
   auditQualityLoop,
   parseMethodSkill,
   splitVerdict,
   verdictBodyHash,
-} from '../../tools/lib/quality-loop.mjs'
+} from '../../tools/lib/company/quality-loop.mjs'
 
 const args = process.argv.slice(2)
 const flag = (name) => args.includes(`--${name}`)

@@ -14,9 +14,9 @@ import { createHash } from 'node:crypto'
 import { createWriteStream, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { devTarballName, ensureDefaultPort, migrationNotice, planDevStart, resolveDevMode, shouldReuseBuild } from '../lib/dev-install.mjs'
-import { devBuildFingerprint } from '../lib/pack-source.mjs'
-import { redactTokenUrls } from '../lib/session-diagnose.mjs'
+import { devTarballName, ensureDefaultPort, migrationNotice, planDevStart, resolveDevMode, shouldReuseBuild } from '../lib/core/dev-install.mjs'
+import { devBuildFingerprint } from '../lib/core/pack-source.mjs'
+import { redactTokenUrls } from '../lib/session/session-diagnose.mjs'
 
 const here = fileURLToPath(import.meta.url)
 const root = resolve(dirname(here), '../..')

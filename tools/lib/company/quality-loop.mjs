@@ -6,7 +6,7 @@
 // 解析器口径的唯一家在本文件；流程口径的唯一家 = `presets/_shared/skills/quality-loop/SKILL.md`
 // （改判据形状 = 两边同 diff 改，spec 会拦漂移）。
 import { createHash } from 'node:crypto'
-import { headingSections, parseFrontmatter, splitGfmTableCells } from './repo-markdown.mjs'
+import { headingSections, parseFrontmatter, splitGfmTableCells } from '../core/repo-markdown.mjs'
 
 /** 质量环产物目录（相对交付目录）。 */
 export const QUALITY_LOOP_DIR = 'quality-loop'

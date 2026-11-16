@@ -3,7 +3,7 @@
  *
  * 为什么：pack README 是 npm 页面、`_dist/安装手册.md` 是收件人完整手册；两处各写一份
  * 「彻底删除」命令，README 曾只列 3 条而漏掉 lease/日志/检索索引（手册 6 条）。
- * 判据 = 两处 `rm` 路径集合相等且覆盖三类易漏残留；手册是生成物，唯一模板 = tools/lib/install-manual.mjs。
+ * 判据 = 两处 `rm` 路径集合相等且覆盖三类易漏残留；手册是生成物，唯一模板 = tools/lib/release/install-manual.mjs。
  *
  * 证明不了：命令在真实 home/workspace 上可执行（归 release-smoke 的卸载节）；
  * 只证明两处文档不再各说一套。
@@ -11,7 +11,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 const read = (rel: string) => readFileSync(join(ROOT, rel), 'utf8')
 const rmPaths = (text: string): string[] =>

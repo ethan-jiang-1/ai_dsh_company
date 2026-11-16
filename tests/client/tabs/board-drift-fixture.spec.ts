@@ -8,7 +8,7 @@
  * 夹具数据 = **真事故原文**（会话 session-663ff4b6 / turn1 step9）：task-3 的依赖只写在
  * description 里，板面 blockedBy 为空；task-4 声明了依赖且已落板（假阳性对照）。
  */
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { readFileSync } from 'node:fs'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'

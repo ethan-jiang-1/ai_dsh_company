@@ -6,12 +6,12 @@
 // 188 个插桩文件里 3 个 0%、30 个 <80%。本脚本把上限变成**棘轮**：每次 push 跑一次全量覆盖率，
 // 与 `tests/support/coverage-baseline.json` 比：只升不降；新文件有下限；已知空洞必须显式豁免
 // （reason + removeWhen）；豁免一旦过期（文件没了或已到 50%）就红，逼人删掉。
-// 判据纯逻辑 = tools/lib/coverage-baseline.mjs（有 spec），本文件只做跑/读/写。
+// 判据纯逻辑 = checks/lib/coverage-baseline.mjs（有 spec），本文件只做跑/读/写。
 import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'
-import { compareCoverage, indexCoverage, nextBaseline } from '../../tools/lib/coverage-baseline.mjs'
+import { compareCoverage, indexCoverage, nextBaseline } from '../lib/coverage-baseline.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../..')
@@ -53,7 +53,7 @@ if (bootstrap) console.log('coverage-ratchet: --bootstrap（首轮建基线；�
 if (violations.length === 0) {
   console.log(`coverage-ratchet: PASS（${String(fileCount)} 文件；基线 ${baseline.generatedAt ?? '未生成'}；豁免 ${String((baseline.exemptions ?? []).length)} 条）`)
 } else {
-  console.error(`coverage-ratchet: ${String(violations.length)} FAILURE(S)（基线与判据 = tools/lib/coverage-baseline.mjs；修好或显式豁免后才许 --update）`)
+  console.error(`coverage-ratchet: ${String(violations.length)} FAILURE(S)（基线与判据 = checks/lib/coverage-baseline.mjs；修好或显式豁免后才许 --update）`)
   process.exitCode = 1
 }
 

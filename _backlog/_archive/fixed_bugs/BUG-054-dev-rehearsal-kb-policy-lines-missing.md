@@ -12,7 +12,7 @@ opened: 2026-11-10
 > 证据 = `runtime/team-role-packet-exploratory-2026-11-10.json`（gitignored）与 COO 输出
 > `runtime/rehearsal-workspace/.dsh-company/deliverables/2026-11-10-probe-team-role-packet/drafts/coo.md`。
 > 留痕：commit `684d09db`（非材料性；只动 `tools/` + tests + 指南事实句，根因与影响面在 commit message）。
-> 修复 = `tools/lib/kb-seeds.mjs`（seed.json 唯一读取面）+ 两条旁路改走它；旁路不再维护第三份清单。
+> 修复 = `tools/lib/core/kb-seeds.mjs`（seed.json 唯一读取面）+ 两条旁路改走它；旁路不再维护第三份清单。
 > 审查：agent — 对照「已修判定」逐条核过；红→绿与真入口见「修复落地」。
 
 ## 症状
@@ -29,7 +29,7 @@ COO/CFO 的 CHARTER 与公司手册都指向 `.dsh-company/kb/policy-lines.md`�
 `company/review-protocol.md` 两条 seed，真实 `bootstrapCompanyWorkspace` 会补。
 缺口在 dev/rehearsal 两条旁路：
 
-- `tools/lib/rehearsal.mjs` 的 `mirrorCompanyReference` 只复制 `state/{company,org,owners,motion-ledger,
+- `tools/lib/core/rehearsal.mjs` 的 `mirrorCompanyReference` 只复制 `state/{company,org,owners,motion-ledger,
   process-docs}.md` 与 charters，没有复制 `company/policy-lines.md` / `company/review-protocol.md`；
 - `tools/bundle-init.mjs` 也只复制 `company.md / org.md / owners.md / motion-ledger.md`，没有复制
   `company/` 下的政策/复核文件。
@@ -64,7 +64,7 @@ node runtime/team-role-packet-exploratory-2026-11-10.mjs
 
 ## 修复关联（实际做法）
 
-- 新增 `tools/lib/kb-seeds.mjs`：读 `seed.json`、过滤 `.dsh-company/kb/` 目标、复制（`onlyMissing`
+- 新增 `tools/lib/core/kb-seeds.mjs`：读 `seed.json`、过滤 `.dsh-company/kb/` 目标、复制（`onlyMissing`
   对齐生产只补缺语义）；缺清单 / 坏 JSON / target 越界 / **缺源都 fail-loud**（静默跳过正是本卡失败类）。
 - `mirrorCompanyReference` 与 `bundle-init` 改走同一复制面，不再各维护文件清单。
 - 新增 `tests/tools/kb-seeds.spec.ts`：与生产 `readSeeds` 同清单 + fresh workspace 文件逐一

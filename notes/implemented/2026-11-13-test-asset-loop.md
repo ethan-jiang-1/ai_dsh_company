@@ -6,7 +6,7 @@
 
 ## 决定
 
-1. **lane 注册表住 `tools/lib/asset-lanes.mjs`，不是卡里计划的 checks/lanes/lanes.mjs。**
+1. **lane 注册表住 `tools/lib/core/asset-lanes.mjs`，不是卡里计划的 checks/lanes/lanes.mjs。**
    理由：`tests/repo/structure/layering.spec.ts` 禁止 spec import `checks|probes|tools` 下的驱动脚本，
    而注册表必须被 spec 机械校验；`tools/lib/` 是唯一允许的 keyless seam。注册表是纯数据 + 纯函数，
    import 无副作用、不起进程、不读盘。
@@ -31,7 +31,7 @@
 
 6. **C 件：覆盖率从「手选阈值」升级为棘轮，并进 pre-push。**
    pre-push 最后一步从 `pnpm test` 换成 `node checks/audit/coverage-ratchet.mjs`（跑全量测试 + 覆盖率 + 比基线）；
-   实测覆盖率运行 24s，与 test 同量级，不额外花时间。判据纯逻辑 = `tools/lib/coverage-baseline.mjs`：
+   实测覆盖率运行 24s，与 test 同量级，不额外花时间。判据纯逻辑 = `checks/lib/coverage-baseline.mjs`：
    ① 任何文件低于基线 → 红；② 新文件 statements<80 / branches<70 → 红；③ statements<50 的已知空洞必须显式豁免；
    ④ 豁免过期（文件没了或已到 50%）→ 红，逼人删配对。基线 = `tests/support/coverage-baseline.json`，只升不降。
 7. **现有 5 个低覆盖文件登记为「已知空洞」而不是假装没看见。** 3 个 0% 的 tools/lib 文件
@@ -45,7 +45,7 @@
    （上一轮已否决「检查 Note 有没有某节」的重门禁）。
 
 10. **A 件：盘子是生成物，探针也登记，失败类先显式「未分类」。**
-    `tools/lib/test-census.mjs` 建模/渲染 + `tools/repo/test-census.mjs` 写 `tests/CENSUS.generated.md`；
+    `tools/lib/repo/test-census.mjs` 建模/渲染 + `tools/repo/test-census.mjs` 写 `tests/CENSUS.generated.md`；
     数据 = 注册表（32 冒烟 + 69 探针）+ 盘上目录计数（71 门禁 / 246 spec）。32 个冒烟的失败类人工判定进
     `FAILURE_CLASS_BY_NAME`；69 个探针显式记「未分类」并在汇总里报数——**不假装已分类**，下一轮收敛。
 11. **出生登记 = 注册表，不是头注。** 卡里原计划在头注加「失败类 / lane」两行；实作改为注册表字段：
@@ -77,10 +77,10 @@
 
 | 判据 | 命令 | 原话 |
 |---|---|---|
-| 空间完备负例（红） | 临时建 checks/lanes/zz-unregistered.mjs + `pnpm vitest run tests/repo/budget/asset-lanes.spec.ts` | `AssertionError: 这些 checks/lanes/*.mjs 没进 tools/lib/asset-lanes.mjs——新资产必须选 lane（或写 manualReason）: expected [ 'zz-unregistered' ] to deeply equal []` |
+| 空间完备负例（红） | 临时建 checks/lanes/zz-unregistered.mjs + `pnpm vitest run tests/repo/budget/asset-lanes.spec.ts` | `AssertionError: 这些 checks/lanes/*.mjs 没进 tools/lib/core/asset-lanes.mjs——新资产必须选 lane（或写 manualReason）: expected [ 'zz-unregistered' ] to deeply equal []` |
 | 还原（绿） | 删除临时文件 + 重跑 | `Tests 5 passed (5)` |
 | 按面选面（命中） | `node checks/pre-push-surfaces.mjs --stdin /tmp/refs-client --dry-run`（真实历史 commit `d31d8366` 的 parent..commit） | `因为改了 packages/company-pack/src/client/data/use-company-data.ts（命中 packages/company-pack/src/client/**；client 装配/入口改动 → 真页面零挂载失败）→ client-load-smoke` |
-| 按面选面（不命中） | 同上换 docs-only 范围 | `本次未触发面级检查（规则表 = tools/lib/asset-lanes.mjs SURFACE_RULES）` |
+| 按面选面（不命中） | 同上换 docs-only 范围 | `本次未触发面级检查（规则表 = tools/lib/core/asset-lanes.mjs SURFACE_RULES）` |
 | fast 迁移后不变 | `pnpm -s smoke:fast` | `ALL PASS（6 条，2.95s）` |
 | 全量成员 | `node checks/lanes/keyless-lane.mjs --list` | 18 条 |
 | 全量 runner | `node checks/lanes/keyless-lane.mjs --ci --filter gates-negative-smoke` | `1 PASS / 0 FAIL / 31 SKIP`（SKIP 逐条打印，含真模型/浏览器/手动理由） |
@@ -102,9 +102,9 @@
 ## 状态事实与载体
 
 - 事实：**资产 lane 的唯一家 = lane 注册表**；pre-push 按面补跑；每周全量 keyless。
-- 唯一入口：`tools/lib/asset-lanes.mjs`（lane 成员 + 规则 + 纯匹配）、`checks/pre-push-surfaces.mjs`（取范围 + 跑）、
+- 唯一入口：`tools/lib/core/asset-lanes.mjs`（lane 成员 + 规则 + 纯匹配）、`checks/pre-push-surfaces.mjs`（取范围 + 跑）、
   `checks/lanes/keyless-lane.mjs`（全量）、`tests/repo/budget/asset-lanes.spec.ts`（空间完备门）；
-  执行下限的唯一入口 = `checks/audit/coverage-ratchet.mjs` + `tools/lib/coverage-baseline.mjs` + `tests/support/coverage-baseline.json`；
+  执行下限的唯一入口 = `checks/audit/coverage-ratchet.mjs` + `checks/lib/coverage-baseline.mjs` + `tests/support/coverage-baseline.json`；
   失败类决策表 = `tests/failure-classes.md`；账本三列 = `close-out-definition` / `agent-note-definition` skill；盘子 = `tools/repo/test-census.mjs` → `tests/CENSUS.generated.md`（生成物），一致性 = `tests/repo/budget/test-census.spec.ts`。
 - 读载体：`tests/README.md`「按面触发」一段、`checks/README.md` quick-select、`.githooks/pre-push` 头注、
   `checks/INDEX.generated.md`（生成物）。

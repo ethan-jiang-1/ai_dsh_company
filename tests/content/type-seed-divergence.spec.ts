@@ -11,7 +11,7 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const DIR = join(ROOT, 'packages/company-pack/content/product-types')
 const read = (type: string, file: string): string => readFileSync(join(DIR, type, file), 'utf8')

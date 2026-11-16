@@ -68,6 +68,7 @@ export function run({ ok, fail, root: base = root }) {
   for (const path of walk(probesDir)) {
     if (!path.endsWith('.mjs')) continue
     const rel = relative(probesDir, path).split('/')
+    if (rel[0] === 'lib') continue // probes/lib/ = show 面的支撑实现（非入口、非探针）；规则同 checks/lib/
     if (rel[rel.length - 1] === 'index.mjs' && rel.length >= 3) continue // probes/<域>/<fixture>/index.mjs
     if (!path.endsWith('-probe.mjs')) failWith(path, '期望 -probe.mjs（fixture 入口只允许 <域>/<fixture>/index.mjs）')
   }

@@ -15,8 +15,8 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
 
 const KEEP = process.argv.includes('--keep')
 const BASE = join(ROOT, 'runtime/multi-install-smoke')

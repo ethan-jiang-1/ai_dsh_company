@@ -13,9 +13,9 @@ intent: 把 backlog/notes/实现/收尾的规则逐条对到机械执行，找�
 
 | # | 规则 | 规则 owner | 机械执行 | 缺口 |
 |---|---|---|---|---|
-| 1 | 卡只经分诊存在 | `_backlog/README.md:132` | `tools/lib/backlog-liveness.mjs:217` | 无（只查分诊后形状） |
-| 2 | `待落地` 门票 = 非空 `## 验收标准` + 去向三值 | `_backlog/README.md` | `tools/lib/backlog-liveness.mjs:224-233` | 太弱：非空即过，「可执行」无判据 |
-| 3 | 缺陷门票 = 非空 `## 已修判定` | `_backlog/README.md` | `tools/lib/backlog-liveness.mjs:235-238` | 太弱：同上 |
+| 1 | 卡只经分诊存在 | `_backlog/README.md:132` | `checks/lib/backlog-liveness.mjs:217` | 无（只查分诊后形状） |
+| 2 | `待落地` 门票 = 非空 `## 验收标准` + 去向三值 | `_backlog/README.md` | `checks/lib/backlog-liveness.mjs:224-233` | 太弱：非空即过，「可执行」无判据 |
+| 3 | 缺陷门票 = 非空 `## 已修判定` | `_backlog/README.md` | `checks/lib/backlog-liveness.mjs:235-238` | 太弱：同上 |
 | 4 | 材料性判据 + 自授权边界 + 留痕 | `_backlog/README.md:124-128` | 无（`severity` 只查语法） | 无执行：最高杠杆的散文 |
 | 5 | 任务源 = 已批 RFC + 用户点名；卡不是任务源 | `docs/guides/dev-loop.md:34-38` | 部分（`proposals.mjs:22-25` 识别「已批」） | 无执行：无「实施须引用授权」检查 |
 | 6 | RFC 只收已批；验收必须可执行 | `notes/proposed/README.md` | `checks/gates/proposals.mjs:22-30` | 太弱：`## 验收` 标题在场即过；「批准」任意位置字样 |
@@ -46,7 +46,7 @@ intent: 把 backlog/notes/实现/收尾的规则逐条对到机械执行，找�
 
 1. **`proposal-scheduled`**：`checks/gates/proposals.mjs:26-27` 只匹配 `^## 验收`；空节、只有标题都绿。`批准` 是 `head.includes`，注释里提一句也能过。
 2. **`notes-liveness`**：`checks/gates/notes-liveness.mjs:33-38` 只查 `## 决定` 标题；节内无正文不报。rationale 的「现行语义」只要求节内出现一个 `](…)`，链到错文件也算。
-3. **`backlog-liveness` 门票**：`tools/lib/backlog-liveness.mjs:228-229`、`:236-237` 的 `sectionBody` 只要求「标题到下一个 `##` 之间非空」；写「待定」「见 RFC」均绿。`:248` 的 `审查：` 只匹配 token，`审查：跳过 —` 不写理由也绿。
+3. **`backlog-liveness` 门票**：`checks/lib/backlog-liveness.mjs:228-229`、`:236-237` 的 `sectionBody` 只要求「标题到下一个 `##` 之间非空」；写「待定」「见 RFC」均绿。`:248` 的 `审查：` 只匹配 token，`审查：跳过 —` 不写理由也绿。
 
 对照两条（不展开）：`guard-red-record` 只要注释里出现 `// 负例留证 日期：…BUG-nnn`，红是不是真的不影响；`doc-budget` 纯行数。
 

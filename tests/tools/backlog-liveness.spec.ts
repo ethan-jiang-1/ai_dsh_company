@@ -1,8 +1,8 @@
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { backlogLivenessProblems } from '../../tools/lib/backlog-liveness.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { backlogLivenessProblems } from '../../checks/lib/backlog-liveness.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 // Exercise the owning gate's read-only function without running the repository-wide gate runner.
 // 2026-10-10：改为直接 import（原先是切 checks/run-gates.mjs 源码 + vm 求值，改一处注释就假红）。

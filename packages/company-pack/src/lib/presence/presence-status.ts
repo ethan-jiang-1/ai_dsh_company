@@ -8,7 +8,7 @@
 // 有防漂移断言钉着）——与 300 多行事件折算混住时，改文案的人要翻整个读模型。
 //
 // 依赖：本文件只 import `role-copy.ts`（同样零依赖的叶子）；presence.ts → 本文件单向。
-// 为什么 `PRESET_KEYS` 留在这里而不引 `tools/lib/company-roles.mjs`：pack 发布面自包含
+// 为什么 `PRESET_KEYS` 留在这里而不引 `tools/lib/company/company-roles.mjs`：pack 发布面自包含
 // （`files` 不含 tools/），不许反向依赖维护工具层——同名决定见 notes/archived/2026-10-14-code-restructure.md
 // 「输掉的方案」（`CULTIVATION_ROLES`/`PRESET_KEYS` 同理）。
 
@@ -51,7 +51,7 @@ export function statusLabelFor(status: string): string {
 
 /**
  * 六个 preset id——**pack 内名册唯一事实家**（2026-10-21 收拢：cultivation 的 CULTIVATION_ROLES 与
- * host 培养工具串改为从这里派生；pack/tools 边界仍由 tools/lib/company-roles.mjs 自持，互不依赖）。
+ * host 培养工具串改为从这里派生；pack/tools 边界仍由 tools/lib/company/company-roles.mjs 自持，互不依赖）。
  * 有限键，索引安全；与 `presets/<role>/agent.cordis.yml` 一一对应。
  */
 export const PRESET_KEYS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo'] as const

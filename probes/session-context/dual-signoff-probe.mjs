@@ -19,26 +19,26 @@
 //   request 事件即止。
 // 用法：DSH_HOME=runtime/harness-home node probes/session-context/dual-signoff-probe.mjs
 // 退出码：0 = B2 不成立（CEO 侧可见/可处理——防线在场）；1 = B2 成立（缺口确认）；2 = 环境失败。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('dual-signoff-probe')
 } catch (error) {
   console.error(error.message)
   process.exit(2)
 }
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `dsp-` 由调用方传入，不推导；
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `dsp-` 由调用方传入，不推导；
 // spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)

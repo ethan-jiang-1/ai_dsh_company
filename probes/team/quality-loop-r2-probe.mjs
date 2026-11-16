@@ -13,12 +13,12 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { ensureRehearsalWorkspace } from '../../tools/lib/rehearsal.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { splitVerdict, verdictBodyHash } from '../../tools/lib/quality-loop.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { ensureRehearsalWorkspace } from '../../tools/lib/core/rehearsal.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { splitVerdict, verdictBodyHash } from '../../tools/lib/company/quality-loop.mjs'
 
 const arg = (name, fallback) => {
   const index = process.argv.indexOf(`--${name}`)

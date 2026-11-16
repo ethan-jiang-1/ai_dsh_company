@@ -4,7 +4,7 @@
 //   基线时。成本：keyless（只读盘 + zstd 解压），round-8 的 47 条观察秒级；不调模型。
 // 用法：source run/env.sh && node checks/audit/surface-matrix-audit.mjs
 //       [--home <DSH_HOME>] [--session <rootId>] [--since <ISO|epoch>] [--json-out <path>] [--md-out <path>]
-// 判据（实现 = tools/lib/surface-matrix.mjs，spec 钉同源）：
+// 判据（实现 = checks/lib/surface-matrix.mjs，spec 钉同源）：
 //   model/YAML 声明 → 运行时 request/header + system/message + skill-catalog：
 //   - named delegates / generic subagent / fork / workflow / subagent_retry / control（仅 child）
 //   - handbook 在场 ⇔ preset ∉ handbookSkipPresets()
@@ -21,14 +21,14 @@ import {
   buildSessionEvidence,
   parseSessionRecords,
   shortSessionId,
-} from '../../tools/lib/session-evidence.mjs'
+} from '../../tools/lib/session/session-evidence.mjs'
 import {
   entryKind,
   matrixRows,
   observationOf,
   surfaceProblems,
-} from '../../tools/lib/surface-matrix.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+} from '../lib/surface-matrix.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const args = process.argv.slice(2)
 const valueOf = (name) => {

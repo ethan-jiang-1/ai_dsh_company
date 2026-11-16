@@ -59,7 +59,7 @@ function section(text, heading) {
 ### 1.4 失真 D：`asset-consumers` 把 20 个自动 lane 冒烟误判为“0 消费者”，且探针 0 减法
 
 首轮 Note 报告“30 冒烟 + 67 探针里 **72 个 0 消费者**”。实测拆解这 72 个：
-- 其中 **20 个其实是正在 `fast` / `surface` / `weekly` 自动运行的冒烟**（包括 `workflow-contract`、`company-root-process`、`snapshot-motion` 甚至本轮新建的 `generative`）！原因：[fast-lane.mjs](../../../../checks/lanes/fast-lane.mjs) 与 [keyless-lane.mjs](../../../../checks/lanes/keyless-lane.mjs) 通过 `tools/lib/asset-lanes.mjs` 数组动态调度，而 [asset-consumers.mjs](../../../../tools/lib/asset-consumers.mjs) 把 `asset-lanes.mjs` 列入 `SELF` 排除后，只扫代码文本硬编码字面量，导致所有动态调度的冒烟全被记为 `0 消费者`。真实的 0 消费者是 **5 个手动真模型冒烟 + 52 个探针**。
+- 其中 **20 个其实是正在 `fast` / `surface` / `weekly` 自动运行的冒烟**（包括 `workflow-contract`、`company-root-process`、`snapshot-motion` 甚至本轮新建的 `generative`）！原因：[fast-lane.mjs](../../../../checks/lanes/fast-lane.mjs) 与 [keyless-lane.mjs](../../../../checks/lanes/keyless-lane.mjs) 通过 `tools/lib/core/asset-lanes.mjs` 数组动态调度，而 [asset-consumers.mjs](../../../../tools/lib/repo/asset-consumers.mjs) 把 `asset-lanes.mjs` 列入 `SELF` 排除后，只扫代码文本硬编码字面量，导致所有动态调度的冒烟全被记为 `0 消费者`。真实的 0 消费者是 **5 个手动真模型冒烟 + 52 个探针**。
 - 更关键的是：**67 个探针 0 个分类、0 个退役、0 个合并**；连原卡正文第 52 行亲手点名的 3 处散文数字漂移（`fast-lane.mjs:3` 写 6 条实为 4 条、`asset-lanes.mjs:162` 写“保持既有 6 条不变”实为 4 条、`asset-lanes.mjs:255` 写“69 个探针”实为 67 个）在结案时都一字未改。
 
 ### 1.5 缩水 E & F：象征性变异与“箭头即合规”棘轮
@@ -76,13 +76,13 @@ function section(text, heading) {
 
 | 层面 | 现行机制 | 实际产生的反向激励 |
 |---|---|---|
-| **原语层（违反「不自造」）** | 本仓 [markdown-links.mjs](../../../../tools/lib/markdown-links.mjs) 早接通了 `vendor/dsh` 的标准 GFM AST（`mdast-util-from-markdown` + `gfm`），[backlog-liveness.mjs](../../../../tools/lib/backlog-liveness.mjs) 早接通了 `js-yaml`；但没有任何规则禁止门禁/工具手写裸正则解析 | 每建一道门禁就顺手 `split('\n')` 手搓半套 Markdown/YAML/路径解析器；32 张卡里 21 张在替手搓解析器擦边角 |
+| **原语层（违反「不自造」）** | 本仓 [markdown-links.mjs](../../../../tools/lib/core/markdown-links.mjs) 早接通了 `vendor/dsh` 的标准 GFM AST（`mdast-util-from-markdown` + `gfm`），[backlog-liveness.mjs](../../../../checks/lib/backlog-liveness.mjs) 早接通了 `js-yaml`；但没有任何规则禁止门禁/工具手写裸正则解析 | 每建一道门禁就顺手 `split('\n')` 手搓半套 Markdown/YAML/路径解析器；32 张卡里 21 张在替手搓解析器擦边角 |
 | **宪章层（点证据导向）** | [testing.md §3.7](../../../../docs/testing.md) 与 `bug-coverage` 考核“标题含 `BUG-nnn` + 单次红→绿” | 在共享层出 bug 时，打 1 行 `if` + 写 1 条常量字符串 `it('BUG-xxx')` 是最快拿分的路径，没人被逼去消解第二事实源或找独立参考真值 |
 | **流程层（同源收尾自审）** | [policy.md §P5](../../../../docs/policy.md) 与 [close-out-definition](../../../../.agents/skills/close-out-definition/SKILL.md) 允许“独立子代理盲审 **或 收尾自查**”；`## 未覆盖轴` 允许把原定验收降级记账 | 连续写完 9 个 commit 的作者有强烈的确认偏误；原本在探索轮（新上下文）才能抓出的 8 个 bug，在归档门前零阻力滑过 |
 | **预算层（加法零摩擦）** | `docs/` 有严厉的 [doc-budget.mjs](../../../../checks/gates/doc-budget.mjs) 封顶；但 `checks/gates/`（75）与 `probes/`（67）无上限棘轮 | 遇到治理问题时，“再加 3 个脚本”永远比“合并旧门禁、清理旧探针、抽单一原语”省事 |
 
 **对照本仓已成功的先例**：
-1. 为什么 `.dsh-company` 裸写乱象被根治了？不是因为写了更多点测试，而是立了 [carrier-registry.mjs](../../../../tools/lib/carrier-registry.mjs) + [company-root-carriers.mjs](../../../../checks/gates/company-root-carriers.mjs) **从静态门上禁止了登记载体以外的直接写入（单原语垄断）**。
+1. 为什么 `.dsh-company` 裸写乱象被根治了？不是因为写了更多点测试，而是立了 [carrier-registry.mjs](../../../../checks/lib/carrier-registry.mjs) + [company-root-carriers.mjs](../../../../checks/gates/company-root-carriers.mjs) **从静态门上禁止了登记载体以外的直接写入（单原语垄断）**。
 2. 为什么 `docs/` 不再无限膨胀？不是靠提醒，而是 `doc-budget` 设了硬顶与空置反向棘轮——**想加新条款，必须先压掉或合并旧废话（负债封顶）**。
 
 测试资产与门禁治理缺的正是把这两个模式搬过来。
@@ -97,13 +97,13 @@ function section(text, heading) {
 
 | 模块 | 当前做法 | 问题与收口方向 |
 |---|---|---|
-| `tools/lib/markdown-links.mjs` | 已通过 `vendor/dsh` 加载 `mdast-util-from-markdown` + `mdast-util-gfm` + `micromark-extension-gfm` | **现成标准 GFM AST 底座**；可抽出共享加载器供门禁读卡与测试真值裁判共用 |
-| `tools/lib/backlog-liveness.mjs` | 已加载 `vendor/dsh` 的 `js-yaml`；但 `sectionBody` / `headText` 仍裸 `split('\n')` | YAML 加载器可抽成 `tools/lib/` 共享原语；节提取切到共享 AST/形状原语，消掉“keyless seam 例外”借口 |
+| `tools/lib/core/markdown-links.mjs` | 已通过 `vendor/dsh` 加载 `mdast-util-from-markdown` + `mdast-util-gfm` + `micromark-extension-gfm` | **现成标准 GFM AST 底座**；可抽出共享加载器供门禁读卡与测试真值裁判共用 |
+| `checks/lib/backlog-liveness.mjs` | 已加载 `vendor/dsh` 的 `js-yaml`；但 `sectionBody` / `headText` 仍裸 `split('\n')` | YAML 加载器可抽成 `tools/lib/` 共享原语；节提取切到共享 AST/形状原语，消掉“keyless seam 例外”借口 |
 | `packages/company-pack/src/lib/markdown-shape-core.js` | 运行时零依赖手写扫描器，但文件内含 `scanDocumentDetailed` 与 `sectionRange` **两套状态机** | 删掉独立 `sectionRange` 状态机，改为直接建立在 `scanDocumentDetailed` 结构行视图之上；在测试层用 `mdast` 做独立参考真值差分 |
 | `checks/gates/fix-evidence.mjs` | 自写 5 行正则 `frontmatter()` + 裸 `slice` 未过滤非结构行 | 改调共享 frontmatter 原语 + 结构行节提取原语（围栏内假字段不再漏进 `field()`） |
 | `checks/gates/notes-liveness.mjs` / `proposals.mjs` / `notes-axes.mjs` | 调 `sectionRange` 后裸切 `split('\n')`（`notes-axes` 另调了 `scanDocumentDetailed`） | 统一调结构行节提取原语，不在各门禁重复写 `slice().join()` |
 | `checks/gates/notes-tree.mjs` / `release-ready.mjs` | 裸 `split('\n')` 扫 `^状态[:：]` / `## `，未过 BOM/CRLF/围栏过滤 | 统一过结构行视图，消除前 12 行围栏/注释与 CRLF 盲区 |
-| `tools/lib/quality-loop.mjs` / `candidate-scan.mjs` | `quality-loop` 自写正则 frontmatter 与 `section()`；`candidate-scan` 已耗语料配套 | `quality-loop` 改调共享原语；由静态门禁锁定后续不再新增裸解析 |
+| `tools/lib/company/quality-loop.mjs` / `candidate-scan.mjs` | `quality-loop` 自写正则 frontmatter 与 `section()`；`candidate-scan` 已耗语料配套 | `quality-loop` 改调共享原语；由静态门禁锁定后续不再新增裸解析 |
 
 *(注：关键架构发现——`tests/repo/layering.spec.ts` 早已显式放行 `tools/lib/` 通过 `vendor/dsh` 解析 `mdast-util-*` 与 `js-yaml`！首轮 Note 说“因 `tools/lib` keyless seam 不能统一 `backlog-liveness` 的节解析”是伪阻塞：`tools/lib/` 本身就可以直接用 `mdast`！)*
 
@@ -113,7 +113,7 @@ function section(text, heading) {
 - 引用分布：15 个被文档/测试/审计显式点名，**52 个零外部代码/工具引用**。
 - 明确同族重复簇（首批可直接合并/归档减法目标）：
   1. `probes/session-context/human-exits-{probe,expression-probe,nonblocking-probe}.mjs`（同一退出表达边界拆了 3 个手动脚本）；
-  2. `probes/team/{claim-race-probe,team-claim-loser-probe,team-concurrency-probe}.mjs`（同一认领竞态拆了 3 个手动脚本，纯判据已在 `tools/lib/team-concurrency-verdict.mjs`）；
+  2. `probes/team/{claim-race-probe,team-claim-loser-probe,team-concurrency-probe}.mjs`（同一认领竞态拆了 3 个手动脚本，纯判据已在 `probes/lib/team-concurrency-verdict.mjs`）；
   3. `probes/browser-visual/cultivation-{main-e2e,ux-scenarios,ux-walkthrough}-probe.mjs`（三次历史走查留下的同面板手动探针）；
   4. `tests/evidence/collaboration-probe-verdict.spec.ts` 仍用 `indexOf` + `vm.runInNewContext` 切 `collaboration-oracle-probe.mjs` 源码字符串。
 - 治理原则：不靠拍脑袋全删真模型探针，而是 ① **修对 `asset-consumers` 口径**（区分 `lane 自动消费` vs `文档/审计引用` vs `真孤儿`）；② **合并同族重复探针 + 归档一次性历史走查探针到 `tools/archive/`**；③ **为保留的常驻探针按四域补齐真实 `failureClass`（消灭 `未分类 67`）**，并把“未分类数 = 0、探针总数只降不升”写进 census 门禁。

@@ -93,13 +93,13 @@ intent: 二轮覆盖审计——确认 content/presets 是否逐文件覆盖、�
    `CultivationBoard.tsx:90`「五角色」在六角色后仍是用户可见文案；`RoleBadge` 的 `ROLE_SHORT`/`ROLE_MARK`
    是显示名的第 2、3 份事实；「成员 X（CEO 团队）」在 `cultivation-actions.ts:100` 与
    `cultivation-context-data.ts:285` 各写一遍。
-9. **tools 侧独立名册**：`tools/lib/company-roles.mjs:10`（另 `:18`） 与 pack 的 `PRESET_KEYS` 是两份；漏改**不红但错判**
+9. **tools 侧独立名册**：`tools/lib/company/company-roles.mjs:10`（另 `:18`） 与 pack 的 `PRESET_KEYS` 是两份；漏改**不红但错判**
    （署名/journal/参与统计静默归零），比红更危险。
 10. **既有漂移**（不是改造才产生）：`CultivationBoard.tsx:90` 与 `cordis.patch.yml:40` 仍写"五角色"；
     `rehearsal.mjs:10`、`company-skeleton.mjs:13` 的清单仍无 cmo。
 11. **测试把公司事实当不变量**：`presets.spec.ts:180`（前缀必须"梦之队 "）、`:81`（禁止出现公司名——换公司名后
     该断言永远绿=漏检）、`:77`（只抓旧样本事实）、`brand.spec.ts:13`、`signoff.spec.ts:15` 等 8+ 处。
-12. **九条 preset 三处枚举**：`package.json:143-156`、`README.md:27`、`tools/lib/company-roles.mjs:10`（另 `:18`）。
+12. **九条 preset 三处枚举**：`package.json:143-156`、`README.md:27`、`tools/lib/company/company-roles.mjs:10`（另 `:18`）。
 13. **`cordis.patch.yml:77` 的 `maxMembers: 8`** 是编制政策数字，与 `org.md` 的"并行 8 个"语义不同但同值，
     改编制时容易只改一处。
 

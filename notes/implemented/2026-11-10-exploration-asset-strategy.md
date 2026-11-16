@@ -21,14 +21,14 @@
    ④ 头注写清「不证明什么」；
    ⑤ 资产有层（keyless/smoke/probe/audit/evidence），不把模型塞进 `pnpm test`；
    ⑥ 同类形状第二次出现、或某 charter 被盲区卡住才建，不预建每 bug 场景。
-2. **运行时面矩阵（A1）**：`tools/lib/surface-matrix.mjs` 判据 + `checks/audit/surface-matrix-audit.mjs`
+2. **运行时面矩阵（A1）**：`checks/lib/surface-matrix.mjs` 判据 + `checks/audit/surface-matrix-audit.mjs`
    读盘 + `tests/evidence/surface-matrix.spec.ts` 红绿。入口语义钉死：
    root = Lead（9 个团队工具，support preset 也不判越权）；team member 继承 Lead；
    one-shot child / workflow 分支才按 preset 判 generic/fork/workflow/control；`send_to_subagent`
    在 root/member 是宿主面，不当 preset control。handbook 跟 `handbookSkipPresets()`，
    workflow 合同跟 `workflow` 工具，skill catalog 跟 preset `skills/` + `_shared` + methods。
    审计必须 `--since`（历史日志会被当前模型判成旧状态误报）。
-3. **会话证据包（A2）**：`tools/lib/session-evidence.mjs` 纯解析 + `probes/analyze/explore-evidence-probe.mjs`
+3. **会话证据包（A2）**：`tools/lib/session/session-evidence.mjs` 纯解析 + `probes/analyze/explore-evidence-probe.mjs`
    一条命令出 JSON/markdown（树/header/终态/工具调用/写盘/catalog）；缺首帧显式 `unavailable`，
    不默认 worker/0。3 个 probe 的 `rawHeader` 暂保留（probe 走 `session/page` 的 mode fallback，
    evidence 包走盘上直读；输入面不同，统一另开）。

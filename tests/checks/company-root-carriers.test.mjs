@@ -72,8 +72,8 @@ test('非注册原语植入裸 frontmatter 正则/前缀或裸 Markdown `##` 节
   try {
     mkdirSync(join(root, 'checks/gates/lib'), { recursive: true })
     mkdirSync(join(root, 'tools/lib'), { recursive: true })
-    writeFileSync(join(root, 'tools/lib/repo-markdown.mjs'), 'export const FRONTMATTER = /^---\\n([\\s\\S]*?)\\n---/\n')
-    writeFileSync(join(root, 'tools/lib/markdown-links.mjs'), 'export const ok = true\n')
+    writeFileSync(join(root, 'tools/lib/core/repo-markdown.mjs'), 'export const FRONTMATTER = /^---\\n([\\s\\S]*?)\\n---/\n')
+    writeFileSync(join(root, 'tools/lib/core/markdown-links.mjs'), 'export const ok = true\n')
     writeFileSync(join(root, 'checks/gates/bad-gate.mjs'), [
       '// comment /^##\\s+/ does not trigger',
       'export function run(text) {',

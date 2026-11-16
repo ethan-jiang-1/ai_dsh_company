@@ -10,8 +10,8 @@
 //      导出后对产物本体再跑一遍清单边界断言（必备条目在场、无 package/ 外文件）；
 //   ③ 手册由脚本生成、注入版本与日期，永不手改——手册和旁边的 tarball 不可能漂。
 // 导出 ≠ 发布：不 bump 版本、不跑门禁（除清单）、不发布任何 registry——按工作树现状打包。
-import { repositoryRoot as repoRoot } from '../lib/repository-layout.mjs'
-import { renderInstallManual } from '../lib/install-manual.mjs'
+import { repositoryRoot as repoRoot } from '../lib/core/repository-layout.mjs'
+import { renderInstallManual } from '../lib/release/install-manual.mjs'
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'

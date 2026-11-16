@@ -16,15 +16,15 @@
 //   J5 lead 日志含 res 的完成回执（第二次成员消息）
 //   J6 lead 收口（turn/end）
 // 用法：source run/env.sh && node probes/team/member-rescue-probe.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
-import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const SHOTS = join(ROOT, 'snapshots/probes/attention-e2e', new Date().toISOString().slice(0, 10) + '-rescue')
@@ -33,9 +33,9 @@ const results = []
 const check = makeCheck(results)
 
 let home
-try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('member-rescue-probe') } catch (e) { console.error(e.message); process.exit(2) }
+try { home = (await import('../../tools/lib/core/runtime-home.mjs')).requireDevHome('member-rescue-probe') } catch (e) { console.error(e.message); process.exit(2) }
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `mrp-` 由调用方传入，不推导；
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `mrp-` 由调用方传入，不推导；
 // spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home })
 console.log(`web up: ${base}`)

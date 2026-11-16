@@ -22,14 +22,14 @@
 // 退出码：0 = 成功（计划或执行）；1 = 前置不满足/用法错误。
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
 import { join, basename, relative, resolve, sep } from 'node:path'
-import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
-import { assess, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalSlug, parseFlags, steps } from '../lib/converge-rules.mjs'
-import { parseAuditVerdict } from '../lib/audit-verdict.mjs'
-import { COMPANY_ROLE_IDS } from '../lib/company-roles.mjs'
+import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
+import { assess, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalSlug, parseFlags, steps } from '../lib/company/converge-rules.mjs'
+import { parseAuditVerdict } from '../lib/repo/audit-verdict.mjs'
+import { COMPANY_ROLE_IDS } from '../lib/company/company-roles.mjs'
 import { spawnSync } from 'node:child_process'
 
 const args = process.argv.slice(2)
-// 旗标解析单源 = tools/lib/converge-rules.mjs parseFlags（未知旗标 fail-loud——BUG-016①：
+// 旗标解析单源 = tools/lib/company/converge-rules.mjs parseFlags（未知旗标 fail-loud——BUG-016①：
 // `--plan` 曾被文档发明出来，传了还被静默「碰巧能跑」）
 let DRY, SLUG_ARG, BACKFILL_ARG, RESUME_ARG, FLAGS
 try {

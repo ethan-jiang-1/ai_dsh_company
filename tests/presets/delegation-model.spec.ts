@@ -7,7 +7,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 import { NON_ROLE_PRESETS } from '../../packages/company-pack/src/lib/delegation/delegation-surface.ts'
 import {
   CHANNELS,
@@ -21,7 +21,7 @@ import {
   implementedWorkerProfiles,
   modelProblems,
   presetPath,
-} from '../../tools/lib/delegation-model.mjs'
+} from '../../checks/lib/delegation-model.mjs'
 
 const PACKAGE = JSON.parse(readFileSync(join(ROOT, 'packages/company-pack/package.json'), 'utf8')) as {
   dsh?: { bundle?: { patch?: readonly string[] } }

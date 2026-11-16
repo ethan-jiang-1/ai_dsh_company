@@ -8,9 +8,9 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
-import { handbookSkipPresets } from '../../tools/lib/delegation-model.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company/company-roles.mjs'
+import { handbookSkipPresets } from '../../checks/lib/delegation-model.mjs'
 import { NON_ROLE_PRESETS } from '../../packages/company-pack/src/lib/delegation/delegation-surface.ts'
 import { allRows, loadPresetDoc, pluginConfig, rowById } from './preset-yaml.ts'
 

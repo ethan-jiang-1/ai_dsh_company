@@ -72,7 +72,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 - **语义真空绿**：`replay-fixture-freshness` 输出 `×0 场景`（唯一 runnable 是 headless，按设计跳过注入面比对）；`replay-ui-freshness` 在**盘上 0 个 `ui.expected.md`** 的情况下 PASS。门禁把"没有对象"和"检查通过"渲染成同一个词。
 - **声明资产不存在**：`docs/testing.md:62` 与 `checks/audit/candidate-scan-eval.mjs:20` 都指向 `snapshots/corpora/candidate-scan-corpus/`；盘上 `snapshots/` 下只有 `replay/`。实测该脚本 **ENOENT 崩栈、exit 1**（不是优雅报"语料缺失"），因此"行为质量档"只剩真模型 `probe --full` 一条腿。
 - **升 pin 的“第一道回归网”已名存实亡（最重的一条）**：`docs/contracts/release.md:123-125` 仍写“语料回放全绿 = vendor 换 tag 后先跑 `checks/lanes/replay.e2e.mjs`（r2/r3 会话判据 + foundation workspace oracle）…replay = 升 pin 回归网第一道”，并列出“已知漂移红（r3 ×2 / foundation ×3）”。现实是：r2/r3 已不在盘上，foundation 是 authored 合成场景且我实跑全绿；`docs/guides/dev-loop.md:133` 与 `docs/testing.md:62` 的同一句也指向已不存在的语料。**升 pin 程序会拿一个不加载本包的合成回放当“全绿”证据。**
-- **计数与事实漂移**：`packages/company-pack/README.md:23` 写"公司视图与**五个页签**"——注册面实际 9 个（`company-tab-registration.ts` 九个 `id:`，cdp-probe 活体也验到 9 个）。`nav-count-claims` 门禁的扫描面是 `docs/** + AGENTS.md + README.md`，**不含包 README**，所以这条活到了收货人文档里。同类：`tests/session/entry-probe.spec.ts:13` 的 Q4 旧标准答案仍是 `dsh-v0.1.7-rc.2`（现行 pin 是 `dsh-v0.2.1-rc.2`），而判据 `tools/lib/entry-probe.mjs:6` 只匹配 `/dsh-v\d+\.\d+/`——这个"入口链新鲜度"探针抓不到版本腐化；`checks/gates/doc-budget.mjs` 第 13-15 行刚写"注释里不要复述当前行数"，随后三处"内容 N"已过期（64/59/351 写成 60/55/348）。
+- **计数与事实漂移**：`packages/company-pack/README.md:23` 写"公司视图与**五个页签**"——注册面实际 9 个（`company-tab-registration.ts` 九个 `id:`，cdp-probe 活体也验到 9 个）。`nav-count-claims` 门禁的扫描面是 `docs/** + AGENTS.md + README.md`，**不含包 README**，所以这条活到了收货人文档里。同类：`tests/session/entry-probe.spec.ts:13` 的 Q4 旧标准答案仍是 `dsh-v0.1.7-rc.2`（现行 pin 是 `dsh-v0.2.1-rc.2`），而判据 `checks/lib/entry-probe.mjs:6` 只匹配 `/dsh-v\d+\.\d+/`——这个"入口链新鲜度"探针抓不到版本腐化；`checks/gates/doc-budget.mjs` 第 13-15 行刚写"注释里不要复述当前行数"，随后三处"内容 N"已过期（64/59/351 写成 60/55/348）。
 - **同文件内重复**：`docs/contracts/data-model.md` 把"面板摘要全扫 + open/最近 120 全文"写了三次（:15 表格、:67、:70——后两条几乎逐字重复）。
 - **归档指针失效**：`docs/contracts/demo.md` 在 :68/:152/:171/:228 引 `snapshots/archive/...` 四个路径，盘上都不存在；:68 还把合成的 `foundation-workspace` 称作一场真实动议的"归档"。
 - **设计层标签过期**：`docs/architecture.md:273` "（0.1.7 模型）"、`notes/implemented/2026-11-10-roles-isolation-rationale.md:130` "（0.1.7 现状）"、`notes/implemented/2026-11-10-ui-demo-rationale.md` 多处——机制在 rc.2 下仍成立（子代理回查 vendor 确认），但"现状"写在旧版本号上，读者无法判断。
@@ -118,7 +118,7 @@ intent: "第三轮 fresh-agent 六维度打扫（2026-10-27）：接续 2026-10-
 | # | 维 | 级 | 发现（证据） |
 |---|---|---|---|
 | R3-01 | D2 | P0 | 分层无默认守卫：无 `typecheck`/`build` 脚本，verify 无 `tsc`，test 裸 vitest；client→host 非法边在两命令下全绿（`package.json:scripts`、`checks/run-gates.mjs`、模块图 0 反向边） |
-| R3-02 | D6 | P0 | `diagnose` 对无 `turn/end` 的中断 turn 报 `FAILURES none` 且恒 exit 0（实跑 `EVENTS total=15 turns=0`；判据见 `tools/lib/session-diagnose.mjs:76-86`） |
+| R3-02 | D6 | P0 | `diagnose` 对无 `turn/end` 的中断 turn 报 `FAILURES none` 且恒 exit 0（实跑 `EVENTS total=15 turns=0`；判据见 `tools/lib/session/session-diagnose.mjs:76-86`） |
 | R3-03 | D6 | P0 | 客户端错误从不进模型可见记录；console/pageerror 只在探针进程且仅失败落盘（`tools/drivers/cdp-driver.mjs:107-114`；无 host 事件类型） |
 | R3-04 | D6 | P0 | UI 症状不可复现：`replay-smoke --ui` 仅 r3/r2 白名单，两场景已不在盘上（实测裸栈 exit 1；`checks/lanes/replay.e2e.mjs:782`） |
 | R3-05 | D4/D5 | P0 | 声明资产不存在：`snapshots/corpora/candidate-scan-corpus/` 缺失，而 `docs/testing.md:62` 与 `checks/audit/candidate-scan-eval.mjs:20` 指向它（实跑 ENOENT 崩栈 exit 1） |

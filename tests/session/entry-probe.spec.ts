@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { assistantMessageText, collectText } from '../../tools/lib/session-log.mjs'
-import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../../tools/lib/entry-probe.mjs'
+import { assistantMessageText, collectText } from '../../tools/lib/session/session-log.mjs'
+import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../../checks/lib/entry-probe.mjs'
 
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'

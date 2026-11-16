@@ -19,7 +19,7 @@ opened: 2026-10-16
 
 **下一步：** 已全部完成，本卡结档。
 
-> **结论与去向（2026-10-16 结）：** 范围 A **做并已落地**——Item 1（`tools/lib/deliverables.mjs` 506 行拆「形状与身份」210 行 /「声明对账」`deliverables-audit.mjs` 322 行，依赖严格单向；对应 spec 538 行拆基座 128 + 对账 462，恢复 `<模块>.spec.ts` 一一对应）＋ Item 3（`replay-smoke` 头注触发线）。范围外留档：Item 2（`presence.ts` 内部接缝）未做、留独立第二轮；另三条观察项只住本卡上表。
+> **结论与去向（2026-10-16 结）：** 范围 A **做并已落地**——Item 1（`tools/lib/company/deliverables.mjs` 506 行拆「形状与身份」210 行 /「声明对账」`deliverables-audit.mjs` 322 行，依赖严格单向；对应 spec 538 行拆基座 128 + 对账 462，恢复 `<模块>.spec.ts` 一一对应）＋ Item 3（`replay-smoke` 头注触发线）。范围外留档：Item 2（`presence.ts` 内部接缝）未做、留独立第二轮；另三条观察项只住本卡上表。
 > 实施与验证收据 = [notes/archived/2026-10-16-deliverables-audit-seam.md](../../../notes/archived/2026-10-16-deliverables-audit-seam.md)（commit `fa9801f` 触发线＋毕业 / `2e73269` spec 拆分 / `3f0af0b` lib 拆分，加本 Note 归档 commit）；两处实施口径修正（`WARNING` 留基座、`presentResultRows` + `META_FINAL_RESULTS` 迁对账）见 §拍板记录，且已被实测消费面证实。上轮 owner 互链：[2026-10-14 六项重构](../../../notes/archived/2026-10-14-code-restructure.md)、[client-host-replay 局部化](../../../notes/archived/2026-10-14-client-host-replay-locality.md)（本卡未翻它们的案）。
 > 关闭条件核对：范围已圈定（A）且去向已记录（实施通道 = 用户点名 + 基线法）⇒ 毕业头改「做」、按章程迁 settled_issues、实施与验收证据归收尾 Note（均已完成）。
 
@@ -36,7 +36,7 @@ opened: 2026-10-16
 
 ## 范围与排除项
 
-范围（三个 Item，可任选组合）：`tools/lib/deliverables.mjs` 拆分（Item 1）；`packages/company-pack/src/lib/presence.ts` 内部接缝（Item 2）；观察项触发线落档（Item 3）。
+范围（三个 Item，可任选组合）：`tools/lib/company/deliverables.mjs` 拆分（Item 1）；`packages/company-pack/src/lib/presence.ts` 内部接缝（Item 2）；观察项触发线落档（Item 3）。
 
 排除（负清单——翻案须新证据，理由见各「输掉的方案」）：
 - 模块大小门禁 gate——门禁升格判据未满足（dev-loop §9：「具体错误复发过」不成立）；

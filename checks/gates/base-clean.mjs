@@ -1,8 +1,8 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { headingSections } from '../../tools/lib/repo-markdown.mjs'
-import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
+import { headingSections } from '../../tools/lib/core/repo-markdown.mjs'
+import { COMPANY_ROLE_IDS } from '../../tools/lib/company/company-roles.mjs'
 
 // ── 基部零部署历史（base-clean，2026-11-01 v3）──────────────────────────────────
 // 为什么：插件只读内容随包分发；CHARTER/手册/模板里带本部署历史，新装公司就会继承我们的

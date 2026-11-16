@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 const requireFromVendor = createRequire(join(ROOT, 'vendor/dsh/packages/boot/app-boot/package.json'))
 const semver = requireFromVendor('semver') as { satisfies: (version: string, range: string, options?: { includePrerelease?: boolean }) => boolean }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { claimLoserEvidence } from '../../tools/lib/claim-loser-evidence.mjs'
+import { claimLoserEvidence } from '../../probes/lib/claim-loser-evidence.mjs'
 
 const OWNER = 'journal/claim-loser-owner.md'
 const SHARED = 'journal/claim-loser-shared.md'

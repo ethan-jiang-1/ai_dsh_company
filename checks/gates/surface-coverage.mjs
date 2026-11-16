@@ -1,6 +1,6 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { spawnSync } from 'node:child_process'
-import { selectSurfaces } from '../../tools/lib/asset-lanes.mjs'
+import { selectSurfaces } from '../../tools/lib/core/asset-lanes.mjs'
 
 // ── 面规则完备性门（surface-coverage，2026-11-16 二轮立）──────────────────────────
 // 为什么：pre-push 的 `SURFACE_RULES` 决定「改到哪个面要跑哪条真入口」。`asset-lanes.spec` 的
@@ -12,7 +12,7 @@ import { selectSurfaces } from '../../tools/lib/asset-lanes.mjs'
 // 判据（机械、窄）：
 //   ① `git ls-files -z` 的全集逐条过 `selectSurfaces`，`unseen` 必须为空；
 //   ② tracked 集合为空 / git 不可用 = 判据没有对象，报错而不是通过。
-// 业务语义（哪些面挂哪条 lane）仍归 `tools/lib/asset-lanes.mjs` + 它的 spec；本门只管「不漏」。
+// 业务语义（哪些面挂哪条 lane）仍归 `tools/lib/core/asset-lanes.mjs` + 它的 spec；本门只管「不漏」。
 //
 // 负例留证 2026-11-16（二轮，真树实跑）：删掉 `packages/company-pack/locale/**` 规则 →
 //   `FAIL surface-coverage: N 条 tracked 路径未分类…packages/company-pack/locale/en.json…`；

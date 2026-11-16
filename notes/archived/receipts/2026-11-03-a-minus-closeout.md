@@ -23,7 +23,7 @@
 
 ## 本轮 A- 批次证据
 
-- D1：`tools/checks-index.mjs`/`tools/lib/checks-index.mjs`；`script-index` 红→绿（临时探针 108→107）；README 80→56；9 份 when-to-read。
+- D1：`tools/checks-index.mjs`/`tools/lib/core/checks-index.mjs`；`script-index` 红→绿（临时探针 108→107）；README 80→56；9 份 when-to-read。
 - D2：`cultivation-command/context/maintenance.spec.ts`（23 例不变）；`pack-exports` 钉 `['apply','inject']`；`tool-card` 用 `guards.isRecord`。
 - D5：`company-tabs-body.spec.ts`（五页签 53.7→75.92）；`ledger.spec` 路径修正（skip 0）；catalog 审计路径 5 分支（55.8→76.29）**抓到并修复 v3 slug bug**；Picker problem 态；mock 白名单措辞。
 - D7：0.8.0 breaking 公开面收窄；peers 50→47；0.8.1 slug 修复；0.8.2 review 维护；README web-only/品牌偏离。

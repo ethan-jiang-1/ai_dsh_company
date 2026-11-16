@@ -12,7 +12,7 @@
 
 1. **清 live journal 判 tracked**（`clearLiveJournal`，收敛与续跑共用）：`git ls-files --error-unmatch` 判定——已跟踪走 `git rm`、未跟踪走 `rmSync`（语义等价：两者都已在证据副本里）。`.gitkeep` 只在**缺时**写（幂等：重写会让未改动的 tracked 文件凭空出现在 `git status`）。
 2. **`converge --resume <目录名>`**：交付物已在归档家、但 journal/台账没做完时接手。**只做剩余步骤**（证据副本 → 清 live journal → 台账行 → 打印 backfill 指引），**不搬移已归档的交付物**；不可续跑时 fail-loud 并给恢复指引。
-3. **判定是纯函数** `convergenceResume({dirName, journalled, hasFinal, archived})` → `{resumable, reason, remaining}`，`reason ∈ 'ok' | 'still-active' | 'directions-missing'`；`remaining` **只列还需做**的步骤（零 live journal ⇒ journal 步视为已完成 ⇒ 续跑幂等）。住 `tools/lib/converge-rules.mjs` 的理由同零 journal 前置：**`checks/**` 不许被 `tests/` 导入**，判据住门禁侧就测不到。
+3. **判定是纯函数** `convergenceResume({dirName, journalled, hasFinal, archived})` → `{resumable, reason, remaining}`，`reason ∈ 'ok' | 'still-active' | 'directions-missing'`；`remaining` **只列还需做**的步骤（零 live journal ⇒ journal 步视为已完成 ⇒ 续跑幂等）。住 `tools/lib/company/converge-rules.mjs` 的理由同零 journal 前置：**`checks/**` 不许被 `tests/` 导入**，判据住门禁侧就测不到。
 
 ## 输掉的方案
 

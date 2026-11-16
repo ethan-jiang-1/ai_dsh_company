@@ -10,7 +10,7 @@
 // 语义分诊 = `.agents/skills/notes-consistency-audit/SKILL.md`。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { auditNotes } from '../../tools/lib/notes-audit.mjs'
+import { auditNotes } from '../../tools/lib/session/notes-audit.mjs'
 
 const argv = process.argv.slice(2)
 const KNOWN = new Set(['--json', '--strict', '--root'])

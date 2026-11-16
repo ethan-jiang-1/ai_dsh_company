@@ -1,7 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { flattenCordisRows, loadCordisYaml } from '../../tools/lib/repo-markdown.mjs'
+import { flattenCordisRows, loadCordisYaml } from '../../tools/lib/core/repo-markdown.mjs'
 import { pack } from './pack-shape.mjs'
 import { roles } from './presets.mjs'
 

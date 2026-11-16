@@ -1,5 +1,5 @@
 /** 动议台账读模型（呈现叙事切片一的 keyless 完成定义）。 */
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { describe, expect, it } from 'vitest'
 import { ledgerStats, parseMotionLedger } from '../../../packages/company-pack/src/lib/accounting/ledger.ts'
 import { existsSync, readFileSync } from 'node:fs'

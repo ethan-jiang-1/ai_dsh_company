@@ -22,13 +22,13 @@
 // 分层（guides/dev-loop §9.1）：认证档——真模型 + 真浏览器 + 起进程，不进 `pnpm test`。
 // 排练场 cwd，真盘零接触。
 // 用法：source run/env.sh && node checks/lanes/attention-e2e.entry.mjs [--dual-gate]
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
@@ -44,13 +44,13 @@ const check = (label, ok, detail = '') => {
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('attention-e2e-smoke')
 } catch (error) {
   console.error(error.message); process.exit(2)
 }
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless
 // 纯逻辑缝）；rpcId 前缀 `e2e-` 由调用方传入，不推导。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home })
 console.log(`web up: ${base}${DUAL ? '（--dual-gate 双门）' : ''}`)

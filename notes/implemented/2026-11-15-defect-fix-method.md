@@ -65,7 +65,7 @@
 ## 未覆盖轴
 
 - [policy] **新门只查形状**：四节非空 + `## 复现` 有围栏/行内命令（裸行、纯散文、常见输出前缀不算）；不证明复现真红、根因真确认、同类真扫过；真证据仍靠 `fix-evidence` 与独立盲审 → `_backlog/methods/bug-fix.md`、`checks/gates/backlog-liveness.mjs`
-- [policy] **命令锚挡不住所有 output 行**：`git version …` / `npm ERR! …` 这类命令词+空格的输出仍可能过；门只挡常见前缀（node:/sh:/curl:/git:）、裸行与纯散文 → `_backlog/methods/bug-fix.md`、`tools/lib/backlog-liveness.mjs`
+- [policy] **命令锚挡不住所有 output 行**：`git version …` / `npm ERR! …` 这类命令词+空格的输出仍可能过；门只挡常见前缀（node:/sh:/curl:/git:）、裸行与纯散文 → `_backlog/methods/bug-fix.md`、`checks/lib/backlog-liveness.mjs`
 - [policy] **批次的「同根因」是判断**：没有门禁证明一组卡真的共享根因、排序合理或 Note 该写；靠 ledger 批次表 + 独立盲审 + 每卡证据 → `_backlog/bugs/README.md`、`_backlog/methods/bug-fix.md`
 - [policy] **无卡快修没有卡 / 门禁**：非材料性当场修靠 commit body 与轮次回执，机械面不查 → `_backlog/methods/bug-fix.md`、`docs/guides/dev-loop.md`
 - [policy] **非缺陷改判沿用先例**：不新增状态 / 门禁，按问题轨归档 → `_backlog/_archive/settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md`

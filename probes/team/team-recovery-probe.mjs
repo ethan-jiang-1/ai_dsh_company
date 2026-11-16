@@ -15,14 +15,14 @@
 //   R3 重启 prompt 后 res→lead 新回复含 MARKER，精确 messageId 已 queued 且 delivered
 //   R4 重启 prompt 后出现 completed turn；deadline 未完成明确失败
 // 用法：source run/env.sh && node probes/team/team-recovery-probe.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { recoveryEvidence } from '../../tools/lib/recovery-scope-evidence.mjs'
-import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { recoveryEvidence } from '../lib/recovery-scope-evidence.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const MARKER = `R7-恢复标记-${String(Date.now() % 100000)}`
@@ -32,7 +32,7 @@ const kill9 = child => { try { child.kill('SIGKILL') } catch { /* 已死 */ } }
 let proc = null // 当前 web 进程持有者（run 内赋值，finally 兜杀）
 // 直接顺序实现（不用上面的占位）
 const run = async () => {
-  // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：本探针起**两次** web，函数各调一次
+  // 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：本探针起**两次** web，函数各调一次
   // （不做进程级单例）。既有差异保留：环境原样传 `process.env`（不另加 DSH_HOME）；
   // rpcId 计数器**跨两次启动共用**⇒ 每次调用传入同一个 rpc 工厂持有的闭包。
   // spawn/fetch 注入：tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带。

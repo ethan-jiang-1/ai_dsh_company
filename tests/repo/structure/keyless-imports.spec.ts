@@ -1,8 +1,8 @@
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
-import { repositoryRoot } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot } from '../../../tools/lib/core/repository-layout.mjs'
 import { join, relative } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { inspectKeylessGraph, isForbiddenKeylessModule, localImportPath, parseKeylessImports } from '../../../tools/lib/keyless-imports.mjs'
+import { inspectKeylessGraph, isForbiddenKeylessModule, localImportPath, parseKeylessImports } from '../../support/keyless-imports.mjs'
 
 const fixtures: string[] = []
 const fixture = (files: Record<string, string>) => {

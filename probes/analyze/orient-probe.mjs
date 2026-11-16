@@ -10,14 +10,14 @@
 // profiles、最近会话（含 preset）、公司盘概览、待核工作候选与便宜检查清单；--session <slug>[/<id前缀>]
 // 列/查某 slug 历史会话的 preset·cwd·createdAt；--scenario <kind>/<场景> 按 snapshots/README
 // 「Run bundle 引用合同」计算 run bundle 视图（引用不复制，不落盘 manifest）。
-// 纯逻辑核心 = tools/lib/orient.mjs（keyless 测试面）；git / zstd 等真实进程效果只住本 CLI 侧。
+// 纯逻辑核心 = probes/lib/orient.mjs（keyless 测试面）；git / zstd 等真实进程效果只住本 CLI 侧。
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot } from '../../tools/lib/core/repository-layout.mjs'
 import { zstdText } from '../../tools/drivers/zstd.mjs'
-import { homeStatus, listSessions, listSlugSessions, orientState, parseSessionHead, renderOrient, renderRunBundle, renderSessionView, runBundleView } from '../../tools/lib/orient.mjs'
-import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
+import { homeStatus, listSessions, listSlugSessions, orientState, parseSessionHead, renderOrient, renderRunBundle, renderSessionView, runBundleView } from '../lib/orient.mjs'
+import { pickSessionLog } from '../../tools/lib/session/session-log-generation.mjs'
 
 const ROOT = repositoryRoot
 

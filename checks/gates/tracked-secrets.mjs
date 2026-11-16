@@ -10,7 +10,7 @@
 //   `git rm --cached` + `rm` → 绿。
 import { readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { findSecretAssignments } from '../../tools/lib/tracked-secrets.mjs'
+import { findSecretAssignments } from '../lib/tracked-secrets.mjs'
 import { worktreeFiles } from './lib/worktree-files.mjs'
 
 const MAX_BYTES = 2 * 1024 * 1024

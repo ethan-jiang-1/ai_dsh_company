@@ -1,7 +1,7 @@
 /**
  * 《安装手册》纯模板判据（2026-11-03 第六轮 F 批）。
  *
- * 为什么补：`tools/lib/install-manual.mjs`（`renderInstallManual`）是收件人拿到的唯一安装/卸载文档的
+ * 为什么补：`tools/lib/release/install-manual.mjs`（`renderInstallManual`）是收件人拿到的唯一安装/卸载文档的
  * **唯一事实源**，此前零覆盖——第六轮修了两处真实错误（lease 路径写错、workspace 登记/客户端日志/
  * localStorage 未披露），没有判据就还会漂回去。
  *
@@ -9,7 +9,7 @@
  * 版本/日期/sha 与真实 tarball 一致（归 `dist-manual` 门禁）。
  */
 import { describe, expect, it } from 'vitest'
-import { renderInstallManual } from '../../../tools/lib/install-manual.mjs'
+import { renderInstallManual } from '../../../tools/lib/release/install-manual.mjs'
 
 const INPUT = {
   version: '9.8.7',

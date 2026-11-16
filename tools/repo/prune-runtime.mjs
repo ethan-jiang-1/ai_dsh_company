@@ -9,8 +9,8 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, lstatSync, readdirSync, readFileSync, rmSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
-import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
-import { selectPrunable } from '../lib/prune-runtime.mjs'
+import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
+import { selectPrunable } from '../lib/core/prune-runtime.mjs'
 
 const arg = (name, fallback) => {
   const index = process.argv.indexOf(`--${name}`)

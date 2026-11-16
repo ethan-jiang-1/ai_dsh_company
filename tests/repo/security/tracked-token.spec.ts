@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findTokenUrls } from '../../../tools/lib/tracked-token.mjs'
+import { findTokenUrls } from '../../../checks/lib/tracked-token.mjs'
 
 // BUG-029 的 keyless 判据：真实 token URL 必须命中；动态参数与占位串不能假红。
 // 负例留证 2026-10-20：BUG-013/029 —— 在 tracked 文件写合成 token URL → tracked-token 门禁红；

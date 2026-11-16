@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { redactTokenUrls, summarizeSessionEvents } from '../../tools/lib/session-diagnose.mjs'
+import { redactTokenUrls, summarizeSessionEvents } from '../../tools/lib/session/session-diagnose.mjs'
 // 事件形状是动态日志；纯函数返回的 summary 字段很多，局部用 wide 类型收口。
 const summarize: any = summarizeSessionEvents
 

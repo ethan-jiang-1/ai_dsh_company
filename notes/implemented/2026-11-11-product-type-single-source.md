@@ -36,7 +36,7 @@
    workspace `kb/company.md`（没有则读 pack `state/company.md`），解析后选
    `product-types/<id>/requirements-model.md`。缺/未知类型 **fail-closed**：跳过 process-docs、
    `plan.warnings` 点名缺什么，其余 seed 照常；既有文件仍 only-fill 不覆盖。旁路
-   `tools/lib/kb-seeds.mjs` 共用同一占位语义（缺/未知直接抛错）。
+   `tools/lib/core/kb-seeds.mjs` 共用同一占位语义（缺/未知直接抛错）。
 5. **守卫**：`seed-integrity` 增三条——process-docs 的 source 必须含 `{productType}`；每个类型包
    都能解析到该 source；`company.md` 默认类型在盘上。
 6. **YAML 标量口径**（red-team E16 反馈，同轮修）：`/req check`、bootstrap、`kb-seeds` 与两道门禁
@@ -65,7 +65,7 @@
 - `content/state/company.md` 默认 `business-software`；`/req check` 回执多来源括注。
 - `content/kb-setup/seed.json` 的 process-docs source 变成
   `product-types/{productType}/requirements-model.md`；`bootstrap.ts` 新增
-  `resolveCompanyProductType` 与 `BootstrapPlan.warnings`；`tools/lib/kb-seeds.mjs` 接受 `productType`。
+  `resolveCompanyProductType` 与 `BootstrapPlan.warnings`；`tools/lib/core/kb-seeds.mjs` 接受 `productType`。
 - `project-services` playbook 不再是可选值；有真实动议时随类型包发布再接入。
 - 新增 `packages/company-pack/src/lib/docs/yaml-scalar.ts`（共享 YAML 标量解析）；`req-command` / `bootstrap`
   改调它，避免两份实现漂移（`pnpm dup` 从 1 clone 回到 0）。

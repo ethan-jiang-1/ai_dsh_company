@@ -10,7 +10,7 @@
 import { createRequire } from 'node:module'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const yaml = createRequire(join(ROOT, 'vendor/dsh/package.json'))('js-yaml') as {
   load(text: string, options?: unknown): unknown

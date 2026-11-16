@@ -9,10 +9,10 @@
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { FAST, assetByName, suffixOf } from '../../tools/lib/asset-lanes.mjs'
+import { FAST, assetByName, suffixOf } from '../../tools/lib/core/asset-lanes.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
-// 成员唯一家 = tools/lib/asset-lanes.mjs（本文件只读；`asset-lanes.spec` 盯住两边一致）。
+// 成员唯一家 = tools/lib/core/asset-lanes.mjs（本文件只读；`asset-lanes.spec` 盯住两边一致）。
 const CASES = FAST.map(name => {
   const asset = assetByName(name)
   if (!asset) throw new Error(`smoke:fast 引用了未登记资产 ${name}`)

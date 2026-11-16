@@ -6,7 +6,7 @@
 // snapshots/ 仍在射程（历史证据若含 token 也应被看见，而不是被目录名豁免）。
 import { readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { findTokenUrls } from '../../tools/lib/tracked-token.mjs'
+import { findTokenUrls } from '../lib/tracked-token.mjs'
 import { worktreeFiles } from './lib/worktree-files.mjs'
 
 const MAX_BYTES = 2 * 1024 * 1024

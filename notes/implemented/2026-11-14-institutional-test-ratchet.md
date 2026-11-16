@@ -10,7 +10,7 @@
 
 1. **宪章层**：横切语义（Markdown 形状、frontmatter、路径）**只许一个原语**；共享层缺陷必须交独立真值差分/全通道矩阵；门禁 ≤ 75、探针 ≤ 59 只降不升（`docs/testing.md`、`docs/policy.md` §P2）。
 2. **流程层**：废除“作者收尾自查”，非平凡变更收尾必须真跑**独立只读子代理盲审**（输入集 = policy §P5：当前 diff + 四样判据），`BLOCKER = 0` 才许归档；`## 未覆盖轴` 必须四分类并指向盘上真实文件（`docs/policy.md` §P5、`.agents/skills/{close-out,gate-change,agent-note}-definition/SKILL.md`）。
-3. **元门禁层**：`markdown-shape-core.js` 收成单状态机；`tools/lib/repo-markdown.mjs` 复用 `vendor/dsh` 的 `mdast`+`js-yaml`；`company-root-carriers` 用 AST 静态禁裸解析（并入既有门禁，门禁数不涨）；`doc-grammar.ts` 真语法生成器 × `mdast` 独立真值差分；4 消费者契约；读/写/建目录与 `prd-gate` 同判据路径矩阵；`gate-mutation.test.mjs` 分支级变异；资产负债棘轮（`MAX_GATES=75`/`MAX_PROBES=59`，探针 67→59，未分类 0）。
+3. **元门禁层**：`markdown-shape-core.js` 收成单状态机；`tools/lib/core/repo-markdown.mjs` 复用 `vendor/dsh` 的 `mdast`+`js-yaml`；`company-root-carriers` 用 AST 静态禁裸解析（并入既有门禁，门禁数不涨）；`doc-grammar.ts` 真语法生成器 × `mdast` 独立真值差分；4 消费者契约；读/写/建目录与 `prd-gate` 同判据路径矩阵；`gate-mutation.test.mjs` 分支级变异；资产负债棘轮（`MAX_GATES=75`/`MAX_PROBES=59`，探针 67→59，未分类 0）。
 4. **盲审是首验也是主证据**：本卡自身收尾真跑了多轮独立盲审（轮次与结论见验证），首轮抓出 6 个作者自查没发现的 BLOCKER。
 
 ## 状态事实与载体
@@ -65,5 +65,5 @@
 - [policy] **notes-axes 锚点只验“任一盘上真实非自身文件”**，不验与该轴语义相关；语义相关性交盲审判断 → `checks/gates/notes-axes.mjs`
 - [unprovable] **BUG-181 跨行反引号行的真值来自生成器自报**（`multilineSpanLines`），不是 `mdast` 独立差分，属已声明策略断言 → `tests/lib/docs/markdown-shape.property.spec.ts`
 - [policy] **四个真模型探针的 verdict 仍由受控源码切片断言退出码关系**（探针是带副作用的驱动脚本，不能直接 import 执行；`collaboration-oracle` / `team-concurrency` 两簇已抽纯模块）→ `tests/evidence/collaboration-probe-verdict.spec.ts`
-- [policy] **工具盘 `.dsh-company` 字面量门是开放集合**：只认字面量里的路径段（`'.dsh-company'`、`'./.dsh-company/kb'`、`` `${ws}/.dsh-company` ``、`` `${ws}/.dsh-company${sub}` ``）；变量拼接（`'.dsh' + '-company'`）与 `WRITE_CALLS`（sync + promises，host 与工具盘共用）之外的新写 API 不扫，登记粒度 = 整模块（已登记的 rehearsal/kb-seeds 后续新增裸写不再红）→ `checks/gates/company-root-carriers.mjs`、`tools/lib/carrier-registry.mjs`
+- [policy] **工具盘 `.dsh-company` 字面量门是开放集合**：只认字面量里的路径段（`'.dsh-company'`、`'./.dsh-company/kb'`、`` `${ws}/.dsh-company` ``、`` `${ws}/.dsh-company${sub}` ``）；变量拼接（`'.dsh' + '-company'`）与 `WRITE_CALLS`（sync + promises，host 与工具盘共用）之外的新写 API 不扫，登记粒度 = 整模块（已登记的 rehearsal/kb-seeds 后续新增裸写不再红）→ `checks/gates/company-root-carriers.mjs`、`checks/lib/carrier-registry.mjs`
 - [policy] **`symlink-prefix` 变体在 4 消费者契约里只断言 `prd-gate` deny**，读写面同判据由路径矩阵单独覆盖 → `tests/host/contract/structure-agreement.spec.ts`、`tests/host/contract/file-shape-agreement.spec.ts`

@@ -25,17 +25,17 @@
 // 出处：驱动 = ai_dsh_loop_advisor/tools/drivers/cdp-driver.mjs（2026-10-01 owner 指令内化，
 //   docs/guides/cdp-probe.md 记模式与环境坑）；场景选择器与本仓坑（首启双模态、Start-chip 回切、
 //   dock 前后台子树 .some() 扫描）为本仓 2026-09/10 走查实证。
-import { repositoryRoot } from '../../tools/lib/repository-layout.mjs';
+import { repositoryRoot } from '../../tools/lib/core/repository-layout.mjs';
 import { attachCdpBrowser, launchCdpBrowser } from '../../tools/drivers/cdp-driver.mjs';
 import { loadChromium } from '../../tools/drivers/playwright.mjs';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { join } from 'node:path';
 import process from 'node:process';
-import { parseCompanyTabCatalog } from '../../tools/lib/company-tab-catalog.mjs';
-import { diagnosisDir } from '../../tools/lib/diagnosis.mjs';
-import { sleep } from '../../tools/lib/probe-kit.mjs'
-import { parseProbeSteps } from '../../tools/lib/probe-steps.mjs'
+import { parseCompanyTabCatalog } from '../../tools/lib/probe/company-tab-catalog.mjs';
+import { diagnosisDir } from '../../tools/lib/probe/diagnosis.mjs';
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
+import { parseProbeSteps } from '../lib/probe-steps.mjs'
 
 const args = process.argv.slice(2);
 const attachIndex = args.indexOf('--attach');

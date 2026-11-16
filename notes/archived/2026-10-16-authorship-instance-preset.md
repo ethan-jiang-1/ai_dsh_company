@@ -4,10 +4,10 @@
 
 ## 决定
 
-`tools/lib/authorship.mjs` 新增 `baseRoleOf(preset)`：**只抹掉团队实例后缀**（`<角色>-<数字>` → `<角色>`）。`classifyAuthorship` 的写入者归属改用它，判档与显示都用基础角色；原始 preset 另存 `writerRaw` 保留实例信息。
+`checks/lib/authorship.mjs` 新增 `baseRoleOf(preset)`：**只抹掉团队实例后缀**（`<角色>-<数字>` → `<角色>`）。`classifyAuthorship` 的写入者归属改用它，判档与显示都用基础角色；原始 preset 另存 `writerRaw` 保留实例信息。
 
 - **为什么是规范化而不是降档**：`coo-2` 与 `coo` 是**同一角色的两个实例**（团队插件给第 2、3 个成员发的 preset 带实例后缀，不在 `packages/company-pack/presets/` 的五个 id 里）。署名行写的是角色名，写成 `coo` 是**对的**——判红是把对的判成错的。BUG-018 卡里列的候选 C（带后缀一律降观察档）会连真冒名一起降，**输掉**。
-- **为什么不在 audit 侧修**：`classifyAuthorship` 是判据的单一来源（[tools/lib/authorship.mjs](../../tools/lib/authorship.mjs) 头注），档位语义属它；audit 只管 IO 与显示。在 audit 侧规范化会让「判据」在两处各写一遍。
+- **为什么不在 audit 侧修**：`classifyAuthorship` 是判据的单一来源（[checks/lib/authorship.mjs](../../checks/lib/authorship.mjs) 头注），档位语义属它；audit 只管 IO 与显示。在 audit 侧规范化会让「判据」在两处各写一遍。
 - **为什么保留 `writerRaw`**：规范化只该作用在**比较**这一维，不该把「哪个实例写的」这个事实抹掉。审计的显示面因此改成 `写入=coo(coo-2)`——同角色多实例时看得出是哪个成员，跨角色时零变化。
 
 ## 输掉的方案

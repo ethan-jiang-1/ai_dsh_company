@@ -7,7 +7,7 @@
 // `sea-reconcile-2026` 的 CFO 稿与 journal 首版由 **`ceo` preset 会话代笔**（开第二扇门时 preset 没改），
 // `journal-audit` 照样判 ✅。这个盲区正是独立评审点名的：**路径不是作者证明**。
 //
-// 判据（档位定义与实现单一来源 = tools/lib/authorship.mjs，keyless 单测见 tests/tools/authorship.spec.ts）：
+// 判据（档位定义与实现单一来源 = checks/lib/authorship.mjs，keyless 单测见 tests/tools/authorship.spec.ts）：
 //   ✓ **一致**   —— 稿首署名行的角色 == 实际写入该文件的会话的 agentPreset；
 //   ◐ **已收回** —— 署名 ≠ 写入者，但稿里有"复核并署名"更正行 ⇒ 观察（sea-reconcile 真实案例）；
 //   ✗ **署名不实** —— 稿里**真的写了** `出稿：<角色>`，且 ≠ 写入者，且无更正行 ⇒ 判红；
@@ -24,14 +24,14 @@
 //   ✗ **版本过期** —— 引用 vN ≠ 稿面当前 vM（quote-z-2026 失败模式仪器化：双签锚 v2、盘面已 v3）。
 // 用法：source run/env.sh && node checks/audit/authorship-audit.mjs [--workspace <dir>]
 // 退出码：0 = 无"署名不实"；1 = 有；2 = 环境（缺 DSH_HOME）。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { pickSessionLog } from '../../tools/lib/session/session-log-generation.mjs'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { join, relative, resolve } from 'node:path'
-import { deliverableId, normalizeRel } from '../../tools/lib/deliverables.mjs'
-import { classifyAuthorship, crossCheckVersions, currentVersionOf } from '../../tools/lib/authorship.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { deliverableId, normalizeRel } from '../../tools/lib/company/deliverables.mjs'
+import { classifyAuthorship, crossCheckVersions, currentVersionOf } from '../lib/authorship.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 
 const WS_FLAG = process.argv.indexOf('--workspace')
 const WS = WS_FLAG === -1 ? join(ROOT, 'company-workspace') : resolve(process.argv[WS_FLAG + 1])

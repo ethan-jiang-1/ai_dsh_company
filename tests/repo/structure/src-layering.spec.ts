@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ALLOWED_EDGES, edgeProblem, importProblem, importSpecifiers, isNodeBuiltinSpecifier, layerOf, stripComments } from '../../../tools/lib/src-layering.mjs'
+import { ALLOWED_EDGES, edgeProblem, importProblem, importSpecifiers, isNodeBuiltinSpecifier, layerOf, stripComments } from '../../../checks/lib/src-layering.mjs'
 
 // 2026-10-27 R3-01：分层判据的纯逻辑（门禁消费它；真树的反向红证见 checks/gates/src-layering.mjs 头注）。
 describe('pack 源码面分层判据', () => {

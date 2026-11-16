@@ -14,11 +14,11 @@
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { spawn } from 'node:child_process'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { ensureRehearsalWorkspace } from '../../tools/lib/rehearsal.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { ensureRehearsalWorkspace } from '../../tools/lib/core/rehearsal.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const arg = (name, fallback) => {
   const index = process.argv.indexOf(`--${name}`)

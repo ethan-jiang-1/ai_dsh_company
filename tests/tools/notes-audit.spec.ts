@@ -11,7 +11,7 @@ import {
   noteStatus,
   noteTitle,
   receiptReasons,
-} from '../../tools/lib/notes-audit.mjs'
+} from '../../tools/lib/session/notes-audit.mjs'
 
 const TMP: string[] = []
 afterAll(() => { for (const dir of TMP) rmSync(dir, { recursive: true, force: true }) })

@@ -9,10 +9,10 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { join, relative } from 'node:path'
-import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
-import { parseAuditVerdict } from '../lib/audit-verdict.mjs'
-import { parseMeta, slugFromDirName } from '../lib/deliverables.mjs'
-import { buildDeliverablesCatalog, CATALOG_ROOTS } from '../lib/deliverables-catalog.mjs'
+import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
+import { parseAuditVerdict } from '../lib/repo/audit-verdict.mjs'
+import { parseMeta, slugFromDirName } from '../lib/company/deliverables.mjs'
+import { buildDeliverablesCatalog, CATALOG_ROOTS } from '../lib/company/deliverables-catalog.mjs'
 
 // 测试缝（2026-10-23）：converge 的端到端探针把工作区重定向到 runtime/ 下的临时目录。
 // 默认值不变；只有显式设了 DELIVERABLES_WS_REL 才重定向（converge 会把它传给本生成器）。

@@ -168,8 +168,8 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 
 | token | 消费方 | 处理方向 |
 |---|---|---|
-| `出稿：<role>｜版本 v<N>｜任务书 = <path>` | `tools/lib/authorship.mjs` `SIG` / `DRAFT_VERSION`、`authorship-audit`、`presets.spec`、`work-handoff`、`assembling` | 改 `By: <role>｜Version v<N>｜Brief = <path>`；`SIG`/`DRAFT_VERSION` + 测试 + 模板同步 |
-| `让位=认领撤销，非出稿` / `占位=认领，非出稿` | `tools/lib/deliverables.mjs`、`deliverables-audit` 测试 | 改英文 canonical 行；`isPlaceholderYield`/`isPlaceholderClaim` + 测试同步 |
+| `出稿：<role>｜版本 v<N>｜任务书 = <path>` | `checks/lib/authorship.mjs` `SIG` / `DRAFT_VERSION`、`authorship-audit`、`presets.spec`、`work-handoff`、`assembling` | 改 `By: <role>｜Version v<N>｜Brief = <path>`；`SIG`/`DRAFT_VERSION` + 测试 + 模板同步 |
+| `让位=认领撤销，非出稿` / `占位=认领，非出稿` | `tools/lib/company/deliverables.mjs`、`deliverables-audit` 测试 | 改英文 canonical 行；`isPlaceholderYield`/`isPlaceholderClaim` + 测试同步 |
 
 **已做（2026-11-12，署名行）**：
 
@@ -194,7 +194,7 @@ I1 不能靠“继续翻文案”完成。以下 token 是机器/审计消费的
 
 | token | 消费方 | 处理方向 |
 |---|---|---|
-| `已修 / 反驳 / 接受` | `tools/lib/quality-loop.mjs` `DISPOSITION_VALUES`、audit、`quality-loop.spec` | 改 `fixed / rebut / accept`；parser + 审计 + 测试同步 |
+| `已修 / 反驳 / 接受` | `tools/lib/company/quality-loop.mjs` `DISPOSITION_VALUES`、audit、`quality-loop.spec` | 改 `fixed / rebut / accept`；parser + 审计 + 测试同步 |
 | `接受人：` | `parseDispositions` 的 acceptor 检查 | 改 `accepted-by:`；parser/测试同步 |
 | `未复验` | `post-verdict-unverified` warning 正则 | 改 `unverified`；warning 文案/测试同步 |
 | `body-sha256=待填` | `verdict-hash.mjs` 回填 | 改 `to-fill` 或保留占位；脚本/审计同步 |

@@ -2,7 +2,7 @@
 // 负例留证 2026-11-13：去掉 members/tasks 的 `?? []` ⇒ partial view 抛 reading map（BUG-145）；兜底即绿。
 /** 在场板读模型（R5b，Q5–Q8 定案的 keyless 完成定义——提案验收判据 1/4）。 */
 // 负例留证 2026-11-13：把 teamWithEventTasks 改成直接返回 view ⇒「事件流补任务板」用例红（BUG-103）；还原即绿。
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { readFileSync } from 'node:fs'
 import { roleLabel } from '../../../packages/company-pack/src/lib/presence/presence-status.ts'
 import { join } from 'node:path'

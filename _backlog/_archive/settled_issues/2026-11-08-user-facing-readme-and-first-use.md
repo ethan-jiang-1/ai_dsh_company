@@ -22,7 +22,7 @@ opened: 2026-11-08
 **当前情况（2026-11-08 实测）：**
 
 1. **根 README 87 行，预算 90（余 3 行，顶格）**。前 20 行以交付形态与 profile 语义为主（bundle / 六个角色 preset / named profile / 公司状态）；维护者 dev 12 行（L69–80，≈14%），数据布局节 11 行（L57–67）与手册 §四重复；无截图、无「第一次怎么用」、无「坏了去哪」。入口链在 L85–87。
-2. **《安装手册》229 行**，由 [install-manual.mjs](../../../tools/lib/install-manual.mjs) 生成（[dist-manual](../../../checks/gates/dist-manual.mjs) 强制「手册 == 当前模板渲染」+ 必含短语表）。§零前置、§一 GUI 安装已可照做；但 §二「第一次启动」只讲 workspace 与首启写盘（「首屏即可开工」一句带过），§三「验证」先给 `--dump-config | grep -c` 机器核对；**全文没有「怎么用这家公司」**，也**没有「要不要模型凭据」**（凭据只在 §四/§七的表里出现）。§四数据布局是平面视角，不是「我的报告在哪」。
+2. **《安装手册》229 行**，由 [install-manual.mjs](../../../tools/lib/release/install-manual.mjs) 生成（[dist-manual](../../../checks/gates/dist-manual.mjs) 强制「手册 == 当前模板渲染」+ 必含短语表）。§零前置、§一 GUI 安装已可照做；但 §二「第一次启动」只讲 workspace 与首启写盘（「首屏即可开工」一句带过），§三「验证」先给 `--dump-config | grep -c` 机器核对；**全文没有「怎么用这家公司」**，也**没有「要不要模型凭据」**（凭据只在 §四/§七的表里出现）。§四数据布局是平面视角，不是「我的报告在哪」。
 3. **产品的「怎么用」只在 [docs/contracts/demo.md](../../../docs/contracts/demo.md)**（236 行维护者演示合同：动议 → 分镜 → 观测点，含 `node checks/audit/...` 仓内命令）。它不随包分发，也不是用户教程。
 4. **三处安装命令副本**（README L29–35、[pack README](../../../packages/company-pack/README.md) Install、手册 §一）。2026-11-02 归档卡已拍板 owner 口径——「手册 = 收件人唯一安装路径；README/pack README = 首屏 + 指针」（见 [harness-release-alignment](2026-11-02-harness-release-alignment.md) 噪声退休表）——**口径定了，没落实**。
 5. **前两轮修的不是这件事**：[release-and-docs](2026-11-01-release-and-docs.md) 修事实（旧形状、sha、门禁），[harness-release-alignment](2026-11-02-harness-release-alignment.md) G8 修「收件人读到内部流程引用」。**受众与首次使用没有被处理过**。
@@ -105,7 +105,7 @@ opened: 2026-11-08
 完整安装与使用手册 · 发布合同（release） · 开发者（bootstrap） · Agent（AGENTS） · License
 ```
 
-### 手册目标结构（`tools/lib/install-manual.mjs`）
+### 手册目标结构（`tools/lib/release/install-manual.mjs`）
 
 ```text
 表头元数据（保留六行，不占主路径）
@@ -170,7 +170,7 @@ opened: 2026-11-08
 
 - **去向**：[Note](../../../notes/archived/2026-11-08-user-facing-readme-and-first-use.md)（决定、输掉的方案、真证据、未验/环境限制）。
 - **README**：89 行（预算 90）；七问冷读 5.0 → 6.5 → **7.0/7**（补「第一条命令」后换读者复探）；首 25 行零本仓内部词；两张真实例截图进 `docs/assets/`。
-- **手册**：v4 模板（`tools/lib/install-manual.mjs`）；新增 §四「第一次经营一家公司」六步；七问冷读 **7/7**；`node tools/export-dist.mjs` ALL PASS，sha `7cfc216d…`；`dist-manual` 模板同源绿。
+- **手册**：v4 模板（`tools/lib/release/install-manual.mjs`）；新增 §四「第一次经营一家公司」六步；七问冷读 **7/7**；`node tools/export-dist.mjs` ALL PASS，sha `7cfc216d…`；`dist-manual` 模板同源绿。
 - **契约门**：`readme-manual-commands` 先红（README 三处安装副本不在手册）后绿（README 的 2 条 dsh 命令全在手册）；已接线，`checks/INDEX.generated.md` 重生成。
 - **开发面**：README 开发者内容 1 行 → [bootstrap](../../../docs/guides/bootstrap.md)；pack README 安装段收成一句 + 手册指针（Data/Backup/Uninstall 结构未动）。
 - **全量检查**：`pnpm test` 1,223 PASS、`pnpm typecheck` exit 0、`pnpm verify` ALL PASS、`pnpm release --check` **READY 0.9.0**（7 项检查 pass）；并行会话在途研究文件在 stamp/check 短窗口内临时 stash、随后原样恢复。

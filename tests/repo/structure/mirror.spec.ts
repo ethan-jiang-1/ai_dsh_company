@@ -16,7 +16,7 @@
 import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 /** 例外表的「侧」：这条不对应关系落在哪边。 */
 type Side = 'src-only' | 'tests-only'

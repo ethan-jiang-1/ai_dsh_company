@@ -13,7 +13,7 @@ opened: 2026-11-15
 
 ## 症状
 
-`.githooks/pre-push` 调用 [pre-push-surfaces.mjs](../../../checks/pre-push-surfaces.mjs)，按 [asset-lanes.mjs](../../../tools/lib/asset-lanes.mjs) 的 `SURFACE_RULES` 选真入口检查。规则只有三条：
+`.githooks/pre-push` 调用 [pre-push-surfaces.mjs](../../../checks/pre-push-surfaces.mjs)，按 [asset-lanes.mjs](../../../tools/lib/core/asset-lanes.mjs) 的 `SURFACE_RULES` 选真入口检查。规则只有三条：
 
 - `packages/company-pack/src/client/**` → `client-load`
 - `packages/company-pack/presets/**` → `preset`
@@ -31,7 +31,7 @@ opened: 2026-11-15
 
 ## 运行面
 
-tooling / 验证面（`.githooks/pre-push` + `checks/pre-push-surfaces.mjs` + `tools/lib/asset-lanes.mjs`）。不是产品运行时；影响「改到哪个面就必须跑哪条真入口」的机械保证。
+tooling / 验证面（`.githooks/pre-push` + `checks/pre-push-surfaces.mjs` + `tools/lib/core/asset-lanes.mjs`）。不是产品运行时；影响「改到哪个面就必须跑哪条真入口」的机械保证。
 
 ## 复现
 
@@ -70,7 +70,7 @@ node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/src/li
 
 ## 修复证据
 
-- 改动面：`tools/lib/asset-lanes.mjs`、`checks/pre-push-surfaces.mjs`、`tests/repo/budget/asset-lanes.spec.ts`
+- 改动面：`tools/lib/core/asset-lanes.mjs`、`checks/pre-push-surfaces.mjs`、`tests/repo/budget/asset-lanes.spec.ts`
 - 红：`pnpm test tests/repo/budget/asset-lanes.spec.ts`（3 例红：src/lib 不触发 replay、多数改动面无证据、顶层目录未登记）
 - 绿：`pnpm test tests/repo/budget/asset-lanes.spec.ts`（13 passed；三批提交复跑 unseen=0，dry-run 对 src/lib 打印 replay）
 - 提交：commit 713acc60

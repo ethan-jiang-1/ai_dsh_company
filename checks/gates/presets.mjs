@@ -1,7 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
+import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company/company-roles.mjs'
 
 // ── 3. preset 结构：六角色 × (声明文件 + ≥1 skill，含第二 skill 根) + 非角色 preset × 声明文件 ───
 // 负例留证 2026-09-27：移走一个 SKILL.md → skill-file 红。

@@ -43,7 +43,7 @@ description: Use when finishing any non-trivial change before reporting it done,
 7. **反向检查**：被证伪的已落地切片**整片 revert**（实现+测试+docs+Note 同退），修正另起新条目。
    不做半 revert 的外科修补——半退留「文档说 A、代码是 B」的漂移态，结构门禁查 HEAD 不查语义一致，抓不住。
 8. **跑门禁**：`pnpm verify` + `pnpm test`（`set -o pipefail` 链；裸 `cmd | tail` 取的是 tail 的
-   退出码 = 假绿）。改动面涉类型/导入签名时加 `pnpm typecheck`；涉 `src` / `tools/lib` / `drivers` 时加
+   退出码 = 假绿）。改动面涉类型/导入签名时加 `pnpm typecheck`；涉 `src` / 各面 `lib/`（`tools/lib`、`checks/lib`、`probes/lib`）/ `drivers` 时加
    `pnpm lint` + `pnpm dup`（pre-push 也强制）。提交体写 why / what / 验证行——本仓代码 commit 的现行形状，别只写标题。
 9. **发轮次回执**（非平凡收尾必发——交接的标准形状，驾驶座可见面）。固定六行：
    ① 外部行为与影响面（含改动 owner）；

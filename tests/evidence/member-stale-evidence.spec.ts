@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fullRead, memberStaleEvidence } from '../../tools/lib/member-stale-evidence.mjs'
+import { fullRead, memberStaleEvidence } from '../../probes/lib/member-stale-evidence.mjs'
 const target = 'journal/fixture/target.md'
 const call = (id: string, name: string, args: object) => ({ type: 'tool/call', data: { callId: id, name, arguments: JSON.stringify(args) } })
 const result = (id: string, code?: string, text?: string) => ({ type: 'tool/result', data: {

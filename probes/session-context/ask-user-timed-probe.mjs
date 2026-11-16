@@ -26,12 +26,12 @@
 // 清理：默认只留会话（不再删——它是证据现场）；`--keep-session` 同义（保留是默认行为，参数只为显式化）。
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
-import { companyCookie, companyRpc, startWeb } from '../../tools/lib/probe-web.mjs'
-import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
-import { questionStopOf } from '../../tools/lib/question-stop.mjs'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { companyCookie, companyRpc, startWeb } from '../../tools/lib/probe/probe-web.mjs'
+import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
+import { questionStopOf } from '../lib/question-stop.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 /** BUG-022 档：让模型要一个无界窗口，验驱动的"看到停点就停并报"。 */

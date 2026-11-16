@@ -40,7 +40,7 @@ skill？质量环 starter 能不能被 VP-Eng 真加载？旧 worker/retry/workf
 
 - **11 个 preset**：6 角色 + 5 support（`worker` / `worker-researcher` / `worker-orchestrator` +
   `quality-loop-producer` / `quality-loop-verifier`）；清单唯一源 =
-  [`delegation-model.mjs`](../../../tools/lib/delegation-model.mjs)。`worker` 是 leaf；`worker-orchestrator`
+  [`delegation-model.mjs`](../../../checks/lib/delegation-model.mjs)。`worker` 是 leaf；`worker-orchestrator`
   只多一条 `subagent` 行（钉 `worker`，`maxDepth: 3`）；`worker-researcher` 只读、named-only。
 - **CEO 五条角色命名行**：`vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo`，全部 `maxDepth: 1`；另有
   `subagent_research`；CEO 没有 generic `subagent` / workflow / 控制行。UI key =
@@ -166,8 +166,8 @@ root/child `aborted`、无 sleep 残留。真装配探针另证：只跑 `tsc -b
 
 | ID | 资产 | 落点 | 判据 / oracle | 红证 | 成本 |
 |---|---|---|---|---|---|
-| A1 | 运行时面矩阵 judge + audit | 待建：tools/lib/surface-matrix.mjs、checks/audit/surface-matrix-audit.mjs、spec；YAML 派生收成 tools/lib/preset-rows.mjs | 11 preset × 4 类入口：工具面/命名行/control/workflow/handbook/合同/skill catalog/preset/depth；root 只判 Lead/overlay | 合成观察四例：worker 带 `list_subagents`、verifier 带 `write`、CEO 缺 `coo`、handbook 反置 | 0 模型；秒级 |
-| A2 | 会话证据包 | 待建：tools/lib/session-evidence.mjs、tools/explore-evidence.mjs、spec | 树/child durable header/终态/工具调用/写盘/catalog；缺 header 显式 `unavailable` | 合成日志缺 header → `unavailable`，不默认 worker/0 | 0 模型；秒级 |
+| A1 | 运行时面矩阵 judge + audit | 待建：checks/lib/surface-matrix.mjs、checks/audit/surface-matrix-audit.mjs、spec；YAML 派生收成 tools/lib/preset-rows.mjs | 11 preset × 4 类入口：工具面/命名行/control/workflow/handbook/合同/skill catalog/preset/depth；root 只判 Lead/overlay | 合成观察四例：worker 带 `list_subagents`、verifier 带 `write`、CEO 缺 `coo`、handbook 反置 | 0 模型；秒级 |
+| A2 | 会话证据包 | 待建：tools/lib/session/session-evidence.mjs、tools/explore-evidence.mjs、spec | 树/child durable header/终态/工具调用/写盘/catalog；缺 header 显式 `unavailable` | 合成日志缺 header → `unavailable`，不默认 worker/0 | 0 模型；秒级 |
 | A3 | UI 全文证据 | `probes/browser-visual/cdp-probe.mjs` 加 `--body-out`（~15 行） | `--ask`/`--steps` 后写完整 `document.body.innerText`；label 正/负控 | 已知不存在的 label 必须不命中 | 0 模型 |
 
 A1 验收：spec 红→绿；在 round-8 窗口（HEAD 后）的 47 条观察上零假阳性；`--since` 是必需参数
@@ -219,11 +219,11 @@ A3 验收：负控 label 不命中；`COO（运营与交付）` / `CFO（财务�
 > 决策记忆 = [探索测试的资产策略](../../../notes/implemented/2026-11-10-exploration-asset-strategy.md)
 > （ROI 六条、入口语义、输掉的方案与验证/未验面）。
 
-- **A1**：`tools/lib/surface-matrix.mjs` + `checks/audit/surface-matrix-audit.mjs` + spec（14 tests）。
+- **A1**：`checks/lib/surface-matrix.mjs` + `checks/audit/surface-matrix-audit.mjs` + spec（14 tests）。
   round-8 窗口（`--since 2026-11-10T17:00+08:00`）= **47 观察（20 root / 19 child / 8 member）**、
   54 个无模型轮跳过、**0 问题**；红证 = 同一 audit 对 `--since 2026-11-09` 旧日志 **exit 1**，
   含 `worker d1 control=list_subagents,send_to_subagent`（BUG-052 同型）与旧 vp-eng 缺 `quality_loop_*` 行。
-- **A2**：`tools/lib/session-evidence.mjs` + `tools/explore-evidence.mjs` + spec（6 tests）；在
+- **A2**：`tools/lib/session/session-evidence.mjs` + `tools/explore-evidence.mjs` + spec（6 tests）；在
   `session-2110bd4a` 上出 root + 2 children（80/71/71 工具、3 轮 completed）；缺首帧显式 `unavailable`。
   3 个 probe 的 `rawHeader` 暂保留：probe 走 `session/page` 的 mode fallback，evidence 包走盘上直读，
   输入面不同；统一另开（不是本轮资产绿）。
@@ -292,7 +292,7 @@ B5 从「未证」改 PASS。
 - **会话**：VP-Eng `session-c33f9412…`；R1 verifier `7ae15c99…`；R2 verifier `cdf67a74…`（depth 1）。
 - **裁决**：R2 `pass`，7/7 check-id、0 blocker；R1 的 F1 已消除，F2/F3/F4 仍 advisory，新增 F5 接受；
   `dispositions-r2.md` 在场。
-- **BUG-059（audit 假红）**：`tools/lib/quality-loop.mjs` 的原文索引用跨轮全局 `lastTextIndex`；
+- **BUG-059（audit 假红）**：`tools/lib/company/quality-loop.mjs` 的原文索引用跨轮全局 `lastTextIndex`；
   R2 换新 verifier session 后仍从 R1 的 index+1 找，误报 `not-verbatim`。合成用例修前 1 failed →
   40 passed；真盘 R2 audit 复跑 **ALL PASS**。已修归档。
 - **R1 artifact**：`verdict-r1.md` 头 hash `d9d252…` 与正文 `5738a1…` 不一致；正文与 R1 verifier
@@ -873,7 +873,7 @@ CMO 深度门都正确。
 | [资产审计与第九轮设计](../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md) | 当前轮的资产结论、八轮缺陷家族、round-8 实测矩阵、A/B 资产、红证、预算与不建清单 |
 | [重构后第四轮计划](../research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md) | 第四轮 delta、入口、charters、假设、fixtures、预算、停止与交接（历史） |
 | [2026-11-08 计划](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md) | §1–§15 机制/设计（部分已被重构取代）；§16–§18 前三轮结果与未覆盖 |
-| [模型](../../../tools/lib/delegation-model.mjs) | preset/通道/worker profile/合同/深度的唯一期望源；静态对账对象 |
+| [模型](../../../checks/lib/delegation-model.mjs) | preset/通道/worker profile/合同/深度的唯一期望源；静态对账对象 |
 | [delegation 合同](../../../docs/contracts/delegation.md) / [presets 合同](../../../docs/contracts/presets.md) | 当前人读合同；tool 行以 preset 为准 |
 | [presets](../../../packages/company-pack/presets) | vp-eng / CEO / worker family 的声明面 |
 | [subagent-retry.ts](../../../packages/company-pack/src/host/delegation/subagent-retry.ts) / [spec](../../../tests/host/delegation/subagent-retry.spec.ts) | 重试原语与 keyless 分类 |

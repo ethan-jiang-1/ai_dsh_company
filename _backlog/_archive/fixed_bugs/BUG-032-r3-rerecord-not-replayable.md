@@ -30,7 +30,7 @@ node checks/lanes/replay.e2e.mjs --scenario r3-delegation
 - 重放差异：lead 归一化消息 id 位移（expected `{{message:14}}` / actual `{{message:13}}`），
   另有一条「session#0 的 inbox 投递内容不同」。
 - **已排除** cwd 复述噪音：模型会把「工作目录已切换到 <临时目录>」写进回复正文，两侧必然不同；
-  已加 `normalizeReplayTempPaths`（tools/lib/replay-logic.mjs，先 vendor 归一化再 token 化），
+  已加 `normalizeReplayTempPaths`（checks/lib/replay-logic.mjs，先 vendor 归一化再 token 化），
   该噪音消除后本症状仍在。
 
 ## 疑似根因（待查）

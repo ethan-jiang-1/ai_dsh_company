@@ -11,7 +11,7 @@ import {
   type DeliverablesCatalog,
 } from '../../../packages/company-pack/src/client/data/deliverables-index.ts'
 import { sessionFileAddress } from '../../../packages/company-pack/src/lib/deliverables/deliverables-address.ts'
-import { buildDeliverablesCatalog } from '../../../tools/lib/deliverables-catalog.mjs'
+import { buildDeliverablesCatalog } from '../../../tools/lib/company/deliverables-catalog.mjs'
 import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 import { en, type CompanyKey, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 

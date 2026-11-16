@@ -1,7 +1,7 @@
 // 署名核对的纯逻辑（2026-09-26 立；IO 在 checks/audit/authorship-audit.mjs）。
 // 为什么抽出来：判据本身值得单测（三档 + 文件名归属不判红），而完整审计要读会话日志（有 DSH_HOME
 // 依赖、秒级），不进 `pnpm test` ⇒ 纯逻辑放这里，keyless 可测。
-import { COMPANY_ROLE_IDS } from './company-roles.mjs'
+import { COMPANY_ROLE_IDS } from '../../tools/lib/company/company-roles.mjs'
 
 /** canonical 稿首署名行：`By: <role>｜Version vN｜Brief = <path>`；仍认旧 `出稿：` 形状。 */
 export const SIG = /(?:By:|出稿[:：])\s*(?:(VP-Eng|VP-Sales|COO|CFO|CEO|CMO)|(vp-eng|vp-sales|coo|cfo|ceo|cmo))/

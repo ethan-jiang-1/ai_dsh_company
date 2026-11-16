@@ -31,7 +31,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 const TEST_PATH = /tests\/[A-Za-z0-9_./-]+\.spec\.ts/g
 /** 故意写坏的负例/夹具名（`zz-` / `nonexistent`）不判：它们是负例留证，不是活指针。 */

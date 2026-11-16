@@ -15,12 +15,12 @@
 // 前置：DSH_HOME + 模型凭据（dev home）；cwd 写死 `runtime/rehearsal-workspace`（练习场 ≠ 运行场，
 //   产物落排练场，真盘零接触）。
 // 用法：source run/env.sh && node checks/lanes/presence-e2e.entry.mjs [--wall 600]
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -40,7 +40,7 @@ try {
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
 // 既有差异当参数保留：空 cookie 静默拼空串（companyCookie 默认 'join'）、rpcId 前缀 `pe2e-` +
 // 失败回退转储响应体（dumpBodyOnError）；boot 失败文案统一为模块款（卡内接受的文本统一，
 // 退出码与清理路径不变）。

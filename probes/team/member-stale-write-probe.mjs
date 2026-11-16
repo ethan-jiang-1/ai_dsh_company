@@ -9,14 +9,14 @@
 import { spawn } from 'node:child_process'
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { pairedCalls, toolResultText, toolArguments, hasCompletedTurn } from '../../tools/lib/collaboration-evidence.mjs'
-import { fullRead, memberStaleEvidence } from '../../tools/lib/member-stale-evidence.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
-const home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('member-stale-write-probe')
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { pairedCalls, toolResultText, toolArguments, hasCompletedTurn } from '../lib/collaboration-evidence.mjs'
+import { fullRead, memberStaleEvidence } from '../lib/member-stale-evidence.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
+const home = (await import('../../tools/lib/core/runtime-home.mjs')).requireDevHome('member-stale-write-probe')
 const cwd = join(ROOT, REHEARSAL_REL)
 mkdirSync(join(cwd, 'journal'), { recursive: true })
 const run = mkdtempSync(join(cwd, 'journal', 'member-stale-'))
@@ -33,7 +33,7 @@ let child
 let budgetExpired = false
 const budget = setTimeout(() => { budgetExpired = true; child.kill('SIGTERM'); console.error('ERROR: 12分钟总预算到限'); process.exitCode = 2 }, 12 * 60_000)
 try {
-  // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+  // 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
   // 既有差异当参数保留：RPC 逐调用 30s 超时 ⇒ companyRpc 产物外包一层传 { signal }；budget 定时器与
   // finally 都引用 child ⇒ 经注入的 spawn 顺手捕获——起进程先于等 banner，12 分钟总预算仍含 boot。
   const { base, token } = await startWeb({ spawn: (...args) => (child = spawn(...args)), root: ROOT, home })

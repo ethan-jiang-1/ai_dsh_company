@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 // 六维提分 D5：夹具出处（`tests/fixtures/README.md` 是唯一家；盘上每个顶层条目都要有行）。
 // 为什么：夹具是"期望"的载体，出处不明的夹具会让失败变成猜谜；且产品仓只允许合成数据。

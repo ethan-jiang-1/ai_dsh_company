@@ -1,7 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { freshnessProblems } from '../../tools/lib/replay-fixture-freshness.mjs'
+import { freshnessProblems } from '../lib/replay-fixture-freshness.mjs'
 
 // ── 重放注入面新鲜度门禁（replay-fixture-freshness，2026-10-20 立）────────────────
 // 为什么：手册（packages/company-pack/content/AGENTS.md，唯一家；company-workspace 是符号链接）

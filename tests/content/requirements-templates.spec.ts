@@ -13,7 +13,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { validateProductDocs } from '../../packages/company-pack/src/lib/docs/prd-check.ts'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const TEMPLATES = join(ROOT, 'packages/company-pack/content/templates')
 /** 领域模板（SyRS/IRS/allocation）住产品类型包；解析器按"先通用后类型包"找。 */

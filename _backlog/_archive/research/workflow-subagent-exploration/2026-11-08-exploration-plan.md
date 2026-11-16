@@ -287,8 +287,8 @@ pnpm typecheck                 # 类型面（改 TS/src 时）
 ## 8. Harness
 
 - **探针**：计划在 `probes/team/` 下新增参数化矩阵探针（文件名待定；`--scenario` + `--mode forced|natural`），
-  或先用 `runtime/tmp` 的一次性脚本。复用 `tools/lib/probe-web.mjs`（`startWeb`/`companyCookie`/`companyRpc`）、
-  `tools/lib/session-log.mjs`（`readRecords`）、`tools/lib/rehearsal.mjs`、`tools/lib/runtime-home.mjs`。
+  或先用 `runtime/tmp` 的一次性脚本。复用 `tools/lib/probe/probe-web.mjs`（`startWeb`/`companyCookie`/`companyRpc`）、
+  `tools/lib/session/session-log.mjs`（`readRecords`）、`tools/lib/core/rehearsal.mjs`、`tools/lib/core/runtime-home.mjs`。
 - **流程**：`source run/env.sh` → `startWeb({ profile: 'company' })` → `session/create`（`agentPreset` 按入口）
   → `session/prompt` → 等新的 `turn/end` → 读 raw session log（zstd）→ 解析
   `tool/call`、`tool-workflow/run-start|agent-start|agent-end|run-end` 时间戳、`tool/result`、终稿。

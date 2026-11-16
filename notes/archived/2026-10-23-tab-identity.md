@@ -11,7 +11,7 @@
    原有的 27 个具名导出保留为派生常量（注册面与测试继续按名字引用，对象恒等不变）。
 3. **注册行只留身份键**：`{ id, kind, face, description, order, registerBody }`；标题、guide icon、
    guide 胶囊全部由循环按 `face` 现取——注册行不再各存一份 title/icon/registerTitle/registerGuide。
-4. **源解析器改成两输入**：[company-tab-catalog.mjs](../../tools/lib/company-tab-catalog.mjs) 同时读注册源与
+4. **源解析器改成两输入**：[company-tab-catalog.mjs](../../tools/lib/probe/company-tab-catalog.mjs) 同时读注册源与
    身份源，按 face 键解出标题；任一 face 找不到 label 一律返回空（cdp-probe 据此 fail-loud）。
 
 ## 输掉的方案

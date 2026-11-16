@@ -1,7 +1,7 @@
 # 2026-10-19 · 闸门④锚粒度：判据从「每个 T 号各一条锚」改成「锚点名 + 依赖链」
 
 状态：已交付（[BUG-028](../../_backlog/_archive/fixed_bugs/BUG-028-pending-material-anchor-granularity.md) 已修迁归档；
-判据唯一家 = `tools/lib/deliverables-audit.mjs` 的 `uncoveredPendingMaterial`）。
+判据唯一家 = `checks/lib/deliverables-audit.mjs` 的 `uncoveredPendingMaterial`）。
 
 ## 问题
 
@@ -82,7 +82,7 @@ CEO 真写出来的形状是「**总锚挂 T1 复查，prompt 里逐个点名 T1
 
 ## 落账
 
-改动面：`tools/lib/deliverables-audit.mjs`（判据）、`checks/audit/deliverables-check.mjs`（调用面 + 报告合并）、
+改动面：`checks/lib/deliverables-audit.mjs`（判据）、`checks/audit/deliverables-check.mjs`（调用面 + 报告合并）、
 `packages/company-pack/presets/ceo/skills/chairing-staff-meeting/SKILL.md`（④行补一句；2026-10-21 自 workspace/AGENTS.md 迁入）、`tests/tools/deliverables-audit.spec.ts`（两条守卫 + 红配方）、
 `snapshots/replay/r3-delegation/replay/`（当时夹具同步；r3 已随真实证据移出产品仓，2026-10-25）、
 `_backlog/`（卡迁归档 + 两处清单 + 索引链接）、`notes/archived/receipts/2026-10-17-motion5-question-avoidance.md`（指向新位置）。

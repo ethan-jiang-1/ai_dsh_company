@@ -16,7 +16,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import type { Context } from '@deepseek-ai/cordis'
 import { apply } from '../../vendor/dsh/packages/workflow/tool-workflow/src/index.ts'
-import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot } from '../../tools/lib/core/repository-layout.mjs'
 
 /** 86k 字符的合成返回值——R7 实测的溢出量级（完整渲染 ~85.9k）。 */
 const bigValue = {

@@ -2,11 +2,11 @@
 // 状态：常驻
 // 何时跑：BUG-007 修复前后或协作探针判据改变时；输入已证实反例，零模型、秒级。
 // 退出码：0 = 完整坏样本集均被判拒；1 = 判据误接受；2 = 执行失败或反例缺失。
-// 判据纯函数唯一家 = tools/lib/collaboration-oracle-verdict.mjs（单测直连，不再切片求值）。
+// 判据纯函数唯一家 = probes/lib/collaboration-oracle-verdict.mjs（单测直连，不再切片求值）。
 import {
   collectCollaborationOracleFindings,
   evaluateCollaborationOracle,
-} from '../../tools/lib/collaboration-oracle-verdict.mjs'
+} from '../lib/collaboration-oracle-verdict.mjs'
 
 try {
   const findings = collectCollaborationOracleFindings()

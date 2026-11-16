@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { selectPrunable } from '../../../tools/lib/prune-runtime.mjs'
+import { selectPrunable } from '../../../tools/lib/core/prune-runtime.mjs'
 
 // 2026-10-23（P7）：运行时数据清扫的判据——>7 天 + 无 markdown 引用 + 非 tracked 才删。
 // 用户口径：7 天前的数据一律清（插件内容除外）；最近但别扭的由人判断。

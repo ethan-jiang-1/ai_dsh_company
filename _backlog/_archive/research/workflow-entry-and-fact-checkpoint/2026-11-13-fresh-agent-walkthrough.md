@@ -21,7 +21,7 @@ intent: 记录一个 fresh-context agent 按仓库文档走完加工环路的实
 | 6 | `docs/guides/dev-loop.md:32-41`、`docs/policy.md:7-17` | 任务源与 Plan Mode | 问题卡（含 `待落地`）不是任务源；无 RFC/点名则报告后停 |
 | 7 | `notes/README.md:16`、`notes/proposed/README.md:3-31`、wiki Note `:118` | RFC/Note 载体与触发 | FTS 有形状无卡；触发写在研究材料（>100–200 页） |
 | 8 | `tests/README.md:27-41`（尤其 `:35`）、`src/README.md:10-16`、`docs/contracts/data-model.md:7-12` | 新持久化路径的登记义务 | 只能从 tests README 看到 carrier-registry；data-model 没有 readers 列 |
-| 9 | `src/index.ts:155-159`、`tools/lib/carrier-registry.mjs`、`checks/gates/company-root-carriers.mjs:81-83` | 命令注册与写入口 | 实际注册 5 个命令；未登记写入口 verify 红 |
+| 9 | `src/index.ts:155-159`、`checks/lib/carrier-registry.mjs`、`checks/gates/company-root-carriers.mjs:81-83` | 命令注册与写入口 | 实际注册 5 个命令；未登记写入口 verify 红 |
 | 10 | `close-out-definition/SKILL.md:19-51`、`notes/README.md:61-66` | 收尾次序与门禁 | 六行回执；notes 门只查状态行与 `## 决定` |
 
 **纸面产物（不写盘）**：新卡 `推敲中 → 待落地`（验收写命令/断言/红形态，去向 rfc）→ RFC（带 `批准：`、`## 验收`、输掉的方案）→ 先红 `新建:tests/host/wiki/wiki-index.spec.ts` → `src/host/wiki/wiki-index.ts` + `/wiki search` + `RUN_BUNDLE_PATHS` + carrier 登记 → 同 diff Note → 收尾四件套。候选 = wiki L1 FTS；它只是纸面候选，不是授权。
@@ -60,5 +60,5 @@ intent: 记录一个 fresh-context agent 按仓库文档走完加工环路的实
 ## 6. 它给的三处最小改动
 
 1. **模板**：`_backlog/issues/README.md` 卡模板加 `## 事实与读者`（新事实/写者/读者/环境坏法四行）+ `## 验收标准` 三列骨架（命令 | 断言 | 红形态），仅 `毕业：做` 的卡必填。
-2. **门禁**：`checks/gates/proposals.mjs` 与 `tools/lib/backlog-liveness.mjs` 的「非空」升级为「至少一个可执行标记」（`pnpm test|verify|typecheck`、`node checks/`、`Given/When/Then`、`assert` 任一），配 `zz` 负例卡写「测试通过」必须红。
-3. **文档**：`docs/guides/dev-loop.md:64-71` 四问后加第 ⑤ 行「谁读这个事实 / 环境怎么坏」，落点指 `tests/README.md:35` 与 `tools/lib/carrier-registry.mjs`，不另造新清单。
+2. **门禁**：`checks/gates/proposals.mjs` 与 `checks/lib/backlog-liveness.mjs` 的「非空」升级为「至少一个可执行标记」（`pnpm test|verify|typecheck`、`node checks/`、`Given/When/Then`、`assert` 任一），配 `zz` 负例卡写「测试通过」必须红。
+3. **文档**：`docs/guides/dev-loop.md:64-71` 四问后加第 ⑤ 行「谁读这个事实 / 环境怎么坏」，落点指 `tests/README.md:35` 与 `checks/lib/carrier-registry.mjs`，不另造新清单。

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 /**
  * 只测 doorsFromSessions 纯函数投影（host 面 = src/index.ts 的事件监听接线 + workspace_doors
  * 工具注册，真链路归认证档 dual-ceo-probe）。2026-10-14 自 deliverables.spec.ts 尾块迁入独立
- * 文件（该文件主体守 tools/lib/deliverables.mjs，本块是唯一跨模块寄居——迁出后恢复
+ * 文件（该文件主体守 tools/lib/company/deliverables.mjs，本块是唯一跨模块寄居——迁出后恢复
  * tests/lib 的 <模块>.spec.ts 一一对应）。
  */
 

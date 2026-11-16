@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseAuditVerdict } from '../../tools/lib/audit-verdict.mjs'
+import { parseAuditVerdict } from '../../tools/lib/repo/audit-verdict.mjs'
 
 // 2026-10-23（架构评审候选 4）：审计档的机器判词此前是「人类报告 + 一行 JSON」，而两个消费者
 // 各用各的方式刮：converge 用正则扫人读行、index 找 `JSON:` 前缀。判词结构化后只有一份解析器。

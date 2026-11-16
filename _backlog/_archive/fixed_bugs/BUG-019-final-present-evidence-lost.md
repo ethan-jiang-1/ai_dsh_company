@@ -27,7 +27,7 @@ opened: 2026-10-16
 
 ## 保留下来的真缺陷（判别盲区）
 
-判据的输入是「盘上文件清单 + 喂进来的会话日志」两件（`tools/lib/deliverables.mjs` 头注）。`final-not-presented` 的判法是「盘上有成品 ∧ 审计源里没有对应 present 事件」——它**分不清**：
+判据的输入是「盘上文件清单 + 喂进来的会话日志」两件（`tools/lib/company/deliverables.mjs` 头注）。`final-not-presented` 的判法是「盘上有成品 ∧ 审计源里没有对应 present 事件」——它**分不清**：
 
 - ① 真没 present（**本案**，已实测证实）；与
 - ② present 发生过，但那段时间的会话日志不在审计源里（归档件靠路径豁免，活跃件无档）。
@@ -45,7 +45,7 @@ opened: 2026-10-16
 # ① 全量严格重扫：真 present = 0（用判据解析器，不靠 grep）
 source run/env.sh && node -e "
 const { execFileSync } = require('node:child_process'); const { readdirSync, existsSync } = require('node:fs'); const { join } = require('node:path')
-;(async () => { const { parseSessionLog } = await import('./tools/lib/deliverables-audit.mjs')
+;(async () => { const { parseSessionLog } = await import('./checks/lib/deliverables-audit.mjs')
 let n = 0, hits = 0
 for (const home of ['runtime/harness-home', process.env.HOME + '/.dsh']) { const root = join(home, 'sessions'); if (!existsSync(root)) continue
   const walk = (d, dep) => { if (dep > 3) return

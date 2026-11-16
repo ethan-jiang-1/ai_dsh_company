@@ -120,7 +120,7 @@ persona 把方法写回去。
 
 > 检查表 id 只是研究草案；真正落包时要按质量环方法契约（`metadata.method/version/side` +
 > check-id 表 + 输入/程序/检查表/输出四段）写成两份 `SKILL.md`。审计工具会核两侧
-> `method/version` 配对与 check-id 全覆盖（[`quality-loop.mjs`](../../../../tools/lib/quality-loop.mjs)）。
+> `method/version` 配对与 check-id 全覆盖（[`quality-loop.mjs`](../../../../tools/lib/company/quality-loop.mjs)）。
 
 ### 3.3 为什么不是一个大包
 
@@ -194,7 +194,7 @@ VP-Eng；VP-Eng 可以把 blocker 写进 final 并升级 CEO，但这是**合同
 
 - 旧 skill 内容：`git show bf04ab1c:packages/company-pack/presets/system-architect/skills/systems-architecture/SKILL.md`
   与 `.../system-qa/skills/vv-playbook/SKILL.md`。
-- 质量环契约/审计：`presets/_shared/skills/quality-loop/SKILL.md`、`tools/lib/quality-loop.mjs`、
+- 质量环契约/审计：`presets/_shared/skills/quality-loop/SKILL.md`、`tools/lib/company/quality-loop.mjs`、
   `docs/guides/quality-loop.md`、`tests/fixtures/methods/`。
 - 本轮没有真模型 E2E；没有写方法包；没有改 preset。方法包是否真能被执行，需 issue 后跑一次
   keyless method fixture + 一次真模型质量环。

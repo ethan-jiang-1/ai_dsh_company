@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot } from '../../../tools/lib/core/repository-layout.mjs'
 
 // 条目 A 布局守卫（RFC driver-surface-package，2026-10-06；2026-10-07 S1 起 run/）：run/ 只收 tracked 启动配置，
 // 运行残留家 = 顶层 runtime/。断言全部落在 tracked 文件上——fresh clone 与开发机同判。

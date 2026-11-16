@@ -14,8 +14,8 @@ opened: 2026-10-25
 **当前情况：**
 - 手册（[AGENTS.md](../../../packages/company-pack/content/AGENTS.md)）第 23/30/74/77/99/150 行附近引用 `../docs/*`、`checks/audit/*`、`snapshots/README.md`、`runtime/rehearsal-workspace/`。
 - 13/14 份 skill 结尾写“可机械核对的部分归仓库的门禁/审计脚本”；CEO chairing skill 直接写 `node tools/converge.mjs`。
-- 模板（[meta.md](../../../packages/company-pack/content/templates/meta.md)）把词表指向 `tools/lib/deliverables.mjs`。
-- 现有 `md-links` 门禁把 pack 骨架排除、只校验 dev 盘那份（[markdown-links.mjs](../../../tools/lib/markdown-links.mjs)），所以安装形状的悬空链接在结构上不可见。
+- 模板（[meta.md](../../../packages/company-pack/content/templates/meta.md)）把词表指向 `tools/lib/company/deliverables.mjs`。
+- 现有 `md-links` 门禁把 pack 骨架排除、只校验 dev 盘那份（[markdown-links.mjs](../../../tools/lib/core/markdown-links.mjs)），所以安装形状的悬空链接在结构上不可见。
 - `handbook-smoke` 只证明注入基线，不证明链接可解析。
 
 **未决问题：**

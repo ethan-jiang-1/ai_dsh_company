@@ -37,7 +37,7 @@
 
 ## 状态事实与载体
 
-- 唯一入口：`tools/lib/asset-lanes.mjs`（资产 + `SUFFIX_BY_NAME`）、`checks/lanes/`（e2e/entry + runner）、
+- 唯一入口：`tools/lib/core/asset-lanes.mjs`（资产 + `SUFFIX_BY_NAME`）、`checks/lanes/`（e2e/entry + runner）、
   `tests/checks/`（门禁自测）、`package.json` 四条命令。
 - 门禁：`naming-contract` 改为 lanes/test.mjs 规则；`script-index`/`script-triggers` 识别新后缀。
 - 读载体：tests/README（分层与命令）、checks/README、AGENTS 命令表。

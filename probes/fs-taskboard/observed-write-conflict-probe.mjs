@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict'
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const control = process.argv.includes('--unguarded-control')
 const timer = setTimeout(() => { console.error('ERROR: 30秒预算到限'); process.exit(2) }, 30_000)

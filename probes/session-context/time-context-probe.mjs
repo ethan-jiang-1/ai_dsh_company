@@ -11,14 +11,14 @@
 //      说明机制通了但公司手册/skill 文案还教它占位 ⇒ 属于 D2' 落地的"改文面"工作项，不是机制失败。
 // 用法：source run/env.sh && node probes/session-context/time-context-probe.mjs
 // 退出码：0 = PASS（①+②）；1 = FAIL；2 = 环境/启动失败。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const CEO_JOURNAL = join(REHEARSAL, 'kb/ceo/journal')
@@ -26,7 +26,7 @@ const INJECTION_MARK = 'Time sampled while preparing turn'
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('time-context-probe')
 } catch (error) {
   console.error(error.message)
@@ -34,7 +34,7 @@ try {
 }
 ensureRehearsalWorkspace(ROOT)
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `tcp-` 由调用方传入，不推导（与
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `tcp-` 由调用方传入，不推导（与
 // team-concurrency 同用 `tcp-` 是既有事实）；spawn/fetch 注入（keyless 纯逻辑缝，真进程/真网络自带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)

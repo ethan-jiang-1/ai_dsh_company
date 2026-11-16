@@ -1,5 +1,5 @@
 // 状态：常驻
-// 何时跑：改 `checks/pre-push-surfaces.mjs`（push 范围计算）或 `tools/lib/asset-lanes.mjs` SURFACE_RULES 后；
+// 何时跑：改 `checks/pre-push-surfaces.mjs`（push 范围计算）或 `tools/lib/core/asset-lanes.mjs` SURFACE_RULES 后；
 //   `pnpm test:checks`（pre-push 也跑）。keyless，秒级，不进 pnpm test。
 //
 // 为什么在这里：判据要真起 git 仓库 + 真跑脚本子进程（`--root` 只服务本自测，见脚本头注）；

@@ -1,7 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { canonicalParticipation } from '../../tools/lib/converge-rules.mjs'
+import { canonicalParticipation } from '../../tools/lib/company/converge-rules.mjs'
 
 // ── 台账「参与」列口径门禁（ledger-participation，2026-10-16 立）──────────────────
 // 为什么：2026-10-16 真动议诊断实测——`kb/motion-ledger.md` 的「参与」列 **36 行 18 种写法**，

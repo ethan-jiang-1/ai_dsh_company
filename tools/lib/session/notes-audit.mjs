@@ -8,7 +8,7 @@
 // 边界：只读；不跑 git、不读会话；不把 `notes/` 当第二本账（不生成索引文件）。
 import { existsSync } from 'node:fs'
 import { basename, dirname, join, normalize } from 'node:path'
-import { headingSections, noteStatusLines, structuralLines } from './repo-markdown.mjs'
+import { headingSections, noteStatusLines, structuralLines } from '../core/repo-markdown.mjs'
 
 const NOTE_DATE = /^(\d{4}-\d{2}-\d{2})-/
 const NOTE_LINK = /\]\(([^)\s]+?\.md)(?:#[^)]*)?\)/g

@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs'
 import { runInNewContext } from 'node:vm'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { concurrencyVerdict, verdictOutcome } from '../../tools/lib/team-concurrency-verdict.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { concurrencyVerdict, verdictOutcome } from '../../probes/lib/team-concurrency-verdict.mjs'
 import {
   ORACLE_EXPECTED_LABELS,
   collectCollaborationOracleFindings,
   evaluateCollaborationOracle,
-} from '../../tools/lib/collaboration-oracle-verdict.mjs'
+} from '../../probes/lib/collaboration-oracle-verdict.mjs'
 
 // Exercise the actual verdict block: a helper test alone cannot catch a dropped required check.
 // team-concurrency 与 collaboration-oracle 已抽纯模块（tools/lib/*-verdict.mjs）直连 import；

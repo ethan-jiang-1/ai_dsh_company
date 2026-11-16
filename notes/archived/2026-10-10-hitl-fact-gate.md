@@ -19,7 +19,7 @@
    ③CEO 第一时间发一张补料卡（料落 `deliverables/<slug>/drafts/sources/`）；④补料落盘即解锁；
    ⑤final 结论层不得建立在未读到的事实上——降级「预案版（待补料重算）」或不收口。
    病灶 = ai-transformation-2026 轮：A 级事实 0 条，T1–T6 仍全部「完成」、final v1 照常收口。
-3. **派活行状态枚举扩「待补料」+ 扫描仪器同步**（`tools/lib/candidate-scan.mjs`）：
+3. **派活行状态枚举扩「待补料」+ 扫描仪器同步**（`checks/lib/candidate-scan.mjs`）：
    `ASSIGN_LINE` 正则扩枚举；R3/R3′ 把待补料任务**浮出 blocked**（不静默丢、不当候选）；
    待补料**不算依赖满足**，R3′ 的盘上稿**不假满足**待补料依赖（事实没回来 ≠ 稿在盘上）。
    红证：新 4 用例先红（1 failed 系测试断言写错平面规则语义，修正断言后实现绿）。

@@ -3,9 +3,9 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
-import { COMPOSITIONS, PRESET_IDS } from '../../tools/lib/delegation-model.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company/company-roles.mjs'
+import { COMPOSITIONS, PRESET_IDS } from '../../checks/lib/delegation-model.mjs'
 import { allRows, loadPresetDoc, pluginConfig, rowById } from './preset-yaml.ts'
 
 const TOOL_SUBAGENT = '@deepseek-ai/dsh-tool-subagent'

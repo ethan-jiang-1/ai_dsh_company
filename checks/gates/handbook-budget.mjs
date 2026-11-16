@@ -1,7 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { flattenCordisRows, loadCordisYaml, parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
+import { flattenCordisRows, loadCordisYaml, parseFrontmatter } from '../../tools/lib/core/repo-markdown.mjs'
 
 // ── 2c-bis. 公司手册注入预算（2026-10-02 立；2026-11-01 v3 改源）──────────────────
 // v3 起手册住 pack `content/AGENTS.md`，由 host 作为 system prompt section 注入（不再复制到

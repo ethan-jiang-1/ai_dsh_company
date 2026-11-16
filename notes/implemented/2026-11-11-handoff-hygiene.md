@@ -45,7 +45,7 @@
   11 个 `agent.cordis.yml`，19 个 `content/delivery-modes/**` 文件；`_dist/安装手册.md` 同步再生。
 - 分发状态：`market-index.json` = 0.11.0；`market-index.staged.json` 仍标 `requiresPublish: true`
   （未执行 `npm publish`，不冒充已发布）。
-- 启动：`tools/dev/company.mjs` 缺省追加 `--port 0`；`tools/lib/dev-install.mjs` 的
+- 启动：`tools/dev/company.mjs` 缺省追加 `--port 0`；`tools/lib/core/dev-install.mjs` 的
   `ensureDefaultPort` 是唯一判断点，带单测。
 - 接手面：新测试 `tests/repo/docs/src-readme-pointers.spec.ts` 钉住 README 相对路径与 inject；
   `orient.spec` 钉住 6+5 计数；`attention-observers.spec` 钉住两个事件退订。

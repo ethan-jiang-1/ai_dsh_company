@@ -9,11 +9,11 @@
 // - P-B：generic `subagent` 的 child 首帧 agentPreset = worker；child 目录不含 workflow/team 工具。
 // 不证明：模型是否“读懂”政策（行为质量）；P-C/P-H 另探。
 import { spawn } from 'node:child_process'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { collectText, readRecords } from '../../tools/lib/session-log.mjs'
-import { ensureRehearsalWorkspace } from '../../tools/lib/rehearsal.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { collectText, readRecords } from '../../tools/lib/session/session-log.mjs'
+import { ensureRehearsalWorkspace } from '../../tools/lib/core/rehearsal.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const WALL_MS = 300000
 const home = requireDevHome('delegation-contract-probe')

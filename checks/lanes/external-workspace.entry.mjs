@@ -9,8 +9,8 @@ import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
 
 const BASE = join(ROOT, 'runtime/external-workspace-smoke')
 const CLI = join(ROOT, 'vendor/dsh/apps/cli/lib/bin.js')

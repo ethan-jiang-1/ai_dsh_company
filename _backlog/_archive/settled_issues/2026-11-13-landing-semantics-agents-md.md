@@ -70,7 +70,7 @@ opened: 2026-11-13
 
 - 入口：`AGENTS.md`、`_backlog/AGENTS.md`、`_backlog/README.md`、`docs/guides/dev-loop.md`。
 - 模板：`_backlog/issues/README.md`、`notes/README.md`、`notes/proposed/README.md`、`notes/AGENTS.md`、`tests/AGENTS.md`。
-- 门禁：`checks/gates/proposals.mjs`、`checks/gates/notes-liveness.mjs`、`tools/lib/backlog-liveness.mjs`、`checks/gates/doc-budget.mjs`。
+- 门禁：`checks/gates/proposals.mjs`、`checks/gates/notes-liveness.mjs`、`checks/lib/backlog-liveness.mjs`、`checks/gates/doc-budget.mjs`。
 - 一致性：`docs/contracts/data-model.md`、`packages/company-pack/src/README.md`、`_backlog/triggers.md`。
 - 命令：`pnpm verify` ALL PASS；`pnpm test` 242 files / 1997 tests；三条 zz 红证删除后复绿。
 

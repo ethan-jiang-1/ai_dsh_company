@@ -12,12 +12,12 @@ import assert from 'node:assert/strict'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { spawn, execFileSync } from 'node:child_process'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { readRecords } from '../../tools/lib/session-log.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const arg = name => { const i = process.argv.indexOf(`--${name}`); return i === -1 ? undefined : process.argv[i + 1] }
 const outDir = join(ROOT, 'runtime', 'human-exits-evidence')
@@ -90,7 +90,7 @@ const SCENE = `开一场动议，只做这一件事，做完即停：
 两人交回来后你收口。`
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('budget-reconcile-probe')
 } catch (error) { console.error(error.message); process.exit(2) }
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {

@@ -19,12 +19,12 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { spawn } from 'node:child_process'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { readRecords } from '../../tools/lib/session-log.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const outDir = join(ROOT, 'runtime', 'harness-home', 'probe-evidence')
 
@@ -74,7 +74,7 @@ if (sessionArg) {
   process.exit(result.verdict === 'minimal-assembly' ? 0 : 1)
 }
 
-const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
 const home = requireDevHome('ceo-assembly-probe')
 
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {

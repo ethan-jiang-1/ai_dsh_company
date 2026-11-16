@@ -11,7 +11,7 @@ import {
   sectionBody,
   splitGfmTableCells,
   structuralLines,
-} from '../../tools/lib/repo-markdown.mjs'
+} from '../../tools/lib/core/repo-markdown.mjs'
 
 describe('tools/lib/repo-markdown 单原语契约', () => {
   it('normalizeMarkdown 剥离 UTF-8 BOM 并把 CRLF 与孤立 CR 归一为 LF', () => {

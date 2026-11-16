@@ -5,10 +5,10 @@
  * 补了 timed 默认后又被模型的单次 `timeout: -1` 打回无界（BUG-022）。判定必须只看**会话日志可观测面**
  * （`tool/call name=ask_user_question` 与配对的 `tool/result`），不依赖 UI 或投影私有面——
  * 驱动手里只有日志，判据也得只用日志。
- * 红证（先红后绿）：本 spec 在 `tools/lib/question-stop.mjs` 存在前 import 即红。
+ * 红证（先红后绿）：本 spec 在 `probes/lib/question-stop.mjs` 存在前 import 即红。
  */
 import { describe, expect, it } from 'vitest'
-import { questionStopOf } from '../../tools/lib/question-stop.mjs'
+import { questionStopOf } from '../../probes/lib/question-stop.mjs'
 
 const T0 = 1_700_000_000_000
 /** 一条 tool/call（`arguments` 是 JSON 字符串——实测形状）。 */
@@ -37,7 +37,7 @@ const result = (callId: string, { at = T0 + 1000, text = '{"pending":true}' } = 
 /** 与本卡无关的事件（不该干扰判定）。 */
 const noise = () => ({ type: 'assistant/message', seq: 3, time: T0, data: { text: '干活中' } })
 
-// 负例留证 2026-10-18：BUG-022——① 本 spec 在 `tools/lib/question-stop.mjs` 存在前 import 即红（模块缺失）；
+// 负例留证 2026-10-18：BUG-022——① 本 spec 在 `probes/lib/question-stop.mjs` 存在前 import 即红（模块缺失）；
 //   ② 判定本身的红证 = 真模型探针 `--unbounded` 档：模型传 `timeout: -1` 时，若判定不认这条路，
 //   探针会在 ② 卡到 30s 超时（实跑对照：判定在位时 **0s** 给出「需人参与」+ callId/question.id）。
 describe('questionStopOf：停在问询上吗？这个停点驱动能不能自己解？', () => {

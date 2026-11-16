@@ -23,7 +23,7 @@ import {
 } from '../../../packages/company-pack/src/host/commands/settings-command.ts'
 import { STARTUP_COMMAND_COPY } from '../../../packages/company-pack/src/lib/startup/startup-command-copy.ts'
 import { readStartupSettings } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 const CONTENT_DIR = join(ROOT, 'packages/company-pack/content')
 

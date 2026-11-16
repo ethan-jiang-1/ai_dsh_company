@@ -5,15 +5,15 @@
 // Machine checks validate per-question routing/evidence, not semantic correctness.
 // No keyless regression claim: true-model certification, 不进 pnpm test.
 // Usage: source run/env.sh && node checks/lanes/entry-probe.entry.mjs [--port 0] [--timeout 240000]
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { isAbsolute, join, relative, sep } from 'node:path'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
-import { assistantMessageText, collectText, readRecords } from '../../tools/lib/session-log.mjs'
-import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../../tools/lib/entry-probe.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
+import { assistantMessageText, collectText, readRecords } from '../../tools/lib/session/session-log.mjs'
+import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../lib/entry-probe.mjs'
 import { expectedTag } from '../gates/lib/pin.mjs'   // Q4 严格档：判据绑定现行 pin（2026-10-27 R3-15）
 
 const arg = (name, fallback) => {
@@ -85,7 +85,7 @@ async function stop(child) {
   await Promise.race([exited, sleep(1500)])
   if (child.exitCode === null && child.signalCode === null) { child.kill('SIGKILL'); await exited }
 }
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
 // 既有差异当参数保留：--patch 钉 entry-probe 场景（string 形态）、env 钉 DSH_PERMISSION_MODE:
 // 'read-only'（有意的 fail-closed 档，一个字节不许动）；banner 等待的 error 事件/16000 输出上限/
 // 120s 定时器已收进模块，不再本地重复。注入的 spawn 顺手捕获 child——boot 失败（banner 等不到）

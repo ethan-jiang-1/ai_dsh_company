@@ -15,7 +15,7 @@
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, utimesSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const BASE = join(ROOT, 'runtime/company-root-process-smoke')
 const PROBE = join(ROOT, 'checks/lanes/lib/company-root-probe.mjs')

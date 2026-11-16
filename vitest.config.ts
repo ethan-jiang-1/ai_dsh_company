@@ -24,7 +24,7 @@ export default defineConfig({
     // `pnpm test` 仍不跑 coverage（秒级）；阈值是发布前/独立轮的手动棘轮，不塞进 pre-push。
     coverage: {
       provider: 'v8',
-      include: ['packages/company-pack/src/**/*.{ts,tsx}', 'tools/lib/**/*.mjs'],
+      include: ['packages/company-pack/src/**/*.{ts,tsx}', 'tools/lib/**/*.mjs', 'checks/lib/*.mjs', 'probes/lib/*.mjs'],
       reporter: ['text'],
       thresholds: {
         'packages/company-pack/src/client/wiring/context-wiring.ts': { statements: 90, branches: 85 },

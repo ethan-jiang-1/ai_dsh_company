@@ -1,8 +1,8 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { parseCompanyTabCatalog } from '../../tools/lib/company-tab-catalog.mjs'
-import { goldenProblems } from '../../tools/lib/ui-expected.mjs'
+import { parseCompanyTabCatalog } from '../../tools/lib/probe/company-tab-catalog.mjs'
+import { goldenProblems } from '../lib/ui-expected.mjs'
 
 // ── 3c. UI 金样与注册面（ui-expected-freshness，2026-10-28 立，六维提分 D5）────────────
 // 为什么：`snapshots/visual/company-shell/ui.expected.json` 是 `ui-scene-smoke --isolated --expected` 的

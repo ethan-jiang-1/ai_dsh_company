@@ -13,8 +13,8 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { validateMeta } from '../../tools/lib/deliverables.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { validateMeta } from '../../tools/lib/company/deliverables.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const CONTENT = join(ROOT, 'packages/company-pack/content')
 const CONTRACT = join(CONTENT, 'product-types/hardware-software/requirements-model.md')

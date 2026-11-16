@@ -140,7 +140,7 @@ opened: 2026-11-12
 - [ ] `checks/gates/` 下 `client-copy.mjs` 在迁移后的 `packages/company-pack/src/client/` 全绿；真实中文硬编码造红→还原→绿，红原话写进门禁注释「负例留证」。
 - [ ] 根 `AGENTS.md` 纪律行指向合同 + gate + skill；`packages/company-pack/src/README.md` / `tests/README.md` 指针更新到现行合同。
 - [ ] 11 个 preset 的 description 不是纯中文（双语一行或英文短句）；picker 不出现纯中文描述；role name 不变。
-- [ ] 根 README / pack README 语言说明（默认中文、Settings 切换、英文输出跟随）；`tools/lib/install-manual.mjs` 语言段 + `_dist/安装手册.md` 重生成；`dist-manual` 绿。
+- [ ] 根 README / pack README 语言说明（默认中文、Settings 切换、英文输出跟随）；`tools/lib/release/install-manual.mjs` 语言段 + `_dist/安装手册.md` 重生成；`dist-manual` 绿。
 - [ ] `pnpm verify` ALL PASS；`pnpm test` 全绿；`pnpm typecheck` 0；`pnpm lint` + `pnpm dup`（涉 src）绿；`client-load-smoke` ALL PASS；`ui-scene-smoke --isolated --expected` zh 与 en 都绿；`preset-smoke` ALL PASS。
 - [ ] 已有 `.dsh-company` 数据兼容**不再作为约束**：内部全英文 RFC 以新格式为准，旧盘一次性迁移/重建；表达层不要求旧盘可读。
 

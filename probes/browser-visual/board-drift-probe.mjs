@@ -15,20 +15,20 @@
 //   D3 tag 落在卡脚内（不越出卡片盒）
 // 图像判据：出 snapshots/visual/board-drift/board.png（人/多模态看图）。
 // 用法：source run/env.sh && node probes/browser-visual/board-drift-probe.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb } from '../../tools/lib/probe/probe-web.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { makeFailingCheck } from '../../tools/lib/probe-kit.mjs'
+import { makeFailingCheck } from '../../tools/lib/probe/probe-kit.mjs'
 
 const SHOTS = join(ROOT, 'snapshots/visual/board-drift')
 mkdirSync(SHOTS, { recursive: true })
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('board-drift-probe')
 } catch (error) {
   console.error(error.message)

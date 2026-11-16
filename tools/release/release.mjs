@@ -18,8 +18,8 @@ import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
-import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
-import { sourceFingerprint } from '../lib/pack-source.mjs'
+import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
+import { sourceFingerprint } from '../lib/core/pack-source.mjs'
 import { expectedTag } from '../../checks/gates/lib/pin.mjs'
 
 const PACK = join(ROOT, 'packages/company-pack')
@@ -119,7 +119,7 @@ function assertVendor(manifest) {
 }
 
 // 发布物的源指纹：tarball 里的包内容（构建产物 lib/ 除外，由 --prepare 的 build 负责）。
-// 实现与 dev 启动器的构建缓存共用单一 owner = tools/lib/pack-source.mjs。
+// 实现与 dev 启动器的构建缓存共用单一 owner = tools/lib/core/pack-source.mjs。
 
 function readManifest() {
   if (!existsSync(MANIFEST)) fail('缺 release-manifest.json；先 --prepare/--verify')

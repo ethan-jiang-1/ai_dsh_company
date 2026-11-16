@@ -17,8 +17,8 @@
 //   必须解析到 notes/ 下真实文件（见下方 settled_issues 分支的检查块；负例留证 = checks/gates/backlog-liveness.mjs 头注）。
 import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { basename, isAbsolute, join, relative, resolve } from 'node:path'
-import { markdownLinkTargets } from './markdown-links.mjs'
-import { parseFrontmatter, sectionBody as readSectionBody, structuralLines } from './repo-markdown.mjs'
+import { markdownLinkTargets } from '../../tools/lib/core/markdown-links.mjs'
+import { parseFrontmatter, sectionBody as readSectionBody, structuralLines } from '../../tools/lib/core/repo-markdown.mjs'
 
 export function backlogLivenessProblems(backlogRoot) {
   const problems = []

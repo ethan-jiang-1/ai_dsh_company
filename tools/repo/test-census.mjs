@@ -2,15 +2,15 @@
 // 状态：常驻
 // 何时跑：加/减测试资产、改 lane 或失败类后跑 `--write`；不一致由 tests/repo/budget/test-census.spec.ts 在 pnpm test 里报红。
 //
-// 为什么：盘子在文档里手抄必漂。census 是生成物——数据来自 tools/lib/asset-lanes.mjs 的登记
+// 为什么：盘子在文档里手抄必漂。census 是生成物——数据来自 tools/lib/core/asset-lanes.mjs 的登记
 // 与盘上目录计数；谁改资产不重生成，spec 就红。它不评价资产，只让「有什么、在哪条 lane、
 // 抓哪类失败、多少未分类」可见（研究 A 件）。
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'
-import { ASSETS, PROBES, FAILURE_CLASSES, failureClassOf } from '../lib/asset-lanes.mjs'
-import { buildCensus, countProjectSurface, renderCensus } from '../lib/test-census.mjs'
-import { consumerCount } from '../lib/asset-consumers.mjs'
+import { ASSETS, PROBES, FAILURE_CLASSES, failureClassOf } from '../lib/core/asset-lanes.mjs'
+import { buildCensus, countProjectSurface, renderCensus } from '../lib/repo/test-census.mjs'
+import { consumerCount } from '../lib/repo/asset-consumers.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const target = join(root, 'tests/CENSUS.generated.md')

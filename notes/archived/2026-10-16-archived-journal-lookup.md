@@ -13,7 +13,7 @@
 
 ## 决定
 
-1. **判据提为 lib 纯函数 `pickArchivedJournal({dirs, slug})`**（`tools/lib/converge-rules.mjs`）：调用方按两种形状枚举候选目录，函数负责在目录里找目标 journal。住 lib 的理由同前几轮：`checks/**` 不许被 `tests/` 导入，判据住审计脚本里就测不到。
+1. **判据提为 lib 纯函数 `pickArchivedJournal({dirs, slug})`**（`tools/lib/company/converge-rules.mjs`）：调用方按两种形状枚举候选目录，函数负责在目录里找目标 journal。住 lib 的理由同前几轮：`checks/**` 不许被 `tests/` 导入，判据住审计脚本里就测不到。
 2. **audit 侧两种形状都枚举**：老形状 `<场景>/workspace.actual/kb/<role>/journal/` + 新形状 `<场景>/<dir>/journal/<role>/`。
 3. **在场判据收紧为「只认文件名命中」**（含 `日期待核-<slug>.md` 这类**精确尾段**），**不做正文包含**。
 

@@ -1,9 +1,9 @@
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, afterEach, describe, expect, it, vi } from 'vitest'
-import { requireDevHome } from '../../../tools/lib/runtime-home.mjs'
+import { requireDevHome } from '../../../tools/lib/core/runtime-home.mjs'
 
 vi.mock('node:os', async (importOriginal) => ({
   ...await importOriginal<typeof import('node:os')>(),
@@ -88,7 +88,7 @@ describe('当前角色章程的工具路径以会话 cwd 为基准', () => {
 
 describe('排练场镜像：v3 run bundle 状态', () => {
   it('ensureRehearsalWorkspace 建 .dsh-company/kb 状态/章程/journal；不写根手册/模板', async () => {
-    const { ensureRehearsalWorkspace } = await import('../../../tools/lib/rehearsal.mjs')
+    const { ensureRehearsalWorkspace } = await import('../../../tools/lib/core/rehearsal.mjs')
     const repo = mkdtempSync(join(tmpdir(), 'company-rehearsal-mirror-'))
     try {
       mkdirSync(join(repo, 'packages/company-pack/content/state'), { recursive: true })
@@ -119,7 +119,7 @@ describe('排练场镜像：v3 run bundle 状态', () => {
 
 describe('录制工作区参考镜像（v3）', () => {
   it('mirrorCompanyReference 镜像 .dsh-company/kb 状态/章程，不混 journal/deliverables', async () => {
-    const { mirrorCompanyReference } = await import('../../../tools/lib/rehearsal.mjs')
+    const { mirrorCompanyReference } = await import('../../../tools/lib/core/rehearsal.mjs')
     const repo = mkdtempSync(join(tmpdir(), 'company-ref-src-'))
     const company = join(repo, 'company-workspace')
     const workspace = mkdtempSync(join(tmpdir(), 'company-ref-ws-'))

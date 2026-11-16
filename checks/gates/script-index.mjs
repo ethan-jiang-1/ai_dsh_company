@@ -9,7 +9,7 @@
 //   删除探针后生成物多一条 → 再红；--write 还原 → 绿。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { renderScriptInventory, scanPublicScripts, strayToolEntries } from '../../tools/lib/checks-index.mjs'
+import { renderScriptInventory, scanPublicScripts, strayToolEntries } from '../../tools/lib/core/checks-index.mjs'
 
 export function run({ root, ok, fail }) {
   const readmePath = join(root, 'checks', 'README.md')

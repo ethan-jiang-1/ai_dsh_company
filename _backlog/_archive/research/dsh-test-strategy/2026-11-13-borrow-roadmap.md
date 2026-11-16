@@ -69,7 +69,7 @@ intent: 回答「怎么借鉴、先做什么、怎么算做到」——每项给
 ### B3 执行下限棘轮（coverage baseline）
 
 - **借自**：DSH 的 per-file 门槛（借**机制**：未覆盖行 = 待处理项；不借数字 100%）。
-- **载体**：tools/lib/coverage-baseline.mjs（计划）（纯逻辑）+ checks/audit/coverage-ratchet.mjs（计划）（跑 coverage、比 baseline、`--update` 只在变好时写）；
+- **载体**：checks/lib/coverage-baseline.mjs（计划）（纯逻辑）+ checks/audit/coverage-ratchet.mjs（计划）（跑 coverage、比 baseline、`--update` 只在变好时写）；
   baseline 住 tests/support/coverage-baseline.json（计划）（committed，生成物）。
 - **形态**：规则三条——① 任一文件不得低于 baseline；② 新出现的插桩文件 ≥80% statements / 70% branches，否则显式豁免
   （豁免项写 `owner` + `移除条件`，与 DSH "无移除条件的豁免 = 隐性空洞"对齐）；③ baseline 只升不降。

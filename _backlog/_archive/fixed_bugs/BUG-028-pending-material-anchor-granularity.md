@@ -85,7 +85,7 @@ source run/env.sh && node checks/audit/deliverables-check.mjs --only lingang-rec
 
 ## 修复实况（2026-10-19）
 
-**修法 = 候选 A（认总锚）+ 两条本卡未预见的补充**，判据唯一家 = `tools/lib/deliverables-audit.mjs`：
+**修法 = 候选 A（认总锚）+ 两条本卡未预见的补充**，判据唯一家 = `checks/lib/deliverables-audit.mjs`：
 
 | 补的 | 为什么 |
 |---|---|

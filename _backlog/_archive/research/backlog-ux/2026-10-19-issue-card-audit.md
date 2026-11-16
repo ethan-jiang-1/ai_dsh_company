@@ -17,7 +17,7 @@ intent: "为 issue 卡质量审与 DSH-native 收口提供逐条证据：四张�
 
 **同一失败类在文档层重演。** BUG-026/027 的教训是“复现脚本必须指到消费者真正读的那一层”；这四张卡现在读 **state** 当 **wire**（golden 快照）、读 **旧版**当 **现状**（正文订正）、读 **索引**当 **卡片**（README）。层错了，量得再准也是别的东西。
 
-**门禁全绿不构成反证。** `backlog-liveness` 查目录、README、status 枚举、状态行镜像、`毕业：` 封闭头、索引链接与闭场信号（[gate](../../../../checks/gates/backlog-liveness.mjs) 的 `run` 函数，[实现](../../../../tools/lib/backlog-liveness.mjs) 的 `statuses`/状态镜像段），不查“当前结论是否成立”。章程自己写了“检查通过不证明问题结论正确或方法有效”（[README](../../../README.md) §文件与维护）。
+**门禁全绿不构成反证。** `backlog-liveness` 查目录、README、status 枚举、状态行镜像、`毕业：` 封闭头、索引链接与闭场信号（[gate](../../../../checks/gates/backlog-liveness.mjs) 的 `run` 函数，[实现](../../../../checks/lib/backlog-liveness.mjs) 的 `statuses`/状态镜像段），不查“当前结论是否成立”。章程自己写了“检查通过不证明问题结论正确或方法有效”（[README](../../../README.md) §文件与维护）。
 
 ## 二、逐条发现
 
@@ -121,7 +121,7 @@ updated: 2026-10-19
 
 证据层的受控词：`source`（读码/配置）、`state`（持久投影 state）、`wire`（浏览器收到的视图）、`runtime`（真浏览器/DOM）、`human`（人读/计时/可读性判断）。每个数字标一个层，避免再犯“state 当 wire”。
 
-**门禁窗口约束（本轮实测）**：`backlog-liveness` 只在 `slice(0, 12)` 里找状态行（[实现](../../../../tools/lib/backlog-liveness.mjs) 的状态行查找段）。frontmatter 超过 5 个字段（`status/owner/blockedBy/opened/updated`）就会把状态行挤到第 13 行，门禁红。B 方案若保留 `blocker/touches`，要么放正文（如元问题卡），要么同 diff 把窗口扩到标题后/前 20 行，并带红/绿证据。**这是 Card v2 的第一个实现约束，不是排版偏好。**
+**门禁窗口约束（本轮实测）**：`backlog-liveness` 只在 `slice(0, 12)` 里找状态行（[实现](../../../../checks/lib/backlog-liveness.mjs) 的状态行查找段）。frontmatter 超过 5 个字段（`status/owner/blockedBy/opened/updated`）就会把状态行挤到第 13 行，门禁红。B 方案若保留 `blocker/touches`，要么放正文（如元问题卡），要么同 diff 把窗口扩到标题后/前 20 行，并带红/绿证据。**这是 Card v2 的第一个实现约束，不是排版偏好。**
 
 ### 4.3 三条硬规则
 

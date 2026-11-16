@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
-import { parseCompanyTabCatalog } from '../../tools/lib/company-tab-catalog.mjs'
+import { repositoryRoot } from '../../tools/lib/core/repository-layout.mjs'
+import { parseCompanyTabCatalog } from '../../tools/lib/probe/company-tab-catalog.mjs'
 
 // 2026-10-20 审计：cdp-probe 的 8 个页签 vs 注册面 9 个（成品缺）；2026-11-12 加「策略」→ 10。本 spec 钉注册源形状，
 // live 面由 cdp-probe 从同一份 catalog 驱动；解析失败 = 探针不该静默跑 8/8。

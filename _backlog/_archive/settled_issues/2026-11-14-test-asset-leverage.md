@@ -47,7 +47,7 @@ opened: 2026-11-14
 
 ### 3. 新层复制了第二份事实源
 
-- **markdown 形状 4 份实现**：`packages/company-pack/src/lib/markdown-shape.ts`、`checks/gates/fix-evidence.mjs:79` 的 `structuralFlags`、`checks/gates/notes-tree.mjs`、`tools/lib/backlog-liveness.mjs`。v5 修了围栏块，`structuralFlags` 仍在。
+- **markdown 形状 4 份实现**：`packages/company-pack/src/lib/markdown-shape.ts`、`checks/gates/fix-evidence.mjs:79` 的 `structuralFlags`、`checks/gates/notes-tree.mjs`、`checks/lib/backlog-liveness.mjs`。v5 修了围栏块，`structuralFlags` 仍在。
 - **路径语义 3 处**：`company-root.ts` 的 `relToCompany` / `walkCompanyDirs` / POSIX `dirname`；`file-shape-agreement.spec.ts:174-190` 只枚举 5 条 rel。
 - **lane 选择 4 处**：`asset-lanes.spec` / `lane-match.spec` / `pre-push-surfaces.test` / census；散文已漂（`fast-lane.mjs:5` 说 6 条、实际 4；`asset-lanes.mjs:274` 说 69 探针、实际 67）。
 - **覆盖率豁免**：`coverage-baseline.json` 796 行，有 `removeWhen`，没有到期测试。
@@ -78,7 +78,7 @@ opened: 2026-11-14
 ## 事实与读者
 
 - 事实：**测试资产的杠杆/预防能力**（不是某个产品状态）。
-- 唯一入口：`tests/`、`checks/lanes/`、`checks/gates/`、`tools/lib/asset-lanes.mjs`、`tests/failure-classes.md`、`tests/CENSUS.generated.md`。
+- 唯一入口：`tests/`、`checks/lanes/`、`checks/gates/`、`tools/lib/core/asset-lanes.mjs`、`tests/failure-classes.md`、`tests/CENSUS.generated.md`。
 - 读/写载体：测试资产作者、门禁作者、fresh agent、pre-push/周 lane。
 - 环境坏法：新层/新门禁/新契约；exploratory 从“上一轮未覆盖轴”找；metric 只量资产存在。
 - 一致性：census ↔ 盘面 ↔ 散文；类覆盖 ↔ 资产形状；新增门禁 ↔ 元测试。
@@ -96,7 +96,7 @@ opened: 2026-11-14
 
 已落（commits `34ccab6c` / `refactor(test-assets)` / `feat(proof)` / `ed33e4cd`）：
 
-- **P0.1 形状收口**：`markdown-shape-core.js` 一份核心（TS 薄包装 + 门禁 import）；`fix-evidence`/`proposals`/`notes-liveness` 共用 `sectionRange`；`tools/lib/backlog-liveness.mjs` 因 keyless seam 保留行级定位并注释边界。
+- **P0.1 形状收口**：`markdown-shape-core.js` 一份核心（TS 薄包装 + 门禁 import）；`fix-evidence`/`proposals`/`notes-liveness` 共用 `sectionRange`；`checks/lib/backlog-liveness.mjs` 因 keyless seam 保留行级定位并注释边界。
 - **P0.2 v5 轴分类**：Windows `..\` = environment gap + trigger；闭合行残余 = policy 夹具；围栏嵌套 = covered；命令执行 = unprovable；notes 根 symlink = policy。
 - **P0.3 退役**：删 8 份 content english spec + `gitignore-guards`；3 份文件清单并进 `content-english`；`gitignore-shape` 门补 `company-workspace`/`_dist`；archived 死指针改指门禁。
 - **P0.4 census v2**：`asset-consumers` 消费者图，96 个资产 **56 个 0 消费者**；`shape`/消费者列 + `lastRed`/`replaceBy`/`retireWhen` 字段说明。

@@ -1,10 +1,25 @@
 /** Repository paths and discovery shared by maintenance entrypoints and their tests. */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
-import { isAbsolute, join, relative, resolve } from 'node:path'
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+/**
+ * 向上找 workspace 根（纯函数，可测）：lib 分组/搬家不得改变仓库根解析面。
+ * 找不到即报错——不静默退回一个错误深度（返回错根会让所有路径判据静默错）。
+ */
+export function findRepositoryRoot(startDir) {
+  let dir = startDir
+  for (let i = 0; i < 12; i += 1) {
+    if (existsSync(join(dir, 'pnpm-workspace.yaml'))) return dir
+    const up = dirname(dir)
+    if (up === dir) break
+    dir = up
+  }
+  throw new Error('仓库根解析失败：向上未找到 pnpm-workspace.yaml（移动 lib 分组后仍须可解析）')
+}
+
 /** The checkout root, independent of an entrypoint's directory depth. */
-export const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url))
+export const repositoryRoot = findRepositoryRoot(fileURLToPath(new URL('.', import.meta.url)))
 
 const IMPLEMENTATION_DIRS = new Set(['lib', 'drivers', 'node_modules'])
 

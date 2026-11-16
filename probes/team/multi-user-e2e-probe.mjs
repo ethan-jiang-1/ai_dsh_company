@@ -22,14 +22,14 @@
 //   观察：workspace_doors 工具是否被任何门调用（BUG-002 修复面——检测面可用性）。
 // 用法：DSH_HOME=runtime/harness-home node probes/team/multi-user-e2e-probe.mjs
 // 退出码：0 = E1–E6 全过；1 = 任一判据失败；2 = 环境。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const SLUG = '2026-10-06-multi-user-e2e'
@@ -37,7 +37,7 @@ const DELIV = join(REHEARSAL, 'deliverables', SLUG)
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('multi-user-e2e-probe')
 } catch (error) { console.error(error.message); process.exit(2) }
 
@@ -51,7 +51,7 @@ const CEO_TASK = `# 任务书 · token-api 续约定价\n\n`
   + `派活｜T2｜coo｜交付窗口核查：token-api 续约交付需要多少人周、能不能接住｜依赖：无｜状态：待办\n`
   + `派活｜T3｜ceo｜合稿收口｜依赖：T1、T2｜状态：待办\n`
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `e2e-` 由调用方传入，不推导；
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `e2e-` 由调用方传入，不推导；
 // spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)

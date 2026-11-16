@@ -6,7 +6,7 @@ opened: 2026-10-10
 # 下游：checks/smoke 十个 web 启动块同款收成
 
 > 立卡：2026-10-10 ｜ 状态：已结 ｜ 类型：Task ｜ 可关闭：是
-> **结论与去向（2026-10-10 实施完毕）**：10/10 迁入 `tools/lib/probe-web.mjs`（第一批 3 个 = commit
+> **结论与去向（2026-10-10 实施完毕）**：10/10 迁入 `tools/lib/probe/probe-web.mjs`（第一批 3 个 = commit
 > ba38ca2；第二批 7 个 + 模块扩展 = 本轮提交）。模块扩 `patch: string[]` / `onEmptyCookie` /
 > `dumpBodyOnError` + 三处 boot 健壮性；两处铁律钉值（entry-probe read-only、replay workspace-write
 > 死代码）逐字节未动；entry-probe 的 token 交换留 3 行本地块（报文不在批准统一清单）。
@@ -17,7 +17,7 @@ opened: 2026-10-10
 
 **问题与期望结果**：`checks/lanes/` 下 10 个起 `bin.ts web` 的脚本各抄一份启动块（等 banner +
 token 交换 + client-request 发送），与探针面迁移前的 25 份重复同病。期望同款收进
-`tools/lib/probe-web.mjs`，调用方观察到的行为不变。
+`tools/lib/probe/probe-web.mjs`，调用方观察到的行为不变。
 
 ## 范围
 

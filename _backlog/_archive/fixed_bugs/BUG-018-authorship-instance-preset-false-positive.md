@@ -7,7 +7,7 @@ opened: 2026-10-16
 # BUG-018：署名审计把同角色的多实例 preset 判成「署名不实」（假阳性 10 条）
 
 > 严重级别：P2（次要——不阻断任何验收，但让该仪器常年带伤红，真信号被噪音淹没）｜发现：2026-10-16｜状态：已修（2026-10-16 同日修复）
-> **修复**：候选 A 落地——`tools/lib/authorship.mjs` 新增 `baseRoleOf`（只抹 `<角色>-<数字>` 实例后缀）并用于判档，原始 preset 另存 `writerRaw` 保留诊断信息；真盘 `authorship-audit` 由「署名不实 10 + exit 1」变「署名不实 0 + ALL PASS」。收据 = [implemented/2026-10-16-authorship-instance-preset.md](../../../notes/archived/2026-10-16-authorship-instance-preset.md)（红→绿原文、守卫用例、输掉的方案在内）。候选 B（修 `sessionId → 成员名` 映射构建路径）留作后续。
+> **修复**：候选 A 落地——`checks/lib/authorship.mjs` 新增 `baseRoleOf`（只抹 `<角色>-<数字>` 实例后缀）并用于判档，原始 preset 另存 `writerRaw` 保留诊断信息；真盘 `authorship-audit` 由「署名不实 10 + exit 1」变「署名不实 0 + ALL PASS」。收据 = [implemented/2026-10-16-authorship-instance-preset.md](../../../notes/archived/2026-10-16-authorship-instance-preset.md)（红→绿原文、守卫用例、输掉的方案在内）。候选 B（修 `sessionId → 成员名` 映射构建路径）留作后续。
 
 ## 症状
 
@@ -41,7 +41,7 @@ FAIL（署名不实 10｜版本引用过期 0）
    `memberBySession.get(writerEntry.session) ?? writerEntry.preset`
    ——先从 `team/member` 事件建 `sessionId → 成员名` 映射，**映射缺失时回落到该会话 `agentPreset` 原文**。
 2. 团队插件给同角色的第 2、3 个成员发的 preset id 带实例后缀（`coo-2` / `vp-eng-3`）；这些 id **不在** `packages/company-pack/presets/` 里（该目录只有 `ceo / cfo / coo / vp-eng / vp-sales`）⇒ 是运行时生成的同角色实例。
-3. `tools/lib/authorship.mjs:80` 判「一致」用的是**精确字符串相等**：`claimed === writerPreset`。
+3. `checks/lib/authorship.mjs:80` 判「一致」用的是**精确字符串相等**：`claimed === writerPreset`。
 4. ⇒ `coo` vs `coo-2` 被判 `fail`（署名不实）。这是**同一角色的两个实例**，语义上不是冒名。
 
 **为什么映射会缺失**：这 10 条都来自 2026-10-10 两场动议。待查方向——① 队友会话是否走了不产生 `team/member` 事件的路径（例如直接 `session/create`）；② 该会话日志是否已被轮换/清理（`写入者不可考` 那 8 条是另一档）。两者都不影响本缺陷的定性：**映射缺失时的回落值本身就带着实例后缀，精确比较必然误判**。
@@ -63,7 +63,7 @@ source run/env.sh && node checks/audit/authorship-audit.mjs | grep '✗'   # 10 
 
 ```sh
 node --input-type=module -e "
-const { classifyAuthorship } = await import('./tools/lib/authorship.mjs')
+const { classifyAuthorship } = await import('./checks/lib/authorship.mjs')
 console.log(classifyAuthorship('出稿：coo｜版本 v1', 'coo.md', 'coo-2'))
 // 现输出 { level: 'fail', claimed: 'coo', writer: 'coo-2' } —— 期望 match（同角色实例）
 console.log(classifyAuthorship('出稿：coo｜版本 v1', 'coo.md', 'vp-eng-2'))

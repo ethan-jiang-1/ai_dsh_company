@@ -3,11 +3,11 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { assess, archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, pickArchivedJournal, steps } from '../../tools/lib/converge-rules.mjs'
+import { assess, archiveMovePlan, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, isPlaceholderConclusion, journalPresence, journalSlug, parseFlags, pickArchivedJournal, steps } from '../../tools/lib/company/converge-rules.mjs'
 const TMP: string[] = []
 afterAll(() => { for (const d of TMP) rmSync(d, { recursive: true, force: true }) })
 
-// converge.mjs 的纯判定规则（判据单一来源 = tools/lib/converge-rules.mjs；IO 在驱动脚本
+// converge.mjs 的纯判定规则（判据单一来源 = tools/lib/company/converge-rules.mjs；IO 在驱动脚本
 // ——沙箱对照实验与真仓复现收据见 _backlog 卡 BUG-014 / BUG-015）。
 // ⚠ 2026-10-13：归档搬移那条初版在此**真跑 git**，被 layering 守卫当场拦下（回归层不许起子进程）——
 // 真跑那半已搬去 probes/fs-taskboard/converge-e2e-probe.mjs（archive-move-probe 已删）；本文件只留纯计划断言。

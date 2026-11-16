@@ -11,7 +11,7 @@ opened: 2026-10-19
 
 **做了，按派生视图 + 只读页签落地**：
 
-- **数据面**：盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md` ⇒ 纯形状 `tools/lib/deliverables-catalog.mjs` ⇒ 生成器 `tools/deliverables-index.mjs` ⇒ `company-workspace/kb/deliverables-index.json`。当前 **47 份**（**活跃 0 / 归档 47 / 台账外 1** / **present 46 / 未 present 1 / present 未核 0**）。2026-10-20 已收敛 v2 / v3 / lingang / role-kit / private-deploy / token-account-pool / hefeng / kid-ai 八件；private-deploy 先由真 CEO 会话 `session-a87b177b…` 补 `present` 再收敛；hefeng 收口为「判不了」、kid-ai 收口为「已采纳」；light 按用户轻量纪律处置为「已废弃/无 final」，不入目录；唯一未 present/未入台账 = recon-pack（归档 legacy）。`present` 状态由 `deliverables-check --json` 提供（单一判据；不可得时 `presented=null`，面板显示「present 未核」）。
+- **数据面**：盘上 `deliverables/` + `deliverables-archive/` 的 `final.md` + `meta.md` ⇒ 纯形状 `tools/lib/company/deliverables-catalog.mjs` ⇒ 生成器 `tools/deliverables-index.mjs` ⇒ `company-workspace/kb/deliverables-index.json`。当前 **47 份**（**活跃 0 / 归档 47 / 台账外 1** / **present 46 / 未 present 1 / present 未核 0**）。2026-10-20 已收敛 v2 / v3 / lingang / role-kit / private-deploy / token-account-pool / hefeng / kid-ai 八件；private-deploy 先由真 CEO 会话 `session-a87b177b…` 补 `present` 再收敛；hefeng 收口为「判不了」、kid-ai 收口为「已采纳」；light 按用户轻量纪律处置为「已废弃/无 final」，不入目录；唯一未 present/未入台账 = recon-pack（归档 legacy）。`present` 状态由 `deliverables-check --json` 提供（单一判据；不可得时 `presented=null`，面板显示「present 未核」）。
 - **页签**：右栏第 9 个公司页签「成品」（guide entry 同步）。统计（含 present / 未 present）→ 全部/活跃/归档/台账外四档筛选 → 按月分组；每行 `结果 tag + slug + 归档/台账外 + 日期·类型 + 一句话结论（2 行 + 全文） + 打开`；「打开」用 `dsh-resource://file/session/...` 在右栏预览 `final.md`。
 - **静态索引说真话**：页签头「静态索引 · 生成于 …」+「重读」；不轮询；缺索引/坏 schema 明确提示跑生成器。
 - **并列不替代**：动议台账答「决定了什么」，成品目录答「交出了哪些 final」；`present` 背书/审计仍归 [`deliverables-check`](../../../checks/audit/deliverables-check.mjs)。
@@ -26,7 +26,7 @@ opened: 2026-10-19
 
 ## 本轮实施（2026-10-19）
 
-- **纯逻辑**：`tools/lib/deliverables-catalog.mjs`（只收 final；按 kickoff 倒序；活跃/归档/台账外计数；slug 从 meta 或目录回落）。
+- **纯逻辑**：`tools/lib/company/deliverables-catalog.mjs`（只收 final；按 kickoff 倒序；活跃/归档/台账外计数；slug 从 meta 或目录回落）。
 - **生成器**：`tools/deliverables-index.mjs`（扫两棵树 + 解析 meta/台账 slug + 跑 `deliverables-check --json` 取 present，写 JSON；无参）。
 - **自动重建**：`tools/converge.mjs` 收敛/续跑后自动调用生成器；`--rebuild-index` 可单独跑；纯命令形状在 `converge-rules` spec 钉住。
 - **页签**：[`DeliverablesTab.tsx`](../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx) + `company-tab-registration` 第 9 项 + `tab-icons` 的产出箱 glyph；`readCatalog` 走 `remote.workspaceFiles.read('kb/deliverables-index.json')`；`openFinal` 走 `sessionFileAddress` + `sidebarRight.openResource`。

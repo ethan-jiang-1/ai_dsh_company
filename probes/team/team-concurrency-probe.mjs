@@ -13,18 +13,18 @@
 //   C2a 两名成员都尝试认领同一 revision，恰一成功、一 stale，任务 owner 与胜者一致
 //   C2b 两名成员各有一条真实 queued 且 delivered 的 team message
 // 用法：source run/env.sh && node probes/team/team-concurrency-probe.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, existsSync, readFileSync, rmSync, writeFileSync, mkdtempSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { concurrencyEvidence, teamRunComplete } from '../../tools/lib/collaboration-evidence.mjs'
-import { concurrencyVerdict, verdictOutcome } from '../../tools/lib/team-concurrency-verdict.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { concurrencyEvidence, teamRunComplete } from '../lib/collaboration-evidence.mjs'
+import { concurrencyVerdict, verdictOutcome } from '../lib/team-concurrency-verdict.mjs'
 
-import { teamBarrierEvidence } from '../../tools/lib/team-barrier-evidence.mjs'
-import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
+import { teamBarrierEvidence } from '../lib/team-barrier-evidence.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe/probe-kit.mjs'
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const TARGET = join(REHEARSAL, 'journal', 'team-concurrency-probe.md')
 mkdirSync(dirname(TARGET), { recursive: true })
@@ -32,13 +32,13 @@ const results = []
 const check = makeCheck(results)
 try { rmSync(TARGET, { force: true }) } catch {}
 let home
-try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('team-concurrency-probe') } catch (e) { console.error(e.message); process.exit(2) }
+try { home = (await import('../../tools/lib/core/runtime-home.mjs')).requireDevHome('team-concurrency-probe') } catch (e) { console.error(e.message); process.exit(2) }
 
 const barrierDir = mkdtempSync(join(home, 'team-read-barrier-'))
 const overlay = join(barrierDir, 'barrier.patch.yml')
 writeFileSync(overlay, `- insert:\n    - id: probe-read-barrier\n      name: ${JSON.stringify(join(ROOT, 'probes/team/read-barrier/index.mjs'))}\n`)
 writeFileSync(TARGET, '', 'utf8')
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）。本探针的既有差异全当参数传：
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）。本探针的既有差异全当参数传：
 //   ① 读屏障 overlay 走 startWeb 的 patch 参数（argv 在 web 后插 --patch overlay）；
 //   ② DSH_PROBE_BARRIER_* 三个键随基础环境传入（home 会再叠加 DSH_HOME）；
 //   ③ finally 里未防护地引用 child ⇒ 用 spawn 捕获适配器：startWeb 起进程是同步的，

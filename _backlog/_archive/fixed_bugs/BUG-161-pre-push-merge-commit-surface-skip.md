@@ -34,7 +34,7 @@ runtime/tmp/c9-merge-probe.sh
 输出含 `merge=eae24ea`、`git log --graph` 的 merge 结构，以及：
 
 ```text
-pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/asset-lanes.mjs SURFACE_RULES）
+pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/core/asset-lanes.mjs SURFACE_RULES）
 ```
 
 ## 影响 / 失败类

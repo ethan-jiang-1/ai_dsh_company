@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
-import { ASSETS, FAILURE_CLASSES, PROBES, allAssets, failureClassOf } from '../../../tools/lib/asset-lanes.mjs'
-import { buildCensus, countProjectSurface, renderCensus } from '../../../tools/lib/test-census.mjs'
-import { consumerCount } from '../../../tools/lib/asset-consumers.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
+import { ASSETS, FAILURE_CLASSES, PROBES, allAssets, failureClassOf } from '../../../tools/lib/core/asset-lanes.mjs'
+import { buildCensus, countProjectSurface, renderCensus } from '../../../tools/lib/repo/test-census.mjs'
+import { consumerCount } from '../../../tools/lib/repo/asset-consumers.mjs'
 
 /**
  * 资产盘子与制度负债棘轮（W4 硬化）：
@@ -38,7 +38,7 @@ describe('资产盘子与负债上限棘轮（census + P2 硬顶）', () => {
   it('每个探针都登记且只登记一次', () => {
     const files = probeFiles()
     const registered = PROBES.map(probe => probe.name).sort()
-    expect(files.filter((name: string) => !registered.includes(name)), '这些 probes/**/*.mjs 没进 tools/lib/asset-lanes.mjs（新探针也要登记）').toEqual([])
+    expect(files.filter((name: string) => !registered.includes(name)), '这些 probes/**/*.mjs 没进 tools/lib/core/asset-lanes.mjs（新探针也要登记）').toEqual([])
     expect(registered.filter((name: string) => !files.includes(name)), '注册表里的探针在盘上不存在——删探针要同 diff 退登记').toEqual([])
     expect(new Set(registered).size).toBe(registered.length)
   })

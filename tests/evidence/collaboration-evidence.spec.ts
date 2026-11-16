@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { atomicityEvidence, concurrencyEvidence, createRaceEvidence, hasExactRows, judgeWriteGuard, teamRunComplete } from '../../tools/lib/collaboration-evidence.mjs'
+import { atomicityEvidence, concurrencyEvidence, createRaceEvidence, hasExactRows, judgeWriteGuard, teamRunComplete } from '../../probes/lib/collaboration-evidence.mjs'
 
 const call = (callId: string, name: string, args: object) => ({ type: 'tool/call', data: { callId, name, arguments: JSON.stringify(args) } })
 const result = (callId: string, text: string, error?: string, meta?: object) => ({ type: 'tool/result', data: {

@@ -29,7 +29,7 @@ node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/packag
 
 ```text
 pre-push surfaces: 未分类改动面（既没有 surface 规则，也没有 coveredBy 申报）——新目录要登记 SURFACE_RULES：packages/company-pack/package.json
-pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/asset-lanes.mjs SURFACE_RULES）
+pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/core/asset-lanes.mjs SURFACE_RULES）
 ```
 
 `exit=0`。对照：同一脚本对 `packages/company-pack/src/lib/presence/presence.ts` 会 `→ replay`。

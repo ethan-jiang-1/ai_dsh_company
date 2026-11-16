@@ -7,10 +7,10 @@
 // 与各 snapshot.yml 自身。引用不复制：本模块不落盘任何 manifest。
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { devHomeStatus } from './runtime-home.mjs'
-import { scanR3Dual } from './candidate-scan.mjs'
-import { repositoryRoot, snapshotScenes } from './repository-layout.mjs'
-import { FULL_ROLE_IDS, SUPPORT_PRESET_IDS } from './delegation-model.mjs'
+import { devHomeStatus } from '../../tools/lib/core/runtime-home.mjs'
+import { scanR3Dual } from '../../checks/lib/candidate-scan.mjs'
+import { repositoryRoot, snapshotScenes } from '../../tools/lib/core/repository-layout.mjs'
+import { FULL_ROLE_IDS, SUPPORT_PRESET_IDS } from '../../checks/lib/delegation-model.mjs'
 
 /** 双 home 判定的观测包装：只分类与警告，不拒绝执行。 */
 export function homeStatus(env = process.env, { dailyHome } = {}) {

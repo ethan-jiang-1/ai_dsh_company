@@ -87,7 +87,7 @@ node --import tsx/esm _backlog/_archive/research/two-product-structure-audit/exp
   `product-types/{productType}/requirements-model.md`。
 - `bootstrap.ts`：`resolveCompanyProductType`（workspace `kb/company.md` > pack `state/company.md`）+
   `readSeeds` 解析占位；缺 / 未知类型 → 跳过该条 + `plan.warnings`，其余 seed 照常；only-fill 不变。
-  `src/index.ts` 把 warnings 写日志；`tools/lib/kb-seeds.mjs` 同占位语义（缺 / 未知抛错）。
+  `src/index.ts` 把 warnings 写日志；`tools/lib/core/kb-seeds.mjs` 同占位语义（缺 / 未知抛错）。
 - `seed-integrity` 增三条守卫；反证：process-docs 写死 hardware → 红；删 business requirements-model
   → 红；默认 nope → 红；还原 → PASS。
 - E4 复跑：`business == hardware: false`；business sha `fbbb32d3…` / hardware `7502db26…`。

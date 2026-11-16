@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
-import { coverageReport, renderCoverage } from '../../../tools/lib/bug-coverage.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
+import { coverageReport, renderCoverage } from '../../../tools/lib/repo/bug-coverage.mjs'
 import baseline from '../../support/bug-coverage-baseline.json' with { type: 'json' }
 
 describe('历史缺陷 → 具名守卫覆盖（生成物）', () => {

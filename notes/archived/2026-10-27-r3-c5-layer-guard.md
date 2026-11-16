@@ -13,7 +13,7 @@
    只按**目标层**判方向——`root → {root,host,lib}`、`host → {host,lib}`、`client → {client,lib}`、
    `lib → lib`；`client ↔ host`、`lib → host/client`、`root → client` 一律红；另查 `lib`/`client` 不许
    `node:` 内建（会编进浏览器叶，TS2591 同类）。越出 `src/` 的相对引用也红。
-   判据主体 = [tools/lib/src-layering.mjs](../../tools/lib/src-layering.mjs)（纯逻辑 + spec），门禁只做遍历。
+   判据主体 = [checks/lib/src-layering.mjs](../../checks/lib/src-layering.mjs)（纯逻辑 + spec），门禁只做遍历。
 2. **`pnpm typecheck`**（根 `package.json`）= `tsc -b packages/company-pack` 两面。定位是**按需命令**，
    不进 `verify`、不进 pre-push：fresh clone 上 pack 的 client 面依赖 vendor client 的 `.d.ts`，
    没按 bootstrap 构建过就会假红——门禁必须在无构建的树上可跑（这是 src-layering 用路径判据、不用 tsc 的原因）。
@@ -31,7 +31,7 @@
 
 - 门禁数 47 → 48；`gate-wiring` 自动接管接线一致性。
 - 分层从"tsconfig 保证"变成"默认回路保证"；真正的类型错误仍由 `pnpm typecheck` / 构建暴露。
-- 新增纯逻辑模块 `tools/lib/src-layering.mjs` 与其 spec（5 例）。
+- 新增纯逻辑模块 `checks/lib/src-layering.mjs` 与其 spec（5 例）。
 
 ## 验证（真跑）
 

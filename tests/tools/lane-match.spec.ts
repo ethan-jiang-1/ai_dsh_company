@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { globToRegExp, matchesAny, selectSurfaces } from '../../tools/lib/asset-lanes.mjs'
+import { globToRegExp, matchesAny, selectSurfaces } from '../../tools/lib/core/asset-lanes.mjs'
 
 /**
- * lane 匹配是 pre-push 按面触发的唯一判据（数据 = tools/lib/asset-lanes.mjs 的 SURFACE_RULES）。
+ * lane 匹配是 pre-push 按面触发的唯一判据（数据 = tools/lib/core/asset-lanes.mjs 的 SURFACE_RULES）。
  * 这里只测纯逻辑：一条规则误命中会把无关检查塞进每次 push，误不命中则等于没有这条 lane。
  */
 describe('lane 匹配纯逻辑（按面触发的判据）', () => {

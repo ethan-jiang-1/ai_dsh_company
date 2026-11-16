@@ -20,7 +20,7 @@
 - **保留 counts 在解析类型里**：没有生产消费者，却让「同一份计数」有三个来源（生成器/解析/视图现算）。
 - **测试里现算夹具**（`build` 再 `parse` 同一份内存对象）：循环自证，抓不到「生成器改形状而 parser 没跟」。
   提交的 JSON 才是那个可被两侧分别钉住的工件。
-- **客户端直接 import `tools/lib/deliverables.mjs` 的 `META_RESULTS`**：跨运行时（node .mjs → browser bundle）
+- **客户端直接 import `tools/lib/company/deliverables.mjs` 的 `META_RESULTS`**：跨运行时（node .mjs → browser bundle）
   会拖进不必要依赖；用测试覆盖代替运行时共享。
 
 ## 后果

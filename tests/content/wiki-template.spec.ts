@@ -11,7 +11,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot } from '../../tools/lib/core/repository-layout.mjs'
 
 const DIR = join(repositoryRoot, 'packages/company-pack/content/wiki-template')
 

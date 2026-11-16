@@ -10,7 +10,7 @@
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
-import { headingSections, parseFrontmatter } from './repo-markdown.mjs'
+import { headingSections, parseFrontmatter } from '../core/repo-markdown.mjs'
 
 /** 读已修卡：id/opened/slug/title。 */
 export function fixedBugs(root) {

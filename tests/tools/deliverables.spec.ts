@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { classifyDeliverable, deliverableId, parseMeta, slugFromDirName, validateMeta } from '../../tools/lib/deliverables.mjs'
+import { classifyDeliverable, deliverableId, parseMeta, slugFromDirName, validateMeta } from '../../tools/lib/company/deliverables.mjs'
 
 /**
  * 交付物判据**形状与身份**面的回归层（R4「成品流程」轮；2026-10-16 第三轮结构收敛按
@@ -94,4 +94,4 @@ describe('meta.md 形状校验（validateMeta / parseMeta）', () => {
 })
 
 // 工作区门投影（doors.ts）的 keyless 守卫已迁 tests/lib/presence/doors.spec.ts（2026-10-14 重构轮：
-// 本文件主体守 tools/lib/deliverables.mjs，doors 块是唯一跨模块寄居——迁出恢复一一对应）。
+// 本文件主体守 tools/lib/company/deliverables.mjs，doors 块是唯一跨模块寄居——迁出恢复一一对应）。

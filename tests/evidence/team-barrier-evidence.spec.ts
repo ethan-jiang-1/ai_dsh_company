@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { teamBarrierEvidence } from '../../tools/lib/team-barrier-evidence.mjs'
+import { teamBarrierEvidence } from '../../probes/lib/team-barrier-evidence.mjs'
 const target = '/fixture/journal/team-concurrency-probe.md'
 const call = (callId: string, name: string, args: object) => ({ type: 'tool/call', data: { callId, name, arguments: JSON.stringify(args) } })
 const result = (callId: string, code?: string, rows?: string[]) => ({ type: 'tool/result', data: {

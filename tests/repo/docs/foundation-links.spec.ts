@@ -1,8 +1,8 @@
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { markdownLinkTargets, sourceMarkdownFiles, validateMarkdownLinks } from '../../../tools/lib/markdown-links.mjs'
+import { markdownLinkTargets, sourceMarkdownFiles, validateMarkdownLinks } from '../../../tools/lib/core/markdown-links.mjs'
 
 const scratch = join(ROOT, 'node_modules/.cache/company-markdown-links')
 let root: string

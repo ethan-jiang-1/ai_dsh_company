@@ -13,7 +13,7 @@ opened: 2026-11-16
 
 ## 症状
 
-`tools/lib/asset-lanes.mjs` 的 `SURFACE_RULES` 在 BUG-186 修复后仍有 19 条 tracked 路径既没有 surface asset，也没有 `coveredBy` 申报：
+`tools/lib/core/asset-lanes.mjs` 的 `SURFACE_RULES` 在 BUG-186 修复后仍有 19 条 tracked 路径既没有 surface asset，也没有 `coveredBy` 申报：
 
 ```text
 .gitattributes
@@ -41,7 +41,7 @@ runtime/harness-home/README.md
 
 ## 运行面
 
-tooling / pre-push 面选择（`tools/lib/asset-lanes.mjs` + `checks/pre-push-surfaces.mjs`）；不是运行时行为。
+tooling / pre-push 面选择（`tools/lib/core/asset-lanes.mjs` + `checks/pre-push-surfaces.mjs`）；不是运行时行为。
 
 ## 复现
 
@@ -81,7 +81,7 @@ node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/packag
 
 ## 修复证据
 
-- 改动面：`checks/gates/surface-coverage.mjs`、`checks/run-gates.mjs`、`tools/lib/asset-lanes.mjs`、`tests/repo/budget/asset-lanes.spec.ts`
+- 改动面：`checks/gates/surface-coverage.mjs`、`checks/run-gates.mjs`、`tools/lib/core/asset-lanes.mjs`、`tests/repo/budget/asset-lanes.spec.ts`
 - 红：`node checks/run-gates.mjs`（surface-coverage FAIL：19 条 tracked 路径既无 asset 也无 coveredBy）
 - 绿：`node checks/run-gates.mjs`（ALL PASS；surface-coverage ×1924 tracked 路径）
 - 提交：commit 34f84fd2

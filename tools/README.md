@@ -18,7 +18,8 @@
 
 ## 实现层（不是入口）
 
-- [`lib/`](./lib/) —— **共享实现**：可被入口 / checks / tests 直接 import 的解析、生成与判据代码；**不启动进程、不联网**。注意「纯逻辑」不等于「不碰盘」：`kb-seeds` / `rehearsal` / `pin-transaction` 这些辅助函数会显式读写盘——副作用只发生在被调用时，模块 import 本身不写。
+- [`lib/`](./lib/) —— **共享地基**（三个面都 import；自包含，不反向 import 面专属库）：`core/` 路径/仓库根/home/会话日志/注册表、`probe/` 探针骨架、`session/` 会话投影、`company/` 公司域、`repo/` 生成器、`release/` 发布与安装。**不启动进程、不联网**；「纯逻辑」不等于「不碰盘」：辅助函数会显式读写盘，副作用只发生在被调用时。
+- **面专属支撑住各自的面里**：judge 判据支撑 → [`checks/lib/`](../checks/lib/)；show 探针骨架 → [`probes/lib/`](../probes/lib/)。判据 = 谁主要用它、且不反向依赖别面的库。
 - [`drivers/`](./drivers/) —— **真实驱动**：Playwright / CDP / 发布子进程 / zstd 解压；只被入口层与 lanes 调用，不被 tests import（layering 门禁）。
 - [`archive/`](./archive/) —— **已耗仪器**：一次性任务用完即收，保留只为可复现。
 

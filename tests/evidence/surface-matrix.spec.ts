@@ -10,7 +10,7 @@ import {
   observationOf,
   observationProblems,
   surfaceProblems,
-} from '../../tools/lib/surface-matrix.mjs'
+} from '../../checks/lib/surface-matrix.mjs'
 
 const base = (overrides = {}) => ({
   id: 's-1',

@@ -25,13 +25,13 @@
 // 图像判据（人/多模态看图）：出 snapshots/visual/sidebar-role-mark/{desktop,narrow,full-bleed}.png
 //   + roles.png（六角色对照图，1× / 6× 两条）；computed.json 另写逐行盒与判据结论。
 // 用法：source run/env.sh && node probes/browser-visual/sidebar-role-mark-probe.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb } from '../../tools/lib/probe/probe-web.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { makeFailingCheck } from '../../tools/lib/probe-kit.mjs'
+import { makeFailingCheck } from '../../tools/lib/probe/probe-kit.mjs'
 
 const SHOTS = join(ROOT, 'snapshots/visual/sidebar-role-mark')
 const SEAT_CEILING = 16
@@ -39,7 +39,7 @@ mkdirSync(SHOTS, { recursive: true })
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('sidebar-role-mark-probe')
 } catch (error) {
   console.error(error.message)

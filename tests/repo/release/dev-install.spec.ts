@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
-import { COMPANY_ROLE_IDS } from '../../../tools/lib/company-roles.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
+import { COMPANY_ROLE_IDS } from '../../../tools/lib/company/company-roles.mjs'
 import {
   devInstallSpec,
   devTarballName,
@@ -12,7 +12,7 @@ import {
   planDevStart,
   resolveDevMode,
   shouldReuseBuild,
-} from '../../../tools/lib/dev-install.mjs'
+} from '../../../tools/lib/core/dev-install.mjs'
 
 const SHA = 'a'.repeat(64)
 

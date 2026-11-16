@@ -3,8 +3,8 @@
 // 形状：pack `content/methods/<side>/<pack>/SKILL.md` → `<DSH_HOME>/company/methods/<side>/<pack>/SKILL.md`。
 // 为什么不自动：方法层是「人拥有」的合同；复制后人可以改/换/删，pack 升级不擦。
 import { join } from 'node:path'
-import { repositoryRoot } from '../lib/repository-layout.mjs'
-import { seedMethods } from '../lib/methods-init.mjs'
+import { repositoryRoot } from '../lib/core/repository-layout.mjs'
+import { seedMethods } from '../lib/core/methods-init.mjs'
 
 const dshHome = process.env.DSH_HOME
 if (dshHome === undefined || dshHome === '') {

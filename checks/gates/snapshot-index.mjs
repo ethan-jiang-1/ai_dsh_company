@@ -3,7 +3,7 @@
 // 为什么：2026-10-20 审计发现 README 43 行 vs 盘上 47 场景，4 个新场景未登记。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { missingSnapshotIndexRows, SNAPSHOT_KINDS } from '../../tools/lib/snapshot-index.mjs'
+import { missingSnapshotIndexRows, SNAPSHOT_KINDS } from '../lib/snapshot-index.mjs'
 
 export function run({ root, ok, fail }) {
   const readmePath = join(root, 'snapshots', 'README.md')

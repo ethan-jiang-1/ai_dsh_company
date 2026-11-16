@@ -53,9 +53,9 @@ drafts/ 下 mrd/prd 叶子 symlink      → deny
 meta 缺失（真没写）                  → allow（旧动议豁免；保持）
 ```
 
-读取判据 = `readCompanyFileAt()` 的三态（text / missing / unsafe）：missing 才豁免，unsafe 一律 deny。该载体同 diff 登记进 `tools/lib/carrier-registry.mjs`（reader / `file-shape-agreement`）并加入 `tests/host/contract/file-shape-agreement.spec.ts` 的 READERS。红证 = 把 unsafe 折回 undefined → 三种 symlink 用例变 allow。
+读取判据 = `readCompanyFileAt()` 的三态（text / missing / unsafe）：missing 才豁免，unsafe 一律 deny。该载体同 diff 登记进 `checks/lib/carrier-registry.mjs`（reader / `file-shape-agreement`）并加入 `tests/host/contract/file-shape-agreement.spec.ts` 的 READERS。红证 = 把 unsafe 折回 undefined → 三种 symlink 用例变 allow。
 
 ## 证据
 
 - `runtime/tmp/c8-round1.mts`：`gate symlink deliverables root allow`、`gate symlink meta allow`。
-- 代码：[prd-gate.ts](../../../packages/company-pack/src/host/commands/prd-gate.ts#L82)、[safe-file.ts](../../../packages/company-pack/src/host/fs/safe-file.ts#L41)、[carrier-registry.mjs](../../../tools/lib/carrier-registry.mjs)。
+- 代码：[prd-gate.ts](../../../packages/company-pack/src/host/commands/prd-gate.ts#L82)、[safe-file.ts](../../../packages/company-pack/src/host/fs/safe-file.ts#L41)、[carrier-registry.mjs](../../../checks/lib/carrier-registry.mjs)。

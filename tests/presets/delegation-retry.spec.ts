@@ -3,7 +3,7 @@
 // 负例留证 2026-11-09：把 CONTRACTS['policy.delegation'].status 从 delivered 改回 planned ⇒
 // tests/presets/delegation-model.spec.ts 的载体状态用例红；还原 ⇒ 10 passed。BUG-049
 import { describe, expect, it } from 'vitest'
-import { COMPOSITIONS, PRESET_IDS, RETRY, retryDecision, retrySurface } from '../../tools/lib/delegation-model.mjs'
+import { COMPOSITIONS, PRESET_IDS, RETRY, retryDecision, retrySurface } from '../../checks/lib/delegation-model.mjs'
 import {
   SUBAGENT_RETRY,
   SUBAGENT_RETRY_SURFACE,

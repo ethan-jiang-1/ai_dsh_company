@@ -106,7 +106,7 @@
 
 ## I1c 阻断：quality-loop 处置 token
 
-- `已修/反驳/接受` 被 `tools/lib/quality-loop.mjs` `DISPOSITION_VALUES` 解析；`接受人：` 被 acceptor 检查；`未复验` 被 warning 正则消费；`body-sha256=待填` 由回填脚本处理。
+- `已修/反驳/接受` 被 `tools/lib/company/quality-loop.mjs` `DISPOSITION_VALUES` 解析；`接受人：` 被 acceptor 检查；`未复验` 被 warning 正则消费；`body-sha256=待填` 由回填脚本处理。
 - 这些都是机器合同，quality-loop 暂缓翻译；先做 I1c token 切片。
 
 ## I1c（quality-loop 处置 token）

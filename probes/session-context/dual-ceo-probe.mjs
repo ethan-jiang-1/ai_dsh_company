@@ -19,14 +19,14 @@
 //     规范版本链取代 v1→v2 = 记录，不判红）。
 // 用法：DSH_HOME=runtime/harness-home node probes/session-context/dual-ceo-probe.mjs
 // 退出码：0 = 判据 B/C 成立（防线在——即便来自文案层）；1 = FAIL（缺口确认）；2 = 环境失败。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const SLUG = '2026-10-06-dual-ceo-probe'
@@ -34,7 +34,7 @@ const DELIV = join(REHEARSAL, 'deliverables', SLUG)
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('dual-ceo-probe')
 } catch (error) {
   console.error(error.message)
@@ -51,7 +51,7 @@ for (const [role, verdict] of [['vp-eng', '技术可行，两周'], ['vp-sales',
 writeFileSync(join(DELIV, 'drafts', 'ceo.md'),
   `派活｜T1｜vp-eng｜技术可行性结论｜依赖：无｜状态：完成\n派活｜T2｜vp-sales｜客户接受度判断｜依赖：无｜状态：完成\n派活｜T3｜coo｜承接核查｜依赖：无｜状态：完成\n派活｜T4｜cfo｜经济性测算｜依赖：无｜状态：完成\n`)
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `dcp-` 由调用方传入，不推导；
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `dcp-` 由调用方传入，不推导；
 // spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)

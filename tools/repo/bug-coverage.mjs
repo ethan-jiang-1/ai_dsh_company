@@ -4,7 +4,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'
-import { coverageReport, renderCoverage } from '../lib/bug-coverage.mjs'
+import { coverageReport, renderCoverage } from '../lib/repo/bug-coverage.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const target = join(root, 'tests/BUG-COVERAGE.generated.md')

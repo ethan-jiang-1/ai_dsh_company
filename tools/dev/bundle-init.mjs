@@ -7,8 +7,8 @@
 // 应用内安装不需要本脚本——`dsh --profile company` 首启会自己初始化 `.dsh-company/`；这里只补 dev 盘。
 import { existsSync, mkdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
-import { seedKbFiles } from '../lib/kb-seeds.mjs'
-import { repositoryRoot as repoRoot } from '../lib/repository-layout.mjs'
+import { seedKbFiles } from '../lib/core/kb-seeds.mjs'
+import { repositoryRoot as repoRoot } from '../lib/core/repository-layout.mjs'
 
 const CONTENT = join(repoRoot, 'packages/company-pack/content')
 const WORKSPACE = join(repoRoot, 'company-workspace')

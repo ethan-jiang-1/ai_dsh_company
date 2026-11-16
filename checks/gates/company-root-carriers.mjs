@@ -2,8 +2,8 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import ts from 'typescript'
-import { CARRIERS, EXEMPT, KNOWN_GAP, MARKDOWN_PRIMITIVES, WORKSPACE_TOOLING } from '../../tools/lib/carrier-registry.mjs'
-import { parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
+import { CARRIERS, EXEMPT, KNOWN_GAP, MARKDOWN_PRIMITIVES, WORKSPACE_TOOLING } from '../lib/carrier-registry.mjs'
+import { parseFrontmatter } from '../../tools/lib/core/repo-markdown.mjs'
 
 // ── 公司盘载体与治理面单原语门禁（company-root-carriers，2026-11-13 P0；2026-11-14 W2 扩禁裸解析）──
 // 为什么：
@@ -30,7 +30,7 @@ import { parseFrontmatter } from '../../tools/lib/repo-markdown.mjs'
 //   - 在任一非原语门禁植入 `/^##\s+/` 或 `/^---\r?\n/` → `FAIL company-root-carriers: … → 禁止手写裸 …`。
 
 const HOST = 'packages/company-pack/src/host'
-const GOVERNANCE_DIRS = ['checks/gates', 'tools/lib']
+const GOVERNANCE_DIRS = ['checks/gates', 'checks/lib', 'probes/lib', 'tools/lib']
 const COMPANY_REF = /\.dsh-company|companyHomeOf|companyFilePath|RUN_BUNDLE_PATHS/
 const RAW_FRONTMATTER_RE = /^\^(?:\(\?:(?:\\uFEFF|\\ufeff|\\xEF\\xBB\\xBF|\uFEFF)\)\?|(?:\\uFEFF|\\ufeff|\\xEF\\xBB\\xBF|\uFEFF)\?)?---(?:\\r\?\\n|\\n|\\s|\s|\$)/
 const LEADING_WS_TOKEN = String.raw`(?:\(\?:|\()?(?:\\s| |\\t|\[[^\]]+\])(?:[*+?]|\\?\{\d+(?:,\d*)?\\?\})?\)?\??`
@@ -158,7 +158,7 @@ function scanRawParsingProblems(root, primitives) {
         if (pattern === undefined) return
         const line = sf.getLineAndCharacterOfPosition(pos).line + 1
         if (RAW_FRONTMATTER_RE.test(pattern)) {
-          problems.push(`${rel}:${String(line)} → 禁止手写裸 frontmatter 正则 /${pattern}/（改调 tools/lib/repo-markdown.mjs 的 parseFrontmatter）`)
+          problems.push(`${rel}:${String(line)} → 禁止手写裸 frontmatter 正则 /${pattern}/（改调 tools/lib/core/repo-markdown.mjs 的 parseFrontmatter）`)
         } else if (RAW_HEADING_SPLIT_RE.test(pattern) || RAW_HEADING_ANYWHERE_RE.test(pattern)) {
           problems.push(`${rel}:${String(line)} → 禁止手写裸 Markdown 节切分正则 /${pattern}/（改调 repo-markdown.mjs 或 markdown-shape-core.js）`)
         }
@@ -177,7 +177,7 @@ function scanRawParsingProblems(root, primitives) {
           const prefix = extractStringPattern(node.arguments?.[0])
           const line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1
           if (prefix !== undefined && node.expression.name.text === 'startsWith' && RAW_FRONTMATTER_PREFIX_RE.test(prefix)) {
-            problems.push(`${rel}:${String(line)} → 禁止手写裸 frontmatter 前缀判据 .startsWith(${JSON.stringify(prefix)})（改调 tools/lib/repo-markdown.mjs 的 parseFrontmatter）`)
+            problems.push(`${rel}:${String(line)} → 禁止手写裸 frontmatter 前缀判据 .startsWith(${JSON.stringify(prefix)})（改调 tools/lib/core/repo-markdown.mjs 的 parseFrontmatter）`)
           } else if (prefix !== undefined && RAW_HEADING_STRING_RE.test(prefix)) {
             problems.push(`${rel}:${String(line)} → 禁止手写裸 Markdown 节判据 .${node.expression.name.text}(${JSON.stringify(prefix)})（改调 repo-markdown.mjs 的 headingSections）`)
           }
@@ -190,7 +190,7 @@ function scanRawParsingProblems(root, primitives) {
   return { problems, scanned }
 }
 
-const TOOLING_SKIP = new Set([RAW_SCAN_SELF, 'tools/lib/carrier-registry.mjs'])
+const TOOLING_SKIP = new Set([RAW_SCAN_SELF, 'checks/lib/carrier-registry.mjs'])
 /** 字面量里把 `.dsh-company` 当**路径段**用：`'.dsh-company'`、`'./.dsh-company/kb'`、`` `${ws}/.dsh-company` ``、`` `${ws}/.dsh-company${sub}` ``。 */
 const RAW_COMPANY_DIR_LITERAL = /['"`](?:[^'"`\n]*?[\\/])?\.dsh-company(?:[\\/]|['"`$])/
 
@@ -210,7 +210,7 @@ function scanToolingProblems(root, tooling) {
       const pos = companyDirWritePos(sf, text)
       if (pos === undefined) continue
       const line = sf.getLineAndCharacterOfPosition(pos).line + 1
-      problems.push(`${rel}:${String(line)} → 禁止手写裸 .dsh-company 路径拼接（登记到 tools/lib/carrier-registry.mjs 的 WORKSPACE_TOOLING 并写理由）`)
+      problems.push(`${rel}:${String(line)} → 禁止手写裸 .dsh-company 路径拼接（登记到 checks/lib/carrier-registry.mjs 的 WORKSPACE_TOOLING 并写理由）`)
     }
   }
   return problems
@@ -255,7 +255,7 @@ export function run({
     if (line === undefined) continue
     writers += 1
     if (!registered.has(rel)) {
-      problems.push(`${rel}:${String(line)} → 未登记的公司盘写入口（登记到 tools/lib/carrier-registry.mjs 的 CARRIERS / EXEMPT / KNOWN_GAP）`)
+      problems.push(`${rel}:${String(line)} → 未登记的公司盘写入口（登记到 checks/lib/carrier-registry.mjs 的 CARRIERS / EXEMPT / KNOWN_GAP）`)
     }
   }
 

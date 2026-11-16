@@ -9,7 +9,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { backfillWorkspaceRoles, planRoleBackfill } from '../../../packages/company-pack/src/host/run-bundle/bootstrap.ts'
 
 const CONTENT = join(ROOT, 'packages/company-pack/content')

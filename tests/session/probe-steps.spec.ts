@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseProbeSteps, stepLabel } from '../../tools/lib/probe-steps.mjs'
+import { parseProbeSteps, stepLabel } from '../../probes/lib/probe-steps.mjs'
 
 describe('probe-steps：--steps 的受控动作集', () => {
   it('解析 clickText / waitText / expectText / typeText 与 timeoutMs', () => {

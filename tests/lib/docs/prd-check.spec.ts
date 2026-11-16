@@ -14,7 +14,7 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { extractJsonBlock, parsePrdSlices, validateProductDocs } from '../../../packages/company-pack/src/lib/docs/prd-check.ts'
 import { splitTableRow } from '../../../packages/company-pack/src/lib/docs/markdown-shape.ts'
 

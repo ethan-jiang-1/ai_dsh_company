@@ -12,14 +12,14 @@
 // 前置：DSH_HOME 指向已装本 pack 的 company profile（`source run/env.sh` 后 `pnpm company` 默认装这里），
 //       client 面与前端 dist 已构建（guides/bootstrap）。
 // 用法：source run/env.sh && node checks/lanes/preset.entry.mjs [--port 0] [--profile company]
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company-roles.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { COMPANY_ROLE_IDS, COMPANY_SUPPORT_PRESET_IDS } from '../../tools/lib/company/company-roles.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -140,7 +140,7 @@ const check = (label, fn) => fn().then(
   (error) => { failures.push(`${label}: ${error.message}`); console.log(`  FAIL ${label}: ${error.message}`) },
 )
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
 // 既有差异当参数保留：--port 走 PORT（默认 0）、空 cookie 即抛（onEmptyCookie: 'throw'）、rpcId 前缀
 // `smoke-` + 失败回退转储响应体（dumpBodyOnError）；rpc/boot 失败文案统一为模块款（卡内接受的
 // 文本统一：只进 FAIL 行的诊断后缀，判据标签与退出码不变）。

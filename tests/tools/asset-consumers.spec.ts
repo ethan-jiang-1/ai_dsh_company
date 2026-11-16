@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { consumerCount } from '../../tools/lib/asset-consumers.mjs'
+import { consumerCount } from '../../tools/lib/repo/asset-consumers.mjs'
 
 describe('consumerCount（census v2 消费者图：自动 lane + 显式文件引用）', () => {
   it('合并计入自动调度 lane 数与显式引用，且不把资产自身/README/generated 算作消费者', () => {

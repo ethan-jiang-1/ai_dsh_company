@@ -2,7 +2,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { sectionStructuralText } from '../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
-import { noteStatusLines } from '../../tools/lib/repo-markdown.mjs'
+import { noteStatusLines } from '../../tools/lib/core/repo-markdown.mjs'
 
 // ── 9-bis. Note 活状态门禁（notes-liveness，2026-10-05 D35 立；notes/ 分类 owner = notes/README.md）──
 // implemented/ 新写 Note（文件名日期 ≥ 生效日）前 6 行须有「状态：」行且以生命周期词开头

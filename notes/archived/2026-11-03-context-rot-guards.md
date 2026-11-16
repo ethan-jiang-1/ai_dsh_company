@@ -15,7 +15,7 @@
    pnpm 内建；`node <tools|checks|probes 路径>` 必须存在。上游 vendor 自己的两个脚本
    （`gen-client-catalog` / `build`）显式放行并注明来源。
 3. **`dist-manual` 同源**：tracked 的 `_dist/安装手册.md` 必须**逐字等于**当前
-   `tools/lib/install-manual.mjs` 用头部注入值渲染的产物；不同源即红，并给首处差异。
+   `tools/lib/release/install-manual.mjs` 用头部注入值渲染的产物；不同源即红，并给首处差异。
    渲染输入从手册自身读回（版本/包名/sha/日期）+ pin，fresh clone 无 manifest 也能复核。
 4. **`ledger-routing` 顺序**：决策台账的 D 号必须非降序（取每行首号；合并行不拆）。
 5. **`notes:audit` 双口径**：同时报「零 Note 入链」（note→note）与「零任何当前文档入链」

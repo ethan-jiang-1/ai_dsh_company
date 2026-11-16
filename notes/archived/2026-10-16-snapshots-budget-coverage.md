@@ -4,7 +4,7 @@
 
 ## 决定
 
-**收敛切片的「识别与计量」判据移入 `tools/lib/converge-rules.mjs` 的 `convergenceSlices({scenes, bytesOf})`，预算门禁改调它**，匹配按**代际**而不是前缀字面：
+**收敛切片的「识别与计量」判据移入 `tools/lib/company/converge-rules.mjs` 的 `convergenceSlices({scenes, bytesOf})`，预算门禁改调它**，匹配按**代际**而不是前缀字面：
 
 - 旧命名 `memory-convergence-<日期>[-N]`（至 2026-10-07 的 7 个切片）；
 - 新命名 `convergence-<日期>`（`tools/converge.mjs` 现行 `evName`）。

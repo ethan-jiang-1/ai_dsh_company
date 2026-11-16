@@ -7,7 +7,7 @@ import {
   sectionStructuralText,
   splitTableRow,
 } from '../../../packages/company-pack/src/lib/docs/markdown-shape'
-import { parseGfmAst } from '../../../tools/lib/repo-markdown.mjs'
+import { parseGfmAst } from '../../../tools/lib/core/repo-markdown.mjs'
 import { makeDocDetailed } from '../../support/doc-grammar'
 
 const CASES = Number(process.env.MARKDOWN_SHAPE_CASES ?? 500)

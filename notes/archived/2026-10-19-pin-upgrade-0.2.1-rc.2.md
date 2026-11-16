@@ -112,7 +112,7 @@ vendor 树内 `pnpm install --frozen-lockfile`（vendor node_modules 是 .gitign
 4. `release-smoke` / `replay-smoke` 的临时 profile **删掉 schedule-bundle**（退役 + 与 preset 行撞重复 id）；
    `tools/export-dist.mjs` 的安装手册去掉"再装节律 bundle"那一步。
 5. `tests/presets/presets.spec.ts`：三条断言按新契约重写（agentPreset、preset-clock、researcher 守卫）；
-   `tools/lib/company-roles.mjs` 新增 `COMPANY_SUPPORT_PRESET_IDS`，presets 门禁与 preset-smoke 一并覆盖它。
+   `tools/lib/company/company-roles.mjs` 新增 `COMPANY_SUPPORT_PRESET_IDS`，presets 门禁与 preset-smoke 一并覆盖它。
 
 **红→绿证据（每项都先看到红）**：
 - `delegation-smoke --delegate`：`模型可见工具目录里没有 subagent`（改写期自伤删了 delegation 组）→

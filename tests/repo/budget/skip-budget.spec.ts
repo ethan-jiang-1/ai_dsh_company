@@ -9,7 +9,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 /** 唯一允许的 skip：dev-only live 台账；预期 dev home 真跑 3 例，fresh clone 0 例。 */
 const ALLOWED = new Map([

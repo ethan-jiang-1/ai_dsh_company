@@ -64,6 +64,7 @@
 | <a id="d62"></a>D62 | 缺陷修复轨显性化：bug-fix 方法 + 按根因成批 + 修复就绪四节证据门 | [Note](../../notes/implemented/2026-11-15-defect-fix-method.md) |
 | <a id="d63"></a>D63 | 维护面 = 两层（oracle/entry）× 三面（judge/show/operate）；目录默认面 checks/probes/tools，例外住 reference | [Note](../../notes/implemented/2026-11-16-maintenance-surface-declaration-and-migration.md) |
 | <a id="d64"></a>D64 | 维护面根目录三仓统一 checks/probes/tools = 承诺方向（先纯化后统一、独立迁移项目；D63 分类法仍现行） | [Note](../../notes/implemented/2026-11-16-surface-root-unification-direction.md) |
+| <a id="d65"></a>D65 | 共享实现按归属分层：跨面地基 `tools/lib/`（自包含）、judge `checks/lib/`、show `probes/lib/`、测试专属 `tests/support/` | [Note](../../notes/implemented/2026-11-17-lib-ownership-split.md) |
 
 ## 已退役
 

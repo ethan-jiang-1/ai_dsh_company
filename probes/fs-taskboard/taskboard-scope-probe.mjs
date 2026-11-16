@@ -5,20 +5,20 @@
 // 退出码：0 = CFO create/list、COO isolation 两项都由工具结果证明；1 = 任一验收项失败；2 = 环境/工具错误。
 //
 // CFO 与 COO 是不同 root Team。探针核对 create、两门 list 的成对 tool call/result，模型回答只用于诊断。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { taskboardScopeEvidence } from '../../tools/lib/recovery-scope-evidence.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { taskboardScopeEvidence } from '../lib/recovery-scope-evidence.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('taskboard-scope-probe')
 } catch (error) {
   console.error(error.message)
@@ -28,7 +28,7 @@ try {
 let child
 try {
   const run = async () => {
-    // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `tsp-` 由调用方传入；spawn/fetch 注入
+    // 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `tsp-` 由调用方传入；spawn/fetch 注入
     // （tools/lib 是 keyless 纯逻辑缝）。外层 finally 兜杀引用 child ⇒ 经注入的 spawn 顺手捕获：
     // startWeb 起进程先于等 banner，boot 失败时 child 已在手，清理路径与原实现一致。
     const { base, token } = await startWeb({ spawn: (...args) => (child = spawn(...args)), root: ROOT, home })

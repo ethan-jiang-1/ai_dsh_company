@@ -33,7 +33,7 @@
 | 项 | 内容 |
 |---|---|
 | 事实 | 面规则对全 tracked 路径完备；未分类改动面 fail-closed；守卫的「命中」= 普通文件；活指针/构建字面量/计数面 = live 载体全集；证据标签 = 可直接复跑的 pnpm 脚本 |
-| 唯一入口 | `checks/gates/surface-coverage.mjs`（全 tracked 完备性）、`tools/lib/asset-lanes.mjs`（`SURFACE_RULES` / `UNCONDITIONAL_STEPS`）、`checks/pre-push-surfaces.mjs`（阻断 + 归一）、四个守卫 spec |
+| 唯一入口 | `checks/gates/surface-coverage.mjs`（全 tracked 完备性）、`tools/lib/core/asset-lanes.mjs`（`SURFACE_RULES` / `UNCONDITIONAL_STEPS`）、`checks/pre-push-surfaces.mjs`（阻断 + 归一）、四个守卫 spec |
 | 读载体 | `pnpm verify`（新门禁）、`.githooks/pre-push`（unseen 阻断）、`pnpm test`（守卫 spec） |
 | 契约测试 | `tests/repo/budget/asset-lanes.spec.ts`、`tests/repo/budget/vitest-coverage-thresholds.spec.ts`、`tests/repo/docs/live-pointer-paths.spec.ts`、`tests/repo/docs/typecheck-coverage-claim.spec.ts`、`tests/repo/structure/built-path-literals.spec.ts`、`tests/checks/pre-push-surfaces.test.mjs` |
 

@@ -33,7 +33,7 @@ import {
   classifyDeliverable,
   deliverableId,
   normalizeRel,
-} from './deliverables.mjs'
+} from '../../tools/lib/company/deliverables.mjs'
 
 /** 判据违规代码（测试与脚本都按这些码断言，别用自由文本）。 */
 /**

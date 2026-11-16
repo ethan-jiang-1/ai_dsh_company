@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { recoveryEvidence, taskboardScopeEvidence } from '../../tools/lib/recovery-scope-evidence.mjs'
+import { recoveryEvidence, taskboardScopeEvidence } from '../../probes/lib/recovery-scope-evidence.mjs'
 
 const call = (seq: number, callId: string, name: string, args: unknown = {}) => ({
   type: 'tool/call', seq, data: { callId, name, arguments: JSON.stringify(args) },

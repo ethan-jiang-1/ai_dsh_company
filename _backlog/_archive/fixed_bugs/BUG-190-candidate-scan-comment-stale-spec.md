@@ -37,7 +37,7 @@ test -e tests/tools/candidate-scan-labels.spec.ts   # 旧路径：不存在（ex
 ## 根因与证据
 
 - **根因**：测试树拆分/重命名时，`candidate-scan` 的 spec 从计划名 `candidate-scan-labels.spec.ts` 落成 `candidate-scan-assignments.spec.ts`（2026-10-11 起的 BUG-011 守卫与实际导入都在 assignments 文件里），审计脚本注释没有改。注释在 `.mjs` 里，不在 Markdown 裸路径/`command-refs`/`md-links` 任一扫描面。
-- **确认**：旧文件名在盘上不存在；`assignments` spec 的 import 明确消费 `tools/lib/candidate-scan.mjs` 的同一组函数，10 passed。
+- **确认**：旧文件名在盘上不存在；`assignments` spec 的 import 明确消费 `checks/lib/candidate-scan.mjs` 的同一组函数，10 passed。
 
 ## 失败类与同类排查
 
@@ -49,7 +49,7 @@ test -e tests/tools/candidate-scan-labels.spec.ts   # 旧路径：不存在（ex
 
 - 把注释里的文件名改成 `tests/tools/candidate-scan-assignments.spec.ts`。
 - 防复发：`tests/repo/docs/live-pointer-paths.spec.ts` 的「审计脚本」用例扫 `checks/audit/**` 的 `tests/*.spec.ts` 字面量并要求存在。
-- 明确不改：不改审计逻辑、不改 spec、不改 `tools/lib/candidate-scan.mjs`。
+- 明确不改：不改审计逻辑、不改 spec、不改 `checks/lib/candidate-scan.mjs`。
 
 ## 已修判定
 

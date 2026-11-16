@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { renderInstallManual } from '../../tools/lib/install-manual.mjs'
+import { renderInstallManual } from '../../tools/lib/release/install-manual.mjs'
 import { expectedTag } from './lib/pin.mjs'
 
 // ── 2g. 手动分发手册版本 + 安装形状门禁（2026-09-28 立；2026-11-01 v3 重写）────────
@@ -85,7 +85,7 @@ export function run({ root, ok, fail }) {
       let at = 0
       while (at < rendered.length && at < manual.length && rendered[at] === manual[at]) at += 1
       const around = (text) => JSON.stringify(text.slice(Math.max(0, at - 40), at + 60))
-      problems.push(`手册不是当前模板的产物（${'tools/lib/install-manual.mjs'} 改了而手册没重生成）：`
+      problems.push(`手册不是当前模板的产物（${'tools/lib/release/install-manual.mjs'} 改了而手册没重生成）：`
         + `首处差异 @${String(at)} 模板=${around(rendered)} 手册=${around(manual)}——重跑 \`node tools/release/export-dist.mjs\`（或 release --prepare）`)
     }
   } else {

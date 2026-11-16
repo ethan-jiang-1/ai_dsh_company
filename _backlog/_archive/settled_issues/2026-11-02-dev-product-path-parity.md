@@ -162,7 +162,7 @@ workspace、安装副本就是仓库源码——所以"dev 里看着对"与"用�
 **P0 完成**：`tools/company.mjs` 默认 `tsc + tsdown → npm pack → dsh plugin --profile company add file:<tgz>
 → exec`；`--link` 显式快速通道；link→tarball 迁移有显式提示（不静默）；tarball 内容寻址命名
 （`<name>-<ver>-<sha8>.tgz`，内容一变 spec 就变）；同 spec 跳过 add（二启 `安装副本已是最新`）。
-安装规划抽成纯函数 `tools/lib/dev-install.mjs`（`resolveDevMode`/`devTarballName`/`planDevStart`）。
+安装规划抽成纯函数 `tools/lib/core/dev-install.mjs`（`resolveDevMode`/`devTarballName`/`planDevStart`）。
 
 **P1 完成**：新增 [parity 指南](../../../docs/guides/dev-product-parity.md)（同形机制 + 允许差异 + 怎么验）；
 修 `docs/guides/bootstrap.md` 的「装进 **web profile**」→ company；`policy`/`demo`/`profile`/`release`/`AGENTS`

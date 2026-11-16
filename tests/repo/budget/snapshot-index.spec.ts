@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { missingSnapshotIndexRows } from '../../../tools/lib/snapshot-index.mjs'
+import { missingSnapshotIndexRows } from '../../../checks/lib/snapshot-index.mjs'
 
 // 2026-10-20 审计：README 43 行 vs 盘上 47 场景；本 spec 钉住「目录 → README 行」的判据。
 describe('snapshot-index 纯逻辑', () => {

@@ -5,7 +5,7 @@
 
 ## 决定
 
-1. **`assess(state, flags)` 住 [converge-rules.mjs](../../tools/lib/converge-rules.mjs)，纯函数、不做 I/O。**
+1. **`assess(state, flags)` 住 [converge-rules.mjs](../../tools/lib/company/converge-rules.mjs)，纯函数、不做 I/O。**
    state = 可观察事实（`closed` / `conclusion` / `hasFinal` / `archived` / `journals` / `findings`），
    flags 只认 `allowNoJournal` / `allowOpenFindings`。返回 `{ ready, reasons, blocking, accepted }`：
    `reasons` 给计划档逐条展示，`blocking` 决定 ready，`accepted` 记录被旗标放行的闸。

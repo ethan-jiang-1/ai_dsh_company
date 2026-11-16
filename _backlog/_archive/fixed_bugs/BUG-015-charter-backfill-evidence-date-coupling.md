@@ -8,7 +8,7 @@ opened: 2026-10-12
 
 > 严重级别：P2（次要）｜发现：2026-10-12（评审聚合者独立巡检）｜状态：修复就绪
 > **翻转记录（2026-10-12）**：沙箱对照实验坐实（收据在复现节）+ 修法选定 + 已修判定在场——缺陷轨翻转表「调查中 → 修复就绪」（P2 修复型自授权通道）。
-> **修复（2026-10-12）**：证据目录按 slug 解析真实收敛目录——`tools/lib/converge-rules.mjs` 的 `resolveEvidenceDir`（多日并存取最新、无证据目录 throw → CLI exit 1）；converge() 侧创建目录单源 `evName`（创建日语义不变）。红绿 = spec 三用例（解析/throw/多日）+ 复现节沙箱（修复前写断链 exit 0）对照；真仓 dry-run 打印解析后路径、COO 补登条目指针已核可解析——已修判定满足，修复已落地 → 已修归档。
+> **修复（2026-10-12）**：证据目录按 slug 解析真实收敛目录——`tools/lib/company/converge-rules.mjs` 的 `resolveEvidenceDir`（多日并存取最新、无证据目录 throw → CLI exit 1）；converge() 侧创建目录单源 `evName`（创建日语义不变）。红绿 = spec 三用例（解析/throw/多日）+ 复现节沙箱（修复前写断链 exit 0）对照；真仓 dry-run 打印解析后路径、COO 补登条目指针已核可解析——已修判定满足，修复已落地 → 已修归档。
 
 ## 症状
 

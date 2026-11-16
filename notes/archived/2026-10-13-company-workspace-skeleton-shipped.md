@@ -36,11 +36,11 @@
 ## 后果与边界（本轮真撞到的两处）
 
 1. **md-links 的（路径）排除**：骨架是要**发布到任意磁盘**的运行语料，手册里的相对指针（`../docs/*`）
-   是**部署相对**的——在运行盘读到才成立，在 pack 家读到深度没有意义。所以 `tools/lib/markdown-links.mjs`
+   是**部署相对**的——在运行盘读到才成立，在 pack 家读到深度没有意义。所以 `tools/lib/core/markdown-links.mjs`
    按**路径**排除 `packages/company-pack/content`（不按目录名，避免误伤任何叫 workspace 的目录），
    校验落在运行盘那份（显式加入 `packages/company-pack/content/AGENTS.md`，符号链接读到同一内容）。
    模板与 CHARTER 实测 **0 条 markdown 链接** ⇒ 无覆盖损失。
-2. **排练场镜像要解引用**：`tools/lib/rehearsal.mjs` 此前 `cpSync` 直接拷制度件；源变成符号链接后
+2. **排练场镜像要解引用**：`tools/lib/core/rehearsal.mjs` 此前 `cpSync` 直接拷制度件；源变成符号链接后
    二次刷新 EEXIST 崩（preset-smoke 首跑现场）。修法 = `copyRef` 先 `realpathSync` 再拷
    （⚠ Node 的 `cpSync` 对「符号链接源 + 已存在目标」会抛误导错 `Cannot overwrite non-directory … with
    directory …`，`dereference: true` 与否都实测复现——所以不能靠 `dereference` 旗子）。
@@ -73,6 +73,6 @@ converge/orient/排练判据适配 + `drafts-untracked` 门禁）。
 
 - 骨架：`packages/company-pack/content/`（含 `README.md` 说明"是什么 / 装完怎么落盘"）；pack `files` 加 `workspace/**`。
 - 运行盘链接：`packages/company-pack/content/AGENTS.md`、`templates`、`kb/org.md`（3 处）；`kb/<角色>/CHARTER.md`×5 是实文件（随包分发，不链接）。
-- 门禁：`checks/run-gates.mjs` 的 `company-skeleton`；走查修复：`tools/lib/markdown-links.mjs`（路径排除）、
-  `tools/lib/rehearsal.mjs`（`copyRef` 解引用）+ `tests/repo/foundation-safety.spec.ts`（新守）。
+- 门禁：`checks/run-gates.mjs` 的 `company-skeleton`；走查修复：`tools/lib/core/markdown-links.mjs`（路径排除）、
+  `tools/lib/core/rehearsal.mjs`（`copyRef` 解引用）+ `tests/repo/foundation-safety.spec.ts`（新守）。
 - 文档：`packages/company-pack/README.md`（owner 表 + 装完第一步）、`docs/project-map.md` 公司盘行。

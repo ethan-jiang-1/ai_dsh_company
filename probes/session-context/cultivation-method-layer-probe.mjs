@@ -30,14 +30,14 @@
 //      danger-full-access（机器条件，env.sh 明示打印），⑦ 会红且红文提示按 workspace-write
 //      重跑；判 ⑦ 前先 `DSH_PERMISSION_MODE=workspace-write` 钉住模式。
 // 清理：探针只删自己种下的文件（seed 方法目录、adopt 产物、本次写入的记录文件）。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { readRecords } from '../../tools/lib/session-log.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const FULL = process.argv.includes('--full')
 const SEED_METHOD = 'probe-seeded-method'

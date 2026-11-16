@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
-import { devBuildFingerprint, packageSourceFiles, sourceFingerprint } from '../../../tools/lib/pack-source.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
+import { devBuildFingerprint, packageSourceFiles, sourceFingerprint } from '../../../tools/lib/core/pack-source.mjs'
 
 const makePack = () => {
   const dir = mkdtempSync(join(tmpdir(), 'pack-source-'))
@@ -55,7 +55,8 @@ describe('包源指纹（release 与 dev 缓存共用）', () => {
 
   it('release 的唯一 owner 是 pack-source（不许再私藏第二份清单）', () => {
     const release = readFileSync(join(ROOT, 'tools/release/release.mjs'), 'utf8')
-    expect(release).toContain("from '../lib/pack-source.mjs'")
+    // 断言「依赖存在」而不是某一层深度：lib 内部分组（core/ 等）不该让这条不变量变红。
+    expect(release).toMatch(/from '\.\.\/lib\/(?:[a-z]+\/)?pack-source\.mjs'/)
     expect(release).not.toContain('const PACKAGE_SOURCE_DIRS')
   })
 })

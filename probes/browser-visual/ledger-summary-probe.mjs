@@ -10,8 +10,8 @@
 import assert from 'node:assert/strict'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { repositoryRoot } from '../../tools/lib/repository-layout.mjs'
-import { dismissNotices, openCompanyTab, openSessionBySearch } from '../../tools/lib/probe-window.mjs'
+import { repositoryRoot } from '../../tools/lib/core/repository-layout.mjs'
+import { dismissNotices, openCompanyTab, openSessionBySearch } from '../lib/probe-window.mjs'
 import { loadChromium, launchChromium } from '../../tools/drivers/playwright.mjs'
 
 const [url, title] = process.argv.slice(2)

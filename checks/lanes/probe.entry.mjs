@@ -26,13 +26,13 @@
 //   · **完成信号用持久事件**（`turn/end`），不要用状态位（`session/list.running` 是"会话有活着的 agent"，
 //     idle 也为 true，会让等待永不满足）。
 //   · **慢是常态**：内容档超时 ≥5min；快档 90s 足够；失败重试一次（换新会话）。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { COMPANY_ROLE_IDS } from '../../tools/lib/company/company-roles.mjs'
 import { spawn } from 'node:child_process'
 import { join, resolve } from 'node:path'
-import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -106,7 +106,7 @@ if (!process.argv.includes('--cwd')) ensureRehearsalWorkspace(ROOT)
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝）。
 // 既有差异当参数保留：空 cookie 即抛（onEmptyCookie: 'throw'）、rpcId 前缀 `probe-` + 失败回退转储
 // 响应体（dumpBodyOnError；rpc 错误措辞统一为模块的 `${endpoint}: …`，boot 失败文案同——卡内
 // 接受的文本统一，判据标签与退出码不变）。readLog/askInNewSession 是模块顶层的既有调用点，用的是

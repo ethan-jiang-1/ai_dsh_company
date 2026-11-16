@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildDeliverablesCatalog } from '../../tools/lib/deliverables-catalog.mjs'
+import { buildDeliverablesCatalog } from '../../tools/lib/company/deliverables-catalog.mjs'
 
 /**
  * 成品目录的 keyless 形状判据（2026-10-19 成品台账卡）。

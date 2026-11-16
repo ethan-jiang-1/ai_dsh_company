@@ -48,7 +48,7 @@ source run/env.sh && node probes/session-context/ask-user-timed-probe.mjs
 
 ## 已修判定
 
-- [x] 纯逻辑 `questionStopOf(events, options)` 落 `tools/lib/question-stop.mjs`：三类结论（无停点 / 有界等待含 `remainingMs` /
+- [x] 纯逻辑 `questionStopOf(events, options)` 落 `probes/lib/question-stop.mjs`：三类结论（无停点 / 有界等待含 `remainingMs` /
       无界卡死含理由）+ 逾期分支；**红**（模块缺失，spec import 即红）→ **绿 10/10**。
 - [x] 判定只用**会话日志可观测面**（`tool/call name=ask_user_question` 与 `data.message.toolCallId` 配对），
       坏 `arguments` / 缺时间戳 / 别的工具挂住都有 spec 兜底。

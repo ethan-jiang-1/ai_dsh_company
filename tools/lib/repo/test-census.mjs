@@ -2,7 +2,7 @@
  * 资产盘子（census）的纯逻辑：建模 + 渲染。
  *
  * 为什么：盘子在文档里手抄必漂（本仓六份清单同一种病）。census 是**生成物**：
- * 数据来自注册表（tools/lib/asset-lanes.mjs）+ 盘上目录计数，渲染结果与提交的文件逐字比对，
+ * 数据来自注册表（tools/lib/core/asset-lanes.mjs）+ 盘上目录计数，渲染结果与提交的文件逐字比对，
  * 不一致即红。它不评价资产好坏，只让「有什么、在哪条 lane、抓哪类失败、多少未分类」一眼可见。
  */
 import { readdirSync } from 'node:fs'
@@ -47,7 +47,7 @@ export function renderCensus(model) {
   lines.push('# 测试资产盘子（生成物，勿手改）')
   lines.push('')
   lines.push('> 生成 = `node tools/repo/test-census.mjs --write`；一致性门 = `tests/repo/budget/test-census.spec.ts`（不一致即红）。')
-  lines.push('> 数据源 = `tools/lib/asset-lanes.mjs`（登记 + lane）+ 盘上目录计数；失败类词表 = `tests/failure-classes.md`。')
+  lines.push('> 数据源 = `tools/lib/core/asset-lanes.mjs`（登记 + lane）+ 盘上目录计数；失败类词表 = `tests/failure-classes.md`。')
   lines.push('')
   lines.push('## 汇总')
   lines.push('')

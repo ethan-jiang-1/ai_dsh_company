@@ -7,7 +7,7 @@
 # （上游提供免构建 test 路径 / 第二贡献者进场值得付构建链）成立再回 CI。
 # 2026-11-11：fresh-clone 的 setup-macos job 每周/手动在干净 macOS 上跑全量 setup + test——
 # 不是每 push 的通道，不改变本 workflow 的边界。
-# ⚠ verify 不是零依赖：tools/lib/markdown-links.mjs 复用 vendor 工作区的解析器依赖
+# ⚠ verify 不是零依赖：tools/lib/core/markdown-links.mjs 复用 vendor 工作区的解析器依赖
 # （mdast-util-from-markdown 等，经 vendor/dsh/package.json 解析——首跑失败的根因即此），
 # 所以走标准引导（dev-loop §7 第 3 步）：corepack + pnpm install --frozen-lockfile。
 name: ci

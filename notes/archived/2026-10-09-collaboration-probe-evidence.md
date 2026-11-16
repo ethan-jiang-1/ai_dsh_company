@@ -4,7 +4,7 @@
 
 ## 决定
 
-探针依据配对工具结果、持久任务快照、消息身份及恢复水位判断，不从模型正文推断动作。纯判据由 [协作 evidence](../../tools/lib/collaboration-evidence.mjs)、[恢复/跨根 evidence](../../tools/lib/recovery-scope-evidence.mjs)及[双成员barrier evidence](../../tools/lib/team-barrier-evidence.mjs)提供，真实驱动复用同一实现；[退出码回归](../../tests/evidence/collaboration-probe-verdict.spec.ts)执行真实脚本判分段，双成员读屏障/发布链由[spec](../../tests/evidence/team-barrier-evidence.spec.ts)钉住。
+探针依据配对工具结果、持久任务快照、消息身份及恢复水位判断，不从模型正文推断动作。纯判据由 [协作 evidence](../../probes/lib/collaboration-evidence.mjs)、[恢复/跨根 evidence](../../probes/lib/recovery-scope-evidence.mjs)及[双成员barrier evidence](../../probes/lib/team-barrier-evidence.mjs)提供，真实驱动复用同一实现；[退出码回归](../../tests/evidence/collaboration-probe-verdict.spec.ts)执行真实脚本判分段，双成员读屏障/发布链由[spec](../../tests/evidence/team-barrier-evidence.spec.ts)钉住。
 
 结束条件采用 Lead 与成员最新轮 completed，加目标产物，不要求未被提示的第二轮；子成员日志用带父身份的 subagent 地址。恢复只接受重启提示后的状态与回报，旧 completed 轮不算恢复完成。正常拒绝或未触发所需路径退出1，环境/工具读取失败退出2，均不能当PASS。
 

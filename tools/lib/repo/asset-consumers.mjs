@@ -13,10 +13,11 @@ import { basename, join, relative } from 'node:path'
 const ROOTS = ['tests', 'checks', 'tools', 'probes', 'run']
 const EXTS = /\.(?:mjs|js|ts|tsx|md)$/
 const SKIP_DIRS = new Set(['node_modules', '.git', 'vendor', '_dist', 'runtime', 'snapshots'])
-const SKIP_REL_DIRS = new Set(['tools/lib'])
+/** 支撑实现目录（非入口、非资产）：各面的 lib/ 都不参与消费者计数。 */
+const isSupportDir = rel => /^(?:checks|probes|tools)\/lib(?:\/|$)/.test(rel)
 const SELF = new Set([
-  'tools/lib/asset-lanes.mjs',
-  'tools/lib/test-census.mjs',
+  'tools/lib/core/asset-lanes.mjs',
+  'tools/lib/repo/test-census.mjs',
   'tools/repo/test-census.mjs',
   'tests/CENSUS.generated.md',
   'checks/lanes/probe.entry.mjs',
@@ -29,7 +30,7 @@ function walk(root, dir, acc) {
     const path = join(dir, entry.name)
     const rel = relative(root, path).replaceAll('\\', '/')
     if (entry.isDirectory()) {
-      if (SKIP_REL_DIRS.has(rel)) continue
+      if (isSupportDir(rel)) continue
       walk(root, path, acc)
       continue
     }

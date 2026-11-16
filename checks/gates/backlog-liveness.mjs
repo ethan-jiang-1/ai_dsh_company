@@ -1,6 +1,6 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { join } from 'node:path'
-import { backlogLivenessProblems } from '../../tools/lib/backlog-liveness.mjs'
+import { backlogLivenessProblems } from '../lib/backlog-liveness.mjs'
 
 // ── _backlog 活状态 + 索引交叉核对门禁（backlog-liveness；D33 原门唯一家）───────
 // 为什么：D30 未完结卡缺户口、D33 搬卡未同步索引，两类真漂移要求位置、头与索引一起检查。
@@ -12,7 +12,7 @@ import { backlogLivenessProblems } from '../../tools/lib/backlog-liveness.mjs'
 // 迁移反例留证 2026-10-09（真实仓文件，pnpm verify 红→逐项还原绿）：issues 卡删 opened →
 //   backlog-liveness 报「缺 opened」；归档总索引改掉一条 settled issue 目标 → 报该卡未被 _archive/README.md 索引；
 //   issues/README.md 暂移 → 报必需索引缺失；新 research 文件缺 frontmatter → 报缺 frontmatter。四项各自还原后 ALL PASS。
-// 2026-10-10：函数体已原样挪进 tools/lib/backlog-liveness.mjs（本卡「两处重复收成模块」）。
+// 2026-10-10：函数体已原样挪进 checks/lib/backlog-liveness.mjs（本卡「两处重复收成模块」）。
 // 2026-10-25：归档「毕业：做」卡的 durable 去向（opened ≥ 2026-10-25；老卡豁免）——理由与反证见 lib 的检查块。
 // 2026-11-02（五道门）：状态 ↔ 出口物耦合——`待落地` 门票/去向/毕业头、`修复就绪`/`修复已落地` 的 `## 已修判定`、
 //   归档去向封闭集 + `审查：` 记录（生效日 2026-11-03）、题名页 `调研中|已定性`、材料禁 status。

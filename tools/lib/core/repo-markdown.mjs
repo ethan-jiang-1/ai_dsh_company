@@ -9,12 +9,15 @@
  * - 门禁与 `tools/lib/` 严禁再手写裸 `/^---\r?\n/` 或裸 `/^##\s+/` 切分（由 `company-root-carriers` 静态门强制）。
  */
 import { createRequire } from 'node:module'
+import { join } from 'node:path'
 import { parseMarkdownAst, renderedNodeText } from './markdown-links.mjs'
+import { repositoryRoot } from './repository-layout.mjs'
 
 // js-yaml 由 vendor 根声明（根 install 后 hoisted 亦可解析）；解析一次、两个 schema 共用。
 // 解析不到 = install 未完成：让 Node 抛 MODULE_NOT_FOUND（报错点名 js-yaml 与下面的解析基），
 // 不另造一条永远不可达的「友好错误」分支——死语句会永久压低本文件覆盖且从不被执行。
-const yamlJs = createRequire(new URL('../../vendor/dsh/package.json', import.meta.url))('js-yaml')
+// 解析基从仓库根派生（单源 = repository-layout），不按本文件深度算。
+const yamlJs = createRequire(join(repositoryRoot, 'vendor/dsh/package.json'))('js-yaml')
 
 const loadYaml = text => yamlJs.load(text, { schema: yamlJs.CORE_SCHEMA })
 

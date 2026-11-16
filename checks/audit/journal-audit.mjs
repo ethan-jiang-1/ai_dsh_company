@@ -20,11 +20,11 @@
 import { execFileSync, execSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { snapshotScenes } from '../../tools/lib/repository-layout.mjs'
-import { pickArchivedJournal } from '../../tools/lib/converge-rules.mjs'
-import { pickSessionLog } from '../../tools/lib/session-log-generation.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
-import { COMPANY_ROLE_IDS } from '../../tools/lib/company-roles.mjs'
+import { snapshotScenes } from '../../tools/lib/core/repository-layout.mjs'
+import { pickArchivedJournal } from '../../tools/lib/company/converge-rules.mjs'
+import { pickSessionLog } from '../../tools/lib/session/session-log-generation.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
+import { COMPANY_ROLE_IDS } from '../../tools/lib/company/company-roles.mjs'
 import { zstdText } from '../../tools/drivers/zstd.mjs'
 
 const args = process.argv.slice(2)

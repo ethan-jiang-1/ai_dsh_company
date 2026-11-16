@@ -19,14 +19,14 @@
 //       playwright（vendor 全树 `pnpm install` 后在 .pnpm store，本脚本自动定位）与一份
 //       chromium（缺 playwright 期望的版本时自动回退缓存里最新一份）。
 // 用法：source run/env.sh && node checks/lanes/client-load.entry.mjs [--port 0] [--profile company]
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb } from '../../tools/lib/probe/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
-import { diagnosisDir } from '../../tools/lib/diagnosis.mjs'
+import { diagnosisDir } from '../../tools/lib/probe/diagnosis.mjs'
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
@@ -47,7 +47,7 @@ try {
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
 const chromiumApi = await loadChromium(ROOT)
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：本 smoke 只 boot——token 直接进浏览器 URL，
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：本 smoke 只 boot——token 直接进浏览器 URL，
 // 不取 cookie、不发 RPC ⇒ 只走 startWeb 这一层；spawn 注入（tools/lib 是 keyless 纯逻辑缝）。
 const { child, port, token } = await startWeb({ spawn, root: ROOT, home, port: PORT, profile: PROFILE })
 let failures = 0

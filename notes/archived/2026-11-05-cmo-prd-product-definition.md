@@ -32,7 +32,7 @@
 
 ## 后果 / 边界
 
-- 角色接线面：`tools/lib/company-roles.mjs`、`converge-rules`、`authorship`、`deliverables`、
+- 角色接线面：`tools/lib/company/company-roles.mjs`、`converge-rules`、`authorship`、`deliverables`、
   `candidate-scan`、`recovery-scope`、`presence-status`、`RoleBadge` / `styles`、presets 门禁、
   测试与文档。
 - `handbook-budget` 门禁改为**按声明文件枚举 preset**（`presets/_shared` 不是 preset，缺声明不崩）。
@@ -64,7 +64,7 @@
    已加 cmo；release-smoke 干净资料首启件数 **36→39**（多 `kb/cmo/`、`journal/`、`CHARTER.md`）且 PASS。
 2. **编制残留**：`content/charters/vp-eng.md` 与 `docs/contracts/presets.md` 仍写研发 18 人 / 含产品 2 →
    改 **16 人**（产品 2 已归 CMO 线）。
-3. **用户可见面**：安装手册模板（`tools/lib/install-manual.mjs`）五角色→六角色（含排障表）。
+3. **用户可见面**：安装手册模板（`tools/lib/release/install-manual.mjs`）五角色→六角色（含排障表）。
 4. **active 面五角色残留**：presets / ledger-participation 注释、channel-matrix-smoke ROLES、
    preset / replay smoke 注释、sidebar-role-mark-probe G6（含 cmo/M/六底色）、
    cultivation-method-layer probe ROLES、role-mark-fixture；converge-rules 新增
@@ -80,9 +80,9 @@
 
 1. **`tools/bundle-init.mjs` ROLES 仍是五角色**（dev 初始化不建 `kb/cmo/` 与章程）→ 加 cmo；
    新增测试断言 bundle-init 覆盖 `COMPANY_ROLE_IDS`。
-2. **`tools/lib/authorship.mjs` 的 `SIG`/`RECLAIM` 正则仍五角色**（CMO 的 `出稿：cmo` 不被识别）→
+2. **`checks/lib/authorship.mjs` 的 `SIG`/`RECLAIM` 正则仍五角色**（CMO 的 `出稿：cmo` 不被识别）→
    加 CMO/cmo；authorship 测试新增 cmo 署名用例。
-3. **`tools/lib/candidate-scan.mjs` 的 `ASSIGN_LINE`/`MENTION`/`ENTRY_HEAD` 仍五角色**（CMO 派活/点名
+3. **`checks/lib/candidate-scan.mjs` 的 `ASSIGN_LINE`/`MENTION`/`ENTRY_HEAD` 仍五角色**（CMO 派活/点名
    扫不到）→ 加 cmo；candidate-scan 测试新增 cmo 派活行/点名用例。
 4. **测试资产缺口**：bootstrap 无 cmo 章程断言（正是第一遍功能 bug 的漏网口）、共享 skill 挂载/引用无测试、
    模板与 `/prd check` 同源无测试、CMO 显示名/徽标无测试、presets 的时钟/手册角色循环仍五角色、

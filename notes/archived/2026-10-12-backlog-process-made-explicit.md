@@ -14,7 +14,7 @@
 - **就地修复排查落点**：当场修掉不建卡的，其同类横切排查一句话记该轮轮次回执①行（有 Note 随 Note）——解「模板问横切排查、当场修的没有卡可写」的自相矛盾。
 - **bugs 模板**：加 `## 已修判定`（含搭载依赖字段）；状态节列新枚举并指回章程。
 - **开发环 §0.5 对账**：任务源清单加唯一例外指针句（修复就绪自授权），规则唯一家 = 章程，不双写。
-- **门禁修订**（`tools/lib/backlog-liveness.mjs`，既有类修订不新增族）：缺陷轨枚举表扩容改名、状态行↔frontmatter 镜像互查、问题卡 `毕业：` 封闭头；反证在 `tests/tools/backlog-liveness.spec.ts`（24 例）。
+- **门禁修订**（`checks/lib/backlog-liveness.mjs`，既有类修订不新增族）：缺陷轨枚举表扩容改名、状态行↔frontmatter 镜像互查、问题卡 `毕业：` 封闭头；反证在 `tests/tools/backlog-liveness.spec.ts`（24 例）。
 
 ## 输掉的方案
 

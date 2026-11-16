@@ -18,11 +18,11 @@
 //   ⑦ 子会话 address 可 page（有 fixture 才判；无 = SKIP）
 //
 // 红证：删掉本探针依赖的投影/读面（或把 page 换成会 promote 的路径）→ ①/② 红；命令超限 → ④ 红。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
-import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
-import { readRecords } from '../../tools/lib/session-log.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
+import { ensureRehearsalWorkspace, REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'

@@ -49,9 +49,9 @@ rmdir tools/observe
 
 ## 3. 注册表、门禁与预算
 
-1. `tools/lib/asset-lanes.mjs` 的 `PROBES` 增 6 条，`domain: 'analyze'`；`FAILURE_CLASS_BY_NAME` 增 6 条（候选：orient / ask-latency / diagnose / explore-evidence = `会话持久化`，notes-audit = `文档指针`，propose-sampler = `模型可见文本`）。
+1. `tools/lib/core/asset-lanes.mjs` 的 `PROBES` 增 6 条，`domain: 'analyze'`；`FAILURE_CLASS_BY_NAME` 增 6 条（候选：orient / ask-latency / diagnose / explore-evidence = `会话持久化`，notes-audit = `文档指针`，propose-sampler = `模型可见文本`）。
 2. `tests/repo/budget/test-census.spec.ts` 的 `MAX_PROBES`：**A** 59 → 65（一次性抬顶 + Note）或 **B** 保持 59、同批退役 6 支同族探针。**未决，需用户裁。**
-3. `tools/lib/checks-index.mjs`：探针分组/计数排除 `probes/**/index.mjs`（fixture 入口不是资产），修掉 60 vs 59。
+3. `tools/lib/core/checks-index.mjs`：探针分组/计数排除 `probes/**/index.mjs`（fixture 入口不是资产），修掉 60 vs 59。
 4. 重生成：`node tools/repo/checks-index.mjs --write`、`node tools/repo/test-census.mjs --write`。
 5. 新文件头注：`// 状态：` 与 `// 何时跑：` 已在原文件，改名不动内容，门禁应继续绿。
 
@@ -64,9 +64,9 @@ rmdir tools/observe
 | `tools/README.md` | 12 行组表 | 删 observe 组，四组 → 三组 + 说明 |
 | `notes/implemented/2026-10-30-notes-consistency-governance.md` | 21 | notes-audit 路径 |
 | `notes/implemented/2026-11-10-exploration-asset-strategy.md` | 31、59、72 | explore-evidence 路径 |
-| `tests/support/coverage-baseline.json` | 801 | 豁免 reason 里的 diagnose 路径（键 `tools/lib/diagnosis.mjs` 不动） |
-| `tools/lib/orient.mjs` | 3 | 注释里的 CLI 面路径 |
-| `tools/lib/session-evidence.mjs` | 5 | 注释里的调用方路径 |
+| `tests/support/coverage-baseline.json` | 801 | 豁免 reason 里的 diagnose 路径（键 `tools/lib/probe/diagnosis.mjs` 不动） |
+| `probes/lib/orient.mjs` | 3 | 注释里的 CLI 面路径 |
+| `tools/lib/session/session-evidence.mjs` | 5 | 注释里的调用方路径 |
 | 本题研究材料 | 多篇 | 这是**自指成本**：research 材料在 bare-path 扫描面内，迁完必须同步改路径，否则它们会把迁移判红 |
 
 > 自指成本是这轮的新发现：**研究文档也是消费者**。以后写迁移类研究，要么在实施同 diff 更新研究材料，要么先把材料归档。后者会让证据离开活区，不推荐。

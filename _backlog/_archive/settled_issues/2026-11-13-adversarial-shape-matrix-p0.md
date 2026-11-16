@@ -64,7 +64,7 @@ opened: 2026-11-13
 - [x] `新建:tests/host/contract/company-root-safety.spec.ts`：**10 个 writer × 13 shape = 130 例 + 4 个零覆盖入口单测 = 134 例**；每个 writer 在任意形状下「写进根内」或 typed refusal；`outside/` 快照不变。
 - [x] 词表对齐（只动类型/注释，不改运行时）：`companyFileProblem` 不再声明永不产生的 `'corrupt'`；`companyFileProblemAt` 注释与返回一致。
 - [x] `新建:tests/host/contract/file-shape-agreement.spec.ts`：`companyFileProblem` / `companyFileProblemAt` / `plainFileProblem` / `readCompanyText` 归一后 ok/not-ok 一致；`readCompanyText` 的「更粗」视图显式声明。
-- [x] `新建:tools/lib/carrier-registry.mjs`：**15 个已收口载体、3 个 `EXEMPT`、0 个 `KNOWN_GAP`**。
+- [x] `新建:checks/lib/carrier-registry.mjs`：**15 个已收口载体、3 个 `EXEMPT`、0 个 `KNOWN_GAP`**。
 - [x] `新建:checks/gates/company-root-carriers.mjs`：未登记的生产者 → 红，报 `file:line`；模块/符号不存在 → 红；`KNOWN_GAP` 卡不存在 → 红；`KNOWN_GAP` 在 PASS 行列出。
 - [x] 四个红证实跑：门禁植入未登记写入口 / 根 residency 短路 / 分类器折平 / 去掉 TOCTOU recheck → 对应矩阵红；还原绿；原话进 Note。
 - [x] `pnpm test` 全量 **242 files / 1997 tests** 绿（契约目录 4 spec / 167 用例）；`pnpm verify` ALL PASS；进程 smoke 16 项 ALL PASS。

@@ -9,8 +9,8 @@
 // 不证明：真实 SIGKILL 发生在 revoke 执行中的精确时点（状态注入覆盖恢复路径，不覆盖进程调度）。
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 import { plainNodeEnv, releaseProcesses } from '../../tools/drivers/release-process.mjs'
 
 const PROFILE = 'revoke-recovery'

@@ -8,21 +8,21 @@
 // 何时跑：CEO persona/主持动议 skill 的人话出口、阻塞拍板、非阻塞假设继续或短表行锚规则改动时（合并原 expression/nonblocking 两子探针）。
 // 用法：source run/env.sh && node probes/session-context/human-exits-probe.mjs [--mode blocking|nonblocking|expression|all]
 // 退出码：0 = 指定模式全部满足；1 = 行为不符；2 = 环境/启动失败。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
 import { mkdir, writeFile } from 'node:fs/promises'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('human-exits-probe')
 } catch (error) {
   console.error(error.message)

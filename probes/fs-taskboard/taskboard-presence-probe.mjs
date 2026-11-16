@@ -18,14 +18,14 @@
 //   P2b 成员回报链在场（≥2 条成员→lead 消息）
 //   P3 writeScope 重叠警告原文在场（C5a 同场复核，任务 writeScopes 故意重叠，零成本）
 // 用法：source run/env.sh && node probes/fs-taskboard/taskboard-presence-probe.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { makeCheck, sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { makeCheck, sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const ASSETS = join(ROOT, 'snapshots/probes/taskboard-presence-probe/2026-10-04')
@@ -34,9 +34,9 @@ const results = []
 const check = makeCheck(results)
 
 let home
-try { home = (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('taskboard-presence-probe') } catch (e) { console.error(e.message); process.exit(2) }
+try { home = (await import('../../tools/lib/core/runtime-home.mjs')).requireDevHome('taskboard-presence-probe') } catch (e) { console.error(e.message); process.exit(2) }
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `tpp-` 由调用方传入，不推导；
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `tpp-` 由调用方传入，不推导；
 // spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home })
 console.log(`web up: ${base}`)

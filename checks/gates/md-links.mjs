@@ -1,5 +1,5 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
-import { validateMarkdownLinks } from '../../tools/lib/markdown-links.mjs'
+import { validateMarkdownLinks } from '../../tools/lib/core/markdown-links.mjs'
 
 // ── 2. 当前源文档的 Markdown 引用：文件 + 标题锚点 + reference definitions ──────
 // 负例留证 2026-09-27：公司手册追加死链 → link 红。

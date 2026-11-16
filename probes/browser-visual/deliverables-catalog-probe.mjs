@@ -12,10 +12,10 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { spawn } from 'node:child_process'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { makeFailingCheck } from '../../tools/lib/probe-kit.mjs'
-import { startWeb } from '../../tools/lib/probe-web.mjs'
-import { dismissNotices, openCompanyTab, openSessionBySearch } from '../../tools/lib/probe-window.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { makeFailingCheck } from '../../tools/lib/probe/probe-kit.mjs'
+import { startWeb } from '../../tools/lib/probe/probe-web.mjs'
+import { dismissNotices, openCompanyTab, openSessionBySearch } from '../lib/probe-window.mjs'
 
 const args = process.argv.slice(2)
 const titleArg = args.indexOf('--title') === -1 ? '' : args[args.indexOf('--title') + 1]
@@ -30,7 +30,7 @@ const INDEX = join(ROOT, 'company-workspace', 'kb', 'deliverables-index.json')
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('deliverables-catalog-probe')
 } catch (error) {
   console.error(error.message)

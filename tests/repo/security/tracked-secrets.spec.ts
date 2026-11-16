@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findSecretAssignments } from '../../../tools/lib/tracked-secrets.mjs'
+import { findSecretAssignments } from '../../../checks/lib/tracked-secrets.mjs'
 
 // 2026-10-25：补 BUG-013 的形状缺口——tracked-token 只认 `?token=`，不认 `const TOKEN = '...'`。
 // 负例留证 2026-10-25：把本 spec 的实现退化成只认 URL 形状（BUG-013 回归）→ `pnpm test` 红；

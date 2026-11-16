@@ -40,8 +40,8 @@ export function run({ root, ok, fail }) {
       problems.push('dev 启动器没有经 DSH CLI 启动（缺 spawn [cli, --profile, company, --]）——启动次序必须走 DSH 原生，不得旁路起服务')
     }
     if (!/planDevStart\(/.test(launcher)) problems.push('dev 启动器没有再走 planDevStart——安装判定被旁路')
-    const planner = join(root, 'tools/lib/dev-install.mjs')
-    if (!existsSync(planner)) problems.push('缺 tools/lib/dev-install.mjs（安装规划纯函数）')
+    const planner = join(root, 'tools/lib/core/dev-install.mjs')
+    if (!existsSync(planner)) problems.push('缺 tools/lib/core/dev-install.mjs（安装规划纯函数）')
     else if (!/argv\.includes\('--link'\) \? 'link' : 'tarball'/.test(readFileSync(planner, 'utf8'))) {
       problems.push('dev 启动器默认模式不是 tarball（resolveDevMode 首选项被改）')
     }

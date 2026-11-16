@@ -6,8 +6,8 @@
 //       node tools/repo/checks-index.mjs [--check] # 只校验（默认）
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { renderScriptInventory, scanPublicScripts } from '../lib/checks-index.mjs'
-import { repositoryRoot as ROOT } from '../lib/repository-layout.mjs'
+import { renderScriptInventory, scanPublicScripts } from '../lib/core/checks-index.mjs'
+import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 
 const OUT = join(ROOT, 'checks/INDEX.generated.md')
 const gateCount = readdirSync(join(ROOT, 'checks/gates'), { withFileTypes: true })

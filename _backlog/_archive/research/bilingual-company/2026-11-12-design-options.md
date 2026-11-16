@@ -109,7 +109,7 @@ DSH locale.preference (zh default)
 ### 3.6 Docs：Phase A 只做「发现 + 默认」，不做全量翻译
 
 - 根 README / pack README 加**语言说明**（默认中文、Settings 切换、英文输出跟随）。
-- `tools/lib/install-manual.mjs` 加一段语言说明并重新生成 `_dist/安装手册.md`；`dist-manual` 的必含句同 diff。
+- `tools/lib/release/install-manual.mjs` 加一段语言说明并重新生成 `_dist/安装手册.md`；`dist-manual` 的必含句同 diff。
 - 如果 README 预算已顶格（`doc-budget` 90，现 87），**不要硬塞**：可以把语言说明放到 pack README（更贴近安装者）或新增一页短的英文 quick start；新增文档的 owner 与链接要写清。
 - 全量 docs 英文是 Phase C：需要配对/一致性门禁，不能只加 `.en.md` 文件。
 

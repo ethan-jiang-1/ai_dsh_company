@@ -16,7 +16,7 @@ import * as fixEvidence from '../../checks/gates/fix-evidence.mjs'
 import * as notesTree from '../../checks/gates/notes-tree.mjs'
 import * as notesAxes from '../../checks/gates/notes-axes.mjs'
 import * as ledgerRouting from '../../checks/gates/ledger-routing.mjs'
-import { backlogLivenessProblems } from '../../tools/lib/backlog-liveness.mjs'
+import { backlogLivenessProblems } from '../../checks/lib/backlog-liveness.mjs'
 
 const ROOT_DIR = join(dirname(fileURLToPath(import.meta.url)), '../..')
 const GATES = join(ROOT_DIR, 'checks/gates')

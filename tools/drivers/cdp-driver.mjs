@@ -29,7 +29,7 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { assertAttachPort } from '../lib/cdp-attach.mjs';
+import { assertAttachPort } from '../lib/probe/cdp-attach.mjs';
 
 const CHROME_CANDIDATES = [
   process.env.DSH_PROBE_CHROME,

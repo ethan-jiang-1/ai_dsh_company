@@ -49,7 +49,7 @@ intent: 对照原生基线逐项检查公司角色的通道/合同/能力面，�
 
 - `delegation-policy` 由六个公司角色共同加载（各 preset 的 `customSkillDirs` 都含 `_shared/delegation/skills/`；persona 也点名“委派前先加载”）。
 - 政策表列出四条通道：`subagent` / `subagent_fork` / `workflow` / `team`（`SKILL.md:11`-`16`），§7 还讲 `subagent_retry`。
-- 实际能力面（`tools/lib/delegation-model.mjs` 的 `COMPOSITIONS`）：
+- 实际能力面（`checks/lib/delegation-model.mjs` 的 `COMPOSITIONS`）：
   - `workflow` 只在 `vp-eng`；
   - `subagent_fork` 在 CEO 没有；
   - `team` 只有根会话是 Lead；CEO 的命名 child（vp-eng 等）不是 member，不能 `spawn_teammate`；
@@ -120,7 +120,7 @@ intent: 对照原生基线逐项检查公司角色的通道/合同/能力面，�
 
 - `docs/architecture.md:37`-`44` 的“协作通道（四条）”= A 命名委托 / B Agent Teams / C dsh-sdk 子进程 / D Workflow；`docs/reference/terminology.md:16` 同一套。
 - C（dsh-sdk）当前六角色未使用（`_backlog/_archive/research/org-coordination-topology/2026-11-10-org-coordination-topology.md` §“另有 dsh-sdk 子进程通道”）；A/B/D 是**组织用法**分组，不是 DSH 的能力轴。
-- `tools/lib/delegation-model.mjs:46`-`73` 与 `delegation-policy` 用的是原生四通道 spawn/fork/workflow/team；fork 在 A/B/C/D 表里没有位置。
+- `checks/lib/delegation-model.mjs:46`-`73` 与 `delegation-policy` 用的是原生四通道 spawn/fork/workflow/team；fork 在 A/B/C/D 表里没有位置。
 - 更细一层：`CHANNELS.*.control` 写的是本仓的控制面（`list_subagents` / `send_to_subagent` / `workflow_runs`），不是 vendor 的通道能力（原生是 `send_message` / `interrupt_agent` / run 返回值）。这个字段没有测试消费者，但它把“本仓 workaround”写成了“通道硬能力”，会误导下一次升级。
 - 两套分类的粒度不同：原生四通道按“子代身份 / 独立 preset / 上下文 / 深度 / 控制”分；A/B/C/D 按“公司怎么用”分。混读会漏掉 fork，也会把“命名委托”和“team”当成互斥的两条，而实际上它们共享 spawn 底座。
 

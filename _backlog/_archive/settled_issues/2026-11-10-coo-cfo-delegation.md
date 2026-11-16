@@ -34,7 +34,7 @@ preset 的一次性通道，要么在 team 里能拿到角色方法。推敲完�
 **当前情况：**
 
 - CEO 命名行：`subagent_research` + `vp_eng` + `vp_sales` + `vp_cmo`；没有 `coo`/`cfo`
-  （[`delegation-model.mjs:181`](../../../tools/lib/delegation-model.mjs)）。
+  （[`delegation-model.mjs:181`](../../../checks/lib/delegation-model.mjs)）。
 - COO/CFO preset 都存在，有角色 skills；它们的 `delegation` 组只有 generic `subagent` / `fork`
   （[`coo/agent.cordis.yml:169-200`](../../../packages/company-pack/presets/coo/agent.cordis.yml)、
   [`cfo/agent.cordis.yml:168-199`](../../../packages/company-pack/presets/cfo/agent.cordis.yml)）。

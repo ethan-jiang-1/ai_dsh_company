@@ -23,11 +23,11 @@ import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { loadChromium, launchChromium } from '../../tools/drivers/playwright.mjs'
-import { startWeb } from '../../tools/lib/probe-web.mjs'
-import { dismissNotices } from '../../tools/lib/probe-window.mjs'
-import { ensureRehearsalWorkspace } from '../../tools/lib/rehearsal.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
+import { startWeb } from '../../tools/lib/probe/probe-web.mjs'
+import { dismissNotices } from '../lib/probe-window.mjs'
+import { ensureRehearsalWorkspace } from '../../tools/lib/core/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 
 const PROTOCOL = process.argv.includes('--protocol')
 /** 每步截图（我逐张读图做"第一次用"的观察；也给真人档留现场）。 */

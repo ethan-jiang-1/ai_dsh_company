@@ -25,15 +25,15 @@
 //   事件 data 的全量 JSON，锚 = FS_NOT_OBSERVED / FS_STALE_VERSION 两个码。
 // 用法：source run/env.sh && node probes/fs-taskboard/fs-guard-probe.mjs
 // 退出码：0 = 三判据全 PASS；1 = 有红或判据空转（不确定态，头注①三态表）；2 = 环境/启动失败。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
 import { spawn } from 'node:child_process'
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
-import { createRaceEvidence, judgeWriteGuard, pairedCalls } from '../../tools/lib/collaboration-evidence.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
+import { createRaceEvidence, judgeWriteGuard, pairedCalls } from '../lib/collaboration-evidence.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const EXISTING = 'fs-guard-probe-existing.md'
@@ -41,7 +41,7 @@ const RACE = 'fs-guard-probe-race.md'
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('fs-guard-probe')
 } catch (error) {
   console.error(error.message)
@@ -50,7 +50,7 @@ try {
 
 let child
 try {
-  // 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `fgp-` 由调用方传入；spawn/fetch 注入
+  // 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `fgp-` 由调用方传入；spawn/fetch 注入
   // （tools/lib 是 keyless 纯逻辑缝）。下方 finally 兜杀引用 child ⇒ 经注入的 spawn 顺手捕获：
   // startWeb 起进程先于等 banner，boot 失败时 child 已在手，清理路径与原实现一致。
   const { base, token } = await startWeb({ spawn: (...args) => (child = spawn(...args)), root: ROOT, home })

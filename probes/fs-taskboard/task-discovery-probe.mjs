@@ -18,14 +18,14 @@
 //     核查 worker 属合法深挖，v1 判据误校准已纠正）。
 // 用法：DSH_HOME=runtime/harness-home node probes/fs-taskboard/task-discovery-probe.mjs
 // 退出码：0 = 三判据全过；1 = FAIL（按判据定性）；2 = 环境失败。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const SLUG = '2026-10-06-task-discovery-probe'
@@ -33,7 +33,7 @@ const DELIV = join(REHEARSAL, 'deliverables', SLUG)
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('task-discovery-probe')
 } catch (error) {
   console.error(error.message)
@@ -53,7 +53,7 @@ writeFileSync(join(DELIV, 'drafts', 'ceo.md'),
 writeFileSync(join(DELIV, 'drafts', 'vp-eng.md'),
   `出稿：vp-eng｜版本 v1｜任务书 = deliverables/2026-09-30-renewal-w-2026/drafts/ceo.md\n\n（上一场 renewal-w 的旧稿残留——非本场内容。）\n`)
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `tdp-` 由调用方传入，不推导；
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `tdp-` 由调用方传入，不推导；
 // spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)

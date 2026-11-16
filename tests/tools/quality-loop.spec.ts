@@ -4,13 +4,13 @@
 // 真盘红证（探针驱动，同样实跑）见 `node checks/audit/quality-loop-audit.mjs --self-test`：
 // 改裁决正文 / 删一条处置 / 换方法版本 / 验证者写盘 各自变红，还原回绿。
 //
-// 质量环判据的 keyless 单测：**判据住 tools/lib/quality-loop.mjs，这一层只喂合成输入**。
+// 质量环判据的 keyless 单测：**判据住 tools/lib/company/quality-loop.mjs，这一层只喂合成输入**。
 // 它证明"契约判得对"，不证明"真会话里 agent 照做了"（那是 preset-smoke + 一次真模型 E2E）。
 import { readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 import { fixVerdictText, hashBody } from '../../packages/company-pack/presets/_shared/skills/quality-loop/scripts/verdict-hash.mjs'
 import {
   DISPOSITION_VALUES,
@@ -24,7 +24,7 @@ import {
   parseVerdictHeader,
   splitVerdict,
   verdictBodyHash,
-} from '../../tools/lib/quality-loop.mjs'
+} from '../../tools/lib/company/quality-loop.mjs'
 
 const METHODS_HOME = join(ROOT, 'tests/fixtures/methods/dsh-home/company/methods')
 /** 方法层根 = preset id（人按前缀找齐）；`side` 是方法包自己的词表。 */

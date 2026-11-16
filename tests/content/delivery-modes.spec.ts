@@ -10,7 +10,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const CONTENT = join(ROOT, 'packages/company-pack/content')
 const MODES_DIR = join(CONTENT, 'delivery-modes')

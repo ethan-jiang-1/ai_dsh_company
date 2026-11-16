@@ -7,7 +7,7 @@
 // 为什么：真入口证据（client 装配 / preset 挂载 / 回放 / 进程级写面）不在任何 required lane 里，
 // 只能靠人记得跑（2026-11-13 研究：33 个冒烟只有 6 条在 push 时自动跑；发布验收曾静默红）。
 // 本脚本把「改到哪个面就必须跑哪条真入口检查」变成 push 前的机械动作：规则住
-// `tools/lib/asset-lanes.mjs` 的 SURFACE_RULES（一处事实一个家），这里只做取范围 + 匹配 + 跑。
+// `tools/lib/core/asset-lanes.mjs` 的 SURFACE_RULES（一处事实一个家），这里只做取范围 + 匹配 + 跑。
 //
 // 没有匹配到 asset ≠ 无话可说（BUG-186）：规则里没有额外 lane 的面用 `coveredBy` 申报「由哪条
 // 无条件步骤覆盖」，本脚本逐条打印；两者都没有的路径打印「未分类」并**退出非零**（BUG-199）：
@@ -29,7 +29,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, posix, resolve } from 'node:path'
-import { assetByName, selectSurfaces, suffixOf } from '../tools/lib/asset-lanes.mjs'
+import { assetByName, selectSurfaces, suffixOf } from '../tools/lib/core/asset-lanes.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const argv = process.argv.slice(2)
@@ -147,7 +147,7 @@ if (unseen.length > 0) {
 if (assets.length === 0) {
   console.log(covered.length > 0
     ? 'pre-push surfaces: 本次没有额外真入口（命中面由无条件步骤覆盖，见上）'
-    : 'pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/asset-lanes.mjs SURFACE_RULES）')
+    : 'pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/core/asset-lanes.mjs SURFACE_RULES）')
   process.exit(unseen.length > 0 ? 1 : 0)
 }
 

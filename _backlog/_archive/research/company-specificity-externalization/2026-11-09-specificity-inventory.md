@@ -157,7 +157,7 @@ intent: 盘点通用能力、领域知识与公司细节在仓库里的实际分
 | `locale/zh.json:3`、`package.json:5` | 「梦之队公司包」/ 包描述 | 市场显示名 |
 | `src/host/commands/signoff-tool.ts:17`、`:23` | 工具描述与参数示例写「margin below 30% / discount below 9折」 | 公司政策进模型可见的机制面 |
 | `src/lib/signoff.ts:12` | 注释同款阈值（第 3 份副本） | 同上 |
-| `tools/lib/install-manual.mjs:22`、`:83`、`tools/lib/market-index.mjs:110-111` | 生成手册标题、市场索引元数据带公司名 | 公司名进产物 |
+| `tools/lib/release/install-manual.mjs:22`、`:83`、`tools/lib/release/market-index.mjs:110-111` | 生成手册标题、市场索引元数据带公司名 | 公司名进产物 |
 
 ### 7.2 领域模型被执行
 
@@ -193,7 +193,7 @@ intent: 盘点通用能力、领域知识与公司细节在仓库里的实际分
 
 ### 7.5 清单漂移（同骨架的两份陈旧副本）
 
-`tools/lib/rehearsal.mjs:10` 与 `checks/gates/company-skeleton.mjs:13` 仍是五角色（无 cmo），CMO 加入后未同步——
+`tools/lib/core/rehearsal.mjs:10` 与 `checks/gates/company-skeleton.mjs:13` 仍是五角色（无 cmo），CMO 加入后未同步——
 说明"清单化"本身在无单一事实家时会漂。
 
 ## 8. 已有的 seam（正例，目标形状不需要发明）

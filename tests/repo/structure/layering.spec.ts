@@ -1,7 +1,7 @@
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join, relative } from 'node:path'
-import { inspectKeylessGraph } from '../../../tools/lib/keyless-imports.mjs'
+import { inspectKeylessGraph } from '../../support/keyless-imports.mjs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 

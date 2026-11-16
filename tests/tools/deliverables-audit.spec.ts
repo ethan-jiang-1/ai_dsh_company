@@ -1,9 +1,9 @@
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
-import { WARNING, classifyDeliverable, deliverableId, isPlaceholderClaim } from '../../tools/lib/deliverables.mjs'
+import { WARNING, classifyDeliverable, deliverableId, isPlaceholderClaim } from '../../tools/lib/company/deliverables.mjs'
 import {
   VIOLATION,
   auditDeliverables,
@@ -13,7 +13,7 @@ import {
   partitionArchiveViolations,
   presentResultRows,
   uncoveredPendingMaterial,
-} from '../../tools/lib/deliverables-audit.mjs'
+} from '../../checks/lib/deliverables-audit.mjs'
 
 /**
  * 交付物**声明对账**面的回归层（R4「成品流程」轮；2026-10-16 第三轮结构收敛自
@@ -545,13 +545,13 @@ describe('证据可得性：声明给「这段时期拿不到」时，判据不�
 // 也让 `持认 ∧ 让位` 同时为真。还原 → 绿。
 describe('让位行的机器可查面（BUG-004，2026-10-06 修复轮立——持认判定 = 占位 ∧ ¬让位）', () => {
   it('首行恰好「yield=claim withdrawn, not a draft」⇒ isPlaceholderYield 为真', async () => {
-    const { isPlaceholderYield, PLACEHOLDER_YIELD_LINE } = await import('../../tools/lib/deliverables.mjs')
+    const { isPlaceholderYield, PLACEHOLDER_YIELD_LINE } = await import('../../tools/lib/company/deliverables.mjs')
     expect(PLACEHOLDER_YIELD_LINE).toBe('yield=claim withdrawn, not a draft')
     expect(isPlaceholderYield('\n\nyield=claim withdrawn, not a draft\n\n出稿：cfo｜版本 v2…让位记录')).toBe(true)
   })
 
   it('让位行不在首行 / 仍是占位首行 ⇒ 非让位（持认与让位靠首行互斥区分）', async () => {
-    const { isPlaceholderYield, isPlaceholderClaim } = await import('../../tools/lib/deliverables.mjs')
+    const { isPlaceholderYield, isPlaceholderClaim } = await import('../../tools/lib/company/deliverables.mjs')
     expect(isPlaceholderYield('claim=acknowledged, not a draft\n\n（后文提了让位但首行未改写）')).toBe(false)
     expect(isPlaceholderClaim('claim=acknowledged, not a draft\n')).toBe(true)
     expect(isPlaceholderYield('claim=acknowledged, not a draft\n')).toBe(false)
@@ -565,7 +565,7 @@ describe('让位行的机器可查面（BUG-004，2026-10-06 修复轮立——�
   // 那正是 BUG-004 存在要防的互斥失效。⇒ 本条 fixture 必须让让位行**原文出现在正文、
   // 但不在首个非空行**：只有这样，子串实现才会返回 true 而被抓住。
   it('让位行原文出现在正文但不在首个非空行 ⇒ 非让位（钉死「首行相等」，防子串实现）', async () => {
-    const { isPlaceholderYield, PLACEHOLDER_YIELD_LINE } = await import('../../tools/lib/deliverables.mjs')
+    const { isPlaceholderYield, PLACEHOLDER_YIELD_LINE } = await import('../../tools/lib/company/deliverables.mjs')
     const bodyBesideYieldLine = `claim=acknowledged, not a draft\n\n讨论：我本可以写 ${PLACEHOLDER_YIELD_LINE} 来放弃`
     expect(bodyBesideYieldLine.includes(PLACEHOLDER_YIELD_LINE), 'fixture 必须真的含让位行原文，否则本条验不出子串实现').toBe(true)
     expect(isPlaceholderYield(bodyBesideYieldLine)).toBe(false)

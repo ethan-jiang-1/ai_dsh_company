@@ -66,6 +66,6 @@ VP-Eng 组队（B1/B2）；跨动议键。
   - C4 无 `final.md`；C5 接线：2 个 teammate（继承 ceo 组合）+ `system-architect` / `system-qa` 两个命名 child
   - C6 `/req check` 命令回执：**环境阻断**（dev home writer lease 被另一个常驻进程 pid 98394 持有 → 宿主的 `dataBlocked` 守卫报「公司数据已停写」；停写守卫本身是期望语义，不是产品红）。命令解析/读盘/回执的 green 路径由 A6 `req-command.spec` 8 条 keyless 断言覆盖；真会话 green 回执待下一次非阻断运行补
 - 两次差异：第 1 次墙钟 20min 且 SQA 串行（新建子会话太晚）→ 缺 V&V；第 2 次墙钟 30min + 任务书要求 SA/SQA 并行 → 全绿。不把单次绿写成「稳定」。
-- 资产：新 `probes/team/requirements-chain-probe.mjs`（C1–C6 判据、逐次结果写 `runtime/requirements-chain-probe/last-run.json`）；`checks/INDEX.generated.md` 重新生成（team 探针 17→18）；`tools/lib/rehearsal.mjs` 镜像补 process-docs
+- 资产：新 `probes/team/requirements-chain-probe.mjs`（C1–C6 判据、逐次结果写 `runtime/requirements-chain-probe/last-run.json`）；`checks/INDEX.generated.md` 重新生成（team 探针 17→18）；`tools/lib/core/rehearsal.mjs` 镜像补 process-docs
 - 文档/Note：程序 Note 待 W5 落；`docs/guides/product-definition.md` 的操作面已在 A1/A2 落
 - 审查：`审查：agent — 2026-11-07`

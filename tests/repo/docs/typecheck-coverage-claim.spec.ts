@@ -22,7 +22,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 const CLAIM = /(?:\b\d+\s*\/\s*\d+\s*个?\s*spec\b|未接\s*\d+)/
 const FILES = ['AGENTS.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', 'checks/README.md', 'run/README.md', 'runtime/README.md']

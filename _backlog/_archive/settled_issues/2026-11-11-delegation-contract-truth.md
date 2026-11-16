@@ -18,9 +18,9 @@ opened: 2026-11-11
 **当前情况：**
 
 - G2 证据：`packages/company-pack/presets/ceo/agent.cordis.yml:190`；`tests/presets/presets.spec.ts:234`；vendor `resolveChildDepth` 在 `vendor/dsh/packages/subagent/subagent/src/child-agent.ts:49`-`58`；E6 模拟 CEO→vp-eng(1)→worker(2) 放行。
-- G3 证据：`tools/lib/delegation-model.mjs:68`；`delegation-policy/SKILL.md:16`；`docs/contracts/delegation.md:81`；vendor `tool-agent-team/src/index.ts:61`、`:208`；B2 实测 CEO 两次 `spawn_teammate` 都传 `context: "fresh"`。
-- G4 证据：`docs/architecture.md:37`-`44`、`docs/reference/terminology.md:16` vs `tools/lib/delegation-model.mjs:46`-`73`；C（dsh-sdk）当前六角色未使用，fork 在 A/B/C/D 表里没有位置。
-- `teamLead` 语义：`COMPOSITIONS.*.teamLead` 是 preset 级期望；E5 实测 worker root 仍有 `spawn_teammate`（任何 root 都是 Lead，`tools/lib/surface-matrix.mjs` 头注同款结论）。
+- G3 证据：`checks/lib/delegation-model.mjs:68`；`delegation-policy/SKILL.md:16`；`docs/contracts/delegation.md:81`；vendor `tool-agent-team/src/index.ts:61`、`:208`；B2 实测 CEO 两次 `spawn_teammate` 都传 `context: "fresh"`。
+- G4 证据：`docs/architecture.md:37`-`44`、`docs/reference/terminology.md:16` vs `checks/lib/delegation-model.mjs:46`-`73`；C（dsh-sdk）当前六角色未使用，fork 在 A/B/C/D 表里没有位置。
+- `teamLead` 语义：`COMPOSITIONS.*.teamLead` 是 preset 级期望；E5 实测 worker root 仍有 `spawn_teammate`（任何 root 都是 Lead，`checks/lib/surface-matrix.mjs` 头注同款结论）。
 - 完整证据与复读命令 = [实验第一轮](../research/dsh-native-orchestration-fit/2026-11-11-experiment-results.md)；GAP 编号 = [GAP 登记](../research/dsh-native-orchestration-fit/2026-11-11-repo-fit-gap-register.md)。
 
 **未决问题：** 没有需要用户拍板的产品选择；实现时需定两件小口径：① `teamLead` 改成 `teamLeadWhenRoot` 还是加 `runtimeAuthority` 字段（推荐前者：保留 preset 期望，另在注入侧用 `agentTeams.membership` 判运行时）；② A/B/C/D 表保留为组织别名，还是从 `architecture.md` 主表移除（推荐保留 A/B/D 为别名、C 标“未启用的外部 provider 通道”，能力矩阵以原生四通道为准）。
@@ -29,7 +29,7 @@ opened: 2026-11-11
 
 ## 范围与排除项
 
-**范围**：`tools/lib/delegation-model.mjs`、`tests/presets/delegation-model.spec.ts`、`tests/presets/presets.spec.ts`、`packages/company-pack/presets/ceo/agent.cordis.yml` 的注释、`docs/contracts/delegation.md`、`docs/contracts/presets.md`、`docs/architecture.md`、`docs/reference/terminology.md`、`docs/guides/budget-and-ops.md` 的 fork 省钱句。
+**范围**：`checks/lib/delegation-model.mjs`、`tests/presets/delegation-model.spec.ts`、`tests/presets/presets.spec.ts`、`packages/company-pack/presets/ceo/agent.cordis.yml` 的注释、`docs/contracts/delegation.md`、`docs/contracts/presets.md`、`docs/architecture.md`、`docs/reference/terminology.md`、`docs/guides/budget-and-ops.md` 的 fork 省钱句。
 
 **排除**：任何 runtime/host 行为改动（政策注入 = Issue 2）；G7（workflow/质量环范围）与 G8（goal 治理）的产品决定；给更多角色挂 workflow；改 vendor。
 

@@ -13,9 +13,9 @@ opened: 2026-11-14
 
 **当前情况：** 二阶实测审计（完整复现与全仓底数见 [二阶深挖材料](../research/test-asset-spiral/2026-11-14-leverage-postmortem-and-institutional-ratchet.md)，题名页 = [test-asset-spiral](../research/test-asset-spiral/README.md)）在干净 `HEAD`（`95d05326`）上证实了 6 处结构性缩水与 4 个当场复现的问题：
 1. **核心内部仍藏两套分叉状态机**：`packages/company-pack/src/lib/markdown-shape-core.js` 内 `sectionRange` 与 `scanDocumentDetailed` 对跨行反引号内标题、同行注释后标题结论相反；而 `tests/support/doc-grammar.ts`（仅 38 行固定模板）不生成这些语法，替实现掩盖了分叉。
-2. **门禁注释与实现相反**：`checks/gates/fix-evidence.mjs` 注释写“节内只返回结构行，避免围栏里的假字段被读成证据”，代码却裸切原文行——围栏里的示例 `- 改动面：` 当场被误读为真证据；`checks/gates/notes-tree.mjs`、`tools/lib/backlog-liveness.mjs`、`tools/lib/quality-loop.mjs` 等仍保留手写裸解析（尽管 `tools/lib/markdown-links.mjs` 早接通了 `vendor/dsh` 的 `mdast` GFM AST 与 `js-yaml`）。
+2. **门禁注释与实现相反**：`checks/gates/fix-evidence.mjs` 注释写“节内只返回结构行，避免围栏里的假字段被读成证据”，代码却裸切原文行——围栏里的示例 `- 改动面：` 当场被误读为真证据；`checks/gates/notes-tree.mjs`、`checks/lib/backlog-liveness.mjs`、`tools/lib/company/quality-loop.mjs` 等仍保留手写裸解析（尽管 `tools/lib/core/markdown-links.mjs` 早接通了 `vendor/dsh` 的 `mdast` GFM AST 与 `js-yaml`）。
 3. **路径与交付闸门双标**：`packages/company-pack/src/host/commands/prd-gate.ts` 的 `deliverableOf` 按 `sep` 切而 `isDeliverableShaped` 按 `/[\\/]+/` 切——带反斜杠的绝对路径会**静默绕过交付前 PRD 校验**；`packages/company-pack/src/host/run-bundle/company-root.ts` 先词法消解 `kb/link/..` 再 `lstatSync`，跳过了对中间符号链接目录的检查；写面与尾部 `..` 未入矩阵。
-4. **收尾制度放水与盘子失真**：`docs/policy.md` §P5 与 `.agents/skills/close-out-definition/SKILL.md` 允许“作者收尾自查”替代独立盲审；P1 核心承诺“4 消费者差分”被一句 `→ 决定：…留后续卡` 塞进 Note `## 未覆盖轴` 销账并通过 `checks/gates/notes-axes.mjs`；`tools/lib/asset-consumers.mjs` 漏算 lane 动态调度，把 20 个自动运行的冒烟误报为“0 消费者”，而 67 个探针仍 **100% 未分类、0 减法**，连原卡亲手点名的 3 处散文数字漂移都未改。
+4. **收尾制度放水与盘子失真**：`docs/policy.md` §P5 与 `.agents/skills/close-out-definition/SKILL.md` 允许“作者收尾自查”替代独立盲审；P1 核心承诺“4 消费者差分”被一句 `→ 决定：…留后续卡` 塞进 Note `## 未覆盖轴` 销账并通过 `checks/gates/notes-axes.mjs`；`tools/lib/repo/asset-consumers.mjs` 漏算 lane 动态调度，把 20 个自动运行的冒烟误报为“0 消费者”，而 67 个探针仍 **100% 未分类、0 减法**，连原卡亲手点名的 3 处散文数字漂移都未改。
 
 **未决问题：** 无阻塞性未知事实（全仓解析器、75 门禁、67 探针及 `doc-budget` 行数余量均已实测摸清）。唯一需注意的执行约束：门禁总数实行**不净增硬顶（≤ 75）**——新增“禁裸解析”检查须并入既有门禁或通过合并重叠门禁腾出槽位。
 
@@ -27,9 +27,9 @@ opened: 2026-11-14
 
 **做（四块硬切片，不加凑数脚本）：**
 - **W1 宪章与流程硬化**：升级 `docs/testing.md`（单原语铁律 + 共享层缺陷必须交独立真值差分/全通道矩阵）、`docs/policy.md`（§P2 门禁与探针封顶 + §P5 非平凡变更废除作者自查、强制独立只读子代理盲审），以及 `.agents/skills/close-out-definition/SKILL.md`、`.agents/skills/gate-change-definition/SKILL.md`、`.agents/skills/agent-note-definition/SKILL.md`、`_backlog/README.md`、`notes/README.md`；
-- **W2 单原语垄断与静态禁裸解析**：抽出 `tools/lib/repo-markdown.mjs`（封装 `vendor/dsh` 现成的 `mdast` GFM AST + `js-yaml`，零新依赖），收口 `fix-evidence` / `notes-liveness` / `proposals` / `notes-axes` / `notes-tree` / `release-ready` / `backlog-liveness` / `quality-loop` 的节/头/状态行读取；消除 `markdown-shape-core.js` 内部 `sectionRange` 第二状态机（统一从 `scanDocumentDetailed` 结构行派生）；在结构门禁中加上**禁裸解析规则**（门禁总数保持 **≤ 75**）；
+- **W2 单原语垄断与静态禁裸解析**：抽出 `tools/lib/core/repo-markdown.mjs`（封装 `vendor/dsh` 现成的 `mdast` GFM AST + `js-yaml`，零新依赖），收口 `fix-evidence` / `notes-liveness` / `proposals` / `notes-axes` / `notes-tree` / `release-ready` / `backlog-liveness` / `quality-loop` 的节/头/状态行读取；消除 `markdown-shape-core.js` 内部 `sectionRange` 第二状态机（统一从 `scanDocumentDetailed` 结构行派生）；在结构门禁中加上**禁裸解析规则**（门禁总数保持 **≤ 75**）；
 - **W3 真语法生成器 + `mdast` 独立真值差分 + 4 消费者契约 + 路径读写闸门同判据**：重写 `tests/support/doc-grammar.ts` 覆盖全语法轴，以 `mdast` 为独立参考真值校验 `markdown-shape-core`；补齐 `prd-check / requirements-check / prd-gate / 读卡原语` 4 消费者同语料差分；修 `prd-gate.ts` 分隔符绕过与 `company-root.ts` 中间段 `lstat` 顺序/尾部 `..` 边界，建立读写目录闸门同判据矩阵；
-- **W4 门禁分支级变异 + `notes-axes` 落盘锚点 + 资产负债棘轮与探针实减**：把 `notes-axes` 收紧为强制四分类前缀 + 校验 `→` 右侧盘上真实锚点（覆盖 `implemented/` 与前向 `archived/`，生效日调至 `2026-11-14` 并修齐前序 Note）；扩充 `tests/checks/gate-mutation.test.mjs` 至核心门禁多分支与 `fix-evidence` 浅克隆跳过分支，并接入 `checks/lanes/generative.e2e.mjs`；修 `tools/lib/asset-consumers.mjs` 自动 lane 口径与 `fast-lane.mjs` / `asset-lanes.mjs` 散文漂移，抽纯 `collaboration-probe-verdict` 判据，合并/归档首批同族重复探针，清零探针 `未分类` 并在 `tests/repo/test-census.spec.ts` 钉死**门禁数与探针数只降不升棘轮** + `keyless-lane.mjs` 零命中防假绿。
+- **W4 门禁分支级变异 + `notes-axes` 落盘锚点 + 资产负债棘轮与探针实减**：把 `notes-axes` 收紧为强制四分类前缀 + 校验 `→` 右侧盘上真实锚点（覆盖 `implemented/` 与前向 `archived/`，生效日调至 `2026-11-14` 并修齐前序 Note）；扩充 `tests/checks/gate-mutation.test.mjs` 至核心门禁多分支与 `fix-evidence` 浅克隆跳过分支，并接入 `checks/lanes/generative.e2e.mjs`；修 `tools/lib/repo/asset-consumers.mjs` 自动 lane 口径与 `fast-lane.mjs` / `asset-lanes.mjs` 散文漂移，抽纯 `collaboration-probe-verdict` 判据，合并/归档首批同族重复探针，清零探针 `未分类` 并在 `tests/repo/test-census.spec.ts` 钉死**门禁数与探针数只降不升棘轮** + `keyless-lane.mjs` 零命中防假绿。
 
 **不做（排除项）：**
 - 不引入任何外部 npm 新依赖（`mdast` 与 `js-yaml` 直接走 `vendor/dsh` 既有解析链）；
@@ -80,7 +80,7 @@ opened: 2026-11-14
 - **事实（新增/修改）**：本仓测试与门禁的**原语唯一性、证明等级下限、验收分权规则、治理资产总量上限**（不含业务产品状态）。
 - **唯一入口**：
   - 宪章与流程：`docs/testing.md`、`docs/policy.md`、`.agents/skills/{close-out-definition,gate-change-definition,agent-note-definition}/SKILL.md`；
-  - 解析与路径原语：`packages/company-pack/src/lib/markdown-shape-core.js`、`tools/lib/repo-markdown.mjs`、`packages/company-pack/src/host/run-bundle/company-root.ts`；
+  - 解析与路径原语：`packages/company-pack/src/lib/markdown-shape-core.js`、`tools/lib/core/repo-markdown.mjs`、`packages/company-pack/src/host/run-bundle/company-root.ts`；
   - 棘轮与元测试：`checks/gates/notes-axes.mjs`、`tests/checks/gate-mutation.test.mjs`、`tools/lib/{asset-lanes,asset-consumers,test-census}.mjs`、`tests/repo/test-census.spec.ts`。
 - **读载体 / 写载体**：后续所有开发会话 agent、独立盲审子代理、`pnpm verify`、pre-push hook、weekly `generative` lane。
 - **环境坏法**：

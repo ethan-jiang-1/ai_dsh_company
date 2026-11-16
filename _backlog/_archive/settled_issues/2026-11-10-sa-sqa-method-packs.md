@@ -40,7 +40,7 @@ blocker 怎么升级」，让硬软动议能按需跑系统架构/V&V；不恢�
   `.../quality-loop-verifier/<pack>/SKILL.md`；示例夹具在
   `tests/fixtures/methods/dsh-home/company/methods/{requirements-trace,api-contract}`。
 - 审计核：两侧 method/version 配对、check-id 全覆盖、verifier 只读、先产后验、裁决原文
-  （[`tools/lib/quality-loop.mjs`](../../../tools/lib/quality-loop.mjs)）。
+  （[`tools/lib/company/quality-loop.mjs`](../../../tools/lib/company/quality-loop.mjs)）。
 - `business-software`（用户 2026-11-10 已定名）不需要 SyRS/IRS/V&V（见产品类型卡）；本卡只服务
   `hardware-software`。
 
@@ -86,7 +86,7 @@ starter 安装 + keyless method fixture + 一次真模型质量环；不恢复�
 - `content/methods/quality-loop-{producer,verifier}/{system-architecture,vv-plan}/SKILL.md` 四份在场；
   同 `method`/`version`、`side` 正确、check-id 表同批且非空。
 - `pnpm methods:init` 复制四包到 `<DSH_HOME>/company/methods/...`，已存在跳过、不覆盖；
-  `tools/lib/methods-init.mjs` 有 keyless spec（配对 / 幂等 / 源缺失）。
+  `tools/lib/core/methods-init.mjs` 有 keyless spec（配对 / 幂等 / 源缺失）。
 - VP-Eng persona 指向 starter 方法包；`docs/guides/quality-loop.md` 写 `methods:init` 与 starter；
   `content/manifest.json` 列四份；`pnpm verify` 全绿。
 - blocker 升级合同写进两侧方法包与 quality-loop skill/VP-Eng persona；不恢复旧 SA/SQA persona。

@@ -16,14 +16,14 @@
 //     手册强制的动作，是行为自觉，风险窗口记录进 BUG-004）。
 // 用法：DSH_HOME=runtime/harness-home node probes/team/claim-race-probe.mjs
 // 退出码：0 = B1 成立（盘面可见性完成仲裁）；1 = B2（双认领缺口确认）；2 = 环境失败。
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { REHEARSAL_REL } from '../../tools/lib/rehearsal.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { REHEARSAL_REL } from '../../tools/lib/core/rehearsal.mjs'
 import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { sleep } from '../../tools/lib/probe-kit.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { sleep } from '../../tools/lib/probe/probe-kit.mjs'
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const SLUG = '2026-10-06-claim-race-probe'
@@ -31,7 +31,7 @@ const DELIV = join(REHEARSAL, 'deliverables', SLUG)
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('claim-race-probe')
 } catch (error) {
   console.error(error.message)
@@ -47,7 +47,7 @@ writeFileSync(join(DELIV, 'drafts', 'ceo.md'),
   + `派活｜T2｜cfo｜renewal-y 经济性测算｜依赖：无｜状态：待办\n`
   + `派活｜T3｜coo｜renewal-y 交付窗口核查｜依赖：无｜状态：待办\n`)
 
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：前缀 `crp-` 由调用方传入，不推导；
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：前缀 `crp-` 由调用方传入，不推导；
 // spawn/fetch 注入（tools/lib 是 keyless 纯逻辑缝，真进程/真网络由本驱动层自己带）。
 const { child, base, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)
@@ -89,7 +89,7 @@ await Promise.all([awaitTurnEnd(cfoId), awaitTurnEnd(cooId)])
 const readDraft = role => { try { return readFileSync(join(DELIV, 'drafts', `${role}.md`), 'utf8') } catch { return '' } }
 const cfoDraft = readDraft('cfo')
 const cooDraft = readDraft('coo')
-const { PLACEHOLDER_YIELD_LINE } = await import('../../tools/lib/deliverables.mjs')
+const { PLACEHOLDER_YIELD_LINE } = await import('../../tools/lib/company/deliverables.mjs')
 const CLAIM = /占位=认领|占位＝认领/
 /** 持认 = 占位行在场 ∧ ¬让位（让位可出现在正文叙述里——如让位裁定节的「归对门」结论——
  *  判定只认**首行标准让位行**：手册明文「让位时把首行改写为让位标记」，改写即撤销持认；

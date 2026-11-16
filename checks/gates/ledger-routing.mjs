@@ -2,7 +2,7 @@
 // 何时跑：pnpm verify（每次）；改 docs/reference/decisions.md 或本门禁判据后跑 pnpm test:checks。
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { headingSections, structuralLines } from '../../tools/lib/repo-markdown.mjs'
+import { headingSections, structuralLines } from '../../tools/lib/core/repo-markdown.mjs'
 
 // ── 2c-bis. 决策台账路由门禁（ledger-routing，2026-10-09 D36 立；2026-11-14 扩双表+锚点+表外控长）──
 // 为什么：

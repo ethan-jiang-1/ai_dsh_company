@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { judgeReplaySessions, normalizeReplayTempPaths, normalizeReplayTimeContext } from '../../tools/lib/replay-logic.mjs'
+import { judgeReplaySessions, normalizeReplayTempPaths, normalizeReplayTimeContext } from '../../checks/lib/replay-logic.mjs'
 
 describe('replay fixture normalization and judgements', () => {
   it('stabilizes volatile time and posture values while retaining posture source', () => {

@@ -4,7 +4,7 @@
 //
 // 为什么：冒烟只有 FAST 的 4 条在每次 push 跑，其余若只靠头注「何时跑」的散文契约，坏了没人知道。
 // 本 runner 把「健康检查」从散文变成每周一次的实跑：
-//   - 成员从 `tools/lib/asset-lanes.mjs` 读，**skip 清单每次都打印**（资产可以手动，但不许静默消失）；
+//   - 成员从 `tools/lib/core/asset-lanes.mjs` 读，**skip 清单每次都打印**（资产可以手动，但不许静默消失）；
 //   - 选中的资产文件缺失 = 红（注册表与盘面不一致）；
 //   - 过滤条件选出 0 个资产（如 `--filter zz-none`）= 红（拒绝 0 命中假绿）。
 //
@@ -13,7 +13,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { ASSETS, selectWeeklyAssets, suffixOf } from '../../tools/lib/asset-lanes.mjs'
+import { ASSETS, selectWeeklyAssets, suffixOf } from '../../tools/lib/core/asset-lanes.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const argv = process.argv.slice(2)
@@ -48,7 +48,7 @@ const skipped = ASSETS.filter(asset => !selectedNames.has(asset.name)).map(asset
 })
 
 const label = `lane=weekly${ci ? '(ci)' : ''}${withBrowser ? '+browser' : ''}`
-console.log(`smoke:all ${label} ×${String(selected.length)}（注册表 = tools/lib/asset-lanes.mjs）`)
+console.log(`smoke:all ${label} ×${String(selected.length)}（注册表 = tools/lib/core/asset-lanes.mjs）`)
 
 if (selected.length === 0) {
   for (const line of skipped) console.log(`smoke:all SKIP ${line}`)

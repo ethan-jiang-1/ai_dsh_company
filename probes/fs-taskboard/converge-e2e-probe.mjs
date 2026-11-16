@@ -11,12 +11,12 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const SLUG = 'converge-e2e-probe'
 const DIR = `2026-10-23-${SLUG}`
 
-try { (await import('../../tools/lib/runtime-home.mjs')).requireDevHome('converge-e2e-probe') }
+try { (await import('../../tools/lib/core/runtime-home.mjs')).requireDevHome('converge-e2e-probe') }
 catch (error) { console.error(`converge-e2e-probe: ${error.message}`); process.exit(2) }
 
 const wsRel = `runtime/probe-converge-${String(Date.now())}`

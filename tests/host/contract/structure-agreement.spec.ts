@@ -23,7 +23,7 @@ import {
 } from '../../../packages/company-pack/src/lib/docs/markdown-shape'
 import { validateProductDocs } from '../../../packages/company-pack/src/lib/docs/prd-check'
 import { checkRequirements } from '../../../packages/company-pack/src/lib/docs/requirements-check'
-import { headingSections, parseFrontmatter, sectionBody } from '../../../tools/lib/repo-markdown.mjs'
+import { headingSections, parseFrontmatter, sectionBody } from '../../../tools/lib/core/repo-markdown.mjs'
 import { makeDeliverableBundle, makeDocDetailed } from '../../support/doc-grammar'
 
 const CASES = Number(process.env.MARKDOWN_SHAPE_CASES ?? 500)

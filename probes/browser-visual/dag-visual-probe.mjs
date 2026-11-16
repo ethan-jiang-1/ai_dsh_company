@@ -13,20 +13,20 @@
 //      两态边色不同、两态箭头 fill 不同且非黑（证明双 marker 生效）、徽章四态文案齐；
 //   ② **图像判据**（人/多模态看图）：出 `snapshots/visual/dag-visual/{light,dark}.png`，逐张判"看起来对不对"。
 // 用法：source run/env.sh && node probes/browser-visual/dag-visual-probe.mjs
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
-import { startWeb } from '../../tools/lib/probe-web.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import { startWeb } from '../../tools/lib/probe/probe-web.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { makeFailingCheck } from '../../tools/lib/probe-kit.mjs'
+import { makeFailingCheck } from '../../tools/lib/probe/probe-kit.mjs'
 
 const SHOTS = join(ROOT, 'snapshots/visual/dag-visual')
 mkdirSync(SHOTS, { recursive: true })
 
 let home
 try {
-  const { requireDevHome } = await import('../../tools/lib/runtime-home.mjs')
+  const { requireDevHome } = await import('../../tools/lib/core/runtime-home.mjs')
   home = requireDevHome('dag-visual-probe')
 } catch (error) {
   console.error(error.message)
@@ -46,7 +46,7 @@ if (emitted.status !== 0) {
 const { svg, css, chainSvg, chainHeight } = JSON.parse(readFileSync(FIXTURE, 'utf8'))
 
 // ── 起真 web（真主题令牌的来源）──
-// 启动块收成 tools/lib/probe-web.mjs（2026-10-10 卡）：本探针只等 banner、不取 cookie ⇒ 只走 startWeb 这一层。
+// 启动块收成 tools/lib/probe/probe-web.mjs（2026-10-10 卡）：本探针只等 banner、不取 cookie ⇒ 只走 startWeb 这一层。
 // spawn 注入：tools/lib 是 keyless 纯逻辑缝（layering 守卫），真进程由本驱动层自己带。
 const { child, port, token } = await startWeb({ spawn, root: ROOT, home }).catch(error => {
   console.error(error.message)

@@ -2,8 +2,8 @@ import { mkdtempSync, readdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
-import { TOOL_GROUPS, indexTargetFor, renderScriptInventory, scanPublicScripts, strayToolEntries } from '../../../tools/lib/checks-index.mjs'
-import { repositoryRoot as ROOT } from '../../../tools/lib/repository-layout.mjs'
+import { TOOL_GROUPS, indexTargetFor, renderScriptInventory, scanPublicScripts, strayToolEntries } from '../../../tools/lib/core/checks-index.mjs'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 // 临时根：只放一个空目录，用来制造「tools/ 不存在」这一早退分支（盘上真仓永远有 tools/）。
 const emptyRoot = mkdtempSync(join(tmpdir(), 'checks-index-'))

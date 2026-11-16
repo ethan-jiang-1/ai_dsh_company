@@ -1,8 +1,8 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { lstatSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { canonicalSnapshotScenes } from '../../tools/lib/repository-layout.mjs'
-import { convergenceSlices } from '../../tools/lib/converge-rules.mjs'
+import { canonicalSnapshotScenes } from '../../tools/lib/core/repository-layout.mjs'
+import { convergenceSlices } from '../../tools/lib/company/converge-rules.mjs'
 
 // ── 2c-quater. snapshots 体积预算（2026-10-05 立，复跑轮用户拍板「无法承受没完没了的增长」）──
 // 2026-10-25：产品仓只留合成 replay fixture（<1MB）；预算从 64M/16M 收到 2M/1M——
@@ -27,7 +27,7 @@ export function run({ root, ok, fail }) {
   const SNAPSHOTS_CONVERGENCE_BUDGET_MB = 1
   const snapshotsDir = join(root, 'snapshots')
   const totalBytes = walkBytes(snapshotsDir)
-  // 收敛切片的识别与计量判据住 tools/lib/converge-rules.mjs（命名有两代，见该函数注释）；
+  // 收敛切片的识别与计量判据住 tools/lib/company/converge-rules.mjs（命名有两代，见该函数注释）；
   // ⚠ 2026-10-16 实测旧过滤器只认旧前缀，两个新命名切片（428K）完全在预算外 ⇒ 守卫漏扫。
   const convergenceBytes = convergenceSlices({
     scenes: canonicalSnapshotScenes(root),

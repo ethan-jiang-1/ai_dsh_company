@@ -28,7 +28,7 @@ export function strayToolEntries(root) {
     .sort()
 }
 /** 内部实现前缀：不要求进公开库存。 */
-export const EXCLUDED_PREFIXES = ['checks/gates/', 'checks/lib/', 'checks/lanes/lib/', 'tools/drivers/', 'tools/lib/', 'tools/archive/']
+export const EXCLUDED_PREFIXES = ['checks/gates/', 'checks/lib/', 'checks/lanes/lib/', 'probes/lib/', 'tools/drivers/', 'tools/lib/', 'tools/archive/']
 
 /** 递归收集某目录下的 .mjs（仓库相对路径）。 */
 function walk(root, rel) {

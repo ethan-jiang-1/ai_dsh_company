@@ -12,7 +12,7 @@
 //   删文件 → `PASS notes-supersession ×N（取代均有回链）`。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { basename, join } from 'node:path'
-import { supersessionBacklinks } from '../../tools/lib/notes-audit.mjs'
+import { supersessionBacklinks } from '../../tools/lib/session/notes-audit.mjs'
 
 export function run({ root, ok, fail }) {
   const dir = join(root, 'notes', 'implemented')

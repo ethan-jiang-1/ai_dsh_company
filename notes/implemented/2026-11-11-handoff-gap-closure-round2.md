@@ -15,7 +15,7 @@
    原因：core.hooksPath 不随 clone 走，只在 `source run/env.sh` 里接线会让忘 source 的 agent 静默跳过 verify/test。
 3. **卸载残留清单两处对账，不删 README 的可执行清单。** pack README 补齐 lease/日志/检索索引 3 条，
    与《安装手册》§八 的 6 条 rm 路径一致；判据 = `tests/repo/release/uninstall-parity.spec.ts`。
-   手册仍是生成物（唯一模板 = `tools/lib/install-manual.mjs`），README 不指向不可离线取得的清单。
+   手册仍是生成物（唯一模板 = `tools/lib/release/install-manual.mjs`），README 不指向不可离线取得的清单。
 4. **随包 YAML 注释里的 docs 指针加存在性 spec。** `cordis.patch.yml` 的 docs/release.md 是死指针；
    `bare-path` 只扫 Markdown，注释面没有守卫。新 spec 只查 pack 内 `.yml` 注释的 `docs/` 路径，
    不扫 `vendor` 相对写法（如注释里的 `vendor packages/...`），避免把上游相对路径误判成仓库根路径。

@@ -16,13 +16,13 @@
   `tool/result`（实测配对键 = `data.message.toolCallId`）。三类结论 + 逾期分支：
   `null`（没停在问询上）/ **有界等待**（含 `remainingMs`，驱动继续等窗口）/ **无界卡死**（`timeout: -1`，或超长窗视同无界）/
   **逾期**（窗口 + 宽限已过仍无结果 ⇒ 也停，报"工具没按窗口收口，需人查现场"）。
-- **不改 vendor、不动 pack 公开行为**：落点 = `tools/lib/question-stop.mjs`（纯逻辑）+ keyless spec + 真模型探针 + 一处文档指针。
+- **不改 vendor、不动 pack 公开行为**：落点 = `probes/lib/question-stop.mjs`（纯逻辑）+ keyless spec + 真模型探针 + 一处文档指针。
 - **不做**：B（persona 禁 `-1`——软守卫且与 vendor 语义相抵）；C（提上游，另议）；D（只写手册，危害仍在）。
 
 ## 驱动用法
 
 ```js
-import { questionStopOf } from '<repo>/tools/lib/question-stop.mjs'
+import { questionStopOf } from '<repo>/probes/lib/question-stop.mjs'
 // 轮询驱动的主循环里：拿会话事件（session/page 或日志），判定一次
 const verdict = questionStopOf(events, { now: Date.now() })
 if (verdict?.action === 'stop') {
@@ -58,5 +58,5 @@ if (verdict?.action === 'stop') {
 ## 指针
 
 - 卡（三次真跑时序、候选 A/B/C/D）：[BUG-022（已归档）](../../_backlog/_archive/fixed_bugs/BUG-022-ask-user-unbounded-timeout-override.md)
-- 判定实现：[question-stop.mjs](../../tools/lib/question-stop.mjs)｜判据：[question-stop.spec.ts](../../tests/tools/question-stop.spec.ts)｜真模型两档：[ask-user-timed-probe.mjs](../../probes/session-context/ask-user-timed-probe.mjs)
+- 判定实现：[question-stop.mjs](../../probes/lib/question-stop.mjs)｜判据：[question-stop.spec.ts](../../tests/tools/question-stop.spec.ts)｜真模型两档：[ask-user-timed-probe.mjs](../../probes/session-context/ask-user-timed-probe.mjs)
 - 文档面：[web-rpc.md](../../docs/guides/web-rpc.md)｜前决定：[BUG-021 Note](./2026-10-18-bug021-timed-user-question.md)

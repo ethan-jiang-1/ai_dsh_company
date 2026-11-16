@@ -24,7 +24,7 @@ opened: 2026-11-10
 
 ## 根因（假设）
 
-`tools/lib/quality-loop.mjs` 的 `auditQualityLoop` 用**一个跨轮全局** `lastTextIndex` 记录
+`tools/lib/company/quality-loop.mjs` 的 `auditQualityLoop` 用**一个跨轮全局** `lastTextIndex` 记录
 "上一轮在该 session 的哪条正文命中"。R2 换了新 session 后，代码仍从 R1 的 index+1 开始找；
 新 session 的 `assistantTexts` 只有 2 条（前导 + 裁决），从 index 2 起为空 → 误报 `not-verbatim`。
 正确语义：原文索引进度按 **session id** 记；同一 child 续跑（同 session）才沿用上一轮的 index。
@@ -45,7 +45,7 @@ opened: 2026-11-10
 
 ## 修复关联
 
-- `tools/lib/quality-loop.mjs`：`lastTextIndex` → `lastTextIndexBySession`（`Map`）；
+- `tools/lib/company/quality-loop.mjs`：`lastTextIndex` → `lastTextIndexBySession`（`Map`）；
   `sessionKey = header.session ?? 'round:<n>'`；命中后只更新该 session 的 index。
 - `tests/tools/quality-loop.spec.ts`：新增 R1/R2 不同 session 的用例 + `// 负例留证`。
 - 不改变 R1 头 hash 的判据（`body-modified` 仍然红）；R1 盘上旧 hash 由 `verdict-hash.mjs --fix`

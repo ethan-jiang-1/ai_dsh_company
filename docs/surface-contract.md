@@ -17,7 +17,7 @@
 ## 两个前置轴（先于三面判定）
 
 - **生命周期**：头注 `状态：已耗` → 非面（归档候选），不进面计数；`script-status` 门禁强制该字段。
-- **管道件**：lib / driver / fixture / runner / reporter / 索引生成器 / 纯查询 / support → 非面，跟消费者住。
+- **管道件**：lib / driver / fixture / runner / reporter / 索引生成器 / 纯查询 / support → 非面，跟消费者住（跨面共享地基住 `tools/lib/`，面专属支撑住各面的 `checks/lib/`、`probes/lib/`；面专属库不得被共享地基反向依赖）。
 
 ## 判定顺序
 

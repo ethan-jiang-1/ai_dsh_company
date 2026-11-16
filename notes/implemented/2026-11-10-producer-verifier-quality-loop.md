@@ -35,7 +35,7 @@ VP-Eng 一个人既做设计又做验证时，E（工程）与 V（验证）在�
 5. **裁决原样落盘**：验证者只读、写不了盘；由 VP-Eng 把它的最终正文写进 `verdict-r<N>.md` 并带一行头
    `session / preset=quality-loop-verifier / depth / producer=<产出者 sessionId> / method / body-sha256`。
    哈希口径 = 正文去掉结尾空白（文件尾随换行不算"改了"）。「未被改」由此可机械核对；`producer` 字段则让**次序**可核。
-6. **审计是事后检测，不是运行时 veto**：判据住 `tools/lib/quality-loop.mjs`（纯函数），驱动 =
+6. **审计是事后检测，不是运行时 veto**：判据住 `tools/lib/company/quality-loop.mjs`（纯函数），驱动 =
    `checks/audit/quality-loop-audit.mjs`（读盘 + 读 child durable header）。核八件：**先产后验的次序**、
    两个独立 activation、原文一致、未被改、处置覆盖、方法配对、check-id 全覆盖、验证者没调 `write`/`edit`/`bash`。
 7. **非角色边界按"是不是公司角色"派生**：pack 运行时表由 `WORKER_FAMILY_PRESETS` 改名并扩为

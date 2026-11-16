@@ -6,7 +6,7 @@
 
 ## 决定
 
-`checks/lanes/` 下全部 10 个起 `bin.ts web` 的脚本迁入 `tools/lib/probe-web.mjs`（探针面 25 个
+`checks/lanes/` 下全部 10 个起 `bin.ts web` 的脚本迁入 `tools/lib/probe/probe-web.mjs`（探针面 25 个
 之后的第二批）。为此模块扩了四项能力、收了三处健壮性：
 
 - **`patch: string | string[]`**——`--patch` 可重复；replay 的场景 patch + 五个角色预设组合走数组形态。
@@ -67,5 +67,5 @@ entry-probe/replay 的 `catch { child.kill }` 未防护引用 ⇒ spawn 捕获�
 ## 指针
 
 - 卡：[_backlog/issues/2026-10-10-smoke-boot-extraction.md](../../_backlog/_archive/settled_issues/2026-10-10-smoke-boot-extraction.md)（实施后归档）
-- 模块与形状 spec：[tools/lib/probe-web.mjs](../../tools/lib/probe-web.mjs) / [tests/session/probe-web.spec.ts](../../tests/session/probe-web.spec.ts)
+- 模块与形状 spec：[tools/lib/probe/probe-web.mjs](../../tools/lib/probe/probe-web.mjs) / [tests/session/probe-web.spec.ts](../../tests/session/probe-web.spec.ts)
 - 上游卡与 Note：见状态行引用

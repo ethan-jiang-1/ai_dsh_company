@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { extractInjectedHandbook, freshnessProblems, handbookDrift } from '../../tools/lib/replay-fixture-freshness.mjs'
+import { extractInjectedHandbook, freshnessProblems, handbookDrift } from '../../checks/lib/replay-fixture-freshness.mjs'
 
 const wrap = (handbook: string) =>
   `<system-reminder>\nThe following workspace instructions may be relevant…\n\nInstructions from: AGENTS.md\n\n${handbook}\n\n</system-reminder>`

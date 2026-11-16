@@ -537,272 +537,272 @@
       "statements": 100,
       "branches": 90
     },
-    "tools/lib/asset-consumers.mjs": {
+    "tools/lib/repo/asset-consumers.mjs": {
       "statements": 97.82,
       "branches": 95
     },
-    "tools/lib/asset-lanes.mjs": {
+    "tools/lib/core/asset-lanes.mjs": {
       "statements": 100,
       "branches": 96.15
     },
-    "tools/lib/audit-verdict.mjs": {
+    "tools/lib/repo/audit-verdict.mjs": {
       "statements": 100,
       "branches": 75
     },
-    "tools/lib/authorship.mjs": {
+    "checks/lib/authorship.mjs": {
       "statements": 100,
       "branches": 100
     },
-    "tools/lib/backlog-liveness.mjs": {
+    "checks/lib/backlog-liveness.mjs": {
       "statements": 95.55,
       "branches": 91.69
     },
-    "tools/lib/bug-coverage.mjs": {
+    "tools/lib/repo/bug-coverage.mjs": {
       "statements": 100,
       "branches": 92.85
     },
-    "tools/lib/candidate-scan.mjs": {
+    "checks/lib/candidate-scan.mjs": {
       "statements": 96.09,
       "branches": 89.2
     },
-    "tools/lib/carrier-registry.mjs": {
+    "checks/lib/carrier-registry.mjs": {
       "statements": 0,
       "branches": 100
     },
-    "tools/lib/cdp-attach.mjs": {
+    "tools/lib/probe/cdp-attach.mjs": {
       "statements": 100,
       "branches": 100
     },
-    "tools/lib/checks-index.mjs": {
+    "tools/lib/core/checks-index.mjs": {
       "statements": 93.75,
       "branches": 71.87
     },
-    "tools/lib/claim-loser-evidence.mjs": {
+    "probes/lib/claim-loser-evidence.mjs": {
       "statements": 100,
       "branches": 84.48
     },
-    "tools/lib/collaboration-evidence.mjs": {
+    "probes/lib/collaboration-evidence.mjs": {
       "statements": 98.2,
       "branches": 90.95
     },
-    "tools/lib/collaboration-oracle-verdict.mjs": {
+    "probes/lib/collaboration-oracle-verdict.mjs": {
       "statements": 97.29,
       "branches": 94.11
     },
-    "tools/lib/company-roles.mjs": {
+    "tools/lib/company/company-roles.mjs": {
       "statements": 100,
       "branches": 100
     },
-    "tools/lib/company-tab-catalog.mjs": {
+    "tools/lib/probe/company-tab-catalog.mjs": {
       "statements": 95.83,
       "branches": 92.3
     },
-    "tools/lib/converge-rules.mjs": {
+    "tools/lib/company/converge-rules.mjs": {
       "statements": 96.66,
       "branches": 91.5
     },
-    "tools/lib/coverage-baseline.mjs": {
+    "checks/lib/coverage-baseline.mjs": {
       "statements": 98.21,
       "branches": 84.9
     },
-    "tools/lib/delegation-model.mjs": {
+    "checks/lib/delegation-model.mjs": {
       "statements": 72.82,
       "branches": 69.86
     },
-    "tools/lib/deliverables-audit.mjs": {
+    "checks/lib/deliverables-audit.mjs": {
       "statements": 91.21,
       "branches": 76.22
     },
-    "tools/lib/deliverables-catalog.mjs": {
+    "tools/lib/company/deliverables-catalog.mjs": {
       "statements": 100,
       "branches": 97.36
     },
-    "tools/lib/deliverables.mjs": {
+    "tools/lib/company/deliverables.mjs": {
       "statements": 100,
       "branches": 97.8
     },
-    "tools/lib/dev-install.mjs": {
+    "tools/lib/core/dev-install.mjs": {
       "statements": 92.15,
       "branches": 89.06
     },
-    "tools/lib/diagnosis.mjs": {
+    "tools/lib/probe/diagnosis.mjs": {
       "statements": 0,
       "branches": 100
     },
-    "tools/lib/entry-probe.mjs": {
+    "checks/lib/entry-probe.mjs": {
       "statements": 94.64,
       "branches": 96.15
     },
-    "tools/lib/install-manual.mjs": {
+    "tools/lib/release/install-manual.mjs": {
       "statements": 100,
       "branches": 100
     },
-    "tools/lib/kb-seeds.mjs": {
+    "tools/lib/core/kb-seeds.mjs": {
       "statements": 89.23,
       "branches": 81.66
     },
-    "tools/lib/keyless-imports.mjs": {
+    "tests/support/keyless-imports.mjs": {
       "statements": 89.61,
       "branches": 87.27
     },
-    "tools/lib/markdown-links.mjs": {
+    "tools/lib/core/markdown-links.mjs": {
       "statements": 97.05,
       "branches": 94.11
     },
-    "tools/lib/market-index.mjs": {
+    "tools/lib/release/market-index.mjs": {
       "statements": 96.77,
       "branches": 67.24
     },
-    "tools/lib/member-stale-evidence.mjs": {
+    "probes/lib/member-stale-evidence.mjs": {
       "statements": 100,
       "branches": 92.5
     },
-    "tools/lib/methods-init.mjs": {
+    "tools/lib/core/methods-init.mjs": {
       "statements": 100,
       "branches": 100
     },
-    "tools/lib/notes-audit.mjs": {
+    "tools/lib/session/notes-audit.mjs": {
       "statements": 96.1,
       "branches": 88.46
     },
-    "tools/lib/orient.mjs": {
+    "probes/lib/orient.mjs": {
       "statements": 95.71,
       "branches": 88.04
     },
-    "tools/lib/pack-source.mjs": {
+    "tools/lib/core/pack-source.mjs": {
       "statements": 100,
       "branches": 90
     },
-    "tools/lib/pin-transaction.mjs": {
+    "tools/lib/release/pin-transaction.mjs": {
       "statements": 95.31,
       "branches": 83.78
     },
-    "tools/lib/probe-kit.mjs": {
+    "tools/lib/probe/probe-kit.mjs": {
       "statements": 100,
       "branches": 93.33
     },
-    "tools/lib/probe-steps.mjs": {
+    "probes/lib/probe-steps.mjs": {
       "statements": 93.75,
       "branches": 90.24
     },
-    "tools/lib/probe-web.mjs": {
+    "tools/lib/probe/probe-web.mjs": {
       "statements": 97.61,
       "branches": 100
     },
-    "tools/lib/probe-window.mjs": {
+    "probes/lib/probe-window.mjs": {
       "statements": 0,
       "branches": 0
     },
-    "tools/lib/prune-runtime.mjs": {
+    "tools/lib/core/prune-runtime.mjs": {
       "statements": 100,
       "branches": 90
     },
-    "tools/lib/quality-loop.mjs": {
+    "tools/lib/company/quality-loop.mjs": {
       "statements": 94.75,
       "branches": 80.95
     },
-    "tools/lib/question-stop.mjs": {
+    "probes/lib/question-stop.mjs": {
       "statements": 96.61,
       "branches": 84.48
     },
-    "tools/lib/recovery-scope-evidence.mjs": {
+    "probes/lib/recovery-scope-evidence.mjs": {
       "statements": 97.93,
       "branches": 91.33
     },
-    "tools/lib/rehearsal.mjs": {
+    "tools/lib/core/rehearsal.mjs": {
       "statements": 93.75,
       "branches": 80
     },
-    "tools/lib/replay-fixture-freshness.mjs": {
+    "checks/lib/replay-fixture-freshness.mjs": {
       "statements": 93.93,
       "branches": 80
     },
-    "tools/lib/replay-logic.mjs": {
+    "checks/lib/replay-logic.mjs": {
       "statements": 95.45,
       "branches": 91.66
     },
-    "tools/lib/repo-markdown.mjs": {
+    "tools/lib/core/repo-markdown.mjs": {
       "statements": 98.65,
       "branches": 87.7
     },
-    "tools/lib/repository-layout.mjs": {
+    "tools/lib/core/repository-layout.mjs": {
       "statements": 97.39,
       "branches": 92.92
     },
-    "tools/lib/runtime-home.mjs": {
+    "tools/lib/core/runtime-home.mjs": {
       "statements": 92,
       "branches": 88.88
     },
-    "tools/lib/session-diagnose.mjs": {
+    "tools/lib/session/session-diagnose.mjs": {
       "statements": 93.75,
       "branches": 72.04
     },
-    "tools/lib/session-evidence.mjs": {
+    "tools/lib/session/session-evidence.mjs": {
       "statements": 94.54,
       "branches": 75.49
     },
-    "tools/lib/session-log-generation.mjs": {
+    "tools/lib/session/session-log-generation.mjs": {
       "statements": 100,
       "branches": 100
     },
-    "tools/lib/session-log.mjs": {
+    "tools/lib/session/session-log.mjs": {
       "statements": 53.84,
       "branches": 58.33
     },
-    "tools/lib/snapshot-index.mjs": {
+    "checks/lib/snapshot-index.mjs": {
       "statements": 100,
       "branches": 100
     },
-    "tools/lib/src-layering.mjs": {
+    "checks/lib/src-layering.mjs": {
       "statements": 96.15,
       "branches": 86.88
     },
-    "tools/lib/surface-matrix.mjs": {
+    "checks/lib/surface-matrix.mjs": {
       "statements": 87.2,
       "branches": 70
     },
-    "tools/lib/team-barrier-evidence.mjs": {
+    "probes/lib/team-barrier-evidence.mjs": {
       "statements": 100,
       "branches": 88.75
     },
-    "tools/lib/team-concurrency-verdict.mjs": {
+    "probes/lib/team-concurrency-verdict.mjs": {
       "statements": 80,
       "branches": 100
     },
-    "tools/lib/test-census.mjs": {
+    "tools/lib/repo/test-census.mjs": {
       "statements": 100,
       "branches": 96.55
     },
-    "tools/lib/tracked-secrets.mjs": {
+    "checks/lib/tracked-secrets.mjs": {
       "statements": 92.85,
       "branches": 75
     },
-    "tools/lib/tracked-token.mjs": {
+    "checks/lib/tracked-token.mjs": {
       "statements": 100,
       "branches": 100
     },
-    "tools/lib/ui-expected.mjs": {
+    "checks/lib/ui-expected.mjs": {
       "statements": 97.5,
       "branches": 71.87
     },
-    "tools/lib/workspace-oracle.mjs": {
+    "tools/lib/core/workspace-oracle.mjs": {
       "statements": 96.29,
       "branches": 94.62
     }
   },
   "exemptions": [
     {
-      "path": "tools/lib/carrier-registry.mjs",
+      "path": "checks/lib/carrier-registry.mjs",
       "reason": "写入口登记表：由 company-root-carriers 门禁间接消费，尚无直接 spec",
       "removeWhen": "改这个文件时同 diff 补 spec，或删除/合并进 safe-file"
     },
     {
-      "path": "tools/lib/diagnosis.mjs",
+      "path": "tools/lib/probe/diagnosis.mjs",
       "reason": "诊断工具的纯逻辑，当前只被 probes/analyze/diagnose-probe.mjs 调用，无直接 spec",
       "removeWhen": "下一次改诊断面时补 spec"
     },
     {
-      "path": "tools/lib/probe-window.mjs",
+      "path": "probes/lib/probe-window.mjs",
       "reason": "探针窗口 helpers，当前无直接 spec",
       "removeWhen": "下一次动 probe 基础设施时补 spec 或删掉该文件"
     },

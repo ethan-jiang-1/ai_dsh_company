@@ -7,11 +7,11 @@
 // 成本：真模型 1 会话 / 1 条 prompt，约 1–3 分钟；不进 pnpm test。
 // 用法：source run/env.sh && node probes/team/vp-eng-workflow-probe.mjs
 import { spawn } from 'node:child_process'
-import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe-web.mjs'
-import { readRecords } from '../../tools/lib/session-log.mjs'
-import { ensureRehearsalWorkspace } from '../../tools/lib/rehearsal.mjs'
-import { requireDevHome } from '../../tools/lib/runtime-home.mjs'
-import { repositoryRoot as ROOT } from '../../tools/lib/repository-layout.mjs'
+import { startWeb, companyCookie, companyRpc } from '../../tools/lib/probe/probe-web.mjs'
+import { readRecords } from '../../tools/lib/session/session-log.mjs'
+import { ensureRehearsalWorkspace } from '../../tools/lib/core/rehearsal.mjs'
+import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 
 const home = requireDevHome('vp-eng-workflow-probe')
 const rehearsal = ensureRehearsalWorkspace(ROOT)

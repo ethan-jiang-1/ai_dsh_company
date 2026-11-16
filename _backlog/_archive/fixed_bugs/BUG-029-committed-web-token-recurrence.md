@@ -72,7 +72,7 @@ token 值不复制到卡、报告或测试输出里。
 1. `git rm --cached` 两件日志并删除本地文件；`.gitignore` 增加 `runtime/web-logs/`；
    `AGENTS.md:25` 与 `runtime/README.md` 的 tracked/ignored 说明同步。
 2. 类级守卫落在两处：
-   - 纯逻辑 = `tools/lib/tracked-token.mjs`（只认 URL 查询串里的 token，值不回传）；
+   - 纯逻辑 = `checks/lib/tracked-token.mjs`（只认 URL 查询串里的 token，值不回传）；
    - 门禁 = `checks/gates/tracked-token.mjs`（扫 `git ls-files`，跳过只读 `vendor/`），
      已装配进 `checks/run-gates.mjs`；keyless 判据 = `tests/repo/tracked-token.spec.ts`，
      `.gitignore` 红绿守卫 = `tests/repo/gitignore-guards.spec.ts`。

@@ -6,9 +6,9 @@
 
 **动机**：用户 2026-10-16 点名做全仓结构评估，判据 =「今后容易搜索到局部，改东西变得简单」——第三轮只接前两轮未接的宽接口模块，不翻它们的案。
 
-**① `tools/lib/deliverables.mjs` 506 行 → 按「形状与身份 / 声明对账」拆两个模块**（依赖严格单向）：
-- 基座 `tools/lib/deliverables.mjs` 210 行 / 18 导出——身份解析（`deliverableId`）、形状合法性（`classifyDeliverable`）、meta 行形状与词表（`parseMeta` / `validateMeta` / `META_TYPES` / `META_RESULTS`）、占位与让位首行判定、`WARNING`（观察项码词表）、`normalizeRel`。
-- 对账 `tools/lib/deliverables-audit.mjs` 322 行 / 8 导出——`VIOLATION`、`parseSessionLog`、`auditDeliverables`、`isLeadSession`、`uncoveredPendingMaterial`、`partitionArchiveViolations`、`presentResultRows` + `META_FINAL_RESULTS`（只被 `presentResultRows` 消费）、私有 `idKey`。
+**① `tools/lib/company/deliverables.mjs` 506 行 → 按「形状与身份 / 声明对账」拆两个模块**（依赖严格单向）：
+- 基座 `tools/lib/company/deliverables.mjs` 210 行 / 18 导出——身份解析（`deliverableId`）、形状合法性（`classifyDeliverable`）、meta 行形状与词表（`parseMeta` / `validateMeta` / `META_TYPES` / `META_RESULTS`）、占位与让位首行判定、`WARNING`（观察项码词表）、`normalizeRel`。
+- 对账 `checks/lib/deliverables-audit.mjs` 322 行 / 8 导出——`VIOLATION`、`parseSessionLog`、`auditDeliverables`、`isLeadSession`、`uncoveredPendingMaterial`、`partitionArchiveViolations`、`presentResultRows` + `META_FINAL_RESULTS`（只被 `presentResultRows` 消费）、私有 `idKey`。
 
 **判据是「谁消费」而不是「名字像谁」**，两处据此修正了来源卡的分表（卡 §拍板记录已同 diff 记录）：
 - `WARNING` **留基座**：它的 7 个码里 check 侧用 5 个（`SLUG_UNLEDGERED` / `PLACEHOLDER_CLAIMS` / `FINAL_WITHOUT_META` / `META_RESULT_PENDING` / `META_LEDGER_MISMATCH`），其中三个是纯盘面观察、与会话对账无关；放对账侧会逼出 `deliverables-check → audit` 的反向依赖。
@@ -45,10 +45,10 @@
 - **验收② 回归**：`pnpm test` → `61 passed (61)` / `559 passed (559)`（60 + 新 spec）。
 - **验收③ keyless 与结构门禁**：`pnpm verify` → `verify: ALL PASS`（`guard-red-record` 现报 `×11 条守卫声明（61 个 spec…）`，证明 BUG-003 / BUG-004 的负例留证行随 describe 同迁后仍按文件找得到）；`pnpm exec vitest run tests/harness` → `24 passed (24)` / `243 passed (243)`。
 - **验收④ 真入口等价**：拆前/拆后同一条快照档命令，输出 `diff` 为空、退出码同为 0。
-- **验收⑤ 探针引用可达**：`node --input-type=module -e "const { PLACEHOLDER_YIELD_LINE } = await import('./tools/lib/deliverables.mjs')…"` → 原文在场（该常量属形状词表，留基座 ⇒ `claim-race-probe.mjs` 指针**无需改动**，比来源卡预期少一处改动）。
-- **导出普查守恒**：拆前 `git show 3f0af0b~1:tools/lib/deliverables.mjs` 的 26 个导出（22 函数 + 4 常量）＝拆后 18 + 8，**两侧零重名、零丢失**；`audit` 从基座取的 8 个符号全部在基座导出面内；基座不 import 对账（单向）。首轮构建曾把 `VIOLATION` 与 `presentResultRows` 误落基座、并漏掉 `idKey` 与 `META_FINAL_RESULTS`，均由「导出普查 + 冒烟 import」抓出并修正。
+- **验收⑤ 探针引用可达**：`node --input-type=module -e "const { PLACEHOLDER_YIELD_LINE } = await import('./tools/lib/company/deliverables.mjs')…"` → 原文在场（该常量属形状词表，留基座 ⇒ `claim-race-probe.mjs` 指针**无需改动**，比来源卡预期少一处改动）。
+- **导出普查守恒**：拆前 `git show 3f0af0b~1:tools/lib/company/deliverables.mjs` 的 26 个导出（22 函数 + 4 常量）＝拆后 18 + 8，**两侧零重名、零丢失**；`audit` 从基座取的 8 个符号全部在基座导出面内；基座不 import 对账（单向）。首轮构建曾把 `VIOLATION` 与 `presentResultRows` 误落基座、并漏掉 `idKey` 与 `META_FINAL_RESULTS`，均由「导出普查 + 冒烟 import」抓出并修正。
 - **红证（制造 → 见红 → 还原见绿，原文）**：
-  - ① keyless 面（破坏真东西）：往新模块注入 `import { execFileSync } from 'node:child_process'` → `FAIL …tools/lib 只能保持 keyless 纯逻辑；本地驱动、危险 builtin 和运行调用必须隔离`，明细行 = `"tools/lib/deliverables-audit.mjs → forbidden builtin: node:child_process [tools/lib/deliverables-audit.mjs]"`（`Test Files 1 failed / Tests 1 failed | 3 passed`）→ 还原 → `4 passed (4)`。**这条同时证明新文件真的进了 layering 的扫描面**（不是溜出守卫）。
+  - ① keyless 面（破坏真东西）：往新模块注入 `import { execFileSync } from 'node:child_process'` → `FAIL …tools/lib 只能保持 keyless 纯逻辑；本地驱动、危险 builtin 和运行调用必须隔离`，明细行 = `"checks/lib/deliverables-audit.mjs → forbidden builtin: node:child_process [checks/lib/deliverables-audit.mjs]"`（`Test Files 1 failed / Tests 1 failed | 3 passed`）→ 还原 → `4 passed (4)`。**这条同时证明新文件真的进了 layering 的扫描面**（不是溜出守卫）。
   - ② 审计判据钉子：把 `isLeadSession` 反转成 `identity.agentPreset === leadPreset`（去掉 `delegationDepth === 0` 门）→ 三条红：`承诺权… expected [] to include 'final-presented-by-non-lead'`、`Lead 判据… expected true to be false`、`反向检查只追 Lead 声明… expected [ { code: 'dangling-present', …(2) } ] to deeply equal []` → 还原 → `32 passed (32)`。
   - ③ 常量原文钉子：把 `PLACEHOLDER_YIELD_LINE` 的「，」改成「,」→ 独立 import 断言红 `❌ 原文漂移被抓：期望「让位=认领撤销，非出稿」，实得「让位=认领撤销,非出稿」`，且 spec 钉子同轮红 `expected '让位=认领撤销,非出稿' to be '让位=认领撤销，非出稿'` → 还原 → 绿。
   - ④ 触发线本身可绊人：`node runtime/e2e/round3-receipts/trigger-check.mjs` 现状 `replay-smoke: 717 行 / 5 个 mode 声明 —— 触发线 800 行 / 6 mode` → `PASS（触发线未触发）`；注入两个 mode 声明后 `719 行 / 7 个 mode 声明` → `FAIL mode 声明 7 个 > 触发线 6（… --red-probe-a --red-probe-b） ⇒ 该分家了`（exit 1）→ 还原 → PASS。**首版判据自身有假绿**（正则把 `--wall` 当 mode、且 `--` 列表被重复计数），由「先跑绿再跑红」的次序抓出并重写。

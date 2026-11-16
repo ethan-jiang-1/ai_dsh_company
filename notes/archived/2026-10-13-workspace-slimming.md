@@ -21,7 +21,7 @@
    不 blanket 整个 `deliverables/`（那会把成品也挡在门外，spec 有反向断言）。
 2. **`tools/converge.mjs` 的归档搬移改机制**：`git mv <目录>` 遇到未跟踪文件会 fatal
    （`not under version control`），drafts 现在正是未跟踪的 ⇒ 改成 **fs rename + `git add -A -- <旧> <新>`**
-   （成品照样 stage 成重命名）。计划住 `tools/lib/converge-rules.mjs` 的 `archiveMovePlan`（纯逻辑缝）。
+   （成品照样 stage 成重命名）。计划住 `tools/lib/company/converge-rules.mjs` 的 `archiveMovePlan`（纯逻辑缝）。
 3. **`tools/orient.mjs` 加 ignored 面计数**：只数 tracked 会把这层本地过程稿报成"零改动"（静默失真）——
    概览现在两行：`git 改动 N 处（company-workspace 面）` + `本地过程稿 M 项（ignored）`。
 4. **排练验收判据改档**（`docs/guides/dev-loop.md` §7）：`git status --porcelain company-workspace/` 为空
@@ -67,7 +67,7 @@
 ## 落点
 
 - 规则：`.gitignore`（两条点名规则 + 理由/量级注释）。
-- 机制：`tools/lib/converge-rules.mjs`（`archiveMovePlan`）、`tools/converge.mjs`（搬移段）、`tools/orient.mjs`（ignored 计数）。
+- 机制：`tools/lib/company/converge-rules.mjs`（`archiveMovePlan`）、`tools/converge.mjs`（搬移段）、`tools/orient.mjs`（ignored 计数）。
 - 判据：`checks/run-gates.mjs` 的 `drafts-untracked`、`probes/fs-taskboard/archive-move-probe.mjs`、
   `tests/tools/converge-rules.spec.ts`（纯计划）、`checks/gates/gitignore-shape.mjs`（规则在场；原 gitignore-guards spec 2026-11-14 退役）。
 - 文档：`docs/guides/dev-loop.md` §7、`snapshots/README.md` §归档动作、`docs/project-map.md` 公司盘行。

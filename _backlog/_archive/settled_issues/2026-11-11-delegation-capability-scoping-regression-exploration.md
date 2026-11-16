@@ -133,7 +133,7 @@ opened: 2026-11-11
 
 ## 范围与排除项
 
-**范围**：上述 A1–A5、B1–B6；最近两次改动涉及的 host/policy/section/workflow_runs/role skill/docs；测试资产可复用（优先用 `tools/lib/surface-matrix.mjs`、`session-evidence`、现有 probes），不足再补小探针。
+**范围**：上述 A1–A5、B1–B6；最近两次改动涉及的 host/policy/section/workflow_runs/role skill/docs；测试资产可复用（优先用 `checks/lib/surface-matrix.mjs`、`session-evidence`、现有 probes），不足再补小探针。
 
 **排除**：重跑第四–九轮旧矩阵；修产品代码（本卡只取证）；G7/G8 产品决策；把 support root 是否隐藏直接改掉；发布声明；旧 pin 的机制争议。
 
