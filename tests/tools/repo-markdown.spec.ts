@@ -129,12 +129,18 @@ describe('tools/lib/repo-markdown 单原语契约', () => {
       '        disabled: !!js "process.env.X === \'off\'"',
     ].join('\n')
     const document = loadCordisYaml(text) as Array<Record<string, unknown>>
-    const row = (document[0]?.insert as Array<Record<string, unknown>>)[0]
+    const operation = document.at(0)
+    expect(operation).toBeDefined()
+    const inserted = operation?.insert as Array<Record<string, unknown>>
+    const row = inserted.at(0)
+    expect(row).toBeDefined()
     const config = row?.config as Record<string, unknown>
     expect(config.path).toContain('baseUrl')
     expect(config.disabled).toContain("process.env.X === 'off'")
-    // 同一份文本在 CORE_SCHEMA（文档 frontmatter 面）下必须抛错——证明 !!js 是组合方言而非普通 YAML。
-    expect(() => parseFrontmatter(`---\n${text.replace(/^- /, 'x: "')}\n---\n`)).not.toThrow()
+    // 同一份 !!js 文本在文档 frontmatter 面（CORE_SCHEMA）不可解析——证明 !!js 是组合方言而非普通 YAML。
+    const asFrontmatter = parseFrontmatter('---\ndisabled: !!js "process.env.X === \'off\'"\n---\n')
+    expect(asFrontmatter.data).toBeNull()
+    expect(asFrontmatter.error ?? '').toContain('不可解析')
   })
 
   it('flattenCordisRows 展平 insert 行 / group 嵌套 config / preset 的 config.plugins', () => {
