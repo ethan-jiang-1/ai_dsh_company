@@ -20,7 +20,7 @@ import { backlogLivenessProblems } from '../../checks/lib/backlog-liveness.mjs'
 
 const ROOT_DIR = join(dirname(fileURLToPath(import.meta.url)), '../..')
 const GATES = join(ROOT_DIR, 'checks/gates')
-const TOOLS_LIB = join(ROOT_DIR, 'tools/lib')
+const CHECKS_LIB = join(ROOT_DIR, 'checks/lib')
 
 function rewriteMutantSource(source, dir, baseName) {
   const originalUrl = JSON.stringify(pathToFileURL(join(dir, `${baseName}.mjs`)).href)
@@ -46,7 +46,7 @@ async function mutantInDir(dir, baseName, from, to) {
 }
 
 const mutant = (gate, from, to) => mutantInDir(GATES, gate, from, to)
-const libMutant = (name, from, to) => mutantInDir(TOOLS_LIB, name, from, to)
+const libMutant = (name, from, to) => mutantInDir(CHECKS_LIB, name, from, to)
 
 function fixture(files, dirs = []) {
   const root = mkdtempSync(join(tmpdir(), 'gate-mutation-'))
