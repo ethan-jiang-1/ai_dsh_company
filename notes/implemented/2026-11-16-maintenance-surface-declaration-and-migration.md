@@ -11,7 +11,7 @@
 1. **P0 先立合同，零搬家**：新增 [surface-contract](../../docs/surface-contract.md)——两层（oracle / entry）× 三面（judge / show / operate）× 两前置轴（生命周期 / 管道件）+ 判定顺序；根布局三行、`checks/` / `probes/` / `tools/` 首屏同步写面声明。
 2. **例外表住查表层，不住合同文末**：handoff §3.4 说「13 条放合同文末」且 §3.1 给 28 行预算——两者不可兼得（表头 + 14 行已超合同预算的 5% 留白）。按 [docs/AGENTS](../../docs/AGENTS.md) 的层规矩（参考 = 查表与登记）落到 [surface-exceptions](../../docs/reference/surface-exceptions.md)；合同保持 24 行。**与 handoff 的有意偏差，已在此登记。**
 3. **P1 搬家**：tools/observe/ 7 件（ask-latency / diagnose / explore-evidence / notes-audit / orient / propose-sampler / session-log-export）→ `probes/analyze/*-probe.mjs`（新域 `analyze`：共享 zstd + 会话日志/notes 读取 harness、同一证据源、同一解析失败模式）；tools/repo/refactor-drift.mjs → `checks/audit/refactor-drift-audit.mjs`（judge 归 `checks/`）。tools/observe/ 目录删除，工具面四组 → 三组。
-4. **注册表与棘轮同 diff**：[asset-lanes](../../tools/lib/asset-lanes.mjs) PROBES +7（domain `analyze`）、失败类 +7（5 会话持久化 / 1 文档指针 / 1 模型可见文本）；`MAX_PROBES` 59 → 66（[test-census.spec](../../tests/repo/budget/test-census.spec.ts)）。口径 = **登记资产**：搬家是分类变更，入口总数不变，不是能力增长；此后新增仍只降不升。
+4. **注册表与棘轮同 diff**：[asset-lanes](../../tools/lib/asset-lanes.mjs) PROBES +7（domain `analyze`）、失败类 +7（5 会话持久化 / 1 文档指针 / 1 模型可见文本）；`MAX_PROBES` 59 → 66（[test-census.spec](../../tests/repo/budget/test-census.spec.ts)）。口径 = **登记资产**：搬家是分类变更，入口总数不变，不是能力增长；此后新增仍只降不升。同 diff 在 [policy §P2](../../docs/policy.md) 补一句口径（分类迁移可校准 cap 并在 Note 论证），避免政策与棘轮口径相反。
 5. **修了 handoff 的一处事实错误**：§4.3 称「相对 import 不用改，tools/observe 与 probes/analyze 同为两层深」——错。`probes/analyze/` 下入口的 `../lib/` 解析到不存在的 probes/lib/。7 件统一改 `../../tools/lib/` / `../../tools/drivers/`；orient 首次实跑 `ERR_MODULE_NOT_FOUND`，改后 exit 0。
 6. **研究材料按「旧家 = 纯文本、反引号 = 现行家」处理**：`_backlog/` 活跃面是 bare-path **硬档**（不是 handoff 以为的观察档），搬家后旧路径会红；把旧家路径的反引号去掉、加「已落地」banner 保留时点文本，历史不篡改、门禁不误读。
 7. **保留「新增工具四问」**（handoff §4.4 说「四问改三问」）：第二问（入口还是纯逻辑 / 属哪一步）仍是选组判据，删掉会丢判据；只把组枚举改成三组。**偏差登记。**
@@ -41,6 +41,7 @@
 - [policy] `MAX_PROBES` 抬顶属 P2 口径变更，按 handoff 建议取 A；B（退役换 cap）未取，理由见「输掉的方案」 → `tests/repo/budget/test-census.spec.ts`
 - [environment-gap] 未跑真模型 / 浏览器 / 真页面：本轮只动维护面文件与文档，不触 preset、host、client 面 → `checks/lanes/preset.entry.mjs`
 - [environment-gap] 未重跑 clean clone：无新依赖、无构建面变化，仅仓内路径与注册表 → `docs/guides/bootstrap.md`
+- [policy] 库存口径分裂（INDEX 67 = 66 探针 + 1 fixture；census 66 = 注册探针）保持现状：handoff §2 只把它列为既有事实、未列入 P0/P1；修它要先决定「fixture 算不算公开入口」，属独立决定 → `tools/lib/checks-index.mjs`
 - [unprovable] 仓库外书签/外部仓对旧扁平常量 tools/observe 的引用，本仓观测不到 → `AGENTS.md`
 
 ## 验证
