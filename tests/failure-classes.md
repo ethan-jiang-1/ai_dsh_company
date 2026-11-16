@@ -15,7 +15,7 @@
 | 5 | 模型可见文本（prompt / 工具描述 / 诊断） | **组装转录**（keyless 回放） | 现有只有真模型冒烟（抽样） | **缺**：待组装回放场景（研究 B6） |
 | 6 | 会话 / 持久化 / 迁移 | unit + 世界断言 | `tests/host/ledger`、`run-bundle`、`presented-*` | 有 |
 | 7 | provider / adapter / 模型路由 | unit + with-key e2e | 本仓无 provider 插件 | 不适用 |
-| 8 | 子进程 / 沙箱 / 并发写 | 真进程 + 独立 home | `company-root-process-smoke`、`two-homes`、`cross-process-fs-probe` | 有资产；**按面 pre-push 已接，进程级矩阵在 weekly** |
+| 8 | 子进程 / 沙箱 / 并发写 | 真进程 + 独立 home | `company-root-process.e2e`、`two-homes`、`cross-process-fs-probe` | 有资产；**按面 pre-push 已接，进程级矩阵在 weekly** |
 | 9 | client UI / 浏览器 / 布局 | 组件 spec（jsdom）+ 真页面 | `tests/client` 62 个 spec + `ui-scene-smoke` | 有；真交互不在 push 链（weekly / 手动） |
 | 10 | 配置 / profile / 组合（`cordis.yml`） | 静态门 + 真挂载 | `preset-smoke` / `client-load-smoke` + manifest specs | 有；真挂载已进按面 pre-push |
 | 11 | 性能敏感路径（时间 / 内存 / 吞吐） | benchmark + 预算 | 无 | **缺**：本仓无性能层（显式未覆盖） |

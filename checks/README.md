@@ -10,11 +10,12 @@
 | 当前目标 | 入口 |
 |---|---|
 | 检查结构、引用与簿记 | `pnpm verify` → [run-gates](run-gates.mjs) |
+| pre-push 按面分派 | [pre-push-surfaces](pre-push-surfaces.mjs)：从 git ref 算 outgoing 范围 → 选 surface lane；未分类 fail-closed |
 | 看运行态全景 / 场景 / 会话历史 | `pnpm orient` → [orient](../probes/analyze/orient-probe.mjs) |
 | 看最近会话的失败摘要（中断轮、非零 bash、待审批也算） | `pnpm diagnose [--strict]` → [diagnose](../probes/analyze/diagnose-probe.mjs) |
 | 检查密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs) · [tracked-token](gates/tracked-token.mjs) · [tracked-secrets](gates/tracked-secrets.mjs) |
 | 检查局部逻辑或静态渲染 | `pnpm test` → [tests](../tests/)；分层守卫 = [layering.spec](../tests/repo/structure/layering.spec.ts) |
-| 确认测试资产还活着 | `pnpm smoke:fast` → [fast](lanes/fast-lane.mjs)（4 条，~2.2s；pre-push）；全量 = `pnpm smoke:all` → [keyless-lane](lanes/keyless-lane.mjs)（每周 CI 跑 `--ci`；成员唯一家 = [lane 注册表](../tools/lib/core/asset-lanes.mjs)） |
+| 确认测试资产还活着 | `pnpm smoke:fast` → [fast](lanes/fast-lane.mjs)（4 条，~2.4s；pre-push）；全量 = `pnpm smoke:all` → [keyless-lane](lanes/keyless-lane.mjs)（每周 CI 跑 `--ci`；成员唯一家 = [lane 注册表](../tools/lib/core/asset-lanes.mjs)） |
 | 类型 / 导入签名改动 | `pnpm typecheck`（命令与预算 = [tests/README §验证分层与预算](../tests/README.md)） |
 | 确认角色真的挂载 | [preset-smoke](lanes/preset.entry.mjs) |
 | 确认 client 真的装配 | [client-load-smoke](lanes/client-load.entry.mjs) |
@@ -39,11 +40,10 @@
 
 ## 共享实现与目录选择
 
-[lib](./lib/) 保存 judge 专属判据（作者/交付物核对、覆盖基线、分层与面判据、回放与快照判据、密钥与 token 扫描）；跨面共享地基住 [tools/lib](../tools/lib/)（core/ 路径与会话、probe/ 探针骨架、注册表等）；真实驱动住 [tools/drivers](../tools/drivers/)。
+[lib](./lib/) 保存 judge-wide 判据（作者/交付物核对、覆盖基线、分层与面判据、回放与快照判据、密钥与 token 扫描）；[gates/lib](gates/lib/) / [lanes/lib](lanes/lib/) 是 gate-local / lane-local 支撑（只许各自子树 import）；跨面共享地基住 [tools/lib](../tools/lib/)（core/ 路径与会话、probe/ 探针骨架、注册表等）；真实驱动住 [tools/drivers](../tools/drivers/)。
 驱动不进入 keyless spec，准入由 [分层守卫](../tests/repo/structure/layering.spec.ts) 检查。
 
-目录取舍 = [driver-purpose-top-level](../notes/archived/2026-10-07-driver-purpose-top-level.md)
-（`scripts/`、`dev/` 形态名已退役）；顶层分区导航 = [项目地图](../docs/project-map.md)。
+目录取舍见 [driver-purpose-top-level](../notes/archived/2026-10-07-driver-purpose-top-level.md)；顶层导航 = [项目地图](../docs/project-map.md)。
 
 ## 待触发复查（触发条件 → 该做什么）
 

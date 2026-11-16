@@ -9,7 +9,7 @@
 #        全量 vendor 构建链（DSH 自己的 test 脚本也是 build && vitest），负担不成比例。
 #        ⇒ 分工 = hook 管「忘跑」（verify+typecheck+lint+dup+test 都强制），CI 管「环境差异/绕过」（verify 穷举档）。
 # 2026-11-13（研究 B 件）：加「按面触发」——真入口检查（client 装配 / preset 挂载 / 回放 / 进程级写面）
-#        原本不在任何 required lane 里。规则唯一家 = tools/lib/asset-lanes.mjs 的 SURFACE_RULES；
+#        原本不在任何 required lane 里。规则唯一家 = tools/lib/core/asset-lanes.mjs 的 SURFACE_RULES；
 #        hook 把 git 喂进来的 ref 清单交给 checks/pre-push-surfaces.mjs，由它算 outgoing 范围再选检查。
 #        成本：只在改到对应面时增加（client ~25s / presets ~30s / content ~2s）。
 # 2026-11-16（二轮）：未分类改动面 = 阻断（pre-push-surfaces 对 unseen 退出非零）；新目录/新文件先登记

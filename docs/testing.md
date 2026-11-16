@@ -25,14 +25,14 @@
 | 名字 | 证据类型 / 命令 |
 |---|---|
 | `tests/**/*.spec.ts` | 进程内 keyless（`pnpm test:spec`；`pnpm test` 兼容）；目录 = 被测面 |
-| `checks/lanes/*.e2e.mjs` | 真进程（`pnpm test:e2e`；含 keyless process/built） |
+| `checks/lanes/*.e2e.mjs` | 真进程（`pnpm test:e2e`；含 keyless process/built 与自行 spawn vitest 的 meta-lane） |
 | `checks/lanes/*.entry.mjs` | 真浏览器 / 真 profile / 真 tarball（`pnpm test:entry`） |
 | `checks/lanes/*-lane.mjs` | lane runner（只调度，不证明行为） |
 | `tests/checks/*.test.mjs` | 门禁自身（`pnpm test:checks`） |
 | `probes/**/*-probe.mjs` | 手动诊断证据，不进 `test:*`（fixture 入口只允许 `<域>/<fixture>/index.mjs`） |
 | `checks/audit/*-(audit\|check\|eval\|ratchet).mjs` | 只读判据/报告 |
 
-**纪律**：后缀只由证据类型决定，目录只由 lane/被测面决定；**名字不编码失败类或 owner**。文件名 token 禁词：`golden`/`util`/`misc`/`helper`/`common`/`tmp`/`temp`/`new`/`old`/`copy`/`backup`。机械判据 = `naming-contract` 门禁；新资产不登记 lane/失败类 = `asset-lanes.spec` / census 红。用例名 = 行为命题现在时、不写 "should"——测试描述行为，不描述正确性。
+**纪律**：`generative.e2e` 这类自己 spawn vitest 的 meta-lane 仍是 asset；`*-lane.mjs` 只调度、不自证。后缀只由证据类型决定，目录只由 lane/被测面决定；**名字不编码失败类或 owner**。文件名 token 禁词：`golden`/`util`/`misc`/`helper`/`common`/`tmp`/`temp`/`new`/`old`/`copy`/`backup`。机械判据 = `naming-contract` 门禁；新资产不登记 lane/失败类 = `asset-lanes.spec` / census 红。用例名 = 行为命题现在时、不写 "should"——测试描述行为，不描述正确性。
 ## 2. 改动面 → 最小证据（同 diff 交付）
 
 **行级映射**（哪个改动面跑哪个检查、何时升档、回放/视觉夹具的义务）唯一家 =

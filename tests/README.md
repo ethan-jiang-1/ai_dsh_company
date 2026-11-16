@@ -2,7 +2,7 @@
 
 > 什么时候读：选最窄检查、加 spec、判断某一层能证明什么时。
 > 本文件管「改动面 → 检查」与「命令与预算」；政策与证明边界 = [testing.md](../docs/testing.md)，逐脚本触发/成本 = 头注 + [checks/README](../checks/README.md)。
-> 四区各测什么、**不证明什么**、改动面 → 最窄检查怎么选——本文件做导航 + 改动面映射表（单家，2026-10-10 自 testing.md §2 迁入行级表）。分层与证据政策唯一家 =
+> 各区各测什么、**不证明什么**、改动面 → 最窄检查怎么选——本文件做导航 + 改动面映射表（单家，2026-10-10 自 testing.md §2 迁入行级表）。分层与证据政策唯一家 =
 > [docs/testing.md](../docs/testing.md)（九层证明边界 / 证据纪律 / 改动面→最小证据）；逐脚本触发/成本/状态
 > 唯一源 = 脚本头注（[检查索引](../checks/README.md) 只索引，门禁强制自述）——本文件不复述，防漂移。
 > 真模型 / 真浏览器**不进本树**（[repo/layering.spec](./repo/structure/layering.spec.ts) 机械守卫）。
@@ -13,11 +13,12 @@
 
 | 区 | 测什么 | 不证明什么 |
 |---|---|---|
-| [tests/host](./host/) | `src/host/` 的 keyless 逻辑与真文件集成；**目录名镜像 `src/host` 的组名**（同名对应；未对应的两侧目录在 [tests/repo/structure](./repo/structure/) 的镜像断言里带理由登记——目前只剩三条：`contract/`、`index/`、`i18n/`） | Cordis 真装配、profile 挂载、会话级行为 |
+| [tests/host](./host/) | `src/host/` 的 keyless 逻辑与真文件集成；**目录名镜像 `src/host` 的组名**（同名对应；未对应的两侧目录在 [tests/repo/structure](./repo/structure/) 的镜像断言里带理由登记——目前跨 host/client 只剩三条：`contract/`、`index/`、`i18n/`） | Cordis 真装配、profile 挂载、会话级行为 |
 | [tests/lib](./lib/) · [tests/content](./content/) | `src/lib/` 纯逻辑（**目录名镜像 `src/lib` 的八组**：presence、cultivation、docs、deliverables、delegation、startup、accounting、shared）+ `content/` 形状与合同（模板头、产品类型包、交付模式包、编号合同、两轴 scenario） | Host 注册/装配、运行时注入行为 |
 | [tests/client](./client/) | client 面板视图模型 + 静态渲染 + CSS 守卫；Lead/follow 适配器与 tab 注册目录（真实 Cordis `Context`/`SlotRegistry`）；多实例探活 disposer 契约；whole-client 档（真 `bootClient` × web profile bundle roster）覆盖 `apply` 组合与 fiber 卸载/重载。**目录名镜像 `src/client` 的组名**（同名对应；根只留 whole-client 组合 spec）；另有 `i18n/` 快速回归（字典/页签壳/缺省 locale），属性区，不镜像源码组 | 真浏览器渲染交互（→ client-load-smoke；真页面页签/错误环 → ui-scene-smoke） |
 | [tests/presets](./presets/) | persona / skills 声明内容；两轴 coverage（product-type 五件齐 + playbook + fixture / delivery-mode 经营侧方法 + workflow 分派 + awareness） | 组合装配与工具行实际生效（→ preset-smoke + 会话日志证据） |
-| [tests/repo](./repo/) · [tests/contract](./contract/) · [tests/tools](./tools/) · [tests/session](./session/) · [tests/evidence](./evidence/) · [tests/ui](./ui/) | 仓库合同（**按 owner 分六个子目录**：structure、pack、release、docs、budget、security——钉的是 `docs/`、`package.json`、`checks/` 与生成物，**没有单一的源码对象，所以不按源码分**；清单 = 目录本身）· 引擎合同与真值表 · `tools/lib` 纯逻辑 · 会话日志/诊断/探针驱动 · 协作与证据判据 · 页签目录（Phase 2 后叫 expected） | 运行时或 CLI 端到端行为 |
+| [tests/repo](./repo/) · [tests/contract](./contract/) · [tests/tools](./tools/) · [tests/session](./session/) · [tests/evidence](./evidence/) · [tests/ui](./ui/) | 仓库合同（**按 owner 分六个子目录**：structure、pack、release、docs、budget、security——钉的是 `docs/`、`package.json`、`checks/` 与生成物，**没有单一的源码对象，所以不按源码分**；清单 = 目录本身）· 引擎合同与真值表 · 维护面纯逻辑（`tools/lib` 为主，兼 `checks`/`probes` 的纯函数） · 会话日志/诊断/探针驱动 · 协作与证据判据 · 页签目录（金样 = expected） | 运行时或 CLI 端到端行为 |
+| [tests/checks](./checks/) | 门禁自测（node:test，`pnpm test:checks`）：每个 guard 的拒绝分支/负例；不是 vitest spec | 产品行为（→ checks/lanes 或 probes） |
 | [tests/support](./support/) · [tests/fixtures](./fixtures/) | 共享夹具/合成输入与 provenance（不是 spec；`fixture-provenance` spec 守卫，pnpm test） | 产品行为或运行时行为 |
 
 spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随仓库增长，写进文档必过期）；导航到区，不到件。
@@ -80,7 +81,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 **三条硬规矩**：
 
 1. **真模型 / 真浏览器不进迭代环的秒级回归档**：keyless 单测与结构检查保持快速；认证档仅在受影响面或验收要求时运行，不按“轮末/每轮”机械触发。需要真入口 → 写 `checks/lanes/*-smoke.mjs`，别塞进 `tests/`。**这条有机械门禁**：[`repo/layering.spec.ts`](repo/structure/layering.spec.ts) 扫 `tests/**` spec 文本，命中 `node:child_process` import / playwright / 密钥（`DEEPSEEK_API_KEY`|`credentials.yaml`）即红（已反证：塞一行 `import { spawn } from 'node:child_process'` 立刻变红）；`spawn(`/`fetch(` 调用点**不**机械扫（raw-text 会误伤夹具字符串），由 import ban + 下条驱动 import 禁 + 分层纪律守。**R5a 起另禁两条**（均双红证）：tests/
-   不得 import `tools/` 下的驱动脚本（`tools/lib/` 纯逻辑库除外）；任何 vitest 配置不得把
+   不得 import `checks|probes|tools` 下的驱动/入口脚本（三处 `lib/` 纯逻辑库除外）；任何 vitest 配置不得把
    `checks|probes|tools` 编进测试发现——重放 lane 是第三档，只由 `checks/lanes/replay.e2e.mjs` 驱动。
 2. **能做成纯函数就做成纯函数**：UI 组件把"展示事实"抽成纯函数（范本 `delegationCardModel`），
    keyless 单测直接断言它——组件层就永远不需要模型与浏览器。

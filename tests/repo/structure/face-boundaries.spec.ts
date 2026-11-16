@@ -24,12 +24,13 @@ import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layou
  *   → 共享地基→judge 边红；删除 → 绿。
  */
 
-const LIB_ROOTS = ['tools/lib', 'checks/lib', 'checks/gates/lib', 'checks/lanes/lib', 'probes/lib']
+const ZONE_ROOTS = ['tools/lib', 'checks/lib', 'checks/gates/lib', 'checks/lanes/lib', 'probes/lib']
+const SCAN_ROOTS = ['tools', 'checks', 'probes']
 
 type Edge = { source: string; target: string; sourceZone: string; targetZone: string }
 
 function zoneOf(rel: string): string {
-  for (const zone of LIB_ROOTS) {
+  for (const zone of ZONE_ROOTS) {
     if (rel === zone || rel.startsWith(`${zone}/`)) return zone
   }
   if (rel.startsWith('tests/support/')) return 'tests/support'
@@ -45,7 +46,7 @@ function walk(dir: string): string[] {
   })
 }
 
-const files = LIB_ROOTS.flatMap(root => walk(resolve(ROOT, root))).sort()
+const files = SCAN_ROOTS.flatMap(root => walk(resolve(ROOT, root))).sort()
 const edges: Edge[] = []
 for (const file of files) {
   const source = relative(ROOT, file).split(sep).join('/')
@@ -63,6 +64,9 @@ const FORBIDDEN_EDGES: readonly { from: RegExp; to: RegExp; why: string }[] = [
   { from: /^checks\/lib\//, to: /^(?:probes|tests)\//, why: 'judge-wide 判据不得依赖 show 或 test-only 支撑' },
   { from: /^checks\/lib\//, to: /^checks\/(?:gates|lanes)\/lib\//, why: 'judge-wide 判据不得依赖 gate/lane-local 支撑' },
   { from: /^probes\/lib\//, to: /^(?:checks|tests)\//, why: 'show-wide 支撑不得依赖 judge 或 test-only 支撑' },
+  { from: /^tools\//, to: /^(?:checks|probes|tests)\//, why: 'operate 面不得依赖 judge/show/test-only 实现' },
+  { from: /^checks\//, to: /^(?:probes|tests)\//, why: 'judge 面不得依赖 show/test-only 实现' },
+  { from: /^probes\//, to: /^(?:checks|tests)\//, why: 'show 面不得依赖 judge/test-only 实现' },
 ]
 
 describe('面库依赖方向（归属不是目录位置，是 import 方向）', () => {
@@ -77,6 +81,7 @@ describe('面库依赖方向（归属不是目录位置，是 import 方向）',
       for (const rule of FORBIDDEN_EDGES) {
         if (!rule.from.test(edge.source) || !rule.to.test(edge.target)) continue
         problems.push(`${edge.source} → ${edge.target}：${rule.why}`)
+        break
       }
     }
     expect(problems, '违反归属规则的 import 边（修家或搬模块，不要加豁免）').toEqual([])

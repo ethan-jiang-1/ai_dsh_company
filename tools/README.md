@@ -14,12 +14,12 @@
 | [`repo/`](./repo/) | 维护仓库自身：收敛、索引 / census / 覆盖生成物、清理、**升 pin 簿记（`sync-dsh`）** | 会改仓库文件（tracked 或 gitignored） |
 | [`release/`](./release/) | 产出仓库外的字节：tarball、安装手册、市场索引 | `_dist/` 与发布 manifest |
 
-`dev/` 与 `release/` 是**会留下东西**的两组。拿不准时先看工具头注的「何时跑」，再决定进哪个门；只读视图（运行态、诊断、notes 审计、证据导出）不在这里，走 `probes/analyze/`。
+`dev/`、`repo/`、`release/` 都会留下东西（环境 / 仓库文件 / `_dist`）；`archive/` 只保留已耗仪器。拿不准时先看工具头注的「何时跑」，再决定进哪个门；只读视图（运行态、诊断、notes 审计、证据导出）不在这里，走 `probes/analyze/`（例外：纯查询 `repo/snapshot-path.mjs` 已在例外表登记）。
 
 ## 实现层（不是入口）
 
-- [`lib/`](./lib/) —— **共享地基**（三个面都 import；自包含，不反向 import 面专属库）：`core/` 路径/仓库根/home/会话日志/注册表、`probe/` 探针骨架、`session/` 会话投影、`company/` 公司域、`repo/` 生成器、`release/` 发布与安装。**不启动进程、不联网**；「纯逻辑」不等于「不碰盘」：辅助函数会显式读写盘，副作用只发生在被调用时。
-- **面专属支撑住各自的面里**：judge 判据支撑 → [`checks/lib/`](../checks/lib/)；show 探针骨架 → [`probes/lib/`](../probes/lib/)。判据 = 谁主要用它、且不反向依赖别面的库。
+- [`lib/`](./lib/) —— **共享地基**（三个面都 import；自包含，不反向 import 面专属库）：`core/` 路径/仓库根/home/会话日志/注册表/pin、`probe/` 探针运行管道（web 启动/CDP/页签目录，跨面共用）、`session/` 会话投影、`company/` 公司域（含 candidate-scan / delegation-model 等共享模型）、`repo/` 生成器、`release/` 发布与安装。**不启动进程、不联网**；「纯逻辑」不等于「不碰盘」：辅助函数会显式读写盘，副作用只发生在被调用时。
+- **面专属 / 局部支撑各有其家**：judge-wide → [`checks/lib/`](../checks/lib/)；gate-local → [`checks/gates/lib/`](../checks/gates/lib/)；lane-local → [`checks/lanes/lib/`](../checks/lanes/lib/)；show 证据/判词 → [`probes/lib/`](../probes/lib/)；test-only → [`tests/support/`](../tests/support/)。判据 = 谁主要用它；局部支撑只许其子树 import（`face-boundaries` spec 机械守）。
 - [`drivers/`](./drivers/) —— **真实驱动**：Playwright / CDP / 发布子进程 / zstd 解压；只被入口层与 lanes 调用，不被 tests import（layering 门禁）。
 - [`archive/`](./archive/) —— **已耗仪器**：一次性任务用完即收，保留只为可复现。
 
