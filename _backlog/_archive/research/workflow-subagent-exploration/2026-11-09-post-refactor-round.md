@@ -28,7 +28,7 @@ intent: 给下一位执行者一份重构后 delta、入口矩阵、charters、�
 
 - 随包 9 个 preset：6 角色（`ceo` / `vp-eng` / `vp-sales` / `coo` / `cfo` / `cmo`）+ 3 个 support
   （`worker` / `worker-researcher` / `worker-orchestrator`）；清单唯一源 =
-  [`delegation-model.mjs`](../../../../checks/lib/delegation-model.mjs) 的 `PRESET_IDS`。
+  [`delegation-model.mjs`](../../../../tools/lib/company/delegation-model.mjs) 的 `PRESET_IDS`。
 - `worker`（leaf）：fs / bash / web / todo / compaction；无 subagent / team / workflow / control /
   ask-user / present / goal / schedule / skill。见
   [`presets/worker/agent.cordis.yml`](../../../../packages/company-pack/presets/worker/agent.cordis.yml)。
@@ -450,7 +450,7 @@ coo/cfo root 的逐个 retry 采用；长期采纳/workspace-write/release。
   [subagent 子系统](../../../../vendor/dsh/docs/subsystems/subagent.md)。
 - 本仓合同：[delegation](../../../../docs/contracts/delegation.md)、[presets](../../../../docs/contracts/presets.md)、
   [testing](../../../../docs/testing.md)、[tests README](../../../../tests/README.md)。
-- 模型/资产：[delegation-model.mjs](../../../../checks/lib/delegation-model.mjs)、
+- 模型/资产：[delegation-model.mjs](../../../../tools/lib/company/delegation-model.mjs)、
   [delegation-tree.ts](../../../../packages/company-pack/src/lib/delegation/delegation-tree.ts)、
   [DelegationFlowPanel.tsx](../../../../packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx)、
   [subagent-retry.ts](../../../../packages/company-pack/src/host/delegation/subagent-retry.ts)。

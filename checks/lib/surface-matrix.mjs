@@ -14,7 +14,7 @@
 // 不证明：模型行为、深度预算是否拒绝、UI、生命周期；缺 header 的 observation 应显式标 unknown，
 // 这里不猜 preset/depth。
 
-import { COMPOSITIONS, handbookSkipPresets } from './delegation-model.mjs'
+import { COMPOSITIONS, handbookSkipPresets } from '../../tools/lib/company/delegation-model.mjs'
 
 /** cordis.patch.yml 根会话 overlay 的 9 个团队工具（6 协作 + 3 控制）。 */
 export const PROFILE_TEAM_COORDINATION = [

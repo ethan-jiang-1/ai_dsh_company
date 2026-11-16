@@ -21,7 +21,7 @@ import {
   implementedWorkerProfiles,
   modelProblems,
   presetPath,
-} from '../../checks/lib/delegation-model.mjs'
+} from '../../tools/lib/company/delegation-model.mjs'
 
 const PACKAGE = JSON.parse(readFileSync(join(ROOT, 'packages/company-pack/package.json'), 'utf8')) as {
   dsh?: { bundle?: { patch?: readonly string[] } }

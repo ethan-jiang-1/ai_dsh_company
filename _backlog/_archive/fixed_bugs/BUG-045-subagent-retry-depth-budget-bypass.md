@@ -32,7 +32,7 @@ opened: 2026-11-09
 （vp-sales/coo/cfo 同款）。工具与行级预算各说各话。
 
 同类风险：`subagent_retry` 的注册列表与默认深度不在
-[`checks/lib/delegation-model.mjs`](../../../checks/lib/delegation-model.mjs) 的模型里；模型是“唯一期望源”，
+[`tools/lib/company/delegation-model.mjs`](../../../tools/lib/company/delegation-model.mjs) 的模型里；模型是“唯一期望源”，
 但这条能力面目前只在 host 代码里硬编码，静态 spec 无法发现注册面/深度漂移。
 
 ## 暴露的失败类
@@ -69,7 +69,7 @@ opened: 2026-11-09
 - 注册面：[`packages/company-pack/src/index.ts`](../../../packages/company-pack/src/index.ts) 的
   `registerSubagentRetry(ctx, { allowedPresets: [...] })`。
 - 组合声明：CMO / vp-sales / coo / cfo 的 `tool-subagent` 行 `maxDepth: 2`；
-  [`checks/lib/delegation-model.mjs`](../../../checks/lib/delegation-model.mjs) 的 `COMPOSITIONS.*.depthRows`。
+  [`tools/lib/company/delegation-model.mjs`](../../../tools/lib/company/delegation-model.mjs) 的 `COMPOSITIONS.*.depthRows`。
 - 测试：[`tests/host/delegation/subagent-retry.spec.ts`](../../../tests/host/delegation/subagent-retry.spec.ts)
   目前只在 `allowedPresets: ['vp-eng']` 下断言 `maxDepth: 3`，没有按 preset 覆盖深度预算。
 

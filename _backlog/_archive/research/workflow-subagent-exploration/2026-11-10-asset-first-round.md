@@ -217,7 +217,7 @@ model (delegation-model.mjs)  ──keyless spec──▶  preset YAML  ──�
 - 第八轮执行：本卡 §8；会话 id 与证据摘要见卡内「第八轮执行结果」。
 - 实测矩阵：`runtime/harness-home/sessions/**`（gitignored；窗口 2026-11-10 17:00 后，47 观察/27 child）；
   原型 `/tmp/matrix-proto2.mjs`（未入库，只读）。
-- 代码：`checks/lib/delegation-model.mjs`（期望源）、`tests/presets/delegation-composition.spec.ts`（model↔YAML）、
+- 代码：`tools/lib/company/delegation-model.mjs`（期望源）、`tests/presets/delegation-composition.spec.ts`（model↔YAML）、
   `checks/lanes/delegation.entry.mjs`（CEO/vp_eng 面）、`packages/company-pack/src/host/prompt/handbook.ts` /
   `contracts.ts`（注入标记）、`packages/company-pack/src/client/wiring/delegation-keys.ts`（UI key）。
 - 静态漂移：`docs/contracts/delegation.md` §5（key 仍写两项）；`cordis.patch.yml` 注释；

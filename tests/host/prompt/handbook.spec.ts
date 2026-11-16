@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { readHandbook, registerHandbook, HANDBOOK_SECTION } from '../../../packages/company-pack/src/host/prompt/handbook.ts'
-import { handbookSkipPresets } from '../../../checks/lib/delegation-model.mjs'
+import { handbookSkipPresets } from '../../../tools/lib/company/delegation-model.mjs'
 import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 
 function content(): string {

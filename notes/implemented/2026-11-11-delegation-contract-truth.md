@@ -36,7 +36,7 @@
 ## 现行语义（canonical）
 
 - [delegation 合同](../../docs/contracts/delegation.md) · [architecture 协作通道](../../docs/architecture.md) · [terminology](../../docs/reference/terminology.md) · [presets 四形态](../../docs/contracts/presets.md)
-- 模型 = [checks/lib/delegation-model.mjs](../../checks/lib/delegation-model.mjs)；钉子 = [delegation-channel-parity.spec.ts](../../tests/contract/delegation-channel-parity.spec.ts)
+- 模型 = [tools/lib/company/delegation-model.mjs](../../tools/lib/company/delegation-model.mjs)；钉子 = [delegation-channel-parity.spec.ts](../../tests/contract/delegation-channel-parity.spec.ts)
 
 ## 相关
 

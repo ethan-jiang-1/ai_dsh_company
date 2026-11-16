@@ -40,7 +40,7 @@ skill？质量环 starter 能不能被 VP-Eng 真加载？旧 worker/retry/workf
 
 - **11 个 preset**：6 角色 + 5 support（`worker` / `worker-researcher` / `worker-orchestrator` +
   `quality-loop-producer` / `quality-loop-verifier`）；清单唯一源 =
-  [`delegation-model.mjs`](../../../checks/lib/delegation-model.mjs)。`worker` 是 leaf；`worker-orchestrator`
+  [`delegation-model.mjs`](../../../tools/lib/company/delegation-model.mjs)。`worker` 是 leaf；`worker-orchestrator`
   只多一条 `subagent` 行（钉 `worker`，`maxDepth: 3`）；`worker-researcher` 只读、named-only。
 - **CEO 五条角色命名行**：`vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo`，全部 `maxDepth: 1`；另有
   `subagent_research`；CEO 没有 generic `subagent` / workflow / 控制行。UI key =
@@ -873,7 +873,7 @@ CMO 深度门都正确。
 | [资产审计与第九轮设计](../research/workflow-subagent-exploration/2026-11-10-asset-first-round.md) | 当前轮的资产结论、八轮缺陷家族、round-8 实测矩阵、A/B 资产、红证、预算与不建清单 |
 | [重构后第四轮计划](../research/workflow-subagent-exploration/2026-11-09-post-refactor-round.md) | 第四轮 delta、入口、charters、假设、fixtures、预算、停止与交接（历史） |
 | [2026-11-08 计划](../research/workflow-subagent-exploration/2026-11-08-exploration-plan.md) | §1–§15 机制/设计（部分已被重构取代）；§16–§18 前三轮结果与未覆盖 |
-| [模型](../../../checks/lib/delegation-model.mjs) | preset/通道/worker profile/合同/深度的唯一期望源；静态对账对象 |
+| [模型](../../../tools/lib/company/delegation-model.mjs) | preset/通道/worker profile/合同/深度的唯一期望源；静态对账对象 |
 | [delegation 合同](../../../docs/contracts/delegation.md) / [presets 合同](../../../docs/contracts/presets.md) | 当前人读合同；tool 行以 preset 为准 |
 | [presets](../../../packages/company-pack/presets) | vp-eng / CEO / worker family 的声明面 |
 | [subagent-retry.ts](../../../packages/company-pack/src/host/delegation/subagent-retry.ts) / [spec](../../../tests/host/delegation/subagent-retry.spec.ts) | 重试原语与 keyless 分类 |

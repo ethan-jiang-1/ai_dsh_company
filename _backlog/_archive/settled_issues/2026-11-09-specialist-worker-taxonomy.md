@@ -34,7 +34,7 @@ opened: 2026-11-09
 | 父级入口 | CEO `subagent_research` | CEO/vp-eng `system_architect` | CEO/vp-eng `system_qa` | vp-eng generic `subagent` |
 | 模型 archetype | `leaf`，`contracts: []` | `leaf`，`contracts: []` | `leaf`，`contracts: []` | `worker` |
 
-具体文件：[researcher](../../../packages/company-pack/presets/worker-researcher/agent.cordis.yml)、system-architect（已随 SA/SQA 退役删除）、system-qa（已随 SA/SQA 退役删除）、[worker](../../../packages/company-pack/presets/worker/agent.cordis.yml)、[worker-orchestrator](../../../packages/company-pack/presets/worker-orchestrator/agent.cordis.yml)、[模型](../../../checks/lib/delegation-model.mjs)。
+具体文件：[researcher](../../../packages/company-pack/presets/worker-researcher/agent.cordis.yml)、system-architect（已随 SA/SQA 退役删除）、system-qa（已随 SA/SQA 退役删除）、[worker](../../../packages/company-pack/presets/worker/agent.cordis.yml)、[worker-orchestrator](../../../packages/company-pack/presets/worker-orchestrator/agent.cordis.yml)、[模型](../../../tools/lib/company/delegation-model.mjs)。
 
 ### 调用面
 

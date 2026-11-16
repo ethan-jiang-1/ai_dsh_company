@@ -206,7 +206,7 @@ Observation（静态矩阵 / 图 spec / 场景 / 探针）
 3. **`subagent_retry` host 原语（已落）**：per-agent 注册，只在五个有 generic subagent 的 full role；同步等终态、最多 2 attempts、幂等门、attempts/childIds/stopReason/exhausted 可见；不是全局工具，worker/leaf/CEO 不挂；长/批量仍走 workflow。keyless fake-subagents spec 覆盖 completed/error→success/error→error/refusal/aborted/max-tokens/非幂等/start 失败；真实失败注入探针仍待。
 4. **禁止**：静默自动重试、无限重试、对 `refusal`/`aborted` 重试、把 `max-tokens` 当普通 error、重试非幂等写操作。
 
-**模型**：[delegation-model.mjs](../../../checks/lib/delegation-model.mjs) 的 `RETRY` + `retryDecision` 是纯决策；spec 覆盖 error/interrupted/lost、refusal/aborted/max-tokens、非幂等、exhausted、workflow 对照。
+**模型**：[delegation-model.mjs](../../../tools/lib/company/delegation-model.mjs) 的 `RETRY` + `retryDecision` 是纯决策；spec 覆盖 error/interrupted/lost、refusal/aborted/max-tokens、非幂等、exhausted、workflow 对照。
 
 **探针**：P-H 采用已 PASS（真实调用 `subagent_retry`，attempts=1/completed/worker depth 1）；P-H 真失败注入（分类型重试）与 P-I（workflow 重试/`missing` 对照）仍待。预算足够，但每个探针先写假设与判据。
 

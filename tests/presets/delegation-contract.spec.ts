@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
-import { FULL_ROLE_IDS, SUPPORT_PRESET_IDS } from '../../checks/lib/delegation-model.mjs'
+import { FULL_ROLE_IDS, SUPPORT_PRESET_IDS } from '../../tools/lib/company/delegation-model.mjs'
 
 const PRESETS = join(ROOT, 'packages/company-pack/presets')
 const POLICY = join(PRESETS, '_shared/delegation/skills/delegation-policy/SKILL.md')

@@ -10,7 +10,7 @@ import { join } from 'node:path'
 import { devHomeStatus } from '../../tools/lib/core/runtime-home.mjs'
 import { scanR3Dual } from '../../tools/lib/company/candidate-scan.mjs'
 import { repositoryRoot, snapshotScenes } from '../../tools/lib/core/repository-layout.mjs'
-import { FULL_ROLE_IDS, SUPPORT_PRESET_IDS } from '../../checks/lib/delegation-model.mjs'
+import { FULL_ROLE_IDS, SUPPORT_PRESET_IDS } from '../../tools/lib/company/delegation-model.mjs'
 
 /** 双 home 判定的观测包装：只分类与警告，不拒绝执行。 */
 export function homeStatus(env = process.env, { dailyHome } = {}) {

@@ -14,7 +14,7 @@ opened: 2026-11-09
 
 模型自称“唯一期望源”，但静态声明与实现/运行时不一致：
 
-1. [`checks/lib/delegation-model.mjs`](../../../checks/lib/delegation-model.mjs) 的 `CONTRACTS`：
+1. [`tools/lib/company/delegation-model.mjs`](../../../tools/lib/company/delegation-model.mjs) 的 `CONTRACTS`：
    - `policy.delegation.status = 'planned'`，但共享 skill 已落并在六个 full role 挂载；
    - `engine.workflow.status = 'planned'`，但 `company:workflow-contract` section 与
      `content/contracts/workflow.md` 已落（vp-eng 真 systemPrompt 命中）。
@@ -43,7 +43,7 @@ spec，没有进“唯一期望源”的模型字段；`src/index.ts` 的注册�
 
 ## 复现
 
-- 读 `checks/lib/delegation-model.mjs` 的 `CONTRACTS` / `RETRY` / `COMPOSITIONS`；
+- 读 `tools/lib/company/delegation-model.mjs` 的 `CONTRACTS` / `RETRY` / `COMPOSITIONS`；
 - 读 `packages/company-pack/src/index.ts` 的 `registerSubagentRetry(...)`；
 - 读 `packages/company-pack/cordis.patch.yml` 的 `handbookSkipPresets`（另见
   [BUG-047](BUG-047-worker-family-handbook-scope.md)）；
@@ -53,7 +53,7 @@ spec，没有进“唯一期望源”的模型字段；`src/index.ts` 的注册�
 
 ## 修复关联
 
-- `checks/lib/delegation-model.mjs`：`CONTRACTS.*.status`、retry 的注册面/深度/幂等门；
+- `tools/lib/company/delegation-model.mjs`：`CONTRACTS.*.status`、retry 的注册面/深度/幂等门；
   `COMPOSITIONS.*` 或 `RETRY` 至少声明“哪些 preset 有 retry、每个 preset 的上限”。
 - `packages/company-pack/src/index.ts`：注册列表从模型/常量读取，或由 spec 反查；
   避免两处事实家。
@@ -71,7 +71,7 @@ spec，没有进“唯一期望源”的模型字段；`src/index.ts` 的注册�
 
 ## 修复落地（2026-11-09）
 
-- **模型**：[`delegation-model.mjs`](../../../checks/lib/delegation-model.mjs) 的 `CONTRACTS` 改为
+- **模型**：[`delegation-model.mjs`](../../../tools/lib/company/delegation-model.mjs) 的 `CONTRACTS` 改为
   `delivered`（`policy.delegation` / `engine.workflow`，带真实 `carrierPath`）/ `merged`
   （`engine.subagent` → `policy.delegation`）；`RETRY.subagent` 声明 `childPreset` 与
   `depth: 'caller-generic-subagent-row'`；新增 `retrySurface()`，只从

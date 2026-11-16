@@ -17,7 +17,7 @@
 
 ### 1. 模型是第一性对象
 
-把 capability / contract / composition / archetype / worker profile / channel / depth 做成**可执行模型**（[delegation-model.mjs](../../checks/lib/delegation-model.mjs)）；YAML 是模型的投影，运行期仍自包含。模型是唯一期望源：spec / dump smoke / 生成器都消费它，不得各自再写一份矩阵。
+把 capability / contract / composition / archetype / worker profile / channel / depth 做成**可执行模型**（[delegation-model.mjs](../../tools/lib/company/delegation-model.mjs)）；YAML 是模型的投影，运行期仍自包含。模型是唯一期望源：spec / dump smoke / 生成器都消费它，不得各自再写一份矩阵。
 
 四层：
 

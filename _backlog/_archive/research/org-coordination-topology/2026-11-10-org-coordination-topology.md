@@ -44,7 +44,7 @@ intent: 解释 CEO 的命名 delegation 为什么只有三条、SA/SQA 退役后
 | 层 | 载体 | 数量 | 回答什么 |
 |---|---|---|---|
 | 公司编制（部署配置 / KB 事实） | [`content/state/org.md`](../../../../packages/company-pack/content/state/org.md) | 50 人、六条线、岗位级 | 角色做判断时引用的公司事实：多少人、什么岗位、预算线、并行上限 |
-| 运行时角色（agent preset） | [`presets/<role>/agent.cordis.yml`](../../../../packages/company-pack/presets/) + [`PRESET_IDS`](../../../../checks/lib/delegation-model.mjs) | 11 个 preset：6 个公司角色 + 5 个 support（worker ×3、质量环 ×2） | 一个会话挂什么人格、工具、skills |
+| 运行时角色（agent preset） | [`presets/<role>/agent.cordis.yml`](../../../../packages/company-pack/presets/) + [`PRESET_IDS`](../../../../tools/lib/company/delegation-model.mjs) | 11 个 preset：6 个公司角色 + 5 个 support（worker ×3、质量环 ×2） | 一个会话挂什么人格、工具、skills |
 | 协同通道 | [`docs/contracts/delegation.md`](../../../../docs/contracts/delegation.md) | 4 条：命名 child / team / subagent/fork / workflow | 活怎么分、子代是谁、父代怎么收 |
 
 - 50 人编制里，CEO 的直接汇报是 5 个职能：CMO、VP-Eng、VP-Sales、COO、CFO
@@ -95,7 +95,7 @@ CEO preset 的 `delegation` 组（[`ceo/agent.cordis.yml:192-228`](../../../../p
 但没有解释为什么不是五个。测试也复制了这个盲点：`tests/presets/presets.spec.ts:223-246` 的
 「CEO 汇报线」测试只循环断言 `vp_eng` / `vp_sales` / `vp_cmo` 三条工具；`:248-256` 的
 「CEO 五职能在位」只查 persona 文案，不查工具行。**没有测试断言 COO/CFO 的命名行。** 静态模型
-（[`delegation-model.mjs:181`](../../../../checks/lib/delegation-model.mjs)）同样只列了四条 `namedDelegates`
+（[`delegation-model.mjs:181`](../../../../tools/lib/company/delegation-model.mjs)）同样只列了四条 `namedDelegates`
 （三条角色 + 一条调研），所以模型矩阵也不会报这个缺口。
 
 ### 2.2 历史：不是一次「五汇报」设计，是逐步长出来的
@@ -406,7 +406,7 @@ git show bf04ab1c:packages/company-pack/presets/system-qa/skills/vv-playbook/SKI
 | `worker` / `worker-researcher` / `worker-orchestrator` | support | — | 各自 | — | 无 | 无 | 无 |
 | `quality-loop-producer` / `quality-loop-verifier` | support | — | 无 | — | 无 | 无 | 无 |
 
-来源：[`checks/lib/delegation-model.mjs:173-345`](../../../../checks/lib/delegation-model.mjs)。
+来源：[`tools/lib/company/delegation-model.mjs:173-345`](../../../../tools/lib/company/delegation-model.mjs)。
 
 三个值得注意的不对称：
 
