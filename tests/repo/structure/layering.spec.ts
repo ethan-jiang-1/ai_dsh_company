@@ -83,11 +83,23 @@ describe('测试分层纪律（真模型/真浏览器不进回归）', () => {
 
     // `tools/lib/` is the keyless seam. Follow the local graph, including
     // re-exports and literal dynamic imports; do not execute anything while scanning.
+    //
+    // 2026-11-17：共享实现从平铺改成 core/probe/session/company/repo/release 六组后，
+    // 这里仍只读顶层文件 ⇒ entries 恒为空，整条守卫静默空转（Note 里的“绿”其实是空集的绿）。
+    // 现在递归收集，并显式断言扫描面非空——空集必须红，不能再靠“没有违规”冒充通过。
+    // 负例留证 2026-11-17：往 tools/lib/core 放一条 `import { spawn } from 'node:child_process'`
+    //   → 本条红（forbidden builtin: node:child_process）；删除 → 绿。
     const libRoot = join(ROOT, 'tools/lib')
-    const entries = readdirSync(libRoot, { withFileTypes: true })
-      .filter(entry => entry.isFile() && entry.name.endsWith('.mjs'))
-      .map(entry => join(libRoot, entry.name))
+    const libFiles = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+      if (entry.name === 'node_modules') return []
+      const path = join(dir, entry.name)
+      if (entry.isDirectory()) return libFiles(path)
+      return entry.name.endsWith('.mjs') ? [path] : []
+    })
+    const entries = libFiles(libRoot)
+    expect(entries.length, 'tools/lib 的 keyless 守卫没有扫描对象（目录空或收集规则失效）——空集不是通过').toBeGreaterThan(0)
     const report = inspectKeylessGraph(entries, { libRoot })
+    expect(report.files.length, 'keyless 守卫必须沿依赖图走到实际文件；零文件 = 守卫空转').toBeGreaterThanOrEqual(entries.length)
     const libOffenders = report.violations.map(({ file, reason, chain }) =>
       `${relative(ROOT, file)} → ${reason} [${chain.map((path: string) => relative(ROOT, path)).join(' → ')}]`)
     const allowedUnresolved = new Set([
@@ -98,7 +110,7 @@ describe('测试分层纪律（真模型/真浏览器不进回归）', () => {
     expect(report.unresolvedImports.every(({ file, expression }) =>
       file.endsWith('/markdown-links.mjs') && allowedUnresolved.has(expression)),
       '非字面量动态 import 只允许已审阅的 vendor parser loader；其他表达式不得伪装成已证明安全').toBe(true)
-    expect(libOffenders, 'tools/lib 只能保持 keyless 纯逻辑；本地驱动、危险 builtin 和运行调用必须隔离').toEqual([])
+    expect(libOffenders, 'tools/lib（含子目录）只能保持 keyless 纯逻辑；本地驱动、危险 builtin 和运行调用必须隔离').toEqual([])
 
     // ② 任何 vitest 配置都不得把检查/工具目录编进测试发现——将来加第二个 config（replay lane）也算。
     const configFiles = readdirSync(ROOT).filter(name => /^vitest.*\.config\./.test(name))
