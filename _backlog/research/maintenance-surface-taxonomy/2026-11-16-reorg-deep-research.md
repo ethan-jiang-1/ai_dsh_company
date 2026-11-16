@@ -9,6 +9,36 @@ intent: ai_dsh_deep_research 维护面整理单（自包含 handoff，含完整�
 > **授权边界**：P0（§3）是声明层改动；P1（§4）涉及搬家与探针规格变更，**动手前必须拿到用户明确批准**。本文不是 P1 的授权。
 > **来源**：2026-11-16 三仓维护面分类法研究（宿主 = `ai_dsh_company` 的 `_backlog/research/maintenance-surface-taxonomy/`）。本仓的组级分类经独立盲审复核，数字已按盘上重新核实。
 > **术语警告**：本仓 docs/evaluation.md 的「面」= 评估等级 L0–L4（五个评估面），**与本文的「维护面」不是一回事**。本文第一句就要写清，否则 fresh agent 会把两套「面」混起来。evaluation.md 自己也说「探针不是第六个评估面」——那句话里的「面」是评估面，不是维护面。
+> **方向更新（2026-11-16，D64）**：三仓根目录统一为 checks/probes/tools 已由「可选远期」升为**承诺方向**（用户裁决：人仍驾驭 AI，根名不一致 → 理解差异 → 驱动出错；先满足人 + 极度满足 fresh agent 可并存）。**硬顺序：先纯化（每目录一个动词）后统一**，或同批；先改名后拆组 = 给 mixed 目录假保证。本仓 scripts/ → checks/、operate 家 dev/ → tools/。仍是独立迁移项目（161 文件 + gate 输入 + hooksPath 重装 + 引用 + 冻结归档 redirect + AGENTS.md 注入面一起做），需用户批准；P0/P1 范围不变。决策家 = [surface-root-unification-direction](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。**落地纪律（用户追加）**：调整时每个根目录的定位（面 = judge/show/operate + 装什么/不装什么 + 例外）必须写进该仓自己的 surface-contract 与 README 首屏，一眼可判、不含糊；共识随本自包含 handoff 携带，实施 agent 不回看宿主仓对话——含糊定位 = 共识跨仓蒸发。
+
+## 目标根布局（统一后，实施对照）
+
+> D64 承诺方向的**推荐终态**，显式画出以免实施时乱发挥。**P1 纯化 + 改名迁移后**才到此形状；P0 不改名。决策家 = [surface-root-unification-direction](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。
+
+三仓同一 skeleton（**只统一维护面**）：
+
+```text
+<repo 根>/
+  checks/   judge    裁决：会红，有人（hook/CI/验收）据此放行/退回
+  probes/   show     证据：红了只给人看，不阻塞（analyze/ 收只读分析器）
+  tools/    operate  持久状态：run（起/复用进程）/ act（持久改动，需 converge/repair）
+  tests/    oracle   非面：pnpm test runner 跑，服务三面，不是第四面
+  启动配置   非面     env.sh / overlay 等 sourced 环境，不是入口
+```
+
+**统一范围** = 维护面三目录 + tests oracle + 配置非面；产品/源码/文档/记忆等其余根目录本仓自有，不在统一范围。根名三仓固定；每面目录只装一个动词；**内部子组各仓自由**；例外进本仓例外登记一次。
+
+**本仓现状 → 目标**（动作细节见 §4）：
+
+| 面 | 现状 | 目标 | 动作 |
+|---|---|---|---|
+| judge | scripts/（mixed） | checks/ | scripts/ 名退役 → checks/（161 文件 + redirect ledger + AGENTS.md 注入面）；留 verify/smoke/run-gates/run-accept/acceptance-check/release-check |
+| show | probes/ | probes/ | 留 behavior/browser/stream；run-ops 11 件 show → probes/analyze/（或 run/，域定义待扩，§4.1） |
+| operate | dev/ | tools/ | dev/ 名退役 → tools/（hooksPath 重装）；吸收 dist 3 件 operate + runtime-clean |
+| oracle | tests/ | tests/ | 不变 |
+| 配置 | dev/env.sh、overlay | 非面 | 随 tools/ 或独立配置位（本仓自便，非面） |
+
+**待裁/口径不许乱发挥**：show 新域 analyze/ vs run/（§4.1）与 stream tee 口径统一（§4.3，行为改动需批准）须先定；维护面 ≠ evaluation.md 的 L0–L4 评估面（术语警告）。内部子组名本仓自定，但每面目录的动词纯度不许破。
 
 ## 0. 背景：这套规则怎么来的（30 秒版）
 
@@ -44,7 +74,7 @@ intent: ai_dsh_deep_research 维护面整理单（自包含 handoff，含完整�
 
 **为什么「产物」优先**：「失败要重跑」对所有条目都成立，判别力为零；「产出是裁决/证据/世界状态」三者互斥，可判。
 
-**目录名**：P0 **不改名**。`scripts/` 保留但声明为 mixed；`dev/` 保留（它是 operate 面）。目标名（checks/probes/tools）是可选远期方向，不是本次义务。
+**目录名**：P0 **不改名**。`scripts/` 保留但声明为 mixed；`dev/` 保留（它是 operate 面）。目标名（checks/probes/tools）是**承诺方向**（2026-11-16 用户裁决，D64；先纯化后统一、独立迁移项目），不是 P0/P1 义务。
 
 ## 2. 本仓现状（逐组核实过，2026-11-16）
 
@@ -166,7 +196,7 @@ pnpm test      # 预期绿（无行为改动）
 - `dist/`、`run-ops/`、`smoke/`、`test/` 仍在里面；只改名不改组，得到的 `checks/` 仍有约 1/3 不是 judge。
 - `dev/env.sh:57` 设置 `core.hooksPath dev/hooks`（相对路径）；若同时改 dev/ 名，老 clone 静默不跑 hooks。
 
-**结论**：保留 `scripts/`，用面声明 + 组表消除歧义；真要做 161 文件改名，另立迁移项目，别塞进 P0/P1。
+**结论**：保留 `scripts/`，用面声明 + 组表消除歧义；真要做 161 文件改名，另立迁移项目，别塞进 P0/P1。（2026-11-16 更新：统一已是承诺方向 D64；161 文件改名仍另立迁移项目、先纯化后统一，别塞进 P0/P1。）
 
 ### 4.3 stream tee 口径统一（P1 子项）
 若要把 `llm-stream-tee.cjs` 从探针计数摘出：

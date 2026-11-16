@@ -8,6 +8,34 @@ intent: 本仓维护面整理单（自包含 handoff，含完整决策上下文�
 > **状态：已落地（2026-11-16）。** 本仓 P0 + P1 已实施并提交：P1 取文档建议的 A（MAX_PROBES 59→66，口径 = 分类变更、非能力增长），B（退役 7 支同族探针）未取；7 件迁 `probes/analyze/`、`refactor-drift` 迁 `checks/audit/`。下文保留执行前的时点文本，旧家路径一律以纯文本书写（反引号只留给现行家）；现行事实 = [surface-contract](../../../docs/surface-contract.md) + [例外登记](../../../docs/reference/surface-exceptions.md)。
 > **给实施 agent**：本文自包含——规则、为什么是这套规则、本仓现状的逐条证据、P0 的精确插入文本、P1 的成本与撞墙点、验收命令，全在这里。你不需要读研究过程的其他材料；需要反例来源时再看 [盲审记录](2026-11-16-blind-review.md)。
 > **授权边界**：P0（§3）是声明层改动，用户已点名要做；P1（§4）涉及搬家与预算裁决，**动手前必须拿到用户对 A/B 选项的明确答复**。本文不是 P1 的授权。
+> **方向更新（2026-11-16，D64）**：三仓根目录统一为 checks/probes/tools 已由「可选远期」升为**承诺方向**（用户裁决：人仍驾驭 AI，根名不一致会漂移；先满足人 + 极度满足 fresh agent 可并存）。本仓已达标（零成本）；另两仓先纯化后统一、走独立迁移项目。决策家 = [surface-root-unification-direction](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。本文 P0/P1 范围不变。**落地纪律（用户追加）**：调整时每个根目录的定位（面 = judge/show/operate + 装什么/不装什么 + 例外）必须写进该仓自己的 surface-contract 与 README 首屏，一眼可判、不含糊；共识随本自包含 handoff 携带，实施 agent 不回看宿主仓对话——含糊定位 = 共识跨仓蒸发。
+
+## 目标根布局（统一后，实施对照）
+
+> D64 承诺方向的**推荐终态**，显式画出以免实施时乱发挥。本仓已达标（P0+P1 已落地），此节是另两仓的对照基准。决策家 = [surface-root-unification-direction](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。
+
+三仓同一 skeleton（**只统一维护面**）：
+
+```text
+<repo 根>/
+  checks/   judge    裁决：会红，有人（hook/CI/验收）据此放行/退回
+  probes/   show     证据：红了只给人看，不阻塞（analyze/ 收只读分析器）
+  tools/    operate  持久状态：run（起/复用进程）/ act（持久改动，需 converge/repair）
+  tests/    oracle   非面：pnpm test runner 跑，服务三面，不是第四面
+  启动配置   非面     env.sh / overlay 等 sourced 环境，不是入口
+```
+
+**统一范围** = 维护面三目录 + tests oracle + 配置非面；产品/源码/文档/记忆等其余根目录各仓自有，不在统一范围。根名三仓固定；每面目录只装一个动词；**内部子组各仓自由**；例外进该仓例外登记一次。
+
+**本仓现状 → 目标**（已达标，零搬家）：
+
+| 面 | 现状 | 目标 | 动作 |
+|---|---|---|---|
+| judge | checks/ | checks/ | 不变（gates/lanes/audit） |
+| show | probes/ | probes/ | 不变（analyze/ 已收 7 件只读分析器） |
+| operate | tools/ | tools/ | 不变（dev/repo/release；observe 已解散） |
+| oracle | tests/ | tests/ | 不变 |
+| 配置 | run/ | run/ | 不变（env.sh + overlay，非面） |
 
 ## 0. 背景：这套规则怎么来的（30 秒版）
 
@@ -48,7 +76,7 @@ intent: 本仓维护面整理单（自包含 handoff，含完整决策上下文�
 
 **目录名**
 - P0 **不改名**。本仓已经是目标名（checks/probes/tools），无需动。
-- 另两仓的 `dev/`、`scripts/` 改名是独立项目（gate 输入、hooksPath、redirect ledger、归档豁免），不在本次范围。
+- 另两仓的 `dev/`、`scripts/` 改名是独立项目（gate 输入、hooksPath、redirect ledger、归档豁免），不在本次范围。根目录统一已是**承诺方向**（2026-11-16 用户裁决，D64），但仍走独立迁移项目、先纯化后统一，不是 P0/P1 义务。
 
 ## 2. 本仓现状（逐条核实过，2026-11-16）
 

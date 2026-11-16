@@ -8,7 +8,7 @@ opened: 2026-11-16
 > 问题：三个仓的维护面都是 3 个目录，但名字不同、内部混装不同——本仓 checks / probes / tools，bsimulation checks / probes / dev，deep_research probes / scripts / dev。能不能收敛出一套判据，让「新东西放哪」一句话可判、两个人给出同一答案，而不是靠读四份 README？
 > 消费者：用户 2026-11-16 点名（本会话跨三仓比较；尚无卡）。
 > 产出的卡：—（交接物 = 三份 reorg handoff，见材料表）
-> 结论：维护面 = 两层（tests oracle / 真入口）× 三面（judge / show / operate）；operate 分 run/act 两种模式，`状态：已耗` 与管道件是非面。P0 只做面声明与例外表，不改名；改名是独立项目。三仓各按自己那份 reorg 执行。
+> 结论：维护面 = 两层（tests oracle / 真入口）× 三面（judge / show / operate）；operate 分 run/act 两种模式，`状态：已耗` 与管道件是非面。P0 只做面声明与例外表，不改名；根目录统一（checks/probes/tools）是**承诺方向**（2026-11-16 用户裁决，[D64](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)），先纯化后统一、独立迁移项目；每仓落地须写清每目录定位（面 + 装什么/不装什么 + 例外），共识随 handoff 携带、不含糊。**推荐终态根布局显式见各 handoff「目标根布局」节与 D64 Note**（canonical skeleton + 现状→目标映射 + 待裁选项）。三仓各按自己那份 reorg 执行。
 
 ## 材料
 

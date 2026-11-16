@@ -5,6 +5,7 @@
 > 上游 = 用户 2026-11-16 原话：「你应该汲取了这个内容之后落地……除非有什么东西对你来说是荒唐的……Goal 之后静默自主」。handoff 的授权边界：P0 已点名、P1 需 A/B **明示答复**；用户本轮只给「落地 + 静默自主」总授权，**未对 A/B 作答**。据此按 handoff §4.2 建议取 A（抬顶 59→66 + Note 论证），B 未取——这不是「用户裁决 A」；若改 B 需新决定。
 > 部分取代 [2026-11-15-tools-purpose-groups](./2026-11-15-tools-purpose-groups.md)（observe 组解散、工具面四组→三组）；其核心决定（保留 `tools/` 名、按用途分组）仍现行。
 > 决策台账 = [D63](../../docs/reference/decisions.md)。
+> 改名处置演进（2026-11-16）：三仓根目录统一由「可选远期」升为承诺方向 = [D64](../../docs/reference/decisions.md#d64) / [surface-root-unification-direction](./2026-11-16-surface-root-unification-direction.md)。本文「输掉的方案」中『三仓统一改名』指盲审撤回的**廉价 P0 改名**，非承诺的独立迁移项目；分类法与 company P0+P1 落地仍现行。
 
 ## 决定
 

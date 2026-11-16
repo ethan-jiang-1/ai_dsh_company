@@ -8,6 +8,36 @@ intent: ai_dsh_bsimulation 维护面整理单（自包含 handoff，含完整决
 > **给实施 agent**：本文自包含——规则、为什么是这套规则、本仓现状的逐条证据、P0 的精确插入文本、P1 的成本与撞墙点、验收命令，全在这里。你不需要读姊妹仓的研究材料。
 > **授权边界**：P0（§3）是声明层改动；P1（§4）涉及搬家与行为改动，**动手前必须拿到用户明确批准**。本文不是 P1 的授权。
 > **来源**：2026-11-16 三仓维护面分类法研究（宿主 = `ai_dsh_company` 的 `_backlog/research/maintenance-surface-taxonomy/`）。本仓的组级分类经独立盲审复核，数字已按盘上重新核实。
+> **方向更新（2026-11-16，D64）**：三仓根目录统一为 checks/probes/tools 已由「可选远期」升为**承诺方向**（用户裁决：人仍驾驭 AI，根名不一致 → 理解差异 → 驱动出错；先满足人 + 极度满足 fresh agent 可并存）。**硬顺序：先纯化（每目录一个动词）后统一**，或同批；先改名后拆组 = 给 mixed 目录假保证。本仓 operate 家 dev/ 最终迁 tools/。仍是独立迁移项目（gate 输入 + hooksPath 重装 + 引用 + 冻结归档 redirect 一起做），需用户批准；P0/P1 范围不变。决策家 = [surface-root-unification-direction](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。**落地纪律（用户追加）**：调整时每个根目录的定位（面 = judge/show/operate + 装什么/不装什么 + 例外）必须写进该仓自己的 surface-contract 与 README 首屏，一眼可判、不含糊；共识随本自包含 handoff 携带，实施 agent 不回看宿主仓对话——含糊定位 = 共识跨仓蒸发。
+
+## 目标根布局（统一后，实施对照）
+
+> D64 承诺方向的**推荐终态**，显式画出以免实施时乱发挥。**P1 纯化 + 改名迁移后**才到此形状；P0 不改名。决策家 = [surface-root-unification-direction](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。
+
+三仓同一 skeleton（**只统一维护面**）：
+
+```text
+<repo 根>/
+  checks/   judge    裁决：会红，有人（hook/CI/验收）据此放行/退回
+  probes/   show     证据：红了只给人看，不阻塞（analyze/ 收只读分析器）
+  tools/    operate  持久状态：run（起/复用进程）/ act（持久改动，需 converge/repair）
+  tests/    oracle   非面：pnpm test runner 跑，服务三面，不是第四面
+  启动配置   非面     env.sh / overlay 等 sourced 环境，不是入口
+```
+
+**统一范围** = 维护面三目录 + tests oracle + 配置非面；产品/源码/文档/记忆等其余根目录本仓自有，不在统一范围。根名三仓固定；每面目录只装一个动词；**内部子组各仓自由**；例外进本仓例外登记一次。
+
+**本仓现状 → 目标**（动作细节见 §4）：
+
+| 面 | 现状 | 目标 | 动作 |
+|---|---|---|---|
+| judge | checks/（mixed） | checks/ | 留 verify/gates/quality/mutants + release judge 半；show/operate 半迁出 |
+| show | probes/ | probes/ | 留 cdp/e2e/session；audit 报表去向 **A/B 待用户裁**（A → probes/analyze/；B → 改 exit 1 变 judge 留 checks/） |
+| operate | dev/ | tools/ | dev/ 名退役 → tools/（hooksPath 重装）；吸收 checks 的 backlog/openspec/build/evidence + release act 半 |
+| oracle | tests/ | tests/ | 不变 |
+| 配置 | dev/env.sh、overlays | 非面 | 随 tools/ 或独立配置位（本仓自便，非面） |
+
+**待裁选项不许乱发挥**：audit 的 A/B（§4.1）须用户明示，未裁前不预设 probes/analyze/。内部子组名本仓自定，但每面目录的动词纯度不许破；dom-replay 的 CI judge 例外仍登记（§3.4）。
 
 ## 0. 背景：这套规则怎么来的（30 秒版）
 
@@ -43,7 +73,7 @@ intent: ai_dsh_bsimulation 维护面整理单（自包含 handoff，含完整决
 
 **为什么「产物」优先**：「失败要重跑」对所有条目都成立，判别力为零；「产出是裁决/证据/世界状态」三者互斥，可判。
 
-**目录名**：P0 **不改名**。`dev/` 保留（它是 operate 面，名字本地化不影响判定）；`checks/` 保留但声明为 mixed。目标名（checks/probes/tools）是可选的远期方向，不是本次义务。
+**目录名**：P0 **不改名**。`dev/` 保留（它是 operate 面，名字本地化不影响判定）；`checks/` 保留但声明为 mixed。目标名（checks/probes/tools）是**承诺方向**（2026-11-16 用户裁决，D64；先纯化后统一、独立迁移项目），不是 P0/P1 义务。
 
 ## 2. 本仓现状（逐组核实过，2026-11-16）
 
@@ -146,7 +176,7 @@ pnpm test      # 预期绿（无行为改动）
 - tests/checks/fresh-start.test.mjs:46 复制 `dev/env.sh` 到临时目录。
 - 24 个外部 tracked 文件、45 处 `dev/env.sh` 引用（不含 dev/ 自身）；其中 3 个在冻结归档区。
 
-**结论**：除非当独立迁移项目（gate 输入 + hooksPath + redirect ledger + 归档豁免一起做），否则**保留 dev/，用面声明消除歧义**。名字不统一不会让 fresh agent 糊涂——没有面声明才会。
+**结论**：除非当独立迁移项目（gate 输入 + hooksPath + redirect ledger + 归档豁免一起做），否则**保留 dev/，用面声明消除歧义**。名字不统一不会让 fresh agent 糊涂——没有面声明才会。（2026-11-16 更新：统一已是承诺方向 D64，但仍走独立迁移项目、先纯化后统一；「不建议现在做」= 不在 P0/P1 里廉价做，非永久否决。）
 
 ### 4.3 同 diff 义务
 - 新 Note / openspec change：记录决定、输掉的方案、红→绿证据。
