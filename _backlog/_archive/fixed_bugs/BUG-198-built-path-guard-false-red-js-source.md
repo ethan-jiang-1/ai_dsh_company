@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-16
 ---
 
 # BUG-198：构建产物字面量守卫把合法的 `.js` 源码判红（sourceCandidates 只认 .ts/.tsx）
 
-> 严重级别：P2（次要）｜发现：2026-11-16｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-16｜状态：已修｜修复：2026-11-16｜审查：agent（独立盲审）— 2 blocker（pre-push 非 ASCII 路径被 git C-quote 误判「未分类」；归档 ×1912 与修复提交 ×1924 不符）已修复；建议 S1–S5 处置（尾注标签、审查落盘、passed 数校正、`--paths` 不支持项、docs/testing.md 合同行）
 >
-> **关联**：[探索卡 Round 93](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-185 的守卫（`tests/repo/structure/built-path-literals.spec.ts`）。
-> **留痕**：Note（本批共用；落地同 diff 写 `notes/implemented/2026-11-16-guard-surfaces-not-samples.md`）。
+> **关联**：[探索卡 Round 93](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-185 的守卫（`tests/repo/structure/built-path-literals.spec.ts`）。
+> **留痕**：Note [2026-11-16-guard-surfaces-not-samples.md](../../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)（本批共用）。
 
 ## 症状
 
@@ -57,3 +57,10 @@ cp /tmp/replay.bak checks/lanes/replay.e2e.mjs
 ## 已修判定
 
 向 `checks/lanes/replay.e2e.mjs` 临时加入 `packages/company-pack/lib/types/lib/docs/markdown-shape-core.js` → `pnpm test tests/repo/structure/built-path-literals.spec.ts` 绿；把路径改成不存在的 `ghost.js` → 红；还原 → 绿。
+
+## 修复证据
+
+- 改动面：`tests/repo/structure/built-path-literals.spec.ts`
+- 红：`pnpm test tests/repo/structure/built-path-literals.spec.ts`（SOURCE_SUFFIXES 只认 .ts/.tsx：`.js` 候选用例红）
+- 绿：`pnpm test tests/repo/structure/built-path-literals.spec.ts`（4 passed；`.js/.mjs` 候选）
+- 提交：commit 34f84fd2

@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-16
 ---
 
 # BUG-201：pre-push `--paths` 不规范化 `./` 前缀，合法路径被判未分类且不触发 lane
 
-> 严重级别：P2（次要）｜发现：2026-11-16｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-16｜状态：已修｜修复：2026-11-16｜审查：agent（独立盲审）— 2 blocker（pre-push 非 ASCII 路径被 git C-quote 误判「未分类」；归档 ×1912 与修复提交 ×1924 不符）已修复；建议 S1–S5 处置（尾注标签、审查落盘、passed 数校正、`--paths` 不支持项、docs/testing.md 合同行）
 >
-> **关联**：[探索卡 Round 93](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-186 的新 `--paths` 入口（`checks/pre-push-surfaces.mjs`）。
-> **留痕**：Note（本批共用；落地同 diff 写 `notes/implemented/2026-11-16-guard-surfaces-not-samples.md`）。
+> **关联**：[探索卡 Round 93](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-186 的新 `--paths` 入口（`checks/pre-push-surfaces.mjs`）。
+> **留痕**：Note [2026-11-16-guard-surfaces-not-samples.md](../../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)（本批共用）。
 
 ## 症状
 
@@ -55,3 +55,10 @@ node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/src/li
 ## 已修判定
 
 `--dry-run --paths ./packages/company-pack/src/lib/presence/presence.ts` 与去掉 `./` 的输出一致（`→ replay`）；`--paths .\packages\...` 在 Windows 语义下同样命中；含逗号的路径不再被拆（或显式拒绝并说明）。
+
+## 修复证据
+
+- 改动面：`checks/pre-push-surfaces.mjs`、`tests/checks/pre-push-surfaces.test.mjs`
+- 红：`pnpm test:checks`（`./` 前缀用例：修复前未分类、无反斜杠命中）
+- 绿：`pnpm test:checks`（10 PASS；`./` 与反斜杠都命中 replay）
+- 提交：commit 34f84fd2

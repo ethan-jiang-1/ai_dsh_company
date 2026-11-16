@@ -93,13 +93,13 @@ describe('构建产物路径字面量（live 文本面）', () => {
     expect(findings(), '改源码分组后必须同 diff 改这些字面量（或在车道里用稳定入口）').toEqual([])
   })
 
-  it('扫描面覆盖 docs 与 `.ts` 文本（2026-11-16 二轮）', () => {
+  it('扫描面覆盖 docs 与 `.ts` 文本（2026-11-16 二轮，BUG-197）', () => {
     const files = scannedFiles()
     expect(files).toContain('docs/testing.md')
     expect(files.some(file => file.endsWith('.ts')), 'tests/ 与 src 的 .ts 注释同样是活指针载体').toBe(true)
   })
 
-  it('源码候选包含 `.js`（合法 `.js` 产物不被假红，2026-11-16 二轮）', () => {
+  it('源码候选包含 `.js`（合法 `.js` 产物不被假红，2026-11-16 二轮，BUG-198）', () => {
     expect(sourceCandidates('packages/company-pack/lib/types/lib/docs/markdown-shape-core.js'))
       .toContain('packages/company-pack/src/lib/docs/markdown-shape-core.js')
   })

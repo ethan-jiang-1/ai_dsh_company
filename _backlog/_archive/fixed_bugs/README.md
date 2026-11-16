@@ -4,6 +4,21 @@
 
 ## 修复流水（倒序）
 
+- **BUG-192..201**（2026-11-16，根因组 A–E，P2×10）：C11 二轮——修复后的守卫面（Round 93）：
+  判据面写成「上次出事的样本」而不是载体全集：
+  **A** 面规则/选择器：[192](BUG-192-surface-rules-tracked-path-completeness.md) 19 条 tracked 路径 unseen →
+  新门禁 `surface-coverage`（`git ls-files` 全集）、[199](BUG-199-pre-push-unseen-exits-zero.md) 未分类可 push →
+  fail-closed、[201](BUG-201-pre-push-paths-dot-prefix-unseen.md) `--paths` 不归一；
+  **B** [193](BUG-193-vitest-threshold-guard-accepts-directory.md) 阈值键放过目录 → `statSync().isFile()`；
+  **C** 活指针：[194](BUG-194-live-pointer-guard-misses-js-source.md) `.js` 源码、
+  [195](BUG-195-live-pointer-guard-misses-presets-skills.md) presets/skills 载体；
+  **D** 文档/构建字面量：[196](BUG-196-typecheck-claim-guard-misses-checks-readme.md) checks/run/runtime README、
+  [197](BUG-197-built-path-guard-misses-docs-ts.md) 文档/`.ts` 字面量、
+  [198](BUG-198-built-path-guard-false-red-js-source.md) 合法 `.js` 产物假红；
+  **E** [200](BUG-200-coveredby-coverage-ratchet-not-executable.md) 证据标签不可执行。
+  证据提交 = `34f84fd2`；`pnpm test` 253 files / 2153 tests、`verify`（门禁 75 / surface-coverage ×1900+）、
+  `typecheck`/`lint`/`dup`/`coverage:ratchet` 全绿。详见 [守卫判据面 Note](../../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)。
+
 - **BUG-184..191**（2026-11-16，根因组 A–D，P1×1 + P2×7）：C11 搬移副作用首轮（Round 92）——
   三批纯搬移后四类非静态消费者未随迁且对未命中静默：
   **A** 配置键：[184](BUG-184-vitest-coverage-thresholds-stale-host-paths.md) vitest 5 个死阈值键、

@@ -121,7 +121,7 @@ describe('资产 lane 注册表（空间完备）', () => {
     expect(selectSurfaces(['packages/company-pack/src/lib/presence/presence.ts']).assets).toEqual(['replay'])
   })
 
-  it('全 tracked 代表路径都有证据（全集判据 = verify 的 surface-coverage 门禁）', () => {
+  it('全 tracked 代表路径都有证据（全集判据 = verify 的 surface-coverage 门禁，BUG-192）', () => {
     // 全集由 checks/gates/surface-coverage.mjs 用 git ls-files 判；这里守它依赖的代表路径不退登记
     //（第二轮实证：19 条 tracked 路径 unseen 时，样本判据仍绿）。
     const trackedSamples = [
@@ -178,7 +178,7 @@ describe('资产 lane 注册表（空间完备）', () => {
     }
   })
 
-  it('每个无条件步骤都是可直接复跑的 pnpm 脚本（证据标签可执行，2026-11-16 二轮）', () => {
+  it('每个无条件步骤都是可直接复跑的 pnpm 脚本（证据标签可执行，2026-11-16 二轮，BUG-200）', () => {
     const scripts = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).scripts ?? {}
     const missing = UNCONDITIONAL_STEPS.filter(step => typeof scripts[step] !== 'string')
     expect(missing, 'pre-push 把 coveredBy 标签打印成「证据」；标签必须能直接跑（pnpm <label>），否则是假证据').toEqual([])

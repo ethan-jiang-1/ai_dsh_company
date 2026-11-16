@@ -21,6 +21,16 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-192（已修）](fixed_bugs/BUG-192-surface-rules-tracked-path-completeness.md) | 已修：19 条 tracked 路径无面规则/豁免、完备性只抽样；新门禁 `surface-coverage` 全 tracked 判据 + 登记 | 2026-11-16 |
+| [BUG-193（已修）](fixed_bugs/BUG-193-vitest-threshold-guard-accepts-directory.md) | 已修：阈值键守卫放过目录；三处守卫统一 `statSync().isFile()` | 2026-11-16 |
+| [BUG-194（已修）](fixed_bugs/BUG-194-live-pointer-guard-misses-js-source.md) | 已修：活指针守卫漏 `.js` 源码；源码面后缀补 `.js/.mjs` | 2026-11-16 |
+| [BUG-195（已修）](fixed_bugs/BUG-195-live-pointer-guard-misses-presets-skills.md) | 已修：活指针守卫漏 presets/`.agents/skills`；两个 live 载体面入 `FACES` | 2026-11-16 |
+| [BUG-196（已修）](fixed_bugs/BUG-196-typecheck-claim-guard-misses-checks-readme.md) | 已修：计数守卫漏 checks/run/runtime README 与 skills；导航面补全 | 2026-11-16 |
+| [BUG-197（已修）](fixed_bugs/BUG-197-built-path-guard-misses-docs-ts.md) | 已修：构建字面量守卫只扫 checks/tools/probes `.mjs`；扩到 live 文本面 | 2026-11-16 |
+| [BUG-198（已修）](fixed_bugs/BUG-198-built-path-guard-false-red-js-source.md) | 已修：合法 `.js` 源码产物被假红；源码候选补 `.js/.mjs` | 2026-11-16 |
+| [BUG-199（已修）](fixed_bugs/BUG-199-pre-push-unseen-exits-zero.md) | 已修：未分类改动面只打印不阻断；`unseen` 一律退出非零 | 2026-11-16 |
+| [BUG-200（已修）](fixed_bugs/BUG-200-coveredby-coverage-ratchet-not-executable.md) | 已修：证据标签 `coverage-ratchet` 不可执行；改 `coverage:ratchet` + 可执行性断言 | 2026-11-16 |
+| [BUG-201（已修）](fixed_bugs/BUG-201-pre-push-paths-dot-prefix-unseen.md) | 已修：`--paths` 不归一 `./`/反斜杠；归一后才进选择器 | 2026-11-16 |
 | [BUG-184（已修）](fixed_bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md) | 已修：vitest 5 个 host 覆盖率阈值键指向搬移前路径、阈值静默失效；改现行路径 + 键命中 spec | 2026-11-16 |
 | [BUG-185（已修）](fixed_bugs/BUG-185-replay-lane-stale-built-presence-import.md) | 已修：replay 动态 import 旧 built presence 路径（MODULE_NOT_FOUND）；指到 presence/presence.js + 构建字面量 spec | 2026-11-16 |
 | [BUG-186（已修）](fixed_bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md) | 已修：pre-push 面规则缺 src/lib/tools，搬移面零真入口；src/lib→replay + `coveredBy` 申报 + 覆盖面 spec | 2026-11-16 |

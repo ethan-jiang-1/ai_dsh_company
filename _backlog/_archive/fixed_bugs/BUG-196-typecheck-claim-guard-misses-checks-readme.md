@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-16
 ---
 
 # BUG-196：类型面计数守卫不扫 checks/README 等导航文档，旧分数仍可存活
 
-> 严重级别：P2（次要）｜发现：2026-11-16｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-16｜状态：已修｜修复：2026-11-16｜审查：agent（独立盲审）— 2 blocker（pre-push 非 ASCII 路径被 git C-quote 误判「未分类」；归档 ×1912 与修复提交 ×1924 不符）已修复；建议 S1–S5 处置（尾注标签、审查落盘、passed 数校正、`--paths` 不支持项、docs/testing.md 合同行）
 >
-> **关联**：[探索卡 Round 93](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-191 的守卫（`tests/repo/docs/typecheck-coverage-claim.spec.ts`）。
-> **留痕**：Note（本批共用；落地同 diff 写 `notes/implemented/2026-11-16-guard-surfaces-not-samples.md`）。
+> **关联**：[探索卡 Round 93](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-191 的守卫（`tests/repo/docs/typecheck-coverage-claim.spec.ts`）。
+> **留痕**：Note [2026-11-16-guard-surfaces-not-samples.md](../../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)（本批共用）。
 
 ## 症状
 
@@ -50,4 +50,11 @@ cp /tmp/checks-readme.bak checks/README.md
 
 ## 已修判定
 
-向 `checks/README.md` 注入 `227/245 spec` → `pnpm test tests/repo/docs/typecheck-coverage-claim.spec.ts` 红；还原 → 2 passed。`node runtime/tmp/c11/typecheck-count-check.mjs` 仍 exit 0（实际 235/253）。
+向 `checks/README.md` 注入 `227/245 spec` → `pnpm test tests/repo/docs/typecheck-coverage-claim.spec.ts` 红；还原 → 3 passed。`node runtime/tmp/c11/typecheck-count-check.mjs` 仍 exit 0（实际 235/253）。
+
+## 修复证据
+
+- 改动面：`tests/repo/docs/typecheck-coverage-claim.spec.ts`
+- 红：`pnpm test tests/repo/docs/typecheck-coverage-claim.spec.ts`（导航面不含 checks/README：面覆盖用例红）
+- 绿：`pnpm test tests/repo/docs/typecheck-coverage-claim.spec.ts`（3 passed）
+- 提交：commit 34f84fd2

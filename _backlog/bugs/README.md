@@ -8,11 +8,7 @@
 
 ## 活跃清单
 
-**活跃 10 张**：2026-11-16 C11 二轮（修复后的守卫面）——本轮已全部翻 `修复就绪` 并在修，见下方「## 2026-11-16 修复交接（根因组 A–E：BUG-192..201）」。
-
-- [BUG-192](BUG-192-surface-rules-tracked-path-completeness.md) · [BUG-193](BUG-193-vitest-threshold-guard-accepts-directory.md) · [BUG-194](BUG-194-live-pointer-guard-misses-js-source.md) · [BUG-195](BUG-195-live-pointer-guard-misses-presets-skills.md)
-- [BUG-196](BUG-196-typecheck-claim-guard-misses-checks-readme.md) · [BUG-197](BUG-197-built-path-guard-misses-docs-ts.md) · [BUG-198](BUG-198-built-path-guard-false-red-js-source.md) · [BUG-199](BUG-199-pre-push-unseen-exits-zero.md)
-- [BUG-200](BUG-200-coveredby-coverage-ratchet-not-executable.md) · [BUG-201](BUG-201-pre-push-paths-dot-prefix-unseen.md)
+**活跃 0 张**：2026-11-16 C11 二轮（修复后的守卫面）的 10 张（BUG-192..201）已于 2026-11-16 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；见下方「## 2026-11-16 修复交接（根因组 A–E：BUG-192..201）」。
 
 **上一轮收口**：2026-11-15 C11 搬移副作用探索（focus v6）的 8 张（BUG-184..191）已于 2026-11-16 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；见下方「## 2026-11-16 修复交接（根因组 A–D：BUG-184..191）」。上一轮 focus v5 的 8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-176..183）」）。
 
@@ -31,14 +27,18 @@
 
 | 组 | 卡 | 同一根因 | 修法（唯一事实源） |
 |---|---|---|---|
-| **A 面规则/选择器** | [192](BUG-192-surface-rules-tracked-path-completeness.md) / [199](BUG-199-pre-push-unseen-exits-zero.md) / [201](BUG-201-pre-push-paths-dot-prefix-unseen.md) | 完备性只抽样；未分类不阻断；入口不归一 | 新门禁 `checks/gates/surface-coverage.mjs`（`git ls-files` 全集）+ 19 条路径登记；pre-push 对 `unseen` 退出非零；`--paths` 归一 `./`/反斜杠/`a//b` |
-| **B 阈值键** | [193](BUG-193-vitest-threshold-guard-accepts-directory.md) | 「命中真实文件」只查 `existsSync` | 三个守卫统一 `statSync().isFile()`（阈值 / 活指针 / 构建字面量）；负例 = 目录键红 |
-| **C 活指针守卫** | [194](BUG-194-live-pointer-guard-misses-js-source.md) / [195](BUG-195-live-pointer-guard-misses-presets-skills.md) | 载体后缀/集合是白名单 | 源码面补 `.js/.mjs`；新增 `presets/**` 与 `.agents/skills/**` 两面；`FACES` 单一表 |
-| **D 文档/构建字面量守卫** | [196](BUG-196-typecheck-claim-guard-misses-checks-readme.md) / [197](BUG-197-built-path-guard-misses-docs-ts.md) / [198](BUG-198-built-path-guard-false-red-js-source.md) | 扫描面按上次事故文件；源码候选只认 `.ts/.tsx` | 计数面补 checks / run / runtime 的 README + `.agents/skills`；构建字面量面扩到 live 文本（md/ts/tsx/mjs/js/sh/yml）；源码候选补 `.js/.mjs` |
-| **E 证据标签** | [200](BUG-200-coveredby-coverage-ratchet-not-executable.md) | 人读标签 ≠ 可执行命令 | 词表标签改 `coverage:ratchet` + spec 断言每条标签都是 `package.json` 脚本 |
+| **A 面规则/选择器** | [192](../_archive/fixed_bugs/BUG-192-surface-rules-tracked-path-completeness.md) / [199](../_archive/fixed_bugs/BUG-199-pre-push-unseen-exits-zero.md) / [201](../_archive/fixed_bugs/BUG-201-pre-push-paths-dot-prefix-unseen.md) | 完备性只抽样；未分类不阻断；入口不归一 | 新门禁 `checks/gates/surface-coverage.mjs`（`git ls-files` 全集）+ 19 条路径登记；pre-push 对 `unseen` 退出非零；`--paths` 归一 `./`/反斜杠/`a//b` |
+| **B 阈值键** | [193](../_archive/fixed_bugs/BUG-193-vitest-threshold-guard-accepts-directory.md) | 「命中真实文件」只查 `existsSync` | 三个守卫统一 `statSync().isFile()`（阈值 / 活指针 / 构建字面量）；负例 = 目录键红 |
+| **C 活指针守卫** | [194](../_archive/fixed_bugs/BUG-194-live-pointer-guard-misses-js-source.md) / [195](../_archive/fixed_bugs/BUG-195-live-pointer-guard-misses-presets-skills.md) | 载体后缀/集合是白名单 | 源码面补 `.js/.mjs`；新增 `presets/**` 与 `.agents/skills/**` 两面；`FACES` 单一表 |
+| **D 文档/构建字面量守卫** | [196](../_archive/fixed_bugs/BUG-196-typecheck-claim-guard-misses-checks-readme.md) / [197](../_archive/fixed_bugs/BUG-197-built-path-guard-misses-docs-ts.md) / [198](../_archive/fixed_bugs/BUG-198-built-path-guard-false-red-js-source.md) | 扫描面按上次事故文件；源码候选只认 `.ts/.tsx` | 计数面补 checks / run / runtime 的 README + `.agents/skills`；构建字面量面扩到 live 文本（md/ts/tsx/mjs/js/sh/yml）；源码候选补 `.js/.mjs` |
+| **E 证据标签** | [200](../_archive/fixed_bugs/BUG-200-coveredby-coverage-ratchet-not-executable.md) | 人读标签 ≠ 可执行命令 | 词表标签改 `coverage:ratchet` + spec 断言每条标签都是 `package.json` 脚本 |
 
 **次序 = B → E → C → D → A**：B/E 是单点（文件类型、标签可执行）；C/D 扩载体面互相独立；A 最后落——它把 pre-push 改成 fail-closed 并新增全 tracked 门禁，blast radius 最大，必须在其余判据先绿时才收紧。
 **证据口径**：先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；每卡红/绿写同一条可执行命令。
+
+**收口（2026-11-16）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `34f84fd2`。
+`pnpm test` 253 files / 2153 tests、`verify` ALL PASS（新门禁 surface-coverage ×1900+、gate 总数 75）、`typecheck`/`lint`/`dup`/`smoke:fast`/`test:checks` 全绿、`coverage:ratchet` PASS（asset-lanes 98.33 / backlog-liveness 93.89 分支覆盖，均高于基线）。
+共享机制决定与输掉的方案 = [守卫判据面 Note](../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)。
 
 ## 2026-11-16 C11 二轮探索（修复后的守卫面）
 
@@ -46,11 +46,11 @@
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
-| A 面规则/选择器 | [192](BUG-192-surface-rules-tracked-path-completeness.md) / [199](BUG-199-pre-push-unseen-exits-zero.md) / [201](BUG-201-pre-push-paths-dot-prefix-unseen.md) | 完备性 spec 只抽样；unseen 不阻断；入口不归一 | 19 条 tracked 路径 unseen；未分类可 push；`./` 前缀假阴性 | P2 ×3 |
-| B 阈值键 | [193](BUG-193-vitest-threshold-guard-accepts-directory.md) | 「命中真实文件」只查 existsSync | 目录键仍绿，阈值失效 | P2 |
-| C 活指针守卫 | [194](BUG-194-live-pointer-guard-misses-js-source.md) / [195](BUG-195-live-pointer-guard-misses-presets-skills.md) | 守卫的载体后缀/集合不完备 | `.js` 源码与 presets/skills 里的旧 spec 路径仍绿 | P2 ×2 |
-| D 文档/构建字面量守卫 | [196](BUG-196-typecheck-claim-guard-misses-checks-readme.md) / [197](BUG-197-built-path-guard-misses-docs-ts.md) / [198](BUG-198-built-path-guard-false-red-js-source.md) | 扫描面按白名单；sourceCandidates 只认 .ts/.tsx | 导航文档/文档字面量漏扫；合法 `.js` 产物假红 | P2 ×3 |
-| E 证据标签 | [200](BUG-200-coveredby-coverage-ratchet-not-executable.md) | 人读标签 ≠ 可执行命令 | `coverage-ratchet` 照跑即失败 | P2 |
+| A 面规则/选择器 | [192](../_archive/fixed_bugs/BUG-192-surface-rules-tracked-path-completeness.md) / [199](../_archive/fixed_bugs/BUG-199-pre-push-unseen-exits-zero.md) / [201](../_archive/fixed_bugs/BUG-201-pre-push-paths-dot-prefix-unseen.md) | 完备性 spec 只抽样；unseen 不阻断；入口不归一 | 19 条 tracked 路径 unseen；未分类可 push；`./` 前缀假阴性 | P2 ×3 |
+| B 阈值键 | [193](../_archive/fixed_bugs/BUG-193-vitest-threshold-guard-accepts-directory.md) | 「命中真实文件」只查 existsSync | 目录键仍绿，阈值失效 | P2 |
+| C 活指针守卫 | [194](../_archive/fixed_bugs/BUG-194-live-pointer-guard-misses-js-source.md) / [195](../_archive/fixed_bugs/BUG-195-live-pointer-guard-misses-presets-skills.md) | 守卫的载体后缀/集合不完备 | `.js` 源码与 presets/skills 里的旧 spec 路径仍绿 | P2 ×2 |
+| D 文档/构建字面量守卫 | [196](../_archive/fixed_bugs/BUG-196-typecheck-claim-guard-misses-checks-readme.md) / [197](../_archive/fixed_bugs/BUG-197-built-path-guard-misses-docs-ts.md) / [198](../_archive/fixed_bugs/BUG-198-built-path-guard-false-red-js-source.md) | 扫描面按白名单；sourceCandidates 只认 .ts/.tsx | 导航文档/文档字面量漏扫；合法 `.js` 产物假红 | P2 ×3 |
+| E 证据标签 | [200](../_archive/fixed_bugs/BUG-200-coveredby-coverage-ratchet-not-executable.md) | 人读标签 ≠ 可执行命令 | `coverage-ratchet` 照跑即失败 | P2 |
 
 ## 2026-11-16 修复交接（根因组 A–D：BUG-184..191）
 

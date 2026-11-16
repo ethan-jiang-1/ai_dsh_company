@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-16
 ---
 
 # BUG-195：live 指针守卫不扫 presets / skills，随包分发的 SKILL 里旧 spec 路径仍绿
 
-> 严重级别：P2（次要）｜发现：2026-11-16｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-16｜状态：已修｜修复：2026-11-16｜审查：agent（独立盲审）— 2 blocker（pre-push 非 ASCII 路径被 git C-quote 误判「未分类」；归档 ×1912 与修复提交 ×1924 不符）已修复；建议 S1–S5 处置（尾注标签、审查落盘、passed 数校正、`--paths` 不支持项、docs/testing.md 合同行）
 >
-> **关联**：[探索卡 Round 93](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-187/188/189 的守卫（`tests/repo/docs/live-pointer-paths.spec.ts`）。
-> **留痕**：Note（本批共用；落地同 diff 写 `notes/implemented/2026-11-16-guard-surfaces-not-samples.md`）。
+> **关联**：[探索卡 Round 93](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-187/188/189 的守卫（`tests/repo/docs/live-pointer-paths.spec.ts`）。
+> **留痕**：Note [2026-11-16-guard-surfaces-not-samples.md](../../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)（本批共用）。
 
 ## 症状
 
@@ -57,4 +57,11 @@ cp /tmp/skill.bak "$g"
 
 ## 已修判定
 
-向 preset SKILL 注入 tests/host/cultivation-legacy.spec.ts、向 `.agents` SKILL 注入 tests/lib/ledger-legacy.spec.ts → `pnpm test tests/repo/docs/live-pointer-paths.spec.ts` 各红；还原 → 6 passed。`node runtime/tmp/c11/live-pointer-check.mjs` 现有 6 条仍 exit 0。
+向 preset SKILL 注入 tests/host/cultivation-legacy.spec.ts、向 `.agents` SKILL 注入 tests/lib/ledger-legacy.spec.ts → `pnpm test tests/repo/docs/live-pointer-paths.spec.ts` 各红；还原 → 8 passed。`node runtime/tmp/c11/live-pointer-check.mjs` 现有 6 条仍 exit 0。
+
+## 修复证据
+
+- 改动面：`tests/repo/docs/live-pointer-paths.spec.ts`
+- 红：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts`（旧 FACES：presets/skills 面用例红）
+- 绿：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts`（8 passed；FACES 含 presets 与 .agents/skills）
+- 提交：commit 34f84fd2

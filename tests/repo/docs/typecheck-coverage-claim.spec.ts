@@ -61,7 +61,7 @@ describe('live 文档不写死类型面覆盖分数', () => {
     expect(findings(), '分数随测试树搬移必漂；改成「覆盖 = 三个 tsconfig.test-* 的 include 减 exclude」并指向配置').toEqual([])
   })
 
-  it('导航面覆盖 checks / run / runtime README 与 .agents/skills（2026-11-16 二轮）', () => {
+  it('导航面覆盖 checks / run / runtime README 与 .agents/skills（2026-11-16 二轮，BUG-196）', () => {
     const files = navFiles()
     expect(files).toContain('checks/README.md')
     expect(files).toContain('run/README.md')

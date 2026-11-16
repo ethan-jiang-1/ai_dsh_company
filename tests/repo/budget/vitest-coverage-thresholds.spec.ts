@@ -72,7 +72,7 @@ describe('vitest 覆盖率阈值键', () => {
     expect(problems.outside, '阈值键必须在 pack 源码面内（packages/company-pack/src/）').toEqual([])
   })
 
-  it('目录键不算命中（不是普通文件 = 阈值同样失效）', () => {
+  it('目录键不算命中（不是普通文件 = 阈值同样失效，BUG-193）', () => {
     expect(problemsOf([{ path: 'packages/company-pack/src/host', body: 'statements: 90, branches: 85' }]).missing,
       '目录键在 vitest 里同样匹配不到文件；判据必须是 isFile，不是存在').toEqual(['packages/company-pack/src/host'])
   })

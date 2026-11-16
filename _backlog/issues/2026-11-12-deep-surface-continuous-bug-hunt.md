@@ -25,8 +25,8 @@ opened: 2026-11-12
 
 **当前情况（2026-11-15 focus v6 基线）：**
 
-- **当前基线（2026-11-16 08:12，HEAD `da746267` 实测）**：`pnpm test` 253 files / 2145 tests；`pnpm verify` ALL PASS（2 门无对象）；`pnpm typecheck` exit 0；活跃缺陷 = **10**（BUG-192..201，2026-11-16 C11 二轮；只开卡不修）；Next BUG = 202；`packages/company-pack` version 0.11.8；census = 30 冒烟 / 59 探针 / 74 门禁 / 253 spec；对抗矩阵 `KNOWN_GAP = 0`。
-- **当前主面 = C11 搬移副作用**（focus v6，2026-11-15）：三批纯搬移 = `29ae8c94`（tests 分轴）→ `1eb14f46`（src↔tests 对齐）→ `57d34a34`（tools 四组；原 `5c2c0796` amend）；C1–C10 冻结。首轮（Round 92）8 张已修；二轮（Round 93，2026-11-16）转到**修复后的守卫面**，开 BUG-192..201（10 张，见 [bugs/README「C11 二轮」](../bugs/README.md)）。
+- **当前基线（2026-11-16 09:50，收口工作树实测）**：`pnpm test` 253 files / 2153 tests；`pnpm verify` ALL PASS（2 门无对象）；`pnpm typecheck` exit 0；活跃缺陷 = **0**（BUG-192..201 已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）；Next BUG = 202；`packages/company-pack` version 0.11.8；census = 30 冒烟 / 59 探针 / 75 门禁 / 253 spec；对抗矩阵 `KNOWN_GAP = 0`。
+- **当前主面 = C11 搬移副作用**（focus v6，2026-11-15）：三批纯搬移 = `29ae8c94`（tests 分轴）→ `1eb14f46`（src↔tests 对齐）→ `57d34a34`（tools 四组；原 `5c2c0796` amend）；C1–C10 冻结。首轮（Round 92）8 张已修；二轮（Round 93，2026-11-16）转到**修复后的守卫面**，10 张 2026-11-16 全部修复（见 [bugs/README「C11 二轮」](../bugs/README.md) 与 [守卫判据面 Note](../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)）。
 - **上一轮基线（2026-11-14 11:01）**：`pnpm test` 247 files / 2072 tests；活跃缺陷 8（BUG-176..183，focus v5；该批已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）；version 0.11.6。
 - **更早四轮基线（2026-11-13 19:26 – 2026-11-14 10:17）**：247 files / 2034–2066 tests；每轮 8 张 BUG 均已修复归档（BUG-152..175）。
 - **历史起点（2026-11-12）**：`50878cd6`（BUG-080..089 修复）｜Note = [startup/wiki bug sweep](../../notes/implemented/2026-11-12-startup-strategy-wiki-bug-sweep.md)｜十张卡已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)｜当时基线 236 files / 1761 tests。该基线只作历史，不再当当前事实。
@@ -1810,16 +1810,16 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | BUG | 守卫/入口 | 一句话 | 级别 |
 |---|---|---|---|
-| [192](../bugs/BUG-192-surface-rules-tracked-path-completeness.md) | `asset-lanes` 完备性 | 19 条 tracked 路径 unseen；spec 只抽样 21 条 | P2 |
-| [193](../bugs/BUG-193-vitest-threshold-guard-accepts-directory.md) | 阈值键 spec | `existsSync` 放过目录键，floor 仍可静默失效 | P2 |
-| [194](../bugs/BUG-194-live-pointer-guard-misses-js-source.md) | 活指针 spec | 不扫 `.js` 源码注释 | P2 |
-| [195](../bugs/BUG-195-live-pointer-guard-misses-presets-skills.md) | 活指针 spec | 不扫 presets / `.agents/skills` | P2 |
-| [196](../bugs/BUG-196-typecheck-claim-guard-misses-checks-readme.md) | 计数 spec | 不扫 `checks/README.md` 等导航文档 | P2 |
-| [197](../bugs/BUG-197-built-path-guard-misses-docs-ts.md) | built 字面量 spec | 不扫 docs / `.ts` | P2 |
-| [198](../bugs/BUG-198-built-path-guard-false-red-js-source.md) | built 字面量 spec | 合法 `.js` 源码产物被假红 | P2 |
-| [199](../bugs/BUG-199-pre-push-unseen-exits-zero.md) | pre-push | `unseen` 只打印，仍 exit 0 | P2 |
-| [200](../bugs/BUG-200-coveredby-coverage-ratchet-not-executable.md) | coveredBy 标签 | `coverage-ratchet` 不可执行 | P2 |
-| [201](../bugs/BUG-201-pre-push-paths-dot-prefix-unseen.md) | `--paths` | `./` 前缀被判 unseen，不触发 lane | P2 |
+| [192](../_archive/fixed_bugs/BUG-192-surface-rules-tracked-path-completeness.md) | `asset-lanes` 完备性 | 19 条 tracked 路径 unseen；spec 只抽样 21 条 | P2 |
+| [193](../_archive/fixed_bugs/BUG-193-vitest-threshold-guard-accepts-directory.md) | 阈值键 spec | `existsSync` 放过目录键，floor 仍可静默失效 | P2 |
+| [194](../_archive/fixed_bugs/BUG-194-live-pointer-guard-misses-js-source.md) | 活指针 spec | 不扫 `.js` 源码注释 | P2 |
+| [195](../_archive/fixed_bugs/BUG-195-live-pointer-guard-misses-presets-skills.md) | 活指针 spec | 不扫 presets / `.agents/skills` | P2 |
+| [196](../_archive/fixed_bugs/BUG-196-typecheck-claim-guard-misses-checks-readme.md) | 计数 spec | 不扫 `checks/README.md` 等导航文档 | P2 |
+| [197](../_archive/fixed_bugs/BUG-197-built-path-guard-misses-docs-ts.md) | built 字面量 spec | 不扫 docs / `.ts` | P2 |
+| [198](../_archive/fixed_bugs/BUG-198-built-path-guard-false-red-js-source.md) | built 字面量 spec | 合法 `.js` 源码产物被假红 | P2 |
+| [199](../_archive/fixed_bugs/BUG-199-pre-push-unseen-exits-zero.md) | pre-push | `unseen` 只打印，仍 exit 0 | P2 |
+| [200](../_archive/fixed_bugs/BUG-200-coveredby-coverage-ratchet-not-executable.md) | coveredBy 标签 | `coverage-ratchet` 不可执行 | P2 |
+| [201](../_archive/fixed_bugs/BUG-201-pre-push-paths-dot-prefix-unseen.md) | `--paths` | `./` 前缀被判 unseen，不触发 lane | P2 |
 
 **逐条证据（实跑）：**
 
@@ -1839,6 +1839,8 @@ TypeError: Cannot read properties of undefined (reading 'map')
 **未跑：** Windows 实机、clean clone、live 模型 / 真页面（本轮真页面只跑 `ui-scene --isolated --expected` 与 `client-load`）；`pnpm lint` / `pnpm dup` 未重跑（批次 Note 已记）。
 
 **判定：** 10 张卡全部是**修复后的守卫面**缺陷（5 类载体覆盖 + 阈值键类型 + 选择器边界 + 证据标签），不是旧搬移残留复现；真入口全绿，没有发现产品行为回归。没有「守卫已完备」结论。
+
+**收口（2026-11-16）：** 10 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；证据提交 = `34f84fd2`；`pnpm test` 253 files / 2153 tests、`verify` ALL PASS（新门禁 `surface-coverage` ×1900+ / 门禁 75）、`typecheck`/`lint`/`dup`/`coverage:ratchet` 全绿。共享决定与输掉的方案 = [守卫判据面 Note](../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)。
 
 ## 证据、判据与处置
 

@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-16
 ---
 
 # BUG-192：SURFACE_RULES 仍有 19 条 tracked 路径未分类，完备性 spec 只抽样
 
-> 严重级别：P2（次要）｜发现：2026-11-16｜状态：修复就绪
+> 严重级别：P2（次要）｜发现：2026-11-16｜状态：已修｜修复：2026-11-16｜审查：agent（独立盲审）— 2 blocker（pre-push 非 ASCII 路径被 git C-quote 误判「未分类」；归档 ×1912 与修复提交 ×1924 不符）已修复；建议 S1–S5 处置（尾注标签、审查落盘、passed 数校正、`--paths` 不支持项、docs/testing.md 合同行）
 >
-> **关联**：[探索卡 Round 93](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 二轮（修复后新面）。
-> **留痕**：Note（本批共用；落地同 diff 写 `notes/implemented/2026-11-16-guard-surfaces-not-samples.md`）。
+> **关联**：[探索卡 Round 93](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；C11 二轮（修复后新面）。
+> **留痕**：Note [2026-11-16-guard-surfaces-not-samples.md](../../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)（本批共用）。
 
 ## 症状
 
@@ -78,3 +78,10 @@ node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/packag
 ## 已修判定
 
 `node runtime/tmp/c11/unseen-paths-check.mjs` 退出 0（`unseen=0`）；`node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/package.json,packages/company-pack/locale/zh.json` 打印具体 `coveredBy`，不再打印「未分类」。
+
+## 修复证据
+
+- 改动面：`checks/gates/surface-coverage.mjs`、`checks/run-gates.mjs`、`tools/lib/asset-lanes.mjs`、`tests/repo/budget/asset-lanes.spec.ts`
+- 红：`node checks/run-gates.mjs`（surface-coverage FAIL：19 条 tracked 路径既无 asset 也无 coveredBy）
+- 绿：`node checks/run-gates.mjs`（ALL PASS；surface-coverage ×1924 tracked 路径）
+- 提交：commit 34f84fd2

@@ -109,11 +109,11 @@ describe('live 指针：tests/*.spec.ts 字面量必须现行', () => {
     expect(stalePointers('checks/audit', ['.mjs']), '审计脚本注释里的测试路径要能直接跑（2026-11-15 candidate-scan 实例）').toEqual([])
   })
 
-  it('源码面扫到 `.js` 源码（2026-11-16 二轮；markdown-shape-core 是产品源码）', () => {
+  it('源码面扫到 `.js` 源码（2026-11-16 二轮；markdown-shape-core 是产品源码，BUG-194）', () => {
     expect(filesUnder('packages/company-pack/src', SOURCE_SUFFIXES)).toContain('packages/company-pack/src/lib/docs/markdown-shape-core.js')
   })
 
-  it('随包 presets 与 `.agents/skills` 在扫描面内（2026-11-16 二轮）', () => {
+  it('随包 presets 与 `.agents/skills` 在扫描面内（2026-11-16 二轮，BUG-195）', () => {
     const dirs = FACES.map(face => face.dir)
     expect(dirs).toContain('packages/company-pack/presets')
     expect(dirs).toContain('.agents/skills')
