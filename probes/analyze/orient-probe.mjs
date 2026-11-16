@@ -4,7 +4,7 @@
 // Orient：keyless 只读运行态观测（RFC driver-surface-package 条目 B；preset 字段与
 // --session 历史会话口径 = observation-hardening 条目 B / observation-closeout 条目 A；
 // 「待核工作候选」扫描节 = RFC orient-scan-view——默认全景对 deliverables/ 跑已采用的
-// R3′（scanR3Dual），零容忍未达门槛只显示不进待办，规则语义唯一家 = candidate-scan.mjs；
+// R3′（scanR3Dual），零容忍未达门槛只显示不进待办，规则语义唯一家 = tools/lib/company/candidate-scan.mjs；
 // --workspace <dir> 把公司盘/扫描指向别的工作区（RFC r7-motion-final 走查切片，缺席 fail-loud））
 // ——不开 web 会话就能看到当前 home（含「未 source run/env.sh = 日用 home」警告）、在场
 // profiles、最近会话（含 preset）、公司盘概览、待核工作候选与便宜检查清单；--session <slug>[/<id前缀>]

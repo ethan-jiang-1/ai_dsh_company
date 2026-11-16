@@ -8,7 +8,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { devHomeStatus } from '../../tools/lib/core/runtime-home.mjs'
-import { scanR3Dual } from '../../checks/lib/candidate-scan.mjs'
+import { scanR3Dual } from '../../tools/lib/company/candidate-scan.mjs'
 import { repositoryRoot, snapshotScenes } from '../../tools/lib/core/repository-layout.mjs'
 import { FULL_ROLE_IDS, SUPPORT_PRESET_IDS } from '../../checks/lib/delegation-model.mjs'
 

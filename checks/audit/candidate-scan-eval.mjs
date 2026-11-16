@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：已耗（2026-11-13 语料已移出本仓；恢复语料时重跑）
 // 实验语料打分器（2026-09-26 立；keyless，秒级）——实验 B 的"仪器自检"腿 + "金标准打分"腿。
-// 何时跑：`checks/lib/candidate-scan.mjs` 改动时；语料须先在盘上（本仓已无该资产，缺则 exit 2）；
+// 何时跑：`tools/lib/company/candidate-scan.mjs` 改动时；语料须先在盘上（本仓已无该资产，缺则 exit 2）；
 //         金标准标注文件改动时（打分腿）：`node checks/audit/candidate-scan-eval.mjs --labels <标注文件>`。
 //
 // ⚠ 自检腿只出**仪器自检**结论（语料期望值自标）——**不能给真实精确率/召回率**。
@@ -15,7 +15,7 @@
 import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { scanR1, scanR2, scanR2Closed, scanR3, scanR3Dual, parseLabelsText, scoreLabels } from '../lib/candidate-scan.mjs'
+import { scanR1, scanR2, scanR2Closed, scanR3, scanR3Dual, parseLabelsText, scoreLabels } from '../../tools/lib/company/candidate-scan.mjs'
 
 const CORPUS = join(ROOT, 'snapshots/corpora/candidate-scan-corpus/cases')
 const DELIVERABLES = join(ROOT, 'company-workspace/deliverables')

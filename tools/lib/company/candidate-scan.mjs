@@ -6,7 +6,7 @@
 // ⚠ 命名纪律（评审 §五 B 的零容忍条款）：未达判据前，输出只能叫「**待核工作候选**」，
 // 不叫"我的待办"，不自动通知。候选项必须带「待核实」标记。
 
-import { headingSections } from '../../tools/lib/core/repo-markdown.mjs'
+import { headingSections } from '../core/repo-markdown.mjs'
 
 /**
  * 结构化 ASSIGN 行（R2/R3 用）。形状（一行一格，机器可读）：

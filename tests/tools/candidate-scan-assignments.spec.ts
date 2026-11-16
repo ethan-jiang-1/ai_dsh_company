@@ -10,11 +10,11 @@ import {
   scanR3,
   scanR3Dual,
   scoreLabels,
-} from '../../checks/lib/candidate-scan.mjs'
+} from '../../tools/lib/company/candidate-scan.mjs'
 
 // 负例留证 2026-10-11：BUG-011 修前先跑本文件 —— `ASSIGN_LINE` 不捕获假设段、`parseAssignments`
 // 不返回该字段 ⇒ 「带『假设』段的派活行」的 assumption 断言红；补解析后绿。
-// 纯逻辑单测（全内联夹具，不读外部语料盘）：覆盖 `checks/lib/candidate-scan.mjs` 的派活解析、
+// 纯逻辑单测（全内联夹具，不读外部语料盘）：覆盖 `tools/lib/company/candidate-scan.mjs` 的派活解析、
 // 双源依赖（`orient` 活消费者 `scanR3Dual`）与金标准打分纯函数。
 
 const CASE14_BRIEF = [

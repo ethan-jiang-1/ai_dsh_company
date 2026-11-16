@@ -33,7 +33,7 @@ import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 import { join, resolve } from 'node:path'
 import { WARNING, isPlaceholderClaim, validateMeta } from '../../tools/lib/company/deliverables.mjs'
 import { VIOLATION, auditDeliverables, metaLedgerFindings, parseSessionLog, partitionArchiveViolations, presentResultRows, uncoveredPendingMaterial } from '../lib/deliverables-audit.mjs'
-import { parseAssignments } from '../lib/candidate-scan.mjs'
+import { parseAssignments } from '../../tools/lib/company/candidate-scan.mjs'
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
