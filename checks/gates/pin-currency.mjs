@@ -1,7 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { expectedSha, expectedTag } from './lib/pin.mjs'
+import { expectedSha, expectedTag } from '../../tools/lib/core/pin.mjs'
 import { NOW_FILES } from './bare-path.mjs'
 
 // ── 2e. pin 版本一致性门禁（2026-09-26 立，技术债清扫 B2/B3/B4 类）───────────────
@@ -9,7 +9,7 @@ import { NOW_FILES } from './bare-path.mjs'
 // 为什么：升 pin 的消费面只改了一半——代码改对了，叙述机制的老文档留在上一代（dev-loop 头部
 // 自称"已在 0.1.5-rc.2 核对"、index 的 `_digested` 行写 0.1.5-rc.2、release.md 的依赖与矩阵示例）。
 // 这类"易腐常量多拷贝、无机械单一源"没有守卫，只能靠人交叉核对。
-// 规则：**唯一事实家 = gates/lib/pin.mjs 的 expectedTag/expectedSha**（vendor-pin 门禁已用它核对 submodule HEAD）。
+// 规则：**唯一事实家 = tools/lib/core/pin.mjs 的 expectedTag/expectedSha**（vendor-pin 门禁已用它核对 submodule HEAD）。
 //   ① AGENTS.md §vendor 簿记必须逐字声明该 tag 与 SHA（簿记是给 agent 读的那一份，不能漂）；
 //   ② 现在时文件里出现的 `dsh-v<x.y.z>` 字面量必须等于 expectedTag，除非该行自带历史/外部标记。
 // 收窄理由（避免假阳性）：只认 `dsh-v` 前缀形式——裸 `x.y.z-rc.n` 在本仓多为历史叙述或外部语料；

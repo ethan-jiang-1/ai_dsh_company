@@ -14,7 +14,7 @@ import { isAbsolute, join, relative, sep } from 'node:path'
 import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 import { assistantMessageText, collectText, readRecords } from '../../tools/lib/session/session-log.mjs'
 import { ENTRY_QUESTIONS, evaluateEntryProbe, assertCodingBaseline } from '../lib/entry-probe.mjs'
-import { expectedTag } from '../gates/lib/pin.mjs'   // Q4 严格档：判据绑定现行 pin（2026-10-27 R3-15）
+import { expectedTag } from '../../tools/lib/core/pin.mjs'   // Q4 严格档：判据绑定现行 pin（2026-10-27 R3-15）
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)

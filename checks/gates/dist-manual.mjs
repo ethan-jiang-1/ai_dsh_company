@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { renderInstallManual } from '../../tools/lib/release/install-manual.mjs'
-import { expectedTag } from './lib/pin.mjs'
+import { expectedTag } from '../../tools/lib/core/pin.mjs'
 
 // ── 2g. 手动分发手册版本 + 安装形状门禁（2026-09-28 立；2026-11-01 v3 重写）────────
 // 为什么：手册是收件人的安装路径；版本对但内容教旧形状（launcher/--workspace/一 home

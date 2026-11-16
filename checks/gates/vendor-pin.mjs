@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { join } from 'node:path'
-import { expectedSha, expectedTag } from './lib/pin.mjs'
+import { expectedSha, expectedTag } from '../../tools/lib/core/pin.mjs'
 
 // ── 5. vendor/dsh：submodule 钉在簿记 SHA，且工作树**一个字节都不许改**（铁律）──────
 // 负例留证 2026-09-27：submodule HEAD 移到 HEAD~1 → vendor-pin 红；vendor 内 tracked 文件加一字节 → vendor-clean 红；.gitmodules URL 破坏 → gitmodules 红。
@@ -10,7 +10,7 @@ import { expectedSha, expectedTag } from './lib/pin.mjs'
 // 构建产物**（lib/、dist/、node_modules/——"从源码跑"要求构建，构建必须在树内）。
 // 任何 tracked 文件的改动、或未被 gitignore 的新文件，都判 FAIL。
 // 为什么用 SHA 而不是 tag：tag 可被移动/别名，SHA 才是钉住的合同。
-// （expectedTag / expectedSha 的唯一事实家 = gates/lib/pin.mjs；此处不再重复声明。）
+// （expectedTag / expectedSha 的唯一事实家 = tools/lib/core/pin.mjs；此处不再重复声明。）
 export function run({ root, ok, fail }) {
 const vendorDir = join(root, 'vendor/dsh')
 const gm = readFileSync(join(root, '.gitmodules'), 'utf8')

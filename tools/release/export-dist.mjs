@@ -34,8 +34,8 @@ try {
   const pkg = JSON.parse(readFileSync(join(packDir, 'package.json'), 'utf8'))
   const version = pkg.version
   const tarballName = `dsh-company-pack-${version}.tgz`
-  // 验证基线的事实家 = checks/gates/lib/pin.mjs（2026-10-14 拆分轮自 run-gates.mjs §0 迁出）；先核对输入，再替换已有导出。
-  const pinText = readFileSync(join(repoRoot, 'checks', 'gates', 'lib', 'pin.mjs'), 'utf8')
+  // 验证基线的事实家 = tools/lib/core/pin.mjs（2026-10-14 拆分轮自 run-gates.mjs §0 迁出）；先核对输入，再替换已有导出。
+  const pinText = readFileSync(join(repoRoot, 'tools', 'lib', 'core', 'pin.mjs'), 'utf8')
   const expectedTag = /const expectedTag = '([^']+)'/.exec(pinText)?.[1]
   if (!expectedTag) throw new Error('pin.mjs 缺 expectedTag；未替换已有导出')
 

@@ -20,7 +20,7 @@ import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 import { sourceFingerprint } from '../lib/core/pack-source.mjs'
-import { expectedTag } from '../../checks/gates/lib/pin.mjs'
+import { expectedTag } from '../lib/core/pin.mjs'
 
 const PACK = join(ROOT, 'packages/company-pack')
 const DIST = join(ROOT, '_dist')

@@ -35,7 +35,7 @@
 - **公开入口自动库存** = [INDEX.generated.md](INDEX.generated.md)（生成物，勿手改；
   `node tools/repo/checks-index.mjs --write` 更新，`script-index` 门禁校验它与目录一致）。
 - **结构门禁** = `checks/gates/` 目录（清单唯一源；装配 = [run-gates](run-gates.mjs)，
-  `gate-wiring` 强制接线一致；pin 常量 = [gates/lib/pin.mjs](gates/lib/pin.mjs)）。
+  `gate-wiring` 强制接线一致；pin 常量 = [tools/lib/core/pin.mjs](../tools/lib/core/pin.mjs)）。
 
 ## 共享实现与目录选择
 
