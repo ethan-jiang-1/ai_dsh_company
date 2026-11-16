@@ -72,5 +72,5 @@
 
 - 6 个文件均为 `git mv`；移动文件内容零改动（`pin`/`mutation`/`delegation-model`/`compat-tags`/`coverage-baseline` 100% similarity；`candidate-scan` 99%，唯一差异是内部 `repo-markdown` 相对路径一层）。
 - 消费者全部同 diff 改指新家：`pin` 9 处（含 `export-dist` / `sync-dsh` 的**路径字面量**）、`candidate-scan` 5 处、`delegation-model` 10 处、`mutation` 2 处、`compat-tags` 5 处（pack-shape/release-ready/release/sync-dsh/docs）、`coverage-baseline` 1 处 audit + 2 篇 Note + docs/testing。
-- 16 条 archived 链接只做机械路径修复（`_backlog/_archive` 15 条 + `notes/archived` 1 条），正文/决定未改；`link-debt` 回到基线 4。
+- archived / backlog 的 markdown/backtick 路径只做机械修复（delegation-model 16 条；compat-tags / coverage-baseline 随移动改指新家），正文/决定未改；`link-debt` 回到基线 4。
 - `checks/lib/ci-security-gates/README.md` 只加当前运行面横幅；MANIFEST 同 diff 抬指纹。
