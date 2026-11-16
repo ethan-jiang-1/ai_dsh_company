@@ -380,7 +380,7 @@ export const SURFACE_RULES = [
     why: '市场索引暂存/生成手册/runtime 白名单/根 dotfile 与 lint-dup 配置：改这些跑对应工具 + 结构门禁',
   },
   {
-    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', '.agents/**', 'run/**', 'probes/**', 'snapshots/**'],
+    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', '.agents/**', 'run/**', 'probes/**', 'snapshots/**'],
     coveredBy: ['verify'],
     why: '文档/指针/技能/运行配置/探针/快照 = 结构门禁 verify 的射程；探针与真模型档按头注手动跑',
   },
