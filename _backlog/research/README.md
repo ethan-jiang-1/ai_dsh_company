@@ -58,6 +58,8 @@ opened: YYYY-MM-DD
 
 ## 索引
 
+- [maintenance-surface-taxonomy](maintenance-surface-taxonomy/README.md) — 三仓维护面顶层分类法比较（调研中，2026-11-16）
+
 （2026-11-15 tests-src-correspondence 随 tests-tree-axis 卡落地迁入[研究归档](../_archive/research/README.md)。）
 
 （2026-11-14 dsh-notes-flow-borrow 与 test-asset-spiral 随其卡结项迁入[研究归档](../_archive/research/README.md)。）
