@@ -36,6 +36,13 @@
 - **读载体 / 写载体**：读 = 新 agent 的三个 README 与本 Note；写 = 新模块先判 6 个落点，再改 `face-boundaries` 允许的形状。
 - **环境坏法**：① 守卫空转（lib 拆组后只扫顶层）→ `layering.spec` 递归 + 非空断言；② 面库反向依赖 → `face-boundaries.spec`；③ 清单口径漂移 → `checks-index.spec` 对账；④ 冻结副本 README 与 wrapper 脱节 → 横幅 + MANIFEST 指纹；⑤ 纯移动触发覆盖率“新文件”误判 → 基线键随家迁移。
 
+## 独立盲审
+
+- 审者 = **无历史上下文的只读子代理**（`subagent`，非本会话作者）；输入 = `f8d0f50c..9c6535fd` diff + 用户原话 + 合同 + 实盘门禁。
+- 发现：**3 条 declaration blocker，0 条 code/behavior blocker**。B1 = `cordis.patch.yml:8` 随包注释仍指旧 compat-tags；B2 = 本 Note 的 archived 链接计数不实；B3 = `MANIFEST.sha_chain` 与 `files/deployed_sha` 自相矛盾。另有 6 条非阻塞建议。
+- 处置：B1 走本条 `[policy]` + [release.md](../../docs/contracts/release.md) 触发线（不改 pack 源，避免 `_dist` 重打）；B2 删掉不实数字；B3 补 2026-11-17 链节；6 条建议全修（CENSUS 57/0、示例改非资产名、README 秒级、pin 豁免 reason、layering 消息、Note 措辞）。
+- 复审：`8cf8fd19` 后同一盲审快速确认 **blocker=0, cleared**（3 条 declaration blocker 全清、6 条建议 6/6 cleared；定向 3 个 spec 共 13 passed；无新红/新假声明）。
+
 ## 未覆盖轴
 
 - [covered] keyless 守卫空转修复与负例 → `tests/repo/structure/layering.spec.ts`
@@ -71,6 +78,6 @@
 ## 移动副作用账
 
 - 6 个文件均为 `git mv`；移动文件内容零改动（`pin`/`mutation`/`delegation-model`/`compat-tags`/`coverage-baseline` 100% similarity；`candidate-scan` 99%，唯一差异是内部 `repo-markdown` 相对路径一层）。
-- 消费者全部同 diff 改指新家：`pin` 9 处（含 `export-dist` / `sync-dsh` 的**路径字面量**）、`candidate-scan` 5 处、`delegation-model` 10 处、`mutation` 2 处、`compat-tags` 5 处（pack-shape/release-ready/release/sync-dsh/docs）、`coverage-baseline` 1 处 audit + 2 篇 Note + docs/testing。
+- 代码/文档消费者全部同 diff 改指新家（shipped 注释见 [policy] 保留）：`pin` 9 处（含 `export-dist` / `sync-dsh` 的**路径字面量**）、`candidate-scan` 5 处、`delegation-model` 10 处、`mutation` 2 处、`compat-tags` 5 处（pack-shape/release-ready/release/sync-dsh/docs）、`coverage-baseline` 1 处 audit + 2 篇 Note + docs/testing。
 - archived / backlog 的 markdown/backtick 路径只做机械修复（delegation-model 的 archived/backlog 链接逐条改；compat-tags / coverage-baseline 随移动改指新家），正文/决定未改；`link-debt` 回到基线 4。
 - `checks/lib/ci-security-gates/README.md` 只加当前运行面横幅；MANIFEST 同 diff 抬指纹。
