@@ -11,7 +11,7 @@
 //   content-single-home   删 policy-lines 的“服务信用”行                     → 缺政策线
 //   content-manifest      company/ 加一份未登记 .md                           → 未登记的 content 文件
 //   base-clean            charter 加“公司财务 agent 案（date-pending）”           → 含部署个案语言
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import * as baseClean from '../../checks/gates/base-clean.mjs'
@@ -19,6 +19,7 @@ import * as contentManifest from '../../checks/gates/content-manifest.mjs'
 import * as contentSingleHome from '../../checks/gates/content-single-home.mjs'
 import * as methodContract from '../../checks/gates/method-contract.mjs'
 import * as packContentPaths from '../../checks/gates/pack-content-paths.mjs'
+import * as navCountClaims from '../../checks/gates/nav-count-claims.mjs'
 import { mutateFile } from '../../checks/lanes/lib/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
@@ -98,6 +99,29 @@ const mutateOrFail = (label, path, transform) => {
     if (mutateOrFail('base-clean：部署个案语言', path, text => text.replace('## Historical minutes', '- 公司财务 agent 案（date-pending）。\n\n## Historical minutes'))) {
       report('base-clean：部署个案语言 → 红', run(baseClean, root), '含部署个案语言')
     }
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // nav-count-claims 文档篇数类（2026-11-16 扩）：红方向 = 括号裸篇数库存注解（真实病灶形状）；
+  // 豁免方向 = 本篇/一篇/四篇/历史叙事（篇后散文）仍绿。门属导航面中风险，conformance 住本 smoke；
+  // 分支级定向 mutation 套件（gate-mutation.test.mjs）scope 仍是七个高风险门，不含本门。
+  const root = makeRoot()
+  try {
+    mkdirSync(join(root, 'docs/guides'), { recursive: true })
+    const path = join(root, 'docs/guides/zz-doc-count.md')
+    writeFileSync(path, '# x\n\n- `notes/`（332 篇）与 `_backlog/`（597 篇）是决策记忆。\n')
+    report('nav-count-claims：括号裸篇数（分支①）→ 红', run(navCountClaims, root), '文档篇数计数声明')
+    // 盲审 S1：分支②（库存目录相邻裸篇数）独立红夹具——只坏分支②而①仍在时也必须红。
+    writeFileSync(path, '# x\n\nnotes/ 现有 335 篇，持续增长。\n')
+    report('nav-count-claims：库存目录相邻裸篇数（分支②）→ 红', run(navCountClaims, root), '文档篇数计数声明')
+    // 盲审 S2：豁免夹具补齐注释清单（长篇/八篇/两篇），与真盘 13 行绿双兜。
+    writeFileSync(path, '# x\n\n本篇管环境。各追加一篇。四篇理由 Note。八篇制度。两篇 PDF。长篇失控。（46 篇 journal 已于昔日迁移）。\n')
+    const msgs = run(navCountClaims, root)
+    const green = !msgs.some(m => m.startsWith('FAIL'))
+    if (!green) failures += 1
+    console.log(`${green ? 'PASS' : 'FAIL'} nav-count-claims：本篇/一篇/四篇/历史叙事 → 豁免绿`)
+    for (const m of msgs.slice(0, 2)) console.log(`  ${m}`)
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 

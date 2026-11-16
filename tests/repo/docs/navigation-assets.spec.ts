@@ -87,3 +87,29 @@ describe('snapshots 场景元数据政策', () => {
     expect(text).toContain('独立 oracle')
   })
 })
+
+describe('clean-clone 首跑序列单家锚点（防 handoff/bootstrap 漂移）', () => {
+  // 散文家 = bootstrap（AGENTS「fresh clone 顺序唯一家」）；行为家 = tools/dev/setup.mjs（内部含
+  // vendor 自身 lock install + typert pass）。本常量只做**漂移守卫锚点**（同 navigation-assets 钉骨架
+  // 教义：复述清单必漂，故只钉命令在场+顺序，不抄全文）。handoff §1 是入口自足复述，必须与 bootstrap
+  // 共享 init 前缀同序；改序/删步/两家分叉 → 红。2026-11-16 立（接手评估 Top3：序列三家无同步守卫）。
+  // 盲审 S4 边界登记：ordered() 取全文首现序（非 §1 块提取）。今日全部首现恰在 §1 sh 块内（有效）；
+  // 前文早提同命令会致假红（保守方向，安全）；邻位窗口提及理论上可掩盖 §1 删步——现盘无此形，
+  // 若将来 handoff 前文引入同命令再收窄到块提取（仿本文件「AGENTS 命令表」的块抽取）。
+  const INIT = ['git submodule update --init', 'corepack enable pnpm', 'pnpm install', 'pnpm bundle:init', 'pnpm setup']
+  const ACCEPTANCE = ['node tools/dev/setup.mjs --check', 'pnpm verify', 'pnpm test', 'pnpm typecheck']
+  const ordered = (text: string, cmds: string[]) => {
+    let last = -1
+    for (const cmd of cmds) {
+      const at = text.indexOf(cmd)
+      expect(at, `缺命令或乱序：${cmd}`).toBeGreaterThan(last)
+      last = at
+    }
+  }
+  it('handoff §1 含完整首跑 + 验收序列（按序）', () => {
+    ordered(read('docs/guides/repo-handoff.md'), [...INIT, ...ACCEPTANCE])
+  })
+  it('bootstrap 含共享 init 前缀（按序，与 handoff 不分叉）', () => {
+    ordered(read('docs/guides/bootstrap.md'), INIT)
+  })
+})
