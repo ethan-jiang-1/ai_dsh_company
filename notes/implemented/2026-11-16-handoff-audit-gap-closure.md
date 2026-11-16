@@ -24,7 +24,7 @@
    [budget-and-ops](../../docs/guides/budget-and-ops.md)、[dev-product-parity](../../docs/guides/dev-product-parity.md)、
    [demo-scenes](../../docs/guides/demo-scenes.md)、[web-window-ops](../../.agents/skills/web-window-ops/SKILL.md)）改为
    「日用 GUI 永不动 / 端口是环境状态」，判据单家 = [multi-human-runbook §2](../../docs/guides/multi-human-runbook.md)（实测 3080/3081/3082 都可能是别人的）。
-   决定本身（`--port 0` 安全默认）已在 [handoff-hygiene 归档 Note](../implemented/2026-11-11-handoff-hygiene.md)，本笔只删复述。
+   决定本身（`--port 0` 安全默认）已在 [handoff-hygiene Note](2026-11-11-handoff-hygiene.md)，本笔只删复述。
 5. **dead evidence lane 复活**：[permissions-recovery lane](../../checks/lanes/permissions-recovery.entry.mjs) 两处修真身——
    ① `DSH_COMPANY_HOME` 目录不存在时 host 按设计停写（无 workspace 零写，2026-11-03），lane 必须先 `mkdirSync(WS)`；
    ② 公司状态家迁 `.dsh-company/` 后本 lane 仍写旧布局 `WS/kb`，改消费
