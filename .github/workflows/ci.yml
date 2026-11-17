@@ -31,4 +31,9 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # verify 的 YAML/MD 解析原语经 vendor/dsh/package.json 锚解析 js-yaml/mdast
+      # （tools/lib/core/repo-markdown.mjs:20）：vendor 根不是 workspace 项目，根 install
+      # 不装它的依赖 —— 2026-11-17 CI 连红实证（MODULE_NOT_FOUND js-yaml，暖树本地不现形）。
+      # 这一步 = bootstrap「标准引导」的 vendor install（setup.mjs install() 同款命令），非新依赖面。
+      - run: pnpm -C vendor/dsh install --frozen-lockfile --ignore-scripts
       - run: pnpm verify

@@ -36,6 +36,9 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # ci.yml verify job 同款：verify 经 vendor/dsh/package.json 锚解析 js-yaml/mdast，
+      # vendor 根依赖根 install 不装（2026-11-17 双 OS 同红实证）；= bootstrap vendor install 步。
+      - run: pnpm -C vendor/dsh install --frozen-lockfile --ignore-scripts
       - run: pnpm bundle:init
       - run: pnpm verify
 
@@ -55,7 +58,12 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm bundle:init
+      # 2026-11-17：`setup: vendor host types`（vendor tsc -b tsconfig.host.json）在 arm64
+      # runner 2GB 默认 old-space 下 120s OOM（run 43852645841 / job 133248855109 实证）；
+      # macos-latest 内存 7GB，显式放宽 old-space。
       - run: pnpm run setup
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
       - run: node tools/dev/setup.mjs --check
       - run: pnpm verify
       - run: pnpm test
