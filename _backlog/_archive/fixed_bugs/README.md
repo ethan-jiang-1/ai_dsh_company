@@ -4,6 +4,22 @@
 
 ## 修复流水（倒序）
 
+- **BUG-202..211**（2026-11-17，根因组 A–C，P2×10）：C12 归属波次——63 个 lib + 77 renames 后
+  「绿」的制造者没随迁：
+  **A** oracle / 棘轮：[202](BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) 测试体 AST 指纹 + 多重集、
+  [203](BUG-203-coverage-ratchet-rename-resets-floor.md) 基线键消失 = 红 + `--rename/--drop` 显式迁移地板、
+  [204](BUG-204-ledger-branches-floor-cold-only.md) ledger 冷/暖同形回 100；
+  **B** 守卫扫描面：[205](BUG-205-live-pointer-faces-miss-moved-libs.md) FACES 四个新家、
+  [206](BUG-206-coveredby-evidence-does-not-execute.md) 入口 import 图 + probes coveredBy、
+  [207](BUG-207-retired-path-misses-wave-renames.md) retired-path git 自动推导 + 手工表自检、
+  [208](BUG-208-face-boundaries-computed-imports.md) 计算型 import 空集；
+  **C** live / shipped：[209](BUG-209-live-declarations-stale-after-split.md) 删手抄面表/件数、
+  [210](BUG-210-shipped-comments-dev-only-paths.md) shipped 注释限定 + 重建 `_dist`、
+  [211](BUG-211-tools-readme-lib-purity-contradiction.md) tools/README 纯度句。
+  证据提交 = `eccd5f16`；`pnpm test` 260 files / 2200 tests、`verify` ALL PASS、
+  `typecheck`/`lint`/`dup`/`coverage:ratchet`/`smoke:fast`/`test:checks` 全绿。
+  详见 [C12 修复 Note](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)。
+
 - **BUG-192..201**（2026-11-16，根因组 A–E，P2×10）：C11 二轮——修复后的守卫面（Round 93）：
   判据面写成「上次出事的样本」而不是载体全集：
   **A** 面规则/选择器：[192](BUG-192-surface-rules-tracked-path-completeness.md) 19 条 tracked 路径 unseen →

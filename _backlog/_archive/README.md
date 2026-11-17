@@ -21,6 +21,16 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-202（已修）](fixed_bugs/BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) | 已修：`--hashes` 拿标题冒充测试体、`--compare` 集合差吞重复；AST 测试体指纹 + 多重集比较 | 2026-11-17 |
+| [BUG-203（已修）](fixed_bugs/BUG-203-coverage-ratchet-rename-resets-floor.md) | 已修：基线键消失只发 note、改名重置地板；`missing-baseline` 红 + `--rename/--drop` 显式迁移/删除 | 2026-11-17 |
+| [BUG-204（已修）](fixed_bugs/BUG-204-ledger-branches-floor-cold-only.md) | 已修：冷环境 skip 把暖树 ledger 地板拉到 94；补无尾竖线纯测试、冷/暖同形回 100 | 2026-11-17 |
+| [BUG-205（已修）](fixed_bugs/BUG-205-live-pointer-faces-miss-moved-libs.md) | 已修：live 指针 FACES 未随 63 lib 扩面；四个新家入面 + 每面非空 | 2026-11-17 |
+| [BUG-206（已修）](fixed_bugs/BUG-206-coveredby-evidence-does-not-execute.md) | 已修：coveredBy 只是声明、pre-push 不加载探针；入口 import 图 spec + probes 改 coverage:ratchet | 2026-11-17 |
+| [BUG-207（已修）](fixed_bugs/BUG-207-retired-path-misses-wave-renames.md) | 已修：退役前缀表没登记本波 77 renames；从近期 git 历史自动推导 + 手工表自检 | 2026-11-17 |
+| [BUG-208（已修）](fixed_bugs/BUG-208-face-boundaries-computed-imports.md) | 已修：face-boundaries 丢弃 unresolvedImports；五个面断言空集 | 2026-11-17 |
+| [BUG-209（已修）](fixed_bugs/BUG-209-live-declarations-stale-after-split.md) | 已修：tests/README 手抄面表与 Note 件数漂移；删手抄表/数字 + 声明守卫 | 2026-11-17 |
+| [BUG-210（已修）](fixed_bugs/BUG-210-shipped-comments-dev-only-paths.md) | 已修：shipped 注释指向不随包的 tools/lib；加「不随包分发」+ spec + 重打 `_dist` | 2026-11-17 |
+| [BUG-211（已修）](fixed_bugs/BUG-211-tools-readme-lib-purity-contradiction.md) | 已修：tools/README「lib 不启动进程」与 probe web 启动矛盾；改注入式措辞 + 靠评审 | 2026-11-17 |
 | [2026-11-12-deep-surface-continuous-bug-hunt.md](settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md) | 已结；C1–C11 探索收官（BUG-090..201 分批修复归档；focus v6 两轮 18 张）；C12 归属波次另立 [新卡](../issues/2026-11-17-ownership-wave-exploratory.md) | 2026-11-17 |
 | [BUG-192（已修）](fixed_bugs/BUG-192-surface-rules-tracked-path-completeness.md) | 已修：19 条 tracked 路径无面规则/豁免、完备性只抽样；新门禁 `surface-coverage` 全 tracked 判据 + 登记 | 2026-11-16 |
 | [BUG-193（已修）](fixed_bugs/BUG-193-vitest-threshold-guard-accepts-directory.md) | 已修：阈值键守卫放过目录；三处守卫统一 `statSync().isFile()` | 2026-11-16 |

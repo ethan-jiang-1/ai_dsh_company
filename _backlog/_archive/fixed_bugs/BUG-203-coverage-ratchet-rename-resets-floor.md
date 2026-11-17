@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-203：coverage-ratchet 对文件改名只发 note，旧键的高地板消失、新路径按新文件下限重新起算
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— 3 blocker 已修（归档同批 / Note 一致 / 红证配方），S1–S4 已处置
 >
-> **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-5 / N3）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
+> **关联**：[C12 归属波次探索卡](../../issues/2026-11-17-ownership-wave-exploratory.md)（C12-5 / N3）。
+> **留痕**：批次 Note [2026-11-17-c12-ownership-wave-repairs](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)（本批共用）。
 
 ## 症状
 
@@ -47,7 +47,7 @@ next= {"generatedAt":"2026-11-17","files":{"pkg/new-home/moved.ts":{"statements"
 
 ## 根因与证据
 
-- 根因：[coverage-baseline.mjs](../../checks/lib/coverage-baseline.mjs) 的 `compareCoverage()`：
+- 根因：[coverage-baseline.mjs](../../../checks/lib/coverage-baseline.mjs) 的 `compareCoverage()`：
   `for (const [path, value] of Object.entries(current))` 只判当前键；缺失基线键的循环只 `notes.push`。
   新键的判定是 `NEW_FILE_FLOOR = { statements: 80, branches: 70 }`。
 - `nextBaseline()` 以 `current` 为全集重建，旧键不保留；所以下一次 `--update` 后旧地板彻底消失。
@@ -80,3 +80,12 @@ next= {"generatedAt":"2026-11-17","files":{"pkg/new-home/moved.ts":{"statements"
 - 在 `compareCoverage` 里对「基线键缺失 + 新键出现」做配对候选（按 basename/相似度），要求显式
   `--rename old=new` 或基线里的 `renamedFrom` 字段；没有映射就红。
 - 或在 `nextBaseline` 里保留未消费的旧键直到显式 `--drop-key`，让丢失地板成为显式动作。
+
+## 修复证据
+
+- 改动面：`checks/lib/coverage-baseline.mjs`、`checks/audit/coverage-ratchet.mjs`、`checks/lib/coverage-baseline.json`、`tests/tools/coverage-baseline.spec.ts`
+- 红：`pnpm test tests/tools/coverage-baseline.spec.ts`（同一条命令；红证注入配方见下一行）
+- 红证（注入配方，非证据命令）：用 `git show HEAD~:checks/lib/coverage-baseline.mjs` 临时换回旧实现 → 同一条 spec 红；恢复新实现 → 绿
+- 红输出：`expected [] to include 'missing-baseline'`
+- 绿：`pnpm test tests/tools/coverage-baseline.spec.ts`（修复后绿；日志 = `runtime/tmp/c12-fix/evidence/203-green.log`）
+- 提交：commit eccd5f16

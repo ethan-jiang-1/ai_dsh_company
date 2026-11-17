@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 199 |
-| 有具名守卫 | 94 |
+| 已修卡 | 209 |
+| 有具名守卫 | 104 |
 | 无具名守卫 | 105 |
-| 覆盖率 | 47.2% |
+| 覆盖率 | 49.8% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -205,18 +205,28 @@
 | 184 | 2026-11-15 | tests/repo/budget/vitest-coverage-thresholds.spec.ts:67 |
 | 185 | 2026-11-15 | tests/repo/structure/built-path-literals.spec.ts:92 |
 | 186 | 2026-11-15 | tests/repo/budget/asset-lanes.spec.ts:112 |
-| 187 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:95 |
-| 188 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:103 |
-| 189 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:110 |
-| 190 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:117 |
+| 187 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:93 |
+| 188 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:101 |
+| 189 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:108 |
+| 190 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:115 |
 | 191 | 2026-11-15 | tests/repo/docs/typecheck-coverage-claim.spec.ts:60 |
 | 192 | 2026-11-16 | tests/repo/budget/asset-lanes.spec.ts:130 |
 | 193 | 2026-11-16 | tests/repo/budget/vitest-coverage-thresholds.spec.ts:75 |
-| 194 | 2026-11-16 | tests/repo/docs/live-pointer-paths.spec.ts:121 |
-| 195 | 2026-11-16 | tests/repo/docs/live-pointer-paths.spec.ts:125 |
+| 194 | 2026-11-16 | tests/repo/docs/live-pointer-paths.spec.ts:119 |
+| 195 | 2026-11-16 | tests/repo/docs/live-pointer-paths.spec.ts:123 |
 | 196 | 2026-11-16 | tests/repo/docs/typecheck-coverage-claim.spec.ts:64 |
 | 197 | 2026-11-16 | tests/repo/structure/built-path-literals.spec.ts:96 |
 | 198 | 2026-11-16 | tests/repo/structure/built-path-literals.spec.ts:102 |
 | 199 | 2026-11-16 | tests/checks/pre-push-surfaces.test.mjs:121；tests/checks/pre-push-surfaces.test.mjs:144 |
 | 200 | 2026-11-16 | tests/repo/budget/asset-lanes.spec.ts:187 |
 | 201 | 2026-11-16 | tests/checks/pre-push-surfaces.test.mjs:129 |
+| 202 | 2026-11-17 | tests/tools/refactor-drift.spec.ts:48 |
+| 203 | 2026-11-17 | tests/tools/coverage-baseline.spec.ts:67 |
+| 204 | 2026-11-17 | tests/lib/accounting/ledger.spec.ts:28 |
+| 205 | 2026-11-17 | tests/repo/docs/live-pointer-paths.spec.ts:131 |
+| 206 | 2026-11-17 | tests/repo/structure/entry-import-graph.spec.ts:55 |
+| 207 | 2026-11-17 | tests/tools/retired-paths.spec.ts:14 |
+| 208 | 2026-11-17 | tests/repo/structure/face-boundaries.spec.ts:93 |
+| 209 | 2026-11-17 | tests/repo/docs/live-declarations.spec.ts:27；tests/repo/docs/live-declarations.spec.ts:32 |
+| 210 | 2026-11-17 | tests/repo/pack/shipped-comments.spec.ts:65 |
+| 211 | 2026-11-17 | tests/repo/docs/live-declarations.spec.ts:38 |

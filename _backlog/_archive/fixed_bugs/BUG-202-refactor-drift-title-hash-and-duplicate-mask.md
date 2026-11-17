@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-202：refactor-drift 的 `--hashes` 只证标题，`--compare` 又用集合差掩盖重复测试的删除
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— 3 blocker 已修（归档同批 / Note 一致 / 红证配方），S1–S4 已处置
 >
-> **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-3 / N1）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
+> **关联**：[C12 归属波次探索卡](../../issues/2026-11-17-ownership-wave-exploratory.md)（C12-3 / N1）。
+> **留痕**：批次 Note [2026-11-17-c12-ownership-wave-repairs](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)（本批共用）。
 
 ## 症状
 
@@ -47,7 +47,7 @@ node checks/audit/refactor-drift-audit.mjs --compare runtime/tmp/c12-pre/dup-bef
 
 ## 根因与证据
 
-- 根因 1：[refactor-drift-audit.mjs](../../checks/audit/refactor-drift-audit.mjs) 的 `bodyHash(entry)`
+- 根因 1：[refactor-drift-audit.mjs](../../../checks/audit/refactor-drift-audit.mjs) 的 `bodyHash(entry)`
   只做 `sha256(entry.body)`，而 `namesFrom()` 把 `body` 设为 `titlePath.join('\0')`；文件名与
   `titlePath` 之外没有任何测试体信息。头注「测试体指纹」与实现不符。
 - 根因 2：`--compare` 的 `onlyA`/`onlyB` 用 `Array.includes` 做成员判断；重复行不会被计数消耗。
@@ -78,3 +78,12 @@ node checks/audit/refactor-drift-audit.mjs --compare runtime/tmp/c12-pre/dup-bef
 - 若保留标题档：把输出改为「标题指纹」，并在 [deep-surface 方法] 与 C12 卡里撤回「测试体」措辞。
 - 若要真测试体：在 `namesFrom` 里读源文件、按 AST 取 `it/test` 回调文本做归一化哈希；这会把
   「文件搬家」与「测试体改动」分开，但实现成本更高。
+
+## 修复证据
+
+- 改动面：`checks/lib/refactor-drift.mjs`、`checks/audit/refactor-drift-audit.mjs`、`tests/tools/refactor-drift.spec.ts`
+- 红：`pnpm test tests/tools/refactor-drift.spec.ts`（同一条命令；红证注入配方见下一行）
+- 红证（注入配方，非证据命令）：隐藏 checks/lib/refactor-drift.mjs（旧 CLI 无纯逻辑可 import）→ 同一条 spec 红；旧实现的假绿复现 = `node checks/audit/refactor-drift-audit.mjs --compare runtime/tmp/c12-pre/dup-before.hashes runtime/tmp/c12-pre/dup-after.hashes` → exit 0「ALL PASS」
+- 红输出：`AssertionError / Cannot find module ...refactor-drift.mjs（修复前）；修复后同一注入下的 202-red.log 为判据级红`
+- 绿：`pnpm test tests/tools/refactor-drift.spec.ts`（修复后绿；日志 = `runtime/tmp/c12-fix/evidence/202-green.log`）
+- 提交：commit eccd5f16

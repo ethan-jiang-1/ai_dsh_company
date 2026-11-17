@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-206：coveredBy 只登记命令名，不证明该命令执行被覆盖的入口——probes/** / tools/** 的 pre-push 证据是空的
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— 3 blocker 已修（归档同批 / Note 一致 / 红证配方），S1–S4 已处置
 >
-> **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-7 / N2/N6）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
+> **关联**：[C12 归属波次探索卡](../../issues/2026-11-17-ownership-wave-exploratory.md)（C12-7 / N2/N6）。
+> **留痕**：批次 Note [2026-11-17-c12-ownership-wave-repairs](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)（本批共用）。
 
 ## 症状
 
@@ -77,3 +77,12 @@ git checkout -- probes/analyze/explore-evidence-probe.mjs
   解析本地 import 并断言目标存在；成本秒级，可进 `verify` 或 `test:checks`。
 - 或在 `surface-coverage` 里为 `coveredBy` 增加「执行证明」字段（例如该步骤的入口 import 面），
   没有证明就红；但这会把声明面扩得较大，需先写决定。
+
+## 修复证据
+
+- 改动面：`tests/repo/structure/entry-import-graph.spec.ts`、`tools/lib/core/asset-lanes.mjs`、`tests/repo/budget/asset-lanes.spec.ts`
+- 红：`pnpm test tests/repo/structure/entry-import-graph.spec.ts`（同一条命令；红证注入配方见下一行）
+- 红证（注入配方，非证据命令）：向 probes/analyze/explore-evidence-probe.mjs 末尾注入 `import './definitely-missing-helper.mjs'` → 同一条 spec 红；删除 → 绿
+- 红输出：`AssertionError: 入口 import 指向不存在的本地目标: expected [ Array(1) ] to deeply equal []`
+- 绿：`pnpm test tests/repo/structure/entry-import-graph.spec.ts`（修复后绿；日志 = `runtime/tmp/c12-fix/evidence/206-green.log`）
+- 提交：commit eccd5f16

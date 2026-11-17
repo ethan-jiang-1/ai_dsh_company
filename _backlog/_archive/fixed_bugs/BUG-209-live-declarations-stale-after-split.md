@@ -1,26 +1,26 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-209：搬移后的两处 live 声明仍按旧树写：tests/README 的「lib → replay」与 lib-ownership Note 的库件数
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— 3 blocker 已修（归档同批 / Note 一致 / 红证配方），S1–S4 已处置
 >
-> **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-6 / N4）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
+> **关联**：[C12 归属波次探索卡](../../issues/2026-11-17-ownership-wave-exploratory.md)（C12-6 / N4）。
+> **留痕**：批次 Note [2026-11-17-c12-ownership-wave-repairs](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)（本批共用）。
 
 ## 症状
 
 搬移后有两个 **live 声明**仍按旧树写，而且都不在任何机械判据的射程：
 
-1. [tests/README.md](../../tests/README.md) 第 44 行仍写 pre-push 面「…content → `replay-smoke`、
+1. [tests/README.md](../../../tests/README.md) 第 44 行仍写 pre-push 面「…content → `replay-smoke`、
    `lib` → `replay-smoke`」。`SURFACE_RULES` 里只有
    `packages/company-pack/src/lib/**` → replay；`2450d0ef` 之后新出现的 `tools/lib/**` 走的是
    `coveredBy: test:checks / coverage:ratchet / verify`，**不会**触发 replay。读者把 `tools/lib`
    当「lib」会预期错的证据。
-2. [lib-ownership-split Note](../../notes/implemented/2026-11-17-lib-ownership-split.md) 第 31 行
+2. [lib-ownership-split Note](../../../notes/implemented/2026-11-17-lib-ownership-split.md) 第 31 行
    「`checks/lib/` 16 件 + 冻结 CI 套件；…测试专属 1 件」。实盘：
    - `checks/lib` 顶层 = 14 个 `.mjs` + 1 个 `.json` + `ci-security-gates/` 目录 = **16 个条目**，
      「16 件 + 冻结套件」把冻结套件算了两次；
@@ -68,3 +68,12 @@ ls tests/support/keyless-imports.mjs tests/support/mutation.mjs
 1. `tests/README.md` 删除手抄面表（含 `lib → replay-smoke` 歧义句），只保留「规则与成员唯一家 = SURFACE_RULES」指针。
 2. `lib-ownership-split` Note 删掉 `16 件` / `1 件` 等手写件数，改成结构口径（判据模块 + 基线 + 冻结套件；测试专属 = `tests/support` 的具名模块）。
 3. 最小负例（同一条命令）：`pnpm test tests/repo/docs/live-declarations.spec.ts`——旧文本在场时红；改后绿。
+
+## 修复证据
+
+- 改动面：`tests/README.md`、`tests/repo/docs/live-declarations.spec.ts`
+- 红：`pnpm test tests/repo/docs/live-declarations.spec.ts`（同一条命令；红证注入配方见下一行）
+- 红证（注入配方，非证据命令）：把 tests/README 的 `lib → replay-smoke` 面表与 lib-ownership Note 的「16 件 + 冻结 CI 套件 / 测试专属 1 件」接回 → 同一条 spec 红；改回 → 绿
+- 红输出：expected '# tests/ · keyless 回归的领域分区与导航…' not to contain 'lib → replay-smoke'
+- 绿：`pnpm test tests/repo/docs/live-declarations.spec.ts`（修复后绿；日志 = `runtime/tmp/c12-fix/evidence/209-green.log`）
+- 提交：commit eccd5f16

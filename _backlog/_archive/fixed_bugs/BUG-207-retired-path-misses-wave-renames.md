@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-207：retired-path 的退役前缀表没有登记这一波 77 个 renames，脚本注释里的旧家仍全绿
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— 3 blocker 已修（归档同批 / Note 一致 / 红证配方），S1–S4 已处置
 >
-> **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-1 / N1）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
+> **关联**：[C12 归属波次探索卡](../../issues/2026-11-17-ownership-wave-exploratory.md)（C12-1 / N1）。
+> **留痕**：批次 Note [2026-11-17-c12-ownership-wave-repairs](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)（本批共用）。
 
 ## 症状
 
@@ -42,10 +42,10 @@ git checkout -- tools/lib/core/asset-lanes.mjs
 
 ## 根因与证据
 
-- 根因：`RETIRED_PATH_PREFIXES` 是手写数组；[retired-path.mjs](../../checks/gates/retired-path.mjs)
+- 根因：`RETIRED_PATH_PREFIXES` 是手写数组；[retired-path.mjs](../../../checks/gates/retired-path.mjs)
   没有从搬移提交/git 历史生成，也没有「本波 renames 必须登记」的检查。归属波次的 Note
-  （[lib-ownership-split](../../notes/implemented/2026-11-17-lib-ownership-split.md) /
-  [surface-ownership-cleanup](../../notes/implemented/2026-11-17-surface-ownership-cleanup.md)）
+  （[lib-ownership-split](../../../notes/implemented/2026-11-17-lib-ownership-split.md) /
+  [surface-ownership-cleanup](../../../notes/implemented/2026-11-17-surface-ownership-cleanup.md)）
   没有提退役前缀。
 - 证据：上负控实跑；`RETIRED_PATH_PREFIXES` 原文只有 _backlog/_done、_backlog/plans/、
   packages/company-pack/workspace、tools/standalone.mjs。
@@ -70,3 +70,12 @@ git checkout -- tools/lib/core/asset-lanes.mjs
 1. 退役面不再只靠手写表：`retired-path` 从最近 300 个提交的 `git log --diff-filter=RD -M --name-status` 自动推导旧路径，扫描脚本注释面；当前波次的旧 observe 目录等手工表条目仍登记，且 `to` 必须是现行路径。
 2. 手工表自检：`from` 不得仍存在；`_backlog/research`、归档树、历史引文（`FAIL …` 行）不判。
 3. 最小负例（同一条命令）：`pnpm verify`——向 `tools/lib/core/asset-lanes.mjs` 注释注入旧 observe 目录下的探针路径 → 红；删除 → 绿。
+
+## 修复证据
+
+- 改动面：`checks/gates/retired-path.mjs`、`checks/gates/naming-contract.mjs`、`tests/repo/docs/shipped-yaml-docs-pointers.spec.ts`
+- 红：`pnpm verify`（同一条命令；红证注入配方见下一行）
+- 红证（注入配方，非证据命令）：向 tools/lib/core/asset-lanes.mjs 注释注入旧 observe 目录下的探针路径 → `pnpm verify` 红；删除 → 绿；自动面另测旧扁平 tools/lib/candidate-scan.mjs → 红
+- 红输出：FAIL retired-path: … 注释引用退役路径 tools/observe/——改指现行家 probes/analyze/
+- 绿：`pnpm verify`（修复后绿；日志 = `runtime/tmp/c12-fix/evidence/207-green.log`）
+- 提交：commit eccd5f16

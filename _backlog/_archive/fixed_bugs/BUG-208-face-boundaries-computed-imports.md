@@ -1,25 +1,25 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-208：face-boundaries 对计算型 import 不可见，checks/lib 与 probes/lib 又没有 tools/lib 那样的 keyless 图兜底
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— 3 blocker 已修（归档同批 / Note 一致 / 红证配方），S1–S4 已处置
 >
-> **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-2 / N1）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
+> **关联**：[C12 归属波次探索卡](../../issues/2026-11-17-ownership-wave-exploratory.md)（C12-2 / N1）。
+> **留痕**：批次 Note [2026-11-17-c12-ownership-wave-repairs](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)（本批共用）。
 
 ## 症状
 
-归属波次的机械守卫 [face-boundaries.spec.ts](../../tests/repo/structure/face-boundaries.spec.ts)
+归属波次的机械守卫 [face-boundaries.spec.ts](../../../tests/repo/structure/face-boundaries.spec.ts)
 只消费 `parseKeylessImports()` 的 `imports`，不读同一解析器返回的 `unresolvedImports`：
 
 - 计算型动态 import（`await import(['../../checks', 'lib/entry-probe.mjs'].join('/'))`）不会产生边；
 - 该 spec 头注承认「不证明运行时通过动态字符串/非字面量路径拼接的依赖」，但合同同时写「本仓禁手搓裸路径」——
   两边没有机械交点；
-- `tools/lib` 另有 [layering.spec.ts](../../tests/repo/structure/layering.spec.ts) 的 `inspectKeylessGraph`
+- `tools/lib` 另有 [layering.spec.ts](../../../tests/repo/structure/layering.spec.ts) 的 `inspectKeylessGraph`
   兜底（且只允许 3 条已审阅的 markdown-links 表达式），但 `checks/lib`/`probes/lib` 没有同样的图守卫。
 
 ## 复现
@@ -74,3 +74,12 @@ git checkout -- probes/lib/orient.mjs
 - 优先扩 `layering.spec` 的图守卫（已有 `inspectKeylessGraph` 与白名单机制），把 `checks/lib`/
   `probes/lib` 作为独立 root 跑；每面单独白名单，避免一个面的白名单给另一个面开后门。
 - 或在 `face-boundaries` 里直接断言 `unresolvedImports` 为空并维护白名单；两处会重复，选一处。
+
+## 修复证据
+
+- 改动面：`tests/repo/structure/face-boundaries.spec.ts`
+- 红：`pnpm test tests/repo/structure/face-boundaries.spec.ts`（同一条命令；红证注入配方见下一行）
+- 红证（注入配方，非证据命令）：向 probes/lib/orient.mjs 末尾注入 `const _bypass = await import(["../../checks", "lib/entry-probe.mjs"].join("/"))` → 同一条 spec 红；删除 → 绿
+- 红输出：`AssertionError: 计算型动态 import 不得绕过归属方向: expected [ Array(1) ] to deeply equal []`
+- 绿：`pnpm test tests/repo/structure/face-boundaries.spec.ts`（修复后绿；日志 = `runtime/tmp/c12-fix/evidence/208-green.log`）
+- 提交：commit eccd5f16

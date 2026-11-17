@@ -26,8 +26,8 @@ export function parseNameStatus(output) {
 }
 
 /**
- * 旧路径所在目录已经消失、且至少两段（`tools/observe/`、`checks/smoke/`）时，作为退役目录前缀。
- * 单段顶层目录（`dev/`、`scripts/`）不作为自动前缀：近期历史里混着历史叙述，且不是本波要治的新家。
+ * 旧路径所在目录已经消失、且至少两段（例如旧的 observe / smoke 目录）时，作为退役目录前缀。
+ * 单段顶层目录（dev、scripts）不作为自动前缀：近期历史里混着历史叙述，且不是本波要治的新家。
  * @param {Map<string,string>} retired 旧路径 → 新路径
  * @param {(dir:string)=>boolean} exists 目录是否仍在盘上
  * @returns {Map<string,string>} 退役目录（带尾斜杠）→ 现家示例

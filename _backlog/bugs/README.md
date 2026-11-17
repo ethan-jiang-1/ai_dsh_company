@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 10 张**：2026-11-17 C12 归属波次探索（focus v7）的 10 张（BUG-202..211）已由 2026-11-17 用户指令授权本轮修复，`调查中 → 修复就绪`；批次计划与根因组见下方「## 2026-11-17 修复交接（根因组 A–C：BUG-202..211）」。
+**活跃 0 张**：2026-11-17 C12 归属波次探索（focus v7）的 10 张（BUG-202..211）已由 2026-11-17 用户指令授权本轮修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；批次计划与根因组见下方「## 2026-11-17 修复交接（根因组 A–C：BUG-202..211）」。
 
 **上一轮收口**：2026-11-16 C11 二轮（修复后的守卫面）的 10 张（BUG-192..201）已于 2026-11-16 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；见下方「## 2026-11-16 修复交接（根因组 A–E：BUG-192..201）」。
 
@@ -29,13 +29,17 @@
 
 | 组 | 卡 | 共同根因 | 修法（唯一事实源） |
 |---|---|---|---|
-| **A oracle / 棘轮判别面** | [202](BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) / [203](BUG-203-coverage-ratchet-rename-resets-floor.md) / [204](BUG-204-ledger-branches-floor-cold-only.md) | oracle 名字声称的面大于实现；改名/冷环境被当成「变好」或「无变化」 | 202：测试体 AST 指纹 + **多重集**比较（纯逻辑进 `checks/lib/refactor-drift.mjs`）；203：基线键消失 = 红，`--rename`/`--drop` 显式迁移地板；204：补无尾竖线纯测试，冷/暖同形、地板回 100 |
-| **B 守卫扫描面** | [205](BUG-205-live-pointer-faces-miss-moved-libs.md) / [206](BUG-206-coveredby-evidence-does-not-execute.md) / [207](BUG-207-retired-path-misses-wave-renames.md) / [208](BUG-208-face-boundaries-computed-imports.md) | `FACES` / `RETIRED_PATH_PREFIXES` / `coveredBy` 是手写清单，未随 63 lib + 77 renames 扩面；计算型 import 不可见 | 205：FACES 纳入 `tools/lib`、`checks/lib`、`probes/lib`、`tests/support` + 每面非空；206：新增入口 import 图 spec（本地 import 目标必须存在），`probes/**` 的 coveredBy 改「真执行该 spec」的 `coverage:ratchet`；207：退役面从 git 历史自动推导近期 rename/delete（脚本注释面）+ 手工表自检；208：`face-boundaries` 读 `unresolvedImports`，五个面空集断言 |
-| **C live / shipped 声明** | [209](BUG-209-live-declarations-stale-after-split.md) / [210](BUG-210-shipped-comments-dev-only-paths.md) / [211](BUG-211-tools-readme-lib-purity-contradiction.md) | 手抄面表/件数随树漂；shipped 注释指不随包路径；归属纯度句与实盘矛盾 | 209：删 `tests/README.md` 手抄面表（只留唯一源链接）+ Note 去件数；210：shipped 注释加「不随包分发」限定 + shipped-comments spec + 重建 `_dist`；211：纯度句改「不直接 import/调用；进程由调用方注入，靠评审」 |
+| **A oracle / 棘轮判别面** | [202](../_archive/fixed_bugs/BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) / [203](../_archive/fixed_bugs/BUG-203-coverage-ratchet-rename-resets-floor.md) / [204](../_archive/fixed_bugs/BUG-204-ledger-branches-floor-cold-only.md) | oracle 名字声称的面大于实现；改名/冷环境被当成「变好」或「无变化」 | 202：测试体 AST 指纹 + **多重集**比较（纯逻辑进 `checks/lib/refactor-drift.mjs`）；203：基线键消失 = 红，`--rename`/`--drop` 显式迁移地板；204：补无尾竖线纯测试，冷/暖同形、地板回 100 |
+| **B 守卫扫描面** | [205](../_archive/fixed_bugs/BUG-205-live-pointer-faces-miss-moved-libs.md) / [206](../_archive/fixed_bugs/BUG-206-coveredby-evidence-does-not-execute.md) / [207](../_archive/fixed_bugs/BUG-207-retired-path-misses-wave-renames.md) / [208](../_archive/fixed_bugs/BUG-208-face-boundaries-computed-imports.md) | `FACES` / `RETIRED_PATH_PREFIXES` / `coveredBy` 是手写清单，未随 63 lib + 77 renames 扩面；计算型 import 不可见 | 205：FACES 纳入 `tools/lib`、`checks/lib`、`probes/lib`、`tests/support` + 每面非空；206：新增入口 import 图 spec（本地 import 目标必须存在），`probes/**` 的 coveredBy 改「真执行该 spec」的 `coverage:ratchet`；207：退役面从 git 历史自动推导近期 rename/delete（脚本注释面）+ 手工表自检；208：`face-boundaries` 读 `unresolvedImports`，五个面空集断言 |
+| **C live / shipped 声明** | [209](../_archive/fixed_bugs/BUG-209-live-declarations-stale-after-split.md) / [210](../_archive/fixed_bugs/BUG-210-shipped-comments-dev-only-paths.md) / [211](../_archive/fixed_bugs/BUG-211-tools-readme-lib-purity-contradiction.md) | 手抄面表/件数随树漂；shipped 注释指不随包路径；归属纯度句与实盘矛盾 | 209：删 `tests/README.md` 手抄面表（只留唯一源链接）+ Note 去件数；210：shipped 注释加「不随包分发」限定 + shipped-comments spec + 重建 `_dist`；211：纯度句改「不直接 import/调用；进程由调用方注入，靠评审」 |
 
 **次序 = A1(204) → A2(203) → A3(202) → B1(208) → B2(205) → B3(206) → B4(207) → C1(209/211) → C2(210)**：
 A 先修「判绿的人」（覆盖率地板 → oracle）；B 先补无判据的语法形式（208），再扩清单面（205），再让 coveredBy 有执行证据（206），最后改退役登记（207，会扫全树注释）；
 C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；每卡红/绿写同一条可执行命令；日志落 `runtime/tmp/c12-fix/`。
+
+**收口（2026-11-17）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `eccd5f16`。
+`pnpm test` 260 files / 2200 tests、`verify` ALL PASS（retired-path 自动面 ×259 文件 + 558 脚本注释）、`typecheck`/`lint`/`dup`/`smoke:fast`/`test:checks` 全绿、`coverage:ratchet` PASS（198 文件）、`release --prepare` 重打 0.11.9。
+共享机制决定与输掉的方案 = [批次 Note](../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)。
 
 ## 2026-11-17 C12 归属波次探索（focus v7）
 
@@ -43,15 +47,15 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
-| A oracle 判别力 | [202](BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) | `--hashes` 只取 `titlePath`；`--compare` 用集合差 | 改断言仍报零测试体改动；重复测试删一条仍报零删除 | P2 |
-| B 覆盖率地板 | [203](BUG-203-coverage-ratchet-rename-resets-floor.md) / [204](BUG-204-ledger-branches-floor-cold-only.md) | 单一基线同时服务暖/冷形状；改名只发 note | 改名重置高地板；ledger 暖树留 6 点盲区 | P2 ×2 |
-| C 守卫扫描面 | [205](BUG-205-live-pointer-faces-miss-moved-libs.md) | `FACES` 手写清单未随 63 个 lib 搬家扩面 | 新家注释里的死 spec 不扫 | P2 |
-| D 证据执行 | [206](BUG-206-coveredby-evidence-does-not-execute.md) | `coveredBy` 是声明，不是执行证据 | 探针/工具入口坏了 pre-push 仍绿 | P2 |
-| E 退役登记 | [207](BUG-207-retired-path-misses-wave-renames.md) | 退役前缀表是手写数组，未随 77 renames 更新 | 脚本注释里的旧家仍称「零残留」 | P2 |
-| F 依赖图 | [208](BUG-208-face-boundaries-computed-imports.md) | 只消费字面量 import；checks/probes lib 无图守卫 | 计算型反向 import 可绕过归属方向 | P2 |
-| G live 声明 | [209](BUG-209-live-declarations-stale-after-split.md) | 手写面表/件数无生成器 | tests/README 的 lib→replay 与 Note 件数仍按旧树 | P3 |
-| H shipped 面 | [210](BUG-210-shipped-comments-dev-only-paths.md) | 只清旧家，未区分 dev-only 同源说明 | 安装包里注释指向不存在的 tools/lib | P3 |
-| I 归属规则 | [211](BUG-211-tools-readme-lib-purity-contradiction.md) | 纯度句未随 probe/ 纳入 lib 更新 | 「lib 不启动进程」与 probe-web 矛盾 | P3 |
+| A oracle 判别力 | [202](../_archive/fixed_bugs/BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) | `--hashes` 只取 `titlePath`；`--compare` 用集合差 | 改断言仍报零测试体改动；重复测试删一条仍报零删除 | P2 |
+| B 覆盖率地板 | [203](../_archive/fixed_bugs/BUG-203-coverage-ratchet-rename-resets-floor.md) / [204](../_archive/fixed_bugs/BUG-204-ledger-branches-floor-cold-only.md) | 单一基线同时服务暖/冷形状；改名只发 note | 改名重置高地板；ledger 暖树留 6 点盲区 | P2 ×2 |
+| C 守卫扫描面 | [205](../_archive/fixed_bugs/BUG-205-live-pointer-faces-miss-moved-libs.md) | `FACES` 手写清单未随 63 个 lib 搬家扩面 | 新家注释里的死 spec 不扫 | P2 |
+| D 证据执行 | [206](../_archive/fixed_bugs/BUG-206-coveredby-evidence-does-not-execute.md) | `coveredBy` 是声明，不是执行证据 | 探针/工具入口坏了 pre-push 仍绿 | P2 |
+| E 退役登记 | [207](../_archive/fixed_bugs/BUG-207-retired-path-misses-wave-renames.md) | 退役前缀表是手写数组，未随 77 renames 更新 | 脚本注释里的旧家仍称「零残留」 | P2 |
+| F 依赖图 | [208](../_archive/fixed_bugs/BUG-208-face-boundaries-computed-imports.md) | 只消费字面量 import；checks/probes lib 无图守卫 | 计算型反向 import 可绕过归属方向 | P2 |
+| G live 声明 | [209](../_archive/fixed_bugs/BUG-209-live-declarations-stale-after-split.md) | 手写面表/件数无生成器 | tests/README 的 lib→replay 与 Note 件数仍按旧树 | P3 |
+| H shipped 面 | [210](../_archive/fixed_bugs/BUG-210-shipped-comments-dev-only-paths.md) | 只清旧家，未区分 dev-only 同源说明 | 安装包里注释指向不存在的 tools/lib | P3 |
+| I 归属规则 | [211](../_archive/fixed_bugs/BUG-211-tools-readme-lib-purity-contradiction.md) | 纯度句未随 probe/ 纳入 lib 更新 | 「lib 不启动进程」与 probe-web 矛盾 | P3 |
 
 本组是 Round 94–96 的产出；9 条安装形状 lane、7 件 analyze 探针与 `smoke:all` 已实跑 PASS；clean worktree 未跑，见探索卡。
 

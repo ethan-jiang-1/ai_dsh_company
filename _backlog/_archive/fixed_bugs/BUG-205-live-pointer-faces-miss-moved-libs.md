@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-205：live-pointer 守卫的扫描面没有随 63 个 lib 搬进 tools/lib / checks/lib / probes/lib
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— 3 blocker 已修（归档同批 / Note 一致 / 红证配方），S1–S4 已处置
 >
-> **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-2 / N1）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
+> **关联**：[C12 归属波次探索卡](../../issues/2026-11-17-ownership-wave-exploratory.md)（C12-2 / N1）。
+> **留痕**：批次 Note [2026-11-17-c12-ownership-wave-repairs](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)（本批共用）。
 
 ## 症状
 
@@ -47,7 +47,7 @@ git checkout -- tools/lib/core/asset-lanes.mjs
 
 ## 根因与证据
 
-- 根因：[live-pointer-paths.spec.ts](../../tests/repo/docs/live-pointer-paths.spec.ts) 的 `FACES`
+- 根因：[live-pointer-paths.spec.ts](../../../tests/repo/docs/live-pointer-paths.spec.ts) 的 `FACES`
   是手写面清单，搬移没有同 diff 扩面；`stalePointers()` 只遍历 `FACES`。
 - 证据：上负控实跑；`FACES` 原文不含 `tools/lib`/`checks/lib`/`probes/lib`/`tests/support`。
 - 影响：本波 63 个 lib 的注释是「活指针」的一部分，却不在判据面；搬移后最容易出现旧 spec 路径的
@@ -72,3 +72,12 @@ git checkout -- tools/lib/core/asset-lanes.mjs
 1. `FACES` 纳入 `tools/lib`、`checks/lib`、`probes/lib`、`tests/support`（文本后缀按面）；每个面收集文件数 > 0，空面不许通过。
 2. `tests/support/doc-grammar.ts` 的负向样本改用现行 spec 路径，不留豁免口子。
 3. 最小负例（同一条命令）：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts`——向 `tools/lib/core/asset-lanes.mjs` 注入旧扁平的 tests/lib/old-ledger.spec.ts 注释 → 红；删除 → 绿。
+
+## 修复证据
+
+- 改动面：`tests/repo/docs/live-pointer-paths.spec.ts`、`tests/support/doc-grammar.ts`
+- 红：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts`（同一条命令；红证注入配方见下一行）
+- 红证（注入配方，非证据命令）：向 tools/lib/core/asset-lanes.mjs 末尾注入 `// probe: stale spec pointer tests/lib/old-ledger.spec.ts` → 同一条 spec 红；删除 → 绿
+- 红输出：`AssertionError: 所有 live 载体面一起判：任一面的旧指针都红: expected [ Array(1) ] to deeply equal []`
+- 绿：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts`（修复后绿；日志 = `runtime/tmp/c12-fix/evidence/205-green.log`）
+- 提交：commit eccd5f16

@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-204：ledger.ts 分支地板被冷环境实测拉低到 94，暖树上留出 6 点静默回归空间
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— 3 blocker 已修（归档同批 / Note 一致 / 红证配方），S1–S4 已处置
 >
-> **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-5 / N3）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
+> **关联**：[C12 归属波次探索卡](../../issues/2026-11-17-ownership-wave-exploratory.md)（C12-5 / N3）。
+> **留痕**：批次 Note [2026-11-17-c12-ownership-wave-repairs](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)（本批共用）。
 
 ## 症状
 
@@ -42,14 +42,14 @@ pnpm coverage:ratchet
 第二条命令输出 `ledger.ts 变好：100/94 → 100/100` 且 PASS；把 `94` 临时改成 `99` 再跑仍是 PASS
 （暖树 100 ≥ 99），说明 94 给了 6 点松弛。`tests/lib/accounting/ledger.spec.ts` 的 skip 条件是
 `describe.skipIf(!hasLive)`，`hasLive` 由 dev 盘 `company-workspace/.dsh-company/.../meta.md` 是否存在决定
-（[ledger.spec.ts](../../tests/lib/accounting/ledger.spec.ts) 第 18/44 行）。
+（[ledger.spec.ts](../../../tests/lib/accounting/ledger.spec.ts) 第 18/44 行）。
 
 ## 根因与证据
 
 - 根因：同一个 `coverage-baseline.json` 同时服务暖 dev 树与冷 CI；`e56a637a` 用「冷环境实测值」
   覆盖了暖树地板，而没有把 dev-only 的 3 个用例从冷环境的 ledger 分支统计里排除，也没有双基线。
 - 证据：基线 94 vs 暖树 100（`coverage-ratchet` 原文）；Note
-  [ci-fresh-tree-vendor-install-and-heap](../../notes/implemented/2026-11-17-ci-fresh-tree-vendor-install-and-heap.md)
+  [ci-fresh-tree-vendor-install-and-heap](../../../notes/implemented/2026-11-17-ci-fresh-tree-vendor-install-and-heap.md)
   决定 ⑤ 明确写了「修基线不修 spec」。
 - 影响：`coverage:ratchet` 是 pre-push 的强制门；它的绿灯现在对 ledger 的分支回归有 6 点盲区。
   这是「修绿了」而不是「修对了」：冷环境的 skip 是设计，不应改变暖树的棘轮。
@@ -79,3 +79,12 @@ pnpm coverage:ratchet
   形状下选择；冷形状只允许「已知 dev-only 空洞」的显式豁免。
 - 或者在 `vitest.config.ts` 用 coverage `exclude` 排除 live 用例所在文件，让 ledger 只按纯函数测；
   但那会改变统计语义，需先写决定。
+
+## 修复证据
+
+- 改动面：`tests/lib/accounting/ledger.spec.ts`、`checks/lib/coverage-baseline.json`
+- 红：`pnpm coverage:ratchet`（同一条命令；红证注入配方见下一行）
+- 红证（注入配方，非证据命令）：在 ledger.ts 的 parseMotionLedger 返回前注入 `if (rows.length > 999999) return rows`（未覆盖分支）→ `pnpm coverage:ratchet` 红；还原 → 绿
+- 红输出：`coverage-ratchet FAIL [regressed] packages/company-pack/src/lib/accounting/ledger.ts — branches 94.73% < 基线 100%`
+- 绿：`pnpm coverage:ratchet`（修复后绿；日志 = `runtime/tmp/c12-fix/evidence/204-green.log`）
+- 提交：commit eccd5f16

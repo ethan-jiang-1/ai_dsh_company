@@ -15,7 +15,7 @@
     },
     "checks/lib/coverage-baseline.mjs": {
       "statements": 100,
-      "branches": 94.44
+      "branches": 94.64
     },
     "checks/lib/deliverables-audit.mjs": {
       "statements": 91.21,
@@ -36,6 +36,10 @@
     "checks/lib/replay-logic.mjs": {
       "statements": 95.45,
       "branches": 91.66
+    },
+    "checks/lib/retired-paths.mjs": {
+      "statements": 92.3,
+      "branches": 83.33
     },
     "checks/lib/snapshot-index.mjs": {
       "statements": 100,

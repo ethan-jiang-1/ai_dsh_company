@@ -171,13 +171,13 @@ opened: 2026-11-17
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C12-1 旧家仍被活载体引用 | **refuted（live executable）/ 守卫面 confirmed** | 77 renames × live 顶层粗扫：9 个 live 文件命中，全部是研究材料、implemented Note 散文、一个守卫的负例注释；无 live executable 命中。但脚本注释/新家注释的守卫面有缺口 → [BUG-207](../bugs/BUG-207-retired-path-misses-wave-renames.md)、[BUG-205](../bugs/BUG-205-live-pointer-faces-miss-moved-libs.md) |
-| C12-2 face-boundaries 扫描面 | **confirmed** | 计算型 import 注入 `probes/lib` 后 spec 仍 4 passed；`checks/lib`/`probes/lib` 无 keyless 图兜底 → [BUG-208](../bugs/BUG-208-face-boundaries-computed-imports.md) |
-| C12-3 refactor-drift 判别力 | **confirmed** | 同 `titlePath` 不同失败信息 → 同一指纹且 `ALL PASS 零测试体改动`；重复行 2→1 → 仍 `零删除` → [BUG-202](../bugs/BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) |
+| C12-1 旧家仍被活载体引用 | **refuted（live executable）/ 守卫面 confirmed** | 77 renames × live 顶层粗扫：9 个 live 文件命中，全部是研究材料、implemented Note 散文、一个守卫的负例注释；无 live executable 命中。但脚本注释/新家注释的守卫面有缺口 → [BUG-207](../_archive/fixed_bugs/BUG-207-retired-path-misses-wave-renames.md)、[BUG-205](../_archive/fixed_bugs/BUG-205-live-pointer-faces-miss-moved-libs.md) |
+| C12-2 face-boundaries 扫描面 | **confirmed** | 计算型 import 注入 `probes/lib` 后 spec 仍 4 passed；`checks/lib`/`probes/lib` 无 keyless 图兜底 → [BUG-208](../_archive/fixed_bugs/BUG-208-face-boundaries-computed-imports.md) |
+| C12-3 refactor-drift 判别力 | **confirmed** | 同 `titlePath` 不同失败信息 → 同一指纹且 `ALL PASS 零测试体改动`；重复行 2→1 → 仍 `零删除` → [BUG-202](../_archive/fixed_bugs/BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) |
 | C12-4 INDEX / CENSUS 口径 | **refuted** | 独立枚举：ASSETS 30 / PROBES 66 / lanes 32（30 assets + 2 runners）/ gates 75 / audit 8 / spec 256 / tests/checks 10；INDEX 32 = 30+2、probes 67 = 66+1、tools 19 = 17+1+1 均对盘 |
-| C12-5 覆盖率基线 / 豁免 | **confirmed** | 改名合成样本 old 100/100 → new 85/75：`violations=[]`；暖树 `ledger.ts` 100/100 vs 地板 94 → [BUG-203](../bugs/BUG-203-coverage-ratchet-rename-resets-floor.md)、[BUG-204](../bugs/BUG-204-ledger-branches-floor-cold-only.md) |
-| C12-6 卫生提交的语义面 | **部分 / doc confirmed** | `e52d20c9` / `3a99f0ed` / `7a46c79f` 逐 hunk 看只动指针/红态引用；但 live 声明仍按旧树写 → [BUG-209](../bugs/BUG-209-live-declarations-stale-after-split.md)、[BUG-211](../bugs/BUG-211-tools-readme-lib-purity-contradiction.md) |
-| C12-9 4 件搬移探针 | **refuted** | `ask-latency` / `propose-sampler` / `explore-evidence` / `session-log-export` 均 exit 0（export 3656 份 / 1 无日志）；`orient` / `diagnose` / `notes-audit` 亦 exit 0；但 pre-push 不执行它们 → [BUG-206](../bugs/BUG-206-coveredby-evidence-does-not-execute.md) |
+| C12-5 覆盖率基线 / 豁免 | **confirmed** | 改名合成样本 old 100/100 → new 85/75：`violations=[]`；暖树 `ledger.ts` 100/100 vs 地板 94 → [BUG-203](../_archive/fixed_bugs/BUG-203-coverage-ratchet-rename-resets-floor.md)、[BUG-204](../_archive/fixed_bugs/BUG-204-ledger-branches-floor-cold-only.md) |
+| C12-6 卫生提交的语义面 | **部分 / doc confirmed** | `e52d20c9` / `3a99f0ed` / `7a46c79f` 逐 hunk 看只动指针/红态引用；但 live 声明仍按旧树写 → [BUG-209](../_archive/fixed_bugs/BUG-209-live-declarations-stale-after-split.md)、[BUG-211](../_archive/fixed_bugs/BUG-211-tools-readme-lib-purity-contradiction.md) |
+| C12-9 4 件搬移探针 | **refuted** | `ask-latency` / `propose-sampler` / `explore-evidence` / `session-log-export` 均 exit 0（export 3656 份 / 1 无日志）；`orient` / `diagnose` / `notes-audit` 亦 exit 0；但 pre-push 不执行它们 → [BUG-206](../_archive/fixed_bugs/BUG-206-coveredby-evidence-does-not-execute.md) |
 | C12-10 clean worktree | **unrun** | 成本高且本轮是 docs/cards 变更；保留到下一轮或用户点名的 clean clone |
 
 **本轮负控（实跑）：**
@@ -198,8 +198,8 @@ opened: 2026-11-17
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C12-5 豁免与地板 | **confirmed** | 波次前基线 197 文件 / 5 豁免；HEAD 197 / 6（新增 `pin`）；`carrier-registry` / `diagnosis` / `probe-window` 在波次前已是豁免，非搬移造成；`ledger.ts` 100→94 是唯一数值降标 → [BUG-204](../bugs/BUG-204-ledger-branches-floor-cold-only.md) |
-| C12-8 发布字节同源 | **部分 confirmed** | `_dist` tarball 旧家命中 0；安装手册旧家 0；MANIFEST 34 件 / README blob 与 `deployed_sha` 一致；但 shipped 的 3 处注释指向不随包的 `tools/lib/company/delegation-model.mjs` → [BUG-210](../bugs/BUG-210-shipped-comments-dev-only-paths.md) |
+| C12-5 豁免与地板 | **confirmed** | 波次前基线 197 文件 / 5 豁免；HEAD 197 / 6（新增 `pin`）；`carrier-registry` / `diagnosis` / `probe-window` 在波次前已是豁免，非搬移造成；`ledger.ts` 100→94 是唯一数值降标 → [BUG-204](../_archive/fixed_bugs/BUG-204-ledger-branches-floor-cold-only.md) |
+| C12-8 发布字节同源 | **部分 confirmed** | `_dist` tarball 旧家命中 0；安装手册旧家 0；MANIFEST 34 件 / README blob 与 `deployed_sha` 一致；但 shipped 的 3 处注释指向不随包的 `tools/lib/company/delegation-model.mjs` → [BUG-210](../_archive/fixed_bugs/BUG-210-shipped-comments-dev-only-paths.md) |
 | `release --check` | **观察（非产品缺陷）** | HEAD 上 exit 1：manifest `gitSha` 620507ec ≠ HEAD；本卡/前身卡是 docs-only 提交，需手工 `--stamp`；不是本波搬移行为 |
 | 覆盖率基线键迁移 | **pass** | 197 键全在盘；`delegation-model` / `candidate-scan` 历史值保留；无其它键丢失 |
 

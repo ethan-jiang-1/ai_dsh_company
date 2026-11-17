@@ -1,24 +1,24 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-211：tools/README 仍说 lib「不启动进程、不联网」，但 tools/lib/probe 就是 web 启动管道
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— 3 blocker 已修（归档同批 / Note 一致 / 红证配方），S1–S4 已处置
 >
-> **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-10 / N4）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
+> **关联**：[C12 归属波次探索卡](../../issues/2026-11-17-ownership-wave-exploratory.md)（C12-10 / N4）。
+> **留痕**：批次 Note [2026-11-17-c12-ownership-wave-repairs](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)（本批共用）。
 
 ## 症状
 
-[tools/README.md](../../tools/README.md) 的「实现层」同时写了两句互相打架的话：
+[tools/README.md](../../../tools/README.md) 的「实现层」同时写了两句互相打架的话：
 
 - `lib/` 是共享地基，「**不启动进程、不联网**；「纯逻辑」不等于「不碰盘」」；
 - `probe/` 是「探针运行管道（**web 启动**/CDP/页签目录，跨面共用）」。
 
-而 [probe-web.mjs](../../tools/lib/probe/probe-web.mjs) 的 `startWeb()` 就是起 web 进程 + 等 banner
+而 [probe-web.mjs](../../../tools/lib/probe/probe-web.mjs) 的 `startWeb()` 就是起 web 进程 + 等 banner
 （进程启动器由调用方注入）：
 
 ```text
@@ -74,3 +74,12 @@ pnpm test tests/repo/docs/live-declarations.spec.ts
 
 - 纯文档修复优先；若要把规则变成机械判据，需要设计「注入函数的调用点」白名单，成本高，
   不建议只为这一句加门禁。
+
+## 修复证据
+
+- 改动面：`tools/README.md`、`tests/repo/docs/live-declarations.spec.ts`
+- 红：`pnpm test tests/repo/docs/live-declarations.spec.ts`（同一条命令；红证注入配方见下一行）
+- 红证（注入配方，非证据命令）：把 tools/README 的「不启动进程、不联网」接回 → 同一条 spec 红；改回 → 绿
+- 红输出：`expected '# tools/ · 维护工具面…' not to contain '不启动进程'`
+- 绿：`pnpm test tests/repo/docs/live-declarations.spec.ts`（修复后绿；日志 = `runtime/tmp/c12-fix/evidence/211-green.log`）
+- 提交：commit eccd5f16
