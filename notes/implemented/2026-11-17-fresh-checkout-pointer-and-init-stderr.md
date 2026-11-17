@@ -34,7 +34,7 @@
 
 | 层 | 失败类 | 负控（见过红） |
 |---|---|---|
-| 指针 · 新鲜 checkout | install/CI（活指针腐化） | CI run 44004329410 `bare-path` 三 FAIL 点名 `bug-fix.md:31/120/193 → packages/company-pack/lib/client.js 不存在`；修复后本地 verify ALL PASS（CI 绿收据 → receipts） |
+| 指针 · 新鲜 checkout | install/CI（活指针腐化） | CI run 44004329410 bare-path 三 FAIL 点名 bug-fix.md:31/120/193 的 client 产物指针（lib/client.js，双树均无——红态引用不带反引号，防本门禁自伤）；修复后本地 verify ALL PASS（CI 绿收据 → receipts） |
 | init 可诊断性 | 静默失败（typed 输出缺失） | 负控：`DSH_HOME` 指向只读目录跑 `node tools/dev/company.mjs --no-open` → init 必败且 stderr 回放可见（本 Note 同轮实跑）；此前同场景 `stdio:'ignore'` 只剩一行「步骤失败」 |
 | clone 首跑恢复 | — | clone 树 `/tmp/dsh-company-cleanclone`：重跑 init 成功建 profile（PROFILE_CREATED）；后续 `release --verify` 全链收口（同轮实跑） |
 
