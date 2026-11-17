@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-213：tarball 的 lib 面 98% 是类型声明——135 个 `.d.ts` vs 2 个运行时 JS
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— B1 类型闭包 + S1–S4 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-1 / C13-7 / A·E）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
+> **关联**：[C13 运行时/发布面分离卡](../../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-1 / C13-7 / A·E）。
+> **留痕**：批次 Note [2026-11-17-shipped-package-boundary](../../../notes/implemented/2026-11-17-shipped-package-boundary.md)（本批共用）。
 
 ## 症状
 
@@ -37,7 +37,7 @@ pnpm release:shape
 ## 根因与证据
 
 - 根因：`files` 把 `lib/types/**/*.d.ts` 当发布面；`tsc -b` 产出全部内部声明（host/client/lib），没有区分「对外两个 exports 的 `.d.ts`」与「内部模块声明」。`tsdown` 只产 `index.js`/`client.js`，所以 135 个类型声明成为 tarball 主体。
-- 证据：上命令；[package.json](../../packages/company-pack/package.json) 的 `files`/`exports`；[tsdown.config.ts](../../packages/company-pack/tsdown.config.ts) 的 `dts: false` 与两个入口。
+- 证据：上命令；[package.json](../../../packages/company-pack/package.json) 的 `files`/`exports`；[tsdown.config.ts](../../../packages/company-pack/tsdown.config.ts) 的 `dts: false` 与两个入口。
 - 影响：安装字节与攻击面/审计面被类型面放大；用户/agent 在安装包里看到大量 dev/type 文件，误把它们当运行时；发布包 506 KB 中类型面 660 KB（未压缩）。
 
 ## 失败类与同类排查
@@ -50,6 +50,13 @@ pnpm release:shape
 
 修成什么算修好：
 
-1. tarball 的 `lib/types/` 只保留 `exports.types` 可达闭包（实测 2 个：`lib/types/index.d.ts` / `lib/types/client/index.d.ts`），不再整树 135 个 `.d.ts`。
+1. tarball 的 `lib/types/` 只保留 `exports.types` 可达闭包（实测 3 个：`lib/types/index.d.ts` / `lib/types/client/index.d.ts` / `lib/types/host/cultivation/cultivation.d.ts`），不再整树 135 个 `.d.ts`；入口里的 `.ts` import 改写为 `.js`。
 2. `pnpm release:shape` 断言类型面 = 闭包、无 exports 不可达 `.d.ts`；旧 tarball 红，新 tarball 绿。
 3. 正例：`company-entry`/`client-load` 仍绿；`exports.types` 仍能解析。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/package.json`、`tools/lib/release/shipped-shape.mjs`、`tools/release/export-dist.mjs`、`tests/repo/release/shipped-shape.spec.ts`
+- 红：`pnpm release:shape`（旧 tarball：types: 133 个 exports 不可达 .d.ts；入口 .d.ts 的 `./host/cultivation/cultivation.ts` import 未改写）
+- 绿：`pnpm release:shape`（新 tarball：`lib/types` = 3，tarball 137 entries）
+- 提交：commit f1629047

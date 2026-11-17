@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-215：shipped README 的 5/5 相对链接指向包外，且含 dev 测试/probes/backlog 引用
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— B1 类型闭包 + S1–S4 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-4 / D）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
+> **关联**：[C13 运行时/发布面分离卡](../../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-4 / D）。
+> **留痕**：批次 Note [2026-11-17-shipped-package-boundary](../../../notes/implemented/2026-11-17-shipped-package-boundary.md)（本批共用）。
 
 ## 症状
 
@@ -56,7 +56,7 @@ EOF
 
 ## 根因与证据
 
-- 根因：[pack README](../../packages/company-pack/README.md) 是**仓库读者**文档（链接到 `docs/`/`probes/`/`_backlog/`），被 npm 原样带进 tarball；没有「包内链接必须落在包内」的判据。
+- 根因：[pack README](../../../packages/company-pack/README.md) 是**仓库读者**文档（链接到 `docs/`/`probes/`/`_backlog/`），被 npm 原样带进 tarball；没有「包内链接必须落在包内」的判据。
 - 证据：上脚本；README 行 94/135/140/145/147/150；`md-links` 只解析仓库树。
 - 影响：安装用户/agent 按 README 找数据模型、发布合同、探针、看板卡，全部 404；同时把内部 backlog 路径暴露到 npm 页面。
 
@@ -73,3 +73,10 @@ EOF
 1. tarball 的 `README.md` 来自 shipped 专用 `README.shipped.md`；相对链接全部落在包内或为稳定外链，`broken == 0`。
 2. `pnpm release:shape` 解析 README 链接，任何 `..` 出包或不存在目标即红；旧 tarball 5/5 断链红。
 3. 正例：npm 页面仍能解释安装/升级/卸载；仓库内 dev README 不受影响。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/README.shipped.md`、`tools/lib/release/shipped-shape.mjs`、`tools/release/export-dist.mjs`
+- 红：`pnpm release:shape`（旧 tarball：README: 5 条相对链接全部出包（docs/probes/_backlog））
+- 绿：`pnpm release:shape`（新 tarball：README.md 来自 README.shipped.md；相对链接 0 条、外链稳定）
+- 提交：commit f1629047

@@ -4,6 +4,23 @@
 
 ## 修复流水（倒序）
 
+- **BUG-213..222**（2026-11-17，根因组 A–E，P2×10）：C13 运行时/发布面分离——tarball 是仓库树的子集，
+  dev 字节/元数据/文本/未声明依赖一起漏进安装面：
+  **A** 字节：[213](BUG-213-tarball-ships-type-dts-majority.md) 类型 135→3 且 import 改 `.js`、
+  [220](BUG-220-sourcemap-url-missing-maps.md) sourcemap 关、无 `.map`/`sourceMappingURL`；
+  **B** manifest：[214](BUG-214-shipped-prepack-missing-scripts.md) 去 `scripts.prepack`、
+  [219](BUG-219-shipped-devdeps-workspace-protocol.md) 去 `devDependencies`/`workspace:`；
+  **C** client：[217](BUG-217-client-inject-missing-primitives.md) primitives 进 inject/peer、
+  [221](BUG-221-client-inject-over-declared.md) 保留 8 条 peer 背书的组合边并改 README、
+  [222](BUG-222-client-react-not-declared.md) react 由 vendor `PLATFORM_MODULES` 基线提供；
+  **D** 文本：[215](BUG-215-shipped-readme-dev-links.md) README.shipped、
+  [216](BUG-216-shipped-comments-dev-paths.md) bundle/注释 dev 指针清零、
+  [218](BUG-218-readme-pnpm-runtime-prereq.md) pnpm 改成安装器依赖 + DSH 诊断；
+  **E** 门禁：`tools/lib/release/shipped-shape.mjs` sanitizer/checker + `pnpm release:shape`。
+  证据提交 = `f1629047`；`release --prepare` ALL PASS（137 entries）、`release:shape` PASS、
+  `company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2218 tests、`verify`/`typecheck`/`coverage` 绿。
+  详见 [shipped package boundary Note](../../../notes/implemented/2026-11-17-shipped-package-boundary.md)。
+
 - **BUG-202..211**（2026-11-17，根因组 A–C，P2×10）：C12 归属波次——63 个 lib + 77 renames 后
   「绿」的制造者没随迁：
   **A** oracle / 棘轮：[202](BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) 测试体 AST 指纹 + 多重集、

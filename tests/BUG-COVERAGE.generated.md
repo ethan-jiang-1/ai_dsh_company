@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 209 |
-| 有具名守卫 | 104 |
+| 已修卡 | 219 |
+| 有具名守卫 | 114 |
 | 无具名守卫 | 105 |
-| 覆盖率 | 49.8% |
+| 覆盖率 | 52.1% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -230,3 +230,13 @@
 | 209 | 2026-11-17 | tests/repo/docs/live-declarations.spec.ts:27；tests/repo/docs/live-declarations.spec.ts:32 |
 | 210 | 2026-11-17 | tests/repo/pack/shipped-comments.spec.ts:65 |
 | 211 | 2026-11-17 | tests/repo/docs/live-declarations.spec.ts:38 |
+| 213 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:88 |
+| 214 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:98 |
+| 215 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:103 |
+| 216 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:108 |
+| 217 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:115 |
+| 218 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:122 |
+| 219 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:129 |
+| 220 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:136 |
+| 221 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:141 |
+| 222 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:148 |

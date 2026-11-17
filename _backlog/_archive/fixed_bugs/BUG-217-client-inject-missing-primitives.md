@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-217：client bundle require dsh-client-ui-primitives，但 peer 与 dsh.client.inject 都没声明
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— B1 类型闭包 + S1–S4 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-3 / C13-9 / C·E）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
+> **关联**：[C13 运行时/发布面分离卡](../../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-3 / C13-9 / C·E）。
+> **留痕**：批次 Note [2026-11-17-shipped-package-boundary](../../../notes/implemented/2026-11-17-shipped-package-boundary.md)（本批共用）。
 
 ## 症状
 
@@ -21,7 +21,7 @@ react
 react/jsx-runtime
 ```
 
-但 [package.json](../../packages/company-pack/package.json)：
+但 [package.json](../../../packages/company-pack/package.json)：
 
 - `peerDependencies` 里**没有** `@deepseek-ai/dsh-client-ui-primitives`；
 - `overrides`/`dependencies` 也没有；它只在 `devDependencies` 里；
@@ -56,8 +56,8 @@ EOF
 
 ## 根因与证据
 
-- 根因：[tsdown.config.ts](../../packages/company-pack/tsdown.config.ts) 的 client 半 `external` 用了 `/^@deepseek-ai\/dsh-client-/`，把 primitives external 成 `require`；但 `package.json` 的 `peerDependencies` 与 `dsh.client.inject` 是手写清单，没有同步（它只在 devDependencies）。
-- 证据：上脚本；[lib/client.js](../../packages/company-pack/lib/client.js) 的 require；`package.json` 三处清单。
+- 根因：[tsdown.config.ts](../../../packages/company-pack/tsdown.config.ts) 的 client 半 `external` 用了 `/^@deepseek-ai\/dsh-client-/`，把 primitives external 成 `require`；但 `package.json` 的 `peerDependencies` 与 `dsh.client.inject` 是手写清单，没有同步（它只在 devDependencies）。
+- 证据：上脚本；[lib/client.js](../../../packages/company-pack/lib/client.js) 的 require；`package.json` 三处清单。
 - 影响：安装到不 hoist primitives、或宿主基线未注册该模块的 profile，client 加载会 `module not found`；`client-load` 只证明当前 dev 宿主有它。
 
 ## 失败类与同类排查
@@ -73,3 +73,10 @@ EOF
 1. `dsh.client.inject` 含 `@deepseek-ai/dsh-client-ui-primitives`；`peerDependencies` 含同包（版本与 DSH peer 窗口一致）。
 2. 假 module table（只提供 `client.inject` + vendor `PLATFORM_MODULES`）加载 `lib/client.js`，`missing == []`。
 3. `pnpm release:shape` 从 bundle require 派生 package row，旧 tarball 缺 primitives 红；新 tarball 绿；真 `client-load` 仍绿。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/package.json`、`packages/company-pack/README.shipped.md`、`tools/lib/release/shipped-shape.mjs`
+- 红：`pnpm release:shape`（旧 tarball：client: 缺 @deepseek-ai/dsh-client-ui-primitives（bundle 实际 require））
+- 绿：`pnpm release:shape`（新 tarball：primitives 进 inject + peer；假 module table（inject + PLATFORM_MODULES）missing=[]）
+- 提交：commit f1629047

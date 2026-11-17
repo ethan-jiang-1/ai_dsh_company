@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 11 张**：BUG-212（收尾验证链偏长）保持活跃，**不并入本批**；C13 10 张（BUG-213..222）已由 2026-11-17 用户指令授权，`调查中 → 修复就绪`，批次计划见下方「## 2026-11-17 修复交接（C13 运行时/发布面：BUG-213..222）」。
+**活跃 1 张**：BUG-212（收尾验证链偏长）保持活跃，**不并入本批**；C13 10 张（BUG-213..222）已于 2026-11-17 修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，批次与收口见下方「## 2026-11-17 修复交接（C13 运行时/发布面：BUG-213..222）」。
 
 **独立卡**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
 
@@ -61,10 +61,10 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 
 | 组 | 卡 | 共同根因 | 修法（唯一事实源） |
 |---|---|---|---|
-| **A 发布字节** | [213](BUG-213-tarball-ships-type-dts-majority.md) / [220](BUG-220-sourcemap-url-missing-maps.md) | `files`/构建产物清单把 dev 字节当运行时 | 类型只 ship `exports` 可达闭包（实测 2 个 `.d.ts`）；tsdown `sourcemap: false`，bundle 无 `sourceMappingURL` |
-| **B manifest** | [214](BUG-214-shipped-prepack-missing-scripts.md) / [219](BUG-219-shipped-devdeps-workspace-protocol.md) | dev lifecycle/元数据原样进 tarball | tarball manifest 去 `scripts` 与 `devDependencies`（source 保留）；`prepack` 仍由仓库打包前跑 |
-| **C client 声明** | [217](BUG-217-client-inject-missing-primitives.md) / [221](BUG-221-client-inject-over-declared.md) / [222](BUG-222-client-react-not-declared.md) | inject/peer 手写，不是从 bundle require 派生 | `dsh.client.inject` = 实际 package row（primitives）；primitives 进 peer；react/react-jsx-runtime 由 vendor `PLATFORM_MODULES` 基线提供并在 README/checker 可追溯；删 8 条内联边 |
-| **D shipped 文本** | [215](BUG-215-shipped-readme-dev-links.md) / [216](BUG-216-shipped-comments-dev-paths.md) / [218](BUG-218-readme-pnpm-runtime-prereq.md) | README/注释按仓库树写；pnpm 被写成包运行时前置 | shipped 专用 `README.shipped.md`（包内链接/外链，不含 dev 路径）；bundle/声明注释剥离；`cordis.patch.yml`/presets 注释加「不随包」；pnpm 改成「DSH 插件安装器使用 pnpm；缺失时 DSH 打印 `dsh: pnpm was not found…`」 |
+| **A 发布字节** | [213](../_archive/fixed_bugs/BUG-213-tarball-ships-type-dts-majority.md) / [220](../_archive/fixed_bugs/BUG-220-sourcemap-url-missing-maps.md) | `files`/构建产物清单把 dev 字节当运行时 | 类型只 ship `exports` 可达闭包（实测 3 个 `.d.ts`，import 改 `.js`）；tsdown `sourcemap: false`，bundle 无 `sourceMappingURL` |
+| **B manifest** | [214](../_archive/fixed_bugs/BUG-214-shipped-prepack-missing-scripts.md) / [219](../_archive/fixed_bugs/BUG-219-shipped-devdeps-workspace-protocol.md) | dev lifecycle/元数据原样进 tarball | tarball manifest 去 `scripts` 与 `devDependencies`（source 保留）；`prepack` 仍由仓库打包前跑 |
+| **C client 声明** | [217](../_archive/fixed_bugs/BUG-217-client-inject-missing-primitives.md) / [221](../_archive/fixed_bugs/BUG-221-client-inject-over-declared.md) / [222](../_archive/fixed_bugs/BUG-222-client-react-not-declared.md) | inject/peer 手写，不是从 bundle require 派生 | `dsh.client.inject` = 实际 package row（primitives）+ 8 条有 peer 背书的组合/排序边（删除会让 company-client-composition 红）；primitives 进 peer；react/react-jsx-runtime 由 vendor `PLATFORM_MODULES` 基线提供并在 README/checker 可追溯 |
+| **D shipped 文本** | [215](../_archive/fixed_bugs/BUG-215-shipped-readme-dev-links.md) / [216](../_archive/fixed_bugs/BUG-216-shipped-comments-dev-paths.md) / [218](../_archive/fixed_bugs/BUG-218-readme-pnpm-runtime-prereq.md) | README/注释按仓库树写；pnpm 被写成包运行时前置 | shipped 专用 `README.shipped.md`（包内链接/外链，不含 dev 路径）；bundle/声明注释剥离；`cordis.patch.yml`/presets 注释加「不随包」；pnpm 改成「DSH 插件安装器使用 pnpm；缺失时 DSH 打印 `dsh: pnpm was not found…`」 |
 | **E 门禁** | 全组 | 发布面没有机械判据，`release --check` 只看源码指纹 | 新 `tools/release/shipped-shape.mjs`（sanitizer + checker）+ `pnpm release:shape`；`export-dist` 在替换 `_dist` 前先 sanitize 再 check；spec 用合成 fixture 锁每条判据 |
 
 **次序 = E(先红) → A/B/C/D 实现 → 重建 `_dist` → E(绿) → 真入口**：
@@ -72,17 +72,21 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 
 **终点** = C13 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃，不动。
 
+**收口（2026-11-17）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `f1629047`。
+`pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2218 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
+共享机制决定 = [shipped package boundary Note](../../notes/implemented/2026-11-17-shipped-package-boundary.md)。
+
 ## 2026-11-17 C13 运行时/发布面分离（focus v8）
 
-**用户指令（2026-11-17）**：「我们不少脚本/代码，其实发布到运行时的不应该那么多，运行时的代码/脚本不应该依赖开发时刻的脚本，比如测试、设置环境等未来测试/验证什么的……沿着这个方向探索探索挖掘挖掘，再来一轮，至少 10 个」——本组 10 张全部 `调查中`，只开卡不修；证据 = [C13 探索卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)。
+**用户指令（2026-11-17）**：「我们不少脚本/代码，其实发布到运行时的不应该那么多，运行时的代码/脚本不应该依赖开发时刻的脚本，比如测试、设置环境等未来测试/验证什么的……沿着这个方向探索探索挖掘挖掘，再来一轮，至少 10 个」——本组 10 张已于 2026-11-17 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [C13 探索卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)。
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
-| A tarball 内容 | [213](BUG-213-tarball-ships-type-dts-majority.md) | `files` 把类型面当运行时面 | 135 个 `.d.ts` vs 2 个运行时 JS | P2 |
-| B package metadata | [214](BUG-214-shipped-prepack-missing-scripts.md) / [219](BUG-219-shipped-devdeps-workspace-protocol.md) | dev lifecycle/元数据泄漏进发布 manifest | `prepack` 指不存在的 scripts；`workspace:*` 让解包 npm 安装失败 | P2 ×2 |
-| C 运行时 import | [217](BUG-217-client-inject-missing-primitives.md) / [221](BUG-221-client-inject-over-declared.md) / [222](BUG-222-client-react-not-declared.md) | client 声明不是从 bundle require 派生 | 缺 primitives/react，过报 8 条 inject | P2 ×3 |
-| D shipped 文本 | [215](BUG-215-shipped-readme-dev-links.md) / [216](BUG-216-shipped-comments-dev-paths.md) | README/注释按仓库树写 | README 5/5 链接断；76 处 dev 路径 | P2 ×2 |
-| E 安装形状 | [218](BUG-218-readme-pnpm-runtime-prereq.md) / [220](BUG-220-sourcemap-url-missing-maps.md) | 安装前置/产物清单与运行时面不一致 | pnpm 成运行时前置；sourceMappingURL 无 map | P2 ×2 |
+| A tarball 内容 | [213](../_archive/fixed_bugs/BUG-213-tarball-ships-type-dts-majority.md) | `files` 把类型面当运行时面 | 135 个 `.d.ts` vs 2 个运行时 JS | P2 |
+| B package metadata | [214](../_archive/fixed_bugs/BUG-214-shipped-prepack-missing-scripts.md) / [219](../_archive/fixed_bugs/BUG-219-shipped-devdeps-workspace-protocol.md) | dev lifecycle/元数据泄漏进发布 manifest | `prepack` 指不存在的 scripts；`workspace:*` 让解包 npm 安装失败 | P2 ×2 |
+| C 运行时 import | [217](../_archive/fixed_bugs/BUG-217-client-inject-missing-primitives.md) / [221](../_archive/fixed_bugs/BUG-221-client-inject-over-declared.md) / [222](../_archive/fixed_bugs/BUG-222-client-react-not-declared.md) | client 声明不是从 bundle require 派生 | 缺 primitives/react，过报 8 条 inject | P2 ×3 |
+| D shipped 文本 | [215](../_archive/fixed_bugs/BUG-215-shipped-readme-dev-links.md) / [216](../_archive/fixed_bugs/BUG-216-shipped-comments-dev-paths.md) | README/注释按仓库树写 | README 5/5 链接断；76 处 dev 路径 | P2 ×2 |
+| E 安装形状 | [218](../_archive/fixed_bugs/BUG-218-readme-pnpm-runtime-prereq.md) / [220](../_archive/fixed_bugs/BUG-220-sourcemap-url-missing-maps.md) | 安装前置/产物清单与运行时面不一致 | pnpm 成运行时前置；sourceMappingURL 无 map | P2 ×2 |
 
 本组是 Round 97–99 的产出；tarball/解包/假 module table 均已实跑，未修任何产品代码。
 

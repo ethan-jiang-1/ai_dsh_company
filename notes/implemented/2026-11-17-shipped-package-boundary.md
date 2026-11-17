@@ -68,7 +68,7 @@
 - 解包形状：`npm pack --dry-run --ignore-scripts` 成功；`npm install --dry-run --omit=peer` 成功；
   假 module table 只提供 inject + `PLATFORM_MODULES`，`missing == []`。
 - 真入口：`company-entry-smoke: ALL PASS`；`client-load-smoke: ALL PASS`。
-- `pnpm test` 262 files / 2217 tests；`pnpm verify` ALL PASS；`pnpm typecheck` exit 0；
+- `pnpm test` 262 files / 2218 tests；`pnpm verify` ALL PASS；`pnpm typecheck` exit 0；
   `pnpm coverage:ratchet` PASS（200 文件）。
 
 ## 未覆盖轴

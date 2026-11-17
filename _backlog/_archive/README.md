@@ -21,6 +21,16 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-213（已修）](fixed_bugs/BUG-213-tarball-ships-type-dts-majority.md) | 已修：类型 135→3 且 import 改 `.js`；`release:shape` 判闭包 | 2026-11-17 |
+| [BUG-214（已修）](fixed_bugs/BUG-214-shipped-prepack-missing-scripts.md) | 已修：tarball manifest 去 `scripts.prepack`；源码 prepack 保留 | 2026-11-17 |
+| [BUG-215（已修）](fixed_bugs/BUG-215-shipped-readme-dev-links.md) | 已修：shipped README 用 README.shipped.md，包外相对链接清零 | 2026-11-17 |
+| [BUG-216（已修）](fixed_bugs/BUG-216-shipped-comments-dev-paths.md) | 已修：bundle/注释 dev 指针剥离；cordis/presets 加「不随包」 | 2026-11-17 |
+| [BUG-217（已修）](fixed_bugs/BUG-217-client-inject-missing-primitives.md) | 已修：primitives 进 peer + client.inject；假 module table missing=[] | 2026-11-17 |
+| [BUG-218（已修）](fixed_bugs/BUG-218-readme-pnpm-runtime-prereq.md) | 已修：pnpm 改成 DSH 插件安装器依赖 + 缺包诊断 | 2026-11-17 |
+| [BUG-219（已修）](fixed_bugs/BUG-219-shipped-devdeps-workspace-protocol.md) | 已修：tarball 去 devDependencies/workspace 协议 | 2026-11-17 |
+| [BUG-220（已修）](fixed_bugs/BUG-220-sourcemap-url-missing-maps.md) | 已修：sourcemap 关，tarball 无 `.map`/sourceMappingURL | 2026-11-17 |
+| [BUG-221（已修）](fixed_bugs/BUG-221-client-inject-over-declared.md) | 已修：保留 8 条 peer 背书的组合边；纠 README 的 inject 语义 | 2026-11-17 |
+| [BUG-222（已修）](fixed_bugs/BUG-222-client-react-not-declared.md) | 已修：react 由 vendor PLATFORM_MODULES 基线提供，checker 可追溯 | 2026-11-17 |
 | [BUG-202（已修）](fixed_bugs/BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) | 已修：`--hashes` 拿标题冒充测试体、`--compare` 集合差吞重复；AST 测试体指纹 + 多重集比较 | 2026-11-17 |
 | [BUG-203（已修）](fixed_bugs/BUG-203-coverage-ratchet-rename-resets-floor.md) | 已修：基线键消失只发 note、改名重置地板；`missing-baseline` 红 + `--rename/--drop` 显式迁移/删除 | 2026-11-17 |
 | [BUG-204（已修）](fixed_bugs/BUG-204-ledger-branches-floor-cold-only.md) | 已修：冷环境 skip 把暖树 ledger 地板拉到 94；补无尾竖线纯测试、冷/暖同形回 100 | 2026-11-17 |

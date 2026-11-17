@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-220：两个 bundle 各留 sourceMappingURL，tarball 里 0 个 .map
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— B1 类型闭包 + S1–S4 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-5 / A·E）。
-> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
+> **关联**：[C13 运行时/发布面分离卡](../../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-5 / A·E）。
+> **留痕**：批次 Note [2026-11-17-shipped-package-boundary](../../../notes/implemented/2026-11-17-shipped-package-boundary.md)（本批共用）。
 
 ## 症状
 
@@ -36,7 +36,7 @@ pnpm release:shape
 
 ## 根因与证据
 
-- 根因：[tsdown.config.ts](../../packages/company-pack/tsdown.config.ts) 的 `sourcemap: true`，但 `files` 只收 `lib/index.js`/`lib/client.js`/`lib/*.js`，没有 `.map`；构建与打包的产物清单没有对齐。
+- 根因：[tsdown.config.ts](../../../packages/company-pack/tsdown.config.ts) 的 `sourcemap: true`，但 `files` 只收 `lib/index.js`/`lib/client.js`/`lib/*.js`，没有 `.map`；构建与打包的产物清单没有对齐。
 - 证据：上命令；bundle 尾部；`files`。
 - 影响：调试器/`--enable-source-maps` 的 404；把构建期调试资产引用带进运行时字节。
 
@@ -53,3 +53,10 @@ pnpm release:shape
 1. tsdown `sourcemap: false`；tarball 的 bundle 无 `sourceMappingURL`、无 `.map` 条目。
 2. `pnpm release:shape` 对旧 tarball 报 2 条 dangling sourceMappingURL / 0 map，新 tarball 0。
 3. 正例：`company-entry`/`client-load` 仍绿。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/tsdown.config.ts`、`tools/lib/release/shipped-shape.mjs`
+- 红：`pnpm release:shape`（旧 tarball：bytes: lib/index.js 与 lib/client.js 各 1 条 sourceMappingURL，tarball .map = 0）
+- 绿：`pnpm release:shape`（新 tarball：sourcemap:false + stripComments；tarball 无 sourceMappingURL/.map）
+- 提交：commit f1629047

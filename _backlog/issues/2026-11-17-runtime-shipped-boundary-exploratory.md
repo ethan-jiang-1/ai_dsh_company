@@ -66,16 +66,16 @@ opened: 2026-11-17
 
 | # | 载体 | 预检看到什么 | 轴 | 首轮怎么证伪 |
 |---|---|---|---|---|
-| 1 | tarball `lib/` | 137 entries；运行时 JS 只有 2 个；135 个 `.d.ts`（660 KB） | A/E | `tar -tzf` × `exports` × `main`；[BUG-213](../bugs/BUG-213-tarball-ships-type-dts-majority.md) |
-| 2 | tarball `package.json` | `scripts.prepack = node scripts/prepack-check.mjs`，但 `package/scripts/` 不存在；`npm pack --dry-run` exit 1 | B | 解包 `npm pack --dry-run`；[BUG-214](../bugs/BUG-214-shipped-prepack-missing-scripts.md) |
-| 3 | tarball `README.md` | 5/5 相对链接指向包外（`docs/`/`probes/`/`_backlog/`）；另有 tests/repo/... 与 pnpm 前置 | D | 包内链接解析；[BUG-215](../bugs/BUG-215-shipped-readme-dev-links.md) |
-| 4 | tarball `lib/*.js`、`lib/types`、`cordis.patch.yml`、preset YAML、技能脚本 | 共 76 处 dev 路径引用（lib/index 22、lib/client 16、types 27、README 7、cordis 4） | D | 逐文件 grep + 包内存在性；[BUG-216](../bugs/BUG-216-shipped-comments-dev-paths.md) |
-| 5 | tarball `lib/client.js` + `package.json` | 只 require `@deepseek-ai/dsh-client-ui-primitives`（不在 peer/inject）+ react；`client.inject` 9 条里 8 条未被 factory require | C/E | 假 module table；[BUG-217](../bugs/BUG-217-client-inject-missing-primitives.md) |
-| 6 | tarball `package.json` | `devDependencies` 24 条、其中 21 条 `workspace:*`；`dependencies` 缺失；全部运行时包走 peer | B | 解包 `npm install --dry-run`；[BUG-219](../bugs/BUG-219-shipped-devdeps-workspace-protocol.md) |
-| 7 | tarball `lib/*.js` | 两个 bundle 各 1 条 `sourceMappingURL=*.js.map`；tarball `.map` 0 个 | A/E | grep + tar；[BUG-220](../bugs/BUG-220-sourcemap-url-missing-maps.md) |
-| 8 | tarball `README.md` 前置 | Desktop 自带 pnpm；npm CLI / Plugins 页要求 pnpm 在 PATH；无 npm-only fallback | D/E | README 行 + 安装路径；[BUG-218](../bugs/BUG-218-readme-pnpm-runtime-prereq.md) |
-| 9 | tarball `package.json` `dsh.client.inject` | 9 条声明 vs factory 实际 1 条 require；注入面大于/错于运行时面 | C | 假 module table；[BUG-221](../bugs/BUG-221-client-inject-over-declared.md) |
-| 10 | tarball `lib/client.js` | external 了 `react`/`react/jsx-runtime`，但 peerDependencies / client.inject 都没有 react | C/E | 假 module table（提供 react 才能继续）；[BUG-222](../bugs/BUG-222-client-react-not-declared.md) |
+| 1 | tarball `lib/` | 137 entries；运行时 JS 只有 2 个；135 个 `.d.ts`（660 KB） | A/E | `tar -tzf` × `exports` × `main`；[BUG-213](../_archive/fixed_bugs/BUG-213-tarball-ships-type-dts-majority.md) |
+| 2 | tarball `package.json` | `scripts.prepack = node scripts/prepack-check.mjs`，但 `package/scripts/` 不存在；`npm pack --dry-run` exit 1 | B | 解包 `npm pack --dry-run`；[BUG-214](../_archive/fixed_bugs/BUG-214-shipped-prepack-missing-scripts.md) |
+| 3 | tarball `README.md` | 5/5 相对链接指向包外（`docs/`/`probes/`/`_backlog/`）；另有 tests/repo/... 与 pnpm 前置 | D | 包内链接解析；[BUG-215](../_archive/fixed_bugs/BUG-215-shipped-readme-dev-links.md) |
+| 4 | tarball `lib/*.js`、`lib/types`、`cordis.patch.yml`、preset YAML、技能脚本 | 共 76 处 dev 路径引用（lib/index 22、lib/client 16、types 27、README 7、cordis 4） | D | 逐文件 grep + 包内存在性；[BUG-216](../_archive/fixed_bugs/BUG-216-shipped-comments-dev-paths.md) |
+| 5 | tarball `lib/client.js` + `package.json` | 只 require `@deepseek-ai/dsh-client-ui-primitives`（不在 peer/inject）+ react；`client.inject` 9 条里 8 条未被 factory require | C/E | 假 module table；[BUG-217](../_archive/fixed_bugs/BUG-217-client-inject-missing-primitives.md) |
+| 6 | tarball `package.json` | `devDependencies` 24 条、其中 21 条 `workspace:*`；`dependencies` 缺失；全部运行时包走 peer | B | 解包 `npm install --dry-run`；[BUG-219](../_archive/fixed_bugs/BUG-219-shipped-devdeps-workspace-protocol.md) |
+| 7 | tarball `lib/*.js` | 两个 bundle 各 1 条 `sourceMappingURL=*.js.map`；tarball `.map` 0 个 | A/E | grep + tar；[BUG-220](../_archive/fixed_bugs/BUG-220-sourcemap-url-missing-maps.md) |
+| 8 | tarball `README.md` 前置 | Desktop 自带 pnpm；npm CLI / Plugins 页要求 pnpm 在 PATH；无 npm-only fallback | D/E | README 行 + 安装路径；[BUG-218](../_archive/fixed_bugs/BUG-218-readme-pnpm-runtime-prereq.md) |
+| 9 | tarball `package.json` `dsh.client.inject` | 9 条声明 vs factory 实际 1 条 require；注入面大于/错于运行时面 | C | 假 module table；[BUG-221](../_archive/fixed_bugs/BUG-221-client-inject-over-declared.md) |
+| 10 | tarball `lib/client.js` | external 了 `react`/`react/jsx-runtime`，但 peerDependencies / client.inject 都没有 react | C/E | 假 module table（提供 react 才能继续）；[BUG-222](../_archive/fixed_bugs/BUG-222-client-react-not-declared.md) |
 
 ## 方法（每轮固定）
 
@@ -132,10 +132,10 @@ opened: 2026-11-17
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C13-1 tarball 非运行时字节占多数 | **confirmed** | `lib/` 137 entries = 2 运行时 JS + 135 `.d.ts`（660 KB）；`files` 显式收 `lib/types/**/*.d.ts` → [BUG-213](../bugs/BUG-213-tarball-ships-type-dts-majority.md) |
-| C13-2 shipped manifest 引用 dev 脚本/协议 | **confirmed** | `package/scripts/` 0 条但 `prepack` 指向 `scripts/prepack-check.mjs`；解包 `npm pack --dry-run` exit 1；`devDependencies` 24 条 / 21 条 `workspace:*`，`npm install --dry-run` EUNSUPPORTEDPROTOCOL → [BUG-214](../bugs/BUG-214-shipped-prepack-missing-scripts.md)、[BUG-219](../bugs/BUG-219-shipped-devdeps-workspace-protocol.md) |
-| C13-3 运行时 require 与 peer/inject 不一致 | **confirmed** | `lib/client.js` 只 require primitives + react；primitives 不在 peer/inject，react 不在 peer/inject；inject 9 条里 8 条未被 factory require → [BUG-217](../bugs/BUG-217-client-inject-missing-primitives.md)、[BUG-221](../bugs/BUG-221-client-inject-over-declared.md)、[BUG-222](../bugs/BUG-222-client-react-not-declared.md) |
-| C13-5 sourceMappingURL 无 map | **confirmed** | 两个 bundle 各 1 条 `sourceMappingURL`；tarball `.map` 0 → [BUG-220](../bugs/BUG-220-sourcemap-url-missing-maps.md) |
+| C13-1 tarball 非运行时字节占多数 | **confirmed** | `lib/` 137 entries = 2 运行时 JS + 135 `.d.ts`（660 KB）；`files` 显式收 `lib/types/**/*.d.ts` → [BUG-213](../_archive/fixed_bugs/BUG-213-tarball-ships-type-dts-majority.md) |
+| C13-2 shipped manifest 引用 dev 脚本/协议 | **confirmed** | `package/scripts/` 0 条但 `prepack` 指向 `scripts/prepack-check.mjs`；解包 `npm pack --dry-run` exit 1；`devDependencies` 24 条 / 21 条 `workspace:*`，`npm install --dry-run` EUNSUPPORTEDPROTOCOL → [BUG-214](../_archive/fixed_bugs/BUG-214-shipped-prepack-missing-scripts.md)、[BUG-219](../_archive/fixed_bugs/BUG-219-shipped-devdeps-workspace-protocol.md) |
+| C13-3 运行时 require 与 peer/inject 不一致 | **confirmed** | `lib/client.js` 只 require primitives + react；primitives 不在 peer/inject，react 不在 peer/inject；inject 9 条里 8 条未被 factory require → [BUG-217](../_archive/fixed_bugs/BUG-217-client-inject-missing-primitives.md)、[BUG-221](../_archive/fixed_bugs/BUG-221-client-inject-over-declared.md)、[BUG-222](../_archive/fixed_bugs/BUG-222-client-react-not-declared.md) |
+| C13-5 sourceMappingURL 无 map | **confirmed** | 两个 bundle 各 1 条 `sourceMappingURL`；tarball `.map` 0 → [BUG-220](../_archive/fixed_bugs/BUG-220-sourcemap-url-missing-maps.md) |
 
 **负控（实跑）：**
 
@@ -154,8 +154,8 @@ opened: 2026-11-17
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C13-4 shipped README/注释含 dev-only 路径、包外断链 | **confirmed** | README 5/5 相对链接断；README 7 处 dev 引用；`lib/index.js` 22 + `lib/client.js` 16 + `lib/types` 27 + `cordis.patch.yml` 4 = 76 处 dev 路径 → [BUG-215](../bugs/BUG-215-shipped-readme-dev-links.md)、[BUG-216](../bugs/BUG-216-shipped-comments-dev-paths.md) |
-| C13-8 README 把 pnpm 写成运行时前置 | **confirmed** | README 行 9/10/62；`engines` 无包管理器；无 fallback/检查 → [BUG-218](../bugs/BUG-218-readme-pnpm-runtime-prereq.md) |
+| C13-4 shipped README/注释含 dev-only 路径、包外断链 | **confirmed** | README 5/5 相对链接断；README 7 处 dev 引用；`lib/index.js` 22 + `lib/client.js` 16 + `lib/types` 27 + `cordis.patch.yml` 4 = 76 处 dev 路径 → [BUG-215](../_archive/fixed_bugs/BUG-215-shipped-readme-dev-links.md)、[BUG-216](../_archive/fixed_bugs/BUG-216-shipped-comments-dev-paths.md) |
+| C13-8 README 把 pnpm 写成运行时前置 | **confirmed** | README 行 9/10/62；`engines` 无包管理器；无 fallback/检查 → [BUG-218](../_archive/fixed_bugs/BUG-218-readme-pnpm-runtime-prereq.md) |
 | C13-10 dev 引用无门禁 | **confirmed（构造性）** | `pnpm verify`/`md-links` 在仓库树绿（README 链接目标在仓库内存在）；`release --check` 只查源码指纹，不扫 tarball 文本；无 shipped-text 判据 |
 
 **未跑：** 真 `company-entry` / `client-load` 本轮未重跑（无产品代码改动；tarball 是只读输入）；clean install 在无 pnpm 环境的实跑未做。
