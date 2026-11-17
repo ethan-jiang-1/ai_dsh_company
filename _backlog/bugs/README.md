@@ -2,13 +2,15 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 212；已分配 BUG-001..211。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 213；已分配 BUG-001..212。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**：2026-11-17 C12 归属波次探索（focus v7）的 10 张（BUG-202..211）已由 2026-11-17 用户指令授权本轮修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；批次计划与根因组见下方「## 2026-11-17 修复交接（根因组 A–C：BUG-202..211）」。
+**活跃 1 张**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，本轮只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
+
+**上一轮收口**：2026-11-17 C12 归属波次探索（focus v7）的 10 张（BUG-202..211）已由 2026-11-17 用户指令授权本轮修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；批次计划与根因组见下方「## 2026-11-17 修复交接（根因组 A–C：BUG-202..211）」。
 
 **上一轮收口**：2026-11-16 C11 二轮（修复后的守卫面）的 10 张（BUG-192..201）已于 2026-11-16 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；见下方「## 2026-11-16 修复交接（根因组 A–E：BUG-192..201）」。
 
@@ -40,6 +42,14 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 **收口（2026-11-17）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `eccd5f16`。
 `pnpm test` 260 files / 2200 tests、`verify` ALL PASS（retired-path 自动面 ×259 文件 + 558 脚本注释）、`typecheck`/`lint`/`dup`/`smoke:fast`/`test:checks` 全绿、`coverage:ratchet` PASS（198 文件）、`release --prepare` 重打 0.11.9。
 共享机制决定与输掉的方案 = [批次 Note](../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)。
+
+## 2026-11-17 收尾验证链成本（BUG-212，调查中）
+
+**用户指令（2026-11-17）**：「感觉上我们东西都修完了，准备提交, 但是在尾巴上验证的 CI 啊，过程是不是比较长啊？如果过长, 你还是需要提交一个 BUG，这里不能过长呢, 毕竟经常用啊。」——本轮只立卡不修；实测与修法建议 = [BUG-212](BUG-212-pre-push-and-release-tail-budget-overrun.md)。
+
+| 卡 | 共同根因 | 一句话 | 级别 |
+|---|---|---|---|
+| [212](BUG-212-pre-push-and-release-tail-budget-overrun.md) | pre-push 六段无机械预算；release stamp 把 docs-only 的 gitSha 过期与全量 verify 绑死 | 暖树全链 ~46s（覆盖率 21.8s / verify 11.1s）；docs-only 收尾要分钟级 `--verify` | P2 |
 
 ## 2026-11-17 C12 归属波次探索（focus v7）
 
