@@ -30,6 +30,13 @@
    `_dist` tarball 等安装态前置，干净 CI 从未具备；此前 `ciSafe` 默认 true 从未在真 CI 里被检验过。
    按 fresh-clone.yml 头注预设的处置（「按实际结果标 ciSafe:false + 理由，不删资产」）收敛：weekly CI
    只声明它真能跑的（6 PASS），这 11 条在本地 pre-push/smoke:all 的证据面不变。
+5. **[checks/lib/coverage-baseline.json](../../checks/lib/coverage-baseline.json) 的
+   `accounting/ledger.ts` branches 地板 100 → 94（冷环境实测值）。**
+   同一次 dispatch 的最后一块红：CI 里 [tests/lib/accounting/ledger.spec.ts](../../tests/lib/accounting/ledger.spec.ts)
+   的「live bundle 台账（dev only）」三例按设计 skip（fresh clone 无 dev home），ledger.ts 分支覆盖只剩
+   94.11%——基线 100 是在暖 dev 树上抓取的，把「只有 dev 态可达」的值钉成了地板（暖树本地永远绿）。
+   live 台账 spec 本身是诚实的（真产物审计，不造假夹具），修基线不修 spec；豁免机制只护基线外新文件，
+   不适用。红→绿：run 44006907359 job 133784367134 FAIL [regressed] → 下一次 fresh-clone dispatch 绿收据。
 
 ## 输掉的方案
 

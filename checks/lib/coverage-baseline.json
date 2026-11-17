@@ -479,7 +479,7 @@
     },
     "packages/company-pack/src/lib/accounting/ledger.ts": {
       "statements": 100,
-      "branches": 100
+      "branches": 94
     },
     "packages/company-pack/src/lib/docs/markdown-shape.ts": {
       "statements": 100,
