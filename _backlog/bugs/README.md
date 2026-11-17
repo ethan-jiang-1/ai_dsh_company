@@ -2,13 +2,13 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 213；已分配 BUG-001..212。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 223；已分配 BUG-001..222。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 1 张**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，本轮只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
+**活跃 11 张**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，本轮只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。另有 C13 10 张（BUG-213..222）见下方「## 2026-11-17 C13 运行时/发布面分离（focus v8）」。
 
 **上一轮收口**：2026-11-17 C12 归属波次探索（focus v7）的 10 张（BUG-202..211）已由 2026-11-17 用户指令授权本轮修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；批次计划与根因组见下方「## 2026-11-17 修复交接（根因组 A–C：BUG-202..211）」。
 
@@ -50,6 +50,20 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|
 | [212](BUG-212-pre-push-and-release-tail-budget-overrun.md) | pre-push 六段无机械预算；release stamp 把 docs-only 的 gitSha 过期与全量 verify 绑死 | 暖树全链 ~46s（覆盖率 21.8s / verify 11.1s）；docs-only 收尾要分钟级 `--verify` | P2 |
+
+## 2026-11-17 C13 运行时/发布面分离（focus v8）
+
+**用户指令（2026-11-17）**：「我们不少脚本/代码，其实发布到运行时的不应该那么多，运行时的代码/脚本不应该依赖开发时刻的脚本，比如测试、设置环境等未来测试/验证什么的……沿着这个方向探索探索挖掘挖掘，再来一轮，至少 10 个」——本组 10 张全部 `调查中`，只开卡不修；证据 = [C13 探索卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)。
+
+| 组 | 卡 | 共同根因 | 一句话 | 级别 |
+|---|---|---|---|---|
+| A tarball 内容 | [213](BUG-213-tarball-ships-type-dts-majority.md) | `files` 把类型面当运行时面 | 135 个 `.d.ts` vs 2 个运行时 JS | P2 |
+| B package metadata | [214](BUG-214-shipped-prepack-missing-scripts.md) / [219](BUG-219-shipped-devdeps-workspace-protocol.md) | dev lifecycle/元数据泄漏进发布 manifest | `prepack` 指不存在的 scripts；`workspace:*` 让解包 npm 安装失败 | P2 ×2 |
+| C 运行时 import | [217](BUG-217-client-inject-missing-primitives.md) / [221](BUG-221-client-inject-over-declared.md) / [222](BUG-222-client-react-not-declared.md) | client 声明不是从 bundle require 派生 | 缺 primitives/react，过报 8 条 inject | P2 ×3 |
+| D shipped 文本 | [215](BUG-215-shipped-readme-dev-links.md) / [216](BUG-216-shipped-comments-dev-paths.md) | README/注释按仓库树写 | README 5/5 链接断；76 处 dev 路径 | P2 ×2 |
+| E 安装形状 | [218](BUG-218-readme-pnpm-runtime-prereq.md) / [220](BUG-220-sourcemap-url-missing-maps.md) | 安装前置/产物清单与运行时面不一致 | pnpm 成运行时前置；sourceMappingURL 无 map | P2 ×2 |
+
+本组是 Round 97–99 的产出；tarball/解包/假 module table 均已实跑，未修任何产品代码。
 
 ## 2026-11-17 C12 归属波次探索（focus v7）
 

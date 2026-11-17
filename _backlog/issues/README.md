@@ -4,6 +4,7 @@
 
 ## 活跃清单
 
+- [2026-11-17 运行时/发布面分离 exploratory（C13）](2026-11-17-runtime-shipped-boundary-exploratory.md) — tarball × package.json × 安装形状 × shipped 文本；Round 97–99 已跑（tarball 类型面 / `prepack` 死引用 / README 断链 / 76 处注释 dev 路径 / client 依赖声明 / `workspace:*` / source map）；10 张 BUG-213..221（调查中，只开卡不修）。
 - [2026-11-17 归属波次 exploratory（挪目录 + 打扫卫生）](2026-11-17-ownership-wave-exploratory.md) — focus v7 = C12：7 个搬移提交 / 77 renames / 668 文件 slot + 37 个卫生/口径/基线/守卫/发布/CI 提交；六面 N1–N6 + 10 条假设 + 8 条预检坐标；Round 94–96 已跑；10 张 BUG-202..211 全部 `调查中`（只开卡不修，Next 以 [bugs/README](../bugs/README.md) 为准）；不修产品代码。前身 = [2026-11-12 深面探索（已结）](../_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
