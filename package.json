@@ -29,6 +29,7 @@
     "release:prepare": "node tools/release/release.mjs --prepare",
     "release:verify": "node tools/release/release.mjs --verify",
     "release:stamp": "node tools/release/release.mjs --stamp",
+    "release:shape": "node tools/release/shipped-shape.mjs",
     "release:all": "node tools/release/release.mjs --all",
     "market:hosted": "node tools/release/market-index.mjs --check --hosted",
     "test:coverage": "vitest run --coverage",

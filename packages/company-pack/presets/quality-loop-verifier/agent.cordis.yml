@@ -1,7 +1,7 @@
 # Verifier（验证者）preset —— 质量环里"验"的那一侧；不是公司角色，不进编制/在场板/署名。
 #
 # 为什么是独立 preset + 真只读（卡 2026-11-10-producer-verifier-quality-loop）：
-#   ① 独立上下文：命名 child 才带独立 preset（team 成员继承 Lead、workflow 分支同人格），见 docs/contracts/delegation.md；
+#   ① 独立上下文：命名 child 才带独立 preset（team 成员继承 Lead、workflow 分支同人格），见 docs/contracts/delegation.md；（仓库内，不随包）
 #   ② 独立手：validation 的硬边界用"缺行"表达——没有 write/edit/bash，它改不了盘也跑不了测试，
 #     比 persona 写"请只读"硬（vendor tool-fs 的 write/edit 开关）。
 # 代价（诚实记账，写进合同）：防"验的人顺手把东西改了"，但**保不住执行者独立性**——动态证据得由产出者跑、

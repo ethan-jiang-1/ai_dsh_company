@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-215：shipped README 的 5/5 相对链接指向包外，且含 dev 测试/probes/backlog 引用
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-4 / D）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
 
 ## 症状
 
@@ -68,8 +68,8 @@ EOF
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. shipped README 只保留包内相对链接或稳定外链；dev 路径改成「仓库内文档（不随包）」的纯文本说明。
-2. 最小判据：解包后解析 README 相对链接，`broken == 0` 且不含包外路径。
-3. 正例：npm 页面仍能解释安装/升级/卸载；不要求仓库内 `md-links` 变红。
+1. tarball 的 `README.md` 来自 shipped 专用 `README.shipped.md`；相对链接全部落在包内或为稳定外链，`broken == 0`。
+2. `pnpm release:shape` 解析 README 链接，任何 `..` 出包或不存在目标即红；旧 tarball 5/5 断链红。
+3. 正例：npm 页面仍能解释安装/升级/卸载；仓库内 dev README 不受影响。

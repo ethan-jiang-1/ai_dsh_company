@@ -427,7 +427,7 @@ export const SURFACE_RULES = [
     why: '探针入口图由 tests/repo/structure/entry-import-graph.spec.ts 在 coverage:ratchet 下逐条解析本地 import（可解析 ≠ 运行时跑通）；verify 管头注/结构；真探针按头注手动跑',
   },
   {
-    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', '.agents/**', 'run/**', 'snapshots/**'],
+    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', 'packages/company-pack/README.shipped.md', '.agents/**', 'run/**', 'snapshots/**'],
     coveredBy: ['verify'],
     why: '文档/指针/技能/运行配置/快照 = 结构门禁 verify 的射程',
   },

@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-221：dsh.client.inject 声明 9 条依赖边，client factory 实际只 require 1 条
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-9 / C）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
 
 ## 症状
 
@@ -75,8 +75,8 @@ EOF
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 从 `lib/client.js` 的实际 `require` 派生 `dsh.client.inject`（加 primitives/react，删 8 条内联边）；或按需要保留 8 条但把 README 的「= factory 依赖边」改掉并写清用途。
-2. 最小判据：`required_not_declared == []`，且 `declared_not_required == []`（或每条有在 README 说明的理由）。
-3. 正例：真 `client-load` 仍绿。
+1. `dsh.client.inject` = factory 实际 require 的 package row（primitives）+ **组合/排序边**；后者必须每条都有 `peerDependencies` 背书。实测删除 8 条内联边会让 `tests/client/company-client-composition.spec.ts` 红：`web boot: 1 entry did not activate … waiting for services: slots, remote, sessions, locale`——它们不是幽灵，是激活顺序边。
+2. `pnpm release:shape` 从 `lib/client.js` 的 require 派生：`required_not_declared == []`；`declared_not_required` 的每条必须在 peerDependencies 里（否则红）。
+3. README 不再声称 inject = factory 全部依赖边：写清「package row 到达 + 插件组合/排序」两种语义（react 由 platform baseline 提供）。

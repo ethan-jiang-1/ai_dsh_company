@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-219：发布包 `devDependencies` 保留 21 条 `workspace:*`，解包 `npm install` 直接 EUNSUPPORTEDPROTOCOL
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-2 / B）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
 
 ## 症状
 
@@ -52,8 +52,8 @@ cd runtime/tmp/c13-dist/package && npm install --dry-run --ignore-scripts --no-a
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 发布 manifest 去掉 `devDependencies`（或重写成可解析版本）；`files` 只留运行时字节；根 `package.json` 继续保留 workspace devDeps。
-2. 最小判据：tarball 内 `npm install --dry-run` 成功；`devDependencies` 为空或全部可解析。
-3. 正例：`pnpm install` 在仓库根仍按 workspace 工作。
+1. tarball `package.json` 无 `devDependencies`，全包无 `workspace:` 协议；source package.json 的 workspace devDeps 保留。
+2. `pnpm release:shape` 对旧 tarball 报 24 devDeps / 21 workspace，新 tarball 0。
+3. 安装形状：解包后 `npm install --dry-run --omit=peer --ignore-scripts` 不再 EUNSUPPORTEDPROTOCOL（网络依赖另记）。

@@ -119,7 +119,7 @@
 [worker-orchestrator-probe](../probes/team/worker-orchestrator-probe.mjs)
 [worker-researcher-probe](../probes/team/worker-researcher-probe.mjs)
 
-## 维护工具（tools/，19 = 17 tools + 1 runner + 1 query）
+## 维护工具（tools/，20 = 18 tools + 1 runner + 1 query）
 
 ### dev/（6）
 
@@ -127,10 +127,10 @@
 [hooks-install](../tools/dev/hooks-install.mjs) · [methods-init](../tools/dev/methods-init.mjs)
 [rehearsal-init](../tools/dev/rehearsal-init.mjs) · [setup](../tools/dev/setup.mjs)
 
-### release/（3）
+### release/（4）
 
 [export-dist](../tools/release/export-dist.mjs) · [market-index](../tools/release/market-index.mjs)
-[release](../tools/release/release.mjs)
+[release](../tools/release/release.mjs) · [shipped-shape](../tools/release/shipped-shape.mjs)
 
 ### repo/（10）
 

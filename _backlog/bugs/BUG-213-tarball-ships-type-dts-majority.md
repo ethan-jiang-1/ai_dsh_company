@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-213：tarball 的 lib 面 98% 是类型声明——135 个 `.d.ts` vs 2 个运行时 JS
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-1 / C13-7 / A·E）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
 
 ## 症状
 
@@ -31,6 +31,7 @@ rm -rf runtime/tmp/c13-dist && mkdir -p runtime/tmp/c13-dist
 tar -xzf "$T" -C runtime/tmp/c13-dist
 du -sh runtime/tmp/c13-dist/package/lib/types runtime/tmp/c13-dist/package/lib/index.js runtime/tmp/c13-dist/package/lib/client.js
 tar -xOf "$T" package/package.json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const p=JSON.parse(s);console.log(p.files);console.log(p.exports)})"
+pnpm release:shape
 ```
 
 ## 根因与证据
@@ -47,9 +48,8 @@ tar -xOf "$T" package/package.json | node -e "let s='';process.stdin.on('data',d
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 明确「是否对外提供类型」：若不提供，`files` 去掉 `lib/types/**`、`exports.types` 删除，tarball `lib/` 只剩运行时 JS；
-   若提供，只 ship `exports` 可达的两个 `.d.ts` 及其必要引用，或拆独立 `dsh-company-pack-types` 包。
-2. 最小判据：tarball 的 `lib/` 运行时入口数 == 加载面（`main` + `exports` + `dsh.client`）所需 JS 数；类型面单列并有自己的理由。
-3. 正例：`pnpm test`/`company-entry`/`client-load` 在去掉类型面后仍绿。
+1. tarball 的 `lib/types/` 只保留 `exports.types` 可达闭包（实测 2 个：`lib/types/index.d.ts` / `lib/types/client/index.d.ts`），不再整树 135 个 `.d.ts`。
+2. `pnpm release:shape` 断言类型面 = 闭包、无 exports 不可达 `.d.ts`；旧 tarball 红，新 tarball 绿。
+3. 正例：`company-entry`/`client-load` 仍绿；`exports.types` 仍能解析。

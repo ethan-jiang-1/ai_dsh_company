@@ -12,10 +12,12 @@
 // 导出 ≠ 发布：不 bump 版本、不跑门禁（除清单）、不发布任何 registry——按工作树现状打包。
 import { repositoryRoot as repoRoot } from '../lib/core/repository-layout.mjs'
 import { renderInstallManual } from '../lib/release/install-manual.mjs'
+import { checkShippedPackage, sanitizePackage } from '../lib/release/shipped-shape.mjs'
+import { extractTarball, readTarball } from './shipped-shape.mjs'
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 
@@ -70,8 +72,30 @@ try {
   }
   report('npm pack', true, tarballName)
 
+  // 1b. 发布面 sanitize：npm pack 的原始 tarball 保留 source manifest（scripts/devDeps）与整树
+  //     types；解包后清成运行时形状，再从 sanitized 目录重打。判据 = tools/release/shipped-shape.mjs。
+  const unpacked = extractTarball(join(staging, tarballName), join(staging, 'unpacked'))
+  const shippedReadme = join(packDir, 'README.shipped.md')
+  if (!existsSync(shippedReadme)) throw new Error('缺 packages/company-pack/README.shipped.md；旧 _dist 未动')
+  sanitizePackage({ dir: unpacked, shippedReadme })
+  const sanitizedDir = join(staging, 'sanitized')
+  mkdirSync(sanitizedDir, { recursive: true })
+  const scratch2 = mkdtempSync(join(tmpdir(), 'dsh-export-dist-sanitize-'))
+  const repacked = spawnSync('npm', ['pack', '--pack-destination', sanitizedDir, '--cache', join(scratch2, 'npm-cache'), '--ignore-scripts'], { cwd: unpacked, encoding: 'utf8' })
+  rmSync(scratch2, { recursive: true, force: true })
+  const repackedName = (repacked.stdout ?? '').trim().split('\n').filter(Boolean).pop()
+  if (repacked.status !== 0 || repackedName !== tarballName) {
+    report('repackage (sanitized)', false, `exit ${repacked.status}, ${repackedName ?? 'no tarball'}`)
+    throw new Error('sanitized npm pack 失败；旧 _dist 未动')
+  }
+  const stagedTarball = join(sanitizedDir, tarballName)
+  const shape = readTarball(stagedTarball)
+  const shapeProblems = checkShippedPackage(shape)
+  report('shipped-shape', shapeProblems.length === 0,
+    shapeProblems.length ? `${String(shapeProblems.length)} 条：${shapeProblems.slice(0, 3).join('；')}` : `${String(shape.entries.length)} entries`)
+  if (shapeProblems.length > 0) throw new Error('shipped 形状不合；旧 _dist 未动')
+
   // 2. 清单边界——对 staging 里的产物本体再断言一次发布形状
-  const stagedTarball = join(staging, tarballName)
   const listed = spawnSync('tar', ['-tzf', stagedTarball], { encoding: 'utf8' })
   const entries = (listed.stdout ?? '').split('\n').filter(Boolean)
   const must = ['package/cordis.patch.yml', 'package/package.json', 'package/lib/index.js', 'package/lib/client.js',

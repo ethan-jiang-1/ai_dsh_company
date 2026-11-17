@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-217：client bundle require dsh-client-ui-primitives，但 peer 与 dsh.client.inject 都没声明
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-3 / C13-9 / C·E）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
 
 ## 症状
 
@@ -68,8 +68,8 @@ EOF
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `@deepseek-ai/dsh-client-ui-primitives` 进 `peerDependencies` 和 `dsh.client.inject`（或 tsdown 不 external、把它内联）。
-2. 最小判据：只提供 `client.inject` + react 的假 module table 加载 `lib/client.js`，`missing == []`。
-3. 正例：真 `client-load` 仍绿；`preset.entry` 不受影响。
+1. `dsh.client.inject` 含 `@deepseek-ai/dsh-client-ui-primitives`；`peerDependencies` 含同包（版本与 DSH peer 窗口一致）。
+2. 假 module table（只提供 `client.inject` + vendor `PLATFORM_MODULES`）加载 `lib/client.js`，`missing == []`。
+3. `pnpm release:shape` 从 bundle require 派生 package row，旧 tarball 缺 primitives 红；新 tarball 绿；真 `client-load` 仍绿。

@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-216：shipped 代码/组合/技能注释里有 76 处 dev-only 路径，安装包内不可解析
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-4 / C13-10 / D）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
 
 ## 症状
 
@@ -44,6 +44,7 @@ for f in lib/index.js lib/client.js README.md cordis.patch.yml; do
   grep -oE 'tests/[A-Za-z0-9_./-]+|probes/[A-Za-z0-9_./-]+|tools/[A-Za-z0-9_./-]+|_backlog/[A-Za-z0-9_./-]+|docs/[A-Za-z0-9_./-]+' "runtime/tmp/c13-dist/package/$f" | wc -l
 done
 grep -rhoE 'tests/[A-Za-z0-9_./-]+|probes/[A-Za-z0-9_./-]+|tools/[A-Za-z0-9_./-]+|_backlog/[A-Za-z0-9_./-]+' runtime/tmp/c13-dist/package/lib/types | wc -l
+pnpm release:shape
 ```
 
 实测 `lib/index.js 22`、`lib/client.js 16`、`lib/types 27`、`README 7`、`cordis 4`。
@@ -62,8 +63,8 @@ grep -rhoE 'tests/[A-Za-z0-9_./-]+|probes/[A-Za-z0-9_./-]+|tools/[A-Za-z0-9_./-]
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. shipped 注释里的 dev-only 路径改为 `（仓库内，不随包）` 的纯文本，或删除；至少 README、`cordis.patch.yml`、`lib/*.js`、`lib/types` 四面清零。
-2. 最小判据：解包后 `grep` 上述四类路径，计数为 0（或每条带「不随包」限定）。
-3. 正例：`cordis.patch.yml` 的「不随包分发」措辞保留；`content`/`presets` 的运行时说明书不误杀。
+1. tarball 的 `lib/*.js`、`lib/types/**/*.d.ts`、`README.md`、`cordis.patch.yml`、`presets/**` 里不再有**未限定**的 `tests|probes|tools|checks|_backlog|docs` 路径；带「不随包」限定或已剥离。
+2. `pnpm release:shape` 扫 shipped 文本，旧 tarball 76 处红；新 tarball 0 处未限定。
+3. 正例：`cordis.patch.yml` 的「不随包分发」措辞保留；content 运行时说明书不误杀。

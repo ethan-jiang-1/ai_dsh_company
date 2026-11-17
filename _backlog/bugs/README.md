@@ -8,7 +8,9 @@
 
 ## 活跃清单
 
-**活跃 11 张**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，本轮只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。另有 C13 10 张（BUG-213..222）见下方「## 2026-11-17 C13 运行时/发布面分离（focus v8）」。
+**活跃 11 张**：BUG-212（收尾验证链偏长）保持活跃，**不并入本批**；C13 10 张（BUG-213..222）已由 2026-11-17 用户指令授权，`调查中 → 修复就绪`，批次计划见下方「## 2026-11-17 修复交接（C13 运行时/发布面：BUG-213..222）」。
+
+**独立卡**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
 
 **上一轮收口**：2026-11-17 C12 归属波次探索（focus v7）的 10 张（BUG-202..211）已由 2026-11-17 用户指令授权本轮修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；批次计划与根因组见下方「## 2026-11-17 修复交接（根因组 A–C：BUG-202..211）」。
 
@@ -50,6 +52,25 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|
 | [212](BUG-212-pre-push-and-release-tail-budget-overrun.md) | pre-push 六段无机械预算；release stamp 把 docs-only 的 gitSha 过期与全量 verify 绑死 | 暖树全链 ~46s（覆盖率 21.8s / verify 11.1s）；docs-only 收尾要分钟级 `--verify` | P2 |
+
+## 2026-11-17 修复交接（C13 运行时/发布面：BUG-213..222）
+
+**用户指令（2026-11-17）**：「_backlog/bugs 里面有最近 exploratory test 发现的 bugs，你琢磨一下，看看是否能系统性修起来。计划有了后 setup goal 逐步按 REPO 的流程来推进。」——本句即本轮授权（材料性：发布形状/manifest、shipped 文本、client 注入声明、release 管线与 docs 合同；留痕 = 批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`）。BUG-212 不并入本批。
+
+这十张不是十个补丁，是**发布面没有自己的构建产物**：tarball 是仓库树的子集，`files`/manifest/README/注释/client 声明各自手写，于是同一道边界在五个载体上漏水。
+
+| 组 | 卡 | 共同根因 | 修法（唯一事实源） |
+|---|---|---|---|
+| **A 发布字节** | [213](BUG-213-tarball-ships-type-dts-majority.md) / [220](BUG-220-sourcemap-url-missing-maps.md) | `files`/构建产物清单把 dev 字节当运行时 | 类型只 ship `exports` 可达闭包（实测 2 个 `.d.ts`）；tsdown `sourcemap: false`，bundle 无 `sourceMappingURL` |
+| **B manifest** | [214](BUG-214-shipped-prepack-missing-scripts.md) / [219](BUG-219-shipped-devdeps-workspace-protocol.md) | dev lifecycle/元数据原样进 tarball | tarball manifest 去 `scripts` 与 `devDependencies`（source 保留）；`prepack` 仍由仓库打包前跑 |
+| **C client 声明** | [217](BUG-217-client-inject-missing-primitives.md) / [221](BUG-221-client-inject-over-declared.md) / [222](BUG-222-client-react-not-declared.md) | inject/peer 手写，不是从 bundle require 派生 | `dsh.client.inject` = 实际 package row（primitives）；primitives 进 peer；react/react-jsx-runtime 由 vendor `PLATFORM_MODULES` 基线提供并在 README/checker 可追溯；删 8 条内联边 |
+| **D shipped 文本** | [215](BUG-215-shipped-readme-dev-links.md) / [216](BUG-216-shipped-comments-dev-paths.md) / [218](BUG-218-readme-pnpm-runtime-prereq.md) | README/注释按仓库树写；pnpm 被写成包运行时前置 | shipped 专用 `README.shipped.md`（包内链接/外链，不含 dev 路径）；bundle/声明注释剥离；`cordis.patch.yml`/presets 注释加「不随包」；pnpm 改成「DSH 插件安装器使用 pnpm；缺失时 DSH 打印 `dsh: pnpm was not found…`」 |
+| **E 门禁** | 全组 | 发布面没有机械判据，`release --check` 只看源码指纹 | 新 `tools/release/shipped-shape.mjs`（sanitizer + checker）+ `pnpm release:shape`；`export-dist` 在替换 `_dist` 前先 sanitize 再 check；spec 用合成 fixture 锁每条判据 |
+
+**次序 = E(先红) → A/B/C/D 实现 → 重建 `_dist` → E(绿) → 真入口**：
+先让 checker 对当前旧 tarball 列出全部 10 类违规（红），再在 `export-dist` 里加 sanitize（manifest/类型/注释/README），并改 source `package.json`/tsdown/cordis/presets；重建后同一命令绿。证据口径 = 先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；每卡红/绿写同一条命令 `pnpm release:shape`（旧 tarball 红 / 新 tarball 绿），另附解包/假 module table/真入口补充。
+
+**终点** = C13 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃，不动。
 
 ## 2026-11-17 C13 运行时/发布面分离（focus v8）
 

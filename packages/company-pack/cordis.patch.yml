@@ -14,8 +14,8 @@
 # ui-scene 真页面错误环零命中 + 10 页签金样一致（2026-11-17），无用户可见残缺；
 # 处置 = 知悉，不建门禁。若上游修复该 inject，这条 WARN 会自行消失。
 # 不用 developerTools 开关：它连带代码差异/交互预览与 built-in ptc/minimal，且是每用户设置。
-# 用户决定与验收 = _backlog/_archive/settled_issues/2026-11-02-remove-trajectory-terminal-ui.md；
-# 落地 Note = notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md。
+# 用户决定与验收 = _backlog/_archive/settled_issues/2026-11-02-remove-trajectory-terminal-ui.md（仓库内，不随包）；
+# 落地 Note = notes/implemented/2026-11-02-remove-trajectory-terminal-ui.md。（仓库内，不随包）
 - id: ui-trajectory
   name: '@deepseek-ai/dsh-client-ui-trajectory'
   disabled: true
@@ -110,7 +110,7 @@
         # 培养方法层根（2026-10-28 M3：公司级）：!!js 锚 baseUrl = loader 树根（profile 目录）。
         # `<home>/profiles/<p>/../../company/methods/` = `<DSH_HOME>/company/methods/`；与各角色
         # preset 的第二 customSkillDirs（../../company/methods/<role>/）同一前缀，host 写入与
-        # preset 加载构造上对齐；端到端实证 = probes/session-context/cultivation-method-layer-probe.mjs。
+        # preset 加载构造上对齐；端到端实证 = probes/session-context/cultivation-method-layer-probe.mjs（仓库内，不随包）。
         # 旧 `<profile>/company-cultivation/` 只读留一版，host 启动一次性迁移（含冲突备份）。
         cultivationRoot: !!js "process.getBuiltinModule('node:url').fileURLToPath(new URL('../../company/methods/', baseUrl))"
         # 非公司角色（worker family 执行手 + 质量环能力档 producer/verifier）默认不注入角色/汇报线/编制手册。

@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-218：shipped README 把 pnpm 写成运行时前置，安装路径依赖 dev 包管理器且无 fallback
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-8 / D·E）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
 
 ## 症状
 
@@ -47,8 +47,8 @@ node -e "const p=require('./runtime/tmp/c13-dist/package/package.json'); console
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 要么把安装路径做成不依赖 pnpm（npm/DSH 自带安装器），要么在 DSH 插件安装入口给出**可诊断的**「需要 pnpm/corepack」错误，并把 pnpm 写进 `engines`/安装检查（而不是只写 README）。
-2. 最小判据：无 pnpm 的环境跑安装命令，失败信息点名缺失的包管理器与补救命令；有 pnpm 的环境仍绿。
-3. 正例：Desktop 内置 pnpm 路径不回归。
+1. shipped README 不再把 pnpm 写成**包运行时前置**；改成「DSH 插件安装器使用 pnpm；Desktop 内置，CLI 缺失时 DSH 打印 `dsh: pnpm was not found…`」。
+2. `pnpm release:shape` 检查：README 提 pnpm 时必须同时给出安装器路径与 DSH 诊断（或删掉 pnpm 提法）。
+3. 证据：vendor `apps/cli/src/plugin.ts` 的 exit 127 诊断行；真 Desktop 路径不回归（不跑）。

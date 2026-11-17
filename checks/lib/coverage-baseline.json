@@ -761,6 +761,10 @@
       "statements": 95.31,
       "branches": 83.78
     },
+    "tools/lib/release/shipped-shape.mjs": {
+      "statements": 91.97,
+      "branches": 80.74
+    },
     "tools/lib/repo/asset-consumers.mjs": {
       "statements": 97.87,
       "branches": 95

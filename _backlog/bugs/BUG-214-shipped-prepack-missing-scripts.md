@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-214：发布包 `package.json` 的 `prepack` 指向不存在的 scripts/prepack-check.mjs
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-2 / B）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
 
 ## 症状
 
@@ -53,8 +53,8 @@ cd runtime/tmp/c13-dist/package && npm pack --dry-run
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 发布包不保留 `prepack`（dev 检查放根 `package.json` / CI / 发布前脚本），或把 `scripts/prepack-check.mjs` 收进 `files` 并让它只读包内字节。
-2. 最小判据：tarball 内 `npm pack --dry-run` 成功；安装包 manifest 的 `scripts` 没有指向包外文件的命令。
-3. 正例：仓库内 `pnpm release --prepare`/`--verify` 仍能跑 prepack 检查。
+1. tarball 的 `package.json` 不再带 `scripts`（尤其 `prepack`）；源码 `package.json` 的 prepack 保留，仓库打包前仍跑。
+2. 解包目录 `npm pack --dry-run --ignore-scripts` 成功；`pnpm release:shape` 对旧 tarball 报 `scripts.prepack`，新 tarball 无。
+3. 正例：`pnpm release --prepare` 仍执行 prepack 检查。

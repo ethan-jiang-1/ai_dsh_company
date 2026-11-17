@@ -13,7 +13,9 @@ import { defineConfig } from 'tsdown'
 const shared = {
   outDir: 'lib',
   dts: false,
-  sourcemap: true,
+  // 2026-11-17 C13 BUG-220：tarball 不带 .map（`files` 只收运行时 JS），sourcemap 会让 bundle
+  // 尾部留下指向包内不存在文件的 sourceMappingURL。调试需要时在仓库构建里临时改回即可。
+  sourcemap: false,
   clean: false,
   target: 'es2024',
   fixedExtension: false,

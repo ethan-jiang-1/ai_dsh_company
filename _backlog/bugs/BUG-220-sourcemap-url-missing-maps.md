@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-220：两个 bundle 各留 sourceMappingURL，tarball 里 0 个 .map
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-5 / A·E）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
 
 ## 症状
 
@@ -29,6 +29,7 @@ T=_dist/dsh-company-pack-0.11.9.tgz
 grep -n 'sourceMappingURL' <(tar -xOf "$T" package/lib/index.js) | tail -2
 grep -n 'sourceMappingURL' <(tar -xOf "$T" package/lib/client.js) | tail -2
 tar -tzf "$T" | grep -c '\.map$'
+pnpm release:shape
 ```
 
 实测两条 sourceMappingURL；`.map` 计数 `0`。
@@ -47,8 +48,8 @@ tar -tzf "$T" | grep -c '\.map$'
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 二选一：`files` 收 `lib/*.js.map`，或 tsdown `sourcemap: false`（清掉 bundle 尾部注释）；不要保留半套引用。
-2. 最小判据：tarball 内 `sourceMappingURL` 的每个目标都存在；或 bundle 无 `sourceMappingURL`。
+1. tsdown `sourcemap: false`；tarball 的 bundle 无 `sourceMappingURL`、无 `.map` 条目。
+2. `pnpm release:shape` 对旧 tarball 报 2 条 dangling sourceMappingURL / 0 map，新 tarball 0。
 3. 正例：`company-entry`/`client-load` 仍绿。

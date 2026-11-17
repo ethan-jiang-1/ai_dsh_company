@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-222：client bundle external 了 react / react/jsx-runtime，但 package.json 没有 react peer 或 inject
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C13 运行时/发布面分离卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)（C13-3 / C13-9 / C·E）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`（本批共用）。
 
 ## 症状
 
@@ -55,8 +55,8 @@ EOF
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 明确 react 是宿主基线还是 peer：若是 peer，加 `react`/`react-dom`（版本范围与 DSH 一致）；若否，README/注释写明「react 由 module table 基线提供」并从 `external` 契约中可追溯。
-2. 最小判据：假 module table 只提供 package 声明 + 基线，加载 `lib/client.js` 不缺 react；或声明里明确含 react。
-3. 正例：真 `client-load` 仍绿。
+1. 明确 react/react-jsx-runtime 由 vendor `PLATFORM_MODULES` 基线提供，写进 shipped README/构建注释；不把 react 误加为包 row。
+2. `pnpm release:shape` 读 vendor `platform.ts` 的 `PLATFORM_MODULES`，断言 bundle 的 react require 在基线内；旧 tarball 无此追溯红。
+3. 假 module table 只提供 inject + platform baseline 时 `missing == []`；真 `client-load` 仍绿。

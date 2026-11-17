@@ -1,8 +1,8 @@
 # CEO 角色 preset —— 会话挂上它即获得该角色的人格、专属 skills 与工具面。
-# 设计依据：docs/architecture.md「组合层」；**R1 实证修正**：preset 是自包含组合
+# 设计依据：docs/architecture.md「组合层」；**R1 实证修正**：preset 是自包含组合（仓库内，不随包）
 #   （DSH 无 patch 继承，shipped standard 自己声明全部工具行）——**工具行必须随 preset 声明**，
 #   否则会话只拿到全局 bundle 的少数行（R1 首跑：CEO 只有 10 个团队工具，读不了文件、写不出交付物）。
-# 文案定稿：notes/implemented/2026-11-10-role-content-rationale.md §1（R1：CEO 个体，非职能模板）。
+# 文案定稿：notes/implemented/2026-11-10-role-content-rationale.md §1（R1：CEO 个体，非职能模板）。（仓库内，不随包）
 
 # ① 身份：persona row，shadow 掉部署默认人格，只对本 preset 的会话生效
 - insert:
@@ -193,7 +193,7 @@
           #    child 再派由它自己 preset 的行决定：vp-eng 的通用 subagent 行 = 3，
           #    CEO→vp_eng(1)→worker(2) 仍放行；真正的“禁止平级派活”靠 vp-eng 没有
           #    vp_sales/coo/cfo 行，不靠这行 1。
-          #    出处：docs/contracts/delegation.md；探针 checks/lanes/delegation.entry.mjs（= 这条边界的回归守卫）。
+          #    出处：docs/contracts/delegation.md；探针 checks/lanes/delegation.entry.mjs（= 这条边界的回归守卫）。（仓库内，不随包）
           - id: delegation
             name: cordis:group
             group: true
