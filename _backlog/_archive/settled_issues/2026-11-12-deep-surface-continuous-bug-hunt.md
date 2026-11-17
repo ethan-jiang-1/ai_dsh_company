@@ -1,13 +1,15 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-12
 ---
 
 # 推敲：高复杂度面的持续探索（培养 / 委派 / run-bundle / 账本 / 客户端流 / PRD 闸门 / 验证元面 / 搬移副作用）
 
-> 立卡：2026-11-12 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-12 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：implementation — 本卡执行多轮探索 + 证据（发现缺陷另开 `_backlog/bugs/` 卡；编号唯一源 = [bugs/README](../bugs/README.md) 的 Next BUG ID，2026-11-15 = BUG-184..191，Next = 192）；本卡不改产品代码。
+> **结论/去向**：none — focus v6 于 2026-11-16 收口；BUG-184..201 已全部修复并迁 [fixed_bugs](../fixed_bugs/README.md)；C12 归属波次另立 [新卡](../../issues/2026-11-17-ownership-wave-exploratory.md)。本卡只作历史与参考，不再承接轮次。
+>
+> 审查：跳过 — 用户 2026-11-17 直接转场（focus v6 收口；C12 另立新卡）。v6 两轮的判据与盲审记录 = [守卫判据面 Note](../../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)、[搬移副作用 Note](../../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)。
 >
 > **授权边界**：静态 / keyless / 真挂载 / 真页面可自主；live 模型轮按每轮小预算、隔离 workspace 跑（入口与预算写在 Round 头）。不修产品代码；不改 vendor。
 >
@@ -16,6 +18,8 @@ opened: 2026-11-12
 > **2026-11-14 post-fix 回归（focus v3/v4/v5）**：v3 = BUG-152..159 修复后的回归（Round 89，开 BUG-160..167）；v4 = BUG-160..167 修复后的回归（Round 90，开 BUG-168..175）；v5 = BUG-168..175 修复后的回归（Round 91，开 BUG-176..183）。这是**修复后新面**，不是重复 focus v2 首轮；C9 的新门禁/资产按新预算计。
 >
 > **2026-11-15 焦点调整（focus v6：搬移副作用）**：三批纯搬移（`29ae8c94` tests 分轴 → `1eb14f46` src↔tests 对齐 → `57d34a34` tools 四组）之后，主面切到 **C11 搬移副作用**——用可复跑的 exploratory test 证「位置变了、行为没变」，并抓住「全绿但仍有残留」的副作用。C1–C10 暂停常规轮转，只接受与搬移相交的假设。C11 的 oracle = 搬移父提交基线 + 声明面 + 真入口 + 负控；**不把 `pnpm test` 全绿当等价证明**。见下方「2026-11-15 调整（focus v6）」节。
+>
+> **归档（2026-11-17）**：本卡 2026-11-12–11-16 的宪章与 93 轮记录保留为历史；现行 exploratory charter = [归属波次卡](../../issues/2026-11-17-ownership-wave-exploratory.md)。旧结论不重开；C1–C11 的未跑项（refactor-drift 实跑、clean clone、Windows）在新的 C12 卡承接。
 
 ## 问题与期望结果
 
@@ -25,12 +29,12 @@ opened: 2026-11-12
 
 **当前情况（2026-11-15 focus v6 基线）：**
 
-- **当前基线（2026-11-16 09:50，收口工作树实测）**：`pnpm test` 253 files / 2153 tests；`pnpm verify` ALL PASS（2 门无对象）；`pnpm typecheck` exit 0；活跃缺陷 = **0**（BUG-192..201 已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）；Next BUG = 202；`packages/company-pack` version 0.11.8；census = 30 冒烟 / 59 探针 / 75 门禁 / 253 spec；对抗矩阵 `KNOWN_GAP = 0`。
-- **当前主面 = C11 搬移副作用**（focus v6，2026-11-15）：三批纯搬移 = `29ae8c94`（tests 分轴）→ `1eb14f46`（src↔tests 对齐）→ `57d34a34`（tools 四组；原 `5c2c0796` amend）；C1–C10 冻结。首轮（Round 92）8 张已修；二轮（Round 93，2026-11-16）转到**修复后的守卫面**，10 张 2026-11-16 全部修复（见 [bugs/README「C11 二轮」](../bugs/README.md) 与 [守卫判据面 Note](../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)）。
-- **上一轮基线（2026-11-14 11:01）**：`pnpm test` 247 files / 2072 tests；活跃缺陷 8（BUG-176..183，focus v5；该批已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)）；version 0.11.6。
+- **当前基线（2026-11-16 09:50，收口工作树实测）**：`pnpm test` 253 files / 2153 tests；`pnpm verify` ALL PASS（2 门无对象）；`pnpm typecheck` exit 0；活跃缺陷 = **0**（BUG-192..201 已全部修复并迁 [fixed_bugs](../fixed_bugs/README.md)）；Next BUG = 202；`packages/company-pack` version 0.11.8；census = 30 冒烟 / 59 探针 / 75 门禁 / 253 spec；对抗矩阵 `KNOWN_GAP = 0`。
+- **当前主面 = C11 搬移副作用**（focus v6，2026-11-15）：三批纯搬移 = `29ae8c94`（tests 分轴）→ `1eb14f46`（src↔tests 对齐）→ `57d34a34`（tools 四组；原 `5c2c0796` amend）；C1–C10 冻结。首轮（Round 92）8 张已修；二轮（Round 93，2026-11-16）转到**修复后的守卫面**，10 张 2026-11-16 全部修复（见 [bugs/README「C11 二轮」](../../bugs/README.md) 与 [守卫判据面 Note](../../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)）。
+- **上一轮基线（2026-11-14 11:01）**：`pnpm test` 247 files / 2072 tests；活跃缺陷 8（BUG-176..183，focus v5；该批已修复并迁 [fixed_bugs](../fixed_bugs/README.md)）；version 0.11.6。
 - **更早四轮基线（2026-11-13 19:26 – 2026-11-14 10:17）**：247 files / 2034–2066 tests；每轮 8 张 BUG 均已修复归档（BUG-152..175）。
-- **历史起点（2026-11-12）**：`50878cd6`（BUG-080..089 修复）｜Note = [startup/wiki bug sweep](../../notes/implemented/2026-11-12-startup-strategy-wiki-bug-sweep.md)｜十张卡已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)｜当时基线 236 files / 1761 tests。该基线只作历史，不再当当前事实。
-- **后续已收口**：Round 15–85 找到 BUG-104..151（BUG-140 撤回、BUG-150 复核不成立）；focus v2–v5 开 BUG-152..183，全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+- **历史起点（2026-11-12）**：`50878cd6`（BUG-080..089 修复）｜Note = [startup/wiki bug sweep](../../../notes/implemented/2026-11-12-startup-strategy-wiki-bug-sweep.md)｜十张卡已迁 [fixed_bugs](../fixed_bugs/README.md)｜当时基线 236 files / 1761 tests。该基线只作历史，不再当当前事实。
+- **后续已收口**：Round 15–85 找到 BUG-104..151（BUG-140 撤回、BUG-150 复核不成立）；focus v2–v5 开 BUG-152..183，全部修复并迁 [fixed_bugs](../fixed_bugs/README.md)。
 - **已知开放点（历史 Note「剩余风险」）**：`fs.watch` 平台降级；内容包新增类型仍需重启；其它 host 命令仍中文；`/req` `/prd` 的 workspace 仍 boot 优先——保留为观察，不在 C11 首轮抢修。另：C8-H10 真模型 present deny、Windows 实机、C11 后的 clean clone / Linux 全量仍 `unverified`；Round 93 已实跑 company-entry / release / client-load / ui-scene / preset / replay，均 PASS。
 - **宪章的「低置信」判据**：代码体量大 / 状态跨 home+workspace / 派生文件无新鲜度契约 / 有多进程或并发 / 测试只固定夹具 / 只在真页面或真 team 才暴露。**focus v6 追加搬移判据**：位置是唯一变量 / 引用住注释、技能、头注、生成物 / 门禁扫描面靠 glob 与登记表 / `pnpm test` 全绿不等于零漂移。
 
@@ -41,9 +45,9 @@ opened: 2026-11-12
 **四处变化：**
 
 1. **形状轴由对抗矩阵接管**：`company-root-safety.spec.ts`（10 写入口 × 13 shape = 134 例）、`file-shape-agreement.spec.ts`、`startup-state-agreement.spec.ts`、`ledger-state-agreement.spec.ts`、`company-root-process.e2e.mjs`（16 项）、`checks/lib/carrier-registry.mjs`（15 载体 / `KNOWN_GAP = 0`）+ `company-root-carriers` 门禁；BUG-151 就是矩阵首跑抓的。剩余缺口只列四个：TOCTOU 窗口（recheck 后/rename 前）、真崩溃/fsync、读载体未进矩阵、内容解析器语义（startup/ledger 之外）。
-2. **测试资产改了证据规则**：`tests/` 六面 + 四后缀 lane（`*.spec.ts` / `*.e2e.mjs` / `*.entry.mjs` / `tests/checks/*.test.mjs`）；[asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs) 是唯一注册表；census = 29 冒烟 / 67 探针 / 72 门禁 / 247 spec；pre-push 按面 + 覆盖率棘轮。旧的 `*-smoke` / `golden` 名只作历史；新探索脚本留 `runtime/tmp/`，升常驻必须登记。
-3. **新产品面：PRD headings + present 闸门**：[prd-check.ts](../../packages/company-pack/src/lib/docs/prd-check.ts) 新 parser；[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts) 在 `present` 前 deny；[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts) 只有 5 个用例；[PRD headings Note](../../notes/implemented/2026-11-13-prd-headings-definition.md) 明确「真模型 present deny 端到端未跑」。这是 C1–C7 没覆盖的交付阻断面。
-4. **新验证/客户端面**：client 错误环（[error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts)）刚改；lane/pre-push/census 是新系统。错误环可能滤掉真错误；验证系统可能假绿——后者是「元 bug」，仍在本卡射程。
+2. **测试资产改了证据规则**：`tests/` 六面 + 四后缀 lane（`*.spec.ts` / `*.e2e.mjs` / `*.entry.mjs` / `tests/checks/*.test.mjs`）；[asset-lanes.mjs](../../../tools/lib/core/asset-lanes.mjs) 是唯一注册表；census = 29 冒烟 / 67 探针 / 72 门禁 / 247 spec；pre-push 按面 + 覆盖率棘轮。旧的 `*-smoke` / `golden` 名只作历史；新探索脚本留 `runtime/tmp/`，升常驻必须登记。
+3. **新产品面：PRD headings + present 闸门**：[prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts) 新 parser；[prd-gate.ts](../../../packages/company-pack/src/host/commands/prd-gate.ts) 在 `present` 前 deny；[prd-gate.spec.ts](../../../tests/host/commands/prd-gate.spec.ts) 只有 5 个用例；[PRD headings Note](../../../notes/implemented/2026-11-13-prd-headings-definition.md) 明确「真模型 present deny 端到端未跑」。这是 C1–C7 没覆盖的交付阻断面。
+4. **新验证/客户端面**：client 错误环（[error-ring.ts](../../../packages/company-pack/src/client/wiring/error-ring.ts)）刚改；lane/pre-push/census 是新系统。错误环可能滤掉真错误；验证系统可能假绿——后者是「元 bug」，仍在本卡射程。
 
 **执行规则：**
 
@@ -69,12 +73,12 @@ opened: 2026-11-12
 
 **为什么「我说过不许破坏」不够——最近这一轮腾挪已经出现过副作用（有据）：**
 
-- `57d34a34`（原 `5c2c0796`）迁移中抓到并修掉 4 个真回归：`market-index` 的动态 import 未被静态扫描覆盖、`converge-rules` 分段拼路径、`pack-source.spec` 的 import 字面量、`runtime/README.md` 的 tracked 链接（见 [tools 四组 Note](../../notes/implemented/2026-11-15-tools-purpose-groups.md)）。
+- `57d34a34`（原 `5c2c0796`）迁移中抓到并修掉 4 个真回归：`market-index` 的动态 import 未被静态扫描覆盖、`converge-rules` 分段拼路径、`pack-source.spec` 的 import 字面量、`runtime/README.md` 的 tracked 链接（见 [tools 四组 Note](../../../notes/implemented/2026-11-15-tools-purpose-groups.md)）。
 - `0ec98374` 刚修好的模块注释（ledger / signoff / presence-status 指向的 spec），在 `1eb14f46` 再次搬测试后**又指回旧家**——见下方预检表第 1–3 行。
 - 测试树分轴前的 clean clone：`pnpm verify` 首跑 5 FAIL，全是已退役 tests/harness 的死指针；暖树因本地留空目录而全绿（`51a1c61b`）。
 - `tests/presets` 未进类型面：补进后首跑 24 个类型错误（`0fb6256c`）。
 - `1eb14f46` 的独立盲审 2 个 blocker：`tests/README.md` 仍写五条例外且新 spec 落点漏 lib、冻结层 36 个文件白改。
-- 三批搬移的 Note / 提交都**未见记录使用**本仓现成的纯搬移等价 oracle [refactor-drift.mjs](../../checks/audit/refactor-drift-audit.mjs)；等价性靠「逐文件对读 + 全绿」证明。而它自己的用法头注还写着过期路径（预检表第 6 行）。
+- 三批搬移的 Note / 提交都**未见记录使用**本仓现成的纯搬移等价 oracle [refactor-drift.mjs](../../../checks/audit/refactor-drift-audit.mjs)；等价性靠「逐文件对读 + 全绿」证明。而它自己的用法头注还写着过期路径（预检表第 6 行）。
 
 **结论：搬移的机械面是已知的（import / 显式引用 / 生成物），但「活指针的载体分类」「门禁扫描面是否被搬空」「真入口是否仍通」不在任何单一门禁的射程；`pnpm test` 全绿只证明跑过的没红，不证明没被删、没改名、没弱化。**
 
@@ -82,8 +86,8 @@ opened: 2026-11-12
 
 | ID | 子面 | 问题 | oracle（不拿实现当 oracle） |
 |---|---|---|---|
-| M1 | **等价性** | 搬移前后，测试全名 / 测试体指纹、spec 数、lane / 门禁清单、覆盖率基线数值、类型面 include-exclude 是否只发生声明过的变化 | 搬移父提交 + [refactor-drift.mjs](../../checks/audit/refactor-drift-audit.mjs) 的 `--hashes` + `git show --name-status -M` + 提交声明面 |
-| M2 | **活指针** | 代码注释、README、docs、`.agents/skills/**`、SKILL / 头注、生成物是否还指向搬移前的家；哪些是 frozen / fixture，哪些是 live | 路径存在性 + 载体是否会被 agent / 人读到 + 搬移提交的 changed files；frozen 规则见 [notes/archived AGENTS](../../notes/archived/AGENTS.md) |
+| M1 | **等价性** | 搬移前后，测试全名 / 测试体指纹、spec 数、lane / 门禁清单、覆盖率基线数值、类型面 include-exclude 是否只发生声明过的变化 | 搬移父提交 + [refactor-drift.mjs](../../../checks/audit/refactor-drift-audit.mjs) 的 `--hashes` + `git show --name-status -M` + 提交声明面 |
+| M2 | **活指针** | 代码注释、README、docs、`.agents/skills/**`、SKILL / 头注、生成物是否还指向搬移前的家；哪些是 frozen / fixture，哪些是 live | 路径存在性 + 载体是否会被 agent / 人读到 + 搬移提交的 changed files；frozen 规则见 [notes/archived AGENTS](../../../notes/archived/AGENTS.md) |
 | M3 | **真入口** | 被搬移的工具 / 脚本，经真实入口跑（`pnpm company`、`pnpm setup`、release lane、company-entry、preset、hooks / pre-push）是否仍按设计工作 | 退出码 + 启动横幅 + 真安装 / 真会话；`--help` / `--check` 不算「真入口已通」 |
 | M4 | **静默弱化** | 门禁 / 类型 / 覆盖率 / 生成物 / 注册表在搬移后是否变成空扫、漏扫或指向旧家；绿灯是否因此变假 | 声明扫描面 × 盘面；负控 = 人为把被搬文件放回旧家或改一个引用，看门禁是否真红 |
 
@@ -98,7 +102,7 @@ opened: 2026-11-12
 | 1 | `packages/company-pack/src/lib/accounting/ledger.ts` 第 5 行 | tests/lib/ledger.spec.ts | `tests/lib/accounting/ledger.spec.ts` | **真残留**（`1eb14f46` 后未随迁） |
 | 2 | `packages/company-pack/src/lib/accounting/signoff.ts` 第 4 行 | tests/lib/signoff.spec.ts | `tests/lib/accounting/signoff.spec.ts` | **真残留**（同上） |
 | 3 | `packages/company-pack/src/lib/presence/presence-status.ts` 第 72 行 | tests/lib/presence-board.spec.ts | `tests/lib/presence/presence-board.spec.ts` | **真残留**（同上） |
-| 4 | [close-out-definition SKILL](../../.agents/skills/close-out-definition/SKILL.md) 第 25 行 | node tools/release.mjs --check | `node tools/release/release.mjs --check` | **已修**（`57d34a34` 修正路径并把 `.agents` 纳入 `command-refs`） |
+| 4 | [close-out-definition SKILL](../../../.agents/skills/close-out-definition/SKILL.md) 第 25 行 | node tools/release.mjs --check | `node tools/release/release.mjs --check` | **已修**（`57d34a34` 修正路径并把 `.agents` 纳入 `command-refs`） |
 | 5 | `packages/company-pack/src/lib/deliverables/deliverables-address.ts` 第 6 行 | tools/deliverables-index.mjs | `tools/repo/deliverables-index.mjs` | **有意保留**（发布源指纹；下次 bump 同 diff 修，见 tools Note） |
 | 6 | `checks/audit/refactor-drift-audit.mjs` 第 14–18 行 | checks/lanes/refactor-drift.mjs | `checks/audit/refactor-drift-audit.mjs` | **已修**（`57d34a34` 把用法头注改成现行家） |
 | 7 | `packages/company-pack/src/client/cultivation/cultivation-data.ts` 第 8 行、`packages/company-pack/src/host/cultivation/cultivation.ts` 第 22 行 | tests/host/cultivation.spec.ts | `tests/host/cultivation/` 三份 | **同类但非本批**（更早的 spec 拆分残留） |
@@ -113,15 +117,15 @@ opened: 2026-11-12
 
 | ID | 假设 | oracle | 入口 |
 |---|---|---|---|
-| C11-1 | 三批搬移**改过测试体**（不止 import / 路径行），或改了测试名 / describe 归属而没有声明 | `refactor-drift --hashes` 对每个搬移父提交 vs HEAD；指纹有变且提交未声明 = 缺口 | [refactor-drift.mjs](../../checks/audit/refactor-drift-audit.mjs)、vitest JSON（两个 worktree） |
+| C11-1 | 三批搬移**改过测试体**（不止 import / 路径行），或改了测试名 / describe 归属而没有声明 | `refactor-drift --hashes` 对每个搬移父提交 vs HEAD；指纹有变且提交未声明 = 缺口 | [refactor-drift.mjs](../../../checks/audit/refactor-drift-audit.mjs)、vitest JSON（两个 worktree） |
 | C11-2 | 有 spec 在搬移后掉出类型面 / 覆盖率面（tsconfig include-exclude 或 vitest glob 不再命中） | 盘上 spec 清单 × `tsconfig.test-*.json` include-exclude 求差；负控 = 移一个 spec 到未覆盖目录，看 typecheck 是否仍绿 | `tsconfig.test-*.json`、`pnpm typecheck` |
-| C11-3 | `asset-lanes` / census / checks 索引有陈旧路径：登记项指向搬移前的家或已消失的资产 | 注册表 × 盘面；`node tools/repo/test-census.mjs --check`、`node tools/repo/checks-index.mjs --check`；负控 = 改一个登记路径，看 spec / gate 是否红 | [asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs)、[CENSUS](../../tests/CENSUS.generated.md)、[checks/INDEX](../../checks/INDEX.generated.md) |
-| C11-4 | 覆盖率基线在搬移中被改过数值（静默降标），或键名改了但文件不再被覆盖率面覆盖 | baseline 数值集合 vs 搬移父提交；`coverage-ratchet` 的输入面 | [coverage-baseline.json](../../checks/lib/coverage-baseline.json)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs) |
+| C11-3 | `asset-lanes` / census / checks 索引有陈旧路径：登记项指向搬移前的家或已消失的资产 | 注册表 × 盘面；`node tools/repo/test-census.mjs --check`、`node tools/repo/checks-index.mjs --check`；负控 = 改一个登记路径，看 spec / gate 是否红 | [asset-lanes.mjs](../../../tools/lib/core/asset-lanes.mjs)、[CENSUS](../../../tests/CENSUS.generated.md)、[checks/INDEX](../../../checks/INDEX.generated.md) |
+| C11-4 | 覆盖率基线在搬移中被改过数值（静默降标），或键名改了但文件不再被覆盖率面覆盖 | baseline 数值集合 vs 搬移父提交；`coverage-ratchet` 的输入面 | [coverage-baseline.json](../../../checks/lib/coverage-baseline.json)、[coverage-ratchet.mjs](../../../checks/audit/coverage-ratchet.mjs) |
 | C11-5 | 门禁的扫描面 / 登记表在搬移后变成空集合或旧路径（bare-path 的 NOW_FILES、retired-path 前缀、tests-literals ALLOW、carrier 表、spec-duplicates 哈希、naming-contract） | 门禁声明面 × 盘面；逐门一次负控（把一条登记改回旧家 → 应红） | `checks/gates/**`、`pnpm verify` |
 | C11-6 | live 载体仍有搬移前路径（本次预检已 4 处；假设还有未扫到的载体：presets、content、SKILL、tool 头注、生成物） | 全 live 面路径存在性 + 载体分类；排除 frozen / fixture / deliberate | `.agents/skills/**`、`packages/company-pack/{presets,content,src}/**`、`tools/**` 头注 |
 | C11-7 | 真入口在搬移后未全跑：`pnpm company`、`pnpm setup`、hooks / pre-push、release / company-entry / preset / client-load 至少一项在 HEAD 上会因路径而红 | 逐入口实跑；`--help` / `--check` 不算；至少一个真 boot + 一个真安装 | `checks/lanes/{company-entry,release,preset,client-load}.entry.mjs`、`run/env.sh` |
-| C11-8 | pre-push 面映射在搬移后漏掉某些改动面（例如 tools 四组、src/lib 八组、tests/repo 六组不在 SURFACE_RULES 的 glob 里） | [pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs) 的规则 × 三批搬移的 changed files；负控 = staged 一个搬移文件，看触发的 lane | [pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)、pre-push dry-run |
-| C11-9 | 冻结层在搬移中被改了不允许的字节（散文 / 历史结论，而非链接目标或命令路径） | `git show` 对读三批提交在 `_backlog/_archive/` / `notes/archived/` 的 diff；允许面 = Markdown 链接目标 + fix-evidence 可执行命令路径 | 三批提交、[fix-evidence](../../checks/gates/fix-evidence.mjs) |
+| C11-8 | pre-push 面映射在搬移后漏掉某些改动面（例如 tools 四组、src/lib 八组、tests/repo 六组不在 SURFACE_RULES 的 glob 里） | [pre-push-surfaces.mjs](../../../checks/pre-push-surfaces.mjs) 的规则 × 三批搬移的 changed files；负控 = staged 一个搬移文件，看触发的 lane | [pre-push-surfaces.mjs](../../../checks/pre-push-surfaces.mjs)、pre-push dry-run |
+| C11-9 | 冻结层在搬移中被改了不允许的字节（散文 / 历史结论，而非链接目标或命令路径） | `git show` 对读三批提交在 `_backlog/_archive/` / `notes/archived/` 的 diff；允许面 = Markdown 链接目标 + fix-evidence 可执行命令路径 | 三批提交、[fix-evidence](../../../checks/gates/fix-evidence.mjs) |
 | C11-10 | 搬移引入了「只在真安装 / 真挂载才暴露」的路径问题：tarball 安装副本、preset skill 路径、client 模块闭包 | `release.entry.mjs` + `preset.entry.mjs` + `client-load.entry.mjs` 在搬移后的 HEAD 实跑；安装形状 vs dev 形状 | `checks/lanes/{release,preset,client-load}.entry.mjs` |
 
 **执行规则（C11）：**
@@ -138,23 +142,23 @@ opened: 2026-11-12
 
 **范围（轮转宪章 v3，2026-11-15；主面 = C11 搬移副作用，C1–C10 冻结）：**
 
-> C1–C4 只打矩阵未覆盖的命名缺口或行为/生命周期；C5–C7 保留残余行为/真入口；C8–C10 是 focus v2 新增；C11 是 focus v6 新增。形状矩阵 = [Note](../../notes/implemented/2026-11-13-adversarial-shape-matrix.md)。
+> C1–C4 只打矩阵未覆盖的命名缺口或行为/生命周期；C5–C7 保留残余行为/真入口；C8–C10 是 focus v2 新增；C11 是 focus v6 新增。形状矩阵 = [Note](../../../notes/implemented/2026-11-13-adversarial-shape-matrix.md)。
 >
 > **focus v6 的冻结规则：** C1–C10 暂停常规轮转；只有「与三批搬移相交」的假设可以开（例如 C9 的假绿判据被搬移利用、C5 的真页面路径被搬移影响）。C11 不重跑 C1–C10 已闭合的形状枚举，也不把旧结论当新面已证。
 
 | ID | 面 | 为什么低置信 | 首批入口 |
 |---|---|---|---|
-| C1 | **培养状态机 + 存储**（propose / adopt / reject / revoke / verify / archive / purge / check / journal / 方法层 / context） | **shape = matrix-owned**；只打行为/生命周期：跨 workspace 归属、revoke 后状态、迁移/回滚、journal 恢复；文件形状不再枚举 | `tests/host/cultivation/`、`tests/client/cultivation/`、`probes/session-context/cultivation-{propose,method-layer,context}-probe.mjs`、[contract](./../../docs/contracts/cultivation.md) |
-| C2 | **委派 / team / workflow 生命周期** | seat、depth、spawn/wait/interrupt/send_message、member scope、task board、workflow durable view；多进程与冷恢复；**写面形状/进程矩阵已覆盖，只打 live/durable 行为** | `checks/lanes/product-team-e2e.entry.mjs`、`probes/team/`、`tests/host/delegation/`、[contract](./../../docs/contracts/delegation.md) |
+| C1 | **培养状态机 + 存储**（propose / adopt / reject / revoke / verify / archive / purge / check / journal / 方法层 / context） | **shape = matrix-owned**；只打行为/生命周期：跨 workspace 归属、revoke 后状态、迁移/回滚、journal 恢复；文件形状不再枚举 | `tests/host/cultivation/`、`tests/client/cultivation/`、`probes/session-context/cultivation-{propose,method-layer,context}-probe.mjs`、[contract](./../../../docs/contracts/cultivation.md) |
+| C2 | **委派 / team / workflow 生命周期** | seat、depth、spawn/wait/interrupt/send_message、member scope、task board、workflow durable view；多进程与冷恢复；**写面形状/进程矩阵已覆盖，只打 live/durable 行为** | `checks/lanes/product-team-e2e.entry.mjs`、`probes/team/`、`tests/host/delegation/`、[contract](./../../../docs/contracts/delegation.md) |
 | C3 | **run-bundle / workspace / lease / upgrade** | v3 身份、seed 只补缺、home 与 workspace 双轴、writer lease、外部盘、二次启动、迁移/回滚；**shape = matrix-owned**；只打跨 workspace/lease fencing/真崩溃恢复 | `checks/lanes/release.entry.mjs`、`checks/lanes/external-workspace.entry.mjs`、`checks/lanes/company-entry.entry.mjs`、`tests/host/run-bundle/` |
-| C4 | **账本 / 成品 / 治理导出** | presented ledger 派生、catalog、final.md、审计哈希、治理导出幂等/重建；**shape = matrix-owned**（10 写入口 × 13 shape + 4 读载体）；只打跨来源一致性/导出中断/账本降级 | `tests/host/ledger/`、`tests/host/contract/company-root-safety.spec.ts`、`probes/browser-visual/deliverables-catalog-probe.mjs`、[data-model](./../../docs/contracts/data-model.md) |
+| C4 | **账本 / 成品 / 治理导出** | presented ledger 派生、catalog、final.md、审计哈希、治理导出幂等/重建；**shape = matrix-owned**（10 写入口 × 13 shape + 4 读载体）；只打跨来源一致性/导出中断/账本降级 | `tests/host/ledger/`、`tests/host/contract/company-root-safety.spec.ts`、`probes/browser-visual/deliverables-catalog-probe.mjs`、[data-model](./../../../docs/contracts/data-model.md) |
 | C5 | **任务板 / 在场 / DAG / 客户端流** | 文件派生 + 实时 follow + 多窗口/浮动/会话切换；stale/empty/error 三态 | `probes/fs-taskboard/`、`tests/client/`、`checks/lanes/ui-scene.entry.mjs`（`--isolated --steps`） |
 | C6 | **命令 / 解析 / 数据命令的 workspace** | `/req` `/prd` `/delivery` `/deliverables` 仍在 boot 优先；解析器与回执/locale 各写一份；**C8 管 prd 闸门，C6 管命令面** | `tests/host/commands/`、`tests/content/`、`checks/lanes/company-entry.entry.mjs`、`tests/host/commands/prd-command.spec.ts` |
 | C7 | **发布 / 安装 / 隔离** | tarball、plugin add/remove/upgrade、多 home、profile 共享、content 打包；用 0.11.8 当前产物重跑 | `checks/lanes/release.entry.mjs`、`checks/lanes/multi-install.entry.mjs`、`checks/lanes/isolation-matrix.entry.mjs`、`checks/lanes/concurrent-home.entry.mjs` |
-| **C8** | **PRD headings / present 闸门 / requirements-check** | 新交付阻断面：新 parser + 新旧兼容 + 模型可写输入；`present` 前 deny；只有 5 个 gate spec；Note 的 live deny 未跑；解析器对 CRLF/围栏/缩进的容错未证 | [prd-check.ts](../../packages/company-pack/src/lib/docs/prd-check.ts)、[prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts)、[prd-gate.spec.ts](../../tests/host/commands/prd-gate.spec.ts)、[prd 模板](../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../docs/reference/decisions.md) |
-| **C9** | **测试资产 / 验证元面**（lane 注册、pre-push、census、覆盖率） | 新「绿灯」的制造者：假绿/假跳过不会被产品 spec 抓到；新分支 zero-SHA 只 diff tip 已复现 | [asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs)、[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs)、[CENSUS](../../tests/CENSUS.generated.md) |
-| **C10** | **client 错误环** | 新增过滤/持久化/上报；可能把真错误滤掉；真页面 lane 只在 weekly | [error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts)、`tests/client/wiring/error-ring.spec.ts`、`checks/lanes/client-error-chain.entry.mjs` |
-| **C11** | **搬移副作用 / 等价性**（三批纯搬移：tests 分轴、src↔tests 对齐、tools 四组） | 变量 = 位置：机械面（import / 显式引用 / 生成物）已改齐，但注释、技能、头注、门禁扫描面、注册表、类型面、覆盖率基线不在任何单一门禁的射程；全绿 ≠ 零漂移；搬移等价 oracle 未进任何 lane | 三批提交 `29ae8c94` / `1eb14f46` / `57d34a34`；[refactor-drift](../../checks/audit/refactor-drift-audit.mjs)；[mirror.spec.ts](../../tests/repo/structure/mirror.spec.ts)；[CENSUS](../../tests/CENSUS.generated.md)；[checks/INDEX](../../checks/INDEX.generated.md)；[coverage-baseline.json](../../checks/lib/coverage-baseline.json)；[pre-push-surfaces.mjs](../../checks/pre-push-surfaces.mjs)；`checks/lanes/{company-entry,release,preset,client-load}.entry.mjs`；`.agents/skills/**`、`packages/company-pack/{presets,content,src}/**` 的头注 |
+| **C8** | **PRD headings / present 闸门 / requirements-check** | 新交付阻断面：新 parser + 新旧兼容 + 模型可写输入；`present` 前 deny；只有 5 个 gate spec；Note 的 live deny 未跑；解析器对 CRLF/围栏/缩进的容错未证 | [prd-check.ts](../../../packages/company-pack/src/lib/docs/prd-check.ts)、[prd-gate.ts](../../../packages/company-pack/src/host/commands/prd-gate.ts)、[prd-gate.spec.ts](../../../tests/host/commands/prd-gate.spec.ts)、[prd 模板](../../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../../docs/reference/decisions.md) |
+| **C9** | **测试资产 / 验证元面**（lane 注册、pre-push、census、覆盖率） | 新「绿灯」的制造者：假绿/假跳过不会被产品 spec 抓到；新分支 zero-SHA 只 diff tip 已复现 | [asset-lanes.mjs](../../../tools/lib/core/asset-lanes.mjs)、[pre-push-surfaces.mjs](../../../checks/pre-push-surfaces.mjs)、[coverage-ratchet.mjs](../../../checks/audit/coverage-ratchet.mjs)、[CENSUS](../../../tests/CENSUS.generated.md) |
+| **C10** | **client 错误环** | 新增过滤/持久化/上报；可能把真错误滤掉；真页面 lane 只在 weekly | [error-ring.ts](../../../packages/company-pack/src/client/wiring/error-ring.ts)、`tests/client/wiring/error-ring.spec.ts`、`checks/lanes/client-error-chain.entry.mjs` |
+| **C11** | **搬移副作用 / 等价性**（三批纯搬移：tests 分轴、src↔tests 对齐、tools 四组） | 变量 = 位置：机械面（import / 显式引用 / 生成物）已改齐，但注释、技能、头注、门禁扫描面、注册表、类型面、覆盖率基线不在任何单一门禁的射程；全绿 ≠ 零漂移；搬移等价 oracle 未进任何 lane | 三批提交 `29ae8c94` / `1eb14f46` / `57d34a34`；[refactor-drift](../../../checks/audit/refactor-drift-audit.mjs)；[mirror.spec.ts](../../../tests/repo/structure/mirror.spec.ts)；[CENSUS](../../../tests/CENSUS.generated.md)；[checks/INDEX](../../../checks/INDEX.generated.md)；[coverage-baseline.json](../../../checks/lib/coverage-baseline.json)；[pre-push-surfaces.mjs](../../../checks/pre-push-surfaces.mjs)；`checks/lanes/{company-entry,release,preset,client-load}.entry.mjs`；`.agents/skills/**`、`packages/company-pack/{presets,content,src}/**` 的头注 |
 
 **排除：**
 
@@ -167,7 +171,7 @@ opened: 2026-11-12
 - C9 的测试资产缺口只开卡/记观察，不在本卡修；C8/C10 的产品缺陷只开卡，不在本卡修。
 - **不把 `pnpm test` / `pnpm verify` 全绿当「搬移无副作用」**；也不把「grep 零命中」当「活指针已清」——先分 live / frozen / fixture / deliberate。
 - **不改冻结层的历史路径**（`notes/archived/`、`_backlog/_archive/`、`CHANGELOG.md`）；只读对比；允许面 = Markdown 链接目标与可执行命令路径（`fix-evidence` 判据）。
-- **不把夹具 / 负向样本里的不存在路径当缺陷**（如 [doc-grammar.ts](../../tests/support/doc-grammar.ts) 的样本）；先分类再判。
+- **不把夹具 / 负向样本里的不存在路径当缺陷**（如 [doc-grammar.ts](../../../tests/support/doc-grammar.ts) 的样本）；先分类再判。
 - **不重做搬移**：本卡只取证；发现搬移本身错了 → 开 BUG 卡，不在卡里改文件。
 - **不为「再列一遍文件清单」开轮次**；C11 只打「等价 / 活指针 / 真入口 / 静默弱化」四个子面。
 
@@ -178,8 +182,8 @@ opened: 2026-11-12
 2. **静态取证**：读代码、测试、probe、Note 的「未跑 / 剩余风险」；列出测试只在固定夹具上成立的判据。C11 另加：把引用按 live / frozen / fixture / deliberate 分类，只有 live 可判。
 3. **对抗夹具 + 负控**：优先 keyless 真文件 / 真 Cordis / 真装配；为每条关键断言做一次最小破坏，看现有 spec / 门禁是否真会红。**C11 的「门禁仍有效 / 搬移等价」结论必须有负控**（破坏 → 红 → 还原 → 绿）；没有负控就写 `unverified`。
 4. **真实入口**：`checks/lanes/preset.entry.mjs` / `client-load.entry.mjs` / `ui-scene.entry.mjs` / `release.entry.mjs` / `company-entry.entry.mjs` / `company-root-process.e2e.mjs` 按面选择；C8 live 只用于 `present` deny 端到端；live 用隔离 workspace/home。**C11 优先搬移影响链上的入口**（`pnpm company`、`pnpm setup`、hooks / pre-push、release / preset / client-load）；`--help` / `--check` 只算前置。
-5. **判决 + 证据**：每格 PASS / FAIL / 未证 + 原因；FAIL 立刻开 `_backlog/bugs/` 卡（编号 = [bugs/README](../bugs/README.md) 的 Next，当前 192）；C9 的假绿 / 假跳过同样开卡或观察；观察标 owner。C11 的格必须带「旧家 → 新家」「载体分类」「等价判据」「负控」四列。
-6. **回填**：本卡追加 `## Round N`（已跑面、H 判决、BUG 卡、未跑面）；不覆盖旧结论；新探索脚本留 `runtime/tmp/`，升常驻必须登记 [asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs)。
+5. **判决 + 证据**：每格 PASS / FAIL / 未证 + 原因；FAIL 立刻开 `_backlog/bugs/` 卡（编号 = [bugs/README](../../bugs/README.md) 的 Next，当前 192）；C9 的假绿 / 假跳过同样开卡或观察；观察标 owner。C11 的格必须带「旧家 → 新家」「载体分类」「等价判据」「负控」四列。
+6. **回填**：本卡追加 `## Round N`（已跑面、H 判决、BUG 卡、未跑面）；不覆盖旧结论；新探索脚本留 `runtime/tmp/`，升常驻必须登记 [asset-lanes.mjs](../../../tools/lib/core/asset-lanes.mjs)。
 
 ## Round 1（C1 培养状态机/存储）
 
@@ -212,14 +216,14 @@ opened: 2026-11-12
 |---|---|---|
 | H1 slug/ID 碰撞覆盖 | **refuted（keyless）** | `installMethod` 对已存在方法目录返回 false、记录用 `writeNewFile` 独占 + `newRecordId` 重试；现有 collision spec 覆盖。未跑多进程并发。 |
 | H2 跨角色采纳/拒收/撤回 | **refuted** | `ceo` 采纳/拒收 `cfo` 的记录均 error「仅建议权 / 请在该角色会话」；`cfo` 采纳成功。证据 = `runtime/tmp/c1-role-guards.mts`。 |
-| H3 revoke 后 check/记录一致性 | **confirmed** | [BUG-091](../_archive/fixed_bugs/BUG-091-cultivation-check-revoked-broken-unsafe.md)：revoke 后记录仍 status adopted，check 报「记录缺方法」。 |
+| H3 revoke 后 check/记录一致性 | **confirmed** | [BUG-091](../fixed_bugs/BUG-091-cultivation-check-revoked-broken-unsafe.md)：revoke 后记录仍 status adopted，check 报「记录缺方法」。 |
 | H4 原子/并发 | **部分 pass** | 记录 CAS（expectedText + 二次读）、sibling-temp rename、方法 mkdir 独占均有 spec；未跑真多进程/断电。 |
 | H5 `--context` 边界 | **unverified** | 未造 base64url 坏形状、超大 excerpt、deliverable 索引缺/坏、sessionQuery 缺失的真实命令；代码有 `CONTEXT_COMMAND_MAX_BYTES`/`clipExcerpt` 但未逐格判。 |
-| H6 迁移幂等/冲突 | **confirmed + 部分 pass** | 合法输入幂等（marker + copy EXCL）；**非法 slug 被原样搬进方法层** → [BUG-093](../_archive/fixed_bugs/BUG-093-cultivation-legacy-migration-invalid-slug.md)。 |
-| H7 archive/purge/check 坏记录 | **confirmed** | [BUG-091](../_archive/fixed_bugs/BUG-091-cultivation-check-revoked-broken-unsafe.md)：check 不计 `loadRecords.broken`，坏记录被当成 0 条。 |
+| H6 迁移幂等/冲突 | **confirmed + 部分 pass** | 合法输入幂等（marker + copy EXCL）；**非法 slug 被原样搬进方法层** → [BUG-093](../fixed_bugs/BUG-093-cultivation-legacy-migration-invalid-slug.md)。 |
+| H7 archive/purge/check 坏记录 | **confirmed** | [BUG-091](../fixed_bugs/BUG-091-cultivation-check-revoked-broken-unsafe.md)：check 不计 `loadRecords.broken`，坏记录被当成 0 条。 |
 | H8 client actions 失败/刷新 | **unverified** | `cultivation-actions.spec` 覆盖命令构造/失败上行，但未跑真实面板「采纳后刷新/失败仍显示已采纳」的 steps。 |
-| H9 proposal guard | **部分 pass / confirmed** | 角色/kind/self-target guard 命中（`c1-role-guards`）；**空 expectation/body 不拒** → [BUG-092](../_archive/fixed_bugs/BUG-092-cultivation-propose-empty-fields.md)。 |
-| H10 同 home 多 workspace | **confirmed** | [BUG-090](../_archive/fixed_bugs/BUG-090-cultivation-revoke-unreachable-records-deletes-method.md)：B workspace 把 A 的方法报 orphan，revoke 删掉 A 的方法且「标记 0 条记录」；records 目录缺失同样删。 |
+| H9 proposal guard | **部分 pass / confirmed** | 角色/kind/self-target guard 命中（`c1-role-guards`）；**空 expectation/body 不拒** → [BUG-092](../fixed_bugs/BUG-092-cultivation-propose-empty-fields.md)。 |
+| H10 同 home 多 workspace | **confirmed** | [BUG-090](../fixed_bugs/BUG-090-cultivation-revoke-unreachable-records-deletes-method.md)：B workspace 把 A 的方法报 orphan，revoke 删掉 A 的方法且「标记 0 条记录」；records 目录缺失同样删。 |
 
 **额外发现（H 表外）：**
 
@@ -244,12 +248,12 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| C3-1 v2 legacy `id` 路径穿越 | **confirmed P1** | [BUG-094](../_archive/fixed_bugs/BUG-094-bundle-manifest-id-path-traversal.md)：`id: ../../../pwn` → `identityBackupPath` 穿出 home，`writeBundleManifest` 在 tmp 根写 `pwn.json`，v3 保留穿越 id。 |
-| C3-2 系统 tmp 根当 workspace | **confirmed P2** | [BUG-095](../_archive/fixed_bugs/BUG-095-workspace-resolution-accepts-tmp-root.md)：`/tmp`、`/private/tmp` 都被 `resolveWorkspace` 接受为 `source:'cwd'`；注释说应排除。 |
+| C3-1 v2 legacy `id` 路径穿越 | **confirmed P1** | [BUG-094](../fixed_bugs/BUG-094-bundle-manifest-id-path-traversal.md)：`id: ../../../pwn` → `identityBackupPath` 穿出 home，`writeBundleManifest` 在 tmp 根写 `pwn.json`，v3 保留穿越 id。 |
+| C3-2 系统 tmp 根当 workspace | **confirmed P2** | [BUG-095](../fixed_bugs/BUG-095-workspace-resolution-accepts-tmp-root.md)：`/tmp`、`/private/tmp` 都被 `resolveWorkspace` 接受为 `source:'cwd'`；注释说应排除。 |
 | C3-3 lease stale / PID 复用 | **unverified / 观察** | `isAlive(pid)` 只看 PID；锁里的 `startedAt` 不参与判定。未造「旧 PID 被无关进程复用」的可复现样本；可能永久挡写，标观察。 |
 | C3-4 合法 v2 → v3 升级 | **pass（spec）** | `bundle-manifest.spec` 的 legacy 升级用例 + 身份备份；本轮只额外测了非法 id。 |
 | C3-5 无 workspace 零写 | **pass（spec）** | `runtime-guard.spec`「DSH_COMPANY_HOME 不存在 → 无 workspace/停写/不建目录」；resolve 在 env 缺失时提前返回。 |
-| C3-6 同 home 多 profile / 多 workspace | **unverified** | `prepareCompanyRuntime` 只 warn；方法层/账本/records 的跨 workspace 面已在 C1 撞到 [BUG-090](../_archive/fixed_bugs/BUG-090-cultivation-revoke-unreachable-records-deletes-method.md)，本面未重测。 |
+| C3-6 同 home 多 profile / 多 workspace | **unverified** | `prepareCompanyRuntime` 只 warn；方法层/账本/records 的跨 workspace 面已在 C1 撞到 [BUG-090](../fixed_bugs/BUG-090-cultivation-revoke-unreachable-records-deletes-method.md)，本面未重测。 |
 | C3-7 `writeSavedWorkspace` 原子性 | **unverified** | 非原子 writeFileSync；坏 JSON 读取会折 undefined，但未造崩溃/半写盘样本。 |
 
 **额外发现（H 表外）：**
@@ -272,7 +276,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| C4-1 成品目录扫描的坏形状 | **confirmed P2** | [BUG-096](../_archive/fixed_bugs/BUG-096-deliverables-catalog-directory-eisdir.md)：`meta.md` / `kb/motion-ledger.md` 是目录 → `readFileSync` EISDIR，`regenerateCatalog` 抛；boot 的 `void initializeCatalog` 无 catch；`final.md` 目录被算成成品。 |
+| C4-1 成品目录扫描的坏形状 | **confirmed P2** | [BUG-096](../fixed_bugs/BUG-096-deliverables-catalog-directory-eisdir.md)：`meta.md` / `kb/motion-ledger.md` 是目录 → `readFileSync` EISDIR，`regenerateCatalog` 抛；boot 的 `void initializeCatalog` 无 catch；`final.md` 目录被算成成品。 |
 | C4-2 presented false/slug 语义 | **pass（spec）** | `catalog.spec` 的 false 只认精确 path、同 slug 新件不继承；`presentedOf` 实现一致。 |
 | C4-3 导出幂等 | **pass（部分）** | ledger.json 内容不变不重写（`governance-export.spec`）；`methods/` 每次 cpSync 重建（内容等价但 mtime 变），未作为缺陷。 |
 | C4-4 导出原子性/符号链接 | **unverified** | `atomicReplaceDir` 先 rm 再 rename；staging 失败残留、methods 内 symlink、target 是 symlink 未造样本。 |
@@ -294,7 +298,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| C2-1 workflow call→run 配对 | **confirmed P2** | [BUG-097](../_archive/fixed_bugs/BUG-097-workflow-runs-mispair-failed-call.md)：第一次同名调用在 run-start 前失败，第二次成功 → r2 被归到 c1，jobId 丢失，jobKnown 为 true 仍报 `lost`。 |
+| C2-1 workflow call→run 配对 | **confirmed P2** | [BUG-097](../fixed_bugs/BUG-097-workflow-runs-mispair-failed-call.md)：第一次同名调用在 run-start 前失败，第二次成功 → r2 被归到 c1，jobId 丢失，jobKnown 为 true 仍报 `lost`。 |
 | C2-2 `list_subagents` 终态/身份 | **pass（spec）** | `delegation-control.spec` 覆盖 unavailable/inferred-open-turn/身份降级；本轮未跑真 durable 失败。 |
 | C2-3 `send_to_subagent` 归属 | **unverified** | 实现只转发 `ctx.subagents.sendMessage`；vendor manager 是否按 parent/authority 拒绝越权未造跨 root 样本。 |
 | C2-4 seat 矩阵 / support guard | **pass（spec）** | `seat.spec` / `team-seat-guard.spec`：support root 不组队、teammate 按 child 预算、未知 preset 不猜；本轮未改代码。 |
@@ -317,7 +321,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| C5-1 任务回退 `pending` 的动态 | **confirmed P2** | [BUG-098](../_archive/fixed_bugs/BUG-098-presence-pending-transition-shows-deleted.md)：`diffActivity` 与 `presenceFromEvents` 都把 pending 落进 `else`，显示「已删除」；首次 deleted 事件还会先报「新任务」。 |
+| C5-1 任务回退 `pending` 的动态 | **confirmed P2** | [BUG-098](../fixed_bugs/BUG-098-presence-pending-transition-shows-deleted.md)：`diffActivity` 与 `presenceFromEvents` 都把 pending 落进 `else`，显示「已删除」；首次 deleted 事件还会先报「新任务」。 |
 | C5-2 board ready 语义/依赖悬空 | **pass（spec）** | `board.spec`：`readyOf` 不含自身 pending、`tasksFromTeamView` 用 `task.ready ?? (pending && readyOf)` 与官方同义；悬空 id 未就绪。 |
 | C5-3 声明 vs 板面 drift | **pass（spec）** | `dependencyDrift` 覆盖 missing/unmapped/「不依赖」假阳性；本轮未造新文本形态。 |
 | C5-4 DAG 成环/悬空/跨层车道 | **pass（spec）** | `dag.spec`：成环层级有界、悬空不出边、跨层走边缘、边不穿节点。 |
@@ -340,7 +344,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| C6-1 `/deliverables audit` 的不存在 final | **confirmed P2** | [BUG-099](../_archive/fixed_bugs/BUG-099-deliverables-audit-nonexistent-final.md)：不存在 path 仍写账本；`true` 同时写 `slugs.nope=true`，随后创建同 slug final 即显示 `presented:true`。 |
+| C6-1 `/deliverables audit` 的不存在 final | **confirmed P2** | [BUG-099](../fixed_bugs/BUG-099-deliverables-audit-nonexistent-final.md)：不存在 path 仍写账本；`true` 同时写 `slugs.nope=true`，随后创建同 slug final 即显示 `presented:true`。 |
 | C6-2 产品类型/交付模式 id 的读路径 | **unverified / 观察** | `productType` / `deliveryMode` 来自模型可写 meta/company.md，`join(contentDir, product-types, id, ...)` 未校验 id 的单段性，理论上可读 content 外 JSON；当前只读、错误路径不写，未判产品缺陷。 |
 | C6-3 slug / 单段路径安全 | **pass（spec）** | `resolveDeliverablePath` 拒绝 `/`、`\`、`.`/`..`、越出 deliverables 根；`req/prd/delivery` 共用；BUG-057 守卫仍绿。 |
 | C6-4 产品类型/交付模式 canonical | **pass（spec）** | 旧中文 key 不解析；placeholder 视为未声明；未知类型列可用；meta 优先 company 回落。 |
@@ -364,7 +368,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| C7-1 导出失败路径的旧产物 | **confirmed P2** | [BUG-100](../_archive/fixed_bugs/BUG-100-export-dist-deletes-old-before-pack.md)：`export-dist` 先删 `_dist` 旧 tgz/sha/手册，再 `npm pack`；pack 失败后既无新包也无旧包，tracked 手册成 deleted 态。 |
+| C7-1 导出失败路径的旧产物 | **confirmed P2** | [BUG-100](../fixed_bugs/BUG-100-export-dist-deletes-old-before-pack.md)：`export-dist` 先删 `_dist` 旧 tgz/sha/手册，再 `npm pack`；pack 失败后既无新包也无旧包，tracked 手册成 deleted 态。 |
 | C7-2 当前 tarball 的发布形状 | **pass（本轮实跑）** | 当前源码 `npm pack` 含 `content/wiki-template/**`、`presets/_shared/wiki/skills/**`；`release-smoke` 在修复后 ALL PASS（Note 实测，本轮未重跑）。 |
 | C7-3 安装 profile 的六角色 skill 面 | **unverified / 资产缺口** | `release-smoke` 只证 preset 挂载与 content 清单；没有在 release profile 上跑 `preset-smoke` 的 `skills/list`。共享 skill 的 `node_modules/dsh-company-pack/...` 路径若坏，现有 smoke 不一定红。 |
 | C7-4 多安装/并发 home/运行中升级 | **unverified** | `multi-install-smoke` / `concurrent-home-smoke` / `upgrade-while-running-smoke` 本轮未重跑；lease 的 stale PID 面已在 C3 记录观察。 |
@@ -393,7 +397,7 @@ opened: 2026-11-12
    - client 模块闭包 70 模块、本包缺失 0。
    - 唯一 WARN 是上游模块 `@deepseek-ai/dsh-client-ui-attachment → ...ui-trajectory`，不是本包。
 
-**判定：** C7-3（安装 profile 的六角色 skill 面）**PASS**；未发现新缺陷。C7-4（multi-install/concurrent-home/upgrade-while-running）与 C7-5（路径含空格/unicode 安装）仍未跑；[BUG-100](../_archive/fixed_bugs/BUG-100-export-dist-deletes-old-before-pack.md) 的失败路径仍待修/复现。
+**判定：** C7-3（安装 profile 的六角色 skill 面）**PASS**；未发现新缺陷。C7-4（multi-install/concurrent-home/upgrade-while-running）与 C7-5（路径含空格/unicode 安装）仍未跑；[BUG-100](../fixed_bugs/BUG-100-export-dist-deletes-old-before-pack.md) 的失败路径仍待修/复现。
 
 **证据：**
 
@@ -411,7 +415,7 @@ opened: 2026-11-12
 |---|---|
 | 当前源码 `npm pack` 到 `_dist`（0.11.5） | 成功；含 `content/wiki-template/**`、`presets/_shared/wiki/skills/**` |
 | `multi-install-smoke` | **ALL PASS**（两 home 不串 / 非空 home 后装 / 自定义 profile base-only 预期失败 / 补 web-app 可启动 / 空 bundle 共存 / 同版本重复 add 幂等） |
-| `concurrent-home-smoke --keep` | **FAIL**：`up=2 blocked=0` + `ENOENT …/home/bundle.json` → [BUG-101](../_archive/fixed_bugs/BUG-101-concurrent-home-smoke-stale-v2-and-lease-timing.md) |
+| `concurrent-home-smoke --keep` | **FAIL**：`up=2 blocked=0` + `ENOENT …/home/bundle.json` → [BUG-101](../fixed_bugs/BUG-101-concurrent-home-smoke-stale-v2-and-lease-timing.md) |
 | 手工两 writer 对照（同 base/profile，等 3s） | 第二个进程确实打印「另一个 writer 正在使用这个 home」；lease 生效，smoke 单次快照读早了 |
 
 **判定：**
@@ -438,7 +442,7 @@ opened: 2026-11-12
 | `upgrade-while-running-smoke` | **ALL PASS**：V1 0.11.5 boot 中 remove/add 0.11.6，旧实例继续 RPC/建会话；重启后 bundle 保留创建版本 0.11.5、profile 到 0.11.6、旧 session/数据仍在 |
 | `interrupted-install-smoke` | **ALL PASS**：remove 后坏 tarball/不存在 tarball add 失败且数据/账本/身份仍在；re-add 恢复 roster；坏 profile package 可诊断、修复后 boot 恢复 |
 
-**判定：** C7-4 的 upgrade/interrupted 两项 **PASS**；本轮未发现新缺陷。C7-5（isolation-matrix、带空格/unicode 路径）仍未跑；[BUG-101](../_archive/fixed_bugs/BUG-101-concurrent-home-smoke-stale-v2-and-lease-timing.md) 的检查器陈旧/时序问题仍待修。
+**判定：** C7-4 的 upgrade/interrupted 两项 **PASS**；本轮未发现新缺陷。C7-5（isolation-matrix、带空格/unicode 路径）仍未跑；[BUG-101](../fixed_bugs/BUG-101-concurrent-home-smoke-stale-v2-and-lease-timing.md) 的检查器陈旧/时序问题仍待修。
 
 **证据：** `runtime/tmp/upgrade-running.log`、`runtime/tmp/interrupted-install.log`；均为 `runtime/` 下落盘状态，不入 git。
 
@@ -462,8 +466,8 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| C6-2 productType / deliveryMode 的读路径 | **confirmed P1** | [BUG-102](../_archive/fixed_bugs/BUG-102-req-delivery-rule-path-traversal.md)：`meta.md` 写 `deliveryMode: ../../workspace/evil-mode`、`productType: ../../workspace/evil-type`，workspace 里自造「零要求」规则；`/delivery check` 返回 `success「文档 0 份」`，`/req check` 返回 `success「不走五层」`——检查器被模型自造规则背书。 |
-| C6-1 audit 不存在 final | **confirmed P2** | [BUG-099](../_archive/fixed_bugs/BUG-099-deliverables-audit-nonexistent-final.md)（上一轮）。 |
+| C6-2 productType / deliveryMode 的读路径 | **confirmed P1** | [BUG-102](../fixed_bugs/BUG-102-req-delivery-rule-path-traversal.md)：`meta.md` 写 `deliveryMode: ../../workspace/evil-mode`、`productType: ../../workspace/evil-type`，workspace 里自造「零要求」规则；`/delivery check` 返回 `success「文档 0 份」`，`/req check` 返回 `success「不走五层」`——检查器被模型自造规则背书。 |
+| C6-1 audit 不存在 final | **confirmed P2** | [BUG-099](../fixed_bugs/BUG-099-deliverables-audit-nonexistent-final.md)（上一轮）。 |
 | C6-3 slug/单段路径 | **pass（spec）** | `resolveDeliverablePath` 拒绝 `/`、`\`、`.`/`..`；本轮的穿越发生在 `productType`/`deliveryMode` 的规则 id，不在 slug。 |
 | C6-4 canonical 字段 | **pass（spec）** | 旧中文 key 不解析、placeholder 未声明、未知类型列可用（合法 id 分支）。 |
 | C6-5 空白路径 | **unverified** | `/deliverables audit` 仍单空格 join；未造连续空格路径。 |
@@ -491,7 +495,7 @@ opened: 2026-11-12
 
 - 任务创建侧 PASS：两次 `team_task_create` 工具结果 = task-1 / task-2；会话日志有两条 `team/task` 事件。
 - **UI 侧 FAIL**：任务板显示「成员：lead(待命) / 还没有共享任务」，`waitText 写 PRD` 失败；依赖图/看板同源为空。
-- → [BUG-103](../_archive/fixed_bugs/BUG-103-tasks-tab-empty-despite-team-task-events.md)（P2，真页面读模型/投影不同步）。
+- → [BUG-103](../fixed_bugs/BUG-103-tasks-tab-empty-despite-team-task-events.md)（P2，真页面读模型/投影不同步）。
 
 **证据：**
 
@@ -507,16 +511,16 @@ opened: 2026-11-12
 
 | 卡 | 面 | 判决 |
 |---|---|---|
-| [BUG-104](../_archive/fixed_bugs/BUG-104-team-task-merge-no-revision-null-view.md) | C5 merge | 旧 `team/task` 事件覆盖新投影（无 revision 比较）；`view=null` 时事件整段丢 |
-| [BUG-105](../_archive/fixed_bugs/BUG-105-stream-error-not-rendered-in-board-dag-tasks.md) | C5 流 | follow 失败只有 PresenceTab 显示 `streamError`；board/dag/tasks 静默空/旧 |
-| [BUG-106](../_archive/fixed_bugs/BUG-106-lease-pid-reuse-blocks-writer.md) | C3 lease | PID 复用 + `startedAt` 不参与 → 旧锁永久挡 writer |
-| [BUG-107](../_archive/fixed_bugs/BUG-107-deliverables-audit-multi-space-path.md) | C6 parser | `/deliverables audit` 单空格 join，连续空格路径被改成另一路径 |
-| [BUG-108](../_archive/fixed_bugs/BUG-108-catalog-symlink-final-outside.md) | C4 catalog | `final.md`/`meta.md` symlink→workspace 外仍算成品（stat 跟随） |
-| [BUG-109](../_archive/fixed_bugs/BUG-109-catalog-warnings-dropped-in-audit-present.md) | C4 warnings | 坏形状 warnings 只在 boot 消费；audit/present 静默丢 |
-| [BUG-110](../_archive/fixed_bugs/BUG-110-governance-export-rm-before-rename.md) | C4 export | 目录替换先 `rm` 再 rename，失败丢上一份导出 |
-| [BUG-111](../_archive/fixed_bugs/BUG-111-saved-workspace-non-atomic-write.md) | C3 settings | `writeSavedWorkspace` 非原子写，崩溃成坏 JSON |
-| [BUG-112](../_archive/fixed_bugs/BUG-112-team-task-unassign-keeps-old-owner.md) | C5 task merge | 取消认领（无 ownerId）保留旧 ownerName |
-| [BUG-113](../_archive/fixed_bugs/BUG-113-command-doc-symlink-outside-workspace.md) | C6 docs | `/prd` `/req` `/delivery` 跟随 deliverables symlink 读 workspace 外文档 |
+| [BUG-104](../fixed_bugs/BUG-104-team-task-merge-no-revision-null-view.md) | C5 merge | 旧 `team/task` 事件覆盖新投影（无 revision 比较）；`view=null` 时事件整段丢 |
+| [BUG-105](../fixed_bugs/BUG-105-stream-error-not-rendered-in-board-dag-tasks.md) | C5 流 | follow 失败只有 PresenceTab 显示 `streamError`；board/dag/tasks 静默空/旧 |
+| [BUG-106](../fixed_bugs/BUG-106-lease-pid-reuse-blocks-writer.md) | C3 lease | PID 复用 + `startedAt` 不参与 → 旧锁永久挡 writer |
+| [BUG-107](../fixed_bugs/BUG-107-deliverables-audit-multi-space-path.md) | C6 parser | `/deliverables audit` 单空格 join，连续空格路径被改成另一路径 |
+| [BUG-108](../fixed_bugs/BUG-108-catalog-symlink-final-outside.md) | C4 catalog | `final.md`/`meta.md` symlink→workspace 外仍算成品（stat 跟随） |
+| [BUG-109](../fixed_bugs/BUG-109-catalog-warnings-dropped-in-audit-present.md) | C4 warnings | 坏形状 warnings 只在 boot 消费；audit/present 静默丢 |
+| [BUG-110](../fixed_bugs/BUG-110-governance-export-rm-before-rename.md) | C4 export | 目录替换先 `rm` 再 rename，失败丢上一份导出 |
+| [BUG-111](../fixed_bugs/BUG-111-saved-workspace-non-atomic-write.md) | C3 settings | `writeSavedWorkspace` 非原子写，崩溃成坏 JSON |
+| [BUG-112](../fixed_bugs/BUG-112-team-task-unassign-keeps-old-owner.md) | C5 task merge | 取消认领（无 ownerId）保留旧 ownerName |
+| [BUG-113](../fixed_bugs/BUG-113-command-doc-symlink-outside-workspace.md) | C6 docs | `/prd` `/req` `/delivery` 跟随 deliverables symlink 读 workspace 外文档 |
 
 **证据脚本：** `runtime/tmp/newbugs-merge.mts`、`newbugs-2.mts`（unassign/catalog symlink/audit spaces）、`newbugs-lease.mts`、`newbugs-doc-symlink.mts`。均为 upstream 生产函数直调或 handler 直调；未改产品代码。
 
@@ -528,9 +532,9 @@ opened: 2026-11-12
 
 | 卡 | 面 | 判定 |
 |---|---|---|
-| [BUG-114](../_archive/fixed_bugs/BUG-114-governance-export-corrupt-ledger-drops-old-snapshot.md) | S3 导出 | `exportGovernance` 账本 corrupt/undef 时整个 exports 替换，旧 `ledger.json` 被删；warning 说「保留上次快照」与实际相反 |
-| [BUG-115](../_archive/fixed_bugs/BUG-115-lease-takeover-no-fencing-old-writer.md) | S6 lease | heartbeat stale 接管只换锁，不 fence 旧 writer；旧 host 恢复后两边都写（实测 child+parent 同时 acquired） |
-| [BUG-116](../_archive/fixed_bugs/BUG-116-release-inventory-misses-wiki-template-shared-skill.md) | C7 发布 | `export-dist` `must` 与 `release-smoke` content 清单不含 wiki-template/共享 skill；缺包仍绿 |
+| [BUG-114](../fixed_bugs/BUG-114-governance-export-corrupt-ledger-drops-old-snapshot.md) | S3 导出 | `exportGovernance` 账本 corrupt/undef 时整个 exports 替换，旧 `ledger.json` 被删；warning 说「保留上次快照」与实际相反 |
+| [BUG-115](../fixed_bugs/BUG-115-lease-takeover-no-fencing-old-writer.md) | S6 lease | heartbeat stale 接管只换锁，不 fence 旧 writer；旧 host 恢复后两边都写（实测 child+parent 同时 acquired） |
+| [BUG-116](../fixed_bugs/BUG-116-release-inventory-misses-wiki-template-shared-skill.md) | C7 发布 | `export-dist` `must` 与 `release-smoke` content 清单不含 wiki-template/共享 skill；缺包仍绿 |
 
 **证据脚本/实跑：**
 
@@ -546,7 +550,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `adopt <id> as`（缺 slug） | **confirmed P2** | [BUG-117](../_archive/fixed_bugs/BUG-117-cultivation-adopt-as-missing-slug.md)：tokens[3] undefined 被当成「未提供 as」，静默部署 `method-<id>` 并 success。 |
+| `adopt <id> as`（缺 slug） | **confirmed P2** | [BUG-117](../fixed_bugs/BUG-117-cultivation-adopt-as-missing-slug.md)：tokens[3] undefined 被当成「未提供 as」，静默部署 `method-<id>` 并 success。 |
 | `adopt <id> asx <slug>` / 多余 token | **同根因（未单独开卡）** | 解析只认 tokens[2]==='as'，其余形状回默认；卡内列为修复 spec。 |
 | `adopt <id>` 默认 slug | pass（设计） | 仍 success，部署 `method-<id>`；这是合法用法。 |
 | `adopt` 已采纳/已拒绝/角色不符/方法已存在 | pass（spec） | 现有 15 个 cultivation-command spec 全绿。 |
@@ -561,7 +565,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| null 投影 + `team/member` | **confirmed P2** | [BUG-118](../_archive/fixed_bugs/BUG-118-member-events-dropped-without-team-projection.md)：`teamWithEventTasks(null,[member])` → null；`presenceFromEvents` 已能出成员行/「上线」动态。 |
+| null 投影 + `team/member` | **confirmed P2** | [BUG-118](../fixed_bugs/BUG-118-member-events-dropped-without-team-projection.md)：`teamWithEventTasks(null,[member])` → null；`presenceFromEvents` 已能出成员行/「上线」动态。 |
 | null 投影 + task | pass（BUG-104） | task 事件建最小视图。 |
 | 有投影 + member | pass | projection members 提供行；follow 只补 activity。 |
 
@@ -575,7 +579,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| lease blocked 的第二 host 写 startup options | **confirmed P2** | [BUG-119](../_archive/fixed_bugs/BUG-119-lease-blocked-host-writes-startup-options.md)：同 home 锁被 live PID 占，host 已报「公司数据已停写」，建 CEO 会话后 `$WS/.dsh-company/startup-options.json` 仍出现。 |
+| lease blocked 的第二 host 写 startup options | **confirmed P2** | [BUG-119](../fixed_bugs/BUG-119-lease-blocked-host-writes-startup-options.md)：同 home 锁被 live PID 占，host 已报「公司数据已停写」，建 CEO 会话后 `$WS/.dsh-company/startup-options.json` 仍出现。 |
 | lease blocked 的 commands/自举/成品目录 | pass（现有 gate） | `dataBlocked` 传给命令、`ensureRunBundle`、`initializeCatalog`、present handler、`exportNow`。 |
 | lease blocked 的 catalog 写 | pass | `ledgerStorePromise` 在 `hasWorkspace && !runtime.dataBlocked` 才创建。 |
 
@@ -589,7 +593,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| session cwd = tmpdir | **confirmed P2** | [BUG-120](../_archive/fixed_bugs/BUG-120-startup-settings-dangerous-session-cwd.md)：`isDangerousRoot(tmpdir())=true`，但 `startupWorkspace('/ws', agent tmpdir)` 仍返回 tmpdir；watch 会写 `<tmpdir>/.dsh-company/startup-options.json`。 |
+| session cwd = tmpdir | **confirmed P2** | [BUG-120](../fixed_bugs/BUG-120-startup-settings-dangerous-session-cwd.md)：`isDangerousRoot(tmpdir())=true`，但 `startupWorkspace('/ws', agent tmpdir)` 仍返回 tmpdir；watch 会写 `<tmpdir>/.dsh-company/startup-options.json`。 |
 | session cwd = `/tmp`/home/root | 同根因（未单独开卡） | `startupWorkspace` 不校验任何危险根；卡内列修复 spec。 |
 | boot workspace 危险 | pass（G7） | `resolveWorkspace` 已拒绝根、home、tmpdir、`/tmp` 等危险落点。 |
 | 普通子目录 cwd | 设计允许 | BUG-081/089 的多 workspace 语义；不按危险根误杀。 |
@@ -604,7 +608,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| dataBlocked + `set` | **confirmed P2** | [BUG-121](../_archive/fixed_bugs/BUG-121-company-settings-blocked-host-writes.md)：注入 `dataBlocked:true` + 非空 workspace，`set productType` 仍 success，`startup.json` 写入。 |
+| dataBlocked + `set` | **confirmed P2** | [BUG-121](../fixed_bugs/BUG-121-company-settings-blocked-host-writes.md)：注入 `dataBlocked:true` + 非空 workspace，`set productType` 仍 success，`startup.json` 写入。 |
 | dataBlocked + `reset` | 同根因 | 同一 handler 分支，未单独开卡；修复 spec 覆盖。 |
 | dataBlocked + `show` | 只读，可放行 | 现状不写；产品可选是否也 blocked。 |
 | 无 workspace + blocked | pass（现有） | 返回 blockedCompanyText。 |
@@ -619,7 +623,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| 根=普通文件 | **confirmed P2** | [BUG-122](../_archive/fixed_bugs/BUG-122-catalog-root-file-symlink-enotdir.md)：`regenerateCatalog` 直接 `ENOTDIR: not a directory, scandir …/deliverables`。 |
+| 根=普通文件 | **confirmed P2** | [BUG-122](../fixed_bugs/BUG-122-catalog-root-file-symlink-enotdir.md)：`regenerateCatalog` 直接 `ENOTDIR: not a directory, scandir …/deliverables`。 |
 | 根=symlink→目录 | 同根因（未单独开卡） | `existsSync` 后 `readdirSync` 跟随；叶子 safe-file 才按 outside 跳过，根没有 lstat。 |
 | 根=正常目录 | pass | 扫描叶子的 final/meta 仍绿。 |
 | 审计命令在坏根下 | 同根因 | audit 先写账本后 `regenerate` 抛错；命令以异常结束，账本已写。 |
@@ -634,7 +638,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| startup.json 截断 | **confirmed P2** | [BUG-123](../_archive/fixed_bugs/BUG-123-startup-json-corrupt-silent-auto.md)：`readStartupSettings` 返回 EMPTY，无 problem；`/company-settings show` 会显示全 auto，不报坏。 |
+| startup.json 截断 | **confirmed P2** | [BUG-123](../fixed_bugs/BUG-123-startup-json-corrupt-silent-auto.md)：`readStartupSettings` 返回 EMPTY，无 problem；`/company-settings show` 会显示全 auto，不报坏。 |
 | startup-options.json 截断 | 同根因（未单独开卡） | `readStartupOptions` 同样 catch→EMPTY；面板可能显示无可选项。 |
 | 合法 auto / 正常设置 | pass | 现有 startup store spec 绿。 |
 | saved workspace corrupt | pass（BUG-111） | 已返回 problem='corrupt'，runtime guard warn。 |
@@ -649,7 +653,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| lock 是目录 | **confirmed P2** | [BUG-124](../_archive/fixed_bugs/BUG-124-lease-lock-directory-path-blocks.md)：acquire 返回「writer lease 竞争失败（另一个进程抢先）」，无 holder、无坏形状提示；实际没有进程占锁。 |
+| lock 是目录 | **confirmed P2** | [BUG-124](../fixed_bugs/BUG-124-lease-lock-directory-path-blocks.md)：acquire 返回「writer lease 竞争失败（另一个进程抢先）」，无 holder、无坏形状提示；实际没有进程占锁。 |
 | lock 是 symlink→目录 | 同根因（未单独开卡） | 代码路径相同；卡内 spec 覆盖。 |
 | lock 坏 JSON/空文件 | pass（现有） | parseHolder null → unlink → 重试/接管。 |
 | lock 正常/有 holder | pass | 现有 lease spec 绿。 |
@@ -664,7 +668,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| x/final.md → y/final.md（内部链接） | **confirmed P2** | [BUG-125](../_archive/fixed_bugs/BUG-125-audit-symlink-canonicalizes-to-target.md)：audit x 后 ledger.paths 是 y/final.md、slugs 是 y；x 未被审计。 |
+| x/final.md → y/final.md（内部链接） | **confirmed P2** | [BUG-125](../fixed_bugs/BUG-125-audit-symlink-canonicalizes-to-target.md)：audit x 后 ledger.paths 是 y/final.md、slugs 是 y；x 未被审计。 |
 | final.md → workspace 外 | pass | auditRelPath canonical 越界 → 拒绝。 |
 | 普通 final | pass | 现有 audit spec 绿。 |
 | 目录 final | pass（BUG-099） | auditTargetProblem 拒绝非普通文件。 |
@@ -679,7 +683,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| 两个同名 background call + 两个 start | **confirmed P2** | [BUG-126](../_archive/fixed_bugs/BUG-126-workflow-concurrent-same-name-pairing-swap.md)：r1 拿 jobB（c2），r2 拿 jobA（c1），互换。 |
+| 两个同名 background call + 两个 start | **confirmed P2** | [BUG-126](../fixed_bugs/BUG-126-workflow-concurrent-same-name-pairing-swap.md)：r1 拿 jobB（c2），r2 拿 jobA（c1），互换。 |
 | 单 run + 失败前置 call | pass（BUG-097） | 现有 workflow-runs spec 绿。 |
 | 结果先于 start 的启动文案 | pass（现有） | runEvidence 允许前置结果。 |
 | jobKnown live | 未跑 | 交换后 running/lost 行的影响未实机。 |
@@ -694,7 +698,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| records=普通文件 | **confirmed P2** | [BUG-127](../_archive/fixed_bugs/BUG-127-cultivation-records-file-throws.md)：`check` / `archive 30` 都抛 `UnsafeCultivationPathError`；revoke 已有 catch。 |
+| records=普通文件 | **confirmed P2** | [BUG-127](../fixed_bugs/BUG-127-cultivation-records-file-throws.md)：`check` / `archive 30` 都抛 `UnsafeCultivationPathError`；revoke 已有 catch。 |
 | records=symlink | 同根因（未单独开卡） | 存储层 `recordsDirectoryState` 抛；卡内 spec 覆盖。 |
 | records=missing | pass | `reachable=false`，check/revoke 给可读错误。 |
 | 正常 records | pass | 15 个 cultivation-command spec 绿。 |
@@ -709,7 +713,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `kb/org.md` symlink→外部文件 + replace | **confirmed P1** | [BUG-128](../_archive/fixed_bugs/BUG-128-bootstrap-replace-follows-symlink-write-outside.md)：`applyBootstrap` created，外部文件被覆盖为 'REPLACED BY BOOTSTRAP'。 |
+| `kb/org.md` symlink→外部文件 + replace | **confirmed P1** | [BUG-128](../fixed_bugs/BUG-128-bootstrap-replace-follows-symlink-write-outside.md)：`applyBootstrap` created，外部文件被覆盖为 'REPLACED BY BOOTSTRAP'。 |
 | 父目录 `kb` symlink | 同根因（未单独开卡） | `mkdirSync`/`writeFileSync` 都跟随父 symlink；卡内 spec 覆盖。 |
 | create 模式（`wx`） | 不覆盖，但父 symlink 仍可穿 | 同族；修复要逐级 lstat/realpath。 |
 | 普通 replace | pass | 现有 bootstrap spec 绿。 |
@@ -724,7 +728,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `.dsh-company` symlink→外部 + catalog | **confirmed P1** | [BUG-129](../_archive/fixed_bugs/BUG-129-dsh-company-symlink-root-writes-outside.md)：`regenerateCatalog` written=true，外部 `kb/deliverables-index.json` 出现。 |
+| `.dsh-company` symlink→外部 + catalog | **confirmed P1** | [BUG-129](../fixed_bugs/BUG-129-dsh-company-symlink-root-writes-outside.md)：`regenerateCatalog` written=true，外部 `kb/deliverables-index.json` 出现。 |
 | 同根影响 export/startup/bundle/bootstrap | 同根因（未逐项实跑） | 所有写路径都 `join(workspace,'.dsh-company',…)`；卡内列四个入口。 |
 | `.dsh-company` symlink→内部目录 | 策略未定 | 卡内要求明确允许/拒绝；当前无 lstat。 |
 | 普通 `.dsh-company` 目录 | pass | 现有 catalog/bundle/startup spec 绿。 |
@@ -739,7 +743,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| records=文件 + correct | **confirmed P2** | [BUG-130](../_archive/fixed_bugs/BUG-130-cultivation-write-root-throws.md)：command correct 抛 UnsafeCultivationPathError。 |
+| records=文件 + correct | **confirmed P2** | [BUG-130](../fixed_bugs/BUG-130-cultivation-write-root-throws.md)：command correct 抛 UnsafeCultivationPathError。 |
 | records=文件 + propose | **confirmed P2** | 同卡：tool execute 抛 UnsafeCultivationPathError；模型拿不到结构化 note。 |
 | records=missing | pass | writeRecord 建目录；正常写记录。 |
 | check/archive | BUG-127 已记 | 读边界同样抛。 |
@@ -754,7 +758,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `.dsh-company/kb` symlink→外部 + catalog | **confirmed P1** | [BUG-131](../_archive/fixed_bugs/BUG-131-kb-symlink-catalog-writes-outside.md)：written=true，`/outside/deliverables-index.json` 出现。 |
+| `.dsh-company/kb` symlink→外部 + catalog | **confirmed P1** | [BUG-131](../fixed_bugs/BUG-131-kb-symlink-catalog-writes-outside.md)：written=true，`/outside/deliverables-index.json` 出现。 |
 | 同根影响 startup/export/bootstrap | 同根因（未逐项实跑） | 都走固定子路径；卡内列全入口。 |
 | `.dsh-company` 根 symlink | BUG-129 已记 | 根级；本卡是中间目录，修复层次更深。 |
 | `kb` 普通目录 | pass | 现有 catalog spec 绿。 |
@@ -769,7 +773,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `kb/deliverables-index.json` 是目录 | **confirmed P2** | [BUG-132](../_archive/fixed_bugs/BUG-132-catalog-index-path-directory-eisdir.md)：`regenerateCatalog` 抛 `EISDIR`（rename temp→目录）。 |
+| `kb/deliverables-index.json` 是目录 | **confirmed P2** | [BUG-132](../fixed_bugs/BUG-132-catalog-index-path-directory-eisdir.md)：`regenerateCatalog` 抛 `EISDIR`（rename temp→目录）。 |
 | 输出是 symlink | 安全（rename 替换 symlink） | 未单独开卡；卡内 spec 要求。 |
 | 输出普通文件/缺失 | pass | 现有 catalog spec 绿。 |
 | audit 先写账本后 regenerate 抛 | 同根因 | 卡内列修复：账本/索引两步可读回执。 |
@@ -784,7 +788,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `startup.json` 是目录 | **confirmed P2** | [BUG-133](../_archive/fixed_bugs/BUG-133-startup-json-directory-eisdir.md)：`writeStartupSettings` 抛 EISDIR；`/company-settings set` 无 catch。 |
+| `startup.json` 是目录 | **confirmed P2** | [BUG-133](../fixed_bugs/BUG-133-startup-json-directory-eisdir.md)：`writeStartupSettings` 抛 EISDIR；`/company-settings set` 无 catch。 |
 | `startup-options.json` 是目录 | 同根因（未单独开卡） | `writeStartupOptionsFile` 同 `writeAtomic`；settings refresh 抛，watcher 只 warn。 |
 | startup.json symlink | 安全（rename 替换 symlink） | 未单独开卡；卡内 spec。 |
 | 普通文件/缺失 | pass | 现有 startup spec 绿。 |
@@ -799,7 +803,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `.dsh-company` symlink→外部 + `/prd check` | **confirmed P2** | [BUG-134](../_archive/fixed_bugs/BUG-134-dsh-company-symlink-command-read-outside.md)：外部 mrd/prd 被读，命令 success「PRD 校验通过」。 |
+| `.dsh-company` symlink→外部 + `/prd check` | **confirmed P2** | [BUG-134](../fixed_bugs/BUG-134-dsh-company-symlink-command-read-outside.md)：外部 mrd/prd 被读，命令 success「PRD 校验通过」。 |
 | 同根影响 /req /delivery /catalog | 同根因（未逐项实跑） | `resolveDeliverablePath`/`readTextInside` 都以 companyRoot 为信任根；卡内列。 |
 | 叶子 symlink | pass（S2） | readTextInside 拒绝叶子 symlink；但根本身未被验证。 |
 | 正常 `.dsh-company` | pass | 现有 prd/req/delivery spec 绿。 |
@@ -829,7 +833,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `kb/deliverables-index.json` symlink→外部 | **confirmed P2** | [BUG-135](../_archive/fixed_bugs/BUG-135-catalog-index-symlink-read-outside.md)：`readCatalog` 返回外部 JSON 的 fake entries/presented=true。 |
+| `kb/deliverables-index.json` symlink→外部 | **confirmed P2** | [BUG-135](../fixed_bugs/BUG-135-catalog-index-symlink-read-outside.md)：`readCatalog` 返回外部 JSON 的 fake entries/presented=true。 |
 | 普通索引/缺失 | pass | 现有 catalog-state spec 绿。 |
 | 输出目录/父 symlink | 已开 132/131 | 不重复。 |
 | `workspaceFiles` 客户端读同一路径 | 未实跑 | 卡内列为同一路径。 |
@@ -844,7 +848,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `startup.json` symlink→外部 | **confirmed P2** | [BUG-136](../_archive/fixed_bugs/BUG-136-startup-settings-symlink-read-outside.md)：`readStartupSettings` 返回外部 productType/deliveryMode/wiki。 |
+| `startup.json` symlink→外部 | **confirmed P2** | [BUG-136](../fixed_bugs/BUG-136-startup-settings-symlink-read-outside.md)：`readStartupSettings` 返回外部 productType/deliveryMode/wiki。 |
 | `startup-options.json` symlink | 同根因（未单独开卡） | `readStartupOptions` 同 readFileSync；卡内列。 |
 | 写路径 symlink | 安全（rename 替换 symlink） | 现有 writeAtomic；读/写策略不一致。 |
 | 普通文件/缺失 | pass | 现有 startup spec 绿。 |
@@ -859,7 +863,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `kb/deliverables-presented.json` symlink→外部 | **confirmed P2** | [BUG-137](../_archive/fixed_bugs/BUG-137-presented-ledger-symlink-read-outside.md)：`readPresentedLedger` status ok，外部 paths/slugs 被采用，伪造 presented。 |
+| `kb/deliverables-presented.json` symlink→外部 | **confirmed P2** | [BUG-137](../fixed_bugs/BUG-137-presented-ledger-symlink-read-outside.md)：`readPresentedLedger` status ok，外部 paths/slugs 被采用，伪造 presented。 |
 | 普通账本/缺失 | pass | 现有 presented-ledger spec 绿。 |
 | 写路径 symlink | 安全（rename 替换） | 读写策略不一致。 |
 | domain store | 未变 | 生产 domain 优先；file fallback 仍走坏读。 |
@@ -874,7 +878,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `kb/deliverables-presented.json` 是目录 | **confirmed P2** | [BUG-138](../_archive/fixed_bugs/BUG-138-presented-ledger-directory-eisdir.md)：`writePresentedLedger` 抛 EISDIR（rename temp→目录）。 |
+| `kb/deliverables-presented.json` 是目录 | **confirmed P2** | [BUG-138](../fixed_bugs/BUG-138-presented-ledger-directory-eisdir.md)：`writePresentedLedger` 抛 EISDIR（rename temp→目录）。 |
 | 账本 symlink | 读面 BUG-137；写 rename 替换 | 未单独开卡；卡内 spec。 |
 | 普通账本/缺失 | pass | 现有 presented-ledger spec 绿。 |
 | domain store | 未变 | 生产 domain 优先；file fallback 仍撞。 |
@@ -889,7 +893,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| revoke 后 verify pass/fail | **confirmed P2** | [BUG-139](../_archive/fixed_bugs/BUG-139-cultivation-verify-after-revoke.md)：verify success，记录同时 adopted+revokedAt+verification；方法已删除。 |
+| revoke 后 verify pass/fail | **confirmed P2** | [BUG-139](../fixed_bugs/BUG-139-cultivation-verify-after-revoke.md)：verify success，记录同时 adopted+revokedAt+verification；方法已删除。 |
 | active adopted 后 verify | pass | 现有 verify spec 绿。 |
 | rejected 后 verify | pass | status 检查拒绝。 |
 | 撤回后 UI/check | check 已排除 revoked | 现有 BUG-091 修复。 |
@@ -916,7 +920,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| 选中会话 + 任务板 | **withdrawn（测试选址）** | [BUG-140（撤回）](../_archive/settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md)：侧栏显示会话标题「用 team_task_create 创建两个任务」，任务板仍「成员：lead(待命) / 还没有共享任务」；waitText 写 PRD 失败。 |
+| 选中会话 + 任务板 | **withdrawn（测试选址）** | [BUG-140（撤回）](../settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md)：侧栏显示会话标题「用 team_task_create 创建两个任务」，任务板仍「成员：lead(待命) / 还没有共享任务」；waitText 写 PRD 失败。 |
 | 会话日志有 team/task | pass | task-1/task-2 两条事件已在会话日志。 |
 | streamError | 无错误条 | 不是 follow 失败；更像 follow 没返回 task 事件或 merge 未适配。 |
 | 旧 BUG-103/104 修复 | **真页面未收口** | 修复验证停在 projection/纯 merge；这是当前 bug。 |
@@ -977,7 +981,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| records=文件 + adopt | **confirmed P2** | [BUG-141](../_archive/fixed_bugs/BUG-141-cultivation-adopt-reject-verify-throws.md)：THREW UnsafeCultivationPathError。 |
+| records=文件 + adopt | **confirmed P2** | [BUG-141](../fixed_bugs/BUG-141-cultivation-adopt-reject-verify-throws.md)：THREW UnsafeCultivationPathError。 |
 | records=文件 + reject/verify | **confirmed P2** | 同卡：两个命令都 THREW，没有「记录目录坏」回执。 |
 | records=missing | pass | 现有命令返回「记录不存在」。 |
 | 正常 records | pass | 现有 cultivation-command spec 绿。 |
@@ -992,7 +996,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `kb/org.md` 是目录 + replace | **confirmed P2** | [BUG-142](../_archive/fixed_bugs/BUG-142-bootstrap-replace-directory-eisdir.md)：`applyBootstrap` 抛 EISDIR；catch 只处理 EEXIST。 |
+| `kb/org.md` 是目录 + replace | **confirmed P2** | [BUG-142](../fixed_bugs/BUG-142-bootstrap-replace-directory-eisdir.md)：`applyBootstrap` 抛 EISDIR；catch 只处理 EEXIST。 |
 | 目标 symlink | BUG-128 已记 | replace 跟随写到外部。 |
 | 普通文件/缺失 | pass | 现有 bootstrap spec 绿。 |
 | 角色补种调用方 | 未实跑 | `ensureRunBundle`/`applyRoleBackfill` 的错误包装未证。 |
@@ -1007,7 +1011,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `.dsh-company` 是文件 + dir entry | **confirmed P2** | [BUG-143](../_archive/fixed_bugs/BUG-143-bootstrap-directory-entry-eexist.md)：`applyBootstrap` 抛 EEXIST（mkdir）；dir 分支无 catch。 |
+| `.dsh-company` 是文件 + dir entry | **confirmed P2** | [BUG-143](../fixed_bugs/BUG-143-bootstrap-directory-entry-eexist.md)：`applyBootstrap` 抛 EEXIST（mkdir）；dir 分支无 catch。 |
 | `.dsh-company/kb` 文件 | 同根因（未单独开卡） | 同一 dir 分支；卡内 spec 覆盖。 |
 | 正常目录/缺失 | pass | 现有 bootstrap spec 绿。 |
 | 调用方 ensureRunBundle | 未实跑 | 启动是否会 dataBlocked/warn 未证。 |
@@ -1082,7 +1086,7 @@ task-2@1 复核 PRD → 写 PRD → 待办（阻塞）/ 未分配
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `blockCompanyWrites` + cultivation writeRecord | **confirmed P2** | [BUG-144](../_archive/fixed_bugs/BUG-144-write-gate-bypassed-by-direct-company-writes.md)：writeRecord 仍写入 `2026…md`，不读 gate。 |
+| `blockCompanyWrites` + cultivation writeRecord | **confirmed P2** | [BUG-144](../fixed_bugs/BUG-144-write-gate-bypassed-by-direct-company-writes.md)：writeRecord 仍写入 `2026…md`，不读 gate。 |
 | installMethod/bundle/export | 同根因（未逐项实跑） | cultivation-storage 自己 writeNewFile；bundle-manifest/governance-export 直接写；卡内列。 |
 | catalog/startup/presented/bootstrap | 已接 gate | 新 company-root helper 消费方。 |
 | 读路径 | 不受影响 | gate 只挡写。 |
@@ -1113,7 +1117,7 @@ task-2@1 复核 PRD → 写 PRD → 待办（阻塞）/ 未分配
 
 | H | 判决 | 证据 |
 |---|---|---|
-| view=`{tasks:[]}` / `{members:[]}` / `{}` | **confirmed P2** | [BUG-145](../_archive/fixed_bugs/BUG-145-team-with-event-tasks-partial-view-crash.md)：全部 `THREW Cannot read properties of undefined (reading 'map')`。 |
+| view=`{tasks:[]}` / `{members:[]}` / `{}` | **confirmed P2** | [BUG-145](../fixed_bugs/BUG-145-team-with-event-tasks-partial-view-crash.md)：全部 `THREW Cannot read properties of undefined (reading 'map')`。 |
 | 现有 client lifecycle spec | **4 failed** | `tests/client/data/company-data-lifecycle.spec.ts` 4 条同栈；A 的 BUG-118 修复引入。 |
 | 正常 teamView | pass（历史） | 有 members/tasks 的投影不崩。 |
 | member 事件 role 缺失 | 同 patch 风险 | 测试 `memberActive` 只给 id/name/phase；role undefined 需归一化。 |
@@ -1145,7 +1149,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `useProjection('agentTeam')` 兜底 | **confirmed P1** | [BUG-146](../_archive/fixed_bugs/BUG-146-use-company-data-agent-team-projection-oom.md)：focused spec OOM 4GB，worker 退出；之前 5 failed/1 passed。 |
+| `useProjection('agentTeam')` 兜底 | **confirmed P1** | [BUG-146](../fixed_bugs/BUG-146-use-company-data-agent-team-projection-oom.md)：focused spec OOM 4GB，worker 退出；之前 5 failed/1 passed。 |
 | 测试 useProjection 替身 | 根因线索 | 对未知 key 返回新 stats 对象 → `team` identity 每帧变 → effect setState 循环。 |
 | BUG-140 | 已撤回 | 新空会话测试选址；兜底不应存在。 |
 | BUG-145 partial view | 仍活跃 | 数组兜底/下游消费方一起修。 |
@@ -1233,7 +1237,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `.dsh-company` symlink + exportGovernance | **confirmed P1** | [BUG-147](../_archive/fixed_bugs/BUG-147-export-governance-symlink-root-writes-outside.md)：`outside/exports/README.md` 被写；methods/ledger 同根。 |
+| `.dsh-company` symlink + exportGovernance | **confirmed P1** | [BUG-147](../fixed_bugs/BUG-147-export-governance-symlink-root-writes-outside.md)：`outside/exports/README.md` 被写；methods/ledger 同根。 |
 | C5 平台 tab | pass（本轮） | 依赖图/用量/台账/成品/策略/待办均可经 guide 打开。 |
 | C7 路径空格/unicode | pass | release-smoke ALL PASS。 |
 | 其它 company-root 消费者 | 上一轮已 PASS | catalog/startup/presented/bootstrap。 |
@@ -1248,7 +1252,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 |
 |---|---|---|
-| `.dsh-company` symlink + plan/writeBundleManifest | **confirmed P1** | [BUG-148](../_archive/fixed_bugs/BUG-148-bundle-manifest-root-symlink-writes-outside.md)：outside/bundle.json 出现，read 状态 ok。 |
+| `.dsh-company` symlink + plan/writeBundleManifest | **confirmed P1** | [BUG-148](../fixed_bugs/BUG-148-bundle-manifest-root-symlink-writes-outside.md)：outside/bundle.json 出现，read 状态 ok。 |
 | cultivation/revoke journal/log | 同根因（卡内列） | 仍直拼 `.dsh-company`；A 加了 write-gate 但没 root residency。 |
 | catalog/startup/presented/bootstrap | 已修 | 129 覆盖。 |
 | export | BUG-147 活跃 | 同族。 |
@@ -1263,7 +1267,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 |
 |---|---|---|
-| 根 symlink + cultivation writeRecord | **confirmed P1** | [BUG-149](../_archive/fixed_bugs/BUG-149-cultivation-root-symlink-writes-outside.md)：outside/cultivation/records/<id>.md 出现。 |
+| 根 symlink + cultivation writeRecord | **confirmed P1** | [BUG-149](../fixed_bugs/BUG-149-cultivation-root-symlink-writes-outside.md)：outside/cultivation/records/<id>.md 出现。 |
 | installMethod/archive/revoke journal/log | 同根因（卡内列） | 仍 join `.dsh-company`；write-gate 只挡 blocked。 |
 | catalog/startup/presented/bootstrap | 已修 | 129 覆盖。 |
 | export/bundle | 147/148 活跃 | 同族。 |
@@ -1418,7 +1422,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 |
 |---|---|---|
-| catalog.regenerate root-symlink-out | **spec 误用** | [BUG-150](../_archive/settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md)：spec 传 `join(ws,'.dsh-company')`，但 API 要 workspace；双重 `.dsh-company`。 |
+| catalog.regenerate root-symlink-out | **spec 误用** | [BUG-150](../settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md)：spec 传 `join(ws,'.dsh-company')`，但 API 要 workspace；双重 `.dsh-company`。 |
 | presented.write root-symlink-out | **spec 误用** | 同卡；startup/bootstrap 传 workspace，正常 typed。 |
 | BUG-147/148 | 代码已修（Round 74） | export 返回不安全 warning；bundle plan skip。 |
 | BUG-149 | 仍活跃 | cultivation writeRecord 仍写 outside。 |
@@ -1607,18 +1611,18 @@ TypeError: Cannot read properties of undefined (reading 'map')
 | H9 | 新动议忘写 `numbering` 即被当旧动议豁免，闸门形同虚设 | 闸门的 stated boundary：兼容还是漏洞 |
 | H10 | 真模型 `present` 被 deny 后能否读懂错误并在下一轮修好 | Note 未跑的端到端；小预算 1 条 prompt |
 
-**首批入口：** `tests/lib/docs/prd-check.spec.ts`、`tests/host/commands/prd-gate.spec.ts`、`tests/host/commands/prd-command.spec.ts`、[prd 模板](../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../docs/reference/decisions.md)；keyless 脚本留 `runtime/tmp/`；live 用隔离 workspace/home。
+**首批入口：** `tests/lib/docs/prd-check.spec.ts`、`tests/host/commands/prd-gate.spec.ts`、`tests/host/commands/prd-command.spec.ts`、[prd 模板](../../../packages/company-pack/content/templates/prd.md)、[requirements-model](../../../packages/company-pack/content/product-types/hardware-software/requirements-model.md)、[D61](../../../docs/reference/decisions.md)；keyless 脚本留 `runtime/tmp/`；live 用隔离 workspace/home。
 
 **首跑结果（2026-11-13 keyless）：**
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| H1 CRLF/BOM | **confirmed** | [BUG-152](../_archive/fixed_bugs/BUG-152-prd-headings-crlf-bom.md)；CRLF PRD false；BOM PRD false |
-| H2 围栏 | **confirmed** | [BUG-153](../_archive/fixed_bugs/BUG-153-prd-headings-fenced-code-blocks.md)；fenced REQ/Slices false |
-| H3 numbering 空值 | **confirmed** | [BUG-154](../_archive/fixed_bugs/BUG-154-prd-gate-numbering-empty-value.md)；gate allow / validate false |
+| H1 CRLF/BOM | **confirmed** | [BUG-152](../fixed_bugs/BUG-152-prd-headings-crlf-bom.md)；CRLF PRD false；BOM PRD false |
+| H2 围栏 | **confirmed** | [BUG-153](../fixed_bugs/BUG-153-prd-headings-fenced-code-blocks.md)；fenced REQ/Slices false |
+| H3 numbering 空值 | **confirmed** | [BUG-154](../fixed_bugs/BUG-154-prd-gate-numbering-empty-value.md)；gate allow / validate false |
 | H4 drafts vs final | **unverified（设计边界）** | 闸门只读 drafts；drafts 缺失按旧动议 fail-open；未开卡 |
-| H5 meta 坏形状 | **confirmed** | [BUG-156](../_archive/fixed_bugs/BUG-156-prd-gate-symlink-unreadable-fail-open.md)；meta symlink allow |
-| H6 路径/根别名 | **confirmed** | [BUG-155](../_archive/fixed_bugs/BUG-155-prd-gate-stale-session-cwd.md) + [BUG-156](../_archive/fixed_bugs/BUG-156-prd-gate-symlink-unreadable-fail-open.md)；cwd 分叉 + deliverables 根 symlink |
+| H5 meta 坏形状 | **confirmed** | [BUG-156](../fixed_bugs/BUG-156-prd-gate-symlink-unreadable-fail-open.md)；meta symlink allow |
+| H6 路径/根别名 | **confirmed** | [BUG-155](../fixed_bugs/BUG-155-prd-gate-stale-session-cwd.md) + [BUG-156](../fixed_bugs/BUG-156-prd-gate-symlink-unreadable-fail-open.md)；cwd 分叉 + deliverables 根 symlink |
 | H7 多 slug | **unverified** | 未跑；代码只返回首个 deny；未见独立缺陷 |
 | H8 AC 缩进 | **confirmed（严格）** | 4 空格 AC → `acceptance 不能为空`；模板/技能规定 2/4 空格，判为内容不合约，未开卡 |
 | H9 legacy 豁免 | **confirmed（设计）** | 缺 `numbering` → allow；模板要求新动议写 identity；观察，不另开卡 |
@@ -1634,7 +1638,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| 新分支 remote 全零只 diff tip | **confirmed** | [BUG-158](../_archive/fixed_bugs/BUG-158-pre-push-zero-sha-range.md)；合成分支 `bd8eff1`；dry-run 未触发 |
+| 新分支 remote 全零只 diff tip | **confirmed** | [BUG-158](../fixed_bugs/BUG-158-pre-push-zero-sha-range.md)；合成分支 `bd8eff1`；dry-run 未触发 |
 | 删除分支 local 全零 | **confirmed** | 同卡；`runtime/tmp/c9-delete.log` → bad object |
 | SURFACE_RULES 只覆盖 client/presets/content | **confirmed（观察）** | `src/host/commands/prd-gate.ts` 改动不命中任何 surface glob；`pnpm test` 仍跑 gate spec，但没有真 present；不另开卡 |
 | `--ci` 跳过 browser/model | **pass（设计）** | skip 清单打印；不新开 |
@@ -1649,7 +1653,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| `error: {}` + `message` | **confirmed** | [BUG-159](../_archive/fixed_bugs/BUG-159-client-error-ring-empty-object-message.md)；`c10-error-ring` 第一条 `"{}"` |
+| `error: {}` + `message` | **confirmed** | [BUG-159](../fixed_bugs/BUG-159-client-error-ring-empty-object-message.md)；`c10-error-ring` 第一条 `"{}"` |
 | `error: null` | **pass** | 第二条 `null-error message` |
 | string error | **pass** | 第三条 `string error` |
 | console.error 多参 / 跨 realm Error | **unverified** | 未跑；保留 |
@@ -1666,11 +1670,11 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| `/req check` 仍按原始文本（BOM/围栏） | **confirmed** | [BUG-160](../_archive/fixed_bugs/BUG-160-req-check-raw-text-bom-fence.md)；BOM 缺头、围栏幽灵 REQ-999 |
-| HTML 注释不是定义容器 | **confirmed** | [BUG-162](../_archive/fixed_bugs/BUG-162-prd-html-comments-parsed-as-definitions.md)；注释里的 REQ/Slices 被解析 |
-| 一个 REQ 只能属于一个 slice | **confirmed（缺口）** | [BUG-164](../_archive/fixed_bugs/BUG-164-req-in-multiple-slices.md)；REQ-001 列进 S1+S2 仍 ok |
-| Slices 表认 Markdown 转义竖线 | **confirmed（缺口）** | [BUG-165](../_archive/fixed_bugs/BUG-165-slices-escaped-pipe.md)；Goal 里的竖线被拆列 |
-| changeLog 校验日期/作者形状 | **confirmed（缺口）** | [BUG-166](../_archive/fixed_bugs/BUG-166-prd-changelog-format.md)；`2026-13-99 · nobody · bad` 过门 |
+| `/req check` 仍按原始文本（BOM/围栏） | **confirmed** | [BUG-160](../fixed_bugs/BUG-160-req-check-raw-text-bom-fence.md)；BOM 缺头、围栏幽灵 REQ-999 |
+| HTML 注释不是定义容器 | **confirmed** | [BUG-162](../fixed_bugs/BUG-162-prd-html-comments-parsed-as-definitions.md)；注释里的 REQ/Slices 被解析 |
+| 一个 REQ 只能属于一个 slice | **confirmed（缺口）** | [BUG-164](../fixed_bugs/BUG-164-req-in-multiple-slices.md)；REQ-001 列进 S1+S2 仍 ok |
+| Slices 表认 Markdown 转义竖线 | **confirmed（缺口）** | [BUG-165](../fixed_bugs/BUG-165-slices-escaped-pipe.md)；Goal 里的竖线被拆列 |
+| changeLog 校验日期/作者形状 | **confirmed（缺口）** | [BUG-166](../fixed_bugs/BUG-166-prd-changelog-format.md)；`2026-13-99 · nobody · bad` 过门 |
 | CRLF/BOM/围栏/AC 重号（BUG-152/153/157） | **pass（修复后）** | 现有 spec + 探针绿；未复现旧缺陷 |
 
 **C9 post-fix 假设与判决：**
@@ -1678,9 +1682,9 @@ TypeError: Cannot read properties of undefined (reading 'map')
 | H | 判决 | 证据 / BUG |
 |---|---|---|
 | pre-push zero-SHA 覆盖整条出站集 | **pass（线性提交）** | BUG-158 修复 + `tests/checks/pre-push-surfaces.test.mjs` |
-| merge 提交的合并结果可见 | **confirmed（缺口）** | [BUG-161](../_archive/fixed_bugs/BUG-161-pre-push-merge-commit-surface-skip.md)；merge-only client 改动未触发 client-load |
-| notes-tree 检查全部 lifecycle | **confirmed（缺口）** | [BUG-163](../_archive/fixed_bugs/BUG-163-notes-tree-rejected-status-unguarded.md)；`rejected/` 状态行跳过 |
-| notes-tree 校验真实日历 | **confirmed（缺口）** | [BUG-167](../_archive/fixed_bugs/BUG-167-notes-tree-invalid-calendar-date.md)；`2026-99-99` 过门 |
+| merge 提交的合并结果可见 | **confirmed（缺口）** | [BUG-161](../fixed_bugs/BUG-161-pre-push-merge-commit-surface-skip.md)；merge-only client 改动未触发 client-load |
+| notes-tree 检查全部 lifecycle | **confirmed（缺口）** | [BUG-163](../fixed_bugs/BUG-163-notes-tree-rejected-status-unguarded.md)；`rejected/` 状态行跳过 |
+| notes-tree 校验真实日历 | **confirmed（缺口）** | [BUG-167](../fixed_bugs/BUG-167-notes-tree-invalid-calendar-date.md)；`2026-99-99` 过门 |
 | `SURFACE_RULES` 覆盖 host/PRD 改动 | **unverified / 观察** | 仍只收 client/presets/content；`pnpm test` 会跑 gate spec，但没有真 present 入口 |
 
 **本轮开卡：** BUG-160..167（8 张）。**未跑：** C8-H10 live present deny（仍 unverified）；C10 console/rejection；C2/C5/C7 残余真入口。**证据：** `runtime/tmp/c8b-*.mts`、`c9-merge-probe.sh`、`c9b-*.mts` 与对应 `.log`。
@@ -1695,19 +1699,19 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| 行内代码里的 `<!--` 不算注释开始 | **confirmed（缺口）** | [BUG-168](../_archive/fixed_bugs/BUG-168-markdown-inline-code-comment.md)；userStory 后的字段全被吞 |
-| 未闭合 HTML 注释会 fail loud | **confirmed（缺口）** | [BUG-169](../_archive/fixed_bugs/BUG-169-markdown-unclosed-comment.md)；整份 PRD 被读成「没有需求」 |
-| `\\|`（字面反斜杠 + 分隔符）能被正确切列 | **confirmed（缺口）** | [BUG-172](../_archive/fixed_bugs/BUG-172-split-table-row-double-backslash.md)；单元格少切一列 |
-| legacy JSON 在 HTML 注释里不算定义 | **confirmed（缺口）** | [BUG-173](../_archive/fixed_bugs/BUG-173-legacy-json-in-comment.md)；注释账本仍 `ok/reqCount 1` |
-| `readCompanyFileAt` 的越界 `../` 子类稳定 | **confirmed（缺口）** | [BUG-170](../_archive/fixed_bugs/BUG-170-read-company-file-dotdot-subclass.md)；`../` unsafe vs `../../` missing |
+| 行内代码里的 `<!--` 不算注释开始 | **confirmed（缺口）** | [BUG-168](../fixed_bugs/BUG-168-markdown-inline-code-comment.md)；userStory 后的字段全被吞 |
+| 未闭合 HTML 注释会 fail loud | **confirmed（缺口）** | [BUG-169](../fixed_bugs/BUG-169-markdown-unclosed-comment.md)；整份 PRD 被读成「没有需求」 |
+| `\\|`（字面反斜杠 + 分隔符）能被正确切列 | **confirmed（缺口）** | [BUG-172](../fixed_bugs/BUG-172-split-table-row-double-backslash.md)；单元格少切一列 |
+| legacy JSON 在 HTML 注释里不算定义 | **confirmed（缺口）** | [BUG-173](../fixed_bugs/BUG-173-legacy-json-in-comment.md)；注释账本仍 `ok/reqCount 1` |
+| `readCompanyFileAt` 的越界 `../` 子类稳定 | **confirmed（缺口）** | [BUG-170](../fixed_bugs/BUG-170-read-company-file-dotdot-subclass.md)；`../` unsafe vs `../../` missing |
 
 **C9 新门禁假设与判决：**
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| fix-evidence 支持删除型修复 | **confirmed（缺口）** | [BUG-171](../_archive/fixed_bugs/BUG-171-fix-evidence-deletion-surface.md)；删除文件的改动面被判「不在盘上」 |
-| notes-tree 对 symlink 条目不静默 | **confirmed（缺口）** | [BUG-174](../_archive/fixed_bugs/BUG-174-notes-tree-symlink-invisible.md)；链接 Note `files:0/checked:0` |
-| fix-evidence 校验命令真实存在 | **confirmed（缺口）** | [BUG-175](../_archive/fixed_bugs/BUG-175-fix-evidence-fake-command.md)；`pnpm` 假脚本 PASS |
+| fix-evidence 支持删除型修复 | **confirmed（缺口）** | [BUG-171](../fixed_bugs/BUG-171-fix-evidence-deletion-surface.md)；删除文件的改动面被判「不在盘上」 |
+| notes-tree 对 symlink 条目不静默 | **confirmed（缺口）** | [BUG-174](../fixed_bugs/BUG-174-notes-tree-symlink-invisible.md)；链接 Note `files:0/checked:0` |
+| fix-evidence 校验命令真实存在 | **confirmed（缺口）** | [BUG-175](../fixed_bugs/BUG-175-fix-evidence-fake-command.md)；`pnpm` 假脚本 PASS |
 | fix-evidence 支持 merge 提交 | **pass** | 临时仓库 merge 的 `git show --name-only` 有输出，gate 通过（与 pre-push 的 `diff-tree` 不同） |
 | 共享形状层已覆盖 headings/table-rows/JSON | **unverified / 部分** | `scanDocument` 覆盖标题/表格；JSON 提取仍独立（BUG-173） |
 
@@ -1723,14 +1727,14 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 / BUG |
 |---|---|---|
-| legacy JSON 提取会跳过围栏示例 | **confirmed（缺口）** | [BUG-176](../_archive/fixed_bugs/BUG-176-json-fence-example-extracted.md)；示例空账本盖过真账本 |
-| 跨行行内 code span 里的标题不算定义 | **confirmed（缺口）** | [BUG-181](../_archive/fixed_bugs/BUG-181-multiline-code-span.md)；幽灵 REQ-999 + 真字段截断 |
-| `..` 闸只拒越出根，不拒内部跳转 | **confirmed（缺口）** | [BUG-179](../_archive/fixed_bugs/BUG-179-internal-dotdot-over-rejected.md)；`a/../b` → unsafe |
-| `..` 闸覆盖 Windows `..\` | **confirmed（代码+win32 语义；Windows 未实跑）** | [BUG-180](../_archive/fixed_bugs/BUG-180-walk-company-dirs-windows-dotdot.md)；`win32.join` 到盘外，`split('/')` 只有一段 |
-| fix-evidence 命令解析接受合法形态 | **confirmed（缺口）** | [BUG-177](../_archive/fixed_bugs/BUG-177-fix-evidence-valid-command-forms.md)；`pnpm run`/`--filter`/`node --import` 被拒 |
-| fix-evidence 节标题只匹配真节 | **confirmed（缺口）** | [BUG-178](../_archive/fixed_bugs/BUG-178-fix-evidence-section-in-code-block.md)；代码块里的标题截错节 |
-| fix-evidence 命令必须是真判据 | **confirmed（缺口）** | [BUG-182](../_archive/fixed_bugs/BUG-182-fix-evidence-noop-commands.md)；`sh -c true` 等 PASS |
-| notes-tree 根 symlink 不被跟随 | **confirmed（缺口）** | [BUG-183](../_archive/fixed_bugs/BUG-183-notes-root-symlink-followed.md)；`notes` 根 symlink `files:2/checked:1` |
+| legacy JSON 提取会跳过围栏示例 | **confirmed（缺口）** | [BUG-176](../fixed_bugs/BUG-176-json-fence-example-extracted.md)；示例空账本盖过真账本 |
+| 跨行行内 code span 里的标题不算定义 | **confirmed（缺口）** | [BUG-181](../fixed_bugs/BUG-181-multiline-code-span.md)；幽灵 REQ-999 + 真字段截断 |
+| `..` 闸只拒越出根，不拒内部跳转 | **confirmed（缺口）** | [BUG-179](../fixed_bugs/BUG-179-internal-dotdot-over-rejected.md)；`a/../b` → unsafe |
+| `..` 闸覆盖 Windows `..\` | **confirmed（代码+win32 语义；Windows 未实跑）** | [BUG-180](../fixed_bugs/BUG-180-walk-company-dirs-windows-dotdot.md)；`win32.join` 到盘外，`split('/')` 只有一段 |
+| fix-evidence 命令解析接受合法形态 | **confirmed（缺口）** | [BUG-177](../fixed_bugs/BUG-177-fix-evidence-valid-command-forms.md)；`pnpm run`/`--filter`/`node --import` 被拒 |
+| fix-evidence 节标题只匹配真节 | **confirmed（缺口）** | [BUG-178](../fixed_bugs/BUG-178-fix-evidence-section-in-code-block.md)；代码块里的标题截错节 |
+| fix-evidence 命令必须是真判据 | **confirmed（缺口）** | [BUG-182](../fixed_bugs/BUG-182-fix-evidence-noop-commands.md)；`sh -c true` 等 PASS |
+| notes-tree 根 symlink 不被跟随 | **confirmed（缺口）** | [BUG-183](../fixed_bugs/BUG-183-notes-root-symlink-followed.md)；`notes` 根 symlink `files:2/checked:1` |
 | fix-evidence 删除/重命名 | **pass（修复后）** | 删除型通过；`git show --name-only` 对 rename 输出新路径，gate 通过 |
 
 **本轮开卡：** BUG-176..183（8 张）。**未跑：** C8-H10 live present deny；C10 console/rejection；C2/C5/C7 残余真入口；Windows 实机。**证据：** `runtime/tmp/c8d-*.mts`、`c9d-*.mts` 与对应 `.log`。
@@ -1754,10 +1758,10 @@ TypeError: Cannot read properties of undefined (reading 'map')
 | C11-1 测试体等价 | **refuted（本批）** | 逐文件对读 parent vs HEAD（过滤 import / `from` / `require` 行）：只剩路径/注释行与声明内的测试标题变更（mirror / checks-index / hooks-wiring）；无静默删除、改名或断言弱化。未跑 `refactor-drift --hashes`（需两棵 worktree 的 vitest JSON，成本高；git-diff 等价近似，缺口保留）。 |
 | C11-2 类型面漏扫 | **refuted** | 三份 `tsconfig.test-*` 的 `--listFilesOnly` 并集 = 231 / 盘上 249；未接 18 与文档声明一致；本轮新增的 mirror、host fs/logging、lib deliverables/delegation spec 都在类型面内。 |
 | C11-3 lane/census/索引 | **refuted** | `asset-lanes` 30 资产 + 59 探针路径全在盘；`test-census` / `checks-index` 生成物与盘一致（verify 绿）；`tools` 顶层散件门禁已在 `57d34a34` 加。 |
-| C11-4 覆盖率基线 | **pass（数值）+ confirmed（阈值键）** | `coverage-baseline.json` 的 197 文件键 + 5 豁免全在盘；`1eb14f46` 只改键名不改数值。但 `vitest.config.ts` 的 5 个 host threshold 键死 → [BUG-184](../_archive/fixed_bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md)。 |
-| C11-5 门禁扫描面 | **confirmed（部分）** | `command-refs` 已由 `57d34a34` 纳入 `.agents`（close-out skill 修复）；但源码注释 / implemented Note 普通文本 / audit 注释仍不在射程 → BUG-187..190；pre-push 面规则缺 `src/lib` / `tools` → [BUG-186](../_archive/fixed_bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md)。 |
+| C11-4 覆盖率基线 | **pass（数值）+ confirmed（阈值键）** | `coverage-baseline.json` 的 197 文件键 + 5 豁免全在盘；`1eb14f46` 只改键名不改数值。但 `vitest.config.ts` 的 5 个 host threshold 键死 → [BUG-184](../fixed_bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md)。 |
+| C11-5 门禁扫描面 | **confirmed（部分）** | `command-refs` 已由 `57d34a34` 纳入 `.agents`（close-out skill 修复）；但源码注释 / implemented Note 普通文本 / audit 注释仍不在射程 → BUG-187..190；pre-push 面规则缺 `src/lib` / `tools` → [BUG-186](../fixed_bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md)。 |
 | C11-6 live 活指针 | **confirmed** | 扫 761 个 live 文件：6 处真残留（3 条模块头注 + 2 条 Note + 1 条 audit 注释）；其余命中为 frozen / fixture / 负例 / 有意保留（`deliverables-address.ts` 的发布指纹）。 |
-| C11-7 真入口 | **confirmed（replay）/ pass（preset）** | `node checks/lanes/replay.e2e.mjs` FAIL（MODULE_NOT_FOUND）→ [BUG-185](../_archive/fixed_bugs/BUG-185-replay-lane-stale-built-presence-import.md)；`preset.entry` ALL PASS（6 角色 + 5 非角色）；`pnpm smoke:fast` 4/4、`pnpm test:checks` 10/10。 |
+| C11-7 真入口 | **confirmed（replay）/ pass（preset）** | `node checks/lanes/replay.e2e.mjs` FAIL（MODULE_NOT_FOUND）→ [BUG-185](../fixed_bugs/BUG-185-replay-lane-stale-built-presence-import.md)；`preset.entry` ALL PASS（6 角色 + 5 非角色）；`pnpm smoke:fast` 4/4、`pnpm test:checks` 10/10。 |
 | C11-8 pre-push 面映射 | **confirmed** | 三批命中表；`src/lib` / `tools` / `tests` / `checks` 零命中 → BUG-186。 |
 | C11-9 冻结层 | **pass（抽样）** | `1eb14f46` / `57d34a34` 的冻结层改动只修链接目标 / 命令路径；本卡未改 frozen。40 张卡未逐字节全审，保留。 |
 | C11-10 真安装 / 真挂载 | **部分** | preset 真挂载 PASS；replay FAIL；tarball / release / client-load 未跑。 |
@@ -1766,14 +1770,14 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | BUG | 面 | 一句话 | 级别 |
 |---|---|---|---|
-| [184](../_archive/fixed_bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md) | 验证面 | vitest 5 个 host 覆盖率阈值键死，floor 静默失效 | P2 |
-| [185](../_archive/fixed_bugs/BUG-185-replay-lane-stale-built-presence-import.md) | 真入口 | replay 车道 import 搬移前 built presence 路径，确定性失败 | P1 |
-| [186](../_archive/fixed_bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md) | 验证面 | pre-push 面规则缺 src/lib / tools / tests / checks，搬移面零真入口 | P2 |
-| [187](../_archive/fixed_bugs/BUG-187-module-comments-stale-spec-paths.md) | 活指针 | 3 条模块头注仍指 tests/lib 扁平 spec | P2 |
-| [188](../_archive/fixed_bugs/BUG-188-implemented-note-ui-surface-stale-command.md) | 活指针 | implemented Note 的 ui-surface 命令指向 tests/host 旧家 | P2 |
-| [189](../_archive/fixed_bugs/BUG-189-implemented-note-generic-english-stale-path.md) | 活指针 | implemented Note 指向已退役 generic-english spec | P2 |
-| [190](../_archive/fixed_bugs/BUG-190-candidate-scan-comment-stale-spec.md) | 活指针 | audit 注释指向不存在的 candidate-scan-labels spec | P2 |
-| [191](../_archive/fixed_bugs/BUG-191-typecheck-coverage-counts-stale-docs.md) | 文档计数 | 两份 live 文档停在 227/245、226/244（实测 231/249） | P2 |
+| [184](../fixed_bugs/BUG-184-vitest-coverage-thresholds-stale-host-paths.md) | 验证面 | vitest 5 个 host 覆盖率阈值键死，floor 静默失效 | P2 |
+| [185](../fixed_bugs/BUG-185-replay-lane-stale-built-presence-import.md) | 真入口 | replay 车道 import 搬移前 built presence 路径，确定性失败 | P1 |
+| [186](../fixed_bugs/BUG-186-pre-push-surface-rules-miss-src-lib-tools.md) | 验证面 | pre-push 面规则缺 src/lib / tools / tests / checks，搬移面零真入口 | P2 |
+| [187](../fixed_bugs/BUG-187-module-comments-stale-spec-paths.md) | 活指针 | 3 条模块头注仍指 tests/lib 扁平 spec | P2 |
+| [188](../fixed_bugs/BUG-188-implemented-note-ui-surface-stale-command.md) | 活指针 | implemented Note 的 ui-surface 命令指向 tests/host 旧家 | P2 |
+| [189](../fixed_bugs/BUG-189-implemented-note-generic-english-stale-path.md) | 活指针 | implemented Note 指向已退役 generic-english spec | P2 |
+| [190](../fixed_bugs/BUG-190-candidate-scan-comment-stale-spec.md) | 活指针 | audit 注释指向不存在的 candidate-scan-labels spec | P2 |
+| [191](../fixed_bugs/BUG-191-typecheck-coverage-counts-stale-docs.md) | 文档计数 | 两份 live 文档停在 227/245、226/244（实测 231/249） | P2 |
 
 **证据（gitignored，可复跑）：**
 
@@ -1794,7 +1798,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 **状态：** keyless + 真入口已跑；Windows / clean clone / live 未跑。
 
-**背景：** BUG-184..191 于 `713acc60` 修复、`da746267` 收口（Note = [搬移副作用的非静态消费者](../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)）后，本轮不再找「旧搬移残留」，而是打**修复自身造出的守卫面**：阈值键判据、面规则完备性、活指针/构建字面量/文档计数的扫描边界、以及 pre-push `--paths` 新入口。
+**背景：** BUG-184..191 于 `713acc60` 修复、`da746267` 收口（Note = [搬移副作用的非静态消费者](../../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)）后，本轮不再找「旧搬移残留」，而是打**修复自身造出的守卫面**：阈值键判据、面规则完备性、活指针/构建字面量/文档计数的扫描边界、以及 pre-push `--paths` 新入口。
 
 **真入口基线（本轮实跑）：**
 
@@ -1810,16 +1814,16 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | BUG | 守卫/入口 | 一句话 | 级别 |
 |---|---|---|---|
-| [192](../_archive/fixed_bugs/BUG-192-surface-rules-tracked-path-completeness.md) | `asset-lanes` 完备性 | 19 条 tracked 路径 unseen；spec 只抽样 21 条 | P2 |
-| [193](../_archive/fixed_bugs/BUG-193-vitest-threshold-guard-accepts-directory.md) | 阈值键 spec | `existsSync` 放过目录键，floor 仍可静默失效 | P2 |
-| [194](../_archive/fixed_bugs/BUG-194-live-pointer-guard-misses-js-source.md) | 活指针 spec | 不扫 `.js` 源码注释 | P2 |
-| [195](../_archive/fixed_bugs/BUG-195-live-pointer-guard-misses-presets-skills.md) | 活指针 spec | 不扫 presets / `.agents/skills` | P2 |
-| [196](../_archive/fixed_bugs/BUG-196-typecheck-claim-guard-misses-checks-readme.md) | 计数 spec | 不扫 `checks/README.md` 等导航文档 | P2 |
-| [197](../_archive/fixed_bugs/BUG-197-built-path-guard-misses-docs-ts.md) | built 字面量 spec | 不扫 docs / `.ts` | P2 |
-| [198](../_archive/fixed_bugs/BUG-198-built-path-guard-false-red-js-source.md) | built 字面量 spec | 合法 `.js` 源码产物被假红 | P2 |
-| [199](../_archive/fixed_bugs/BUG-199-pre-push-unseen-exits-zero.md) | pre-push | `unseen` 只打印，仍 exit 0 | P2 |
-| [200](../_archive/fixed_bugs/BUG-200-coveredby-coverage-ratchet-not-executable.md) | coveredBy 标签 | `coverage-ratchet` 不可执行 | P2 |
-| [201](../_archive/fixed_bugs/BUG-201-pre-push-paths-dot-prefix-unseen.md) | `--paths` | `./` 前缀被判 unseen，不触发 lane | P2 |
+| [192](../fixed_bugs/BUG-192-surface-rules-tracked-path-completeness.md) | `asset-lanes` 完备性 | 19 条 tracked 路径 unseen；spec 只抽样 21 条 | P2 |
+| [193](../fixed_bugs/BUG-193-vitest-threshold-guard-accepts-directory.md) | 阈值键 spec | `existsSync` 放过目录键，floor 仍可静默失效 | P2 |
+| [194](../fixed_bugs/BUG-194-live-pointer-guard-misses-js-source.md) | 活指针 spec | 不扫 `.js` 源码注释 | P2 |
+| [195](../fixed_bugs/BUG-195-live-pointer-guard-misses-presets-skills.md) | 活指针 spec | 不扫 presets / `.agents/skills` | P2 |
+| [196](../fixed_bugs/BUG-196-typecheck-claim-guard-misses-checks-readme.md) | 计数 spec | 不扫 `checks/README.md` 等导航文档 | P2 |
+| [197](../fixed_bugs/BUG-197-built-path-guard-misses-docs-ts.md) | built 字面量 spec | 不扫 docs / `.ts` | P2 |
+| [198](../fixed_bugs/BUG-198-built-path-guard-false-red-js-source.md) | built 字面量 spec | 合法 `.js` 源码产物被假红 | P2 |
+| [199](../fixed_bugs/BUG-199-pre-push-unseen-exits-zero.md) | pre-push | `unseen` 只打印，仍 exit 0 | P2 |
+| [200](../fixed_bugs/BUG-200-coveredby-coverage-ratchet-not-executable.md) | coveredBy 标签 | `coverage-ratchet` 不可执行 | P2 |
+| [201](../fixed_bugs/BUG-201-pre-push-paths-dot-prefix-unseen.md) | `--paths` | `./` 前缀被判 unseen，不触发 lane | P2 |
 
 **逐条证据（实跑）：**
 
@@ -1840,7 +1844,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 **判定：** 10 张卡全部是**修复后的守卫面**缺陷（5 类载体覆盖 + 阈值键类型 + 选择器边界 + 证据标签），不是旧搬移残留复现；真入口全绿，没有发现产品行为回归。没有「守卫已完备」结论。
 
-**收口（2026-11-16）：** 10 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；证据提交 = `34f84fd2`；`pnpm test` 253 files / 2153 tests、`verify` ALL PASS（新门禁 `surface-coverage` ×1900+ / 门禁 75）、`typecheck`/`lint`/`dup`/`coverage:ratchet` 全绿。共享决定与输掉的方案 = [守卫判据面 Note](../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)。
+**收口（2026-11-16）：** 10 张已全部修复并迁 [fixed_bugs](../fixed_bugs/README.md)；证据提交 = `34f84fd2`；`pnpm test` 253 files / 2153 tests、`verify` ALL PASS（新门禁 `surface-coverage` ×1900+ / 门禁 75）、`typecheck`/`lint`/`dup`/`coverage:ratchet` 全绿。共享决定与输掉的方案 = [守卫判据面 Note](../../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)。
 
 ## 证据、判据与处置
 
@@ -1861,7 +1865,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 1. 每个宪章至少跑一轮，或逐项写「未跑 + 原因 + owner」；每轮有期望 vs 实测与证据坐标。
 2. 每轮假设全部判决（confirmed / refuted / unverified + 原因）；confirmed 有 BUG 卡或观察落点；不写「没有 bug」。
-3. 发现缺陷立即开 `_backlog/bugs/` 卡（编号唯一源 = [bugs/README](../bugs/README.md) 的 Next，当前 192），本卡不改产品代码。
+3. 发现缺陷立即开 `_backlog/bugs/` 卡（编号唯一源 = [bugs/README](../../bugs/README.md) 的 Next，当前 192），本卡不改产品代码。
 4. 每轮回填 `## Round N`，并同步 `_backlog/issues/README.md` 活跃索引；`pnpm verify` 保持 ALL PASS。
 5. focus v2：C8–C10 每面至少一轮，或逐项写「未跑 + 原因」；C8 的 H10（真模型 present deny）若未跑，必须写未跑，不能折成 PASS。
 6. 用户叫停或所有宪章有明确结论时，按关闭条件收口；审查记录写 `审查：agent｜用户｜跳过 — 理由`。
@@ -1876,7 +1880,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 - **focus v3（2026-11-14）**：这是 BUG-152..159 修复后的 post-fix 回归；C8 第 2 轮、C9 额外 1 轮按用户新预算计，不算重复 v2 首轮。C8-H10 live 仍未跑，保持 `unverified`。
 - **focus v4（2026-11-14）**：这是 BUG-160..167 修复后的第二轮回归；新门禁 `fix-evidence` 与共享形状层按新预算计；C8-H10 live 仍未跑。
 - **focus v5（2026-11-14）**：这是 BUG-168..175 修复后的第三轮回归；新层（code span / JSON 掩码 / `..` 闸 / fix-evidence 命令与节解析 / notes-tree 根 symlink）按新预算计；Windows 实机仍未跑。
-- **focus v6（2026-11-15）**：C11 至少覆盖 M1–M4 各一次，或逐项写未跑原因；预检 7 条有分诊结论；[refactor-drift](../../checks/audit/refactor-drift-audit.mjs) 至少实跑一次（或写「不能跑」的证据）；C11 ≤ 3 轮。
+- **focus v6（2026-11-15）**：C11 至少覆盖 M1–M4 各一次，或逐项写未跑原因；预检 7 条有分诊结论；[refactor-drift](../../../checks/audit/refactor-drift-audit.mjs) 至少实跑一次（或写「不能跑」的证据）；C11 ≤ 3 轮。
 - **停止规则（focus v6）**：一轮没有新 material → 收口；用户叫停优先。
 - 不写「没有 bug」；未覆盖面保留并标 owner；单场 live 不写成稳定。
 - 证据可复读；`pnpm verify` + `pnpm test` 绿；审查记录齐后归档。

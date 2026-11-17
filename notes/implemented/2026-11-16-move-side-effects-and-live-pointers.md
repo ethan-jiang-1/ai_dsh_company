@@ -3,7 +3,7 @@
 状态：implemented（2026-11-16 落地）
 
 上游 = 用户 2026-11-16「_backlog/bugs 这里头有不少当借助 exploratory test 发现的 bug，你系统性地看一看，考虑考虑怎么修复，他们给你 setup goal 目标是修复所有的 bug」；
-来源 = 探索卡 [Round 92](../../_backlog/issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C11 搬移副作用）；批次记录与逐卡判定 = [_backlog/bugs/README.md「2026-11-16 修复交接」](../../_backlog/bugs/README.md)；归档 = [_archive/fixed_bugs](../../_backlog/_archive/fixed_bugs/README.md)。
+来源 = 探索卡 [Round 92](../../_backlog/_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C11 搬移副作用）；批次记录与逐卡判定 = [_backlog/bugs/README.md「2026-11-16 修复交接」](../../_backlog/bugs/README.md)；归档 = [_archive/fixed_bugs](../../_backlog/_archive/fixed_bugs/README.md)。
 
 ## 决定
 
@@ -66,7 +66,7 @@
 
 ## 未覆盖轴
 
-- [unprovable] 「三批搬移之外是否还有别的搬移副作用」没有穷举 oracle；本批只证四类载体 → `_backlog/issues/2026-11-12-deep-surface-continuous-bug-hunt.md`
+- [unprovable] 「三批搬移之外是否还有别的搬移副作用」没有穷举 oracle；本批只证四类载体 → `_backlog/_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md`
 - [environment-gap] Windows 实机 / clean clone 未跑（本批只在本机 macOS + 完整构建树上验证）→ `_backlog/triggers.md`
 - [covered] 面规则覆盖面与 `coveredBy` 词表 → `tests/repo/budget/asset-lanes.spec.ts`
 - [policy] weekly 慢档（company-entry / release）不进 pre-push 的成本边界 → `docs/testing.md`

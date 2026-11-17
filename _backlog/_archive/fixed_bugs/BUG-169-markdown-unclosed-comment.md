@@ -8,7 +8,7 @@ opened: 2026-11-14
 
 > 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 90](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；与 BUG-162 的注释容器同层。
+> **关联**：[探索卡 Round 90](../settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；与 BUG-162 的注释容器同层。
 > **留痕**：Note [2026-11-14-shape-state-machine-and-gate-edges.md](../../../notes/implemented/2026-11-14-shape-state-machine-and-gate-edges.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8c-markdown-shape.mts`。
 
 ## 症状

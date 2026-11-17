@@ -3,7 +3,7 @@
 状态：implemented（2026-11-14 落地）
 
 上游 = 用户 2026-11-14「_backlog/bugs 现有大量刚才经过exploratory test发现的bug……系统地思考如何修复它们」；
-来源 = 探索卡 Round 90（[C8/C9/C10 延续](../../_backlog/issues/2026-11-12-deep-surface-continuous-bug-hunt.md)）；
+来源 = 探索卡 Round 90（[C8/C9/C10 延续](../../_backlog/_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)）；
 逐卡判定与证据 = [BUG-168..175 归档索引](../../_backlog/_archive/fixed_bugs/README.md)。
 
 ## 决定

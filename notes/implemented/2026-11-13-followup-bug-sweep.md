@@ -4,7 +4,7 @@
 
 上游 = 用户 2026-11-13：「_backlog/bugs 这里又找到一堆bug，系统性地思考好怎么把这些bug能修好吧……直到所有bug解决了」；
 修复交接 = [_backlog/bugs/README.md](../../_backlog/bugs/README.md) 的 2026-11-13 第二轮节。十张卡 BUG-104..113
-来自 [高复杂度面持续探索](../../_backlog/issues/2026-11-12-deep-surface-continuous-bug-hunt.md) 的 C3–C6 回归扫，
+来自 [高复杂度面持续探索](../../_backlog/_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md) 的 C3–C6 回归扫，
 多数是上一轮 [缺陷横扫 Note](./2026-11-13-deep-surface-bug-sweep.md) 修复后的边界复查。
 
 ## 问题

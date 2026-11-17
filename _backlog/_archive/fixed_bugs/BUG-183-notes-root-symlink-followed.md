@@ -8,7 +8,7 @@ opened: 2026-11-14
 
 > 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 91](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-174 修了 lifecycle 下/entry 级 symlink，根级未修。
+> **关联**：[探索卡 Round 91](../settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-174 修了 lifecycle 下/entry 级 symlink，根级未修。
 > **留痕**：Note [2026-11-14-shape-fences-and-gate-parsing.md](../../../notes/implemented/2026-11-14-shape-fences-and-gate-parsing.md)（同轮八卡）；复现脚本 = `runtime/tmp/c9d-notes-root-symlink.mts`。
 
 ## 症状

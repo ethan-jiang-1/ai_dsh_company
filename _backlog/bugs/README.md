@@ -42,7 +42,7 @@
 
 ## 2026-11-16 C11 二轮探索（修复后的守卫面）
 
-**用户指令（2026-11-16）**：「你发现的 bug 全全修好了……我需要你继续这样一口气能继续 exploratory test 找到 10 个 bug」——本组 10 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 93](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+**用户指令（2026-11-16）**：「你发现的 bug 全全修好了……我需要你继续这样一口气能继续 exploratory test 找到 10 个 bug」——本组 10 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 93](../_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
@@ -76,7 +76,7 @@
 
 ## 2026-11-15 C11 搬移副作用探索（focus v6）
 
-**用户指令（2026-11-15）**：「用这个新的 exploratory test 来做寻找 bug……找到 bug 就直接报，希望你能找到七八个吧」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 92](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+**用户指令（2026-11-15）**：「用这个新的 exploratory test 来做寻找 bug……找到 bug 就直接报，希望你能找到七八个吧」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 92](../_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
@@ -87,7 +87,7 @@
 
 ## 2026-11-14 focus v5 探索（post-fix 3）
 
-**用户指令（2026-11-14）**：「你发现的问题全修好了，继续往前，Exploratory test去寻找更多的bug」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 91](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+**用户指令（2026-11-14）**：「你发现的问题全修好了，继续往前，Exploratory test去寻找更多的bug」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 91](../_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
 
 | 组 | 卡 | 一句话 | 级别 |
 |---|---|---|---|
@@ -120,7 +120,7 @@ D 独立。**证据口径**：先落代码提交拿 sha → 再归档补 `## 修
 
 ## 2026-11-14 focus v4 探索（post-fix 2）
 
-**用户指令（2026-11-14）**：「继续再来……探索抓更多的bug」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 90](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+**用户指令（2026-11-14）**：「继续再来……探索抓更多的bug」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 90](../_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
 
 | 组 | 卡 | 一句话 | 级别 |
 |---|---|---|---|
@@ -151,7 +151,7 @@ D 独立。**证据口径**：先落代码提交拿 sha → 再归档补 `## 修
 
 ## 2026-11-14 focus v3 探索（post-fix 回归）
 
-**用户指令（2026-11-14）**：「继续再来……探索抓更多的bug」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 89](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+**用户指令（2026-11-14）**：「继续再来……探索抓更多的bug」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 89](../_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
 
 | 组 | 卡 | 一句话 | 级别 |
 |---|---|---|---|
@@ -189,7 +189,7 @@ BUG-151 由 Safety 矩阵首跑发现，同轮修并迁 [fixed_bugs](../_archive
 
 ## 2026-11-13 focus v2 探索（C8/C9/C10）
 
-**用户指令（2026-11-13）**：「对，抓到bug之后不要改，直接报就行了」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 86](../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+**用户指令（2026-11-13）**：「对，抓到bug之后不要改，直接报就行了」——本组 8 张全部 `调查中`，只开卡不修；证据 = [探索卡 Round 86](../_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
 
 | 组 | 卡 | 一句话 | 级别 |
 |---|---|---|---|

@@ -4,7 +4,7 @@
 
 上游 = 用户 2026-11-13：「_backlog/bugs 这里又找到一堆bug，系统性地思考好怎么把这些bug能修好吧」+
 「setup goal 静默，自主执行……直到所有bug解决了」；修复交接 = [_backlog/bugs/README.md](../../_backlog/bugs/README.md)
-的 2026-11-13 节。十四个缺陷（BUG-090..103）来自 [高复杂度面持续探索](../../_backlog/issues/2026-11-12-deep-surface-continuous-bug-hunt.md) 的 C1–C7 轮。
+的 2026-11-13 节。十四个缺陷（BUG-090..103）来自 [高复杂度面持续探索](../../_backlog/_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md) 的 C1–C7 轮。
 
 ## 问题
 

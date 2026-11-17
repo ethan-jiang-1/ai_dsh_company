@@ -21,6 +21,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [2026-11-12-deep-surface-continuous-bug-hunt.md](settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md) | 已结；C1–C11 探索收官（BUG-090..201 分批修复归档；focus v6 两轮 18 张）；C12 归属波次另立 [新卡](../issues/2026-11-17-ownership-wave-exploratory.md) | 2026-11-17 |
 | [BUG-192（已修）](fixed_bugs/BUG-192-surface-rules-tracked-path-completeness.md) | 已修：19 条 tracked 路径无面规则/豁免、完备性只抽样；新门禁 `surface-coverage` 全 tracked 判据 + 登记 | 2026-11-16 |
 | [BUG-193（已修）](fixed_bugs/BUG-193-vitest-threshold-guard-accepts-directory.md) | 已修：阈值键守卫放过目录；三处守卫统一 `statSync().isFile()` | 2026-11-16 |
 | [BUG-194（已修）](fixed_bugs/BUG-194-live-pointer-guard-misses-js-source.md) | 已修：活指针守卫漏 `.js` 源码；源码面后缀补 `.js/.mjs` | 2026-11-16 |

@@ -8,7 +8,7 @@ opened: 2026-11-13
 
 > 严重级别：P2（次要）｜发现：2026-11-13｜状态：已修｜审查：agent — keyless 红→绿（旧件保留）
 >
-> **关联**：[高复杂度面持续探索卡](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C4 / 治理导出）
+> **关联**：[高复杂度面持续探索卡](../settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C4 / 治理导出）
 > **留痕**：Note [2026-11-13-state-root-write-gate-sweep](../../../notes/implemented/2026-11-13-state-root-write-gate-sweep.md)
 
 ## 症状

@@ -3,7 +3,7 @@
 状态：implemented（2026-11-13 落地；验证见下）
 
 上游 = 用户 2026-11-13：「_backlog/bugs 这里又找到一堆bug……直到所有bug解决了」。32 张卡（114..139、141..146；BUG-140 经复核撤回）来自
-[高复杂度面持续探索](../../_backlog/issues/2026-11-12-deep-surface-continuous-bug-hunt.md) 的 C1–C7 回归扫，
+[高复杂度面持续探索](../../_backlog/_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md) 的 C1–C7 回归扫，
 绝大多数是前两轮修复后的边界复查：**同一个「workspace 可写 ⇒ `.dsh-company` 及其子目录可被 symlink/文件替换」
 假设被各模块各自实现**，以及 typed error 只在部分命令边界收口。
 

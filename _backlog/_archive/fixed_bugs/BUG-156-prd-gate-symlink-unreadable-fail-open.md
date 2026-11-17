@@ -8,7 +8,7 @@ opened: 2026-11-13
 
 > 严重级别：P1（重要）｜发现：2026-11-13｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 86](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H5/H6）；与 BUG-129/131/134/147/149 同族的「新增读载体未接 company-root」。
+> **关联**：[探索卡 Round 86](../settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C8-H5/H6）；与 BUG-129/131/134/147/149 同族的「新增读载体未接 company-root」。
 > **留痕**：Note [2026-11-14-eight-bug-second-sources.md](../../../notes/implemented/2026-11-14-eight-bug-second-sources.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8-round1.mts`。
 
 ## 症状

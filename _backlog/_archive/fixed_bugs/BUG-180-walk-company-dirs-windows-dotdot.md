@@ -8,7 +8,7 @@ opened: 2026-11-14
 
 > 严重级别：P1（重要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 修复证据`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 91](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-170 的 `..` 修复只覆盖 POSIX 分隔符。
+> **关联**：[探索卡 Round 91](../settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-170 的 `..` 修复只覆盖 POSIX 分隔符。
 > **留痕**：Note [2026-11-14-shape-fences-and-gate-parsing.md](../../../notes/implemented/2026-11-14-shape-fences-and-gate-parsing.md)（同轮八卡）；证据 = `runtime/tmp/c9d-win-dotdot.log` + 代码；**Windows 实跑未做**（本机 macOS），按 platform 语义判。
 
 ## 症状

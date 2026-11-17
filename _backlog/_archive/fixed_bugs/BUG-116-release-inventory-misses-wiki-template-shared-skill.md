@@ -8,7 +8,7 @@ opened: 2026-11-13
 
 > 严重级别：P2（次要）｜发现：2026-11-13｜状态：已修｜审查：agent — 清单补齐；release-smoke 待跑
 >
-> **关联**：[高复杂度面持续探索卡](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C7 / 发布安装）
+> **关联**：[高复杂度面持续探索卡](../settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C7 / 发布安装）
 > **留痕**：Note [2026-11-13-state-root-write-gate-sweep](../../../notes/implemented/2026-11-13-state-root-write-gate-sweep.md)
 
 ## 症状

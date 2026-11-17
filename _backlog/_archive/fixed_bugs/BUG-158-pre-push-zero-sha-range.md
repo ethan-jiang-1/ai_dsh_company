@@ -8,7 +8,7 @@ opened: 2026-11-13
 
 > 严重级别：P1（重要）｜发现：2026-11-13｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 86](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C9-H1）；pre-push 是 2026-11-13 新增的「改到哪个面就必须跑哪条真入口」机械门。
+> **关联**：[探索卡 Round 86](../settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C9-H1）；pre-push 是 2026-11-13 新增的「改到哪个面就必须跑哪条真入口」机械门。
 > **留痕**：Note [2026-11-14-eight-bug-second-sources.md](../../../notes/implemented/2026-11-14-eight-bug-second-sources.md)（同轮八卡）；复现证据 = `runtime/tmp/c8-round1.mts` 之外的 `runtime/tmp/c9-delete.log` 与合成分支。
 
 ## 症状

@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-- [2026-11-12 高复杂度面持续探索（培养/委派/run-bundle/账本/客户端流/搬移副作用）](2026-11-12-deep-surface-continuous-bug-hunt.md) — C1–C10 + focus v2–v6；**focus v6（2026-11-15）= C11 搬移副作用**（三批纯搬移的等价性 / 活指针 / 真入口 / 静默弱化；C1–C10 冻结）；v2–v5 已修复归档；首轮 BUG-184..191 已修；二轮（Round 93，2026-11-16）开 BUG-192..201（活跃 10，只开卡不修，Next 202）；不修产品代码。
+- [2026-11-17 归属波次 exploratory（挪目录 + 打扫卫生）](2026-11-17-ownership-wave-exploratory.md) — focus v7 = C12：7 个搬移提交 / 77 renames / 668 文件 slot + 37 个卫生/口径/基线/守卫/发布/CI 提交；六面 N1–N6 + 10 条假设 + 8 条预检坐标；Round 94–96 待用户 push；不修产品代码。前身 = [2026-11-12 深面探索（已结）](../_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 

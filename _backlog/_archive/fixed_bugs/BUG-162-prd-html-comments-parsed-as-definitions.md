@@ -8,7 +8,7 @@ opened: 2026-11-14
 
 > 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 89](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-153 修了围栏代码块，但另一类「非定义容器」HTML 注释仍未处理。
+> **关联**：[探索卡 Round 89](../settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；BUG-153 修了围栏代码块，但另一类「非定义容器」HTML 注释仍未处理。
 > **留痕**：Note [2026-11-14-shape-layer-and-structure-semantics.md](../../../notes/implemented/2026-11-14-shape-layer-and-structure-semantics.md)（同轮八卡）；复现脚本 = `runtime/tmp/c8b-html-comment.mts`。
 
 ## 症状

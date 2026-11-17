@@ -8,7 +8,7 @@ opened: 2026-11-13
 
 > 严重级别：P2（次要）｜发现：2026-11-13｜状态：已结｜审查：agent — 复核不成立：当前 spec 已传 workspace，55 passed；无产品改动
 >
-> **关联**：[高复杂度面持续探索卡](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C4 / 测试资产）
+> **关联**：[高复杂度面持续探索卡](./2026-11-12-deep-surface-continuous-bug-hunt.md)（C4 / 测试资产）
 > **留痕**：Note [2026-11-13-last-direct-writers](../../../notes/implemented/2026-11-13-last-direct-writers.md)
 
 ## 症状

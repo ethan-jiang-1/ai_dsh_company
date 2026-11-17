@@ -3,7 +3,7 @@
 状态：implemented（2026-11-16 落地）
 
 上游 = 用户 2026-11-16「_backlog/bugs 这里头又有不少当借助 exploratory test 发现的 bug，你系统性地看一看，考虑考虑怎么修复……目标是修复所有的 bug」；
-来源 = 探索卡 [Round 93](../../_backlog/issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C11 二轮：修复后的守卫面）；批次记录与逐卡判定 = [_backlog/bugs/README.md「2026-11-16 修复交接（根因组 A–E）」](../../_backlog/bugs/README.md)；归档 = [_archive/fixed_bugs](../../_backlog/_archive/fixed_bugs/README.md)。
+来源 = 探索卡 [Round 93](../../_backlog/_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C11 二轮：修复后的守卫面）；批次记录与逐卡判定 = [_backlog/bugs/README.md「2026-11-16 修复交接（根因组 A–E）」](../../_backlog/bugs/README.md)；归档 = [_archive/fixed_bugs](../../_backlog/_archive/fixed_bugs/README.md)。
 
 ## 决定
 
@@ -48,7 +48,7 @@
 
 ## 未覆盖轴
 
-- [unprovable] 「所有守卫的判据面都已到全集」没有穷举 oracle；本批只证五类载体 → `_backlog/issues/2026-11-12-deep-surface-continuous-bug-hunt.md`
+- [unprovable] 「所有守卫的判据面都已到全集」没有穷举 oracle；本批只证五类载体 → `_backlog/_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md`
 - [environment-gap] Windows 实机 / clean clone 未跑（`--paths` 的反斜杠归一只有单测）→ `_backlog/triggers.md`
 - [covered] 面规则完备性与选择器边界 → `tests/repo/budget/asset-lanes.spec.ts`
 - [policy] 未分类改动面 fail-closed 的逃生门（`--no-verify`）与成本边界 → `docs/testing.md`

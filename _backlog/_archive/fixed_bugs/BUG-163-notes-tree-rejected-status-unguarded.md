@@ -8,7 +8,7 @@ opened: 2026-11-14
 
 > 严重级别：P2（次要）｜发现：2026-11-14｜状态：已修｜审查：agent — 红→绿证据见 `## 已修判定`；同轮八卡留痕 = Note
 >
-> **关联**：[探索卡 Round 89](../../issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；notes-tree 是 2026-11-14 新增门禁，声称「状态行唯一且与目录同轴」。
+> **关联**：[探索卡 Round 89](../settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)；notes-tree 是 2026-11-14 新增门禁，声称「状态行唯一且与目录同轴」。
 > **留痕**：Note [2026-11-14-shape-layer-and-structure-semantics.md](../../../notes/implemented/2026-11-14-shape-layer-and-structure-semantics.md)（同轮八卡）；复现脚本 = `runtime/tmp/c9b-notes-tree.mts`。
 
 ## 症状
