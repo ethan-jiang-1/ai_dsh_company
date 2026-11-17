@@ -23,6 +23,13 @@
    本包整行 disabled `ui-trajectory` 后，上游 attachment 行的 inject 指针悬空，preset-smoke 每跑必报一条
    「非本包模块 inject 引用未知包名」；ui-scene 真页面错误环零命中 + 10 页签金样一致 ⇒ 无用户可见残缺，
    处置 = 知悉（登记在惊吓点就地），上游修复后该 WARN 自行消失。
+4. **[tools/lib/core/asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs) 11 条 weekly lane 标 `ciSafe:false` + 实测理由。**
+   首次 dispatch 的 fresh-clone（2026-11-16 schedule + 2026-11-17 手动）实证 `keyless-lane --ci` 11 红
+   （preset/company-entry/concurrent-home/external-workspace/interrupted-install/isolation-matrix/multi-install/
+   permissions-recovery/profile-row/revoke-recovery/upgrade-while-running）——它们需要 dev home、已装 pack、
+   `_dist` tarball 等安装态前置，干净 CI 从未具备；此前 `ciSafe` 默认 true 从未在真 CI 里被检验过。
+   按 fresh-clone.yml 头注预设的处置（「按实际结果标 ciSafe:false + 理由，不删资产」）收敛：weekly CI
+   只声明它真能跑的（6 PASS），这 11 条在本地 pre-push/smoke:all 的证据面不变。
 
 ## 输掉的方案
 
@@ -57,7 +64,8 @@
 | 层 | 失败类 | 负控（见过红） |
 |---|---|---|
 | CI 新鲜树 · 依赖解析 | install/CI | run 43998433633（ci verify）与 run 43852645841（fresh-clone install-verify 双 OS）：`Cannot find module 'js-yaml'`，requireStack 点名 vendor/dsh/package.json |
-| CI 新鲜树 · 全量构建 | 资源上限（OOM） | run 43852645841 `setup-macos`：`FATAL ERROR: Ineffective mark-compacts … heap out of memory`，发生在 `setup: vendor host types` |
+| CI 新鲜树 · 全量构建 | 资源上限（OOM） | run 43852645841 `setup-macos`：`FATAL ERROR: Ineffective mark-compacts … heap out of memory`，发生在 `setup: vendor host types`；修复后 run 44004467565 `setup-macos` 走到 `pnpm test` 全绿（OOM 步通过） |
+| weekly CI · lane 前提 | 安装态缺失（11 红） | run 44004467565 `keyless-lane --ci`：6 PASS / 11 FAIL / 13 SKIP，FAIL 全是 dev 态前置缺失；标 ciSafe:false 后 weekly CI 只跑真 ci-safe 资产（绿收据 → receipts） |
 | 本地门禁（改动后） | — | `pnpm verify` ALL PASS；`pnpm test tests/presets` 138 passed；`node checks/lanes/preset.entry.mjs` 11/11 真挂载 ALL PASS（WARN 按决定③属预期） |
 | 真页面（WARN 无残缺） | — | `node checks/lanes/ui-scene.entry.mjs --isolated --expected`：ALL PASS，金样 10 页签一致、错误环零命中 |
 | CI 绿收据 | — | push 后 ci run 与手动 dispatch 的 fresh-clone run 绿态收据 → `notes/archived/receipts/`（未绿前本表不写绿） |

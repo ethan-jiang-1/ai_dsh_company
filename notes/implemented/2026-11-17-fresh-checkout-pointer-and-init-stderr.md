@@ -6,8 +6,7 @@
 
 ## 决定
 
-1. **[_backlog/methods/bug-fix.md](../../_backlog/methods/bug-fix.md) 三处「rebuild 后重建 client 产物」的指针从
-   `packages/company-pack/lib/client.js` 改到构建入口 `packages/company-pack/tsdown.config.ts`，并注明产物是
+1. **[_backlog/methods/bug-fix.md](../../_backlog/methods/bug-fix.md) 三处「rebuild 后重建 client 产物」的指针从 client 构建产物路径改到构建入口 `packages/company-pack/tsdown.config.ts`，并注明产物是
    gitignored 构建输出、fresh checkout 上不存在。** 依据：`lib/**` 是产物，rebuild/rename 都会动它——
    「怎么重建」的导航指针语义就该指入口；bare-path 门禁在新鲜 checkout 上判「活指针腐化」是正确行为
    （CI run 44004329410 三 FAIL 实证，本地绿只因暖树 lib 在场）。

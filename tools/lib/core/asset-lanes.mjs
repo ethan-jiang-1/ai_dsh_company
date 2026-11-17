@@ -213,6 +213,10 @@ export const ASSETS = [
   }),
   define('preset', 'classic', ['surface', 'weekly'], {
     why: 'preset 真挂载、六角色 + 五 support 的完成定义',
+    // ciSafe:false（2026-11-17 weekly --ci 实证 11 红）：需要已装 pack 的 dev home company profile，
+    // 干净 CI 无安装态。按 fresh-clone.yml 头注「按实际结果标 ciSafe:false + 理由，不删资产」。
+    ciSafe: false,
+    manualReason: '需要已装 pack 的 dev home profile（干净 CI 无安装态）；本地 pre-push/smoke:all 不受影响',
   }),
   define('replay', 'classic', ['surface', 'weekly'], {
     why: '合成回放场景的会话日志 + workspace 判据',
@@ -221,33 +225,56 @@ export const ASSETS = [
   // ── weekly lane（每周全量 keyless；不在 push 时跑，但最多陈旧 7 天）──────────
   define('company-entry', 'classic', ['weekly'], {
     why: '真 tarball 装 profile → dsh --profile company → workspace/公司状态（1–2 分钟）',
+    // ciSafe:false（2026-11-17 weekly --ci 实证）：需要 _dist 发布 tarball，CI 不导出 _dist。
+    ciSafe: false,
+    manualReason: '需要 _dist 发布 tarball（CI 不导出 _dist）；本地跑法与证据面不变',
   }),
   define('concurrent-home', 'classic', ['weekly'], {
     why: '两个 writer 同 home 的 lease 与停写行为',
+    // ciSafe:false（2026-11-17 weekly --ci 实证）：需要 DSH_HOME dev 态，干净 CI 无。
+    ciSafe: false,
+    manualReason: '需要 DSH_HOME dev 态（干净 CI 无）；本地跑法与证据面不变',
   }),
   define('external-workspace', 'classic', ['weekly'], {
     why: 'DSH_COMPANY_HOME / 外部盘 / 搬家逻辑',
+    ciSafe: false,
+    manualReason: '需要 DSH_HOME + DSH_COMPANY_HOME dev 态（干净 CI 无）；本地跑法与证据面不变',
   }),
   define('interrupted-install', 'classic', ['weekly'], {
     why: 'install/remove/upgrade 的失败与恢复路径',
+    ciSafe: false,
+    manualReason: '需要安装态前置（已装 pack / dev home；干净 CI 无）；本地跑法与证据面不变',
   }),
   define('isolation-matrix', 'classic', ['weekly'], {
     why: 'workspace 解析 / 身份落点 / 停写的隔离矩阵',
+    ciSafe: false,
+    manualReason: '需要 DSH_HOME dev 态（干净 CI 无）；本地跑法与证据面不变',
   }),
   define('multi-install', 'classic', ['weekly'], {
     why: 'profile 组合 / 安装形状 / 多 pack 共存',
+    ciSafe: false,
+    manualReason: '需要已装 pack 的 profile 组合前置（干净 CI 无安装态）；本地跑法与证据面不变',
   }),
   define('permissions-recovery', 'classic', ['weekly'], {
     why: 'bootstrap/catalog 的文件权限与坏索引恢复',
+    ciSafe: false,
+    manualReason: '需要 dev home/catalog 前置（干净 CI 无 dev 态）；本地跑法与证据面不变',
   }),
   define('profile-row', 'classic', ['weekly'], {
     why: 'profile patch / 组合行 / 第二 bundle 的装配',
+    ciSafe: false,
+    manualReason: '需要 dev home profile 前置（干净 CI 无安装态）；本地跑法与证据面不变',
   }),
   define('revoke-recovery', 'classic', ['weekly'], {
     why: 'revoke / pending journal / 方法层恢复',
+    ciSafe: false,
+    manualReason: '需要 DSH_HOME（实证：缺 DSH_HOME 即抛「先 source run/env.sh」）；干净 CI 无 dev home',
   }),
   define('upgrade-while-running', 'classic', ['weekly'], {
     why: '运行中升级的边界（旧实例继续工作、数据不丢）',
+    // ciSafe:false（2026-11-17 weekly --ci 实证）：需要 _dist 发布 tarball + 运行中实例。
+    ciSafe: false,
+    manualReason: '需要 _dist 发布 tarball + 运行中实例（实证缺 tgz 即抛）；本地跑法与证据面不变',
   }),
   define('client-error-chain', 'browser', ['weekly'], {
     why: '真页面 console.error → 错误环 → host 日志落点',
