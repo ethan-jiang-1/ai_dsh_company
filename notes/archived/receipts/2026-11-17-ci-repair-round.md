@@ -24,7 +24,7 @@
 - **本地全量**（每笔提交 pre-push enforcement 实跑）：verify ALL PASS / test 256 文件 2170 绿 / typecheck / lint 0 警告 / dup 0 克隆 / coverage-ratchet PASS（197 文件）。
 - **真页面**：client-load-smoke ALL PASS；ui-scene `--isolated --expected` 金样 10 页签一致、错误环零命中。
 - **真挂载**：preset-smoke 11/11（含隔离组/并发/skills 隔离），WARN 按决定③为预期。
-- **fresh-clone dispatch**：run 44006907359 三 job 绿（install-verify 双 OS / install-channel）；setup-macos 的 keyless-lane 与 coverage-ratchet 修复后收据 = 修复提交后的 dispatch（本收据同批）。
+- **fresh-clone dispatch（终局）**：run 44010206843（12af312b）**4/4 job 全绿**——install-verify（ubuntu 53s / macOS 1m11s）、setup-macos 7m10s（setup 全量构建 + `--check` + verify + test + `keyless-lane --ci` + coverage-ratchet 全过）、install-channel 4m17s；vendor install / heap / ciSafe / coverage 基线四个修复全部被真 CI 验证。
 
 ## 红收据（修理前的真实红，全部来自 GitHub Actions log）
 
