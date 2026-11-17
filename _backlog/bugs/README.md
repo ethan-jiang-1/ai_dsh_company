@@ -2,13 +2,15 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 202；已分配 BUG-001..201。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 212；已分配 BUG-001..211。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**：2026-11-16 C11 二轮（修复后的守卫面）的 10 张（BUG-192..201）已于 2026-11-16 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；见下方「## 2026-11-16 修复交接（根因组 A–E：BUG-192..201）」。
+**活跃 10 张**：2026-11-17 C12 归属波次探索（focus v7）的 10 张（BUG-202..211）全部 `调查中`，只开卡不修；见下方「## 2026-11-17 C12 归属波次探索（focus v7）」。
+
+**上一轮收口**：2026-11-16 C11 二轮（修复后的守卫面）的 10 张（BUG-192..201）已于 2026-11-16 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；见下方「## 2026-11-16 修复交接（根因组 A–E：BUG-192..201）」。
 
 **上一轮收口**：2026-11-15 C11 搬移副作用探索（focus v6）的 8 张（BUG-184..191）已于 2026-11-16 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；见下方「## 2026-11-16 修复交接（根因组 A–D：BUG-184..191）」。上一轮 focus v5 的 8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-176..183）」）。
 
@@ -17,6 +19,24 @@
 **更早收口**（2026-11-14 focus v3）：8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）」）。
 
 **最早收口**（2026-11-13 focus v2）：8 张已于 2026-11-14 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接」）。
+
+## 2026-11-17 C12 归属波次探索（focus v7）
+
+**用户指令（2026-11-17）**：「利用这个思路做 exploratory test……找到差不多10来个的时候收手，bug直接报，别试图去修整这些bug」——本组 5 张全部 `调查中`，只开卡不修；证据 = [探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)。
+
+| 组 | 卡 | 共同根因 | 一句话 | 级别 |
+|---|---|---|---|---|
+| A oracle 判别力 | [202](BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) | `--hashes` 只取 `titlePath`；`--compare` 用集合差 | 改断言仍报零测试体改动；重复测试删一条仍报零删除 | P2 |
+| B 覆盖率地板 | [203](BUG-203-coverage-ratchet-rename-resets-floor.md) / [204](BUG-204-ledger-branches-floor-cold-only.md) | 单一基线同时服务暖/冷形状；改名只发 note | 改名重置高地板；ledger 暖树留 6 点盲区 | P2 ×2 |
+| C 守卫扫描面 | [205](BUG-205-live-pointer-faces-miss-moved-libs.md) | `FACES` 手写清单未随 63 个 lib 搬家扩面 | 新家注释里的死 spec 不扫 | P2 |
+| D 证据执行 | [206](BUG-206-coveredby-evidence-does-not-execute.md) | `coveredBy` 是声明，不是执行证据 | 探针/工具入口坏了 pre-push 仍绿 | P2 |
+| E 退役登记 | [207](BUG-207-retired-path-misses-wave-renames.md) | 退役前缀表是手写数组，未随 77 renames 更新 | 脚本注释里的旧家仍称「零残留」 | P2 |
+| F 依赖图 | [208](BUG-208-face-boundaries-computed-imports.md) | 只消费字面量 import；checks/probes lib 无图守卫 | 计算型反向 import 可绕过归属方向 | P2 |
+| G live 声明 | [209](BUG-209-live-declarations-stale-after-split.md) | 手写面表/件数无生成器 | tests/README 的 lib→replay 与 Note 件数仍按旧树 | P3 |
+| H shipped 面 | [210](BUG-210-shipped-comments-dev-only-paths.md) | 只清旧家，未区分 dev-only 同源说明 | 安装包里注释指向不存在的 tools/lib | P3 |
+| I 归属规则 | [211](BUG-211-tools-readme-lib-purity-contradiction.md) | 纯度句未随 probe/ 纳入 lib 更新 | 「lib 不启动进程」与 probe-web 矛盾 | P3 |
+
+本组是 Round 94–96 的产出；9 条安装形状 lane、7 件 analyze 探针与 `smoke:all` 已实跑 PASS；clean worktree 未跑，见探索卡。
 
 ## 2026-11-16 修复交接（根因组 A–E：BUG-192..201）
 

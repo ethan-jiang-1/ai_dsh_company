@@ -163,7 +163,83 @@ opened: 2026-11-17
 - 所有 finding 已分诊（BUG 卡 / 观察 / deliberate）；不写「没有 bug」。
 - `pnpm verify` + `pnpm test` 绿；审查记录齐后归档。
 
+## Round 94（2026-11-17 · N1 / N2 / N4 · 静态与负控）
+
+**状态：** keyless 实跑；本轮不开 live。
+
+**选面：** 先打「守卫/声明」而不是旧指针：搬移的机械面看起来是干净的，真正的风险在判据面。
+
+| 假设 | 判决 | 证据 / BUG |
+|---|---|---|
+| C12-1 旧家仍被活载体引用 | **refuted（live executable）/ 守卫面 confirmed** | 77 renames × live 顶层粗扫：9 个 live 文件命中，全部是研究材料、implemented Note 散文、一个守卫的负例注释；无 live executable 命中。但脚本注释/新家注释的守卫面有缺口 → [BUG-207](../bugs/BUG-207-retired-path-misses-wave-renames.md)、[BUG-205](../bugs/BUG-205-live-pointer-faces-miss-moved-libs.md) |
+| C12-2 face-boundaries 扫描面 | **confirmed** | 计算型 import 注入 `probes/lib` 后 spec 仍 4 passed；`checks/lib`/`probes/lib` 无 keyless 图兜底 → [BUG-208](../bugs/BUG-208-face-boundaries-computed-imports.md) |
+| C12-3 refactor-drift 判别力 | **confirmed** | 同 `titlePath` 不同失败信息 → 同一指纹且 `ALL PASS 零测试体改动`；重复行 2→1 → 仍 `零删除` → [BUG-202](../bugs/BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) |
+| C12-4 INDEX / CENSUS 口径 | **refuted** | 独立枚举：ASSETS 30 / PROBES 66 / lanes 32（30 assets + 2 runners）/ gates 75 / audit 8 / spec 256 / tests/checks 10；INDEX 32 = 30+2、probes 67 = 66+1、tools 19 = 17+1+1 均对盘 |
+| C12-5 覆盖率基线 / 豁免 | **confirmed** | 改名合成样本 old 100/100 → new 85/75：`violations=[]`；暖树 `ledger.ts` 100/100 vs 地板 94 → [BUG-203](../bugs/BUG-203-coverage-ratchet-rename-resets-floor.md)、[BUG-204](../bugs/BUG-204-ledger-branches-floor-cold-only.md) |
+| C12-6 卫生提交的语义面 | **部分 / doc confirmed** | `e52d20c9` / `3a99f0ed` / `7a46c79f` 逐 hunk 看只动指针/红态引用；但 live 声明仍按旧树写 → [BUG-209](../bugs/BUG-209-live-declarations-stale-after-split.md)、[BUG-211](../bugs/BUG-211-tools-readme-lib-purity-contradiction.md) |
+| C12-9 4 件搬移探针 | **refuted** | `ask-latency` / `propose-sampler` / `explore-evidence` / `session-log-export` 均 exit 0（export 3656 份 / 1 无日志）；`orient` / `diagnose` / `notes-audit` 亦 exit 0；但 pre-push 不执行它们 → [BUG-206](../bugs/BUG-206-coveredby-evidence-does-not-execute.md) |
+| C12-10 clean worktree | **unrun** | 成本高且本轮是 docs/cards 变更；保留到下一轮或用户点名的 clean clone |
+
+**本轮负控（实跑）：**
+
+| 负控 | 结果 |
+|---|---|
+| `tools/lib/core/asset-lanes.mjs` 注入陈旧 spec 注释 → `live-pointer-paths.spec` | 8 passed（绿）→ 守卫面缺口 |
+| `probes/lib/orient.mjs` 注入计算型反向 import → `face-boundaries.spec` | 4 passed（绿）→ 守卫面缺口 |
+| `tools/lib/core/asset-lanes.mjs` 注入 tools/observe 注释 → `run-gates` | `retired-path ×294 + 555 注释面` PASS（绿）→ 退役表缺口 |
+| 探针注入不存在 import → pre-push + `run-gates` | 均 PASS；探针本身 `ERR_MODULE_NOT_FOUND` → coveredBy 空证据 |
+
+**证据坐标：** `runtime/tmp/c12-pre/`（refactor-drift 合成样本、import 图、77 renames 粗扫）、
+`runtime/tmp/c12/neg-*.log`、`runtime/tmp/c12/import-graph.mjs`。
+
+## Round 95（2026-11-17 · N3 / N5 · 基线 / 发布字节）
+
+**状态：** keyless + 构建产物只读；未重打 `_dist`。
+
+| 假设 | 判决 | 证据 / BUG |
+|---|---|---|
+| C12-5 豁免与地板 | **confirmed** | 波次前基线 197 文件 / 5 豁免；HEAD 197 / 6（新增 `pin`）；`carrier-registry` / `diagnosis` / `probe-window` 在波次前已是豁免，非搬移造成；`ledger.ts` 100→94 是唯一数值降标 → [BUG-204](../bugs/BUG-204-ledger-branches-floor-cold-only.md) |
+| C12-8 发布字节同源 | **部分 confirmed** | `_dist` tarball 旧家命中 0；安装手册旧家 0；MANIFEST 34 件 / README blob 与 `deployed_sha` 一致；但 shipped 的 3 处注释指向不随包的 `tools/lib/company/delegation-model.mjs` → [BUG-210](../bugs/BUG-210-shipped-comments-dev-only-paths.md) |
+| `release --check` | **观察（非产品缺陷）** | HEAD 上 exit 1：manifest `gitSha` 620507ec ≠ HEAD；本卡/前身卡是 docs-only 提交，需手工 `--stamp`；不是本波搬移行为 |
+| 覆盖率基线键迁移 | **pass** | 197 键全在盘；`delegation-model` / `candidate-scan` 历史值保留；无其它键丢失 |
+
+## Round 96（2026-11-17 · N6 · 真入口 / 未跑档）
+
+**状态：** 真入口实跑；隔离 home/workspace。
+
+| 入口 | 结果 |
+|---|---|
+| 9 条安装形状 lane（concurrent-home / external-workspace / revoke-recovery / profile-row / permissions-recovery / interrupted-install / multi-install / upgrade-while-running / isolation-matrix） | 全部 `ALL PASS` / exit 0 |
+| 7 件 analyze 探针（4 件搬移件 + orient / diagnose / notes-audit） | 全部 exit 0 |
+| `pnpm smoke:all` | 17 PASS / 0 FAIL / 13 SKIP（真模型 / 真浏览器 / 手动档） |
+| `pnpm company` / `pnpm setup` 独立跑 | 未单独跑；真 host 启动已由上述 lane 覆盖，setup 留待 clean clone 轮 |
+| clean worktree | **unrun**（C12-10 保留） |
+
+**判决：** C12-7 `ciSafe:false` 的 11 条里，实跑的 9 条安装形状 lane 全 PASS；没有「搬移/路径问题被
+`ciSafe:false` 掩盖」的证据，假设 **refuted（本机）**。C12-9 4 件探针 **refuted**。
+
+**证据坐标：** `runtime/tmp/c12/lane-*.log`、`runtime/tmp/c12/smoke-all.log`、`runtime/tmp/c12/coverage-ratchet.log`。
+
+## 判决汇总
+
+| ID | 判决 | BUG |
+|---|---|---|
+| C12-1 | refuted（live）/ 守卫面 confirmed | 205 / 207 |
+| C12-2 | confirmed | 208 |
+| C12-3 | confirmed | 202 |
+| C12-4 | refuted | — |
+| C12-5 | confirmed | 203 / 204 |
+| C12-6 | 部分 / doc confirmed | 209 / 211 |
+| C12-7 | refuted（本机 9 条 lane） | — |
+| C12-8 | 部分 confirmed | 210 |
+| C12-9 | refuted | 206（覆盖机制，不是探针本身） |
+| C12-10 | unrun | — |
+
+**本轮共开 10 张 P2 卡（BUG-202..211）**，全部 `调查中`，不修产品代码；未跑面 = clean worktree /
+`pnpm setup` 独立跑 / live 模型 / Windows。没有「没有 bug」的结论。
+
 ## 执行记录
 
 - 2026-11-17 ｜ 立卡（focus v7）｜ 本卡 + 前身卡归档 + 120 个指向旧卡的链接修复 ｜ 基线 256/2170、verify ALL PASS、typecheck exit 0；预检 3 条（refactor-drift 标题指纹 / 6 文件计算型 import / 9 live 文件命中）｜ `pnpm verify` ALL PASS ｜ Round 94–96 未开，等用户 push。
+- 2026-11-17 ｜ Round 94–96 ｜ `runtime/tmp/c12/` + `runtime/tmp/c12-pre/` ｜ 10 条假设判决 + 4 条守卫负控 + 9 条安装形状 lane + 7 件探针 + smoke:all | 10 张 BUG-202..211（调查中，不修） ｜ `pnpm verify` ALL PASS；`pnpm test` 256/2170；`pnpm typecheck` exit 0；smoke:all 17 PASS / 0 FAIL / 13 SKIP ｜ clean worktree / setup / live 未跑。
 - 每轮：日期 ｜ 面 ｜ 命令/会话 id ｜ 期望 vs 实测 ｜ 证据坐标 ｜ 判定。
