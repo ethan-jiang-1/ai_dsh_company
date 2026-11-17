@@ -42,6 +42,7 @@
 - 发现：**3 条 declaration blocker，0 条 code/behavior blocker**。B1 = `cordis.patch.yml:8` 随包注释仍指旧 compat-tags；B2 = 本 Note 的 archived 链接计数不实；B3 = `MANIFEST.sha_chain` 与 `files/deployed_sha` 自相矛盾。另有 6 条非阻塞建议。
 - 处置：B1 走本条 `[policy]` + [release.md](../../docs/contracts/release.md) 触发线（不改 pack 源，避免 `_dist` 重打）；B2 删掉不实数字；B3 补 2026-11-17 链节；6 条建议全修（CENSUS 57/0、示例改非资产名、README 秒级、pin 豁免 reason、layering 消息、Note 措辞）。
 - 复审：`8cf8fd19` 后同一盲审快速确认 **blocker=0, cleared**（3 条 declaration blocker 全清、6 条建议 6/6 cleared；定向 3 个 spec 共 13 passed；无新红/新假声明）。
+- 第二审（认证答卷语义）：另一无历史只读子代理逐题对照 13 题并重算 15 个来源 SHA-256；**semantic_errors=0**，3 条非阻塞 suggestions（Q3 meta 多一跳、Q11 缺语义审/回执、Q12 少两条 goal 约束）。结果 = [semantic-review.md](../../snapshots/probes/entry-probe/2026-11-17/semantic-review.md)。
 
 ## 未覆盖轴
 
@@ -51,7 +52,7 @@
 - [covered] 库存 kind 计数与 asset-lanes 对账 → `tests/repo/docs/checks-index.spec.ts`
 - [covered] 门禁自测计数 → `tests/repo/budget/test-census.spec.ts`
 - [covered] 真挂载：`preset.entry` 6 角色 + 5 support 全过 → `checks/lanes/preset.entry.mjs`
-- [covered] 真模型入口链认证：`entry-probe` 13/13（首次 240s 超时；清理 probe 根状态后以 600s 重跑通过）→ `snapshots/probes/entry-probe/2026-11-17/answer-00-55-58-376Z.md`
+- [covered] 真模型入口链认证：`entry-probe` 机器 13/13（首次 240s 超时；清理 probe 根状态后以 600s 重跑通过）+ 独立语义复审 0 error → `snapshots/probes/entry-probe/2026-11-17/semantic-review.md`
 - [policy] `probes` 五域与 `tests/*` 分区名不物理重排；只写判定规则，后续要重排另立 RFC → `probes/README.md`
 - [environment-gap] `release --check` 只到“源码面通过”；manifest gitSha 因发布后新增提交而滞后，未做 `--prepare/--verify` 重打 → `tools/release/release.mjs`
 - [policy] shipped pack 的旧指针暂不改：`cordis.patch.yml` 的兼容台账注释与 delegation src 注释仍指旧家；改任何 pack 源码都会触发 `_dist` 重打，本轮不做。触发线写入 [release.md](../../docs/contracts/release.md)：重建 `_dist` 时同批同步 → `packages/company-pack/cordis.patch.yml`
@@ -73,7 +74,7 @@
 | 结构门禁 | `pnpm verify` | 结构 / 全类 / 红 | 修前 `link-debt archived 16 > 基线 4`；修后 `ALL PASS；2 门无对象` |
 | 冻结副本指纹 | `pnpm verify`（security-scan） | 结构 / 导出形态 / 红 | README 加一行不抬 MANIFEST → `挂载件与冻结清单漂移`；抬 MANIFEST → `指纹 34 件 = 冻结副本` |
 | 真挂载 | `node checks/lanes/preset.entry.mjs` | 组合 / 配置组合 / 无 | `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）` |
-| 真模型入口链 | `node checks/lanes/entry-probe.entry.mjs --timeout 600000` | 认证 / 文档指针 / 无（真模型） | `MACHINE CHECKS PASS 13/13`；归档 `snapshots/probes/entry-probe/2026-11-17/answer-00-55-58-376Z.md` |
+| 真模型入口链 | `node checks/lanes/entry-probe.entry.mjs --timeout 600000` | 认证 / 文档指针 / 无（真模型） | `MACHINE CHECKS PASS 13/13`；语义复审 `semantic_errors=0`；归档 `snapshots/probes/entry-probe/2026-11-17/answer-00-55-58-376Z.md` + `semantic-review.md` |
 | 运行态视图 | `pnpm orient` | 回归 / 会话持久化 / 无 | exit 0（含待核工作候选扫描） |
 
 ## 移动副作用账
