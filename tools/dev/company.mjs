@@ -76,8 +76,16 @@ const run = (argv, options = {}) => {
 // 缺 profile 才初始化（web 模板）；已有 profile 一律不动它的依赖/patch。
 if (!profileExists) {
   console.log('company(dev): 缺 company profile；用 web 模板初始化（仅首次）')
-  run([process.execPath, cli, '--profile', 'company', '--from-default-profile', 'web', '--dump-default-config'],
-    { cwd: home, stdio: 'ignore' })
+  // 2026-11-17：此前 stdio:'ignore' 会吞掉 init 的 stderr——fresh clone 上咬过一次（exit 1 无从
+  // 诊断，重试即绿、根因未复现）。改为捕获并在失败时回放：失败必须点名，成功路径依旧安静。
+  const init = spawnSync(process.execPath,
+    [cli, '--profile', 'company', '--from-default-profile', 'web', '--dump-default-config'],
+    { cwd: home, env, stdio: ['ignore', 'ignore', 'pipe'], encoding: 'utf8' })
+  if (init.status !== 0) {
+    console.error(`company(dev): 步骤失败（exit ${String(init.status)}）：web 模板初始化 company profile；stderr ↓`)
+    if (init.stderr?.trim()) console.error(init.stderr.trim())
+    process.exit(init.status ?? 1)
+  }
 }
 
 const forceRebuild = args.includes('--rebuild')
