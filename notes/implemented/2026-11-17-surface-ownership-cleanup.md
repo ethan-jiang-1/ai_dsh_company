@@ -54,7 +54,7 @@
 - [covered] 真挂载：`preset.entry` 6 角色 + 5 support 全过 → `checks/lanes/preset.entry.mjs`
 - [covered] 真模型入口链认证：`entry-probe` 机器 13/13（首次 240s 超时；清理 probe 根状态后以 600s 重跑通过）+ 独立语义复审 0 error → `snapshots/probes/entry-probe/2026-11-17/semantic-review.md`
 - [policy] `probes` 五域与 `tests/*` 分区名不物理重排；只写判定规则，后续要重排另立 RFC → `probes/README.md`
-- [environment-gap] `release --check` 只到“源码面通过”；manifest gitSha 因发布后新增提交而滞后，未做 `--prepare/--verify` 重打 → `tools/release/release.mjs`
+- [covered] 发布面 READY：`--prepare --force`（内含 export-dist 端到端）+ `--verify` 7 项全 pass + `--stamp` 后 `--check --allow-pre-publish-index` → `READY 0.11.9 @ d7f0776c（tgz 268 条目；7 项检查 pass）`；`market-index.staged.json` 哨兵仍在场（是否发布/托管归用户） → `_dist/release-manifest.json`
 - [covered] shipped pack 旧指针已清零：`cordis.patch.yml` 兼容台账注释与 3 处 delegation src 注释改指新家，随 `release --prepare --force` 重建 `_dist`（export-dist 端到端 ALL PASS）同批落地；触发线保留在 [release.md](../../docs/contracts/release.md) → `packages/company-pack/cordis.patch.yml`
 - [unprovable] 未来新增模块会放对家没有 oracle；由 `face-boundaries` + 三份 README 的判定规则兜底 → `docs/surface-contract.md`
 
@@ -76,6 +76,10 @@
 | 真挂载 | `node checks/lanes/preset.entry.mjs` | 组合 / 配置组合 / 无 | `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）` |
 | 真模型入口链 | `node checks/lanes/entry-probe.entry.mjs --timeout 600000` | 认证 / 文档指针 / 无（真模型） | `MACHINE CHECKS PASS 13/13`；语义复审 `semantic_errors=0`；归档 `snapshots/probes/entry-probe/2026-11-17/answer-00-55-58-376Z.md` + `semantic-review.md` |
 | 运行态视图 | `pnpm orient` | 回归 / 会话持久化 / 无 | exit 0（含待核工作候选扫描） |
+| 发布重打 | `pnpm release --prepare --force` | 发布 / 导出形态 / 无 | `export-dist: ALL PASS`（npm pack 268 条目 / sha256 b2213a2d… / 手册重生成） |
+| 发布验收 | `pnpm release --verify` | 发布 / 导出形态 / 红（任一 smoke 失败即 fail 落账） | 7 项全 pass：verify / test / release-smoke / company-entry / client-load / preset / present-catalog |
+| 发布 READY | `pnpm release --check --allow-pre-publish-index` | 发布 / 导出形态 / 红 | `READY 0.11.9 @ d7f0776c（tgz 268 条目；7 项检查 pass）`；WARN staged 在场 |
+| UI 交互车道 | `node checks/lanes/ui-scene.entry.mjs --steps runtime/tmp/ui-steps-proof.json` | 行为 / client UI / 无 | clickText/waitText/expectText 全过；错误环零命中；金样档外全页签扫通过 |
 
 ## 移动副作用账
 
