@@ -448,9 +448,9 @@ export function makeDeliverableBundle(seed: number): GeneratedDeliverableBundle 
     '',
     ...(fault === 'valid'
       ? [
-        '- 改动面：`packages/company-pack/src/lib/prd-check.ts`',
-        '- 红：注入坏 MR → `pnpm vitest run tests/lib/prd-check.spec.ts` 失败',
-        '- 绿：恢复 MR → `pnpm vitest run tests/lib/prd-check.spec.ts` 通过',
+        '- 改动面：`packages/company-pack/src/lib/docs/prd-check.ts`',
+        '- 红：注入坏 MR → `pnpm vitest run tests/lib/docs/prd-check.spec.ts` 失败',
+        '- 绿：恢复 MR → `pnpm vitest run tests/lib/docs/prd-check.spec.ts` 通过',
       ]
       : ['（正文尚未填写结构化证据字段）']),
   ]

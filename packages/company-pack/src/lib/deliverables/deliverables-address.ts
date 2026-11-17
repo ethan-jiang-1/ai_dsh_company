@@ -1,9 +1,9 @@
 /**
- * 成品目录的客户端纯函数（2026-10-21 自 deliverables-catalog.ts 改名——与 tools/lib/company/deliverables-catalog.mjs（生成器）同名异职致 grep 噪声；本文件只做地址构造（2026-10-19 成品台账卡）：
+ * 成品目录的客户端纯函数（2026-10-21 自 deliverables-catalog.ts 改名——与 tools/lib/company/deliverables-catalog.mjs（仓库内生成器，不随包分发）同名异职致 grep 噪声；本文件只做地址构造（2026-10-19 成品台账卡）：
  * - 文件资源地址：把 `kb/deliverables-index.json` 里的 workspace 相对路径变成右栏可打开的
  *   `dsh-resource://file/session/<sessionId>/<path>` 地址（与 `ui-deliverables` 同一套地址语法，
  *   不引入新依赖）。
- * - 目录类型只从数据面消费；生成器 = `tools/deliverables-index.mjs`。
+ * - 目录类型只从数据面消费；生成器 = `tools/repo/deliverables-index.mjs`（不随包分发）。
  */
 
 /**

@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-207：retired-path 的退役前缀表没有登记这一波 77 个 renames，脚本注释里的旧家仍全绿
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-1 / N1）。
-> **留痕**：待修复者决定（本轮只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
 
 ## 症状
 
@@ -65,9 +65,8 @@ git checkout -- tools/lib/core/asset-lanes.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `RETIRED_PATH_PREFIXES` 至少登记本波的目录/文件退役家；登记必须能对到「现家」。
-2. 最小负例：在 `tools/lib/*.mjs` 注释里写 tools/observe/... 或 tools/repo/refactor-drift.mjs
-   → `retired-path` 红；删除 → 绿。
-3. 正例：`_backlog/research`/`notes/archived`/`_backlog/_archive` 的历史材料不扫，不误红。
+1. 退役面不再只靠手写表：`retired-path` 从最近 300 个提交的 `git log --diff-filter=RD -M --name-status` 自动推导旧路径，扫描脚本注释面；当前波次的旧 observe 目录等手工表条目仍登记，且 `to` 必须是现行路径。
+2. 手工表自检：`from` 不得仍存在；`_backlog/research`、归档树、历史引文（`FAIL …` 行）不判。
+3. 最小负例（同一条命令）：`pnpm verify`——向 `tools/lib/core/asset-lanes.mjs` 注释注入旧 observe 目录下的探针路径 → 红；删除 → 绿。

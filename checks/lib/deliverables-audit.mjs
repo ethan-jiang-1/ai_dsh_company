@@ -2,7 +2,7 @@
 // deliverables.mjs 按「形状与身份 / 声明对账」拆出——本文件只做会话声明与盘上比对）。
 //
 // 判据的合同家 = `company-workspace/AGENTS.md`「交付物三态」一节；动机与依据 =
-// `notes/proposed/2026-09-22-workspace-hygiene.md`（验收判据 1）。
+// `notes/archived/2026-10-16-deliverables-audit-seam.md`（验收判据 1）。
 //
 // 三态：
 //   成品    `deliverables/<slug>/final.md`          —— 必须来自一次 Lead 会话的 `present`

@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-204：ledger.ts 分支地板被冷环境实测拉低到 94，暖树上留出 6 点静默回归空间
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-5 / N3）。
-> **留痕**：待修复者决定（本轮只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
 
 ## 症状
 
@@ -67,12 +67,11 @@ pnpm coverage:ratchet
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 暖树地板保持 100；冷环境（3 例 skip）不能把它拉低。允许的实现：按 `hasLive` 两形状分别
-   统计/比对，或把 live 用例的分支从冷环境 metrics 中排除，而不是降全局基线。
-2. 最小负例：暖树上把 ledger 分支真实降到 95 → `coverage:ratchet` 红（当前会 PASS）。
-3. 冷形状：fresh clone 上 3 例 skip 时仍能解释 94.11%，但不得改写暖树地板。
+1. 暖树地板保持 100：`checks/lib/coverage-baseline.json` 的 `ledger.ts` branches 回到 100。
+2. 冷形状（3 个 live 用例 skip）也到 100：补一条无尾竖线的纯测试，覆盖 `trimmed.endsWith('|') ? -1 : undefined` 的 false 分支；不新增第二套基线。
+3. 最小负例（同一条命令）：`pnpm coverage:ratchet`——在 `ledger.ts` 植一条未覆盖分支 → 红（branches < 100）；还原 → 绿。
 
 ## 修复方向（不授权，仅记录）
 

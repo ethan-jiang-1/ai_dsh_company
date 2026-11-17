@@ -14,10 +14,14 @@
  *      普通文本与反引号命令都扫（BUG-189 正是纯文本）；
  *   ③ `checks/audit/**` 的注释（BUG-190）；
  *   ④ `packages/company-pack/presets/**` 与 `.agents/skills/**`（二轮补：随包分发、模型可读的
- *      SKILL/persona 是活指令，里面的「去跑哪个 spec」同样是活指针）。
+ *      SKILL/persona 是活指令，里面的「去跑哪个 spec」同样是活指针）；
+ *   ⑤ `tools/lib/**`、`checks/lib/**`、`probes/lib/**`、`tests/support/**`（2026-11-17 BUG-205：
+ *      63 个 lib 搬进这四个新家后，FACES 没扩面——注释里写错的 spec 路径正是 agent 会照着跑的）。
+ *      每个面收集到 0 个文件也判红（空面不是通过）。
  *
  * 不扫：`notes/archived/`、`_backlog/_archive/`（冻结层，记录当时事实）、`snapshots/`（归档
- * 证据载荷）、fixture / 负例（`zz-` / `nonexistent` 等故意写坏的名字）。
+ * 证据载荷）。负例不再按 `zz-`/`nonexistent` 全局豁免（盲审 S3：换个文件名就能免检）；若某个
+ * 面必须保留旧 spec 字面量，按 `(文件, 字面量)` 白名单逐条登记并写明理由。
  *
  * 证明不了：路径指向的 spec 语义上仍是那条判据（搬移可能把断言带偏）——那要靠各 spec 自己的
  * 断言与真入口；本 spec 只保证「指针不断」。
@@ -28,14 +32,13 @@
 // 负例留证 2026-11-16：把 audit 注释改回 tests/tools/candidate-scan-labels.spec.ts → 「审计脚本注释里的 spec 路径（BUG-190）」红；还原 → 绿。
 // 负例留证 2026-11-16（二轮）：向 `src/lib/docs/markdown-shape-core.js` 注入 tests/lib/ledger-legacy.spec.ts，修复前本 spec 绿（BUG-194）；补 `.js` 后缀后红。
 // 负例留证 2026-11-16（二轮）：向 preset SKILL 与 `.agents` SKILL 各注入旧 spec，修复前本 spec 绿（BUG-195）；补两个面后红。
+// 负例留证 2026-11-17：向 tools/lib 注入旧 spec 路径，本 spec 红（BUG-205）；删除 → 绿。
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 const TEST_PATH = /tests\/[A-Za-z0-9_./-]+\.spec\.ts/g
-/** 故意写坏的负例/夹具名（`zz-` / `nonexistent`）不判：它们是负例留证，不是活指针。 */
-const IGNORED = /(?:^|\/)(?:zz-|nonexistent)/
 
 /** 源码面后缀：`.js` 是包内手写运行时源码（markdown-shape-core），不是构建产物。 */
 const SOURCE_SUFFIXES = ['.ts', '.tsx', '.js', '.mjs']
@@ -47,6 +50,11 @@ const FACES = [
   { dir: 'checks/audit', suffixes: ['.mjs'] },
   { dir: 'packages/company-pack/presets', suffixes: ['.md', '.yml', '.yaml'] },
   { dir: '.agents/skills', suffixes: ['.md'] },
+  // 2026-11-17 BUG-205：归属波次后的四个 lib/support 新家。
+  { dir: 'tools/lib', suffixes: ['.mjs'] },
+  { dir: 'checks/lib', suffixes: ['.mjs'] },
+  { dir: 'probes/lib', suffixes: ['.mjs'] },
+  { dir: 'tests/support', suffixes: ['.mjs', '.ts'] },
 ]
 
 /** 相对路径是否是仓库内的普通文件（目录不算：`tests/x.spec.ts/` 不是可跑的 spec）。 */
@@ -74,7 +82,6 @@ function stalePointers(rel: string, suffixes: readonly string[]): string[] {
   for (const file of filesUnder(rel, suffixes)) {
     readFileSync(join(ROOT, file), 'utf8').split('\n').forEach((line, index) => {
       for (const match of line.matchAll(TEST_PATH)) {
-        if (IGNORED.test(match[0])) continue
         if (!isRepoFile(match[0])) stale.push(`${file}:${String(index + 1)} → ${match[0]}`)
       }
     })
@@ -119,6 +126,15 @@ describe('live 指针：tests/*.spec.ts 字面量必须现行', () => {
     expect(dirs).toContain('.agents/skills')
     expect(filesUnder('packages/company-pack/presets', ['.md', '.yml', '.yaml']).some(file => file.endsWith('SKILL.md'))).toBe(true)
     expect(filesUnder('.agents/skills', ['.md']).some(file => file.endsWith('SKILL.md'))).toBe(true)
+  })
+
+  it('四个 lib/support 新家在扫描面内，且每个面都有扫描对象（BUG-205）', () => {
+    const dirs = FACES.map(face => face.dir)
+    for (const dir of ['tools/lib', 'checks/lib', 'probes/lib', 'tests/support']) {
+      expect(dirs, `${dir} 不在 FACES——新家注释里的旧 spec 路径不会被扫到`).toContain(dir)
+    }
+    const empty = FACES.filter(face => filesUnder(face.dir, face.suffixes).length === 0).map(face => face.dir)
+    expect(empty, '这些 live 载体面一个文件都没收集到——空面不是通过').toEqual([])
   })
 
   it('每个 live 载体面都没有陈旧 spec 指针', () => {

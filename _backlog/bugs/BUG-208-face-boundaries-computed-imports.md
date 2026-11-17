@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-208：face-boundaries 对计算型 import 不可见，checks/lib 与 probes/lib 又没有 tools/lib 那样的 keyless 图兜底
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-2 / N1）。
-> **留痕**：待修复者决定（本轮只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
 
 ## 症状
 
@@ -63,12 +63,11 @@ git checkout -- probes/lib/orient.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 对 `checks/lib`/`probes/lib`/`tests/support` 至少加一层 `unresolvedImports` 判据：空集或仅
-   已审阅白名单才算过；或者把 `inspectKeylessGraph` 的旧 `libRoot` 扩成三个面。
-2. 最小负例：在 `probes/lib` 注入计算型反向 import → 红；删除 → 绿。
-3. 正例：`replay` 的 built 路径与 `markdown-links` 的 parser 表达式仍白名单放行，不误红。
+1. `face-boundaries.spec.ts` 对 `checks/lib`、`checks/gates/lib`、`checks/lanes/lib`、`probes/lib`、`tests/support` 断言 `unresolvedImports` 为空；扫描面/边数仍非空。
+2. 计算型动态 import（`.join`/模板/变量）不再隐身；`tools/lib` 的 3 条 vendor parser 表达式仍由 `layering.spec` 白名单管辖。
+3. 最小负例（同一条命令）：`pnpm test tests/repo/structure/face-boundaries.spec.ts`——向 `probes/lib/orient.mjs` 注入 `await import([...].join('/'))` → 红；删除 → 绿。
 
 ## 修复方向（不授权，仅记录）
 

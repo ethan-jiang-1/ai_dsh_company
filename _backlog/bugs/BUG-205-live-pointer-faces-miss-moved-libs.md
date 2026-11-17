@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-205：live-pointer 守卫的扫描面没有随 63 个 lib 搬进 tools/lib / checks/lib / probes/lib
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-2 / N1）。
-> **留痕**：待修复者决定（本轮只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
 
 ## 症状
 
@@ -67,9 +67,8 @@ git checkout -- tools/lib/core/asset-lanes.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `FACES` 纳入 `tools/lib`、`checks/lib`、`probes/lib`、`tests/support`（按文本后缀 `.mjs/.ts/.md`），
-   并对 `tests/support/doc-grammar.ts` 的负向样本保留显式豁免（`zz-` / `nonexistent` / fixture 名）。
-2. 最小负例：向 `tools/lib/core/*.mjs` 注入 tests/lib/old.spec.ts → 红；删除 → 8 passed。
-3. 扫描面非空断言：新面目录不存在或收集为 0 时必须红，不能空集合冒充通过。
+1. `FACES` 纳入 `tools/lib`、`checks/lib`、`probes/lib`、`tests/support`（文本后缀按面）；每个面收集文件数 > 0，空面不许通过。
+2. `tests/support/doc-grammar.ts` 的负向样本改用现行 spec 路径，不留豁免口子。
+3. 最小负例（同一条命令）：`pnpm test tests/repo/docs/live-pointer-paths.spec.ts`——向 `tools/lib/core/asset-lanes.mjs` 注入旧扁平的 tests/lib/old-ledger.spec.ts 注释 → 红；删除 → 绿。

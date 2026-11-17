@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
-// ── 3a. 资产命名契约（naming-contract，2026-11-13 立；卡 = _backlog/issues/2026-11-13-test-asset-naming-contract.md）
+// ── 3a. 资产命名契约（naming-contract，2026-11-13 立；卡 = _backlog/_archive/settled_issues/2026-11-13-test-asset-naming-contract.md）
 // 为什么：文件名是资产的**类型声明**。名字撒谎的代价不是审美——agent 按名字选错检查、人找错层、
 // census 把 fixture 当资产（2026-11-13 审计：refactor-drift-oracle 住 smoke、fast.mjs 像资产、
 // quality-loop-audit 住 probes、3 个 -walkthrough/-scenarios/-e2e 逃过 script-triggers、

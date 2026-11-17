@@ -10,13 +10,13 @@
 | 冒烟 | 30 |
 | 探针 | 66 |
 | 结构门禁 | 75 |
-| keyless spec 文件 | 256 |
+| keyless spec 文件 | 261 |
 | 门禁自测（tests/checks） | 10 |
 | fast lane | 4 |
 | surface lane | 6 |
 | weekly lane | 21 |
 | 未分类失败类 | 0 |
-| 无消费者资产 | 57 |
+| 无消费者资产 | 55 |
 
 ## 失败类分布
 
@@ -78,9 +78,9 @@
 |---|---|---|---|---|
 | ask-latency-probe | analyze | 会话持久化 | example | 0 |
 | diagnose-probe | analyze | 会话持久化 | example | 0 |
-| explore-evidence-probe | analyze | 会话持久化 | example | 0 |
+| explore-evidence-probe | analyze | 会话持久化 | example | 1 |
 | notes-audit-probe | analyze | 文档指针 | example | 0 |
-| orient-probe | analyze | 会话持久化 | example | 0 |
+| orient-probe | analyze | 会话持久化 | example | 1 |
 | propose-sampler-probe | analyze | 模型可见文本 | example | 0 |
 | session-log-export-probe | analyze | 会话持久化 | example | 0 |
 | attention-panel-probe | browser-visual | client UI | example | 0 |

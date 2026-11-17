@@ -7,7 +7,7 @@
  */
 import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 
-/** 一条成品目录项（与 `tools/lib/company/deliverables-catalog.mjs` 同形）。 */
+/** 一条成品目录项（与 `tools/lib/company/deliverables-catalog.mjs`（不随包分发）同形）。 */
 export interface DeliverablesCatalogEntry {
   readonly slug: string
   readonly kickoff: string

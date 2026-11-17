@@ -9,7 +9,7 @@ import { classifyDeliverable, deliverableId, parseMeta, slugFromDirName, validat
  * `classifyDeliverable` 的形状合法性、meta.md 的行形状与词表校验。
  * **声明对账**面（会话声明 ↔ 盘上比对、违了哪条）住 ./deliverables-audit.spec.ts。
  *
- * 判据的合同家 = `company-workspace/AGENTS.md`；动机 = `notes/proposed/2026-09-22-workspace-hygiene.md`。
+ * 判据的合同家 = `company-workspace/AGENTS.md`；动机 = `notes/archived/2026-10-16-deliverables-audit-seam.md`。
  * 分层（guides/dev-loop §9.1）：本层 keyless、秒级、不碰模型与浏览器。运行场那份
  * （读 `$DSH_HOME` 的多帧 zstd 日志）是认证档，归 `checks/audit/deliverables-check.mjs`。
  */

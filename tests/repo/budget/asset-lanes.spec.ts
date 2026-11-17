@@ -121,6 +121,12 @@ describe('资产 lane 注册表（空间完备）', () => {
     expect(selectSurfaces(['packages/company-pack/src/lib/presence/presence.ts']).assets).toEqual(['replay'])
   })
 
+  it('probes 面由真解析入口图的无条件步骤覆盖，不是只写 verify', () => {
+    const { covered } = selectSurfaces(['probes/analyze/orient-probe.mjs'])
+    expect(covered, 'probes/** 没有 coveredBy 申报').toHaveLength(1)
+    expect(covered[0]?.coveredBy, 'coverage:ratchet 会跑 entry-import-graph.spec；verify 不加载探针').toContain('coverage:ratchet')
+  })
+
   it('全 tracked 代表路径都有证据（全集判据 = verify 的 surface-coverage 门禁，BUG-192）', () => {
     // 全集由 checks/gates/surface-coverage.mjs 用 git ls-files 判；这里守它依赖的代表路径不退登记
     //（第二轮实证：19 条 tracked 路径 unseen 时，样本判据仍绿）。

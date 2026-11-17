@@ -11,7 +11,7 @@ import { consumerCount } from '../../../tools/lib/repo/asset-consumers.mjs'
  * ① `tests/CENSUS.generated.md` 是生成物——与注册表/盘面不一致即红（防手抄漂移）；
  * ② 探针与冒烟双向对齐，且全量显式失败类（`未分类 === 0`）；
  * ③ 结构门禁总数与活跃探针总数实行只降不升硬顶（`policy §P2`）。
- *   2026-11-16 面整理：7 件只读分析入口由 tools/observe 迁入 probes/analyze（分类变更，
+ *   2026-11-16 面整理：7 件只读分析入口由旧的 observe 目录迁入 probes/analyze（分类变更，
  *   入口总数不变，非能力增长）——探针 cap 59→66 与迁移同 diff；此后新增仍只降不升。
  */
 const MAX_GATES = 75

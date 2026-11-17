@@ -1,7 +1,7 @@
 // 探针 web 启动块的收成模块（2026-10-10 卡「两处重复收成模块，调用方行为不变」）。
 // 状态：常驻
 // 何时跑：改本文件或任何改用它的探针启动块后 → `npx vitest run tests/session/probe-web.spec.ts`（keyless）；
-//   本模块**不被** checks/smoke 直接跑，它是被 25 个真模型探针（probes/ 下所有起 web 的文件）import 的启动面。
+//   本模块**不被**旧的 smoke 目录直接跑，它是被 25 个真模型探针（probes/ 下所有起 web 的文件）import 的启动面。
 //
 // 为什么收成模块：每个探针各抄一份「起 web → 等 banner → 取 cookie → 发 client-request」，
 //   同一段启动代码在 24 个文件里漂移（改一处 banner 正则要爬 24 遍）。

@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest'
 import { localImportPath, parseKeylessImports } from '../../support/keyless-imports.mjs'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
+// 负例留证 2026-11-17：向 probes/lib 注入计算型反向 import，本 spec 红（BUG-208）；删除 → 绿。
+
 /**
  * 面库依赖方向（2026-11-17 归属整理的机械守卫）。
  *
@@ -17,9 +19,12 @@ import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layou
  * 为什么不能只看目录：import 是真正的调用图；一个文件住对了家、却 import 了面库，
  * 归属仍然是假的。本 spec 遍历五个 lib 的本地 import，逐边判方向。
  *
- * 不证明：运行时通过动态字符串/非字面量路径拼接的依赖（本仓禁手搓裸路径，但无法穷尽）；
- * 也不证明这些模块的行为正确。
+ * 不证明运行时行为，也不证明 package 内部解析；但**字面量图之外的计算型 import** 不再隐身：
+ * `checks/lib` / `checks/gates/lib` / `checks/lanes/lib` / `probes/lib` / `tests/support` 五个面的
+ * `unresolvedImports` 必须为空（2026-11-17 BUG-208）。`tools/lib` 的 3 条 vendor parser 表达式
+ * 仍由 `layering.spec.ts` 的白名单单独管辖，两处不重复。
  *
+ * 负例留证 2026-11-17：往 probes/lib 加计算型反向 import，五面 unresolved 红（BUG-208）；删除 → 绿。
  * 负例留证 2026-11-17：往 tools/lib/core 加 `import '../../../checks/lib/zz-example.mjs'`
  *   → 共享地基→judge 边红；删除 → 绿。
  * 负例留证 2026-11-17（tests 源）：tests/support 加一条指向
@@ -30,6 +35,8 @@ import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layou
 
 const ZONE_ROOTS = ['tools/lib', 'checks/lib', 'checks/gates/lib', 'checks/lanes/lib', 'probes/lib']
 const SCAN_ROOTS = ['tools', 'checks', 'probes', 'tests']
+/** 计算型 import 必须为空集的面（BUG-208）；tools/lib 由 layering.spec 的图形守卫管辖。 */
+const UNRESOLVED_FREE_ZONES = ['checks/lib/', 'checks/gates/lib/', 'checks/lanes/lib/', 'probes/lib/', 'tests/support/']
 
 type Edge = { source: string; target: string; sourceZone: string; targetZone: string }
 
@@ -52,9 +59,13 @@ function walk(dir: string): string[] {
 
 const files = SCAN_ROOTS.flatMap(root => walk(resolve(ROOT, root))).sort()
 const edges: Edge[] = []
+const unresolvedComputed: { file: string; expression: string }[] = []
 for (const file of files) {
   const source = relative(ROOT, file).split(sep).join('/')
   const parsed = parseKeylessImports(readFileSync(file, 'utf8'), file)
+  if (UNRESOLVED_FREE_ZONES.some(zone => source.startsWith(zone))) {
+    for (const expression of parsed.unresolvedImports) unresolvedComputed.push({ file: source, expression })
+  }
   for (const { specifier } of parsed.imports) {
     const target = localImportPath(file, specifier)
     if (target === undefined) continue
@@ -79,6 +90,18 @@ describe('面库依赖方向（归属不是目录位置，是 import 方向）',
     expect(edges.length, '没有读到任何本地 import 边——解析器或路径规则失效').toBeGreaterThan(0)
   })
 
+  it('五个 lib / support 面没有未证明的计算型 import（BUG-208）', () => {
+    const scanned = files.filter(file => {
+      const source = relative(ROOT, file).split(sep).join('/')
+      return UNRESOLVED_FREE_ZONES.some(zone => source.startsWith(zone))
+    })
+    expect(scanned.length, '五个计算型 import 面一个文件都没扫到——空集不是通过').toBeGreaterThan(0)
+    expect(
+      unresolvedComputed.map(({ file, expression }) => `${file} → ${expression}`),
+      '计算型动态 import 不得绕过归属方向；把它写成本地字面量，或按面登记已审阅白名单',
+    ).toEqual([])
+  })
+
   it('共享地基/ judge / show 不得反向依赖面库或测试专属支撑', () => {
     const problems: string[] = []
     for (const edge of edges) {
@@ -99,7 +122,8 @@ describe('面库依赖方向（归属不是目录位置，是 import 方向）',
       { prefix: 'tests/support/', allowed: /^tests\//, why: 'test-only 只许 tests/** 引用' },
     ]
     // 两个豁免都是“点名/注释”，不是消费：checks-index 排除前缀；naming-contract 注释说明不扫 tests/support。
-    const allow = new Set(['tools/lib/core/checks-index.mjs', 'checks/gates/naming-contract.mjs'])
+    // retired-path 的退役表**点名**旧家 `tests/support/...`（不是消费）；其余豁免同旧例。
+    const allow = new Set(['tools/lib/core/checks-index.mjs', 'checks/gates/naming-contract.mjs', 'checks/gates/retired-path.mjs'])
     const problems: string[] = []
     for (const file of files) {
       const source = relative(ROOT, file).split(sep).join('/')

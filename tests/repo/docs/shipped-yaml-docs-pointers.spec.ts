@@ -1,8 +1,8 @@
 /**
  * 随包 YAML 注释里的仓库文档指针必须存在（2026-11-11 接手审计 Y4）。
  *
- * 为什么：`cordis.patch.yml` 是 tarball 里的文件，注释指向 `docs/release.md`，但该文件已搬到
- * `docs/contracts/release.md`；`bare-path` 只扫 Markdown，注释里的死指针一直看不见。
+ * 为什么：`cordis.patch.yml` 是 tarball 里的文件，注释曾指向一个已搬走的 docs 根文件
+ *（现行家 = `docs/contracts/release.md`）；`bare-path` 只扫 Markdown，注释里的死指针一直看不见。
  * 判据 = pack 内 `.yml/.yaml` 注释里的 `docs/...` 路径逐个存在；只查 docs（vendor 相对路径
  * 如 `vendor packages/...` 不在此列，避免把上游相对路径误判成仓库根路径）。
  *

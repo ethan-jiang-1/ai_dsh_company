@@ -28,7 +28,7 @@
 
 ## 状态事实与载体
 
-- **事实**：共享实现三个落点 + 依赖方向规则（共享地基自包含；面专属库可依赖共享地基）；`tools/lib/` 内 6 组；`checks/lib/` 16 件 + 冻结 CI 套件；`probes/lib/` 11 件；测试专属 1 件。
+- **事实**：共享实现三个落点 + 依赖方向规则（共享地基自包含；面专属库可依赖共享地基）；`tools/lib/` 内 6 组；`checks/lib/` = judge 判据模块 + `coverage-baseline.json` + 冻结 CI 套件；`probes/lib/` = show 专属支撑；测试专属支撑 = `tests/support/`（`keyless-imports` / `mutation` 等）。件数不在这里手写——目录本身是清单（D28）。
 - **唯一入口**：规则 = [surface-contract](../../docs/surface-contract.md)「管道件」条 + [tools/README](../../tools/README.md) 实现层节 + [checks/README](../../checks/README.md) 共享实现节。
 - **读载体 / 写载体**：读 = fresh agent 的三个 README 首屏与 lib 目录本身；写 = 新增模块先判「跨面 / judge / show / 测试」再落家，改门禁扫描面时同 diff 扩 `EXCLUDED_PREFIXES` 与 naming 规则。
 - **环境坏法**：来源 = 反向依赖（layering spec 挡）；内容 = 按固定深度算仓库根（`findRepositoryRoot` + 本轮实证挡）；扫描面 = 新 lib 目录被当入口/探针（`checks-index` + `naming-contract` 挡）；覆盖率 = 新家不在 include（`coverage:ratchet` 挡）；统计口径 = lib 目录未跳过（`asset-consumers` 的 `isSupportDir` 挡）。

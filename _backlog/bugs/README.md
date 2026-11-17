@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 10 张**：2026-11-17 C12 归属波次探索（focus v7）的 10 张（BUG-202..211）全部 `调查中`，只开卡不修；见下方「## 2026-11-17 C12 归属波次探索（focus v7）」。
+**活跃 10 张**：2026-11-17 C12 归属波次探索（focus v7）的 10 张（BUG-202..211）已由 2026-11-17 用户指令授权本轮修复，`调查中 → 修复就绪`；批次计划与根因组见下方「## 2026-11-17 修复交接（根因组 A–C：BUG-202..211）」。
 
 **上一轮收口**：2026-11-16 C11 二轮（修复后的守卫面）的 10 张（BUG-192..201）已于 2026-11-16 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；见下方「## 2026-11-16 修复交接（根因组 A–E：BUG-192..201）」。
 
@@ -19,6 +19,23 @@
 **更早收口**（2026-11-14 focus v3）：8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）」）。
 
 **最早收口**（2026-11-13 focus v2）：8 张已于 2026-11-14 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接」）。
+
+## 2026-11-17 修复交接（根因组 A–C：BUG-202..211）
+
+**用户指令（2026-11-17）**：「_backlog/bugs 里面有最近 exploratory test 发现的 bugs，你琢磨一下，看看是否能系统性修起来。计划有了后 setup goal 逐步按 REPO 的流程来推进。」——本句即本轮授权（材料性：新增/改判据门禁、覆盖率棘轮语义、pre-push 面规则、docs 合同与 shipped 字节；留痕 = 批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`）。
+终点 = 活跃清单清零、10 张卡全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` 与 `## 修复证据`（改动面/红/绿/提交）齐。
+
+十张不是十个补丁，是 **三个「绿」的制造者没随搬移一起改**：oracle 的判别面、守卫的扫描面、live/shipped 声明。
+
+| 组 | 卡 | 共同根因 | 修法（唯一事实源） |
+|---|---|---|---|
+| **A oracle / 棘轮判别面** | [202](BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) / [203](BUG-203-coverage-ratchet-rename-resets-floor.md) / [204](BUG-204-ledger-branches-floor-cold-only.md) | oracle 名字声称的面大于实现；改名/冷环境被当成「变好」或「无变化」 | 202：测试体 AST 指纹 + **多重集**比较（纯逻辑进 `checks/lib/refactor-drift.mjs`）；203：基线键消失 = 红，`--rename`/`--drop` 显式迁移地板；204：补无尾竖线纯测试，冷/暖同形、地板回 100 |
+| **B 守卫扫描面** | [205](BUG-205-live-pointer-faces-miss-moved-libs.md) / [206](BUG-206-coveredby-evidence-does-not-execute.md) / [207](BUG-207-retired-path-misses-wave-renames.md) / [208](BUG-208-face-boundaries-computed-imports.md) | `FACES` / `RETIRED_PATH_PREFIXES` / `coveredBy` 是手写清单，未随 63 lib + 77 renames 扩面；计算型 import 不可见 | 205：FACES 纳入 `tools/lib`、`checks/lib`、`probes/lib`、`tests/support` + 每面非空；206：新增入口 import 图 spec（本地 import 目标必须存在），`probes/**` 的 coveredBy 改「真执行该 spec」的 `coverage:ratchet`；207：退役面从 git 历史自动推导近期 rename/delete（脚本注释面）+ 手工表自检；208：`face-boundaries` 读 `unresolvedImports`，五个面空集断言 |
+| **C live / shipped 声明** | [209](BUG-209-live-declarations-stale-after-split.md) / [210](BUG-210-shipped-comments-dev-only-paths.md) / [211](BUG-211-tools-readme-lib-purity-contradiction.md) | 手抄面表/件数随树漂；shipped 注释指不随包路径；归属纯度句与实盘矛盾 | 209：删 `tests/README.md` 手抄面表（只留唯一源链接）+ Note 去件数；210：shipped 注释加「不随包分发」限定 + shipped-comments spec + 重建 `_dist`；211：纯度句改「不直接 import/调用；进程由调用方注入，靠评审」 |
+
+**次序 = A1(204) → A2(203) → A3(202) → B1(208) → B2(205) → B3(206) → B4(207) → C1(209/211) → C2(210)**：
+A 先修「判绿的人」（覆盖率地板 → oracle）；B 先补无判据的语法形式（208），再扩清单面（205），再让 coveredBy 有执行证据（206），最后改退役登记（207，会扫全树注释）；
+C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；每卡红/绿写同一条可执行命令；日志落 `runtime/tmp/c12-fix/`。
 
 ## 2026-11-17 C12 归属波次探索（focus v7）
 

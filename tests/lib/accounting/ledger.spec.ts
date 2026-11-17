@@ -24,6 +24,21 @@ describe('parseMotionLedger', () => {
     expect(parseMotionLedger('| nope | 表 |\n|---|---|\n| a | b |')).toEqual([])
   })
 
+  // 负例留证 2026-11-17：冷树（3 个 live 用例 skip）时该 false 分支无人覆盖、ledger 分支掉到 94.11%（BUG-204）；补本用例后冷/暖同形。
+  it('行尾没有竖线也按同列切分（live 台账的真实形状之一，BUG-204）', () => {
+    // 2026-11-17 BUG-204：live 台账有一行没有尾竖线，3 个 live 用例只在暖树跑；
+    // 冷树（fresh clone / CI）跳过它们时这个 false 分支没人覆盖，ledger 分支掉到 94.11%。
+    // 用无盘纯测试把「两种行尾」都钉住，冷/暖两形状同形。
+    const text = [
+      '| slug | date | type | participants | wallClock | deliverable | summary |',
+      '|---|---|---|---|---|---|---|',
+      '| a | 2026-10-13 | decision | CEO | 1h | ✅ | 结论',
+    ].join('\n')
+    expect(parseMotionLedger(text)).toEqual([
+      { slug: 'a', date: '2026-10-13', kind: 'decision', roles: 'CEO', wallClock: '1h', final: '✅', summary: '结论' },
+    ])
+  })
+
   it('列数不符的行跳过；分隔行跳过；非表行跳过', () => {
     const text = [
       '# 头',

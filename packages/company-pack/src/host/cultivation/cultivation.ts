@@ -20,7 +20,7 @@
  * 本文件只留命令语义与注册面）；安全不变量与威胁模型见该模块头注。
  *
  * keyless 判据 = `tests/host/cultivation/`（command / context / maintenance 三份：读模型 + 已注册命令与临时文件行为）；真机制（目录发现/
- * 隔离/命令 wiring/跨会话生效）= `probes/session-context/cultivation-method-layer-probe.mjs`。
+ * 隔离/命令 wiring/跨会话生效）= `probes/session-context/cultivation-method-layer-probe.mjs`（不随包分发）。
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { blockedCompanyText } from '../commands/blocked-text.ts'

@@ -22,7 +22,7 @@ import {
  * 守什么：`deliverables/<slug>/final.md` 必须能**机械回溯**到一次 Lead 会话的
  * `deliverables/presented` 事件——"哪些是成品"不再靠 `-vp-eng` 这类命名约定；
  * 会话声明与盘上对账、违了哪条。判据的合同家 = `company-workspace/AGENTS.md`；
- * 动机 = `notes/proposed/2026-09-22-workspace-hygiene.md`。
+ * 动机 = `notes/archived/2026-10-16-deliverables-audit-seam.md`。
  *
  * 形状与身份面（`deliverableId` / `classifyDeliverable` / meta 形状 / 占位首行）住
  * ./deliverables.spec.ts——两侧一一对应 lib 的基座与对账模块。

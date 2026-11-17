@@ -80,7 +80,7 @@ export const FAILURE_CLASS_BY_NAME = {
   'entry-probe': '文档指针',
   'generative': '文档指针',
 
-  // ── analyze 探针（7，2026-11-16 自 tools/observe 迁入）────────────────────────
+  // ── analyze 探针（7，2026-11-16 自旧的 observe 目录迁入）──────────────────────
   'ask-latency-probe': '会话持久化',
   'diagnose-probe': '会话持久化',
   'explore-evidence-probe': '会话持久化',
@@ -350,6 +350,9 @@ export const UNCONDITIONAL_STEPS = ['verify', 'typecheck', 'lint', 'dup', 'smoke
  * 为什么有两种证据而不是只有 assets：选择器对未命中**静默返回空**，于是「这个面不需要额外
  * 真入口」与「这个面忘了登记」同形（BUG-186：src/lib 搬移没有触发 replay）。`coveredBy`
  * 让豁免也变成登记项：每条都要能对到 hook 真跑的无条件步骤，spec 核对覆盖面完备。
+ * **进阶（2026-11-17 BUG-206）**：能对到步骤还不够——步骤必须真的加载/解析该面。
+ * `probes/**` 的 coveredBy 因此含 `coverage:ratchet`（入口 import 图 spec 真解析每个探针的本地
+ * import）；只写 `verify` 而 verify 不加载探针，就是「有登记 ≠ 被执行」。
  * 规则从窄到宽排列；同一 asset 被多条命中只跑一次。
  * 成本纪律：assets 合计应 ≤ 30s；更贵的真入口（company-entry ~1–2 min、release 分钟级）
  * 留在 weekly / 手动档，用 coveredBy 写清「为什么不进 push」，不许把慢档塞进 hook。
@@ -416,9 +419,17 @@ export const SURFACE_RULES = [
     why: '市场索引暂存/生成手册/runtime 白名单/根 dotfile 与 lint-dup 配置：改这些跑对应工具 + 结构门禁',
   },
   {
-    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', '.agents/**', 'run/**', 'probes/**', 'snapshots/**'],
+    // 2026-11-17 BUG-206：`coveredBy` 不是口头豁免——它必须点名一条**真执行/解析该面**的无条件步骤。
+    // 探针入口的本地 import 图由 entry-import-graph.spec 在 coverage:ratchet 下逐条解析；
+    // verify 只做头注/结构，真探针仍按头注手动跑。可解析 ≠ 运行时跑通，不要把这里读成「已验证行为」。
+    globs: ['probes/**'],
+    coveredBy: ['coverage:ratchet', 'verify'],
+    why: '探针入口图由 tests/repo/structure/entry-import-graph.spec.ts 在 coverage:ratchet 下逐条解析本地 import（可解析 ≠ 运行时跑通）；verify 管头注/结构；真探针按头注手动跑',
+  },
+  {
+    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', '.agents/**', 'run/**', 'snapshots/**'],
     coveredBy: ['verify'],
-    why: '文档/指针/技能/运行配置/探针/快照 = 结构门禁 verify 的射程；探针与真模型档按头注手动跑',
+    why: '文档/指针/技能/运行配置/快照 = 结构门禁 verify 的射程',
   },
   {
     globs: ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'tsconfig*.json', 'vitest.config.ts', 'CHANGELOG.md', '.github/**', '.githooks/**', 'runtime/README.md', 'packages/company-pack/src/README.md', 'vendor/**'],

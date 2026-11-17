@@ -1,6 +1,66 @@
 {
   "generatedAt": "2026-11-17",
   "files": {
+    "checks/lib/authorship.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "checks/lib/backlog-liveness.mjs": {
+      "statements": 98.29,
+      "branches": 93.89
+    },
+    "checks/lib/carrier-registry.mjs": {
+      "statements": 0,
+      "branches": 100
+    },
+    "checks/lib/coverage-baseline.mjs": {
+      "statements": 100,
+      "branches": 94.44
+    },
+    "checks/lib/deliverables-audit.mjs": {
+      "statements": 91.21,
+      "branches": 76.22
+    },
+    "checks/lib/entry-probe.mjs": {
+      "statements": 94.64,
+      "branches": 96.15
+    },
+    "checks/lib/refactor-drift.mjs": {
+      "statements": 99.26,
+      "branches": 92.38
+    },
+    "checks/lib/replay-fixture-freshness.mjs": {
+      "statements": 93.93,
+      "branches": 80
+    },
+    "checks/lib/replay-logic.mjs": {
+      "statements": 95.45,
+      "branches": 91.66
+    },
+    "checks/lib/snapshot-index.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "checks/lib/src-layering.mjs": {
+      "statements": 96.15,
+      "branches": 86.88
+    },
+    "checks/lib/surface-matrix.mjs": {
+      "statements": 87.2,
+      "branches": 70
+    },
+    "checks/lib/tracked-secrets.mjs": {
+      "statements": 92.85,
+      "branches": 75
+    },
+    "checks/lib/tracked-token.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "checks/lib/ui-expected.mjs": {
+      "statements": 97.5,
+      "branches": 71.87
+    },
     "packages/company-pack/src/index.ts": {
       "statements": 63.55,
       "branches": 58.33
@@ -291,7 +351,7 @@
     },
     "packages/company-pack/src/host/fs/safe-file.ts": {
       "statements": 89.47,
-      "branches": 90.9
+      "branches": 100
     },
     "packages/company-pack/src/host/language/company-language.ts": {
       "statements": 97.77,
@@ -409,19 +469,15 @@
       "statements": 90.56,
       "branches": 86
     },
-    "packages/company-pack/src/lib/shared/abortable.ts": {
-      "statements": 100,
-      "branches": 80
-    },
-    "packages/company-pack/src/lib/presence/attention.ts": {
-      "statements": 97.29,
-      "branches": 95.83
-    },
-    "packages/company-pack/src/lib/presence/board.ts": {
-      "statements": 100,
-      "branches": 92.72
-    },
     "packages/company-pack/src/lib/accounting/budget.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/accounting/ledger.ts": {
+      "statements": 100,
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/accounting/signoff.ts": {
       "statements": 100,
       "branches": 100
     },
@@ -445,10 +501,6 @@
       "statements": 100,
       "branches": 100
     },
-    "packages/company-pack/src/lib/presence/dag.ts": {
-      "statements": 99.29,
-      "branches": 84.05
-    },
     "packages/company-pack/src/lib/delegation/delegation-capabilities.ts": {
       "statements": 100,
       "branches": 100
@@ -459,7 +511,11 @@
     },
     "packages/company-pack/src/lib/delegation/delegation-tree.ts": {
       "statements": 100,
-      "branches": 95.83
+      "branches": 100
+    },
+    "packages/company-pack/src/lib/delegation/retry-policy.ts": {
+      "statements": 100,
+      "branches": 100
     },
     "packages/company-pack/src/lib/deliverables/deliverables-address.ts": {
       "statements": 100,
@@ -467,19 +523,7 @@
     },
     "packages/company-pack/src/lib/deliverables/deliverables-catalog.ts": {
       "statements": 98.61,
-      "branches": 86.36
-    },
-    "packages/company-pack/src/lib/presence/doors.ts": {
-      "statements": 100,
-      "branches": 100
-    },
-    "packages/company-pack/src/lib/shared/guards.ts": {
-      "statements": 100,
-      "branches": 100
-    },
-    "packages/company-pack/src/lib/accounting/ledger.ts": {
-      "statements": 100,
-      "branches": 94
+      "branches": 87.87
     },
     "packages/company-pack/src/lib/docs/markdown-shape.ts": {
       "statements": 100,
@@ -489,6 +533,30 @@
       "statements": 85.18,
       "branches": 73.49
     },
+    "packages/company-pack/src/lib/docs/requirements-check.ts": {
+      "statements": 94.06,
+      "branches": 76.89
+    },
+    "packages/company-pack/src/lib/docs/yaml-scalar.ts": {
+      "statements": 100,
+      "branches": 90
+    },
+    "packages/company-pack/src/lib/presence/attention.ts": {
+      "statements": 97.29,
+      "branches": 95.83
+    },
+    "packages/company-pack/src/lib/presence/board.ts": {
+      "statements": 100,
+      "branches": 92.72
+    },
+    "packages/company-pack/src/lib/presence/dag.ts": {
+      "statements": 99.29,
+      "branches": 84.05
+    },
+    "packages/company-pack/src/lib/presence/doors.ts": {
+      "statements": 100,
+      "branches": 100
+    },
     "packages/company-pack/src/lib/presence/presence-status.ts": {
       "statements": 95.83,
       "branches": 88.23
@@ -497,11 +565,15 @@
       "statements": 94.16,
       "branches": 80.31
     },
-    "packages/company-pack/src/lib/docs/requirements-check.ts": {
-      "statements": 94.06,
-      "branches": 76.89
+    "packages/company-pack/src/lib/presence/tool-card.ts": {
+      "statements": 100,
+      "branches": 90.9
     },
-    "packages/company-pack/src/lib/delegation/retry-policy.ts": {
+    "packages/company-pack/src/lib/shared/abortable.ts": {
+      "statements": 100,
+      "branches": 80
+    },
+    "packages/company-pack/src/lib/shared/guards.ts": {
       "statements": 100,
       "branches": 100
     },
@@ -513,7 +585,7 @@
       "statements": 75,
       "branches": 0
     },
-    "packages/company-pack/src/lib/accounting/signoff.ts": {
+    "packages/company-pack/src/lib/shared/text.ts": {
       "statements": 100,
       "branches": 100
     },
@@ -524,54 +596,6 @@
     "packages/company-pack/src/lib/startup/startup-settings.ts": {
       "statements": 96.47,
       "branches": 94.62
-    },
-    "packages/company-pack/src/lib/shared/text.ts": {
-      "statements": 100,
-      "branches": 100
-    },
-    "packages/company-pack/src/lib/presence/tool-card.ts": {
-      "statements": 100,
-      "branches": 90.9
-    },
-    "packages/company-pack/src/lib/docs/yaml-scalar.ts": {
-      "statements": 100,
-      "branches": 90
-    },
-    "tools/lib/repo/asset-consumers.mjs": {
-      "statements": 97.82,
-      "branches": 95
-    },
-    "tools/lib/core/asset-lanes.mjs": {
-      "statements": 100,
-      "branches": 96.15
-    },
-    "tools/lib/repo/audit-verdict.mjs": {
-      "statements": 100,
-      "branches": 75
-    },
-    "checks/lib/authorship.mjs": {
-      "statements": 100,
-      "branches": 100
-    },
-    "checks/lib/backlog-liveness.mjs": {
-      "statements": 95.55,
-      "branches": 91.69
-    },
-    "tools/lib/repo/bug-coverage.mjs": {
-      "statements": 100,
-      "branches": 92.85
-    },
-    "checks/lib/carrier-registry.mjs": {
-      "statements": 0,
-      "branches": 100
-    },
-    "tools/lib/probe/cdp-attach.mjs": {
-      "statements": 100,
-      "branches": 100
-    },
-    "tools/lib/core/checks-index.mjs": {
-      "statements": 93.75,
-      "branches": 71.87
     },
     "probes/lib/claim-loser-evidence.mjs": {
       "statements": 100,
@@ -585,113 +609,21 @@
       "statements": 97.29,
       "branches": 94.11
     },
-    "tools/lib/company/company-roles.mjs": {
-      "statements": 100,
-      "branches": 100
-    },
-    "tools/lib/probe/company-tab-catalog.mjs": {
-      "statements": 95.83,
-      "branches": 92.3
-    },
-    "tools/lib/company/converge-rules.mjs": {
-      "statements": 96.66,
-      "branches": 91.5
-    },
-    "checks/lib/coverage-baseline.mjs": {
-      "statements": 98.21,
-      "branches": 84.9
-    },
-    "checks/lib/deliverables-audit.mjs": {
-      "statements": 91.21,
-      "branches": 76.22
-    },
-    "tools/lib/company/deliverables-catalog.mjs": {
-      "statements": 100,
-      "branches": 97.36
-    },
-    "tools/lib/company/deliverables.mjs": {
-      "statements": 100,
-      "branches": 97.8
-    },
-    "tools/lib/core/dev-install.mjs": {
-      "statements": 92.15,
-      "branches": 89.06
-    },
-    "tools/lib/probe/diagnosis.mjs": {
-      "statements": 0,
-      "branches": 100
-    },
-    "checks/lib/entry-probe.mjs": {
-      "statements": 94.64,
-      "branches": 96.15
-    },
-    "tools/lib/release/install-manual.mjs": {
-      "statements": 100,
-      "branches": 100
-    },
-    "tools/lib/core/kb-seeds.mjs": {
-      "statements": 89.23,
-      "branches": 81.66
-    },
-    "tests/support/keyless-imports.mjs": {
-      "statements": 89.61,
-      "branches": 87.27
-    },
-    "tools/lib/core/markdown-links.mjs": {
-      "statements": 97.05,
-      "branches": 94.11
-    },
-    "tools/lib/release/market-index.mjs": {
-      "statements": 96.77,
-      "branches": 67.24
-    },
     "probes/lib/member-stale-evidence.mjs": {
       "statements": 100,
       "branches": 92.5
-    },
-    "tools/lib/core/methods-init.mjs": {
-      "statements": 100,
-      "branches": 100
-    },
-    "tools/lib/session/notes-audit.mjs": {
-      "statements": 96.1,
-      "branches": 88.46
     },
     "probes/lib/orient.mjs": {
       "statements": 95.71,
       "branches": 88.04
     },
-    "tools/lib/core/pack-source.mjs": {
-      "statements": 100,
-      "branches": 90
-    },
-    "tools/lib/release/pin-transaction.mjs": {
-      "statements": 95.31,
-      "branches": 83.78
-    },
-    "tools/lib/probe/probe-kit.mjs": {
-      "statements": 100,
-      "branches": 93.33
-    },
     "probes/lib/probe-steps.mjs": {
       "statements": 93.75,
       "branches": 90.24
     },
-    "tools/lib/probe/probe-web.mjs": {
-      "statements": 97.61,
-      "branches": 100
-    },
     "probes/lib/probe-window.mjs": {
       "statements": 0,
       "branches": 0
-    },
-    "tools/lib/core/prune-runtime.mjs": {
-      "statements": 100,
-      "branches": 90
-    },
-    "tools/lib/company/quality-loop.mjs": {
-      "statements": 94.75,
-      "branches": 80.95
     },
     "probes/lib/question-stop.mjs": {
       "statements": 96.61,
@@ -701,29 +633,149 @@
       "statements": 97.93,
       "branches": 91.33
     },
+    "probes/lib/team-barrier-evidence.mjs": {
+      "statements": 100,
+      "branches": 88.75
+    },
+    "probes/lib/team-concurrency-verdict.mjs": {
+      "statements": 80,
+      "branches": 100
+    },
+    "tools/lib/company/candidate-scan.mjs": {
+      "statements": 96.09,
+      "branches": 89.2
+    },
+    "tools/lib/company/company-roles.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/company/converge-rules.mjs": {
+      "statements": 96.66,
+      "branches": 91.5
+    },
+    "tools/lib/company/delegation-model.mjs": {
+      "statements": 72.82,
+      "branches": 69.86
+    },
+    "tools/lib/company/deliverables-catalog.mjs": {
+      "statements": 100,
+      "branches": 97.36
+    },
+    "tools/lib/company/deliverables.mjs": {
+      "statements": 100,
+      "branches": 97.8
+    },
+    "tools/lib/company/quality-loop.mjs": {
+      "statements": 94.75,
+      "branches": 80.95
+    },
+    "tools/lib/core/asset-lanes.mjs": {
+      "statements": 100,
+      "branches": 98.33
+    },
+    "tools/lib/core/checks-index.mjs": {
+      "statements": 95.79,
+      "branches": 85.93
+    },
+    "tools/lib/core/dev-install.mjs": {
+      "statements": 92.15,
+      "branches": 89.06
+    },
+    "tools/lib/core/kb-seeds.mjs": {
+      "statements": 89.23,
+      "branches": 81.66
+    },
+    "tools/lib/core/markdown-links.mjs": {
+      "statements": 97.08,
+      "branches": 94.11
+    },
+    "tools/lib/core/methods-init.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/core/pack-source.mjs": {
+      "statements": 100,
+      "branches": 90
+    },
+    "tools/lib/core/pin.mjs": {
+      "statements": 0,
+      "branches": 100
+    },
+    "tools/lib/core/prune-runtime.mjs": {
+      "statements": 100,
+      "branches": 90
+    },
     "tools/lib/core/rehearsal.mjs": {
       "statements": 93.75,
       "branches": 80
     },
-    "checks/lib/replay-fixture-freshness.mjs": {
-      "statements": 93.93,
-      "branches": 80
-    },
-    "checks/lib/replay-logic.mjs": {
-      "statements": 95.45,
-      "branches": 91.66
-    },
     "tools/lib/core/repo-markdown.mjs": {
-      "statements": 98.65,
-      "branches": 87.7
+      "statements": 98.78,
+      "branches": 88.05
     },
     "tools/lib/core/repository-layout.mjs": {
-      "statements": 97.39,
-      "branches": 92.92
+      "statements": 97.6,
+      "branches": 93.16
     },
     "tools/lib/core/runtime-home.mjs": {
       "statements": 92,
       "branches": 88.88
+    },
+    "tools/lib/core/workspace-oracle.mjs": {
+      "statements": 96.29,
+      "branches": 94.62
+    },
+    "tools/lib/probe/cdp-attach.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/probe/company-tab-catalog.mjs": {
+      "statements": 95.83,
+      "branches": 92.3
+    },
+    "tools/lib/probe/diagnosis.mjs": {
+      "statements": 0,
+      "branches": 100
+    },
+    "tools/lib/probe/probe-kit.mjs": {
+      "statements": 100,
+      "branches": 93.33
+    },
+    "tools/lib/probe/probe-web.mjs": {
+      "statements": 97.61,
+      "branches": 100
+    },
+    "tools/lib/release/install-manual.mjs": {
+      "statements": 100,
+      "branches": 100
+    },
+    "tools/lib/release/market-index.mjs": {
+      "statements": 96.77,
+      "branches": 67.24
+    },
+    "tools/lib/release/pin-transaction.mjs": {
+      "statements": 95.31,
+      "branches": 83.78
+    },
+    "tools/lib/repo/asset-consumers.mjs": {
+      "statements": 97.87,
+      "branches": 95
+    },
+    "tools/lib/repo/audit-verdict.mjs": {
+      "statements": 100,
+      "branches": 75
+    },
+    "tools/lib/repo/bug-coverage.mjs": {
+      "statements": 100,
+      "branches": 92.85
+    },
+    "tools/lib/repo/test-census.mjs": {
+      "statements": 100,
+      "branches": 96.87
+    },
+    "tools/lib/session/notes-audit.mjs": {
+      "statements": 96.1,
+      "branches": 88.46
     },
     "tools/lib/session/session-diagnose.mjs": {
       "statements": 93.75,
@@ -740,54 +792,6 @@
     "tools/lib/session/session-log.mjs": {
       "statements": 53.84,
       "branches": 58.33
-    },
-    "checks/lib/snapshot-index.mjs": {
-      "statements": 100,
-      "branches": 100
-    },
-    "checks/lib/src-layering.mjs": {
-      "statements": 96.15,
-      "branches": 86.88
-    },
-    "checks/lib/surface-matrix.mjs": {
-      "statements": 87.2,
-      "branches": 70
-    },
-    "probes/lib/team-barrier-evidence.mjs": {
-      "statements": 100,
-      "branches": 88.75
-    },
-    "probes/lib/team-concurrency-verdict.mjs": {
-      "statements": 80,
-      "branches": 100
-    },
-    "tools/lib/repo/test-census.mjs": {
-      "statements": 100,
-      "branches": 96.55
-    },
-    "checks/lib/tracked-secrets.mjs": {
-      "statements": 92.85,
-      "branches": 75
-    },
-    "checks/lib/tracked-token.mjs": {
-      "statements": 100,
-      "branches": 100
-    },
-    "checks/lib/ui-expected.mjs": {
-      "statements": 97.5,
-      "branches": 71.87
-    },
-    "tools/lib/core/workspace-oracle.mjs": {
-      "statements": 96.29,
-      "branches": 94.62
-    },
-    "tools/lib/company/candidate-scan.mjs": {
-      "statements": 96.09,
-      "branches": 89.2
-    },
-    "tools/lib/company/delegation-model.mjs": {
-      "statements": 72.82,
-      "branches": 69.86
     }
   },
   "exemptions": [

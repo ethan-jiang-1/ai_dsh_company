@@ -1,7 +1,7 @@
 /**
  * 成品目录的纯逻辑（无 I/O，2026-10-25，RFC installed-shape-self-sufficient）。
  *
- * 口径与仓库生成器（tools/lib/company/deliverables-catalog.mjs）保持一致：
+ * 口径与仓库生成器（tools/lib/company/deliverables-catalog.mjs，不随包分发）保持一致：
  * - 成品 = 有 `final.md` 的目录；过程稿目录不进目录。
  * - 数据面 = 盘上 meta/final；`presented` 由部署 host 的 present 事件投影，未观测 = null（未核）。
  * - `ledgered` = slug 能在 kb/motion-ledger.md 找到。

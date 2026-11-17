@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-206：coveredBy 只登记命令名，不证明该命令执行被覆盖的入口——probes/** / tools/** 的 pre-push 证据是空的
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-7 / N2/N6）。
-> **留痕**：待修复者决定（本轮只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
 
 ## 症状
 
@@ -65,13 +65,11 @@ git checkout -- probes/analyze/explore-evidence-probe.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 每个 `coveredBy` 面至少有一个**真的加载/执行**该路径的无条件步骤；或者把 `coveredBy` 降级为
-   「已知未执行」，并在 pre-push 打印可见的未执行清单（不许写成「已覆盖」）。
-2. 最小负例：在 `probes/analyze/*-probe.mjs` 与 `tools/dev/*.mjs` 各注入一条不存在 import →
-   pre-push（或其覆盖步骤）红；还原 → 绿。
-3. 正例：合法探针/工具改动仍只跑该跑的步骤，不把 `smoke:all` 塞进 hook（成本边界不变）。
+1. 新增 `tests/repo/structure/entry-import-graph.spec.ts`：对 `tools/**`、`checks/**`、`probes/**` 的每个 `.mjs` 解析本地静态/字面量动态 import，目标必须是普通文件；扫描面与边数非空。
+2. `SURFACE_RULES` 把 `probes/**` 从 docs 面拆出，`coveredBy` = `coverage:ratchet`（真跑该 spec）+ `verify`；why 写清「可解析 ≠ 运行时跑通」。
+3. 最小负例（同一条命令）：`pnpm test tests/repo/structure/entry-import-graph.spec.ts`——向探针注入不存在 import → 红；删除 → 绿。
 
 ## 修复方向（不授权，仅记录）
 

@@ -11,7 +11,7 @@
  * 计划任务时钟图标（`data-session-schedule-mark`，12px）。B 段首版的 3 字药丸（`CEO`）实测
  * 宽 32.45px = 座位的 2.03 倍：居中后左溢 8.22px（把标记推出行框，窄窗里被容器边界切掉字母）、
  * 右溢 8.23px（吃掉整条 4px 标题间隙、压到标题首字盒上）——现场与真 DOM 实测见
- * `probes/browser-visual/sidebar-role-mark-probe.mjs`。故座位标记改按 **12px** 设计
+ * `probes/browser-visual/sidebar-role-mark-probe.mjs`（不随包分发）。故座位标记改按 **12px** 设计
  * （= 同格既有 occupant 的尺寸，与时钟图标同居一格仍不越界）。
  *
  * 数据 = **上游现成的 `agentPreset` 投影**（vendor `agent-preset-registry/src/session.ts`：

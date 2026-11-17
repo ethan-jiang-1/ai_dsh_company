@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-209：搬移后的两处 live 声明仍按旧树写：tests/README 的「lib → replay」与 lib-ownership Note 的库件数
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-6 / N4）。
-> **留痕**：待修复者决定（本轮只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
 
 ## 症状
 
@@ -63,10 +63,8 @@ ls tests/support/keyless-imports.mjs tests/support/mutation.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `tests/README.md` 改成 `src/lib → replay`，`tools/lib → coveredBy（test:checks / coverage:ratchet / verify）`；
-   或者只链接 `SURFACE_RULES` 不手抄面表。
-2. Note 的件数改成生成式口径（「顶层 14 mjs + 1 json + 冻结目录」）或删掉数字；`tests/support` 写 2 件。
-3. 最小负例：把 `tests/README.md` 的 `tools/lib` 写成 replay 后，现有门禁应红（当前不会）——若没有门禁，
-   在卡里写「无机械判据，靠人工复核」。
+1. `tests/README.md` 删除手抄面表（含 `lib → replay-smoke` 歧义句），只保留「规则与成员唯一家 = SURFACE_RULES」指针。
+2. `lib-ownership-split` Note 删掉 `16 件` / `1 件` 等手写件数，改成结构口径（判据模块 + 基线 + 冻结套件；测试专属 = `tests/support` 的具名模块）。
+3. 最小负例（同一条命令）：`pnpm test tests/repo/docs/live-declarations.spec.ts`——旧文本在场时红；改后绿。

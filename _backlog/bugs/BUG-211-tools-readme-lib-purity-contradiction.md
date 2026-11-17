@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-211：tools/README 仍说 lib「不启动进程、不联网」，但 tools/lib/probe 就是 web 启动管道
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-10 / N4）。
-> **留痕**：待修复者决定（本轮只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
 
 ## 症状
 
@@ -35,6 +35,7 @@ keyless 守卫）。`tools/README.md` 的纯度声明与实盘不一致，且没
 sed -n '18,24p' tools/README.md
 sed -n '9,13p' tools/lib/probe/probe-web.mjs
 grep -n 'export function startWeb\|spawnProcess' tools/lib/probe/probe-web.mjs | head
+pnpm test tests/repo/docs/live-declarations.spec.ts
 ```
 
 第 1 条显示「不启动进程」；第 2/3 条显示 `startWeb` 的注入式启动契约。
@@ -63,12 +64,11 @@ grep -n 'export function startWeb\|spawnProcess' tools/lib/probe/probe-web.mjs |
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `tools/README.md` 改为「lib 不直接 import/调用进程与网络；需要真进程/真网络的管道以参数注入，
-   仍算 lib」，并点名 `probe/` 是这一类。
-2. 如果没有门禁能判注入式启动，就明说「靠评审」；不要把「不启动进程」写成机械事实。
-3. 最小复读：`sed` 三段应不再出现「不启动进程」与「web 启动」的直接矛盾。
+1. `tools/README.md` 改为「lib 不直接 import/调用进程与网络；需要真进程/真网络的管道以参数注入（`probe/` 是这一类），仍算 lib」；没有机械判据判注入式启动 → 明说「靠评审」。
+2. `sed -n '18,24p' tools/README.md` 不再出现「不启动进程、不联网」与「web 启动」的直接矛盾。
+3. 最小负例（同一条命令）：`pnpm test tests/repo/docs/live-declarations.spec.ts`——旧句在场时红；改后绿。
 
 ## 修复方向（不授权，仅记录）
 

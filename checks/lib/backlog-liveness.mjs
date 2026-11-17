@@ -9,7 +9,7 @@
 //   挪进 lib 后 spec 直接 import，判据仍在同一个函数里（没有第二份实现）。
 //
 // 函数体逐字是门禁里的原文（含原有的「为什么」注释）——本卡只搬位置，不改判据、不改问题句。
-// 2026-10-12（借鉴卡 _backlog/issues/2026-10-12-backlog-process-made-explicit.md 落地）：修订判据——
+// 2026-10-12（借鉴卡 _backlog/_archive/settled_issues/2026-10-12-backlog-process-made-explicit.md 落地）：修订判据——
 //   ① 缺陷轨「活跃」改名「调查中」并扩到四活跃值（修复就绪/修复已落地/等人拍板）；② 新增状态行↔
 //   frontmatter 镜像互查；③ 问题卡状态行「毕业：」封闭头。制度唯一家 = _backlog/README.md
 //   「双轨状态生命周期」「缺陷的通道」；负例留证见新增块注释。

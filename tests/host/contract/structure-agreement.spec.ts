@@ -122,8 +122,8 @@ describe(`4 消费者跨层契约差分（prd-check × requirements-check × prd
           expect(reqResult.ok, `seed=${String(seed)} req-check 误杀: ${reqResult.errors.join('; ')}`).toBe(true)
           expect(reqResult.skipped, `seed=${String(seed)} 新动议误走豁免`).toBe(false)
           expect(gateDecision, `seed=${String(seed)} prd-gate 误拦`).toBeUndefined()
-          expect(cardBodyRepo).toContain('- 改动面：`packages/company-pack/src/lib/prd-check.ts`')
-          expect(cardBodyPack).toContain('- 改动面：`packages/company-pack/src/lib/prd-check.ts`')
+          expect(cardBodyRepo).toContain('- 改动面：`packages/company-pack/src/lib/docs/prd-check.ts`')
+          expect(cardBodyPack).toContain('- 改动面：`packages/company-pack/src/lib/docs/prd-check.ts`')
         } else if (bundle.fault === 'legacy-exempt') {
           // 围栏里的假 `numbering: identity` 不得把旧动议拉进强制编号检查
           expect(reqResult.skipped, `seed=${String(seed)} 旧动议围栏假 numbering 误触发检查`).toBe(true)

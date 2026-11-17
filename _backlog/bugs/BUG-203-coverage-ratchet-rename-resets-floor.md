@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-203：coverage-ratchet 对文件改名只发 note，旧键的高地板消失、新路径按新文件下限重新起算
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-5 / N3）。
-> **留痕**：待修复者决定（本轮只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
 
 ## 症状
 
@@ -69,12 +69,11 @@ next= {"generatedAt":"2026-11-17","files":{"pkg/new-home/moved.ts":{"statements"
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 基线键缺失必须是**待决状态**，不是 note：要么要求同 diff 的显式 rename 映射，要么在无映射时
-   红并点名「旧键 X 消失、新键 Y 出现，疑似改名；请显式迁移地板」。
-2. 最小负例：old 100/100、new 85/75、无映射 → 红；有显式映射 `old→new` → 绿且地板仍是 100/100。
-3. 正例：真新增文件 85/75 → 走 80/70 新文件下限，绿；不误红。
+1. 基线键缺失 = **红**（`missing-baseline`），点名旧键并提示 `--rename old=new` 或 `--drop old`；不再只进 notes。
+2. `--rename old=new` 把旧地板迁到新键：`current[new]` 与 `baseline[old]` 比较，低于即红；`nextBaseline` 继承 `max(旧地板, 新实测)` 并移除旧键。`--drop old` 显式允许删除；未 drop 的旧键保留，地板不静默丢失。
+3. 最小负例（同一条命令）：`pnpm test tests/tools/coverage-baseline.spec.ts`——旧实现红（缺映射却无 violations / 改名后地板丢失）；修复后绿。
 
 ## 修复方向（不授权，仅记录）
 

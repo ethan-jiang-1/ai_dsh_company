@@ -41,7 +41,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 检查与工具入口（`checks/**`、`probes/**`、`tools/**`） | 消费它的 keyless spec + `pnpm verify`（头注/结构门禁） | 真实入口冒烟按脚本头注「何时跑」 | — |
 | 文档 / 指针 | `pnpm verify`（md-links / bare-path / doc-budget） | [entry-probe-smoke](../checks/lanes/entry-probe.entry.mjs)（入口链文档改动后） | — |
 
-**按面触发（2026-11-13 起；2026-11-16 扩 lib→replay / coveredBy 申报 / 未分类 fail-closed）**：pre-push 按改动面自动补跑真入口检查（client → `client-load-smoke`、presets → `preset-smoke`、content → `replay-smoke`、lib → `replay-smoke`）；没有额外 lane 的面在规则里用 `coveredBy` 申报由哪条无条件步骤覆盖，pre-push 逐条打印；两者都没有的新面打印「未分类」并**退出非零**，另被 verify 的 `surface-coverage` 门禁（全 tracked 全集）判红。规则与成员唯一家 = [`tools/lib/core/asset-lanes.mjs`](../tools/lib/core/asset-lanes.mjs)，本文件不复述；`pnpm smoke:all` = 本地全量 keyless，每周 CI 跑 `--ci`；新增冒烟不登记 = `pnpm verify` 红。失败类→层的决策表 = [failure-classes.md](failure-classes.md)；资产盘子 = [CENSUS.generated.md](CENSUS.generated.md)（生成物）。
+**按面触发（2026-11-13 起；2026-11-16 扩 coveredBy 申报 / 未分类 fail-closed；2026-11-17 BUG-209 停抄面表）**：pre-push 按改动面自动补跑真入口检查；**面成员与 `coveredBy` 唯一家 = [`tools/lib/core/asset-lanes.mjs`](../tools/lib/core/asset-lanes.mjs)，本文件不复述面表**。没有额外 lane 的面必须在规则里用 `coveredBy` 申报由哪条无条件步骤覆盖，且该步骤要真的加载/解析该面（`probes/**` = coverage:ratchet 的入口 import 图 spec）；pre-push 逐条打印；两者都没有的新面打印「未分类」并**退出非零**，另被 verify 的 `surface-coverage` 门禁（全 tracked 全集）判红。`pnpm smoke:all` = 本地全量 keyless，每周 CI 跑 `--ci`；新增冒烟不登记 = `pnpm verify` 红。失败类→层的决策表 = [failure-classes.md](failure-classes.md)；资产盘子 = [CENSUS.generated.md](CENSUS.generated.md)（生成物）。
 
 换档原则与每层证明边界唯一家 = [testing.md §1](../docs/testing.md)；同 diff 义务列的政策（含「不替代组装转录」）= [testing.md §2](../docs/testing.md)；命令与预算速查 = 本文件「验证分层与预算」。
 

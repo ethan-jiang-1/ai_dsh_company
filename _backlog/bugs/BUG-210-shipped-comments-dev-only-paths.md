@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-210：发布产物里的源码注释仍指向不随包分发的 tools/lib 路径
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-8 / N5）。
-> **留痕**：待修复者决定（本轮只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
 
 ## 症状
 
@@ -33,6 +33,7 @@ rm -rf runtime/tmp/c12/dist && mkdir -p runtime/tmp/c12/dist
 tar -xzf _dist/dsh-company-pack-0.11.9.tgz -C runtime/tmp/c12/dist
 grep -rn 'tools/lib/company/delegation-model.mjs' runtime/tmp/c12/dist/package/lib | head
 tar -tzf _dist/dsh-company-pack-0.11.9.tgz | grep -c '^package/tools/' || true
+pnpm test tests/repo/pack/shipped-comments.spec.ts
 ```
 
 实测 grep 命中 `lib/index.js` 与 `lib/types/lib/delegation/*.d.ts`；`package/tools/` 为 0。
@@ -60,13 +61,11 @@ tar -tzf _dist/dsh-company-pack-0.11.9.tgz | grep -c '^package/tools/' || true
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. shipped 源码注释只留「仓库内」限定，或删除 dev 路径；tarball 里 `grep 'tools/lib/'` 为 0
-   （或每一条都带「不随包分发」限定）。
-2. 最小负例：在 shipped source 加一条未限定的 tools/lib 下的路径 注释并重打 → 发布形状检查红；
-   当前没有这条检查。
-3. 正例：`cordis.patch.yml` 的「不随包分发」注释保留，不误杀。
+1. shipped 源码注释里的仓库内 `tools/lib` 子树路径必须带「不随包分发/仓库内」限定；新增 `tests/repo/pack/shipped-comments.spec.ts` 扫 `packages/company-pack/src/**` 注释块。
+2. 重建 `_dist`（0.11.9 重打）；tarball 的 `package/lib/index.js` 里每条 dev-only 路径都有「不随包分发」限定。
+3. 最小负例（同一条命令）：`pnpm test tests/repo/pack/shipped-comments.spec.ts`——去掉一条限定 → 红；接回 → 绿。
 
 ## 修复方向（不授权，仅记录）
 

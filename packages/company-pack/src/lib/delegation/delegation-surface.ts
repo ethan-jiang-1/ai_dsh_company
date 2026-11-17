@@ -1,7 +1,7 @@
 /**
- * 委派面的运行时边界表（pack 内；与 `tools/lib/company/delegation-model.mjs` 的期望同源）。
+ * 委派面的运行时边界表（pack 内；与 `tools/lib/company/delegation-model.mjs`（不随包分发）的期望同源）。
  *
- * 为什么 pack 里要有一份：host 注入面随包发布，不能 import 仓内 `tools/lib`（发布面不自包含）；
+ * 为什么 pack 里要有一份：host 注入面随包发布，不能 import 仓内 `tools/lib`（不随包分发；发布面不自包含）；
  * `tests/presets/delegation-model.spec.ts` 钉本表 == 模型 `handbookSkipPresets()`。
  */
 

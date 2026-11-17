@@ -1,7 +1,7 @@
 /**
- * 委派通道的运行时能力表（pack 内；与 `tools/lib/company/delegation-model.mjs` 的 `COMPOSITIONS` 同源）。
+ * 委派通道的运行时能力表（pack 内；与 `tools/lib/company/delegation-model.mjs`（不随包分发）的 `COMPOSITIONS` 同源）。
  *
- * 为什么 pack 里要有一份：host 注入面随包发布，不能 import 仓内 `tools/lib`；而“这个 preset
+ * 为什么 pack 里要有一份：host 注入面随包发布，不能 import 仓内 `tools/lib`（不随包分发）；而“这个 preset
  * 该看见哪些通道”必须在 `agent/created` 时同步决定。`tests/presets/delegation-capabilities.spec.ts`
  * 钉本表 == 模型 `COMPOSITIONS[*].channels` / `workflow` / `retrySurface()` / `depthRows` 最大深度。
  *

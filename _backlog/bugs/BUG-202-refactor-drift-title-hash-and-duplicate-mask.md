@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-202：refactor-drift 的 `--hashes` 只证标题，`--compare` 又用集合差掩盖重复测试的删除
 
-> 严重级别：P2（次要）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-17｜状态：修复就绪｜修复：2026-11-17（进行中）｜审查：—
 >
 > **关联**：[C12 归属波次探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)（C12-3 / N1）。
-> **留痕**：待修复者决定（本轮只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-17-c12-ownership-wave-repairs.md`（本批共用）。
 
 ## 症状
 
@@ -67,12 +67,11 @@ node checks/audit/refactor-drift-audit.mjs --compare runtime/tmp/c12-pre/dup-bef
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 名字与判别力一致：要么把 `--hashes` 明确改名为标题指纹档并在头注/输出删掉「测试体」声明，
-   要么提供基于源码/测试体的真指纹（例如用 TS AST 对测试体做归一哈希）并给出同标题改断言的负例。
-2. `--compare` 对重复行做多重集比较：拆前 2 条、拆后 1 条必须 `exit=1`。
-3. 最小负例：同标题不同测试体 → 红；重复行删一条 → 红；真搬移（仅文件/describe 搬家）→ 绿。
+1. `--hashes` 输出 `<归一全名>\t<sha256(测试体 AST 归一化)>`；标题是字面量时用**测试体**，参数化/非字面量标题退回标题指纹并在 stderr 点名条数，`--compare` 的判别档如实写「含测试体指纹（N 条退回标题）」。
+2. `--compare` 用**多重集**差：重复行拆前 2 条、拆后 1 条必须 `exit=1`；同标题 `toBe→toContain` 必须 `exit=1`；真搬移（仅文件/describe 搬家）`exit=0`。
+3. 最小负例（同一条命令）：`pnpm test tests/tools/refactor-drift.spec.ts`——旧实现红（标题指纹相等 / 集合差吞重复）；修复后绿。
 
 ## 修复方向（不授权，仅记录）
 

@@ -51,7 +51,7 @@ export function statusLabelFor(status: string): string {
 
 /**
  * 六个 preset id——**pack 内名册唯一事实家**（2026-10-21 收拢：cultivation 的 CULTIVATION_ROLES 与
- * host 培养工具串改为从这里派生；pack/tools 边界仍由 tools/lib/company/company-roles.mjs 自持，互不依赖）。
+ * host 培养工具串改为从这里派生；pack/tools 边界仍由 tools/lib/company/company-roles.mjs（不随包分发）自持，互不依赖）。
  * 有限键，索引安全；与 `presets/<role>/agent.cordis.yml` 一一对应。
  */
 export const PRESET_KEYS = ['ceo', 'vp-eng', 'vp-sales', 'coo', 'cfo', 'cmo'] as const

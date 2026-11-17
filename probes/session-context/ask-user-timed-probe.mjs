@@ -13,7 +13,7 @@
 //
 // 首次验收（2026-10-18）：ALL PASS——并顺带抓出**残留**：模型可在单次调用里传 `timeout: -1`
 //   （vendor schema 允许："必须先得到答案"时用），窗口因此回到无界、驱动静默停住 ⇒ 立 BUG-022
-//   （`_backlog/bugs/BUG-022-ask-user-unbounded-timeout-override.md`）。本档因此让 prompt **显式要一个 30s 窗口**
+//   （`_backlog/_archive/fixed_bugs/BUG-022-ask-user-unbounded-timeout-override.md`）。本档因此让 prompt **显式要一个 30s 窗口**
 //   以保证判据确定性；模型仍传 -1 时按「无法验证」报红并提示重跑（不是修复失效）。
 //
 // 判据（全过 = 已修判定那条真模型行成立）：

@@ -14,7 +14,7 @@
 //   ⚠ **红方向未复现**（2026-10-12 两跑：单轮给思路 / 两轮开工指令，旧 skill 均 0 spawn、路由
 //   VP-Eng）——失败形状依赖真人多轮范围裁定交互（live 负例 = ai-coding-security-2026 四职）。
 //   现役用途 = 修复落地后的回归观察；红方向已由 --session 模式实证（2026-10-12：live 实录
-//   session-6cce7fb4 判 over-assembly，见 [issue 卡](../../../_backlog/issues/2026-10-12-ceo-minimal-assembly.md) 验收表 B1）。
+//   session-6cce7fb4 判 over-assembly，见 [issue 卡](../../../_backlog/_archive/settled_issues/2026-10-12-ceo-minimal-assembly.md) 验收表 B1）。
 // 退出码：0 = 最小在屋；1 = 全员组队或未路由 VP-Eng；2 = 读不到会话/判据不成立。
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'

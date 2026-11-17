@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：新增/移动 checks/smoke|audit、probes、tools/<组> 公开入口后；`pnpm verify` 的 script-index
+// 何时跑：新增/移动 checks/lanes|audit、probes、tools/<组> 公开入口后；`pnpm verify` 的 script-index
 // 门禁报“生成物不一致”时。成本秒级 keyless（只读目录 + 写一个 Markdown）。
 // 用法：node tools/repo/checks-index.mjs --write   # 重新生成 checks/INDEX.generated.md
 //       node tools/repo/checks-index.mjs [--check] # 只校验（默认）
