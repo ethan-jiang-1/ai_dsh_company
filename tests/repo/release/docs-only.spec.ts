@@ -4,15 +4,15 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { docsOnlyChangeProblem, docsOnlyOutputProblem, parseNameStatusZ } from '../../../tools/lib/release/docs-only.mjs'
+// 负例留证 2026-11-19：`git diff --name-only` 对 rename 只给新路径，code→docs 改名被判 docs-only（BUG-281）。
+// 负例留证 2026-11-19：`_dist/安装手册.md` 在 docs-only 集合里，生成的发布字节被当文档（BUG-280）。
+// 负例留证 2026-11-19：`--stamp` 不比 dirty/checks，`--check` 比——同一棵树两入口结论不同（BUG-282）。
+
 import { renderInstallManual } from '../../../tools/lib/release/install-manual.mjs'
 import { manualProductProblem, readinessProblems } from '../../../tools/lib/release/readiness.mjs'
 
 /**
  * release docs-only 边界与就绪判据（2026-11-19，BUG-280/281/282）。
- *
- * 负例留证 2026-11-19：`git diff --name-only` 对 rename 只给新路径，code→docs 改名被判 docs-only（BUG-281）。
- * 负例留证 2026-11-19：`_dist/安装手册.md` 在 docs-only 集合里，生成的发布字节被当文档（BUG-280）。
- * 负例留证 2026-11-19：`--stamp` 不比 dirty/checks，`--check` 比——同一棵树两入口结论不同（BUG-282）。
  */
 
 describe('name-status -z 解析（BUG-281）', () => {

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { DEV_DIRS, devCommandInText, scriptsFromManifest } from '../../tools/lib/core/dev-command.mjs'
+// 负例留证 2026-11-19：`pnpm -s test` / `pnpm exec vitest` / `npm run test` / `npx vitest` 不在旧正则里 → 放行（BUG-271）。
+// 负例留证 2026-11-19：`node probes/...` 不在旧正则的目录白名单里 → 放行（BUG-272）。
+
 
 /**
  * dev 命令判据（2026-11-19，BUG-271/272）。
- *
- * 负例留证 2026-11-19：`pnpm -s test` / `pnpm exec vitest` / `npm run test` / `npx vitest` 不在旧正则里 → 放行（BUG-271）。
- * 负例留证 2026-11-19：`node probes/...` 不在旧正则的目录白名单里 → 放行（BUG-272）。
  */
 
 const SCRIPTS = ['test', 'verify', 'typecheck', 'methods:init', 'release:prepare', 'coverage:ratchet']

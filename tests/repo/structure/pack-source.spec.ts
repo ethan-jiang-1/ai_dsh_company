@@ -64,6 +64,8 @@ describe('包源指纹（release 与 dev 缓存共用）', () => {
   })
 })
 
+// 负例留证 2026-11-19：发布面目录里的 install-manual.mjs 改字节，pipeline 指纹不变（BUG-263）。
+// 负例留证 2026-11-19：market-index.mjs 同样不在手写 5 条清单里（BUG-264）。
 describe('发布管线输入集（目录派生，BUG-263/264）', () => {
   it('目录缺失/非 .mjs/跨目录项缺失都不崩，集随目录派生', () => {
     const dir = mkdtempSync(join(tmpdir(), 'pipeline-files-'))

@@ -1,3 +1,10 @@
+
+// 负例留证 2026-11-19：inventory 写 `..\\evil` 时旧判据只 split('/') → 通过；本 spec 红（BUG-265）。
+// 负例留证 2026-11-19：manifest 缺 version / version=2 时旧判据不看；本 spec 红（BUG-267）。
+// 负例留证 2026-11-19：seed 的 target='../../evil.md'、缺 source 时旧 schema 只判字符串；本 spec 红（BUG-268）。
+// 负例留证 2026-11-19：delivery documents 的 template 不在 content 时旧 schema 通过；本 spec 红（BUG-269）。
+// 负例留证 2026-11-19：check-rules 的 files 值是对象时旧 schema 通过；本 spec 红（BUG-270）。
+// 负例留证 2026-11-19：content 下的 symlink 文件被 `entry.isFile()` 静默跳过；本 spec 红（BUG-266）。
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
@@ -17,12 +24,6 @@ import {
  * 这组卡不是八个补丁：同一份 content 合同被写了两遍（源树 gate + tarball checker），
  * 各自的洞不同。本 spec 钉的是**那份唯一实现**的判据；两处消费者（gate / shipped checker）
  * 的接线各有自己的 spec（`tests/checks/gates-negative.test.mjs` / `tests/repo/release/shipped-shape.spec.ts`）。
- *
- * 负例留证 2026-11-19：inventory 写 `..\\evil` 时旧判据只 split('/') → 通过；本 spec 红（BUG-265）。
- * 负例留证 2026-11-19：manifest 缺 version / version=2 时旧判据不看；本 spec 红（BUG-267）。
- * 负例留证 2026-11-19：seed 的 target='../../evil.md'、缺 source 时旧 schema 只判字符串；本 spec 红（BUG-268）。
- * 负例留证 2026-11-19：delivery documents 的 template 不在 content 时旧 schema 通过；本 spec 红（BUG-269）。
- * 负例留证 2026-11-19：check-rules 的 files 值是对象时旧 schema 通过；本 spec 红（BUG-270）。
  */
 
 const dirs: string[] = []
