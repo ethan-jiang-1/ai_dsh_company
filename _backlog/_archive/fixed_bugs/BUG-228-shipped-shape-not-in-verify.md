@@ -58,4 +58,4 @@ grep -n 'release:shape\|shipped-shape' .githooks/pre-push package.json
 - 绿：`pnpm verify`（`shipped-links` gate PASS；真树植入未限定 dev 路径 → gate 红，还原 → 绿）
 - 提交：commit 87d8b15d
 - 补正（2026-11-18）：源码侧检查从 coverage:ratchet 移到 `checks/gates/shipped-links.mjs`（verify/run-gates），避免给 BUG-212 的昂贵阶段加负担。
-- 补正提交：commit 153fe423（source shape 并入 shipped-links、README.shipped coveredBy=verify）
+- 补正提交：commit 910b77d1（source shape 并入 shipped-links、README.shipped coveredBy=verify）
