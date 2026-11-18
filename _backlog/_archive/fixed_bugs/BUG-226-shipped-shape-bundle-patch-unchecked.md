@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-226：shipped-shape 不验证 dsh.bundle.patch 的目标，缺 preset 的包仍 PASS
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 指纹闭包 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-4 / G1）。
-> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
+> **关联**：[C14 低置信卡](../../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-4 / G1）。
+> **留痕**：批次 Note [2026-11-18-shipped-shape-closure-and-low-confidence-runtime](../../../notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md)（本批共用）。
 
 ## 症状
 
@@ -31,7 +31,7 @@ EOF
 ## 根因与证据
 
 - 根因：checker 的 manifest 段只处理 `scripts`/`devDependencies`/`workspace`/`files`/`main`/`exports`；`dsh.bundle.patch` 没进判据。sanitizer 逐字保留 `dsh`，所以缺一个 preset 不会被清洗或拒绝。
-- 证据：上脚本；[shipped-shape.mjs](../../tools/lib/release/shipped-shape.mjs)；真实 tarball 当前 12 个 patch 目标都在（所以是**面缺口**，不是当前已坏）。
+- 证据：上脚本；[shipped-shape.mjs](../../../tools/lib/release/shipped-shape.mjs)；真实 tarball 当前 12 个 patch 目标都在（所以是**面缺口**，不是当前已坏）。
 - 影响：组合入口是运行时「六个角色 + 五个 support preset」的唯一来源；缺一个 preset，`preset.entry` 真挂载才会红，`release:shape`/`npm pack` 都绿。
 
 ## 失败类与同类排查
@@ -47,3 +47,10 @@ EOF
 1. `checkShippedPackage` 逐个断言 `pkg.dsh.bundle.patch` 的目标在 tarball；缺一个即红。
 2. 最小负例：patch 指向不存在的 preset → 红；12 个真实目标全在 → 绿。
 3. 正例：不要求 `preset.entry` 在 checker 里跑。
+
+## 修复证据
+
+- 改动面：`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`
+- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（patch 指向不存在 preset 仍 []）
+- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（每个 dsh.bundle.patch 目标必须在 entries；缺一红）
+- 提交：commit 87d8b15d

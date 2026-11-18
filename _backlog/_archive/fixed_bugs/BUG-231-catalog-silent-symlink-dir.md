@@ -1,19 +1,19 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-231：catalog 静默跳过 deliverables 子目录 symlink，entries 少一条且 warnings 为空
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 指纹闭包 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-9 / G4）。
-> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
+> **关联**：[C14 低置信卡](../../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-9 / G4）。
+> **留痕**：批次 Note [2026-11-18-shipped-shape-closure-and-low-confidence-runtime](../../../notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md)（本批共用）。
 
 ## 症状
 
-[catalog.ts](../../packages/company-pack/src/host/ledger/catalog.ts) 的 `scanEntries`：
+[catalog.ts](../../../packages/company-pack/src/host/ledger/catalog.ts) 的 `scanEntries`：
 
 ```ts
 for (const item of children) {
@@ -67,3 +67,10 @@ pnpm exec tsx runtime/tmp/c14-catalog.test.mjs
 1. `scanEntries` 对 `item.isSymbolicLink()` 产生 warning（点名路径），不纳入 entries。
 2. 最小负例：deliverables 子目录 symlink → warnings 至少一条含 `symlink`；真实目录 + final 仍进 catalog。
 3. 正例：根/final/meta 的既有 symlink warning 不变。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/ledger/catalog.ts`、`tests/host/ledger/catalog.spec.ts`
+- 红：`pnpm test tests/host/ledger/catalog.spec.ts`（deliverables 子目录 symlink 静默消失）
+- 绿：`pnpm test tests/host/ledger/catalog.spec.ts`（warning 点名路径，entries 不含；真实目录仍进）
+- 提交：commit 87d8b15d

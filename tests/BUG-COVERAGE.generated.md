@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 219 |
-| 有具名守卫 | 114 |
+| 已修卡 | 229 |
+| 有具名守卫 | 124 |
 | 无具名守卫 | 105 |
-| 覆盖率 | 52.1% |
+| 覆盖率 | 54.1% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -240,3 +240,13 @@
 | 220 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:152 |
 | 221 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:157 |
 | 222 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:164 |
+| 223 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:168；tests/repo/release/shipped-shape.spec.ts:178；tests/repo/release/shipped-shape.spec.ts:219 |
+| 224 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:173 |
+| 225 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:185；tests/repo/release/shipped-shape.spec.ts:189 |
+| 226 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:196 |
+| 227 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:201；tests/repo/release/shipped-shape.spec.ts:211 |
+| 228 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:216 |
+| 229 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:230 |
+| 230 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:199 |
+| 231 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:166 |
+| 232 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:178 |

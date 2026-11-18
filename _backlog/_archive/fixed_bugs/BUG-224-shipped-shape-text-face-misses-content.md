@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-224：shipped-shape 的文本面不含 content/**，content 里的 dev 路径不判
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 指纹闭包 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-2 / G1）。
-> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
+> **关联**：[C14 低置信卡](../../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-2 / G1）。
+> **留痕**：批次 Note [2026-11-18-shipped-shape-closure-and-low-confidence-runtime](../../../notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md)（本批共用）。
 
 ## 症状
 
@@ -38,7 +38,7 @@ EOF
 ## 根因与证据
 
 - 根因：`TEXT_FACE` 是手写面清单，写时只列了 C13 当时出事的 README/cordis/presets/lib，漏了 `content/**`；`content` 是运行时角色直接读的指令面，dev 路径同样误导。
-- 证据：上脚本；[shipped-shape.mjs](../../tools/lib/release/shipped-shape.mjs) 的 `TEXT_FACE`；`content` 85 个 entry（tarball 主体之一）。
+- 证据：上脚本；[shipped-shape.mjs](../../../tools/lib/release/shipped-shape.mjs) 的 `TEXT_FACE`；`content` 85 个 entry（tarball 主体之一）。
 - 影响：content 里的 dev 路径/命令可以进入发布包且不触发 checker；当前 content 只有一处 tests/simulation/samples（通用方法词，不是仓库路径），但这是面缺口不是当前违规。
 
 ## 失败类与同类排查
@@ -54,3 +54,10 @@ EOF
 1. `TEXT_FACE` 纳入 `content/**` 的 `.md/.yml/.yaml/.json`；content 里的 dev 路径按同一 `DEV_PATH/DEV_DIR` +「不随包」判。
 2. 最小负例：`content/AGENTS.md` 写未限定的 tests/x.spec.ts → 红；加「不随包」→ 绿。
 3. 正例：content 的 tests/simulation/samples 通用方法词不误红。
+
+## 修复证据
+
+- 改动面：`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`
+- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（content/AGENTS.md 里的 dev 路径不判）
+- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（content dev 路径无「不随包」即红；加限定/通用词绿）
+- 提交：commit 87d8b15d

@@ -1,19 +1,19 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-229：diffActivity 对缺 members/tasks 的部分 TeamView 直接抛异常
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 指纹闭包 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-7 / G3）。
-> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
+> **关联**：[C14 低置信卡](../../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-7 / G3）。
+> **留痕**：批次 Note [2026-11-18-shipped-shape-closure-and-low-confidence-runtime](../../../notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md)（本批共用）。
 
 ## 症状
 
-[presence.ts](../../packages/company-pack/src/lib/presence/presence.ts) 的 `diffActivity`：
+[presence.ts](../../../packages/company-pack/src/lib/presence/presence.ts) 的 `diffActivity`：
 
 ```ts
 const prevMembers = new Map(prev.members.map(...))
@@ -63,3 +63,10 @@ pnpm exec tsx runtime/tmp/c14-diff.test.mjs
 1. `diffActivity` 对 `prev/next` 的 members/tasks 统一 `?? []`；`{}`/缺 tasks 的最小输入不抛。
 2. 最小负例：`diffActivity({}, {members:[],tasks:[]},0)` 返回 `[]`；缺 tasks 也返回合理动态。
 3. 正例：现有完整视图差分用例不变。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/presence.ts`、`tests/lib/presence/presence-board.spec.ts`
+- 红：`pnpm test tests/lib/presence/presence-board.spec.ts`（diffActivity({}, {members:[],tasks:[]}) 抛 reading map）
+- 绿：`pnpm test tests/lib/presence/presence-board.spec.ts`（{} / 缺 tasks 返回 []；完整视图用例不变）
+- 提交：commit 87d8b15d

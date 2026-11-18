@@ -21,6 +21,16 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-223（已修）](fixed_bugs/BUG-223-shipped-shape-globs-unchecked.md) | 已修：files glob/content 关键件闭包 | 2026-11-18 |
+| [BUG-224（已修）](fixed_bugs/BUG-224-shipped-shape-text-face-misses-content.md) | 已修：TEXT_FACE 纳入 content，dev 路径同判 | 2026-11-18 |
+| [BUG-225（已修）](fixed_bugs/BUG-225-shipped-shape-extensionless-dev-paths.md) | 已修：DEV_DIR 识别无扩展名/目录级引用 | 2026-11-18 |
+| [BUG-226（已修）](fixed_bugs/BUG-226-shipped-shape-bundle-patch-unchecked.md) | 已修：dsh.bundle.patch 目标逐个在包 | 2026-11-18 |
+| [BUG-227（已修）](fixed_bugs/BUG-227-release-shape-stale-dist.md) | 已修：release:shape 比对 sourceFingerprint（含 README.shipped） | 2026-11-18 |
+| [BUG-228（已修）](fixed_bugs/BUG-228-shipped-shape-not-in-verify.md) | 已修：checkSourceShape 进 coverage:ratchet | 2026-11-18 |
+| [BUG-229（已修）](fixed_bugs/BUG-229-diff-activity-partial-view.md) | 已修：diffActivity 部分视图 ?? [] | 2026-11-18 |
+| [BUG-230（已修）](fixed_bugs/BUG-230-team-event-overrides-missing-revision.md) | 已修：缺 revision 时保护 completed/deleted 终态 | 2026-11-18 |
+| [BUG-231（已修）](fixed_bugs/BUG-231-catalog-silent-symlink-dir.md) | 已修：子目录 symlink warning 不静默 | 2026-11-18 |
+| [BUG-232（已修）](fixed_bugs/BUG-232-catalog-empty-slug.md) | 已修：空 slug 回退目录名 + warning | 2026-11-18 |
 | [BUG-213（已修）](fixed_bugs/BUG-213-tarball-ships-type-dts-majority.md) | 已修：类型 135→3 且 import 改 `.js`；`release:shape` 判闭包 | 2026-11-17 |
 | [BUG-214（已修）](fixed_bugs/BUG-214-shipped-prepack-missing-scripts.md) | 已修：tarball manifest 去 `scripts.prepack`；源码 prepack 保留 | 2026-11-17 |
 | [BUG-215（已修）](fixed_bugs/BUG-215-shipped-readme-dev-links.md) | 已修：shipped README 用 README.shipped.md，包外相对链接清零 | 2026-11-17 |

@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-230：teamWithEventTasks 在投影任务缺 revision 时让旧事件覆盖 completed → pending
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 指纹闭包 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-8 / G3）。
-> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
+> **关联**：[C14 低置信卡](../../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-8 / G3）。
+> **留痕**：批次 Note [2026-11-18-shipped-shape-closure-and-low-confidence-runtime](../../../notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md)（本批共用）。
 
 ## 症状
 
@@ -44,7 +44,7 @@ pnpm exec tsx runtime/tmp/c14-team.test.mjs
 ## 根因与证据
 
 - 根因：`previous.revision` 缺失时，`typeof previous.revision === 'number'` 为 false，比较被短路；事件无条件覆盖。类型允许 revision 可选（事件路径的 `TeamTaskSnapshot` 无 `ready`，注释也说明投影/事件字段不同），所以这是合法输入形状。
-- 证据：上脚本；[presence.ts](../../packages/company-pack/src/lib/presence/presence.ts) 的 `teamWithEventTasks`；BUG-104 的既有负例只覆盖「两边都有 revision」。
+- 证据：上脚本；[presence.ts](../../../packages/company-pack/src/lib/presence/presence.ts) 的 `teamWithEventTasks`；BUG-104 的既有负例只覆盖「两边都有 revision」。
 - 影响：任务板/看板可能把已完成任务显示回待办（“回退”假动态）；与 BUG-104 同类，只是缺字段。
 
 ## 失败类与同类排查
@@ -57,6 +57,13 @@ pnpm exec tsx runtime/tmp/c14-team.test.mjs
 
 修成什么算修好：
 
-1. `teamWithEventTasks` 在投影任务缺 `revision` 时保留投影，不让事件覆盖 status（尤其 completed→pending）。
-2. 最小负例：base `completed` 无 revision + revision 1 的 pending 事件 → merged 仍 `completed`。
+1. `teamWithEventTasks` 在投影任务缺 `revision` 时保护终态：completed 不被非终态事件覆盖、deleted 不被复活；pending/in_progress 仍允许推进到 completed，避免无 revision 投影永久冻结。
+2. 最小负例：base `completed` 无 revision + revision 1 的 pending 事件 → merged 仍 `completed`；base `pending` 无 revision + completed 事件 → `completed`。
 3. 正例：两边都有 revision 的 BUG-104 样本行为不变。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/presence.ts`、`tests/lib/presence/presence-board.spec.ts`
+- 红：`pnpm test tests/lib/presence/presence-board.spec.ts`（base completed 无 revision + 旧 pending 事件 → pending）
+- 绿：`pnpm test tests/lib/presence/presence-board.spec.ts`（缺 revision 时保留投影，completed 不变）
+- 提交：commit 87d8b15d

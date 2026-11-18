@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 11 张**：BUG-212（收尾验证链偏长）保持活跃；C14 10 张（BUG-223..232）见下方「## 2026-11-18 C14 修复后的守卫面 + 低置信运行态」。C13 10 张（BUG-213..222）已于 2026-11-17 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**活跃 1 张**：BUG-212（收尾验证链偏长）保持活跃，不并入本批；C14 10 张（BUG-223..232）已于 2026-11-18 修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，批次与收口见下方「## 2026-11-18 修复交接（C14 守卫面 + 低置信运行态：BUG-223..232）」。C13 10 张（BUG-213..222）已于 2026-11-17 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 **独立卡**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
 
@@ -85,15 +85,20 @@ A 组是 `shipped-shape` 只拒 C13 见过的形状（glob/content/无扩展名�
 
 | 组 | 卡 | 共同根因 | 修法（唯一事实源） |
 |---|---|---|---|
-| **A checker 闭包** | [223](BUG-223-shipped-shape-globs-unchecked.md) / [224](BUG-224-shipped-shape-text-face-misses-content.md) / [225](BUG-225-shipped-shape-extensionless-dev-paths.md) / [226](BUG-226-shipped-shape-bundle-patch-unchecked.md) | `files` glob/TEXT_FACE/DEV_PATH/patch 目标只覆盖上次样本 | checker 对每个 glob 求至少 1 命中；content/presets 关键件在；`dsh.bundle.patch` 目标逐个在 entries；TEXT_FACE 加 content；无扩展名目录 dev 路径按「仓库根前缀 + 路径形状」判，tools/pre-execute/tools/skills/tests/simulation 白名单 |
-| **B 新鲜度/接线** | [227](BUG-227-release-shape-stale-dist.md) / [228](BUG-228-shipped-shape-not-in-verify.md) | `release:shape` 不读源码指纹；真实 tarball 检查只在 release | `release:shape` 比对 `sourceFingerprint`（不等即红，`--allow-stale` 显式降级）；新增 `checkSourceShape` spec，进 `pnpm test`/coverage:ratchet，覆盖 README.shipped/presets/cordis/content/patch 目标；`README.shipped` 的 coveredBy 指向真执行它的步骤 |
-| **C presence 读模型** | [229](BUG-229-diff-activity-partial-view.md) / [230](BUG-230-team-event-overrides-missing-revision.md) | 类型必填当运行必填；缺 revision 无判据 | `diffActivity` 对 members/tasks `?? []`；`teamWithEventTasks` 在投影 revision 缺失时保留投影（不让旧事件覆盖 completed）；补最小输入负例 |
-| **D catalog 派生** | [231](BUG-231-catalog-silent-symlink-dir.md) / [232](BUG-232-catalog-empty-slug.md) | 坏形状静默 | 子目录 symlink → warning + 不纳入；`slug` 空/空白 → 回退目录名 + warning；补临时 home 负例 |
+| **A checker 闭包** | [223](../_archive/fixed_bugs/BUG-223-shipped-shape-globs-unchecked.md) / [224](../_archive/fixed_bugs/BUG-224-shipped-shape-text-face-misses-content.md) / [225](../_archive/fixed_bugs/BUG-225-shipped-shape-extensionless-dev-paths.md) / [226](../_archive/fixed_bugs/BUG-226-shipped-shape-bundle-patch-unchecked.md) | `files` glob/TEXT_FACE/DEV_PATH/patch 目标只覆盖上次样本 | checker 对每个 glob 求至少 1 命中；content/presets 关键件在；`dsh.bundle.patch` 目标逐个在 entries；TEXT_FACE 加 content；无扩展名目录 dev 路径按「仓库根前缀 + 路径形状」判，tools/pre-execute/tools/skills/tests/simulation 白名单 |
+| **B 新鲜度/接线** | [227](../_archive/fixed_bugs/BUG-227-release-shape-stale-dist.md) / [228](../_archive/fixed_bugs/BUG-228-shipped-shape-not-in-verify.md) | `release:shape` 不读源码指纹；真实 tarball 检查只在 release | `release:shape` 比对 `sourceFingerprint`（不等即红，`--allow-stale` 显式降级）；新增 `checkSourceShape` spec，进 `pnpm test`/coverage:ratchet，覆盖 README.shipped/presets/cordis/content/patch 目标；`README.shipped` 的 coveredBy 指向真执行它的步骤 |
+| **C presence 读模型** | [229](../_archive/fixed_bugs/BUG-229-diff-activity-partial-view.md) / [230](../_archive/fixed_bugs/BUG-230-team-event-overrides-missing-revision.md) | 类型必填当运行必填；缺 revision 无判据 | `diffActivity` 对 members/tasks `?? []`；`teamWithEventTasks` 在投影 revision 缺失时保留投影（不让旧事件覆盖 completed）；补最小输入负例 |
+| **D catalog 派生** | [231](../_archive/fixed_bugs/BUG-231-catalog-silent-symlink-dir.md) / [232](../_archive/fixed_bugs/BUG-232-catalog-empty-slug.md) | 坏形状静默 | 子目录 symlink → warning + 不纳入；`slug` 空/空白 → 回退目录名 + warning；补临时 home 负例 |
 
 **次序 = A(红) → A 实现 → B → C/D → 重建 `_dist` → 真入口**：
 先让 checker 对 C14 的合成包/旧 tarball 红，再补闭包；B 用同一 checker 的 source 面 + fingerprint；C/D 是独立纯函数/盘面修复。证据口径 = 先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；每卡红/绿写同一条可执行命令（A/B = `pnpm test tests/repo/release/shipped-shape.spec.ts` 与 `pnpm release:shape`；C = `pnpm test tests/lib/presence/presence-board.spec.ts`；D = `pnpm test tests/host/ledger/catalog.spec.ts`）。
 
 **终点** = C14 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃，不动。
+
+**收口（2026-11-18）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `87d8b15d`。
+`pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2236 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
+盲审 B1（README.shipped 不在 sourceFingerprint）已修：`PACKAGE_SOURCE_FILES` 纳入它，重打后 fingerprint 变化；S1–S5 已处置。
+共享机制决定 = [shipped shape closure Note](../../notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md)。
 
 ## 2026-11-18 C14 修复后的守卫面 + 低置信运行态
 
@@ -101,12 +106,12 @@ A 组是 `shipped-shape` 只拒 C13 见过的形状（glob/content/无扩展名�
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
-| A 新 checker 面 | [223](BUG-223-shipped-shape-globs-unchecked.md) / [224](BUG-224-shipped-shape-text-face-misses-content.md) / [225](BUG-225-shipped-shape-extensionless-dev-paths.md) / [226](BUG-226-shipped-shape-bundle-patch-unchecked.md) | checker 只拒 C13 当时见过的形状 | files glob / content 文本面 / 目录级 dev 路径 / bundle.patch 四类空绿 | P2 ×4 |
-| B 发布新鲜度/接线 | [227](BUG-227-release-shape-stale-dist.md) / [228](BUG-228-shipped-shape-not-in-verify.md) | 真实 tarball 检查只在 release，且不比对源码 | 旧 `_dist` PASS；source 泄漏过 verify/pre-push | P2 ×2 |
-| C 读模型 | [229](BUG-229-diff-activity-partial-view.md) / [230](BUG-230-team-event-overrides-missing-revision.md) | 类型必填当运行必填；缺 revision 无判据 | 部分视图抛错；旧事件覆盖 completed | P2 ×2 |
-| D catalog 派生 | [231](BUG-231-catalog-silent-symlink-dir.md) / [232](BUG-232-catalog-empty-slug.md) | 坏形状静默 | symlink 子目录消失；空 slug 当已声明 | P2 ×2 |
+| A 新 checker 面 | [223](../_archive/fixed_bugs/BUG-223-shipped-shape-globs-unchecked.md) / [224](../_archive/fixed_bugs/BUG-224-shipped-shape-text-face-misses-content.md) / [225](../_archive/fixed_bugs/BUG-225-shipped-shape-extensionless-dev-paths.md) / [226](../_archive/fixed_bugs/BUG-226-shipped-shape-bundle-patch-unchecked.md) | checker 只拒 C13 当时见过的形状 | files glob / content 文本面 / 目录级 dev 路径 / bundle.patch 四类空绿 | P2 ×4 |
+| B 发布新鲜度/接线 | [227](../_archive/fixed_bugs/BUG-227-release-shape-stale-dist.md) / [228](../_archive/fixed_bugs/BUG-228-shipped-shape-not-in-verify.md) | 真实 tarball 检查只在 release，且不比对源码 | 旧 `_dist` PASS；source 泄漏过 verify/pre-push | P2 ×2 |
+| C 读模型 | [229](../_archive/fixed_bugs/BUG-229-diff-activity-partial-view.md) / [230](../_archive/fixed_bugs/BUG-230-team-event-overrides-missing-revision.md) | 类型必填当运行必填；缺 revision 无判据 | 部分视图抛错；旧事件覆盖 completed | P2 ×2 |
+| D catalog 派生 | [231](../_archive/fixed_bugs/BUG-231-catalog-silent-symlink-dir.md) / [232](../_archive/fixed_bugs/BUG-232-catalog-empty-slug.md) | 坏形状静默 | symlink 子目录消失；空 slug 当已声明 | P2 ×2 |
 
-本组是 Round 100–101 的产出；tarball/合成 checker/纯函数/临时 companyHome 均已实跑，未修任何产品代码。
+本组是 Round 100–101 的产出；10 张已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)。
 
 ## 2026-11-17 C13 运行时/发布面分离（focus v8）
 

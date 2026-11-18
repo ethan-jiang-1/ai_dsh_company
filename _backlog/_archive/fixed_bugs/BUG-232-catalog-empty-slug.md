@@ -1,19 +1,19 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-232：meta.md 的空 slug 被当成 `''`，不回退目录名、不告警
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 指纹闭包 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-10 / G4）。
-> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
+> **关联**：[C14 低置信卡](../../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-10 / G4）。
+> **留痕**：批次 Note [2026-11-18-shipped-shape-closure-and-low-confidence-runtime](../../../notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md)（本批共用）。
 
 ## 症状
 
-[catalog.ts](../../packages/company-pack/src/host/ledger/catalog.ts)：
+[catalog.ts](../../../packages/company-pack/src/host/ledger/catalog.ts)：
 
 ```ts
 const slug = fields.get('slug') ?? slugFromDirName(item.name)
@@ -62,3 +62,10 @@ pnpm exec tsx runtime/tmp/c14-catalog2.test.mjs
 1. `slug:` 空/空白视为未声明：回退 `slugFromDirName`，并产生 warning；`buildDeliverablesCatalog` 用同一 `deliverableSlug` 判据。
 2. 最小负例：`slug:` 空 → entry.slug == 目录名、warnings 含「slug 为空」；两个空 slug 不互相覆盖。
 3. 正例：`slug: alpha` 不变。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/ledger/catalog.ts`、`packages/company-pack/src/lib/deliverables/deliverables-catalog.ts`、`tests/host/ledger/catalog.spec.ts`
+- 红：`pnpm test tests/host/ledger/catalog.spec.ts`（slug: 空 → entry.slug=""、warnings []）
+- 绿：`pnpm test tests/host/ledger/catalog.spec.ts`（entry.slug=目录名 + warning；正常 slug 不变）
+- 提交：commit 87d8b15d

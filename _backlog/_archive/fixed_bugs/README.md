@@ -4,6 +4,21 @@
 
 ## 修复流水（倒序）
 
+- **BUG-223..232**（2026-11-18，根因组 A–D，P2×10）：C14 修复后的守卫面 + 低置信运行态：
+  **A checker 闭包**：[223](BUG-223-shipped-shape-globs-unchecked.md) files glob/content 关键件、
+  [224](BUG-224-shipped-shape-text-face-misses-content.md) content 文本面、
+  [225](BUG-225-shipped-shape-extensionless-dev-paths.md) 无扩展名目录 dev、
+  [226](BUG-226-shipped-shape-bundle-patch-unchecked.md) `dsh.bundle.patch` 目标；
+  **B 新鲜度/接线**：[227](BUG-227-release-shape-stale-dist.md) sourceFingerprint（含 README.shipped）、
+  [228](BUG-228-shipped-shape-not-in-verify.md) `checkSourceShape` 进 coverage:ratchet；
+  **C presence**：[229](BUG-229-diff-activity-partial-view.md) 部分视图 `?? []`、
+  [230](BUG-230-team-event-overrides-missing-revision.md) 缺 revision 终态保护；
+  **D catalog**：[231](BUG-231-catalog-silent-symlink-dir.md) 子目录 symlink warning、
+  [232](BUG-232-catalog-empty-slug.md) 空 slug 回退。
+  证据提交 = `87d8b15d`；`release --prepare` ALL PASS（137 entries）、`release:shape` PASS、
+  `company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2236 tests、`verify`/`typecheck`/`coverage` 绿。
+  详见 [shipped shape closure Note](../../../notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md)。
+
 - **BUG-213..222**（2026-11-17，根因组 A–E，P2×10）：C13 运行时/发布面分离——tarball 是仓库树的子集，
   dev 字节/元数据/文本/未声明依赖一起漏进安装面：
   **A** 字节：[213](BUG-213-tarball-ships-type-dts-majority.md) 类型 135→3 且 import 改 `.js`、

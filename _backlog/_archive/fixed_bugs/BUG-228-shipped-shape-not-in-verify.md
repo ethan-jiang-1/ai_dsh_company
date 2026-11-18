@@ -1,15 +1,15 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-228：真实 tarball 的 shipped-shape 检查不在 verify / pre-push；源码泄漏只到 release 才红
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 指纹闭包 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-6 / G2）。
-> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
+> **关联**：[C14 低置信卡](../../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-6 / G2）。
+> **留痕**：批次 Note [2026-11-18-shipped-shape-closure-and-low-confidence-runtime](../../../notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md)（本批共用）。
 
 ## 症状
 
@@ -34,7 +34,7 @@ grep -n 'release:shape\|shipped-shape' .githooks/pre-push package.json
 ## 根因与证据
 
 - 根因：shipped-shape 的判据依赖 `_dist`（构建产物），而 verify/pre-push 不保证 `_dist` 在场；于是只能把真实检查放到 release。`coveredBy: verify` 是**声明性**兜底，不执行真实 tarball 检查（与 C12 BUG-206 同族）。
-- 证据：`selectSurfaces` 输出；pre-push 原文；[shipped-shape.spec.ts](../../tests/repo/release/shipped-shape.spec.ts) 只测合成 fixture；Note `[environment-gap]`。
+- 证据：`selectSurfaces` 输出；pre-push 原文；[shipped-shape.spec.ts](../../../tests/repo/release/shipped-shape.spec.ts) 只测合成 fixture；Note `[environment-gap]`。
 - 影响：dev 文本泄漏可在 merge 前全绿；发布前才红，修复成本/回滚面更大。
 
 ## 失败类与同类排查
@@ -50,3 +50,10 @@ grep -n 'release:shape\|shipped-shape' .githooks/pre-push package.json
 1. 新增 `checkSourceShape`（不依赖 `_dist`）：README.shipped 链接/pnpm 文案、cordis/presets/content dev 限定、`dsh.bundle.patch` 目标在源码树存在。
 2. 该检查进 `tests/repo/release/shipped-shape.spec.ts`，随 `coverage:ratchet`/pre-push 真跑；`README.shipped` 的 coveredBy 从 `verify` 改成 `coverage:ratchet`。
 3. 最小负例：README.shipped 加未限定 dev 路径或 patch 缺目标 → spec 红；改回 → 绿。
+
+## 修复证据
+
+- 改动面：`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`、`tools/lib/core/asset-lanes.mjs`
+- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（源码侧 README.shipped dev/pnpm/patch 缺口不判）
+- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（checkSourceShape 进 spec；README.shipped coveredBy=coverage:ratchet；源码负例红）
+- 提交：commit 87d8b15d

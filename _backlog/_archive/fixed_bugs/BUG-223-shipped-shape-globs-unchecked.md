@@ -1,20 +1,20 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-223：shipped-shape 不验证 files 的 glob（content/**、presets/**），缺 content/presets 的包仍 PASS
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 指纹闭包 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-1 / G1）。
-> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
+> **关联**：[C14 低置信卡](../../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-1 / G1）。
+> **留痕**：批次 Note [2026-11-18-shipped-shape-closure-and-low-confidence-runtime](../../../notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md)（本批共用）。
 
 ## 症状
 
-[sanitizePackage](../../tools/lib/release/shipped-shape.mjs) 的 `files` 含 `content/**`、`presets/**`；
-[checkShippedPackage](../../tools/lib/release/shipped-shape.mjs) 对 `files` 的检查是：
+[sanitizePackage](../../../tools/lib/release/shipped-shape.mjs) 的 `files` 含 `content/**`、`presets/**`；
+[checkShippedPackage](../../../tools/lib/release/shipped-shape.mjs) 对 `files` 的检查是：
 
 ```js
 for (const value of files) {
@@ -47,7 +47,7 @@ EOF
 ## 根因与证据
 
 - 根因：checker 的 `files` 判据只检查**无 glob 的字面条目**；`content/**`、`presets/**`、`locale/*.json` 三种 glob 都被 `continue` 跳过，没有「glob 至少命中 N 个」或「运行时必需目录存在」的判据。
-- 证据：上脚本；[shipped-shape.spec.ts](../../tests/repo/release/shipped-shape.spec.ts) 的正例 fixture 也没有 presets/dsh.bundle.patch（见 BUG-226），所以测试不会暴露。
+- 证据：上脚本；[shipped-shape.spec.ts](../../../tests/repo/release/shipped-shape.spec.ts) 的正例 fixture 也没有 presets/dsh.bundle.patch（见 BUG-226），所以测试不会暴露。
 - 影响：发布包可以「sanitize 成功、checker PASS、company-entry 起得来」但缺模板/preset——如果 boots 不读某个 content 文件，缺口要等具体命令才炸。
 
 ## 失败类与同类排查
@@ -63,3 +63,10 @@ EOF
 1. `checkShippedPackage` 对每个 `files` glob 求至少 1 个 entry 命中；`content/AGENTS.md` 必须在；`content/**`/`presets/**` 空集即红。
 2. 最小负例：删掉 content/presets 全部 entries → checker 红；接回 → 绿。
 3. 正例：137-entry 真实 tarball 仍 PASS。
+
+## 修复证据
+
+- 改动面：`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`
+- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（旧 checker 对无 content/presets 的合成包返回 []）
+- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（files glob 空集/content 缺入口/关键条目缺失均红；137-entry tarball PASS）
+- 提交：commit 87d8b15d

@@ -53,16 +53,16 @@ C13 的修法不是十个补丁：`export-dist` 现在先 **sanitize** 再从 sa
 
 | # | 载体 | 预检看到什么 | 轴 | 首轮怎么证伪 |
 |---|---|---|---|---|
-| 1 | [shipped-shape.mjs](../../tools/lib/release/shipped-shape.mjs) | 合成包无 `content/`/`presets/` entries → `[]`；`files` 的 `/**` glob 被跳过 | G1 | 删 entries → checker；[BUG-223](../bugs/BUG-223-shipped-shape-globs-unchecked.md) |
-| 2 | 同上 | `content/AGENTS.md` 里 tests/x.spec.ts → `[]`；`TEXT_FACE` 无 content | G1 | 合成 content → checker；[BUG-224](../bugs/BUG-224-shipped-shape-text-face-misses-content.md) |
-| 3 | 同上 | cordis 里 `tests/host/cultivation/`（目录级）→ `[]`；`DEV_PATH` 要扩展名 | G1 | 合成目录引用 → checker；[BUG-225](../bugs/BUG-225-shipped-shape-extensionless-dev-paths.md) |
-| 4 | 同上 | `dsh.bundle.patch` 指向不存在的 preset → `[]`；checker 不读 patch | G1 | 合成 patch → checker；[BUG-226](../bugs/BUG-226-shipped-shape-bundle-patch-unchecked.md) |
-| 5 | 同上 | `release:shape` 只 read tarball；manifest gitSha/sourceFingerprint 不参与 | G2 | 旧 `_dist` + 新源码；[BUG-227](../bugs/BUG-227-release-shape-stale-dist.md) |
-| 6 | pre-push/verify | 真实 tarball 检查只在 `pnpm release --prepare`/`release:shape`；`verify`/pre-push 不调用 | G2 | 改 `README.shipped`/preset dev 路径 → verify 仍绿；[BUG-228](../bugs/BUG-228-shipped-shape-not-in-verify.md) |
-| 7 | [presence.ts](../../packages/company-pack/src/lib/presence/presence.ts) | `diffActivity({}, {members:[],tasks:[]})` → `Cannot read properties of undefined (reading 'map')` | G3 | 纯函数最小输入；[BUG-229](../bugs/BUG-229-diff-activity-partial-view.md) |
-| 8 | 同上 | base completed 任务无 `revision` + 旧事件 revision 1 pending → 覆盖成 pending | G3 | 纯函数最小输入；[BUG-230](../bugs/BUG-230-team-event-overrides-missing-revision.md) |
-| 9 | [catalog.ts](../../packages/company-pack/src/host/ledger/catalog.ts) | deliverables 子目录 symlink 被 `item.isDirectory()` 过滤，entries 少一条、warnings 空 | G4 | 临时 home + symlink；[BUG-231](../bugs/BUG-231-catalog-silent-symlink-dir.md) |
-| 10 | 同上 | `slug:` 空值 → catalog slug `''`，不告警 | G4 | 临时 home + 空 slug；[BUG-232](../bugs/BUG-232-catalog-empty-slug.md) |
+| 1 | [shipped-shape.mjs](../../tools/lib/release/shipped-shape.mjs) | 合成包无 `content/`/`presets/` entries → `[]`；`files` 的 `/**` glob 被跳过 | G1 | 删 entries → checker；[BUG-223](../_archive/fixed_bugs/BUG-223-shipped-shape-globs-unchecked.md) |
+| 2 | 同上 | `content/AGENTS.md` 里 tests/x.spec.ts → `[]`；`TEXT_FACE` 无 content | G1 | 合成 content → checker；[BUG-224](../_archive/fixed_bugs/BUG-224-shipped-shape-text-face-misses-content.md) |
+| 3 | 同上 | cordis 里 `tests/host/cultivation/`（目录级）→ `[]`；`DEV_PATH` 要扩展名 | G1 | 合成目录引用 → checker；[BUG-225](../_archive/fixed_bugs/BUG-225-shipped-shape-extensionless-dev-paths.md) |
+| 4 | 同上 | `dsh.bundle.patch` 指向不存在的 preset → `[]`；checker 不读 patch | G1 | 合成 patch → checker；[BUG-226](../_archive/fixed_bugs/BUG-226-shipped-shape-bundle-patch-unchecked.md) |
+| 5 | 同上 | `release:shape` 只 read tarball；manifest gitSha/sourceFingerprint 不参与 | G2 | 旧 `_dist` + 新源码；[BUG-227](../_archive/fixed_bugs/BUG-227-release-shape-stale-dist.md) |
+| 6 | pre-push/verify | 真实 tarball 检查只在 `pnpm release --prepare`/`release:shape`；`verify`/pre-push 不调用 | G2 | 改 `README.shipped`/preset dev 路径 → verify 仍绿；[BUG-228](../_archive/fixed_bugs/BUG-228-shipped-shape-not-in-verify.md) |
+| 7 | [presence.ts](../../packages/company-pack/src/lib/presence/presence.ts) | `diffActivity({}, {members:[],tasks:[]})` → `Cannot read properties of undefined (reading 'map')` | G3 | 纯函数最小输入；[BUG-229](../_archive/fixed_bugs/BUG-229-diff-activity-partial-view.md) |
+| 8 | 同上 | base completed 任务无 `revision` + 旧事件 revision 1 pending → 覆盖成 pending | G3 | 纯函数最小输入；[BUG-230](../_archive/fixed_bugs/BUG-230-team-event-overrides-missing-revision.md) |
+| 9 | [catalog.ts](../../packages/company-pack/src/host/ledger/catalog.ts) | deliverables 子目录 symlink 被 `item.isDirectory()` 过滤，entries 少一条、warnings 空 | G4 | 临时 home + symlink；[BUG-231](../_archive/fixed_bugs/BUG-231-catalog-silent-symlink-dir.md) |
+| 10 | 同上 | `slug:` 空值 → catalog slug `''`，不告警 | G4 | 临时 home + 空 slug；[BUG-232](../_archive/fixed_bugs/BUG-232-catalog-empty-slug.md) |
 
 ## 方法（每轮固定）
 
@@ -117,12 +117,12 @@ C13 的修法不是十个补丁：`export-dist` 现在先 **sanitize** 再从 sa
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C14-1 files glob 未验证 | **confirmed** | 合成 entries 删掉 content/presets → `checkShippedPackage` 返回 `[]` → [BUG-223](../bugs/BUG-223-shipped-shape-globs-unchecked.md) |
-| C14-2 TEXT_FACE 不含 content | **confirmed** | `content/AGENTS.md` 写未限定 tests/x.spec.ts → `[]`；同文本进 cordis → 红 → [BUG-224](../bugs/BUG-224-shipped-shape-text-face-misses-content.md) |
-| C14-3 目录级 dev 路径不判 | **confirmed** | cordis 写 `tests/host/cultivation/` → `[]`；带扩展名 → 红 → [BUG-225](../bugs/BUG-225-shipped-shape-extensionless-dev-paths.md) |
-| C14-4 dsh.bundle.patch 未验证 | **confirmed** | patch 指向不存在的 preset → `[]` → [BUG-226](../bugs/BUG-226-shipped-shape-bundle-patch-unchecked.md) |
-| C14-5 release:shape 不比对源码 | **confirmed** | manifest gitSha `a692bf58…` ≠ HEAD `ba0afd61`，`pnpm release:shape` 仍 PASS（137 entries） → [BUG-227](../bugs/BUG-227-release-shape-stale-dist.md) |
-| C14-6 真实 tarball 检查不在 verify/pre-push | **confirmed** | `README.shipped.md` → `coveredBy: ['verify']`；pre-push 无 `release:shape`；只有 package.json 手动脚本 → [BUG-228](../bugs/BUG-228-shipped-shape-not-in-verify.md) |
+| C14-1 files glob 未验证 | **confirmed** | 合成 entries 删掉 content/presets → `checkShippedPackage` 返回 `[]` → [BUG-223](../_archive/fixed_bugs/BUG-223-shipped-shape-globs-unchecked.md) |
+| C14-2 TEXT_FACE 不含 content | **confirmed** | `content/AGENTS.md` 写未限定 tests/x.spec.ts → `[]`；同文本进 cordis → 红 → [BUG-224](../_archive/fixed_bugs/BUG-224-shipped-shape-text-face-misses-content.md) |
+| C14-3 目录级 dev 路径不判 | **confirmed** | cordis 写 `tests/host/cultivation/` → `[]`；带扩展名 → 红 → [BUG-225](../_archive/fixed_bugs/BUG-225-shipped-shape-extensionless-dev-paths.md) |
+| C14-4 dsh.bundle.patch 未验证 | **confirmed** | patch 指向不存在的 preset → `[]` → [BUG-226](../_archive/fixed_bugs/BUG-226-shipped-shape-bundle-patch-unchecked.md) |
+| C14-5 release:shape 不比对源码 | **confirmed** | manifest gitSha `a692bf58…` ≠ HEAD `ba0afd61`，`pnpm release:shape` 仍 PASS（137 entries） → [BUG-227](../_archive/fixed_bugs/BUG-227-release-shape-stale-dist.md) |
+| C14-6 真实 tarball 检查不在 verify/pre-push | **confirmed** | `README.shipped.md` → `coveredBy: ['verify']`；pre-push 无 `release:shape`；只有 package.json 手动脚本 → [BUG-228](../_archive/fixed_bugs/BUG-228-shipped-shape-not-in-verify.md) |
 
 **负控：** 四个 checker 缺口都是「合成 package → `[]`」；同一形状放进已覆盖面（cordis 带扩展名路径）→ 红。
 
@@ -132,10 +132,10 @@ C13 的修法不是十个补丁：`export-dist` 现在先 **sanitize** 再从 sa
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C14-7 diffActivity 部分视图抛错 | **confirmed** | `diffActivity({}, {members:[],tasks:[]},0)` → `Cannot read properties of undefined (reading 'map')`；缺 tasks/缺 members 同 → [BUG-229](../bugs/BUG-229-diff-activity-partial-view.md) |
-| C14-8 teamWithEventTasks 缺 revision 被旧事件覆盖 | **confirmed** | base completed 无 revision + 事件 revision 1 pending → merged pending → [BUG-230](../bugs/BUG-230-team-event-overrides-missing-revision.md) |
-| C14-9 catalog 静默跳过子目录 symlink | **confirmed** | 临时 home：entries 只有 real、warnings `[]`，linked 消失 → [BUG-231](../bugs/BUG-231-catalog-silent-symlink-dir.md) |
-| C14-10 meta 空 slug 被当 `''` | **confirmed** | `slug:` 空 → entry `{dir:'2026-10-25-empty', slug:''}`、warnings `[]` → [BUG-232](../bugs/BUG-232-catalog-empty-slug.md) |
+| C14-7 diffActivity 部分视图抛错 | **confirmed** | `diffActivity({}, {members:[],tasks:[]},0)` → `Cannot read properties of undefined (reading 'map')`；缺 tasks/缺 members 同 → [BUG-229](../_archive/fixed_bugs/BUG-229-diff-activity-partial-view.md) |
+| C14-8 teamWithEventTasks 缺 revision 被旧事件覆盖 | **confirmed** | base completed 无 revision + 事件 revision 1 pending → merged pending → [BUG-230](../_archive/fixed_bugs/BUG-230-team-event-overrides-missing-revision.md) |
+| C14-9 catalog 静默跳过子目录 symlink | **confirmed** | 临时 home：entries 只有 real、warnings `[]`，linked 消失 → [BUG-231](../_archive/fixed_bugs/BUG-231-catalog-silent-symlink-dir.md) |
+| C14-10 meta 空 slug 被当 `''` | **confirmed** | `slug:` 空 → entry `{dir:'2026-10-25-empty', slug:''}`、warnings `[]` → [BUG-232](../_archive/fixed_bugs/BUG-232-catalog-empty-slug.md) |
 
 **证据坐标：** `runtime/tmp/c14-*.test.mjs`、`runtime/tmp/c14-dist/`、`runtime/tmp/c14-release-shape.log`。
 
