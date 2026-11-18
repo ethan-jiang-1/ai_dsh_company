@@ -9,7 +9,8 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { checkShippedPackage } from '../lib/release/shipped-shape.mjs'
+import { checkShippedPackage, freshnessProblem } from '../lib/release/shipped-shape.mjs'
+import { sourceFingerprint } from '../lib/core/pack-source.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = join(here, '..', '..')
@@ -50,8 +51,32 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
     process.exit(2)
   }
   const problems = checkShippedPackage(parsed)
-  if (args.includes('--json')) {
-    process.stdout.write(`${JSON.stringify({ tarball, problems }, null, 2)}\n`)
+  const json = args.includes('--json')
+  const emit = message => { if (json) console.error(message); else console.log(message) }
+  const staleArg = args.find(arg => arg === '--allow-stale' || arg.startsWith('--allow-stale='))
+  const allowStale = staleArg !== undefined
+  const staleReason = staleArg?.includes('=') ? staleArg.slice(staleArg.indexOf('=') + 1) : ''
+  const customTarball = tarballIndex >= 0
+  const manifestPath = join(root, '_dist/release-manifest.json')
+  const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : undefined
+  let head
+  try { head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim() } catch { head = undefined }
+  let stale
+  if (customTarball) {
+    emit('shipped-shape note: --tarball 指定自定义包，跳过 _dist manifest 新鲜度（只判形状）')
+  } else {
+    const currentFingerprint = sourceFingerprint(join(root, 'packages/company-pack'))
+    stale = freshnessProblem({ manifest, currentFingerprint })
+    if (stale !== undefined) {
+      if (allowStale) emit(`shipped-shape WARN freshness: ${stale}${staleReason === '' ? '（--allow-stale 未给理由）' : `（理由：${staleReason}）`}`)
+      else problems.push(`freshness: ${stale}`)
+    }
+    if (manifest?.gitSha !== undefined && manifest.gitSha !== head && head !== undefined) {
+      emit(`shipped-shape note: manifest gitSha ${String(manifest.gitSha).slice(0, 8)}… ≠ HEAD ${String(head).slice(0, 8)}…（${manifest.dirty === true ? '构建时工作树 dirty=true，gitSha 不可比；以 sourceFingerprint 为准' : 'sourceFingerprint 匹配即可，docs-only 提交可接受'}）`)
+    }
+  }
+  if (json) {
+    process.stdout.write(`${JSON.stringify({ tarball, problems, ...(stale === undefined ? {} : { freshness: stale }) }, null, 2)}\n`)
   } else {
     for (const problem of problems) console.log(`shipped-shape FAIL ${problem}`)
     if (problems.length === 0) console.log(`shipped-shape PASS（${tarball}；${String(parsed.entries.length)} entries）`)

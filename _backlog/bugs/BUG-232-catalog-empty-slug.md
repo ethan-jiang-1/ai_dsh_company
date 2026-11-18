@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-232：meta.md 的空 slug 被当成 `''`，不回退目录名、不告警
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
 >
 > **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-10 / G4）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
 
 ## 症状
 
@@ -57,8 +57,8 @@ pnpm exec tsx runtime/tmp/c14-catalog2.test.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `const raw = fields.get('slug')?.trim() ?? ''; const slug = raw === '' ? slugFromDirName(item.name) : raw`，并可加 warning（`slug 为空，按目录名`）。
-2. 最小负例：`slug:` 空 → entry.slug == 目录名（或 warning 点名）；两件空 slug 不互相覆盖。
-3. 正例：正常 `slug: alpha` 不变。
+1. `slug:` 空/空白视为未声明：回退 `slugFromDirName`，并产生 warning；`buildDeliverablesCatalog` 用同一 `deliverableSlug` 判据。
+2. 最小负例：`slug:` 空 → entry.slug == 目录名、warnings 含「slug 为空」；两个空 slug 不互相覆盖。
+3. 正例：`slug: alpha` 不变。

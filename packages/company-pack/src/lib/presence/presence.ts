@@ -134,6 +134,12 @@ export function teamWithEventTasks(view: TeamViewLike | null, events: readonly T
     if (event.type !== 'team/task') continue
     const task = (event.data as { task: { readonly id: string, readonly revision: number, readonly subject: string, readonly status: string, readonly ownerId?: string, readonly blockedBy?: readonly string[], readonly description?: string } }).task
     const previous = tasks.get(task.id)
+    // BUG-230：投影任务缺 revision 时无法证明事件新旧；保护终态，不让旧 pending 把 completed 覆盖回去，
+    // 但允许 pending/in_progress 推进到 completed（也允许 completed → deleted），避免无 revision 的投影永久冻结。
+    if (previous !== undefined && typeof previous.revision !== 'number') {
+      if (previous.status === 'deleted') continue
+      if (previous.status === 'completed' && task.status !== 'completed' && task.status !== 'deleted') continue
+    }
     // 事件流的历史/实时顺序不等于投影新旧：旧 revision 不覆盖新投影（BUG-104）。
     if (previous !== undefined && typeof previous.revision === 'number' && task.revision < previous.revision) continue
     if (task.status === 'deleted') { tasks.delete(task.id); continue }
@@ -240,10 +246,11 @@ export function rowsFromTeamView(view: TeamViewLike): PresenceRow[] {
 export function diffActivity(prev: TeamViewLike | undefined, next: TeamViewLike, now: number): ActivityEntry[] {
   if (prev === undefined) return []
   const entries: ActivityEntry[] = []
-  const prevMembers = new Map(prev.members.map(member => [member.id, member]))
-  const prevTasks = new Map(prev.tasks.map(task => [task.id, task]))
+  // BUG-229：wire/旧投影可以给部分视图；类型必填不等于运行时必填（BUG-145 同族）。
+  const prevMembers = new Map((prev.members ?? []).map(member => [member.id, member]))
+  const prevTasks = new Map((prev.tasks ?? []).map(task => [task.id, task]))
 
-  for (const member of next.members) {
+  for (const member of next.members ?? []) {
     const before = prevMembers.get(member.id)
     const display = displayNameFor(member.name, member.role)
     if (before === undefined) {
@@ -256,7 +263,7 @@ export function diffActivity(prev: TeamViewLike | undefined, next: TeamViewLike,
       }
     }
   }
-  for (const task of next.tasks) {
+  for (const task of next.tasks ?? []) {
     const before = prevTasks.get(task.id)
     if (before === undefined) {
       if (task.status !== 'deleted') {

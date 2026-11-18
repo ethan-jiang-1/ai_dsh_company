@@ -1,5 +1,7 @@
 // 负例留证 2026-11-13：null 基座只看 task 事件 ⇒ member-only 事件返回 null（BUG-118）；消费 member 即绿。
 // 负例留证 2026-11-13：去掉 members/tasks 的 `?? []` ⇒ partial view 抛 reading map（BUG-145）；兜底即绿。
+// 负例留证 2026-11-18：diffActivity({}, {members:[],tasks:[]}) 不兜底即抛（BUG-229）；补 ?? [] 后绿。
+// 负例留证 2026-11-18：投影 completed 无 revision + 旧 pending 事件即覆盖（BUG-230）；保留投影后绿。
 /** 在场板读模型（R5b，Q5–Q8 定案的 keyless 完成定义——提案验收判据 1/4）。 */
 // 负例留证 2026-11-13：把 teamWithEventTasks 改成直接返回 view ⇒「事件流补任务板」用例红（BUG-103）；还原即绿。
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
@@ -193,6 +195,29 @@ describe('缺失 / 未知不崩（验收判据 1 的后半句）', () => {
   })
 })
 
+describe('teamWithEventTasks（事件补投影）', () => {
+  it('投影缺 revision 时旧事件不覆盖 completed（BUG-230）', () => {
+    const base = {
+      members: [{ id: 'm1', name: 'vp-eng', role: 'teammate', phase: 'active' }],
+      tasks: [{ id: 't1', subject: 'done task', status: 'completed' }],
+    } as TeamViewLike
+    const merged = teamWithEventTasks(base, [taskEvent('t1', 1, 'done task', 'pending', undefined, 1)])
+    expect(merged?.tasks?.[0]?.status).toBe('completed')
+    const pendingBase = {
+      members: [{ id: 'm1', name: 'vp-eng', role: 'teammate', phase: 'active' }],
+      tasks: [{ id: 't2', subject: 'open task', status: 'pending' }],
+    } as TeamViewLike
+    const advanced = teamWithEventTasks(pendingBase, [taskEvent('t2', 1, 'open task', 'completed', undefined, 2)])
+    expect(advanced?.tasks?.[0]?.status).toBe('completed')
+    const deletedBase = {
+      members: [{ id: 'm1', name: 'vp-eng', role: 'teammate', phase: 'active' }],
+      tasks: [{ id: 't3', subject: 'gone task', status: 'deleted' }],
+    } as TeamViewLike
+    const stillDeleted = teamWithEventTasks(deletedBase, [taskEvent('t3', 1, 'gone task', 'completed', undefined, 3)])
+    expect(stillDeleted?.tasks?.[0]?.status).toBe('deleted')
+  })
+})
+
 describe('diffActivity（live 动态流 = 快照差分）', () => {
   // 0.1.7：成员只有持久生命周期 phase（live 忙闲来自 Session 状态，不在这条读模型里）。
   const member = (id: string, name: string, role: 'lead' | 'teammate', phase: string) => ({ id, name, role, phase })
@@ -201,6 +226,10 @@ describe('diffActivity（live 动态流 = 快照差分）', () => {
 
   it('首次同步不产动态（板即状态）', () => {
     expect(diffActivity(undefined, { members: [member('l', 'lead', 'lead', 'active')], tasks: [] }, 1)).toEqual([])
+  })
+  it('部分视图（空对象 / 缺 tasks）不抛，按空板降级（BUG-229）', () => {
+    expect(diffActivity({} as TeamViewLike, { members: [], tasks: [] }, 0)).toEqual([])
+    expect(diffActivity({ members: [], tasks: [] } as TeamViewLike, {} as TeamViewLike, 0)).toEqual([])
   })
 
   it('成员出现 → 上线；phase 迁移 → 转启动中 / 转待命 / 故障', () => {

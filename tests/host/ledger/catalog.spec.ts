@@ -1,4 +1,6 @@
 // 负例留证 2026-11-13：presented 写回 temp+rename 不捕获目录 ⇒ setPresentedAudit 抛 EISDIR（BUG-138）；safe 写 + 捕获即绿。
+// 负例留证 2026-11-18：deliverables 子目录 symlink 被静默跳过、warnings 为空（BUG-231）；加 symlink warning 后绿。
+// 负例留证 2026-11-18：`slug:` 空值被当已声明（entry.slug=''）（BUG-232）；回退目录名 + warning 后绿。
 /**
  * 成品目录 host 生成器（2026-10-25；2026-11-01 v3 路径）的 keyless 判据。
  *
@@ -159,6 +161,29 @@ describe('host catalog', () => {
     const catalog = regenerateCatalog(root).catalog
     expect(catalog?.entries[0]?.ledgered).toBe(true)
     expect(catalog?.counts.unledgered).toBe(0)
+  })
+
+  it('deliverables 子目录 symlink → warning 且不纳入（BUG-231）', () => {
+    const root = workspace()
+    const base = join(root, RUN_BUNDLE_PATHS.deliverables)
+    mkdirSync(join(base, '2026-10-25-real'), { recursive: true })
+    writeFileSync(join(base, '2026-10-25-real', 'meta.md'), 'slug: real\n')
+    writeFileSync(join(base, '2026-10-25-real', 'final.md'), '# final\n')
+    symlinkSync(join(base, '2026-10-25-real'), join(base, '2026-10-25-linked'))
+    const result = regenerateCatalog(root)
+    expect(result.catalog?.entries.map(entry => entry.dir)).toEqual(['2026-10-25-real'])
+    expect(result.warnings.some(warning => warning.includes('2026-10-25-linked') && warning.includes('symlink'))).toBe(true)
+  })
+
+  it('meta.md 的空 slug 回退目录名并 warning（BUG-232）', () => {
+    const root = workspace()
+    const dir = join(root, RUN_BUNDLE_PATHS.deliverables, '2026-10-25-empty')
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, 'meta.md'), 'slug:\n')
+    writeFileSync(join(dir, 'final.md'), '# final\n')
+    const result = regenerateCatalog(root)
+    expect(result.catalog?.entries[0]?.slug).toBe('empty')
+    expect(result.warnings.some(warning => warning.includes('slug 为空'))).toBe(true)
   })
 
   it('两个 workspace 的扫描不互相串', () => {

@@ -91,6 +91,12 @@ export interface CatalogScanEntry {
   readonly presented?: boolean | null
 }
 
+/** 成品 slug：`slug:` 缺失或空/空白 → 目录名（BUG-232 的单一判据）。 */
+export function deliverableSlug(fields: ReadonlyMap<string, string>, dir: string): string {
+  const raw = (fields.get('slug') ?? '').trim()
+  return raw === '' ? slugFromDirName(dir) : raw
+}
+
 /** meta 形状检查（与仓库 `deliverables-check` 的核心词表一致；缺行/枚举外/日期格式）。 */
 export function metaProblemsOf(fields: ReadonlyMap<string, string>): string[] {
   const problems: string[] = []
@@ -115,7 +121,7 @@ export function buildDeliverablesCatalog(input: {
   const rows: CatalogEntry[] = []
   for (const entry of input.entries) {
     if (!entry.final) continue
-    const slug = entry.fields.get('slug') ?? slugFromDirName(entry.dir)
+    const slug = deliverableSlug(entry.fields, entry.dir)
     const metaProblems = metaProblemsOf(entry.fields)
     rows.push({
       slug,

@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-227：release:shape 只判 tarball，不比对源码/HEAD；旧 _dist 仍 PASS
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
 >
 > **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-5 / G2）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
 
 ## 症状
 
@@ -47,8 +47,8 @@ pnpm release:shape
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `release:shape` 增加「tarball 的 manifest gitSha/sourceFingerprint == 当前源码」判据；不等即红并提示 `pnpm release --prepare`（或加 `--allow-stale` 明确降级）。
-2. 最小负例：旧 `_dist` + 新 HEAD → 红；`--prepare` 后 → 绿。
-3. 正例：发布流水线内 `release --prepare` 生成的 `_dist` → 绿。
+1. `pnpm release:shape` 读 `_dist/release-manifest.json` 的 `sourceFingerprint`，与当前源码指纹不等即红并提示 `pnpm release --prepare`；`--allow-stale` 是显式降级。
+2. `gitSha` 落后但源码指纹相同（docs-only 提交）只打印 note，不误红。
+3. 最小负例：旧 `_dist` + 新源码 → 红；prepare 后 → 绿。

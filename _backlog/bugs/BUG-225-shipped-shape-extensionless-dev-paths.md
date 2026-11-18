@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-225：DEV_PATH 只认带扩展名的文件路径，目录级 dev 引用（tests/host/cultivation/）不判
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
 >
 > **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-3 / G1）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
 
 ## 症状
 
@@ -49,8 +49,8 @@ EOF
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 扩展 dev 路径判据到「目录级」：`(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_./-]+\/?`，并维护少量白名单（tools/pre-execute、tools/skills 这类通用词）。
-2. 最小负例：`cordis` 写 `tests/host/cultivation/` → 红；写 tests/host/cultivation/x.ts → 红；tools/pre-execute → 绿。
-3. 正例：`presets` 的 tools/skills 通用词不误红（或加白名单）。
+1. `DEV_DIR` 识别无扩展名/目录级 dev 引用（`tests/host/cultivation/`、tools/observe）；tools/pre-execute/tools/skills/tools/source/tests/simulation 是显式白名单。
+2. 最小负例：cordis 写 `tests/host/cultivation/` → 红；写 tools/pre-execute/tests/simulation/samples → 绿。
+3. 正例：带扩展名的 tests/x.spec.ts 仍由 `DEV_PATH` 判。

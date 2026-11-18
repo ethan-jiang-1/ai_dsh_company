@@ -427,7 +427,14 @@ export const SURFACE_RULES = [
     why: '探针入口图由 tests/repo/structure/entry-import-graph.spec.ts 在 coverage:ratchet 下逐条解析本地 import（可解析 ≠ 运行时跑通）；verify 管头注/结构；真探针按头注手动跑',
   },
   {
-    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', 'packages/company-pack/README.shipped.md', '.agents/**', 'run/**', 'snapshots/**'],
+    // 2026-11-18 BUG-228：源码侧 shipped 面由 shipped-shape spec 在 coverage:ratchet 下真跑；
+    // verify 不读 tarball。真实 tarball 的新鲜度/形状仍由 release:shape 判。
+    globs: ['packages/company-pack/README.shipped.md'],
+    coveredBy: ['coverage:ratchet'],
+    why: '源码侧 shipped shape（README.shipped 链接/pnpm、presets/cordis/content dev 限定、patch 目标）由 tests/repo/release/shipped-shape.spec.ts 在 coverage:ratchet 下检查；真实 tarball 由 release:shape 判',
+  },
+  {
+    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', '.agents/**', 'run/**', 'snapshots/**'],
     coveredBy: ['verify'],
     why: '文档/指针/技能/运行配置/快照 = 结构门禁 verify 的射程',
   },

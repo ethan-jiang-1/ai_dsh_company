@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-228：真实 tarball 的 shipped-shape 检查不在 verify / pre-push；源码泄漏只到 release 才红
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
 >
 > **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-6 / G2）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
 
 ## 症状
 
@@ -45,8 +45,8 @@ grep -n 'release:shape\|shipped-shape' .githooks/pre-push package.json
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 在 `verify`/pre-push 加一个**不依赖 `_dist`** 的源码侧 shape 检查（README.shipped 链接/pnpm 文案、presets/cordis dev 限定、`dsh.bundle.patch` 目标在 `packages/company-pack` 内存在），真实 tarball 检查仍留 release。
-2. 或者把 `release:shape` 放进 CI 的发布 job / weekly（有 `_dist` 的通道），并让 `coveredBy` 指向真实执行它的步骤。
-3. 最小负例：README.shipped 加一条未限定 dev 路径 → verify/pre-push 红；正向仍绿。
+1. 新增 `checkSourceShape`（不依赖 `_dist`）：README.shipped 链接/pnpm 文案、cordis/presets/content dev 限定、`dsh.bundle.patch` 目标在源码树存在。
+2. 该检查进 `tests/repo/release/shipped-shape.spec.ts`，随 `coverage:ratchet`/pre-push 真跑；`README.shipped` 的 coveredBy 从 `verify` 改成 `coverage:ratchet`。
+3. 最小负例：README.shipped 加未限定 dev 路径或 patch 缺目标 → spec 红；改回 → 绿。

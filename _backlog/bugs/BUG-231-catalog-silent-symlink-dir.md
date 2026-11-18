@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-231：catalog 静默跳过 deliverables 子目录 symlink，entries 少一条且 warnings 为空
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
 >
 > **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-9 / G4）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
 
 ## 症状
 
@@ -62,8 +62,8 @@ pnpm exec tsx runtime/tmp/c14-catalog.test.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `scanEntries` 对 `item.isSymbolicLink()` 产生 warning（`<path> 是 symlink，不跟随`），并按「无 final」处理；不要静默 skip。
-2. 最小负例：symlink 子目录 → warnings 至少一条，点名路径；entries 不含不跟随项。
-3. 正例：真实目录 + 真实 final 仍进 catalog。
+1. `scanEntries` 对 `item.isSymbolicLink()` 产生 warning（点名路径），不纳入 entries。
+2. 最小负例：deliverables 子目录 symlink → warnings 至少一条含 `symlink`；真实目录 + final 仍进 catalog。
+3. 正例：根/final/meta 的既有 symlink warning 不变。

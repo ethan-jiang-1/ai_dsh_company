@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-223：shipped-shape 不验证 files 的 glob（content/**、presets/**），缺 content/presets 的包仍 PASS
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
 >
 > **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-1 / G1）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
 
 ## 症状
 
@@ -58,8 +58,8 @@ EOF
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 对每个非空 glob（`content/**`、`presets/**`、`locale/*.json`）至少要求命中 1 个 entry；`content`/`presets` 还应要求关键文件（`content/AGENTS.md`、每个 `dsh.bundle.patch` 目标）存在。
-2. 最小负例：从 entries 删掉 `content/**`/`presets/**` 的全部条目 → checker 红；接回 → 绿。
-3. 正例：干净 tarball 仍 PASS；`release:shape` 对 137-entry 包 PASS。
+1. `checkShippedPackage` 对每个 `files` glob 求至少 1 个 entry 命中；`content/AGENTS.md` 必须在；`content/**`/`presets/**` 空集即红。
+2. 最小负例：删掉 content/presets 全部 entries → checker 红；接回 → 绿。
+3. 正例：137-entry 真实 tarball 仍 PASS。

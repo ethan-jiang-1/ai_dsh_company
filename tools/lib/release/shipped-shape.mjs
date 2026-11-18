@@ -20,6 +20,7 @@ import { copyFileSync, existsSync, readFileSync, readdirSync, rmSync, statSync, 
 import { dirname, join, posix } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
+import { packageSourceFiles } from '../core/pack-source.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = join(here, '..', '..', '..')
@@ -28,7 +29,29 @@ const root = join(here, '..', '..', '..')
 const DEV_PATH = /(?<![A-Za-z0-9_./-])(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+/g
 const REL_DEV_PATH = /\.\.\/(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+/g
 const QUALIFIER = /不随包|仓库内|dev-only|发布面自包含/
-const TEXT_FACE = /^package\/(?:README\.md|cordis\.patch\.yml|presets\/.*|lib\/.*\.(?:js|mjs|d\.ts))$/
+const TEXT_FACE = /^package\/(?:README\.md|cordis\.patch\.yml|presets\/.*|content\/.*\.(?:md|ya?ml|json)|lib\/.*\.(?:js|mjs|d\.ts))$/
+const DEV_DIR = /(?<![A-Za-z0-9_./-])((?:\.\.\/)*(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_.-]+(?:\/[A-Za-z0-9_.-]+)*\/?)/g
+const DEV_DIR_ALLOW = [
+  /^tests\/simulation(?:\/|$)/,
+  /^tools\/skills(?:\/|$)/,
+  /^tools\/source(?:\/|$)/,
+  /^tools\/pre-execute$/,
+]
+/** 发布包必须有的运行时关键件（glob 只证非空不够，BUG-223）。 */
+const REQUIRED_SHIPPED = [
+  'content/AGENTS.md',
+  'content/manifest.json',
+  'content/charters/ceo.md',
+  'content/charters/cfo.md',
+  'content/charters/cmo.md',
+  'content/charters/coo.md',
+  'content/charters/vp-eng.md',
+  'content/charters/vp-sales.md',
+  'content/company/policy-lines.md',
+  'content/company/review-protocol.md',
+  'locale/en.json',
+  'locale/zh.json',
+]
 /** 运行时字节里出现的 dev 路径（字符串/模板内的 CSS 注释也可能有）→ 中性占位。 */
 const SCRUB = /(?<![A-Za-z0-9_./-])(?:\.\.\/)*(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+/g
 
@@ -101,6 +124,36 @@ function entryOfExport(value) {
   return `package/${String(value).replace(/^\.\//, '')}`
 }
 
+
+/** 简单 glob → 正则（`**` 跨段、`*` 段内、`?` 单字符）。 */
+function globToRegExp(glob) {
+  let out = ''
+  for (let i = 0; i < glob.length; i += 1) {
+    const char = glob[i]
+    if (char === '*') {
+      if (glob[i + 1] === '*') {
+        if (glob[i + 2] === '/') { out += '(?:.*/)?'; i += 2 } else { out += '.*'; i += 1 }
+        continue
+      }
+      out += '[^/]*'
+      continue
+    }
+    if (char === '?') { out += '[^/]'; continue }
+    out += /[.+^${}()|[\]\\]/.test(char) ? `\\${char}` : char
+  }
+  return new RegExp(`^${out}$`)
+}
+
+/** 一行里的 dev 路径（文件级优先，其次目录级；目录级白名单见 DEV_DIR_ALLOW）。 */
+export function devPathInLine(line) {
+  const fileHit = line.match(DEV_PATH)?.[0]
+  if (fileHit !== undefined) return fileHit
+  const dirHit = line.match(DEV_DIR)?.[0]
+  if (dirHit === undefined) return undefined
+  const normalized = dirHit.replace(/^(?:\.\.\/)+/, '').replace(/\/$/, '')
+  return DEV_DIR_ALLOW.some(pattern => pattern.test(normalized)) ? undefined : normalized
+}
+
 /**
  * 对解包后的 package（或 tarball 抽象）判 shipped 形状。
  * @param {{pkg:Record<string,any>,entries:string[],read:(entry:string)=>string,platformModules?:string[]}} input
@@ -148,8 +201,20 @@ export function checkShippedPackage({ pkg, entries, read, platformModules: platf
   if (JSON.stringify(pkg).includes('workspace:')) problems.push('manifest: 仍含 workspace: 协议')
   if (files.some(item => item.includes('lib/types/**'))) problems.push('manifest: files 仍整树收 lib/types/**')
   for (const value of files) {
-    if (value.includes('*')) continue
+    if (value.includes('*')) {
+      const pattern = globToRegExp(`package/${value}`)
+      if (!entries.some(entry => pattern.test(entry))) problems.push(`manifest: files glob ${value} 未命中任何 entry`)
+      continue
+    }
     if (!entrySet.has(`package/${value.replace(/^\.\//, '')}`)) problems.push(`manifest: files 条目 ${value} 不在 tarball`)
+  }
+  for (const rel of REQUIRED_SHIPPED) {
+    if (!entrySet.has(`package/${rel}`)) problems.push(`manifest: 缺关键运行时件 ${rel}`)
+  }
+  const patches = Array.isArray(pkg.dsh?.bundle?.patch) ? pkg.dsh.bundle.patch : []
+  for (const rel of patches) {
+    const entry = `package/${String(rel).replace(/^\.\//, '')}`
+    if (!entrySet.has(entry)) problems.push(`manifest: dsh.bundle.patch 目标 ${String(rel)} 不在 tarball`)
   }
 
   // 4. client require × inject / platform
@@ -191,12 +256,64 @@ export function checkShippedPackage({ pkg, entries, read, platformModules: platf
     const lines = read(entry).split('\n')
     lines.forEach((line, index) => {
       if (QUALIFIER.test(line)) return
-      const hit = line.match(DEV_PATH)?.[0] ?? line.match(REL_DEV_PATH)?.[0]
-      if (hit === 'tools/pre-execute') return // DSH task hook name, not a repo path
+      const hit = devPathInLine(line) ?? line.match(REL_DEV_PATH)?.[0]
       if (hit !== undefined) problems.push(`${entry}:${String(index + 1)} → dev 路径 ${hit} 未带「不随包」限定`)
     })
   }
   return problems
+}
+
+/**
+ * 源码侧 shipped 面（不依赖 _dist）：README.shipped 链接/pnpm、cordis/presets/content dev 限定、patch 目标。
+ * @param {{packDir:string, readFile?:(rel:string)=>string, exists?:(rel:string)=>boolean}} options
+ */
+export function checkSourceShape({ packDir, readFile = rel => readFileSync(join(packDir, rel), 'utf8'), exists = rel => existsSync(join(packDir, rel)) }) {
+  const problems = []
+  const readme = readFile('README.shipped.md')
+  for (const match of readme.matchAll(/\]\(([^)\s]+)\)/g)) {
+    const link = match[1]
+    if (/^(?:https?:|#|mailto:)/.test(link)) continue
+    const target = posix.normalize(link.split('#')[0])
+    if (target.startsWith('..') || !exists(target)) problems.push(`source README.shipped: 相对链接出包或不存在：${link}`)
+  }
+  if (readme.includes('pnpm')) {
+    if (!readme.includes('dsh plugin add')) problems.push('source README.shipped: 提 pnpm 但没给 DSH 插件安装入口（dsh plugin add）')
+    if (!readme.includes('dsh: pnpm was not found')) problems.push('source README.shipped: 提 pnpm 但没给 DSH 的缺包管理器诊断')
+  }
+  const manifest = JSON.parse(readFile('package.json'))
+  for (const rel of REQUIRED_SHIPPED) {
+    if (!exists(rel)) problems.push(`source manifest: 缺关键运行时件 ${rel}`)
+  }
+  const patches = Array.isArray(manifest.dsh?.bundle?.patch) ? manifest.dsh.bundle.patch : []
+  for (const rel of patches) {
+    if (!exists(String(rel).replace(/^\.\//, ''))) problems.push(`source manifest: dsh.bundle.patch 目标 ${String(rel)} 不在源码树`)
+  }
+  const sourceFiles = packageSourceFiles(packDir)
+  for (const value of Array.isArray(manifest.files) ? manifest.files : []) {
+    if (!value.includes('*') || value.startsWith('lib/')) continue
+    const pattern = globToRegExp(value)
+    if (!sourceFiles.some(file => pattern.test(file))) problems.push(`source manifest: files glob ${value} 未命中源码文件`)
+  }
+  const textFiles = ['README.shipped.md', 'cordis.patch.yml', ...sourceFiles.filter(file => /^(?:presets|content)\/.*\.(?:md|ya?ml|json|mjs)$/.test(file))]
+  for (const rel of [...new Set(textFiles)]) {
+    let text
+    try { text = readFile(rel) } catch { continue }
+    text.split('\n').forEach((line, index) => {
+      if (QUALIFIER.test(line)) return
+      const hit = devPathInLine(line) ?? line.match(REL_DEV_PATH)?.[0]
+      if (hit !== undefined) problems.push(`${rel}:${String(index + 1)} → dev 路径 ${hit} 未带「不随包」限定`)
+    })
+  }
+  return problems
+}
+
+/** 发布新鲜度：manifest 的 sourceFingerprint 必须等于当前源码指纹；gitSha 落后仅提示（docs-only）。 */
+export function freshnessProblem({ manifest, currentFingerprint } = {}) {
+  if (manifest === undefined) return '缺 release-manifest.json；先 pnpm release --prepare'
+  if (manifest.sourceFingerprint !== currentFingerprint) {
+    return `_dist 的 sourceFingerprint ${String(manifest.sourceFingerprint).slice(0, 12)}… ≠ 当前源码 ${String(currentFingerprint).slice(0, 12)}…——先 pnpm release --prepare（或 --allow-stale 显式降级）`
+  }
+  return undefined
 }
 
 /** 把解包后的 package 清洗成可发布形态（原地改）。 */

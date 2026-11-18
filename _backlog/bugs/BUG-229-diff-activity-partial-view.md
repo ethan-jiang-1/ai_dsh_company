@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-229：diffActivity 对缺 members/tasks 的部分 TeamView 直接抛异常
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
 >
 > **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-7 / G3）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
 
 ## 症状
 
@@ -58,8 +58,8 @@ pnpm exec tsx runtime/tmp/c14-diff.test.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `diffActivity` 对 `prev`/`next` 的 members/tasks 统一 `?? []`；最小输入 `{}` / 缺字段不抛。
-2. 最小负例：`diffActivity({}, {members:[],tasks:[]},0)` 返回 `[]`；缺 tasks 也返回 `[]` 或合理动态。
-3. 正例：现有完整视图的差分用例不变。
+1. `diffActivity` 对 `prev/next` 的 members/tasks 统一 `?? []`；`{}`/缺 tasks 的最小输入不抛。
+2. 最小负例：`diffActivity({}, {members:[],tasks:[]},0)` 返回 `[]`；缺 tasks 也返回合理动态。
+3. 正例：现有完整视图差分用例不变。

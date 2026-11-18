@@ -76,6 +76,25 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 `pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2218 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
 共享机制决定 = [shipped package boundary Note](../../notes/implemented/2026-11-17-shipped-package-boundary.md)。
 
+## 2026-11-18 修复交接（C14 守卫面 + 低置信运行态：BUG-223..232）
+
+**用户指令（2026-11-18）**：「再来一波 _backlog/bugs 里面有最近 exploratory test 发现的 bugs，你琢磨一下，看看是否能系统性修起来。计划有了后 setup goal 逐步按 REPO 的流程来推进。」——本句即本轮授权（材料性：发布门禁/source shape、presence/catalog 运行态、docs 合同；留痕 = 批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`）。BUG-212 不并入本批。
+
+十张不是十个症状，是**上一轮修复造出的新判据面** + **四个低置信运行态**：
+A 组是 `shipped-shape` 只拒 C13 见过的形状（glob/content/无扩展名目录/patch 目标）；B 组是真实 tarball 检查只在 release 且不比对源码；C/D 是 presence/catalog 对「缺字段、缺 revision、坏形状」的静默。
+
+| 组 | 卡 | 共同根因 | 修法（唯一事实源） |
+|---|---|---|---|
+| **A checker 闭包** | [223](BUG-223-shipped-shape-globs-unchecked.md) / [224](BUG-224-shipped-shape-text-face-misses-content.md) / [225](BUG-225-shipped-shape-extensionless-dev-paths.md) / [226](BUG-226-shipped-shape-bundle-patch-unchecked.md) | `files` glob/TEXT_FACE/DEV_PATH/patch 目标只覆盖上次样本 | checker 对每个 glob 求至少 1 命中；content/presets 关键件在；`dsh.bundle.patch` 目标逐个在 entries；TEXT_FACE 加 content；无扩展名目录 dev 路径按「仓库根前缀 + 路径形状」判，tools/pre-execute/tools/skills/tests/simulation 白名单 |
+| **B 新鲜度/接线** | [227](BUG-227-release-shape-stale-dist.md) / [228](BUG-228-shipped-shape-not-in-verify.md) | `release:shape` 不读源码指纹；真实 tarball 检查只在 release | `release:shape` 比对 `sourceFingerprint`（不等即红，`--allow-stale` 显式降级）；新增 `checkSourceShape` spec，进 `pnpm test`/coverage:ratchet，覆盖 README.shipped/presets/cordis/content/patch 目标；`README.shipped` 的 coveredBy 指向真执行它的步骤 |
+| **C presence 读模型** | [229](BUG-229-diff-activity-partial-view.md) / [230](BUG-230-team-event-overrides-missing-revision.md) | 类型必填当运行必填；缺 revision 无判据 | `diffActivity` 对 members/tasks `?? []`；`teamWithEventTasks` 在投影 revision 缺失时保留投影（不让旧事件覆盖 completed）；补最小输入负例 |
+| **D catalog 派生** | [231](BUG-231-catalog-silent-symlink-dir.md) / [232](BUG-232-catalog-empty-slug.md) | 坏形状静默 | 子目录 symlink → warning + 不纳入；`slug` 空/空白 → 回退目录名 + warning；补临时 home 负例 |
+
+**次序 = A(红) → A 实现 → B → C/D → 重建 `_dist` → 真入口**：
+先让 checker 对 C14 的合成包/旧 tarball 红，再补闭包；B 用同一 checker 的 source 面 + fingerprint；C/D 是独立纯函数/盘面修复。证据口径 = 先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；每卡红/绿写同一条可执行命令（A/B = `pnpm test tests/repo/release/shipped-shape.spec.ts` 与 `pnpm release:shape`；C = `pnpm test tests/lib/presence/presence-board.spec.ts`；D = `pnpm test tests/host/ledger/catalog.spec.ts`）。
+
+**终点** = C14 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃，不动。
+
 ## 2026-11-18 C14 修复后的守卫面 + 低置信运行态
 
 **用户指令（2026-11-18）**：「你找那 bug 都修好了，咱们再来一轮，至少抓到 10 个再停下来，尤其找那些你心里比较发虚的领域」——本组 10 张全部 `调查中`，只开卡不修；证据 = [C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)。

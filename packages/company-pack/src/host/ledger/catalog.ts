@@ -8,11 +8,11 @@ import { existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   buildDeliverablesCatalog,
+  deliverableSlug,
   CATALOG_ROOTS,
   ledgerSlugsFromText,
   normalizeRel,
   parseMeta,
-  slugFromDirName,
   type CatalogRoot,
   type CatalogScanEntry,
   type DeliverablesCatalog,
@@ -57,6 +57,11 @@ function scanEntries(companyHome: string, ledger: PresentedLedger): { entries: C
       continue
     }
     for (const item of children) {
+      // BUG-231：Dirent.isDirectory() 不跟随 symlink；坏形状必须 warning，不静默 skip。
+      if (item.isSymbolicLink()) {
+        warnings.push(`${join(dir, item.name)} 是 symlink，不跟随`)
+        continue
+      }
       if (!item.isDirectory()) continue
       const finalPath = join(dir, item.name, 'final.md')
       const finalProblem = plainFileProblem(companyHome, finalPath)
@@ -68,7 +73,10 @@ function scanEntries(companyHome: string, ledger: PresentedLedger): { entries: C
       if (metaProblem !== null && metaProblem !== 'missing') warnings.push(`${metaPath} ${labelOfProblem(metaProblem)}，按无 meta 处理`)
       const body = metaIsFile ? readFileSync(metaPath, 'utf8') : ''
       const fields = parseMeta(body).fields
-      const slug = fields.get('slug') ?? slugFromDirName(item.name)
+      // BUG-232：`slug:` 空值在 parseMeta 里是 ''，`??` 不会回退；空/空白视为未声明。
+      const slug = deliverableSlug(fields, item.name)
+      const rawSlug = (fields.get('slug') ?? '').trim()
+      if (rawSlug === '' && fields.has('slug')) warnings.push(`${metaPath} 的 slug 为空，按目录名 ${slug}`)
       const path = normalizeRel(`${root}/${item.name}/final.md`)
       entries.push({
         root: root as CatalogRoot,

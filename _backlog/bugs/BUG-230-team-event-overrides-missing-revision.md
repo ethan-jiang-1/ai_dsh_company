@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-230：teamWithEventTasks 在投影任务缺 revision 时让旧事件覆盖 completed → pending
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
 >
 > **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-8 / G3）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
 
 ## 症状
 
@@ -55,8 +55,8 @@ pnpm exec tsx runtime/tmp/c14-team.test.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 投影缺 revision 时不要静默让事件覆盖：可保留投影状态并告警/标 `revisionGap`，或只允许「事件比投影新」的显式证据（时间/来源）；不能把 completed 改成 pending。
-2. 最小负例：上面样本的 merged 仍为 `completed`（或明确 `revisionGap`），不能是 pending。
+1. `teamWithEventTasks` 在投影任务缺 `revision` 时保留投影，不让事件覆盖 status（尤其 completed→pending）。
+2. 最小负例：base `completed` 无 revision + revision 1 的 pending 事件 → merged 仍 `completed`。
 3. 正例：两边都有 revision 的 BUG-104 样本行为不变。

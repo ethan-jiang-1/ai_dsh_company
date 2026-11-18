@@ -9,7 +9,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 export const PACKAGE_SOURCE_DIRS = ['presets', 'content', 'locale', 'src']
-export const PACKAGE_SOURCE_FILES = ['package.json', 'cordis.patch.yml', 'README.md', 'LICENSE', 'icon.svg',
+export const PACKAGE_SOURCE_FILES = ['package.json', 'cordis.patch.yml', 'README.md', 'README.shipped.md', 'LICENSE', 'icon.svg',
   'tsconfig.json', 'tsconfig.host.json', 'tsconfig.client.json', 'tsdown.config.ts']
 
 /** 随包分发的源文件相对路径（排序、去重）。 */

@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-224：shipped-shape 的文本面不含 content/**，content 里的 dev 路径不判
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
 >
 > **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-2 / G1）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
 
 ## 症状
 
@@ -49,8 +49,8 @@ EOF
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `TEXT_FACE` 加 `content/.*`（至少 `content/**/*.md`/`.yml`/`.json`）；同一套 `DEV_PATH`/`QUALIFIER` 判。
+1. `TEXT_FACE` 纳入 `content/**` 的 `.md/.yml/.yaml/.json`；content 里的 dev 路径按同一 `DEV_PATH/DEV_DIR` +「不随包」判。
 2. 最小负例：`content/AGENTS.md` 写未限定的 tests/x.spec.ts → 红；加「不随包」→ 绿。
-3. 正例：当前 content 的 tests/simulation/samples（无扩展名、方法词）不误红；`cordis`/presets 仍绿。
+3. 正例：content 的 tests/simulation/samples 通用方法词不误红。

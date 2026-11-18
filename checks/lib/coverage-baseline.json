@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17",
+  "generatedAt": "2026-11-18",
   "files": {
     "checks/lib/authorship.mjs": {
       "statements": 100,
@@ -366,8 +366,8 @@
       "branches": 75.86
     },
     "packages/company-pack/src/host/ledger/catalog.ts": {
-      "statements": 88.73,
-      "branches": 88.63
+      "statements": 89.61,
+      "branches": 90
     },
     "packages/company-pack/src/host/ledger/governance-export.ts": {
       "statements": 91.54,
@@ -526,8 +526,8 @@
       "branches": 100
     },
     "packages/company-pack/src/lib/deliverables/deliverables-catalog.ts": {
-      "statements": 98.61,
-      "branches": 87.87
+      "statements": 98.64,
+      "branches": 88.23
     },
     "packages/company-pack/src/lib/docs/markdown-shape.ts": {
       "statements": 100,
@@ -566,8 +566,8 @@
       "branches": 88.23
     },
     "packages/company-pack/src/lib/presence/presence.ts": {
-      "statements": 94.16,
-      "branches": 80.31
+      "statements": 94.36,
+      "branches": 82.87
     },
     "packages/company-pack/src/lib/presence/tool-card.ts": {
       "statements": 100,
@@ -762,8 +762,8 @@
       "branches": 83.78
     },
     "tools/lib/release/shipped-shape.mjs": {
-      "statements": 91.97,
-      "branches": 80.74
+      "statements": 97.84,
+      "branches": 88.77
     },
     "tools/lib/repo/asset-consumers.mjs": {
       "statements": 97.87,

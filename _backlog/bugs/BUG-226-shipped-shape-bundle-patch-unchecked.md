@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-226：shipped-shape 不验证 dsh.bundle.patch 的目标，缺 preset 的包仍 PASS
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复就绪｜修复：2026-11-18（进行中）｜审查：—
 >
 > **关联**：[C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)（C14-4 / G1）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`（本批共用）。
 
 ## 症状
 
@@ -42,8 +42,8 @@ EOF
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 对 `pkg.dsh.bundle.patch` 的每一项求 `package/<rel>`，断言在 entrySet；`dsh.client.inject` 的每个 package row 至少有一条 peer 或 platform 背书（已有部分）。
-2. 最小负例：patch 指向不存在的 preset → 红；接回 → 绿。
-3. 正例：12 个真实 preset 全在 tarball → 绿；不要求 `preset.entry` 在 checker 里跑。
+1. `checkShippedPackage` 逐个断言 `pkg.dsh.bundle.patch` 的目标在 tarball；缺一个即红。
+2. 最小负例：patch 指向不存在的 preset → 红；12 个真实目标全在 → 绿。
+3. 正例：不要求 `preset.entry` 在 checker 里跑。
