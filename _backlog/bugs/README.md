@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 21 张**：BUG-212（收尾验证链偏长）保持活跃，不并入本批；C16 20 张（BUG-243..262）已由 2026-11-18 用户指令授权，`调查中 → 修复就绪`，批次计划见下方「## 2026-11-18 修复交接（C16 管线指纹 + 关键件闭包 + 低置信运行态：BUG-243..262）」。C13/C14/C15 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**活跃 1 张**：BUG-212（收尾验证链偏长）保持活跃，不并入本批；C16 20 张（BUG-243..262）已于 2026-11-18 修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，批次与收口见下方「## 2026-11-18 修复交接（C16 管线指纹 + 关键件闭包 + 低置信运行态：BUG-243..262）」。C13/C14/C15 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 **独立卡**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
 
@@ -98,18 +98,23 @@ A 管线指纹（243）；B 关键件/JSON/YAML（244-250）；C dev 命令（25
 
 **终点** = 20 张全部迁 fixed_bugs、每卡盲审 + 证据；`verify`/`test`/`typecheck`/`coverage` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃。
 
+**收口（2026-11-18）**：20 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `21ff3ee7`。
+`pnpm release --prepare` ALL PASS（137 entries）；`release:shape` PASS（source+pipeline）；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2277 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
+盲审 blocker（v3 pack version 变化被误判 corrupt）已修：同 name 版本变化走 upgrade 保留 id/createdAt；S1–S5 记录/处置。
+共享机制决定 = [pipeline fingerprint + runtime closure Note](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)。
+
 
 ## 2026-11-18 C16 门禁管线指纹 + 运行时发虚面
 
-**用户指令（2026-11-18）**：「至少抓到 20 个再停，尤其找心里发虚的领域」——本组 20 张全部 `调查中`，只开卡不修；证据 = [C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)。
+**用户指令（2026-11-18）**：「至少抓到 20 个再停，尤其找心里发虚的领域」——本组 20 张已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)。
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
-| A 管线/关键件 | [243](BUG-243-pipeline-fingerprint-sanitizer.md) / [244](BUG-244-required-shipped-misses-generic-content.md) / [245](BUG-245-required-shipped-misses-product-docs.md) / [246](BUG-246-required-shipped-misses-delivery-templates.md) / [247](BUG-247-required-shipped-misses-content-templates.md) / [248](BUG-248-required-json-schema-only-parse.md) / [249](BUG-249-seed-json-empty-object-passes.md) / [250](BUG-250-preset-yaml-not-parsed.md) | 发布指纹/关键件只覆盖上一轮想到的形状 | sanitizer 不在指纹；4 类内容族漏关键件；JSON/YAML 只 parse | P2 ×8 |
-| B 运行时指令/降级 | [251](BUG-251-persona-pnpm-methods-init.md) / [252](BUG-252-source-shape-no-dev-command-scan.md) / [253](BUG-253-allow-stale-arbitrary-reason.md) | 文本门禁不判 dev 命令；降级理由无约束 | persona 让 operator 跑 pnpm methods:init；--allow-stale=x 可过 | P2 ×3 |
-| C lease/bundle | [254](BUG-254-lease-unreadable-lock-takeover.md) / [255](BUG-255-bundle-created-at-invalid.md) / [256](BUG-256-bundle-pack-mismatch.md) | fail-open / 只判存在 | 不可读 live lease 被抢占；bad createdAt/pack 仍 ok | P2 ×3 |
-| D presence/catalog | [257](BUG-257-presence-unknown-status-ignored.md) / [258](BUG-258-presence-deleted-no-reopen.md) / [259](BUG-259-catalog-empty-final.md) / [260](BUG-260-catalog-json-symlink.md) | 未知/终态/空文件被折成正常 | 未知 status 丢弃；deleted 不可重开；空 final；symlink 替换 | P2 ×4 |
-| E content manifest | [261](BUG-261-content-manifest-extra-drift.md) / [262](BUG-262-content-manifest-refs-not-checked.md) | 清单与盘面/引用无对账 | 50 vs 84；tiers 缺文件/`..` 不判 | P2 ×2 |
+| A 管线/关键件 | [243](../_archive/fixed_bugs/BUG-243-pipeline-fingerprint-sanitizer.md) / [244](../_archive/fixed_bugs/BUG-244-required-shipped-misses-generic-content.md) / [245](../_archive/fixed_bugs/BUG-245-required-shipped-misses-product-docs.md) / [246](../_archive/fixed_bugs/BUG-246-required-shipped-misses-delivery-templates.md) / [247](../_archive/fixed_bugs/BUG-247-required-shipped-misses-content-templates.md) / [248](../_archive/fixed_bugs/BUG-248-required-json-schema-only-parse.md) / [249](../_archive/fixed_bugs/BUG-249-seed-json-empty-object-passes.md) / [250](../_archive/fixed_bugs/BUG-250-preset-yaml-not-parsed.md) | 发布指纹/关键件只覆盖上一轮想到的形状 | sanitizer 不在指纹；4 类内容族漏关键件；JSON/YAML 只 parse | P2 ×8 |
+| B 运行时指令/降级 | [251](../_archive/fixed_bugs/BUG-251-persona-pnpm-methods-init.md) / [252](../_archive/fixed_bugs/BUG-252-source-shape-no-dev-command-scan.md) / [253](../_archive/fixed_bugs/BUG-253-allow-stale-arbitrary-reason.md) | 文本门禁不判 dev 命令；降级理由无约束 | persona 让 operator 跑 pnpm methods:init；--allow-stale=x 可过 | P2 ×3 |
+| C lease/bundle | [254](../_archive/fixed_bugs/BUG-254-lease-unreadable-lock-takeover.md) / [255](../_archive/fixed_bugs/BUG-255-bundle-created-at-invalid.md) / [256](../_archive/fixed_bugs/BUG-256-bundle-pack-mismatch.md) | fail-open / 只判存在 | 不可读 live lease 被抢占；bad createdAt/pack 仍 ok | P2 ×3 |
+| D presence/catalog | [257](../_archive/fixed_bugs/BUG-257-presence-unknown-status-ignored.md) / [258](../_archive/fixed_bugs/BUG-258-presence-deleted-no-reopen.md) / [259](../_archive/fixed_bugs/BUG-259-catalog-empty-final.md) / [260](../_archive/fixed_bugs/BUG-260-catalog-json-symlink.md) | 未知/终态/空文件被折成正常 | 未知 status 丢弃；deleted 不可重开；空 final；symlink 替换 | P2 ×4 |
+| E content manifest | [261](../_archive/fixed_bugs/BUG-261-content-manifest-extra-drift.md) / [262](../_archive/fixed_bugs/BUG-262-content-manifest-refs-not-checked.md) | 清单与盘面/引用无对账 | 50 vs 84；tiers 缺文件/`..` 不判 | P2 ×2 |
 
 本组是 Round 105–107 的产出；真实 tarball/纯函数/临时 home/CLI 均已实跑，未修任何产品代码。
 

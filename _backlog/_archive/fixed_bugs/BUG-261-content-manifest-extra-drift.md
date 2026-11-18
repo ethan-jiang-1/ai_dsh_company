@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-261：content/manifest.json 与盘面 34 个文件不一致，无对账门禁
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
+> **关联**：[C16 卡](../../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -48,4 +48,4 @@ manifest 是手写声明；checker 只要求它 JSON 可解析，未与盘面对
 - 改动面：`checks/gates/content-manifest.mjs`、`packages/company-pack/content/manifest.json`
 - 红：`pnpm verify`（盘上 34 件不在 manifest 无门禁）
 - 绿：`pnpm verify`（inventory 双向对差红）
-- 提交：commit 82e23163
+- 提交：commit 21ff3ee7

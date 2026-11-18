@@ -109,12 +109,12 @@ C14/C15 把「发布面」拆成 source shape（`shipped-links`/`checkSourceShap
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C16-1 sanitizer 不在 sourceFingerprint | **confirmed** | 改 `tools/lib/release/shipped-shape.mjs` 注释后指纹仍 `f9eaef4dd008`，`release:shape` PASS → [BUG-243](../bugs/BUG-243-pipeline-fingerprint-sanitizer.md) |
-| C16-2 JSON 只 parse | **confirmed** | delivery-rules `{}` / seed `{}` → checker `[]` → [BUG-248](../bugs/BUG-248-required-json-schema-only-parse.md)、[BUG-249](../bugs/BUG-249-seed-json-empty-object-passes.md) |
-| C16-3 REQUIRED 漏运行时读取面 | **confirmed** | 过滤 generic/product document-map/delivery template/content templates → checker `[]` → [BUG-244](../bugs/BUG-244-required-shipped-misses-generic-content.md)、[BUG-245](../bugs/BUG-245-required-shipped-misses-product-docs.md)、[BUG-246](../bugs/BUG-246-required-shipped-misses-delivery-templates.md)、[BUG-247](../bugs/BUG-247-required-shipped-misses-content-templates.md) |
-| C16-4 EXPECTED_PATCH/关键件只判存在/非空 | **confirmed** | 坏 YAML preset → checker `[]` → [BUG-250](../bugs/BUG-250-preset-yaml-not-parsed.md) |
-| C16-5 --allow-stale 任意理由 | **confirmed** | 改 README.shipped + `--allow-stale=x` → WARN/PASS/exit 0；裸 flag exit 1 → [BUG-253](../bugs/BUG-253-allow-stale-arbitrary-reason.md) |
-| 运行时 dev 命令 | **confirmed** | vp-eng persona 的 `pnpm methods:init`；`checkSourceShape` 返回 `[]` → [BUG-251](../bugs/BUG-251-persona-pnpm-methods-init.md)、[BUG-252](../bugs/BUG-252-source-shape-no-dev-command-scan.md) |
+| C16-1 sanitizer 不在 sourceFingerprint | **confirmed** | 改 `tools/lib/release/shipped-shape.mjs` 注释后指纹仍 `f9eaef4dd008`，`release:shape` PASS → [BUG-243](../_archive/fixed_bugs/BUG-243-pipeline-fingerprint-sanitizer.md) |
+| C16-2 JSON 只 parse | **confirmed** | delivery-rules `{}` / seed `{}` → checker `[]` → [BUG-248](../_archive/fixed_bugs/BUG-248-required-json-schema-only-parse.md)、[BUG-249](../_archive/fixed_bugs/BUG-249-seed-json-empty-object-passes.md) |
+| C16-3 REQUIRED 漏运行时读取面 | **confirmed** | 过滤 generic/product document-map/delivery template/content templates → checker `[]` → [BUG-244](../_archive/fixed_bugs/BUG-244-required-shipped-misses-generic-content.md)、[BUG-245](../_archive/fixed_bugs/BUG-245-required-shipped-misses-product-docs.md)、[BUG-246](../_archive/fixed_bugs/BUG-246-required-shipped-misses-delivery-templates.md)、[BUG-247](../_archive/fixed_bugs/BUG-247-required-shipped-misses-content-templates.md) |
+| C16-4 EXPECTED_PATCH/关键件只判存在/非空 | **confirmed** | 坏 YAML preset → checker `[]` → [BUG-250](../_archive/fixed_bugs/BUG-250-preset-yaml-not-parsed.md) |
+| C16-5 --allow-stale 任意理由 | **confirmed** | 改 README.shipped + `--allow-stale=x` → WARN/PASS/exit 0；裸 flag exit 1 → [BUG-253](../_archive/fixed_bugs/BUG-253-allow-stale-arbitrary-reason.md) |
+| 运行时 dev 命令 | **confirmed** | vp-eng persona 的 `pnpm methods:init`；`checkSourceShape` 返回 `[]` → [BUG-251](../_archive/fixed_bugs/BUG-251-persona-pnpm-methods-init.md)、[BUG-252](../_archive/fixed_bugs/BUG-252-source-shape-no-dev-command-scan.md) |
 
 ## Round 106（2026-11-18 · G4–G5 · lease / bundle / presence / catalog）
 
@@ -122,11 +122,11 @@ C14/C15 把「发布面」拆成 source shape（`shipped-links`/`checkSourceShap
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C16-6 不可读 live lease 被抢 | **confirmed** | chmod 000 live lock → `acquireCompanyLease` acquired true（删除锁） → [BUG-254](../bugs/BUG-254-lease-unreadable-lock-takeover.md) |
-| C16-7 bundle createdAt/pack 只判存在 | **confirmed** | v3 `createdAt:'not-a-date'`/`pack:'other'` → status ok → [BUG-255](../bugs/BUG-255-bundle-created-at-invalid.md)、[BUG-256](../bugs/BUG-256-bundle-pack-mismatch.md) |
-| C16-8 未知 task status 被丢弃 | **confirmed** | base pending + event `paused` → merged pending → [BUG-257](../bugs/BUG-257-presence-unknown-status-ignored.md) |
-| C16-9 deleted 投影不可重开 | **confirmed** | base deleted + event pending → merged deleted → [BUG-258](../bugs/BUG-258-presence-deleted-no-reopen.md) |
-| C16-10 catalog 空 final / catalog symlink | **confirmed** | 零字节 final → final:true；catalog.json symlink → 替换无 warning → [BUG-259](../bugs/BUG-259-catalog-empty-final.md)、[BUG-260](../bugs/BUG-260-catalog-json-symlink.md) |
+| C16-6 不可读 live lease 被抢 | **confirmed** | chmod 000 live lock → `acquireCompanyLease` acquired true（删除锁） → [BUG-254](../_archive/fixed_bugs/BUG-254-lease-unreadable-lock-takeover.md) |
+| C16-7 bundle createdAt/pack 只判存在 | **confirmed** | v3 `createdAt:'not-a-date'`/`pack:'other'` → status ok → [BUG-255](../_archive/fixed_bugs/BUG-255-bundle-created-at-invalid.md)、[BUG-256](../_archive/fixed_bugs/BUG-256-bundle-pack-mismatch.md) |
+| C16-8 未知 task status 被丢弃 | **confirmed** | base pending + event `paused` → merged pending → [BUG-257](../_archive/fixed_bugs/BUG-257-presence-unknown-status-ignored.md) |
+| C16-9 deleted 投影不可重开 | **confirmed** | base deleted + event pending → merged deleted → [BUG-258](../_archive/fixed_bugs/BUG-258-presence-deleted-no-reopen.md) |
+| C16-10 catalog 空 final / catalog symlink | **confirmed** | 零字节 final → final:true；catalog.json symlink → 替换无 warning → [BUG-259](../_archive/fixed_bugs/BUG-259-catalog-empty-final.md)、[BUG-260](../_archive/fixed_bugs/BUG-260-catalog-json-symlink.md) |
 
 ## Round 107（2026-11-18 · G6–G7 · content manifest / 门禁面）
 
@@ -134,8 +134,8 @@ C14/C15 把「发布面」拆成 source shape（`shipped-links`/`checkSourceShap
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C16-11 content manifest 与盘面漂移 | **confirmed** | tiers 并集 50 vs 盘上 84；34 extra；无门禁 → [BUG-261](../bugs/BUG-261-content-manifest-extra-drift.md) |
-| C16-12 manifest tiers 引用不校验 | **confirmed** | tiers 加 `generic/missing.md` → checker `[]` → [BUG-262](../bugs/BUG-262-content-manifest-refs-not-checked.md) |
+| C16-11 content manifest 与盘面漂移 | **confirmed** | tiers 并集 50 vs 盘上 84；34 extra；无门禁 → [BUG-261](../_archive/fixed_bugs/BUG-261-content-manifest-extra-drift.md) |
+| C16-12 manifest tiers 引用不校验 | **confirmed** | tiers 加 `generic/missing.md` → checker `[]` → [BUG-262](../_archive/fixed_bugs/BUG-262-content-manifest-refs-not-checked.md) |
 
 ## 判决汇总
 

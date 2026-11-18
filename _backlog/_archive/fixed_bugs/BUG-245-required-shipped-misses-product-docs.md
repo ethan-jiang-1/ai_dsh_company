@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-245：REQUIRED_SHIPPED 漏 product-types 的 document-map/glossary/overview/模板
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
+> **关联**：[C16 卡](../../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -48,4 +48,4 @@ REQUIRED 只收 requirements-model/check-rules 与部分 hardware templates，�
 - 改动面：`packages/company-pack/content/manifest.json`、`tools/lib/release/shipped-shape.mjs`
 - 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（删 product-types document-map 仍 PASS）
 - 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（inventory 缺文件红）
-- 提交：commit 82e23163
+- 提交：commit 21ff3ee7

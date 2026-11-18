@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-251：shipped vp-eng persona 让运行时 operator 跑 `pnpm methods:init`（dev 脚本）
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
+> **关联**：[C16 卡](../../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -48,4 +48,4 @@ pnpm verify
 - 改动面：`packages/company-pack/presets/vp-eng/agent.cordis.yml`
 - 红：`pnpm verify`（persona 写 pnpm methods:init）
 - 绿：`pnpm verify`（改成运行时「安装方法包」；source shape 扫 dev 命令）
-- 提交：commit 82e23163
+- 提交：commit 21ff3ee7

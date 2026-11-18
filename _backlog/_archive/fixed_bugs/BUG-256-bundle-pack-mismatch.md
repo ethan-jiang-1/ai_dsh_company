@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-256：bundle v3 pack.name/version 不校验与实际 pack 一致
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
+> **关联**：[C16 卡](../../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -48,4 +48,4 @@ manifest 是模型可写约定，但 host 在读取时没有与 `resolvePackMeta
 - 改动面：`packages/company-pack/src/host/run-bundle/bundle-manifest.ts`、`packages/company-pack/src/host/run-bundle/runtime-guard.ts`
 - 红：`pnpm test tests/host/run-bundle/bundle-manifest.spec.ts`（pack 名称不符仍 ok；version 变化被判 corrupt）
 - 绿：`pnpm test tests/host/run-bundle/bundle-manifest.spec.ts`（name 不符 corrupt；version 变化 upgrade 保留 id/createdAt；boot 不 block）
-- 提交：commit 82e23163
+- 提交：commit 21ff3ee7

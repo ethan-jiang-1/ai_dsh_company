@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-254：不可读的 live lease 被当 stale 删除并抢占
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
+> **关联**：[C16 卡](../../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -48,4 +48,4 @@ pnpm test tests/host/run-bundle/lease.spec.ts
 - 改动面：`packages/company-pack/src/host/run-bundle/lease.ts`、`tests/host/run-bundle/lease.spec.ts`
 - 红：`pnpm test tests/host/run-bundle/lease.spec.ts`（chmod 000 live lease 被删后抢占）
 - 绿：`pnpm test tests/host/run-bundle/lease.spec.ts`（EACCES/EPERM fail-closed，锁仍在）
-- 提交：commit 82e23163
+- 提交：commit 21ff3ee7

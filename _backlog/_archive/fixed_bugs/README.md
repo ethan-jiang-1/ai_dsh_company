@@ -4,6 +4,14 @@
 
 ## 修复流水（倒序）
 
+- **BUG-243..262**（2026-11-18，P2×20）：C16 管线指纹 + content inventory/schema + 低置信运行态：
+  243 pipelineFingerprint；244-247 content inventory 84 件；248-250 JSON schema/YAML；251/252 dev 命令；
+  253 sha 绑定 allow-stale；254 lease fail-closed；255/256 bundle ISO/pack 升级；257/258 presence revisionGap；
+  259/260 catalog 空 final/symlink；261/262 content-manifest 双向对账。
+  证据提交 = `21ff3ee7`；`release --prepare` 137 entries、`release:shape` PASS（source+pipeline）、
+  `company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2277 tests、`verify`/`typecheck`/`coverage` 绿。
+  详见 [pipeline + runtime closure Note](../../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)。
+
 - **BUG-233..242**（2026-11-18，根因组 A–D，P2×10）：C15 门禁闭环 + 不可读/部分输入：
   **A shipped 关键件/集合**：[233](BUG-233-required-shipped-misses-runtime-content.md) 43 条关键件
   （含 seed 源）、[234](BUG-234-preset-set-completeness-unchecked.md) 12 个组合目标且非空、

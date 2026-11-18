@@ -21,6 +21,26 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-243（已修）](fixed_bugs/BUG-243-pipeline-fingerprint-sanitizer.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-244（已修）](fixed_bugs/BUG-244-required-shipped-misses-generic-content.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-245（已修）](fixed_bugs/BUG-245-required-shipped-misses-product-docs.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-246（已修）](fixed_bugs/BUG-246-required-shipped-misses-delivery-templates.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-247（已修）](fixed_bugs/BUG-247-required-shipped-misses-content-templates.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-248（已修）](fixed_bugs/BUG-248-required-json-schema-only-parse.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-249（已修）](fixed_bugs/BUG-249-seed-json-empty-object-passes.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-250（已修）](fixed_bugs/BUG-250-preset-yaml-not-parsed.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-251（已修）](fixed_bugs/BUG-251-persona-pnpm-methods-init.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-252（已修）](fixed_bugs/BUG-252-source-shape-no-dev-command-scan.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-253（已修）](fixed_bugs/BUG-253-allow-stale-arbitrary-reason.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-254（已修）](fixed_bugs/BUG-254-lease-unreadable-lock-takeover.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-255（已修）](fixed_bugs/BUG-255-bundle-created-at-invalid.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-256（已修）](fixed_bugs/BUG-256-bundle-pack-mismatch.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-257（已修）](fixed_bugs/BUG-257-presence-unknown-status-ignored.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-258（已修）](fixed_bugs/BUG-258-presence-deleted-no-reopen.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-259（已修）](fixed_bugs/BUG-259-catalog-empty-final.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-260（已修）](fixed_bugs/BUG-260-catalog-json-symlink.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-261（已修）](fixed_bugs/BUG-261-content-manifest-extra-drift.md) | 已修：C16 组 | 2026-11-18 |
+| [BUG-262（已修）](fixed_bugs/BUG-262-content-manifest-refs-not-checked.md) | 已修：C16 组 | 2026-11-18 |
 | [2026-11-18-guard-closure-and-unreadable-inputs.md](settled_issues/2026-11-18-guard-closure-and-unreadable-inputs.md) | 已结；C15 门禁闭环 + 不可读/部分输入（BUG-233..242 已修）；去向 = implementation（`56e4f986`） | 2026-11-18 |
 | [BUG-233（已修）](fixed_bugs/BUG-233-required-shipped-misses-runtime-content.md) | 已修：REQUIRED_SHIPPED 43 条含 seed 源 | 2026-11-18 |
 | [BUG-234（已修）](fixed_bugs/BUG-234-preset-set-completeness-unchecked.md) | 已修：EXPECTED_PATCH 12 且目标非空 | 2026-11-18 |
