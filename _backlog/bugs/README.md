@@ -2,13 +2,13 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 223；已分配 BUG-001..222。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 233；已分配 BUG-001..232。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 1 张**：BUG-212（收尾验证链偏长）保持活跃，**不并入本批**；C13 10 张（BUG-213..222）已于 2026-11-17 修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，批次与收口见下方「## 2026-11-17 修复交接（C13 运行时/发布面：BUG-213..222）」。
+**活跃 11 张**：BUG-212（收尾验证链偏长）保持活跃；C14 10 张（BUG-223..232）见下方「## 2026-11-18 C14 修复后的守卫面 + 低置信运行态」。C13 10 张（BUG-213..222）已于 2026-11-17 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 **独立卡**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
 
@@ -75,6 +75,19 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 **收口（2026-11-17）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `f1629047`。
 `pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2218 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
 共享机制决定 = [shipped package boundary Note](../../notes/implemented/2026-11-17-shipped-package-boundary.md)。
+
+## 2026-11-18 C14 修复后的守卫面 + 低置信运行态
+
+**用户指令（2026-11-18）**：「你找那 bug 都修好了，咱们再来一轮，至少抓到 10 个再停下来，尤其找那些你心里比较发虚的领域」——本组 10 张全部 `调查中`，只开卡不修；证据 = [C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)。
+
+| 组 | 卡 | 共同根因 | 一句话 | 级别 |
+|---|---|---|---|---|
+| A 新 checker 面 | [223](BUG-223-shipped-shape-globs-unchecked.md) / [224](BUG-224-shipped-shape-text-face-misses-content.md) / [225](BUG-225-shipped-shape-extensionless-dev-paths.md) / [226](BUG-226-shipped-shape-bundle-patch-unchecked.md) | checker 只拒 C13 当时见过的形状 | files glob / content 文本面 / 目录级 dev 路径 / bundle.patch 四类空绿 | P2 ×4 |
+| B 发布新鲜度/接线 | [227](BUG-227-release-shape-stale-dist.md) / [228](BUG-228-shipped-shape-not-in-verify.md) | 真实 tarball 检查只在 release，且不比对源码 | 旧 `_dist` PASS；source 泄漏过 verify/pre-push | P2 ×2 |
+| C 读模型 | [229](BUG-229-diff-activity-partial-view.md) / [230](BUG-230-team-event-overrides-missing-revision.md) | 类型必填当运行必填；缺 revision 无判据 | 部分视图抛错；旧事件覆盖 completed | P2 ×2 |
+| D catalog 派生 | [231](BUG-231-catalog-silent-symlink-dir.md) / [232](BUG-232-catalog-empty-slug.md) | 坏形状静默 | symlink 子目录消失；空 slug 当已声明 | P2 ×2 |
+
+本组是 Round 100–101 的产出；tarball/合成 checker/纯函数/临时 companyHome 均已实跑，未修任何产品代码。
 
 ## 2026-11-17 C13 运行时/发布面分离（focus v8）
 
