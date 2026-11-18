@@ -224,7 +224,7 @@ const DOCS_ONLY_PATHS = [/^docs\//, /^notes\//, /^_backlog\//, /^_dist\/安装�
 function docsOnlySince(sha) {
   let names
   try {
-    names = capture('git', ['diff', '--name-only', `${sha}..HEAD`]).split('\n').filter(Boolean)
+    names = capture('git', ['diff', '--name-only', '-z', `${sha}..HEAD`]).split('\0').filter(Boolean)
   } catch { return false }
   return names.length > 0 && names.every(name => DOCS_ONLY_PATHS.some(pattern => pattern.test(name)))
 }
