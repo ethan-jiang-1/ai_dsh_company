@@ -9,7 +9,7 @@ opened: 2026-11-18
 >
 > **结论/去向**：implementation — C15-1..10 全部 confirmed；10 张 BUG-233..242 已于 2026-11-18 修复（`56e4f986`）并归档（`40fa86dd`），决策记忆 = [Note](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)。本卡只作证据历史，不再承接轮次。
 >
-> 审查：agent（独立盲审）— 归档复核：10 项负控逐条复验仍绿（2026-11-18）；审查记录与处置见 `## 落地证据`。
+> 审查：agent（独立盲审）— 修复轮 B1/B2 已修，S1–S5 原始清单未在仓内留档（仅 S2 见 Note 未覆盖轴）；归档复核 2026-11-18 由独立只读子代理执行：0 BLOCKER、3 条非阻塞建议，见 `## 落地证据`。
 >
 > **授权边界**：静态 / 合成包 / tarball / 纯函数 / 临时 companyHome 可自主；不修产品代码；不改 vendor；`_dist` 只读。
 >
@@ -104,11 +104,14 @@ C14 修复把 shipped-shape 的判据从「上次出事的样本」扩到 files 
 4. 回填 `## Round 103/104`，更新两张索引；`pnpm verify` ALL PASS；`pnpm test` 绿。
 5. 不把「新 spec 绿」写成「新门禁完备」；不把「当前 tarball 137 entries」写成「运行时全集已证」。
 
+> 阶段限定：第 3 条是立卡时的研究阶段判据（只开卡、不修）；修复轮由用户另行授权，落点见 `## 落地证据`。
+
 ## 落地证据
 
 - C15-1..10 的修复落点：`tools/lib/release/shipped-shape.mjs`、`tools/lib/core/pack-source.mjs`、`packages/company-pack/src/host/ledger/catalog.ts`、`packages/company-pack/src/lib/presence/presence.ts`、`packages/company-pack/src/lib/shared/text.ts` + 三份 spec；提交 `56e4f986`；10 张 BUG 卡迁 [fixed_bugs](../fixed_bugs/README.md)（`40fa86dd`）。
 - 决策记忆 = [C15 批次 Note](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)。
 - 归档复核（2026-11-18 实跑）：10 项负控逐一复验——缺 `content/templates/prd.md` → `manifest: 缺关键运行时件`；patch 裁 6 条 → 4 条组合目标缺失；空 charter → `关键运行时件为空`；dev README 改后指纹不变、`README.shipped.md` 改后指纹变化；`--allow-stale` 裸旗标 exit 1；`pnpm release:shape` PASS（137 entries）；三份 C15 spec 98 passed。
+- 归档复核（2026-11-18，独立只读子代理）：0 BLOCKER；建议 = S1/S3–S5 原始清单未在仓内留档、复核日志在 gitignored `runtime/tmp`、验收标准 3 需阶段限定。
 - 立卡基线（实跑）：`pnpm test` 262 files / 2237 tests（C14 修复 Note）；`pnpm verify` ALL PASS；`pnpm release:shape` PASS；`_dist` 137 entries。
 - 立卡时预检（修复前，实跑）：过滤 template 后 checker `[]`；patch 裁 6 条后 `[]`；dev README 指纹变化；allow-stale 无理由 PASS；catalog chmod 000 三例；presence 三例。
 

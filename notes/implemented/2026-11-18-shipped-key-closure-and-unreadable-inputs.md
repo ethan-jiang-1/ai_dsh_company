@@ -55,6 +55,11 @@
 - 负例：空 charter/非法 manifest、patch 裁 6、dev README 指纹不变、`--allow-stale` 无理由 exit 1、
   catalog chmod 000 三例、presence in_progress 回退/未知 phase/缺 content 均有 spec 或 CLI 证据。
 
+## 审查记录
+
+- 修复轮（2026-11-18）：独立盲审 B1/B2 已修；**S1–S5 的原始清单未在仓内留档**，仓内仅 S2 见「## 未覆盖轴」——已知记录缺口（与 C13/C14 同惯例），不阻塞本批结论。
+- 归档复核（2026-11-18，独立只读子代理）：0 BLOCKER；3 条非阻塞建议——S 记录缺口、归档复核实跑日志在 gitignored `runtime/tmp`、C15 卡验收标准 3 需阶段限定（研究阶段判据，修复轮由用户另行授权）。处置：卡头与本节记明缺口；验收标准加阶段限定。
+
 ## 未覆盖轴
 
 - [covered] shipped 关键件/组合/空文件：`pnpm test tests/repo/release/shipped-shape.spec.ts` → `tests/repo/release/shipped-shape.spec.ts`
