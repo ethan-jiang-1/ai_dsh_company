@@ -252,7 +252,7 @@ describe('shipped package 形状判据（C13）', () => {
 
   it('source shape 正例：关键件/链接/pnpm/patch 全在（BUG-228）', () => {
     const base = mkdtempSync(join(tmpdir(), 'source-shape-ok-'))
-    const write = (rel, text) => { mkdirSync(join(base, rel, '..'), { recursive: true }); writeFileSync(join(base, rel), text) }
+    const write = (rel: string, text: string) => { mkdirSync(join(base, rel, '..'), { recursive: true }); writeFileSync(join(base, rel), text) }
     write('package.json', `${JSON.stringify({ dsh: { bundle: { patch: ['./presets/ceo/agent.cordis.yml'] } }, files: ['content/**', 'presets/**', 'locale/*.json', 'LICENSE'] })}\n`)
     write('README.shipped.md', '# x\n\n[home](https://example.com)\ndsh plugin add\ndsh: pnpm was not found; install pnpm and make it available on PATH.\n')
     for (const rel of ['content/AGENTS.md', 'content/manifest.json', 'content/charters/ceo.md', 'content/charters/cfo.md',
