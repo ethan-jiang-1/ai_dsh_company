@@ -2,13 +2,13 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 233；已分配 BUG-001..232。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 243；已分配 BUG-001..242。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 1 张**：BUG-212（收尾验证链偏长）保持活跃，不并入本批；C14 10 张（BUG-223..232）已于 2026-11-18 修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，批次与收口见下方「## 2026-11-18 修复交接（C14 守卫面 + 低置信运行态：BUG-223..232）」。C13 10 张（BUG-213..222）已于 2026-11-17 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**活跃 11 张**：BUG-212（收尾验证链偏长）保持活跃；C15 10 张（BUG-233..242）见下方「## 2026-11-18 C15 修复后门禁的新面 + 不可读/部分输入」。C13/C14 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 **独立卡**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
 
@@ -75,6 +75,19 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 **收口（2026-11-17）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `f1629047`。
 `pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2218 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
 共享机制决定 = [shipped package boundary Note](../../notes/implemented/2026-11-17-shipped-package-boundary.md)。
+
+## 2026-11-18 C15 修复后门禁的新面 + 不可读/部分输入
+
+**用户指令（2026-11-18）**：「bug 都修好了只剩一个，再来一轮，至少 10 个，尤其找发虚领域」——本组 10 张全部 `调查中`，只开卡不修；证据 = [C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)。
+
+| 组 | 卡 | 共同根因 | 一句话 | 级别 |
+|---|---|---|---|---|
+| A 关键件/集合完整性 | [233](BUG-233-required-shipped-misses-runtime-content.md) / [234](BUG-234-preset-set-completeness-unchecked.md) / [237](BUG-237-required-shipped-empty-file.md) | REQUIRED 列表与集合断言只覆盖上一轮想到的形状 | 缺 template 仍绿；patch 裁到 6 条仍绿；空 charter 仍绿 | P2 ×3 |
+| B 指纹/降级 | [235](BUG-235-source-fingerprint-includes-dev-readme.md) / [236](BUG-236-allow-stale-no-reason.md) | 指纹边界与降级理由无判据 | dev README 假过期；--allow-stale 无理由仍 PASS | P2 ×2 |
+| C catalog 不可读 | [238](BUG-238-catalog-unreadable-throws.md) / [239](BUG-239-catalog-unreadable-final-silent.md) | 可读性不在坏形状判据 | meta/ledger 抛 EACCES；final 静默 present | P2 ×2 |
+| D presence 部分 wire | [240](BUG-240-team-event-reopens-in-progress.md) / [241](BUG-241-presence-unknown-phase-diverges.md) / [242](BUG-242-presence-message-content-missing.md) | 类型必填当运行必填；两读模型不同映射 | in_progress 被打回；未知 phase 分叉；缺 content 抛 | P2 ×3 |
+
+本组是 Round 103–104 的产出；真实 tarball/纯函数/临时 home 均已实跑，未修任何产品代码。
 
 ## 2026-11-18 修复交接（C14 守卫面 + 低置信运行态：BUG-223..232）
 
