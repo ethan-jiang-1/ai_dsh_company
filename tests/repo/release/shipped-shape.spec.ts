@@ -213,14 +213,13 @@ describe('shipped package 形状判据（C13）', () => {
     expect(freshnessProblem({ manifest: { sourceFingerprint: 'a', gitSha: 'old' }, currentFingerprint: 'a' })).toBeUndefined()
   })
 
-  it('源码侧 shipped 面不依赖 _dist（BUG-228）', () => {
-    expect(checkSourceShape({ packDir: join(ROOT, 'packages/company-pack') })).toEqual([])
-  })
   it('glob 分支（**、*、?）与字面 files 缺失都判（BUG-223）', () => {
     const missingLiteral = fixture({ pkg: { files: [...fixture().pkg.files, 'missing.txt'] } })
     expect(checkShippedPackage(missingLiteral).some(problem => problem.includes('missing.txt'))).toBe(true)
-    const weirdGlob = fixture({ pkg: { files: ['content/**/missing.md', 'lib/?.js'] } })
-    expect(checkShippedPackage(weirdGlob).some(problem => problem.includes('files glob'))).toBe(true)
+    const weirdGlob = fixture({ pkg: { files: ['content/**/missing.md', 'lib/?.js', 'lib/types/**'] } })
+    const problems = checkShippedPackage(weirdGlob)
+    expect(problems.some(problem => problem.includes('files glob'))).toBe(true)
+    expect(problems.some(problem => problem.includes('lib/types/**'))).toBe(true)
   })
 
   it('exports 目标缺失、.map 随包、client 未知 external 都判', () => {
@@ -233,7 +232,7 @@ describe('shipped package 形状判据（C13）', () => {
   })
 
   it('README 相对链接（存在/缺失）与 source shape 负例', () => {
-    const linked = fixture({ texts: { 'package/README.md': `${README}[license](./LICENSE)\n[bad](../x.md)\n` } })
+    const linked = fixture({ texts: { 'package/README.md': `${README}[license](./LICENSE)\n[bad](../x.md)\n[home](https://example.com)\n` } })
     const problems = checkShippedPackage(linked)
     expect(problems.some(problem => problem.includes('../x.md'))).toBe(true)
     expect(problems.every(problem => !problem.includes('./LICENSE'))).toBe(true)
@@ -251,7 +250,20 @@ describe('shipped package 形状判据（C13）', () => {
     rmSync(base, { recursive: true, force: true })
   })
 
-  it('source shape 负例：出包链接/pnpm 文案/patch 目标/glob/ dev 路径', () => {
+  it('source shape 正例：关键件/链接/pnpm/patch 全在（BUG-228）', () => {
+    const base = mkdtempSync(join(tmpdir(), 'source-shape-ok-'))
+    const write = (rel, text) => { mkdirSync(join(base, rel, '..'), { recursive: true }); writeFileSync(join(base, rel), text) }
+    write('package.json', `${JSON.stringify({ dsh: { bundle: { patch: ['./presets/ceo/agent.cordis.yml'] } }, files: ['content/**', 'presets/**', 'locale/*.json', 'LICENSE'] })}\n`)
+    write('README.shipped.md', '# x\n\n[home](https://example.com)\ndsh plugin add\ndsh: pnpm was not found; install pnpm and make it available on PATH.\n')
+    for (const rel of ['content/AGENTS.md', 'content/manifest.json', 'content/charters/ceo.md', 'content/charters/cfo.md',
+      'content/charters/cmo.md', 'content/charters/coo.md', 'content/charters/vp-eng.md', 'content/charters/vp-sales.md',
+      'content/company/policy-lines.md', 'content/company/review-protocol.md', 'locale/en.json', 'locale/zh.json',
+      'presets/ceo/agent.cordis.yml', 'LICENSE']) write(rel, '# x\n')
+    expect(checkSourceShape({ packDir: base })).toEqual([])
+    rmSync(base, { recursive: true, force: true })
+  })
+
+  it('source shape 负例：出包链接/pnpm 文案/patch 目标/glob/ dev 路径（BUG-228）', () => {
     const base = mkdtempSync(join(tmpdir(), 'source-shape-'))
     mkdirSync(join(base, 'content'), { recursive: true })
     writeFileSync(join(base, 'package.json'), `${JSON.stringify({ dsh: { bundle: { patch: ['./presets/missing.yml'] } }, files: ['content/**', 'presets/**'] })}\n`)
@@ -320,6 +332,14 @@ describe('sanitizer 与字节工具', () => {
   it('scrubDevPaths 只改 CSS 注释里的路径；运行时字符串直接拒绝', () => {
     expect(scrubDevPaths('const css = `/* tests/x.spec.ts */`')).toContain('仓库内路径')
     expect(() => scrubDevPaths('const s = "tests/x.spec.ts"')).toThrow(/拒绝自动改写/)
+  })
+
+  it('sanitizePackage 无 lib/types 时 walk 不崩（BUG-213 边界）', () => {
+    const packageDir = join(dir, 'package-no-types')
+    mkdirSync(join(packageDir, 'lib'), { recursive: true })
+    writeFileSync(join(packageDir, 'package.json'), `${JSON.stringify({ name: 'x', version: '0', peerDependencies: {}, dsh: { client: { inject: [], platform: 'web' } } })}\n`)
+    writeFileSync(join(packageDir, 'lib/index.js'), 'export const x = 1\n')
+    expect(() => sanitizePackage({ dir: packageDir, shippedReadme: join(dir, 'missing-readme.md') })).not.toThrow()
   })
 
   it('packageRootOf 取 package 名', () => {

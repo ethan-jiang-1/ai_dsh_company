@@ -26,7 +26,7 @@
 | [BUG-225（已修）](fixed_bugs/BUG-225-shipped-shape-extensionless-dev-paths.md) | 已修：DEV_DIR 识别无扩展名/目录级引用 | 2026-11-18 |
 | [BUG-226（已修）](fixed_bugs/BUG-226-shipped-shape-bundle-patch-unchecked.md) | 已修：dsh.bundle.patch 目标逐个在包 | 2026-11-18 |
 | [BUG-227（已修）](fixed_bugs/BUG-227-release-shape-stale-dist.md) | 已修：release:shape 比对 sourceFingerprint（含 README.shipped） | 2026-11-18 |
-| [BUG-228（已修）](fixed_bugs/BUG-228-shipped-shape-not-in-verify.md) | 已修：checkSourceShape 进 coverage:ratchet | 2026-11-18 |
+| [BUG-228（已修）](fixed_bugs/BUG-228-shipped-shape-not-in-verify.md) | 已修：checkSourceShape 并入 shipped-links gate | 2026-11-18 |
 | [BUG-229（已修）](fixed_bugs/BUG-229-diff-activity-partial-view.md) | 已修：diffActivity 部分视图 ?? [] | 2026-11-18 |
 | [BUG-230（已修）](fixed_bugs/BUG-230-team-event-overrides-missing-revision.md) | 已修：缺 revision 时保护 completed/deleted 终态 | 2026-11-18 |
 | [BUG-231（已修）](fixed_bugs/BUG-231-catalog-silent-symlink-dir.md) | 已修：子目录 symlink warning 不静默 | 2026-11-18 |

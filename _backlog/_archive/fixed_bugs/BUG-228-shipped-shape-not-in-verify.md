@@ -48,12 +48,14 @@ grep -n 'release:shape\|shipped-shape' .githooks/pre-push package.json
 修成什么算修好：
 
 1. 新增 `checkSourceShape`（不依赖 `_dist`）：README.shipped 链接/pnpm 文案、cordis/presets/content dev 限定、`dsh.bundle.patch` 目标在源码树存在。
-2. 该检查进 `tests/repo/release/shipped-shape.spec.ts`，随 `coverage:ratchet`/pre-push 真跑；`README.shipped` 的 coveredBy 从 `verify` 改成 `coverage:ratchet`。
+2. 该检查进 `checks/gates/shipped-links.mjs`，随 `pnpm verify`/pre-push 的 `run-gates` 真跑（不新增昂贵阶段）；`README.shipped` 的 coveredBy = `verify`。
 3. 最小负例：README.shipped 加未限定 dev 路径或 patch 缺目标 → spec 红；改回 → 绿。
 
 ## 修复证据
 
 - 改动面：`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`、`tools/lib/core/asset-lanes.mjs`
-- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（源码侧 README.shipped dev/pnpm/patch 缺口不判）
-- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（checkSourceShape 进 spec；README.shipped coveredBy=coverage:ratchet；源码负例红）
+- 红：`pnpm verify`（旧检查不覆盖源码侧；真树植入未限定 dev 路径仍 PASS）
+- 绿：`pnpm verify`（`shipped-links` gate PASS；真树植入未限定 dev 路径 → gate 红，还原 → 绿）
 - 提交：commit 87d8b15d
+- 补正（2026-11-18）：源码侧检查从 coverage:ratchet 移到 `checks/gates/shipped-links.mjs`（verify/run-gates），避免给 BUG-212 的昂贵阶段加负担。
+- 补正提交：commit 153fe423（source shape 并入 shipped-links、README.shipped coveredBy=verify）

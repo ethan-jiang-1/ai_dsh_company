@@ -430,8 +430,8 @@ export const SURFACE_RULES = [
     // 2026-11-18 BUG-228：源码侧 shipped 面由 shipped-shape spec 在 coverage:ratchet 下真跑；
     // verify 不读 tarball。真实 tarball 的新鲜度/形状仍由 release:shape 判。
     globs: ['packages/company-pack/README.shipped.md'],
-    coveredBy: ['coverage:ratchet'],
-    why: '源码侧 shipped shape（README.shipped 链接/pnpm、presets/cordis/content dev 限定、patch 目标）由 tests/repo/release/shipped-shape.spec.ts 在 coverage:ratchet 下检查；真实 tarball 由 release:shape 判',
+    coveredBy: ['verify'],
+    why: '源码侧 shipped shape（README.shipped 链接/pnpm、presets/cordis/content dev 限定、patch 目标）由 checks/gates/shipped-links.mjs 在 verify/run-gates 下检查；真实 tarball 由 release:shape 判',
   },
   {
     globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', '.agents/**', 'run/**', 'snapshots/**'],

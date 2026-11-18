@@ -17,9 +17,9 @@
    （docs-only 提交）只打印 note，不误红。
 3. **源码侧 shipped 面进 `pnpm test`/pre-push**（BUG-228）：新增 `checkSourceShape()`，覆盖
    `README.shipped.md` 链接/pnpm 文案、`cordis.patch.yml`/`presets`/`content` 的 dev 限定、
-   `dsh.bundle.patch` 目标在源码树存在；由 `tests/repo/release/shipped-shape.spec.ts` 在
-   `coverage:ratchet` 下真跑，`README.shipped.md` 的 `coveredBy` 从 `verify` 改为
-   `coverage:ratchet`。真实 tarball 的字节/新鲜度仍由 `release:shape` 判。
+   `dsh.bundle.patch` 目标在源码树存在；由 `checks/gates/shipped-links.mjs` 在 `pnpm verify`/pre-push 的 `run-gates` 下真跑
+   （不新增昂贵阶段），`README.shipped.md` 的 `coveredBy` = `verify`。真实 tarball 的字节/新鲜度
+   仍由 `release:shape` 判。
 4. **presence 读模型按「部分视图也是合法输入」**（BUG-229/230）：
    `diffActivity` 对 `prev/next` 的 members/tasks 统一 `?? []`；`teamWithEventTasks` 在投影任务
    缺 `revision` 时保留投影，不让旧事件把 `completed` 覆盖成 `pending`。
@@ -58,7 +58,7 @@
 
 - `pnpm release --prepare --force`：ALL PASS（shipped-shape 137 entries）。
 - `pnpm release:shape`：PASS（sourceFingerprint 与 `_dist` 一致；gitSha docs-only 只 note）。
-- `pnpm test`：262 files / 2236 tests；`verify` ALL PASS；`typecheck` exit 0；`lint` 0 warning；
+- `pnpm test`：262 files / 2237 tests；`verify` ALL PASS；`typecheck` exit 0；`lint` 0 warning；
   `coverage:ratchet` PASS（200 文件；`tools/lib/release/shipped-shape.mjs` 97.84/88.77）。
 - 真入口：`company-entry`/`client-load` ALL PASS（2026-11-18 实跑）。
 

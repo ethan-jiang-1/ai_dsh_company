@@ -10,7 +10,7 @@
   [225](BUG-225-shipped-shape-extensionless-dev-paths.md) 无扩展名目录 dev、
   [226](BUG-226-shipped-shape-bundle-patch-unchecked.md) `dsh.bundle.patch` 目标；
   **B 新鲜度/接线**：[227](BUG-227-release-shape-stale-dist.md) sourceFingerprint（含 README.shipped）、
-  [228](BUG-228-shipped-shape-not-in-verify.md) `checkSourceShape` 进 coverage:ratchet；
+  [228](BUG-228-shipped-shape-not-in-verify.md) `checkSourceShape` 并入 shipped-links gate；
   **C presence**：[229](BUG-229-diff-activity-partial-view.md) 部分视图 `?? []`、
   [230](BUG-230-team-event-overrides-missing-revision.md) 缺 revision 终态保护；
   **D catalog**：[231](BUG-231-catalog-silent-symlink-dir.md) 子目录 symlink warning、

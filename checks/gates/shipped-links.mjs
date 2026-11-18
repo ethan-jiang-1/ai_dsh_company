@@ -2,6 +2,7 @@
 // 何时跑：改 pack 的 `content/**` 或 `presets/**/skills/**` Markdown 后；发布/导出前。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, extname, isAbsolute, join, relative, resolve, sep } from 'node:path'
+import { checkSourceShape } from '../../tools/lib/release/shipped-shape.mjs'
 
 // ── 安装形状的出厂内容（shipped-links，2026-10-25，RFC installed-shape-self-sufficient）──
 // 为什么：workspace/ + skills 的 Markdown 会随包落到别人的 home；`../docs`、`checks/`、`tools/`、
@@ -163,7 +164,14 @@ export function run({ root, ok, fail }) {
       if (REPO_PATH.test(trimmed)) problems.push(`${PRESETS}/${rel}:${String(index + 1)} persona 指向仓库：${trimmed.slice(0, 100)}`)
     })
   }
+  // 2026-11-18 BUG-228：源码侧 shipped 面（README.shipped 链接/pnpm、patch 目标、关键件、
+  // presets/content/cordis dev 限定）并入既有门禁，不新增第 76 道门（policy §P2 封顶）。
+  try {
+    problems.push(...checkSourceShape({ packDir: join(root, 'packages/company-pack') }))
+  } catch (error) {
+    problems.push(`源码侧 shipped 面不可读：${String(error).split('\n')[0]}`)
+  }
   problems.length === 0
-    ? ok(`shipped-links（content ${String(files.filter(f => f.kind === 'content').length)} 份 + skill ${String(files.filter(f => f.kind === 'skill').length)} 份 + persona ${String(personas.length)} 份；零仓库路径/穿出 content）`)
+    ? ok(`shipped-links（content ${String(files.filter(f => f.kind === 'content').length)} 份 + skill ${String(files.filter(f => f.kind === 'skill').length)} 份 + persona ${String(personas.length)} 份；零仓库路径/穿出 content；source shape 绿）`)
     : fail('shipped-links', problems.join('；'))
 }

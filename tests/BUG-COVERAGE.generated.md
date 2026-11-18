@@ -230,7 +230,7 @@
 | 209 | 2026-11-17 | tests/repo/docs/live-declarations.spec.ts:27；tests/repo/docs/live-declarations.spec.ts:32 |
 | 210 | 2026-11-17 | tests/repo/pack/shipped-comments.spec.ts:65 |
 | 211 | 2026-11-17 | tests/repo/docs/live-declarations.spec.ts:38 |
-| 213 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:104 |
+| 213 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:104；tests/repo/release/shipped-shape.spec.ts:337 |
 | 214 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:114 |
 | 215 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:119 |
 | 216 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:124 |
@@ -240,12 +240,12 @@
 | 220 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:152 |
 | 221 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:157 |
 | 222 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:164 |
-| 223 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:168；tests/repo/release/shipped-shape.spec.ts:178；tests/repo/release/shipped-shape.spec.ts:219 |
+| 223 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:168；tests/repo/release/shipped-shape.spec.ts:178；tests/repo/release/shipped-shape.spec.ts:216 |
 | 224 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:173 |
 | 225 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:185；tests/repo/release/shipped-shape.spec.ts:189 |
 | 226 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:196 |
 | 227 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:201；tests/repo/release/shipped-shape.spec.ts:211 |
-| 228 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:216 |
+| 228 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:253；tests/repo/release/shipped-shape.spec.ts:266 |
 | 229 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:230 |
 | 230 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:199 |
 | 231 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:166 |

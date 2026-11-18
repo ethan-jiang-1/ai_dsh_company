@@ -109,3 +109,15 @@ pnpm release --stamp
   `coveredBy` 机制承载。风险是漏门，需负例。
 - **release stamp**：`--stamp` 增加「checks 全部 pass 且 changed files ⊆ docs/notes/_backlog」的
   秒级前移路径；或 release 收尾流程明确「docs-only 提交后不需要 --check」并写进 runbook。
+
+## 2026-11-18 C14 相邻改动实测（只记录，不修本卡）
+
+C14 的源码侧 shipped-shape 检查一度想新增第 76 道门，被 policy §P2 的 75 道封顶挡住；最终**并入既有
+`shipped-links` gate**，没有新增 pre-push 阶段。实测：
+
+- `node checks/run-gates.mjs` ≈ **11.48s**（本卡基线 11.10s；+0.38s，在噪声内）。
+- `coverage:ratchet` 本轮 ≈ **20.3s**（本卡基线 21.82s；没有变慢；C14 的 spec 增量被测试并行/波动盖住）。
+- 未改 `.githooks/pre-push`、`release.mjs`、`release --check`/`--stamp`、pre-push 六段。
+- 本卡两个症状（整链预算、docs-only 收尾的 release 验证摩擦）仍在；状态保持 `调查中`。
+
+C14 的 `release:shape` 新鲜度检查（BUG-227）只看 `sourceFingerprint`，不替代 `release --check`/`--stamp`。
