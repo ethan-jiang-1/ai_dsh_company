@@ -21,7 +21,7 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
-| [2026-11-18-guard-closure-and-unreadable-inputs.md](settled_issues/2026-11-18-guard-closure-and-unreadable-inputs.md) | 已结；C15 门禁闭环 + 不可读/部分输入（BUG-233..242 已修）；去向 = Note | 2026-11-18 |
+| [2026-11-18-guard-closure-and-unreadable-inputs.md](settled_issues/2026-11-18-guard-closure-and-unreadable-inputs.md) | 已结；C15 门禁闭环 + 不可读/部分输入（BUG-233..242 已修）；去向 = implementation（`56e4f986`） | 2026-11-18 |
 | [BUG-233（已修）](fixed_bugs/BUG-233-required-shipped-misses-runtime-content.md) | 已修：REQUIRED_SHIPPED 43 条含 seed 源 | 2026-11-18 |
 | [BUG-234（已修）](fixed_bugs/BUG-234-preset-set-completeness-unchecked.md) | 已修：EXPECTED_PATCH 12 且目标非空 | 2026-11-18 |
 | [BUG-235（已修）](fixed_bugs/BUG-235-source-fingerprint-includes-dev-readme.md) | 已修：dev README 移出 sourceFingerprint | 2026-11-18 |
