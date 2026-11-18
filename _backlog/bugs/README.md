@@ -2,13 +2,13 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 263；已分配 BUG-001..262。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 283；已分配 BUG-001..282。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**：BUG-212 已于 2026-11-18 部分修复（docs-only 快速路径）后挂起，迁 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)；C16 20 张（BUG-243..262）已于 2026-11-18 修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，批次与收口见下方「## 2026-11-18 修复交接（C16 管线指纹 + 关键件闭包 + 低置信运行态：BUG-243..262）」。C13/C14/C15 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**活跃 20 张**：C17 20 张（BUG-263..282）见下方「## 2026-11-19 C17 门禁残余面 + 运行态边界」。C16 20 张（BUG-243..262）已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；BUG-212 挂起在 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)。
 
 **已挂起**：BUG-212（收尾验证链偏长）——docs-only 快速路径已修；pre-push 46s 是成本-only，迁 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)，触发器见卡尾。
 
@@ -103,6 +103,20 @@ A 管线指纹（243）；B 关键件/JSON/YAML（244-250）；C dev 命令（25
 盲审 blocker（v3 pack version 变化被误判 corrupt）已修：同 name 版本变化走 upgrade 保留 id/createdAt；S1–S5 记录/处置。
 共享机制决定 = [pipeline fingerprint + runtime closure Note](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)。
 
+
+## 2026-11-19 C17 门禁残余面 + 运行态边界
+
+**用户指令（2026-11-19）**：「至少抓到 20 个再停，尤其找发虚领域」——本组 20 张全部 `调查中`，只开卡不修；证据 = [C17 卡](../issues/2026-11-19-guard-residuals-and-runtime-edges.md)。
+
+| 组 | 卡 | 共同根因 | 一句话 | 级别 |
+|---|---|---|---|---|
+| A pipeline 文件集 | [263](BUG-263-pipeline-install-manual.md) / [264](BUG-264-pipeline-market-index.md) | pipeline 指纹是手写 5 条 | install-manual/market-index 变化不改指纹 | P2 ×2 |
+| B inventory/清单 | [265](BUG-265-inventory-backslash-path.md) / [266](BUG-266-inventory-symlink-file.md) / [267](BUG-267-manifest-version-unvalidated.md) / [273](BUG-273-content-required-dirs.md) / [274](BUG-274-inventory-duplicate-gate.md) | inventory 安全/完整性仍是手写 | 反斜杠/ symlink/version/目录/重复 | P2 ×5 |
+| C schema/dev 命令 | [268](BUG-268-seed-target-unsafe.md) / [269](BUG-269-delivery-documents-refs.md) / [270](BUG-270-check-rules-values.md) / [271](BUG-271-dev-command-pnpm-forms.md) / [272](BUG-272-dev-command-probes.md) | 最小 schema/命令正则只挡上一轮形状 | seed target/交付引用/规则值/pnpm 形式/probes | P2 ×5 |
+| D catalog/presence/bundle | [275](BUG-275-catalog-whitespace-final.md) / [276](BUG-276-catalog-json-unreadable-silent.md) / [277](BUG-277-presence-revision-gap-not-consumed.md) / [278](BUG-278-presence-unknown-status-label.md) / [279](BUG-279-bundle-upgrade-no-backup.md) | 修复字段/降级未到消费面 | 空白 final/索引静默/gap 未消费/升级无备份 | P2 ×5 |
+| E release docs-only | [280](BUG-280-release-docs-only-manual.md) / [281](BUG-281-release-docs-only-rename.md) / [282](BUG-282-release-stamp-check-asymmetry.md) | docs-only 快速路径边界 | 生成手册/rename/stamp-check 不对称 | P2 ×3 |
+
+本组是 Round 108–109 的产出；真实 tarball/合成包/纯函数/临时 home/静态对账均已实跑或对读，未修任何产品代码。
 
 ## 2026-11-18 C16 门禁管线指纹 + 运行时发虚面
 

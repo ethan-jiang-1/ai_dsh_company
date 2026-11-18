@@ -4,6 +4,7 @@
 
 ## 活跃清单
 
+- [2026-11-19 门禁残余面 + 运行态边界（C17）](2026-11-19-guard-residuals-and-runtime-edges.md) — pipeline 文件集/ content inventory 安全与版本/ JSON schema 跨引用/ dev-command 正则/ catalog·presence·bundle·release 边界；20 张 BUG-263..282（调查中，只开卡不修）。
 - [2026-11-18 门禁管线指纹 + 运行时发虚面（C16）](2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md) — sanitizer 不在 sourceFingerprint；REQUIRED 漏 4 类 content 族；JSON/YAML 只 parse；persona 的 pnpm methods:init；lease 不可读被抢；bundle bad createdAt/pack；presence/catalog 边界；20 张 BUG-243..262（调查中，只开卡不修）。
 - [2026-11-18 修复后的守卫面 + 低置信运行态（C14）](2026-11-18-low-confidence-runtime-exploratory.md) — 新 shipped-shape checker 的 glob/content/目录路径/patch 面；`release:shape` 新鲜度与接线；diffActivity/teamWithEventTasks/catalog 部分视图与坏形状；10 张 BUG-223..232（调查中，只开卡不修）。
 - [2026-11-17 运行时/发布面分离 exploratory（C13）](2026-11-17-runtime-shipped-boundary-exploratory.md) — tarball × package.json × 安装形状 × shipped 文本；Round 97–99 已跑（tarball 类型面 / `prepack` 死引用 / README 断链 / 76 处注释 dev 路径 / client 依赖声明 / `workspace:*` / source map）；10 张 BUG-213..221（调查中，只开卡不修）。
