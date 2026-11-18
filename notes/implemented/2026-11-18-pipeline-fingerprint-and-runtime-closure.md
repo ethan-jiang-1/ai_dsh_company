@@ -37,7 +37,7 @@
 
 - `pnpm release --prepare --force`：ALL PASS（137 entries；pipeline fingerprint 写入）。
 - `pnpm release:shape`：PASS（source + pipeline 匹配）。
-- `pnpm test`：262 files / 2277 tests（见收口实测）；`verify`/`typecheck`/`lint`/`coverage` 绿。
+- `pnpm test`：262 files / 2281 tests（见收口实测）；`verify`/`typecheck`/`lint`/`coverage` 绿。
 - 真入口：`company-entry`/`client-load` ALL PASS。
 - 负例：坏 YAML/空 JSON/缺 inventory、dev 命令、lease chmod、bundle 坏日期/pack、presence unknown/deleted、catalog 空/symlink 均有 spec。
 

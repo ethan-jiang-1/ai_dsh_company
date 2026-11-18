@@ -290,6 +290,27 @@ describe('shipped package 形状判据（C13）', () => {
     })
   }
 
+  it('product-types 文档面在 inventory（BUG-245）', () => {
+    const base = fixture(); const rel = 'content/product-types/business-software/document-map.md'; const contentRel = rel.replace(/^content\//, '')
+    const inventory = [...JSON.parse(base.read('package/content/manifest.json')).inventory, contentRel]
+    const read = (path: string) => path === 'package/content/manifest.json' ? JSON.stringify({ tiers: {}, inventory }) : base.read(path)
+    expect(checkShippedPackage({ ...base, read }).some(problem => problem.includes('inventory 缺文件'))).toBe(true)
+  })
+
+  it('delivery-modes 模板在 inventory（BUG-246）', () => {
+    const base = fixture(); const rel = 'content/delivery-modes/project-services/templates/sow.md'; const contentRel = rel.replace(/^content\//, '')
+    const inventory = [...JSON.parse(base.read('package/content/manifest.json')).inventory, contentRel]
+    const read = (path: string) => path === 'package/content/manifest.json' ? JSON.stringify({ tiers: {}, inventory }) : base.read(path)
+    expect(checkShippedPackage({ ...base, read }).some(problem => problem.includes('inventory 缺文件'))).toBe(true)
+  })
+
+  it('content/templates 全家族在 inventory（BUG-247）', () => {
+    const base = fixture(); const rel = 'content/templates/strs.md'; const contentRel = rel.replace(/^content\//, '')
+    const inventory = [...JSON.parse(base.read('package/content/manifest.json')).inventory, contentRel]
+    const read = (path: string) => path === 'package/content/manifest.json' ? JSON.stringify({ tiers: {}, inventory }) : base.read(path)
+    expect(checkShippedPackage({ ...base, read }).some(problem => problem.includes('inventory 缺文件'))).toBe(true)
+  })
+
   it('delivery-rules 空对象 schema 红（BUG-248）', () => {
     const emptyRules = fixture({ texts: { 'package/content/delivery-modes/managed-service/delivery-rules.json': '{}\n' } })
     expect(checkShippedPackage(emptyRules).some(problem => problem.includes('delivery-rules 缺'))).toBe(true)
@@ -349,6 +370,11 @@ describe('shipped package 形状判据（C13）', () => {
   })
   it('pipelineFingerprint 变化 → freshness 红（BUG-243）', () => {
     expect(freshnessProblem({ manifest: { sourceFingerprint: 'a', pipelineFingerprint: 'old' }, currentFingerprint: 'a', currentPipeline: 'new' })).toContain('pipelineFingerprint')
+  })
+
+  it('--allow-stale 的 sha 必须是 HEAD/manifest 前缀（BUG-253）', () => {
+    expect(staleFlagProblem({ args: ['--allow-stale=deadbee:test'], head: '1990fcc3aaaa' })).toContain('前缀')
+    expect(staleFlagProblem({ args: ['--allow-stale=1990fcc3:test'], head: '1990fcc3aaaa' })).toBeUndefined()
   })
 
   it('--allow-stale 必须带理由且 CI 禁止（BUG-236）', () => {
