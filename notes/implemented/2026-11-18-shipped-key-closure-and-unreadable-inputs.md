@@ -70,4 +70,4 @@
 - [unprovable] `--allow-stale` 的 CI 禁用在本地只验证 `CI` 环境变量分支；真实 CI 策略未接线 → `tools/release/shipped-shape.mjs`
 - [unprovable] sanitizer/`export-dist` 本身决定 tarball 字节，但不在 pack `sourceFingerprint` 内；只改 sanitizer 时 `release:shape` 仍可能给旧包盖章（C15 审查 S2，未在本批修，需 pipeline 指纹） → `tools/lib/release/shipped-shape.mjs`
 - [policy] 缺 revision 的「只进不退」会丢弃合法「退回待办」snapshot；这是为了不让旧事件回退而选的 tradeoff，动态流仍显示退回、任务板保守保留，待 revisionGap/updatedAt 再区分 → `packages/company-pack/src/lib/presence/presence.ts`
-- [policy] BUG-212（pre-push 整链 ~46s、docs-only release 摩擦）仍独立活跃，本批未动 → `_backlog/bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md`
+- [policy] BUG-212（pre-push 整链 ~46s、docs-only release 摩擦）仍独立活跃，本批未动 → `_backlog/_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md`

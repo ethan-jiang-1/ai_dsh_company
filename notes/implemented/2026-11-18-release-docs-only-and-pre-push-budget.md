@@ -28,6 +28,8 @@
 
 ## 验证
 
+- 2026-11-19 演练：docs-only commit 后 `release --check` 允许、`--stamp` 只更新 gitSha。
+
 - `pnpm test` / `pnpm verify` / `typecheck` / `coverage` 绿（C16 收口后）。
 - docs-only 演练：prepare 后 checks 手工置 pass + docs-only commit → `release --check` PASS；
   `release --stamp` 更新 gitSha 后 `--check` PASS。
@@ -38,5 +40,3 @@
 - [covered] docs-only 快速路径：`tools/release/release.mjs` → `tools/release/release.mjs`
 - [unprovable] checks 未 pass 的 prepare-only 收尾仍要 verify；这是安全边界 → `tools/release/release.mjs`
 - [policy] pre-push 46s 成本挂起，触发条件见 BUG-212 卡 → `_backlog/_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md`
-
-- 2026-11-19 演练：docs-only commit 后 `release --check` 允许、`--stamp` 只更新 gitSha。

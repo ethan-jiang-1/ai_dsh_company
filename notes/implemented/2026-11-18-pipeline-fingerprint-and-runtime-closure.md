@@ -49,4 +49,4 @@
 - [covered] catalog：`pnpm test tests/host/ledger/catalog.spec.ts` → `tests/host/ledger/catalog.spec.ts`
 - [environment-gap] chmod 000 在 root/容器不生效；root CI 可能假绿 → `tests/host/run-bundle/lease.spec.ts`
 - [unprovable] pipeline 指纹只覆盖显式列出的管线文件；新增工具需同 diff 加 → `tools/lib/core/pack-source.mjs`
-- [policy] BUG-212 仍独立活跃，未修 → `_backlog/bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md`
+- [policy] BUG-212 仍独立活跃，未修 → `_backlog/_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md`
