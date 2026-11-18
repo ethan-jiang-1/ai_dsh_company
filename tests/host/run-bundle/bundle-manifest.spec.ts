@@ -13,7 +13,7 @@
  */
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { dirname, join } from 'node:path'
+import { basename, dirname, join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { pathToFileURL } from 'node:url'
 import {
@@ -243,6 +243,70 @@ describe('升级日志', () => {
       expect(next.manifest.pack.version).toBe('0.11.9')
       expect(writeBundleManifest(next).upgraded).toBe(true)
       expect(readBundleManifestState(ws, { name: PACK.name, version: '0.11.9' }).status).toBe('ok')
+    } finally { rmSync(h, { recursive: true, force: true }); rmSync(ws, { recursive: true, force: true }) }
+  })
+
+  // 负例留证 2026-11-19：v3 版本升级不带备份路径 ⇒ writeBundleManifest 直接覆盖 bundle.json，旧版本证据丢失（BUG-279）。
+  it('v3 版本升级保留旧字节备份（BUG-279）', () => {
+    const h = home(); const ws = workspace()
+    try {
+      const oldPack = { name: 'dsh-company-pack', version: '0.11.8' }
+      const created = create(h, ws, oldPack)
+      expect(created.written.created).toBe(true)
+      const oldBytes = readFileSync(created.plan.path, 'utf8')
+
+      const next = planBundleManifest({ dshHome: h, workspace: ws, pack: { name: oldPack.name, version: '0.11.9' } })
+      expect(next.action).toBe('upgrade')
+      expect(next.previousVersionPath).toBe(`${next.path}.v3-0.11.8.bak`)
+      expect(writeBundleManifest(next).upgraded).toBe(true)
+      const current = readBundleManifestState(ws, { name: oldPack.name, version: '0.11.9' })
+      expect(current.status).toBe('ok')
+      if (current.status !== 'ok') return
+      expect(current.manifest.pack.version).toBe('0.11.9')
+
+      const backup = next.previousVersionPath
+      if (backup === undefined) return
+      expect(existsSync(backup)).toBe(true)
+      expect(readFileSync(backup, 'utf8')).toBe(oldBytes)
+      const backupJson = JSON.parse(readFileSync(backup, 'utf8'))
+      expect(backupJson.v).toBe(BUNDLE_MANIFEST_VERSION)
+      expect(backupJson.pack.version).toBe('0.11.8')
+
+      // 盘上旧版本号不可信：`../../evil` 不得把备份带出 bundle.json 所在目录。
+      const crafted = JSON.parse(oldBytes)
+      crafted.pack = { name: oldPack.name, version: '../../evil' }
+      writeFileSync(next.path, JSON.stringify(crafted))
+      const craftedBytes = readFileSync(next.path, 'utf8')
+      const evil = planBundleManifest({ dshHome: h, workspace: ws, pack: { name: oldPack.name, version: '0.11.9' } })
+      expect(evil.action).toBe('upgrade')
+      const evilBackup = evil.previousVersionPath
+      expect(evilBackup).toBeDefined()
+      if (evilBackup === undefined) return
+      expect(dirname(evilBackup)).toBe(dirname(evil.path))
+      expect(basename(evilBackup)).not.toContain('..')
+      expect(basename(evilBackup)).toMatch(/^bundle\.json\.v3-[0-9A-Za-z._-]+\.bak$/)
+      expect(writeBundleManifest(evil).upgraded).toBe(true)
+      expect(readFileSync(evilBackup, 'utf8')).toBe(craftedBytes)
+      expect(JSON.parse(readFileSync(evilBackup, 'utf8')).pack.version).toBe('../../evil')
+
+      // 旧版本号清洗后为空（全是点）→ 固定 fallback 名，仍在同一目录（不拼出隐藏路径）。
+      const dotted = JSON.parse(craftedBytes)
+      dotted.pack = { name: oldPack.name, version: '...' }
+      writeFileSync(next.path, JSON.stringify(dotted))
+      const fallback = planBundleManifest({ dshHome: h, workspace: ws, pack: { name: oldPack.name, version: '0.11.9' } })
+      expect(basename(fallback.previousVersionPath ?? '')).toBe('bundle.json.v3-prev.bak')
+      expect(writeBundleManifest(fallback).upgraded).toBe(true)
+
+      // skip 与 create 不产生备份路径。
+      const skipped = planBundleManifest({ dshHome: h, workspace: ws, pack: { name: oldPack.name, version: '0.11.9' } })
+      expect(skipped.action).toBe('skip')
+      expect(skipped.previousVersionPath).toBeUndefined()
+      const fresh = workspace()
+      try {
+        const freshPlan = planBundleManifest({ dshHome: h, workspace: fresh, pack: oldPack })
+        expect(freshPlan.action).toBe('create')
+        expect(freshPlan.previousVersionPath).toBeUndefined()
+      } finally { rmSync(fresh, { recursive: true, force: true }) }
     } finally { rmSync(h, { recursive: true, force: true }); rmSync(ws, { recursive: true, force: true }) }
   })
 

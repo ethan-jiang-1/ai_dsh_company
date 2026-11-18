@@ -60,19 +60,42 @@ export function devBuildFingerprint(packDir, { vendorSha, lockfilePath }) {
 }
 
 
-/** 决定 tarball 字节/发布判据的管线文件（相对仓库根；BUG-243）。 */
-export const RELEASE_PIPELINE_FILES = [
-  'tools/lib/release/shipped-shape.mjs',
-  'tools/release/shipped-shape.mjs',
-  'tools/release/export-dist.mjs',
-  'tools/release/release.mjs',
-  'tools/lib/core/pack-source.mjs',
-]
+/**
+ * 发布管线的**目录**（相对仓库根）：目录里每个 `.mjs` 都是发布字节/判据的决定者。
+ * 2026-11-19（BUG-263/264）：此前是手写 5 条，install-manual/market-index 后来加入管线却没进清单，
+ * 改它们 `_dist` 不重打也能绿。输入集必须随目录增长，不靠人记得改清单。
+ */
+export const RELEASE_PIPELINE_DIRS = ['tools/release', 'tools/lib/release']
 
-/** 发布管线指纹：只改 sanitizer/export-dist/pack-source 也必须触发重打。 */
+/**
+ * 跨目录的发布字节决定者（这些目录之外、但改了就改变 `_dist` 字节或手册表头）：
+ * - `pack-source.mjs` 定义源指纹本身；
+ * - `pin.mjs` 的 expectedTag 写进安装手册表头。
+ */
+export const RELEASE_PIPELINE_FILES = ['tools/lib/core/pack-source.mjs', 'tools/lib/core/pin.mjs']
+
+/**
+ * 决定 tarball 字节/发布判据的管线文件（相对仓库根） = 目录派生 ∪ 显式跨目录项。
+ * @param {string} root 仓库根
+ * @returns {string[]} 排序后的相对路径
+ */
+export function releasePipelineFiles(root) {
+  const files = new Set()
+  for (const relDir of RELEASE_PIPELINE_DIRS) {
+    const dir = join(root, relDir)
+    if (!existsSync(dir)) continue
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isFile() && entry.name.endsWith('.mjs')) files.add(`${relDir}/${entry.name}`)
+    }
+  }
+  for (const rel of RELEASE_PIPELINE_FILES) if (existsSync(join(root, rel))) files.add(rel)
+  return [...files].sort()
+}
+
+/** 发布管线指纹：改 sanitizer/export-dist/手册模板/市场索引等任一决定者都必须触发重打。 */
 export function releasePipelineFingerprint(root) {
   const hash = createHash('sha256')
-  for (const rel of RELEASE_PIPELINE_FILES) {
+  for (const rel of releasePipelineFiles(root)) {
     hash.update(rel)
     hash.update('\0')
     hash.update(readFileSync(join(root, rel)))

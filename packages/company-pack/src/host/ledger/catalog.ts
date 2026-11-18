@@ -4,7 +4,7 @@
  * 本文件只留「扫描交付物根 + 生成派生索引（幂等）」；读取/校验 = catalog-state.ts，
  * 审计账本 = presented-ledger.ts。索引 `kb/deliverables-index.json` 是盘上 meta/final + 账本的派生视图。
  */
-import { accessSync, constants, existsSync, lstatSync, readdirSync, readFileSync, statSync } from 'node:fs'
+import { copyFileSync, existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   buildDeliverablesCatalog,
@@ -41,8 +41,11 @@ function labelOfProblem(problem: Exclude<ReturnType<typeof plainFileProblem>, nu
       : '不是普通文件'
 }
 
-/** 扫描两个交付物根；presented 由账本按 path/slug 命中决定，未命中 = null。 */
-function scanEntries(companyHome: string, ledger: PresentedLedger): { entries: CatalogScanEntry[], warnings: string[] } {
+/**
+ * 扫描两个交付物根；presented 由账本按 path/slug 命中决定，未命中 = null。
+ * 导出是给 spec 的测试缝：catalog 输出会丢弃无 `final` 的目录，只有扫描结果能看到被判 false 的 entry。
+ */
+export function scanCatalogEntries(companyHome: string, ledger: PresentedLedger): { entries: CatalogScanEntry[], warnings: string[] } {
   const entries: CatalogScanEntry[] = []
   const warnings: string[] = []
   for (const root of CATALOG_ROOTS) {
@@ -68,19 +71,16 @@ function scanEntries(companyHome: string, ledger: PresentedLedger): { entries: C
       let final = finalProblem === null
       if (finalProblem !== null && finalProblem !== 'missing') warnings.push(`${finalPath} ${labelOfProblem(finalProblem)}，按无 final 处理`)
       // BUG-239：路径存在 ≠ 可读；不可读的 final 不能冒充可展示成品。
+      // BUG-275：非零字节 ≠ 有内容；空白也按无 final。一次读同时判「可读」与「非空白」。
       if (final) {
-        try { accessSync(finalPath, constants.R_OK) } catch {
+        try {
+          if (readFileSync(finalPath, 'utf8').trim() === '') {
+            warnings.push(`${finalPath} 为空，按无 final 处理`)
+            final = false
+          }
+        } catch {
           warnings.push(`${finalPath} 不可读，按无 final 处理`)
           final = false
-        }
-        // BUG-259：可读但零字节不是可展示成品。
-        if (final) {
-          try {
-            if (statSync(finalPath).size === 0) {
-              warnings.push(`${finalPath} 为空，按无 final 处理`)
-              final = false
-            }
-          } catch { /* accessSync 已过，stat 失败按不可读 */ }
         }
       }
       const metaPath = join(dir, item.name, 'meta.md')
@@ -114,6 +114,32 @@ function scanEntries(companyHome: string, ledger: PresentedLedger): { entries: C
   return { entries, warnings }
 }
 
+/**
+ * BUG-276：旧索引读不出来时，覆盖前把旧字节留在旁边（`<path>.bak`）。
+ * 源/目标都过 `plainFileProblem`（symlink/盘外一律不跟）；跳过或失败只降级成 warning，绝不抛。
+ * @returns 备份文件路径；未备份 = null。
+ */
+function backupUnreadableCatalog(companyHome: string, path: string, warnings: string[]): string | null {
+  const backupPath = `${path}.bak`
+  const sourceProblem = plainFileProblem(companyHome, path)
+  if (sourceProblem !== null) {
+    warnings.push(`${path} ${sourceProblem === 'missing' ? '已不存在' : labelOfProblem(sourceProblem)}，跳过旧索引备份`)
+    return null
+  }
+  const backupProblem = plainFileProblem(companyHome, backupPath)
+  if (backupProblem !== null && backupProblem !== 'missing') {
+    warnings.push(`${backupPath} ${labelOfProblem(backupProblem)}，跳过旧索引备份`)
+    return null
+  }
+  try {
+    copyFileSync(path, backupPath)
+    return backupPath
+  } catch (error) {
+    warnings.push(`旧索引备份失败：${(error as Error).message}`)
+    return null
+  }
+}
+
 export interface CatalogResult {
   readonly written: boolean
   readonly catalog: DeliverablesCatalog | null
@@ -137,8 +163,14 @@ export function regenerateCatalog(companyHome: string, presented?: PresentedLedg
   }
   const previousState = readCatalogState(companyHome)
   const previous = previousState.status === 'ok' ? previousState.catalog : null
-  const scanned = scanEntries(companyHome, ledger)
+  const scanned = scanCatalogEntries(companyHome, ledger)
   const warnings = [...scanned.warnings]
+  // BUG-276：旧索引 corrupt/unsupported 不能静默当「没有历史」覆盖；先告警，再尽力留下旧字节。
+  if (previousState.status === 'corrupt' || previousState.status === 'unsupported') {
+    const rebuilt = `${path} 旧索引不可读或不受信（${previousState.error}），按重建处理`
+    const backupPath = backupUnreadableCatalog(companyHome, path, warnings)
+    warnings.push(backupPath === null ? rebuilt : `${rebuilt}，旧字节已备份为 ${backupPath}`)
+  }
   const ledgerPath = join(companyHome, RUN_BUNDLE_PATHS.ledger)
   const ledgerProblem = plainFileProblem(companyHome, ledgerPath)
   const ledgerIsFile = ledgerProblem === null

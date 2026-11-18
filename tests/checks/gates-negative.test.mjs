@@ -10,8 +10,10 @@
 //   pack-content-paths    AGENTS 加 `` `content/nope.md` ``                    → 死指针
 //   content-single-home   删 policy-lines 的“服务信用”行                     → 缺政策线
 //   content-manifest      company/ 加一份未登记 .md                           → 未登记的 content 文件
+//   content-manifest      content/ 下放 symlink 文件                          → 出现 symlink
+//   content-manifest      删 content/templates/ 整目录                        → 必需目录缺内容
 //   base-clean            charter 加“公司财务 agent 案（date-pending）”           → 含部署个案语言
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import * as baseClean from '../../checks/gates/base-clean.mjs'
@@ -89,6 +91,24 @@ const mutateOrFail = (label, path, transform) => {
   try {
     writeFileSync(join(root, 'packages/company-pack/content/company/zz-unlisted.md'), '# 未登记\n')
     report('content-manifest：未登记文件 → 红', run(contentManifest, root), '未登记的 content 文件')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // BUG-266：symlink 文件此前 entry.isFile() 为 false，整条被静默跳过 → gate 绿。
+  const root = makeRoot()
+  try {
+    symlinkSync(join(root, 'packages/company-pack/content/AGENTS.md'), join(root, 'packages/company-pack/content/company/zz-link.md'))
+    report('content-manifest：symlink 文件 → 红', run(contentManifest, root), '出现 symlink')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // BUG-273：必需目录此前只用于「未登记 .md」扫描，目录缺失走 continue → gate 绿。
+  const root = makeRoot()
+  try {
+    rmSync(join(root, 'packages/company-pack/content/templates'), { recursive: true, force: true })
+    report('content-manifest：删必需目录 → 红', run(contentManifest, root), '必需目录缺内容')
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 

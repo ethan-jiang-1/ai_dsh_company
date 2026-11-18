@@ -788,6 +788,28 @@ BUG-001..022 已修迁、BUG-023 误报 [fixed_bugs](../_archive/fixed_bugs/BUG-
 不修改 `vendor/dsh/`（vendor 侧写清上游提案即可）。探索轮已落地的缓解（skill/docs/注释）不重复做，
 先核对再补缺口；证据落 `runtime/tmp/explore/`（gitignored）或新 keyless spec。
 
+## 2026-11-19 修复交接（根因组 A–G：BUG-263..282）
+
+**用户指令（2026-11-19）**：「继续新的bug, _backlog/bugs 里面有最近exploratory test 发现的bugs, 你琢磨一下, 看看是否能系统性修起来. 计划有了后 setup goal 逐步按REPO的流程来推进。」——本句即本轮授权（材料性：门禁判据、发布管线与 docs-only 边界、content 合同、client 用户可见面；留痕 = 批次 Note `notes/implemented/2026-11-19-guard-residuals-closure.md`）。BUG-212 仍挂起（见 suspended_bugs）。
+
+20 张不是 20 个补丁。C17 的七条轴收成 **七个「判据的输入集靠人写」的根因**：每个守卫/降级面都只闭了上一轮被想到的形状，没闭「谁来决定输入集」。修法一律是**把输入集变成派生量或单一纯函数**，不是再补两条路径/两个 if。
+
+| 组 | 卡 | 共同根因（证据） | 修法（唯一事实源） | 顺序 |
+|---|---|---|---|---|
+| **A 发布输入集** | [263](BUG-263-pipeline-install-manual.md) / [264](BUG-264-pipeline-market-index.md) | `RELEASE_PIPELINE_FILES` 是手写 5 条；改 install-manual/market-index 指纹不变（`107c586152b7` 前后同一值） | `releasePipelineFiles(root)` = `tools/release/*.mjs` + `tools/lib/release/*.mjs` 目录派生 ∪ 显式跨目录字节决定者（`pack-source` / `pin`）；spec 断言「目录里每个 .mjs 都在集内」+ 逐文件改字节指纹必变 | 1 |
+| **B content 合同单一实现** | [265](BUG-265-inventory-backslash-path.md) / [266](BUG-266-inventory-symlink-file.md) / [267](BUG-267-manifest-version-unvalidated.md) / [268](BUG-268-seed-target-unsafe.md) / [269](BUG-269-delivery-documents-refs.md) / [270](BUG-270-check-rules-values.md) / [273](BUG-273-content-required-dirs.md) / [274](BUG-274-inventory-duplicate-gate.md) | 同一份 content 合同有**两份实现**（`checks/gates/content-manifest.mjs` vs `tools/lib/release/shipped-shape.mjs` 的 `contentManifestProblems`/`jsonSchemaProblem`），且跨引用判据只活在源树门禁（`seed-integrity`/`delivery-mode-sources`）里；重复项两门结论相反 | 新纯模块 `tools/lib/company/content-contract.mjs`：`contentRelProblem`（POSIX+反斜杠+盘符+NUL）、`contentManifestProblems({manifest,has,read,list})`（version=1 / inventory / tiers / 必需目录 / JSON 跨引用）、`contentJsonProblem`（seed target 在 `.dsh-company/` 内且 source 在 inventory、delivery documents 的 `template` 在场、check-rules `files` 形状与 `layers` 覆盖）；gate 与 shipped checker 同调一份，`list` 由 gate 适配（含 symlink 显式拒绝） | 2 |
+| **C dev 命令解析** | [271](BUG-271-dev-command-pnpm-forms.md) / [272](BUG-272-dev-command-probes.md) | `DEV_COMMAND` 是手写正则白名单；`pnpm -s test` / `pnpm exec` / `npm run` / `node probes/` 不在判据 | 新纯模块 `tools/lib/core/dev-command.mjs`：按**首词 + 包管理器子命令**解析（`pnpm\|npm\|yarn\|npx` × 旗标 × `run\|exec\|dlx\|<package.json scripts 名>`），`node\|tsx` 认 `tools\|checks\|tests\|probes/`，脚本名从 root `package.json` 派生；`checkSourceShape` 改为调用它 | 3 |
+| **G release docs-only 边界** | [280](BUG-280-release-docs-only-manual.md) / [281](BUG-281-release-docs-only-rename.md) / [282](BUG-282-release-stamp-check-asymmetry.md) | docs-only 判据 = `git diff --name-only` + 手写路径正则，**只看新路径**、把生成手册当 docs；`stamp`/`check` 两入口各写一份判据 | 新纯模块 `tools/lib/release/docs-only.mjs`（`--name-status -z` 解析、rename 的**旧路径也算**、生成物不在集合内）+ `tools/lib/release/readiness.mjs`（stamp/check 共用的就绪判据，含「手册 = 当前模板产物」同源校验，`dist-manual` 同调一份） | 4 |
+| **D catalog 降级** | [275](BUG-275-catalog-whitespace-final.md) / [276](BUG-276-catalog-json-unreadable-silent.md) | 「可展示」被折成非空字节；读索引失败被当成空索引静默覆盖 | `final` 判据到 `trim()`；`readCatalogState` 为 corrupt/unsupported 时 warning + 旧索引备份后再写 | 5 |
+| **F bundle 升级留痕** | [279](BUG-279-bundle-upgrade-no-backup.md) | 升级路径只备份 v2（`legacyPath` 只在 legacy 分支），v3 版本升级直接覆盖 | v3 版本升级也返回版本化备份路径（`bundle.json.v3-<oldVersion>.bak`），写前 rename（writer 已有该分支） | 6 |
+| **E gap 到 UI** | [277](BUG-277-presence-revision-gap-not-consumed.md) / [278](BUG-278-presence-unknown-status-label.md) | C16 修了读模型（`revisionGap`），**消费面没接**：`tasksFromTeamView` 丢掉 gap、未知 status 静默折成「待办」 | `TaskRow`/`BoardCard` 带 `revisionGap`/`statusGap`；任务板 + 看板各出一条 zh/en 成对文案（`company-ui-change-definition`）；读模型纯函数可测 | 7 |
+
+**次序 = A → B → C → G → D/F → E → 重打 `_dist` → 证据/归档**：A 先立「发布字节由谁决定」的地基；B/C 同改 `tools/lib/release/shipped-shape.mjs`，背靠背做；G 收发布入口；D/F 是 host 运行时（与发布面正交，可并行）；E 动 client + 需要重建 `lib/client.js` 与刷新金样，放在重打前最后一步。一次重打覆盖 A/B/C/G 的 pipeline 指纹变化（同版用 `--prepare --force`）。
+
+**证据口径**：先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；每卡红/绿写**同一条**可执行命令（B/C/A/G = 对应面的 keyless spec；D/F = 对应 host spec；E = `pnpm test tests/lib/presence tests/client`）；日志落 `runtime/tmp/c17-fix/`。批次 Note = 共享机制决定（七组七节：输入集派生 vs 逐条补路径、单一纯函数 vs 两处判据、UI 消费 vs 只修读模型）。
+
+**终点** = 20 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡盲审 + `## 修复证据`；`pnpm verify` / `test` / `typecheck` / `coverage:ratchet` 绿；`_dist` 重打且 `release:shape` / `release --check` 绿。
+
 ## frontmatter 与模板
 
 第一行 `---`，字段按 `status` / `severity` / `opened` 顺序。活跃状态 = `调查中`（原 `活跃`，2026-10-12 改名——与「活跃清单」撞词）/ `修复就绪` / `修复已落地` / `等人拍板`，出口值 `已修`/`待修`；翻转法与修复授权边界唯一家 = 章程「双轨状态生命周期」「缺陷的通道」。严重级为 `P0` 阻断 / `P1` 重要 / `P2` 次要——哪个级别走哪条通道见章程（severity 的消费者）。迁档时仅改 `status`，其余字段保留，状态行补 `审查：agent｜用户｜跳过 — 理由`。

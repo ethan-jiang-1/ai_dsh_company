@@ -21,6 +21,8 @@ import { spawnSync } from 'node:child_process'
 import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 import { releasePipelineFingerprint, sourceFingerprint } from '../lib/core/pack-source.mjs'
 import { expectedTag } from '../lib/core/pin.mjs'
+import { docsOnlyOutputProblem } from '../lib/release/docs-only.mjs'
+import { manualProductProblem, readinessProblems } from '../lib/release/readiness.mjs'
 
 const PACK = join(ROOT, 'packages/company-pack')
 const DIST = join(ROOT, '_dist')
@@ -184,6 +186,9 @@ function artifactCheck() {
   if (manualVersion !== version) errors.push(`手册版本 ${String(manualVersion)} ≠ package ${version}`)
   const manualSha = /\|\s*校验（sha256）\s*\|\s*`([0-9a-f]{64})`/.exec(text)?.[1]
   if (manualSha !== actual) errors.push(`手册 sha256 ${String(manualSha)} ≠ tgz ${actual}`)
+  // BUG-280：手册是**生成物**，必须逐字节等于当前模板用同一批字段渲染的结果（手改/旧模板都红）。
+  const productProblem = manualProductProblem({ manual: text, version, expectedTag })
+  if (productProblem !== undefined) errors.push(`${productProblem}——重跑 --prepare（手册不手改）`)
   if (errors.length > 0) fail(errors.join('\n  '))
   return { file: `dsh-company-pack-${version}.tgz`, sha256: actual, entries: entryCount(tgz), manual: '安装手册.md', manualSha256: sha256(manual) }
 }
@@ -218,15 +223,28 @@ function build() {
   run(process.execPath, ['tools/release/export-dist.mjs'])
 }
 
-/** docs-only 收尾路径：只改备忘/文档，不改 pack 源、管线、产物。 */
-const DOCS_ONLY_PATHS = [/^docs\//, /^notes\//, /^_backlog\//, /^_dist\/安装手册\.md$/, /^README\.md$/, /^AGENTS\.md$/, /^CLAUDE\.md$/]
-
-function docsOnlySince(sha) {
-  let names
+/**
+ * docs-only 收尾路径的判据（唯一家 = lib/release/docs-only.mjs）：只改备忘/文档，不改 pack 源、管线、产物。
+ * rename/copy 的两侧路径都参与判断；`_dist/安装手册.md` 是生成物，不在集合内（BUG-280/281）。
+ * @returns {string|undefined} 问题描述；docs-only = undefined
+ */
+function docsOnlyProblemSince(sha) {
+  let output
   try {
-    names = capture('git', ['diff', '--name-only', '-z', `${sha}..HEAD`]).split('\0').filter(Boolean)
-  } catch { return false }
-  return names.length > 0 && names.every(name => DOCS_ONLY_PATHS.some(pattern => pattern.test(name)))
+    output = capture('git', ['diff', '--name-status', '-z', '--find-renames', `${sha}..HEAD`])
+  } catch { return '读不到 git diff（拒绝当 docs-only）' }
+  return docsOnlyOutputProblem(output)
+}
+
+/** stamp/check 共用的就绪判据（BUG-282：两入口同一份结论）。 */
+function sharedReadinessProblems(manifest, artifact) {
+  return readinessProblems({
+    manifest,
+    version: pack().version,
+    sourceFingerprint: sourceFingerprint(PACK),
+    pipelineFingerprint: releasePipelineFingerprint(ROOT),
+    artifactSha256: artifact.sha256,
+  })
 }
 
 function writeManifest(checks) {
@@ -305,15 +323,13 @@ function stamp() {
   const artifact = artifactCheck()
   const manifest = readManifest()
   assertVendor(manifest)
-  if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
-  if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；' + repackHint())
-  if (manifest.pipelineFingerprint !== releasePipelineFingerprint(ROOT)) fail('发布管线已变但 _dist 没重打；' + repackHint())
-  if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
-  const checks = manifest.checks ?? {}
-  const notPass = Object.entries(checks).filter(([, status]) => status !== 'pass')
-  if (checks.verify !== 'pass' || checks.test !== 'pass' || notPass.length > 0) fail('manifest 还没有全项 pass；先 --verify')
+  const problems = sharedReadinessProblems(manifest, artifact)
+  if (problems.length > 0) fail(problems.join('\n  '))
   const head = capture('git', ['rev-parse', 'HEAD']).trim()
-  if (manifest.gitSha !== head && !docsOnlySince(manifest.gitSha)) fail('manifest gitSha 与当前 HEAD 之间不是 docs-only；先 --prepare/--verify')
+  if (manifest.gitSha !== head) {
+    const problem = docsOnlyProblemSince(manifest.gitSha)
+    if (problem !== undefined) fail(`manifest gitSha 与当前 HEAD 之间不是 docs-only（${problem}）；先 --prepare/--verify`)
+  }
   manifest.gitSha = head
   manifest.dirty = false
   manifest.generatedAt = new Date().toISOString()
@@ -326,20 +342,14 @@ function check(allowDirtyTree = allowDirty) {
   const artifact = artifactCheck()
   const manifest = readManifest()
   assertVendor(manifest)
-  if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
-  if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；' + repackHint())
-  if (manifest.pipelineFingerprint !== releasePipelineFingerprint(ROOT)) fail('发布管线已变但 _dist 没重打；' + repackHint())
+  const problems = sharedReadinessProblems(manifest, artifact)
+  if (problems.length > 0) fail(`${problems.join('\n  ')}\n  提示：${repackHint()}`)
   const head = capture('git', ['rev-parse', 'HEAD']).trim()
   if (manifest.gitSha !== head) {
-    if (!docsOnlySince(manifest.gitSha)) fail('manifest gitSha 不是当前 HEAD（发布后被改过？只提交 docs/receipt 时用 --stamp；重建产物才用 --prepare/--verify）')
+    const problem = docsOnlyProblemSince(manifest.gitSha)
+    if (problem !== undefined) fail(`manifest gitSha 不是当前 HEAD（${problem}；发布后被改过？只提交 docs/receipt 时用 --stamp；重建产物才用 --prepare/--verify）`)
     console.log('release: docs-only commit since stamp；source/pipeline/artifact 未变，允许 --check（用 --stamp 钉 HEAD）')
   }
-  if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
-  if (manifest.dirty !== false) fail('manifest 记录的是脏树（发布字节不对应一个干净 commit；重跑 --verify）')
-  const checks = manifest.checks ?? {}
-  const notPass = Object.entries(checks).filter(([, status]) => status !== 'pass')
-  if (checks.verify !== 'pass' || checks.test !== 'pass') fail('manifest 未记录 verify/test 通过（--prepare 后必须 --verify）')
-  if (notPass.length > 0) fail(`manifest 有未通过的检查：${notPass.map(([name, status]) => `${name}=${String(status)}`).join(', ')}`)
   if (!allowPrePublishIndex
     && existsSync(join(ROOT, 'market-index.staged.json'))
     && existsSync(join(ROOT, 'market-index.json'))) {

@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
-import { devBuildFingerprint, packageSourceFiles, sourceFingerprint } from '../../../tools/lib/core/pack-source.mjs'
+import { devBuildFingerprint, packageSourceFiles, releasePipelineFiles, sourceFingerprint } from '../../../tools/lib/core/pack-source.mjs'
 
 const makePack = () => {
   const dir = mkdtempSync(join(tmpdir(), 'pack-source-'))
@@ -21,7 +21,10 @@ describe('包源指纹（release 与 dev 缓存共用）', () => {
     try {
       mkdirSync(join(dir, 'src', 'node_modules'), { recursive: true })
       writeFileSync(join(dir, 'src', 'node_modules', 'x.js'), 'x')
-      expect(packageSourceFiles(dir)).toEqual(['package.json', 'presets/ceo/persona.md', 'src/a.ts'])
+      writeFileSync(join(dir, 'src', '.DS_Store'), 'x')
+      mkdirSync(join(dir, 'src', 'nested'), { recursive: true })
+      writeFileSync(join(dir, 'src', 'nested', 'b.ts'), 'export const b = 1\n')
+      expect(packageSourceFiles(dir)).toEqual(['package.json', 'presets/ceo/persona.md', 'src/a.ts', 'src/nested/b.ts'])
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 
@@ -58,5 +61,21 @@ describe('包源指纹（release 与 dev 缓存共用）', () => {
     // 断言「依赖存在」而不是某一层深度：lib 内部分组（core/ 等）不该让这条不变量变红。
     expect(release).toMatch(/from '\.\.\/lib\/(?:[a-z]+\/)?pack-source\.mjs'/)
     expect(release).not.toContain('const PACKAGE_SOURCE_DIRS')
+  })
+})
+
+describe('发布管线输入集（目录派生，BUG-263/264）', () => {
+  it('目录缺失/非 .mjs/跨目录项缺失都不崩，集随目录派生', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'pipeline-files-'))
+    try {
+      mkdirSync(join(dir, 'tools', 'release'), { recursive: true })
+      writeFileSync(join(dir, 'tools', 'release', 'a.mjs'), '// a\n')
+      writeFileSync(join(dir, 'tools', 'release', 'b.txt'), 'x')
+      // tools/lib/release 不在盘上 → 目录缺失分支；pack-source/pin 不在盘上 → 显式项缺失分支
+      expect(releasePipelineFiles(dir)).toEqual(['tools/release/a.mjs'])
+      mkdirSync(join(dir, 'tools', 'lib', 'core'), { recursive: true })
+      writeFileSync(join(dir, 'tools', 'lib', 'core', 'pack-source.mjs'), '// s\n')
+      expect(releasePipelineFiles(dir)).toEqual(['tools/lib/core/pack-source.mjs', 'tools/release/a.mjs'])
+    } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 })

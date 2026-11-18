@@ -5,7 +5,7 @@ import { dagLevels, layoutDag } from '../../../packages/company-pack/src/lib/pre
 
 /** 造一行任务（只填布局关心的字段）。 */
 function task(id: string, blockedBy: readonly string[] = [], status: TaskRow['status'] = 'pending'): TaskRow {
-  return { id, subject: `任务 ${id}`, description: '', status, ownerName: null, revision: 1, blockedBy, ready: true }
+  return { id, subject: `任务 ${id}`, description: '', status, ownerName: null, revision: 1, blockedBy, ready: true, revisionGap: false, statusGap: false }
 }
 
 describe('dagLevels', () => {

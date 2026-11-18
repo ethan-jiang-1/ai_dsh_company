@@ -13,6 +13,7 @@ import {
   dependencyDrift,
   dependencyEdges,
   driftLabel,
+  isKnownTaskStatus,
   readyOf,
   tasksFromTeamView,
   toTaskStatus,
@@ -235,5 +236,36 @@ describe('dependencyDrift（声明 vs 板面：2026-10-13 真事故的机器判�
     // 分叉信号本身不受影响——drift tag 与 ready 是**两个独立信号**：前者说"文本里声明了依赖、板面没落边"，
     // 后者说"这活现在能不能开工"。任务在跑 ⇒ 后者当然 false，与分叉无关。
     expect(card?.ready).toBe(false)
+  })
+})
+
+/**
+ * BUG-277/278：读模型必须把「降级」当事实交出去（statusGap / revisionGap），
+ * 而不是把未知 status 静默折成待办、把缺 revision 的覆盖当成正常事件。
+ */
+// 负例留证 2026-11-19：未知 status 折成 pending 后无任何标记、revisionGap 在读模型里丢失（BUG-277/278）。
+describe('降级事实（BUG-277/278）', () => {
+  it('未知 status 折成 pending 但标 statusGap；合法 status 不标', () => {
+    const [unknown, known] = tasksFromTeamView(view([
+      { id: 't1', subject: '状态未知', status: 'paused', revision: 1 },
+      { id: 't2', subject: '正常', status: 'in_progress', revision: 2 },
+    ]))
+    expect(unknown?.status).toBe('pending')
+    expect(unknown?.statusGap).toBe(true)
+    expect(known?.statusGap).toBe(false)
+    expect(isKnownTaskStatus('paused')).toBe(false)
+    expect(isKnownTaskStatus('completed')).toBe(true)
+  })
+
+  it('事件覆盖缺 revision 的投影 → revisionGap 透传到卡', () => {
+    const tasks = tasksFromTeamView(view([
+      { id: 't1', subject: '降级', status: 'in_progress', revision: 2, revisionGap: true },
+      { id: 't2', subject: '正常', status: 'in_progress', revision: 3 },
+    ]))
+    expect(tasks.find(task => task.id === 't1')?.revisionGap).toBe(true)
+    expect(tasks.find(task => task.id === 't2')?.revisionGap).toBe(false)
+    const cards = boardColumns(tasks).flatMap(column => column.cards)
+    expect(cards.find(card => card.id === 't1')?.revisionGap).toBe(true)
+    expect(cards.find(card => card.id === 't2')?.revisionGap).toBe(false)
   })
 })

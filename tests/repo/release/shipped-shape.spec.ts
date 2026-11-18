@@ -1,10 +1,11 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { appendFileSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { EXPECTED_PATCH, REQUIRED_SHIPPED, checkShippedPackage, checkSourceShape, freshnessProblem, packageRootOf, platformModules, sanitizePackage, scrubDevPaths, staleFlagProblem, stripComments } from '../../../tools/lib/release/shipped-shape.mjs'
-import { RELEASE_PIPELINE_FILES, devBuildFingerprint, packageSourceFiles, releasePipelineFingerprint, sourceFingerprint } from '../../../tools/lib/core/pack-source.mjs'
+import { CONTENT_VERSION } from '../../../tools/lib/company/content-contract.mjs'
+import { devBuildFingerprint, packageSourceFiles, releasePipelineFiles, releasePipelineFingerprint, sourceFingerprint } from '../../../tools/lib/core/pack-source.mjs'
 
 // 负例留证 2026-11-17：类型面植入内部 .d.ts，checker 红（BUG-213）；删除 → 绿。
 // 负例留证 2026-11-17：manifest 植入 scripts.prepack，checker 红（BUG-214）；删除 → 绿。
@@ -73,9 +74,22 @@ const README = [
   '',
 ].join('\n')
 
-/** 合成关键件 JSON 的最小合法形状（与 checker 的 schema 判据同步）。 */
+/** delivery-rules 在 fixture 里引用的模板名（按交付模式固定，fixture 会建同名文件）。 */
+function deliveryTemplate(rel: string): string {
+  return rel.includes('managed-service') ? 'sla' : 'sow'
+}
+
+/** 合成关键件 JSON 的最小合法形状（与 checker 的 schema/跨引用判据同步）。 */
 function requiredJson(rel: string): string {
-  if (rel.includes('delivery-rules.json')) return JSON.stringify({ deliveryMode: 'x', kind: 'delivery', documents: { SOW: {} } })
+  if (rel.includes('delivery-rules.json')) {
+    const mode = rel.includes('managed-service') ? 'managed-service' : 'project-services'
+    return JSON.stringify({
+      deliveryMode: mode,
+      kind: 'delivery',
+      entry: 'overview.md',
+      documents: { DOC: { file: `drafts/${deliveryTemplate(rel)}.md`, owner: 'COO', template: `templates/${deliveryTemplate(rel)}.md` } },
+    })
+  }
   if (rel.endsWith('seed.json')) return JSON.stringify({ seeds: [{ source: 'state/company.md', target: '.dsh-company/kb/company.md' }] })
   if (rel.endsWith('check-rules.json')) return JSON.stringify({ productType: 'x', layers: ['MRD'], files: { MRD: 'mrd.md' } })
   return '{"tiers":{}}'
@@ -100,6 +114,13 @@ function fixture(overrides: { pkg?: Record<string, unknown>; entries?: string[];
     dsh: { bundle: { patch: EXPECTED_PATCH }, client: { inject: ['@deepseek-ai/dsh-client-ui-primitives'], platform: 'web' } },
     ...overrides.pkg,
   }
+  // delivery-rules 的 entry/template 是**被引用就存在**：fixture 按规则文件建同名件（BUG-269 判据的前提）。
+  const deliveryExtras = REQUIRED_SHIPPED
+    .filter(rel => /^content\/delivery-modes\/.*\/delivery-rules\.json$/.test(rel))
+    .flatMap(rel => {
+      const dir = rel.slice('content/'.length).replace(/\/delivery-rules\.json$/, '')
+      return [`package/content/${dir}/overview.md`, `package/content/${dir}/document-map.md`, `package/content/${dir}/templates/${deliveryTemplate(rel)}.md`]
+    })
   const entries = overrides.entries ?? [
     'package/package.json', 'package/lib/index.js', 'package/lib/client.js',
     'package/lib/types/index.d.ts', 'package/lib/types/client/index.d.ts',
@@ -107,6 +128,7 @@ function fixture(overrides: { pkg?: Record<string, unknown>; entries?: string[];
     'package/LICENSE', 'package/README.md', 'package/cordis.patch.yml',
     ...REQUIRED_SHIPPED.map(rel => `package/${rel}`),
     ...EXPECTED_PATCH.map(rel => `package/${rel.replace(/^\.\//, '')}`),
+    ...deliveryExtras,
   ]
   const contentInventory = entries
     .filter(entry => entry.startsWith('package/content/'))
@@ -117,7 +139,8 @@ function fixture(overrides: { pkg?: Record<string, unknown>; entries?: string[];
     `package/${rel}`,
     rel.endsWith('.json') ? `${requiredJson(rel)}\n` : '# x\n',
   ]))
-  requiredTexts['package/content/manifest.json'] = `${JSON.stringify({ tiers: {}, inventory: contentInventory })}\n`
+  for (const entry of deliveryExtras) requiredTexts[entry as keyof typeof requiredTexts] = '# x\n'
+  requiredTexts['package/content/manifest.json'] = `${JSON.stringify({ version: CONTENT_VERSION, tiers: {}, inventory: contentInventory })}\n`
   const presetTexts = Object.fromEntries(EXPECTED_PATCH.filter(rel => rel.includes('presets/')).map(rel => [
     `package/${rel.replace(/^\.\//, '')}`,
     'id: x\n',
@@ -138,6 +161,16 @@ function fixture(overrides: { pkg?: Record<string, unknown>; entries?: string[];
     ...overrides.texts,
   }
   return { pkg, entries, read: (entry: string) => texts[entry as keyof typeof texts] ?? '', platformModules: overrides.platformModules ?? PLATFORM }
+}
+
+/** 一个「包里有、清单里没有」的 content 文件 → checker 必须红（双向对账缺的一侧）。 */
+function guardUnlisted(rel: string): boolean {
+  const base = fixture()
+  const contentRel = rel.replace(/^content\//, '')
+  const entry = `package/content/${contentRel}`
+  const entries = [...base.entries, entry]
+  const read = (path: string) => path === entry ? '# x\n' : base.read(path)
+  return checkShippedPackage({ ...base, entries, read }).some(problem => problem.includes('未登记的 content 文件'))
 }
 
 describe('shipped package 形状判据（C13）', () => {
@@ -271,44 +304,28 @@ describe('shipped package 形状判据（C13）', () => {
     expect(checkShippedPackage({ ...base, entries, read }).some(problem => problem.includes('inventory 缺文件'))).toBe(true)
   })
 
-  for (const [num, rel] of [
-    ['244', 'content/generic/collaboration.md'],
-    ['245', 'content/product-types/business-software/document-map.md'],
-    ['246', 'content/delivery-modes/project-services/templates/sow.md'],
-    ['247', 'content/templates/strs.md'],
-  ] as const) {
-    it(`content inventory 覆盖运行时文件 ${rel}（BUG-${num}）`, () => {
-      const base = fixture()
-      const contentRel = rel.replace(/^content\//, '')
-      const entry = `package/content/${contentRel}`
-      const entries = [...base.entries, entry]
-      const inventory = [...JSON.parse(base.read('package/content/manifest.json')).inventory, contentRel]
-      const read = (path: string) => path === entry ? '# x\n' : path === 'package/content/manifest.json'
-        ? JSON.stringify({ tiers: {}, inventory }) : base.read(path)
-      expect(checkShippedPackage({ ...base, entries, read })).toEqual([])
-      expect(checkShippedPackage({ ...base, entries: entries.filter(item => item !== entry), read }).some(problem => problem.includes('inventory 缺文件'))).toBe(true)
-    })
-  }
-
-  it('product-types 文档面在 inventory（BUG-245）', () => {
-    const base = fixture(); const rel = 'content/product-types/business-software/document-map.md'; const contentRel = rel.replace(/^content\//, '')
-    const inventory = [...JSON.parse(base.read('package/content/manifest.json')).inventory, contentRel]
-    const read = (path: string) => path === 'package/content/manifest.json' ? JSON.stringify({ tiers: {}, inventory }) : base.read(path)
-    expect(checkShippedPackage({ ...base, read }).some(problem => problem.includes('inventory 缺文件'))).toBe(true)
+  // 随包 content 文件必须在 inventory（双向对账缺的一侧）——每张卡各自的守卫（标题带字面 BUG 号）。
+  it('随包 content 文件：product-types 文档面必须在 inventory（BUG-245）', () => {
+    expect(guardUnlisted('content/product-types/business-software/document-map.md')).toBe(true)
   })
 
-  it('delivery-modes 模板在 inventory（BUG-246）', () => {
-    const base = fixture(); const rel = 'content/delivery-modes/project-services/templates/sow.md'; const contentRel = rel.replace(/^content\//, '')
-    const inventory = [...JSON.parse(base.read('package/content/manifest.json')).inventory, contentRel]
-    const read = (path: string) => path === 'package/content/manifest.json' ? JSON.stringify({ tiers: {}, inventory }) : base.read(path)
-    expect(checkShippedPackage({ ...base, read }).some(problem => problem.includes('inventory 缺文件'))).toBe(true)
+  it('随包 content 文件：delivery-modes 文档必须在 inventory（BUG-246）', () => {
+    expect(guardUnlisted('content/delivery-modes/project-services/glossary.md')).toBe(true)
   })
 
-  it('content/templates 全家族在 inventory（BUG-247）', () => {
-    const base = fixture(); const rel = 'content/templates/strs.md'; const contentRel = rel.replace(/^content\//, '')
-    const inventory = [...JSON.parse(base.read('package/content/manifest.json')).inventory, contentRel]
-    const read = (path: string) => path === 'package/content/manifest.json' ? JSON.stringify({ tiers: {}, inventory }) : base.read(path)
-    expect(checkShippedPackage({ ...base, read }).some(problem => problem.includes('inventory 缺文件'))).toBe(true)
+  it('随包 content 文件：templates 全家族必须在 inventory（BUG-247）', () => {
+    expect(guardUnlisted('content/templates/strs.md')).toBe(true)
+  })
+
+  it('随包 content 文件：README 也必须在 inventory（BUG-244）', () => {
+    expect(guardUnlisted('content/README.md')).toBe(true)
+  })
+
+  it('delivery-modes 模板缺文件红（BUG-246）', () => {
+    const base = fixture()
+    const entry = 'package/content/delivery-modes/project-services/templates/sow.md'
+    const entries = base.entries.filter(item => item !== entry)
+    expect(checkShippedPackage({ ...base, entries }).some(problem => problem.includes('inventory 缺文件'))).toBe(true)
   })
 
   it('delivery-rules 空对象 schema 红（BUG-248）', () => {
@@ -435,16 +452,24 @@ describe('shipped package 形状判据（C13）', () => {
     const write = (rel: string, text: string) => { mkdirSync(join(base, rel, '..'), { recursive: true }); writeFileSync(join(base, rel), text) }
     write('package.json', `${JSON.stringify({ dsh: { bundle: { patch: EXPECTED_PATCH } }, files: ['content/**', 'presets/**', 'locale/*.json', 'LICENSE'] })}\n`)
     write('README.shipped.md', '# x\n\n[home](https://example.com)\ndsh plugin add\ndsh: pnpm was not found; install pnpm and make it available on PATH.\n')
-    const sourceContent = REQUIRED_SHIPPED.filter(rel => rel.startsWith('content/')).map(rel => rel.slice('content/'.length)).sort()
-    for (const rel of [...REQUIRED_SHIPPED, ...EXPECTED_PATCH.map(item => item.replace(/^\.\//, '')), 'LICENSE']) {
+    const deliveryRefs = REQUIRED_SHIPPED
+      .filter(rel => /^content\/delivery-modes\/.*\/delivery-rules\.json$/.test(rel))
+      .flatMap(rel => {
+        const dir = rel.slice('content/'.length).replace(/\/delivery-rules\.json$/, '')
+        return [`content/${dir}/overview.md`, `content/${dir}/document-map.md`, `content/${dir}/templates/${deliveryTemplate(rel)}.md`]
+      })
+    const sourceContent = [...REQUIRED_SHIPPED.filter(rel => rel.startsWith('content/')), ...deliveryRefs]
+      .map(rel => rel.slice('content/'.length)).filter(rel => rel !== 'manifest.json').sort()
+    for (const rel of [...REQUIRED_SHIPPED, ...deliveryRefs, ...EXPECTED_PATCH.map(item => item.replace(/^\.\//, '')), 'LICENSE']) {
       write(rel, rel === 'content/manifest.json'
-        ? `${JSON.stringify({ tiers: {}, inventory: sourceContent })}\n`
+        ? `${JSON.stringify({ version: CONTENT_VERSION, tiers: {}, inventory: sourceContent })}\n`
         : rel.endsWith('.json') ? `${requiredJson(rel)}\n`
           : rel.startsWith('presets/') ? 'id: x\n' : '# x\n')
     }
     expect(checkSourceShape({ packDir: base })).toEqual([])
     write('README.shipped.md', '# x\n\npnpm methods:init\n')
-    expect(checkSourceShape({ packDir: base }).some(problem => problem.includes('dev 命令'))).toBe(true)
+    // 合成 pack 没有仓库根 package.json：脚本表由调用方给（真实入口从磁盘派生）。
+    expect(checkSourceShape({ packDir: base, devScripts: ['methods:init'] }).some(problem => problem.includes('dev 命令'))).toBe(true)
     rmSync(base, { recursive: true, force: true })
   })
 
@@ -520,6 +545,56 @@ describe('sanitizer 与字节工具', () => {
     expect(problems.some(problem => problem.includes('dev 命令'))).toBe(true)
   })
 
+  // 负例留证 2026-11-19：`pnpm -s test` / `pnpm exec` / `npm run` / `npx` / `node probes/…` 不在旧白名单正则里 → 放行（BUG-271/272）。
+  it('source shape 扫 dev 命令：包管理器形式与 probes（BUG-271/272）', () => {
+    const packDir = join(ROOT, 'packages/company-pack')
+    const readmeWith = (text: string) => (rel: string) => rel === 'README.shipped.md'
+      ? `${text}\ndsh plugin add dsh-company-pack\ndsh: pnpm was not found; install pnpm and make it available on PATH.\n`
+      : readFileSync(join(packDir, rel), 'utf8')
+    for (const command of ['pnpm -s test', 'pnpm exec vitest run', 'npm run test', 'npx vitest', 'node probes/browser-visual/cdp-probe.mjs']) {
+      const problems = checkSourceShape({ packDir, readFile: readmeWith(`# x\n\n${command}\n`) })
+      expect(problems.some(problem => problem.includes('dev 命令')), command).toBe(true)
+    }
+    // 散文里的包管理器不误伤（判据理解形状，不是关键词）
+    const prose = checkSourceShape({ packDir, readFile: readmeWith('# x\n\nThe DSH plugin installer uses pnpm. DSH Desktop bundles pnpm; install pnpm and retry.\n') })
+    expect(prose.some(problem => problem.includes('dev 命令'))).toBe(false)
+  })
+
+  it('最小 pkg / 最小源码树走全部分支（无 files/dsh/README/client.js）', () => {
+    // shipped checker：缺 files 数组 / 无 README / 无 client.js / 无 dsh —— 每条 fallback 都得走通。
+    const bare = checkShippedPackage({ pkg: { name: 'x', version: '0' }, entries: [], read: () => '', platformModules: [] })
+    expect(bare.some(problem => problem.includes('关键运行时件'))).toBe(true)
+    // freshness：manifest 没有 pipelineFingerprint 时也要报（不抛）
+    expect(freshnessProblem({ manifest: { sourceFingerprint: 'same' }, currentFingerprint: 'same', currentPipeline: 'p' })).toContain('pipelineFingerprint')
+    // sanitize：pkg 没有 peerDependencies/dsh/client —— fallback 全部生效
+    const packageDir = join(dir, 'package-min')
+    mkdirSync(join(packageDir, 'lib'), { recursive: true })
+    writeFileSync(join(packageDir, 'package.json'), `${JSON.stringify({ name: 'x', version: '0' })}\n`)
+    const shipped = sanitizePackage({ dir: packageDir, shippedReadme: join(dir, 'missing-readme.md') })
+    expect(shipped.files).toContain('content/**')
+    expect(shipped.peerDependencies?.['@deepseek-ai/dsh-client-ui-primitives']).toBeDefined()
+    expect(shipped.dsh.client.inject).toContain('@deepseek-ai/dsh-client-ui-primitives')
+    // source shape：package.json 没有 dsh/files 也不崩
+    const bareSource = mkdtempSync(join(tmpdir(), 'source-bare-'))
+    try {
+      writeFileSync(join(bareSource, 'package.json'), `${JSON.stringify({ name: 'x', version: '0' })}\n`)
+      writeFileSync(join(bareSource, 'README.shipped.md'), '# x\n')
+      const problems = checkSourceShape({ packDir: bareSource, devScripts: [] })
+      expect(problems.some(problem => problem.includes('关键运行时件'))).toBe(true)
+    } finally { rmSync(bareSource, { recursive: true, force: true }) }
+  })
+
+  it('source shape 的合同错误路径：manifest/关键件坏 JSON、关键件不可读', () => {
+    const packDir = join(ROOT, 'packages/company-pack')
+    const base = (rel: string) => readFileSync(join(packDir, rel), 'utf8')
+    const badManifest = checkSourceShape({ packDir, readFile: rel => rel === 'content/manifest.json' ? 'not json' : base(rel) })
+    expect(badManifest.some(problem => problem.includes('source manifest: content/manifest.json 不是合法 JSON'))).toBe(true)
+    const badSeed = checkSourceShape({ packDir, readFile: rel => rel === 'content/kb-setup/seed.json' ? 'not json' : base(rel) })
+    expect(badSeed.some(problem => problem.includes('关键运行时件不是合法 JSON'))).toBe(true)
+    const unreadable = checkSourceShape({ packDir, readFile: rel => { if (rel === 'content/AGENTS.md') throw new Error('EACCES'); return base(rel) } })
+    expect(unreadable.some(problem => problem.includes('不可读'))).toBe(true)
+  })
+
   it('sanitizePackage 去 scripts/devDeps、收类型、剥注释、换 README', () => {
     const packageDir = join(dir, 'package')
     mkdirSync(join(packageDir, 'lib/types/lib'), { recursive: true })
@@ -579,9 +654,58 @@ describe('sanitizer 与字节工具', () => {
   })
 
   it('pipeline fingerprint 覆盖 sanitizer/export-dist/pack-source（BUG-243）', () => {
-    expect(RELEASE_PIPELINE_FILES).toContain('tools/lib/release/shipped-shape.mjs')
+    expect(releasePipelineFiles(ROOT)).toContain('tools/lib/release/shipped-shape.mjs')
     expect(releasePipelineFingerprint(ROOT)).toMatch(/^[0-9a-f]{64}$/)
     expect(devBuildFingerprint('packages/company-pack', { vendorSha: 'x', lockfilePath: join(ROOT, 'pnpm-lock.yaml') })).toMatch(/^[0-9a-f]{64}$/)
+  })
+
+  // 负例留证 2026-11-19：发布面目录里任一 .mjs（install-manual / market-index）改字节，指纹不变（BUG-263/264）；目录派生后必变。
+  it('改发布面任一 .mjs 字节 → pipeline 指纹必变（BUG-263/264）', () => {
+    const MUTATE = ['tools/lib/release/install-manual.mjs', 'tools/lib/release/market-index.mjs', 'tools/release/market-index.mjs']
+    const temp = mkdtempSync(join(tmpdir(), 'pipeline-inputs-'))
+    try {
+      for (const dir of ['tools/release', 'tools/lib/release']) {
+        mkdirSync(join(temp, dir), { recursive: true })
+        for (const name of readdirSync(join(ROOT, dir))) {
+          if (name.endsWith('.mjs')) copyFileSync(join(ROOT, dir, name), join(temp, dir, name))
+        }
+      }
+      mkdirSync(join(temp, 'tools/lib/core'), { recursive: true })
+      copyFileSync(join(ROOT, 'tools/lib/core/pack-source.mjs'), join(temp, 'tools/lib/core/pack-source.mjs'))
+      const base = releasePipelineFingerprint(temp)
+      expect(base).toMatch(/^[0-9a-f]{64}$/)
+      for (const rel of MUTATE) {
+        appendFileSync(join(temp, rel), '\n// mutation\n')
+        expect(releasePipelineFingerprint(temp), `${rel} 改动没进指纹`).not.toBe(base)
+        copyFileSync(join(ROOT, rel), join(temp, rel))
+      }
+    } finally {
+      rmSync(temp, { recursive: true, force: true })
+    }
+  })
+
+  // 负例留证 2026-11-19：inventory 写 `..\\evil`、version=2、seed target 越界、delivery template 缺件、
+  // check-rules files 为空对象时，旧 checker 全绿（BUG-265/267/268/269/270）；接回 content 合同后各自红。
+  it('content 合同：版本/反斜杠/seed/交付引用/规则值（BUG-265/267/268/269/270）', () => {
+    const base = fixture()
+    const inventory = JSON.parse(base.read('package/content/manifest.json')).inventory as string[]
+    const withManifest = (manifest: unknown) => ({ ...base, read: (entry: string) => entry === 'package/content/manifest.json' ? JSON.stringify(manifest) : base.read(entry) })
+    const withText = (rel: string, text: string) => ({ ...base, read: (entry: string) => entry === rel ? text : base.read(entry) })
+    // 265：`..\\evil` 在 posix-only 判据里只是一个怪文件名 → 穿过
+    expect(checkShippedPackage(withManifest({ version: CONTENT_VERSION, tiers: {}, inventory: [...inventory, '..\\evil.md'] })).some(problem => problem.includes('反斜杠'))).toBe(true)
+    // 267：清单版本
+    expect(checkShippedPackage(withManifest({ version: 2, tiers: {}, inventory })).some(problem => problem.includes('version 必须是 1'))).toBe(true)
+    // 268：seed 的 target 越界 / source 缺文件
+    const seedRel = 'package/content/kb-setup/seed.json'
+    expect(checkShippedPackage(withText(seedRel, JSON.stringify({ seeds: [{ source: 'state/company.md', target: '../../evil.md' }] }))).some(problem => problem.includes('.. 段'))).toBe(true)
+    expect(checkShippedPackage(withText(seedRel, JSON.stringify({ seeds: [{ source: 'state/missing.md', target: '.dsh-company/kb/x.md' }] }))).some(problem => problem.includes('source 不在 inventory'))).toBe(true)
+    // 269：delivery documents 的 template 不在 content
+    const rulesRel = 'package/content/delivery-modes/managed-service/delivery-rules.json'
+    const rules = { deliveryMode: 'managed-service', kind: 'delivery', entry: 'overview.md', documents: { SLA: { file: 'drafts/sla.md', owner: 'COO', template: 'templates/missing.md' } } }
+    expect(checkShippedPackage(withText(rulesRel, JSON.stringify(rules))).some(problem => problem.includes('template 不在 content'))).toBe(true)
+    // 270：check-rules 的 files 值是对象
+    const checkRel = 'package/content/product-types/business-software/check-rules.json'
+    expect(checkShippedPackage(withText(checkRel, JSON.stringify({ productType: 'x', layers: ['MRD'], files: { MRD: {} } }))).some(problem => problem.includes('files.MRD 必须是'))).toBe(true)
   })
 
   it('content inventory/JSON schema 缺省和非法值红（BUG-244/261/262）', () => {

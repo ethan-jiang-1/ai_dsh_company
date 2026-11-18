@@ -22,6 +22,8 @@ import { dirname, join, posix } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
 import { packageSourceFiles } from '../core/pack-source.mjs'
+import { REQUIRED_CONTENT_FILES, contentManifestProblems } from '../company/content-contract.mjs'
+import { devCommandInText, scriptsFromManifest } from '../core/dev-command.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = join(here, '..', '..', '..')
@@ -34,7 +36,6 @@ const yamlSchema = yaml.DEFAULT_SCHEMA.extend([
 const DEV_PATH = /(?<![A-Za-z0-9_./-])(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+/g
 const REL_DEV_PATH = /\.\.\/(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+/g
 const QUALIFIER = /不随包|仓库内|dev-only|发布面自包含/
-const DEV_COMMAND = /(?:^|[\s`"'(])((?:pnpm\s+(?:[A-Za-z0-9_-]+:[A-Za-z0-9:_-]+|typecheck|test|verify|lint|build|setup|company|release|coverage|dev|format|check|bundle|sync|dup|smoke)\b)|(?:node\s+(?:tools|checks|tests)\/)|(?:(?:bash\s+)?(?:\.\/)?run\/env\.sh))/
 const TEXT_FACE = /^package\/(?:README\.md|cordis\.patch\.yml|presets\/.*|content\/.*\.(?:md|ya?ml|json)|lib\/.*\.(?:js|mjs|d\.ts))$/
 const DEV_DIR = /(?<![A-Za-z0-9_./-])((?:\.\.\/)*(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_.-]+(?:\/[A-Za-z0-9_.-]+)*\/?)/g
 const DEV_DIR_ALLOW = [
@@ -43,49 +44,14 @@ const DEV_DIR_ALLOW = [
   /^tools\/source(?:\/|$)/,
   /^tools\/pre-execute$/,
 ]
-/** 发布包必须有的运行时关键件（从 host/client 实际读取面收；glob 非空不等于关键件在）。 */
+/**
+ * 发布包必须有的运行时关键件。content 部分**派生**自 `tools/lib/company/content-contract.mjs`
+ * 的 `REQUIRED_CONTENT_FILES`（content 合同唯一家；2026-11-19 BUG-273 前这里是第二份手写清单）。
+ */
 export const REQUIRED_SHIPPED = [
-  'content/AGENTS.md',
+  // 清单本体不在 inventory 里（它是清单），但它是随包关键件。
   'content/manifest.json',
-  'content/charters/ceo.md',
-  'content/charters/cfo.md',
-  'content/charters/cmo.md',
-  'content/charters/coo.md',
-  'content/charters/vp-eng.md',
-  'content/charters/vp-sales.md',
-  'content/company/policy-lines.md',
-  'content/company/review-protocol.md',
-  'content/templates/prd.md',
-  'content/templates/mrd.md',
-  'content/templates/meta.md',
-  'content/contracts/workflow.md',
-  'content/contracts/delegation/spawn.md',
-  'content/contracts/delegation/team-spawn.md',
-  'content/contracts/delegation/retry.md',
-  'content/contracts/delegation/workflow.md',
-  'content/contracts/delegation/team.md',
-  'content/contracts/delegation/fork.md',
-  'content/delivery-modes/managed-service/delivery-rules.json',
-  'content/delivery-modes/project-services/delivery-rules.json',
-  'content/product-types/business-software/requirements-model.md',
-  'content/product-types/business-software/check-rules.json',
-  'content/product-types/hardware-software/requirements-model.md',
-  'content/product-types/hardware-software/check-rules.json',
-  'content/methods/quality-loop-producer/system-architecture/SKILL.md',
-  'content/methods/quality-loop-producer/vv-plan/SKILL.md',
-  'content/methods/quality-loop-verifier/system-architecture/SKILL.md',
-  'content/methods/quality-loop-verifier/vv-plan/SKILL.md',
-  'content/kb-setup/seed.json',
-  'content/kb-setup/guide.md',
-  'content/kb-setup/run-bundle.md',
-  'content/wiki-template/AGENTS.md',
-  'content/wiki-template/index.md',
-  'content/company/rates.md',
-  'content/state/company.md',
-  'content/state/org.md',
-  'content/state/owners.md',
-  'content/state/roster.md',
-  'content/state/motion-ledger.md',
+  ...REQUIRED_CONTENT_FILES.map(rel => `content/${rel}`),
   'locale/en.json',
   'locale/zh.json',
 ]
@@ -183,64 +149,14 @@ function isRecord(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-/** content-relative path 必须单段安全，不能 `..`/绝对路径/NUL。 */
-function safeContentRel(rel) {
-  return typeof rel === 'string' && rel !== '' && !rel.startsWith('/') && !rel.split('/').includes('..') && !rel.includes('\0')
-}
+/** content 相对路径的安全判据 / JSON 跨引用 / 清单判据的唯一家 = ./content-contract.mjs 之上（见该文件）。 */
 
-/** JSON 关键件的最小 schema；不是 schema 引擎，只挡「空对象/缺产品语义」。 */
-function jsonSchemaProblem(rel, value) {
-  if (rel.includes('delivery-rules.json')) {
-    return isRecord(value) && typeof value.deliveryMode === 'string' && value.kind === 'delivery' && isRecord(value.documents) && Object.keys(value.documents).length > 0
-      ? undefined : 'delivery-rules 缺 deliveryMode/kind/documents'
-  }
-  if (rel.endsWith('kb-setup/seed.json') || rel.endsWith('seed.json')) {
-    return isRecord(value) && Array.isArray(value.seeds) && value.seeds.length > 0
-      && value.seeds.every(seed => isRecord(seed) && typeof seed.source === 'string' && typeof seed.target === 'string')
-      ? undefined : 'seed 缺非空 seeds/source/target'
-  }
-  if (rel.endsWith('check-rules.json')) {
-    return isRecord(value) && typeof value.productType === 'string' && Array.isArray(value.layers) && value.layers.length > 0 && isRecord(value.files) && Object.keys(value.files).length > 0
-      ? undefined : 'check-rules 缺 productType/layers/files'
-  }
-  return undefined
-}
-
-/** content/manifest 的 inventory 与 tiers 引用闭包；get() 返回文本或 undefined。 */
-function contentManifestProblems(manifest, has, get, label) {
-  const problems = []
-  if (!isRecord(manifest)) return [`${label}content/manifest.json 不是对象`]
-  const inventory = manifest.inventory
-  if (!Array.isArray(inventory) || inventory.length === 0) return [`${label}content/manifest.json 缺非空 inventory`]
-  const set = new Set()
-  for (const rel of inventory) {
-    if (!safeContentRel(rel)) { problems.push(`${label}inventory 不安全路径：${String(rel)}`); continue }
-    if (set.has(rel)) problems.push(`${label}inventory 重复：${rel}`)
-    set.add(rel)
-    if (!has(rel)) { problems.push(`${label}inventory 缺文件：${rel}`); continue }
-    const text = get(rel)
-    if (typeof text !== 'string' || text.trim() === '') { problems.push(`${label}inventory 文件为空：${rel}`); continue }
-    if (rel.endsWith('.json')) {
-      try {
-        const value = JSON.parse(text)
-        const schema = jsonSchemaProblem(rel, value)
-        if (schema !== undefined) problems.push(`${label}${rel} schema 不符：${schema}`)
-      } catch { problems.push(`${label}${rel} 不是合法 JSON`) }
-    }
-  }
-  const tiers = manifest.tiers
-  if (!isRecord(tiers)) problems.push(`${label}content/manifest.json 缺 tiers`)
-  else {
-    for (const [tier, files] of Object.entries(tiers)) {
-      if (!Array.isArray(files)) { problems.push(`${label}tier ${tier} 不是数组`); continue }
-      for (const rel of files) {
-        if (!safeContentRel(rel)) { problems.push(`${label}tier ${tier} 不安全路径：${String(rel)}`); continue }
-        if (!set.has(rel)) problems.push(`${label}tier ${tier} 引用不在 inventory：${rel}`)
-        if (!has(rel)) problems.push(`${label}tier ${tier} 引用缺文件：${rel}`)
-      }
-    }
-  }
-  return problems
+/** tarball 条目里的 content 相对文件列表（不含清单本体）。 */
+function contentFilesOf(entries) {
+  return entries
+    .filter(entry => entry.startsWith('package/content/'))
+    .map(entry => entry.slice('package/content/'.length))
+    .filter(rel => rel !== 'manifest.json')
 }
 
 /** YAML 关键件（preset）必须可加载；cordis.patch.yml 可能带 !!js 自定义 tag，不在此列。 */
@@ -369,12 +285,11 @@ export function checkShippedPackage({ pkg, entries, read, platformModules: platf
   if (entrySet.has('package/content/manifest.json')) {
     try {
       const manifest = JSON.parse(read('package/content/manifest.json'))
-      problems.push(...contentManifestProblems(
+      for (const problem of contentManifestProblems({
         manifest,
-        rel => entrySet.has(`package/content/${rel}`),
-        rel => read(`package/content/${rel}`),
-        'manifest: ',
-      ))
+        files: contentFilesOf(entries),
+        read: rel => read(`package/content/${rel}`),
+      })) problems.push(`manifest: ${problem}`)
     } catch { problems.push('manifest: content/manifest.json 不是合法 JSON') }
   }
 
@@ -426,12 +341,24 @@ export function checkShippedPackage({ pkg, entries, read, platformModules: platf
   return problems
 }
 
+/** 仓库根 `package.json` 的脚本名（`pnpm <script>` 判据的唯一源；读不到 = 空表，判据退化成只认子命令）。 */
+function repoScripts(packDir) {
+  try { return scriptsFromManifest(readFileSync(join(packDir, '..', '..', 'package.json'), 'utf8')) } catch { return [] }
+}
+
 /**
  * 源码侧 shipped 面（不依赖 _dist）：README.shipped 链接/pnpm、cordis/presets/content dev 限定、patch 目标。
- * @param {{packDir:string, readFile?:(rel:string)=>string, exists?:(rel:string)=>boolean}} options
+ * @param {{packDir:string, readFile?:(rel:string)=>string, exists?:(rel:string)=>boolean, devScripts?:string[]}} options
  */
-export function checkSourceShape({ packDir, readFile = rel => readFileSync(join(packDir, rel), 'utf8'), exists = rel => existsSync(join(packDir, rel)) }) {
+export function checkSourceShape({
+  packDir,
+  readFile = rel => readFileSync(join(packDir, rel), 'utf8'),
+  exists = rel => existsSync(join(packDir, rel)),
+  devScripts,
+}) {
   const problems = []
+  // dev 命令判据的脚本名唯一源 = 仓库根 package.json（pack 的 package.json 只有 prepack 等打包脚本）。
+  const scripts = devScripts ?? repoScripts(packDir)
   const readme = readFile('README.shipped.md')
   for (const match of readme.matchAll(/\]\(([^)\s]+)\)/g)) {
     const link = match[1]
@@ -470,16 +397,18 @@ export function checkSourceShape({ packDir, readFile = rel => readFileSync(join(
     const yamlIssue = yamlProblem(target, text)
     if (yamlIssue !== undefined) problems.push(`source manifest: 组合目标 ${rel} ${yamlIssue}`)
   }
+  const sourceFiles = packageSourceFiles(packDir)
   try {
     const contentManifest = JSON.parse(readFile('content/manifest.json'))
-    problems.push(...contentManifestProblems(
-      contentManifest,
-      rel => exists(`content/${rel}`),
-      rel => readFile(`content/${rel}`),
-      'source manifest: ',
-    ))
+    for (const problem of contentManifestProblems({
+      manifest: contentManifest,
+      files: sourceFiles
+        .filter(rel => rel.startsWith('content/'))
+        .map(rel => rel.slice('content/'.length))
+        .filter(rel => rel !== 'manifest.json'),
+      read: rel => readFile(`content/${rel}`),
+    })) problems.push(`source manifest: ${problem}`)
   } catch { problems.push('source manifest: content/manifest.json 不是合法 JSON') }
-  const sourceFiles = packageSourceFiles(packDir)
   for (const value of Array.isArray(manifest.files) ? manifest.files : []) {
     if ((!value.includes('*') && !value.includes('?')) || value.startsWith('lib/')) continue
     const pattern = globToRegExp(value)
@@ -493,7 +422,7 @@ export function checkSourceShape({ packDir, readFile = rel => readFileSync(join(
       if (QUALIFIER.test(line) || line.trim().startsWith('#')) return
       const hit = devPathInLine(line) ?? line.match(REL_DEV_PATH)?.[0]
       if (hit !== undefined) problems.push(`${rel}:${String(index + 1)} → dev 路径 ${hit} 未带「不随包」限定`)
-      const command = DEV_COMMAND.exec(line)?.[1]
+      const command = devCommandInText(line, { scripts })
       if (command !== undefined) problems.push(`${rel}:${String(index + 1)} → dev 命令 ${command} 不随包`)
     })
   }

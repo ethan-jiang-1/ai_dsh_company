@@ -10,7 +10,7 @@
 | 冒烟 | 30 |
 | 探针 | 66 |
 | 结构门禁 | 75 |
-| keyless spec 文件 | 262 |
+| keyless spec 文件 | 265 |
 | 门禁自测（tests/checks） | 10 |
 | fast lane | 4 |
 | surface lane | 6 |
@@ -45,7 +45,7 @@
 | present-catalog | classic | fast + surface + weekly | 会话持久化 | example | 4 |
 | company-root-process | classic | fast + surface + weekly | 子进程并发 | example | 3 |
 | snapshot-motion | classic | fast + weekly | 会话持久化 | example | 2 |
-| client-load | browser | surface + weekly | client UI | example | 6 |
+| client-load | browser | surface + weekly | client UI | example | 7 |
 | preset | classic | surface + weekly | 配置组合 | example | 8 |
 | replay | classic | surface + weekly | 会话持久化 | example | 11 |
 | company-entry | classic | weekly | 配置组合 | example | 2 |
@@ -62,7 +62,7 @@
 | multi-window-banner | browser | weekly | client UI | example | 1 |
 | ui-scene | browser | weekly | client UI | example | 6 |
 | channel-matrix | browser | 手动（要真实全局 dsh + 网络 + 已导出 _dist；发布前手动跑 --channel all） | 配置组合 | example | 1 |
-| release | classic | 手动（分钟级构建 + pack；由 release --verify 调度，不进每周 sweep） | 导出形态 | example | 6 |
+| release | classic | 手动（分钟级构建 + pack；由 release --verify 调度，不进每周 sweep） | 导出形态 | example | 7 |
 | probe | model | 手动（真模型档（连通 ~6s / 内容 --full 5–10min），按内容改动触发） | 模型可见文本 | example | 4 |
 | delegation | model | 手动（真模型 1 条 prompt（升 pin 或委托边界改动时）） | 工具定义 | example | 3 |
 | presence-e2e | model | 手动（真模型 ~$1，按在场/协作面验收触发） | 模型可见文本 | example | 0 |
@@ -87,7 +87,7 @@
 | board-drift-probe | browser-visual | client UI | example | 2 |
 | browser-behavior-probe | browser-visual | client UI | example | 0 |
 | budget-panel-probe | browser-visual | client UI | example | 0 |
-| cdp-probe | browser-visual | client UI | example | 5 |
+| cdp-probe | browser-visual | client UI | example | 7 |
 | cultivation-ux-scenarios-probe | browser-visual | client UI | example | 0 |
 | cultivation-ux-walkthrough-probe | browser-visual | client UI | example | 1 |
 | dag-midflight-probe | browser-visual | client UI | example | 0 |

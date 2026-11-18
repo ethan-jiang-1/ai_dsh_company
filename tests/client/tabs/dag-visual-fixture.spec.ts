@@ -19,7 +19,7 @@ import { layoutDag } from '../../../packages/company-pack/src/lib/presence/dag.t
 import type { TaskRow } from '../../../packages/company-pack/src/lib/presence/board.ts'
 
 const task = (id: string, blockedBy: readonly string[] = [], status: TaskRow['status'] = 'pending', ownerName = 'vp-eng'): TaskRow =>
-  ({ id, subject: `T${id} 任务标题示例`, status, blockedBy, ownerName, description: '', ready: false, revision: 1 })
+  ({ id, subject: `T${id} 任务标题示例`, status, blockedBy, ownerName, description: '', ready: false, revision: 1, revisionGap: false, statusGap: false })
 
 /** 三态同屏夹具（视觉判据的输入；改这里 = 改视觉档的取材）。 */
 export const FIXTURE_TASKS: readonly TaskRow[] = [

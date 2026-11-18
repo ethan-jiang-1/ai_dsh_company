@@ -6,6 +6,7 @@
  * - v3 只记 `id / createdAt / pack / runBundle.schema`；不再记手册目标或骨架哈希
  *   （手册/模板是只读 pack 内容，不属于 run bundle 身份）；
  * - v2 身份可原地升 v3：保留 id/createdAt，旧文件备份 `bundle.v2.json`；
+ * - v3 身份遇 pack 版本变化：保留 id/createdAt，旧字节备份 `bundle.json.v3-<oldVersion>.bak`；
  * - home 留一份 `company/identity/<id>.json` 恢复备份；
  * - manifest 在 workspace 是**模型可写**的 host-owned 约定，不是防篡改边界。
  *
@@ -86,7 +87,28 @@ export interface ManifestPlan {
   readonly backupPath: string
   readonly action: 'create' | 'skip' | 'upgrade'
   readonly legacyPath?: string
+  /** v3 版本升级时旧字节的去处（`bundle.json.v3-<oldVersion>.bak`）；v2 仍用 `legacyPath`。 */
+  readonly previousVersionPath?: string
   readonly error?: string
+}
+
+const VERSION_LABEL_MAX = 64
+
+/**
+ * 升 v3 后旧版本的备份路径：`bundle.json.v3-<oldVersion>.bak`（BUG-279）。
+ *
+ * `oldVersion` 来自盘上 manifest（workspace 是模型可写面），必须当不可信输入：
+ * 只留 `[0-9A-Za-z._-]`、折叠点段/连字符、夹掉首尾、截断；清空则落固定名
+ * `bundle.json.v3-prev.bak`。结果始终是 `path` 同目录的单段文件名。
+ */
+function versionBackupPath(path: string, oldVersion: string): string {
+  const label = oldVersion
+    .replace(/[^0-9A-Za-z._-]+/g, '-')
+    .replace(/\.{2,}/g, '.')
+    .replace(/-{2,}/g, '-')
+    .replace(/^[.-]+|[.-]+$/g, '')
+    .slice(0, VERSION_LABEL_MAX)
+  return label === '' ? `${path}.v3-prev.bak` : `${path}.v3-${label}.bak`
 }
 
 /** 同目录临时文件 + rename：崩溃时要么旧文件、要么新文件，不留半截。 */
@@ -225,7 +247,7 @@ export function readBundleManifestState(workspace: string, expectedPack?: PackMe
 /**
  * 生成 manifest 计划（只读；不写盘）。
  * - 无文件：create，新 id；
- * - v3 有效：skip；
+ * - v3 有效：skip；pack 版本变化：upgrade，旧字节备份 `bundle.json.v3-<oldVersion>.bak`；
  * - v2 legacy：upgrade，保留 id/createdAt（缺失则新生成），旧文件备份；
  * - 坏/更高版本：skip + error（调用方告警，不覆盖）。
  */
@@ -260,6 +282,7 @@ export function planBundleManifest(options: {
         path,
         manifest: { ...state.manifest, pack: options.pack },
         backupPath: identityBackupPath(options.dshHome, state.manifest.id),
+        previousVersionPath: versionBackupPath(path, state.manifest.pack.version),
         action: 'upgrade',
       }
     }
@@ -311,7 +334,7 @@ export function planBundleManifest(options: {
   }
 }
 
-/** 执行计划：创建/升级；v2 旧文件备份；身份备份；绝不覆盖有效 v3。 */
+/** 执行计划：创建/升级；v2 旧文件与 v3 版本升级旧字节各自备份；身份备份；绝不覆盖有效 v3。 */
 export function writeBundleManifest(
   plan: ManifestPlan,
   _deps: { readonly link?: typeof linkSync } = {},
@@ -323,8 +346,9 @@ export function writeBundleManifest(
   const workspace = dirname(dirname(plan.path))
   ensureCompanyRoot(workspace, { create: true })
   if (plan.action === 'create' && existsSync(plan.path)) return { created: false, skipped: true, upgraded: false }
-  if (plan.action === 'upgrade' && plan.legacyPath !== undefined && existsSync(plan.path)) {
-    try { renameSync(plan.path, plan.legacyPath) } catch { /* 备份失败不阻塞写入；旧内容仍在 */ }
+  const stalePath = plan.legacyPath ?? plan.previousVersionPath
+  if (plan.action === 'upgrade' && stalePath !== undefined && existsSync(plan.path)) {
+    try { renameSync(plan.path, stalePath) } catch { /* 备份失败不阻塞写入；旧内容仍在 */ }
   }
   writeCompanyAtomic(workspace, BUNDLE_MANIFEST_REL, `${JSON.stringify(plan.manifest, null, 2)}\n`)
   writeIdentityBackup(plan.backupPath, plan.manifest)

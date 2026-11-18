@@ -45,6 +45,13 @@ export interface TaskRow {
   readonly blockedBy: readonly string[]
   /** 依赖全部完成（官方 `taskReady` 同义：`blockedBy.every(completed)`；悬空 id 视为未完成）。 */
   readonly ready: boolean
+  /**
+   * 事件覆盖了缺 `revision` 的投影——状态序无法证明新旧（BUG-240/257/258/277）。
+   * 读模型只给事实，文案归 client 的 `t`（`src/lib` 不返回中文）。
+   */
+  readonly revisionGap: boolean
+  /** wire 的 status 不在官方闭集里（被 `toTaskStatus` 折成 `pending` 展示前的标记；BUG-278）。 */
+  readonly statusGap: boolean
 }
 
 /**
@@ -136,6 +143,10 @@ export interface BoardCard {
   readonly revision: number
   readonly blockedBy: readonly string[]
   readonly ready: boolean
+  /** 事件覆盖了缺 revision 的投影（BUG-277）：卡片要显示"状态序不可证"，不能冒充已知。 */
+  readonly revisionGap: boolean
+  /** wire status 不在官方闭集（BUG-278）：列名是折出来的，卡片要标明。 */
+  readonly statusGap: boolean
   /** 声明 vs 板面的分叉（无分叉 = null）；看板据此把"假就绪"标出来。 */
   readonly drift: DependencyDrift | null
 }
@@ -147,9 +158,14 @@ export interface BoardColumn {
   readonly cards: readonly BoardCard[]
 }
 
+/** 官方状态闭集判定（未知值不抛；看板/任务板据此标 `statusGap`，不静默改名）。 */
+export function isKnownTaskStatus(value: string): value is TaskStatus {
+  return KNOWN_STATUS.includes(value as TaskStatus)
+}
+
 /** 官方状态字面量窄化；未知值按 `pending` 处理（不崩）。 */
 export function toTaskStatus(value: string): TaskStatus {
-  return KNOWN_STATUS.includes(value as TaskStatus) ? (value as TaskStatus) : 'pending'
+  return isKnownTaskStatus(value) ? value : 'pending'
 }
 
 /**
@@ -203,6 +219,8 @@ export function tasksFromTeamView(view: TeamViewLike): TaskRow[] {
       blockedBy,
       // ⚠ 右侧必须带 `status === 'pending'`：`readyOf` 只查依赖，官方 `ready` 还要求自己是 pending。
       ready: task.ready ?? (status === 'pending' && readyOf(blockedBy, statusById)),
+      revisionGap: task.revisionGap === true,
+      statusGap: !isKnownTaskStatus(task.status),
     })
   }
   return rows
@@ -227,6 +245,8 @@ export function boardColumns(tasks: readonly TaskRow[]): BoardColumn[] {
         revision: task.revision,
         blockedBy: task.blockedBy,
         ready: task.ready,
+        revisionGap: task.revisionGap,
+        statusGap: task.statusGap,
         drift: driftByTask.get(task.id) ?? null,
       })),
   }))

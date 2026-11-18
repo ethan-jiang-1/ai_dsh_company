@@ -27,6 +27,7 @@ import {
   readCatalogState,
   readPresentedLedger,
   regenerateCatalog,
+  scanCatalogEntries,
   setPresentedAudit,
 } from '../../../packages/company-pack/src/host/ledger/catalog.ts'
 import {
@@ -158,6 +159,47 @@ describe('host catalog', () => {
     expect(readdirSync(join(root, RUN_BUNDLE_PATHS.kb)).some(name => name.endsWith('.tmp'))).toBe(false)
   })
 
+  // 负例留证 2026-11-19：坏索引被静默覆盖，无 warning、旧字节丢失（BUG-276）；备份 + warning 后绿。
+  it('旧 catalog JSON 损坏 → warning 且旧字节备份到 .bak（BUG-276）', () => {
+    const root = workspace()
+    deliverable(root)
+    const path = catalogPath(root)
+    const oldBytes = '{ definitely not json'
+    writeFileSync(path, oldBytes)
+    const result = regenerateCatalog(root)
+    expect(result.warnings.some(warning => warning.includes('旧索引') && warning.includes('重建'))).toBe(true)
+    expect(existsSync(`${path}.bak`)).toBe(true)
+    expect(readFileSync(`${path}.bak`, 'utf8')).toBe(oldBytes)
+  })
+
+  it('kb 目录不可写：备份与写入各降级成 warning，不抛（BUG-276 边界）', () => {
+    const root = workspace()
+    deliverable(root)
+    const path = catalogPath(root)
+    writeFileSync(path, '{ definitely not json')
+    const kb = join(root, RUN_BUNDLE_PATHS.kb)
+    chmodSync(kb, 0o500)
+    try {
+      const result = regenerateCatalog(root)
+      expect(result.written).toBe(false)
+      expect(result.warnings.some(warning => warning.includes('备份失败'))).toBe(true)
+      expect(result.warnings.some(warning => warning.includes('写入失败'))).toBe(true)
+    } finally {
+      chmodSync(kb, 0o755)
+    }
+  })
+
+  it('旧索引的备份目标被目录占用：跳过备份 + warning，仍重建（BUG-276 边界）', () => {
+    const root = workspace()
+    deliverable(root)
+    const path = catalogPath(root)
+    writeFileSync(path, '{ definitely not json')
+    mkdirSync(`${path}.bak`)
+    const result = regenerateCatalog(root)
+    expect(result.warnings.some(warning => warning.includes('跳过旧索引备份'))).toBe(true)
+    expect(result.written).toBe(true)
+  })
+
   it('台账命中与未命中都写进目录', () => {
     const root = workspace()
     deliverable(root)
@@ -205,6 +247,17 @@ describe('host catalog', () => {
     const result = regenerateCatalog(root)
     expect(result.catalog?.entries).toEqual([])
     expect(result.warnings.some(warning => warning.includes('为空'))).toBe(true)
+  })
+
+  // 负例留证 2026-11-19：纯空白 final.md（'   \n'）仍 final:true、warnings 空（BUG-275）；按 trim 判空后绿。
+  it('纯空白 final.md → final:false 且 warning 点名路径（BUG-275）', () => {
+    const root = workspace()
+    const dir = deliverable(root)
+    const final = join(dir, 'final.md')
+    writeFileSync(final, '   \n')
+    const scan = scanCatalogEntries(root, emptyPresentedLedger())
+    expect(scan.entries[0]?.final).toBe(false)
+    expect(scan.warnings.some(warning => warning.includes(final))).toBe(true)
   })
 
   it('catalog.json 是 symlink → 拒绝写并 warning（BUG-260）', () => {

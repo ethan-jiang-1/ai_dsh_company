@@ -136,6 +136,10 @@ export function BoardPanel({ columns, roleLabel = label => label, t = defaultT }
                   {/* 声明 vs 板面：任务文本里写了"依赖 T1,T2"而板面没有这条边 ⇒ 上面那句
                       "依赖已就绪"是**假信号**（2026-10-13 真事故：静默缺边）。这条 tag 拆穿它。 */}
                   {card.drift !== null && <Tag tone="warning">⚠ {driftText(card.drift, t)}</Tag>}
+                  {/* BUG-277/278：读模型标出来的降级（缺 revision / 未知 status）必须到卡面，
+                      否则「折成待办」与「真的待办」在页面上同一副脸。 */}
+                  {card.statusGap && <Tag tone="warning">{t('tasks.gap.status')}</Tag>}
+                  {card.revisionGap && <Tag tone="warning">{t('tasks.gap.revision')}</Tag>}
                   <span className="wk-card-id">{card.id}@{card.revision}</span>
                 </div>
               </article>

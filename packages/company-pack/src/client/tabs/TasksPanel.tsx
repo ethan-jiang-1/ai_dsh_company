@@ -102,6 +102,9 @@ export function TasksTableView({ view, roleLabel = name => name, t = defaultT }:
                           其中 273 行是非 pending（活都干完了还标阻塞）。同 BUG-027 族的第二处。 */}
                       {STATUS_KEYS[task.status] === undefined ? task.status : t(STATUS_KEYS[task.status] as CompanyKey)}
                       {task.status === 'pending' && task.ready === false ? t('tasks.blocked') : ''}
+                      {/* 降级不是正常态：未知 status / 缺 revision 必须在状态格显式标出（BUG-277/278）。 */}
+                      {task.statusGap ? ` · ${t('tasks.gap.status')}` : ''}
+                      {task.revisionGap ? ` · ${t('tasks.gap.revision')}` : ''}
                     </td>
                     <td data-col="owner">{task.ownerName ?? t('tasks.unassigned')}</td>
                   </tr>

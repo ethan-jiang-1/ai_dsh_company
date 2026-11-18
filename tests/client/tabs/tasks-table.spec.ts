@@ -114,3 +114,28 @@ describe('TasksTableView：依赖列人读优先（owner · subject + id 次要�
     expect(source, 'STATUS_LABEL 不再保留 deleted: 已删（映射永远不命中）').not.toContain("deleted: '已删'")
   })
 })
+
+/**
+ * BUG-277/278：任务表的状态格也要标降级（未知 status / 缺 revision），不只是看板。
+ */
+// 负例留证 2026-11-19：TasksPanel 只翻 status 文案、丢掉 statusGap/revisionGap（BUG-277/278）。
+describe('TasksTableView：状态格的降级标记（BUG-277/278）', () => {
+  const DEGRADED: TeamViewLike = {
+    members: [{ id: 'session-lead', name: 'lead', role: 'lead', phase: 'active' }],
+    tasks: [
+      { id: 'g1', subject: '状态不明', status: 'paused', revision: 1, ownerName: 'coo' },
+      { id: 'g2', subject: '修订缺失', status: 'in_progress', revision: 2, ownerName: 'cfo', revisionGap: true },
+      { id: 'g3', subject: '正常', status: 'in_progress', revision: 3, ownerName: 'vp-eng' },
+    ],
+  }
+
+  it('未知 status 行带「未知状态」，缺 revision 行带「修订缺失」，正常行零标记', () => {
+    const html = renderToStaticMarkup(createElement(TasksTableView, { view: DEGRADED }))
+    const rows = html.split('<tr').slice(1)
+    const byId = (id: string) => rows.find(item => item.includes(`>${id}@`))
+    expect(byId('g1')).toContain('未知状态')
+    expect(byId('g2')).toContain('修订缺失')
+    expect(byId('g3')).not.toContain('未知状态')
+    expect(byId('g3')).not.toContain('修订缺失')
+  })
+})
