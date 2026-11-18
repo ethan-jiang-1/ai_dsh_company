@@ -17,6 +17,12 @@
 | [research/](research/README.md) | 归档研究题：题名页 + 一题一行索引；随最后一张活卡整目录迁入 |
 | [legacy/](legacy/README.md) | 退役历史池，只按历史引用读取，不再收新件 |
 
+## 待修缺陷
+
+| 卡 | 挂起原因 | 触发器 |
+|---|---|---|
+| [BUG-212](suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md) | docs-only 快速路径已修；pre-push 46s 成本-only | 连续两次 >60s / 真实阻塞投诉 |
+
 ## 已关闭问题
 
 | 卡 | 历史结论 | 日期 |

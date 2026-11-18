@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 待修
 severity: P2
 opened: 2026-11-17
 ---
 
 # BUG-212：收尾验证链偏长——pre-push 暖树 ~46s；docs-only 后 release --check 还要全量 --verify
 
-> 严重级别：P2（次要；但每次 push 都走）｜发现：2026-11-17｜状态：调查中｜审查：—
+> 严重级别：P2（次要；但每次 push 都走）｜发现：2026-11-17｜状态：待修（挂起）｜docs-only 快速路径已修；pre-push 46s 预算成本-only，触发器见卡尾｜审查：—
 >
 > **关联**：用户本轮收尾指令（「尾巴上验证的 CI/过程是不是比较长……毕竟经常用」）。
-> **留痕**：待修复者决定（本轮只立卡，不修）。
+> **留痕**：[release docs-only Note](../../notes/implemented/2026-11-18-release-docs-only-and-pre-push-budget.md)。
 
 ## 症状
 
@@ -121,3 +121,9 @@ C14 的源码侧 shipped-shape 检查一度想新增第 76 道门，被 policy �
 - 本卡两个症状（整链预算、docs-only 收尾的 release 验证摩擦）仍在；状态保持 `调查中`。
 
 C14 的 `release:shape` 新鲜度检查（BUG-227）只看 `sourceFingerprint`，不替代 `release --check`/`--stamp`。
+
+## 处置（2026-11-18）
+
+- **docs-only 收尾已修**：`release --check/--stamp` 新增 docs-only 快速路径（source/pipeline/artifact 未变 + checks 已 pass 时只更新 gitSha，不重跑全量 verify）。prepare-only（checks=not-run）仍必须 verify，这是安全边界。
+- **pre-push 46s 预算挂起**：成本-only，不是正确性缺口；并行化收益不确定且会改变失败归因。触发器 = 连续两次 push >60s，或出现真实 push 阻塞投诉。
+- 本卡迁 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)；不是已修。

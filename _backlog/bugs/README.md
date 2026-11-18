@@ -8,9 +8,9 @@
 
 ## 活跃清单
 
-**活跃 1 张**：BUG-212（收尾验证链偏长）保持活跃，不并入本批；C16 20 张（BUG-243..262）已于 2026-11-18 修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，批次与收口见下方「## 2026-11-18 修复交接（C16 管线指纹 + 关键件闭包 + 低置信运行态：BUG-243..262）」。C13/C14/C15 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**活跃 0 张**：BUG-212 已于 2026-11-18 部分修复（docs-only 快速路径）后挂起，迁 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)；C16 20 张（BUG-243..262）已于 2026-11-18 修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，批次与收口见下方「## 2026-11-18 修复交接（C16 管线指纹 + 关键件闭包 + 低置信运行态：BUG-243..262）」。C13/C14/C15 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
-**独立卡**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
+**已挂起**：BUG-212（收尾验证链偏长）——docs-only 快速路径已修；pre-push 46s 是成本-only，迁 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)，触发器见卡尾。
 
 **上一轮收口**：2026-11-17 C12 归属波次探索（focus v7）的 10 张（BUG-202..211）已由 2026-11-17 用户指令授权本轮修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；批次计划与根因组见下方「## 2026-11-17 修复交接（根因组 A–C：BUG-202..211）」。
 
@@ -47,15 +47,15 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 
 ## 2026-11-17 收尾验证链成本（BUG-212，调查中）
 
-**用户指令（2026-11-17）**：「感觉上我们东西都修完了，准备提交, 但是在尾巴上验证的 CI 啊，过程是不是比较长啊？如果过长, 你还是需要提交一个 BUG，这里不能过长呢, 毕竟经常用啊。」——本轮只立卡不修；实测与修法建议 = [BUG-212](BUG-212-pre-push-and-release-tail-budget-overrun.md)。
+**用户指令（2026-11-17）**：「感觉上我们东西都修完了，准备提交, 但是在尾巴上验证的 CI 啊，过程是不是比较长啊？如果过长, 你还是需要提交一个 BUG，这里不能过长呢, 毕竟经常用啊。」——本轮只立卡不修；实测与修法建议 = [BUG-212](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)。
 
 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|
-| [212](BUG-212-pre-push-and-release-tail-budget-overrun.md) | pre-push 六段无机械预算；release stamp 把 docs-only 的 gitSha 过期与全量 verify 绑死 | 暖树全链 ~46s（覆盖率 21.8s / verify 11.1s）；docs-only 收尾要分钟级 `--verify` | P2 |
+| [212](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md) | pre-push 六段无机械预算；release stamp 把 docs-only 的 gitSha 过期与全量 verify 绑死 | 暖树全链 ~46s（覆盖率 21.8s / verify 11.1s）；docs-only 收尾要分钟级 `--verify` | P2 |
 
 ## 2026-11-17 修复交接（C13 运行时/发布面：BUG-213..222）
 
-**用户指令（2026-11-17）**：「_backlog/bugs 里面有最近 exploratory test 发现的 bugs，你琢磨一下，看看是否能系统性修起来。计划有了后 setup goal 逐步按 REPO 的流程来推进。」——本句即本轮授权（材料性：发布形状/manifest、shipped 文本、client 注入声明、release 管线与 docs 合同；留痕 = 批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`）。BUG-212 不并入本批。
+**用户指令（2026-11-17）**：「_backlog/bugs 里面有最近 exploratory test 发现的 bugs，你琢磨一下，看看是否能系统性修起来。计划有了后 setup goal 逐步按 REPO 的流程来推进。」——本句即本轮授权（材料性：发布形状/manifest、shipped 文本、client 注入声明、release 管线与 docs 合同；留痕 = 批次 Note `notes/implemented/2026-11-17-shipped-package-boundary.md`）。BUG-212 已挂起（见 suspended_bugs）。
 
 这十张不是十个补丁，是**发布面没有自己的构建产物**：tarball 是仓库树的子集，`files`/manifest/README/注释/client 声明各自手写，于是同一道边界在五个载体上漏水。
 
@@ -70,7 +70,7 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 **次序 = E(先红) → A/B/C/D 实现 → 重建 `_dist` → E(绿) → 真入口**：
 先让 checker 对当前旧 tarball 列出全部 10 类违规（红），再在 `export-dist` 里加 sanitize（manifest/类型/注释/README），并改 source `package.json`/tsdown/cordis/presets；重建后同一命令绿。证据口径 = 先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；每卡红/绿写同一条命令 `pnpm release:shape`（旧 tarball 红 / 新 tarball 绿），另附解包/假 module table/真入口补充。
 
-**终点** = C13 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃，不动。
+**终点** = C13 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 已挂起（见 suspended_bugs）。
 
 **收口（2026-11-17）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `f1629047`。
 `pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2218 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
@@ -78,7 +78,7 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 
 ## 2026-11-18 修复交接（C16 管线指纹 + 关键件闭包 + 低置信运行态：BUG-243..262）
 
-**用户指令（2026-11-18）**：「继续新的bug……看看是否能系统性修起来。计划有了后 setup goal 逐步按REPO的流程来推进。」——本句即本轮授权（材料性：发布管线指纹、shipped 关键件/schema/YAML、dev 命令、lease/bundle/catalog/presence、content manifest；留痕 = 批次 Note `notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md`）。BUG-212 不并入本批。
+**用户指令（2026-11-18）**：「继续新的bug……看看是否能系统性修起来。计划有了后 setup goal 逐步按REPO的流程来推进。」——本句即本轮授权（材料性：发布管线指纹、shipped 关键件/schema/YAML、dev 命令、lease/bundle/catalog/presence、content manifest；留痕 = 批次 Note `notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md`）。BUG-212 已挂起（见 suspended_bugs）。
 
 20 张分八组：
 A 管线指纹（243）；B 关键件/JSON/YAML（244-250）；C dev 命令（251/252）；D allow-stale 结构化（253）；E lease/bundle（254-256）；F presence 未知/删除（257/258）；G catalog 空 final/symlink（259/260）；H content manifest 对账/引用（261/262）。
@@ -96,7 +96,7 @@ A 管线指纹（243）；B 关键件/JSON/YAML（244-250）；C dev 命令（25
 
 **次序 = A/B → C/D → E → F/G/H → 重打 `_dist` → 真入口**。证据 = 先代码提交 sha → 每卡 `## 修复证据`（改动面/红/绿/提交）→ 归档；A/B = `pnpm test tests/repo/release/shipped-shape.spec.ts` + `release:shape`；C/D = `pnpm verify` / CLI；E = 临时 home；F = 纯函数；G = 临时 home；H = `pnpm verify` + spec。
 
-**终点** = 20 张全部迁 fixed_bugs、每卡盲审 + 证据；`verify`/`test`/`typecheck`/`coverage` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃。
+**终点** = 20 张全部迁 fixed_bugs、每卡盲审 + 证据；`verify`/`test`/`typecheck`/`coverage` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 已挂起（见 suspended_bugs）。
 
 **收口（2026-11-18）**：20 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `21ff3ee7`。
 `pnpm release --prepare` ALL PASS（137 entries）；`release:shape` PASS（source+pipeline）；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2277 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
@@ -120,7 +120,7 @@ A 管线指纹（243）；B 关键件/JSON/YAML（244-250）；C dev 命令（25
 
 ## 2026-11-18 修复交接（C15 门禁闭环 + 不可读/部分输入：BUG-233..242）
 
-**用户指令（2026-11-18）**：「下一波bug来了，你也一块儿去改吧 继续下一波……看看是否能系统性修起来。计划有了后 setup goal 逐步按REPO的流程来推进。」——本句即本轮授权（材料性：shipped 关键件/组合集合、源码指纹、降级门禁、catalog 坏形状、presence 部分 wire；留痕 = 批次 Note `notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md`）。BUG-212 不并入本批。
+**用户指令（2026-11-18）**：「下一波bug来了，你也一块儿去改吧 继续下一波……看看是否能系统性修起来。计划有了后 setup goal 逐步按REPO的流程来推进。」——本句即本轮授权（材料性：shipped 关键件/组合集合、源码指纹、降级门禁、catalog 坏形状、presence 部分 wire；留痕 = 批次 Note `notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md`）。BUG-212 已挂起（见 suspended_bugs）。
 
 C15 十张是 C14 新判据的「再闭包」+ 三类坏输入：
 A 组是 checker 只到「关键件在不在/glob 非空」；B 组是源码指纹与降级理由；C/D 是 catalog 不可读、presence 部分 wire。
@@ -135,7 +135,7 @@ A 组是 checker 只到「关键件在不在/glob 非空」；B 组是源码指�
 **次序 = A/B(检查器) → C/D(运行态) → 重打 `_dist` → 真入口**：
 先补 checker 的声明面并让合成/真实包红→绿；再修指纹/降级；C/D 用临时 companyHome + 纯函数最小输入。证据口径 = 先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；A/B = `pnpm test tests/repo/release/shipped-shape.spec.ts` + `pnpm release:shape`；C = `pnpm test tests/host/ledger/catalog.spec.ts`；D = `pnpm test tests/lib/presence/presence-board.spec.ts`。
 
-**终点** = C15 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃，不动。
+**终点** = C15 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 已挂起（见 suspended_bugs）。
 
 **收口（2026-11-18）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `56e4f986`。
 `pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2252 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
@@ -157,7 +157,7 @@ A 组是 checker 只到「关键件在不在/glob 非空」；B 组是源码指�
 
 ## 2026-11-18 修复交接（C14 守卫面 + 低置信运行态：BUG-223..232）
 
-**用户指令（2026-11-18）**：「再来一波 _backlog/bugs 里面有最近 exploratory test 发现的 bugs，你琢磨一下，看看是否能系统性修起来。计划有了后 setup goal 逐步按 REPO 的流程来推进。」——本句即本轮授权（材料性：发布门禁/source shape、presence/catalog 运行态、docs 合同；留痕 = 批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`）。BUG-212 不并入本批。
+**用户指令（2026-11-18）**：「再来一波 _backlog/bugs 里面有最近 exploratory test 发现的 bugs，你琢磨一下，看看是否能系统性修起来。计划有了后 setup goal 逐步按 REPO 的流程来推进。」——本句即本轮授权（材料性：发布门禁/source shape、presence/catalog 运行态、docs 合同；留痕 = 批次 Note `notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md`）。BUG-212 已挂起（见 suspended_bugs）。
 
 十张不是十个症状，是**上一轮修复造出的新判据面** + **四个低置信运行态**：
 A 组是 `shipped-shape` 只拒 C13 见过的形状（glob/content/无扩展名目录/patch 目标）；B 组是真实 tarball 检查只在 release 且不比对源码；C/D 是 presence/catalog 对「缺字段、缺 revision、坏形状」的静默。
@@ -172,7 +172,7 @@ A 组是 `shipped-shape` 只拒 C13 见过的形状（glob/content/无扩展名�
 **次序 = A(红) → A 实现 → B → C/D → 重建 `_dist` → 真入口**：
 先让 checker 对 C14 的合成包/旧 tarball 红，再补闭包；B 用同一 checker 的 source 面 + fingerprint；C/D 是独立纯函数/盘面修复。证据口径 = 先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；每卡红/绿写同一条可执行命令（A/B = `pnpm test tests/repo/release/shipped-shape.spec.ts` 与 `pnpm release:shape`；C = `pnpm test tests/lib/presence/presence-board.spec.ts`；D = `pnpm test tests/host/ledger/catalog.spec.ts`）。
 
-**终点** = C14 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃，不动。
+**终点** = C14 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 已挂起（见 suspended_bugs）。
 
 **收口（2026-11-18）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `87d8b15d`。
 `pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2236 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
