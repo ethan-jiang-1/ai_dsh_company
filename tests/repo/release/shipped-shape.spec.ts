@@ -545,8 +545,9 @@ describe('sanitizer 与字节工具', () => {
     expect(problems.some(problem => problem.includes('dev 命令'))).toBe(true)
   })
 
-  // 负例留证 2026-11-19：`pnpm -s test` / `pnpm exec` / `npm run` / `npx` / `node probes/…` 不在旧白名单正则里 → 放行（BUG-271/272）。
-  it('source shape 扫 dev 命令：包管理器形式与 probes（BUG-271/272）', () => {
+  // 负例留证 2026-11-19：`pnpm -s test` / `pnpm exec` / `npm run` / `npx` 不在旧白名单正则里 → 放行（BUG-271）。
+// 负例留证 2026-11-19：`node probes/…` 不在旧目录白名单（只列 tools|checks|tests）里 → 放行（BUG-272）。
+  it('source shape 扫 dev 命令：包管理器形式（BUG-271）', () => {
     const packDir = join(ROOT, 'packages/company-pack')
     const readmeWith = (text: string) => (rel: string) => rel === 'README.shipped.md'
       ? `${text}\ndsh plugin add dsh-company-pack\ndsh: pnpm was not found; install pnpm and make it available on PATH.\n`
@@ -558,6 +559,14 @@ describe('sanitizer 与字节工具', () => {
     // 散文里的包管理器不误伤（判据理解形状，不是关键词）
     const prose = checkSourceShape({ packDir, readFile: readmeWith('# x\n\nThe DSH plugin installer uses pnpm. DSH Desktop bundles pnpm; install pnpm and retry.\n') })
     expect(prose.some(problem => problem.includes('dev 命令'))).toBe(false)
+  })
+
+  it('source shape 扫 dev 命令：probes 目录（BUG-272）', () => {
+    const packDir = join(ROOT, 'packages/company-pack')
+    const problems = checkSourceShape({ packDir, readFile: rel => rel === 'README.shipped.md'
+      ? '# x\n\nnode probes/browser-visual/cdp-probe.mjs\ndsh plugin add dsh-company-pack\ndsh: pnpm was not found; install pnpm and make it available on PATH.\n'
+      : readFileSync(join(packDir, rel), 'utf8') })
+    expect(problems.some(problem => problem.includes('dev 命令'))).toBe(true)
   })
 
   it('最小 pkg / 最小源码树走全部分支（无 files/dsh/README/client.js）', () => {
@@ -659,7 +668,8 @@ describe('sanitizer 与字节工具', () => {
     expect(devBuildFingerprint('packages/company-pack', { vendorSha: 'x', lockfilePath: join(ROOT, 'pnpm-lock.yaml') })).toMatch(/^[0-9a-f]{64}$/)
   })
 
-  // 负例留证 2026-11-19：发布面目录里任一 .mjs（install-manual / market-index）改字节，指纹不变（BUG-263/264）；目录派生后必变。
+  // 负例留证 2026-11-19：install-manual.mjs 改字节，pipeline 指纹不变（BUG-263）；目录派生后必变。
+// 负例留证 2026-11-19：market-index.mjs 不在手写 5 条清单里，改它不触发重打（BUG-264）。
   it('改发布面任一 .mjs 字节 → pipeline 指纹必变（BUG-263/264）', () => {
     const MUTATE = ['tools/lib/release/install-manual.mjs', 'tools/lib/release/market-index.mjs', 'tools/release/market-index.mjs']
     const temp = mkdtempSync(join(tmpdir(), 'pipeline-inputs-'))
@@ -725,6 +735,12 @@ describe('sanitizer 与字节工具', () => {
     expect(checkShippedPackage(badTier).some(problem => problem.includes('不是数组'))).toBe(true)
     const unsafeTier = fixture({ texts: { 'package/content/manifest.json': JSON.stringify({ inventory: ['AGENTS.md'], tiers: { t2: ['../x'] } }) } })
     expect(checkShippedPackage(unsafeTier).some(problem => problem.includes('不安全路径'))).toBe(true)
+  })
+
+  it('market-index 也在发布输入集内（BUG-264）', () => {
+    expect(releasePipelineFiles(ROOT)).toContain('tools/release/market-index.mjs')
+    expect(releasePipelineFiles(ROOT)).toContain('tools/lib/release/market-index.mjs')
+    expect(releasePipelineFiles(ROOT)).not.toContain('tools/lib/core/repository-layout.mjs')
   })
 
   it('packageRootOf 取 package 名', () => {

@@ -29,7 +29,7 @@ describe('name-status -z 解析（BUG-281）', () => {
   })
 })
 
-describe('docs-only 判据（BUG-280/281）', () => {
+describe('docs-only 判据（BUG-280）', () => {
   it('docs/notes/_backlog 与根三件是 docs-only；空 diff 不是', () => {
     expect(docsOnlyOutputProblem('M\0docs/a.md\0M\0notes/b.md\0M\0_backlog/bugs/x.md\0M\0README.md\0')).toBeUndefined()
     expect(docsOnlyOutputProblem('')).toMatch(/没有文件变化/)
@@ -40,7 +40,7 @@ describe('docs-only 判据（BUG-280/281）', () => {
     expect(docsOnlyChangeProblem([{ status: 'M', paths: ['src/host/x.ts'] }])).toContain('非 docs')
   })
 
-  it('rename 两侧都判：code→docs 红，docs→notes 绿', () => {
+  it('rename 两侧都判：code→docs 红，docs→notes 绿（BUG-281）', () => {
     expect(docsOnlyChangeProblem([{ status: 'R100', paths: ['src/a.ts', 'docs/a.md'] }])).toContain('src/a.ts')
     expect(docsOnlyChangeProblem([{ status: 'R100', paths: ['docs/a.md', 'notes/a.md'] }])).toBeUndefined()
   })
@@ -76,7 +76,7 @@ describe('就绪判据（BUG-282）', () => {
     expect(readinessProblems({ manifest: { ...manifest, artifact: { sha256: 'x' } }, ...expected }).join()).toContain('sha256')
   })
 
-  it('stamp/check 共用一份判据（不再各写一半）', () => {
+  it('stamp/check 共用一份判据（BUG-282）', () => {
     const text = readFileSync(join(ROOT, 'tools/release/release.mjs'), 'utf8')
     expect(text.match(/sharedReadinessProblems\(/g)?.length).toBe(3)   // 定义 + stamp + check
     expect(text).not.toContain('manifest.dirty !== false')

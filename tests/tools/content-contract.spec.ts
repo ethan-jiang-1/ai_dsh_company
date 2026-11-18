@@ -5,6 +5,8 @@
 // 负例留证 2026-11-19：delivery documents 的 template 不在 content 时旧 schema 通过；本 spec 红（BUG-269）。
 // 负例留证 2026-11-19：check-rules 的 files 值是对象时旧 schema 通过；本 spec 红（BUG-270）。
 // 负例留证 2026-11-19：content 下的 symlink 文件被 `entry.isFile()` 静默跳过；本 spec 红（BUG-266）。
+// 负例留证 2026-11-19：删 content/templates/ 整目录时 REQUIRED_DIRS 走 continue；本 spec 红（BUG-273）。
+// 负例留证 2026-11-19：inventory 重复项 gate 不判、checker 判，两门结论相反；本 spec 红（BUG-274）。
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
@@ -55,7 +57,7 @@ describe('content 路径安全（BUG-265）', () => {
   })
 })
 
-describe('content manifest 的版本/重复/双向对账（BUG-267/274）', () => {
+describe('content manifest 的版本与双向对账（BUG-267）', () => {
   const files = { 'AGENTS.md': '# x\n', 'templates/prd.md': '# p\n' }
   const ok = { version: CONTENT_VERSION, inventory: ['AGENTS.md', 'templates/prd.md'], tiers: {} }
 
@@ -67,7 +69,7 @@ describe('content manifest 的版本/重复/双向对账（BUG-267/274）', () =
     expect(contentManifestProblems({ manifest: ok, files: Object.keys(files), read: readOf(files), requiredFiles: [], requiredDirs: [] })).toEqual([])
   })
 
-  it('inventory 重复项两处消费者同一结论（gate/checker 不再各判一半）', () => {
+  it('inventory 重复项两处消费者同一结论（BUG-274）', () => {
     const duplicated = { ...ok, inventory: ['AGENTS.md', 'AGENTS.md', 'templates/prd.md'] }
     const fromTarball = contentManifestProblems({ manifest: duplicated, files: Object.keys(files), read: readOf(files), requiredFiles: [], requiredDirs: [] })
     expect(fromTarball.some(problem => problem.includes('inventory 重复'))).toBe(true)
@@ -86,7 +88,7 @@ describe('content manifest 的版本/重复/双向对账（BUG-267/274）', () =
   })
 })
 
-describe('content symlink 与必需面（BUG-266/273）', () => {
+describe('content symlink 与必需面（BUG-266）', () => {
   it('content 下的 symlink 单列并红，不静默跳过', () => {
     const { dir } = tree({ 'AGENTS.md': '# x\n' })
     symlinkSync('/etc/hostname', join(dir, 'zz-link.md'))
@@ -97,7 +99,7 @@ describe('content symlink 与必需面（BUG-266/273）', () => {
     expect(problems.some(problem => problem.includes('symlink'))).toBe(true)
   })
 
-  it('必需目录为空 / 关键件缺失即红（目录由关键件派生）', () => {
+  it('必需目录为空 / 关键件缺失即红（BUG-273）', () => {
     expect(requiredContentDirs()).toContain('templates')
     expect(requiredContentDirs()).toContain('charters')
     expect(requiredContentDirs()).toContain('generic')
@@ -113,7 +115,7 @@ describe('content symlink 与必需面（BUG-266/273）', () => {
   })
 })
 
-describe('content JSON 跨引用与读取器同义（BUG-268/269/270）', () => {
+describe('content JSON 跨引用与读取器同义（BUG-268）', () => {
   const files = [
     'kb-setup/seed.json',
     'state/company.md',
@@ -153,7 +155,7 @@ describe('content JSON 跨引用与读取器同义（BUG-268/269/270）', () => 
     expect(duplicated.join()).toContain('target 重复')
   })
 
-  it('delivery-rules：template 不在 content / file 形状不对 / entry 缺失 都红', () => {
+  it('delivery-rules：template 不在 content / file 形状不对 / entry 缺失 都红（BUG-269）', () => {
     const missingTemplate = contentJsonProblems({
       rel: 'delivery-modes/managed-service/delivery-rules.json',
       value: { deliveryMode: 'managed-service', kind: 'delivery', entry: 'overview.md', documents: { SLA: { file: 'drafts/sla.md', owner: 'COO', template: 'templates/missing.md' } } },
@@ -174,7 +176,7 @@ describe('content JSON 跨引用与读取器同义（BUG-268/269/270）', () => 
     expect(missingEntry.join()).toContain('entry 不在 content')
   })
 
-  it('check-rules：files 值形状 / layers 覆盖 / defaultLayers 子集 都红', () => {
+  it('check-rules：files 值形状 / layers 覆盖 / defaultLayers 子集 都红（BUG-270）', () => {
     const rel = 'product-types/business-software/check-rules.json'
     expect(contentJsonProblems({ rel, value: { productType: 'x', layers: ['MRD'], files: { MRD: {} } }, files }).join()).toContain('files.MRD 必须是')
     expect(contentJsonProblems({ rel, value: { productType: 'x', layers: ['MRD', 'PRD'], files: { MRD: 'mrd.md' } }, files }).join()).toContain('layers 的 PRD')

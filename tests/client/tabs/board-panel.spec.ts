@@ -124,7 +124,8 @@ describe('BoardPanel：依赖徽章只在待办卡上（BUG-027 判据）', () =
  * BUG-277/278：降级读模型（缺 revision / 未知 status）必须在卡面显式标出。
  * 反证：删掉 `company-panels.tsx` 的 `card.statusGap` / `card.revisionGap` 两个分支 ⇒ 两条红。
  */
-// 负例留证 2026-11-19：revisionGap/statusGap 只进读模型、看板不消费（BUG-277/278）；接线后本文件红。
+// 负例留证 2026-11-19：revisionGap 只进读模型、看板不消费（BUG-277）；接线后本文件红。
+// 负例留证 2026-11-19：未知 status 被折成「待办」且卡面无任何标记（BUG-278）；接线后本文件红。
 describe('BoardPanel：降级标记到卡面（BUG-277/278）', () => {
   const DEGRADED: TeamViewLike = {
     members: [{ id: 'session-lead', name: 'lead', role: 'lead', phase: 'running' }],
@@ -138,13 +139,17 @@ describe('BoardPanel：降级标记到卡面（BUG-277/278）', () => {
     ],
   }
 
-  it('未知 status / 缺 revision 各出一条 tag，正常卡零 tag', () => {
-    const html = render(DEGRADED)
-    const cards = html.split('<article').slice(1)
+  it('未知 status 的卡带「未知状态」tag，正常卡零 tag（BUG-278）', () => {
+    const cards = render(DEGRADED).split('<article').slice(1)
     const byId = (id: string) => cards.find(card => card.includes(`${id}@`))
     expect(byId('g1')).toContain('未知状态')
-    expect(byId('g2')).toContain('修订缺失')
     expect(byId('g3')).not.toContain('未知状态')
+  })
+
+  it('缺 revision 的卡带「修订缺失」tag，正常卡零 tag（BUG-277）', () => {
+    const cards = render(DEGRADED).split('<article').slice(1)
+    const byId = (id: string) => cards.find(card => card.includes(`${id}@`))
+    expect(byId('g2')).toContain('修订缺失')
     expect(byId('g3')).not.toContain('修订缺失')
   })
 })
