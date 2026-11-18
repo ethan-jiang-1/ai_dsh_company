@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-234：dsh.bundle.patch 只逐个校验目标，六角色 + 五 support 的集合完整性没断言
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-2 / H2）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -45,8 +45,15 @@ EOF
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 断言 patch 集合 = 12 个预期 preset（或至少 6 角色 id + 5 support id）；每个目标在 tarball。
-2. 最小负例：patch 裁到 6 条 → 红；缺一个 support preset → 红。
+1. `EXPECTED_PATCH` 断言 12 个组合目标（cordis + 六角色 + 五 support）全在 `dsh.bundle.patch`，每个目标在 tarball 且非空（空 preset = 组合少一个角色）。
+2. 最小负例：patch 裁到 6 条 → 红；缺一个 support → 红。
 3. 正例：12 条真实 patch 仍 PASS。
+
+## 修复证据
+
+- 改动面：`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`
+- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（patch 裁到 6 条/空 preset 仍 []）
+- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（EXPECTED_PATCH 12 条全在且目标非空；缺一/空文件红）
+- 提交：commit ce472f48

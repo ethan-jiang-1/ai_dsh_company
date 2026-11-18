@@ -107,6 +107,8 @@ export interface TeamViewLike {
   }[]
 }
 
+const STATUS_ORDER: Readonly<Record<string, number>> = { pending: 0, in_progress: 1, completed: 2, deleted: 3 }
+
 /**
  * 用事件流补任务板（2026-11-13，BUG-103）。
  *
@@ -138,7 +140,11 @@ export function teamWithEventTasks(view: TeamViewLike | null, events: readonly T
     // 但允许 pending/in_progress 推进到 completed（也允许 completed → deleted），避免无 revision 的投影永久冻结。
     if (previous !== undefined && typeof previous.revision !== 'number') {
       if (previous.status === 'deleted') continue
-      if (previous.status === 'completed' && task.status !== 'completed' && task.status !== 'deleted') continue
+      const beforeRank = STATUS_ORDER[previous.status] ?? -1
+      const nextRank = STATUS_ORDER[task.status] ?? -1
+      // 只允许前进（pending→in_progress→completed；任意→deleted），缺 revision 时也不让
+      // in_progress 被旧 pending 打回（BUG-230/240）。
+      if (task.status !== 'deleted' && nextRank < beforeRank) continue
     }
     // 事件流的历史/实时顺序不等于投影新旧：旧 revision 不覆盖新投影（BUG-104）。
     if (previous !== undefined && typeof previous.revision === 'number' && task.revision < previous.revision) continue
@@ -323,13 +329,16 @@ export function presenceFromEvents(
         activity.push({ time: event.time, kind: 'member', text: `${display} 启动中`, token: memberToken(display, 'provisioning') })
       } else if (member.phase === 'active') {
         activity.push({ time: event.time, kind: 'member', text: `${display} 上线`, token: { key: 'presence.activity.memberOnline', params: { name: display } } })
-      } else {
+      } else if (member.phase === 'failed') {
         activity.push({
           time: event.time,
           kind: 'member',
           text: `${display} 故障${member.error === undefined ? '' : `：${clip(member.error, 60)}`}`,
           token: member.error === undefined ? memberToken(display, 'failed') : { key: 'presence.activity.memberFailedDetail', params: { name: display, error: clip(member.error, 60) } },
         })
+      } else {
+        // 未知/未来 phase 与行状态同义落 unknown，不再冒充 failed（BUG-241）。
+        activity.push({ time: event.time, kind: 'member', text: `${display} 转未知`, token: memberToken(display, 'unknown') })
       }
       members.set(member.id, { name: member.name, phase: member.phase, error: member.error })
     } else if (isTaskEvent(event)) {
@@ -383,10 +392,10 @@ export function presenceFromEvents(
     })
   }
   for (const [id, member] of members) {
-    const status: PresenceStatus
-      = member.phase === 'provisioning' ? 'provisioning'
-        : member.phase === 'failed' ? 'failed'
-          : 'inactive'
+    // active 在 durable 事件板里是「已上线但未在跑任务」的 inactive；未知/未来 phase
+    // 与 live 读模型同义落 unknown（BUG-241）。
+    const phaseStatus = presenceStatusFromPhase(member.phase)
+    const status: PresenceStatus = member.phase === 'active' ? 'inactive' : phaseStatus
     rows.push({
       id,
       name: member.name,

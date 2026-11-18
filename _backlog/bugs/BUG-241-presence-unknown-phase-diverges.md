@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-241：未知 member phase 在事件板落 inactive、live 读模型落 unknown
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-9 / H6）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -54,8 +54,15 @@ pnpm exec tsx runtime/tmp/c15-presence.test.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 事件板行统一调用 `presenceStatusFromPhase(member.phase)`；若「active 显示 inactive」是 durable 语义，则对 active 显式映射，未知仍落 unknown。
-2. 最小负例：phase `warping` → 两边都 unknown（或都说明白为什么不同）；phase `active` 的 durable 语义有注释/测试。
+1. 事件板与 live 共用 `presenceStatusFromPhase`；`active` 显式保留 durable inactive，未知/未来 phase 的行状态与成员动态都落 `unknown`（`memberUnknown` token）。
+2. 最小负例：phase `warping` → 两边都 unknown；phase `active` 的事件板仍 inactive（有注释/测试）。
 3. 正例：现有 provisioning/failed/active 测试不变。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/presence.ts`、`tests/lib/presence/presence-board.spec.ts`
+- 红：`pnpm test tests/lib/presence/presence-board.spec.ts`（未知 phase 行 inactive vs live unknown；动态显示故障）
+- 绿：`pnpm test tests/lib/presence/presence-board.spec.ts`（行/动态同落 unknown；active durable inactive 有注释/测试）
+- 提交：commit ce472f48

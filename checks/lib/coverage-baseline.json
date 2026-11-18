@@ -366,8 +366,8 @@
       "branches": 75.86
     },
     "packages/company-pack/src/host/ledger/catalog.ts": {
-      "statements": 89.61,
-      "branches": 90
+      "statements": 91.2,
+      "branches": 90.74
     },
     "packages/company-pack/src/host/ledger/governance-export.ts": {
       "statements": 91.54,
@@ -562,12 +562,12 @@
       "branches": 100
     },
     "packages/company-pack/src/lib/presence/presence-status.ts": {
-      "statements": 95.83,
-      "branches": 88.23
+      "statements": 100,
+      "branches": 94.11
     },
     "packages/company-pack/src/lib/presence/presence.ts": {
-      "statements": 94.36,
-      "branches": 82.87
+      "statements": 97.97,
+      "branches": 89.26
     },
     "packages/company-pack/src/lib/presence/tool-card.ts": {
       "statements": 100,
@@ -762,8 +762,8 @@
       "branches": 83.78
     },
     "tools/lib/release/shipped-shape.mjs": {
-      "statements": 98.92,
-      "branches": 90.81
+      "statements": 99.42,
+      "branches": 92.67
     },
     "tools/lib/repo/asset-consumers.mjs": {
       "statements": 97.87,

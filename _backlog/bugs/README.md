@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 11 张**：BUG-212（收尾验证链偏长）保持活跃；C15 10 张（BUG-233..242）见下方「## 2026-11-18 C15 修复后门禁的新面 + 不可读/部分输入」。C13/C14 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**活跃 11 张**：BUG-212（收尾验证链偏长）保持活跃，不并入本批；C15 10 张（BUG-233..242）已由 2026-11-18 用户指令授权，`调查中 → 修复就绪`，批次计划见下方「## 2026-11-18 修复交接（C15 门禁闭环 + 不可读/部分输入：BUG-233..242）」。C13/C14 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 **独立卡**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
 
@@ -75,6 +75,25 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 **收口（2026-11-17）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `f1629047`。
 `pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2218 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
 共享机制决定 = [shipped package boundary Note](../../notes/implemented/2026-11-17-shipped-package-boundary.md)。
+
+## 2026-11-18 修复交接（C15 门禁闭环 + 不可读/部分输入：BUG-233..242）
+
+**用户指令（2026-11-18）**：「下一波bug来了，你也一块儿去改吧 继续下一波……看看是否能系统性修起来。计划有了后 setup goal 逐步按REPO的流程来推进。」——本句即本轮授权（材料性：shipped 关键件/组合集合、源码指纹、降级门禁、catalog 坏形状、presence 部分 wire；留痕 = 批次 Note `notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md`）。BUG-212 不并入本批。
+
+C15 十张是 C14 新判据的「再闭包」+ 三类坏输入：
+A 组是 checker 只到「关键件在不在/glob 非空」；B 组是源码指纹与降级理由；C/D 是 catalog 不可读、presence 部分 wire。
+
+| 组 | 卡 | 共同根因 | 修法（唯一事实源） |
+|---|---|---|---|
+| **A shipped 关键件/集合** | [233](BUG-233-required-shipped-misses-runtime-content.md) / [234](BUG-234-preset-set-completeness-unchecked.md) / [237](BUG-237-required-shipped-empty-file.md) | REQUIRED 只列 12 条、patch 只逐个校验、存在 ≠ 非空 | `REQUIRED_SHIPPED` 扩到 templates/contracts/delivery-modes/product-types/methods/kb/state/wiki；`EXPECTED_PATCH` 12 个组合目标；关键件 trim 非空 + JSON 可解析 |
+| **B 指纹/降级** | [235](BUG-235-source-fingerprint-includes-dev-readme.md) / [236](BUG-236-allow-stale-no-reason.md) | dev README 误入指纹；`--allow-stale` 无理由仍绿 | 从 `PACKAGE_SOURCE_FILES` 移除 dev `README.md`（保留 `README.shipped.md`）；`--allow-stale=理由` 必填，CI 禁止 |
+| **C catalog 不可读** | [238](BUG-238-catalog-unreadable-throws.md) / [239](BUG-239-catalog-unreadable-final-silent.md) | plainFileProblem 不查可读；读点无 catch | meta/ledger 读取 try/catch → warning + 无 meta/空账本；final `accessSync(R_OK)` 失败 → warning + 无 final |
+| **D presence 部分 wire** | [240](BUG-240-team-event-reopens-in-progress.md) / [241](BUG-241-presence-unknown-phase-diverges.md) / [242](BUG-242-presence-message-content-missing.md) | 状态序只保护 completed；两读模型各写映射；content 假设数组 | 缺 revision 按 pending→in_progress→completed→deleted 状态序只进不退；事件板与 live 共用 `presenceStatusFromPhase`（active 显式 durable inactive）；`firstText` 接受 undefined/非数组 → `''` |
+
+**次序 = A/B(检查器) → C/D(运行态) → 重打 `_dist` → 真入口**：
+先补 checker 的声明面并让合成/真实包红→绿；再修指纹/降级；C/D 用临时 companyHome + 纯函数最小输入。证据口径 = 先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；A/B = `pnpm test tests/repo/release/shipped-shape.spec.ts` + `pnpm release:shape`；C = `pnpm test tests/host/ledger/catalog.spec.ts`；D = `pnpm test tests/lib/presence/presence-board.spec.ts`。
+
+**终点** = C15 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃，不动。
 
 ## 2026-11-18 C15 修复后门禁的新面 + 不可读/部分输入
 

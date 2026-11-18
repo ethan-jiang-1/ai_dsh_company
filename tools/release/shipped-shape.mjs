@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { checkShippedPackage, freshnessProblem } from '../lib/release/shipped-shape.mjs'
+import { checkShippedPackage, freshnessProblem, staleFlagProblem } from '../lib/release/shipped-shape.mjs'
 import { sourceFingerprint } from '../lib/core/pack-source.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -56,6 +56,8 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const staleArg = args.find(arg => arg === '--allow-stale' || arg.startsWith('--allow-stale='))
   const allowStale = staleArg !== undefined
   const staleReason = staleArg?.includes('=') ? staleArg.slice(staleArg.indexOf('=') + 1) : ''
+  const staleFlagError = staleFlagProblem({ args, ci: process.env.CI !== undefined })
+  if (staleFlagError !== undefined) problems.push(staleFlagError)
   const customTarball = tarballIndex >= 0
   const manifestPath = join(root, '_dist/release-manifest.json')
   const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : undefined

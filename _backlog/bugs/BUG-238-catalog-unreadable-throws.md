@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-238：catalog 对不可读 meta.md / motion-ledger.md 直接抛 EACCES，不转 warning
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-6 / H5）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -56,8 +56,15 @@ pnpm exec tsx runtime/tmp/c15-catalog-perm.test.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. meta/ledger 读取用 try/catch → warning + 按无 meta/空账本处理；退出不再抛。
-2. 最小负例：chmod 000 meta.md / ledger → `written` 合理 + warnings 点名路径；不抛。
-3. 正例：正常运行结果不变。
+1. `scanEntries` 的 meta 读取与 ledger 读取 try/catch → warning + 按无 meta/空账本处理；`regenerateCatalog` 不抛。
+2. 最小负例：chmod 000 meta.md / ledger → warnings 点名路径，退出不抛。
+3. 正例：正常读取结果不变。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/ledger/catalog.ts`、`tests/host/ledger/catalog.spec.ts`
+- 红：`pnpm test tests/host/ledger/catalog.spec.ts`（chmod 000 meta/ledger → EACCES 抛）
+- 绿：`pnpm test tests/host/ledger/catalog.spec.ts`（try/catch → warning + 无 meta/空账本，不抛）
+- 提交：commit ce472f48

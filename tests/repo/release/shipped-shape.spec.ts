@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
-import { checkShippedPackage, checkSourceShape, freshnessProblem, packageRootOf, platformModules, sanitizePackage, scrubDevPaths, stripComments } from '../../../tools/lib/release/shipped-shape.mjs'
+import { EXPECTED_PATCH, REQUIRED_SHIPPED, checkShippedPackage, checkSourceShape, freshnessProblem, packageRootOf, platformModules, sanitizePackage, scrubDevPaths, staleFlagProblem, stripComments } from '../../../tools/lib/release/shipped-shape.mjs'
 import { packageSourceFiles, sourceFingerprint } from '../../../tools/lib/core/pack-source.mjs'
 
 // 负例留证 2026-11-17：类型面植入内部 .d.ts，checker 红（BUG-213）；删除 → 绿。
@@ -64,7 +64,7 @@ function fixture(overrides: { pkg?: Record<string, unknown>; entries?: string[];
       'presets/**', 'locale/*.json', 'cordis.patch.yml', 'content/**', 'LICENSE',
     ],
     peerDependencies: { '@deepseek-ai/dsh-client-ui-primitives': '^0.2.1-rc.2' },
-    dsh: { bundle: { patch: ['./presets/ceo/agent.cordis.yml'] }, client: { inject: ['@deepseek-ai/dsh-client-ui-primitives'], platform: 'web' } },
+    dsh: { bundle: { patch: EXPECTED_PATCH }, client: { inject: ['@deepseek-ai/dsh-client-ui-primitives'], platform: 'web' } },
     ...overrides.pkg,
   }
   const entries = overrides.entries ?? [
@@ -72,15 +72,20 @@ function fixture(overrides: { pkg?: Record<string, unknown>; entries?: string[];
     'package/lib/types/index.d.ts', 'package/lib/types/client/index.d.ts',
     'package/lib/types/host/cultivation/cultivation.d.ts',
     'package/LICENSE', 'package/README.md', 'package/cordis.patch.yml',
-    'package/locale/en.json', 'package/locale/zh.json', 'package/content/AGENTS.md',
-    'package/content/manifest.json',
-    'package/content/charters/ceo.md', 'package/content/charters/cfo.md',
-    'package/content/charters/cmo.md', 'package/content/charters/coo.md',
-    'package/content/charters/vp-eng.md', 'package/content/charters/vp-sales.md',
-    'package/content/company/policy-lines.md', 'package/content/company/review-protocol.md',
-    'package/presets/ceo/agent.cordis.yml',
+    ...REQUIRED_SHIPPED.map(rel => `package/${rel}`),
+    ...EXPECTED_PATCH.map(rel => `package/${rel.replace(/^\.\//, '')}`),
   ]
+  const requiredTexts = Object.fromEntries(REQUIRED_SHIPPED.map(rel => [
+    `package/${rel}`,
+    rel.endsWith('.json') ? '{"tiers":{}}\n' : '# x\n',
+  ]))
+  const presetTexts = Object.fromEntries(EXPECTED_PATCH.filter(rel => rel.includes('/presets/')).map(rel => [
+    `package/${rel.replace(/^\.\//, '')}`,
+    'id: x\n',
+  ]))
   const texts = {
+    ...requiredTexts,
+    ...presetTexts,
     'package/lib/index.js': 'export const x = 1\n',
     'package/lib/client.js': 'require("react")\nrequire("react/jsx-runtime")\nrequire("@deepseek-ai/dsh-client-ui-primitives")\n',
     'package/lib/types/index.d.ts': "import type { CultivationHostConfig } from './host/cultivation/cultivation.js'\nexport declare const x: CultivationHostConfig\n",
@@ -175,6 +180,51 @@ describe('shipped package 形状判据（C13）', () => {
     expect(checkShippedPackage(input).some(problem => problem.includes('dev 路径'))).toBe(true)
   })
 
+  it('运行时关键件（templates/contracts/methods）缺失也红（BUG-233）', () => {
+    const missing = fixture({ entries: fixture().entries.filter(entry => entry !== 'package/content/templates/prd.md') })
+    expect(checkShippedPackage(missing).some(problem => problem.includes('templates/prd.md'))).toBe(true)
+  })
+
+  it('patch 集合必须含六角色 + 五 support（BUG-234）', () => {
+    const trimmed = fixture({ pkg: { dsh: { bundle: { patch: EXPECTED_PATCH.slice(0, 6) }, client: { inject: ['@deepseek-ai/dsh-client-ui-primitives'], platform: 'web' } } } })
+    expect(checkShippedPackage(trimmed).some(problem => problem.includes('缺组合目标'))).toBe(true)
+  })
+
+  it('关键件存在但不可读也红（BUG-237 边界）', () => {
+    const base = fixture()
+    const unreadable = checkShippedPackage({ ...base, read: entry => {
+      if (entry === 'package/locale/en.json') throw new Error('EACCES')
+      return base.read(entry)
+    } })
+    expect(unreadable.some(problem => problem.includes('不可读'))).toBe(true)
+    const textUnreadable = checkShippedPackage({ ...base, read: entry => {
+      if (entry === 'package/content/AGENTS.md') throw new Error('EACCES')
+      return base.read(entry)
+    } })
+    expect(textUnreadable.some(problem => problem.includes('content/AGENTS.md: 不可读'))).toBe(true)
+  })
+
+  it('组合目标存在但为空也红（BUG-234/237）', () => {
+    const empty = fixture({ texts: { 'package/presets/ceo/agent.cordis.yml': '   \n' } })
+    expect(checkShippedPackage(empty).some(problem => problem.includes('组合目标为空'))).toBe(true)
+  })
+
+  it('组合目标存在但不可读也红（BUG-234 边界）', () => {
+    const base = fixture()
+    const unreadable = checkShippedPackage({ ...base, read: entry => {
+      if (entry === 'package/presets/ceo/agent.cordis.yml') throw new Error('EACCES')
+      return base.read(entry)
+    } })
+    expect(unreadable.some(problem => problem.includes('组合目标不可读'))).toBe(true)
+  })
+
+  it('关键件存在但为空/非法 JSON 也红（BUG-237）', () => {
+    const empty = fixture({ texts: { 'package/content/charters/ceo.md': '  \n' } })
+    expect(checkShippedPackage(empty).some(problem => problem.includes('关键运行时件为空'))).toBe(true)
+    const badJson = fixture({ texts: { 'package/content/manifest.json': 'not json\n' } })
+    expect(checkShippedPackage(badJson).some(problem => problem.includes('不是合法 JSON'))).toBe(true)
+  })
+
   it('content/locale 关键件缺失也红（BUG-223 sentinel）', () => {
     const missing = fixture({ entries: fixture().entries.filter(entry => entry !== 'package/content/charters/ceo.md' && entry !== 'package/locale/en.json') })
     const problems = checkShippedPackage(missing)
@@ -198,16 +248,26 @@ describe('shipped package 形状判据（C13）', () => {
     expect(checkShippedPackage(input).some(problem => problem.includes('dsh.bundle.patch'))).toBe(true)
   })
 
-  it('README.shipped 进入源码指纹（BUG-227 B1）', () => {
+  it('README.shipped 进入源码指纹，dev README 不进（BUG-227/235）', () => {
     const base = mkdtempSync(join(tmpdir(), 'fingerprint-'))
     writeFileSync(join(base, 'package.json'), '{}\n')
     const before = sourceFingerprint(base)
     expect(packageSourceFiles(base)).not.toContain('README.shipped.md')
+    writeFileSync(join(base, 'README.md'), '# dev\n')
+    expect(sourceFingerprint(base)).toBe(before)
     writeFileSync(join(base, 'README.shipped.md'), '# shipped\n')
     expect(packageSourceFiles(base)).toContain('README.shipped.md')
     expect(sourceFingerprint(base)).not.toBe(before)
     rmSync(base, { recursive: true, force: true })
   })
+  it('--allow-stale 必须带理由且 CI 禁止（BUG-236）', () => {
+    expect(staleFlagProblem({ args: [] })).toBeUndefined()
+    expect(staleFlagProblem({ args: ['--allow-stale'] })).toContain('理由')
+    expect(staleFlagProblem({ args: ['--allow-stale='] })).toContain('理由')
+    expect(staleFlagProblem({ args: ['--allow-stale=test'] })).toBeUndefined()
+    expect(staleFlagProblem({ args: ['--allow-stale=test'], ci: true })).toContain('CI')
+  })
+
   it('freshness 只认 sourceFingerprint；gitSha 落后不误红（BUG-227）', () => {
     expect(freshnessProblem({ manifest: { sourceFingerprint: 'a', gitSha: 'old' }, currentFingerprint: 'b' })).toContain('sourceFingerprint')
     expect(freshnessProblem({ manifest: { sourceFingerprint: 'a', gitSha: 'old' }, currentFingerprint: 'a' })).toBeUndefined()
@@ -216,7 +276,7 @@ describe('shipped package 形状判据（C13）', () => {
   it('glob 分支（**、*、?）与字面 files 缺失都判（BUG-223）', () => {
     const missingLiteral = fixture({ pkg: { files: [...fixture().pkg.files, 'missing.txt'] } })
     expect(checkShippedPackage(missingLiteral).some(problem => problem.includes('missing.txt'))).toBe(true)
-    const weirdGlob = fixture({ pkg: { files: ['content/**/missing.md', 'lib/?.js', 'lib/types/**'] } })
+    const weirdGlob = fixture({ pkg: { files: ['content/**/missing.md', 'lib/?.js', 'lib/types/**', 'x?y'] } })
     const problems = checkShippedPackage(weirdGlob)
     expect(problems.some(problem => problem.includes('files glob'))).toBe(true)
     expect(problems.some(problem => problem.includes('lib/types/**'))).toBe(true)
@@ -253,14 +313,40 @@ describe('shipped package 形状判据（C13）', () => {
   it('source shape 正例：关键件/链接/pnpm/patch 全在（BUG-228）', () => {
     const base = mkdtempSync(join(tmpdir(), 'source-shape-ok-'))
     const write = (rel: string, text: string) => { mkdirSync(join(base, rel, '..'), { recursive: true }); writeFileSync(join(base, rel), text) }
-    write('package.json', `${JSON.stringify({ dsh: { bundle: { patch: ['./presets/ceo/agent.cordis.yml'] } }, files: ['content/**', 'presets/**', 'locale/*.json', 'LICENSE'] })}\n`)
+    write('package.json', `${JSON.stringify({ dsh: { bundle: { patch: EXPECTED_PATCH } }, files: ['content/**', 'presets/**', 'locale/*.json', 'LICENSE'] })}\n`)
     write('README.shipped.md', '# x\n\n[home](https://example.com)\ndsh plugin add\ndsh: pnpm was not found; install pnpm and make it available on PATH.\n')
-    for (const rel of ['content/AGENTS.md', 'content/manifest.json', 'content/charters/ceo.md', 'content/charters/cfo.md',
-      'content/charters/cmo.md', 'content/charters/coo.md', 'content/charters/vp-eng.md', 'content/charters/vp-sales.md',
-      'content/company/policy-lines.md', 'content/company/review-protocol.md', 'locale/en.json', 'locale/zh.json',
-      'presets/ceo/agent.cordis.yml', 'LICENSE']) write(rel, '# x\n')
+    for (const rel of [...REQUIRED_SHIPPED, ...EXPECTED_PATCH.map(item => item.replace(/^\.\//, '')), 'LICENSE']) {
+      write(rel, rel.endsWith('.json') ? '{"tiers":{}}\n' : '# x\n')
+    }
     expect(checkSourceShape({ packDir: base })).toEqual([])
     rmSync(base, { recursive: true, force: true })
+  })
+
+  it('source shape 关键件不可读/为空/非法 JSON 也红（BUG-237 源码侧）', () => {
+    const packDir = join(ROOT, 'packages/company-pack')
+    const problems = checkSourceShape({ packDir, readFile: rel => {
+      if (rel === 'content/AGENTS.md') throw new Error('EACCES')
+      if (rel === 'content/charters/ceo.md') return ''
+      if (rel === 'content/kb-setup/seed.json') return 'not json'
+      return readFileSync(join(packDir, rel), 'utf8')
+    } })
+    expect(problems.some(problem => problem.includes('不可读'))).toBe(true)
+    expect(problems.some(problem => problem.includes('为空'))).toBe(true)
+    expect(problems.some(problem => problem.includes('不是合法 JSON'))).toBe(true)
+  })
+
+  it('source shape 组合目标不可读/为空也红（BUG-234 源码侧）', () => {
+    const packDir = join(ROOT, 'packages/company-pack')
+    const unreadable = checkSourceShape({ packDir, readFile: rel => {
+      if (rel === 'presets/ceo/agent.cordis.yml') throw new Error('EACCES')
+      return readFileSync(join(packDir, rel), 'utf8')
+    } })
+    expect(unreadable.some(problem => problem.includes('组合目标不可读'))).toBe(true)
+    const empty = checkSourceShape({ packDir, readFile: rel => {
+      if (rel === 'presets/ceo/agent.cordis.yml') return '  \n'
+      return readFileSync(join(packDir, rel), 'utf8')
+    } })
+    expect(empty.some(problem => problem.includes('组合目标为空'))).toBe(true)
   })
 
   it('source shape 负例：出包链接/pnpm 文案/patch 目标/glob/ dev 路径（BUG-228）', () => {

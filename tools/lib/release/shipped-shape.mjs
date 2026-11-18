@@ -37,8 +37,8 @@ const DEV_DIR_ALLOW = [
   /^tools\/source(?:\/|$)/,
   /^tools\/pre-execute$/,
 ]
-/** 发布包必须有的运行时关键件（glob 只证非空不够，BUG-223）。 */
-const REQUIRED_SHIPPED = [
+/** 发布包必须有的运行时关键件（从 host/client 实际读取面收；glob 非空不等于关键件在）。 */
+export const REQUIRED_SHIPPED = [
   'content/AGENTS.md',
   'content/manifest.json',
   'content/charters/ceo.md',
@@ -49,8 +49,55 @@ const REQUIRED_SHIPPED = [
   'content/charters/vp-sales.md',
   'content/company/policy-lines.md',
   'content/company/review-protocol.md',
+  'content/templates/prd.md',
+  'content/templates/mrd.md',
+  'content/templates/meta.md',
+  'content/contracts/workflow.md',
+  'content/contracts/delegation/spawn.md',
+  'content/contracts/delegation/team-spawn.md',
+  'content/contracts/delegation/retry.md',
+  'content/contracts/delegation/workflow.md',
+  'content/contracts/delegation/team.md',
+  'content/contracts/delegation/fork.md',
+  'content/delivery-modes/managed-service/delivery-rules.json',
+  'content/delivery-modes/project-services/delivery-rules.json',
+  'content/product-types/business-software/requirements-model.md',
+  'content/product-types/business-software/check-rules.json',
+  'content/product-types/hardware-software/requirements-model.md',
+  'content/product-types/hardware-software/check-rules.json',
+  'content/methods/quality-loop-producer/system-architecture/SKILL.md',
+  'content/methods/quality-loop-producer/vv-plan/SKILL.md',
+  'content/methods/quality-loop-verifier/system-architecture/SKILL.md',
+  'content/methods/quality-loop-verifier/vv-plan/SKILL.md',
+  'content/kb-setup/seed.json',
+  'content/kb-setup/guide.md',
+  'content/kb-setup/run-bundle.md',
+  'content/wiki-template/AGENTS.md',
+  'content/wiki-template/index.md',
+  'content/company/rates.md',
+  'content/state/company.md',
+  'content/state/org.md',
+  'content/state/owners.md',
+  'content/state/roster.md',
+  'content/state/motion-ledger.md',
   'locale/en.json',
   'locale/zh.json',
+]
+
+/** 组合入口必须包含的 12 个 patch 目标（六角色 + 五 support + cordis 行；BUG-234）。 */
+export const EXPECTED_PATCH = [
+  './cordis.patch.yml',
+  './presets/ceo/agent.cordis.yml',
+  './presets/vp-eng/agent.cordis.yml',
+  './presets/vp-sales/agent.cordis.yml',
+  './presets/coo/agent.cordis.yml',
+  './presets/cfo/agent.cordis.yml',
+  './presets/cmo/agent.cordis.yml',
+  './presets/worker-researcher/agent.cordis.yml',
+  './presets/worker/agent.cordis.yml',
+  './presets/worker-orchestrator/agent.cordis.yml',
+  './presets/quality-loop-producer/agent.cordis.yml',
+  './presets/quality-loop-verifier/agent.cordis.yml',
 ]
 /** 运行时字节里出现的 dev 路径（字符串/模板内的 CSS 注释也可能有）→ 中性占位。 */
 const SCRUB = /(?<![A-Za-z0-9_./-])(?:\.\.\/)*(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+/g
@@ -201,7 +248,7 @@ export function checkShippedPackage({ pkg, entries, read, platformModules: platf
   if (JSON.stringify(pkg).includes('workspace:')) problems.push('manifest: 仍含 workspace: 协议')
   if (files.some(item => item.includes('lib/types/**'))) problems.push('manifest: files 仍整树收 lib/types/**')
   for (const value of files) {
-    if (value.includes('*')) {
+    if (value.includes('*') || value.includes('?')) {
       const pattern = globToRegExp(`package/${value}`)
       if (!entries.some(entry => pattern.test(entry))) problems.push(`manifest: files glob ${value} 未命中任何 entry`)
       continue
@@ -209,12 +256,30 @@ export function checkShippedPackage({ pkg, entries, read, platformModules: platf
     if (!entrySet.has(`package/${value.replace(/^\.\//, '')}`)) problems.push(`manifest: files 条目 ${value} 不在 tarball`)
   }
   for (const rel of REQUIRED_SHIPPED) {
-    if (!entrySet.has(`package/${rel}`)) problems.push(`manifest: 缺关键运行时件 ${rel}`)
+    const entry = `package/${rel}`
+    if (!entrySet.has(entry)) { problems.push(`manifest: 缺关键运行时件 ${rel}`); continue }
+    let text
+    try { text = read(entry) } catch { problems.push(`manifest: 关键运行时件不可读 ${rel}`); continue }
+    if (text.trim() === '') problems.push(`manifest: 关键运行时件为空 ${rel}`)
+    if (rel.endsWith('.json')) {
+      try { JSON.parse(text) } catch { problems.push(`manifest: 关键运行时件不是合法 JSON ${rel}`) }
+    }
   }
   const patches = Array.isArray(pkg.dsh?.bundle?.patch) ? pkg.dsh.bundle.patch : []
   for (const rel of patches) {
     const entry = `package/${String(rel).replace(/^\.\//, '')}`
     if (!entrySet.has(entry)) problems.push(`manifest: dsh.bundle.patch 目标 ${String(rel)} 不在 tarball`)
+  }
+  for (const rel of EXPECTED_PATCH) {
+    if (!patches.some(item => String(item).replace(/^\.\//, '') === rel.replace(/^\.\//, ''))) {
+      problems.push(`manifest: dsh.bundle.patch 缺组合目标 ${rel}`)
+      continue
+    }
+    const entry = `package/${rel.replace(/^\.\//, '')}`
+    if (!entrySet.has(entry)) continue
+    let text
+    try { text = read(entry) } catch { problems.push(`manifest: 组合目标不可读 ${rel}`); continue }
+    if (text.trim() === '') problems.push(`manifest: 组合目标为空 ${rel}`)
   }
 
   // 4. client require × inject / platform
@@ -253,7 +318,9 @@ export function checkShippedPackage({ pkg, entries, read, platformModules: platf
     if (!readme.includes('dsh: pnpm was not found')) problems.push('README: 提 pnpm 但没给 DSH 的缺包管理器诊断（dsh: pnpm was not found…）')
   }
   for (const entry of entries.filter(item => TEXT_FACE.test(item))) {
-    const lines = read(entry).split('\n')
+    let text
+    try { text = read(entry) } catch { problems.push(`${entry}: 不可读`); continue }
+    const lines = text.split('\n')
     lines.forEach((line, index) => {
       if (QUALIFIER.test(line)) return
       const hit = devPathInLine(line) ?? line.match(REL_DEV_PATH)?.[0]
@@ -282,15 +349,32 @@ export function checkSourceShape({ packDir, readFile = rel => readFileSync(join(
   }
   const manifest = JSON.parse(readFile('package.json'))
   for (const rel of REQUIRED_SHIPPED) {
-    if (!exists(rel)) problems.push(`source manifest: 缺关键运行时件 ${rel}`)
+    if (!exists(rel)) { problems.push(`source manifest: 缺关键运行时件 ${rel}`); continue }
+    let text
+    try { text = readFile(rel) } catch { problems.push(`source manifest: 关键运行时件不可读 ${rel}`); continue }
+    if (text.trim() === '') problems.push(`source manifest: 关键运行时件为空 ${rel}`)
+    if (rel.endsWith('.json')) {
+      try { JSON.parse(text) } catch { problems.push(`source manifest: 关键运行时件不是合法 JSON ${rel}`) }
+    }
   }
   const patches = Array.isArray(manifest.dsh?.bundle?.patch) ? manifest.dsh.bundle.patch : []
   for (const rel of patches) {
     if (!exists(String(rel).replace(/^\.\//, ''))) problems.push(`source manifest: dsh.bundle.patch 目标 ${String(rel)} 不在源码树`)
   }
+  for (const rel of EXPECTED_PATCH) {
+    if (!patches.some(item => String(item).replace(/^\.\//, '') === rel.replace(/^\.\//, ''))) {
+      problems.push(`source manifest: dsh.bundle.patch 缺组合目标 ${rel}`)
+      continue
+    }
+    const target = rel.replace(/^\.\//, '')
+    if (!exists(target)) { problems.push(`source manifest: 组合目标不在源码树 ${rel}`); continue }
+    let text
+    try { text = readFile(target) } catch { problems.push(`source manifest: 组合目标不可读 ${rel}`); continue }
+    if (text.trim() === '') problems.push(`source manifest: 组合目标为空 ${rel}`)
+  }
   const sourceFiles = packageSourceFiles(packDir)
   for (const value of Array.isArray(manifest.files) ? manifest.files : []) {
-    if (!value.includes('*') || value.startsWith('lib/')) continue
+    if ((!value.includes('*') && !value.includes('?')) || value.startsWith('lib/')) continue
     const pattern = globToRegExp(value)
     if (!sourceFiles.some(file => pattern.test(file))) problems.push(`source manifest: files glob ${value} 未命中源码文件`)
   }
@@ -305,6 +389,19 @@ export function checkSourceShape({ packDir, readFile = rel => readFileSync(join(
     })
   }
   return problems
+}
+
+/**
+ * `--allow-stale` 的降级判据：必须带理由；CI 环境禁止（BUG-236）。
+ * @param {{args?: string[], ci?: boolean}} options
+ */
+export function staleFlagProblem({ args = [], ci = false } = {}) {
+  const arg = args.find(item => item === '--allow-stale' || String(item).startsWith('--allow-stale='))
+  if (arg === undefined) return undefined
+  const reason = String(arg).includes('=') ? String(arg).slice(String(arg).indexOf('=') + 1) : ''
+  if (reason.trim() === '') return '--allow-stale 必须带 =理由（无理由降级不允许）'
+  if (ci) return 'CI 环境禁止 --allow-stale（只在本地人工排障时用 =理由）'
+  return undefined
 }
 
 /** 发布新鲜度：manifest 的 sourceFingerprint 必须等于当前源码指纹；gitSha 落后仅提示（docs-only）。 */

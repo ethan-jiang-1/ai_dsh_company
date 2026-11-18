@@ -12,7 +12,9 @@ export interface TextBlock {
  * @param content - 消息 content 块。
  * @returns 首行文本或空串。
  */
-export function firstText(content: readonly TextBlock[]): string {
+export function firstText(content: readonly TextBlock[] | undefined | null): string {
+  // 部分/旧 wire 可以缺 content；字符串 content 也不是块数组（BUG-242）。
+  if (!Array.isArray(content)) return ''
   for (const block of content) {
     if (block.type === 'text' && typeof block.text === 'string' && block.text.trim() !== '') {
       return block.text.trim().split('\n')[0]!

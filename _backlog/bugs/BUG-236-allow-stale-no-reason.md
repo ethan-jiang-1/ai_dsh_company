@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-236：release:shape 的 --allow-stale 不要求理由，warn 后仍 PASS
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-4 / H4）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -53,8 +53,15 @@ git checkout -- packages/company-pack/README.shipped.md
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `--allow-stale` 必须带 `=理由`（或 `--allow-stale <reason>`），无理由直接 `/red`；CI 环境可禁止该 flag。
-2. 最小负例：无理由 `--allow-stale` → exit 1；带理由 → exit 0 + WARN。
+1. `--allow-stale` 必须带 `=理由`；裸 flag 直接红；CI 环境禁止该 flag。
+2. 最小负例：`--allow-stale` → exit 1；`--allow-stale=test` → exit 0 + WARN。
 3. 正例：`--prepare` 后的 `_dist` 无 flag → PASS。
+
+## 修复证据
+
+- 改动面：`tools/release/shipped-shape.mjs`
+- 红：`pnpm release:shape`（`--allow-stale` 无理由：exit 1（WARN + FAIL））
+- 绿：`pnpm release:shape`（`--prepare` 后 `release:shape` PASS；`--allow-stale=test` 显式降级）
+- 提交：commit ce472f48

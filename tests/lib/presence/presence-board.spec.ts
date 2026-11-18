@@ -2,6 +2,9 @@
 // 负例留证 2026-11-13：去掉 members/tasks 的 `?? []` ⇒ partial view 抛 reading map（BUG-145）；兜底即绿。
 // 负例留证 2026-11-18：diffActivity({}, {members:[],tasks:[]}) 不兜底即抛（BUG-229）；补 ?? [] 后绿。
 // 负例留证 2026-11-18：投影 completed 无 revision + 旧 pending 事件即覆盖（BUG-230）；保留投影后绿。
+// 负例留证 2026-11-18：投影 in_progress 无 revision + 旧 pending 事件即回退（BUG-240）；状态序保护后绿。
+// 负例留证 2026-11-18：未知 phase 事件板 inactive vs live unknown（BUG-241）；共用映射后绿。
+// 负例留证 2026-11-18：message.content 缺失抛 content is not iterable（BUG-242）；firstText 兜底后绿。
 /** 在场板读模型（R5b，Q5–Q8 定案的 keyless 完成定义——提案验收判据 1/4）。 */
 // 负例留证 2026-11-13：把 teamWithEventTasks 改成直接返回 view ⇒「事件流补任务板」用例红（BUG-103）；还原即绿。
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
@@ -11,6 +14,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   PRESET_DISPLAY_NAMES,
+  activityFromEvents,
   diffActivity,
   displayNameFor,
   memberNames,
@@ -196,7 +200,7 @@ describe('缺失 / 未知不崩（验收判据 1 的后半句）', () => {
 })
 
 describe('teamWithEventTasks（事件补投影）', () => {
-  it('投影缺 revision 时旧事件不覆盖 completed（BUG-230）', () => {
+  it('投影缺 revision 时旧事件不覆盖 completed、不退回 in_progress（BUG-230/240）', () => {
     const base = {
       members: [{ id: 'm1', name: 'vp-eng', role: 'teammate', phase: 'active' }],
       tasks: [{ id: 't1', subject: 'done task', status: 'completed' }],
@@ -215,6 +219,54 @@ describe('teamWithEventTasks（事件补投影）', () => {
     } as TeamViewLike
     const stillDeleted = teamWithEventTasks(deletedBase, [taskEvent('t3', 1, 'gone task', 'completed', undefined, 3)])
     expect(stillDeleted?.tasks?.[0]?.status).toBe('deleted')
+    const runningBase = {
+      members: [{ id: 'm1', name: 'vp-eng', role: 'teammate', phase: 'active' }],
+      tasks: [{ id: 't4', subject: 'running task', status: 'in_progress' }],
+    } as TeamViewLike
+    const stillRunning = teamWithEventTasks(runningBase, [taskEvent('t4', 1, 'running task', 'pending', undefined, 4)])
+    expect(stillRunning?.tasks?.[0]?.status).toBe('in_progress')
+  })
+})
+
+describe('presenceFromEvents 部分 wire（BUG-241/242）', () => {
+  it('未知 phase 与 live 读模型同义落 unknown（BUG-241）', () => {
+    const events = [{
+      type: 'team/member', time: 1,
+      data: { teamId: 'lead', member: { id: 'm1', name: 'vp-eng', phase: 'warping' } },
+    }] as unknown as TeamEventLike[]
+    const board = presenceFromEvents(events)
+    expect(board.rows.find(row => row.id === 'm1')?.status).toBe('unknown')
+    expect(board.activity[0]?.token?.key).toBe('presence.activity.memberUnknown')
+    const live = rowsFromTeamView({ members: [{ id: 'm1', name: 'vp-eng', role: 'teammate', phase: 'warping' }], tasks: [] })
+    expect(live[0]?.status).toBe('unknown')
+  })
+
+  it('failed 成员与 deleted/未知任务事件仍折算（BUG-241 边界）', () => {
+    const failed = (id: string, error?: string) => ({
+      type: 'team/member', time: 1,
+      data: { teamId: TEAM, member: { id, name: id, phase: 'failed', ...(error === undefined ? {} : { error }) } },
+    })
+    const events = [
+      failed('m1'),
+      failed('m2', 'boom'),
+      taskEvent('t1', 1, 'x', 'pending', undefined, 1),
+      taskEvent('t1', 2, 'x', 'deleted', undefined, 2),
+      taskEvent('t2', 1, 'y', 'pending', undefined, 3),
+      { type: 'team/task', time: 4, data: { teamId: TEAM, task: { id: 't2', revision: 2, subject: 'y', status: 'paused' } } },
+    ] as unknown as TeamEventLike[]
+    const board = presenceFromEvents(events)
+    expect(board.activity.some(entry => entry.text.includes('故障'))).toBe(true)
+    expect(board.activity.some(entry => entry.text.includes('已删除'))).toBe(true)
+    expect(board.activity.some(entry => entry.text.includes('状态未知'))).toBe(true)
+    expect(activityFromEvents(events).length).toBe(board.activity.length)
+  })
+
+  it('缺 content / 字符串 content 的 message 不抛，落（空）（BUG-242）', () => {
+    const base = { type: 'team/message/queued', time: 1, data: { teamId: 'lead', message: { id: 'm', senderId: 'a', senderName: 'A', targetId: 'b' } } }
+    expect(() => presenceFromEvents([base] as unknown as TeamEventLike[])).not.toThrow()
+    expect(presenceFromEvents([base] as unknown as TeamEventLike[]).activity[0]?.text).toContain('（空）')
+    const stringContent = { ...base, data: { ...base.data, message: { ...base.data.message, content: 'text' } } }
+    expect(presenceFromEvents([stringContent] as unknown as TeamEventLike[]).activity[0]?.text).toContain('（空）')
   })
 })
 

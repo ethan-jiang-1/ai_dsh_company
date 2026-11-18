@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-237：REQUIRED_SHIPPED 只查 entry 存在，空 charter/空 manifest 仍 PASS
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-5 / H1·H4）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -49,8 +49,15 @@ EOF
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 对 REQUIRED 的文本件至少 `read(entry).trim() !== ''`；`content/manifest.json` 还要 JSON.parse 成功；charters 至少非空标题/正文。
-2. 最小负例：空 `content/charters/ceo.md` → 红；空 `content/manifest.json` → 红。
+1. `REQUIRED_SHIPPED` 的每个 entry 必须 `read(entry).trim() !== ''`；`.json` 还要 `JSON.parse` 成功。
+2. 最小负例：空 `content/charters/ceo.md` → 红；非法/空 `content/manifest.json` → 红。
 3. 正例：真实 137-entry tarball 仍 PASS。
+
+## 修复证据
+
+- 改动面：`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`
+- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（空 charter / 空或非法 manifest 仍 []（只查 entry））
+- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（trim 非空 + JSON.parse；空/非法 JSON 红）
+- 提交：commit ce472f48

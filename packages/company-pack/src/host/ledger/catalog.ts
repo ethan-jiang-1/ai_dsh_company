@@ -4,7 +4,7 @@
  * 本文件只留「扫描交付物根 + 生成派生索引（幂等）」；读取/校验 = catalog-state.ts，
  * 审计账本 = presented-ledger.ts。索引 `kb/deliverables-index.json` 是盘上 meta/final + 账本的派生视图。
  */
-import { existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs'
+import { accessSync, constants, existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   buildDeliverablesCatalog,
@@ -65,13 +65,26 @@ function scanEntries(companyHome: string, ledger: PresentedLedger): { entries: C
       if (!item.isDirectory()) continue
       const finalPath = join(dir, item.name, 'final.md')
       const finalProblem = plainFileProblem(companyHome, finalPath)
-      const final = finalProblem === null
+      let final = finalProblem === null
       if (finalProblem !== null && finalProblem !== 'missing') warnings.push(`${finalPath} ${labelOfProblem(finalProblem)}，按无 final 处理`)
+      // BUG-239：路径存在 ≠ 可读；不可读的 final 不能冒充可展示成品。
+      if (final) {
+        try { accessSync(finalPath, constants.R_OK) } catch {
+          warnings.push(`${finalPath} 不可读，按无 final 处理`)
+          final = false
+        }
+      }
       const metaPath = join(dir, item.name, 'meta.md')
       const metaProblem = plainFileProblem(companyHome, metaPath)
       const metaIsFile = metaProblem === null
       if (metaProblem !== null && metaProblem !== 'missing') warnings.push(`${metaPath} ${labelOfProblem(metaProblem)}，按无 meta 处理`)
-      const body = metaIsFile ? readFileSync(metaPath, 'utf8') : ''
+      // BUG-238：plainFileProblem 不查可读性；EACCES 必须降级成 warning，不能整盘抛。
+      let body = ''
+      if (metaIsFile) {
+        try { body = readFileSync(metaPath, 'utf8') } catch (error) {
+          warnings.push(`${metaPath} 不可读：${(error as Error).message}，按无 meta 处理`)
+        }
+      }
       const fields = parseMeta(body).fields
       // BUG-232：`slug:` 空值在 parseMeta 里是 ''，`??` 不会回退；空/空白视为未声明。
       const slug = deliverableSlug(fields, item.name)
@@ -121,9 +134,15 @@ export function regenerateCatalog(companyHome: string, presented?: PresentedLedg
   const ledgerProblem = plainFileProblem(companyHome, ledgerPath)
   const ledgerIsFile = ledgerProblem === null
   if (ledgerProblem !== null && ledgerProblem !== 'missing') warnings.push(`${ledgerPath} ${labelOfProblem(ledgerProblem)}，按空账本处理`)
+  let ledgerText = ''
+  if (ledgerIsFile) {
+    try { ledgerText = readFileSync(ledgerPath, 'utf8') } catch (error) {
+      warnings.push(`${ledgerPath} 不可读：${(error as Error).message}，按空账本处理`)
+    }
+  }
   const catalog = buildDeliverablesCatalog({
     entries: scanned.entries,
-    ledgerSlugs: ledgerIsFile ? ledgerSlugsFromText(readFileSync(ledgerPath, 'utf8')) : new Set(),
+    ledgerSlugs: ledgerIsFile ? ledgerSlugsFromText(ledgerText) : new Set(),
     generatedAt: new Date().toISOString(),
   })
   if (previous !== null && JSON.stringify(previous.entries) === JSON.stringify(catalog.entries)) {

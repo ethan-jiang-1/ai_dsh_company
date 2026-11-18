@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-242：presenceFromEvents 对缺 content 的 message 事件抛 `content is not iterable`
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-10 / H6）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -48,8 +48,15 @@ pnpm exec tsx runtime/tmp/c15-msg.test.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. `firstText` 接受 `readonly TextBlock[] | undefined`（或调用点 `Array.isArray` 归一）；缺 content → `''`。
-2. 最小负例：缺 `content`/字符串 `content` 不抛，动态落「（空）」；其它事件仍折。
+1. `firstText` 接受 `undefined | null | 非数组`，不抛；缺 content → `''`，调用点落「（空）」，其它事件继续折。
+2. 最小负例：缺 content / 字符串 content 不抛，动态落「（空）」。
 3. 正例：正常 text 块预览不变。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/shared/text.ts`、`tests/lib/presence/presence-board.spec.ts`
+- 红：`pnpm test tests/lib/presence/presence-board.spec.ts`（缺 content → content is not iterable）
+- 绿：`pnpm test tests/lib/presence/presence-board.spec.ts`（firstText 非数组 → ""；动态落（空），其它事件继续）
+- 提交：commit ce472f48

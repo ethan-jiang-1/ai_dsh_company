@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-240：缺 revision 的投影任务仍可被旧 pending 事件打回 pending（in_progress → pending）
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-8 / H6）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -56,8 +56,15 @@ pnpm exec tsx runtime/tmp/c15-team2.test.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 缺 revision 时按「状态序」保守合并：completed/deleted 不降；in_progress 不被 pending 降；只允许前进（pending→in_progress→completed，任意→deleted）。
-2. 最小负例：in_progress + 旧 pending → 仍 in_progress（或明确 revisionGap warning）。
-3. 正例：真实有 revision 的 BUG-104 行为不变。
+1. 缺 revision 时按状态序 `pending → in_progress → completed → deleted` 只进不退；in_progress 不被旧 pending 打回，任意→deleted 仍允许。
+2. 最小负例：in_progress + 旧 pending → 仍 in_progress；pending + completed → completed。
+3. 正例：有 revision 的 BUG-104 行为不变。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/presence.ts`、`tests/lib/presence/presence-board.spec.ts`
+- 红：`pnpm test tests/lib/presence/presence-board.spec.ts`（in_progress 无 revision + 旧 pending → pending）
+- 绿：`pnpm test tests/lib/presence/presence-board.spec.ts`（状态序只进不退：in_progress 保持；pending→completed 允许）
+- 提交：commit ce472f48

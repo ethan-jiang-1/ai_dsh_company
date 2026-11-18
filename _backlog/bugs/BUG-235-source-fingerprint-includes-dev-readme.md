@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-235：sourceFingerprint 把 dev README.md 算进指纹，改 dev 文档让 _dist 假过期
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-3 / H3）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -47,8 +47,15 @@ git checkout -- packages/company-pack/README.md
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 从 `PACKAGE_SOURCE_FILES` 移除 dev `README.md`（保留 `README.shipped.md`）；或明确把 `README.md` 纳入的话，把 sanitizer 改为不再覆盖、真正发布它（两者只能选一）。
-2. 最小判据：只改 dev README → sourceFingerprint 不变、release:shape PASS；只改 README.shipped → 指纹变、release:shape 红。
+1. `PACKAGE_SOURCE_FILES` 移除 dev `README.md`，保留 `README.shipped.md`。
+2. 最小判据：只改 dev README → `sourceFingerprint` 不变、`release:shape` PASS；只改 README.shipped → 指纹变、`release:shape` 红。
 3. 正例：改 src/presets/content/locale/package.json → 指纹变。
+
+## 修复证据
+
+- 改动面：`tools/lib/core/pack-source.mjs`、`tests/repo/release/shipped-shape.spec.ts`
+- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（dev README.md 在指纹内，改它指纹变）
+- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（dev README 不在 PACKAGE_SOURCE_FILES；改它指纹不变，改 README.shipped 变）
+- 提交：commit ce472f48

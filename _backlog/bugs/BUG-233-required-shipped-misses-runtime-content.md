@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-233：REQUIRED_SHIPPED 只列 12 个关键件，缺 templates/contracts/methods 仍 PASS
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-1 / H1）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -44,8 +44,15 @@ EOF
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. 从「运行时读取面」派生关键件：host commands `contentDir` 读取的 templates/contracts/methods、company 合同、charters；至少覆盖 `/prd`/`/req`/质量环/培养实际读取的路径。
+1. `REQUIRED_SHIPPED` 扩到运行时读取面：content/AGENTS、manifest、charters、company 合同（含 rates）、templates、contracts/delegation、delivery-modes、product-types、methods、kb-setup（seed/guide/run-bundle）、wiki-template（AGENTS/index）、state（company/org/owners/roster/motion-ledger）、locale，共 43 条。
 2. 最小负例：删 `content/templates/prd.md` → checker 红；接回 → 绿。
 3. 正例：真实 137-entry tarball 仍 PASS。
+
+## 修复证据
+
+- 改动面：`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`
+- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（REQUIRED 只 35 条时删 templates/prd.md / seed 源仍 []）
+- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（43 条关键件缺失即红；真实 137-entry tarball PASS）
+- 提交：commit ce472f48

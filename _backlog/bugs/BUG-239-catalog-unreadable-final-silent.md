@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-239：catalog 把不可读 final.md 仍算 present，warnings 为空
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-7 / H5）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -51,8 +51,15 @@ pnpm exec tsx runtime/tmp/c15-final-perm.test.mjs
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-1. final 至少 `accessSync(R_OK)` 或读首字节；不可读 → warning + `final:false`（或 `unreadable` 状态）。
-2. 最小负例：chmod 000 final.md → entry 不进/标不可读 + warning；不静默 present。
-3. 正例：正常 final 仍 present。
+1. final 在 `plainFileProblem` 之后加 `accessSync(R_OK)`；不可读 → warning + `final:false`，不静默 present。
+2. 最小负例：chmod 000 final.md → 无 entry/warning 点名；正常 final 仍 present。
+3. 正例：正常 final 不变。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/ledger/catalog.ts`、`tests/host/ledger/catalog.spec.ts`
+- 红：`pnpm test tests/host/ledger/catalog.spec.ts`（chmod 000 final → final:true，warnings []）
+- 绿：`pnpm test tests/host/ledger/catalog.spec.ts`（accessSync(R_OK) → final:false + warning）
+- 提交：commit ce472f48

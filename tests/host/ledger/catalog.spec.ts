@@ -1,6 +1,8 @@
 // 负例留证 2026-11-13：presented 写回 temp+rename 不捕获目录 ⇒ setPresentedAudit 抛 EISDIR（BUG-138）；safe 写 + 捕获即绿。
 // 负例留证 2026-11-18：deliverables 子目录 symlink 被静默跳过、warnings 为空（BUG-231）；加 symlink warning 后绿。
 // 负例留证 2026-11-18：`slug:` 空值被当已声明（entry.slug=''）（BUG-232）；回退目录名 + warning 后绿。
+// 负例留证 2026-11-18：meta/ledger chmod 000 直接抛 EACCES（BUG-238）；catch 成 warning 后绿。
+// 负例留证 2026-11-18：final chmod 000 仍 final:true、warnings 空（BUG-239）；按不可读降级后绿。
 /**
  * 成品目录 host 生成器（2026-10-25；2026-11-01 v3 路径）的 keyless 判据。
  *
@@ -8,7 +10,7 @@
  * ③present 事件按 `.dsh-company/deliverables.../final.md` 投影；④meta/台账解析与仓库口径一致；
  * ⑤一个 workspace 的扫描不读另一个。
  */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -173,6 +175,39 @@ describe('host catalog', () => {
     const result = regenerateCatalog(root)
     expect(result.catalog?.entries.map(entry => entry.dir)).toEqual(['2026-10-25-real'])
     expect(result.warnings.some(warning => warning.includes('2026-10-25-linked') && warning.includes('symlink'))).toBe(true)
+  })
+
+  it('meta.md / ledger 不可读 → warning 降级，不抛（BUG-238）', () => {
+    const root = workspace()
+    const dir = deliverable(root)
+    const meta = join(dir, 'meta.md')
+    const ledger = join(root, RUN_BUNDLE_PATHS.ledger)
+    try {
+      chmodSync(meta, 0o000)
+      const metaResult = regenerateCatalog(root)
+      expect(metaResult.warnings.some(warning => warning.includes('不可读'))).toBe(true)
+      chmodSync(meta, 0o644)
+      chmodSync(ledger, 0o000)
+      const ledgerResult = regenerateCatalog(root)
+      expect(ledgerResult.warnings.some(warning => warning.includes('不可读'))).toBe(true)
+    } finally {
+      chmodSync(meta, 0o644)
+      chmodSync(ledger, 0o644)
+    }
+  })
+
+  it('final.md 不可读 → 不算 present，出 warning（BUG-239）', () => {
+    const root = workspace()
+    const dir = deliverable(root)
+    const final = join(dir, 'final.md')
+    try {
+      chmodSync(final, 0o000)
+      const result = regenerateCatalog(root)
+      expect(result.catalog?.entries).toEqual([])
+      expect(result.warnings.some(warning => warning.includes('不可读'))).toBe(true)
+    } finally {
+      chmodSync(final, 0o644)
+    }
   })
 
   it('meta.md 的空 slug 回退目录名并 warning（BUG-232）', () => {
