@@ -218,6 +218,17 @@ function build() {
   run(process.execPath, ['tools/release/export-dist.mjs'])
 }
 
+/** docs-only 收尾路径：只改备忘/文档，不改 pack 源、管线、产物。 */
+const DOCS_ONLY_PATHS = [/^docs\//, /^notes\//, /^_backlog\//, /^_dist\/安装手册\.md$/, /^README\.md$/, /^AGENTS\.md$/, /^CLAUDE\.md$/]
+
+function docsOnlySince(sha) {
+  let names
+  try {
+    names = capture('git', ['diff', '--name-only', `${sha}..HEAD`]).split('\n').filter(Boolean)
+  } catch { return false }
+  return names.length > 0 && names.every(name => DOCS_ONLY_PATHS.some(pattern => pattern.test(name)))
+}
+
 function writeManifest(checks) {
   const version = pack().version
   const artifact = artifactCheck()
@@ -301,7 +312,9 @@ function stamp() {
   const checks = manifest.checks ?? {}
   const notPass = Object.entries(checks).filter(([, status]) => status !== 'pass')
   if (checks.verify !== 'pass' || checks.test !== 'pass' || notPass.length > 0) fail('manifest 还没有全项 pass；先 --verify')
-  manifest.gitSha = capture('git', ['rev-parse', 'HEAD']).trim()
+  const head = capture('git', ['rev-parse', 'HEAD']).trim()
+  if (manifest.gitSha !== head && !docsOnlySince(manifest.gitSha)) fail('manifest gitSha 与当前 HEAD 之间不是 docs-only；先 --prepare/--verify')
+  manifest.gitSha = head
   manifest.dirty = false
   manifest.generatedAt = new Date().toISOString()
   writeFileSync(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`)
@@ -316,7 +329,11 @@ function check(allowDirtyTree = allowDirty) {
   if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
   if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；' + repackHint())
   if (manifest.pipelineFingerprint !== releasePipelineFingerprint(ROOT)) fail('发布管线已变但 _dist 没重打；' + repackHint())
-  if (manifest.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest gitSha 不是当前 HEAD（发布后被改过？只提交 docs/receipt 时用 --stamp；重建产物才用 --prepare/--verify）')
+  const head = capture('git', ['rev-parse', 'HEAD']).trim()
+  if (manifest.gitSha !== head) {
+    if (!docsOnlySince(manifest.gitSha)) fail('manifest gitSha 不是当前 HEAD（发布后被改过？只提交 docs/receipt 时用 --stamp；重建产物才用 --prepare/--verify）')
+    console.log('release: docs-only commit since stamp；source/pipeline/artifact 未变，允许 --check（用 --stamp 钉 HEAD）')
+  }
   if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
   if (manifest.dirty !== false) fail('manifest 记录的是脏树（发布字节不对应一个干净 commit；重跑 --verify）')
   const checks = manifest.checks ?? {}
