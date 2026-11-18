@@ -1,17 +1,19 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-18
 ---
 
 # 推敲：修复后门禁的新面 + 不可读/部分输入（C15）
 
-> 立卡：2026-11-18 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-18 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：implementation — 本卡执行 C15 的探索与证据（缺陷另开 `_backlog/bugs/` 卡；编号唯一源 = [bugs/README](../bugs/README.md) 的 Next，2026-11-18 = 233）；本卡不改产品代码。
+> **结论/去向**：implementation — C15-1..10 全部 confirmed；10 张 BUG-233..242 已于 2026-11-18 修复（`56e4f986`）并归档（`40fa86dd`），决策记忆 = [Note](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)。本卡只作证据历史，不再承接轮次。
+>
+> 审查：agent（独立盲审）— 归档复核：10 项负控逐条复验仍绿（2026-11-18）；审查记录与处置见 `## 落地证据`。
 >
 > **授权边界**：静态 / 合成包 / tarball / 纯函数 / 临时 companyHome 可自主；不修产品代码；不改 vendor；`_dist` 只读。
 >
-> **前序**：[C14 低置信卡](2026-11-18-low-confidence-runtime-exploratory.md) 的 10 张（BUG-223..232）已由 2026-11-18 修复轮收口；本轮继续打「修复后的新判据」与「坏输入不被当坏形状」的同一类。用户点名的方向：**心里发虚的地方**——新 checker 只闭了上一轮的形状、不可读文件没被当坏形状、部分 wire 与 live 读模型不同义。
+> **前序**：[C14 低置信卡](../../issues/2026-11-18-low-confidence-runtime-exploratory.md) 的 10 张（BUG-223..232）已由 2026-11-18 修复轮收口；本轮继续打「修复后的新判据」与「坏输入不被当坏形状」的同一类。用户点名的方向：**心里发虚的地方**——新 checker 只闭了上一轮的形状、不可读文件没被当坏形状、部分 wire 与 live 读模型不同义。
 
 ## 问题与期望结果
 
@@ -58,16 +60,16 @@ C14 修复把 shipped-shape 的判据从「上次出事的样本」扩到 files 
 
 | # | 载体 | 预检看到什么 | 轴 | 首轮怎么证伪 |
 |---|---|---|---|---|
-| 1 | tarball `content/` | 过滤 `content/templates/prd.md` 后 checker 仍 `[]` | H1 | 真实 tarball 过滤 entry；[BUG-233](../_archive/fixed_bugs/BUG-233-required-shipped-misses-runtime-content.md) |
-| 2 | tarball `presets` + `package.json` | patch/preset 裁到 6 条仍 `[]` | H2 | 裁剪 patch + entries；[BUG-234](../_archive/fixed_bugs/BUG-234-preset-set-completeness-unchecked.md) |
-| 3 | `pack-source.mjs` | `README.md` 在 `PACKAGE_SOURCE_FILES`；改 dev README 指纹 `28a0649c→267257dd` | H3 | 前后指纹；[BUG-235](../_archive/fixed_bugs/BUG-235-source-fingerprint-includes-dev-readme.md) |
-| 4 | `release:shape` | `--allow-stale` 无理由仍 PASS（WARN + exit 0） | H4 | 临时改 README.shipped；[BUG-236](../_archive/fixed_bugs/BUG-236-allow-stale-no-reason.md) |
-| 5 | `checkShippedPackage` | 空 `content/charters/ceo.md` 仍 `[]`（只查 entry 存在） | H1/H4 | 合成 entries；[BUG-237](../_archive/fixed_bugs/BUG-237-required-shipped-empty-file.md) |
-| 6 | `catalog.ts` | chmod 000 meta.md → EACCES；ledger 同 | H5 | 临时 home；[BUG-238](../_archive/fixed_bugs/BUG-238-catalog-unreadable-throws.md) |
-| 7 | `catalog.ts` | chmod 000 final.md → entry final true，warnings `[]` | H5 | 临时 home；[BUG-239](../_archive/fixed_bugs/BUG-239-catalog-unreadable-final-silent.md) |
-| 8 | `presence.ts` | in_progress 无 revision + 旧 pending → merged pending | H6 | 纯函数；[BUG-240](../_archive/fixed_bugs/BUG-240-team-event-reopens-in-progress.md) |
-| 9 | `presence.ts` | 未知 phase 事件板 inactive vs live unknown | H6 | 纯函数；[BUG-241](../_archive/fixed_bugs/BUG-241-presence-unknown-phase-diverges.md) |
-| 10 | `presence.ts` | `content` 缺失 → `content is not iterable` | H6 | 纯函数；[BUG-242](../_archive/fixed_bugs/BUG-242-presence-message-content-missing.md) |
+| 1 | tarball `content/` | 过滤 `content/templates/prd.md` 后 checker 仍 `[]` | H1 | 真实 tarball 过滤 entry；[BUG-233](../fixed_bugs/BUG-233-required-shipped-misses-runtime-content.md) |
+| 2 | tarball `presets` + `package.json` | patch/preset 裁到 6 条仍 `[]` | H2 | 裁剪 patch + entries；[BUG-234](../fixed_bugs/BUG-234-preset-set-completeness-unchecked.md) |
+| 3 | `pack-source.mjs` | `README.md` 在 `PACKAGE_SOURCE_FILES`；改 dev README 指纹 `28a0649c→267257dd` | H3 | 前后指纹；[BUG-235](../fixed_bugs/BUG-235-source-fingerprint-includes-dev-readme.md) |
+| 4 | `release:shape` | `--allow-stale` 无理由仍 PASS（WARN + exit 0） | H4 | 临时改 README.shipped；[BUG-236](../fixed_bugs/BUG-236-allow-stale-no-reason.md) |
+| 5 | `checkShippedPackage` | 空 `content/charters/ceo.md` 仍 `[]`（只查 entry 存在） | H1/H4 | 合成 entries；[BUG-237](../fixed_bugs/BUG-237-required-shipped-empty-file.md) |
+| 6 | `catalog.ts` | chmod 000 meta.md → EACCES；ledger 同 | H5 | 临时 home；[BUG-238](../fixed_bugs/BUG-238-catalog-unreadable-throws.md) |
+| 7 | `catalog.ts` | chmod 000 final.md → entry final true，warnings `[]` | H5 | 临时 home；[BUG-239](../fixed_bugs/BUG-239-catalog-unreadable-final-silent.md) |
+| 8 | `presence.ts` | in_progress 无 revision + 旧 pending → merged pending | H6 | 纯函数；[BUG-240](../fixed_bugs/BUG-240-team-event-reopens-in-progress.md) |
+| 9 | `presence.ts` | 未知 phase 事件板 inactive vs live unknown | H6 | 纯函数；[BUG-241](../fixed_bugs/BUG-241-presence-unknown-phase-diverges.md) |
+| 10 | `presence.ts` | `content` 缺失 → `content is not iterable` | H6 | 纯函数；[BUG-242](../fixed_bugs/BUG-242-presence-message-content-missing.md) |
 
 ## 方法（每轮固定）
 
@@ -104,9 +106,11 @@ C14 修复把 shipped-shape 的判据从「上次出事的样本」扩到 files 
 
 ## 落地证据
 
-- 本卡是 charter/证据卡，不改产品代码；系统面 = 本卡 + 10 张 BUG 卡 + 索引。
+- C15-1..10 的修复落点：`tools/lib/release/shipped-shape.mjs`、`tools/lib/core/pack-source.mjs`、`packages/company-pack/src/host/ledger/catalog.ts`、`packages/company-pack/src/lib/presence/presence.ts`、`packages/company-pack/src/lib/shared/text.ts` + 三份 spec；提交 `56e4f986`；10 张 BUG 卡迁 [fixed_bugs](../fixed_bugs/README.md)（`40fa86dd`）。
+- 决策记忆 = [C15 批次 Note](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)。
+- 归档复核（2026-11-18 实跑）：10 项负控逐一复验——缺 `content/templates/prd.md` → `manifest: 缺关键运行时件`；patch 裁 6 条 → 4 条组合目标缺失；空 charter → `关键运行时件为空`；dev README 改后指纹不变、`README.shipped.md` 改后指纹变化；`--allow-stale` 裸旗标 exit 1；`pnpm release:shape` PASS（137 entries）；三份 C15 spec 98 passed。
 - 立卡基线（实跑）：`pnpm test` 262 files / 2237 tests（C14 修复 Note）；`pnpm verify` ALL PASS；`pnpm release:shape` PASS；`_dist` 137 entries。
-- 预检（实跑）：过滤 template 后 checker `[]`；patch 裁 6 条后 `[]`；dev README 指纹变化；allow-stale 无理由 PASS；catalog chmod 000 三例；presence 三例。
+- 立卡时预检（修复前，实跑）：过滤 template 后 checker `[]`；patch 裁 6 条后 `[]`；dev README 指纹变化；allow-stale 无理由 PASS；catalog chmod 000 三例；presence 三例。
 
 ## 关闭条件
 
@@ -121,11 +125,11 @@ C14 修复把 shipped-shape 的判据从「上次出事的样本」扩到 files 
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C15-1 REQUIRED 缺 templates/contracts/methods | **confirmed** | 真实 tarball 过滤 `content/templates/prd.md` → checker `[]` → [BUG-233](../_archive/fixed_bugs/BUG-233-required-shipped-misses-runtime-content.md) |
-| C15-2 patch/preset 集合不完整 | **confirmed** | patch 裁到 6 条 + 只留对应 preset → checker `[]` → [BUG-234](../_archive/fixed_bugs/BUG-234-preset-set-completeness-unchecked.md) |
-| C15-3 sourceFingerprint 含 dev README.md | **confirmed** | 改 dev `README.md`：指纹 `28a0649c63b6 → 267257dd3ac8`；`_dist` 未变 → [BUG-235](../_archive/fixed_bugs/BUG-235-source-fingerprint-includes-dev-readme.md) |
-| C15-4 --allow-stale 无理由仍 PASS | **confirmed** | 临时改 `README.shipped.md` → `WARN …（--allow-stale 未给理由）` + `PASS` + exit 0 → [BUG-236](../_archive/fixed_bugs/BUG-236-allow-stale-no-reason.md) |
-| C15-5 REQUIRED 只查存在性 | **confirmed** | 空 `content/charters/ceo.md` + 满 entries → checker `[]` → [BUG-237](../_archive/fixed_bugs/BUG-237-required-shipped-empty-file.md) |
+| C15-1 REQUIRED 缺 templates/contracts/methods | **confirmed** | 真实 tarball 过滤 `content/templates/prd.md` → checker `[]` → [BUG-233](../fixed_bugs/BUG-233-required-shipped-misses-runtime-content.md) |
+| C15-2 patch/preset 集合不完整 | **confirmed** | patch 裁到 6 条 + 只留对应 preset → checker `[]` → [BUG-234](../fixed_bugs/BUG-234-preset-set-completeness-unchecked.md) |
+| C15-3 sourceFingerprint 含 dev README.md | **confirmed** | 改 dev `README.md`：指纹 `28a0649c63b6 → 267257dd3ac8`；`_dist` 未变 → [BUG-235](../fixed_bugs/BUG-235-source-fingerprint-includes-dev-readme.md) |
+| C15-4 --allow-stale 无理由仍 PASS | **confirmed** | 临时改 `README.shipped.md` → `WARN …（--allow-stale 未给理由）` + `PASS` + exit 0 → [BUG-236](../fixed_bugs/BUG-236-allow-stale-no-reason.md) |
+| C15-5 REQUIRED 只查存在性 | **confirmed** | 空 `content/charters/ceo.md` + 满 entries → checker `[]` → [BUG-237](../fixed_bugs/BUG-237-required-shipped-empty-file.md) |
 
 **负控/实跑：** 真实 tarball `readTarball` 过滤/裁剪；`release:shape` 临时改 README.shipped 后 `--allow-stale`。
 
@@ -135,11 +139,11 @@ C14 修复把 shipped-shape 的判据从「上次出事的样本」扩到 files 
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C15-6 catalog 不可读 meta/ledger 抛 EACCES | **confirmed** | chmod 000 meta.md → `THREW EACCES`；ledger 同 → [BUG-238](../_archive/fixed_bugs/BUG-238-catalog-unreadable-throws.md) |
-| C15-7 catalog 不可读 final 静默 present | **confirmed** | chmod 000 final.md → entry 仍进、warnings `[]` → [BUG-239](../_archive/fixed_bugs/BUG-239-catalog-unreadable-final-silent.md) |
-| C15-8 缺 revision 的 in_progress 可被打回 pending | **confirmed** | `teamWithEventTasks` 输出 `status:'pending'` → [BUG-240](../_archive/fixed_bugs/BUG-240-team-event-reopens-in-progress.md) |
-| C15-9 未知 phase 两读模型分叉 | **confirmed** | 事件板 `inactive` vs live `unknown` → [BUG-241](../_archive/fixed_bugs/BUG-241-presence-unknown-phase-diverges.md) |
-| C15-10 message.content 缺失抛 | **confirmed** | `THREW content is not iterable` → [BUG-242](../_archive/fixed_bugs/BUG-242-presence-message-content-missing.md) |
+| C15-6 catalog 不可读 meta/ledger 抛 EACCES | **confirmed** | chmod 000 meta.md → `THREW EACCES`；ledger 同 → [BUG-238](../fixed_bugs/BUG-238-catalog-unreadable-throws.md) |
+| C15-7 catalog 不可读 final 静默 present | **confirmed** | chmod 000 final.md → entry 仍进、warnings `[]` → [BUG-239](../fixed_bugs/BUG-239-catalog-unreadable-final-silent.md) |
+| C15-8 缺 revision 的 in_progress 可被打回 pending | **confirmed** | `teamWithEventTasks` 输出 `status:'pending'` → [BUG-240](../fixed_bugs/BUG-240-team-event-reopens-in-progress.md) |
+| C15-9 未知 phase 两读模型分叉 | **confirmed** | 事件板 `inactive` vs live `unknown` → [BUG-241](../fixed_bugs/BUG-241-presence-unknown-phase-diverges.md) |
+| C15-10 message.content 缺失抛 | **confirmed** | `THREW content is not iterable` → [BUG-242](../fixed_bugs/BUG-242-presence-message-content-missing.md) |
 
 **证据坐标：** `runtime/tmp/c15-*.test.mjs`、`runtime/tmp/c15-allow-stale.log`、`runtime/tmp/c15-verify-*.log`。
 
@@ -150,10 +154,11 @@ C14 修复把 shipped-shape 的判据从「上次出事的样本」扩到 files 
 | C15-1..5 | confirmed | 233..237 |
 | C15-6..10 | confirmed | 238..242 |
 
-**本轮共开 10 张 P2 卡（BUG-233..242）**，全部 `调查中`，不修产品代码。未跑面 = 真入口
+**本轮共开 10 张 P2 卡（BUG-233..242）**，已全部修复并迁 [fixed_bugs](../fixed_bugs/README.md)（`56e4f986` / `40fa86dd`）。未跑面 = 真入口
 `company-entry`/`client-load` 重跑、真实 wire/UI、无 pnpm 安装环境；没有「新门禁完备」的结论。
 
 ## 执行记录
 
 - 2026-11-18 ｜ 立卡（C15）｜ 本卡 + bugs/README + issues/README ｜ 预检 10 条（关键件/组合集合/指纹/allow-stale/空文件/catalog×2/presence×3）｜ `pnpm verify` ALL PASS ｜ Round 103–104 待跑。
 - 2026-11-18 ｜ Round 103–104 ｜ `runtime/tmp/c15-*` ｜ 关键件缺失/组合裁半/指纹含 dev README/allow-stale 无理由/空关键件/catalog 不可读×2/in_progress 回退/phase 分叉/缺 content 共 10 项 confirmed ｜ 10 张 BUG-233..242（调查中，不修） ｜ `pnpm verify` ALL PASS；`pnpm test` 262/2237 ｜ 真入口未重跑。
+- 2026-11-18 ｜ 修复与归档 ｜ 10 张 BUG 全部修复（`56e4f986`）并迁 fixed_bugs（`40fa86dd`）；本卡复核 10 项负控仍绿 ｜ `pnpm release:shape` PASS；三份 C15 spec 98 passed；`pnpm verify` ALL PASS ｜ 审查：agent（独立盲审）。

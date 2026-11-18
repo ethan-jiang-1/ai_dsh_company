@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-18 落地；任务源 = 用户「下一波 bug 来了，你也一块儿去改吧」）
 
-> 上游 = [C15 探索卡](../../_backlog/issues/2026-11-18-guard-closure-and-unreadable-inputs.md) + [10 张缺陷卡](../../_backlog/bugs/README.md)（BUG-233..242）。BUG-212 保持活跃，不并入本批。
+> 上游 = [C15 探索卡](../../_backlog/_archive/settled_issues/2026-11-18-guard-closure-and-unreadable-inputs.md) + [10 张缺陷卡](../../_backlog/bugs/README.md)（BUG-233..242）。BUG-212 保持活跃，不并入本批。
 
 ## 决定
 

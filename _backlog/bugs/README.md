@@ -2,13 +2,13 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 243；已分配 BUG-001..242。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 263；已分配 BUG-001..262。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 1 张**：BUG-212（收尾验证链偏长）保持活跃，不并入本批；C15 10 张（BUG-233..242）已于 2026-11-18 修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，批次与收口见下方「## 2026-11-18 修复交接（C15 门禁闭环 + 不可读/部分输入：BUG-233..242）」。C13/C14 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**活跃 21 张**：BUG-212（收尾验证链偏长）保持活跃；C16 20 张（BUG-243..262）见下方「## 2026-11-18 C16 门禁管线指纹 + 运行时发虚面」。C13/C14/C15 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 **独立卡**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
 
@@ -76,6 +76,20 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 `pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2218 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
 共享机制决定 = [shipped package boundary Note](../../notes/implemented/2026-11-17-shipped-package-boundary.md)。
 
+## 2026-11-18 C16 门禁管线指纹 + 运行时发虚面
+
+**用户指令（2026-11-18）**：「至少抓到 20 个再停，尤其找心里发虚的领域」——本组 20 张全部 `调查中`，只开卡不修；证据 = [C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)。
+
+| 组 | 卡 | 共同根因 | 一句话 | 级别 |
+|---|---|---|---|---|
+| A 管线/关键件 | [243](BUG-243-pipeline-fingerprint-sanitizer.md) / [244](BUG-244-required-shipped-misses-generic-content.md) / [245](BUG-245-required-shipped-misses-product-docs.md) / [246](BUG-246-required-shipped-misses-delivery-templates.md) / [247](BUG-247-required-shipped-misses-content-templates.md) / [248](BUG-248-required-json-schema-only-parse.md) / [249](BUG-249-seed-json-empty-object-passes.md) / [250](BUG-250-preset-yaml-not-parsed.md) | 发布指纹/关键件只覆盖上一轮想到的形状 | sanitizer 不在指纹；4 类内容族漏关键件；JSON/YAML 只 parse | P2 ×8 |
+| B 运行时指令/降级 | [251](BUG-251-persona-pnpm-methods-init.md) / [252](BUG-252-source-shape-no-dev-command-scan.md) / [253](BUG-253-allow-stale-arbitrary-reason.md) | 文本门禁不判 dev 命令；降级理由无约束 | persona 让 operator 跑 pnpm methods:init；--allow-stale=x 可过 | P2 ×3 |
+| C lease/bundle | [254](BUG-254-lease-unreadable-lock-takeover.md) / [255](BUG-255-bundle-created-at-invalid.md) / [256](BUG-256-bundle-pack-mismatch.md) | fail-open / 只判存在 | 不可读 live lease 被抢占；bad createdAt/pack 仍 ok | P2 ×3 |
+| D presence/catalog | [257](BUG-257-presence-unknown-status-ignored.md) / [258](BUG-258-presence-deleted-no-reopen.md) / [259](BUG-259-catalog-empty-final.md) / [260](BUG-260-catalog-json-symlink.md) | 未知/终态/空文件被折成正常 | 未知 status 丢弃；deleted 不可重开；空 final；symlink 替换 | P2 ×4 |
+| E content manifest | [261](BUG-261-content-manifest-extra-drift.md) / [262](BUG-262-content-manifest-refs-not-checked.md) | 清单与盘面/引用无对账 | 50 vs 84；tiers 缺文件/`..` 不判 | P2 ×2 |
+
+本组是 Round 105–107 的产出；真实 tarball/纯函数/临时 home/CLI 均已实跑，未修任何产品代码。
+
 ## 2026-11-18 修复交接（C15 门禁闭环 + 不可读/部分输入：BUG-233..242）
 
 **用户指令（2026-11-18）**：「下一波bug来了，你也一块儿去改吧 继续下一波……看看是否能系统性修起来。计划有了后 setup goal 逐步按REPO的流程来推进。」——本句即本轮授权（材料性：shipped 关键件/组合集合、源码指纹、降级门禁、catalog 坏形状、presence 部分 wire；留痕 = 批次 Note `notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md`）。BUG-212 不并入本批。
@@ -102,7 +116,7 @@ A 组是 checker 只到「关键件在不在/glob 非空」；B 组是源码指�
 
 ## 2026-11-18 C15 修复后门禁的新面 + 不可读/部分输入
 
-**用户指令（2026-11-18）**：「bug 都修好了只剩一个，再来一轮，至少 10 个，尤其找发虚领域」——本组 10 张已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)。
+**用户指令（2026-11-18）**：「bug 都修好了只剩一个，再来一轮，至少 10 个，尤其找发虚领域」——本组 10 张已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [C15 卡](../_archive/settled_issues/2026-11-18-guard-closure-and-unreadable-inputs.md)。
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
