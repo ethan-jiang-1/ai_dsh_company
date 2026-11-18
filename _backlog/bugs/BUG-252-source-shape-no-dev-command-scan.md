@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-252：checkSourceShape 不扫 `pnpm`/dev 命令，只扫路径
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -18,6 +18,11 @@ opened: 2026-11-18
 ## 复现
 
 对真实 source 跑 `checkSourceShape` 返回 `[]`（含 BUG-251 的 persona）；`shipped-links` PASS。
+
+
+```sh
+pnpm test tests/repo/release/shipped-shape.spec.ts
+```
 
 ## 根因与证据
 
@@ -29,10 +34,18 @@ opened: 2026-11-18
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-增加 dev-command 判据（`pnpm <script>` 非安装器脚本、`node tools|checks|tests`、`run/env.sh`），带合理白名单；命中 → 红。
+1. `checkSourceShape` 扫非注释行的 `pnpm <script>`/`node tools|checks|tests`/`run/env.sh`，安装器命令白名单。
+2. 负例：README.shipped 写 `pnpm methods:init`/`node tools/...` → 红。
 
 ## 修复方向（不授权，仅记录）
 
 - 先补最小负例到对应 spec/checker，再改实现；不动 vendor。
+
+## 修复证据
+
+- 改动面：`tools/lib/release/shipped-shape.mjs`
+- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（dev 命令不判）
+- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（pnpm/node tools/run/env.sh 非注释行红）
+- 提交：commit 82e23163

@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-251：shipped vp-eng persona 让运行时 operator 跑 `pnpm methods:init`（dev 脚本）
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -18,6 +18,11 @@ opened: 2026-11-18
 ## 复现
 
 直接读该 preset 行；`checkSourceShape`/`shipped-links` 仍绿（它们只判 dev 路径，不判 `pnpm` 命令）。
+
+
+```sh
+pnpm verify
+```
 
 ## 根因与证据
 
@@ -29,10 +34,18 @@ opened: 2026-11-18
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-把 persona/skill 里的 `pnpm`/`node tools`/`run/env.sh` 等 dev 命令纳入 source shape（或改成运行时命令）；最少这一处 fail-closed 文案改成「安装方法包后」的运行时入口。
+1. vp-eng persona 的 `pnpm methods:init` 改为运行时「安装方法包」。
+2. 负例：source shape 扫到该命令 → 红；改后真实 source PASS。
 
 ## 修复方向（不授权，仅记录）
 
 - 先补最小负例到对应 spec/checker，再改实现；不动 vendor。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/presets/vp-eng/agent.cordis.yml`
+- 红：`pnpm verify`（persona 写 pnpm methods:init）
+- 绿：`pnpm verify`（改成运行时「安装方法包」；source shape 扫 dev 命令）
+- 提交：commit 82e23163

@@ -4,7 +4,7 @@
  * 本文件只留「扫描交付物根 + 生成派生索引（幂等）」；读取/校验 = catalog-state.ts，
  * 审计账本 = presented-ledger.ts。索引 `kb/deliverables-index.json` 是盘上 meta/final + 账本的派生视图。
  */
-import { accessSync, constants, existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs'
+import { accessSync, constants, existsSync, lstatSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   buildDeliverablesCatalog,
@@ -72,6 +72,15 @@ function scanEntries(companyHome: string, ledger: PresentedLedger): { entries: C
         try { accessSync(finalPath, constants.R_OK) } catch {
           warnings.push(`${finalPath} 不可读，按无 final 处理`)
           final = false
+        }
+        // BUG-259：可读但零字节不是可展示成品。
+        if (final) {
+          try {
+            if (statSync(finalPath).size === 0) {
+              warnings.push(`${finalPath} 为空，按无 final 处理`)
+              final = false
+            }
+          } catch { /* accessSync 已过，stat 失败按不可读 */ }
         }
       }
       const metaPath = join(dir, item.name, 'meta.md')
@@ -156,6 +165,11 @@ export function regenerateCatalog(companyHome: string, presented?: PresentedLedg
   }
   let targetInfo
   try { targetInfo = lstatSync(path) } catch { targetInfo = null }
+  if (targetInfo !== null && targetInfo.isSymbolicLink()) {
+    // BUG-260：不静默替换 catalog 链接（不跟随写外/丢用户链接）。
+    warnings.push(`${path} 是 symlink，拒绝写 catalog`)
+    return { written: false, catalog: previous, path, warnings }
+  }
   if (targetInfo !== null && targetInfo.isDirectory()) {
     warnings.push(`${path} 被目录占用，未写 catalog`)
     return { written: false, catalog: previous, path, warnings }

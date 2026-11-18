@@ -1,4 +1,6 @@
 // 负例留证 2026-11-13：去掉 ensureCompanyRoot + 直写 ⇒ root-symlink bundle 写外部、read 不 corrupt（BUG-148）；safe 写即绿。
+// 负例留证 2026-11-18：createdAt 'not-a-date' 仍 ok（BUG-255）；ISO 往返后 corrupt。
+// 负例留证 2026-11-18：pack 身份与当前 pack 不符仍 ok（BUG-256）；对账后 corrupt。
 /**
  * run bundle manifest v3 的 keyless 完成定义（2026-11-01）。
  *
@@ -13,11 +15,15 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, 
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { pathToFileURL } from 'node:url'
 import {
   BUNDLE_MANIFEST_VERSION,
   appendUpgradeLog,
   bundleManifestPath,
   identityBackupPath,
+  isSafeBundleId,
+  resolvePackMetadata,
+  currentPackMetadata,
   planBundleManifest,
   readBundleManifestState,
   writeBundleManifest,
@@ -190,5 +196,69 @@ describe('升级日志', () => {
     } finally {
       rmSync(h, { recursive: true, force: true }); rmSync(ws, { recursive: true, force: true }); rmSync(outside, { recursive: true, force: true })
     }
+  })
+
+  it('createdAt 非 ISO 往返 → corrupt（BUG-255）', () => {
+    const h = home(); const ws = workspace()
+    try {
+      const { plan } = create(h, ws)
+      const parsed = JSON.parse(readFileSync(plan.path, 'utf8'))
+      parsed.createdAt = 'not-a-date'
+      writeFileSync(plan.path, JSON.stringify(parsed))
+      const state = readBundleManifestState(ws, PACK)
+      expect(state.status).toBe('corrupt')
+      if (state.status === 'corrupt') expect(state.error).toContain('ISO')
+    } finally { rmSync(h, { recursive: true, force: true }); rmSync(ws, { recursive: true, force: true }) }
+  })
+
+  it('pack.name/version 与当前 pack 不符 → corrupt（BUG-256）', () => {
+    const h = home(); const ws = workspace()
+    try {
+      const { plan } = create(h, ws)
+      const parsed = JSON.parse(readFileSync(plan.path, 'utf8'))
+      parsed.pack = { name: 'other', version: '0.6.0' }
+      writeFileSync(plan.path, JSON.stringify(parsed))
+      const state = readBundleManifestState(ws, PACK)
+      expect(state.status).toBe('corrupt')
+      if (state.status === 'corrupt') expect(state.error).toContain('pack 名称不匹配')
+      expect(currentPackMetadata().name).toBe('dsh-company-pack')
+    const badBase = mkdtempSync(join(tmpdir(), 'bad-pack-meta-'))
+    const badModule = join(badBase, 'a', 'b', 'm.js')
+    mkdirSync(join(badBase, 'a'), { recursive: true })
+    writeFileSync(join(badBase, 'a', 'package.json'), '{}')
+    expect(() => currentPackMetadata(pathToFileURL(badModule).href)).toThrow(/name\/version/)
+    rmSync(badBase, { recursive: true, force: true })
+    } finally { rmSync(h, { recursive: true, force: true }); rmSync(ws, { recursive: true, force: true }) }
+  })
+
+  it('同 name 的 pack 版本升级 → upgrade 保留 id/createdAt（BUG-256 升级语义）', () => {
+    const h = home(); const ws = workspace()
+    try {
+      const { plan } = create(h, ws, { name: PACK.name, version: '0.6.0' })
+      const old = JSON.parse(readFileSync(plan.path, 'utf8'))
+      const next = planBundleManifest({ dshHome: h, workspace: ws, pack: { name: PACK.name, version: '0.11.9' } })
+      expect(next.action).toBe('upgrade')
+      expect(next.manifest.id).toBe(old.id)
+      expect(next.manifest.createdAt).toBe(old.createdAt)
+      expect(next.manifest.pack.version).toBe('0.11.9')
+      expect(writeBundleManifest(next).upgraded).toBe(true)
+      expect(readBundleManifestState(ws, { name: PACK.name, version: '0.11.9' }).status).toBe('ok')
+    } finally { rmSync(h, { recursive: true, force: true }); rmSync(ws, { recursive: true, force: true }) }
+  })
+
+  it('bundle id / 包元数据边界（BUG-256 边界）', () => {
+    expect(isSafeBundleId('')).toBe(false)
+    expect(isSafeBundleId('..')).toBe(false)
+    expect(isSafeBundleId('a/b')).toBe(false)
+    expect(isSafeBundleId('a'.repeat(129))).toBe(false)
+    expect(isSafeBundleId('safe-id_1')).toBe(true)
+    expect(() => identityBackupPath('/tmp', '../x')).toThrow()
+    const base = mkdtempSync(join(tmpdir(), 'pack-meta-'))
+    mkdirSync(join(base, 'x'), { recursive: true })
+    writeFileSync(join(base, 'package.json'), JSON.stringify({ name: 'n', version: '1' }))
+    expect(resolvePackMetadata(pathToFileURL(join(base, 'x', 'm.js')).href)).toEqual({ name: 'n', version: '1' })
+    writeFileSync(join(base, 'package.json'), '{}')
+    expect(() => resolvePackMetadata(pathToFileURL(join(base, 'x', 'm.js')).href)).toThrow(/name\/version/)
+    rmSync(base, { recursive: true, force: true })
   })
 })

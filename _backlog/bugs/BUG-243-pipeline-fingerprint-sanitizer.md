@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-243：管线指纹不含 sanitizer/export-dist：只改发布管线，release:shape 仍给旧 _dist 盖章
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -18,6 +18,11 @@ opened: 2026-11-18
 ## 复现
 
 在 `tools/lib/release/shipped-shape.mjs` 末尾加一行注释；前后 `sourceFingerprint` 都是 `f9eaef4dd008`；`node tools/release/shipped-shape.mjs` exit 0 / PASS。还原后干净。
+
+
+```sh
+pnpm release:shape
+```
 
 ## 根因与证据
 
@@ -29,10 +34,19 @@ opened: 2026-11-18
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-把 `tools/lib/release/shipped-shape.mjs`/`tools/release/export-dist.mjs`/`tools/lib/core/pack-source.mjs` 纳入发布 fingerprint（或单独的 pipeline fingerprint），只改管线时 `release:shape` 必须要求 `--prepare`。
+1. release manifest 增 `pipelineFingerprint`（sanitizer/export-dist/pack-source/CLI）；`release:shape` 同时比对 source 与 pipeline，`release --check/--verify` 同。
+2. 负例：只改 sanitizer → pipeline 变、旧 `_dist` 红；`release --prepare` 后绿。
+3. 正例：现存 tarball 137 entries PASS。
 
 ## 修复方向（不授权，仅记录）
 
 - 先补最小负例到对应 spec/checker，再改实现；不动 vendor。
+
+## 修复证据
+
+- 改动面：`tools/lib/core/pack-source.mjs`、`tools/release/release.mjs`、`tools/release/shipped-shape.mjs`
+- 红：`pnpm release:shape`（旧 manifest 无 pipelineFingerprint → freshness 红）
+- 绿：`pnpm release:shape`（rebuild 后 source+pipeline 匹配 → PASS）
+- 提交：commit 82e23163

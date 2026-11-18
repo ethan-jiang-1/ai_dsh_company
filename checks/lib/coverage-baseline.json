@@ -366,8 +366,8 @@
       "branches": 75.86
     },
     "packages/company-pack/src/host/ledger/catalog.ts": {
-      "statements": 91.2,
-      "branches": 90.74
+      "statements": 91.91,
+      "branches": 91.93
     },
     "packages/company-pack/src/host/ledger/governance-export.ts": {
       "statements": 91.54,
@@ -406,8 +406,8 @@
       "branches": 80.18
     },
     "packages/company-pack/src/host/run-bundle/bundle-manifest.ts": {
-      "statements": 87.37,
-      "branches": 85.45
+      "statements": 89.25,
+      "branches": 88.46
     },
     "packages/company-pack/src/host/run-bundle/company-root.ts": {
       "statements": 88.72,
@@ -418,8 +418,8 @@
       "branches": 100
     },
     "packages/company-pack/src/host/run-bundle/lease.ts": {
-      "statements": 86.17,
-      "branches": 78.84
+      "statements": 86.59,
+      "branches": 79.62
     },
     "packages/company-pack/src/host/run-bundle/paths.ts": {
       "statements": 100,
@@ -566,8 +566,8 @@
       "branches": 94.11
     },
     "packages/company-pack/src/lib/presence/presence.ts": {
-      "statements": 97.97,
-      "branches": 89.26
+      "statements": 98,
+      "branches": 91.77
     },
     "packages/company-pack/src/lib/presence/tool-card.ts": {
       "statements": 100,
@@ -762,8 +762,8 @@
       "branches": 83.78
     },
     "tools/lib/release/shipped-shape.mjs": {
-      "statements": 99.42,
-      "branches": 92.67
+      "statements": 99.77,
+      "branches": 94.64
     },
     "tools/lib/repo/asset-consumers.mjs": {
       "statements": 97.87,

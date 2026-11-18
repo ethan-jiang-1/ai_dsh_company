@@ -10,7 +10,7 @@ import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { checkShippedPackage, freshnessProblem, staleFlagProblem } from '../lib/release/shipped-shape.mjs'
-import { sourceFingerprint } from '../lib/core/pack-source.mjs'
+import { releasePipelineFingerprint, sourceFingerprint } from '../lib/core/pack-source.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = join(here, '..', '..')
@@ -56,19 +56,20 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const staleArg = args.find(arg => arg === '--allow-stale' || arg.startsWith('--allow-stale='))
   const allowStale = staleArg !== undefined
   const staleReason = staleArg?.includes('=') ? staleArg.slice(staleArg.indexOf('=') + 1) : ''
-  const staleFlagError = staleFlagProblem({ args, ci: process.env.CI !== undefined })
-  if (staleFlagError !== undefined) problems.push(staleFlagError)
   const customTarball = tarballIndex >= 0
   const manifestPath = join(root, '_dist/release-manifest.json')
   const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : undefined
   let head
   try { head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim() } catch { head = undefined }
+  const staleFlagError = staleFlagProblem({ args, ci: process.env.CI !== undefined, head, manifestGitSha: manifest?.gitSha })
+  if (staleFlagError !== undefined) problems.push(staleFlagError)
   let stale
   if (customTarball) {
     emit('shipped-shape note: --tarball 指定自定义包，跳过 _dist manifest 新鲜度（只判形状）')
   } else {
     const currentFingerprint = sourceFingerprint(join(root, 'packages/company-pack'))
-    stale = freshnessProblem({ manifest, currentFingerprint })
+    const currentPipeline = releasePipelineFingerprint(root)
+    stale = freshnessProblem({ manifest, currentFingerprint, currentPipeline })
     if (stale !== undefined) {
       if (allowStale) emit(`shipped-shape WARN freshness: ${stale}${staleReason === '' ? '（--allow-stale 未给理由）' : `（理由：${staleReason}）`}`)
       else problems.push(`freshness: ${stale}`)

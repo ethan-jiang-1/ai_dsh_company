@@ -17,6 +17,7 @@
  *      README 提 pnpm 时必须是「DSH 插件安装器 + 明确诊断」，不能写成包运行时前置。
  */
 import { copyFileSync, existsSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { dirname, join, posix } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
@@ -24,11 +25,16 @@ import { packageSourceFiles } from '../core/pack-source.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = join(here, '..', '..', '..')
+const yaml = createRequire(join(root, 'vendor/dsh/package.json'))('js-yaml')
+const yamlSchema = yaml.DEFAULT_SCHEMA.extend([
+  new yaml.Type('tag:yaml.org,2002:js', { kind: 'scalar', construct: data => data }),
+])
 
 /** dev-only 路径（shipped 文本里出现时必须有「不随包」限定）。 */
 const DEV_PATH = /(?<![A-Za-z0-9_./-])(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+/g
 const REL_DEV_PATH = /\.\.\/(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+/g
 const QUALIFIER = /不随包|仓库内|dev-only|发布面自包含/
+const DEV_COMMAND = /(?:^|[\s`"'(])((?:pnpm\s+(?:[A-Za-z0-9_-]+:[A-Za-z0-9:_-]+|typecheck|test|verify|lint|build|setup|company|release|coverage|dev|format|check|bundle|sync|dup|smoke)\b)|(?:node\s+(?:tools|checks|tests)\/)|(?:(?:bash\s+)?(?:\.\/)?run\/env\.sh))/
 const TEXT_FACE = /^package\/(?:README\.md|cordis\.patch\.yml|presets\/.*|content\/.*\.(?:md|ya?ml|json)|lib\/.*\.(?:js|mjs|d\.ts))$/
 const DEV_DIR = /(?<![A-Za-z0-9_./-])((?:\.\.\/)*(?:tests|probes|tools|checks|_backlog|notes|docs)\/[A-Za-z0-9_.-]+(?:\/[A-Za-z0-9_.-]+)*\/?)/g
 const DEV_DIR_ALLOW = [
@@ -172,6 +178,83 @@ function entryOfExport(value) {
 }
 
 
+
+function isRecord(value) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/** content-relative path 必须单段安全，不能 `..`/绝对路径/NUL。 */
+function safeContentRel(rel) {
+  return typeof rel === 'string' && rel !== '' && !rel.startsWith('/') && !rel.split('/').includes('..') && !rel.includes('\0')
+}
+
+/** JSON 关键件的最小 schema；不是 schema 引擎，只挡「空对象/缺产品语义」。 */
+function jsonSchemaProblem(rel, value) {
+  if (rel.includes('delivery-rules.json')) {
+    return isRecord(value) && typeof value.deliveryMode === 'string' && value.kind === 'delivery' && isRecord(value.documents) && Object.keys(value.documents).length > 0
+      ? undefined : 'delivery-rules 缺 deliveryMode/kind/documents'
+  }
+  if (rel.endsWith('kb-setup/seed.json') || rel.endsWith('seed.json')) {
+    return isRecord(value) && Array.isArray(value.seeds) && value.seeds.length > 0
+      && value.seeds.every(seed => isRecord(seed) && typeof seed.source === 'string' && typeof seed.target === 'string')
+      ? undefined : 'seed 缺非空 seeds/source/target'
+  }
+  if (rel.endsWith('check-rules.json')) {
+    return isRecord(value) && typeof value.productType === 'string' && Array.isArray(value.layers) && value.layers.length > 0 && isRecord(value.files) && Object.keys(value.files).length > 0
+      ? undefined : 'check-rules 缺 productType/layers/files'
+  }
+  return undefined
+}
+
+/** content/manifest 的 inventory 与 tiers 引用闭包；get() 返回文本或 undefined。 */
+function contentManifestProblems(manifest, has, get, label) {
+  const problems = []
+  if (!isRecord(manifest)) return [`${label}content/manifest.json 不是对象`]
+  const inventory = manifest.inventory
+  if (!Array.isArray(inventory) || inventory.length === 0) return [`${label}content/manifest.json 缺非空 inventory`]
+  const set = new Set()
+  for (const rel of inventory) {
+    if (!safeContentRel(rel)) { problems.push(`${label}inventory 不安全路径：${String(rel)}`); continue }
+    if (set.has(rel)) problems.push(`${label}inventory 重复：${rel}`)
+    set.add(rel)
+    if (!has(rel)) { problems.push(`${label}inventory 缺文件：${rel}`); continue }
+    const text = get(rel)
+    if (typeof text !== 'string' || text.trim() === '') { problems.push(`${label}inventory 文件为空：${rel}`); continue }
+    if (rel.endsWith('.json')) {
+      try {
+        const value = JSON.parse(text)
+        const schema = jsonSchemaProblem(rel, value)
+        if (schema !== undefined) problems.push(`${label}${rel} schema 不符：${schema}`)
+      } catch { problems.push(`${label}${rel} 不是合法 JSON`) }
+    }
+  }
+  const tiers = manifest.tiers
+  if (!isRecord(tiers)) problems.push(`${label}content/manifest.json 缺 tiers`)
+  else {
+    for (const [tier, files] of Object.entries(tiers)) {
+      if (!Array.isArray(files)) { problems.push(`${label}tier ${tier} 不是数组`); continue }
+      for (const rel of files) {
+        if (!safeContentRel(rel)) { problems.push(`${label}tier ${tier} 不安全路径：${String(rel)}`); continue }
+        if (!set.has(rel)) problems.push(`${label}tier ${tier} 引用不在 inventory：${rel}`)
+        if (!has(rel)) problems.push(`${label}tier ${tier} 引用缺文件：${rel}`)
+      }
+    }
+  }
+  return problems
+}
+
+/** YAML 关键件（preset）必须可加载；cordis.patch.yml 可能带 !!js 自定义 tag，不在此列。 */
+function yamlProblem(rel, text) {
+  if (!rel.startsWith('presets/') || !rel.endsWith('.yml')) return undefined
+  try {
+    const value = yaml.load(text, { schema: yamlSchema })
+    return (Array.isArray(value) && value.length > 0) || (isRecord(value) && Object.keys(value).length > 0)
+      ? undefined : 'YAML 空/不是对象或数组'
+  } catch (error) {
+    return `YAML 不可解析：${String(error).split('\n')[0]}`
+  }
+}
+
 /** 简单 glob → 正则（`**` 跨段、`*` 段内、`?` 单字符）。 */
 function globToRegExp(glob) {
   let out = ''
@@ -280,6 +363,19 @@ export function checkShippedPackage({ pkg, entries, read, platformModules: platf
     let text
     try { text = read(entry) } catch { problems.push(`manifest: 组合目标不可读 ${rel}`); continue }
     if (text.trim() === '') problems.push(`manifest: 组合目标为空 ${rel}`)
+    const yamlIssue = yamlProblem(rel.replace(/^\.\//, ''), text)
+    if (yamlIssue !== undefined) problems.push(`manifest: 组合目标 ${rel} ${yamlIssue}`)
+  }
+  if (entrySet.has('package/content/manifest.json')) {
+    try {
+      const manifest = JSON.parse(read('package/content/manifest.json'))
+      problems.push(...contentManifestProblems(
+        manifest,
+        rel => entrySet.has(`package/content/${rel}`),
+        rel => read(`package/content/${rel}`),
+        'manifest: ',
+      ))
+    } catch { problems.push('manifest: content/manifest.json 不是合法 JSON') }
   }
 
   // 4. client require × inject / platform
@@ -371,7 +467,18 @@ export function checkSourceShape({ packDir, readFile = rel => readFileSync(join(
     let text
     try { text = readFile(target) } catch { problems.push(`source manifest: 组合目标不可读 ${rel}`); continue }
     if (text.trim() === '') problems.push(`source manifest: 组合目标为空 ${rel}`)
+    const yamlIssue = yamlProblem(target, text)
+    if (yamlIssue !== undefined) problems.push(`source manifest: 组合目标 ${rel} ${yamlIssue}`)
   }
+  try {
+    const contentManifest = JSON.parse(readFile('content/manifest.json'))
+    problems.push(...contentManifestProblems(
+      contentManifest,
+      rel => exists(`content/${rel}`),
+      rel => readFile(`content/${rel}`),
+      'source manifest: ',
+    ))
+  } catch { problems.push('source manifest: content/manifest.json 不是合法 JSON') }
   const sourceFiles = packageSourceFiles(packDir)
   for (const value of Array.isArray(manifest.files) ? manifest.files : []) {
     if ((!value.includes('*') && !value.includes('?')) || value.startsWith('lib/')) continue
@@ -383,32 +490,42 @@ export function checkSourceShape({ packDir, readFile = rel => readFileSync(join(
     let text
     try { text = readFile(rel) } catch { continue }
     text.split('\n').forEach((line, index) => {
-      if (QUALIFIER.test(line)) return
+      if (QUALIFIER.test(line) || line.trim().startsWith('#')) return
       const hit = devPathInLine(line) ?? line.match(REL_DEV_PATH)?.[0]
       if (hit !== undefined) problems.push(`${rel}:${String(index + 1)} → dev 路径 ${hit} 未带「不随包」限定`)
+      const command = DEV_COMMAND.exec(line)?.[1]
+      if (command !== undefined) problems.push(`${rel}:${String(index + 1)} → dev 命令 ${command} 不随包`)
     })
   }
   return problems
 }
 
 /**
- * `--allow-stale` 的降级判据：必须带理由；CI 环境禁止（BUG-236）。
- * @param {{args?: string[], ci?: boolean}} options
+ * `--allow-stale` 的降级判据：必须带 `<sha>:<reason>`，sha 绑 HEAD/manifest；CI 禁止（BUG-236/253）。
+ * @param {{args?: string[], ci?: boolean, head?: string, manifestGitSha?: string}} options
  */
-export function staleFlagProblem({ args = [], ci = false } = {}) {
+export function staleFlagProblem({ args = [], ci = false, head, manifestGitSha } = {}) {
   const arg = args.find(item => item === '--allow-stale' || String(item).startsWith('--allow-stale='))
   if (arg === undefined) return undefined
   const reason = String(arg).includes('=') ? String(arg).slice(String(arg).indexOf('=') + 1) : ''
   if (reason.trim() === '') return '--allow-stale 必须带 =理由（无理由降级不允许）'
-  if (ci) return 'CI 环境禁止 --allow-stale（只在本地人工排障时用 =理由）'
+  const match = /^([0-9a-f]{7,40}):([^\s].*)$/i.exec(reason.trim())
+  if (match === null) return '--allow-stale 必须用 =<sha>:<reason>（绑定具体提交，不接受任意词）'
+  const sha = match[1].toLowerCase()
+  const known = [head, manifestGitSha].filter(value => typeof value === 'string' && value.length > 0).map(value => String(value).toLowerCase())
+  if (known.length > 0 && !known.some(value => value.startsWith(sha))) return `--allow-stale 的 sha ${sha} 不是 HEAD/manifest 提交前缀`
+  if (ci) return 'CI 环境禁止 --allow-stale（只在本地人工排障时用 =<sha>:<reason>）'
   return undefined
 }
 
 /** 发布新鲜度：manifest 的 sourceFingerprint 必须等于当前源码指纹；gitSha 落后仅提示（docs-only）。 */
-export function freshnessProblem({ manifest, currentFingerprint } = {}) {
+export function freshnessProblem({ manifest, currentFingerprint, currentPipeline } = {}) {
   if (manifest === undefined) return '缺 release-manifest.json；先 pnpm release --prepare'
   if (manifest.sourceFingerprint !== currentFingerprint) {
     return `_dist 的 sourceFingerprint ${String(manifest.sourceFingerprint).slice(0, 12)}… ≠ 当前源码 ${String(currentFingerprint).slice(0, 12)}…——先 pnpm release --prepare（或 --allow-stale 显式降级）`
+  }
+  if (manifest.pipelineFingerprint !== currentPipeline) {
+    return `_dist 的 pipelineFingerprint ${String(manifest.pipelineFingerprint ?? 'missing').slice(0, 12)}… ≠ 当前发布管线 ${String(currentPipeline ?? 'missing').slice(0, 12)}…——先 pnpm release --prepare`
   }
   return undefined
 }

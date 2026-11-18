@@ -15,7 +15,7 @@ import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { validateCompanyHome } from './bootstrap.ts'
-import { readBundleManifestState, type BundleManifestState } from './bundle-manifest.ts'
+import { currentPackMetadata, readBundleManifestState, type BundleManifestState } from './bundle-manifest.ts'
 import { acquireCompanyLease } from './lease.ts'
 import { profilesWithCompanyPack } from './profiles.ts'
 import { canonicalPath } from './paths.ts'
@@ -124,7 +124,7 @@ export function prepareCompanyRuntime(ctx: Context): CompanyRuntime {
   }
 
   const workspace = canonicalPath(configured)
-  const bundleState = readBundleManifestState(workspace)
+  const bundleState = readBundleManifestState(workspace, currentPackMetadata())
   if (bundleState.status === 'corrupt') {
     warn(ctx, `company-pack：bundle.json 损坏，已保留原文件并停写公司数据（${bundleState.path}：${bundleState.error}）；`
       + `修好后重启，或从 home 身份备份恢复（${join(dshHome, 'company/identity')}/<bundle-id>.json，仅作恢复参考）`)

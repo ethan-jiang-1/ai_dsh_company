@@ -1,10 +1,10 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { EXPECTED_PATCH, REQUIRED_SHIPPED, checkShippedPackage, checkSourceShape, freshnessProblem, packageRootOf, platformModules, sanitizePackage, scrubDevPaths, staleFlagProblem, stripComments } from '../../../tools/lib/release/shipped-shape.mjs'
-import { packageSourceFiles, sourceFingerprint } from '../../../tools/lib/core/pack-source.mjs'
+import { RELEASE_PIPELINE_FILES, devBuildFingerprint, packageSourceFiles, releasePipelineFingerprint, sourceFingerprint } from '../../../tools/lib/core/pack-source.mjs'
 
 // 负例留证 2026-11-17：类型面植入内部 .d.ts，checker 红（BUG-213）；删除 → 绿。
 // 负例留证 2026-11-17：manifest 植入 scripts.prepack，checker 红（BUG-214）；删除 → 绿。
@@ -53,6 +53,14 @@ const README = [
   '',
 ].join('\n')
 
+/** 合成关键件 JSON 的最小合法形状（与 checker 的 schema 判据同步）。 */
+function requiredJson(rel: string): string {
+  if (rel.includes('delivery-rules.json')) return JSON.stringify({ deliveryMode: 'x', kind: 'delivery', documents: { SOW: {} } })
+  if (rel.endsWith('seed.json')) return JSON.stringify({ seeds: [{ source: 'state/company.md', target: '.dsh-company/kb/company.md' }] })
+  if (rel.endsWith('check-rules.json')) return JSON.stringify({ productType: 'x', layers: ['MRD'], files: { MRD: 'mrd.md' } })
+  return '{"tiers":{}}'
+}
+
 function fixture(overrides: { pkg?: Record<string, unknown>; entries?: string[]; texts?: Record<string, string>; platformModules?: string[] } = {}) {
   const pkg = {
     name: 'dsh-company-pack',
@@ -80,11 +88,17 @@ function fixture(overrides: { pkg?: Record<string, unknown>; entries?: string[];
     ...REQUIRED_SHIPPED.map(rel => `package/${rel}`),
     ...EXPECTED_PATCH.map(rel => `package/${rel.replace(/^\.\//, '')}`),
   ]
+  const contentInventory = entries
+    .filter(entry => entry.startsWith('package/content/'))
+    .map(entry => entry.slice('package/content/'.length))
+    .filter(rel => rel !== 'manifest.json')
+    .sort()
   const requiredTexts = Object.fromEntries(REQUIRED_SHIPPED.map(rel => [
     `package/${rel}`,
-    rel.endsWith('.json') ? '{"tiers":{}}\n' : '# x\n',
+    rel.endsWith('.json') ? `${requiredJson(rel)}\n` : '# x\n',
   ]))
-  const presetTexts = Object.fromEntries(EXPECTED_PATCH.filter(rel => rel.includes('/presets/')).map(rel => [
+  requiredTexts['package/content/manifest.json'] = `${JSON.stringify({ tiers: {}, inventory: contentInventory })}\n`
+  const presetTexts = Object.fromEntries(EXPECTED_PATCH.filter(rel => rel.includes('presets/')).map(rel => [
     `package/${rel.replace(/^\.\//, '')}`,
     'id: x\n',
   ]))
@@ -230,6 +244,54 @@ describe('shipped package 形状判据（C13）', () => {
     expect(checkShippedPackage(badJson).some(problem => problem.includes('不是合法 JSON'))).toBe(true)
   })
 
+  it('content inventory 缺文件也红（BUG-261）', () => {
+    const base = fixture()
+    const entries = base.entries.filter(entry => entry !== 'package/content/templates/prd.md')
+    const read = (entry: string) => entry === 'package/content/templates/prd.md' ? '' : base.read(entry)
+    expect(checkShippedPackage({ ...base, entries, read }).some(problem => problem.includes('inventory 缺文件'))).toBe(true)
+  })
+
+  for (const [num, rel] of [
+    ['244', 'content/generic/collaboration.md'],
+    ['245', 'content/product-types/business-software/document-map.md'],
+    ['246', 'content/delivery-modes/project-services/templates/sow.md'],
+    ['247', 'content/templates/strs.md'],
+  ] as const) {
+    it(`content inventory 覆盖运行时文件 ${rel}（BUG-${num}）`, () => {
+      const base = fixture()
+      const contentRel = rel.replace(/^content\//, '')
+      const entry = `package/content/${contentRel}`
+      const entries = [...base.entries, entry]
+      const inventory = [...JSON.parse(base.read('package/content/manifest.json')).inventory, contentRel]
+      const read = (path: string) => path === entry ? '# x\n' : path === 'package/content/manifest.json'
+        ? JSON.stringify({ tiers: {}, inventory }) : base.read(path)
+      expect(checkShippedPackage({ ...base, entries, read })).toEqual([])
+      expect(checkShippedPackage({ ...base, entries: entries.filter(item => item !== entry), read }).some(problem => problem.includes('inventory 缺文件'))).toBe(true)
+    })
+  }
+
+  it('delivery-rules 空对象 schema 红（BUG-248）', () => {
+    const emptyRules = fixture({ texts: { 'package/content/delivery-modes/managed-service/delivery-rules.json': '{}\n' } })
+    expect(checkShippedPackage(emptyRules).some(problem => problem.includes('delivery-rules 缺'))).toBe(true)
+  })
+
+  it('seed 空对象 schema 红（BUG-249）', () => {
+    const emptySeed = fixture({ texts: { 'package/content/kb-setup/seed.json': '{}\n' } })
+    expect(checkShippedPackage(emptySeed).some(problem => problem.includes('seed 缺'))).toBe(true)
+  })
+
+  it('preset 坏 YAML / 空组合目标红（BUG-250）', () => {
+    const badYaml = fixture({ texts: { 'package/presets/ceo/agent.cordis.yml': 'not: [valid\n' } })
+    expect(checkShippedPackage(badYaml).some(problem => problem.includes('YAML'))).toBe(true)
+  })
+
+  it('tier 引用不在 inventory 红（BUG-262）', () => {
+    const base = fixture()
+    const bad = JSON.stringify({ tiers: { t2: ['generic/missing.md'] }, inventory: JSON.parse(base.read('package/content/manifest.json')).inventory })
+    const input = { ...base, read: (entry: string) => entry === 'package/content/manifest.json' ? bad : base.read(entry) }
+    expect(checkShippedPackage(input).some(problem => problem.includes('tier t2 引用不在 inventory'))).toBe(true)
+  })
+
   it('content/locale 关键件缺失也红（BUG-223 sentinel）', () => {
     const missing = fixture({ entries: fixture().entries.filter(entry => entry !== 'package/content/charters/ceo.md' && entry !== 'package/locale/en.json') })
     const problems = checkShippedPackage(missing)
@@ -265,17 +327,24 @@ describe('shipped package 形状判据（C13）', () => {
     expect(sourceFingerprint(base)).not.toBe(before)
     rmSync(base, { recursive: true, force: true })
   })
+  it('pipelineFingerprint 变化 → freshness 红（BUG-243）', () => {
+    expect(freshnessProblem({ manifest: { sourceFingerprint: 'a', pipelineFingerprint: 'old' }, currentFingerprint: 'a', currentPipeline: 'new' })).toContain('pipelineFingerprint')
+  })
+
   it('--allow-stale 必须带理由且 CI 禁止（BUG-236）', () => {
     expect(staleFlagProblem({ args: [] })).toBeUndefined()
     expect(staleFlagProblem({ args: ['--allow-stale'] })).toContain('理由')
     expect(staleFlagProblem({ args: ['--allow-stale='] })).toContain('理由')
-    expect(staleFlagProblem({ args: ['--allow-stale=test'] })).toBeUndefined()
-    expect(staleFlagProblem({ args: ['--allow-stale=test'], ci: true })).toContain('CI')
+    expect(staleFlagProblem({ args: ['--allow-stale=test'] })).toContain('sha')
+    expect(staleFlagProblem({ args: ['--allow-stale=1990fcc3:test'], head: '1990fcc3aaaa' })).toBeUndefined()
+    expect(staleFlagProblem({ args: ['--allow-stale=deadbee:test'], head: '1990fcc3aaaa' })).toContain('前缀')
+    expect(staleFlagProblem({ args: ['--allow-stale=1990fcc3:test'], ci: true })).toContain('CI')
   })
 
-  it('freshness 只认 sourceFingerprint；gitSha 落后不误红（BUG-227）', () => {
-    expect(freshnessProblem({ manifest: { sourceFingerprint: 'a', gitSha: 'old' }, currentFingerprint: 'b' })).toContain('sourceFingerprint')
-    expect(freshnessProblem({ manifest: { sourceFingerprint: 'a', gitSha: 'old' }, currentFingerprint: 'a' })).toBeUndefined()
+  it('freshness 认 sourceFingerprint + pipelineFingerprint；gitSha 落后不误红（BUG-227/243）', () => {
+    expect(freshnessProblem({ manifest: { sourceFingerprint: 'a', pipelineFingerprint: 'p', gitSha: 'old' }, currentFingerprint: 'b', currentPipeline: 'p' })).toContain('sourceFingerprint')
+    expect(freshnessProblem({ manifest: { sourceFingerprint: 'a', pipelineFingerprint: 'p', gitSha: 'old' }, currentFingerprint: 'a', currentPipeline: 'p' })).toBeUndefined()
+    expect(freshnessProblem({ manifest: { sourceFingerprint: 'a', pipelineFingerprint: 'old', gitSha: 'old' }, currentFingerprint: 'a', currentPipeline: 'new' })).toContain('pipelineFingerprint')
   })
 
   it('glob 分支（**、*、?）与字面 files 缺失都判（BUG-223）', () => {
@@ -320,10 +389,16 @@ describe('shipped package 形状判据（C13）', () => {
     const write = (rel: string, text: string) => { mkdirSync(join(base, rel, '..'), { recursive: true }); writeFileSync(join(base, rel), text) }
     write('package.json', `${JSON.stringify({ dsh: { bundle: { patch: EXPECTED_PATCH } }, files: ['content/**', 'presets/**', 'locale/*.json', 'LICENSE'] })}\n`)
     write('README.shipped.md', '# x\n\n[home](https://example.com)\ndsh plugin add\ndsh: pnpm was not found; install pnpm and make it available on PATH.\n')
+    const sourceContent = REQUIRED_SHIPPED.filter(rel => rel.startsWith('content/')).map(rel => rel.slice('content/'.length)).sort()
     for (const rel of [...REQUIRED_SHIPPED, ...EXPECTED_PATCH.map(item => item.replace(/^\.\//, '')), 'LICENSE']) {
-      write(rel, rel.endsWith('.json') ? '{"tiers":{}}\n' : '# x\n')
+      write(rel, rel === 'content/manifest.json'
+        ? `${JSON.stringify({ tiers: {}, inventory: sourceContent })}\n`
+        : rel.endsWith('.json') ? `${requiredJson(rel)}\n`
+          : rel.startsWith('presets/') ? 'id: x\n' : '# x\n')
     }
     expect(checkSourceShape({ packDir: base })).toEqual([])
+    write('README.shipped.md', '# x\n\npnpm methods:init\n')
+    expect(checkSourceShape({ packDir: base }).some(problem => problem.includes('dev 命令'))).toBe(true)
     rmSync(base, { recursive: true, force: true })
   })
 
@@ -374,6 +449,30 @@ describe('shipped package 形状判据（C13）', () => {
 describe('sanitizer 与字节工具', () => {
   const dir = mkdtempSync(join(tmpdir(), 'shipped-shape-'))
   afterAll(() => rmSync(dir, { recursive: true, force: true }))
+
+  it('source 组合目标缺失 → 红（BUG-256 边界）', () => {
+    const packDir = join(ROOT, 'packages/company-pack')
+    const problems = checkSourceShape({ packDir, exists: rel => rel === 'presets/ceo/agent.cordis.yml' ? false : existsSync(join(packDir, rel)) })
+    expect(problems.some(problem => problem.includes('组合目标不在源码树'))).toBe(true)
+  })
+
+  it('source shape 扫描 pnpm dev 命令（BUG-251）', () => {
+    const packDir = join(ROOT, 'packages/company-pack')
+    const problems = checkSourceShape({ packDir, readFile: rel => {
+      if (rel === 'README.shipped.md') return '# x\n\npnpm methods:init\n'
+      return readFileSync(join(packDir, rel), 'utf8')
+    } })
+    expect(problems.some(problem => problem.includes('dev 命令'))).toBe(true)
+  })
+
+  it('source shape 扫描 node tools/run-env dev 命令（BUG-252）', () => {
+    const packDir = join(ROOT, 'packages/company-pack')
+    const problems = checkSourceShape({ packDir, readFile: rel => {
+      if (rel === 'README.shipped.md') return '# x\n\nnode tools/repo/check.mjs\n'
+      return readFileSync(join(packDir, rel), 'utf8')
+    } })
+    expect(problems.some(problem => problem.includes('dev 命令'))).toBe(true)
+  })
 
   it('sanitizePackage 去 scripts/devDeps、收类型、剥注释、换 README', () => {
     const packageDir = join(dir, 'package')
@@ -431,6 +530,31 @@ describe('sanitizer 与字节工具', () => {
     writeFileSync(join(packageDir, 'package.json'), `${JSON.stringify({ name: 'x', version: '0', peerDependencies: {}, dsh: { client: { inject: [], platform: 'web' } } })}\n`)
     writeFileSync(join(packageDir, 'lib/index.js'), 'export const x = 1\n')
     expect(() => sanitizePackage({ dir: packageDir, shippedReadme: join(dir, 'missing-readme.md') })).not.toThrow()
+  })
+
+  it('pipeline fingerprint 覆盖 sanitizer/export-dist/pack-source（BUG-243）', () => {
+    expect(RELEASE_PIPELINE_FILES).toContain('tools/lib/release/shipped-shape.mjs')
+    expect(releasePipelineFingerprint(ROOT)).toMatch(/^[0-9a-f]{64}$/)
+    expect(devBuildFingerprint('packages/company-pack', { vendorSha: 'x', lockfilePath: join(ROOT, 'pnpm-lock.yaml') })).toMatch(/^[0-9a-f]{64}$/)
+  })
+
+  it('content inventory/JSON schema 缺省和非法值红（BUG-244/261/262）', () => {
+    const noInventory = fixture({ texts: { 'package/content/manifest.json': '{"tiers":{}}\n' } })
+    expect(checkShippedPackage(noInventory).some(problem => problem.includes('缺非空 inventory'))).toBe(true)
+    const duplicate = fixture({ texts: { 'package/content/manifest.json': JSON.stringify({ tiers: {}, inventory: ['AGENTS.md', 'AGENTS.md'] }) } })
+    expect(checkShippedPackage(duplicate).some(problem => problem.includes('inventory 重复'))).toBe(true)
+    const unsafe = fixture({ texts: { 'package/content/manifest.json': JSON.stringify({ tiers: {}, inventory: ['../x.md'] }) } })
+    expect(checkShippedPackage(unsafe).some(problem => problem.includes('不安全路径'))).toBe(true)
+    const badJson = fixture({ texts: { 'package/content/manifest.json': 'not json' } })
+    expect(checkShippedPackage(badJson).some(problem => problem.includes('不是合法 JSON'))).toBe(true)
+    const arrayManifest = fixture({ texts: { 'package/content/manifest.json': '[]\n' } })
+    expect(checkShippedPackage(arrayManifest).some(problem => problem.includes('不是对象'))).toBe(true)
+    const noTiers = fixture({ texts: { 'package/content/manifest.json': JSON.stringify({ inventory: ['AGENTS.md'] }) } })
+    expect(checkShippedPackage(noTiers).some(problem => problem.includes('缺 tiers'))).toBe(true)
+    const badTier = fixture({ texts: { 'package/content/manifest.json': JSON.stringify({ inventory: ['AGENTS.md'], tiers: { t2: 'x' } }) } })
+    expect(checkShippedPackage(badTier).some(problem => problem.includes('不是数组'))).toBe(true)
+    const unsafeTier = fixture({ texts: { 'package/content/manifest.json': JSON.stringify({ inventory: ['AGENTS.md'], tiers: { t2: ['../x'] } }) } })
+    expect(checkShippedPackage(unsafeTier).some(problem => problem.includes('不安全路径'))).toBe(true)
   })
 
   it('packageRootOf 取 package 名', () => {

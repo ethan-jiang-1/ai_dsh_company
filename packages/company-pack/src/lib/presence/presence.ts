@@ -104,6 +104,8 @@ export interface TeamViewLike {
     revision?: number
     blockedBy?: readonly string[]
     ready?: boolean
+    /** 事件覆盖了缺 revision 的投影：状态序无法证明新旧（BUG-240/257/258）。 */
+    revisionGap?: boolean
   }[]
 }
 
@@ -138,13 +140,17 @@ export function teamWithEventTasks(view: TeamViewLike | null, events: readonly T
     const previous = tasks.get(task.id)
     // BUG-230：投影任务缺 revision 时无法证明事件新旧；保护终态，不让旧 pending 把 completed 覆盖回去，
     // 但允许 pending/in_progress 推进到 completed（也允许 completed → deleted），避免无 revision 的投影永久冻结。
+    let revisionGap = false
     if (previous !== undefined && typeof previous.revision !== 'number') {
-      if (previous.status === 'deleted') continue
+      if (previous.status === 'deleted' && task.status === 'deleted') continue
       const beforeRank = STATUS_ORDER[previous.status] ?? -1
       const nextRank = STATUS_ORDER[task.status] ?? -1
       // 只允许前进（pending→in_progress→completed；任意→deleted），缺 revision 时也不让
       // in_progress 被旧 pending 打回（BUG-230/240）。
-      if (task.status !== 'deleted' && nextRank < beforeRank) continue
+      if (previous.status !== 'deleted' && task.status !== 'deleted' && nextRank >= 0 && beforeRank >= 0 && nextRank < beforeRank) continue
+      // 未知 status 不是「后退」也不是「前进」：保留事件并标 revisionGap（BUG-257）；
+      // deleted 投影只有在显式非 deleted 事件下重建，同样标 gap（BUG-258）。
+      revisionGap = nextRank < 0 || previous.status === 'deleted'
     }
     // 事件流的历史/实时顺序不等于投影新旧：旧 revision 不覆盖新投影（BUG-104）。
     if (previous !== undefined && typeof previous.revision === 'number' && task.revision < previous.revision) continue
@@ -161,6 +167,7 @@ export function teamWithEventTasks(view: TeamViewLike | null, events: readonly T
       ...(ownerName === undefined ? {} : { ownerName }),
       revision: task.revision,
       ...(task.blockedBy === undefined ? {} : { blockedBy: task.blockedBy }),
+      ...(revisionGap ? { revisionGap: true } : {}),
     })
   }
   return { ...base, members: [...members.values()], tasks: [...tasks.values()] }

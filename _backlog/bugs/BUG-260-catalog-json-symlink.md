@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-260：catalog.json 是 symlink 时被静默替换，无 warning
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -18,6 +18,11 @@ opened: 2026-11-18
 ## 复现
 
 临时 home：`kb/deliverables-index.json` 指向不存在的 target；`regenerateCatalog` written true、warnings `[]`，链接被替换。
+
+
+```sh
+pnpm test tests/host/ledger/catalog.spec.ts
+```
 
 ## 根因与证据
 
@@ -29,10 +34,18 @@ catalog 输出路径的坏形状（symlink）没有 warning/拒绝，与 final/m
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-catalog 输出是 symlink → warning + 拒绝写（或明确 safe-replace 并记录）。
+1. catalog 输出 `deliverables-index.json` 是 symlink → warning + 拒绝写，不替换链接。
+2. 负例：symlink target 不存在 → written:false。
 
 ## 修复方向（不授权，仅记录）
 
 - 先补最小负例到对应 spec/checker，再改实现；不动 vendor。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/ledger/catalog.ts`
+- 红：`pnpm test tests/host/ledger/catalog.spec.ts`（catalog.json symlink 被静默替换）
+- 绿：`pnpm test tests/host/ledger/catalog.spec.ts`（warning + 拒绝写）
+- 提交：commit 82e23163

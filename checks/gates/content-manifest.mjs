@@ -16,6 +16,16 @@ const BUDGETS = { t0: 6_144, t1: 4_096, t2: 6_144 }
 const TOTAL_BUDGETS = { t0: 6_144, t1: 4_096 }
 const REQUIRED_DIRS = ['generic', 'company', 'product-types', 'delivery-modes']
 
+function allFiles(dir, prefix = '') {
+  const out = []
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const rel = prefix === '' ? entry.name : `${prefix}/${entry.name}`
+    if (entry.isDirectory()) out.push(...allFiles(join(dir, entry.name), rel))
+    else if (entry.isFile()) out.push(rel)
+  }
+  return out
+}
+
 function markdownFiles(dir, prefix = '') {
   const out = []
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -54,6 +64,23 @@ export function run({ root, ok, fail }) {
   }
   const tiers = manifest?.tiers ?? {}
   const problems = []
+  const inventory = manifest?.inventory
+  if (!Array.isArray(inventory) || inventory.length === 0) {
+    problems.push('manifest 缺非空 inventory（content/** 全量清单）')
+  } else {
+    const inventorySet = new Set(inventory)
+    for (const rel of inventory) {
+      if (typeof rel !== 'string' || rel === '' || rel.startsWith('/') || rel.split('/').includes('..')) {
+        problems.push(`inventory 不安全路径：${String(rel)}`)
+        continue
+      }
+      if (!existsSync(join(content, rel))) problems.push(`inventory 列了不存在的文件：${rel}`)
+    }
+    const disk = allFiles(content).filter(rel => rel !== 'manifest.json').sort()
+    const listedFiles = [...inventorySet].sort()
+    for (const rel of disk) if (!inventorySet.has(rel)) problems.push(`content 盘上有未入 inventory 的文件：${rel}`)
+    for (const rel of listedFiles) if (!disk.includes(rel)) problems.push(`inventory 列了盘上没有的文件：${rel}`)
+  }
   const listed = new Map()
   for (const [tier, files] of Object.entries(tiers)) {
     if (!(tier in BUDGETS) && tier !== 'legacy') { problems.push(`未知 tier：${tier}`); continue }
@@ -61,6 +88,7 @@ export function run({ root, ok, fail }) {
     for (const rel of files) {
       const path = join(content, rel)
       if (!existsSync(path)) { problems.push(`清单列了不存在的文件：${rel}`); continue }
+      if (Array.isArray(inventory) && !inventory.includes(rel)) problems.push(`tier ${tier} 引用不在 inventory：${rel}`)
       if (listed.has(rel)) problems.push(`同一文件被登记两次：${rel}（${listed.get(rel)} / ${tier}）`)
       listed.set(rel, tier)
     }

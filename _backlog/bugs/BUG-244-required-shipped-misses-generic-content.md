@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-244：REQUIRED_SHIPPED 仍漏 content/manifest 的 generic/* 运行时文件
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -18,6 +18,11 @@ opened: 2026-11-18
 ## 复现
 
 `readTarball` 后过滤 `package/content/generic/collaboration.md`，`checkShippedPackage` 返回 `[]`。
+
+
+```sh
+pnpm test tests/repo/release/shipped-shape.spec.ts
+```
 
 ## 根因与证据
 
@@ -29,10 +34,18 @@ REQUIRED_SHIPPED 是手写策展集合（43 条）；manifest 列出 50 条，�
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-从 `content/manifest.json` 的 tiers 派生关键件（或对账两份清单）；删 generic/* → checker 红。
+1. `content/manifest.json` 增 `inventory`（content/** 全量 84 件）；checker 要求每件在 tarball、非空。
+2. 负例：删 `content/generic/collaboration.md` → 红。
 
 ## 修复方向（不授权，仅记录）
 
 - 先补最小负例到对应 spec/checker，再改实现；不动 vendor。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/content/manifest.json`、`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`
+- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（删 generic/collaboration.md 仍 PASS）
+- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（inventory 缺文件红）
+- 提交：commit 82e23163

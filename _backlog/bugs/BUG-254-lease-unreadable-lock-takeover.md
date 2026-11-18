@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-254：不可读的 live lease 被当 stale 删除并抢占
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -18,6 +18,11 @@ opened: 2026-11-18
 ## 复现
 
 临时 home：写 `{schema:1,pid:process.ppid,token:'live',startedAt:'x'}`，chmod 000；`acquireCompanyLease` 返回 acquired true（并删除锁）。
+
+
+```sh
+pnpm test tests/host/run-bundle/lease.spec.ts
+```
 
 ## 根因与证据
 
@@ -29,10 +34,18 @@ opened: 2026-11-18
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-读失败时 fail-closed（拒绝并发，给「lease 不可读」理由），不要 unlink；只有 EOF/坏 JSON 的显式 stale 才接管。
+1. lease 读失败 EACCES/EPERM fail-closed，不 unlink；ENOENT 可重试；空/坏 JSON 仍 stale。
+2. 负例：chmod 000 live lease → acquired false + 不可读，锁仍在。
 
 ## 修复方向（不授权，仅记录）
 
 - 先补最小负例到对应 spec/checker，再改实现；不动 vendor。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/run-bundle/lease.ts`、`tests/host/run-bundle/lease.spec.ts`
+- 红：`pnpm test tests/host/run-bundle/lease.spec.ts`（chmod 000 live lease 被删后抢占）
+- 绿：`pnpm test tests/host/run-bundle/lease.spec.ts`（EACCES/EPERM fail-closed，锁仍在）
+- 提交：commit 82e23163

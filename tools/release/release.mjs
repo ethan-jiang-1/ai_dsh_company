@@ -19,7 +19,7 @@ import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
-import { sourceFingerprint } from '../lib/core/pack-source.mjs'
+import { releasePipelineFingerprint, sourceFingerprint } from '../lib/core/pack-source.mjs'
 import { expectedTag } from '../lib/core/pin.mjs'
 
 const PACK = join(ROOT, 'packages/company-pack')
@@ -228,6 +228,7 @@ function writeManifest(checks) {
     generatedAt: new Date().toISOString(),
     dirty: capture('git', ['status', '--porcelain']).trim() !== '',
     sourceFingerprint: sourceFingerprint(PACK),
+    pipelineFingerprint: releasePipelineFingerprint(ROOT),
     vendor: vendorInfo(),
     artifact,
     checks,
@@ -257,6 +258,7 @@ function verify() {
   const prepared = readManifest()
   if (prepared.version !== pack().version) fail(`manifest 版本 ${prepared.version} ≠ package ${pack().version}；先 --prepare`)
   if (prepared.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；' + repackHint())
+  if (prepared.pipelineFingerprint !== releasePipelineFingerprint(ROOT)) fail('发布管线（sanitizer/export-dist/pack-source）已变但 _dist 没重打；' + repackHint())
   if (!allowStaleManifest && prepared.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest 不是当前 HEAD 的 --prepare 产物；先重跑 --prepare（仅 test/docs 改动可显式 --allow-stale-manifest）')
   const commands = [
     ['verify', ['pnpm', ['verify'], false]],
@@ -294,6 +296,7 @@ function stamp() {
   assertVendor(manifest)
   if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
   if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；' + repackHint())
+  if (manifest.pipelineFingerprint !== releasePipelineFingerprint(ROOT)) fail('发布管线已变但 _dist 没重打；' + repackHint())
   if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
   const checks = manifest.checks ?? {}
   const notPass = Object.entries(checks).filter(([, status]) => status !== 'pass')
@@ -312,6 +315,7 @@ function check(allowDirtyTree = allowDirty) {
   assertVendor(manifest)
   if (manifest.version !== pack().version) fail(`manifest 版本 ${manifest.version} ≠ package ${pack().version}`)
   if (manifest.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；' + repackHint())
+  if (manifest.pipelineFingerprint !== releasePipelineFingerprint(ROOT)) fail('发布管线已变但 _dist 没重打；' + repackHint())
   if (manifest.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest gitSha 不是当前 HEAD（发布后被改过？只提交 docs/receipt 时用 --stamp；重建产物才用 --prepare/--verify）')
   if (manifest.artifact?.sha256 !== artifact.sha256) fail('manifest sha256 与当前 tgz 不一致')
   if (manifest.dirty !== false) fail('manifest 记录的是脏树（发布字节不对应一个干净 commit；重跑 --verify）')

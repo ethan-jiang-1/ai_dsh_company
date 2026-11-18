@@ -58,3 +58,25 @@ export function devBuildFingerprint(packDir, { vendorSha, lockfilePath }) {
   if (typeof lockfilePath === 'string' && existsSync(lockfilePath)) hash.update(readFileSync(lockfilePath))
   return hash.digest('hex')
 }
+
+
+/** 决定 tarball 字节/发布判据的管线文件（相对仓库根；BUG-243）。 */
+export const RELEASE_PIPELINE_FILES = [
+  'tools/lib/release/shipped-shape.mjs',
+  'tools/release/shipped-shape.mjs',
+  'tools/release/export-dist.mjs',
+  'tools/release/release.mjs',
+  'tools/lib/core/pack-source.mjs',
+]
+
+/** 发布管线指纹：只改 sanitizer/export-dist/pack-source 也必须触发重打。 */
+export function releasePipelineFingerprint(root) {
+  const hash = createHash('sha256')
+  for (const rel of RELEASE_PIPELINE_FILES) {
+    hash.update(rel)
+    hash.update('\0')
+    hash.update(readFileSync(join(root, rel)))
+    hash.update('\0')
+  }
+  return hash.digest('hex')
+}

@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 21 张**：BUG-212（收尾验证链偏长）保持活跃；C16 20 张（BUG-243..262）见下方「## 2026-11-18 C16 门禁管线指纹 + 运行时发虚面」。C13/C14/C15 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**活跃 21 张**：BUG-212（收尾验证链偏长）保持活跃，不并入本批；C16 20 张（BUG-243..262）已由 2026-11-18 用户指令授权，`调查中 → 修复就绪`，批次计划见下方「## 2026-11-18 修复交接（C16 管线指纹 + 关键件闭包 + 低置信运行态：BUG-243..262）」。C13/C14/C15 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 **独立卡**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
 
@@ -75,6 +75,29 @@ C 文档/发布面最后落，`_dist` 同批重建。证据口径 = 先落代码
 **收口（2026-11-17）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `f1629047`。
 `pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2218 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
 共享机制决定 = [shipped package boundary Note](../../notes/implemented/2026-11-17-shipped-package-boundary.md)。
+
+## 2026-11-18 修复交接（C16 管线指纹 + 关键件闭包 + 低置信运行态：BUG-243..262）
+
+**用户指令（2026-11-18）**：「继续新的bug……看看是否能系统性修起来。计划有了后 setup goal 逐步按REPO的流程来推进。」——本句即本轮授权（材料性：发布管线指纹、shipped 关键件/schema/YAML、dev 命令、lease/bundle/catalog/presence、content manifest；留痕 = 批次 Note `notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md`）。BUG-212 不并入本批。
+
+20 张分八组：
+A 管线指纹（243）；B 关键件/JSON/YAML（244-250）；C dev 命令（251/252）；D allow-stale 结构化（253）；E lease/bundle（254-256）；F presence 未知/删除（257/258）；G catalog 空 final/symlink（259/260）；H content manifest 对账/引用（261/262）。
+
+| 组 | 卡 | 修法（唯一事实源） |
+|---|---|---|
+| A 管线指纹 | 243 | release manifest 增 `pipelineFingerprint`（sanitizer/export-dist/pack-source），`release:shape` 与 sourceFingerprint 一起比 |
+| B 关键件/schema | 244-250 | 从 `content/manifest.json` 新增 `inventory` 派生全部 content 件；JSON 按 delivery-rules/seed/check-rules 最小 schema；preset YAML 用 js-yaml parse |
+| C dev 命令 | 251/252 | vp-eng persona 改成运行时「安装方法包」；`checkSourceShape` 扫非注释行的 `pnpm <script>`/`node tools|checks|tests`/`run/env.sh`（安装器/`pnpm plugin` 白名单） |
+| D 降级 | 253 | `--allow-stale=<sha>:<reason>` 结构化，裸/任意词红，CI 禁 |
+| E lease/bundle | 254-256 | lease 读失败 fail-closed；bundle createdAt ISO 往返；pack name/version 与当前 pack 对账 |
+| F presence | 257/258 | 未知 status 不静默丢（保留/标 unknown）；deleted 只在无更高证据时终态，允许显式 recreate |
+| G catalog | 259/260 | final 零字节 → warning/无 final；catalog.json symlink → warning + 拒绝覆盖 |
+| H content manifest | 261/262 | inventory 与盘面双向对账；tiers 引用安全/存在/在 inventory 内 |
+
+**次序 = A/B → C/D → E → F/G/H → 重打 `_dist` → 真入口**。证据 = 先代码提交 sha → 每卡 `## 修复证据`（改动面/红/绿/提交）→ 归档；A/B = `pnpm test tests/repo/release/shipped-shape.spec.ts` + `release:shape`；C/D = `pnpm verify` / CLI；E = 临时 home；F = 纯函数；G = 临时 home；H = `pnpm verify` + spec。
+
+**终点** = 20 张全部迁 fixed_bugs、每卡盲审 + 证据；`verify`/`test`/`typecheck`/`coverage` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃。
+
 
 ## 2026-11-18 C16 门禁管线指纹 + 运行时发虚面
 

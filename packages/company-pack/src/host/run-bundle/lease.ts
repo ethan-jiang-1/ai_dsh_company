@@ -160,7 +160,11 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
     let current: LeaseHolder | null = null
     try {
       current = parseHolder(readFileSync(path, 'utf8'))
-    } catch { /* 读不到按 stale */ }
+    } catch (error) {
+      // 不可读 ≠ stale：EACCES/EPERM 的活锁不能删除后抢占（BUG-254）；ENOENT 可重试。
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') continue
+      return { acquired: false, path, reason: `writer lease 不可读，拒绝接管：${(error as Error).message}` }
+    }
     if (current !== null && current.pid !== pid) {
       const age = leaseAgeMs(path, now)
       // PID 存活 + 心跳新鲜 = 真 writer；PID 存活但锁已过期 = 很可能是 PID 复用（BUG-106）。

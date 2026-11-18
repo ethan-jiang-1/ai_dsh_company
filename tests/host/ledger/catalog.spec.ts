@@ -3,6 +3,8 @@
 // 负例留证 2026-11-18：`slug:` 空值被当已声明（entry.slug=''）（BUG-232）；回退目录名 + warning 后绿。
 // 负例留证 2026-11-18：meta/ledger chmod 000 直接抛 EACCES（BUG-238）；catch 成 warning 后绿。
 // 负例留证 2026-11-18：final chmod 000 仍 final:true、warnings 空（BUG-239）；按不可读降级后绿。
+// 负例留证 2026-11-18：零字节 final 仍 present（BUG-259）；按空文件降级后绿。
+// 负例留证 2026-11-18：catalog.json symlink 被静默替换（BUG-260）；拒绝写后绿。
 /**
  * 成品目录 host 生成器（2026-10-25；2026-11-01 v3 路径）的 keyless 判据。
  *
@@ -194,6 +196,26 @@ describe('host catalog', () => {
       chmodSync(meta, 0o644)
       chmodSync(ledger, 0o644)
     }
+  })
+
+  it('零字节 final → 不算 present，出 warning（BUG-259）', () => {
+    const root = workspace()
+    const dir = deliverable(root)
+    writeFileSync(join(dir, 'final.md'), '')
+    const result = regenerateCatalog(root)
+    expect(result.catalog?.entries).toEqual([])
+    expect(result.warnings.some(warning => warning.includes('为空'))).toBe(true)
+  })
+
+  it('catalog.json 是 symlink → 拒绝写并 warning（BUG-260）', () => {
+    const root = workspace()
+    deliverable(root)
+    const target = join(root, 'elsewhere.json')
+    symlinkSync(target, catalogPath(root))
+    const result = regenerateCatalog(root)
+    expect(result.written).toBe(false)
+    expect(result.warnings.some(warning => warning.includes('symlink'))).toBe(true)
+    expect(existsSync(target)).toBe(false)
   })
 
   it('final.md 不可读 → 不算 present，出 warning（BUG-239）', () => {

@@ -101,6 +101,19 @@ function atomicWriteFile(path: string, data: string): void {
   }
 }
 
+/** 从本模块位置读当前 pack 的 name/version（boot 对账用）。 */
+export function currentPackMetadata(moduleUrl: string = import.meta.url): PackMetadata {
+  // 源码模块在 src/host/run-bundle（../../../=包根），bundled 后在 lib/index.js（../=包根）。
+  for (const rel of ['../package.json', '../../../package.json']) {
+    const path = fileURLToPath(new URL(rel, moduleUrl))
+    if (!existsSync(path)) continue
+    const pkg = JSON.parse(readFileSync(path, 'utf8')) as { name?: unknown, version?: unknown }
+    if (typeof pkg.name !== 'string' || typeof pkg.version !== 'string') throw new Error(`pack package.json 缺 name/version：${path}`)
+    return { name: pkg.name, version: pkg.version }
+  }
+  throw new Error('pack package.json 不在模块附近')
+}
+
 /** 读 `<pack>/package.json` 的 name/version。 */
 export function resolvePackMetadata(moduleUrl: string): PackMetadata {
   const path = fileURLToPath(new URL('../package.json', moduleUrl))
@@ -133,7 +146,7 @@ interface ManifestValidation {
 }
 
 /** 校验 v3 身份形状；v2 单独标 legacy 供原地升级。 */
-function validateBundleManifest(value: unknown): ManifestValidation {
+function validateBundleManifest(value: unknown, expectedPack?: PackMetadata): ManifestValidation {
   if (!isRecord(value)) return { ok: false, error: '不是对象' }
   const version = value.v
   if (typeof version !== 'number' || !Number.isSafeInteger(version) || version < 1) {
@@ -152,9 +165,16 @@ function validateBundleManifest(value: unknown): ManifestValidation {
   }
   if (!isSafeBundleId(value.id)) return { ok: false, error: 'id 缺失或不是安全的单段文件名' }
   if (typeof value.createdAt !== 'string' || value.createdAt.trim() === '') return { ok: false, error: 'createdAt 缺失' }
+  const createdAt = new Date(value.createdAt)
+  if (Number.isNaN(createdAt.getTime()) || createdAt.toISOString() !== value.createdAt) {
+    return { ok: false, error: 'createdAt 不是 ISO 往返日期' }
+  }
   const pack = value.pack
   if (!isRecord(pack) || typeof pack.name !== 'string' || typeof pack.version !== 'string') {
     return { ok: false, error: 'pack.name/pack.version 缺失' }
+  }
+  if (expectedPack !== undefined && pack.name !== expectedPack.name) {
+    return { ok: false, error: `pack 名称不匹配（manifest ${pack.name}@${pack.version}；当前 ${expectedPack.name}@${expectedPack.version}）` }
   }
   const runBundle = value.runBundle
   if (!isRecord(runBundle) || runBundle.schema !== 1) return { ok: false, error: 'runBundle.schema 缺失或不是 1' }
@@ -171,7 +191,7 @@ function validateBundleManifest(value: unknown): ManifestValidation {
 }
 
 /** 读 manifest 状态；不存在/坏/更高版本/legacy 分开报。 */
-export function readBundleManifestState(workspace: string): BundleManifestState {
+export function readBundleManifestState(workspace: string, expectedPack?: PackMetadata): BundleManifestState {
   const path = bundleManifestPath(workspace)
   const problem = companyFileProblem(workspace, BUNDLE_MANIFEST_REL)
   if (problem === 'missing') return { status: 'missing', path }
@@ -180,7 +200,7 @@ export function readBundleManifestState(workspace: string): BundleManifestState 
     const text = readCompanyText(workspace, BUNDLE_MANIFEST_REL)
     if (text === undefined) return { status: 'corrupt', path, error: 'bundle.json 不可读' }
     const raw: unknown = JSON.parse(text)
-    const validation = validateBundleManifest(raw)
+    const validation = validateBundleManifest(raw, expectedPack)
     if (validation.unsupportedVersion !== undefined) {
       return {
         status: 'unsupported',
@@ -217,7 +237,7 @@ export function planBundleManifest(options: {
   readonly id?: string
 }): ManifestPlan {
   const path = bundleManifestPath(options.workspace)
-  const state = readBundleManifestState(options.workspace)
+  const state = readBundleManifestState(options.workspace, options.pack)
   if (options.id !== undefined && !isSafeBundleId(options.id)) {
     return {
       path,
@@ -234,6 +254,15 @@ export function planBundleManifest(options: {
     }
   }
   if (state.status === 'ok') {
+    if (state.manifest.pack.version !== options.pack.version) {
+      // 升级 = 安装新版 pack 后重启；pack 字段只是「创建此状态的版本」，不能因此判 corrupt。
+      return {
+        path,
+        manifest: { ...state.manifest, pack: options.pack },
+        backupPath: identityBackupPath(options.dshHome, state.manifest.id),
+        action: 'upgrade',
+      }
+    }
     return {
       path,
       manifest: state.manifest,
@@ -261,8 +290,10 @@ export function planBundleManifest(options: {
   const legacyId = legacy?.id
   const id = options.id
     ?? (isSafeBundleId(legacyId) ? legacyId : `bundle-${randomUUID()}`)
-  const createdAt = typeof legacy?.createdAt === 'string' && legacy.createdAt.trim() !== ''
-    ? legacy.createdAt
+  const legacyCreatedAt = typeof legacy?.createdAt === 'string' ? legacy.createdAt : ''
+  const legacyDate = new Date(legacyCreatedAt)
+  const createdAt = legacyCreatedAt.trim() !== '' && !Number.isNaN(legacyDate.getTime()) && legacyDate.toISOString() === legacyCreatedAt
+    ? legacyCreatedAt
     : (options.now ?? new Date()).toISOString()
   const manifest: BundleManifest = {
     v: BUNDLE_MANIFEST_VERSION,

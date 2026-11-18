@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 修复已落地
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-253：--allow-stale 的理由是任意字符串，无审核/绑定
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
 >
 > **关联**：[C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)（C16 / 发虚领域）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **留痕**：批次 Note [2026-11-18-pipeline-fingerprint-and-runtime-closure](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)（本批共用）。
 
 ## 症状
 
@@ -18,6 +18,11 @@ C15 修复要求 `--allow-stale=理由`，但理由可以是 `x`；CLI 只判非
 ## 复现
 
 临时改 `README.shipped.md`，`node tools/release/shipped-shape.mjs --allow-stale=x`：WARN + PASS + exit 0。
+
+
+```sh
+pnpm test tests/repo/release/shipped-shape.spec.ts
+```
 
 ## 根因与证据
 
@@ -29,10 +34,18 @@ C15 修复要求 `--allow-stale=理由`，但理由可以是 `x`；CLI 只判非
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-把理由解析成结构化（issue/日期）或要求 `--allow-stale=<sha>:<reason>`；CI 仍禁用。
+1. `--allow-stale=<sha>:<reason>` 结构化；裸/任意词红，CI 禁。
+2. 负例：`=x` → exit 1；`=<sha>:docs-only` → PASS。
 
 ## 修复方向（不授权，仅记录）
 
 - 先补最小负例到对应 spec/checker，再改实现；不动 vendor。
+
+## 修复证据
+
+- 改动面：`tools/lib/release/shipped-shape.mjs`
+- 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（--allow-stale=x 仍 PASS）
+- 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（要求 <sha>:<reason>；裸/任意词红）
+- 提交：commit 82e23163

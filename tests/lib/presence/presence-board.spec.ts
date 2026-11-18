@@ -5,6 +5,8 @@
 // 负例留证 2026-11-18：投影 in_progress 无 revision + 旧 pending 事件即回退（BUG-240）；状态序保护后绿。
 // 负例留证 2026-11-18：未知 phase 事件板 inactive vs live unknown（BUG-241）；共用映射后绿。
 // 负例留证 2026-11-18：message.content 缺失抛 content is not iterable（BUG-242）；firstText 兜底后绿。
+// 负例留证 2026-11-18：未知 status（paused）被当后退静默丢弃（BUG-257）；保留 + revisionGap 后绿。
+// 负例留证 2026-11-18：deleted 投影被任何事件永久忽略（BUG-258）；显式事件重建 + revisionGap 后绿。
 /** 在场板读模型（R5b，Q5–Q8 定案的 keyless 完成定义——提案验收判据 1/4）。 */
 // 负例留证 2026-11-13：把 teamWithEventTasks 改成直接返回 view ⇒「事件流补任务板」用例红（BUG-103）；还原即绿。
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
@@ -217,14 +219,36 @@ describe('teamWithEventTasks（事件补投影）', () => {
       members: [{ id: 'm1', name: 'vp-eng', role: 'teammate', phase: 'active' }],
       tasks: [{ id: 't3', subject: 'gone task', status: 'deleted' }],
     } as TeamViewLike
-    const stillDeleted = teamWithEventTasks(deletedBase, [taskEvent('t3', 1, 'gone task', 'completed', undefined, 3)])
-    expect(stillDeleted?.tasks?.[0]?.status).toBe('deleted')
+    const recreated = teamWithEventTasks(deletedBase, [taskEvent('t3', 1, 'gone task', 'completed', undefined, 3)])
+    expect(recreated?.tasks?.[0]?.status).toBe('completed')
+    expect(recreated?.tasks?.[0]?.revisionGap).toBe(true)
     const runningBase = {
       members: [{ id: 'm1', name: 'vp-eng', role: 'teammate', phase: 'active' }],
       tasks: [{ id: 't4', subject: 'running task', status: 'in_progress' }],
     } as TeamViewLike
     const stillRunning = teamWithEventTasks(runningBase, [taskEvent('t4', 1, 'running task', 'pending', undefined, 4)])
     expect(stillRunning?.tasks?.[0]?.status).toBe('in_progress')
+  })
+})
+
+describe('teamWithEventTasks 未知 status / deleted 重建（BUG-257/258）', () => {
+  it('未知 status 不静默丢弃，标 revisionGap（BUG-257）', () => {
+    const base = { members: [], tasks: [{ id: 't1', subject: 'x', status: 'pending' }] } as TeamViewLike
+    const event = { type: 'team/task', time: 1, data: { teamId: TEAM, task: { id: 't1', revision: 1, subject: 'x', status: 'paused' } } } as unknown as TeamEventLike
+    const merged = teamWithEventTasks(base, [event])
+    expect(merged?.tasks?.[0]?.status).toBe('paused')
+    expect(merged?.tasks?.[0]?.revisionGap).toBe(true)
+  })
+
+  it('deleted 投影可被显式事件重建，标 revisionGap（BUG-258）', () => {
+    const base = { members: [], tasks: [{ id: 't1', subject: 'x', status: 'deleted' }] } as TeamViewLike
+    const merged = teamWithEventTasks(base, [taskEvent('t1', 2, 'x', 'pending', undefined, 2)])
+    expect(merged?.tasks?.[0]?.status).toBe('pending')
+    expect(merged?.tasks?.[0]?.revisionGap).toBe(true)
+    const known = teamWithEventTasks({ members: [], tasks: [{ id: 't2', subject: 'x', status: 'pending' }] } as TeamViewLike, [taskEvent('t2', 1, 'x', 'in_progress', undefined, 1)])
+    expect(known?.tasks?.[0]?.revisionGap).toBeUndefined()
+    const stillDeleted = teamWithEventTasks({ members: [], tasks: [{ id: 't3', subject: 'x', status: 'deleted' }] } as TeamViewLike, [taskEvent('t3', 1, 'x', 'deleted', undefined, 1)])
+    expect(stillDeleted?.tasks?.[0]?.status).toBe('deleted')
   })
 })
 

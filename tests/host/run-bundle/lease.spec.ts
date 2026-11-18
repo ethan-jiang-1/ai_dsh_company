@@ -1,5 +1,6 @@
 // 负例留证 2026-11-13：EEXIST 后直接 read/unlink ⇒ 目录锁报 generic 竞争（BUG-124）；lstat 分类即绿。
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, utimesSync, writeFileSync } from 'node:fs'
+// 负例留证 2026-11-18：不可读 live lease 被当 stale 删除并抢占（BUG-254）；读失败 fail-closed 后绿。
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, utimesSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -55,6 +56,36 @@ describe('同 home writer lease（2026-10-27 R2）', () => {
         takeover.release()
       }
     } finally { rmSync(home, { recursive: true, force: true }) }
+  })
+
+  it('坏 JSON/空文件按 stale 清理；ENOENT 竞争可重试（BUG-254 边界）', () => {
+    const home = mkdtempSync(join(tmpdir(), 'company-lease-'))
+    try {
+      writeFileSync(leasePath(home), 'not json')
+      const bad = acquireCompanyLease(home)
+      expect(bad.acquired).toBe(true)
+      if (bad.acquired) bad.release()
+      writeFileSync(leasePath(home), '')
+      const empty = acquireCompanyLease(home)
+      expect(empty.acquired).toBe(true)
+      if (empty.acquired) empty.release()
+    } finally { rmSync(home, { recursive: true, force: true }) }
+  })
+
+  it('不可读 live lease → 拒绝接管且不删除（BUG-254）', () => {
+    const home = mkdtempSync(join(tmpdir(), 'company-lease-'))
+    try {
+      const path = leasePath(home)
+      writeFileSync(path, JSON.stringify({ schema: 1, pid: process.ppid, token: 'live', startedAt: 'x' }))
+      chmodSync(path, 0o000)
+      const blocked = acquireCompanyLease(home)
+      expect(blocked.acquired).toBe(false)
+      if (!blocked.acquired) expect(blocked.reason).toContain('不可读')
+      expect(existsSync(path)).toBe(true)
+    } finally {
+      try { chmodSync(leasePath(home), 0o644) } catch { /* ignore */ }
+      rmSync(home, { recursive: true, force: true })
+    }
   })
 
   it('touchLease 只更新自己 token 的锁', () => {
