@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-238：catalog 对不可读 meta.md / motion-ledger.md 直接抛 EACCES，不转 warning
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1/B2 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-6 / H5）。
-> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
+> **关联**：[C15 卡](../../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-6 / H5）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -45,7 +45,7 @@ pnpm exec tsx runtime/tmp/c15-catalog-perm.test.mjs
 ## 根因与证据
 
 - 根因：`plainFileProblem` 只回答「存在/安全/普通文件」，不回答「可读」；读取点没有 try/catch 到 warnings。契约是「坏形状给 warning，不静默/不崩」，这里两者都没做到。
-- 证据：上脚本；[catalog.ts](../../packages/company-pack/src/host/ledger/catalog.ts) 的 `scanEntries` 与 ledger 读取；`permissions-recovery` 场景说明权限错误是预期形状。
+- 证据：上脚本；[catalog.ts](../../../packages/company-pack/src/host/ledger/catalog.ts) 的 `scanEntries` 与 ledger 读取；`permissions-recovery` 场景说明权限错误是预期形状。
 - 影响：只读 workspace / 文件权限修复期间，boot 的 catalog 初始化可能整体抛，而不是降级成「无 meta/空账本 + warning」。
 
 ## 失败类与同类排查
@@ -67,4 +67,4 @@ pnpm exec tsx runtime/tmp/c15-catalog-perm.test.mjs
 - 改动面：`packages/company-pack/src/host/ledger/catalog.ts`、`tests/host/ledger/catalog.spec.ts`
 - 红：`pnpm test tests/host/ledger/catalog.spec.ts`（chmod 000 meta/ledger → EACCES 抛）
 - 绿：`pnpm test tests/host/ledger/catalog.spec.ts`（try/catch → warning + 无 meta/空账本，不抛）
-- 提交：commit ce472f48
+- 提交：commit 56e4f986

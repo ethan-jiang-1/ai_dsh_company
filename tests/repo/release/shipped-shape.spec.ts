@@ -22,6 +22,11 @@ import { packageSourceFiles, sourceFingerprint } from '../../../tools/lib/core/p
 // 负例留证 2026-11-18：dsh.bundle.patch 指向不存在的 preset，红（BUG-226）；接回 → 绿。
 // 负例留证 2026-11-18：manifest sourceFingerprint 与当前源码不一致，freshness 红（BUG-227）；prepare 后 → 绿。
 // 负例留证 2026-11-18：README.shipped 写未限定 dev 路径，source shape 红（BUG-228）；改回 → 绿。
+// 负例留证 2026-11-18：删 content/templates/prd.md，checker 红（BUG-233）；接回 → 绿。
+// 负例留证 2026-11-18：patch 裁到 6 条/空 preset，checker 红（BUG-234）；接回 → 绿。
+// 负例留证 2026-11-18：dev README 在指纹内，改它指纹变（BUG-235）；移出后 → 不变。
+// 负例留证 2026-11-18：裸 --allow-stale，staleFlagProblem 红（BUG-236）；带 =理由 → 绿。
+// 负例留证 2026-11-18：空 charter/非法 manifest，checker 红（BUG-237）；接回 → 绿。
 
 /**
  * shipped package 形状的判据（C13：BUG-213..222）。
@@ -248,7 +253,7 @@ describe('shipped package 形状判据（C13）', () => {
     expect(checkShippedPackage(input).some(problem => problem.includes('dsh.bundle.patch'))).toBe(true)
   })
 
-  it('README.shipped 进入源码指纹，dev README 不进（BUG-227/235）', () => {
+  it('README.shipped 进入源码指纹，dev README 不进（BUG-235）', () => {
     const base = mkdtempSync(join(tmpdir(), 'fingerprint-'))
     writeFileSync(join(base, 'package.json'), '{}\n')
     const before = sourceFingerprint(base)

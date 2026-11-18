@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 229 |
-| 有具名守卫 | 124 |
+| 已修卡 | 239 |
+| 有具名守卫 | 134 |
 | 无具名守卫 | 105 |
-| 覆盖率 | 54.1% |
+| 覆盖率 | 56.1% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -163,10 +163,10 @@
 | 077 | 2026-11-11 | tests/host/prompt/delegation-contracts.spec.ts:171 |
 | 078 | 2026-11-11 | tests/host/delegation/delegation-control.spec.ts:130 |
 | 079 | 2026-11-11 | tests/host/delegation/seat.spec.ts:77；tests/host/delegation/seat.spec.ts:84；tests/host/prompt/delegation-contracts.spec.ts:200 |
-| 103 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:386 |
+| 103 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:394 |
 | 114 | 2026-11-13 | tests/host/ledger/governance-export.spec.ts:89 |
 | 117 | 2026-11-13 | tests/host/cultivation/cultivation-command.spec.ts:378 |
-| 118 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:419 |
+| 118 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:427 |
 | 119 | 2026-11-13 | tests/host/startup/startup-prompt.spec.ts:186 |
 | 121 | 2026-11-13 | tests/host/commands/settings-command.spec.ts:232 |
 | 123 | 2026-11-13 | tests/host/startup/startup-store.spec.ts:178 |
@@ -179,7 +179,7 @@
 | 139 | 2026-11-13 | tests/host/cultivation/cultivation-command.spec.ts:407 |
 | 143 | 2026-11-13 | tests/host/run-bundle/bootstrap.spec.ts:311 |
 | 144 | 2026-11-13 | tests/host/run-bundle/write-gate.spec.ts:55 |
-| 145 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:426 |
+| 145 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:434 |
 | 147 | 2026-11-13 | tests/host/ledger/governance-export.spec.ts:107 |
 | 148 | 2026-11-13 | tests/host/run-bundle/bundle-manifest.spec.ts:177 |
 | 149 | 2026-11-13 | tests/host/run-bundle/write-gate.spec.ts:73 |
@@ -230,23 +230,33 @@
 | 209 | 2026-11-17 | tests/repo/docs/live-declarations.spec.ts:27；tests/repo/docs/live-declarations.spec.ts:32 |
 | 210 | 2026-11-17 | tests/repo/pack/shipped-comments.spec.ts:65 |
 | 211 | 2026-11-17 | tests/repo/docs/live-declarations.spec.ts:38 |
-| 213 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:109；tests/repo/release/shipped-shape.spec.ts:423 |
-| 214 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:119 |
-| 215 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:124 |
-| 216 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:129 |
-| 217 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:136 |
-| 218 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:143 |
-| 219 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:150 |
-| 220 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:157 |
-| 221 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:162 |
-| 222 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:169 |
-| 223 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:173；tests/repo/release/shipped-shape.spec.ts:228；tests/repo/release/shipped-shape.spec.ts:276 |
-| 224 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:178 |
-| 225 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:235；tests/repo/release/shipped-shape.spec.ts:239 |
-| 226 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:246 |
-| 227 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:251；tests/repo/release/shipped-shape.spec.ts:271 |
-| 228 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:313；tests/repo/release/shipped-shape.spec.ts:352 |
-| 229 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:282 |
+| 213 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:114；tests/repo/release/shipped-shape.spec.ts:428 |
+| 214 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:124 |
+| 215 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:129 |
+| 216 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:134 |
+| 217 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:141 |
+| 218 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:148 |
+| 219 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:155 |
+| 220 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:162 |
+| 221 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:167 |
+| 222 | 2026-11-17 | tests/repo/release/shipped-shape.spec.ts:174 |
+| 223 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:178；tests/repo/release/shipped-shape.spec.ts:233；tests/repo/release/shipped-shape.spec.ts:281 |
+| 224 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:183 |
+| 225 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:240；tests/repo/release/shipped-shape.spec.ts:244 |
+| 226 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:251 |
+| 227 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:276 |
+| 228 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:318；tests/repo/release/shipped-shape.spec.ts:357 |
+| 229 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:290 |
 | 230 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:203 |
 | 231 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:168 |
 | 232 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:213 |
+| 233 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:188 |
+| 234 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:193；tests/repo/release/shipped-shape.spec.ts:212；tests/repo/release/shipped-shape.spec.ts:217；tests/repo/release/shipped-shape.spec.ts:343 |
+| 235 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:256 |
+| 236 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:268 |
+| 237 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:198；tests/repo/release/shipped-shape.spec.ts:226；tests/repo/release/shipped-shape.spec.ts:330 |
+| 238 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:180 |
+| 239 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:199 |
+| 240 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:231；tests/lib/presence/presence-board.spec.ts:232 |
+| 241 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:239；tests/lib/presence/presence-board.spec.ts:240；tests/lib/presence/presence-board.spec.ts:252 |
+| 242 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:272 |

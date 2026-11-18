@@ -21,6 +21,16 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-233（已修）](fixed_bugs/BUG-233-required-shipped-misses-runtime-content.md) | 已修：REQUIRED_SHIPPED 43 条含 seed 源 | 2026-11-18 |
+| [BUG-234（已修）](fixed_bugs/BUG-234-preset-set-completeness-unchecked.md) | 已修：EXPECTED_PATCH 12 且目标非空 | 2026-11-18 |
+| [BUG-235（已修）](fixed_bugs/BUG-235-source-fingerprint-includes-dev-readme.md) | 已修：dev README 移出 sourceFingerprint | 2026-11-18 |
+| [BUG-236（已修）](fixed_bugs/BUG-236-allow-stale-no-reason.md) | 已修：--allow-stale=理由，CI 禁止 | 2026-11-18 |
+| [BUG-237（已修）](fixed_bugs/BUG-237-required-shipped-empty-file.md) | 已修：关键件 trim 非空 + JSON parse | 2026-11-18 |
+| [BUG-238（已修）](fixed_bugs/BUG-238-catalog-unreadable-throws.md) | 已修：meta/ledger 不可读 warning 降级 | 2026-11-18 |
+| [BUG-239（已修）](fixed_bugs/BUG-239-catalog-unreadable-final-silent.md) | 已修：final 不可读 → 无 final + warning | 2026-11-18 |
+| [BUG-240（已修）](fixed_bugs/BUG-240-team-event-reopens-in-progress.md) | 已修：缺 revision 状态序只进不退 | 2026-11-18 |
+| [BUG-241（已修）](fixed_bugs/BUG-241-presence-unknown-phase-diverges.md) | 已修：未知 phase 行/动态同落 unknown | 2026-11-18 |
+| [BUG-242（已修）](fixed_bugs/BUG-242-presence-message-content-missing.md) | 已修：缺 content 降级「（空）」 | 2026-11-18 |
 | [BUG-223（已修）](fixed_bugs/BUG-223-shipped-shape-globs-unchecked.md) | 已修：files glob/content 关键件闭包 | 2026-11-18 |
 | [BUG-224（已修）](fixed_bugs/BUG-224-shipped-shape-text-face-misses-content.md) | 已修：TEXT_FACE 纳入 content，dev 路径同判 | 2026-11-18 |
 | [BUG-225（已修）](fixed_bugs/BUG-225-shipped-shape-extensionless-dev-paths.md) | 已修：DEV_DIR 识别无扩展名/目录级引用 | 2026-11-18 |

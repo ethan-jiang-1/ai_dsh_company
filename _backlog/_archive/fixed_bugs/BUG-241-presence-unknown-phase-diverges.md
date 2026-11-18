@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-241：未知 member phase 在事件板落 inactive、live 读模型落 unknown
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1/B2 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-9 / H6）。
-> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
+> **关联**：[C15 卡](../../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-9 / H6）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -43,7 +43,7 @@ pnpm exec tsx runtime/tmp/c15-presence.test.mjs
 ## 根因与证据
 
 - 根因：`presenceFromEvents` 用三元把「非 provisioning/failed」一律落 inactive（D-b 的 durable 重建假设），而词汇层 `presenceStatusFromPhase` 有 unknown 分支；两处没有共用同一映射。
-- 证据：上脚本；[presence.ts](../../packages/company-pack/src/lib/presence/presence.ts) 的事件板行构造；`presence-status.ts` 的 `presenceStatusFromPhase`。
+- 证据：上脚本；[presence.ts](../../../packages/company-pack/src/lib/presence/presence.ts) 的事件板行构造；`presence-status.ts` 的 `presenceStatusFromPhase`。
 - 影响：上游新增 phase 时，事件/回放板说「未上线」、live 板说「未知」；agent/用户看到不一致的状态。
 
 ## 失败类与同类排查
@@ -65,4 +65,4 @@ pnpm exec tsx runtime/tmp/c15-presence.test.mjs
 - 改动面：`packages/company-pack/src/lib/presence/presence.ts`、`tests/lib/presence/presence-board.spec.ts`
 - 红：`pnpm test tests/lib/presence/presence-board.spec.ts`（未知 phase 行 inactive vs live unknown；动态显示故障）
 - 绿：`pnpm test tests/lib/presence/presence-board.spec.ts`（行/动态同落 unknown；active durable inactive 有注释/测试）
-- 提交：commit ce472f48
+- 提交：commit 56e4f986

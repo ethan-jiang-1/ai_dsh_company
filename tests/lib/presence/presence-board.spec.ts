@@ -200,7 +200,7 @@ describe('缺失 / 未知不崩（验收判据 1 的后半句）', () => {
 })
 
 describe('teamWithEventTasks（事件补投影）', () => {
-  it('投影缺 revision 时旧事件不覆盖 completed、不退回 in_progress（BUG-230/240）', () => {
+  it('投影缺 revision 时旧事件不覆盖 completed（BUG-230）', () => {
     const base = {
       members: [{ id: 'm1', name: 'vp-eng', role: 'teammate', phase: 'active' }],
       tasks: [{ id: 't1', subject: 'done task', status: 'completed' }],
@@ -225,6 +225,14 @@ describe('teamWithEventTasks（事件补投影）', () => {
     } as TeamViewLike
     const stillRunning = teamWithEventTasks(runningBase, [taskEvent('t4', 1, 'running task', 'pending', undefined, 4)])
     expect(stillRunning?.tasks?.[0]?.status).toBe('in_progress')
+  })
+})
+
+describe('teamWithEventTasks 缺 revision 状态序（BUG-240）', () => {
+  it('in_progress 不被旧 pending 打回（BUG-240）', () => {
+    const base = { members: [], tasks: [{ id: 't1', subject: 'running', status: 'in_progress' }] } as TeamViewLike
+    const merged = teamWithEventTasks(base, [taskEvent('t1', 1, 'running', 'pending', undefined, 1)])
+    expect(merged?.tasks?.[0]?.status).toBe('in_progress')
   })
 })
 

@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-237：REQUIRED_SHIPPED 只查 entry 存在，空 charter/空 manifest 仍 PASS
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1/B2 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-5 / H1·H4）。
-> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
+> **关联**：[C15 卡](../../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-5 / H1·H4）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -38,7 +38,7 @@ EOF
 ## 根因与证据
 
 - 根因：REQUIRED 判据停在「在不在 tarball」，没有「可读/非空/可解析」；`content`/`presets` 的 `TEXT_FACE` 只查 dev 路径，不查空文件。
-- 证据：上命令；[shipped-shape.mjs](../../tools/lib/release/shipped-shape.mjs) 的 `REQUIRED_SHIPPED` 循环。
+- 证据：上命令；[shipped-shape.mjs](../../../tools/lib/release/shipped-shape.mjs) 的 `REQUIRED_SHIPPED` 循环。
 - 影响：空 charter/空 manifest 在发布前全绿；运行时角色缺手册，只有真挂载/真会话才暴露。
 
 ## 失败类与同类排查
@@ -60,4 +60,4 @@ EOF
 - 改动面：`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`
 - 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（空 charter / 空或非法 manifest 仍 []（只查 entry））
 - 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（trim 非空 + JSON.parse；空/非法 JSON 红）
-- 提交：commit ce472f48
+- 提交：commit 56e4f986

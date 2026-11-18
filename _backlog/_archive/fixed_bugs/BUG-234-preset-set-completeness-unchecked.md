@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-234：dsh.bundle.patch 只逐个校验目标，六角色 + 五 support 的集合完整性没断言
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1/B2 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-2 / H2）。
-> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
+> **关联**：[C15 卡](../../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-2 / H2）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -34,7 +34,7 @@ EOF
 ## 根因与证据
 
 - 根因：checker 只做「每个列出的 target 存在」，没有「target 集合 == 预期 12 个 preset」或「至少 6 角色 + 5 support」的集合判据；`REQUIRED_SHIPPED` 也没有 preset 条目。
-- 证据：上命令；[package.json](../../packages/company-pack/package.json) 的 `dsh.bundle.patch` 12 条；`presets/` 39 entries。
+- 证据：上命令；[package.json](../../../packages/company-pack/package.json) 的 `dsh.bundle.patch` 12 条；`presets/` 39 entries。
 - 影响：发布包少一个角色/support preset 时 release:shape PASS；`preset.entry` 真挂载才红（在 release `--prepare` 之外）。
 
 ## 失败类与同类排查
@@ -56,4 +56,4 @@ EOF
 - 改动面：`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`
 - 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（patch 裁到 6 条/空 preset 仍 []）
 - 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（EXPECTED_PATCH 12 条全在且目标非空；缺一/空文件红）
-- 提交：commit ce472f48
+- 提交：commit 56e4f986

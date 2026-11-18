@@ -4,6 +4,21 @@
 
 ## 修复流水（倒序）
 
+- **BUG-233..242**（2026-11-18，根因组 A–D，P2×10）：C15 门禁闭环 + 不可读/部分输入：
+  **A shipped 关键件/集合**：[233](BUG-233-required-shipped-misses-runtime-content.md) 43 条关键件
+  （含 seed 源）、[234](BUG-234-preset-set-completeness-unchecked.md) 12 个组合目标且非空、
+  [237](BUG-237-required-shipped-empty-file.md) trim 非空 + JSON 可解析；
+  **B 指纹/降级**：[235](BUG-235-source-fingerprint-includes-dev-readme.md) dev README 移出指纹、
+  [236](BUG-236-allow-stale-no-reason.md) `--allow-stale=理由` 必填 + CI 禁止；
+  **C catalog 不可读**：[238](BUG-238-catalog-unreadable-throws.md) meta/ledger catch → warning、
+  [239](BUG-239-catalog-unreadable-final-silent.md) final R_OK → 无 final + warning；
+  **D presence**：[240](BUG-240-team-event-reopens-in-progress.md) 缺 revision 状态序只进不退、
+  [241](BUG-241-presence-unknown-phase-diverges.md) 未知 phase 行/动态同落 unknown、
+  [242](BUG-242-presence-message-content-missing.md) 缺 content 降级「（空）」。
+  证据提交 = `56e4f986`；`release --prepare` ALL PASS（137 entries）、`release:shape` PASS、
+  `company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2252 tests、`verify`/`typecheck`/`coverage` 绿。
+  详见 [shipped key closure Note](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)。
+
 - **BUG-223..232**（2026-11-18，根因组 A–D，P2×10）：C14 修复后的守卫面 + 低置信运行态：
   **A checker 闭包**：[223](BUG-223-shipped-shape-globs-unchecked.md) files glob/content 关键件、
   [224](BUG-224-shipped-shape-text-face-misses-content.md) content 文本面、

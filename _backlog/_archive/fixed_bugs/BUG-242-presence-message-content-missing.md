@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-242：presenceFromEvents 对缺 content 的 message 事件抛 `content is not iterable`
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1/B2 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-10 / H6）。
-> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
+> **关联**：[C15 卡](../../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-10 / H6）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -37,7 +37,7 @@ pnpm exec tsx runtime/tmp/c15-msg.test.mjs
 ## 根因与证据
 
 - 根因：`firstText` 和调用点都假设 `content` 是数组；没有 `Array.isArray(content) ? content : []` 的归一。与 C14 的 `diffActivity` 部分视图同族。
-- 证据：上脚本；[text.ts](../../packages/company-pack/src/lib/shared/text.ts) 的 `firstText`；`presence.ts` 的消息分支。
+- 证据：上脚本；[text.ts](../../../packages/company-pack/src/lib/shared/text.ts) 的 `firstText`；`presence.ts` 的消息分支。
 - 影响：一条坏 message 事件打断整场事件折算，动态/板丢失；应降级为「（空）」+ 其它事件继续。
 
 ## 失败类与同类排查
@@ -59,4 +59,4 @@ pnpm exec tsx runtime/tmp/c15-msg.test.mjs
 - 改动面：`packages/company-pack/src/lib/shared/text.ts`、`tests/lib/presence/presence-board.spec.ts`
 - 红：`pnpm test tests/lib/presence/presence-board.spec.ts`（缺 content → content is not iterable）
 - 绿：`pnpm test tests/lib/presence/presence-board.spec.ts`（firstText 非数组 → ""；动态落（空），其它事件继续）
-- 提交：commit ce472f48
+- 提交：commit 56e4f986

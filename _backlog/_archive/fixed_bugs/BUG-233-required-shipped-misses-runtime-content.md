@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-233：REQUIRED_SHIPPED 只列 12 个关键件，缺 templates/contracts/methods 仍 PASS
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1/B2 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-1 / H1）。
-> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
+> **关联**：[C15 卡](../../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-1 / H1）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -33,7 +33,7 @@ EOF
 ## 根因与证据
 
 - 根因：`REQUIRED_SHIPPED` 是手写 12 条，按 C14 当时想到的关键件写；`files` 的 `content/**` 只要求「至少 1 个 entry 命中」，没有「运行时读取的模板/合同/方法」闭包。
-- 证据：上命令；[shipped-shape.mjs](../../tools/lib/release/shipped-shape.mjs) 的 `REQUIRED_SHIPPED`；`content` 85 entries 中 12 条被点名。
+- 证据：上命令；[shipped-shape.mjs](../../../tools/lib/release/shipped-shape.mjs) 的 `REQUIRED_SHIPPED`；`content` 85 entries 中 12 条被点名。
 - 影响：缺少 `/prd` 模板或 `/req` 规则时，release:shape PASS；只有真命令才炸。
 
 ## 失败类与同类排查
@@ -55,4 +55,4 @@ EOF
 - 改动面：`tools/lib/release/shipped-shape.mjs`、`tests/repo/release/shipped-shape.spec.ts`
 - 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（REQUIRED 只 35 条时删 templates/prd.md / seed 源仍 []）
 - 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（43 条关键件缺失即红；真实 137-entry tarball PASS）
-- 提交：commit ce472f48
+- 提交：commit 56e4f986

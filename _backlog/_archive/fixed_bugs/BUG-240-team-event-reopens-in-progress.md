@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-240：缺 revision 的投影任务仍可被旧 pending 事件打回 pending（in_progress → pending）
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1/B2 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-8 / H6）。
-> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
+> **关联**：[C15 卡](../../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-8 / H6）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -45,7 +45,7 @@ pnpm exec tsx runtime/tmp/c15-team2.test.mjs
 ## 根因与证据
 
 - 根因：缺 revision 时只能证明「不能把终态改成非终态」，但 `in_progress → pending` 也是回退；修复只覆盖了 completed。`TeamViewLike.revision` 可选，部分/旧投影合法。
-- 证据：上脚本；[presence.ts](../../packages/company-pack/src/lib/presence/presence.ts) 的保护分支；C14 修复 Note 决定 4。
+- 证据：上脚本；[presence.ts](../../../packages/company-pack/src/lib/presence/presence.ts) 的保护分支；C14 修复 Note 决定 4。
 - 影响：任务板/看板把正在执行的任务显示回待办；与 BUG-230 同类、只从 completed 缩到 in_progress。
 
 ## 失败类与同类排查
@@ -67,4 +67,4 @@ pnpm exec tsx runtime/tmp/c15-team2.test.mjs
 - 改动面：`packages/company-pack/src/lib/presence/presence.ts`、`tests/lib/presence/presence-board.spec.ts`
 - 红：`pnpm test tests/lib/presence/presence-board.spec.ts`（in_progress 无 revision + 旧 pending → pending）
 - 绿：`pnpm test tests/lib/presence/presence-board.spec.ts`（状态序只进不退：in_progress 保持；pending→completed 允许）
-- 提交：commit ce472f48
+- 提交：commit 56e4f986

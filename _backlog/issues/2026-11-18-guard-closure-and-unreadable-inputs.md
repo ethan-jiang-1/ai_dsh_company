@@ -58,16 +58,16 @@ C14 修复把 shipped-shape 的判据从「上次出事的样本」扩到 files 
 
 | # | 载体 | 预检看到什么 | 轴 | 首轮怎么证伪 |
 |---|---|---|---|---|
-| 1 | tarball `content/` | 过滤 `content/templates/prd.md` 后 checker 仍 `[]` | H1 | 真实 tarball 过滤 entry；[BUG-233](../bugs/BUG-233-required-shipped-misses-runtime-content.md) |
-| 2 | tarball `presets` + `package.json` | patch/preset 裁到 6 条仍 `[]` | H2 | 裁剪 patch + entries；[BUG-234](../bugs/BUG-234-preset-set-completeness-unchecked.md) |
-| 3 | `pack-source.mjs` | `README.md` 在 `PACKAGE_SOURCE_FILES`；改 dev README 指纹 `28a0649c→267257dd` | H3 | 前后指纹；[BUG-235](../bugs/BUG-235-source-fingerprint-includes-dev-readme.md) |
-| 4 | `release:shape` | `--allow-stale` 无理由仍 PASS（WARN + exit 0） | H4 | 临时改 README.shipped；[BUG-236](../bugs/BUG-236-allow-stale-no-reason.md) |
-| 5 | `checkShippedPackage` | 空 `content/charters/ceo.md` 仍 `[]`（只查 entry 存在） | H1/H4 | 合成 entries；[BUG-237](../bugs/BUG-237-required-shipped-empty-file.md) |
-| 6 | `catalog.ts` | chmod 000 meta.md → EACCES；ledger 同 | H5 | 临时 home；[BUG-238](../bugs/BUG-238-catalog-unreadable-throws.md) |
-| 7 | `catalog.ts` | chmod 000 final.md → entry final true，warnings `[]` | H5 | 临时 home；[BUG-239](../bugs/BUG-239-catalog-unreadable-final-silent.md) |
-| 8 | `presence.ts` | in_progress 无 revision + 旧 pending → merged pending | H6 | 纯函数；[BUG-240](../bugs/BUG-240-team-event-reopens-in-progress.md) |
-| 9 | `presence.ts` | 未知 phase 事件板 inactive vs live unknown | H6 | 纯函数；[BUG-241](../bugs/BUG-241-presence-unknown-phase-diverges.md) |
-| 10 | `presence.ts` | `content` 缺失 → `content is not iterable` | H6 | 纯函数；[BUG-242](../bugs/BUG-242-presence-message-content-missing.md) |
+| 1 | tarball `content/` | 过滤 `content/templates/prd.md` 后 checker 仍 `[]` | H1 | 真实 tarball 过滤 entry；[BUG-233](../_archive/fixed_bugs/BUG-233-required-shipped-misses-runtime-content.md) |
+| 2 | tarball `presets` + `package.json` | patch/preset 裁到 6 条仍 `[]` | H2 | 裁剪 patch + entries；[BUG-234](../_archive/fixed_bugs/BUG-234-preset-set-completeness-unchecked.md) |
+| 3 | `pack-source.mjs` | `README.md` 在 `PACKAGE_SOURCE_FILES`；改 dev README 指纹 `28a0649c→267257dd` | H3 | 前后指纹；[BUG-235](../_archive/fixed_bugs/BUG-235-source-fingerprint-includes-dev-readme.md) |
+| 4 | `release:shape` | `--allow-stale` 无理由仍 PASS（WARN + exit 0） | H4 | 临时改 README.shipped；[BUG-236](../_archive/fixed_bugs/BUG-236-allow-stale-no-reason.md) |
+| 5 | `checkShippedPackage` | 空 `content/charters/ceo.md` 仍 `[]`（只查 entry 存在） | H1/H4 | 合成 entries；[BUG-237](../_archive/fixed_bugs/BUG-237-required-shipped-empty-file.md) |
+| 6 | `catalog.ts` | chmod 000 meta.md → EACCES；ledger 同 | H5 | 临时 home；[BUG-238](../_archive/fixed_bugs/BUG-238-catalog-unreadable-throws.md) |
+| 7 | `catalog.ts` | chmod 000 final.md → entry final true，warnings `[]` | H5 | 临时 home；[BUG-239](../_archive/fixed_bugs/BUG-239-catalog-unreadable-final-silent.md) |
+| 8 | `presence.ts` | in_progress 无 revision + 旧 pending → merged pending | H6 | 纯函数；[BUG-240](../_archive/fixed_bugs/BUG-240-team-event-reopens-in-progress.md) |
+| 9 | `presence.ts` | 未知 phase 事件板 inactive vs live unknown | H6 | 纯函数；[BUG-241](../_archive/fixed_bugs/BUG-241-presence-unknown-phase-diverges.md) |
+| 10 | `presence.ts` | `content` 缺失 → `content is not iterable` | H6 | 纯函数；[BUG-242](../_archive/fixed_bugs/BUG-242-presence-message-content-missing.md) |
 
 ## 方法（每轮固定）
 
@@ -121,11 +121,11 @@ C14 修复把 shipped-shape 的判据从「上次出事的样本」扩到 files 
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C15-1 REQUIRED 缺 templates/contracts/methods | **confirmed** | 真实 tarball 过滤 `content/templates/prd.md` → checker `[]` → [BUG-233](../bugs/BUG-233-required-shipped-misses-runtime-content.md) |
-| C15-2 patch/preset 集合不完整 | **confirmed** | patch 裁到 6 条 + 只留对应 preset → checker `[]` → [BUG-234](../bugs/BUG-234-preset-set-completeness-unchecked.md) |
-| C15-3 sourceFingerprint 含 dev README.md | **confirmed** | 改 dev `README.md`：指纹 `28a0649c63b6 → 267257dd3ac8`；`_dist` 未变 → [BUG-235](../bugs/BUG-235-source-fingerprint-includes-dev-readme.md) |
-| C15-4 --allow-stale 无理由仍 PASS | **confirmed** | 临时改 `README.shipped.md` → `WARN …（--allow-stale 未给理由）` + `PASS` + exit 0 → [BUG-236](../bugs/BUG-236-allow-stale-no-reason.md) |
-| C15-5 REQUIRED 只查存在性 | **confirmed** | 空 `content/charters/ceo.md` + 满 entries → checker `[]` → [BUG-237](../bugs/BUG-237-required-shipped-empty-file.md) |
+| C15-1 REQUIRED 缺 templates/contracts/methods | **confirmed** | 真实 tarball 过滤 `content/templates/prd.md` → checker `[]` → [BUG-233](../_archive/fixed_bugs/BUG-233-required-shipped-misses-runtime-content.md) |
+| C15-2 patch/preset 集合不完整 | **confirmed** | patch 裁到 6 条 + 只留对应 preset → checker `[]` → [BUG-234](../_archive/fixed_bugs/BUG-234-preset-set-completeness-unchecked.md) |
+| C15-3 sourceFingerprint 含 dev README.md | **confirmed** | 改 dev `README.md`：指纹 `28a0649c63b6 → 267257dd3ac8`；`_dist` 未变 → [BUG-235](../_archive/fixed_bugs/BUG-235-source-fingerprint-includes-dev-readme.md) |
+| C15-4 --allow-stale 无理由仍 PASS | **confirmed** | 临时改 `README.shipped.md` → `WARN …（--allow-stale 未给理由）` + `PASS` + exit 0 → [BUG-236](../_archive/fixed_bugs/BUG-236-allow-stale-no-reason.md) |
+| C15-5 REQUIRED 只查存在性 | **confirmed** | 空 `content/charters/ceo.md` + 满 entries → checker `[]` → [BUG-237](../_archive/fixed_bugs/BUG-237-required-shipped-empty-file.md) |
 
 **负控/实跑：** 真实 tarball `readTarball` 过滤/裁剪；`release:shape` 临时改 README.shipped 后 `--allow-stale`。
 
@@ -135,11 +135,11 @@ C14 修复把 shipped-shape 的判据从「上次出事的样本」扩到 files 
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C15-6 catalog 不可读 meta/ledger 抛 EACCES | **confirmed** | chmod 000 meta.md → `THREW EACCES`；ledger 同 → [BUG-238](../bugs/BUG-238-catalog-unreadable-throws.md) |
-| C15-7 catalog 不可读 final 静默 present | **confirmed** | chmod 000 final.md → entry 仍进、warnings `[]` → [BUG-239](../bugs/BUG-239-catalog-unreadable-final-silent.md) |
-| C15-8 缺 revision 的 in_progress 可被打回 pending | **confirmed** | `teamWithEventTasks` 输出 `status:'pending'` → [BUG-240](../bugs/BUG-240-team-event-reopens-in-progress.md) |
-| C15-9 未知 phase 两读模型分叉 | **confirmed** | 事件板 `inactive` vs live `unknown` → [BUG-241](../bugs/BUG-241-presence-unknown-phase-diverges.md) |
-| C15-10 message.content 缺失抛 | **confirmed** | `THREW content is not iterable` → [BUG-242](../bugs/BUG-242-presence-message-content-missing.md) |
+| C15-6 catalog 不可读 meta/ledger 抛 EACCES | **confirmed** | chmod 000 meta.md → `THREW EACCES`；ledger 同 → [BUG-238](../_archive/fixed_bugs/BUG-238-catalog-unreadable-throws.md) |
+| C15-7 catalog 不可读 final 静默 present | **confirmed** | chmod 000 final.md → entry 仍进、warnings `[]` → [BUG-239](../_archive/fixed_bugs/BUG-239-catalog-unreadable-final-silent.md) |
+| C15-8 缺 revision 的 in_progress 可被打回 pending | **confirmed** | `teamWithEventTasks` 输出 `status:'pending'` → [BUG-240](../_archive/fixed_bugs/BUG-240-team-event-reopens-in-progress.md) |
+| C15-9 未知 phase 两读模型分叉 | **confirmed** | 事件板 `inactive` vs live `unknown` → [BUG-241](../_archive/fixed_bugs/BUG-241-presence-unknown-phase-diverges.md) |
+| C15-10 message.content 缺失抛 | **confirmed** | `THREW content is not iterable` → [BUG-242](../_archive/fixed_bugs/BUG-242-presence-message-content-missing.md) |
 
 **证据坐标：** `runtime/tmp/c15-*.test.mjs`、`runtime/tmp/c15-allow-stale.log`、`runtime/tmp/c15-verify-*.log`。
 

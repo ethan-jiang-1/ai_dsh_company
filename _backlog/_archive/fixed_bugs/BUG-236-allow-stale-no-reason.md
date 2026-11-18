@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-236：release:shape 的 --allow-stale 不要求理由，warn 后仍 PASS
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1/B2 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-4 / H4）。
-> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
+> **关联**：[C15 卡](../../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-4 / H4）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -42,7 +42,7 @@ git checkout -- packages/company-pack/README.shipped.md
 ## 根因与证据
 
 - 根因：`allowStale` 只判 flag 存在，`staleReason` 为空时仍放行；没有「无理由 = 失败」或「CI 环境禁止 allow-stale」的判据。
-- 证据：上命令；[tools/release/shipped-shape.mjs](../../tools/release/shipped-shape.mjs) 的 `allowStale`/`staleReason` 分支。
+- 证据：上命令；[tools/release/shipped-shape.mjs](../../../tools/release/shipped-shape.mjs) 的 `allowStale`/`staleReason` 分支。
 - 影响：发布门禁的降级可以静默化；与「显式降级」的意图不符。
 
 ## 失败类与同类排查
@@ -64,4 +64,4 @@ git checkout -- packages/company-pack/README.shipped.md
 - 改动面：`tools/release/shipped-shape.mjs`
 - 红：`pnpm release:shape`（`--allow-stale` 无理由：exit 1（WARN + FAIL））
 - 绿：`pnpm release:shape`（`--prepare` 后 `release:shape` PASS；`--allow-stale=test` 显式降级）
-- 提交：commit ce472f48
+- 提交：commit 56e4f986

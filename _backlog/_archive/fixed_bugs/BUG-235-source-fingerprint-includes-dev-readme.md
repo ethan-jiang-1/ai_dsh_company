@@ -1,15 +1,15 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P2
 opened: 2026-11-18
 ---
 
 # BUG-235：sourceFingerprint 把 dev README.md 算进指纹，改 dev 文档让 _dist 假过期
 
-> 严重级别：P2（次要）｜发现：2026-11-18｜状态：修复已落地｜修复：2026-11-18｜审查：agent（独立盲审）— 见本卡 `## 修复证据`
+> 严重级别：P2（次要）｜发现：2026-11-18｜状态：已修｜修复：2026-11-18｜审查：agent（独立盲审）— B1/B2 + S1–S5 已处置；证据见本卡 `## 修复证据`
 >
-> **关联**：[C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-3 / H3）。
-> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
+> **关联**：[C15 卡](../../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)（C15-3 / H3）。
+> **留痕**：批次 Note [2026-11-18-shipped-key-closure-and-unreadable-inputs](../../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)（本批共用）。
 
 ## 症状
 
@@ -36,7 +36,7 @@ git checkout -- packages/company-pack/README.md
 ## 根因与证据
 
 - 根因：`PACKAGE_SOURCE_FILES` 把 dev README 与 shipped README 放在同一指纹集合；`sanitizePackage` 只复制 `README.shipped` 到 tarball 的 `README.md`，源 `README.md` 不参与发布。
-- 证据：上命令；[pack-source.mjs](../../tools/lib/core/pack-source.mjs)；`sanitizePackage` 的 `copyFileSync(shippedReadme, README.md)`。
+- 证据：上命令；[pack-source.mjs](../../../tools/lib/core/pack-source.mjs)；`sanitizePackage` 的 `copyFileSync(shippedReadme, README.md)`。
 - 影响：C14 的 freshness 修好了「只改 shipped README 假绿」，但同时把 dev README 变成假红；与 BUG-212（收尾摩擦）叠加。
 
 ## 失败类与同类排查
@@ -58,4 +58,4 @@ git checkout -- packages/company-pack/README.md
 - 改动面：`tools/lib/core/pack-source.mjs`、`tests/repo/release/shipped-shape.spec.ts`
 - 红：`pnpm test tests/repo/release/shipped-shape.spec.ts`（dev README.md 在指纹内，改它指纹变）
 - 绿：`pnpm test tests/repo/release/shipped-shape.spec.ts`（dev README 不在 PACKAGE_SOURCE_FILES；改它指纹不变，改 README.shipped 变）
-- 提交：commit ce472f48
+- 提交：commit 56e4f986

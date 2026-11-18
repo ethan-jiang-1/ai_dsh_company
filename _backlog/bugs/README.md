@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 11 张**：BUG-212（收尾验证链偏长）保持活跃，不并入本批；C15 10 张（BUG-233..242）已由 2026-11-18 用户指令授权，`调查中 → 修复就绪`，批次计划见下方「## 2026-11-18 修复交接（C15 门禁闭环 + 不可读/部分输入：BUG-233..242）」。C13/C14 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**活跃 1 张**：BUG-212（收尾验证链偏长）保持活跃，不并入本批；C15 10 张（BUG-233..242）已于 2026-11-18 修复并全部迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，批次与收口见下方「## 2026-11-18 修复交接（C15 门禁闭环 + 不可读/部分输入：BUG-233..242）」。C13/C14 各 10 张已修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 **独立卡**：BUG-212（收尾验证链偏长：pre-push 暖树 ~46s + docs-only 后 release --check 要全量 `--verify`）——用户 2026-11-17 收尾时点名「不能过长」，只立卡不修；见下方「## 2026-11-17 收尾验证链成本（BUG-212）」。
 
@@ -85,26 +85,31 @@ A 组是 checker 只到「关键件在不在/glob 非空」；B 组是源码指�
 
 | 组 | 卡 | 共同根因 | 修法（唯一事实源） |
 |---|---|---|---|
-| **A shipped 关键件/集合** | [233](BUG-233-required-shipped-misses-runtime-content.md) / [234](BUG-234-preset-set-completeness-unchecked.md) / [237](BUG-237-required-shipped-empty-file.md) | REQUIRED 只列 12 条、patch 只逐个校验、存在 ≠ 非空 | `REQUIRED_SHIPPED` 扩到 templates/contracts/delivery-modes/product-types/methods/kb/state/wiki；`EXPECTED_PATCH` 12 个组合目标；关键件 trim 非空 + JSON 可解析 |
-| **B 指纹/降级** | [235](BUG-235-source-fingerprint-includes-dev-readme.md) / [236](BUG-236-allow-stale-no-reason.md) | dev README 误入指纹；`--allow-stale` 无理由仍绿 | 从 `PACKAGE_SOURCE_FILES` 移除 dev `README.md`（保留 `README.shipped.md`）；`--allow-stale=理由` 必填，CI 禁止 |
-| **C catalog 不可读** | [238](BUG-238-catalog-unreadable-throws.md) / [239](BUG-239-catalog-unreadable-final-silent.md) | plainFileProblem 不查可读；读点无 catch | meta/ledger 读取 try/catch → warning + 无 meta/空账本；final `accessSync(R_OK)` 失败 → warning + 无 final |
-| **D presence 部分 wire** | [240](BUG-240-team-event-reopens-in-progress.md) / [241](BUG-241-presence-unknown-phase-diverges.md) / [242](BUG-242-presence-message-content-missing.md) | 状态序只保护 completed；两读模型各写映射；content 假设数组 | 缺 revision 按 pending→in_progress→completed→deleted 状态序只进不退；事件板与 live 共用 `presenceStatusFromPhase`（active 显式 durable inactive）；`firstText` 接受 undefined/非数组 → `''` |
+| **A shipped 关键件/集合** | [233](../_archive/fixed_bugs/BUG-233-required-shipped-misses-runtime-content.md) / [234](../_archive/fixed_bugs/BUG-234-preset-set-completeness-unchecked.md) / [237](../_archive/fixed_bugs/BUG-237-required-shipped-empty-file.md) | REQUIRED 只列 12 条、patch 只逐个校验、存在 ≠ 非空 | `REQUIRED_SHIPPED` 扩到 templates/contracts/delivery-modes/product-types/methods/kb/state/wiki；`EXPECTED_PATCH` 12 个组合目标；关键件 trim 非空 + JSON 可解析 |
+| **B 指纹/降级** | [235](../_archive/fixed_bugs/BUG-235-source-fingerprint-includes-dev-readme.md) / [236](../_archive/fixed_bugs/BUG-236-allow-stale-no-reason.md) | dev README 误入指纹；`--allow-stale` 无理由仍绿 | 从 `PACKAGE_SOURCE_FILES` 移除 dev `README.md`（保留 `README.shipped.md`）；`--allow-stale=理由` 必填，CI 禁止 |
+| **C catalog 不可读** | [238](../_archive/fixed_bugs/BUG-238-catalog-unreadable-throws.md) / [239](../_archive/fixed_bugs/BUG-239-catalog-unreadable-final-silent.md) | plainFileProblem 不查可读；读点无 catch | meta/ledger 读取 try/catch → warning + 无 meta/空账本；final `accessSync(R_OK)` 失败 → warning + 无 final |
+| **D presence 部分 wire** | [240](../_archive/fixed_bugs/BUG-240-team-event-reopens-in-progress.md) / [241](../_archive/fixed_bugs/BUG-241-presence-unknown-phase-diverges.md) / [242](../_archive/fixed_bugs/BUG-242-presence-message-content-missing.md) | 状态序只保护 completed；两读模型各写映射；content 假设数组 | 缺 revision 按 pending→in_progress→completed→deleted 状态序只进不退；事件板与 live 共用 `presenceStatusFromPhase`（active 显式 durable inactive）；`firstText` 接受 undefined/非数组 → `''` |
 
 **次序 = A/B(检查器) → C/D(运行态) → 重打 `_dist` → 真入口**：
 先补 checker 的声明面并让合成/真实包红→绿；再修指纹/降级；C/D 用临时 companyHome + 纯函数最小输入。证据口径 = 先落代码提交拿 sha → 再翻 `修复已落地` / 归档补 `## 修复证据`；A/B = `pnpm test tests/repo/release/shipped-shape.spec.ts` + `pnpm release:shape`；C = `pnpm test tests/host/ledger/catalog.spec.ts`；D = `pnpm test tests/lib/presence/presence-board.spec.ts`。
 
 **终点** = C15 10 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：agent（独立盲审）` + `## 修复证据`；`pnpm verify`/`test`/`typecheck`/`coverage:ratchet` 绿；`_dist` 重打且 `release:shape` 绿。BUG-212 保持活跃，不动。
 
+**收口（2026-11-18）**：10 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `56e4f986`。
+`pnpm release --prepare` ALL PASS（shipped-shape 137 entries）；`release:shape` PASS；`company-entry`/`client-load` ALL PASS；`pnpm test` 262 files / 2252 tests；`verify`/`typecheck`/`lint`/`coverage:ratchet`（200 文件）绿。
+盲审 B1（seed 源漏收）/B2（组合目标空文件）已修；S1–S5 已记录/处置。
+共享机制决定 = [shipped key closure Note](../../notes/implemented/2026-11-18-shipped-key-closure-and-unreadable-inputs.md)。
+
 ## 2026-11-18 C15 修复后门禁的新面 + 不可读/部分输入
 
-**用户指令（2026-11-18）**：「bug 都修好了只剩一个，再来一轮，至少 10 个，尤其找发虚领域」——本组 10 张全部 `调查中`，只开卡不修；证据 = [C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)。
+**用户指令（2026-11-18）**：「bug 都修好了只剩一个，再来一轮，至少 10 个，尤其找发虚领域」——本组 10 张已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [C15 卡](../issues/2026-11-18-guard-closure-and-unreadable-inputs.md)。
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
-| A 关键件/集合完整性 | [233](BUG-233-required-shipped-misses-runtime-content.md) / [234](BUG-234-preset-set-completeness-unchecked.md) / [237](BUG-237-required-shipped-empty-file.md) | REQUIRED 列表与集合断言只覆盖上一轮想到的形状 | 缺 template 仍绿；patch 裁到 6 条仍绿；空 charter 仍绿 | P2 ×3 |
-| B 指纹/降级 | [235](BUG-235-source-fingerprint-includes-dev-readme.md) / [236](BUG-236-allow-stale-no-reason.md) | 指纹边界与降级理由无判据 | dev README 假过期；--allow-stale 无理由仍 PASS | P2 ×2 |
-| C catalog 不可读 | [238](BUG-238-catalog-unreadable-throws.md) / [239](BUG-239-catalog-unreadable-final-silent.md) | 可读性不在坏形状判据 | meta/ledger 抛 EACCES；final 静默 present | P2 ×2 |
-| D presence 部分 wire | [240](BUG-240-team-event-reopens-in-progress.md) / [241](BUG-241-presence-unknown-phase-diverges.md) / [242](BUG-242-presence-message-content-missing.md) | 类型必填当运行必填；两读模型不同映射 | in_progress 被打回；未知 phase 分叉；缺 content 抛 | P2 ×3 |
+| A 关键件/集合完整性 | [233](../_archive/fixed_bugs/BUG-233-required-shipped-misses-runtime-content.md) / [234](../_archive/fixed_bugs/BUG-234-preset-set-completeness-unchecked.md) / [237](../_archive/fixed_bugs/BUG-237-required-shipped-empty-file.md) | REQUIRED 列表与集合断言只覆盖上一轮想到的形状 | 缺 template 仍绿；patch 裁到 6 条仍绿；空 charter 仍绿 | P2 ×3 |
+| B 指纹/降级 | [235](../_archive/fixed_bugs/BUG-235-source-fingerprint-includes-dev-readme.md) / [236](../_archive/fixed_bugs/BUG-236-allow-stale-no-reason.md) | 指纹边界与降级理由无判据 | dev README 假过期；--allow-stale 无理由仍 PASS | P2 ×2 |
+| C catalog 不可读 | [238](../_archive/fixed_bugs/BUG-238-catalog-unreadable-throws.md) / [239](../_archive/fixed_bugs/BUG-239-catalog-unreadable-final-silent.md) | 可读性不在坏形状判据 | meta/ledger 抛 EACCES；final 静默 present | P2 ×2 |
+| D presence 部分 wire | [240](../_archive/fixed_bugs/BUG-240-team-event-reopens-in-progress.md) / [241](../_archive/fixed_bugs/BUG-241-presence-unknown-phase-diverges.md) / [242](../_archive/fixed_bugs/BUG-242-presence-message-content-missing.md) | 类型必填当运行必填；两读模型不同映射 | in_progress 被打回；未知 phase 分叉；缺 content 抛 | P2 ×3 |
 
 本组是 Round 103–104 的产出；真实 tarball/纯函数/临时 home 均已实跑，未修任何产品代码。
 
