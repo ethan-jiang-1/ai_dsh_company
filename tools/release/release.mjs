@@ -362,7 +362,7 @@ function check(allowDirtyTree = allowDirty) {
     fail('market-index.staged.json 在场且根 index 可托管：默认拒绝 READY；发布后删 staged，或显式 --allow-pre-publish-index 确认不会托管')
   }
   console.log('release: SCOPE READY = 当前工作树（暖 lib/_dist）；干净 clone 的验收边界 = fresh-clone CI 的 install + bundle:init + verify')
-  console.log(`release: READY ${manifest.version} @ ${manifest.gitSha.slice(0, 8)}（tgz ${artifact.entries} 条目；${String(Object.keys(checks).length)} 项检查 pass）`)
+  console.log(`release: READY ${manifest.version} @ ${manifest.gitSha.slice(0, 8)}（tgz ${artifact.entries} 条目；${String(Object.keys(manifest.checks ?? {}).length)} 项检查 pass）`)
   if (existsSync(join(ROOT, 'market-index.staged.json'))) {
     console.log('release: WARN market-index.staged.json 在场：根 index 是发布前预览，不可托管；发布后删除 staged 并跑 pnpm market:hosted')
   }
