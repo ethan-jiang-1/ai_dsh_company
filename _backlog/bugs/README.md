@@ -811,9 +811,11 @@ BUG-001..022 已修迁、BUG-023 误报 [fixed_bugs](../_archive/fixed_bugs/BUG-
 **终点** = 20 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡盲审 + `## 修复证据`；`pnpm verify` / `test` / `typecheck` / `coverage:ratchet` 绿；`_dist` 重打且 `release:shape` / `release --check` 绿。
 
 
-**收口（2026-11-19）**：20 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `d13a0eb0`。
-`pnpm release --prepare --force` 重打 0.11.9（137 entries，shipped-shape PASS）；`pnpm test` 265 files / 2319 tests；`pnpm verify` ALL PASS；`typecheck`/`lint`/`dup`/`coverage:ratchet`（204 文件）绿；`ui-scene-smoke --isolated --expected` 金样一致（10 页签）。
-共享机制决定与输掉的方案 = [批次 Note](../../notes/implemented/2026-11-19-guard-residuals-closure.md)。
+**收口（2026-11-19）**：20 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；每卡 `审查：agent（独立盲审）` + `## 修复证据`（改动面/红/绿/提交）齐，证据提交 = `d13a0eb0`（主体）或 `4bc09e0c`（盲审收口时落地的 268/269/274/276/282）。
+`pnpm release --prepare --force` 重打 0.11.9（137 entries，shipped-shape PASS）；`pnpm release --verify` 7 项真入口全绿（verify/test/release-smoke/company-entry/client-load/preset/present-catalog）；`pnpm release --check --allow-pre-publish-index` READY（`market-index.staged.json` 是仓库既有发布态，门禁默认要求显式确认）。
+`pnpm test` 265 files / 2324 tests；`pnpm verify` ALL PASS；`typecheck`/`lint`/`dup`/`coverage:ratchet`（204 文件）绿；`ui-scene-smoke --isolated --expected` 金样一致（10 页签）。
+独立盲审 = 两份互不知情的只读子代理，结论均 approve-with-notes（无产品 blocker；notes 已在 `4bc09e0c` 收口：seed 等价矩阵、delivery 单一判据、verify 前置、不可读索引 rename 兜底）。
+共享机制决定、输掉的方案与未覆盖轴 = [批次 Note](../../notes/implemented/2026-11-19-guard-residuals-closure.md)。
 
 ## frontmatter 与模板
 

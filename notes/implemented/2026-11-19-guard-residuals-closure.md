@@ -116,6 +116,7 @@ v3 的 `pack.version` 变化（`action:'upgrade'`）也带 `previousVersionPath`
 | keyless unit（docs-only/就绪） | 12 文档·生成物 | `pnpm test tests/repo/release/docs-only.spec.ts`：实测抓的 git 输出夹具（`--name-only` 只有新路径 / `--name-status` 两侧都在）+ 判据行为；入口侧断言 stamp/check 共用 `readinessProblems`、verify 用同一模块的 `artifactAlignmentProblems`（去注释后数调用点） |
 | keyless unit（host 降级） | 6 会话·持久化 | `pnpm test tests/host/ledger/catalog.spec.ts`（还原 → `expected true to be false`：空白 final 仍 present）+ `pnpm test tests/host/run-bundle/bundle-manifest.spec.ts`（还原 → `expected undefined to be '<path>.v3-0.11.8.bak'`） |
 | client 组件（静态渲染） | 9 client UI | `pnpm test tests/client/tabs`：还原 `company-panels.tsx`/`TasksPanel.tsx` → 2 红（卡片/行上找不到「未知状态」）；接回 → 绿；`ui-scene-smoke --isolated --expected` 金样一致（10 页签） |
+| 真入口（发布面） | 12 文档·生成物·指针 | `pnpm release --verify`：7 项全绿（verify / test / release-smoke / company-entry / client-load / preset / present-catalog）；`pnpm release --check --allow-pre-publish-index` = READY 0.11.9 @ 52d89629（137 条目、7 项 pass）。`--allow-pre-publish-index` 是仓库既有 `market-index.staged.json` 的显式确认，不是本批引入的降级 |
 
 ## 未覆盖轴
 
