@@ -4,6 +4,26 @@
 
 ## 修复流水（倒序）
 
+- **BUG-263..282**（2026-11-19，根因组 A–G，P2×20）：C17 门禁残余面 + 运行态边界——修法不是补清单，
+  是让判据的输入集成为派生量或单一实现：
+  **A pipeline 输入集**：[263](BUG-263-pipeline-install-manual.md)/[264](BUG-264-pipeline-market-index.md)
+  目录派生的 `releasePipelineFiles`；
+  **B content 合同单一实现**：[265](BUG-265-inventory-backslash-path.md) 反斜杠穿越、
+  [266](BUG-266-inventory-symlink-file.md) symlink 静默跳过、[267](BUG-267-manifest-version-unvalidated.md) version、
+  [268](BUG-268-seed-target-unsafe.md)/[269](BUG-269-delivery-documents-refs.md)/[270](BUG-270-check-rules-values.md)
+  JSON 跨引用、[273](BUG-273-content-required-dirs.md) 必需目录由关键件派生、
+  [274](BUG-274-inventory-duplicate-gate.md) gate/checker 同一份；
+  **C dev 命令**：[271](BUG-271-dev-command-pnpm-forms.md)/[272](BUG-272-dev-command-probes.md) 首词+包管理器子命令解析；
+  **G docs-only/就绪**：[280](BUG-280-release-docs-only-manual.md) 生成手册同源、
+  [281](BUG-281-release-docs-only-rename.md) rename 两侧、[282](BUG-282-release-stamp-check-asymmetry.md) stamp/check 一份判据；
+  **D catalog**：[275](BUG-275-catalog-whitespace-final.md) trim 判空、[276](BUG-276-catalog-json-unreadable-silent.md) 坏索引 warning+.bak；
+  **F bundle**：[279](BUG-279-bundle-upgrade-no-backup.md) v3 升级留旧字节；
+  **E gap 到 UI**：[277](BUG-277-presence-revision-gap-not-consumed.md)/[278](BUG-278-presence-unknown-status-label.md)
+  看板与任务表的 zh/en 降级标记。
+  证据提交 = `d13a0eb0`；`release --prepare --force` 重打 0.11.9（137 entries）、`release:shape` PASS；
+  `pnpm test` 265 files / 2319 tests、`verify`/`typecheck`/`coverage` 绿。
+  详见 [guard residuals closure Note](../../../notes/implemented/2026-11-19-guard-residuals-closure.md)。
+
 - **BUG-243..262**（2026-11-18，P2×20）：C16 管线指纹 + content inventory/schema + 低置信运行态：
   243 pipelineFingerprint；244-247 content inventory 84 件；248-250 JSON schema/YAML；251/252 dev 命令；
   253 sha 绑定 allow-stale；254 lease fail-closed；255/256 bundle ISO/pack 升级；257/258 presence revisionGap；

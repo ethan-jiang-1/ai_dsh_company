@@ -27,6 +27,26 @@
 
 | 卡 | 历史结论 | 日期 |
 |---|---|---|
+| [BUG-263（已修）](fixed_bugs/BUG-263-pipeline-install-manual.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-264（已修）](fixed_bugs/BUG-264-pipeline-market-index.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-265（已修）](fixed_bugs/BUG-265-inventory-backslash-path.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-266（已修）](fixed_bugs/BUG-266-inventory-symlink-file.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-267（已修）](fixed_bugs/BUG-267-manifest-version-unvalidated.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-268（已修）](fixed_bugs/BUG-268-seed-target-unsafe.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-269（已修）](fixed_bugs/BUG-269-delivery-documents-refs.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-270（已修）](fixed_bugs/BUG-270-check-rules-values.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-271（已修）](fixed_bugs/BUG-271-dev-command-pnpm-forms.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-272（已修）](fixed_bugs/BUG-272-dev-command-probes.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-273（已修）](fixed_bugs/BUG-273-content-required-dirs.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-274（已修）](fixed_bugs/BUG-274-inventory-duplicate-gate.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-275（已修）](fixed_bugs/BUG-275-catalog-whitespace-final.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-276（已修）](fixed_bugs/BUG-276-catalog-json-unreadable-silent.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-277（已修）](fixed_bugs/BUG-277-presence-revision-gap-not-consumed.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-278（已修）](fixed_bugs/BUG-278-presence-unknown-status-label.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-279（已修）](fixed_bugs/BUG-279-bundle-upgrade-no-backup.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-280（已修）](fixed_bugs/BUG-280-release-docs-only-manual.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-281（已修）](fixed_bugs/BUG-281-release-docs-only-rename.md) | 已修：C17 组 | 2026-11-19 |
+| [BUG-282（已修）](fixed_bugs/BUG-282-release-stamp-check-asymmetry.md) | 已修：C17 组 | 2026-11-19 |
 | [BUG-243（已修）](fixed_bugs/BUG-243-pipeline-fingerprint-sanitizer.md) | 已修：C16 组 | 2026-11-18 |
 | [BUG-244（已修）](fixed_bugs/BUG-244-required-shipped-misses-generic-content.md) | 已修：C16 组 | 2026-11-18 |
 | [BUG-245（已修）](fixed_bugs/BUG-245-required-shipped-misses-product-docs.md) | 已修：C16 组 | 2026-11-18 |

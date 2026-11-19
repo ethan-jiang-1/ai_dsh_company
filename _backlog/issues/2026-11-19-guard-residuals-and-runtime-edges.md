@@ -101,18 +101,18 @@ C16 把发布面收拢为：content inventory（84 件）+ 最小 schema + prese
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C17-1 install-manual 不在 pipeline | **confirmed** | 改它前后指纹都 `107c586152b7`；`release:shape` PASS → [BUG-263](../bugs/BUG-263-pipeline-install-manual.md) |
-| C17-2 market-index 不在 pipeline | **confirmed** | 同上 → [BUG-264](../bugs/BUG-264-pipeline-market-index.md) |
-| C17-3 inventory 反斜杠可穿 | **confirmed（静态）** | `safeContentRel` 只 split `/` → [BUG-265](../bugs/BUG-265-inventory-backslash-path.md) |
-| C17-4 allFiles 跳过 symlink | **confirmed（静态）** | `entry.isFile()` 对 symlink false → [BUG-266](../bugs/BUG-266-inventory-symlink-file.md) |
-| C17-5 manifest version 无判据 | **confirmed** | version=2 → checker `[]` → [BUG-267](../bugs/BUG-267-manifest-version-unvalidated.md) |
-| C17-6 seed target 不安全 | **confirmed** | `target:'../../evil.md'` → `[]` → [BUG-268](../bugs/BUG-268-seed-target-unsafe.md) |
-| C17-7 delivery documents 引用 | **confirmed** | `documents:{overview:'missing.md'}` → `[]` → [BUG-269](../bugs/BUG-269-delivery-documents-refs.md) |
-| C17-8 check-rules values | **confirmed** | `files:{x:{}}` → `[]` → [BUG-270](../bugs/BUG-270-check-rules-values.md) |
-| C17-9 DEV_COMMAND pnpm 形式 | **confirmed（静态）** | 正则只认 `pnpm <白名单>` → [BUG-271](../bugs/BUG-271-dev-command-pnpm-forms.md) |
-| C17-10 DEV_COMMAND 漏 probes | **confirmed（静态）** | 只列 tools/checks/tests → [BUG-272](../bugs/BUG-272-dev-command-probes.md) |
-| C17-11 REQUIRED_DIRS 少目录 | **confirmed（静态）** | 4 个目录 → [BUG-273](../bugs/BUG-273-content-required-dirs.md) |
-| C17-12 inventory 重复两门不一致 | **confirmed（静态）** | gate Set vs checker 判重复 → [BUG-274](../bugs/BUG-274-inventory-duplicate-gate.md) |
+| C17-1 install-manual 不在 pipeline | **confirmed** | 改它前后指纹都 `107c586152b7`；`release:shape` PASS → [BUG-263](../_archive/fixed_bugs/BUG-263-pipeline-install-manual.md) |
+| C17-2 market-index 不在 pipeline | **confirmed** | 同上 → [BUG-264](../_archive/fixed_bugs/BUG-264-pipeline-market-index.md) |
+| C17-3 inventory 反斜杠可穿 | **confirmed（静态）** | `safeContentRel` 只 split `/` → [BUG-265](../_archive/fixed_bugs/BUG-265-inventory-backslash-path.md) |
+| C17-4 allFiles 跳过 symlink | **confirmed（静态）** | `entry.isFile()` 对 symlink false → [BUG-266](../_archive/fixed_bugs/BUG-266-inventory-symlink-file.md) |
+| C17-5 manifest version 无判据 | **confirmed** | version=2 → checker `[]` → [BUG-267](../_archive/fixed_bugs/BUG-267-manifest-version-unvalidated.md) |
+| C17-6 seed target 不安全 | **confirmed** | `target:'../../evil.md'` → `[]` → [BUG-268](../_archive/fixed_bugs/BUG-268-seed-target-unsafe.md) |
+| C17-7 delivery documents 引用 | **confirmed** | `documents:{overview:'missing.md'}` → `[]` → [BUG-269](../_archive/fixed_bugs/BUG-269-delivery-documents-refs.md) |
+| C17-8 check-rules values | **confirmed** | `files:{x:{}}` → `[]` → [BUG-270](../_archive/fixed_bugs/BUG-270-check-rules-values.md) |
+| C17-9 DEV_COMMAND pnpm 形式 | **confirmed（静态）** | 正则只认 `pnpm <白名单>` → [BUG-271](../_archive/fixed_bugs/BUG-271-dev-command-pnpm-forms.md) |
+| C17-10 DEV_COMMAND 漏 probes | **confirmed（静态）** | 只列 tools/checks/tests → [BUG-272](../_archive/fixed_bugs/BUG-272-dev-command-probes.md) |
+| C17-11 REQUIRED_DIRS 少目录 | **confirmed（静态）** | 4 个目录 → [BUG-273](../_archive/fixed_bugs/BUG-273-content-required-dirs.md) |
+| C17-12 inventory 重复两门不一致 | **confirmed（静态）** | gate Set vs checker 判重复 → [BUG-274](../_archive/fixed_bugs/BUG-274-inventory-duplicate-gate.md) |
 
 ## Round 109（2026-11-19 · I5–I7 · catalog / presence / bundle / release）
 
@@ -120,14 +120,14 @@ C16 把发布面收拢为：content inventory（84 件）+ 最小 schema + prese
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C17-13 纯空白 final | **confirmed** | `'   \n'` final → entry 进、warnings `[]` → [BUG-275](../bugs/BUG-275-catalog-whitespace-final.md) |
-| C17-14 catalog.json 不可读静默 | **confirmed** | chmod 000 → written true、warnings `[]` → [BUG-276](../bugs/BUG-276-catalog-json-unreadable-silent.md) |
-| C17-15 revisionGap 未消费 | **confirmed（静态）** | 字段只在 presence.ts/类型 → [BUG-277](../bugs/BUG-277-presence-revision-gap-not-consumed.md) |
-| C17-16 unknown status 文案不区分 | **confirmed（静态）** | statusLabel unknown 共用 → [BUG-278](../bugs/BUG-278-presence-unknown-status-label.md) |
-| C17-17 bundle v3 升级无备份 | **confirmed（静态）** | `legacyPath` 只 v2 → [BUG-279](../bugs/BUG-279-bundle-upgrade-no-backup.md) |
-| C17-18 docs-only 含生成手册 | **confirmed（静态）** | `DOCS_ONLY_PATHS` 含 `_dist/安装手册.md` → [BUG-280](../bugs/BUG-280-release-docs-only-manual.md) |
-| C17-19 docs-only rename 误判 | **unverified（需临时 git 实验）** | name-only rename 输出未实跑 → [BUG-281](../bugs/BUG-281-release-docs-only-rename.md) |
-| C17-20 stamp/check 不对称 | **confirmed（静态）** | 两分支判据不同 → [BUG-282](../bugs/BUG-282-release-stamp-check-asymmetry.md) |
+| C17-13 纯空白 final | **confirmed** | `'   \n'` final → entry 进、warnings `[]` → [BUG-275](../_archive/fixed_bugs/BUG-275-catalog-whitespace-final.md) |
+| C17-14 catalog.json 不可读静默 | **confirmed** | chmod 000 → written true、warnings `[]` → [BUG-276](../_archive/fixed_bugs/BUG-276-catalog-json-unreadable-silent.md) |
+| C17-15 revisionGap 未消费 | **confirmed（静态）** | 字段只在 presence.ts/类型 → [BUG-277](../_archive/fixed_bugs/BUG-277-presence-revision-gap-not-consumed.md) |
+| C17-16 unknown status 文案不区分 | **confirmed（静态）** | statusLabel unknown 共用 → [BUG-278](../_archive/fixed_bugs/BUG-278-presence-unknown-status-label.md) |
+| C17-17 bundle v3 升级无备份 | **confirmed（静态）** | `legacyPath` 只 v2 → [BUG-279](../_archive/fixed_bugs/BUG-279-bundle-upgrade-no-backup.md) |
+| C17-18 docs-only 含生成手册 | **confirmed（静态）** | `DOCS_ONLY_PATHS` 含 `_dist/安装手册.md` → [BUG-280](../_archive/fixed_bugs/BUG-280-release-docs-only-manual.md) |
+| C17-19 docs-only rename 误判 | **unverified（需临时 git 实验）** | name-only rename 输出未实跑 → [BUG-281](../_archive/fixed_bugs/BUG-281-release-docs-only-rename.md) |
+| C17-20 stamp/check 不对称 | **confirmed（静态）** | 两分支判据不同 → [BUG-282](../_archive/fixed_bugs/BUG-282-release-stamp-check-asymmetry.md) |
 
 ## 判决汇总
 

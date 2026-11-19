@@ -1,15 +1,15 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-19
 ---
 
 # BUG-268：seed schema 只判 source/target 字符串，不判 target 安全/存在
 
-> 严重级别：P2（次要）｜发现：2026-11-19｜状态：调查中｜审查：—
+> 严重级别：P2（次要）｜发现：2026-11-19｜状态：已修｜修复：2026-11-19｜审查：agent（独立盲审）— 两份独立只读盲审（互不知情）均 approve-with-notes；无产品 blocker，notes 已在 4bc09e0c 收口
 >
-> **关联**：[C17 卡](../issues/2026-11-19-guard-residuals-and-runtime-edges.md)（C17 / 发虚领域）。
-> **留痕**：待修复者决定（只开卡，不修）。
+> **关联**：[C17 卡](../../issues/2026-11-19-guard-residuals-and-runtime-edges.md)（C17 / 发虚领域）。
+> **留痕**：批次 Note [2026-11-19-guard-residuals-closure](../../../notes/implemented/2026-11-19-guard-residuals-closure.md)（本批共用）。
 
 ## 症状
 
@@ -37,3 +37,10 @@ schema 只做类型，不做 readSeeds 的安全/存在语义。
 ## 修复方向（不授权，仅记录）
 
 - 先补最小负例到对应 spec/checker，再改实现；不动 vendor。
+
+## 修复证据
+
+- 改动面：`tools/lib/company/content-contract.mjs`、`tools/lib/release/shipped-shape.mjs`、`tests/tools/content-contract.spec.ts`
+- 红：`pnpm test tests/tools/content-contract.spec.ts`（旧 checker：seed `target:"../../evil.md"` 通过）
+- 绿：`pnpm test tests/tools/content-contract.spec.ts`（target 越界/source 缺件/重复 target 都红）
+- 提交：commit 4bc09e0c

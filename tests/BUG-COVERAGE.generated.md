@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 259 |
-| 有具名守卫 | 154 |
+| 已修卡 | 279 |
+| 有具名守卫 | 174 |
 | 无具名守卫 | 105 |
-| 覆盖率 | 59.5% |
+| 覆盖率 | 62.4% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -280,3 +280,23 @@
 | 260 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:263 |
 | 261 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:300 |
 | 262 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:346 |
+| 263 | 2026-11-19 | tests/repo/release/shipped-shape.spec.ts:673；tests/repo/structure/pack-source.spec.ts:69 |
+| 264 | 2026-11-19 | tests/repo/release/shipped-shape.spec.ts:740 |
+| 265 | 2026-11-19 | tests/repo/release/shipped-shape.spec.ts:699；tests/tools/content-contract.spec.ts:46 |
+| 266 | 2026-11-19 | tests/tools/content-contract.spec.ts:91 |
+| 267 | 2026-11-19 | tests/tools/content-contract.spec.ts:60 |
+| 268 | 2026-11-19 | tests/tools/content-contract.spec.ts:118；tests/tools/kb-seeds.spec.ts:124 |
+| 269 | 2026-11-19 | tests/tools/content-contract.spec.ts:158 |
+| 270 | 2026-11-19 | tests/tools/content-contract.spec.ts:179 |
+| 271 | 2026-11-19 | tests/repo/release/shipped-shape.spec.ts:550；tests/tools/dev-command.spec.ts:13 |
+| 272 | 2026-11-19 | tests/repo/release/shipped-shape.spec.ts:564；tests/tools/dev-command.spec.ts:39 |
+| 273 | 2026-11-19 | tests/tools/content-contract.spec.ts:102 |
+| 274 | 2026-11-19 | tests/tools/content-contract.spec.ts:72 |
+| 275 | 2026-11-19 | tests/host/ledger/catalog.spec.ts:253 |
+| 276 | 2026-11-19 | tests/host/ledger/catalog.spec.ts:163；tests/host/ledger/catalog.spec.ts:175；tests/host/ledger/catalog.spec.ts:192 |
+| 277 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:129；tests/client/tabs/board-panel.spec.ts:149；tests/client/tabs/tasks-table.spec.ts:122；tests/lib/presence/board.spec.ts:247 |
+| 278 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:142 |
+| 279 | 2026-11-19 | tests/host/run-bundle/bundle-manifest.spec.ts:250 |
+| 280 | 2026-11-19 | tests/repo/release/docs-only.spec.ts:31；tests/repo/release/docs-only.spec.ts:93 |
+| 281 | 2026-11-19 | tests/repo/release/docs-only.spec.ts:17；tests/repo/release/docs-only.spec.ts:42；tests/repo/release/docs-only.spec.ts:47 |
+| 282 | 2026-11-19 | tests/repo/release/docs-only.spec.ts:58；tests/repo/release/docs-only.spec.ts:78 |
