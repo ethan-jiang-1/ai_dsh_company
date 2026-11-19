@@ -1,8 +1,9 @@
-import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { readSeeds } from '../../packages/company-pack/src/host/run-bundle/bootstrap.ts'
+import { contentRelProblem, seedTargetProblem } from '../../tools/lib/company/content-contract.mjs'
 import { readKbSeeds, readProductType, seedKbFiles } from '../../tools/lib/core/kb-seeds.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 import { mirrorCompanyReference } from '../../tools/lib/core/rehearsal.mjs'
@@ -111,5 +112,47 @@ describe('kb 旁路装配与生产 seed 同形（BUG-054）', () => {
       .toContain('seedKbFiles')
     expect(source, '旧固定清单不得残留（它与 seed.json 漂移）')
       .not.toContain("['company.md', 'org.md', 'owners.md', 'motion-ledger.md']")
+  })
+})
+
+/**
+ * BUG-268：seed 路径越界判据在 runtime（`readSeeds`，pack 内自持）与 content 合同
+ * （`tools/lib/company/content-contract.mjs`，维护面）各有一份渲染——pack 不能 import tools/lib。
+ * 这里钉**等价矩阵**：同一批越界样本两边同时拒、同一批合法样本两边同时过。
+ */
+// 负例留证 2026-11-19：readSeeds 只 split('/') 判 `..`，`..\\evil`/盘符/NUL 穿过（BUG-268）；两边对齐后同拒。
+describe('seed 路径越界：readSeeds 与 content 合同同义（BUG-268）', () => {
+  /** 写一个只含 seed.json 与 $source 的临时 content 目录。 */
+  function seedContent(target: string, source = 'state/company.md'): string {
+    const dir = tempDir('seed-equiv-')
+    mkdirSync(join(dir, 'kb-setup'), { recursive: true })
+    mkdirSync(join(dir, 'state'), { recursive: true })
+    writeFileSync(join(dir, 'state', 'company.md'), '# company\n')
+    writeFileSync(join(dir, 'kb-setup', 'seed.json'), JSON.stringify({ seeds: [{ source, target }] }))
+    return dir
+  }
+
+  it('越界 target 两边都拒，合法 target 两边都过', () => {
+    const ESCAPES = ['..\\evil.md', 'C:/x.md', '/etc/x.md', 'a/../b.md', 'a\0b.md']
+    for (const sample of ESCAPES) {
+      expect(seedTargetProblem(sample), sample).toBeDefined()
+      const { error } = readSeeds(seedContent(sample), { productType: DEFAULT_TYPE })
+      expect(error, sample).toContain('越界')
+    }
+    const OUTSIDE = 'other/x.md'
+    expect(seedTargetProblem(OUTSIDE)).toContain('不在 .dsh-company/ 内')
+    expect(readSeeds(seedContent(OUTSIDE), { productType: DEFAULT_TYPE }).error).toContain('必须在')
+
+    const LEGAL = `${KB_DIR}/company.md`
+    expect(seedTargetProblem(LEGAL)).toBeUndefined()
+    expect(readSeeds(seedContent(LEGAL), { productType: DEFAULT_TYPE }).error).toBeUndefined()
+  })
+
+  it('越界 source 两边都拒（反斜杠/盘符/NUL/..）', () => {
+    for (const sample of ['..\\evil.md', 'C:/x.md', '/etc/x.md', 'state/../x.md', 'a\0b.md']) {
+      expect(contentRelProblem(sample), sample).toBeDefined()
+      const { error } = readSeeds(seedContent(`${KB_DIR}/x.md`, sample), { productType: DEFAULT_TYPE })
+      expect(error, sample).toContain('越界')
+    }
   })
 })

@@ -13,6 +13,7 @@
 //   还原 → 绿。
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { contentJsonProblems, listContentFiles } from '../../tools/lib/company/content-contract.mjs'
 
 const CONTENT = 'packages/company-pack/content'
 const DELIVERY_DIR = `${CONTENT}/delivery-modes`
@@ -34,6 +35,7 @@ export function run({ root, ok, fail }) {
     ? readdirSync(typeDir, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => entry.name)
     : []
 
+  const rulesFiles = listContentFiles(join(root, CONTENT)).files
   for (const mode of modes) {
     const base = join(dir, mode)
     for (const file of ['overview.md', 'document-map.md', 'delivery-rules.json']) {
@@ -50,38 +52,22 @@ export function run({ root, ok, fail }) {
       continue
     }
     if (rules.deliveryMode !== mode) problems.push(`${DELIVERY_DIR}/${mode}/delivery-rules.json 的 deliveryMode「${String(rules.deliveryMode)}」与目录名不一致`)
-    if (typeof rules.entry !== 'string' || !existsSync(join(base, rules.entry))) {
-      problems.push(`${DELIVERY_DIR}/${mode}/delivery-rules.json 的 entry 不在场：${String(rules.entry)}`)
+    // entry / template / owner / file / requiredFields / v1Reminder 的判据唯一家 = content-contract
+    // （与 tarball checker、content-manifest gate 同一份实现；本门禁只留交付模式轴自己的东西）。
+    for (const problem of contentJsonProblems({ rel: `delivery-modes/${mode}/delivery-rules.json`, value: rules, files: rulesFiles })) {
+      problems.push(`${DELIVERY_DIR}/${mode}: ${problem}`)
     }
     const docs = Object.entries(rules.documents ?? {})
     const docNames = new Set(docs.map(([name]) => name))
     const files = new Set()
     for (const [name, doc] of docs) {
-      if (typeof doc?.template !== 'string' || !existsSync(join(base, doc.template))) {
-        problems.push(`${DELIVERY_DIR}/${mode}: ${name}.template 不在场：${String(doc?.template)}`)
+      if (typeof doc?.file === 'string' && /^drafts\/[a-z0-9-]+\.md$/.test(doc.file)) {
+        if (files.has(doc.file)) problems.push(`${DELIVERY_DIR}/${mode}: ${name}.file 与其他文档重复：${doc.file}`)
+        else files.add(doc.file)
       }
-      if (typeof doc?.owner !== 'string' || doc.owner.trim() === '') {
-        problems.push(`${DELIVERY_DIR}/${mode}: ${name}.owner 为空`)
-      }
-      if (typeof doc?.file !== 'string' || !/^drafts\/[a-z0-9-]+\.md$/.test(doc.file)) {
-        problems.push(`${DELIVERY_DIR}/${mode}: ${name}.file 必须是 drafts/<name>.md（实际：${String(doc?.file)}）`)
-      } else if (files.has(doc.file)) {
-        problems.push(`${DELIVERY_DIR}/${mode}: ${name}.file 与其他文档重复：${doc.file}`)
-      } else {
-        files.add(doc.file)
-      }
-    }
-    for (const key of Object.keys(rules.requiredFields ?? {})) {
-      if (!docNames.has(key)) problems.push(`${DELIVERY_DIR}/${mode}: requiredFields「${key}」没有对应 document`)
     }
     for (const key of Object.keys(rules.requiredSections ?? {})) {
       if (!docNames.has(key)) problems.push(`${DELIVERY_DIR}/${mode}: requiredSections「${key}」没有对应 document`)
-    }
-    if (rules.v1Reminder !== undefined) {
-      if (!Array.isArray(rules.v1Reminder)) problems.push(`${DELIVERY_DIR}/${mode}: v1Reminder 必须是数组`)
-      else for (const key of rules.v1Reminder) {
-        if (!docNames.has(String(key))) problems.push(`${DELIVERY_DIR}/${mode}: v1Reminder「${String(key)}」没有对应 document`)
-      }
     }
   }
 

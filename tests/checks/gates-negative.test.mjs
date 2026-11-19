@@ -12,6 +12,7 @@
 //   content-manifest      company/ 加一份未登记 .md                           → 未登记的 content 文件
 //   content-manifest      content/ 下放 symlink 文件                          → 出现 symlink
 //   content-manifest      删 content/templates/ 整目录                        → 必需目录缺内容
+//   content-manifest      inventory 里塞重复项                                → inventory 重复
 //   base-clean            charter 加“公司财务 agent 案（date-pending）”           → 含部署个案语言
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -100,6 +101,18 @@ const mutateOrFail = (label, path, transform) => {
   try {
     symlinkSync(join(root, 'packages/company-pack/content/AGENTS.md'), join(root, 'packages/company-pack/content/company/zz-link.md'))
     report('content-manifest：symlink 文件 → 红', run(contentManifest, root), '出现 symlink')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // BUG-274：gate 用 Set 收敛重复项（不判重复），checker 判 —— 同一清单两门结论相反。
+  const root = makeRoot()
+  try {
+    const path = join(root, 'packages/company-pack/content/manifest.json')
+    const manifest = JSON.parse(readFileSync(path, 'utf8'))
+    manifest.inventory = [...manifest.inventory, manifest.inventory[0]]
+    writeFileSync(path, `${JSON.stringify(manifest, null, 2)}\n`)
+    report('content-manifest：inventory 重复项 → 红', run(contentManifest, root), 'inventory 重复')
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 

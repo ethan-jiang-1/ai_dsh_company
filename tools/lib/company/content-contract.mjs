@@ -112,8 +112,8 @@ export function contentRelProblem(rel) {
   return undefined
 }
 
-/** `.dsh-company/` 内的 workspace 相对 target（seed 用；与 bootstrap.readSeeds 同义）。 */
-function seedTargetProblem(target) {
+/** `.dsh-company/` 内的 workspace 相对 target（seed 用；与 `bootstrap.readSeeds` 同义，等价性由 spec 钉）。 */
+export function seedTargetProblem(target) {
   if (typeof target !== 'string' || target === '') return '不是非空字符串'
   if (target.includes('\0')) return '含 NUL'
   if (target.includes('\\')) return '含反斜杠（跨平台分隔符）'

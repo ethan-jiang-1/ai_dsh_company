@@ -101,22 +101,27 @@ v3 的 `pack.version` 变化（`action:'upgrade'`）也带 `previousVersionPath`
 - 客户端多两种可见标记（看板 tag / 任务表状态后缀），zh+en 成对；未知状态不再静默。
 - 一处历史断言被重写而不是补丁：`shipped-shape.spec.ts` 的 244..247 覆盖用例从「循环模板里拼 BUG 号」
   改成四条字面 `it`（`bug-coverage` 账只认标题里的字面 `BUG-nnn`）。
+- 盲审后补的三处收口（本批同轮，非新卡）：`readSeeds` 的 target/source 越界判据与合同**同义**（反斜杠/盘符/NUL，
+  等价矩阵钉住）；`delivery-mode-sources` 不再自带第三份 delivery-rules 判据；`release --verify` 的入口前置
+  改调 `artifactAlignmentProblems`（第三份手写比较退场）。
 
 ## 验证
 
 | 层 | 失败类 | 负控（见过红） |
 |---|---|---|
-| keyless unit（发布/合同） | 12 文档·生成物·指针 | `pnpm test tests/repo/release/shipped-shape.spec.ts`：把 `tools/lib/release/shipped-shape.mjs` 与 `checks/gates/content-manifest.mjs` 还原到 HEAD → 5 红（`install-manual.mjs 改动没进指纹`、`content 合同：版本/反斜杠/…` 等）；接回 → 61 绿 |
-| keyless unit（合同纯逻辑） | 1 纯逻辑 | `pnpm test tests/tools/content-contract.spec.ts`：合同模块不存在时 spec 不存在；接线后把消费者还原 → 同表上一行红 |
-| gate 负例（真门禁） | 12 文档·生成物 | `node tests/checks/gates-negative.test.mjs`：还原 `checks/gates/content-manifest.mjs` → 2 红（symlink、必需目录）；接回 → ALL PASS |
+| keyless unit（发布指纹） | 12 文档·生成物·指针 | `pnpm test tests/repo/release/shipped-shape.spec.ts`：还原 `tools/lib/release/shipped-shape.mjs` 到 HEAD → 红（`install-manual.mjs 改动没进指纹`、`content 合同：版本/反斜杠/…`、`source shape 扫 dev 命令`）；接回 → 61 绿 |
+| keyless unit（合同纯逻辑） | 1 纯逻辑 | `pnpm test tests/tools/content-contract.spec.ts`：10 条判据各自钉一个洞（反斜杠/version/重复/symlink/必需目录/seed/delivery/check-rules） |
+| gate 负例（真门禁） | 12 文档·生成物 | `pnpm test:checks`：还原 `checks/gates/content-manifest.mjs` → 2 红（symlink、必需目录）；接回 → ALL PASS（含 inventory 重复项） |
 | keyless unit（dev 命令） | 5 模型可见文本 | `pnpm test tests/tools/dev-command.spec.ts` + `shipped-shape.spec.ts -t BUG-271/272`：还原 `shipped-shape.mjs` → `pnpm -s test: expected false to be true`；接回 → 绿 |
-| keyless unit（docs-only/就绪） | 12 文档·生成物 | `pnpm test tests/repo/release/docs-only.spec.ts`：真 git 抓的 `--name-only` 输出只有新路径（旧判据的洞），`--name-status` 两侧都在；就绪判据「两入口共用一份」断言 `release.mjs` 只有一处判据实现 |
+| keyless unit（docs-only/就绪） | 12 文档·生成物 | `pnpm test tests/repo/release/docs-only.spec.ts`：实测抓的 git 输出夹具（`--name-only` 只有新路径 / `--name-status` 两侧都在）+ 判据行为；入口侧断言 stamp/check 共用 `readinessProblems`、verify 用同一模块的 `artifactAlignmentProblems`（去注释后数调用点） |
 | keyless unit（host 降级） | 6 会话·持久化 | `pnpm test tests/host/ledger/catalog.spec.ts`（还原 → `expected true to be false`：空白 final 仍 present）+ `pnpm test tests/host/run-bundle/bundle-manifest.spec.ts`（还原 → `expected undefined to be '<path>.v3-0.11.8.bak'`） |
 | client 组件（静态渲染） | 9 client UI | `pnpm test tests/client/tabs`：还原 `company-panels.tsx`/`TasksPanel.tsx` → 2 红（卡片/行上找不到「未知状态」）；接回 → 绿；`ui-scene-smoke --isolated --expected` 金样一致（10 页签） |
 
 ## 未覆盖轴
 
-- [covered] 20 张卡的逐卡判据与证据 → 账 = `tests/BUG-COVERAGE.generated.md`（批次记录 = `_backlog/bugs/README.md`）
+- [covered] 20 张卡的逐卡判据与证据 → 账 = `tests/BUG-COVERAGE.generated.md`（本轮归档后 263..282 逐行在场；批次记录 = `_backlog/bugs/README.md`）
+- [covered] seed 路径判据的两份渲染（pack 内 `readSeeds` 不能 import `tools/lib`）→ 等价矩阵 = `tests/tools/kb-seeds.spec.ts`（同一批越界样本两边同拒）
+- [covered] delivery-rules 的第三条判据（`delivery-mode-sources`）→ 已改为同调 `contentJsonProblems`：`checks/gates/delivery-mode-sources.mjs`
 - [covered] tarball 形状真入口 → `checks/lanes/release.entry.mjs`（`pnpm release --verify` 的第 3 项）
 - [covered] client 真挂载 → `checks/lanes/client-load.entry.mjs`
 - [policy] `check-rules.json` 的 `files` 目前是合同面而非运行时读面（`/req check` 只读 layers/defaultLayers/retiredPrefixes）→ `packages/company-pack/src/host/commands/req-command.ts`；若将来 runtime 开始读 files，判据已在 `tools/lib/company/content-contract.mjs` 里

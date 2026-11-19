@@ -29,9 +29,10 @@ schema 只判容器，不判条目形状。
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-files 的每个 value 至少含文件路径/规则字段；与读规则器同形。
+1. `files` 的每个 value 是 `<slug>.md` 文件名；`layers` 的每一层都在 `files` 里有条目；`defaultLayers ⊆ layers`、`retiredPrefixes` 是字符串数组。
+2. **已知残余**：`/req check` 当前只读 `layers`/`defaultLayers`/`retiredPrefixes`，不读 `files`——判据钉的是 content 合同（`document-map.md` 与台账把 `files` 当层表文件名），不是今天的运行时读取面；运行时开始读 files 时判据已就位。
 
 ## 修复方向（不授权，仅记录）
 

@@ -22,7 +22,7 @@ import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 import { releasePipelineFingerprint, sourceFingerprint } from '../lib/core/pack-source.mjs'
 import { expectedTag } from '../lib/core/pin.mjs'
 import { docsOnlyOutputProblem } from '../lib/release/docs-only.mjs'
-import { manualProductProblem, readinessProblems } from '../lib/release/readiness.mjs'
+import { artifactAlignmentProblems, manualProductProblem, readinessProblems } from '../lib/release/readiness.mjs'
 
 const PACK = join(ROOT, 'packages/company-pack')
 const DIST = join(ROOT, '_dist')
@@ -285,9 +285,15 @@ function verify() {
   sourceCheck(true)
   const artifact = artifactCheck()
   const prepared = readManifest()
-  if (prepared.version !== pack().version) fail(`manifest 版本 ${prepared.version} ≠ package ${pack().version}；先 --prepare`)
-  if (prepared.sourceFingerprint !== sourceFingerprint(PACK)) fail('pack 源码面已变但 _dist 没重打；' + repackHint())
-  if (prepared.pipelineFingerprint !== releasePipelineFingerprint(ROOT)) fail('发布管线（sanitizer/export-dist/pack-source）已变但 _dist 没重打；' + repackHint())
+  // 第三份手写比较的退场（盲审 S1）：身份判据唯一家 = lib/release/readiness.mjs。
+  const alignment = artifactAlignmentProblems({
+    manifest: prepared,
+    version: pack().version,
+    sourceFingerprint: sourceFingerprint(PACK),
+    pipelineFingerprint: releasePipelineFingerprint(ROOT),
+    artifactSha256: artifact.sha256,
+  })
+  if (alignment.length > 0) fail(`${alignment.join('\n  ')}\n  提示：${repackHint()}`)
   if (!allowStaleManifest && prepared.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest 不是当前 HEAD 的 --prepare 产物；先重跑 --prepare（仅 test/docs 改动可显式 --allow-stale-manifest）')
   const commands = [
     ['verify', ['pnpm', ['verify'], false]],

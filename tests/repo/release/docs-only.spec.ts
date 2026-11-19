@@ -1,4 +1,3 @@
-import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -9,7 +8,7 @@ import { docsOnlyChangeProblem, docsOnlyOutputProblem, parseNameStatusZ } from '
 // 负例留证 2026-11-19：`--stamp` 不比 dirty/checks，`--check` 比——同一棵树两入口结论不同（BUG-282）。
 
 import { renderInstallManual } from '../../../tools/lib/release/install-manual.mjs'
-import { manualProductProblem, readinessProblems } from '../../../tools/lib/release/readiness.mjs'
+import { artifactAlignmentProblems, manualProductProblem, readinessProblems } from '../../../tools/lib/release/readiness.mjs'
 
 /**
  * release docs-only 边界与就绪判据（2026-11-19，BUG-280/281/282）。
@@ -45,13 +44,13 @@ describe('docs-only 判据（BUG-280）', () => {
     expect(docsOnlyChangeProblem([{ status: 'R100', paths: ['docs/a.md', 'notes/a.md'] }])).toBeUndefined()
   })
 
-  it('真 git 输出：--name-only 丢掉 rename 的旧路径（旧判据的洞），--name-status 见得', () => {
+  it('git 实测输出形状：--name-only 只有新路径，--name-status 两侧都在（BUG-281）', () => {
     // 夹具 provenance = 2026-11-19 在临时仓库实测抓的两条输出（`git mv src/a.ts docs/a.md` + commit）：
     //   `git diff --name-only -z HEAD~1..HEAD`        → `docs/a.md\0`                    ← 旧路径缺席
     //   `git diff --name-status -z -M HEAD~1..HEAD`   → `R100\0src/a.ts\0docs/a.md\0`     ← 两侧都在
-    // tests/ 不许起子进程（layering），所以这里钉实测输出本身；真跑配方写进 bug 卡。
-    const nameOnly = 'docs/a.md\0'
-    expect(nameOnly.split('\0').filter(Boolean)).toEqual(['docs/a.md'])
+    // tests/ 不许起子进程（layering 门禁），所以这里钉**实测输出**；命令级复现写进 BUG-281 卡。
+    // `--name-only` 的输出（只有路径、没有状态）连 rename 都表达不出来：判据收不到任何变更对
+    expect(parseNameStatusZ('docs/a.md\0')).toEqual([])
     expect(docsOnlyOutputProblem('R100\0src/a.ts\0docs/a.md\0')).toContain('src/a.ts')
   })
 })
@@ -76,11 +75,18 @@ describe('就绪判据（BUG-282）', () => {
     expect(readinessProblems({ manifest: { ...manifest, artifact: { sha256: 'x' } }, ...expected }).join()).toContain('sha256')
   })
 
-  it('stamp/check 共用一份判据（BUG-282）', () => {
-    const text = readFileSync(join(ROOT, 'tools/release/release.mjs'), 'utf8')
-    expect(text.match(/sharedReadinessProblems\(/g)?.length).toBe(3)   // 定义 + stamp + check
-    expect(text).not.toContain('manifest.dirty !== false')
-    expect(text).not.toContain('checks.verify !== ')
+  it('stamp/check/verify 共用一份判据（BUG-282）', () => {
+    // 行为面：三入口的判据都来自同一个纯函数（verify 用前半段 alignment，stamp/check 用全量）。
+    const expected = { version: '0.0.0', sourceFingerprint: 's', pipelineFingerprint: 'p', artifactSha256: 'a' }
+    expect(artifactAlignmentProblems({ manifest: { version: '9', sourceFingerprint: 's', pipelineFingerprint: 'p', artifact: { sha256: 'a' } }, ...expected })).toHaveLength(1)
+    expect(readinessProblems({ manifest: { version: '0.0.0', sourceFingerprint: 's', pipelineFingerprint: 'p', artifact: { sha256: 'a' }, dirty: false, checks: { verify: 'pass', test: 'pass' } }, ...expected })).toEqual([])
+    // 结构面：入口不再自带第二份比较（注释行不算）。去注释后统计调用点。
+    const code = readFileSync(join(ROOT, 'tools/release/release.mjs'), 'utf8')
+      .split('\n').filter(line => !line.trim().startsWith('//')).join('\n')
+    expect(code.match(/sharedReadinessProblems\(/g)?.length).toBe(3)   // 定义 + stamp + check
+    expect(code.match(/artifactAlignmentProblems\(/g)?.length).toBe(1) // verify 的入口前置
+    expect(code).not.toContain('manifest.dirty !== false')
+    expect(code).not.toContain('checks.verify !== ')
   })
 })
 

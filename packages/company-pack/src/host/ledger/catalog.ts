@@ -4,7 +4,7 @@
  * 本文件只留「扫描交付物根 + 生成派生索引（幂等）」；读取/校验 = catalog-state.ts，
  * 审计账本 = presented-ledger.ts。索引 `kb/deliverables-index.json` 是盘上 meta/final + 账本的派生视图。
  */
-import { copyFileSync, existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs'
+import { copyFileSync, existsSync, lstatSync, readdirSync, readFileSync, renameSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   buildDeliverablesCatalog,
@@ -134,9 +134,16 @@ function backupUnreadableCatalog(companyHome: string, path: string, warnings: st
   try {
     copyFileSync(path, backupPath)
     return backupPath
-  } catch (error) {
-    warnings.push(`旧索引备份失败：${(error as Error).message}`)
-    return null
+  } catch {
+    // 读不出来（EACCES 等）时 copyFileSync 也失败——此时**搬走**旧文件：不读字节也能留住它，
+    // 比「warning + 直接覆盖」少丢一次证据（Prompt 判据 = 保留旧文件，不要求能读它）。
+    try {
+      renameSync(path, backupPath)
+      return backupPath
+    } catch (error) {
+      warnings.push(`旧索引备份失败：${(error as Error).message}`)
+      return null
+    }
   }
 }
 

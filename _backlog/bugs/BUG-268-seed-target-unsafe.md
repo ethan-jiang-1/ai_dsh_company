@@ -29,9 +29,10 @@ schema 只做类型，不做 readSeeds 的安全/存在语义。
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-seed 的 target 必须在 `.dsh-company/` 内、source 在 inventory/存在、无重复；与 readSeeds 共用判据。
+1. seed 的 target 必须在 `.dsh-company/` 内、source 在 inventory、无重复；越界形态（绝对路径 / 盘符 / 反斜杠 / NUL / `..` 段）一律红。
+2. 运行面 `readSeeds` 与合同**同义**：pack 不能 import `tools/lib`（发布面自包含），所以是两份渲染；等价矩阵 = `tests/tools/kb-seeds.spec.ts` 的「seed 路径越界：readSeeds 与 content 合同同义（BUG-268）」——同一批越界样本两边同时拒。
 
 ## 修复方向（不授权，仅记录）
 

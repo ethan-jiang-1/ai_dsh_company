@@ -43,18 +43,30 @@ export function manualProductProblem({ manual, version, expectedTag }) {
 }
 
 /**
+ * 「manifest 对得上当前源码/管线/产物」的判据（`--verify` 的入口前置、以及 stamp/check 的前半段）。
+ * 只判**可提前判**的三项身份；脏树与 checks 状态在 `readinessProblems` 里补。
+ * @param {{manifest: Record<string, any>, version: string, sourceFingerprint: string, pipelineFingerprint: string, artifactSha256: string}} input
+ * @returns {string[]} 问题列表（空 = 产物身份对齐）
+ */
+export function artifactAlignmentProblems({ manifest, version, sourceFingerprint, pipelineFingerprint, artifactSha256 }) {
+  if (manifest === undefined || manifest === null || typeof manifest !== 'object') return ['缺 release-manifest.json；先 --prepare/--verify']
+  const problems = []
+  if (manifest.version !== version) problems.push(`manifest 版本 ${String(manifest.version)} ≠ package ${version}`)
+  if (manifest.sourceFingerprint !== sourceFingerprint) problems.push('pack 源码面已变但 _dist 没重打')
+  if (manifest.pipelineFingerprint !== pipelineFingerprint) problems.push('发布管线已变但 _dist 没重打')
+  if (manifest.artifact?.sha256 !== artifactSha256) problems.push('manifest sha256 与当前 tgz 不一致')
+  return problems
+}
+
+/**
  * manifest 与当前仓库/产物的就绪判据（`--stamp` 与 `--check` 共用）。
  * **不含** gitSha 判定（那是两入口唯一允许的差别：stamp 就是要把 gitSha 挪到 HEAD）。
  * @param {{manifest: Record<string, any>, version: string, sourceFingerprint: string, pipelineFingerprint: string, artifactSha256: string}} input
  * @returns {string[]} 问题列表（空 = 就绪）
  */
 export function readinessProblems({ manifest, version, sourceFingerprint, pipelineFingerprint, artifactSha256 }) {
-  const problems = []
-  if (manifest === undefined || manifest === null || typeof manifest !== 'object') return ['缺 release-manifest.json；先 --prepare/--verify']
-  if (manifest.version !== version) problems.push(`manifest 版本 ${String(manifest.version)} ≠ package ${version}`)
-  if (manifest.sourceFingerprint !== sourceFingerprint) problems.push('pack 源码面已变但 _dist 没重打')
-  if (manifest.pipelineFingerprint !== pipelineFingerprint) problems.push('发布管线已变但 _dist 没重打')
-  if (manifest.artifact?.sha256 !== artifactSha256) problems.push('manifest sha256 与当前 tgz 不一致')
+  const problems = artifactAlignmentProblems({ manifest, version, sourceFingerprint, pipelineFingerprint, artifactSha256 })
+  if (problems.length > 0 && (manifest === undefined || manifest === null || typeof manifest !== 'object')) return problems
   if (manifest.dirty !== false) problems.push('manifest 记录的是脏树（发布字节不对应一个干净 commit；重跑 --verify）')
   const checks = manifest.checks ?? {}
   if (checks.verify !== 'pass' || checks.test !== 'pass') problems.push('manifest 未记录 verify/test 通过（--prepare 后必须 --verify）')

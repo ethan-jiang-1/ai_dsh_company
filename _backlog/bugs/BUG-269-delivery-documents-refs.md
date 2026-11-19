@@ -29,9 +29,11 @@ schema 只判容器，不判引用闭包。
 
 ## 已修判定
 
-修成什么算修好（建议，供修复者采用）：
+修成什么算修好：
 
-documents 每个 value 必须在 content/delivery-modes/<id>/ 存在；缺 → 红。
+1. `documents` 每个 value 是对象：`owner` 非空、`file` 形如 `drafts/<slug>.md`、`template` 在 `content/delivery-modes/<id>/` 内**存在**；`entry` 在场。
+2. **只判 `template`/`entry` 的存在**：`documents.*.file` 是 workspace 相对的草稿路径（不是包内文件），判形状不判存在——判据文案别读成在查草稿。
+3. 同一份判据被 content-manifest gate、`delivery-mode-sources` 门禁与 tarball checker 共用（不再各写一半）。
 
 ## 修复方向（不授权，仅记录）
 

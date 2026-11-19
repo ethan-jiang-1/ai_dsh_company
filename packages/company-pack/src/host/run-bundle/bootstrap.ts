@@ -169,6 +169,30 @@ export interface SeedReadResult {
 /** 合法类型 id（与 `/req check` 的盘上目录名口径一致）。 */
 const TYPE_ID = /^[a-z][a-z0-9-]*$/
 
+
+/**
+ * seed 路径的越界判据（与 `tools/lib/company/content-contract.mjs` 的 `seedTargetProblem` /
+ * `contentRelProblem` **同义**）：绝对路径、盘符、反斜杠（Windows 分隔符）、NUL、`..` 段一律拒。
+ * pack 不能 import tools/lib（发布面自包含），所以这里是第二份渲染；等价性由
+ * `tests/host/run-bundle/bootstrap.spec.ts` 的对照矩阵钉住。
+ */
+function unsafeSeedTarget(target: string): boolean {
+  return isAbsolute(target)
+    || /^[A-Za-z]:/.test(target)
+    || target.includes('\\')
+    || target.includes('\0')
+    || target.split('/').includes('..')
+}
+
+/** source 是 content 相对路径：同样的越界面（`{productType}` 占位符不影响判别）。 */
+function unsafeSeedSource(source: string): boolean {
+  return source.startsWith('/')
+    || /^[A-Za-z]:/.test(source)
+    || source.includes('\\')
+    || source.includes('\0')
+    || source.split('/').includes('..')
+}
+
 /**
  * 读 kb 装配清单，解析 `{productType}` 占位。类型相关条目缺类型 / 未知类型时
  * **跳过该条并给 warning**（fail-closed：不猜一个类型播种），其余条目照常。
@@ -194,7 +218,7 @@ export function readSeeds(contentDir: string, options: ReadSeedsOptions = {}): S
     const rawSource = typeof record.source === 'string' ? record.source : ''
     const target = typeof record.target === 'string' ? record.target : ''
     if (rawSource === '' || target === '') return { seeds: [], error: `kb 装配清单条目不完整：${JSON.stringify(item)}` }
-    if (isAbsolute(target) || target.split('/').includes('..')) {
+    if (unsafeSeedTarget(target)) {
       return { seeds: [], error: `kb 装配 target 越界：${target}` }
     }
     if (!target.startsWith(`${RUN_BUNDLE_DIR}/`)) {
@@ -202,6 +226,7 @@ export function readSeeds(contentDir: string, options: ReadSeedsOptions = {}): S
     }
     if (targets.has(target)) return { seeds: [], error: `kb 装配重复 target：${target}` }
     targets.add(target)
+    if (unsafeSeedSource(rawSource)) return { seeds: [], error: `kb 装配 source 越界：${rawSource}` }
     let source = rawSource
     if (source.includes(PRODUCT_TYPE_TOKEN)) {
       if (productType === null || productType === '') {
