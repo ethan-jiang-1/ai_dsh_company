@@ -7,7 +7,7 @@
 ## 背景：20 张卡是七个「输入集靠人写」的根因
 
 C16 把发布面/content 合同/降级路径收成了一批评据，每一条都是**手写枚举**：5 个 pipeline 文件、
-4 个必需目录、一份最小 schema、一条命令正则、一张 docs-only 路径表。C17 的探索（[C17 卡](../../_backlog/issues/2026-11-19-guard-residuals-and-runtime-edges.md)）证明：
+4 个必需目录、一份最小 schema、一条命令正则、一张 docs-only 路径表。C17 的探索（[C17 卡](../../_backlog/_archive/settled_issues/2026-11-19-guard-residuals-and-runtime-edges.md)）证明：
 **残余面不是漏了两个分支，而是没人负责「输入集随树增长」**。于是本轮 20 张卡按根因收成七组，
 修法一律是「让输入集成为派生量」或「让同一判据只有一份实现」——不再往清单里补条目。
 
