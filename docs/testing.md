@@ -45,7 +45,8 @@
 ## 3. 证据纪律（DSH 教义的本仓投影）
 
 1. **验证世界，不信自报**：断言从会话日志、在盘文件、RPC/外部观察取；agent 自述与模型正文不算证据。
-2. **mock 白名单**：只许替非确定边界（模型/网络/时钟），下游保持真实现；每个替身写明"证明不了什么"。本仓 keyless 层零**未列入白名单**的模块 mock；当前模块级 mock 仅 `foundation-safety` 的 `vi.mock('node:os')`（环境边界）。`company-client-composition` 的 RemoteMock 与 `probe-web.spec` 的 spawn/fetch 都是**参数注入式假件**（网络/进程边界），不是模块 mock；每个 spec 头注自述“证明不了什么”，不占模块白名单。
+2. **mock 白名单**：只许替非确定边界（模型/网络/时钟），下游保持真实现；每个替身写明"证明不了什么"。本仓 keyless 层零**未列入白名单**的模块 mock；当前模块级 mock 包括 `foundation-safety` 的 `vi.mock('node:os')`（环境边界）。`company-client-composition` 的 RemoteMock 与 `probe-web.spec` 的 spawn/fetch 都是**参数注入式假件**（网络/进程边界），不是模块 mock；每个 spec 头注自述“证明不了什么”，不占模块白名单。
+   - **定点文件读取观察例外**：`tests/host/contract/file-shape-agreement.spec.ts` 可在测试内包装原生 `node:fs.readFileSync`，仅当绝对目标路径与用例显式指定路径相等时计数/注入一次打开失败/读后变更；非目标调用及目标成功读取都必须真实 call-through。不得替换自有 owner、解析器或返回结果，不得扩为全局计数器或普通业务 spec 的调用次数断言。此例外仅支撑明确承诺的单次 payload-read 合同。
 3. **真实入口**："能跑"的证据取自真实形态（`pnpm dsh`、真挂载、发布产物）；手搭组装不算数。
 4. **单向归因**：单跑才绿 = spec 自身缺陷，不赖环境；测试获取的资源自己负责到 teardown。
 5. **掩盖黑名单**：加 sleep、加超时不指认等待状态、加重试、整文件串行化、弱化断言、改归一化凑绿——都不是修法。retry 只许出现在真模型档。

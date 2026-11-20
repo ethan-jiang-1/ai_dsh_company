@@ -14,7 +14,7 @@ import { readdirSync, realpathSync, statSync } from 'node:fs'
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { expandHomePath } from '@deepseek-ai/dsh-home-paths'
 import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
-import { companyFileProblem, readCompanyFile, readCompanyText, writeCompanyAtomic } from '../run-bundle/company-root.ts'
+import { readCompanyFile, readCompanyText, writeCompanyAtomic } from '../run-bundle/company-root.ts'
 import type { StartupSettingsProblem } from '../../lib/startup/startup-settings.ts'
 import {
   EMPTY_STARTUP_OPTIONS,
@@ -49,12 +49,10 @@ export function readStartupSettingsState(workspace: string): {
   readonly problem: StartupSettingsProblem | 'unsafe'
 } {
   const rel = RUN_BUNDLE_PATHS.startup
-  const fileProblem = companyFileProblem(workspace, rel)
-  if (fileProblem === 'missing') return { settings: parseStartupSettings(undefined), problem: null }
-  if (fileProblem === 'unsafe') return { settings: parseStartupSettings(undefined), problem: 'unsafe' }
-  const text = readCompanyText(workspace, rel)
-  if (text === undefined) return { settings: parseStartupSettings(undefined), problem: 'corrupt' }
-  return parseStartupSettingsState(text)
+  const read = readCompanyFile(workspace, rel)
+  if (read.kind === 'missing') return { settings: parseStartupSettings(undefined), problem: null }
+  if (read.kind === 'unsafe') return { settings: parseStartupSettings(undefined), problem: 'unsafe' }
+  return parseStartupSettingsState(read.text)
 }
 
 /** 读项目策略；文件缺失/坏 JSON 一律回「全自动」（需要诊断用 `readStartupSettingsState`）。 */

@@ -5,8 +5,7 @@ kind: "package-reference"
 
 # dsh-company-pack
 
-> **给收件人（先读这个）**：本包是 `dsh-company-pack`（版本见 `package.json` / 手册表头）；DSH 窗口 =
-> `engines.dsh`（`>=0.2.1-rc.2 <0.3.0`）。前置按运行时来源：**Desktop 自带 Node/pnpm**；
+> **给收件人（先读这个）**：本包是 `dsh-company-pack`（版本见 `package.json` / 手册表头）；DSH 窗口 = `engines.dsh`（`>=0.2.1-rc.2 <0.3.0`）。前置按运行时来源：**Desktop 自带 Node/pnpm**；
 > **npm 全局 CLI / `dsh web` 的 Plugins 页**用 DSH 的 Node，pnpm 需在 PATH（或 `corepack enable pnpm`）。
 > 安装、sha256 校验、升级、备份、卸载、回退见同版本生成的《安装手册》：
 > <https://github.com/ethan-jiang-1/ai_dsh_company/blob/master/_dist/安装手册.md>（手动分发时与 tarball 同目录）。
@@ -136,6 +135,7 @@ rm -f  <DSH_HOME>/cache/company/session-search-*.db    # 派生索引，可删�
 
 ## 已知限制（随行为变更同 diff 更新）
 
+- **状态文件读取**：startup settings/options、bundle manifest、catalog和presented账本各消费一次文件结果；缺失/unsafe仍沿用既有保守分桶，取得的文本决定本次解析，下次调用重读。至多一次payload读取不提供文件系统原子快照，见[读取决定](../../notes/implemented/2026-11-20-company-file-read-state.md)。
 - **编号校验（`/req check`）的 v1 边界**：跨动议引用 `<动议键>:<ID>` 未实现（遇到只标未支持）；并发取号不加锁（靠 Lead 串行分配 + 撞号红兜底）；旧动议无 `编号体系:` 标记即 `skipped`（只读豁免，不回溯判红）。
 - **只支持 web 组合**：`company-client` 的 `inject` 声明 `workspaceRegistry`（由 web-app 组合提供）；base-only / headless profile 不加载本包。这不是缺陷，是本包的 app surface = Web（[release.md](../../docs/contracts/release.md) 六轴）。
 - **`dsh.client.inject` 的依赖边**（条数以 `package.json` 为准）= 本包 client 模块 factory 的依赖边：Cordis 激活顺序仍由服务 inject 决定；但浏览器模块 factory 会沿这些边在 consumer 前到达（vendor `packages/client/modules/src/client/system.ts` 的 `arriveGraphRow`）。删除需上游合同/证据，故保留。

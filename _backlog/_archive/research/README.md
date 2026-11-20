@@ -18,6 +18,7 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [source-prevention-design/](source-prevention-design/README.md) · 生产源头预防候选：事实同步、重复解释与失败信息保留 | 1 份 | 用户2026-11-20直接委托 | [workspace状态读取卡](../settled_issues/2026-11-20-company-file-read-state.md)（[Note](../../../notes/implemented/2026-11-20-company-file-read-state.md)） | 2026-11-20 |
 | [tests-src-correspondence/](tests-src-correspondence/README.md) · 测试树与源码树的对应：镜像轴 vs owner 轴（盘面实测、四根轴打架、两个独立子代理复核） | 1 份 | 用户 2026-11-15 点名；[测试树分轴卡](../settled_issues/2026-11-15-tests-tree-axis.md) | 同卡（[Note](../../../notes/implemented/2026-11-15-tests-tree-axis.md)） | 2026-11-15 |
 | [test-asset-spiral/](test-asset-spiral/README.md) · 测试资产螺旋与二阶制度棘轮：从例子/加脚本升级为宪章×流程×元门禁 | 2 份 | 用户 2026-11-14 点名研究；[制度棘轮卡](../settled_issues/2026-11-14-institutional-test-ratchet.md) | [测试资产杠杆卡](../settled_issues/2026-11-14-test-asset-leverage.md) + 同卡（[Note](../../../notes/implemented/2026-11-14-institutional-test-ratchet.md)） | 2026-11-14 |
 | [dsh-notes-flow-borrow/](dsh-notes-flow-borrow/README.md) · DSH notes 流程的剩余借鉴点：八章逐节对照与三把锁（树形/载体/判据） | 2 份 | 用户 2026-11-13 点名研究；[notes 树形与载体卡](../settled_issues/2026-11-14-notes-tree-and-carrier-gates.md) | 同卡（[Note](../../../notes/implemented/2026-11-14-notes-tree-and-carrier-gates.md)） | 2026-11-14 |

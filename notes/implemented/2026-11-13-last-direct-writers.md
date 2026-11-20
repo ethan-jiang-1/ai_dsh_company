@@ -2,6 +2,8 @@
 
 状态：implemented（2026-11-13 落地；验证见下）
 
+> bundle-manifest读入口的当前形状由[workspace文件读取结果决定](./2026-11-20-company-file-read-state.md)补充；本篇仍持有写入/升级与另外两处直写收口决定。
+
 上游 = 用户 2026-11-13：「_backlog/bugs 这里又找到一堆bug……直到所有bug解决了」。三张 P1 是上一轮
 [状态根/写 gate Note](./2026-11-13-state-root-write-gate-sweep.md) 的残余：`company-root` 已覆盖
 catalog/ledger/startup/bootstrap/命令，但 `exportGovernance`、`bundle-manifest`、`cultivation-storage`/
@@ -21,7 +23,7 @@ catalog/ledger/startup/bootstrap/命令，但 `exportGovernance`、`bundle-manif
 
 1. **147**：`exportGovernance` 先 `ensureCompanyRoot(workspace,{create:true})`；失败 → warning「导出根不安全」并返回，
    不写。staging 建在安全根下。`readLedgerExport` 用 `readCompanyText(workspace,'exports/ledger.json')`。
-2. **148**：`readBundleManifestState` 用 `companyFileProblem/readCompanyText`：missing / unsafe(corrupt) / ok 分开；
+2. **148**：`readBundleManifestState` 用company-root的文件读取结果区分missing / unsafe(corrupt) / ok；当前规范入口为workspace三态 `readCompanyFile`。
    `writeBundleManifest` 从 `plan.path` 反推 workspace，`ensureCompanyRoot` 后 `writeCompanyAtomic` 写 manifest
    （create 不覆盖、upgrade 先备份 legacy），不再 hardlink 直写。
 3. **149**：cultivation-storage 新增 `assertCompanyResidency(path)`：路径含 `/.dsh-company/` 时，

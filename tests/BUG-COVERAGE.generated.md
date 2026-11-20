@@ -185,7 +185,7 @@
 | 149 | 2026-11-13 | tests/host/run-bundle/write-gate.spec.ts:73 |
 | 152 | 2026-11-13 | tests/lib/docs/markdown-shape.property.spec.ts:152；tests/lib/docs/prd-check.spec.ts:241 |
 | 153 | 2026-11-13 | tests/lib/docs/prd-check.spec.ts:253 |
-| 156 | 2026-11-13 | tests/host/contract/file-shape-agreement.spec.ts:316 |
+| 156 | 2026-11-13 | tests/host/contract/file-shape-agreement.spec.ts:331 |
 | 157 | 2026-11-13 | tests/lib/docs/prd-check.spec.ts:281 |
 | 160 | 2026-11-14 | tests/lib/docs/requirements-check.spec.ts:308 |
 | 162 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:298 |
@@ -194,7 +194,7 @@
 | 166 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:344 |
 | 168 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:358 |
 | 169 | 2026-11-14 | tests/lib/docs/requirements-check.spec.ts:340 |
-| 170 | 2026-11-14 | tests/host/contract/file-shape-agreement.spec.ts:387 |
+| 170 | 2026-11-14 | tests/host/contract/file-shape-agreement.spec.ts:402 |
 | 172 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:376 |
 | 173 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:383 |
 | 176 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:392 |

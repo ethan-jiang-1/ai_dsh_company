@@ -1,5 +1,6 @@
 # _archive/ · 离开活跃区
 
+- [2026-11-20-company-file-read-state.md](settled_issues/2026-11-20-company-file-read-state.md) — workspace三态owner、旧视图委托、五个状态函数一次读取；领域政策与At语义保留，真实文件/负控验收；去向 = [Note](../../notes/implemented/2026-11-20-company-file-read-state.md)。
 - [2026-11-19-guard-residuals-and-runtime-edges.md](settled_issues/2026-11-19-guard-residuals-and-runtime-edges.md) — C17 门禁残余面七轴探索：产出 20 张 P2 卡（BUG-263..282）全部修复归档；去向 = implementation（[批次 Note](../../notes/implemented/2026-11-19-guard-residuals-closure.md)）。
 - [2026-11-15-src-tests-dir-alignment.md](settled_issues/2026-11-15-src-tests-dir-alignment.md) — src↔tests 目录名对齐：host 例外清零 + `src/lib` 八组镜像；去向 = [Note](../../notes/implemented/2026-11-15-src-tests-dir-alignment.md)。
 - [2026-11-15-tests-tree-axis.md](settled_issues/2026-11-15-tests-tree-axis.md) — 测试树分轴：镜像断言 + `tests/repo` 六个 owner 子目录 + 去组数枚举；去向 = [Note](../../notes/implemented/2026-11-15-tests-tree-axis.md)。

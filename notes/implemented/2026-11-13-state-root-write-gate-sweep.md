@@ -2,6 +2,8 @@
 
 状态：implemented（2026-11-13 落地；验证见下）
 
+> 部分后续由[workspace文件读取结果决定](./2026-11-20-company-file-read-state.md)细化：本篇仍拥有根/路径安全与写gate决定；workspace读取API现行形状及五个状态消费者的一次观察规则以新Note为准。
+
 上游 = 用户 2026-11-13：「_backlog/bugs 这里又找到一堆bug……直到所有bug解决了」。32 张卡（114..139、141..146；BUG-140 经复核撤回）来自
 [高复杂度面持续探索](../../_backlog/_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md) 的 C1–C7 回归扫，
 绝大多数是前两轮修复后的边界复查：**同一个「workspace 可写 ⇒ `.dsh-company` 及其子目录可被 symlink/文件替换」
@@ -23,10 +25,11 @@
 
 ## 决定
 
-1. **共享 `host/run-bundle/company-root.ts`**：`ensureCompanyRoot/ensureCompanyDir/companyFileProblem/readCompanyText/
-   writeCompanyAtomic`（+ `At` 变体）。读：根/中间目录 lstat 非 symlink、叶子 `plainFileProblem` 非 symlink 且
-   realpath 在根内；写：父目录逐级安全、目标非目录、temp+rename（symlink 由 rename 替换）。catalog、presented 账本、
-   startup、bootstrap、命令读面统一消费。
+1. **共享 `host/run-bundle/company-root.ts`**：workspace读取走 `readCompanyFile(workspace, rawRel)` 返回
+   text/missing/unsafe；`companyFileProblem` 与 `readCompanyText` 是其有损视图；`readCompanyFileAt` 独立保持确切
+   companyHome 且不剥前缀。五个startup/manifest/catalog/账本状态读取者各消费一次完整结果；其他调用方可按需选视图。
+   根/中间目录检查仍拒绝 symlink、越界及非普通文件；底层 lstat 失败归 missing，打开/读取异常归 unsafe（保守桶，非精确errno）；
+   不承诺文件系统原子快照。写：父目录逐级安全、目标非目录、temp+rename（symlink 由 rename 替换）。
 2. **共享 `host/run-bundle/write-gate.ts`**：进程级 blocked 原因；runtime-guard 在 lease 被占时 block，
    持有者 heartbeat 发现盘上 token 变化时 block；`writeCompanyAtomic`/bootstrap/export 写前 assert。
    lease 锁路径先 lstat：目录/symlink → 可操作错误，不再伪装成「另一个进程抢先」。

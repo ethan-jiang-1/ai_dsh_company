@@ -58,7 +58,7 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-- [source-prevention-design](source-prevention-design/README.md) — 独立研究生产源头怎样减少事实同步、重复解释和失败信息丢失；先研究再出新Issue，既有试点仅作基础（已定性；新卡承接workspace三态读取的兼容与实施取舍）
+（2026-11-20 source-prevention-design随状态读取卡实施收口迁入[研究归档](../_archive/research/source-prevention-design/README.md)。）
 
 - [quality-prevention](quality-prevention/README.md) — 本仓C13–C17跨轮链、独立反证与长期预防实施建议（已定性；首批content试点已交付；同卡承接用户追加的生产源头研究）
 - [maintenance-surface-taxonomy](maintenance-surface-taxonomy/README.md) — 三仓维护面顶层分类法比较（已定性；本仓 handoff 2026-11-16 已落地）

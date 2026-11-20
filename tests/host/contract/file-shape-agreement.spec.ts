@@ -12,7 +12,8 @@
  * 子类（missing vs unsafe）允许分歧，但 primary 载体必须等于形状的预期类。
  *
  * 本文件新增的五个状态读取场景只验证各公开消费者对有限字面JSON样本的稳定映射；不替代各自schema全集或版本矩阵。
- * 证明不了：写路径、跨进程/重启、文件系统原子快照。
+ * 文件读取观察器只拦精确目标的 node:fs.readFileSync；不能证明其他I/O API、跨进程行为、写路径或原子快照。
+ * 解析器与owner仍是真实实现；该窄module mock例外登记于 docs/testing.md。
  */
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -23,7 +24,7 @@ import { readBundleManifestState } from '../../../packages/company-pack/src/host
 import { readCatalogState } from '../../../packages/company-pack/src/host/ledger/catalog-state.ts'
 import { readPresentedLedger } from '../../../packages/company-pack/src/host/ledger/presented-ledger.ts'
 
-// 只观察本次公开入口的目标绝对路径；模块加载与夹具检查不计入内容读取。
+// 观察精确目标路径的文件系统边界；非目标读及成功目标读都保留真实实现。
 const fileRead = vi.hoisted(() => ({
   target: undefined as string | undefined,
   attempts: 0,
@@ -37,7 +38,10 @@ vi.mock('node:fs', async (importOriginal) => {
     readFileSync: vi.fn(actual.readFileSync).mockImplementation((...args) => {
       if (args[0] !== fileRead.target) return actual.readFileSync(...args)
       fileRead.attempts++
-      if (fileRead.fail) throw Object.assign(new Error('target open refused'), { code: 'EACCES' })
+      if (fileRead.fail) {
+        fileRead.fail = false
+        throw Object.assign(new Error('target open refused'), { code: 'EACCES' })
+      }
       const text = actual.readFileSync(...args)
       fileRead.afterRead?.()
       return text
@@ -88,7 +92,9 @@ const STATE_READERS = [
     unsafe: { problem: 'unsafe', settings: DEFAULT_SETTINGS },
     corrupt: { problem: 'corrupt', settings: DEFAULT_SETTINGS },
     empty: { problem: null, settings: DEFAULT_SETTINGS },
+    badShape: { problem: 'corrupt', settings: DEFAULT_SETTINGS },
     text: '{"v":1,"productType":"business-software","deliveryMode":"consulting","wiki":"kb/wiki","updatedAt":null}\n',
+    badShapeText: '[]',
     expected: { problem: null, settings: { v: 1, productType: 'business-software', deliveryMode: 'consulting', wiki: 'kb/wiki', updatedAt: null } },
   },
   {
@@ -97,6 +103,8 @@ const STATE_READERS = [
     unsafe: { problem: 'unsafe', options: EMPTY_OPTIONS },
     corrupt: { problem: 'corrupt', options: EMPTY_OPTIONS },
     empty: { problem: null, options: EMPTY_OPTIONS },
+    badShape: { problem: 'corrupt', options: EMPTY_OPTIONS },
+    badShapeText: '[]',
     text: '{"productTypes":["business-software","research"],"deliveryModes":["consulting","productized"]}\n',
     expected: { problem: null, options: { productTypes: ['business-software', 'research'], deliveryModes: ['consulting', 'productized'] } },
   },
@@ -105,6 +113,7 @@ const STATE_READERS = [
     missing: { status: 'missing' },
     unsafe: { status: 'corrupt', error: 'bundle.json 路径不安全（symlink/目录/越界）' },
     corrupt: { status: 'corrupt' }, empty: { status: 'corrupt' },
+    badShape: { status: 'corrupt' }, badShapeText: '{"v":3,"id":7}',
     text: '{"v":3,"id":"bundle-read-once","createdAt":"2026-11-20T00:00:00.000Z","pack":{"name":"read-contract-pack","version":"1.2.3"},"runBundle":{"schema":1}}\n',
     expected: { status: 'ok', manifest: { v: 3, id: 'bundle-read-once', createdAt: '2026-11-20T00:00:00.000Z', pack: { name: 'read-contract-pack', version: '1.2.3' }, runBundle: { schema: 1 } } },
   },
@@ -113,6 +122,8 @@ const STATE_READERS = [
     missing: { status: 'missing' },
     unsafe: { status: 'corrupt', error: 'catalog 路径不安全（symlink/目录/越界），拒绝读取' },
     corrupt: { status: 'corrupt' }, empty: { status: 'corrupt' },
+    badShape: { status: 'corrupt', error: 'entries 含坏形状（缺 path/slug）' },
+    badShapeText: '{"schema":1,"entries":[{"path":"deliverables/alpha/final.md","slug":7,"presented":false}]}\n',
     text: '{"schema":1,"entries":[{"path":"deliverables/alpha/final.md","slug":"alpha","presented":false}]}\n',
     expected: { status: 'ok', catalog: { schema: 1, entries: [{ path: 'deliverables/alpha/final.md', slug: 'alpha', presented: false }] } },
   },
@@ -121,6 +132,8 @@ const STATE_READERS = [
     missing: { status: 'missing' },
     unsafe: { status: 'corrupt', error: '账本路径不安全（symlink/目录/越界），拒绝读取' },
     corrupt: { status: 'corrupt' }, empty: { status: 'corrupt' },
+    badShape: { status: 'corrupt', error: 'paths 不是 boolean map' },
+    badShapeText: '{"schema":1,"updatedAt":"2026-11-20T00:00:00.000Z","paths":{"deliverables/alpha/final.md":"false"},"slugs":{"beta":true}}\n',
     text: '{"schema":1,"updatedAt":"2026-11-20T00:00:00.000Z","paths":{"deliverables/alpha/final.md":false},"slugs":{"beta":true}}\n',
     expected: { status: 'ok', ledger: { schema: 1, updatedAt: '2026-11-20T00:00:00.000Z', paths: { 'deliverables/alpha/final.md': false }, slugs: { beta: true } } },
   },
@@ -128,7 +141,7 @@ const STATE_READERS = [
 
 describe('五个状态读取入口只消费一次目标文件文本', () => {
   for (const reader of STATE_READERS) {
-    it.each(['valid', 'missing', 'directory', 'symlink', 'open-failure', 'changed-after-read', 'deleted-after-read', 'empty', 'bad-json'] as const)(`${reader.id}：%s，保留分类/首次文本，下一次可恢复`, (mode) => {
+    it.each(['valid', 'missing', 'directory', 'symlink', 'open-failure', 'changed-after-read', 'deleted-after-read', 'empty', 'bad-json', 'bad-shape'] as const)(`${reader.id}：%s，保留分类/首次文本，下一次可恢复`, (mode) => {
       const world = makeWorld('shape-state-read-')
       const target = join(world.ws, '.dsh-company', reader.rel)
       const removeTarget = () => {
@@ -141,7 +154,7 @@ describe('五个状态读取入口只消费一次目标文件文本', () => {
         else if (mode === 'symlink') {
           writeFileSync(join(world.outside, 'state.json'), reader.text)
           symlinkSync(join(world.outside, 'state.json'), target)
-        } else if (mode !== 'missing') writeFileSync(target, mode === 'empty' ? ' \n\t' : mode === 'bad-json' ? '{invalid json\n' : reader.text)
+        } else if (mode !== 'missing') writeFileSync(target, mode === 'empty' ? ' \n\t' : mode === 'bad-json' ? '{invalid json\n' : mode === 'bad-shape' ? reader.badShapeText : reader.text)
         fileRead.target = target
         fileRead.attempts = 0
         fileRead.fail = mode === 'open-failure'
@@ -156,7 +169,9 @@ describe('五个状态读取入口只消费一次目标文件文本', () => {
         const state = reader.run(world.ws)
         const expected = mode === 'missing' ? reader.missing
           : mode === 'directory' || mode === 'symlink' || mode === 'open-failure' ? reader.unsafe
-            : mode === 'empty' ? reader.empty : mode === 'bad-json' ? reader.corrupt : reader.expected
+            : mode === 'empty' ? reader.empty
+              : mode === 'bad-json' ? reader.corrupt
+                : mode === 'bad-shape' ? reader.badShape : reader.expected
         expect(state).toMatchObject(expected)
         if ('path' in state) expect(state.path).toBe(target)
         const refused = mode === 'missing' || mode === 'directory' || mode === 'symlink'
@@ -171,7 +186,7 @@ describe('五个状态读取入口只消费一次目标文件文本', () => {
         else if (mode === 'symlink') {
           expect(actualFs.lstatSync(target).isSymbolicLink()).toBe(true)
           expect(actualFs.readFileSync(join(world.outside, 'state.json'), 'utf8')).toBe(reader.text)
-        } else expect(actualFs.readFileSync(target, 'utf8')).toBe(mode === 'empty' ? ' \n\t' : mode === 'bad-json' ? '{invalid json\n' : mode === 'changed-after-read' ? '{changed after first read\n' : reader.text)
+        } else expect(actualFs.readFileSync(target, 'utf8')).toBe(mode === 'empty' ? ' \n\t' : mode === 'bad-json' ? '{invalid json\n' : mode === 'bad-shape' ? reader.badShapeText : mode === 'changed-after-read' ? '{changed after first read\n' : reader.text)
 
         if (mode === 'directory' || mode === 'symlink') removeTarget()
         writeFileSync(target, reader.text)
