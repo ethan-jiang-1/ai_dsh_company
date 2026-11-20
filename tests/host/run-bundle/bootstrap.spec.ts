@@ -12,9 +12,11 @@
  * ⑥ 类型相关 seed（`{productType}`）按运行盘 company.md 的 productType 解析；缺/未知不猜
  *    （跳过该条 + warning，其余 seed 照常）。
  */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import assert from 'node:assert/strict'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
+import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import { describe, expect, it } from 'vitest'
 import { loadCompanyFixture } from '../../support/company-fixture.ts'
 import {
@@ -66,6 +68,121 @@ function content(): string {
   writeFileSync(join(dir, 'kb-setup/seed.json'), JSON.stringify({ seeds }))
   return dir
 }
+
+const PRODUCTION_CONTENT = join(ROOT, 'packages/company-pack/content')
+const CEO_TARGET = '.dsh-company/kb/ceo/CHARTER.md'
+const PROCESS_TARGET = '.dsh-company/kb/process-docs.md'
+const PRODUCT_TYPES = readdirSync(join(PRODUCTION_CONTENT, 'product-types'), { withFileTypes: true })
+  .filter(entry => entry.isDirectory()).map(entry => entry.name).sort()
+
+/** 独立业务锚点：不从 seed.json 或 bootstrap 返回的 source/target 计算期望。 */
+function assertBusinessSeeds(boot: ReturnType<typeof bootstrapCompanyWorkspace>, productType: string): void {
+  assert.equal(boot.plan.error, undefined)
+  assert.deepEqual(boot.plan.warnings, [])
+  assert.deepEqual(boot.result.warnings, [])
+  for (const [target, source] of [
+    [CEO_TARGET, 'charters/ceo.md'],
+    [PROCESS_TARGET, `product-types/${productType}/requirements-model.md`],
+  ] as const) {
+    assert.equal(boot.plan.entries.find(entry => entry.rel === target)?.sourceRel, source, `business seed mapping: ${target}`)
+    assert.ok(boot.result.created.includes(target), `business seed created: ${target}`)
+    const sourceBytes = readFileSync(join(PRODUCTION_CONTENT, source))
+    assert.ok(sourceBytes.length > 0, `business source nonempty: ${source}`)
+    assert.deepEqual(readFileSync(join(boot.plan.workspace, target)), sourceBytes, `business seed bytes: ${target}`)
+  }
+}
+
+function productionWorld(): { root: string; pack: string; workspace: (name: string, productType: string) => string; cleanup: () => void } {
+  const parent = resolve(ROOT, 'runtime/tmp')
+  mkdirSync(parent, { recursive: true })
+  const root = mkdtempSync(join(parent, 'bootstrap-business-'))
+  const pack = join(root, 'content')
+  cpSync(PRODUCTION_CONTENT, pack, { recursive: true })
+  return {
+    root, pack,
+    workspace(name, productType) {
+      const workspace = join(root, name)
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb/company.md'), `---\nproductType: ${productType}\n---\n`)
+      return workspace
+    },
+    cleanup() {
+      assert.equal(dirname(resolve(root)), parent)
+      assert.equal(realpathSync(root), resolve(root))
+      assert.ok(root.startsWith(join(parent, 'bootstrap-business-')))
+      rmSync(root, { recursive: true, force: true })
+    },
+  }
+}
+
+describe('tracked 出厂 content 的独立业务锚点', () => {
+  it('产品类型枚举非空，并保留两种已承诺编号合同', () => {
+    expect(PRODUCT_TYPES).toEqual(expect.arrayContaining(['business-software', 'hardware-software']))
+    expect(PRODUCT_TYPES.length).toBeGreaterThan(0)
+  })
+
+  it.each(PRODUCT_TYPES)('%s：真实 bootstrap 的 CEO 章程、process-docs 映射及字节', productType => {
+    const world = productionWorld()
+    try {
+      const workspace = world.workspace('workspace', productType)
+      assertBusinessSeeds(bootstrapCompanyWorkspace(PRODUCTION_CONTENT, workspace), productType)
+    } finally { world.cleanup() }
+  })
+
+  it('真实 CEO 源缺失：空计划、明确错误、不落任何 seed', () => {
+    const world = productionWorld()
+    try {
+      // 仅删除本 fixture 内、已核实绝对落点的复制件。
+      const source = resolve(world.pack, 'charters/ceo.md')
+      assert.equal(source, join(world.root, 'content/charters/ceo.md'))
+      rmSync(source)
+      const workspace = join(world.root, 'fresh-workspace')
+      const plan = planBootstrap(world.pack, workspace)
+      expect(plan.error).toContain('kb 装配缺源：charters/ceo.md')
+      expect(plan.entries).toEqual([])
+      expect(applyBootstrap(plan).created).toEqual([])
+      expect(existsSync(workspace)).toBe(false)
+    } finally { world.cleanup() }
+  })
+
+  it.each(PRODUCT_TYPES)('%s：真实编号合同缺源时拒绝该 seed、warning 点名来源', productType => {
+    const world = productionWorld()
+    try {
+      const sourceRel = `product-types/${productType}/requirements-model.md`
+      const source = resolve(world.pack, sourceRel)
+      assert.equal(source, join(world.root, 'content', sourceRel))
+      rmSync(source)
+      const workspace = world.workspace('workspace', productType)
+      const boot = bootstrapCompanyWorkspace(world.pack, workspace)
+      expect(boot.plan.error).toBeUndefined()
+      expect(boot.plan.warnings.some(warning => warning.includes(PROCESS_TARGET) && warning.includes(sourceRel))).toBe(true)
+      expect(boot.plan.entries.some(entry => entry.rel === PROCESS_TARGET)).toBe(false)
+      expect(boot.result.created).not.toContain(PROCESS_TARGET)
+      expect(existsSync(join(workspace, PROCESS_TARGET))).toBe(false)
+      expect(boot.result.created).toContain(CEO_TARGET)
+    } finally { world.cleanup() }
+  })
+
+  it.each([CEO_TARGET, PROCESS_TARGET])('负控：生产 seed 清单同步缩小 %s，独立业务断言必须红', target => {
+    const world = productionWorld()
+    try {
+      const productType = 'business-software'
+      assertBusinessSeeds(bootstrapCompanyWorkspace(world.pack, world.workspace('control', productType)), productType)
+      const manifest = join(world.pack, 'kb-setup/seed.json')
+      const seeds = JSON.parse(readFileSync(manifest, 'utf8')) as { seeds: { source: string; target: string }[] }
+      expect(seeds.seeds.filter(seed => seed.target === target)).toHaveLength(1)
+      seeds.seeds = seeds.seeds.filter(seed => seed.target !== target)
+      writeFileSync(manifest, JSON.stringify(seeds))
+      const boot = bootstrapCompanyWorkspace(world.pack, world.workspace('mutant', productType))
+      expect(boot.plan.error).toBeUndefined()
+      expect(boot.result.warnings).toEqual([])
+      assert.throws(() => assertBusinessSeeds(boot, productType), (error: unknown) =>
+        error instanceof assert.AssertionError
+        && error.message.startsWith(`business seed mapping: ${target}\n`)
+        && error.operator === 'strictEqual')
+    } finally { world.cleanup() }
+  })
+})
 
 describe('run bundle v3：planBootstrap', () => {
   it('只计划 .dsh-company/ 内的目录与状态；不计划根 AGENTS.md/kb/templates', () => {

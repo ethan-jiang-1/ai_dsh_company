@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-- [2026-11-20 content 合同族预防试点](2026-11-20-quality-prevention-contract-pilot.md) — quality-prevention 研究产出的首批建议：动态成员/关系矩阵、两消费者与定向负控，复用既有验收/修复/收尾入口；等人拍板，首批范围与拟RFC去向待确认，未批准实施。
+- [2026-11-20 content 合同族预防试点](2026-11-20-quality-prevention-contract-pilot.md) — 首批content动态成员/关系矩阵、独立业务锚点与定向负控已交付，证据归实施Note；用户追加：本批提交后研究生产源头怎样更易防范缺陷，保留本卡承接，非新增产品实施授权。
 
 - [2026-11-18 门禁管线指纹 + 运行时发虚面（C16）](2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md) — sanitizer 不在 sourceFingerprint；REQUIRED 漏 4 类 content 族；JSON/YAML 只 parse；persona 的 pnpm methods:init；lease 不可读被抢；bundle bad createdAt/pack；presence/catalog 边界；20 张 BUG-243..262（调查中，只开卡不修）。
 - [2026-11-18 修复后的守卫面 + 低置信运行态（C14）](2026-11-18-low-confidence-runtime-exploratory.md) — 新 shipped-shape checker 的 glob/content/目录路径/patch 面；`release:shape` 新鲜度与接线；diffActivity/teamWithEventTasks/catalog 部分视图与坏形状；10 张 BUG-223..232（调查中，只开卡不修）。

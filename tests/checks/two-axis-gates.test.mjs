@@ -80,7 +80,7 @@ const mutateOrFail = (label, path, transform) => {
       console.log('FAIL 删 managed-service SLA 模板（fixture 缺失：先更新夹具）')
     } else {
       rmSync(sla)
-      report('删 managed-service SLA 模板 → delivery-mode-sources 红', run(deliveryGate, root), messages => messages.some(m => m.includes('SLA.template 不在场')))
+      report('删 managed-service SLA 模板 → delivery-mode-sources 红', run(deliveryGate, root), messages => messages.some(m => m.startsWith('FAIL delivery-mode-sources:') && m.includes('documents.SLA.template 不在 content：templates/sla.md')))
     }
   } finally { rmSync(root, { recursive: true, force: true }) }
 }

@@ -22,6 +22,7 @@ description: Use when finishing any non-trivial change before reporting it done,
    机器绿灯不覆盖这一问。范围外多做的东西也要点出来（不是功劳，是没被要求的东西）。
 2. **证据四链点名**（挂得上 / 行为对 / 装得上〔适用时〕/ 批准）：每条点名**实跑的检查**，并带三列——**层 / 失败类 / 负控（见过红）**；
    没跑的**如实标「未执行」**——不混入"应该跑了"的暗示；一类失败没证据就写进「未覆盖」（词表 = [tests/failure-classes.md](../../../tests/failure-classes.md)）。
+   涉共享规则、成员增长或同类逃逸时，核对[验收设计的合同族检查](../../../_backlog/methods/validation-design.md#3-design-protection-for-a-changing-input-family)：输入来源与独立期望、所有适用消费者、触发/互补结果、非空枚举及未来成员见证、实跑负控与自动执行命令。报告删掉的重复维护义务与仍需人工维护的事实；缺原定证据即未完成，不能用总测试数或BUG关联数代替。单点机械修改按原最窄检查，不强加全族矩阵。
    **发布类声明另加**：声称 READY/已发布，必须贴 `node tools/release/release.mjs --check` 的原始 READY 行 + commit SHA；
    没有输出行的 READY 不算证据（2026-11-03 0.8.2 A- 收口的实况：Note 写了 READY，`--check` 实际红）。
 3. **语义审（验收权分立，四输入 = [policy.md §P5](../../../docs/policy.md)）**：

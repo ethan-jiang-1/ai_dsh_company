@@ -36,7 +36,18 @@ Keep criteria in `## 验收标准` on the same card. A small scope can use a sho
 
 Use the [testing evidence map](../../docs/testing.md) to choose an owner and command. Preserve source links, versions, artifact commits and attribution for load-bearing evidence. A command finishing, keyword presence, one happy-path example or a passing demo is not itself a pass condition.
 
-## 3. Keep criteria executable and honest
+## 3. Design protection for a changing input family
+
+When a shared rule crosses consumers, members can grow, or the same failure class escapes an example guard, name the input domain before choosing tests:
+
+- **Discovery and obligations:** derive membership from its real owner (directory, registration or state table). Enumerate each applicable transformation and consumer, assert non-empty execution counts, and add a future-member witness. Keep business-required completeness independently anchored in real reader results; deriving both sides from the production list cannot prove it complete.
+- **Independent expectations:** write why valid and invalid worlds should pass or refuse, including degraded/partial outcomes. Use a literal business anchor, an independent model or a relation specified before running the implementation. Compare common semantics across consumers; their extra rules and wording can differ.
+- **Discrimination:** choose the smallest real negative control that removes a promised predicate or consumer connection while preserving a valid complement. Verify the control changed the intended bytes and was actually loaded; a load error is not a killed defect. A constant accept/reject implementation or fixed enumeration must fail the relevant witness.
+- **Maintenance result:** name which repeated manual enumeration this replaces, which curated obligations remain, and the command that runs the asset automatically. Record counts and comparable command cost; do not add another registry or runner just to name the family.
+
+A mechanical single-point change can keep its narrow example check with a reason. Family protection is triggered by the change's failure mechanism, not by file count or a fixed quota. Exploration ends at a named axis verdict within a stated budget; a minimum number of BUG cards is not a default quality criterion.
+
+## 4. Keep criteria executable and honest
 
 - Deterministic behavior normally becomes a behavioral test at an existing seam. Borrow TDD's red-before-green and independent expected values; use established owners rather than making every technical seam a human approval.
 - Model behavior needs a bounded evaluation case and, for load-bearing claims, real-model observation. Automated evaluation is regression evidence, not a substitute for human judgment of tone, taste, business value or risk.

@@ -11,6 +11,7 @@ import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
+import { caseCounts, contentCases, contentWorld, contractInput } from '../support/content-worlds.mjs'
 import {
   CONTENT_VERSION,
   contentJsonProblems,
@@ -182,6 +183,21 @@ describe('content JSON 跨引用与读取器同义（BUG-268）', () => {
     expect(contentJsonProblems({ rel, value: { productType: 'x', layers: ['MRD', 'PRD'], files: { MRD: 'mrd.md' } }, files }).join()).toContain('layers 的 PRD')
     expect(contentJsonProblems({ rel, value: { productType: 'x', layers: ['MRD'], defaultLayers: ['PRD'], files: { MRD: 'mrd.md' } }, files }).join()).toContain('defaultLayers 的 PRD')
     expect(contentJsonProblems({ rel, value: { layers: ['MRD'], files: { MRD: 'mrd.md' } }, files }).join()).toContain('缺 productType')
+  })
+})
+
+describe('content 合同族随实际成员增长', () => {
+  it('tracked 合法基例及逐成员/关系变换遵循独立接受规则', () => {
+    const base = contentWorld()
+    const counts = new Map<string, number>()
+    for (const row of contentCases(base)) {
+      const problems = contentManifestProblems(contractInput(row.world))
+      expect(problems.length === 0, `${row.axis}:${row.member}: ${problems.join('; ')}`).toBe(row.accept)
+      counts.set(row.axis, (counts.get(row.axis) ?? 0) + 1)
+    }
+    expect(Object.fromEntries(counts)).toEqual(caseCounts(base))
+    for (const [axis, count] of Object.entries(caseCounts(base))) expect(count, axis).toBeGreaterThan(0)
+    console.info('content pure matrix counts:', Object.fromEntries(counts))
   })
 })
 

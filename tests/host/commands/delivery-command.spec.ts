@@ -7,9 +7,10 @@
  * 红配方：删 delivery-command 的 requiredSections 循环 → “缺 section”用例红；
  * 把 project-services 的 rules 改成不存在的文件 → “缺 SOW”用例红。
  */
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import assert from 'node:assert/strict'
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { registerDeliveryCommand } from '../../../packages/company-pack/src/host/commands/delivery-command.ts'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
@@ -26,8 +27,8 @@ function mount(workspace: string, contentDir = CONTENT_DIR): Definition {
   return definition as Definition
 }
 
-function fixture(mode: string): { workspace: string; root: string; drafts: string; cleanup: () => void } {
-  const workspace = mkdtempSync(join(tmpdir(), 'delivery-command-'))
+function fixture(mode: string, parent = tmpdir()): { workspace: string; root: string; drafts: string; cleanup: () => void } {
+  const workspace = mkdtempSync(join(parent, 'delivery-command-'))
   const root = join(workspace, `.dsh-company/deliverables/${SLUG}`)
   const drafts = join(root, 'drafts')
   mkdirSync(drafts, { recursive: true })
@@ -35,8 +36,8 @@ function fixture(mode: string): { workspace: string; root: string; drafts: strin
   return { workspace, root, drafts, cleanup: () => rmSync(workspace, { recursive: true, force: true }) }
 }
 
-function copyTemplates(root: string, mode: string, skip: string[] = []): void {
-  const modeDir = join(CONTENT_DIR, 'delivery-modes', mode)
+function copyTemplates(root: string, mode: string, skip: string[] = [], contentDir = CONTENT_DIR): void {
+  const modeDir = join(contentDir, 'delivery-modes', mode)
   const rules = JSON.parse(readFileSync(join(modeDir, 'delivery-rules.json'), 'utf8')) as {
     documents: Record<string, { file: string; template: string }>
   }
@@ -45,6 +46,106 @@ function copyTemplates(root: string, mode: string, skip: string[] = []): void {
     writeFileSync(join(root, doc.file), readFileSync(join(modeDir, doc.template), 'utf8'))
   }
 }
+
+/** 人工维护的业务承诺：独立于 delivery-rules，不随生产 documents 集合同步缩小。 */
+const MANAGED_DOCUMENTS = [
+  ['SLA', 'drafts/sla.md', 'templates/sla.md'],
+  ['SERVICE_CATALOG', 'drafts/service-catalog.md', 'templates/service-catalog.md'],
+  ['RUNBOOK', 'drafts/runbook.md', 'templates/runbook.md'],
+  ['INCIDENT', 'drafts/incidents.md', 'templates/incident.md'],
+  ['MONTHLY_REPORT', 'drafts/monthly-report.md', 'templates/monthly-report.md'],
+  ['RENEWAL', 'drafts/renewal.md', 'templates/renewal.md'],
+] as const
+
+function assertManagedSuccess(result: Awaited<ReturnType<Definition['handler']>>): void {
+  assert.equal(result.kind, 'success')
+  assert.ok(result.text.includes('交付模式 = managed-service'))
+  assert.ok(result.text.includes('文档 6 份'), 'managed-service business requires six documents')
+}
+
+function managedWorld(): { content: string; delivery: ReturnType<typeof fixture>; cleanup: () => void } {
+  const parent = resolve(ROOT, 'runtime/tmp')
+  mkdirSync(parent, { recursive: true })
+  const root = mkdtempSync(join(parent, 'delivery-business-'))
+  const content = join(root, 'content')
+  cpSync(join(CONTENT_DIR, 'delivery-modes/managed-service'), join(content, 'delivery-modes/managed-service'), { recursive: true })
+  const delivery = fixture('managed-service', root)
+  return {
+    content, delivery,
+    cleanup() {
+      assert.equal(dirname(resolve(root)), parent)
+      assert.equal(realpathSync(root), resolve(root))
+      assert.ok(root.startsWith(join(parent, 'delivery-business-')))
+      rmSync(root, { recursive: true, force: true })
+    },
+  }
+}
+
+describe('managed-service 独立业务文档锚点', () => {
+  it('真实六份模板字节经过 /delivery handler；标识符与文件名来自独立字面承诺', async () => {
+    const world = managedWorld()
+    try {
+      const modeDir = join(CONTENT_DIR, 'delivery-modes/managed-service')
+      const rules = JSON.parse(readFileSync(join(modeDir, 'delivery-rules.json'), 'utf8')) as {
+        documents: Record<string, { file: string; template: string }>
+      }
+      expect(Object.entries(rules.documents).map(([id, doc]) => [id, doc.file, doc.template]).sort())
+        .toEqual([...MANAGED_DOCUMENTS].sort())
+      for (const [, file, template] of MANAGED_DOCUMENTS) {
+        const source = readFileSync(join(modeDir, template))
+        expect(source.length).toBeGreaterThan(0)
+        writeFileSync(join(world.delivery.root, file), source)
+        expect(readFileSync(join(world.delivery.root, file))).toEqual(source)
+      }
+      assertManagedSuccess(await mount(world.delivery.workspace).handler({ rawInput: `check ${SLUG}` }))
+    } finally { world.cleanup() }
+  })
+
+  it.each(MANAGED_DOCUMENTS)('真实命令拒绝缺 %s（%s）', async (id, file) => {
+    const world = managedWorld()
+    try {
+      copyTemplates(world.delivery.root, 'managed-service')
+      const target = resolve(world.delivery.root, file)
+      assert.equal(dirname(target), world.delivery.drafts)
+      rmSync(target)
+      const result = await mount(world.delivery.workspace).handler({ rawInput: `check ${SLUG}` })
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain(`缺 ${id}（${file}）`)
+    } finally { world.cleanup() }
+  })
+
+  it.each(MANAGED_DOCUMENTS)('负控：规则、模板、交付文档同步删 %s，成功回执仍须被独立锚点拒绝', async (id, file, template) => {
+    const world = managedWorld()
+    try {
+      copyTemplates(world.delivery.root, 'managed-service', [], world.content)
+      const command = mount(world.delivery.workspace, world.content)
+      assertManagedSuccess(await command.handler({ rawInput: `check ${SLUG}` }))
+      const modeDir = join(world.content, 'delivery-modes/managed-service')
+      const rulesFile = join(modeDir, 'delivery-rules.json')
+      const rules = JSON.parse(readFileSync(rulesFile, 'utf8')) as {
+        documents: Record<string, unknown>; requiredSections: Record<string, unknown>; requiredFields: Record<string, unknown>; v1Reminder: string[]
+      }
+      expect(Object.hasOwn(rules.documents, id)).toBe(true)
+      delete rules.documents[id]
+      delete rules.requiredSections[id]
+      delete rules.requiredFields[id]
+      rules.v1Reminder = rules.v1Reminder.filter(key => key !== id)
+      writeFileSync(rulesFile, JSON.stringify(rules))
+      const target = resolve(world.delivery.root, file)
+      const templatePath = resolve(modeDir, template)
+      assert.equal(dirname(target), world.delivery.drafts)
+      assert.equal(dirname(templatePath), join(modeDir, 'templates'))
+      rmSync(target)
+      rmSync(templatePath)
+      const result = await command.handler({ rawInput: `check ${SLUG}` })
+      expect(result.kind).toBe('success')
+      expect(result.text).toContain('文档 5 份')
+      assert.throws(() => assertManagedSuccess(result), {
+        name: 'AssertionError', message: 'managed-service business requires six documents',
+      })
+    } finally { world.cleanup() }
+  })
+})
 
 describe('parseDeliveryCheck', () => {
   it('check <slug>；其余 → 用法', async () => {

@@ -58,7 +58,7 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-- [quality-prevention](quality-prevention/README.md) — 本仓C13–C17跨轮链、独立反证与长期预防实施建议（已定性；首批content合同族卡承接，未实施）
+- [quality-prevention](quality-prevention/README.md) — 本仓C13–C17跨轮链、独立反证与长期预防实施建议（已定性；首批content试点已交付；同卡承接用户追加的生产源头研究）
 - [maintenance-surface-taxonomy](maintenance-surface-taxonomy/README.md) — 三仓维护面顶层分类法比较（已定性；本仓 handoff 2026-11-16 已落地）
 
 （2026-11-15 tests-src-correspondence 随 tests-tree-axis 卡落地迁入[研究归档](../_archive/research/README.md)。）
