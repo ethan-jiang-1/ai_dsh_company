@@ -1,4 +1,7 @@
 # _archive/ · 离开活跃区
+- [BUG-285-upgrade-lane-frozen-identity-semantics.md](fixed_bugs/BUG-285-upgrade-lane-frozen-identity-semantics.md) — 升级守卫冻结已废止的「创建版本」语义而长期红；改断言 id/createdAt 保留 + pack.version 跟随 + v3 备份。
+- [BUG-284-dev-wrapper-orphan-writer-holds-lease.md](fixed_bugs/BUG-284-dev-wrapper-orphan-writer-holds-lease.md) — 杀 wrapper 后 dsh 成孤儿持 writer lease，下一次启动静默停写；补 SIGINT/SIGTERM/SIGHUP 转发。
+- [BUG-283-dev-wrapper-home-missing-opaque-failure.md](fixed_bugs/BUG-283-dev-wrapper-home-missing-opaque-failure.md) — `--home` 目录不存在时模板初始化 exit null/空 stderr；先建 home 并点名 spawn 错误。
 
 - [2026-11-20-quality-prevention-contract-pilot.md](settled_issues/2026-11-20-quality-prevention-contract-pilot.md) — content 合同族预防试点：动态成员矩阵 + 独立业务锚点 + 共享分支/接线负控 + 开发入口修订，bootstrap 局部试点与生产源头研究同批交付；剩余候选记为以后做；去向 = [实施Note](../../notes/implemented/2026-11-20-quality-prevention-contract-pilot.md)。
 - [2026-11-17-ownership-wave-exploratory.md](settled_issues/2026-11-17-ownership-wave-exploratory.md) — C12 归属波次探索：Round 94–96 六面齐跑，10 张 BUG-202..211 全部修复归档；未跑面（clean worktree/setup/live/Windows）与 3 项 unverified 如实保留；去向 = implementation（[批次 Note](../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)）。
