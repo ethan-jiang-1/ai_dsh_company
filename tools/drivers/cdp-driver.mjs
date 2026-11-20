@@ -109,6 +109,15 @@ async function connectSession(target) {
     }
     return reply.result?.result?.value;
   };
+  // 真实键盘输入：Enter 是「发消息 / 跑命令」的唯一入口，合成 DOM 事件不算（React/lexical 会忽略 untrusted）。
+  const KEY_CODES = { Enter: 13, Tab: 9, Escape: 27, ArrowUp: 38, ArrowDown: 40 }
+  const pressKey = async (key) => {
+    const virtualKeyCode = KEY_CODES[key]
+    if (virtualKeyCode === undefined) return 'unsupported'
+    await send('Input.dispatchKeyEvent', { type: 'keyDown', key, code: key, windowsVirtualKeyCode: virtualKeyCode, nativeVirtualKeyCode: virtualKeyCode })
+    await send('Input.dispatchKeyEvent', { type: 'keyUp', key, code: key, windowsVirtualKeyCode: virtualKeyCode, nativeVirtualKeyCode: virtualKeyCode })
+    return 'pressed'
+  }
   const click = async (selector) => evaluate(`(() => {
     const el = document.querySelector(${JSON.stringify(selector)});
     if (el === null) return 'no-element';
@@ -116,7 +125,7 @@ async function connectSession(target) {
     return 'clicked';
   })()`);
 
-  return { ws, problems, exceptions, evaluate, click, screenshot, close: () => ws.close() };
+  return { ws, problems, exceptions, evaluate, click, pressKey, screenshot, close: () => ws.close() };
 }
 
 /**
@@ -183,6 +192,7 @@ export async function launchCdpBrowser({ url, chromeBin, windowSize = '1600,1000
   const handle = {
     evaluate: session.evaluate,
     click: session.click,
+    pressKey: session.pressKey,
     screenshot: session.screenshot,
     consoleProblems: session.problems,
     exceptions: session.exceptions,
@@ -235,6 +245,7 @@ export async function attachCdpBrowser({ port, urlIncludes, bootTimeoutMs = 2000
   return {
     evaluate: session.evaluate,
     click: session.click,
+    pressKey: session.pressKey,
     screenshot: session.screenshot,
     consoleProblems: session.problems,
     exceptions: session.exceptions,

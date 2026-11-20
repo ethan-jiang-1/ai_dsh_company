@@ -23,6 +23,14 @@ describe('probe-steps：--steps 的受控动作集', () => {
     expect(() => parseProbeSteps(JSON.stringify([{ clickText: 'a', waitText: 'b' }]))).toThrow(/恰好一个动作键/)
   })
 
+  it('pressKey 只接受受控键，且能进入步骤序列（Enter 提交 = 发消息/跑命令的真实入口）', () => {
+    const steps = parseProbeSteps(JSON.stringify([{ typeText: ['[data-composer-input]', '/company-settings'] }, { pressKey: 'Enter' }]))
+    expect(steps[1]).toEqual({ action: 'pressKey', value: 'Enter' })
+    expect(stepLabel(steps[1])).toBe('pressKey Enter')
+    expect(() => parseProbeSteps(JSON.stringify([{ pressKey: 'F5' }]))).toThrow(/Enter\/Tab\/Escape/)
+    expect(() => parseProbeSteps(JSON.stringify([{ pressKey: '' }]))).toThrow()
+  })
+
   it('拒绝未知动作、空文本、非法 typeText 与 timeoutMs', () => {
     expect(() => parseProbeSteps(JSON.stringify([{ click: 'a' }]))).toThrow(/未知动作/)
     expect(() => parseProbeSteps(JSON.stringify([{ clickText: '  ' }]))).toThrow(/非空字符串/)

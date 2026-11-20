@@ -4,7 +4,7 @@
 // 一串交互。这里只做**受控的最小动作集**：按可见文本点击、等待/断言文本、向选择器输入文本。
 // 不开放任意 JS（evaluate 仍由 cdp-probe 自己拼），避免把探针变成脚本执行器。
 
-const ACTIONS = new Set(['clickText', 'waitText', 'expectText', 'typeText'])
+const ACTIONS = new Set(['clickText', 'waitText', 'expectText', 'typeText', 'pressKey'])
 
 /** 动作的人类可读名（错误/verdict 用）。 */
 export function stepLabel(step) {
@@ -39,6 +39,11 @@ export function parseProbeSteps(text) {
         throw new Error(`${at}: typeText 必须是 [选择器, 文本]`)
       }
       if (value[0].trim() === '' || value[1] === '') throw new Error(`${at}: typeText 选择器/文本不能为空`)
+    } else if (action === 'pressKey') {
+      // 键盘动作是「发消息/跑命令」唯一的真实入口：只点按钮复现不了 Enter 提交（2026-11-20 实测）。
+      if (typeof value !== 'string' || !/^(Enter|Tab|Escape|ArrowUp|ArrowDown)$/.test(value)) {
+        throw new Error(`${at}: pressKey 只接受 Enter/Tab/Escape/ArrowUp/ArrowDown`)
+      }
     } else if (typeof value !== 'string' || value.trim() === '') {
       throw new Error(`${at}: ${action} 需要非空字符串`)
     }

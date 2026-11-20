@@ -436,6 +436,11 @@ try {
       })()`) === true;
       detail = ok ? `clicked ${step.value}` : `no element containing ${step.value}`;
       if (ok) await sleep(300);
+    } else if (step.action === 'pressKey') {
+      const pressed = await handle.pressKey?.(step.value)
+      await sleep(300)
+      ok = pressed === 'pressed'
+      detail = ok ? `pressed ${step.value}` : `pressKey unavailable/unsupported: ${step.value}`
     } else if (step.action === 'typeText') {
       const [selector, text] = step.value;
       ok = await evaluate(`(() => {
