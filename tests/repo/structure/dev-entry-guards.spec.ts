@@ -1,3 +1,10 @@
+// 负例留证 2026-11-20：这五条都是「修法被回退」的静态反证；每条的原始红都已在真入口上见过，
+// 这里只需要把修法删回去即可复现：
+// 负例留证 2026-11-20：删掉 company.mjs 里 `mkdirSync(home, { recursive: true })` 一行 ⇒ BUG-283 用例红（真实现象：home 不存在时 exit null、空 stderr）。
+// 负例留证 2026-11-20：删掉 `for (const signal of ['SIGINT','SIGTERM','SIGHUP'])` 块 ⇒ BUG-284 用例红（真实现象：kill wrapper 后子进程存活并持 writer lease，下一次启动报「公司数据已停写」）。
+// 负例留证 2026-11-20：把升级守卫改回 `bundle 身份保留创建版本` ⇒ BUG-285 用例红（真实现象：lane 报 1 FAILURE「身份保留创建版本 0.11.9（0.11.10）」）。
+// 负例留证 2026-11-20：把任一可访问名改回 `name: 'Search sessions'` 等英文单语 ⇒ BUG-287 用例红（真实现象：默认 zh 档 attention-e2e 15s 超时）。
+// 负例留证 2026-11-20：把 JOURNAL_GAP 改回 `join(REHEARSAL, 'journal', 'gift-rule-gap.md')` ⇒ BUG-289 用例红（真实现象：连续两样本 2 FAILURE，而产品其实写对了 `.dsh-company/kb/ceo/journal/`）。
 /**
  * dev 入口与真入口车道的回归守卫（2026-11-20 端到端验收轮）。
  *

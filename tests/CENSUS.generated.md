@@ -10,13 +10,13 @@
 | 冒烟 | 30 |
 | 探针 | 66 |
 | 结构门禁 | 75 |
-| keyless spec 文件 | 265 |
+| keyless spec 文件 | 266 |
 | 门禁自测（tests/checks） | 11 |
 | fast lane | 4 |
 | surface lane | 6 |
 | weekly lane | 21 |
 | 未分类失败类 | 0 |
-| 无消费者资产 | 55 |
+| 无消费者资产 | 52 |
 
 ## 失败类分布
 
@@ -57,7 +57,7 @@
 | permissions-recovery | classic | weekly | 配置组合 | example | 1 |
 | profile-row | classic | weekly | 配置组合 | example | 1 |
 | revoke-recovery | classic | weekly | 注册生命周期 | example | 1 |
-| upgrade-while-running | classic | weekly | 配置组合 | example | 1 |
+| upgrade-while-running | classic | weekly | 配置组合 | example | 2 |
 | client-error-chain | browser | weekly | client UI | example | 1 |
 | multi-window-banner | browser | weekly | client UI | example | 1 |
 | ui-scene | browser | weekly | client UI | example | 6 |
@@ -67,8 +67,8 @@
 | delegation | model | 手动（真模型 1 条 prompt（升 pin 或委托边界改动时）） | 工具定义 | example | 3 |
 | presence-e2e | model | 手动（真模型 ~$1，按在场/协作面验收触发） | 模型可见文本 | example | 0 |
 | product-team-e2e | model | 手动（真模型 ~$1，按组队/判据面验收触发） | 模型可见文本 | example | 0 |
-| attention-e2e | model | 手动（真模型 + 多用户并发 lane，人工在场时跑） | 模型可见文本 | example | 0 |
-| human-loop-e2e | model | 手动（真模型 + 真浏览器 ~$1–2，人工在场时跑） | 模型可见文本 | example | 0 |
+| attention-e2e | model | 手动（真模型 + 多用户并发 lane，人工在场时跑） | 模型可见文本 | example | 1 |
+| human-loop-e2e | model | 手动（真模型 + 真浏览器 ~$1–2，人工在场时跑） | 模型可见文本 | example | 1 |
 | entry-probe | model | 手动（真模型认证档；入口链文档改动后手动跑） | 文档指针 | example | 0 |
 | generative | classic | weekly | 文档指针 | generator | 2 |
 
@@ -96,7 +96,7 @@
 | ledger-summary-probe | browser-visual | client UI | example | 1 |
 | presence-panel-probe | browser-visual | client UI | example | 0 |
 | sidebar-role-mark-probe | browser-visual | client UI | example | 2 |
-| tasks-panel-probe | browser-visual | client UI | example | 0 |
+| tasks-panel-probe | browser-visual | client UI | example | 1 |
 | collaboration-oracle-probe | fs-taskboard | 纯逻辑 | example | 0 |
 | converge-e2e-probe | fs-taskboard | 会话持久化 | example | 1 |
 | cross-process-fs-probe | fs-taskboard | 子进程并发 | example | 1 |

@@ -300,8 +300,8 @@
 | 280 | 2026-11-19 | tests/repo/release/docs-only.spec.ts:31；tests/repo/release/docs-only.spec.ts:93 |
 | 281 | 2026-11-19 | tests/repo/release/docs-only.spec.ts:17；tests/repo/release/docs-only.spec.ts:42；tests/repo/release/docs-only.spec.ts:47 |
 | 282 | 2026-11-19 | tests/repo/release/docs-only.spec.ts:58；tests/repo/release/docs-only.spec.ts:78 |
-| 283 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:17 |
-| 284 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:28 |
-| 285 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:36 |
-| 287 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:44 |
-| 289 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:56 |
+| 283 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:24 |
+| 284 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:35 |
+| 285 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:43 |
+| 287 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:51 |
+| 289 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:63 |
