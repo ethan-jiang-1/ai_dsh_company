@@ -262,19 +262,24 @@ function readCompanyFileUnderRoot(root: string, rawRel: string, stripCompanyPref
   }
 }
 
+/** 读workspace内公司盘文件并保留text/missing/unsafe；workspace根与前缀规则由此入口统一负责。 */
+export function readCompanyFile(workspace: string, rawRel: string): CompanyFileRead {
+  let root: string
+  try { root = ensureCompanyRoot(workspace) } catch (error) {
+    return { kind: 'unsafe', reason: `公司盘根不是可读目录：${(error as Error).message}` }
+  }
+  return readCompanyFileUnderRoot(root, rawRel, true)
+}
+
 /** 可读普通文件判据：根/中间目录安全 + 叶子非 symlink 且在根内；只产生 missing / unsafe。 */
 export function companyFileProblem(workspace: string, rawRel: string): 'missing' | 'unsafe' | null {
-  let root: string
-  try { root = ensureCompanyRoot(workspace) } catch { return 'unsafe' }
-  const read = readCompanyFileUnderRoot(root, rawRel, true)
+  const read = readCompanyFile(workspace, rawRel)
   return read.kind === 'text' ? null : read.kind
 }
 
 /** 读公司盘内普通文件；缺失/不安全/坏形状返回 undefined（调用方决定文案）。 */
 export function readCompanyText(workspace: string, rawRel: string): string | undefined {
-  let root: string
-  try { root = ensureCompanyRoot(workspace) } catch { return undefined }
-  const read = readCompanyFileUnderRoot(root, rawRel, true)
+  const read = readCompanyFile(workspace, rawRel)
   return read.kind === 'text' ? read.text : undefined
 }
 
@@ -357,7 +362,7 @@ export function readCompanyTextAt(companyHome: string, rel: string): string | un
   return read.kind === 'text' ? read.text : undefined
 }
 
-/** 公司盘文件读取的三态；`unsafe` = 有实体但不是可读普通文件（symlink / 越界 / 非文件 / 根或父目录坏）。 */
+/** 公司盘文件读取的三态；`unsafe` 包含坏路径形状与底层打开/读取异常的保守失败桶。 */
 export type CompanyFileRead =
   | { readonly kind: 'text'; readonly text: string }
   | { readonly kind: 'missing' }
@@ -370,7 +375,7 @@ export type CompanyFileRead =
  * 缺失豁免只适用于前者；把 symlink/越界折成 undefined 会让别的读面把「不安全」当成「没有」。
  * @param companyHome - `<workspace>/.dsh-company` 目录（不跟随 symlink 的根）。
  * @param rel - 相对 companyHome 的路径。
- * @returns text / missing / unsafe；unsafe 的 reason 可直接进模型可见文案。
+ * @returns text / missing / unsafe；`missing/unsafe` 沿用底层判据分桶，不保证精确区分errno；unsafe reason可作诊断文案。
  */
 export function readCompanyFileAt(companyHome: string, rel: string): CompanyFileRead {
   let root: string

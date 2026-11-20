@@ -8,7 +8,7 @@ import { join } from 'node:path'
 import type { DeliverablesCatalog } from '../../lib/deliverables/deliverables-catalog.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 import { isRecord } from '../../lib/shared/guards.ts'
-import { companyFileProblem, readCompanyText } from '../run-bundle/company-root.ts'
+import { readCompanyFile } from '../run-bundle/company-root.ts'
 
 export const CATALOG_REL = RUN_BUNDLE_PATHS.catalog
 
@@ -22,16 +22,14 @@ export type CatalogReadState =
 
 /**
  * 读并校验既有目录。schema 比当前新时单独报 unsupported，host 可以告警而不是静默重建。
- * @param companyHome - 公司盘根。
+ * @param companyHome - workspace根；历史形参名沿用，读取入口按workspace语义解析 `.dsh-company/`。
  */
 export function readCatalogState(companyHome: string): CatalogReadState {
-  const problem = companyFileProblem(companyHome, CATALOG_REL)
-  if (problem === 'missing') return { status: 'missing' }
-  if (problem === 'unsafe') return { status: 'corrupt', error: 'catalog 路径不安全（symlink/目录/越界），拒绝读取' }
+  const read = readCompanyFile(companyHome, CATALOG_REL)
+  if (read.kind === 'missing') return { status: 'missing' }
+  if (read.kind === 'unsafe') return { status: 'corrupt', error: 'catalog 路径不安全（symlink/目录/越界），拒绝读取' }
   try {
-    const text = readCompanyText(companyHome, CATALOG_REL)
-    if (text === undefined) return { status: 'corrupt', error: 'catalog 不可读' }
-    const raw: unknown = JSON.parse(text)
+    const raw: unknown = JSON.parse(read.text)
     if (!isRecord(raw)) return { status: 'corrupt', error: '不是对象' }
     const schema = raw.schema
     if (typeof schema !== 'number' || !Number.isSafeInteger(schema) || schema < 1) {

@@ -14,7 +14,7 @@ import { readdirSync, realpathSync, statSync } from 'node:fs'
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { expandHomePath } from '@deepseek-ai/dsh-home-paths'
 import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
-import { companyFileProblem, readCompanyText, writeCompanyAtomic } from '../run-bundle/company-root.ts'
+import { companyFileProblem, readCompanyFile, readCompanyText, writeCompanyAtomic } from '../run-bundle/company-root.ts'
 import type { StartupSettingsProblem } from '../../lib/startup/startup-settings.ts'
 import {
   EMPTY_STARTUP_OPTIONS,
@@ -69,12 +69,10 @@ export function readStartupOptions(workspace: string): StartupOptions {
 
 /** 读派生可选项 + 诊断（symlink/坏 JSON 不静默空集合）。 */
 export function readStartupOptionsState(workspace: string): { readonly options: StartupOptions, readonly problem: 'corrupt' | 'unsafe' | null } {
-  const fileProblem = companyFileProblem(workspace, RUN_BUNDLE_PATHS.startupOptions)
-  if (fileProblem === 'missing') return { options: EMPTY_STARTUP_OPTIONS, problem: null }
-  if (fileProblem === 'unsafe') return { options: EMPTY_STARTUP_OPTIONS, problem: 'unsafe' }
-  const text = readCompanyText(workspace, RUN_BUNDLE_PATHS.startupOptions)
-  if (text === undefined) return { options: EMPTY_STARTUP_OPTIONS, problem: 'corrupt' }
-  const state = parseStartupOptionsState(text)
+  const read = readCompanyFile(workspace, RUN_BUNDLE_PATHS.startupOptions)
+  if (read.kind === 'missing') return { options: EMPTY_STARTUP_OPTIONS, problem: null }
+  if (read.kind === 'unsafe') return { options: EMPTY_STARTUP_OPTIONS, problem: 'unsafe' }
+  const state = parseStartupOptionsState(read.text)
   return { options: state.options, problem: state.problem === 'unreadable' ? 'corrupt' : state.problem }
 }
 

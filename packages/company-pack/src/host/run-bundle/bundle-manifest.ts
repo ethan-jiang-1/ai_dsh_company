@@ -13,7 +13,7 @@
  * 本模块只做纯事；调用方接住错误，apply 期不抛。
  */
 import { assertCompanyWritesAllowed } from './write-gate.ts'
-import { companyFileProblem, readCompanyText, writeCompanyAtomic, ensureCompanyRoot } from './company-root.ts'
+import { companyFileProblem, readCompanyFile, writeCompanyAtomic, ensureCompanyRoot } from './company-root.ts'
 import { randomUUID } from 'node:crypto'
 import {
   existsSync,
@@ -215,13 +215,11 @@ function validateBundleManifest(value: unknown, expectedPack?: PackMetadata): Ma
 /** 读 manifest 状态；不存在/坏/更高版本/legacy 分开报。 */
 export function readBundleManifestState(workspace: string, expectedPack?: PackMetadata): BundleManifestState {
   const path = bundleManifestPath(workspace)
-  const problem = companyFileProblem(workspace, BUNDLE_MANIFEST_REL)
-  if (problem === 'missing') return { status: 'missing', path }
-  if (problem === 'unsafe') return { status: 'corrupt', path, error: 'bundle.json 路径不安全（symlink/目录/越界）' }
+  const read = readCompanyFile(workspace, BUNDLE_MANIFEST_REL)
+  if (read.kind === 'missing') return { status: 'missing', path }
+  if (read.kind === 'unsafe') return { status: 'corrupt', path, error: 'bundle.json 路径不安全（symlink/目录/越界）' }
   try {
-    const text = readCompanyText(workspace, BUNDLE_MANIFEST_REL)
-    if (text === undefined) return { status: 'corrupt', path, error: 'bundle.json 不可读' }
-    const raw: unknown = JSON.parse(text)
+    const raw: unknown = JSON.parse(read.text)
     const validation = validateBundleManifest(raw, expectedPack)
     if (validation.unsupportedVersion !== undefined) {
       return {

@@ -11,12 +11,39 @@
  * 只有 `readCompanyText` 把 missing/unsafe 折成 undefined 是**声明过**的更粗视图。
  * 子类（missing vs unsafe）允许分歧，但 primary 载体必须等于形状的预期类。
  *
- * 证明不了：写路径、跨进程/重启、内容语义（只判形状，不判 JSON 对不对）。
+ * 本文件新增的五个状态读取场景只验证各公开消费者对有限字面JSON样本的稳定映射；不替代各自schema全集或版本矩阵。
+ * 证明不了：写路径、跨进程/重启、文件系统原子快照。
  */
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { dirname, join } from 'node:path'
+import { describe, expect, it, vi } from 'vitest'
+import { readStartupOptionsState, readStartupSettingsState } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
+import { readBundleManifestState } from '../../../packages/company-pack/src/host/run-bundle/bundle-manifest.ts'
+import { readCatalogState } from '../../../packages/company-pack/src/host/ledger/catalog-state.ts'
+import { readPresentedLedger } from '../../../packages/company-pack/src/host/ledger/presented-ledger.ts'
+
+// 只观察本次公开入口的目标绝对路径；模块加载与夹具检查不计入内容读取。
+const fileRead = vi.hoisted(() => ({
+  target: undefined as string | undefined,
+  attempts: 0,
+  fail: false,
+  afterRead: undefined as (() => void) | undefined,
+}))
+vi.mock('node:fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:fs')>()
+  return {
+    ...actual,
+    readFileSync: vi.fn(actual.readFileSync).mockImplementation((...args) => {
+      if (args[0] !== fileRead.target) return actual.readFileSync(...args)
+      fileRead.attempts++
+      if (fileRead.fail) throw Object.assign(new Error('target open refused'), { code: 'EACCES' })
+      const text = actual.readFileSync(...args)
+      fileRead.afterRead?.()
+      return text
+    }),
+  }
+})
 import { deliverableOf, gateToolCall } from '../../../packages/company-pack/src/host/commands/prd-gate.ts'
 import {
   UnsafeCompanyPathError,
@@ -25,6 +52,7 @@ import {
   createCompanyDir,
   ensureCompanyDir,
   ensureCompanyDirAt,
+  readCompanyFile,
   readCompanyFileAt,
   readCompanyText,
   readCompanyTextAt,
@@ -37,6 +65,128 @@ import { validateProductDocs } from '../../../packages/company-pack/src/lib/docs
 import { ALL_SHAPES, makeWorld, outsideSnapshot, type World } from '../../support/world-shapes.ts'
 
 const TARGET = 'kb/company.md'
+const actualFs = await vi.importActual<typeof import('node:fs')>('node:fs')
+
+function resetFileRead(): void {
+  fileRead.target = undefined
+  fileRead.attempts = 0
+  fileRead.fail = false
+  fileRead.afterRead = undefined
+}
+
+const DEFAULT_SETTINGS = { v: 1, productType: null, deliveryMode: null, wiki: null, updatedAt: null }
+const EMPTY_OPTIONS = {
+  productTypes: [], deliveryModes: [], wikiTemplate: null,
+  wikiCheck: { value: null, ok: true, problem: null, location: null, checkedAt: null },
+}
+
+// 五个消费域独立固定输入与最低业务输出；不是未来消费者的注册框架。
+const STATE_READERS = [
+  {
+    id: 'startup settings', rel: 'startup.json', run: readStartupSettingsState,
+    missing: { problem: null, settings: DEFAULT_SETTINGS },
+    unsafe: { problem: 'unsafe', settings: DEFAULT_SETTINGS },
+    corrupt: { problem: 'corrupt', settings: DEFAULT_SETTINGS },
+    empty: { problem: null, settings: DEFAULT_SETTINGS },
+    text: '{"v":1,"productType":"business-software","deliveryMode":"consulting","wiki":"kb/wiki","updatedAt":null}\n',
+    expected: { problem: null, settings: { v: 1, productType: 'business-software', deliveryMode: 'consulting', wiki: 'kb/wiki', updatedAt: null } },
+  },
+  {
+    id: 'startup options', rel: 'startup-options.json', run: readStartupOptionsState,
+    missing: { problem: null, options: EMPTY_OPTIONS },
+    unsafe: { problem: 'unsafe', options: EMPTY_OPTIONS },
+    corrupt: { problem: 'corrupt', options: EMPTY_OPTIONS },
+    empty: { problem: null, options: EMPTY_OPTIONS },
+    text: '{"productTypes":["business-software","research"],"deliveryModes":["consulting","productized"]}\n',
+    expected: { problem: null, options: { productTypes: ['business-software', 'research'], deliveryModes: ['consulting', 'productized'] } },
+  },
+  {
+    id: 'bundle manifest', rel: 'bundle.json', run: readBundleManifestState,
+    missing: { status: 'missing' },
+    unsafe: { status: 'corrupt', error: 'bundle.json 路径不安全（symlink/目录/越界）' },
+    corrupt: { status: 'corrupt' }, empty: { status: 'corrupt' },
+    text: '{"v":3,"id":"bundle-read-once","createdAt":"2026-11-20T00:00:00.000Z","pack":{"name":"read-contract-pack","version":"1.2.3"},"runBundle":{"schema":1}}\n',
+    expected: { status: 'ok', manifest: { v: 3, id: 'bundle-read-once', createdAt: '2026-11-20T00:00:00.000Z', pack: { name: 'read-contract-pack', version: '1.2.3' }, runBundle: { schema: 1 } } },
+  },
+  {
+    id: 'catalog', rel: 'kb/deliverables-index.json', run: readCatalogState,
+    missing: { status: 'missing' },
+    unsafe: { status: 'corrupt', error: 'catalog 路径不安全（symlink/目录/越界），拒绝读取' },
+    corrupt: { status: 'corrupt' }, empty: { status: 'corrupt' },
+    text: '{"schema":1,"entries":[{"path":"deliverables/alpha/final.md","slug":"alpha","presented":false}]}\n',
+    expected: { status: 'ok', catalog: { schema: 1, entries: [{ path: 'deliverables/alpha/final.md', slug: 'alpha', presented: false }] } },
+  },
+  {
+    id: 'presented ledger', rel: 'kb/deliverables-presented.json', run: readPresentedLedger,
+    missing: { status: 'missing' },
+    unsafe: { status: 'corrupt', error: '账本路径不安全（symlink/目录/越界），拒绝读取' },
+    corrupt: { status: 'corrupt' }, empty: { status: 'corrupt' },
+    text: '{"schema":1,"updatedAt":"2026-11-20T00:00:00.000Z","paths":{"deliverables/alpha/final.md":false},"slugs":{"beta":true}}\n',
+    expected: { status: 'ok', ledger: { schema: 1, updatedAt: '2026-11-20T00:00:00.000Z', paths: { 'deliverables/alpha/final.md': false }, slugs: { beta: true } } },
+  },
+] as const
+
+describe('五个状态读取入口只消费一次目标文件文本', () => {
+  for (const reader of STATE_READERS) {
+    it.each(['valid', 'missing', 'directory', 'symlink', 'open-failure', 'changed-after-read', 'deleted-after-read', 'empty', 'bad-json'] as const)(`${reader.id}：%s，保留分类/首次文本，下一次可恢复`, (mode) => {
+      const world = makeWorld('shape-state-read-')
+      const target = join(world.ws, '.dsh-company', reader.rel)
+      const removeTarget = () => {
+        expect(target).toBe(join(world.ws, '.dsh-company', reader.rel))
+        rmSync(target, { force: true, recursive: true })
+      }
+      try {
+        mkdirSync(dirname(target), { recursive: true })
+        if (mode === 'directory') mkdirSync(target)
+        else if (mode === 'symlink') {
+          writeFileSync(join(world.outside, 'state.json'), reader.text)
+          symlinkSync(join(world.outside, 'state.json'), target)
+        } else if (mode !== 'missing') writeFileSync(target, mode === 'empty' ? ' \n\t' : mode === 'bad-json' ? '{invalid json\n' : reader.text)
+        fileRead.target = target
+        fileRead.attempts = 0
+        fileRead.fail = mode === 'open-failure'
+        if (mode === 'changed-after-read' || mode === 'deleted-after-read') {
+          fileRead.afterRead = () => {
+            fileRead.afterRead = undefined
+            if (mode === 'changed-after-read') writeFileSync(target, '{changed after first read\n')
+            else removeTarget()
+          }
+        }
+
+        const state = reader.run(world.ws)
+        const expected = mode === 'missing' ? reader.missing
+          : mode === 'directory' || mode === 'symlink' || mode === 'open-failure' ? reader.unsafe
+            : mode === 'empty' ? reader.empty : mode === 'bad-json' ? reader.corrupt : reader.expected
+        expect(state).toMatchObject(expected)
+        if ('path' in state) expect(state.path).toBe(target)
+        const refused = mode === 'missing' || mode === 'directory' || mode === 'symlink'
+        if (mode === 'open-failure') {
+          expect(fileRead.attempts).toBeGreaterThan(0)
+          expect(fileRead.attempts).toBeLessThanOrEqual(1)
+        } else expect(fileRead.attempts, `${reader.id} 的目标内容读取次数`).toBe(refused ? 0 : 1)
+
+        // 原始 fs 检查夹具不计数：失败不修盘；首次读取后变化也不被状态读取器写回。
+        if (mode === 'missing' || mode === 'deleted-after-read') expect(actualFs.existsSync(target)).toBe(false)
+        else if (mode === 'directory') expect(actualFs.lstatSync(target).isDirectory()).toBe(true)
+        else if (mode === 'symlink') {
+          expect(actualFs.lstatSync(target).isSymbolicLink()).toBe(true)
+          expect(actualFs.readFileSync(join(world.outside, 'state.json'), 'utf8')).toBe(reader.text)
+        } else expect(actualFs.readFileSync(target, 'utf8')).toBe(mode === 'empty' ? ' \n\t' : mode === 'bad-json' ? '{invalid json\n' : mode === 'changed-after-read' ? '{changed after first read\n' : reader.text)
+
+        if (mode === 'directory' || mode === 'symlink') removeTarget()
+        writeFileSync(target, reader.text)
+        fileRead.fail = false
+        fileRead.afterRead = undefined
+        fileRead.attempts = 0
+        expect(reader.run(world.ws)).toMatchObject(reader.expected)
+        expect(fileRead.attempts, '下次调用重新读取，不能缓存失败或首次文本').toBe(1)
+      } finally {
+        resetFileRead()
+        world.cleanup()
+      }
+    })
+  }
+})
 
 interface Reader {
   readonly id: string
@@ -51,13 +201,14 @@ const READERS: readonly Reader[] = [
     run: (world) => plainFileProblem(join(world.ws, '.dsh-company'), join(world.ws, '.dsh-company', TARGET)),
   },
   { id: 'company.readText', run: (world) => readCompanyText(world.ws, TARGET) },
+  { id: 'company.readFile', run: (world) => readCompanyFile(world.ws, TARGET) },
   { id: 'company.readFileAt', run: (world) => readCompanyFileAt(join(world.ws, '.dsh-company'), TARGET) },
 ]
 
 /** 归一：ok / not-ok。`readCompanyText` 的 undefined 与 `readCompanyFileAt` 的 missing/unsafe 都是声明过的「更粗」视图。 */
 function isOk(id: string, value: unknown): boolean {
   if (id === 'company.readText') return typeof value === 'string'
-  if (id === 'company.readFileAt') return (value as { readonly kind?: string } | null)?.kind === 'text'
+  if (id === 'company.readFile' || id === 'company.readFileAt') return (value as { readonly kind?: string } | null)?.kind === 'text'
   return value === null
 }
 
@@ -76,9 +227,64 @@ describe('公司盘文件形状的 Agreement 矩阵', () => {
         expect(views[0]?.ok, `primary 预期 ${shape.expected}，实得 ${describeViews(views)}`).toBe(shape.expected === 'ok')
         const primary = companyFileProblem(world.ws, TARGET)
         expect(primary, `primary 子类不等于预期 ${shape.expected}`).toBe(shape.expected === 'ok' ? null : shape.expected)
+        expect(readCompanyFile(world.ws, TARGET).kind, 'workspace 完整结果保留 missing/unsafe 子类').toBe(shape.expected === 'ok' ? 'text' : shape.expected)
       } finally { world.cleanup() }
     })
   }
+})
+
+describe('workspace 完整读取与既有有损视图的合同', () => {
+  it('新合法子路径支持公司盘前缀；At 使用确切根且不剥前缀', () => {
+    const world = makeWorld('shape-workspace-read-')
+    try {
+      const home = join(world.ws, '.dsh-company')
+      const rel = 'fresh-members/another-record.txt'
+      const members: readonly (readonly [string, string])[] = [
+        [join(home, rel), 'company member\n'],
+        [join(world.ws, rel), 'workspace member\n'],
+        [join(home, '.dsh-company', rel), 'nested member\n'],
+      ]
+      for (const [path, text] of members) {
+        mkdirSync(dirname(path), { recursive: true })
+        writeFileSync(path, text)
+      }
+      for (const rawRel of [rel, `.dsh-company/${rel}`, `./.dsh-company/${rel}`, '.dsh-company\\fresh-members\\another-record.txt']) {
+        expect(readCompanyFile(world.ws, rawRel), rawRel).toEqual({ kind: 'text', text: 'company member\n' })
+        expect(readCompanyText(world.ws, rawRel), rawRel).toBe('company member\n')
+        expect(companyFileProblem(world.ws, rawRel), rawRel).toBeNull()
+      }
+      expect(readCompanyFileAt(home, rel)).toEqual({ kind: 'text', text: 'company member\n' })
+      expect(readCompanyFileAt(world.ws, rel)).toEqual({ kind: 'text', text: 'workspace member\n' })
+      expect(readCompanyFileAt(home, `.dsh-company/${rel}`)).toEqual({ kind: 'text', text: 'nested member\n' })
+      expect(readCompanyFile(home, rel)).toEqual({ kind: 'text', text: 'nested member\n' })
+    } finally { world.cleanup() }
+  })
+
+  it.each(['text', 'missing', 'unsafe'] as const)('%s：完整结果及原便捷视图保持字面量，内容各至多读一次', (kind) => {
+    const world = makeWorld('shape-read-views-')
+    const target = join(world.ws, '.dsh-company/kb/fresh-view.txt')
+    try {
+      mkdirSync(dirname(target), { recursive: true })
+      if (kind === 'text') writeFileSync(target, 'fresh view\n')
+      if (kind === 'unsafe') mkdirSync(target)
+      fileRead.target = target
+      const result = readCompanyFile(world.ws, 'kb/fresh-view.txt')
+      expect(result.kind).toBe(kind)
+      if (kind === 'text') expect(result).toEqual({ kind: 'text', text: 'fresh view\n' })
+      if (kind === 'missing') expect(result).toEqual({ kind: 'missing' })
+      if (kind === 'unsafe' && result.kind === 'unsafe') expect(result.reason).toContain('不是可读普通文件')
+      expect(fileRead.attempts).toBe(kind === 'text' ? 1 : 0)
+      fileRead.attempts = 0
+      expect(companyFileProblem(world.ws, 'kb/fresh-view.txt')).toBe(kind === 'text' ? null : kind)
+      expect(fileRead.attempts).toBe(kind === 'text' ? 1 : 0)
+      fileRead.attempts = 0
+      expect(readCompanyText(world.ws, 'kb/fresh-view.txt')).toBe(kind === 'text' ? 'fresh view\n' : undefined)
+      expect(fileRead.attempts).toBe(kind === 'text' ? 1 : 0)
+    } finally {
+      resetFileRead()
+      world.cleanup()
+    }
+  })
 })
 
 /**
@@ -234,6 +440,9 @@ describe('路径等价类与读写目录闸门全通道同判据矩阵（W3.3，
       symlinkSync(join(world.outside, 'target-dir'), join(home, 'kb/symlink'))
       const before = outsideSnapshot(world)
 
+      const result = readCompanyFile(world.ws, rel)
+      expect(result.kind, `readCompanyFile(${rel})`).toBe(expected)
+      if (expected === 'text') expect(result).toEqual({ kind: 'text', text: '# ok\n' })
       const resultAt = readCompanyFileAt(home, rel)
       expect(resultAt.kind, `readCompanyFileAt(${rel})`).toBe(expected)
       if (expected === 'text') expect(resultAt).toEqual({ kind: 'text', text: '# ok\n' })
@@ -394,6 +603,7 @@ describe('路径等价类与读写目录闸门全通道同判据矩阵（W3.3，
 
       // 空字节、绝对路径、Windows 盘符路径一律 unsafe
       for (const badRel of ['kb/a\0b.md', '/etc/passwd', 'C:/evil.md', 'C:\\evil.md']) {
+        expect(readCompanyFile(world.ws, badRel).kind, badRel).toBe('unsafe')
         expect(readCompanyFileAt(home, badRel).kind, badRel).toBe('unsafe')
         expect(() => writeCompanyAtomicAt(home, badRel, 'x'), badRel).toThrow(UnsafeCompanyPathError)
       }

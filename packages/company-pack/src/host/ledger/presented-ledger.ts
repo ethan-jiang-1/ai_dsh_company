@@ -8,12 +8,12 @@ import { isAbsolute, join, relative, resolve } from 'node:path'
 import { normalizeRel, slugFromDirName, type DeliverablesCatalog } from '../../lib/deliverables/deliverables-catalog.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 import { isRecord } from '../../lib/shared/guards.ts'
-import { companyFileProblem, readCompanyText, writeCompanyAtomic } from '../run-bundle/company-root.ts'
+import { readCompanyFile, companyFileProblem, writeCompanyAtomic } from '../run-bundle/company-root.ts'
 import { canonicalPath } from '../run-bundle/paths.ts'
 import { readCatalog } from './catalog-state.ts'
 
 export const PRESENTED_LEDGER_REL = RUN_BUNDLE_PATHS.presented
-export const presentedLedgerPath = (companyHome: string): string => join(companyHome, PRESENTED_LEDGER_REL)
+export const presentedLedgerPath = (workspace: string): string => join(workspace, PRESENTED_LEDGER_REL)
 
 // ── presented 审计账本（2026-10-27）──────────────────────────────────────────────
 // 为什么不是纯派生：`presented=false` 只能来自操作员审计（代码里没有任何路径会写 false）；
@@ -39,15 +39,13 @@ function validateBooleanMap(value: unknown): value is Record<string, boolean> {
   return Object.values(value).every(entry => entry === true || entry === false)
 }
 
-export function readPresentedLedger(companyHome: string): PresentedLedgerState {
-  const path = presentedLedgerPath(companyHome)
-  const problem = companyFileProblem(companyHome, RUN_BUNDLE_PATHS.presented)
-  if (problem === 'missing') return { status: 'missing', path }
-  if (problem === 'unsafe') return { status: 'corrupt', path, error: '账本路径不安全（symlink/目录/越界），拒绝读取' }
+export function readPresentedLedger(workspace: string): PresentedLedgerState {
+  const path = presentedLedgerPath(workspace)
+  const read = readCompanyFile(workspace, RUN_BUNDLE_PATHS.presented)
+  if (read.kind === 'missing') return { status: 'missing', path }
+  if (read.kind === 'unsafe') return { status: 'corrupt', path, error: '账本路径不安全（symlink/目录/越界），拒绝读取' }
   try {
-    const text = readCompanyText(companyHome, RUN_BUNDLE_PATHS.presented)
-    if (text === undefined) return { status: 'corrupt', path, error: '账本不可读' }
-    const raw: unknown = JSON.parse(text)
+    const raw: unknown = JSON.parse(read.text)
     if (!isRecord(raw)) return { status: 'corrupt', path, error: '不是对象' }
     const schema = raw.schema
     if (typeof schema !== 'number' || !Number.isSafeInteger(schema) || schema < 1) {
@@ -57,6 +55,8 @@ export function readPresentedLedger(companyHome: string): PresentedLedgerState {
     if (typeof raw.updatedAt !== 'string') return { status: 'corrupt', path, error: '缺 updatedAt' }
     if (!validateBooleanMap(raw.paths)) return { status: 'corrupt', path, error: 'paths 不是 boolean map' }
     if (!validateBooleanMap(raw.slugs)) return { status: 'corrupt', path, error: 'slugs 不是 boolean map' }
+    // SAFETY: 上方已逐字段校验 schema/updatedAt/paths/slugs 的形状与版本，剩余字段即合同本身；
+    // isRecord 只保证 Record<string, unknown>，这里按已验证字段收窄成只读账本视图。
     return { status: 'ok', path, ledger: raw as unknown as PresentedLedger }
   } catch (error) {
     return { status: 'corrupt', path, error: (error as Error).message }
