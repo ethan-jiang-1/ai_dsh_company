@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-289-human-loop-decision-journal-not-written.md](fixed_bugs/BUG-289-human-loop-decision-journal-not-written.md) — 判据按旧布局找 journal，产品写对了 `.dsh-company/kb/ceo/journal/`；改常量后 12/12 绿。
+- [BUG-287-session-search-locale-hardcoded.md](fixed_bugs/BUG-287-session-search-locale-hardcoded.md) — 探针/车道写死英文可访问名，默认 zh 产品档整批导航超时；14 文件改双语正则。
 - [BUG-285-upgrade-lane-frozen-identity-semantics.md](fixed_bugs/BUG-285-upgrade-lane-frozen-identity-semantics.md) — 升级守卫冻结已废止的「创建版本」语义而长期红；改断言 id/createdAt 保留 + pack.version 跟随 + v3 备份。
 - [BUG-284-dev-wrapper-orphan-writer-holds-lease.md](fixed_bugs/BUG-284-dev-wrapper-orphan-writer-holds-lease.md) — 杀 wrapper 后 dsh 成孤儿持 writer lease，下一次启动静默停写；补 SIGINT/SIGTERM/SIGHUP 转发。
 - [BUG-283-dev-wrapper-home-missing-opaque-failure.md](fixed_bugs/BUG-283-dev-wrapper-home-missing-opaque-failure.md) — `--home` 目录不存在时模板初始化 exit null/空 stderr；先建 home 并点名 spawn 错误。

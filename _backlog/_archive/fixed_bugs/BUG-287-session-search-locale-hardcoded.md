@@ -72,4 +72,4 @@ node checks/lanes/attention-e2e.entry.mjs     # 门A PASS，随后 Search sessio
 - 改动面：`probes/lib/probe-window.mjs`、`checks/lanes/attention-e2e.entry.mjs`、`checks/lanes/human-loop-e2e.entry.mjs`、`checks/lanes/replay.e2e.mjs`、`probes/browser-visual/tasks-panel-probe.mjs`、`probes/browser-visual/dag-midflight-probe.mjs`、`probes/team/member-rescue-probe.mjs`、`probes/session-context/human-exits-probe.mjs`、`probes/session-context/ceo-assembly-probe.mjs`、`probes/session-context/hitl-dispatch-order-probe.mjs`、`probes/session-context/reconcile-round-probe.mjs` 等 14 个文件（可访问名改双语正则：搜索会话/搜索结果/搜索框占位、对话页签、打开右侧边栏、允许一次、继续）
 - 红：`node checks/lanes/attention-e2e.entry.mjs` → `TimeoutError: waiting for getByRole('button', { name: 'Search sessions' })`（默认 zh 档，15s）
 - 绿：`node checks/lanes/attention-e2e.entry.mjs` → 同一判据推进过「搜索会话→结果点击→对话页签→门A PASS→session opened」（不再卡在英文可访问名）
-- 提交：commit （见本轮提交）
+- 提交：commit 609598ad

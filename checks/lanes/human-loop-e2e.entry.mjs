@@ -26,7 +26,9 @@ import { launchChromium, loadChromium } from '../../tools/drivers/playwright.mjs
 
 const REHEARSAL = join(ROOT, REHEARSAL_REL)
 const INPUTS = join(REHEARSAL, 'inputs')
-const JOURNAL_GAP = join(REHEARSAL, 'journal', 'gift-rule-gap.md')
+// 角色 journal 的现行家 = <workspace>/.dsh-company/kb/<role>/journal/（v3 布局）；
+// 旧常量落在 workspace 根的 journal/，自 v3 起永远等不到文件（2026-11-20 实证：文件写对了、判据看错地方）。
+const JOURNAL_GAP = join(REHEARSAL, '.dsh-company', 'kb', 'ceo', 'journal', 'gift-rule-gap.md')
 const SHOTS = join(ROOT, 'snapshots/probes/human-loop-e2e', new Date().toISOString().slice(0, 10))
 mkdirSync(SHOTS, { recursive: true })
 const sleep = ms => new Promise(r => setTimeout(r, ms))
