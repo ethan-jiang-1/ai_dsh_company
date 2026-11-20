@@ -1,17 +1,19 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-17
 ---
 
 # 推敲：运行时 / 发布面与开发时刻的分离（C13）
 
-> 立卡：2026-11-17 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-17 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent（独立盲审）— 2026-11-20 独立只读子代理复核：十假设全部有判决、10 张 BUG-213..222 已修且证据齐、去向 Note 成立，无假交付；汇总表编号偏 1 已用订正行中和，机械出口物同变更补齐
 >
-> **结论/去向**：implementation — 本卡执行 C13 的探索与证据（缺陷另开 `_backlog/bugs/` 卡；编号唯一源 = [bugs/README](../bugs/README.md) 的 Next；本组分配 BUG-213..222，Next = 223）；本卡不改产品代码。
+> **结论/去向**：implementation — 本卡执行 C13 的探索与证据（缺陷另开 `_backlog/bugs/` 卡；编号唯一源 = [bugs/README](../../bugs/README.md) 的 Next；本组分配 BUG-213..222，Next = 223）；本卡不改产品代码。决策记忆 = [C13 修复批次 Note](../../../notes/implemented/2026-11-17-shipped-package-boundary.md)；产出 10 张 BUG-213..222 全部已修并迁 [fixed_bugs](../fixed_bugs/)。
+>
+> **收口（2026-11-20）**：Round 97–99 三面齐跑，C13-1..C13-10 全部判决（C13-6 refuted）；10 张 P2 卡由 2026-11-17 修复轮修复（`f1629047`）并迁 [fixed_bugs](../fixed_bugs/)。遗留面 = 无 pnpm 安装环境实跑、clean clone（修复批次已补 `company-entry`/`client-load` 两 lane，见批次 Note）；本卡不把「仓库内全绿」当「安装面干净」。
 >
 > **授权边界**：静态 / tarball / 隔离安装 / 真入口可自主；不修产品代码；不改 vendor；发布字节只读（不重打 `_dist`）。
 >
-> **前序**：[C12 归属波次卡](2026-11-17-ownership-wave-exploratory.md) 已收 10 张 BUG-202..211（调查中）。本卡是用户新方向：「不少脚本/代码发布到运行时的不应该那么多；运行时的代码/脚本不应该依赖开发时刻的脚本，比如测试、设置环境、未来测试/验证什么的」。
+> **前序**：[C12 归属波次卡](2026-11-17-ownership-wave-exploratory.md) 已收 10 张 BUG-202..211（已修并迁 fixed_bugs）。本卡是用户新方向：「不少脚本/代码发布到运行时的不应该那么多；运行时的代码/脚本不应该依赖开发时刻的脚本，比如测试、设置环境、未来测试/验证什么的」。
 
 ## 问题与期望结果
 
@@ -66,16 +68,16 @@ opened: 2026-11-17
 
 | # | 载体 | 预检看到什么 | 轴 | 首轮怎么证伪 |
 |---|---|---|---|---|
-| 1 | tarball `lib/` | 137 entries；运行时 JS 只有 2 个；135 个 `.d.ts`（660 KB） | A/E | `tar -tzf` × `exports` × `main`；[BUG-213](../_archive/fixed_bugs/BUG-213-tarball-ships-type-dts-majority.md) |
-| 2 | tarball `package.json` | `scripts.prepack = node scripts/prepack-check.mjs`，但 `package/scripts/` 不存在；`npm pack --dry-run` exit 1 | B | 解包 `npm pack --dry-run`；[BUG-214](../_archive/fixed_bugs/BUG-214-shipped-prepack-missing-scripts.md) |
-| 3 | tarball `README.md` | 5/5 相对链接指向包外（`docs/`/`probes/`/`_backlog/`）；另有 tests/repo/... 与 pnpm 前置 | D | 包内链接解析；[BUG-215](../_archive/fixed_bugs/BUG-215-shipped-readme-dev-links.md) |
-| 4 | tarball `lib/*.js`、`lib/types`、`cordis.patch.yml`、preset YAML、技能脚本 | 共 76 处 dev 路径引用（lib/index 22、lib/client 16、types 27、README 7、cordis 4） | D | 逐文件 grep + 包内存在性；[BUG-216](../_archive/fixed_bugs/BUG-216-shipped-comments-dev-paths.md) |
-| 5 | tarball `lib/client.js` + `package.json` | 只 require `@deepseek-ai/dsh-client-ui-primitives`（不在 peer/inject）+ react；`client.inject` 9 条里 8 条未被 factory require | C/E | 假 module table；[BUG-217](../_archive/fixed_bugs/BUG-217-client-inject-missing-primitives.md) |
-| 6 | tarball `package.json` | `devDependencies` 24 条、其中 21 条 `workspace:*`；`dependencies` 缺失；全部运行时包走 peer | B | 解包 `npm install --dry-run`；[BUG-219](../_archive/fixed_bugs/BUG-219-shipped-devdeps-workspace-protocol.md) |
-| 7 | tarball `lib/*.js` | 两个 bundle 各 1 条 `sourceMappingURL=*.js.map`；tarball `.map` 0 个 | A/E | grep + tar；[BUG-220](../_archive/fixed_bugs/BUG-220-sourcemap-url-missing-maps.md) |
-| 8 | tarball `README.md` 前置 | Desktop 自带 pnpm；npm CLI / Plugins 页要求 pnpm 在 PATH；无 npm-only fallback | D/E | README 行 + 安装路径；[BUG-218](../_archive/fixed_bugs/BUG-218-readme-pnpm-runtime-prereq.md) |
-| 9 | tarball `package.json` `dsh.client.inject` | 9 条声明 vs factory 实际 1 条 require；注入面大于/错于运行时面 | C | 假 module table；[BUG-221](../_archive/fixed_bugs/BUG-221-client-inject-over-declared.md) |
-| 10 | tarball `lib/client.js` | external 了 `react`/`react/jsx-runtime`，但 peerDependencies / client.inject 都没有 react | C/E | 假 module table（提供 react 才能继续）；[BUG-222](../_archive/fixed_bugs/BUG-222-client-react-not-declared.md) |
+| 1 | tarball `lib/` | 137 entries；运行时 JS 只有 2 个；135 个 `.d.ts`（660 KB） | A/E | `tar -tzf` × `exports` × `main`；[BUG-213](../fixed_bugs/BUG-213-tarball-ships-type-dts-majority.md) |
+| 2 | tarball `package.json` | `scripts.prepack = node scripts/prepack-check.mjs`，但 `package/scripts/` 不存在；`npm pack --dry-run` exit 1 | B | 解包 `npm pack --dry-run`；[BUG-214](../fixed_bugs/BUG-214-shipped-prepack-missing-scripts.md) |
+| 3 | tarball `README.md` | 5/5 相对链接指向包外（`docs/`/`probes/`/`_backlog/`）；另有 tests/repo/... 与 pnpm 前置 | D | 包内链接解析；[BUG-215](../fixed_bugs/BUG-215-shipped-readme-dev-links.md) |
+| 4 | tarball `lib/*.js`、`lib/types`、`cordis.patch.yml`、preset YAML、技能脚本 | 共 76 处 dev 路径引用（lib/index 22、lib/client 16、types 27、README 7、cordis 4） | D | 逐文件 grep + 包内存在性；[BUG-216](../fixed_bugs/BUG-216-shipped-comments-dev-paths.md) |
+| 5 | tarball `lib/client.js` + `package.json` | 只 require `@deepseek-ai/dsh-client-ui-primitives`（不在 peer/inject）+ react；`client.inject` 9 条里 8 条未被 factory require | C/E | 假 module table；[BUG-217](../fixed_bugs/BUG-217-client-inject-missing-primitives.md) |
+| 6 | tarball `package.json` | `devDependencies` 24 条、其中 21 条 `workspace:*`；`dependencies` 缺失；全部运行时包走 peer | B | 解包 `npm install --dry-run`；[BUG-219](../fixed_bugs/BUG-219-shipped-devdeps-workspace-protocol.md) |
+| 7 | tarball `lib/*.js` | 两个 bundle 各 1 条 `sourceMappingURL=*.js.map`；tarball `.map` 0 个 | A/E | grep + tar；[BUG-220](../fixed_bugs/BUG-220-sourcemap-url-missing-maps.md) |
+| 8 | tarball `README.md` 前置 | Desktop 自带 pnpm；npm CLI / Plugins 页要求 pnpm 在 PATH；无 npm-only fallback | D/E | README 行 + 安装路径；[BUG-218](../fixed_bugs/BUG-218-readme-pnpm-runtime-prereq.md) |
+| 9 | tarball `package.json` `dsh.client.inject` | 9 条声明 vs factory 实际 1 条 require；注入面大于/错于运行时面 | C | 假 module table；[BUG-221](../fixed_bugs/BUG-221-client-inject-over-declared.md) |
+| 10 | tarball `lib/client.js` | external 了 `react`/`react/jsx-runtime`，但 peerDependencies / client.inject 都没有 react | C/E | 假 module table（提供 react 才能继续）；[BUG-222](../fixed_bugs/BUG-222-client-react-not-declared.md) |
 
 ## 方法（每轮固定）
 
@@ -85,7 +87,7 @@ opened: 2026-11-17
 3. **文本面**：tarball 内 README/`cordis.patch.yml`/presets/源码注释逐条判「安装后是否存在」；包外相对链接一律按断链算。
 4. **负控**：往 shipped 文本加一条 dev 路径 / 删一个 peer / 去掉一个 map，看声明或门禁是否红；没有负控写 `unverified`。
 5. **判决 + 证据**：每格 PASS/FAIL/未证；FAIL 开 `_backlog/bugs/` 卡（Next 212 起）；证据落 `runtime/tmp/c13/`（gitignored）。
-6. **回填**：本卡 `## Round 97/98`；同步 [issues/README](README.md) 与 [bugs/README](../bugs/README.md)。
+6. **回填**：本卡 `## Round 97/98`；同步 [issues/README](../../issues/README.md) 与 [bugs/README](../../bugs/README.md)。
 
 ## 轮次与停止
 
@@ -132,10 +134,10 @@ opened: 2026-11-17
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C13-1 tarball 非运行时字节占多数 | **confirmed** | `lib/` 137 entries = 2 运行时 JS + 135 `.d.ts`（660 KB）；`files` 显式收 `lib/types/**/*.d.ts` → [BUG-213](../_archive/fixed_bugs/BUG-213-tarball-ships-type-dts-majority.md) |
-| C13-2 shipped manifest 引用 dev 脚本/协议 | **confirmed** | `package/scripts/` 0 条但 `prepack` 指向 `scripts/prepack-check.mjs`；解包 `npm pack --dry-run` exit 1；`devDependencies` 24 条 / 21 条 `workspace:*`，`npm install --dry-run` EUNSUPPORTEDPROTOCOL → [BUG-214](../_archive/fixed_bugs/BUG-214-shipped-prepack-missing-scripts.md)、[BUG-219](../_archive/fixed_bugs/BUG-219-shipped-devdeps-workspace-protocol.md) |
-| C13-3 运行时 require 与 peer/inject 不一致 | **confirmed** | `lib/client.js` 只 require primitives + react；primitives 不在 peer/inject，react 不在 peer/inject；inject 9 条里 8 条未被 factory require → [BUG-217](../_archive/fixed_bugs/BUG-217-client-inject-missing-primitives.md)、[BUG-221](../_archive/fixed_bugs/BUG-221-client-inject-over-declared.md)、[BUG-222](../_archive/fixed_bugs/BUG-222-client-react-not-declared.md) |
-| C13-5 sourceMappingURL 无 map | **confirmed** | 两个 bundle 各 1 条 `sourceMappingURL`；tarball `.map` 0 → [BUG-220](../_archive/fixed_bugs/BUG-220-sourcemap-url-missing-maps.md) |
+| C13-1 tarball 非运行时字节占多数 | **confirmed** | `lib/` 137 entries = 2 运行时 JS + 135 `.d.ts`（660 KB）；`files` 显式收 `lib/types/**/*.d.ts` → [BUG-213](../fixed_bugs/BUG-213-tarball-ships-type-dts-majority.md) |
+| C13-2 shipped manifest 引用 dev 脚本/协议 | **confirmed** | `package/scripts/` 0 条但 `prepack` 指向 `scripts/prepack-check.mjs`；解包 `npm pack --dry-run` exit 1；`devDependencies` 24 条 / 21 条 `workspace:*`，`npm install --dry-run` EUNSUPPORTEDPROTOCOL → [BUG-214](../fixed_bugs/BUG-214-shipped-prepack-missing-scripts.md)、[BUG-219](../fixed_bugs/BUG-219-shipped-devdeps-workspace-protocol.md) |
+| C13-3 运行时 require 与 peer/inject 不一致 | **confirmed** | `lib/client.js` 只 require primitives + react；primitives 不在 peer/inject，react 不在 peer/inject；inject 9 条里 8 条未被 factory require → [BUG-217](../fixed_bugs/BUG-217-client-inject-missing-primitives.md)、[BUG-221](../fixed_bugs/BUG-221-client-inject-over-declared.md)、[BUG-222](../fixed_bugs/BUG-222-client-react-not-declared.md) |
+| C13-5 sourceMappingURL 无 map | **confirmed** | 两个 bundle 各 1 条 `sourceMappingURL`；tarball `.map` 0 → [BUG-220](../fixed_bugs/BUG-220-sourcemap-url-missing-maps.md) |
 
 **负控（实跑）：**
 
@@ -154,8 +156,8 @@ opened: 2026-11-17
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C13-4 shipped README/注释含 dev-only 路径、包外断链 | **confirmed** | README 5/5 相对链接断；README 7 处 dev 引用；`lib/index.js` 22 + `lib/client.js` 16 + `lib/types` 27 + `cordis.patch.yml` 4 = 76 处 dev 路径 → [BUG-215](../_archive/fixed_bugs/BUG-215-shipped-readme-dev-links.md)、[BUG-216](../_archive/fixed_bugs/BUG-216-shipped-comments-dev-paths.md) |
-| C13-8 README 把 pnpm 写成运行时前置 | **confirmed** | README 行 9/10/62；`engines` 无包管理器；无 fallback/检查 → [BUG-218](../_archive/fixed_bugs/BUG-218-readme-pnpm-runtime-prereq.md) |
+| C13-4 shipped README/注释含 dev-only 路径、包外断链 | **confirmed** | README 5/5 相对链接断；README 7 处 dev 引用；`lib/index.js` 22 + `lib/client.js` 16 + `lib/types` 27 + `cordis.patch.yml` 4 = 76 处 dev 路径 → [BUG-215](../fixed_bugs/BUG-215-shipped-readme-dev-links.md)、[BUG-216](../fixed_bugs/BUG-216-shipped-comments-dev-paths.md) |
+| C13-8 README 把 pnpm 写成运行时前置 | **confirmed** | README 行 9/10/62；`engines` 无包管理器；无 fallback/检查 → [BUG-218](../fixed_bugs/BUG-218-readme-pnpm-runtime-prereq.md) |
 | C13-10 dev 引用无门禁 | **confirmed（构造性）** | `pnpm verify`/`md-links` 在仓库树绿（README 链接目标在仓库内存在）；`release --check` 只查源码指纹，不扫 tarball 文本；无 shipped-text 判据 |
 
 **未跑：** 真 `company-entry` / `client-load` 本轮未重跑（无产品代码改动；tarball 是只读输入）；clean install 在无 pnpm 环境的实跑未做。
@@ -186,10 +188,13 @@ opened: 2026-11-17
 | C13-9 | confirmed | 216 / 220 / 221 |
 | C13-10 | confirmed（构造性） | 214 / 215 |
 
-**本轮共开 10 张 P2 卡（BUG-213..222）**，全部 `调查中`，不修产品代码；未跑面 = 真
-`company-entry`/`client-load` 重跑、无 pnpm 安装环境实跑、clean clone。没有「发布面干净」的结论。
+**编号订正（2026-11-20 归档时）**：本表 BUG 列按预分配「Next 212 起」书写，整列偏 1（BUG-212 已被同日收尾轮占用）；正确 = BUG-213..222，逐条对应见 `## 预检坐标` 与各 BUG 卡 `关联` 行（C13-10 → BUG-216）。Round 97–99 正文与预检坐标是原始证据，不改。
+
+**本轮共开 10 张 P2 卡（BUG-213..222）**，当轮全部 `调查中`、不修产品代码（2026-11-20 收口：10 张已全部修复并迁 [fixed_bugs](../fixed_bugs/)）；未跑面 = 真
+`company-entry`/`client-load` 重跑、无 pnpm 安装环境实跑、clean clone（owner = 后续安装形状轮；两 lane 已由修复批次补跑，见 Note）。没有「发布面干净」的结论。
 
 ## 执行记录
 
 - 2026-11-17 ｜ 立卡（focus v8 / C13）｜ 本卡 + bugs/README + issues/README ｜ 拆包与静态预检 10 条 ｜ `pnpm verify` ALL PASS ｜ Round 97–99 待跑。
 - 2026-11-17 ｜ Round 97–99 ｜ `runtime/tmp/c13-*` ｜ 拆包/解包 npm 两个负控/假 module table/README 链接/76 处 dev 引用/类型面 135 ｜ 10 张 BUG-213..222（调查中，不修） ｜ `pnpm verify` ALL PASS；`pnpm test` 261/2203 ｜ 真 lane 重跑与无 pnpm 安装未跑。
+- 2026-11-20 ｜ 收口归档 ｜ 十假设判决复核 + 汇总表编号订正 + 卡内/入链深度修正 ｜ 10 张 BUG-213..222 已修（`f1629047`）并迁 fixed_bugs；去向 = 批次 Note ｜ `pnpm verify` ALL PASS ｜ 审查：agent（独立盲审）。

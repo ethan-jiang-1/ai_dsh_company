@@ -1,5 +1,10 @@
 # _archive/ · 离开活跃区
 
+- [2026-11-20-quality-prevention-contract-pilot.md](settled_issues/2026-11-20-quality-prevention-contract-pilot.md) — content 合同族预防试点：动态成员矩阵 + 独立业务锚点 + 共享分支/接线负控 + 开发入口修订，bootstrap 局部试点与生产源头研究同批交付；剩余候选记为以后做；去向 = [实施Note](../../notes/implemented/2026-11-20-quality-prevention-contract-pilot.md)。
+- [2026-11-17-ownership-wave-exploratory.md](settled_issues/2026-11-17-ownership-wave-exploratory.md) — C12 归属波次探索：Round 94–96 六面齐跑，10 张 BUG-202..211 全部修复归档；未跑面（clean worktree/setup/live/Windows）与 3 项 unverified 如实保留；去向 = implementation（[批次 Note](../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)）。
+- [2026-11-17-runtime-shipped-boundary-exploratory.md](settled_issues/2026-11-17-runtime-shipped-boundary-exploratory.md) — C13 运行时/发布面分离：Round 97–99，10 张 BUG-213..222 全部修复归档；汇总表编号偏 1 已订正；去向 = implementation（[批次 Note](../../notes/implemented/2026-11-17-shipped-package-boundary.md)）。
+- [2026-11-18-low-confidence-runtime-exploratory.md](settled_issues/2026-11-18-low-confidence-runtime-exploratory.md) — C14 修复后的守卫面 + 低置信运行态：Round 100–101，10 张 BUG-223..232 全部修复归档；G5/G6 与 Round 102 未跑已写明 owner；去向 = implementation（[批次 Note](../../notes/implemented/2026-11-18-shipped-shape-closure-and-low-confidence-runtime.md)）。
+- [2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md](settled_issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md) — C16 门禁管线指纹 + 更低置信运行态：Round 105–107，20 张 BUG-243..262 全部修复归档；判决账订正（6 条直接判决/覆盖、4 条部分、10 条未跑）见卡；去向 = implementation（[批次 Note](../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)）。
 - [2026-11-20-company-file-read-state.md](settled_issues/2026-11-20-company-file-read-state.md) — workspace三态owner、旧视图委托、五个状态函数一次读取；领域政策与At语义保留，真实文件/负控验收；去向 = [Note](../../notes/implemented/2026-11-20-company-file-read-state.md)。
 - [2026-11-19-guard-residuals-and-runtime-edges.md](settled_issues/2026-11-19-guard-residuals-and-runtime-edges.md) — C17 门禁残余面七轴探索：产出 20 张 P2 卡（BUG-263..282）全部修复归档；去向 = implementation（[批次 Note](../../notes/implemented/2026-11-19-guard-residuals-closure.md)）。
 - [2026-11-15-src-tests-dir-alignment.md](settled_issues/2026-11-15-src-tests-dir-alignment.md) — src↔tests 目录名对齐：host 例外清零 + `src/lib` 八组镜像；去向 = [Note](../../notes/implemented/2026-11-15-src-tests-dir-alignment.md)。
@@ -110,7 +115,7 @@
 | [BUG-209（已修）](fixed_bugs/BUG-209-live-declarations-stale-after-split.md) | 已修：tests/README 手抄面表与 Note 件数漂移；删手抄表/数字 + 声明守卫 | 2026-11-17 |
 | [BUG-210（已修）](fixed_bugs/BUG-210-shipped-comments-dev-only-paths.md) | 已修：shipped 注释指向不随包的 tools/lib；加「不随包分发」+ spec + 重打 `_dist` | 2026-11-17 |
 | [BUG-211（已修）](fixed_bugs/BUG-211-tools-readme-lib-purity-contradiction.md) | 已修：tools/README「lib 不启动进程」与 probe web 启动矛盾；改注入式措辞 + 靠评审 | 2026-11-17 |
-| [2026-11-12-deep-surface-continuous-bug-hunt.md](settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md) | 已结；C1–C11 探索收官（BUG-090..201 分批修复归档；focus v6 两轮 18 张）；C12 归属波次另立 [新卡](../issues/2026-11-17-ownership-wave-exploratory.md) | 2026-11-17 |
+| [2026-11-12-deep-surface-continuous-bug-hunt.md](settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md) | 已结；C1–C11 探索收官（BUG-090..201 分批修复归档；focus v6 两轮 18 张）；C12 归属波次另立 [新卡](settled_issues/2026-11-17-ownership-wave-exploratory.md) | 2026-11-17 |
 | [BUG-192（已修）](fixed_bugs/BUG-192-surface-rules-tracked-path-completeness.md) | 已修：19 条 tracked 路径无面规则/豁免、完备性只抽样；新门禁 `surface-coverage` 全 tracked 判据 + 登记 | 2026-11-16 |
 | [BUG-193（已修）](fixed_bugs/BUG-193-vitest-threshold-guard-accepts-directory.md) | 已修：阈值键守卫放过目录；三处守卫统一 `statSync().isFile()` | 2026-11-16 |
 | [BUG-194（已修）](fixed_bugs/BUG-194-live-pointer-guard-misses-js-source.md) | 已修：活指针守卫漏 `.js` 源码；源码面后缀补 `.js/.mjs` | 2026-11-16 |

@@ -19,21 +19,21 @@ intent: 将本仓跨轮逃逸、现有自动执行链和有界反证收敛成可
 
 | 链 | 连续补洞是怎样发生的 | 当前确实做对了什么 | 仍需自动保护什么 |
 |---|---|---|---|
-| 关键件与 content | 文件存在 → 非空 → 最小 schema → 路径/跨引用/版本 → 两消费者同义 | C17 已让源树和 tarball 同调 [content 合同](../../../tools/lib/company/content-contract.mjs#L258) | 未来成员、整族删除、合法结构中的坏引用；共同实现错误不能靠“两边相等”发现 |
-| 发布输入指纹 | 源字节 → dev README 误纳入 → 管线5条 → 漏手册/市场入口 → 目录派生 | [输入集实现](../../../tools/lib/core/pack-source.mjs#L68)已删除同目录新增 `.mjs` 要手记的义务 | 集合每个成员都影响指纹；新增允许成员自动入集；跨目录与子目录的明确边界 |
-| presence | 无 revision 的 completed → in_progress → unknown/deleted → gap 传播到 UI | [合并逻辑](../../../packages/company-pack/src/lib/presence/presence.ts#L124)及组件已分别有回归 | 状态×revision关系×未知值的完整有限表，结果追到真实读模型/组件；不能拿状态序冒充时间顺序 |
-| catalog final | 不可读 → 零字节 → 纯空白 | [一次 read+trim](../../../packages/company-pack/src/host/ledger/catalog.ts#L74)合并可读性/空白判断 | 小内容域和正文前后空白等关系；可展示不等于领域内容合格 |
+| 关键件与 content | 文件存在 → 非空 → 最小 schema → 路径/跨引用/版本 → 两消费者同义 | C17 已让源树和 tarball 同调 [content 合同](../../../../tools/lib/company/content-contract.mjs#L258) | 未来成员、整族删除、合法结构中的坏引用；共同实现错误不能靠“两边相等”发现 |
+| 发布输入指纹 | 源字节 → dev README 误纳入 → 管线5条 → 漏手册/市场入口 → 目录派生 | [输入集实现](../../../../tools/lib/core/pack-source.mjs#L68)已删除同目录新增 `.mjs` 要手记的义务 | 集合每个成员都影响指纹；新增允许成员自动入集；跨目录与子目录的明确边界 |
+| presence | 无 revision 的 completed → in_progress → unknown/deleted → gap 传播到 UI | [合并逻辑](../../../../packages/company-pack/src/lib/presence/presence.ts#L124)及组件已分别有回归 | 状态×revision关系×未知值的完整有限表，结果追到真实读模型/组件；不能拿状态序冒充时间顺序 |
+| catalog final | 不可读 → 零字节 → 纯空白 | [一次 read+trim](../../../../packages/company-pack/src/host/ledger/catalog.ts#L74)合并可读性/空白判断 | 小内容域和正文前后空白等关系；可展示不等于领域内容合格 |
 
 这些多是“同失败类的相邻输入逃逸”，并未证明旧红例重新失败。presence 的删除后重建还包含策略改变，不能全部算修复回归。
 
 ## 3. 为什么已有纪律没有自动完成这件事
 
-1. [测试宪法：53](../../../docs/testing.md)与[修复方法：75](../../methods/bug-fix.md)已有唯一原语、独立参考/全通道矩阵要求。**无需再宣布同一规则**；需要让修复方案和验收真写出其量词、输入域及跨消费者后置条件。
-2. [复发升级：32](../../../tests/failure-classes.md)说连续两轮且只有 example 应升格；[注册表](../../../tools/lib/core/asset-lanes.mjs#L165)却以 smoke/probe 为资产单位，不记录 unit spec 的合同或复发链。实读注册表为30 smoke（29 example、1 generator）、66 probe缺省example；这**不是265份 spec 的形状统计**，不能据此说全仓没有模型/生成式测试。
-3. [具名守卫算法](../../../tools/lib/repo/bug-coverage.mjs#L47)识别标题；[棘轮](../../../tests/repo/budget/bug-coverage.spec.ts#L22)保证数量不降、新修卡有名。实读279张已修卡中174张有具名守卫、105张无具名标题；这是保守索引口径，不能把105张当没测，也不能把174张当已消除174类风险。
-4. [shipped 正例：82–146](../../../tests/repo/release/shipped-shape.spec.ts#L82)从生产 REQUIRED/EXPECTED 造夹具。这对接线有用，但遗漏必需件时双方会一起变小；完整性必须另有消费者来源的小锚点，而非再手抄全树。
-5. 自动执行并不空缺：[pre-push](../../../.githooks/pre-push#L32)已经跑 verify、类型、lint/dup、fast、surface、test:checks、coverage；[门禁自测 runner](../../../tools/repo/run-check-tests.mjs#L14)按目录发现，Vitest[按后缀发现](../../../vitest.config.ts#L19)。**新资产进入既有位置就能继承执行，无须新 runner。** PR CI仍只verify；[干净环境](../../../.github/workflows/fresh-clone.yml#L47)每周/手动另跑全量。成本和环境取舍已在[CI：3–9](../../../.github/workflows/ci.yml)解释，本轮不建议把全量安装/模型塞进每次push。
-6. [C16探索卡：26](../../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)与[C17：70](../../_archive/settled_issues/2026-11-19-guard-residuals-and-runtime-edges.md)以“至少20张”为目标/停止条件之一。当时有用户明确要求，执行该要求并非违规；但**不能把产卡配额继承为未来默认质量验收**。配额会让成功更像继续找出边角，而非完成某个可复用保护。
+1. [测试宪法：53](../../../../docs/testing.md)与[修复方法：75](../../../methods/bug-fix.md)已有唯一原语、独立参考/全通道矩阵要求。**无需再宣布同一规则**；需要让修复方案和验收真写出其量词、输入域及跨消费者后置条件。
+2. [复发升级：32](../../../../tests/failure-classes.md)说连续两轮且只有 example 应升格；[注册表](../../../../tools/lib/core/asset-lanes.mjs#L165)却以 smoke/probe 为资产单位，不记录 unit spec 的合同或复发链。实读注册表为30 smoke（29 example、1 generator）、66 probe缺省example；这**不是265份 spec 的形状统计**，不能据此说全仓没有模型/生成式测试。
+3. [具名守卫算法](../../../../tools/lib/repo/bug-coverage.mjs#L47)识别标题；[棘轮](../../../../tests/repo/budget/bug-coverage.spec.ts#L22)保证数量不降、新修卡有名。实读279张已修卡中174张有具名守卫、105张无具名标题；这是保守索引口径，不能把105张当没测，也不能把174张当已消除174类风险。
+4. [shipped 正例：82–146](../../../../tests/repo/release/shipped-shape.spec.ts#L82)从生产 REQUIRED/EXPECTED 造夹具。这对接线有用，但遗漏必需件时双方会一起变小；完整性必须另有消费者来源的小锚点，而非再手抄全树。
+5. 自动执行并不空缺：[pre-push](../../../../.githooks/pre-push#L32)已经跑 verify、类型、lint/dup、fast、surface、test:checks、coverage；[门禁自测 runner](../../../../tools/repo/run-check-tests.mjs#L14)按目录发现，Vitest[按后缀发现](../../../../vitest.config.ts#L19)。**新资产进入既有位置就能继承执行，无须新 runner。** PR CI仍只verify；[干净环境](../../../../.github/workflows/fresh-clone.yml#L47)每周/手动另跑全量。成本和环境取舍已在[CI：3–9](../../../../.github/workflows/ci.yml)解释，本轮不建议把全量安装/模型塞进每次push。
+6. [C16探索卡：26](../../settled_issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)与[C17：70](../../settled_issues/2026-11-19-guard-residuals-and-runtime-edges.md)以“至少20张”为目标/停止条件之一。当时有用户明确要求，执行该要求并非违规；但**不能把产卡配额继承为未来默认质量验收**。配额会让成功更像继续找出边角，而非完成某个可复用保护。
 
 ## 4. 长期机制落在哪：沿现有入口改变完成条件
 
@@ -41,10 +41,10 @@ intent: 将本仓跨轮逃逸、现有自动执行链和有界反证收敛成可
 
 | 时点与现有 owner | 实际要交出的东西 | 自动保障怎样继承 | 不接受什么替代 |
 |---|---|---|---|
-| 方案形成：[验收设计](../../methods/validation-design.md) | 一条窄承诺：适用输入来源、允许/拒绝/降级结果、最终消费者；说明有限范围与未知态 | 测试按该输入来源遍历；新增成员自动参加，或类型穷尽要求补分支 | “所有都正确”、文件存在、仅命令成功 |
-| 修复定因：[bug-fix](../../methods/bug-fix.md#2-confirm-the-cause-and-sweep-the-class) | 对照上轮保证与新反例，指出新轴；说明这次消除了哪项调用者/清单同步义务 | 原语/Module拥有校验、状态提交和失败结果；调用者经过同一 Interface | 跨三个调用者手补三份判断；只留一句“已同类排查” |
+| 方案形成：[验收设计](../../../methods/validation-design.md) | 一条窄承诺：适用输入来源、允许/拒绝/降级结果、最终消费者；说明有限范围与未知态 | 测试按该输入来源遍历；新增成员自动参加，或类型穷尽要求补分支 | “所有都正确”、文件存在、仅命令成功 |
+| 修复定因：[bug-fix](../../../methods/bug-fix.md#2-confirm-the-cause-and-sweep-the-class) | 对照上轮保证与新反例，指出新轴；说明这次消除了哪项调用者/清单同步义务 | 原语/Module拥有校验、状态提交和失败结果；调用者经过同一 Interface | 跨三个调用者手补三份判断；只留一句“已同类排查” |
 | 测试实现：已有 spec 与 checks 自测 | 1个审查过的合法基例；成员变化/关系；必要负控；独立事实锚点 | 遍历生产输入集用于发现成员；期望由领域规则、独立参考或审查字面量给定 | 从生产函数输出推导expected；固定文件列表冒充未来输入 |
-| 收尾：[close-out：21–37](../../../.agents/skills/close-out-definition/SKILL.md) | 审阅者检查“删分支/加消费者/删整族后会怎样”，报告所删维护义务与剩余义务 | 沿原有独立盲审和test/test:checks执行；不再重复列一张证明账 | 测试条数、shape标签、具名BUG数、覆盖率代替判别力 |
+| 收尾：[close-out：21–37](../../../../.agents/skills/close-out-definition/SKILL.md) | 审阅者检查“删分支/加消费者/删整族后会怎样”，报告所删维护义务与剩余义务 | 沿原有独立盲审和test/test:checks执行；不再重复列一张证明账 | 测试条数、shape标签、具名BUG数、覆盖率代替判别力 |
 | 剩余探索：未来探索卡的本轮验收 | 预先命名输入轴/假设和预算，完成判决可为confirmed/refuted/unknown；不设最少BUG数 | 已保护类先用现成资产检查；发现同类逃逸，先深化该owner资产 | 无新输入/无新承诺仍“再来一轮”；预算用完当质量通过 |
 
 具体改法应当**替换**现有步骤中过于宽泛的“同类排查/反例验证”，不要给每次机械小改叠加完整表单。单点业务条件仍可用一个回归例子；出现横切共享语义或同类逃逸时才需要明确输入域/关系/跨消费者资产，沿既有宪法第7条。
@@ -57,7 +57,7 @@ intent: 将本仓跨轮逃逸、现有自动执行链和有界反证收敛成可
 
 ### 5.1 两消费者对12个世界的判别
 
-从当前源content复制普通文件；从当前0.11.9 tarball读取真实非content文本作为基例，content部分按同一变换替换entries/read。源码路径真实调用 [contentProblems](../../../checks/gates/content-manifest.mjs#L42)，tarball路径真实调用 [checkShippedPackage](../../../tools/lib/release/shipped-shape.mjs#L208)。先按合同写期望再执行，非仅检查两边相等。
+从当前源content复制普通文件；从当前0.11.9 tarball读取真实非content文本作为基例，content部分按同一变换替换entries/read。源码路径真实调用 [contentProblems](../../../../checks/gates/content-manifest.mjs#L42)，tarball路径真实调用 [checkShippedPackage](../../../../tools/lib/release/shipped-shape.mjs#L208)。先按合同写期望再执行，非仅检查两边相等。
 
 | 变换 | 预先写定的期望 | 源 / shipped实测 |
 |---|---|---|
@@ -80,7 +80,7 @@ intent: 将本仓跨轮逃逸、现有自动执行链和有界反证收敛成可
 
 **结果：3个负控均被先写的期望区分；正反各跑，共6组通过实验断言。** 说明把这些性质做成常驻资产可以识别对应退化；这不是整仓mutation score，也未证明所有现有测试对这些变异都有效。
 
-两脚本及原始JSON在本机gitignored `runtime/tmp/quality-prevention/`；长期复跑不得依赖它们。下一节给最小可重建命令，完整资产的分期验收见[实施卡](../../issues/2026-11-20-quality-prevention-contract-pilot.md)。没有将临时脚本充当已交付回归资产。
+两脚本及原始JSON在本机gitignored `runtime/tmp/quality-prevention/`；长期复跑不得依赖它们。下一节给最小可重建命令，完整资产的分期验收见[实施卡](../../settled_issues/2026-11-20-quality-prevention-contract-pilot.md)。没有将临时脚本充当已交付回归资产。
 
 ### 5.3 最小重建配方（从仓库根，需现有0.11.9 tarball）
 
@@ -121,7 +121,7 @@ JS
 
 ## 6. 落地顺序：先交付一族，别先治理全仓
 
-**首个实施包选content合同族**：四轮链清楚，当前Module已有两个真实消费者，本轮正反和3个分支负控已验证可行；测试只需沿现有Interface深入，不需发明新生产架构。具体范围和验收住[实施卡](../../issues/2026-11-20-quality-prevention-contract-pilot.md)，这里解释取舍。
+**首个实施包选content合同族**：四轮链清楚，当前Module已有两个真实消费者，本轮正反和3个分支负控已验证可行；测试只需沿现有Interface深入，不需发明新生产架构。具体范围和验收住[实施卡](../../settled_issues/2026-11-20-quality-prevention-contract-pilot.md)，这里解释取舍。
 
 - 第一阶段：一个有界的content族矩阵、3个关键变异、真实消费者接线，与现有验收/修复/收尾入口接起来；改动应保留全部旧事故守卫。不会要求所有变更跑全套矩阵。
 - 第二候选：发布指纹的逐成员字节变异与未来成员入集，输入域更窄、成本低；独立研究员优先推荐它。先未选，因为本轮对content双消费者/负控已有更完整可行性证据，且它直接对应最多阶段的遗漏合同问题。若content第一阶段过大，**应明确缩成指纹切片再重写验收**，不以玩具版本冒充content已完。

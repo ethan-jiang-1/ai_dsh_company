@@ -1,17 +1,19 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-17
 ---
 
 # 推敲：归属波次（挪目录 + 打扫卫生）的 exploratory test
 
-> 立卡：2026-11-17 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-17 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent（独立盲审）— 2026-11-20 独立只读子代理复核：十假设全部判决、10 张 BUG-202..211 已修且证据齐（`eccd5f16`）、去向 Note 成立，无假交付；索引漂移（bugs/README 5 张/P3）与未跑面 owner 同变更修正
 >
-> **结论/去向**：implementation — 本卡执行 Round 94–96 的探索与证据（发现缺陷另开 [_backlog/bugs/](../bugs/README.md) 卡；编号唯一源 = [bugs/README](../bugs/README.md) 的 Next，2026-11-17 = 202）；本卡不改产品代码。
+> **结论/去向**：implementation — 本卡执行 Round 94–96 的探索与证据（发现缺陷另开 [_backlog/bugs/](../../bugs/README.md) 卡；编号唯一源 = [bugs/README](../../bugs/README.md) 的 Next，2026-11-17 = 202）；本卡不改产品代码。决策记忆 = [C12 修复批次 Note](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)；产出 10 张 BUG-202..211 全部已修并迁 [fixed_bugs](../fixed_bugs/)。
+>
+> **收口（2026-11-20）**：Round 94–96 三面齐跑，C12-1..C12-10 全部判决；10 张 P2 卡由 2026-11-17 修复轮修复（`eccd5f16`）并迁 [fixed_bugs](../fixed_bugs/)。未跑面 = clean worktree、`pnpm setup` 独立跑、live 模型、Windows，以及 C12-4 的反向负控、验收 2 的 old→new 持久映射、验收 4 的 37 个卫生提交逐条分类（owner = 下一轮 exploratory/用户点名；C12-6/C12-8 的未证部分按 `部分确认` 保留，不升级为已证）。
 >
 > **授权边界**：静态 / keyless / 真入口 / 隔离 workspace+home 可自主；9 条安装形状 lane 与 clean worktree 按轮实跑；真模型 / 真页面只在需要时小预算。不修产品代码；不改 vendor。
 >
-> **前身**：[2026-11-12 深面持续探索](../_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md) 于 2026-11-17 归档（C1–C11 + 93 轮）。本卡只承接 focus v7 = C12 归属波次；旧卡的 C1–C11 结论不重开，只在相交处引用。
+> **前身**：[2026-11-12 深面持续探索](2026-11-12-deep-surface-continuous-bug-hunt.md) 于 2026-11-17 归档（C1–C11 + 93 轮）。本卡只承接 focus v7 = C12 归属波次；旧卡的 C1–C11 结论不重开，只在相交处引用。
 
 ## 问题与期望结果
 
@@ -68,7 +70,7 @@ opened: 2026-11-17
 
 | ID | 子面 | 问题 | oracle（不拿实现当 oracle） |
 |---|---|---|---|
-| N1 | **归属 / 依赖方向** | 声明方向 × 真实 import 图是否一致；守卫是否只扫了 lib、漏了入口层、漏了计算型 import/路径字面量；新家是否仍被旧面反向依赖 | [surface-contract](../../docs/surface-contract.md) 的方向表 + 独立解析（静/动 import、re-export、spawn/读盘字面量）+ 父提交树；负控 = 在**未覆盖形式**里加一条违规边，看守卫是否真红 |
+| N1 | **归属 / 依赖方向** | 声明方向 × 真实 import 图是否一致；守卫是否只扫了 lib、漏了入口层、漏了计算型 import/路径字面量；新家是否仍被旧面反向依赖 | [surface-contract](../../../docs/surface-contract.md) 的方向表 + 独立解析（静/动 import、re-export、spawn/读盘字面量）+ 父提交树；负控 = 在**未覆盖形式**里加一条违规边，看守卫是否真红 |
 | N2 | **清单 / 口径** | INDEX 32/8/67/19、CENSUS 30/66/75/256/10、`MAX_PROBES=66`、`MAX_GATES=75`、无消费者 57 是否仍按声明定义从盘面重算；搬移件是否被双计/漏计；lib 是否被当成入口/探针 | 独立枚举（`git ls-files`、目录、注册表、生成器双跑）+ 定义表（asset/runner/probe/fixture/tool/query）+ 波次前基线；负控 = 在 `probes/lib` 放非探针（计数不变）/ 在探针域放新探针（计数 +1 且 cap 红） |
 | N3 | **基线 / 豁免 / 阈值** | 覆盖率键迁移、6 条豁免、`ledger.ts` 地板 100→94、vitest include 变化：哪些是搬移等价、哪些是冷环境实测、哪些是静默降标；被豁免的模块是否在搬移后失去覆盖 | 父提交基线 vs HEAD 逐键对比 + 冷/暖两形状（跳过 dev-only spec）+ 豁免 `removeWhen`；负控 = 覆盖目录加 0% 新文件 → ratchet 红；删豁免 → 红；抬/降地板 → 红 |
 | N4 | **卫生清扫的语义面** | 自称「零行为」的提交有没有改规则、数字、例外表、允许清单、删除行；被删的数字是「不实」还是「测不出来」；规则改动有没有决定/Note | 提交正文/Note 的声称 × diff 逐 hunk 分类（pointer-only / semantic）+ 独立重算数字 + 现行合同；负控 = 把一条真规则改错，看现有门禁是否红 |
@@ -80,13 +82,13 @@ opened: 2026-11-17
 | ID | 假设 | oracle | 入口 |
 |---|---|---|---|
 | C12-1 | 7 个搬移提交的旧家仍被**活的 executable 载体**引用（不是解释器、不是 frozen） | 77 renames × 全 tracked 载体；分类 live/frozen/fixture/deliberate/generated/shipped/ci/instructional；粗扫 9 文件命中要逐条判 | `git grep -F` 旧路径、`runtime/tmp/c12/` |
-| C12-2 | `face-boundaries` 的扫描面不足以支撑「依赖方向已守住」：计算型 import、非字面量路径、入口层 / `run/` / CI 未覆盖 | 守卫源码 × 合同方向表 × 6 文件/10 条 `unresolvedImports` 实测；负控 = 在未覆盖形式里加违规边 | [face-boundaries.spec.ts](../../tests/repo/structure/face-boundaries.spec.ts)、[keyless-imports.mjs](../../tests/support/keyless-imports.mjs) |
-| C12-3 | `refactor-drift --hashes` 的判别力低于它的名字：`bodyHash()` 取 `titlePath`，不是测试体；改断言而标题不变 → 仍 `ALL PASS 零测试体改动` | 读实现 + 合成 vitest JSON（同 `titlePath`、不同 `failureMessages`）实跑；见预检 | [refactor-drift-audit.mjs](../../checks/audit/refactor-drift-audit.mjs) |
-| C12-4 | INDEX/CENSUS 的公开数字至少一处与独立枚举不一致，或同名不同义（asset/runner/probe/fixture、tests/checks 收编） | 生成器双跑 + 独立枚举 + 波次前基线；负控 = 非探针/新探针样本 | [checks/INDEX](../../checks/INDEX.generated.md)、[CENSUS](../../tests/CENSUS.generated.md)、[asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs) |
-| C12-5 | 覆盖率基线/豁免里至少一条把「搬移造成的覆盖下降」记成了「冷环境」或「无可测分支」 | 父提交键值 vs HEAD；暖/冷两形状；逐条读 `reason`/`removeWhen`；负控 = 0% 新文件、删豁免 | [coverage-baseline.json](../../checks/lib/coverage-baseline.json)、[coverage-ratchet.mjs](../../checks/audit/coverage-ratchet.mjs) |
+| C12-2 | `face-boundaries` 的扫描面不足以支撑「依赖方向已守住」：计算型 import、非字面量路径、入口层 / `run/` / CI 未覆盖 | 守卫源码 × 合同方向表 × 6 文件/10 条 `unresolvedImports` 实测；负控 = 在未覆盖形式里加违规边 | [face-boundaries.spec.ts](../../../tests/repo/structure/face-boundaries.spec.ts)、[keyless-imports.mjs](../../../tests/support/keyless-imports.mjs) |
+| C12-3 | `refactor-drift --hashes` 的判别力低于它的名字：`bodyHash()` 取 `titlePath`，不是测试体；改断言而标题不变 → 仍 `ALL PASS 零测试体改动` | 读实现 + 合成 vitest JSON（同 `titlePath`、不同 `failureMessages`）实跑；见预检 | [refactor-drift-audit.mjs](../../../checks/audit/refactor-drift-audit.mjs) |
+| C12-4 | INDEX/CENSUS 的公开数字至少一处与独立枚举不一致，或同名不同义（asset/runner/probe/fixture、tests/checks 收编） | 生成器双跑 + 独立枚举 + 波次前基线；负控 = 非探针/新探针样本 | [checks/INDEX](../../../checks/INDEX.generated.md)、[CENSUS](../../../tests/CENSUS.generated.md)、[asset-lanes.mjs](../../../tools/lib/core/asset-lanes.mjs) |
+| C12-5 | 覆盖率基线/豁免里至少一条把「搬移造成的覆盖下降」记成了「冷环境」或「无可测分支」 | 父提交键值 vs HEAD；暖/冷两形状；逐条读 `reason`/`removeWhen`；负控 = 0% 新文件、删豁免 | [coverage-baseline.json](../../../checks/lib/coverage-baseline.json)、[coverage-ratchet.mjs](../../../checks/audit/coverage-ratchet.mjs) |
 | C12-6 | 至少一条「零行为」卫生提交改了语义（规则/数字/例外/允许清单/删除行），且没有决定记录 | 逐 hunk 分类 + 数字重算 + 合同对读；负控 = 改错一条规则看门禁是否红 | `e52d20c9` `f3473f96` `8cf8fd19` `3a99f0ed` `7a46c79f` `37a4db98` |
-| C12-7 | 11 条 `ciSafe:false` 里至少一条是「搬移/路径问题」而不是「干净 CI 无安装态」；或者 9 条未跑档在 HEAD 上会红 | 逐条在隔离 home 实跑 + 父提交对照 + 读失败首行（缺安装态 vs MODULE_NOT_FOUND） | [asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs)、`checks/lanes/` |
-| C12-8 | `_dist` / 安装手册 / 冻结副本 / shipped 注释至少一处与源码面不同源（旧路径、旧计数、旧 MANIFEST 链） | `pnpm release --check` + `tar -tzf` + 字节对比 + MANIFEST 自洽；负控 = 改源不重打 | `_dist/`、[release.entry](../../checks/lanes/release.entry.mjs) |
+| C12-7 | 11 条 `ciSafe:false` 里至少一条是「搬移/路径问题」而不是「干净 CI 无安装态」；或者 9 条未跑档在 HEAD 上会红 | 逐条在隔离 home 实跑 + 父提交对照 + 读失败首行（缺安装态 vs MODULE_NOT_FOUND） | [asset-lanes.mjs](../../../tools/lib/core/asset-lanes.mjs)、`checks/lanes/` |
+| C12-8 | `_dist` / 安装手册 / 冻结副本 / shipped 注释至少一处与源码面不同源（旧路径、旧计数、旧 MANIFEST 链） | `pnpm release --check` + `tar -tzf` + 字节对比 + MANIFEST 自洽；负控 = 改源不重打 | `_dist/`、[release.entry](../../../checks/lanes/release.entry.mjs) |
 | C12-9 | 4 件搬移探针（ask-latency / explore-evidence / propose-sampler / session-log-export）在 HEAD 上入口不通，或至少没有可复跑的实跑证据 | 隔离 home 最小入口；父提交对照；不能跑就写「不能跑」的证据 | `probes/analyze/` |
 | C12-10 | clean worktree 与暖树分叉：暖树的空目录/残留产物让 verify 或某入口假绿 | `git worktree` + 同 store 安装或最小依赖；与暖树同命令对照；负控 = 删一个只存在于暖树的路径 | `pnpm verify` / `pnpm test` / 入口 |
 
@@ -94,14 +96,14 @@ opened: 2026-11-17
 
 | # | 载体 | 预检看到什么 | 风险类 | 首轮怎么证伪 |
 |---|---|---|---|---|
-| 1 | [refactor-drift-audit.mjs](../../checks/audit/refactor-drift-audit.mjs) | `bodyHash()` 取 `assertion.titlePath`；合成样本（同 `titlePath`、不同 `failureMessages`）→ `--compare` 仍 `ALL PASS 零测试体改动` | oracle 名 > 面 | 已用 runtime/tmp/c12-pre/ 的合成样本复现（`--compare` → ALL PASS）；首轮开卡（判 P2）并写明它不能证测试体 |
-| 2 | [face-boundaries.spec.ts](../../tests/repo/structure/face-boundaries.spec.ts) | 只用 `parsed.imports`；`parseKeylessImports` 另返回 `unresolvedImports`，spec 不读。全树实测 6 文件/10 条计算型边（含 replay 的 built presence 路径；其余 vendor/package） | 守卫盲区 | 负控 = 在扫描树加一条计算型违规边；若仍绿 → 缺口 |
-| 3 | [asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs) | `probes/**` 整片 `coveredBy: verify`；verify 不执行探针。7 件搬移探针里只有 orient / diagnose / notes-audit 在 Note 里实跑过 | 未跑档 | 4 件逐条最小入口；不能跑写理由 |
-| 4 | [asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs) | 11 条 `ciSafe:false`；cleanup Note 的发布验收覆盖 company-entry / preset，其余 9 条安装形状 lane 没有 HEAD 实跑记录 | 未跑档制度化 | 9 条隔离 home 实跑，或按预算抽样 + 未跑清单 |
-| 5 | [coverage-baseline.json](../../checks/lib/coverage-baseline.json) | 197 文件 / 6 豁免；4 条豁免是搬移件或新家（carrier-registry / diagnosis / probe-window / pin）；`ledger.ts` 地板 100→94 只在冷环境成立 | 静默降标 | 父提交逐键对比 + 冷/暖两形状 |
-| 6 | [CENSUS](../../tests/CENSUS.generated.md) / [INDEX](../../checks/INDEX.generated.md) | 口径在波次内改过（asset/runner/fixture）；`MAX_PROBES` 59→66；`8cf8fd19` 手改 CENSUS 消费者 1→0 / 无消费者 56→57 | 口径漂移 | 独立枚举 + 生成器双跑；非探针/新探针负控 |
-| 7 | `_dist/` / [cordis.patch.yml](../../packages/company-pack/cordis.patch.yml) | `bfe316e6` 回退 shipped 注释 → `d7f0776c` 清零并重打 → `e0e8aa41` 再打 @`9279bf30`；B1 曾被推迟到「下次重打」 | 发布漂移 | `pnpm release --check` + tarball 逐条 + 源/产物字节对比 |
-| 8 | 前身卡 + [issues/README](README.md) | 调整前基线仍写 253/2153、Next 192、活跃 10；实测 256/2170、Next 202、活跃 0 | 声明漂移 | 已在立卡时修正；后续按轮重算 |
+| 1 | [refactor-drift-audit.mjs](../../../checks/audit/refactor-drift-audit.mjs) | `bodyHash()` 取 `assertion.titlePath`；合成样本（同 `titlePath`、不同 `failureMessages`）→ `--compare` 仍 `ALL PASS 零测试体改动` | oracle 名 > 面 | 已用 runtime/tmp/c12-pre/ 的合成样本复现（`--compare` → ALL PASS）；首轮开卡（判 P2）并写明它不能证测试体 |
+| 2 | [face-boundaries.spec.ts](../../../tests/repo/structure/face-boundaries.spec.ts) | 只用 `parsed.imports`；`parseKeylessImports` 另返回 `unresolvedImports`，spec 不读。全树实测 6 文件/10 条计算型边（含 replay 的 built presence 路径；其余 vendor/package） | 守卫盲区 | 负控 = 在扫描树加一条计算型违规边；若仍绿 → 缺口 |
+| 3 | [asset-lanes.mjs](../../../tools/lib/core/asset-lanes.mjs) | `probes/**` 整片 `coveredBy: verify`；verify 不执行探针。7 件搬移探针里只有 orient / diagnose / notes-audit 在 Note 里实跑过 | 未跑档 | 4 件逐条最小入口；不能跑写理由 |
+| 4 | [asset-lanes.mjs](../../../tools/lib/core/asset-lanes.mjs) | 11 条 `ciSafe:false`；cleanup Note 的发布验收覆盖 company-entry / preset，其余 9 条安装形状 lane 没有 HEAD 实跑记录 | 未跑档制度化 | 9 条隔离 home 实跑，或按预算抽样 + 未跑清单 |
+| 5 | [coverage-baseline.json](../../../checks/lib/coverage-baseline.json) | 197 文件 / 6 豁免；4 条豁免是搬移件或新家（carrier-registry / diagnosis / probe-window / pin）；`ledger.ts` 地板 100→94 只在冷环境成立 | 静默降标 | 父提交逐键对比 + 冷/暖两形状 |
+| 6 | [CENSUS](../../../tests/CENSUS.generated.md) / [INDEX](../../../checks/INDEX.generated.md) | 口径在波次内改过（asset/runner/fixture）；`MAX_PROBES` 59→66；`8cf8fd19` 手改 CENSUS 消费者 1→0 / 无消费者 56→57 | 口径漂移 | 独立枚举 + 生成器双跑；非探针/新探针负控 |
+| 7 | `_dist/` / [cordis.patch.yml](../../../packages/company-pack/cordis.patch.yml) | `bfe316e6` 回退 shipped 注释 → `d7f0776c` 清零并重打 → `e0e8aa41` 再打 @`9279bf30`；B1 曾被推迟到「下次重打」 | 发布漂移 | `pnpm release --check` + tarball 逐条 + 源/产物字节对比 |
+| 8 | 前身卡 + [issues/README](../../issues/README.md) | 调整前基线仍写 253/2153、Next 192、活跃 10；实测 256/2170、Next 202、活跃 0 | 声明漂移 | 已在立卡时修正；后续按轮重算 |
 
 ## 方法（每轮固定）
 
@@ -109,9 +111,9 @@ opened: 2026-11-17
 1. **选面 + 写期望**：从 N1–N6 选一个面，先写 8–12 条可证伪假设与独立 oracle（合同 / 父提交 / 盘面枚举 / 真入口），不拿实现当 oracle。
 2. **静态取证**：读代码、测试、probe、Note 的「未跑 / 剩余风险」；把引用按 live / frozen / fixture / deliberate / **generated / shipped / ci / instructional** 分类；建「声明 → 门禁 → 扫描面 → 负控」矩阵，写不出扫描面或负控的格直接标 `unverified`。
 3. **对抗夹具 + 负控**：优先 keyless 真文件 / 真 Cordis / 真装配；为每条关键断言做一次最小破坏（破坏 → 红 → 还原 → 绿）。**另测「空扫」与「宽分类」**：把扫描对象移走/清空，门禁应红而不是绿；把一条 glob 放宽到能吞掉整棵树，门禁应点名而不是静默。
-4. **真实入口**：[preset.entry](../../checks/lanes/preset.entry.mjs) / [client-load.entry](../../checks/lanes/client-load.entry.mjs) / [release.entry](../../checks/lanes/release.entry.mjs) / [company-entry.entry](../../checks/lanes/company-entry.entry.mjs) 按面选择；另加 `pnpm company`、`pnpm setup`、orient / diagnose / notes:audit、hooks / pre-push、9 条安装形状 lane。`--help` / `--check` 只算前置。**clean worktree 与暖树是同一条判据的两个形状**，不能只跑暖树。
-5. **判决 + 证据**：每格 PASS / FAIL / 未证 + 原因；FAIL 立刻开 `_backlog/bugs/` 卡（编号 = [bugs/README](../bugs/README.md) 的 Next，当前 202）；观察标 owner。**每个格带「旧家 → 新家」「载体分类」「等价判据」「负控」「声明 → 门禁 → 扫描面」**——写不全的格不算 PASS。
-6. **回填**：本卡追加 `## Round N`（已跑面、H 判决、BUG 卡、未跑面）；不覆盖旧结论；证据留 `runtime/tmp/c12/`（gitignored）；新探索脚本升常驻必须登记 [asset-lanes.mjs](../../tools/lib/core/asset-lanes.mjs)。
+4. **真实入口**：[preset.entry](../../../checks/lanes/preset.entry.mjs) / [client-load.entry](../../../checks/lanes/client-load.entry.mjs) / [release.entry](../../../checks/lanes/release.entry.mjs) / [company-entry.entry](../../../checks/lanes/company-entry.entry.mjs) 按面选择；另加 `pnpm company`、`pnpm setup`、orient / diagnose / notes:audit、hooks / pre-push、9 条安装形状 lane。`--help` / `--check` 只算前置。**clean worktree 与暖树是同一条判据的两个形状**，不能只跑暖树。
+5. **判决 + 证据**：每格 PASS / FAIL / 未证 + 原因；FAIL 立刻开 `_backlog/bugs/` 卡（编号 = [bugs/README](../../bugs/README.md) 的 Next，当前 202）；观察标 owner。**每个格带「旧家 → 新家」「载体分类」「等价判据」「负控」「声明 → 门禁 → 扫描面」**——写不全的格不算 PASS。
+6. **回填**：本卡追加 `## Round N`（已跑面、H 判决、BUG 卡、未跑面）；不覆盖旧结论；证据留 `runtime/tmp/c12/`（gitignored）；新探索脚本升常驻必须登记 [asset-lanes.mjs](../../../tools/lib/core/asset-lanes.mjs)。
 
 ## 轮次与停止
 
@@ -171,13 +173,13 @@ opened: 2026-11-17
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C12-1 旧家仍被活载体引用 | **refuted（live executable）/ 守卫面 confirmed** | 77 renames × live 顶层粗扫：9 个 live 文件命中，全部是研究材料、implemented Note 散文、一个守卫的负例注释；无 live executable 命中。但脚本注释/新家注释的守卫面有缺口 → [BUG-207](../_archive/fixed_bugs/BUG-207-retired-path-misses-wave-renames.md)、[BUG-205](../_archive/fixed_bugs/BUG-205-live-pointer-faces-miss-moved-libs.md) |
-| C12-2 face-boundaries 扫描面 | **confirmed** | 计算型 import 注入 `probes/lib` 后 spec 仍 4 passed；`checks/lib`/`probes/lib` 无 keyless 图兜底 → [BUG-208](../_archive/fixed_bugs/BUG-208-face-boundaries-computed-imports.md) |
-| C12-3 refactor-drift 判别力 | **confirmed** | 同 `titlePath` 不同失败信息 → 同一指纹且 `ALL PASS 零测试体改动`；重复行 2→1 → 仍 `零删除` → [BUG-202](../_archive/fixed_bugs/BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) |
+| C12-1 旧家仍被活载体引用 | **refuted（live executable）/ 守卫面 confirmed** | 77 renames × live 顶层粗扫：9 个 live 文件命中，全部是研究材料、implemented Note 散文、一个守卫的负例注释；无 live executable 命中。但脚本注释/新家注释的守卫面有缺口 → [BUG-207](../fixed_bugs/BUG-207-retired-path-misses-wave-renames.md)、[BUG-205](../fixed_bugs/BUG-205-live-pointer-faces-miss-moved-libs.md) |
+| C12-2 face-boundaries 扫描面 | **confirmed** | 计算型 import 注入 `probes/lib` 后 spec 仍 4 passed；`checks/lib`/`probes/lib` 无 keyless 图兜底 → [BUG-208](../fixed_bugs/BUG-208-face-boundaries-computed-imports.md) |
+| C12-3 refactor-drift 判别力 | **confirmed** | 同 `titlePath` 不同失败信息 → 同一指纹且 `ALL PASS 零测试体改动`；重复行 2→1 → 仍 `零删除` → [BUG-202](../fixed_bugs/BUG-202-refactor-drift-title-hash-and-duplicate-mask.md) |
 | C12-4 INDEX / CENSUS 口径 | **refuted** | 独立枚举：ASSETS 30 / PROBES 66 / lanes 32（30 assets + 2 runners）/ gates 75 / audit 8 / spec 256 / tests/checks 10；INDEX 32 = 30+2、probes 67 = 66+1、tools 19 = 17+1+1 均对盘 |
-| C12-5 覆盖率基线 / 豁免 | **confirmed** | 改名合成样本 old 100/100 → new 85/75：`violations=[]`；暖树 `ledger.ts` 100/100 vs 地板 94 → [BUG-203](../_archive/fixed_bugs/BUG-203-coverage-ratchet-rename-resets-floor.md)、[BUG-204](../_archive/fixed_bugs/BUG-204-ledger-branches-floor-cold-only.md) |
-| C12-6 卫生提交的语义面 | **部分 / doc confirmed** | `e52d20c9` / `3a99f0ed` / `7a46c79f` 逐 hunk 看只动指针/红态引用；但 live 声明仍按旧树写 → [BUG-209](../_archive/fixed_bugs/BUG-209-live-declarations-stale-after-split.md)、[BUG-211](../_archive/fixed_bugs/BUG-211-tools-readme-lib-purity-contradiction.md) |
-| C12-9 4 件搬移探针 | **refuted** | `ask-latency` / `propose-sampler` / `explore-evidence` / `session-log-export` 均 exit 0（export 3656 份 / 1 无日志）；`orient` / `diagnose` / `notes-audit` 亦 exit 0；但 pre-push 不执行它们 → [BUG-206](../_archive/fixed_bugs/BUG-206-coveredby-evidence-does-not-execute.md) |
+| C12-5 覆盖率基线 / 豁免 | **confirmed** | 改名合成样本 old 100/100 → new 85/75：`violations=[]`；暖树 `ledger.ts` 100/100 vs 地板 94 → [BUG-203](../fixed_bugs/BUG-203-coverage-ratchet-rename-resets-floor.md)、[BUG-204](../fixed_bugs/BUG-204-ledger-branches-floor-cold-only.md) |
+| C12-6 卫生提交的语义面 | **部分 / doc confirmed** | `e52d20c9` / `3a99f0ed` / `7a46c79f` 逐 hunk 看只动指针/红态引用；但 live 声明仍按旧树写 → [BUG-209](../fixed_bugs/BUG-209-live-declarations-stale-after-split.md)、[BUG-211](../fixed_bugs/BUG-211-tools-readme-lib-purity-contradiction.md) |
+| C12-9 4 件搬移探针 | **refuted** | `ask-latency` / `propose-sampler` / `explore-evidence` / `session-log-export` 均 exit 0（export 3656 份 / 1 无日志）；`orient` / `diagnose` / `notes-audit` 亦 exit 0；但 pre-push 不执行它们 → [BUG-206](../fixed_bugs/BUG-206-coveredby-evidence-does-not-execute.md) |
 | C12-10 clean worktree | **unrun** | 成本高且本轮是 docs/cards 变更；保留到下一轮或用户点名的 clean clone |
 
 **本轮负控（实跑）：**
@@ -198,8 +200,8 @@ opened: 2026-11-17
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C12-5 豁免与地板 | **confirmed** | 波次前基线 197 文件 / 5 豁免；HEAD 197 / 6（新增 `pin`）；`carrier-registry` / `diagnosis` / `probe-window` 在波次前已是豁免，非搬移造成；`ledger.ts` 100→94 是唯一数值降标 → [BUG-204](../_archive/fixed_bugs/BUG-204-ledger-branches-floor-cold-only.md) |
-| C12-8 发布字节同源 | **部分 confirmed** | `_dist` tarball 旧家命中 0；安装手册旧家 0；MANIFEST 34 件 / README blob 与 `deployed_sha` 一致；但 shipped 的 3 处注释指向不随包的 `tools/lib/company/delegation-model.mjs` → [BUG-210](../_archive/fixed_bugs/BUG-210-shipped-comments-dev-only-paths.md) |
+| C12-5 豁免与地板 | **confirmed** | 波次前基线 197 文件 / 5 豁免；HEAD 197 / 6（新增 `pin`）；`carrier-registry` / `diagnosis` / `probe-window` 在波次前已是豁免，非搬移造成；`ledger.ts` 100→94 是唯一数值降标 → [BUG-204](../fixed_bugs/BUG-204-ledger-branches-floor-cold-only.md) |
+| C12-8 发布字节同源 | **部分 confirmed** | `_dist` tarball 旧家命中 0；安装手册旧家 0；MANIFEST 34 件 / README blob 与 `deployed_sha` 一致；但 shipped 的 3 处注释指向不随包的 `tools/lib/company/delegation-model.mjs` → [BUG-210](../fixed_bugs/BUG-210-shipped-comments-dev-only-paths.md) |
 | `release --check` | **观察（非产品缺陷）** | HEAD 上 exit 1：manifest `gitSha` 620507ec ≠ HEAD；本卡/前身卡是 docs-only 提交，需手工 `--stamp`；不是本波搬移行为 |
 | 覆盖率基线键迁移 | **pass** | 197 键全在盘；`delegation-model` / `candidate-scan` 历史值保留；无其它键丢失 |
 
@@ -218,6 +220,8 @@ opened: 2026-11-17
 **判决：** C12-7 `ciSafe:false` 的 11 条里，实跑的 9 条安装形状 lane 全 PASS；没有「搬移/路径问题被
 `ciSafe:false` 掩盖」的证据，假设 **refuted（本机）**。C12-9 4 件探针 **refuted**。
 
+**未跑档（2026-11-20 收口时确权）：** clean worktree（C12-10）、`pnpm setup` 独立跑、live 模型、Windows 仍无实跑；owner = 下一轮 exploratory/用户点名，触发 = 下次 clean clone 或发布前复查。C12-4 的探测域负控与验收 2/4 的持久映射/逐条分类未补，记为 `unverified`，不冒充已证。
+
 **证据坐标：** `runtime/tmp/c12/lane-*.log`、`runtime/tmp/c12/smoke-all.log`、`runtime/tmp/c12/coverage-ratchet.log`。
 
 ## 判决汇总
@@ -235,11 +239,12 @@ opened: 2026-11-17
 | C12-9 | refuted | 206（覆盖机制，不是探针本身） |
 | C12-10 | unrun | — |
 
-**本轮共开 10 张 P2 卡（BUG-202..211）**，全部 `调查中`，不修产品代码；未跑面 = clean worktree /
-`pnpm setup` 独立跑 / live 模型 / Windows。没有「没有 bug」的结论。
+**本轮共开 10 张 P2 卡（BUG-202..211）**，当轮全部 `调查中`、不修产品代码（2026-11-20 收口：10 张已全部修复并迁 [fixed_bugs](../fixed_bugs/)）；未跑面 = clean worktree /
+`pnpm setup` 独立跑 / live 模型 / Windows（owner = 下一轮 exploratory/用户点名；不写成已覆盖）。没有「没有 bug」的结论。
 
 ## 执行记录
 
 - 2026-11-17 ｜ 立卡（focus v7）｜ 本卡 + 前身卡归档 + 120 个指向旧卡的链接修复 ｜ 基线 256/2170、verify ALL PASS、typecheck exit 0；预检 3 条（refactor-drift 标题指纹 / 6 文件计算型 import / 9 live 文件命中）｜ `pnpm verify` ALL PASS ｜ Round 94–96 未开，等用户 push。
 - 2026-11-17 ｜ Round 94–96 ｜ `runtime/tmp/c12/` + `runtime/tmp/c12-pre/` ｜ 10 条假设判决 + 4 条守卫负控 + 9 条安装形状 lane + 7 件探针 + smoke:all | 10 张 BUG-202..211（调查中，不修） ｜ `pnpm verify` ALL PASS；`pnpm test` 256/2170；`pnpm typecheck` exit 0；smoke:all 17 PASS / 0 FAIL / 13 SKIP ｜ clean worktree / setup / live 未跑。
 - 每轮：日期 ｜ 面 ｜ 命令/会话 id ｜ 期望 vs 实测 ｜ 证据坐标 ｜ 判定。
+- 2026-11-20 ｜ 收口归档 ｜ 十假设判决复核 + 索引漂移修正 + 卡内/入链深度修正 ｜ 10 张 BUG-202..211 已修（`eccd5f16`）并迁 fixed_bugs；去向 = 批次 Note ｜ `pnpm verify` ALL PASS ｜ 审查：agent（独立盲审）。

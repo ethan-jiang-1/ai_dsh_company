@@ -1,12 +1,12 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P3
 opened: 2026-11-20
 ---
 
 # BUG-283：`pnpm company --home <不存在目录>` 初始化失败且无诊断（exit null / 空 stderr）
 
-> 严重级别：P3（次要，维护者入口）｜发现：2026-11-20（端到端验收）｜状态：修复已落地｜审查：agent（同轮 E2E 实跑复核）
+> 严重级别：P3（次要，维护者入口）｜发现：2026-11-20（端到端验收）｜状态：已修｜修复：2026-11-20｜审查：agent（同轮 E2E 实跑复核）
 >
 > **留痕**：端到端验收轮（2026-11-20，用户令「端到端……发现问题报bug」）。
 
@@ -47,3 +47,4 @@ node tools/dev/company.mjs --home "$PWD/runtime/e2e-home" --workspace "$PWD/comp
 - 改动面：`tools/dev/company.mjs`
 - 红：上面的复现（`exit null`、空 stderr）
 - 绿：同一命令（home 不存在）→ `GREEN-A: 缺失 home 也能初始化并起服务`
+- 提交：commit bee0f4fc

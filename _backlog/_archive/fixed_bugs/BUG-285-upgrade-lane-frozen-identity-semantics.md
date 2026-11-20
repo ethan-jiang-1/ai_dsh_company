@@ -1,12 +1,12 @@
 ---
-status: 修复已落地
+status: 已修
 severity: P3
 opened: 2026-11-20
 ---
 
 # BUG-285：upgrade-while-running 守卫冻结了已废止的「身份保留创建版本」语义（自 BUG-256 起常红）
 
-> 严重级别：P3（次要：守卫红，但产品语义按 BUG-256 是对的）｜发现：2026-11-20（端到端验收）｜状态：修复已落地｜审查：agent（同轮红绿实证）
+> 严重级别：P3（次要：守卫红，但产品语义按 BUG-256 是对的）｜发现：2026-11-20（端到端验收）｜状态：已修｜修复：2026-11-20｜审查：agent（同轮红绿实证）
 >
 > **留痕**：端到端验收轮（2026-11-20）。
 
@@ -45,3 +45,4 @@ lane 断言现行语义：升级后 `id`/`createdAt` 不变、`pack.version` 等
 - 改动面：`checks/lanes/upgrade-while-running.entry.mjs`
 - 红：`node checks/lanes/upgrade-while-running.entry.mjs` → `FAIL bundle 身份保留创建版本 0.11.9（0.11.10）`（1 FAILURE）
 - 绿：同一条命令 → `upgrade-while-running-smoke: ALL PASS`（含新断言 id/createdAt 保留、pack.version=0.11.10、备份在场）
+- 提交：commit bee0f4fc

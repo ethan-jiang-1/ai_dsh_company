@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-18 落地；任务源 = 用户「再来一波 _backlog/bugs 里面最近 exploratory test 发现的 bugs，看看是否能系统性修起来」）
 
-> 上游 = [C14 低置信探索卡](../../_backlog/issues/2026-11-18-low-confidence-runtime-exploratory.md) + [10 张缺陷卡](../../_backlog/bugs/README.md)（BUG-223..232）。BUG-212（收尾验证链成本）保持活跃，不并入本批。
+> 上游 = [C14 低置信探索卡](../../_backlog/_archive/settled_issues/2026-11-18-low-confidence-runtime-exploratory.md) + [10 张缺陷卡](../../_backlog/bugs/README.md)（BUG-223..232）。BUG-212（收尾验证链成本）保持活跃，不并入本批。
 
 ## 决定
 

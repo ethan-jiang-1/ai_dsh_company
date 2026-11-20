@@ -1,6 +1,6 @@
 # 2026-11-16 · 维护面整理：合同声明 + observe 解散（P0 + P1）
 
-状态：implemented（2026-11-16 落地；任务源 = 用户点名 [reorg-company handoff](../../_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-company.md) 并授权静默自主）
+状态：implemented（2026-11-16 落地；任务源 = 用户点名 [reorg-company handoff](../../_backlog/_archive/research/maintenance-surface-taxonomy/2026-11-16-reorg-company.md) 并授权静默自主）
 
 > 上游 = 用户 2026-11-16 原话：「你应该汲取了这个内容之后落地……除非有什么东西对你来说是荒唐的……Goal 之后静默自主」。handoff 的授权边界：P0 已点名、P1 需 A/B **明示答复**；用户本轮只给「落地 + 静默自主」总授权，**未对 A/B 作答**。据此按 handoff §4.2 建议取 A（抬顶 59→66 + Note 论证），B 未取——这不是「用户裁决 A」；若改 B 需新决定。
 > 部分取代 [2026-11-15-tools-purpose-groups](./2026-11-15-tools-purpose-groups.md)（observe 组解散、工具面四组→三组）；其核心决定（保留 `tools/` 名、按用途分组）仍现行。

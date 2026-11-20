@@ -8,7 +8,7 @@ opened: 2026-11-17
 
 > 严重级别：P2（次要）｜发现：2026-11-17｜状态：已修｜修复：2026-11-17｜审查：agent（独立盲审）— 3 blocker 已修（归档同批 / Note 一致 / 红证配方），S1–S4 已处置
 >
-> **关联**：[C12 归属波次探索卡](../../issues/2026-11-17-ownership-wave-exploratory.md)（C12-7 / N2/N6）。
+> **关联**：[C12 归属波次探索卡](../settled_issues/2026-11-17-ownership-wave-exploratory.md)（C12-7 / N2/N6）。
 > **留痕**：批次 Note [2026-11-17-c12-ownership-wave-repairs](../../../notes/implemented/2026-11-17-c12-ownership-wave-repairs.md)（本批共用）。
 
 ## 症状

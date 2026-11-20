@@ -42,7 +42,7 @@
 - [covered] 行为面：`pnpm orient` / `diagnose` / `notes:audit` 均 exit 0 → `probes/lib/orient.mjs`
 - [covered] 真挂载：`preset.entry` ALL PASS（6 角色 + 5 support） → `checks/lanes/preset.entry.mjs`
 - [covered] 真启动 + 零挂载失败：`pnpm company` 起在 `127.0.0.1:60600`，`client-load.entry` ALL PASS → `checks/lanes/client-load.entry.mjs`
-- [policy] 另两仓的 lib 归属各自决定（用户 2026-11-17：另两仓不归本仓管）；本仓只保证根名与面骨架同形 → `_backlog/research/maintenance-surface-taxonomy/README.md`
+- [policy] 另两仓的 lib 归属各自决定（用户 2026-11-17：另两仓不归本仓管）；本仓只保证根名与面骨架同形 → `_backlog/_archive/research/maintenance-surface-taxonomy/README.md`
 - [environment-gap] 未跑真模型 / 真浏览器交互：本轮零模型可见面与 UI 变更（只动仓内支撑层） → `checks/lanes/preset.entry.mjs`
 - [unprovable] 「以后新增模块会放对家」没有机械 oracle；判据写在合同 + 由 layering / checks-index / naming 三门共同兜底 → `docs/surface-contract.md`
 

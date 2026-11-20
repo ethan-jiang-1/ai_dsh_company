@@ -1,17 +1,19 @@
 ---
-status: 待落地
+status: 已结
 opened: 2026-11-18
 ---
 
 # 推敲：门禁管线的指纹边界 + 更低置信运行态（C16）
 
-> 立卡：2026-11-18 ｜ 状态：待落地 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：否
+> 立卡：2026-11-18 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent（独立盲审）— 2026-11-20 独立只读子代理复核：20 张 BUG-243..262 已修且证据齐（`21ff3ee7`）、去向 Note 成立，无假交付；判决账按同日订正节改为「6 条直接判决/覆盖、4 条部分覆盖、10 条未跑」，不把未跑写成已覆盖；差额复核 approve-with-notes（0 阻断，文字 note 已处置）
 >
-> **结论/去向**：implementation — 本卡执行 C16 的探索与证据（缺陷另开 `_backlog/bugs/` 卡；编号唯一源 = [bugs/README](../bugs/README.md) 的 Next，2026-11-18 = 243）；本卡不改产品代码。
+> **结论/去向**：implementation — 本卡执行 C16 的探索与证据（缺陷另开 `_backlog/bugs/` 卡；编号唯一源 = [bugs/README](../../bugs/README.md) 的 Next，2026-11-18 = 243）；本卡不改产品代码。决策记忆 = [C16 修复批次 Note](../../../notes/implemented/2026-11-18-pipeline-fingerprint-and-runtime-closure.md)；产出 20 张 BUG-243..262 全部已修并迁 [fixed_bugs](../fixed_bugs/)。
+>
+> **收口（2026-11-20）**：Round 105–107 跑完，20 张 P2 卡由 2026-11-18 修复轮修复（`21ff3ee7`）并迁 [fixed_bugs](../fixed_bugs/)（`29783733`）；`release:shape` PASS、`pnpm verify` ALL PASS、`pnpm test` 262/2281（修复批次实测）。判决账与未跑面见下方「判决账订正」：首轮 20 条假设中 6 条有直接判决/覆盖（1/2/3/5/13/19）、4 条部分覆盖（4/14/15/17）、10 条未跑（6..12/16/18/20；G5 cultivation、G6 命令层整轴未跑），owner = 下一轮探索卡/用户点名。Round 102 式真入口重跑未做，两 lane 由修复批次补跑（见 Note）。
 >
 > **授权边界**：静态 / tarball / 合成包 / 纯函数 / 临时 home 可自主；不修产品代码；不改 vendor；`_dist` 只读。
 >
-> **前序**：[C15 卡](../_archive/settled_issues/2026-11-18-guard-closure-and-unreadable-inputs.md) 的 10 张（BUG-233..242）已由 2026-11-18 修复轮收口。C15 修复 Note 自己留了一个未修轴：**sanitizer/`export-dist` 本身决定 tarball 字节，但不在 `sourceFingerprint` 内；只改 sanitizer 时 `release:shape` 仍可能给旧包盖章**。本卡从这条「自认的洞」开始，扩到更低置信的运行态。
+> **前序**：[C15 卡](2026-11-18-guard-closure-and-unreadable-inputs.md) 的 10 张（BUG-233..242）已由 2026-11-18 修复轮收口。C15 修复 Note 自己留了一个未修轴：**sanitizer/`export-dist` 本身决定 tarball 字节，但不在 `sourceFingerprint` 内；只改 sanitizer 时 `release:shape` 仍可能给旧包盖章**。本卡从这条「自认的洞」开始，扩到更低置信的运行态。
 
 ## 问题与期望结果
 
@@ -79,7 +81,7 @@ C14/C15 把「发布面」拆成 source shape（`shipped-links`/`checkSourceShap
 0. **先审门禁自身**：C15 Note 的「未覆盖轴」与新 checker 的策展清单优先。
 1. **合成/临时输入**：真实 tarball 优先；lease/ledger 用临时 home；client 用纯函数；命令用临时 content。
 2. **负控**：每个「门禁已拒/未漂移」结论必须有反向样本；没有写 `unverified`。
-3. **判决 + 证据**：每格 PASS/FAIL/未证；FAIL 开卡（BUG-243 起）；证据 `runtime/tmp/c16/`。
+3. **判决 + 证据**：每格 PASS/FAIL/未证；FAIL 开卡（BUG-243 起）；证据 `runtime/tmp/c16-*`（gitignored 一次性终端证据）。
 4. **回填**：`## Round 105/106/107`；同步两张索引；`pnpm verify` ALL PASS。
 
 ## 验收标准
@@ -92,13 +94,14 @@ C14/C15 把「发布面」拆成 source shape（`shipped-links`/`checkSourceShap
 
 ## 落地证据
 
-- 本卡是 charter/证据卡，不改产品代码；系统面 = 本卡 + ≥20 张 BUG 卡 + 索引。
+- 本卡是探索/证据卡，不改产品代码；系统面 = 20 张 BUG 卡（`21ff3ee7` 修复，改动含 `tools/lib/release/shipped-shape.mjs`、`packages/company-pack/src/host/run-bundle/lease.ts`、`presence.ts`、`catalog.ts`）+ 批次 Note + 两张索引。
 - 立卡基线：`pnpm test` 262 files / 2252 tests（C15 Note）；`pnpm release:shape` PASS；`_dist` 137 entries。
-- 预检（实跑待填）：sanitizer 改动 vs sourceFingerprint；REQUIRED JSON `{}`；lease/ledger 坏形状；content 读取面。
+- 修复批次实测（见 Note）：`pnpm test` 262 files / 2281 tests；`pnpm verify` ALL PASS；`pnpm release:shape` PASS；`company-entry`/`client-load` ALL PASS（终端实跑，日志未留存）。
+- 预检（实跑）：sanitizer 改动 vs sourceFingerprint；REQUIRED JSON `{}`；lease/catalog 坏形状；content manifest 三方对账。
 
 ## 关闭条件
 
-- G1–G7 每轴至少一轮，或逐项写未跑原因；C16-1..C16-20 全部判决。
+- G1–G7 每轴至少一轮，或逐项写未跑原因；C16-1..C16-20 全部判决或未跑 + owner（见「判决账订正」）。
 - 3 轮内无新材料 → 收口；未跑面保留并标 owner。
 - 所有 finding 已分诊（BUG 卡/观察/deliberate）；不写「没有 bug」。
 - `pnpm verify` + `pnpm test` 绿；审查记录齐后归档。
@@ -109,12 +112,12 @@ C14/C15 把「发布面」拆成 source shape（`shipped-links`/`checkSourceShap
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C16-1 sanitizer 不在 sourceFingerprint | **confirmed** | 改 `tools/lib/release/shipped-shape.mjs` 注释后指纹仍 `f9eaef4dd008`，`release:shape` PASS → [BUG-243](../_archive/fixed_bugs/BUG-243-pipeline-fingerprint-sanitizer.md) |
-| C16-2 JSON 只 parse | **confirmed** | delivery-rules `{}` / seed `{}` → checker `[]` → [BUG-248](../_archive/fixed_bugs/BUG-248-required-json-schema-only-parse.md)、[BUG-249](../_archive/fixed_bugs/BUG-249-seed-json-empty-object-passes.md) |
-| C16-3 REQUIRED 漏运行时读取面 | **confirmed** | 过滤 generic/product document-map/delivery template/content templates → checker `[]` → [BUG-244](../_archive/fixed_bugs/BUG-244-required-shipped-misses-generic-content.md)、[BUG-245](../_archive/fixed_bugs/BUG-245-required-shipped-misses-product-docs.md)、[BUG-246](../_archive/fixed_bugs/BUG-246-required-shipped-misses-delivery-templates.md)、[BUG-247](../_archive/fixed_bugs/BUG-247-required-shipped-misses-content-templates.md) |
-| C16-4 EXPECTED_PATCH/关键件只判存在/非空 | **confirmed** | 坏 YAML preset → checker `[]` → [BUG-250](../_archive/fixed_bugs/BUG-250-preset-yaml-not-parsed.md) |
-| C16-5 --allow-stale 任意理由 | **confirmed** | 改 README.shipped + `--allow-stale=x` → WARN/PASS/exit 0；裸 flag exit 1 → [BUG-253](../_archive/fixed_bugs/BUG-253-allow-stale-arbitrary-reason.md) |
-| 运行时 dev 命令 | **confirmed** | vp-eng persona 的 `pnpm methods:init`；`checkSourceShape` 返回 `[]` → [BUG-251](../_archive/fixed_bugs/BUG-251-persona-pnpm-methods-init.md)、[BUG-252](../_archive/fixed_bugs/BUG-252-source-shape-no-dev-command-scan.md) |
+| C16-1 sanitizer 不在 sourceFingerprint | **confirmed** | 改 `tools/lib/release/shipped-shape.mjs` 注释后指纹仍 `f9eaef4dd008`，`release:shape` PASS → [BUG-243](../fixed_bugs/BUG-243-pipeline-fingerprint-sanitizer.md) |
+| C16-2 JSON 只 parse | **confirmed** | delivery-rules `{}` / seed `{}` → checker `[]` → [BUG-248](../fixed_bugs/BUG-248-required-json-schema-only-parse.md)、[BUG-249](../fixed_bugs/BUG-249-seed-json-empty-object-passes.md) |
+| C16-3 REQUIRED 漏运行时读取面 | **confirmed** | 过滤 generic/product document-map/delivery template/content templates → checker `[]` → [BUG-244](../fixed_bugs/BUG-244-required-shipped-misses-generic-content.md)、[BUG-245](../fixed_bugs/BUG-245-required-shipped-misses-product-docs.md)、[BUG-246](../fixed_bugs/BUG-246-required-shipped-misses-delivery-templates.md)、[BUG-247](../fixed_bugs/BUG-247-required-shipped-misses-content-templates.md) |
+| C16-4 EXPECTED_PATCH/关键件只判存在/非空 | **confirmed** | 坏 YAML preset → checker `[]` → [BUG-250](../fixed_bugs/BUG-250-preset-yaml-not-parsed.md) |
+| C16-5 --allow-stale 任意理由 | **confirmed** | 改 README.shipped + `--allow-stale=x` → WARN/PASS/exit 0；裸 flag exit 1 → [BUG-253](../fixed_bugs/BUG-253-allow-stale-arbitrary-reason.md) |
+| 运行时 dev 命令 | **confirmed** | vp-eng persona 的 `pnpm methods:init`；`checkSourceShape` 返回 `[]` → [BUG-251](../fixed_bugs/BUG-251-persona-pnpm-methods-init.md)、[BUG-252](../fixed_bugs/BUG-252-source-shape-no-dev-command-scan.md) |
 
 ## Round 106（2026-11-18 · G4–G5 · lease / bundle / presence / catalog）
 
@@ -122,11 +125,11 @@ C14/C15 把「发布面」拆成 source shape（`shipped-links`/`checkSourceShap
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C16-6 不可读 live lease 被抢 | **confirmed** | chmod 000 live lock → `acquireCompanyLease` acquired true（删除锁） → [BUG-254](../_archive/fixed_bugs/BUG-254-lease-unreadable-lock-takeover.md) |
-| C16-7 bundle createdAt/pack 只判存在 | **confirmed** | v3 `createdAt:'not-a-date'`/`pack:'other'` → status ok → [BUG-255](../_archive/fixed_bugs/BUG-255-bundle-created-at-invalid.md)、[BUG-256](../_archive/fixed_bugs/BUG-256-bundle-pack-mismatch.md) |
-| C16-8 未知 task status 被丢弃 | **confirmed** | base pending + event `paused` → merged pending → [BUG-257](../_archive/fixed_bugs/BUG-257-presence-unknown-status-ignored.md) |
-| C16-9 deleted 投影不可重开 | **confirmed** | base deleted + event pending → merged deleted → [BUG-258](../_archive/fixed_bugs/BUG-258-presence-deleted-no-reopen.md) |
-| C16-10 catalog 空 final / catalog symlink | **confirmed** | 零字节 final → final:true；catalog.json symlink → 替换无 warning → [BUG-259](../_archive/fixed_bugs/BUG-259-catalog-empty-final.md)、[BUG-260](../_archive/fixed_bugs/BUG-260-catalog-json-symlink.md) |
+| C16-6 不可读 live lease 被抢 | **confirmed** | chmod 000 live lock → `acquireCompanyLease` acquired true（删除锁） → [BUG-254](../fixed_bugs/BUG-254-lease-unreadable-lock-takeover.md) |
+| C16-7 bundle createdAt/pack 只判存在 | **confirmed** | v3 `createdAt:'not-a-date'`/`pack:'other'` → status ok → [BUG-255](../fixed_bugs/BUG-255-bundle-created-at-invalid.md)、[BUG-256](../fixed_bugs/BUG-256-bundle-pack-mismatch.md) |
+| C16-8 未知 task status 被丢弃 | **confirmed** | base pending + event `paused` → merged pending → [BUG-257](../fixed_bugs/BUG-257-presence-unknown-status-ignored.md) |
+| C16-9 deleted 投影不可重开 | **confirmed** | base deleted + event pending → merged deleted → [BUG-258](../fixed_bugs/BUG-258-presence-deleted-no-reopen.md) |
+| C16-10 catalog 空 final / catalog symlink | **confirmed** | 零字节 final → final:true；catalog.json symlink → 替换无 warning → [BUG-259](../fixed_bugs/BUG-259-catalog-empty-final.md)、[BUG-260](../fixed_bugs/BUG-260-catalog-json-symlink.md) |
 
 ## Round 107（2026-11-18 · G6–G7 · content manifest / 门禁面）
 
@@ -134,8 +137,8 @@ C14/C15 把「发布面」拆成 source shape（`shipped-links`/`checkSourceShap
 
 | 假设 | 判决 | 证据 / BUG |
 |---|---|---|
-| C16-11 content manifest 与盘面漂移 | **confirmed** | tiers 并集 50 vs 盘上 84；34 extra；无门禁 → [BUG-261](../_archive/fixed_bugs/BUG-261-content-manifest-extra-drift.md) |
-| C16-12 manifest tiers 引用不校验 | **confirmed** | tiers 加 `generic/missing.md` → checker `[]` → [BUG-262](../_archive/fixed_bugs/BUG-262-content-manifest-refs-not-checked.md) |
+| C16-11 content manifest 与盘面漂移 | **confirmed** | tiers 并集 50 vs 盘上 84；34 extra；无门禁 → [BUG-261](../fixed_bugs/BUG-261-content-manifest-extra-drift.md) |
+| C16-12 manifest tiers 引用不校验 | **confirmed** | tiers 加 `generic/missing.md` → checker `[]` → [BUG-262](../fixed_bugs/BUG-262-content-manifest-refs-not-checked.md) |
 
 ## 判决汇总
 
@@ -145,10 +148,12 @@ C14/C15 把「发布面」拆成 source shape（`shipped-links`/`checkSourceShap
 | C16-6..10 | confirmed | 254..260 |
 | C16-11..12 | confirmed | 261..262 |
 
-**本轮共开 20 张 P2 卡（BUG-243..262）**，全部 `调查中`，不修产品代码；未跑面 = 真入口
-`company-entry`/`client-load` 重跑、真实 wire/UI、无 pnpm 安装环境。没有「管线指纹/关键件完备」的结论。
+**判决账订正（2026-11-20 归档时）**：Round 106/107 的「C16-6..12」行与 `## 首轮假设` 表同号不同义——它们是**新发现**（lease 不可读、bundle `createdAt`/`pack`、presence 未知 status/deleted、catalog 空 final/symlink、content manifest 漂移、tiers 引用），对应 BUG-254..262，**不**构成首轮假设 C16-6..12 的判决。如实计数：C16-1/2/3/5 直接判决（Round 105）；C16-4 只测到「关键件存在/非空」（BUG-250），EXPECTED_PATCH 集合完整性未跑；C16-13 由 Round 105 未编号的「运行时 dev 命令」行覆盖（BUG-251/252）；C16-14 部分覆盖（dev-command 面 = BUG-252；schema/空目录/宽 glob 未跑）；C16-15/17 部分覆盖（BUG-244..247/260）；C16-19 由 BUG-261/262 覆盖；**C16-6..12、C16-16、C16-18、C16-20 未跑**（G5 cultivation、G6 命令层整轴未跑），owner = 下一轮探索卡/用户点名。原「20 条假设全部 confirmed」按本节更正为「20 张 BUG 卡全部成立；首轮假设 6 条有直接判决/覆盖、4 条部分覆盖、10 条未跑」。
+
+**本轮共开 20 张 P2 卡（BUG-243..262）**，当轮全部 `调查中`、不修产品代码（2026-11-20 收口：20 张已全部修复并迁 [fixed_bugs](../fixed_bugs/)）；未跑面 = 真入口 `company-entry`/`client-load` 重跑（修复批次已补跑两 lane，见 Note）、真实 wire/UI、无 pnpm 安装环境、G5 cultivation 与 G6 命令层整轴（owner = 下一轮/用户点名）。没有「管线指纹/关键件完备」的结论。
 
 ## 执行记录
 
 - 2026-11-18 ｜ 立卡（C16）｜ 本卡 + bugs/README + issues/README ｜ 20 条假设（管线指纹/关键件/lease/run-bundle/cultivation/ledger/commands/content/门禁）｜ `pnpm verify` ALL PASS ｜ Round 105–107 待跑。
-- 2026-11-18 ｜ Round 105–107 ｜ `runtime/tmp/c16-*` ｜ 20 条假设全部 confirmed（管线指纹/4 类关键件/JSON-YAML/allow-stale/lease/bundle/presence/catalog/content manifest） ｜ 20 张 BUG-243..262（调查中，不修） ｜ `pnpm verify` ALL PASS；`pnpm test` 262/2252 ｜ 真入口未重跑。
+- 2026-11-18 ｜ Round 105–107 ｜ `runtime/tmp/c16-*` ｜ 20 条假设全部 confirmed（管线指纹/4 类关键件/JSON-YAML/allow-stale/lease/bundle/presence/catalog/content manifest）（本条已被 2026-11-20 判决账订正节取代） ｜ 20 张 BUG-243..262（调查中，不修） ｜ `pnpm verify` ALL PASS；`pnpm test` 262/2252 ｜ 真入口未重跑。
+- 2026-11-20 ｜ 收口归档 ｜ 判决账订正（同号不同义消歧 + 未跑 10 条列明）+ 落地证据换真实系统面 + 卡内/入链深度修正 ｜ 20 张 BUG-243..262 已修（`21ff3ee7`）并迁 fixed_bugs（`29783733`）；去向 = 批次 Note ｜ `pnpm verify` ALL PASS ｜ 审查：agent（独立盲审）。

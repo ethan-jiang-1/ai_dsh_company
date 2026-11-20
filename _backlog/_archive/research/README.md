@@ -18,6 +18,8 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [quality-prevention/](quality-prevention/README.md) · 质量预防：跨轮补洞如何收敛为可维护保障 | 6 份 | 用户 2026-11-20 点名；[content 合同族预防试点卡](../settled_issues/2026-11-20-quality-prevention-contract-pilot.md) | 同卡（[Note](../../../notes/implemented/2026-11-20-quality-prevention-contract-pilot.md)） | 2026-11-20 |
+| [maintenance-surface-taxonomy/](maintenance-surface-taxonomy/README.md) · 维护面顶层分类法：judge / show / operate 三面与根布局方向 | 12 份（含 csv） | 用户 2026-11-16 点名（跨三仓比较；无卡） | —（交接 = 三份 reorg handoff，2026-11-16 已落地） | 2026-11-20 |
 | [source-prevention-design/](source-prevention-design/README.md) · 生产源头预防候选：事实同步、重复解释与失败信息保留 | 1 份 | 用户2026-11-20直接委托 | [workspace状态读取卡](../settled_issues/2026-11-20-company-file-read-state.md)（[Note](../../../notes/implemented/2026-11-20-company-file-read-state.md)） | 2026-11-20 |
 | [tests-src-correspondence/](tests-src-correspondence/README.md) · 测试树与源码树的对应：镜像轴 vs owner 轴（盘面实测、四根轴打架、两个独立子代理复核） | 1 份 | 用户 2026-11-15 点名；[测试树分轴卡](../settled_issues/2026-11-15-tests-tree-axis.md) | 同卡（[Note](../../../notes/implemented/2026-11-15-tests-tree-axis.md)） | 2026-11-15 |
 | [test-asset-spiral/](test-asset-spiral/README.md) · 测试资产螺旋与二阶制度棘轮：从例子/加脚本升级为宪章×流程×元门禁 | 2 份 | 用户 2026-11-14 点名研究；[制度棘轮卡](../settled_issues/2026-11-14-institutional-test-ratchet.md) | [测试资产杠杆卡](../settled_issues/2026-11-14-test-asset-leverage.md) + 同卡（[Note](../../../notes/implemented/2026-11-14-institutional-test-ratchet.md)） | 2026-11-14 |

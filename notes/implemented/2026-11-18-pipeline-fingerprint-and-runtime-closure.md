@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-18 落地；任务源 = 用户「继续新的bug……系统性修起来」）
 
-> 上游 = [C16 探索卡](../../_backlog/issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md) + [20 张缺陷卡](../../_backlog/bugs/README.md)（BUG-243..262）。BUG-212 保持活跃，不并入本批。
+> 上游 = [C16 探索卡](../../_backlog/_archive/settled_issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md) + [20 张缺陷卡](../../_backlog/bugs/README.md)（BUG-243..262）。BUG-212 保持活跃，不并入本批。
 
 ## 决定
 

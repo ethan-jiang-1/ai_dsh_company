@@ -2,13 +2,17 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 283；已分配 BUG-001..282。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 288；已分配 BUG-001..287。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**：C17 20 张（BUG-263..282）已于 2026-11-19 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，见下方「## 2026-11-19 修复交接（根因组 A–G：BUG-263..282）」的收口行。C16 20 张（BUG-243..262）已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；BUG-212 挂起在 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)。
+**活跃 2 张（修复就绪，未修）**：[BUG-286](BUG-286-deliverables-check-v3-layout-unusable.md)（`deliverables-check` 在 v3 布局下不可用）、[BUG-287](BUG-287-session-search-locale-hardcoded.md)（探针按英文 aria-label 定位会话搜索，默认 zh 档整批失败）。
+
+**本轮已修并迁出**：BUG-283（dev wrapper `--home` 缺失目录无诊断）、BUG-284（wrapper 不转发信号 ⇒ 孤儿持 writer lease）、BUG-285（upgrade 守卫冻结已废止身份语义）——见 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+
+**上一轮收口**：C17 20 张（BUG-263..282）已于 2026-11-19 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，见下方「## 2026-11-19 修复交接（根因组 A–G：BUG-263..282）」的收口行。C16 20 张（BUG-243..262）已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；BUG-212 挂起在 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)。
 
 **已挂起**：BUG-212（收尾验证链偏长）——docs-only 快速路径已修；pre-push 46s 是成本-only，迁 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)，触发器见卡尾。
 
@@ -106,7 +110,7 @@ A 管线指纹（243）；B 关键件/JSON/YAML（244-250）；C dev 命令（25
 
 ## 2026-11-19 C17 门禁残余面 + 运行态边界
 
-**用户指令（2026-11-19）**：「至少抓到 20 个再停，尤其找发虚领域」——本组 20 张全部 `调查中`，只开卡不修；证据 = [C17 卡](../_archive/settled_issues/2026-11-19-guard-residuals-and-runtime-edges.md)。
+**用户指令（2026-11-19）**：「至少抓到 20 个再停，尤其找发虚领域」——本组 20 张已于 2026-11-19 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [C17 卡](../_archive/settled_issues/2026-11-19-guard-residuals-and-runtime-edges.md)。
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
@@ -120,7 +124,7 @@ A 管线指纹（243）；B 关键件/JSON/YAML（244-250）；C dev 命令（25
 
 ## 2026-11-18 C16 门禁管线指纹 + 运行时发虚面
 
-**用户指令（2026-11-18）**：「至少抓到 20 个再停，尤其找心里发虚的领域」——本组 20 张已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [C16 卡](../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)。
+**用户指令（2026-11-18）**：「至少抓到 20 个再停，尤其找心里发虚的领域」——本组 20 张已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [C16 卡](../_archive/settled_issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md)。
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
@@ -195,7 +199,7 @@ A 组是 `shipped-shape` 只拒 C13 见过的形状（glob/content/无扩展名�
 
 ## 2026-11-18 C14 修复后的守卫面 + 低置信运行态
 
-**用户指令（2026-11-18）**：「你找那 bug 都修好了，咱们再来一轮，至少抓到 10 个再停下来，尤其找那些你心里比较发虚的领域」——本组 10 张全部 `调查中`，只开卡不修；证据 = [C14 低置信卡](../issues/2026-11-18-low-confidence-runtime-exploratory.md)。
+**用户指令（2026-11-18）**：「你找那 bug 都修好了，咱们再来一轮，至少抓到 10 个再停下来，尤其找那些你心里比较发虚的领域」——本组 10 张已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [C14 低置信卡](../_archive/settled_issues/2026-11-18-low-confidence-runtime-exploratory.md)。
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
@@ -208,7 +212,7 @@ A 组是 `shipped-shape` 只拒 C13 见过的形状（glob/content/无扩展名�
 
 ## 2026-11-17 C13 运行时/发布面分离（focus v8）
 
-**用户指令（2026-11-17）**：「我们不少脚本/代码，其实发布到运行时的不应该那么多，运行时的代码/脚本不应该依赖开发时刻的脚本，比如测试、设置环境等未来测试/验证什么的……沿着这个方向探索探索挖掘挖掘，再来一轮，至少 10 个」——本组 10 张已于 2026-11-17 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [C13 探索卡](../issues/2026-11-17-runtime-shipped-boundary-exploratory.md)。
+**用户指令（2026-11-17）**：「我们不少脚本/代码，其实发布到运行时的不应该那么多，运行时的代码/脚本不应该依赖开发时刻的脚本，比如测试、设置环境等未来测试/验证什么的……沿着这个方向探索探索挖掘挖掘，再来一轮，至少 10 个」——本组 10 张已于 2026-11-17 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [C13 探索卡](../_archive/settled_issues/2026-11-17-runtime-shipped-boundary-exploratory.md)。
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
@@ -222,7 +226,7 @@ A 组是 `shipped-shape` 只拒 C13 见过的形状（glob/content/无扩展名�
 
 ## 2026-11-17 C12 归属波次探索（focus v7）
 
-**用户指令（2026-11-17）**：「利用这个思路做 exploratory test……找到差不多10来个的时候收手，bug直接报，别试图去修整这些bug」——本组 5 张全部 `调查中`，只开卡不修；证据 = [探索卡](../issues/2026-11-17-ownership-wave-exploratory.md)。
+**用户指令（2026-11-17）**：「利用这个思路做 exploratory test……找到差不多10来个的时候收手，bug直接报，别试图去修整这些bug」——本组 10 张已于 2026-11-17 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；证据 = [探索卡](../_archive/settled_issues/2026-11-17-ownership-wave-exploratory.md)。
 
 | 组 | 卡 | 共同根因 | 一句话 | 级别 |
 |---|---|---|---|---|
@@ -232,11 +236,11 @@ A 组是 `shipped-shape` 只拒 C13 见过的形状（glob/content/无扩展名�
 | D 证据执行 | [206](../_archive/fixed_bugs/BUG-206-coveredby-evidence-does-not-execute.md) | `coveredBy` 是声明，不是执行证据 | 探针/工具入口坏了 pre-push 仍绿 | P2 |
 | E 退役登记 | [207](../_archive/fixed_bugs/BUG-207-retired-path-misses-wave-renames.md) | 退役前缀表是手写数组，未随 77 renames 更新 | 脚本注释里的旧家仍称「零残留」 | P2 |
 | F 依赖图 | [208](../_archive/fixed_bugs/BUG-208-face-boundaries-computed-imports.md) | 只消费字面量 import；checks/probes lib 无图守卫 | 计算型反向 import 可绕过归属方向 | P2 |
-| G live 声明 | [209](../_archive/fixed_bugs/BUG-209-live-declarations-stale-after-split.md) | 手写面表/件数无生成器 | tests/README 的 lib→replay 与 Note 件数仍按旧树 | P3 |
-| H shipped 面 | [210](../_archive/fixed_bugs/BUG-210-shipped-comments-dev-only-paths.md) | 只清旧家，未区分 dev-only 同源说明 | 安装包里注释指向不存在的 tools/lib | P3 |
-| I 归属规则 | [211](../_archive/fixed_bugs/BUG-211-tools-readme-lib-purity-contradiction.md) | 纯度句未随 probe/ 纳入 lib 更新 | 「lib 不启动进程」与 probe-web 矛盾 | P3 |
+| G live 声明 | [209](../_archive/fixed_bugs/BUG-209-live-declarations-stale-after-split.md) | 手写面表/件数无生成器 | tests/README 的 lib→replay 与 Note 件数仍按旧树 | P2 |
+| H shipped 面 | [210](../_archive/fixed_bugs/BUG-210-shipped-comments-dev-only-paths.md) | 只清旧家，未区分 dev-only 同源说明 | 安装包里注释指向不存在的 tools/lib | P2 |
+| I 归属规则 | [211](../_archive/fixed_bugs/BUG-211-tools-readme-lib-purity-contradiction.md) | 纯度句未随 probe/ 纳入 lib 更新 | 「lib 不启动进程」与 probe-web 矛盾 | P2 |
 
-本组是 Round 94–96 的产出；9 条安装形状 lane、7 件 analyze 探针与 `smoke:all` 已实跑 PASS；clean worktree 未跑，见探索卡。
+本组是 Round 94–96 的产出；9 条安装形状 lane、7 件 analyze 探针与 `smoke:all` 已实跑 PASS；10 张已于 2026-11-17 修复并迁 [fixed_bugs](../_archive/fixed_bugs/)；clean worktree 未跑，见探索卡。
 
 ## 2026-11-16 修复交接（根因组 A–E：BUG-192..201）
 

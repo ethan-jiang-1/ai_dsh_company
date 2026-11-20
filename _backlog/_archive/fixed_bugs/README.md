@@ -4,6 +4,14 @@
 
 ## 修复流水（倒序）
 
+- **BUG-283..285**（2026-11-20，端到端验收轮 / P3·P2·P3）：dev 入口与守卫的「沉默失败」——
+  [283](BUG-283-dev-wrapper-home-missing-opaque-failure.md) `--home` 目录不存在时模板初始化 spawn 失败被压成
+  `exit null`/空 stderr（先建 home + 点名 spawn 错误）；[284](BUG-284-dev-wrapper-orphan-writer-holds-lease.md)
+  wrapper 不转发 SIGINT/SIGTERM/SIGHUP ⇒ dsh 子进程成孤儿、继续持 writer lease，下一次启动只报
+  「公司数据已停写」（转发信号）；[285](BUG-285-upgrade-lane-frozen-identity-semantics.md)
+  `upgrade-while-running` 冻结了 BUG-256 之前的「创建版本」语义而长期红（改断言 id/createdAt 保留 +
+  pack.version 跟随升级 + v3 旧字节备份）。证据提交 `bee0f4fc`。
+
 - **BUG-263..282**（2026-11-19，根因组 A–G，P2×20）：C17 门禁残余面 + 运行态边界——修法不是补清单，
   是让判据的输入集成为派生量或单一实现：
   **A pipeline 输入集**：[263](BUG-263-pipeline-install-manual.md)/[264](BUG-264-pipeline-market-index.md)

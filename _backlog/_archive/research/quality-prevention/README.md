@@ -6,9 +6,10 @@ opened: 2026-11-20
 # 质量预防：怎样让探索测试的发现积累为可收敛的保障
 
 > 问题：长期依赖 exploratory test 找 bug、逐个补洞，为什么难以收敛？应在设计、测试资产和开发纪律的哪些位置预埋机制，使同类错误更早被消除或拦截，并为剩余探索设置明确边界？
-> 消费者：用户 2026-11-20 点名并追加“结合本 REPO，研究清楚如何改善再思考落地”的授权研究；现由 [content 合同族预防试点卡](../../issues/2026-11-20-quality-prevention-contract-pilot.md)承接。起点为 [Schemastery 质量专题](../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/answer.md)与 [Preset 质量专题](../../../../deepseek-harness/_faq_on_digested/31_preset-quality/answer.md)。
-> 产出的卡：[2026-11-20-quality-prevention-contract-pilot.md](../../issues/2026-11-20-quality-prevention-contract-pilot.md)（用户已批准并完成首批content实现；验证与决定见[实施Note](../../../notes/implemented/2026-11-20-quality-prevention-contract-pilot.md)）。
-> 结论：本仓已具备制度和执行链，content试点已把跨轮样本升级成动态资产并接回原入口；追加源码研究发现规则解码集中、计划联合类型及降级证据拥有者可减少具体作者义务，需按真实成本与需求选择，不能推断总体缺陷率下降；不再默认以产卡配额衡量探索完成。研究阶段是定性与实施交接；后续content首批落地见实施Note；用户继续后承接的[bootstrap生产类型试点](../../../notes/implemented/2026-11-20-bootstrap-plan-payload-contract.md)单列证据，历史研究不充当实施证据。
+> 消费者：用户 2026-11-20 点名并追加“结合本 REPO，研究清楚如何改善再思考落地”的授权研究；现由 [content 合同族预防试点卡](../../settled_issues/2026-11-20-quality-prevention-contract-pilot.md)承接。起点为 [Schemastery 质量专题](../../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/answer.md)与 [Preset 质量专题](../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/answer.md)。
+> 产出的卡：[2026-11-20-quality-prevention-contract-pilot.md](../../settled_issues/2026-11-20-quality-prevention-contract-pilot.md)（用户已批准并完成首批content实现；验证与决定见[实施Note](../../../../notes/implemented/2026-11-20-quality-prevention-contract-pilot.md)）。
+> 结论：本仓已具备制度和执行链，content试点已把跨轮样本升级成动态资产并接回原入口；追加源码研究发现规则解码集中、计划联合类型及降级证据拥有者可减少具体作者义务，需按真实成本与需求选择，不能推断总体缺陷率下降；不再默认以产卡配额衡量探索完成。研究阶段是定性与实施交接；后续content首批落地见实施Note；用户继续后承接的[bootstrap生产类型试点](../../../../notes/implemented/2026-11-20-bootstrap-plan-payload-contract.md)单列证据，历史研究不充当实施证据。
+> 归档：2026-11-20（试点卡已按用户授权交付、追加研究已定性；整题随末张活卡迁入研究归档，材料冻结不回填）
 
 ## 研究范围与出口
 
@@ -24,7 +25,7 @@ opened: 2026-11-20
 
 首轮证据支持：先减少重复事实和旁路，把正确性放在状态拥有者的必经操作；再以独立正反例、跨消费者性质、真实装配、合成回放与任务成果验收分层保护。已有治理机制应复用，不再把测试数量和门禁数量当作收敛。
 
-深化后已明确首切片、实际 owner、分期改动和验收。用户已确认研究后最终通过[首批卡](../../issues/2026-11-20-quality-prevention-contract-pilot.md)承接落地；当前范围、取舍、必要步骤、交接去向和验收以该卡为准；下游成立前的变化同步回卡，成立后在此保留承接链接；[本仓实施研究](2026-11-20-repository-implementation.md)保存论据。首轮材料中“先查发布缺证据”的排序已由深化结果调整为 content 族；历史材料保留原证据。研究阶段未验证长期缺陷率；用户随后已批准首批并由实施Note承接，研究材料保留各自时点证据，不回填为实施证据。
+深化后已明确首切片、实际 owner、分期改动和验收。用户已确认研究后最终通过[首批卡](../../settled_issues/2026-11-20-quality-prevention-contract-pilot.md)承接落地；当前范围、取舍、必要步骤、交接去向和验收以该卡为准；下游成立前的变化同步回卡，成立后在此保留承接链接；[本仓实施研究](2026-11-20-repository-implementation.md)保存论据。首轮材料中“先查发布缺证据”的排序已由深化结果调整为 content 族；历史材料保留原证据。研究阶段未验证长期缺陷率；用户随后已批准首批并由实施Note承接，研究材料保留各自时点证据，不回填为实施证据。
 
 ## 材料
 

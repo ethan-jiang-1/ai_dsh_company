@@ -2,7 +2,7 @@
 
 状态：implemented；批准：用户 2026-11-20「好的，整理整理变成计划之后 setup goal准备落地了……质量最重要……有证据……静默自主执行……直到最终结果」；content首批已交付，原定验证与独立审阅完成。整体exploratory缺陷数或缺陷率改善未证明。
 
-上游 = [实施卡](../../_backlog/issues/2026-11-20-quality-prevention-contract-pilot.md)；依据 = [研究题](../../_backlog/research/quality-prevention/README.md)。
+上游 = [实施卡](../../_backlog/_archive/settled_issues/2026-11-20-quality-prevention-contract-pilot.md)；依据 = [研究题](../../_backlog/_archive/research/quality-prevention/README.md)。
 
 ## 问题与结果
 
@@ -45,7 +45,7 @@
 
 ## 验收
 
-原[卡中验收](../../_backlog/issues/2026-11-20-quality-prevention-contract-pilot.md)逐项保留；确定性资产、方法触发/互补走查及独立语义审完成。实际命令如下。
+原[卡中验收](../../_backlog/_archive/settled_issues/2026-11-20-quality-prevention-contract-pilot.md)逐项保留；确定性资产、方法触发/互补走查及独立语义审完成。实际命令如下。
 
 ## 验证
 
@@ -70,5 +70,5 @@
 ## 未覆盖轴
 
 - [covered] 原验收的确定性合同、两消费者与独立业务锚点均有常驻证据，不是枚举BUG标题数 → [content-family](../../tests/checks/content-family.test.mjs)。
-- [policy] 安装、浏览器、真模型、发布与指纹/presence/catalog新资产不在本批范围 → [上游卡](../../_backlog/issues/2026-11-20-quality-prevention-contract-pilot.md)。
+- [policy] 安装、浏览器、真模型、发布与指纹/presence/catalog新资产不在本批范围 → [上游卡](../../_backlog/_archive/settled_issues/2026-11-20-quality-prevention-contract-pilot.md)。
 - [unprovable] 单轮不能证明长期缺陷率下降或自动发现任意新增读取需求；必须性仍由需求与独立业务锚点维护 → [业务bootstrap锚点](../../tests/host/run-bundle/bootstrap.spec.ts)。

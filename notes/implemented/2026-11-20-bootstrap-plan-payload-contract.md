@@ -2,7 +2,7 @@
 
 状态：implemented；批准：用户在生产源头研究提交后于2026-11-20「继续」，会话明确承接研究推荐的bootstrap局部试点，用户随后再次要求继续。
 
-上游 = [质量预防卡](../../_backlog/issues/2026-11-20-quality-prevention-contract-pilot.md)；依据 = [生产源头研究](../../_backlog/research/quality-prevention/2026-11-20-production-source-prevention.md)。
+上游 = [质量预防卡](../../_backlog/_archive/settled_issues/2026-11-20-quality-prevention-contract-pilot.md)；依据 = [生产源头研究](../../_backlog/_archive/research/quality-prevention/2026-11-20-production-source-prevention.md)。
 
 ## 决定
 
@@ -52,6 +52,6 @@ planBootstrap对既存文件产出无payload的skip；待创建种子和角色�
 ## 未覆盖轴
 
 - [covered] 内部构造的非法状态、来源执行与现有文件防护分别由类型检查和真实文件回归承担 → [bootstrap spec](../../tests/host/run-bundle/bootstrap.spec.ts)。
-- [policy] 任意JS/any/cast、外部JSON验证不由TypeScript保证；不新增兼容Adapter或通用规则框架 → [生产源头研究](../../_backlog/research/quality-prevention/2026-11-20-production-source-prevention.md)。
-- [policy] 本批无浏览器、真模型、安装、发布或跨文件事务；现有运行文件合同保持 → [质量预防卡](../../_backlog/issues/2026-11-20-quality-prevention-contract-pilot.md)。
+- [policy] 任意JS/any/cast、外部JSON验证不由TypeScript保证；不新增兼容Adapter或通用规则框架 → [生产源头研究](../../_backlog/_archive/research/quality-prevention/2026-11-20-production-source-prevention.md)。
+- [policy] 本批无浏览器、真模型、安装、发布或跨文件事务；现有运行文件合同保持 → [质量预防卡](../../_backlog/_archive/settled_issues/2026-11-20-quality-prevention-contract-pilot.md)。
 - [unprovable] 局部类型约束减少可构造状态，不证明长期总体缺陷率、真实产品需求完整性或消除文件系统竞态 → [原状态根写门](2026-11-13-state-root-write-gate-sweep.md)。

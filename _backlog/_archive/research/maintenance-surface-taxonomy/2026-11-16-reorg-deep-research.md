@@ -9,12 +9,12 @@ intent: ai_dsh_deep_research 维护面整理单（自包含 handoff，含完整�
 > **授权边界**：P0（§3）是声明层改动；P1（§4）涉及搬家与探针规格变更，**动手前必须拿到用户明确批准**。本文不是 P1 的授权。
 > **来源**：2026-11-16 三仓维护面分类法研究（宿主 = `ai_dsh_company` 的 `_backlog/research/maintenance-surface-taxonomy/`）。本仓的组级分类经独立盲审复核，数字已按盘上重新核实。
 > **术语警告**：本仓 docs/evaluation.md 的「面」= 评估等级 L0–L4（五个评估面），**与本文的「维护面」不是一回事**。本文第一句就要写清，否则 fresh agent 会把两套「面」混起来。evaluation.md 自己也说「探针不是第六个评估面」——那句话里的「面」是评估面，不是维护面。
-> **方向更新（2026-11-16，D64）**：三仓根目录统一为 checks/probes/tools 已由「可选远期」升为**承诺方向**（用户裁决：人仍驾驭 AI，根名不一致 → 理解差异 → 驱动出错；先满足人 + 极度满足 fresh agent 可并存）。**硬顺序：先纯化（每目录一个动词）后统一**，或同批；先改名后拆组 = 给 mixed 目录假保证。本仓 scripts/ → checks/、operate 家 dev/ → tools/。仍是独立迁移项目（161 文件 + gate 输入 + hooksPath 重装 + 引用 + 冻结归档 redirect + AGENTS.md 注入面一起做），需用户批准；P0/P1 范围不变。决策家 = [surface-root-unification-direction](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。**落地纪律（用户追加）**：调整时每个根目录的定位（面 = judge/show/operate + 装什么/不装什么 + 例外）必须写进该仓自己的 surface-contract 与 README 首屏，一眼可判、不含糊；共识随本自包含 handoff 携带，实施 agent 不回看宿主仓对话——含糊定位 = 共识跨仓蒸发。
+> **方向更新（2026-11-16，D64）**：三仓根目录统一为 checks/probes/tools 已由「可选远期」升为**承诺方向**（用户裁决：人仍驾驭 AI，根名不一致 → 理解差异 → 驱动出错；先满足人 + 极度满足 fresh agent 可并存）。**硬顺序：先纯化（每目录一个动词）后统一**，或同批；先改名后拆组 = 给 mixed 目录假保证。本仓 scripts/ → checks/、operate 家 dev/ → tools/。仍是独立迁移项目（161 文件 + gate 输入 + hooksPath 重装 + 引用 + 冻结归档 redirect + AGENTS.md 注入面一起做），需用户批准；P0/P1 范围不变。决策家 = [surface-root-unification-direction](../../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。**落地纪律（用户追加）**：调整时每个根目录的定位（面 = judge/show/operate + 装什么/不装什么 + 例外）必须写进该仓自己的 surface-contract 与 README 首屏，一眼可判、不含糊；共识随本自包含 handoff 携带，实施 agent 不回看宿主仓对话——含糊定位 = 共识跨仓蒸发。
 > **落地状态（2026-11-17）：已完成（维护者在目标仓实施，本仓不代管）。** 目标仓已完成根名统一（scripts → checks、dev → tools；show 新域统一取名 analyze，中间态 run 退役），并留下迁移 Note、redirect 账本与 hooksPath 幂等恢复。本文保留**实施前**时点文本——实施 agent **勿按本文重做迁移**；现行事实以目标仓的维护面合同与其根 README 首屏为准。
 
 ## 目标根布局（统一后，实施对照）
 
-> D64 承诺方向的**推荐终态**，显式画出以免实施时乱发挥。**P1 纯化 + 改名迁移后**才到此形状；P0 不改名。决策家 = [surface-root-unification-direction](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。
+> D64 承诺方向的**推荐终态**，显式画出以免实施时乱发挥。**P1 纯化 + 改名迁移后**才到此形状；P0 不改名。决策家 = [surface-root-unification-direction](../../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。
 
 三仓同一 skeleton（**只统一维护面**）：
 
@@ -141,9 +141,9 @@ dev/        operate（run+act）：env.sh / boot-run / run-driver / run-kickoff 
 ```
 
 ### 3.3 目录 README 首行
-- probes/README.md 标题后加：`> 维护面：show（_index 与 stream tee 是非面；tee 现行仍被 probe-registry 按探针扫）。规则 = [surface-contract](../docs/guides/67-surface-contract.md)。`
-- `scripts/README.md` 顶部加：`> 维护面：mixed（judge + show + operate，待拆）。分组面表见下；规则 = [surface-contract](../docs/guides/67-surface-contract.md)。` 并在既有分组表前插一张**组级面表**（§2 的 scripts 分组明细压缩版）。
-- `dev/README.md` 标题后加：`> 维护面：operate（run + act）。env.sh 是配置（非面）；llm-socket-isolation.cjs 是驱动（非面）。规则 = [surface-contract](../docs/guides/67-surface-contract.md)。`
+- probes/README.md 标题后加：`> 维护面：show（_index 与 stream tee 是非面；tee 现行仍被 probe-registry 按探针扫）。规则 = [surface-contract](../../../research/docs/guides/67-surface-contract.md)。`
+- `scripts/README.md` 顶部加：`> 维护面：mixed（judge + show + operate，待拆）。分组面表见下；规则 = [surface-contract](../../../research/docs/guides/67-surface-contract.md)。` 并在既有分组表前插一张**组级面表**（§2 的 scripts 分组明细压缩版）。
+- `dev/README.md` 标题后加：`> 维护面：operate（run + act）。env.sh 是配置（非面）；llm-socket-isolation.cjs 是驱动（非面）。规则 = [surface-contract](../../../research/docs/guides/67-surface-contract.md)。`
 
 注意：`probe-registry` 要求 probes/README.md 链接 INDEX.generated.md——加面声明行不影响，但**不要删既有的索引链接**。
 

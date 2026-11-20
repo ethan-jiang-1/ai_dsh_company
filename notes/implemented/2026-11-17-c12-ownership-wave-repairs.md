@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-17 落地；任务源 = 用户「_backlog/bugs 里面有最近 exploratory test 发现的 bugs，你琢磨一下，看看是否能系统性修起来。计划有了后 setup goal 逐步按 REPO 的流程来推进。」）
 
-> 上游 = [C12 归属波次探索卡](../../_backlog/issues/2026-11-17-ownership-wave-exploratory.md) + [10 张缺陷卡](../../_backlog/bugs/README.md)（BUG-202..211）。
+> 上游 = [C12 归属波次探索卡](../../_backlog/_archive/settled_issues/2026-11-17-ownership-wave-exploratory.md) + [10 张缺陷卡](../../_backlog/bugs/README.md)（BUG-202..211）。
 > 本批不是十个症状补丁：归属波次改了 63 个 lib、77 个 renames 的落点，**「绿」的制造者**（oracle 判别面、覆盖率棘轮、守卫扫描面、live/shipped 声明）没有随迁。
 
 ## 决定

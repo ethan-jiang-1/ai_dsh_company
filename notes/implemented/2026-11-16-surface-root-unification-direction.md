@@ -31,7 +31,7 @@
 
 - **统一范围** = 维护面三目录（`checks/` `probes/` `tools/`）+ `tests/` oracle + 配置非面；产品/源码/文档/记忆等其余根目录各仓自有，**不在统一范围**（别把整个根改成一样）。
 - 根名三仓固定；每面目录只装一个动词；**内部子组各仓自由**；例外进该仓例外登记一次（company = [surface-exceptions](../../docs/reference/surface-exceptions.md)）。
-- 这是 **P1 纯化 + 改名迁移后的终态**，P0 不改名（决定 3：先纯化后统一）。各仓「现状→目标」映射与待裁选项显式写在三份 handoff 的「目标根布局」节（[company](../../_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-company.md) / [bsimulation](../../_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-bsimulation.md) / [deep-research](../../_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-deep-research.md)）——实施对照用，不许乱发挥。
+- 这是 **P1 纯化 + 改名迁移后的终态**，P0 不改名（决定 3：先纯化后统一）。各仓「现状→目标」映射与待裁选项显式写在三份 handoff 的「目标根布局」节（[company](../../_backlog/_archive/research/maintenance-surface-taxonomy/2026-11-16-reorg-company.md) / [bsimulation](../../_backlog/_archive/research/maintenance-surface-taxonomy/2026-11-16-reorg-bsimulation.md) / [deep-research](../../_backlog/_archive/research/maintenance-surface-taxonomy/2026-11-16-reorg-deep-research.md)）——实施对照用，不许乱发挥。
 
 ## 输掉的方案
 
@@ -44,7 +44,7 @@
 ## 状态事实与载体
 
 - **事实**：维护面分类法 = 两层×三面×两轴（D63 现行）；根目录目标名 checks/probes/tools 三仓统一 = 承诺方向（D64）。company 侧已达标；另两仓的落地归各自目标仓（维护者实施，本仓不代管），本仓只保「方向 + 自包含 handoff + 对账」。
-- **唯一入口**：规则 = [surface-contract](../../docs/surface-contract.md)；方向 = 本 Note + D64；施工 = 三份 reorg handoff（[company](../../_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-company.md) / [bsimulation](../../_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-bsimulation.md) / [deep-research](../../_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-deep-research.md)）。
+- **唯一入口**：规则 = [surface-contract](../../docs/surface-contract.md)；方向 = 本 Note + D64；施工 = 三份 reorg handoff（[company](../../_backlog/_archive/research/maintenance-surface-taxonomy/2026-11-16-reorg-company.md) / [bsimulation](../../_backlog/_archive/research/maintenance-surface-taxonomy/2026-11-16-reorg-bsimulation.md) / [deep-research](../../_backlog/_archive/research/maintenance-surface-taxonomy/2026-11-16-reorg-deep-research.md)）。
 - **读载体 / 写载体**：读 = 人跨仓指挥 + 跨仓 fresh agent（根名）、每仓 fresh agent（面声明 + 例外表）；写 = 另两仓迁移项目同 diff 改 gate 输入 / hooksPath / 引用 / redirect ledger + 重生成库存。
 - **环境坏法**：来源 = 先改名后拆组（假保证）；生命周期 = 老 clone hooksPath 静默丢 hooks（迁移须带重装步骤）；内容 = 冻结归档被 sed 改写（须走 redirect ledger）；扫描面 = gate 硬编码路径漏改（红→绿兜底）；便携 = 共识蒸发（handoff 未携带每目录定位 → 各仓含糊落地；banner + 该仓 surface-contract/README 首屏写清挡）。
 
@@ -52,9 +52,9 @@
 
 - [covered] 结构 / 文档指针门禁：`pnpm verify` 全绿（notes-liveness / notes-tree / notes-supersession / notes-axes / bare-path / md-links / ledger-routing） → `checks/run-gates.mjs`
 - [covered] 取代回链：旧 Note 文首出现本 Note 文件名（notes-supersession 红→绿见验证） → `checks/gates/notes-supersession.mjs`
-- [policy] **本仓验收 = 方向与记录一致 + 门禁绿，不含另两仓的树**：另两仓的拆组、改名与门禁红证由各目标仓自己的实现轮留证；用户 2026-11-17 划定「另外两个 repo 你别管」，本仓不代管、不验证其树 → `_backlog/research/maintenance-surface-taxonomy/2026-11-16-reorg-bsimulation.md`
+- [policy] **本仓验收 = 方向与记录一致 + 门禁绿，不含另两仓的树**：另两仓的拆组、改名与门禁红证由各目标仓自己的实现轮留证；用户 2026-11-17 划定「另外两个 repo 你别管」，本仓不代管、不验证其树 → `_backlog/_archive/research/maintenance-surface-taxonomy/2026-11-16-reorg-bsimulation.md`
 - [environment-gap] 另两仓的实际盘面与迁移本仓观测不到（跨仓）；company 仓只能改 hosting 在此的 handoff 与决策记忆 → `docs/reference/external-research.md`
-- [unprovable] 「统一根名后人跨仓指挥不再漂移」无机械 oracle；这是价值判断，靠迁移后实际驾驭反馈验证 → `_backlog/research/maintenance-surface-taxonomy/README.md`
+- [unprovable] 「统一根名后人跨仓指挥不再漂移」无机械 oracle；这是价值判断，靠迁移后实际驾驭反馈验证 → `_backlog/_archive/research/maintenance-surface-taxonomy/README.md`
 
 ## 验证
 

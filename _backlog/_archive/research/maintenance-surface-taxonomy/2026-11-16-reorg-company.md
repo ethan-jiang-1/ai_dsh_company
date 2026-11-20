@@ -5,14 +5,14 @@ intent: 本仓维护面整理单（自包含 handoff，含完整决策上下文�
 
 # 本仓（ai_dsh_company）维护面整理单
 
-> **状态：已落地（2026-11-16）。** 本仓 P0 + P1 已实施并提交：P1 取文档建议的 A（MAX_PROBES 59→66，口径 = 分类变更、非能力增长），B（退役 7 支同族探针）未取；7 件迁 `probes/analyze/`、`refactor-drift` 迁 `checks/audit/`。下文保留执行前的时点文本，旧家路径一律以纯文本书写（反引号只留给现行家）；现行事实 = [surface-contract](../../../docs/surface-contract.md) + [例外登记](../../../docs/reference/surface-exceptions.md)。
+> **状态：已落地（2026-11-16）。** 本仓 P0 + P1 已实施并提交：P1 取文档建议的 A（MAX_PROBES 59→66，口径 = 分类变更、非能力增长），B（退役 7 支同族探针）未取；7 件迁 `probes/analyze/`、`refactor-drift` 迁 `checks/audit/`。下文保留执行前的时点文本，旧家路径一律以纯文本书写（反引号只留给现行家）；现行事实 = [surface-contract](../../../../docs/surface-contract.md) + [例外登记](../../../../docs/reference/surface-exceptions.md)。
 > **给实施 agent**：本文自包含——规则、为什么是这套规则、本仓现状的逐条证据、P0 的精确插入文本、P1 的成本与撞墙点、验收命令，全在这里。你不需要读研究过程的其他材料；需要反例来源时再看 [盲审记录](2026-11-16-blind-review.md)。
 > **授权边界**：P0（§3）是声明层改动，用户已点名要做；P1（§4）涉及搬家与预算裁决，**动手前必须拿到用户对 A/B 选项的明确答复**。本文不是 P1 的授权。
-> **方向更新（2026-11-16，D64）**：三仓根目录统一为 checks/probes/tools 已由「可选远期」升为**承诺方向**（用户裁决：人仍驾驭 AI，根名不一致会漂移；先满足人 + 极度满足 fresh agent 可并存）。本仓已达标（零成本）；另两仓先纯化后统一、走独立迁移项目。决策家 = [surface-root-unification-direction](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。本文 P0/P1 范围不变。**落地纪律（用户追加）**：调整时每个根目录的定位（面 = judge/show/operate + 装什么/不装什么 + 例外）必须写进该仓自己的 surface-contract 与 README 首屏，一眼可判、不含糊；共识随本自包含 handoff 携带，实施 agent 不回看宿主仓对话——含糊定位 = 共识跨仓蒸发。
+> **方向更新（2026-11-16，D64）**：三仓根目录统一为 checks/probes/tools 已由「可选远期」升为**承诺方向**（用户裁决：人仍驾驭 AI，根名不一致会漂移；先满足人 + 极度满足 fresh agent 可并存）。本仓已达标（零成本）；另两仓先纯化后统一、走独立迁移项目。决策家 = [surface-root-unification-direction](../../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。本文 P0/P1 范围不变。**落地纪律（用户追加）**：调整时每个根目录的定位（面 = judge/show/operate + 装什么/不装什么 + 例外）必须写进该仓自己的 surface-contract 与 README 首屏，一眼可判、不含糊；共识随本自包含 handoff 携带，实施 agent 不回看宿主仓对话——含糊定位 = 共识跨仓蒸发。
 
 ## 目标根布局（统一后，实施对照）
 
-> D64 承诺方向的**推荐终态**，显式画出以免实施时乱发挥。本仓已达标（P0+P1 已落地），此节是另两仓的对照基准。决策家 = [surface-root-unification-direction](../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。
+> D64 承诺方向的**推荐终态**，显式画出以免实施时乱发挥。本仓已达标（P0+P1 已落地），此节是另两仓的对照基准。决策家 = [surface-root-unification-direction](../../../../notes/implemented/2026-11-16-surface-root-unification-direction.md)。
 
 三仓同一 skeleton（**只统一维护面**）：
 
@@ -114,8 +114,8 @@ tools/                  operate：改世界的操作（dev/ repo/ release/；obs
 注意：原第 20 行的 `smoke/` 字样在此一并修正为 `lanes/`。`run/` 行（第 25 行）不动——它已经写明「tracked 启动配置」，与非面定位一致。
 
 ### 3.3 目录 README
-- `checks/README.md` 首行后加：`> 面：judge（会拦人的判断）。规则与例外 = [surface-contract](../docs/surface-contract.md)。`
-- `tools/README.md` 首行后加：`> 面：operate（改世界的操作）。observe/ 组是 show 例外，见 [surface-contract](../docs/surface-contract.md)。` 同时把第 5 行的「checks/ 的 smoke / lane / audit / probe」改为「checks/ 的 lane / audit 与 probes/ 的 probe」。
+- `checks/README.md` 首行后加：`> 面：judge（会拦人的判断）。规则与例外 = [surface-contract](../../../research/docs/surface-contract.md)。`
+- `tools/README.md` 首行后加：`> 面：operate（改世界的操作）。observe/ 组是 show 例外，见 [surface-contract](../../../research/docs/surface-contract.md)。` 同时把第 5 行的「checks/ 的 smoke / lane / audit / probe」改为「checks/ 的 lane / audit 与 probes/ 的 probe」。
 - `probes/` **新建** `README.md`（3–5 行）：`> 面：show（给人看的证据）。` + 链接合同 + 指向 `checks/INDEX.generated.md` 的探针节 + 一句「四域 = 共享 harness/证据源/失败模式的机制分组；fixture 入口（`<域>/<fixture>/index.mjs`）不是探针」。
 
 ### 3.4 例外表（放合同文末，13 条）

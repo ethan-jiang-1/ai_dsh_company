@@ -13,7 +13,7 @@ opened: 2026-11-19
 >
 > **授权边界**：静态 / tarball / 合成包 / 纯函数 / 临时 home 可自主；不修产品代码；不改 vendor；`_dist` 只读。
 >
-> **前序**：[C16 卡](../../issues/2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md) 的 20 张（BUG-243..262）已由 2026-11-18 修复轮收口。C16 修复又造出新的策展面：`RELEASE_PIPELINE_FILES`、`content/manifest.json` 的 inventory/tiers、最小 JSON schema、`DEV_COMMAND`、`--allow-stale=<sha>:<reason>`、catalog/presence/bundle/lease 的降级分支。本轮继续打「新判据只闭了上一轮形状」的同一类。
+> **前序**：[C16 卡](2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md) 的 20 张（BUG-243..262）已由 2026-11-18 修复轮收口。C16 修复又造出新的策展面：`RELEASE_PIPELINE_FILES`、`content/manifest.json` 的 inventory/tiers、最小 JSON schema、`DEV_COMMAND`、`--allow-stale=<sha>:<reason>`、catalog/presence/bundle/lease 的降级分支。本轮继续打「新判据只闭了上一轮形状」的同一类。
 
 ## 问题与期望结果
 

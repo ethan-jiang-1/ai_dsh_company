@@ -7,7 +7,7 @@ opened: 2026-11-12
 
 > 立卡：2026-11-12 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 可关闭：是
 >
-> **结论/去向**：none — focus v6 于 2026-11-16 收口；BUG-184..201 已全部修复并迁 [fixed_bugs](../fixed_bugs/README.md)；C12 归属波次另立 [新卡](../../issues/2026-11-17-ownership-wave-exploratory.md)。本卡只作历史与参考，不再承接轮次。
+> **结论/去向**：none — focus v6 于 2026-11-16 收口；BUG-184..201 已全部修复并迁 [fixed_bugs](../fixed_bugs/README.md)；C12 归属波次另立 [新卡](2026-11-17-ownership-wave-exploratory.md)。本卡只作历史与参考，不再承接轮次。
 >
 > 审查：跳过 — 用户 2026-11-17 直接转场（focus v6 收口；C12 另立新卡）。v6 两轮的判据与盲审记录 = [守卫判据面 Note](../../../notes/implemented/2026-11-16-guard-surfaces-not-samples.md)、[搬移副作用 Note](../../../notes/implemented/2026-11-16-move-side-effects-and-live-pointers.md)。
 >
@@ -19,7 +19,7 @@ opened: 2026-11-12
 >
 > **2026-11-15 焦点调整（focus v6：搬移副作用）**：三批纯搬移（`29ae8c94` tests 分轴 → `1eb14f46` src↔tests 对齐 → `57d34a34` tools 四组）之后，主面切到 **C11 搬移副作用**——用可复跑的 exploratory test 证「位置变了、行为没变」，并抓住「全绿但仍有残留」的副作用。C1–C10 暂停常规轮转，只接受与搬移相交的假设。C11 的 oracle = 搬移父提交基线 + 声明面 + 真入口 + 负控；**不把 `pnpm test` 全绿当等价证明**。见下方「2026-11-15 调整（focus v6）」节。
 >
-> **归档（2026-11-17）**：本卡 2026-11-12–11-16 的宪章与 93 轮记录保留为历史；现行 exploratory charter = [归属波次卡](../../issues/2026-11-17-ownership-wave-exploratory.md)。旧结论不重开；C1–C11 的未跑项（refactor-drift 实跑、clean clone、Windows）在新的 C12 卡承接。
+> **归档（2026-11-17）**：本卡 2026-11-12–11-16 的宪章与 93 轮记录保留为历史；现行 exploratory charter = [归属波次卡](2026-11-17-ownership-wave-exploratory.md)。旧结论不重开；C1–C11 的未跑项（refactor-drift 实跑、clean clone、Windows）在新的 C12 卡承接。
 
 ## 问题与期望结果
 

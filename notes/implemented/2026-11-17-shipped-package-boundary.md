@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-17 落地；任务源 = 用户「不少脚本/代码发布到运行时的不应该那么多，运行时的代码/脚本不应该依赖开发时刻的脚本」+「systematically 修起来」）
 
-> 上游 = [C13 运行时/发布面探索卡](../../_backlog/issues/2026-11-17-runtime-shipped-boundary-exploratory.md) + [10 张缺陷卡](../../_backlog/bugs/README.md)（BUG-213..222）。
+> 上游 = [C13 运行时/发布面探索卡](../../_backlog/_archive/settled_issues/2026-11-17-runtime-shipped-boundary-exploratory.md) + [10 张缺陷卡](../../_backlog/bugs/README.md)（BUG-213..222）。
 
 ## 决定
 

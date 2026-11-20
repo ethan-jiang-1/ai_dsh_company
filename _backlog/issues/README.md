@@ -4,12 +4,7 @@
 
 ## 活跃清单
 
-- [2026-11-20 content 合同族预防试点](2026-11-20-quality-prevention-contract-pilot.md) — content与bootstrap局部试点已交付；用户重申原生产源头问题后已完成深化研究，核对重复解释、集合派生和失败证据拥有者，给出优先级/成本/反证；局部试点不能代替整体研究，不自动扩为生产重构。
-
-- [2026-11-18 门禁管线指纹 + 运行时发虚面（C16）](2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md) — sanitizer 不在 sourceFingerprint；REQUIRED 漏 4 类 content 族；JSON/YAML 只 parse；persona 的 pnpm methods:init；lease 不可读被抢；bundle bad createdAt/pack；presence/catalog 边界；20 张 BUG-243..262（调查中，只开卡不修）。
-- [2026-11-18 修复后的守卫面 + 低置信运行态（C14）](2026-11-18-low-confidence-runtime-exploratory.md) — 新 shipped-shape checker 的 glob/content/目录路径/patch 面；`release:shape` 新鲜度与接线；diffActivity/teamWithEventTasks/catalog 部分视图与坏形状；10 张 BUG-223..232（调查中，只开卡不修）。
-- [2026-11-17 运行时/发布面分离 exploratory（C13）](2026-11-17-runtime-shipped-boundary-exploratory.md) — tarball × package.json × 安装形状 × shipped 文本；Round 97–99 已跑（tarball 类型面 / `prepack` 死引用 / README 断链 / 76 处注释 dev 路径 / client 依赖声明 / `workspace:*` / source map）；10 张 BUG-213..221（调查中，只开卡不修）。
-- [2026-11-17 归属波次 exploratory（挪目录 + 打扫卫生）](2026-11-17-ownership-wave-exploratory.md) — focus v7 = C12：7 个搬移提交 / 77 renames / 668 文件 slot + 37 个卫生/口径/基线/守卫/发布/CI 提交；六面 N1–N6 + 10 条假设 + 8 条预检坐标；Round 94–96 已跑；10 张 BUG-202..211 全部 `调查中`（只开卡不修，Next 以 [bugs/README](../bugs/README.md) 为准）；不修产品代码。前身 = [2026-11-12 深面探索（已结）](../_archive/settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)。
+**活跃 0 张**：C12/C13/C14/C16 四张 exploratory 卡与 content 合同族预防试点卡均已于 2026-11-20 归档——50 张缺陷卡（BUG-202..211 / 213..222 / 223..232 / 243..262）全部已修并迁 [fixed_bugs](../_archive/fixed_bugs/)，去向 = 各批次 Note；卡片见[归档](../_archive/README.md)。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 
