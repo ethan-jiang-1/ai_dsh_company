@@ -22,11 +22,37 @@ import { loadCompanyFixture } from '../../support/company-fixture.ts'
 import {
   applyBootstrap,
   bootstrapCompanyWorkspace,
+  type BootstrapEntry,
   listRunBundleFiles,
   planBootstrap,
   resolveContentDir,
   validateCompanyHome,
 } from '../../../packages/company-pack/src/host/run-bundle/bootstrap.ts'
+
+// 编译期合同，由 pnpm typecheck 执行；Vitest 不负责判断 @ts-expect-error。
+// 负控：缺省 payload / 混入另一来源 / dir 或 skip 携带 payload、mode，放宽类型会报 TS2578。
+function assertBootstrapEntryTypeContract(): void {
+  const directory: BootstrapEntry = { rel: 'kb', kind: 'dir', action: 'create' }
+  const sourceFile: BootstrapEntry = { rel: 'company.md', kind: 'file', action: 'create', payload: { kind: 'source', sourceRel: 'state/company.md' } }
+  const inlineFile: BootstrapEntry = { rel: 'org.md', kind: 'file', action: 'create', payload: { kind: 'content', text: '' }, mode: 'replace' }
+  const skippedFile: BootstrapEntry = { rel: 'company.md', kind: 'file', action: 'skip' }
+  void [directory, sourceFile, inlineFile, skippedFile]
+
+  // @ts-expect-error a created file requires payload
+  const missingPayload: BootstrapEntry = { rel: 'company.md', kind: 'file', action: 'create' }
+  const mixedSource = { rel: 'company.md', kind: 'file' as const, action: 'create' as const, payload: { kind: 'source' as const, sourceRel: 'state/company.md', text: 'ignored' } }
+  // @ts-expect-error a source payload cannot also supply inline text, even via a variable
+  const doublePayload: BootstrapEntry = mixedSource
+  const withDirectoryPayload = { rel: 'kb', kind: 'dir' as const, action: 'create' as const, payload: { kind: 'content' as const, text: 'ignored' } }
+  // @ts-expect-error a directory cannot carry payload, even via a variable
+  const directoryContent: BootstrapEntry = withDirectoryPayload
+  // @ts-expect-error a directory cannot request file replacement
+  const directoryMode: BootstrapEntry = { rel: 'kb', kind: 'dir', action: 'create', mode: 'replace' }
+  // @ts-expect-error skip never reads payload
+  const skippedContent: BootstrapEntry = { rel: 'company.md', kind: 'file', action: 'skip', payload: { kind: 'content', text: 'ignored' } }
+  void [missingPayload, doublePayload, directoryContent, directoryMode, skippedContent]
+}
+void assertBootstrapEntryTypeContract;
 
 /** 最小 pack content：手册 + 模板 + 默认章程 + 状态默认值。 */
 function content(): string {
@@ -84,7 +110,8 @@ function assertBusinessSeeds(boot: ReturnType<typeof bootstrapCompanyWorkspace>,
     [CEO_TARGET, 'charters/ceo.md'],
     [PROCESS_TARGET, `product-types/${productType}/requirements-model.md`],
   ] as const) {
-    assert.equal(boot.plan.entries.find(entry => entry.rel === target)?.sourceRel, source, `business seed mapping: ${target}`)
+    const entry = boot.plan.entries.find((item): item is Extract<BootstrapEntry, { kind: 'file', action: 'create' }> => item.rel === target && item.kind === 'file' && item.action === 'create')
+    assert.equal(entry?.payload.kind === 'source' ? entry.payload.sourceRel : undefined, source, `business seed mapping: ${target}`)
     assert.ok(boot.result.created.includes(target), `business seed created: ${target}`)
     const sourceBytes = readFileSync(join(PRODUCTION_CONTENT, source))
     assert.ok(sourceBytes.length > 0, `business source nonempty: ${source}`)
@@ -233,6 +260,29 @@ describe('run bundle v3：planBootstrap', () => {
 })
 
 describe('run bundle v3：applyBootstrap（只补缺 / 绝不覆盖 / 可重入）', () => {
+  it('skip 无需载荷；计划后源消失仍 warning + skip，其他种子照常创建', () => {
+    const pack = content()
+    const workspace = mkdtempSync(join(tmpdir(), 'company-ws-'))
+    try {
+      const plan = planBootstrap(pack, workspace)
+      rmSync(join(pack, 'state/owners.md'))
+      const result = applyBootstrap({
+        ...plan,
+        entries: [{ rel: '.dsh-company/kb/ignored.md', kind: 'file', action: 'skip' }, ...plan.entries],
+        skips: plan.skips + 1,
+      })
+      expect(result.skipped).toContain('.dsh-company/kb/ignored.md')
+      expect(result.skipped).toContain('.dsh-company/kb/owners.md')
+      expect(result.warnings).toHaveLength(1)
+      expect(result.warnings[0]).toContain('.dsh-company/kb/owners.md：写入失败')
+      expect(existsSync(join(workspace, '.dsh-company/kb/ignored.md'))).toBe(false)
+      expect(existsSync(join(workspace, '.dsh-company/kb/owners.md'))).toBe(false)
+      expect(readFileSync(join(workspace, '.dsh-company/kb/company.md'), 'utf8')).toBe('---\nproductType: business-software\n---\n# 公司身份\n')
+    } finally {
+      rmSync(pack, { recursive: true, force: true }); rmSync(workspace, { recursive: true, force: true })
+    }
+  })
+
   it('第一次落盘、第二次全 skip；已有状态内容一个字节不改；手册/模板不落盘', () => {
     const pack = content()
     const workspace = mkdtempSync(join(tmpdir(), 'company-ws-'))
@@ -298,8 +348,8 @@ describe('类型相关播种：按 company.md 的 productType 选合同', () => 
       writeFileSync(join(workspace, '.dsh-company/kb/company.md'), '---\nproductType: "hardware-software" # 默认\n---\n')
       const { plan, result } = bootstrapCompanyWorkspace(pack, workspace)
       expect(plan.error).toBeUndefined()
-      const entry = plan.entries.find(item => item.rel === '.dsh-company/kb/process-docs.md')
-      expect(entry?.sourceRel, '播种源要随类型解析').toBe('product-types/hardware-software/requirements-model.md')
+      const entry = plan.entries.find((item): item is Extract<BootstrapEntry, { kind: 'file', action: 'create' }> => item.rel === '.dsh-company/kb/process-docs.md' && item.kind === 'file' && item.action === 'create')
+      expect(entry?.payload.kind === 'source' ? entry.payload.sourceRel : undefined, '播种源要随类型解析').toBe('product-types/hardware-software/requirements-model.md')
       expect(result.created).toContain('.dsh-company/kb/process-docs.md')
       expect(readFileSync(join(workspace, '.dsh-company/kb/process-docs.md'), 'utf8')).toBe('# 五层合同\n')
     } finally {
@@ -407,7 +457,7 @@ describe('listRunBundleFiles', () => {
     mkdirSync(join(ws, '.dsh-company/kb'), { recursive: true })
     symlinkSync(outside, join(ws, '.dsh-company/kb/org.md'))
     const link = applyBootstrap({
-      workspace: ws, contentDir, entries: [{ rel: '.dsh-company/kb/org.md', kind: 'file', action: 'create', mode: 'replace', content: 'REPLACED' }],
+      workspace: ws, contentDir, entries: [{ rel: '.dsh-company/kb/org.md', kind: 'file', action: 'create', mode: 'replace', payload: { kind: 'content', text: 'REPLACED' } }],
       creates: 1, skips: 0, warnings: [],
     })
     expect(link.created).toEqual([])
@@ -417,7 +467,7 @@ describe('listRunBundleFiles', () => {
     rmSync(join(ws, '.dsh-company/kb/org.md'), { force: true })
     mkdirSync(join(ws, '.dsh-company/kb/org.md'), { recursive: true })
     const dir = applyBootstrap({
-      workspace: ws, contentDir, entries: [{ rel: '.dsh-company/kb/org.md', kind: 'file', action: 'create', mode: 'replace', content: 'x' }],
+      workspace: ws, contentDir, entries: [{ rel: '.dsh-company/kb/org.md', kind: 'file', action: 'create', mode: 'replace', payload: { kind: 'content', text: 'x' } }],
       creates: 1, skips: 0, warnings: [],
     })
     expect(dir.warnings.some(warning => warning.includes('目录'))).toBe(true)

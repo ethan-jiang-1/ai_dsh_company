@@ -31,18 +31,25 @@ const ORG_SOURCE = 'state/org.md'
 const OWNERS_SOURCE = 'state/owners.md'
 const CHARTERS_SOURCE = 'charters'
 
-export interface BootstrapEntry {
+/** 文件创建明确选一个内容来源；skip 不读取 payload，目录没有文件专属选项。 */
+export type BootstrapEntry = {
   /** 相对 workspace 的 POSIX 路径（目标）。 */
   readonly rel: string
-  /** 内容来源，相对 pack 的 `content/`；目录条目缺省。 */
-  readonly sourceRel?: string
-  readonly kind: 'dir' | 'file'
-  readonly action: 'create' | 'skip'
-  /** 已合并好的内容（`org.md`/`owners.md` 补行用；给出时优先于 `sourceRel`）。 */
-  readonly content?: string
-  /** `replace` = 覆盖写（补席位用）；缺省 `create`（`wx`，绝不覆盖）。 */
-  readonly mode?: 'create' | 'replace'
-}
+} & (
+  | { readonly kind: 'dir'; readonly action: 'create' | 'skip'; readonly payload?: never; readonly mode?: never }
+  | { readonly kind: 'file'; readonly action: 'skip'; readonly payload?: never; readonly mode?: never }
+  | {
+      readonly kind: 'file'
+      readonly action: 'create'
+      readonly payload:
+        /** 内容来源，相对 pack 的 `content/`。 */
+        | { readonly kind: 'source'; readonly sourceRel: string; readonly text?: never }
+        /** 已合并好的内容（`org.md`/`owners.md` 补行用）。 */
+        | { readonly kind: 'content'; readonly text: string; readonly sourceRel?: never }
+      /** `replace` = 覆盖写（补席位用）；缺省 `create`（`wx`，绝不覆盖）。 */
+      readonly mode?: 'create' | 'replace'
+    }
+)
 
 export interface BootstrapPlan {
   readonly workspace: string
@@ -143,8 +150,9 @@ export function planBootstrap(contentDir: string, workspace: string): BootstrapP
     add({ rel, kind: 'dir', action: exists ? 'skip' : 'create' })
   }
   for (const seed of seeds) {
-    const exists = existsSync(join(workspace, seed.target))
-    add({ rel: seed.target, sourceRel: seed.source, kind: 'file', action: exists ? 'skip' : 'create' })
+    const rel = seed.target
+    if (existsSync(join(workspace, rel))) add({ rel, kind: 'file', action: 'skip' })
+    else add({ rel, payload: { kind: 'source', sourceRel: seed.source }, kind: 'file', action: 'create' })
   }
   return { ...base, entries, creates, skips, warnings }
 }
@@ -325,7 +333,9 @@ export function applyBootstrap(plan: BootstrapPlan): BootstrapResult {
     }
     try {
       assertCompanyWritesAllowed()
-      const data = entry.content !== undefined ? entry.content : readFileSync(join(plan.contentDir, entry.sourceRel ?? ''), 'utf8')
+      const data = entry.payload.kind === 'content'
+        ? entry.payload.text
+        : readFileSync(join(plan.contentDir, entry.payload.sourceRel), 'utf8')
       if (entry.mode === 'replace') {
         const temporary = `${target}.${String(process.pid)}.${Math.random().toString(36).slice(2)}.tmp`
         try {
@@ -480,7 +490,7 @@ export function planRoleBackfill(contentDir: string, workspace: string): RoleBac
     if (!existsSync(join(workspace, charterRel))) {
       const sourceRel = `${CHARTERS_SOURCE}/${role}.md`
       if (existsSync(join(contentDir, sourceRel))) {
-        entries.push({ rel: charterRel, sourceRel, kind: 'file', action: 'create' })
+        entries.push({ rel: charterRel, payload: { kind: 'source', sourceRel }, kind: 'file', action: 'create' })
         drift.missingCharter.push(role)
       }
     }
@@ -504,10 +514,10 @@ export function planRoleBackfill(contentDir: string, workspace: string): RoleBac
     }
   }
   if (drift.missingOrg.length > 0 && orgText !== undefined) {
-    entries.push({ rel: `${RUN_BUNDLE_REL.kb}/org.md`, kind: 'file', action: 'create', content: orgText, mode: 'replace' })
+    entries.push({ rel: `${RUN_BUNDLE_REL.kb}/org.md`, kind: 'file', action: 'create', payload: { kind: 'content', text: orgText }, mode: 'replace' })
   }
   if (drift.missingOwners.length > 0 && ownersText !== undefined) {
-    entries.push({ rel: `${RUN_BUNDLE_REL.kb}/owners.md`, kind: 'file', action: 'create', content: ownersText, mode: 'replace' })
+    entries.push({ rel: `${RUN_BUNDLE_REL.kb}/owners.md`, kind: 'file', action: 'create', payload: { kind: 'content', text: ownersText }, mode: 'replace' })
   }
   return { ...base, entries, creates: entries.length, skips: 0 }
 }

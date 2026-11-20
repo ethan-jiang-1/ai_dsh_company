@@ -8,7 +8,7 @@ opened: 2026-11-20
 > 问题：长期依赖 exploratory test 找 bug、逐个补洞，为什么难以收敛？应在设计、测试资产和开发纪律的哪些位置预埋机制，使同类错误更早被消除或拦截，并为剩余探索设置明确边界？
 > 消费者：用户 2026-11-20 点名并追加“结合本 REPO，研究清楚如何改善再思考落地”的授权研究；现由 [content 合同族预防试点卡](../../issues/2026-11-20-quality-prevention-contract-pilot.md)承接。起点为 [Schemastery 质量专题](../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/answer.md)与 [Preset 质量专题](../../../../deepseek-harness/_faq_on_digested/31_preset-quality/answer.md)。
 > 产出的卡：[2026-11-20-quality-prevention-contract-pilot.md](../../issues/2026-11-20-quality-prevention-contract-pilot.md)（用户已批准并完成首批content实现；验证与决定见[实施Note](../../../notes/implemented/2026-11-20-quality-prevention-contract-pilot.md)）。
-> 结论：本仓已具备制度和执行链，content试点已把跨轮样本升级成动态资产并接回原入口；追加源码研究发现规则解码集中、计划联合类型及降级证据拥有者可减少具体作者义务，需按真实成本与需求选择，不能推断总体缺陷率下降；不再默认以产卡配额衡量探索完成。研究阶段是定性与实施交接；后续content首批落地见实施Note，历史研究不充当实施证据。
+> 结论：本仓已具备制度和执行链，content试点已把跨轮样本升级成动态资产并接回原入口；追加源码研究发现规则解码集中、计划联合类型及降级证据拥有者可减少具体作者义务，需按真实成本与需求选择，不能推断总体缺陷率下降；不再默认以产卡配额衡量探索完成。研究阶段是定性与实施交接；后续content首批落地见实施Note；用户继续后承接的[bootstrap生产类型试点](../../../notes/implemented/2026-11-20-bootstrap-plan-payload-contract.md)单列证据，历史研究不充当实施证据。
 
 ## 研究范围与出口
 

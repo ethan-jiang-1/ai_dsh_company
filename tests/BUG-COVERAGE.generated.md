@@ -172,12 +172,12 @@
 | 123 | 2026-11-13 | tests/host/startup/startup-store.spec.ts:178 |
 | 124 | 2026-11-13 | tests/host/run-bundle/lease.spec.ts:105 |
 | 126 | 2026-11-13 | tests/host/delegation/workflow-runs.spec.ts:207 |
-| 128 | 2026-11-13 | tests/host/run-bundle/bootstrap.spec.ts:402 |
+| 128 | 2026-11-13 | tests/host/run-bundle/bootstrap.spec.ts:452 |
 | 133 | 2026-11-13 | tests/host/commands/settings-command.spec.ts:248 |
 | 134 | 2026-11-13 | tests/host/commands/prd-command.spec.ts:201 |
 | 138 | 2026-11-13 | tests/host/ledger/catalog.spec.ts:499 |
 | 139 | 2026-11-13 | tests/host/cultivation/cultivation-command.spec.ts:407 |
-| 143 | 2026-11-13 | tests/host/run-bundle/bootstrap.spec.ts:428 |
+| 143 | 2026-11-13 | tests/host/run-bundle/bootstrap.spec.ts:478 |
 | 144 | 2026-11-13 | tests/host/run-bundle/write-gate.spec.ts:55 |
 | 145 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:458 |
 | 147 | 2026-11-13 | tests/host/ledger/governance-export.spec.ts:107 |
