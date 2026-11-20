@@ -59,4 +59,4 @@ runtime/rehearsal-workspace/.dsh-company/kb/ceo/journal/gift-rule-gap.md
 - 改动面：`checks/lanes/human-loop-e2e.entry.mjs`
 - 红：`node checks/lanes/human-loop-e2e.entry.mjs` → `FAIL 缺口：裁决回流落盘（journal/gift-rule-gap.md 在场）` + `FAIL 缺口：回流含裁决与缺口要素`（2 FAILURE，连续两样本）
 - 绿：`node checks/lanes/human-loop-e2e.entry.mjs` → `human-loop-e2e: ALL PASS（12/12）——补料/建议/规矩缺口→裁决→回流 三类接口真证据`
-- 提交：commit __SHA__
+- 提交：commit b2db07d5
