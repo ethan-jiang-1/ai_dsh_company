@@ -4,6 +4,8 @@
 
 ## 活跃清单
 
+- [2026-11-20 公司盘状态读取保留文本与失败类别](2026-11-20-company-file-read-state.md) — 独立研究后新立；比较五类源头机会，先核对workspace三态读取替代五处“先判再读”的兼容与收益；研究/立卡不等同生产实施或Git提交。
+
 - [2026-11-20 content 合同族预防试点](2026-11-20-quality-prevention-contract-pilot.md) — content与bootstrap局部试点已交付；用户重申原生产源头问题后已完成深化研究，核对重复解释、集合派生和失败证据拥有者，给出优先级/成本/反证；局部试点不能代替整体研究，不自动扩为生产重构。
 
 - [2026-11-18 门禁管线指纹 + 运行时发虚面（C16）](2026-11-18-pipeline-fingerprint-and-runtime-exploratory.md) — sanitizer 不在 sourceFingerprint；REQUIRED 漏 4 类 content 族；JSON/YAML 只 parse；persona 的 pnpm methods:init；lease 不可读被抢；bundle bad createdAt/pack；presence/catalog 边界；20 张 BUG-243..262（调查中，只开卡不修）。
