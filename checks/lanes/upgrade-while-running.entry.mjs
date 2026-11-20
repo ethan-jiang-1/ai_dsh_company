@@ -85,9 +85,15 @@ try {
   console.log(`③ 重启到 ${V2_VERSION}：会话/数据还在`)
   const next = await boot(); const nextRpc = await rpc(next)
   const bundle = JSON.parse(readFileSync(join(WS, '.dsh-company/bundle.json'), 'utf8'))
-  // 0.7.0 语义：bundle.json 的 pack 是**创建**这个 run bundle 的包版本，不跟随升级；
-  // 当前安装版本看 profile dependency。升级保留身份是刻意行为（见安装手册「升级」）。
-  check(`bundle 身份保留创建版本 ${PACK.version}`, bundle?.pack?.version === PACK.version, String(bundle?.pack?.version))
+  // BUG-256 起（2026-11-18）语义：同 name 的版本变化 = 正常升级——保留 id/createdAt，pack.version
+  // 跟到新装版本；旧字节按 BUG-279 备份成 `bundle.json.v3-<old>.bak` 供回看。不是「创建版本永远不变」。
+  check('bundle 身份保留 id/createdAt（升级不改身份）',
+    bundle?.id === v1Bundle?.id && bundle?.createdAt === v1Bundle?.createdAt,
+    `${String(bundle?.id)} / ${String(bundle?.createdAt)}`)
+  check(`bundle pack.version 跟到 ${V2_VERSION}`, bundle?.pack?.version === V2_VERSION, String(bundle?.pack?.version))
+  const versionBackup = join(WS, `.dsh-company/bundle.json.v3-${PACK.version}.bak`)
+  check(`升级保留旧字节 ${versionBackup.split(sep).pop()}`,
+    existsSync(versionBackup) && JSON.parse(readFileSync(versionBackup, 'utf8'))?.pack?.version === PACK.version)
   check(`profile 依赖已到 ${V2_VERSION}`,
     readFileSync(join(HOME, 'profiles/web/package.json'), 'utf8').includes(V2_VERSION))
   check('重启后 roster 含 ceo', (await nextRpc('agentPresets/list', {})).presets?.some(p => p.id === 'ceo') === true)

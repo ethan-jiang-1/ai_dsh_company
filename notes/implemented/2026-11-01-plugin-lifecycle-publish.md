@@ -67,7 +67,7 @@
 认证档（实跑）：`pnpm release --verify` 全绿（verify / test 1027 passed / release-smoke /
 client-load-smoke / preset-smoke / present-catalog-smoke）；`interrupted-install-smoke` ALL PASS
 （remove 后 run bundle / home 身份 / presented ledger 残留）；`upgrade-while-running-smoke` ALL PASS
-（运行中 remove+add 0.7.1；重启后身份保留创建版本 0.7.0、依赖到 0.7.1、旧 session 仍在）；
+（运行中 remove+add 0.7.1；重启后 id/createdAt 保留、pack.version 跟到 0.7.1 且旧字节备份为 `bundle.json.v3-0.7.0.bak`、依赖到 0.7.1、旧 session 仍在；2026-11-18 BUG-256 起 pack.version 跟随升级，不再冻结创建版本）；
 rc.5 干净 profile 应用内安装 `application: applied` + 六 preset + `session/create`。
 
 ## 真模型会话检索（2026-11-02，T）

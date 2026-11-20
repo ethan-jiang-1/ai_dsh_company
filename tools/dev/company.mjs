@@ -78,11 +78,15 @@ if (!profileExists) {
   console.log('company(dev): 缺 company profile；用 web 模板初始化（仅首次）')
   // 2026-11-17：此前 stdio:'ignore' 会吞掉 init 的 stderr——fresh clone 上咬过一次（exit 1 无从
   // 诊断，重试即绿、根因未复现）。改为捕获并在失败时回放：失败必须点名，成功路径依旧安静。
+  // --home 指向尚未创建的目录时，子进程的 cwd 不存在 ⇒ spawn 直接失败（status null、stderr 空），
+  // 表现为无从诊断的 exit null。home 是本次要建的东西，先建出来（2026-11-20 E2E 实证）。
+  mkdirSync(home, { recursive: true })
   const init = spawnSync(process.execPath,
     [cli, '--profile', 'company', '--from-default-profile', 'web', '--dump-default-config'],
     { cwd: home, env, stdio: ['ignore', 'ignore', 'pipe'], encoding: 'utf8' })
   if (init.status !== 0) {
-    console.error(`company(dev): 步骤失败（exit ${String(init.status)}）：web 模板初始化 company profile；stderr ↓`)
+    console.error(`company(dev): 步骤失败（exit ${String(init.status)}）：web 模板初始化 company profile（home = ${home}）；stderr ↓`)
+    if (init.error !== undefined) console.error(`company(dev): 子进程未能启动：${init.error.message}`)
     if (init.stderr?.trim()) console.error(init.stderr.trim())
     process.exit(init.status ?? 1)
   }
@@ -179,6 +183,11 @@ console.log(`company(dev): 启动日志 → ${logPath}（含运行输出，token
 const child = spawn(process.execPath, [cli, '--profile', 'company', '--', ...childArgs], {
   cwd: workspace, env, stdio: ['inherit', 'pipe', 'pipe'],
 })
+// 包装进程被 SIGTERM（脚本/launcher 收摊）时把信号转给 dsh 子进程：否则子进程成孤儿，继续持
+// writer lease，下一次启动只会看到「另一个 writer 正在使用这个 home」而静默停写（2026-11-20 实证）。
+for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
+  process.on(signal, () => { try { child.kill(signal) } catch { /* 子进程已退出 */ } })
+}
 const tee = (stream, target, sink) => {
   stream.on('data', chunk => {
     target.write(chunk)
