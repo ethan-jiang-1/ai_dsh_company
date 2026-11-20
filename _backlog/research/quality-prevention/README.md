@@ -8,14 +8,15 @@ opened: 2026-11-20
 > 问题：长期依赖 exploratory test 找 bug、逐个补洞，为什么难以收敛？应在设计、测试资产和开发纪律的哪些位置预埋机制，使同类错误更早被消除或拦截，并为剩余探索设置明确边界？
 > 消费者：用户 2026-11-20 点名并追加“结合本 REPO，研究清楚如何改善再思考落地”的授权研究；现由 [content 合同族预防试点卡](../../issues/2026-11-20-quality-prevention-contract-pilot.md)承接。起点为 [Schemastery 质量专题](../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/answer.md)与 [Preset 质量专题](../../../../deepseek-harness/_faq_on_digested/31_preset-quality/answer.md)。
 > 产出的卡：[2026-11-20-quality-prevention-contract-pilot.md](../../issues/2026-11-20-quality-prevention-contract-pilot.md)（用户已批准并完成首批content实现；验证与决定见[实施Note](../../../notes/implemented/2026-11-20-quality-prevention-contract-pilot.md)）。
-> 结论：本仓已具备制度和执行链，优先把 content 的跨轮样本修复升级成随成员增长、独立期望、跨消费者与分支反证的常驻资产，并接回现有验收/修复/收尾入口；不再默认以产卡配额衡量探索完成。研究阶段是定性与实施交接；后续content首批落地见实施Note，历史研究不充当实施证据。
+> 结论：本仓已具备制度和执行链，content试点已把跨轮样本升级成动态资产并接回原入口；追加源码研究发现规则解码集中、计划联合类型及降级证据拥有者可减少具体作者义务，需按真实成本与需求选择，不能推断总体缺陷率下降；不再默认以产卡配额衡量探索完成。研究阶段是定性与实施交接；后续content首批落地见实施Note，历史研究不充当实施证据。
 
 ## 研究范围与出口
 
 - 将 FAQ 的建议追溯到本仓钉住的 DSH 源码和本仓实际判据，区分声明、资产、接线、执行与效果证据。
 - 解释已有纪律仍不能阻止无休止补洞的原因，区分已证实缺口、风险假设与尚缺运行数据的结论。
 - 给出设计约束、独立判据、正反场景、真实装配、回放与模型评估的职责划分，以及复用现有载体的最小试点。
-- 写清完成标准、探索预算、何时停止或重新打开；本轮交付是立项与研究材料，不代表预防机制已经落地。
+- 写清完成标准、探索预算、何时停止或重新打开；研究阶段交付是立项与研究材料，content试点的后续实际交付归实施Note。
+- 用户追加：试点提交后研究生产源头是否有办法降低未来防范成本；从真实生产类型、读取器与状态拥有者取证，不把研究等同产品修改授权。
 
 ## 当前判断与未定项
 
@@ -27,6 +28,7 @@ opened: 2026-11-20
 
 | 文件 | 作用 | 日期 |
 |---|---|---|
+| [2026-11-20-production-source-prevention.md](2026-11-20-production-source-prevention.md) | 追加研究：规则可信值、bootstrap计划联合与降级拥有者；源码可取消的维护义务、局部试点与收益边界 | 2026-11-20 |
 | [2026-11-20-repository-implementation.md](2026-11-20-repository-implementation.md) | 深化主结论：本仓机制、两消费者12世界/3分支负控、具体实施与长期执行位置 | 2026-11-20 |
 | [2026-11-20-recurrence-chains.md](2026-11-20-recurrence-chains.md) | C13–C17四条跨轮链，历史承诺/判据/新轴及现有修复边界 | 2026-11-20 |
 | [2026-11-20-prevention-and-convergence.md](2026-11-20-prevention-and-convergence.md) | 本仓现状与两项隔离实验、预防插入点、最小试点及收敛条件 | 2026-11-20 |
