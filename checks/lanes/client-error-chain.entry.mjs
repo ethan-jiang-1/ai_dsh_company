@@ -72,7 +72,7 @@ try {
   await sleep(3_000)
   // 首启的说明页/预览提示：逐个 Continue 关掉（与 cdp-probe 的同一个坑）。
   for (let i = 0; i < 4; i++) {
-    const button = page.getByRole('button', { name: 'Continue' }).first()
+    const button = page.getByRole('button', { name: /^Continue$|^继续$/ }).first()
     if (await button.count() === 0) break
     await button.click({ timeout: 2_000 }).catch(() => {})
     await sleep(300)

@@ -61,13 +61,13 @@ try {
   }
 
   // 打开带任务的会话（搜索走标题；比在折叠侧栏里点更稳）。
-  const searchButton = page.getByRole('button', { name: 'Search sessions' })
+  const searchButton = page.getByRole('button', { name: /Search sessions|搜索会话/ })
   if (await searchButton.getAttribute('aria-expanded') !== 'true') await searchButton.click()
-  await page.getByPlaceholder('Search session names').fill(titleArg)
-  const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: titleArg })
+  await page.getByPlaceholder(/Search session names|搜索会话名称/).fill(titleArg)
+  const result = page.getByRole('tree', { name: /Search results|搜索结果/ }).getByRole('treeitem').filter({ hasText: titleArg })
   await result.first().waitFor({ state: 'visible', timeout: 20_000 })
   await result.first().click()
-  await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
+  await page.getByRole('tab', { name: /^Chat$|^对话$/ }).waitFor({ timeout: 15_000 })
 
   const button = page.getByRole('button', { name: /任务板/ }).first()
   await button.waitFor({ state: 'visible', timeout: 20_000 })

@@ -113,20 +113,20 @@ if (await welcome.count() > 0 && await welcome.isVisible()) {
   await welcome.getByRole('button').click()
   await welcome.waitFor({ state: 'detached', timeout: 15_000 })
 }
-const searchButton = page.getByRole('button', { name: 'Search sessions' })
+const searchButton = page.getByRole('button', { name: /Search sessions|搜索会话/ })
 if (await searchButton.getAttribute('aria-expanded') !== 'true') await searchButton.click()
-await page.getByPlaceholder('Search session names').fill(TITLE)
-const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: TITLE })
+await page.getByPlaceholder(/Search session names|搜索会话名称/).fill(TITLE)
+const result = page.getByRole('tree', { name: /Search results|搜索结果/ }).getByRole('treeitem').filter({ hasText: TITLE })
 await result.first().waitFor({ timeout: 20_000 })
 await result.first().click()
-await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
+await page.getByRole('tab', { name: /^Chat$|^对话$/ }).waitFor({ timeout: 15_000 })
 console.log('会话已在浏览器打开')
 
 const openDag = async () => {
   const dagImage = page.getByRole('img', { name: '任务依赖图' })
   if (await dagImage.count() > 0 && await dagImage.first().isVisible()) return // 已经开着
   // 右栏可能是关着的、也可能切到了别的页签：先确保右栏展开，再点「依赖图」胶囊。
-  const expand = page.getByRole('button', { name: 'Open right sidebar' })
+  const expand = page.getByRole('button', { name: /Open right sidebar|打开右侧边栏/ })
   if (await expand.count() > 0) await expand.first().click().catch(() => {})
   const capsule = page.getByRole('button', { name: /依赖图/ }).first()
   try {

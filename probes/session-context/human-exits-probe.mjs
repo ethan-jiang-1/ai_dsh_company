@@ -91,10 +91,10 @@ const answerInBrowser = async ({ base, token, title, optionLabel, shotPath }) =>
     } else {
       throw new Error('页面里没有 rehearsal-workspace 入口（fresh profile 未登记该工作区）')
     }
-    const search = page.getByRole('button', { name: 'Search sessions' })
+    const search = page.getByRole('button', { name: /Search sessions|搜索会话/ })
     if (await search.getAttribute('aria-expanded') !== 'true') await search.click()
-    await page.getByPlaceholder('Search session names').fill(title)
-    const tree = page.getByRole('tree', { name: 'Search results' })
+    await page.getByPlaceholder(/Search session names|搜索会话名称/).fill(title)
+    const tree = page.getByRole('tree', { name: /Search results|搜索结果/ })
     const result = tree.getByRole('treeitem').filter({ hasText: title.slice(0, 12) })
     try {
       await result.first().waitFor({ timeout: 20_000 })
@@ -103,7 +103,7 @@ const answerInBrowser = async ({ base, token, title, optionLabel, shotPath }) =>
       throw new Error(`搜不到本场会话（搜「${title.slice(0, 12)}」；结果前 5 条：${JSON.stringify(seen)}）`, { cause: error })
     }
     await result.first().click()
-    await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
+    await page.getByRole('tab', { name: /^Chat$|^对话$/ }).waitFor({ timeout: 15_000 })
     // 选项名按前缀匹配：工具入参里的 label 可能带「（推荐）」这类后缀，UI 渲染成独立徽标
     // ⇒ 用全长会 strict/找不到（2026-10-11 实测）。
     const option = page.getByRole('radio', { name: optionLabel.slice(0, 10) }).first()

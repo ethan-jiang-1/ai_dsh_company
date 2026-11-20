@@ -162,13 +162,13 @@ try {
     await welcome.getByRole('button').click()
     await welcome.waitFor({ state: 'detached', timeout: 15_000 })
   }
-  const searchButton = page.getByRole('button', { name: 'Search sessions' })
+  const searchButton = page.getByRole('button', { name: /Search sessions|搜索会话/ })
   if (await searchButton.getAttribute('aria-expanded') !== 'true') await searchButton.click()
-  await page.getByPlaceholder('Search session names').fill(TITLE)
-  const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: TITLE })
+  await page.getByPlaceholder(/Search session names|搜索会话名称/).fill(TITLE)
+  const result = page.getByRole('tree', { name: /Search results|搜索结果/ }).getByRole('treeitem').filter({ hasText: TITLE })
   await result.first().waitFor({ timeout: 15_000 })
   await result.first().click()
-  await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
+  await page.getByRole('tab', { name: /^Chat$|^对话$/ }).waitFor({ timeout: 15_000 })
   console.log('session opened')
 
   const option = page.getByRole('radio', { name: '500 元' })

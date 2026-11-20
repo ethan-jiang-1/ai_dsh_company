@@ -135,13 +135,13 @@ while (Date.now() < deadline) {
       }
       const ws = page.getByText('rehearsal-workspace', { exact: true })
       if (await ws.count() > 0) { await ws.first().click(); await page.waitForTimeout(1_500) }
-      const search = page.getByRole('button', { name: 'Search sessions' })
+      const search = page.getByRole('button', { name: /Search sessions|搜索会话/ })
       if (await search.getAttribute('aria-expanded') !== 'true') await search.click()
-      await page.getByPlaceholder('Search session names').fill(uiTitle)
-      const row = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: uiTitle })
+      await page.getByPlaceholder(/Search session names|搜索会话名称/).fill(uiTitle)
+      const row = page.getByRole('tree', { name: /Search results|搜索结果/ }).getByRole('treeitem').filter({ hasText: uiTitle })
       await row.first().waitFor({ timeout: 20_000 })
       await row.first().click()
-      await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
+      await page.getByRole('tab', { name: /^Chat$|^对话$/ }).waitFor({ timeout: 15_000 })
       const radio = page.getByRole('radio', { name: option.slice(0, 10) }).first()
       await radio.waitFor({ state: 'visible', timeout: 90_000 })
       await radio.click()

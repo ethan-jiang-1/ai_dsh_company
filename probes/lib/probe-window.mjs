@@ -39,7 +39,7 @@ export async function dismissNotices(page, sleep) {
 export async function openSession(page, title, sleep) {
   await page.getByText(title, { exact: true }).first().click()
   await sleep(2000)
-  const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+  const opener = page.getByRole('button', { name: /Open right sidebar|打开右侧边栏/ })
   if (await opener.count() > 0) await opener.click()
   await sleep(800)
 }
@@ -52,16 +52,16 @@ export async function openSession(page, title, sleep) {
  * @returns 无。
  */
 export async function openSessionBySearch(page, title, sleep) {
-  const searchButton = page.getByRole('button', { name: 'Search sessions' })
+  const searchButton = page.getByRole('button', { name: /Search sessions|搜索会话/ })
   if (await searchButton.count() > 0) {
     if (await searchButton.getAttribute('aria-expanded') !== 'true') await searchButton.click()
   }
-  await page.getByPlaceholder('Search session names').fill(title)
-  const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: title })
+  await page.getByPlaceholder(/Search session names|搜索会话名称/).fill(title)
+  const result = page.getByRole('tree', { name: /Search results|搜索结果/ }).getByRole('treeitem').filter({ hasText: title })
   await result.first().waitFor({ state: 'visible', timeout: 20_000 })
   await result.first().click()
   await sleep(2000)
-  const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+  const opener = page.getByRole('button', { name: /Open right sidebar|打开右侧边栏/ })
   if (await opener.count() > 0) await opener.click()
   await sleep(800)
 }

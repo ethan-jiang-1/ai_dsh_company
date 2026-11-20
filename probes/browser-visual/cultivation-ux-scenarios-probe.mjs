@@ -101,7 +101,7 @@ const seeded = []
  */
 async function openPanel(page) {
   await sleep(200)
-  const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+  const opener = page.getByRole('button', { name: /Open right sidebar|打开右侧边栏/ })
   if (await opener.count() > 0) { await opener.first().click().catch(() => {}); await sleep(900) }
   for (let attempt = 0; attempt < 3; attempt++) {
     const entry = page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first()
@@ -198,7 +198,7 @@ try {
   }
   // 开右栏 → 点「培养」页签（带一次重试：菜单遮罩/懒渲染都可能让首次不成立）
   for (let attempt = 0; attempt < 3; attempt++) {
-    const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+    const opener = page.getByRole('button', { name: /Open right sidebar|打开右侧边栏/ })
     if (await opener.count() > 0) { await opener.first().click().catch(() => {}); await sleep(900) }
     const entry = page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first()
     if (await entry.count() > 0) {

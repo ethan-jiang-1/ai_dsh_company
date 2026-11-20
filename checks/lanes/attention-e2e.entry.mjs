@@ -128,7 +128,7 @@ try {
     const notice = page.getByRole('dialog', { name })
     await notice.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {})
     if (await notice.isVisible().catch(() => false)) {
-      await notice.getByRole('button', { name: 'Continue' }).click()
+      await notice.getByRole('button', { name: /^Continue$|^继续$/ }).click()
       await notice.waitFor({ state: 'detached', timeout: 10_000 })
     }
   }
@@ -142,19 +142,19 @@ try {
 
   // 按标题搜会话并打开（搜索树条目点击 = 实证通路；会话列表行 div onClick 打不通）。
   const openSessionBySearch = async title => {
-    const searchButton = page.getByRole('button', { name: 'Search sessions' })
+    const searchButton = page.getByRole('button', { name: /Search sessions|搜索会话/ })
     if (await searchButton.getAttribute('aria-expanded') !== 'true') await searchButton.click()
-    const search = page.getByPlaceholder('Search session names')
+    const search = page.getByPlaceholder(/Search session names|搜索会话名称/)
     await search.fill(title)
-    const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: title })
+    const result = page.getByRole('tree', { name: /Search results|搜索结果/ }).getByRole('treeitem').filter({ hasText: title })
     await result.first().waitFor({ timeout: 15_000 })
     await result.first().click()
-    await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
+    await page.getByRole('tab', { name: /^Chat$|^对话$/ }).waitFor({ timeout: 15_000 })
   }
 
   // 打开右栏注意力面板（「待办」按钮；0.2.0 形态——面板 v2 等你处理/刚完成两段）。
   const openAttentionPanel = async () => {
-    const expand = page.getByRole('button', { name: 'Open right sidebar' })
+    const expand = page.getByRole('button', { name: /Open right sidebar|打开右侧边栏/ })
     if (await expand.count() > 0) await expand.first().click()
     const todoTab = page.getByRole('button', { name: /^待办/ }).first()
     await todoTab.waitFor({ state: 'visible', timeout: 15_000 })
@@ -174,7 +174,7 @@ try {
     check('注意力面板显示待批审批（驾驶舱① DOM 缺口闭合）', attentionText.includes('待批审批'), attentionText.slice(0, 90))
     check('注意力面板显示双签线摘要', attentionText.includes('双签') || attentionText.includes('8.2'), '')
     await page.screenshot({ path: join(SHOTS, 'attention-panel.png'), fullPage: false })
-    const allowButton = page.getByRole('button', { name: 'Allow once' })
+    const allowButton = page.getByRole('button', { name: /Allow once|允许一次/ })
     await allowButton.waitFor({ state: 'visible', timeout: 30_000 })
     await page.screenshot({ path: join(SHOTS, 'approval-panel.png'), fullPage: false })
     check('官方审批面板在场（Allow once / Reject）', true)
@@ -198,7 +198,7 @@ try {
     await page.screenshot({ path: join(SHOTS, 'dual-attention.png'), fullPage: false })
 
     // 应答 A（当前已开 A 的会话，官方审批面板即 A 的卡）
-    const allowA = page.getByRole('button', { name: 'Allow once' })
+    const allowA = page.getByRole('button', { name: /Allow once|允许一次/ })
     await allowA.waitFor({ state: 'visible', timeout: 30_000 })
     await allowA.click()
     console.log('clicked Allow once (gate A); polling approval/decided …')
@@ -223,7 +223,7 @@ try {
     // 切到 B 应答
     await openSessionBySearch(gateB.title)
     console.log('gate B session opened')
-    const allowB = page.getByRole('button', { name: 'Allow once' })
+    const allowB = page.getByRole('button', { name: /Allow once|允许一次/ })
     await allowB.waitFor({ state: 'visible', timeout: 30_000 })
     await allowB.click()
     console.log('clicked Allow once (gate B); polling approval/decided …')

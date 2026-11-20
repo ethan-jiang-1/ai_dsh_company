@@ -142,7 +142,7 @@ try {
     const drive = page.getByText('company-workspace', { exact: true }).last()
     if (await drive.count() > 0) { await drive.click(); await sleep(2500) }
   }
-  const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+  const opener = page.getByRole('button', { name: /Open right sidebar|打开右侧边栏/ })
   if (await opener.count() > 0) { await opener.first().click(); await sleep(900) }
   // 开场自愈：会话 preset 是**持久**的（别的探针/人可能把它切成 PTC/Standard）⇒ 先归位到公司角色。
   await (async () => {
@@ -166,7 +166,7 @@ try {
     }
     await page.getByRole('button').filter({ hasText: 'New Session' }).first().click().catch(() => {})
     await sleep(3000)
-    const opener = page.getByRole('button', { name: 'Open right sidebar', exact: true })
+    const opener = page.getByRole('button', { name: /Open right sidebar|打开右侧边栏/ })
     if (await opener.count() > 0) { await opener.first().click().catch(() => {}); await sleep(900) }
     const entry = page.locator('.wk-guide-entry-label').filter({ hasText: '培养' }).first()
     if (await entry.count() > 0) {

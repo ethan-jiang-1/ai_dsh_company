@@ -73,15 +73,15 @@ try {
   for (const name of ['Internal Testing Notice', 'Preview Notice']) {
     const notice = page.getByRole('dialog', { name })
     await notice.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {})
-    if (await notice.isVisible().catch(() => false)) { await notice.getByRole('button', { name: 'Continue' }).click(); await notice.waitFor({ state: 'detached', timeout: 10_000 }).catch(() => {}) }
+    if (await notice.isVisible().catch(() => false)) { await notice.getByRole('button', { name: /^Continue$|^继续$/ }).click(); await notice.waitFor({ state: 'detached', timeout: 10_000 }).catch(() => {}) }
   }
   await page.locator('[data-composer-input][contenteditable="true"]').waitFor({ timeout: 20_000 })
-  const searchButton = page.getByRole('button', { name: 'Search sessions' })
+  const searchButton = page.getByRole('button', { name: /Search sessions|搜索会话/ })
   if (await searchButton.getAttribute('aria-expanded') !== 'true') await searchButton.click()
-  await page.getByPlaceholder('Search session names').fill(TITLE)
-  const result = page.getByRole('tree', { name: 'Search results' }).getByRole('treeitem').filter({ hasText: TITLE })
+  await page.getByPlaceholder(/Search session names|搜索会话名称/).fill(TITLE)
+  const result = page.getByRole('tree', { name: /Search results|搜索结果/ }).getByRole('treeitem').filter({ hasText: TITLE })
   await result.first().waitFor({ timeout: 15_000 }); await result.first().click()
-  await page.getByRole('tab', { name: 'Chat', exact: true }).waitFor({ timeout: 15_000 })
+  await page.getByRole('tab', { name: /^Chat$|^对话$/ }).waitFor({ timeout: 15_000 })
   console.log('human seat ready')
 
   // ── 主循环：观察 → 应答 ──
@@ -96,7 +96,7 @@ try {
     const ended = evs.some(e => e?.type === 'turn/end')
 
     const todo = await (async () => {
-      const expand = page.getByRole('button', { name: 'Open right sidebar' })
+      const expand = page.getByRole('button', { name: /Open right sidebar|打开右侧边栏/ })
       if (await expand.count() > 0) await expand.first().click().catch(() => {})
       const tab = page.getByRole('button', { name: /^待办/ }).first()
       await tab.waitFor({ state: 'visible', timeout: 10_000 }).catch(() => {})
