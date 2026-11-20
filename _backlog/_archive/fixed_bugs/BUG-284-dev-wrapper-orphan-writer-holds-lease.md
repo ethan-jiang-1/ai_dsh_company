@@ -48,6 +48,6 @@ wrapper 收到 SIGINT/SIGTERM/SIGHUP 时把信号转给子进程；子进程退�
 ## 修复证据
 
 - 改动面：`tools/dev/company.mjs`
-- 红：如上受控红测输出（孤儿存活、端口仍 LISTEN）
-- 绿：同脚本修后重跑 → `GREEN-B: 信号转发后子进程随之退出（bug C 修好）`
+- 红：`node tools/dev/company.mjs --home <临时home> --workspace <ws> --no-open &`，取端口后 `kill -TERM $!`，再 `kill -0 <子进程pid>` → 子进程仍存活、端口仍 LISTEN
+- 绿：`node tools/dev/company.mjs --home <临时home> --workspace <ws> --no-open &`，取端口后 `kill -TERM $!`，`kill -0 <子进程pid>` 返回非零（子进程随 wrapper 退出）
 - 提交：commit bee0f4fc

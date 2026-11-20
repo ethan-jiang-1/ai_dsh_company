@@ -1,6 +1,6 @@
 ---
 status: 已修
-severity: P3
+severity: P2
 opened: 2026-11-20
 ---
 
@@ -44,5 +44,5 @@ lane 断言现行语义：升级后 `id`/`createdAt` 不变、`pack.version` 等
 
 - 改动面：`checks/lanes/upgrade-while-running.entry.mjs`
 - 红：`node checks/lanes/upgrade-while-running.entry.mjs` → `FAIL bundle 身份保留创建版本 0.11.9（0.11.10）`（1 FAILURE）
-- 绿：同一条命令 → `upgrade-while-running-smoke: ALL PASS`（含新断言 id/createdAt 保留、pack.version=0.11.10、备份在场）
+- 绿：`node checks/lanes/upgrade-while-running.entry.mjs` → `upgrade-while-running-smoke: ALL PASS`（含 id/createdAt 保留、pack.version=0.11.10、备份在场）
 - 提交：commit bee0f4fc

@@ -1,6 +1,6 @@
 ---
 status: 已修
-severity: P3
+severity: P2
 opened: 2026-11-20
 ---
 
@@ -45,6 +45,6 @@ node tools/dev/company.mjs --home "$PWD/runtime/e2e-home" --workspace "$PWD/comp
 ## 修复证据
 
 - 改动面：`tools/dev/company.mjs`
-- 红：上面的复现（`exit null`、空 stderr）
-- 绿：同一命令（home 不存在）→ `GREEN-A: 缺失 home 也能初始化并起服务`
+- 红：`node tools/dev/company.mjs --home runtime/e2e-home --workspace company-workspace --no-open`（home 不存在）→ `exit null` + 空 stderr
+- 绿：`node tools/dev/company.mjs --home runtime/e2e-home --workspace company-workspace --no-open`（home 不存在）→ 起服务并打印 `dsh web:` 横幅
 - 提交：commit bee0f4fc
