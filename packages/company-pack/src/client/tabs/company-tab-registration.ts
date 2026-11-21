@@ -4,6 +4,7 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import { AttentionTab } from './AttentionTab.tsx'
 import type { AttentionRegistry } from '../wiring/attention-registry.ts'
+import type { SessionPageFace } from '../presence/attention-history.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
 import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-tabs.tsx'
 import type { CultivationActionsFactory } from '../cultivation/cultivation-actions.ts'
@@ -64,6 +65,8 @@ export interface CompanyTabRegistrationData {
   readonly saveStartup: (sessionId: SessionId, field: StartupField, value: string | null) => Promise<SaveResult>
   /** 全部恢复自动。 */
   readonly resetStartup: (sessionId: SessionId) => Promise<SaveResult>
+  /** 读一个会话的历史事件（跨会话重建挂起项的唯一通道；见 presence/attention-history.ts）。 */
+  readonly pageHistory: SessionPageFace
 }
 
 interface TabRegistration {
@@ -88,6 +91,7 @@ const TAB_REGISTRATIONS = [
         getPending: () => data.attention.list(),
         openSession: (sessionId: SessionId) => { scoped.uiWorkspace.openSession(sessionId) },
         leadOf: data.leadOf,
+        pageHistory: data.pageHistory,
       }),
     }, AttentionTab),
   },

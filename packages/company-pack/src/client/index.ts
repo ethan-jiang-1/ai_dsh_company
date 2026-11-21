@@ -185,8 +185,13 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
     const resetStartup = (sessionId: SessionId): Promise<SaveResult> =>
       runSettingsCommand(sessionId, '/company-settings reset')
 
+    // 跨会话挂起项重建：只有 remote.session.page 对**未打开**的会话可读（retain 的 source 是封闭联合、
+    // follow 对未打开会话零帧——见 presence/attention-history.ts 头注）。
+    const page = scoped.remote.session.page
+    const pageHistory = (request: Parameters<typeof page>[0], signal?: AbortSignal) => page(request, signal)
     registerCompanyTabs(scoped, {
       attention,
+      pageHistory,
       leadOf,
       follow,
       floatTab,

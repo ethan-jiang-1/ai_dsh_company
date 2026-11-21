@@ -24,6 +24,7 @@ import {
   type LivePending,
 } from '../../lib/presence/attention.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
+import { readPendingAcrossSessions, type SessionPageFace } from '../presence/attention-history.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
 import type { CompanyDataInjected } from '../data/use-company-data.ts'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
@@ -39,12 +40,20 @@ export interface AttentionTabInjected {
   readonly openSession: (sessionId: SessionId) => void
   /** 子会话 → lead 归并（follow 与流折条目的归属）。 */
   readonly leadOf: (sessionId: SessionId) => SessionId
+  /** 读别的会话的历史事件（跨会话重建的唯一通道；缺席 = 只覆盖本会话）。 */
+  readonly pageHistory?: SessionPageFace | undefined
 }
 
 export type AttentionTabProps = PropsRuntime<'sidebar.right.pane.tab'> & AttentionTabInjected & { readonly t: CompanyT }
 
 /** 流累计上限（防长会话撑爆内存与折算扫描）。 */
 const MAX_EVENTS = 1_000
+
+/** 跨会话重建最多扫这么多份兄弟会话（每份一次探游标 + 一页历史）。 */
+const HISTORY_SCAN_CAP = 20
+
+/** 跨会话重读周期（别与会话内 2s 的活体轮询同频：那是内存读，这是 N 次远程读）。 */
+const HISTORY_REFRESH_MS = 15_000
 
 const ATTENTION_KEYS: Readonly<Record<AttentionItem['kind'], CompanyKey>> = {
   question: 'attention.kind.question',
@@ -111,9 +120,43 @@ export function AttentionTab(props: AttentionTabProps) {
     return () => { controller.abort() }
   }, [props.follow, props.sessionId])
 
+  // 跨会话重建（BUG-292）：活体登记只覆盖本页在场期，`session/follow` 对**未打开**的会话零 history 帧，
+  // 所以走 `remote.session.page` 读同工作区 root 会话的首页历史，配对 asked/decided 只留「问了没答」。
+  const [historyPending, setHistoryPending] = useState<readonly AttentionItem[]>([])
+  const historyKey = useMemo(() => {
+    const currentCwd = byId[props.sessionId as SessionId]?.cwd
+    return Object.values(byId)
+      .filter(summary => summary.id !== props.sessionId
+        && summary.origin !== 'subagent'
+        && (currentCwd === undefined || summary.cwd === currentCwd))
+      .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
+      .slice(0, HISTORY_SCAN_CAP)
+      .map(summary => summary.id)
+      .join('\n')
+  }, [byId, props.sessionId])
+
+  useEffect(() => {
+    const ids = historyKey === '' ? [] : historyKey.split('\n')
+    const page = props.pageHistory
+    if (ids.length === 0 || page === undefined) { setHistoryPending([]); return }
+    const controller = new AbortController()
+    const read = async (): Promise<void> => {
+      try {
+        const rebuilt = await readPendingAcrossSessions(page, ids, controller.signal)
+        if (!controller.signal.aborted) setHistoryPending(rebuilt)
+      } catch {
+        // 整体失败（罕见）：保留上一轮结果，不让面板闪成空。
+      }
+    }
+    void read()
+    // 别的会话里新挂起的审批不会像活体那样推过来（观察者只覆盖本页在场期），所以按慢周期重读。
+    const timer = setInterval(() => { void read() }, HISTORY_REFRESH_MS)
+    return () => { controller.abort(); clearInterval(timer) }
+  }, [historyKey, props.pageHistory])
+
   const items = useMemo(
-    () => mergeAttention(live, [...pendingApprovals(events, leadId), ...streamAttention(events, leadId, 'CEO')]),
-    [live, events, leadId],
+    () => mergeAttention(live, [...pendingApprovals(events, leadId), ...historyPending, ...streamAttention(events, leadId, 'CEO')]),
+    [live, events, leadId, historyPending],
   )
   const waiting = items.filter(item => item.kind !== 'completion')
   const completions = items.filter(item => item.kind === 'completion')

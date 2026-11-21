@@ -68,6 +68,7 @@ function tabData(t: CompanyTabRegistrationData['t'] = ((key: keyof typeof zh) =>
     follow: vi.fn(async function* () {}),
     floatTab: vi.fn(),
     unfloatTab: vi.fn(),
+    pageHistory: vi.fn(async () => undefined),
     openMember: vi.fn(async () => {}),
     cultivationFiles,
     roleSource,
@@ -178,7 +179,7 @@ describe('company tab registration', () => {
 
     const bodyProps = bodyEntries.map(entry => entry.inject?.() ?? {})
     const attentionProps = bodyProps[0]!
-    expect(Object.keys(attentionProps).sort()).toEqual(['floatTab', 'follow', 'getPending', 'leadOf', 'openSession', 't', 'unfloatTab'])
+    expect(Object.keys(attentionProps).sort()).toEqual(['floatTab', 'follow', 'getPending', 'leadOf', 'openSession', 'pageHistory', 't', 'unfloatTab'])
     expect(attentionProps.floatTab).toBe(harness.data.floatTab)
     expect(attentionProps.unfloatTab).toBe(harness.data.unfloatTab)
     expect(attentionProps.leadOf).toBe(harness.data.leadOf)

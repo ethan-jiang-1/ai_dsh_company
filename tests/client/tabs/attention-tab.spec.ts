@@ -59,10 +59,9 @@ describe('待办页签：挂起项、空态与断流（R3-10）', () => {
   // 作用域诚实（BUG-292）：面板的活体面是整页的，历史重建只覆盖**本会话**——
   // 空态必须说清这条边界，否则「没有等你的事」会被读成「公司里没人等你」（跨会话时是假的）。
   // 负例留证 2026-11-21：撤掉 locales 的 attention.emptyWaiting 改动后 `vitest run tests/client/tabs/attention-tab.spec.ts` 1 failed / 5 passed；接回后 6/6 绿。BUG-292
-  it('空态说清作用域（BUG-292）：本会话的挂起项都在这里，别的会话要打开才看得到', async () => {
+  it('空态说清作用域（BUG-292）：本会话与同工作区其它会话的挂起项都会出现在这里', async () => {
     const host = await mount(createElement(AttentionTab, props()))
-    expect(host.textContent).toContain('本会话的挂起项都在这里')
-    expect(host.textContent).toContain('别的会话里等着的审批')
+    expect(host.textContent).toContain('同工作区其它会话')
   })
 
   it('登记处的挂起项出现在「等你处理」：标签、会话名与正文都在', async () => {
@@ -110,5 +109,41 @@ describe('待办页签：挂起项、空态与断流（R3-10）', () => {
     mounted = createRoot(host)
     await act(async () => { mounted?.render(createElement(AttentionTab, props({ getPending: () => registry.list() }))) })
     expect(host.textContent).not.toContain('要不要并行')
+  })
+})
+
+// 跨会话聚合（BUG-292 的 A 路线）：待办是公司级语义，历史那一半要走 `session/page` 读别的会话——
+// `session/follow` 对未打开的会话零帧，所以注入口是 page 面而不是 follow。
+describe('待办页签：跨会话挂起项（BUG-292）', () => {
+  const sessionsById = {
+    'session-lead': { id: 'session-lead', cwd: '/ws', updatedAt: 2 },
+    'session-cfo': { id: 'session-cfo', cwd: '/ws', updatedAt: 1 },
+  }
+  const useSessionsStub = (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown =>
+    selector({ byId: sessionsById })
+
+  it('别的会话里挂着的审批，经 page 面重建后出现在「等你处理」', async () => {
+    const pageHistory = vi.fn(async (request: { maxMessages?: number }) => (request.maxMessages === 1
+      // 探游标：返回末条 seq；正式页返回那条挂起审批。
+      ? { ok: true as const, value: { records: [{ type: 'event', event: { type: 'turn/start', seq: 9, time: 1, data: {} } }], hasMore: false } }
+      : {
+        ok: true as const,
+        value: {
+          records: [{ type: 'event', event: { type: 'approval/asked', seq: 9, time: 1_000, data: { id: 'x1', toolName: 'request_signoff', reason: '折扣线双签' } } }],
+          hasMore: false,
+        },
+      }))
+    const host = await mount(createElement(AttentionTab, props({ pageHistory, useSessions: useSessionsStub })))
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 30)) })
+    expect(pageHistory, '候选应被读到').toHaveBeenCalled()
+    expect(host.textContent).toContain('折扣线双签')
+    expect(host.textContent).toContain('待批审批')
+  })
+
+  it('page 面缺席时不报错、退回只覆盖本会话（空态仍诚实）', async () => {
+    const host = await mount(createElement(AttentionTab, props({ useSessions: useSessionsStub })))
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)) })
+    expect(host.textContent).toContain('没有等你的事')
+    expect(host.textContent).toContain('同工作区其它会话')
   })
 })
