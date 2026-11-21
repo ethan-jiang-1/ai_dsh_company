@@ -31,8 +31,8 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 import { join, resolve } from 'node:path'
-import { WARNING, isPlaceholderClaim, validateMeta } from '../../tools/lib/company/deliverables.mjs'
-import { VIOLATION, auditDeliverables, metaLedgerFindings, parseSessionLog, partitionArchiveViolations, presentResultRows, uncoveredPendingMaterial } from '../lib/deliverables-audit.mjs'
+import { WARNING, ACTIVE_ROOT, ARCHIVE_ROOT, isPlaceholderClaim, validateMeta } from '../../tools/lib/company/deliverables.mjs'
+import { VIOLATION, RUN_BUNDLE_DIRNAME, auditDeliverables, metaLedgerFindings, parseSessionLog, partitionArchiveViolations, presentResultRows, resolveRunRoots, uncoveredPendingMaterial } from '../lib/deliverables-audit.mjs'
 import { parseAssignments } from '../../tools/lib/company/candidate-scan.mjs'
 
 const arg = (name, fallback) => {
@@ -55,6 +55,15 @@ if (!existsSync(workspace)) {
   if (JSON_OUT) console.log(`JSON:${JSON.stringify({ assessed: false, reason: 'workspace-missing', workspace: workspaceRel })}`)
   process.exit(2)
 }
+
+// v3 布局把两个根拆开了（BUG-286）：文件根装 deliverables/，会话根仍按**外层** workspace 分组。
+// 探测放在入口（唯一做 I/O 的地方），选择规则由 lib 的 resolveRunRoots 决定（纯函数、可测）。
+const roots = resolveRunRoots({
+  workspace,
+  bundleDeliverables: [ACTIVE_ROOT, ARCHIVE_ROOT].some(dir => existsSync(join(workspace, RUN_BUNDLE_DIRNAME, dir))),
+  flatDeliverables: [ACTIVE_ROOT, ARCHIVE_ROOT].some(dir => existsSync(join(workspace, dir))),
+})
+const { workspaceRoot, companyRoot } = roots
 
 /** 递归列出工作区下的文件相对路径（正斜杠）。 */
 function listFiles(dir, base = dir, out = []) {
@@ -90,7 +99,7 @@ function sessionLogs() {
     console.error(`${error.message}；或用 --sessions 指定明文归档日志目录`)
     process.exit(2)
   }
-  const sessionRoot = join(home, 'sessions', `-${workspace.replaceAll('/', '-')}--`)
+  const sessionRoot = join(home, 'sessions', `-${workspaceRoot.replaceAll('/', '-')}--`)
   if (!existsSync(sessionRoot)) {
     console.error(`deliverables-check: 该工作区还没有会话目录：${sessionRoot}`)
     process.exit(2)
@@ -125,12 +134,12 @@ if (source.files.length > 0) {
   }
 }
 
-const workspaceFiles = listFiles(workspace)
+const workspaceFiles = listFiles(companyRoot)
 // ⚠ fail-loud：工作区里一份 `deliverables/` 下的文件都找不到 ⇒ 几乎肯定是 `--workspace` 指错了
 // 层级（实测（R4）：指到 `company-workspace/deliverables` 本身时，相对路径全部丢掉 `deliverables/`
 // 前缀，判据会把**所有** Lead 声明报成 dangling —— 结论全假但不报错）。
 if (!workspaceFiles.some(file => file.startsWith('deliverables/') || file.startsWith('deliverables-archive/'))) {
-  console.error(`deliverables-check: ${workspaceRel} 下找不到任何 deliverables(-archive)/ 文件。\n  --workspace 要给**含 deliverables/ 的工作区根**（如 company-workspace），不是 deliverables/ 本身。`)
+  console.error(`deliverables-check: ${workspaceRel} 下找不到任何 deliverables(-archive)/ 文件。\n  --workspace 要给**含 deliverables/ 的工作区根**（如 company-workspace），不是 deliverables/ 本身。\n  已探到的两个根：外层 workspace = ${workspaceRoot}；文件根 = ${companyRoot}（v3 数据应在 <工作区根>/.dsh-company/deliverables 下）。`)
   process.exit(2)
 }
 
@@ -138,6 +147,7 @@ const result = auditDeliverables({
   workspaceFiles,
   sessions,
   legacyFlat: LEGACY_FLAT,
+  presentPrefix: roots.presentPrefix,
   ...(ONLY_SLUG === undefined ? {} : { onlySlug: ONLY_SLUG }),
   ...(EVIDENCE_FROM === undefined ? {} : { evidenceMissingBefore: EVIDENCE_FROM }),
 })
@@ -146,7 +156,7 @@ const result = auditDeliverables({
 // 为什么（2026-09-26 实测）：sea-entry-2026 与 renewal-y-2026 的产物进了真盘、也 present 过，
 // 却**没有台账行**——台账是"经营历史唯一事实家"，缺行 = 历史有洞。
 // 只警告不判红：动议跑完到轮末收敛之间，台账行本来就还没写（收敛时才补）。
-const ledgerPath = join(workspace, 'kb/motion-ledger.md')
+const ledgerPath = join(companyRoot, 'kb/motion-ledger.md')
 const ledgerSlugs = new Set()
 const ledgerDateBySlug = new Map()
 if (existsSync(ledgerPath)) {
@@ -174,7 +184,7 @@ const leadSessions = sessions.filter(s => s.delegationDepth === 0 && s.agentPres
 // 占位稿是过程稿的合法形状，它取代的是"文件存在 ≠ 认领"下无从查起的口头抢注。
 const claims = []
 for (const row of result.drafts) {
-  const bodyPath = join(workspace, row.path)
+  const bodyPath = join(companyRoot, row.path)
   if (!existsSync(bodyPath)) continue
   if (isPlaceholderClaim(readFileSync(bodyPath, 'utf8'))) claims.push(`${row.slug}/${row.path.split('/').pop()}`)
 }
@@ -196,7 +206,7 @@ const metaLedger = metaLedgerFindings({
   metas: result.metas,
   ledgerDateBySlug,
   readMeta: relPath => {
-    const bodyPath = join(workspace, relPath)
+    const bodyPath = join(companyRoot, relPath)
     return existsSync(bodyPath) ? readFileSync(bodyPath, 'utf8') : undefined
   },
 })
@@ -219,6 +229,8 @@ for (const row of presentResultRows(result.leadFinalSlugs, metaResultBySlug)) {
 }
 
 console.log(`deliverables-check: ${workspaceRel}${LEGACY_FLAT ? '（平铺旧形状口径）' : ''}${ONLY_SLUG === undefined ? '' : `（只审 ${ONLY_SLUG}）`}`)
+// 两个根不同就是 v3 布局；把它们印出来，否则「审的是哪个盘」只能靠猜（BUG-286 的误判来源之一）。
+if (companyRoot !== workspaceRoot) console.log(`  根：外层 workspace ${workspaceRoot} ／ 文件根 ${companyRoot}（present 路径前缀 ${roots.presentPrefix || '（无）'}）`)
 console.log(`  会话日志 ${sessions.length} 份（其中 Lead ${leadSessions} 份）`)
 console.log(`  成品 ${result.finals.length} 份：${result.finals.map(f => f.path).join(' / ') || '（无）'}`)
 console.log(`  过程稿 ${result.drafts.length} 份`)
@@ -241,7 +253,7 @@ console.log(`  过程稿 ${result.drafts.length} 份`)
   // 同一 slug 的锚只算一次：锚表述的是该 slug 的跟进面，不是某条 ASSIGN 行的专属物（BUG-028）。
   const anchorsBySlug = new Map()
   for (const draft of result.drafts.filter(row => row.role === 'ceo')) {
-    const body = readFileSync(join(workspace, draft.path), 'utf8')
+    const body = readFileSync(join(companyRoot, draft.path), 'utf8')
     const pending = parseAssignments(body).filter(t => t.status === 'pending-sources')
     if (pending.length === 0) continue
     pendingSeen += pending.length

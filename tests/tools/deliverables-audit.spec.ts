@@ -12,6 +12,7 @@ import {
   parseSessionLog,
   partitionArchiveViolations,
   presentResultRows,
+  resolveRunRoots,
   uncoveredPendingMaterial,
 } from '../../checks/lib/deliverables-audit.mjs'
 
@@ -574,3 +575,52 @@ describe('让位行的机器可查面（BUG-004，2026-10-06 修复轮立——�
 
 // 工作区门投影（doors.ts）的 keyless 守卫住在 tests/lib/presence/doors.spec.ts（2026-10-14 重构轮迁出：
 // 那之前它寄居在本模块 spec 尾部，是唯一的跨模块寄居块）。
+
+// ── v3 布局把「文件根」与「会话根」拆开了（BUG-286）────────────────────────────────
+// 数据在 `<ws>/.dsh-company/deliverables/`，而 DSH 的会话目录仍按**外层 workspace** 分组。
+// 规则 = `resolveRunRoots`（纯函数）；present 事件里的 `.dsh-company/` 前缀 = `presentPrefix`。
+// 运行场入口（`checks/audit/deliverables-check.mjs`）只负责把这两个返回值接到 listFiles/sessions 上；
+// 它的红→绿在真盘上验（回归层禁子进程，见 tests/repo/structure/layering.spec.ts）。
+// 标题暂不带事故号：guard-red-record 要求 `BUG-nnn` 对到**已归档**卡；卡归档后再补号与留证行。
+describe('v3 布局双根与 present 前缀', () => {
+  it('外层 workspace + .dsh-company 数据 ⇒ 文件根下沉，会话根仍是外层', () => {
+    expect(resolveRunRoots({ workspace: '/ws', bundleDeliverables: true })).toEqual({
+      workspaceRoot: '/ws',
+      companyRoot: '/ws/.dsh-company',
+      presentPrefix: '.dsh-company/',
+    })
+  })
+
+  it('直接给 <ws>/.dsh-company ⇒ 会话根退到外层（会话目录名按外层分组）', () => {
+    expect(resolveRunRoots({ workspace: '/ws/.dsh-company', flatDeliverables: true })).toEqual({
+      workspaceRoot: '/ws',
+      companyRoot: '/ws/.dsh-company',
+      presentPrefix: '.dsh-company/',
+    })
+  })
+
+  it('旧布局 / 已归档快照：deliverables 直接在根下 ⇒ 两个根同一个、无前缀', () => {
+    expect(resolveRunRoots({ workspace: '/snap/workspace.expected', flatDeliverables: true })).toEqual({
+      workspaceRoot: '/snap/workspace.expected',
+      companyRoot: '/snap/workspace.expected',
+      presentPrefix: '',
+    })
+  })
+
+  // 负控 + 正例：同一个 present 事件，剥前缀前判红、剥前缀后对上。证明判据的那一步是「前缀归一」，
+  // 而不是把断言放宽——旧布局（无前缀）的比对口径一字未动。
+  it('present 事件带 .dsh-company/ 前缀 ⇒ 归一后认得出 Lead 背书', () => {
+    const v3Input = {
+      workspaceFiles: ['deliverables/x/final.md'],
+      sessions: [{
+        id: 's1',
+        agentPreset: 'ceo',
+        delegationDepth: 0,
+        cwd: '/ws',
+        presented: [{ path: '.dsh-company/deliverables/x/final.md' }],
+      }],
+    }
+    expect(auditDeliverables(v3Input).violations.map(row => row.code)).toContain(VIOLATION.FINAL_NOT_PRESENTED)
+    expect(auditDeliverables({ ...v3Input, presentPrefix: '.dsh-company/' }).violations.map(row => row.code)).not.toContain(VIOLATION.FINAL_NOT_PRESENTED)
+  })
+})

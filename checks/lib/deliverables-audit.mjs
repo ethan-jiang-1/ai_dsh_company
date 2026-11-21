@@ -22,6 +22,7 @@
 // 本模块**不做 I/O**：调用方把"工作区文件清单"与"会话日志文本"喂进来。于是同一份逻辑
 // 既能在回归层（`tests/`，秒级、无 key）被直接断言，也能被运行场脚本（`checks/`，可起进程）
 // 复用——分层纪律见 `docs/guides/dev-loop.md` §9.1。
+import { basename, dirname, join } from 'node:path'
 import {
   ARCHIVE_ROOT,
   ACTIVE_ROOT,
@@ -34,6 +35,9 @@ import {
   deliverableId,
   normalizeRel,
 } from '../../tools/lib/company/deliverables.mjs'
+
+/** 公司盘目录名（v3 布局的唯一常数；运行场入口与快照口径都从这里取，不各自写死）。 */
+export const RUN_BUNDLE_DIRNAME = '.dsh-company'
 
 /** 判据违规代码（测试与脚本都按这些码断言，别用自由文本）。 */
 /**
@@ -272,6 +276,32 @@ export function parseSessionLog(text) {
 }
 
 /**
+ * 运行场的两个根（v3 布局起不再重合，BUG-286）。
+ *
+ * 为什么需要它：v3 把数据搬进 `<ws>/.dsh-company/`，于是「文件根」（装 `deliverables/`）与
+ * 「会话根」（DSH 按**外层** workspace 绝对路径分组 `sessions/<key>/`）不再是同一个目录。历史上
+ * 运行场入口把两者当同一个，任一传法都跑不完：传外层 ⇒ 文件相对路径带 `.dsh-company/` 前缀，
+ * 判据扫不到；传 `.dsh-company` ⇒ 会话目录名换了 key，找不到日志。
+ *
+ * 本函数只做字符串算术（不碰文件系统）：两个 `*Deliverables` 由调用方探测后传入。
+ * @param input - `{ workspace, bundleDeliverables, flatDeliverables, bundleDir? }`
+ *   - `workspace`：用户给的 `--workspace` 绝对路径；
+ *   - `bundleDeliverables`：`<workspace>/<bundleDir>/deliverables` 是否存在（v3 外层 workspace）；
+ *   - `flatDeliverables`：`<workspace>/deliverables` 是否存在（旧布局，或已传 `<ws>/.dsh-company`）。
+ * @returns `{ workspaceRoot, companyRoot, presentPrefix }`——`presentPrefix` 是 present 事件路径相对
+ *   外层 workspace 时要先剥掉的前缀（旧布局为空串）。
+ */
+export function resolveRunRoots({ workspace, bundleDeliverables = false, flatDeliverables = false, bundleDir = RUN_BUNDLE_DIRNAME }) {
+  const top = String(workspace).replace(/\\/g, '/').replace(/\/+$/, '')
+  // ① 给的是外层 workspace，数据在 <ws>/.dsh-company（v3 主路径）
+  if (bundleDeliverables) return { workspaceRoot: top, companyRoot: join(top, bundleDir), presentPrefix: `${bundleDir}/` }
+  // ② 给的是 <ws>/.dsh-company 本身：照样认外层（会话根按外层分组），只是把数据类型根退到外层
+  if (flatDeliverables && basename(top) === bundleDir) return { workspaceRoot: dirname(top), companyRoot: top, presentPrefix: `${bundleDir}/` }
+  // ③ 旧布局 / 已归档快照：deliverables/ 直接在给定根下（会话根也是它）
+  return { workspaceRoot: top, companyRoot: top, presentPrefix: '' }
+}
+
+/**
  * 审计一个工作区的交付物三态。
  * @param input - `{ workspaceFiles, sessions, legacyFlat?, leadPreset?, onlySlug? }`
  *   - `workspaceFiles`：工作区相对路径清单（调用方列目录得到，本模块不碰文件系统）；
@@ -283,6 +313,8 @@ export function parseSessionLog(text) {
  *   - `onlySlug`：只审这一个交付物。**审归档快照时必须给**——快照的 `workspace.expected/`
  *     是整盘拷贝，而 `sessions/` 只装本轮的日志；不给作用域就会把历史成品误报成
  *     "无 Lead 背书"（那是输入不成对，不是违规）。
+ *   - `presentPrefix`：present 事件路径相对文件根多出的前缀（v3 布局 = `.dsh-company/`；旧布局与
+ *     已归档快照为空串）。由 `resolveRunRoots` 给出，见其注释。
  * @returns `{ finals, drafts, violations }`——`finals`/`drafts` 是形状分类结果，
  *   `violations` 每条 `{ code, path, detail }`。
  */
@@ -295,6 +327,10 @@ export function auditDeliverables(input) {
   // 证据可得性（BUG-019，2026-10-16）：调用方声明「该日期之前的会话日志不可得」⇒ 落在该期内的
   // 「无 present 背书」从违规降为观察档（证据不可考 ≠ 声明缺失）。不声明 = 维持严格判红。
   const evidenceMissingBefore = input.evidenceMissingBefore === undefined ? undefined : String(input.evidenceMissingBefore)
+  // v3 布局：present 事件里的路径相对**外层** workspace，带 `.dsh-company/` 前缀时先剥掉再比对，
+  // 否则同一份声明在 v3 盘上会被判成「没 present 过」（BUG-286 的第三处）。
+  const presentPrefix = typeof input.presentPrefix === 'string' ? input.presentPrefix : ''
+  const presentPathOf = path => presentPrefix !== '' && path.startsWith(presentPrefix) ? path.slice(presentPrefix.length) : path
   // 成品的「日期」按两类真实形状取：① **归档件**在目录名前缀里（`deliverables-archive/<日期>-<slug>/…`）；
   // ② 活跃件**没有**日期在路径里，回落到 slug 内嵌的日期（`<...>-<YYYY>-<MM>` 这类命名）。
   // 取不到日期 ⇒ 视为**未覆盖**（有待判证据地判红，不静默放过）。
@@ -362,7 +398,8 @@ export function auditDeliverables(input) {
   const nonLeadDraftPresents = new Map()
   for (const session of sessions) {
     const lead = isLeadSession(session, leadPreset)
-    for (const { path } of session.presented) {
+    for (const { path: rawPresentedPath } of session.presented) {
+      const path = presentPathOf(rawPresentedPath)
       if (!path.startsWith('deliverables/')) continue // kb/** 等不在判据射程内
       if (!inScope(path)) continue
       const id = deliverableId(path)
