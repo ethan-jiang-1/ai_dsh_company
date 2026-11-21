@@ -19,6 +19,7 @@
 // 退出码：0 = 页面断言（及金样）全绿；1 = 断言/金样失败；2 = 环境未就绪（未登录/构建缺失/参数不符）。
 // 证据：failure → runtime/harness-home/diagnosis/cdp-probe-<ts>/；success 带 --evidence 同样落盘；
 //   web stdout/stderr + 场景回执 → runtime/harness-home/diagnosis/ui-scene-smoke-<ts>/{web.log,scene.json}。
+import { clientBundleProblem } from '../../tools/lib/core/client-bundle.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -89,9 +90,9 @@ if (ISOLATED) {
   if (!existsSync(cli)) {
     failSetup(`ui-scene-smoke: vendor CLI 未构建：${cli}（先按 docs/guides/bootstrap.md 构建）`)
   }
-  if (!existsSync(join(ROOT, 'packages/company-pack/lib/client.js'))) {
-    failSetup('ui-scene-smoke: pack client 未构建（packages/company-pack/lib/client.js 缺失）——先按 bootstrap 跑 tsc -b + tsdown')
-  }
+  // 真页面判据必须跑在**当前源码**构建出的字节上（BUG-296）：存在 ≠ 新鲜。
+  const bundleProblem = clientBundleProblem(ROOT)
+  if (bundleProblem !== undefined) failSetup(`ui-scene-smoke: ${bundleProblem.detail}`)
   mkdirSync(userHome, { recursive: true })
   mkdirSync(company, { recursive: true })
   const provisionEnv = { ...process.env, HOME: userHome, DSH_HOME: home, DSH_COMPANY_BROWSER: 'off' }

@@ -13,6 +13,7 @@
 // 为什么必须隔离：dev home 的会话可能被另一个 writer 持有（`session/writer-held`），
 //   页面 reporter 会发命令但被拒；隔离 home + 自己创建的会话才能证明单 writer 下的真实链路。
 // 退出码：0 = 全链 PASS；1 = 断言失败；2 = 环境未就绪（构建/隔离 profile 初始化失败）。
+import { clientBundleProblem } from '../../tools/lib/core/client-bundle.mjs'
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -27,9 +28,13 @@ if (!existsSync(cli)) {
   console.error(`client-error-chain-smoke: vendor CLI 未构建：${cli}（先按 docs/guides/bootstrap.md 构建）`)
   process.exit(2)
 }
-if (!existsSync(join(PACK, 'lib/client.js'))) {
-  console.error('client-error-chain-smoke: pack client 未构建（先跑 tsc -b + tsdown）')
-  process.exit(2)
+// 真页面判据必须跑在当前源码构建出的字节上（BUG-296）：存在 ≠ 新鲜。
+{
+  const bundleProblem = clientBundleProblem(ROOT)
+  if (bundleProblem !== undefined) {
+    console.error(`client-error-chain-smoke: ${bundleProblem.detail}`)
+    process.exit(2)
+  }
 }
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))

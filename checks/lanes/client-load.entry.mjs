@@ -19,6 +19,7 @@
 //       playwright（vendor 全树 `pnpm install` 后在 .pnpm store，本脚本自动定位）与一份
 //       chromium（缺 playwright 期望的版本时自动回退缓存里最新一份）。
 // 用法：source run/env.sh && node checks/lanes/client-load.entry.mjs [--port 0] [--profile company]
+import { clientBundleProblem } from '../../tools/lib/core/client-bundle.mjs'
 import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 import { startWeb } from '../../tools/lib/probe/probe-web.mjs'
 import { spawn } from 'node:child_process'
@@ -42,6 +43,15 @@ try {
 } catch (error) {
   console.error(error.message)
   process.exit(2)
+}
+
+// 真页面判据必须跑在当前源码构建出的字节上（BUG-296）：存在 ≠ 新鲜。
+{
+  const bundleProblem = clientBundleProblem(ROOT)
+  if (bundleProblem !== undefined) {
+    console.error(`client-load-smoke: ${bundleProblem.detail}`)
+    process.exit(2)
+  }
 }
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms))

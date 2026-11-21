@@ -119,13 +119,14 @@
 [worker-orchestrator-probe](../probes/team/worker-orchestrator-probe.mjs)
 [worker-researcher-probe](../probes/team/worker-researcher-probe.mjs)
 
-## 维护工具（tools/，20 = 18 tools + 1 runner + 1 query）
+## 维护工具（tools/，21 = 19 tools + 1 runner + 1 query）
 
-### dev/（6）
+### dev/（7）
 
-[bundle-init](../tools/dev/bundle-init.mjs) · [company](../tools/dev/company.mjs)
-[hooks-install](../tools/dev/hooks-install.mjs) · [methods-init](../tools/dev/methods-init.mjs)
-[rehearsal-init](../tools/dev/rehearsal-init.mjs) · [setup](../tools/dev/setup.mjs)
+[build-client](../tools/dev/build-client.mjs) · [bundle-init](../tools/dev/bundle-init.mjs)
+[company](../tools/dev/company.mjs) · [hooks-install](../tools/dev/hooks-install.mjs)
+[methods-init](../tools/dev/methods-init.mjs) · [rehearsal-init](../tools/dev/rehearsal-init.mjs)
+[setup](../tools/dev/setup.mjs)
 
 ### release/（4）
 
