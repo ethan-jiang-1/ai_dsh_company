@@ -84,3 +84,36 @@ composer（按纪律 = 上游提案 + 本地缓解 + trigger，不改 vendor）�
 无会话时必须有**可见且可操作**的提示（「命令需要先开始一个会话」+ 新建/开始入口），而不是把草稿悄悄吃掉。
 我方载体：pack 已在用的 `conversation.input.left` 槽（`packages/company-pack/src/client/index.ts` 注册处），
 它是 composer 旁边的自有面，可承载提示与按钮；不新造通道、不碰 vendor。
+
+## 决定性证据（2026-11-21，host 临时 instrumentation）
+
+在 `/req` handler 首行加一行临时 `console.error`（已撤），`--rebuild` 起隔离实例后实跑：
+
+| 观测 | 结果 |
+|---|---|
+| 落地页敲 `/req check no-such-dir` + Enter | **host 被调用**：`[instrument-BUG-290] /req handler entered {"rawInput":" check no-such-dir","hasAgent":true}` |
+| 同一次提交的页面 | body 无任何新文本（错误结果没渲染） |
+| 打开已开始的会话后再发同一条命令 | **正常渲染**：`缺需求文档：<repo>/company-workspace/.dsh-company/deliverables/no-such-dir/drafts（至少要有 mrd.md / strs.md / prd.md）` |
+
+⇒ 两支假设的裁决：**不是**「host 未挂会话」（`hasAgent: true`，命令真跑了），**是**「结果只落进已打开的会话
+transcript；落地页没有 transcript ⇒ client 把结果丢了、草稿却已被消费」。丢的位置在 vendor 的
+composer/transcript 面（`vendor/dsh/packages/client/ui-conversation` + `ui-commands`），我方 handler 无错。
+
+**这是什么类的问题**：`command/executed` 结果没有「无 transcript 时」的兜底面。按纪律（vendor 边界）：
+**不在 vendor 里改**；写上游提案 + 我方做提示型缓解 + 挂 trigger。
+
+## 上游提案（待提，草稿）
+
+- 现象最小复现：真实例 → 不打开任何会话 → 输入 `/req check x` 回车 → 无任何反馈；同命令在已打开的会话里正常回显。
+- 期望：`command/executed` 在无 transcript 可落时，至少给一条 composer notice（或自动把落地会话变成真会话再落）。
+- 现实现线索：`ui-commands` 的 enter 决策表注释声称「异常会 surface one composer notice」，实测未出现；
+  `directory.ensureReady` 在无 retained session 时抛错（`service.ts:100`），而本次 `hasAgent: true` 说明
+  会话是 retained 的——因此缺口更可能在「结果 → transcript」这一段。
+
+## 缓解方案（政策 B；用户 2026-11-21 已定）
+
+在 composer 侧（我方 `conversation.input.left` 槽，已在用）给一条**可见提示**：会话还没开始时，
+「斜杠命令要等会话开始后才回话」+ 指到眼前的「开始」按钮。判据 = 组件 spec（blank ⇒ 有提示 / 非 blank ⇒ 无）
++ 真页面复核；**必须在确认 `blank` 在落地页可靠为 true 之后才落**——否则提示不出现，等于又造一个「看起来做了」。
+
+**未做的原因（诚实记）**：`blank` 在落地页是否可读尚未取证；先提上游提案，缓解待下一轮带着 instrument 验证后再落。
