@@ -61,3 +61,10 @@ v3 起数据在 `<workspace>/.dsh-company/deliverables/**`：传外层 workspace
 ## 修复方向（不授权，仅记录）
 
 先补一条真盘回归（用临时 workspace + `.dsh-company/deliverables/x/final.md` 断言 assessed），再改脚本的两根识别；判据库只加前缀归一，不重写审计政策。
+
+## 同族第三处（2026-11-20 验收轮实测）
+
+`probes/browser-visual/deliverables-catalog-probe.mjs` 读的也是旧的 workspace 根索引路径
+`company-workspace/kb/deliverables-index.json`（v3 起应为 `.dsh-company/kb/…`），直接 ENOENT 退出。
+本轮已就地改到 v3 路径（探针可启动）；该探针随后另报「成品面板 8 行 vs 索引 62 条」「点打开未开到正文」，
+是否同族待查，不并入本卡结论。

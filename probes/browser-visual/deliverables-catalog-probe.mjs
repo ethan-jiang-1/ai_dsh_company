@@ -26,7 +26,8 @@ if (titleArg === '') {
 const fixture = args.includes('--fixture')
 const OUT = join(ROOT, 'runtime', 'human-exits-evidence', 'deliverables-catalog')
 const FIXTURE_DIR = join(ROOT, 'snapshots', 'visual', 'deliverables-catalog')
-const INDEX = join(ROOT, 'company-workspace', 'kb', 'deliverables-index.json')
+// v3 起成品索引住公司盘内（<ws>/.dsh-company/kb/…）；旧路径是 workspace 根的 kb/，自 2026-11-01 起不存在。
+const INDEX = join(ROOT, 'company-workspace', '.dsh-company', 'kb', 'deliverables-index.json')
 
 let home
 try {
