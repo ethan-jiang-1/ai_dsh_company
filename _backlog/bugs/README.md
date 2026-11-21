@@ -14,7 +14,27 @@
 
 **已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
-**本轮批次**：下方「## 2026-11-21 修复交接（e2e 验收遗留：BUG-286/288/290/291）」= 组 A–D、顺序 286 → 一次实起三诊断 → 291 → 290 → 288。
+**本轮批次**：下方「## 2026-11-22 修复交接（E2E 设计轮遗留：BUG-293/294/295/296）
+
+**用户指令（2026-11-21/22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……是个漫长的计划，所以先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：293/294/295 改 client 公开行为与文案、296 改真页面车道判据；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-22））。
+
+**起点事实（已核，勿再猜）**：293 = `28b19a52` 把 `CommandScopeHint` 注册体的 `list` 写成 `undefined as never`（`CommandScopeHint.tsx:72`）——单测 4/4 绿、真页面每次加载 `slot entry crashed`；296 = 真页面车道只查 `lib/client.js` 存在、不查新鲜，昨日那两条「真绿」跑在 22:05 的旧产物上（重建后 `ui-scene --isolated` EXIT=1）；294 = BUG-291 的三态漏了「有记录但无待办」；295 = 待办把整段 `reason` 当摘要（既有面，被跨会话聚合放大）。
+
+| 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
+|---|---|---|---|---|
+| **A 字节新鲜度** | [296](BUG-296-real-page-lanes-stale-client-bundle.md) → [293](BUG-293-command-scope-hint-slot-crash.md) | 判据跑在旧字节上 ⇒ 假绿；293 正是被它藏住的那个回归 | 296：构建指纹（复用 `devBuildFingerprint` 口径）写 `lib/.build-fingerprint`，三条真页面入口启动前比对、不一致 fail-loud；293：把 `scoped.sessions.list` 真实传入注册体，判据改为「渲染真实 inject 产物」 | 1 → 2 |
+| **B 状态空间没穷举** | [294](BUG-294-cultivation-no-pending-lies-about-empty-workspace.md) | 空态三元链只覆盖两态 | 四态矩阵：`records === null` 加载 ／ `recordsProblem` 不可达 ／ `records.length === 0` 目录空 ／ 有记录但 `needsDecision` 空；新文案 zh+en | 3 |
+| **C 摘要边界** | [295](BUG-295-attention-item-unbounded-approval-reason.md) | 外部长文本（模型写的 `reason`）直接进摘要字段 | `summary`（限长）+ `detail`（全文）分家；活体与历史**同源截断**；去重键用截断值；列表钳制 + 全文可读（照 `LedgerSummary`） | 4 |
+
+**次序 = 296 → 293 → 294 → 295**：296 是「判据的判据」，不先修它，其余三张的「已修」都可能再跑在旧字节上；293 是用户可见崩溃、也是 BUG-290 那半条交付的前提；294 是「说假话」（重于 295 的可读性）；295 要动去重键，单独收。
+
+**证据口径**：每卡红→绿同一条可执行命令；先落代码提交拿 sha → 翻 `修复已落地` / 写 `## 修复证据` / 归档。**真页面证据必须带产物新鲜度**：296 落地前贴 `stat packages/company-pack/lib/client.js` 与 `git log -1 -- packages/company-pack/src/client`，落地后由指纹自动拦。`coverage:ratchet` 只升不降（新增面必须带判据）；`push` 前先 `source run/env.sh`（pre-push 的 client-load 依赖 `DSH_HOME`）。
+
+**终点** = 4 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：` 与四行证据齐；`typecheck`/`test`/`verify`/`lint`/`dup` + `coverage:ratchet` 绿；`client-load` 与 `ui-scene --isolated` 真绿且产物新鲜；一篇批次 Note 记 A/B/C 三族与元层教训（「绿的证据形状」）。
+
+**本节是立项与交接，不是落地**：只记批次计划与次序。
+
+## 2026-11-21 修复交接（e2e 验收遗留：BUG-286/288/290/291）」= 组 A–D、顺序 286 → 一次实起三诊断 → 291 → 290 → 288。
 
 **本轮已修并迁出**：BUG-292（待办空态声明作用域：本会话的挂起项都在这里；跨会话聚合需宿主查询面，记在卡与 Note 里）、BUG-288 → 已结（反证，见上）、BUG-290（会话未开始时 composer 旁给「命令要等会话开始」提示 + tooltip，会话开始即消失；vendor 的静默丢弃记上游提案）、BUG-291（培养页点名 workspace + 空/不可达/读取中三态；两盘对照 + `vitest run tests/client/cultivation/cultivation-board.spec.ts` 4/24 红 → 24/24 绿）、BUG-286（`deliverables-check` 认两个根 + present 前缀归一 → 真盘 assessed:true；`vitest run tests/tools/deliverables-audit.spec.ts` 4/45 红 → 45/45 绿）、BUG-289（human-loop 判据停留在 v3 前的 journal 路径 → 改用 `.dsh-company/kb/<role>/journal`；同命令 12/12 绿）、BUG-287（探针/车道写死英文可访问名 → 14 文件双语正则；attention-e2e 由卡搜索框推进到门A PASS）、BUG-283（dev wrapper `--home` 缺失目录无诊断）、BUG-284（wrapper 不转发信号 ⇒ 孤儿持 writer lease）、BUG-285（upgrade 守卫冻结已废止身份语义）——见 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
