@@ -76,3 +76,24 @@ keyless 13/13 通过，构建产物 `lib/client.js` 已含新代码。
 ## 顺带修车道（不与上面混）
 
 无论选 A 还是 B，`attention-e2e` 的浏览器应在签核**之前**打开——否则永久测不到 live 路径；这条属车道时序问题，单独改。
+
+## 2026-11-21 补充取证（不跑真模型也能定的两件事）
+
+1. **`approval/asked` 确实落盘、形状与重建器期望一致**：dev home 的两份会话日志里都有该事件，实测原样：
+   `{"type":"approval/asked","seq":30,"time":1791628355046,"data":{"id":"486b59…","toolName":"bash","callId":"…","reason":"escalate sandbox to danger-full-access: …"}}`
+   ⇒ `pendingApprovals()` 的配对（`asked` 收、`decided` 删）在形状上是对的；lane 仍红的差异只能来自
+   **喂进去的 events 不是那个会话的**（作用域），或 **history 帧不含该事件**（窗口）。
+2. **vendor 没有「全局挂起审批」的查询面**：`vendor/dsh/packages/client/ui-approval` 只有活体 waterfall +
+   per-session `PendingApproval`，没有 list/pending RPC。⇒ 想重建历史挂起项，只能自己走会话日志
+   （`session/follow` 的 history 帧），没有更便宜的宿主查询。
+
+## 下一步（政策 A 的最小正确形态，待落）
+
+- **一次性 history 重建，不开 N 条长连接**：按当前 workspace 的 root 会话（cap 20，最近在前）各取
+  `session/follow` 的**首个 history 帧**即中止，喂给同一个 `pendingApprovals()` 重建器，与活体登记
+  （`attentionRegistry`，页面在场期全局）合并进 `mergeAttention`。
+- 为什么这样够：活体面本来就是**全局**的（waterfall 拦的是整页所有会话），缺的只有「页面不在场时
+  已经挂起的」这一半；history 重建补上这一半，刷新/后开就能看到。
+- 判据：keyless = 两条 history fixture（一条待批、一条已 decided）→ 只出待批那条；真验收 =
+  `node checks/lanes/attention-e2e.entry.mjs` 在**先签核、后开页**的时序下真绿（不放宽断言）。
+- 风险：一次重建要读 ≤20 份会话日志首页——只在面板打开/刷新时触发，不进轮询。
