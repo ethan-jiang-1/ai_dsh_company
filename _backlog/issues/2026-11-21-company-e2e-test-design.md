@@ -75,7 +75,7 @@ opened: 2026-11-21
 
 - 隔离实例：官方 web 模板建 company profile + pack link；临时 workspace + 夹具；Playwright Chromium 1440×960 / 390×844。
 - S1/S2/S4/S6/S7/S8/S9 绿；S3、S5（空态）、S10 红。
-- 4 张卡：[BUG-293](../bugs/BUG-293-command-scope-hint-slot-crash.md)（P1，注入面 `list: undefined`，单测绿/真页面崩）、[BUG-294](../bugs/BUG-294-cultivation-no-pending-lies-about-empty-workspace.md)（P2，无待办被说成工作区无记录）、[BUG-295](../bugs/BUG-295-attention-item-unbounded-approval-reason.md)（P2，整段审批理由进列表摘要）、[BUG-296](../bugs/BUG-296-real-page-lanes-stale-client-bundle.md)（P1，真页面车道旧构建假绿）。
+- 4 张卡：[BUG-293](../_archive/fixed_bugs/BUG-293-command-scope-hint-slot-crash.md)（P1，注入面 `list: undefined`，单测绿/真页面崩）、[BUG-294](../bugs/BUG-294-cultivation-no-pending-lies-about-empty-workspace.md)（P2，无待办被说成工作区无记录）、[BUG-295](../bugs/BUG-295-attention-item-unbounded-approval-reason.md)（P2，整段审批理由进列表摘要）、[BUG-296](../_archive/fixed_bugs/BUG-296-real-page-lanes-stale-client-bundle.md)（P1，真页面车道旧构建假绿）。
 - 原型证据（gitignored）：`runtime/tmp/e2e/company-e2e.mjs`、`runtime/tmp/e2e-evidence/2026-11-21T15-*`、官方车道证据 `runtime/harness-home/diagnosis/cdp-probe-2026-11-21T15-31-00-953Z/`。
 - 结论：这批改动**不是「exploratory 抓不到」，而是 exploratory 没走到那几个状态**；E2E 在约 10 个场景里抓到 4 个，其中 2 个是「单测绿、真页面红」的系统性假绿。跨会话审批、培养三态、成品索引、i18n/窄栏是稳的。
 

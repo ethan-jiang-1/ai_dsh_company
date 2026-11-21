@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-296-real-page-lanes-stale-client-bundle.md](fixed_bugs/BUG-296-real-page-lanes-stale-client-bundle.md) — 真页面车道只查产物存在、不查新鲜，旧字节报绿藏住了 293；构建指纹 + 三条车道启动前比对（stale → EXIT=2）。
+- [BUG-293-command-scope-hint-slot-crash.md](fixed_bugs/BUG-293-command-scope-hint-slot-crash.md) — 注册体把 `list` 写成 `undefined as never`，composer 槽每次加载崩；接回真实 `sessions.list` 并把判据改成渲染 inject 真实产物。
 - [BUG-292-cross-session-pending-approvals-not-aggregated.md](fixed_bugs/BUG-292-cross-session-pending-approvals-not-aggregated.md) — 待办只覆盖本会话；跨会话聚合无正路（retain source 封闭 / follow 零帧），本轮把作用域写进空态。
 - [BUG-288-attention-panel-list-missing.md](fixed_bugs/BUG-288-attention-panel-list-missing.md) — 已结（反证）：`ask` 策略下后开的页面能看到挂起审批；lane 红是环境 `never`。
 - [BUG-290-text-command-silent-no-op-without-session.md](fixed_bugs/BUG-290-text-command-silent-no-op-without-session.md) — 空白页敲斜杠命令无反馈；host 实测被调用、结果丢在 vendor transcript 面，本仓落「会话未开始」提示（政策 B）。

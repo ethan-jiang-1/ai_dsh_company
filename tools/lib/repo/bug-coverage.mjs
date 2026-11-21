@@ -12,7 +12,16 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { headingSections, parseFrontmatter } from '../core/repo-markdown.mjs'
 
-/** 读已修卡：id/opened/slug/title。 */
+/**
+ * 读**真已修**卡：id/opened/slug/title。
+ *
+ * 2026-11-22：`fixed_bugs/` 也住「撤回/非缺陷」卡（`status: 已结`，见该目录 AGENTS 与
+ * notes/implemented/2026-11-22-retracted-bugs-in-fixed-bugs.md）——它们没有、也不该有修复守卫，
+ * 所以这里按 `status === '已修'` 过滤：目录位置不再等于「需要具名守卫」（否则 BUG-288/140/150
+ * 这类反证卡会凭空要求一份不存在的守卫）。
+ * @param root - 仓库根。
+ * @returns 真已修卡清单（按编号）。
+ */
 export function fixedBugs(root) {
   const dir = join(root, '_backlog/_archive/fixed_bugs')
   const bugs = []
@@ -21,6 +30,7 @@ export function fixedBugs(root) {
     if (match === null) continue
     const text = readFileSync(join(dir, name), 'utf8')
     const fm = parseFrontmatter(text)
+    if (fm.data?.status !== '已修') continue
     const rawOpened = fm.data?.opened
     const opened = typeof rawOpened === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(rawOpened) ? rawOpened : '—'
     const title = headingSections(text, { depth: 1 })[0]?.rawTitle || name

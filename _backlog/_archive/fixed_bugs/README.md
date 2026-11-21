@@ -4,6 +4,12 @@
 
 ## 修复流水（倒序）
 
+- **BUG-296 / BUG-293**（2026-11-22，E2E 设计轮 / P1×2）：真页面判据的字节新鲜度与它藏住的槽崩溃——
+  [296](BUG-296-real-page-lanes-stale-client-bundle.md) 三条真页面车道只查 `lib/client.js` 存在，
+  构建指纹缺失/不一致现在 fail-loud（`tools/dev/build-client.mjs` 写指纹）；
+  [293](BUG-293-command-scope-hint-slot-crash.md) 注册体 `list: undefined as never` 让 `conversation.input.left`
+  每次加载崩，接回真实 `sessions.list` 并把判据改成渲染 inject 的真实产物。证据提交 `4308138d` / `e3588ecc`。
+
 - **BUG-292**（2026-11-21，BUG-288 反证时分离 / P2）：待办只重建**本会话**的挂起项——
   [292](BUG-292-cross-session-pending-approvals-not-aggregated.md) 选型后确认跨会话聚合无正路
   （`sessions.retain` 的 source 是 vendor 封闭联合、`session/follow` 对未打开会话零帧、新增宿主

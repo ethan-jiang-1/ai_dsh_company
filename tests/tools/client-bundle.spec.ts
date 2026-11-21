@@ -32,7 +32,8 @@ function fixture(): string {
   return root
 }
 
-describe('client 构建新鲜度', () => {
+// 负例留证 2026-11-22：把 clientBundleProblem 改成恒返回 undefined 后 `vitest run tests/tools/client-bundle.spec.ts` 3 failed / 2 passed（stale/missing 全部失效）；还原后 5/5 绿。BUG-296
+describe('client 构建新鲜度（BUG-296）', () => {
   it('产物缺失 ⇒ problem=missing 点名先构建', () => {
     const root = fixture()
     try {

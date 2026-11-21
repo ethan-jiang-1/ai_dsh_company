@@ -65,7 +65,8 @@ describe('registerCommandScopeHint：挂到 composer 槽', () => {
 
   // BUG-293 的教训：注册体用例此前只断言 id/order/sessionId，于是「组件本身能用」与「真实注入的面」
   // 两半各自绿、拼起来崩。判据必须**渲染 inject 的真实产物**。
-  it('真实 inject 产物能渲染：blank=true 出提示，blank=false 不出', () => {
+  // 负例留证 2026-11-22：把 inject 恢复成 list: undefined as never 后 `vitest run tests/client/startup/command-scope-hint.spec.ts` 1 failed / 3 passed；接回真实 list 后 4/4 绿。BUG-293
+  it('真实 inject 产物能渲染（BUG-293）：blank=true 出提示，blank=false 不出', () => {
     const blankFace = mountRegistered(true) as { sessionId: string, list: unknown, t: unknown }
     expect(renderToStaticMarkup(createElement(CommandScopeHint, blankFace as never))).toContain('斜杠命令要等会话开始后才回话')
     const startedFace = mountRegistered(false) as { sessionId: string, list: unknown, t: unknown }

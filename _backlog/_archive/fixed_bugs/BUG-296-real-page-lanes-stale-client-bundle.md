@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P1
 opened: 2026-11-21
 ---
 
 # BUG-296：真页面车道只查 `lib/client.js` 存在、不查新鲜——源码改了未重建也能「绿」
 
-> 严重级别：P1（重要：真页面判据是 client 回归的最后一道门；它会对着旧字节报绿，等于这道门可以整体失效）｜发现：2026-11-21（E2E 设计轮）｜状态：调查中
+> 严重级别：P1（重要：真页面判据是 client 回归的最后一道门；它会对着旧字节报绿，等于这道门可以整体失效）｜发现：2026-11-21（E2E 设计轮）｜状态：已修｜审查：agent — 逐条核对已修判定（三条车道 stale 各 EXIT=2 + 重建后 ui-scene ALL PASS）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-21 指令「发现问题直接报 bug，别急着修」）。
+> **留痕**：commit 4308138d（tooling/判据面，非 material；批次 Note 覆盖）。
 
 ## 症状
 
@@ -80,3 +80,10 @@ node checks/lanes/ui-scene.entry.mjs --isolated
 - 改任一 `packages/company-pack/src/client/**` 或构建配置、不重建时，三条真页面车道至少一条 fail-loud 并点名「产物过期 / 先构建」；
 - 重建后同一条车道按原判据运行；
 - 反证在卡/提交里留一条：源码改动 → 车道红；重建 → 绿；不依赖人工记得构建。
+
+## 修复证据
+
+- 改动面：`tools/lib/core/client-bundle.mjs`、`tools/dev/build-client.mjs`、`checks/lanes/ui-scene.entry.mjs`、`checks/lanes/client-load.entry.mjs`、`checks/lanes/client-error-chain.entry.mjs`、`tests/tools/client-bundle.spec.ts`
+- 红：`node checks/lanes/ui-scene.entry.mjs --isolated` —— 改一行 client 源码不重建后 **EXIT=2**：`pack client 产物过期（指纹 56a7d880490e ≠ 源码 1ef3c34efd88）——真页面断言会跑在旧字节上；先构建：node tools/dev/build-client.mjs`；`client-load` 与 `client-error-chain` 同条件同样 EXIT=2（各自原话见提交 4308138d）
+- 绿：`node tools/dev/build-client.mjs` 后同一条 `node checks/lanes/ui-scene.entry.mjs --isolated` → **EXIT=0 / ALL PASS**（指纹一致；另两条车道的过期检查同样放行）
+- 提交：commit 4308138d

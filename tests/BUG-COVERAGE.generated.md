@@ -7,16 +7,15 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 291 |
-| 有具名守卫 | 183 |
-| 无具名守卫 | 108 |
-| 覆盖率 | 62.9% |
+| 已修卡 | 284 |
+| 有具名守卫 | 182 |
+| 无具名守卫 | 102 |
+| 覆盖率 | 64.1% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
 | BUG | opened | slug |
 |---|---|---|
-| 288 | 2026-11-20 | attention-panel-list-missing |
 | 183 | 2026-11-14 | notes-root-symlink-followed |
 | 180 | 2026-11-14 | walk-company-dirs-windows-dotdot |
 | 179 | 2026-11-14 | internal-dotdot-over-rejected |
@@ -31,11 +30,9 @@
 | 155 | 2026-11-13 | prd-gate-stale-session-cwd |
 | 154 | 2026-11-13 | prd-gate-numbering-empty-value |
 | 151 | 2026-11-13 | upgrade-log-target-symlink-writes-outside |
-| 150 | 2026-11-13 | company-root-safety-spec-wrong-api-root |
 | 146 | 2026-11-13 | use-company-data-agent-team-projection-oom |
 | 142 | 2026-11-13 | bootstrap-replace-directory-eisdir |
 | 141 | 2026-11-13 | cultivation-adopt-reject-verify-throws |
-| 140 | 2026-11-13 | tasks-tab-still-empty-with-selected-team-task-session |
 | 137 | 2026-11-13 | presented-ledger-symlink-read-outside |
 | 136 | 2026-11-13 | startup-settings-symlink-read-outside |
 | 135 | 2026-11-13 | catalog-index-symlink-read-outside |
@@ -121,17 +118,11 @@
 | 010 | 2026-10-11 | scheduler-single-point-hitl-freeze |
 | 009 | 2026-10-11 | star-topology-no-lateral-channel |
 | 007 | 2026-10-09 | collaboration-probe-false-positives |
-| 006 | — | ceo-meta-vocab-drift |
-| 005 | — | dual-signoff-single-door-routing |
-| 001 | — | manual-truncation |
 
 ## 有具名守卫
 
 | BUG | opened | 守卫 |
 |---|---|---|
-| 002 | — | tests/host/workspace/workspace-doors.spec.ts:55；tests/lib/presence/doors.spec.ts:13 |
-| 003 | — | tests/tools/deliverables-audit.spec.ts:463 |
-| 004 | — | tests/tools/deliverables-audit.spec.ts:547 |
 | 008 | 2026-10-10 | tests/tools/deliverables-audit.spec.ts:295 |
 | 011 | 2026-10-11 | tests/tools/candidate-scan-assignments.spec.ts:49 |
 | 013 | 2026-10-12 | tests/repo/security/tracked-secrets.spec.ts:22；tests/repo/security/tracked-token.spec.ts:20 |
@@ -312,3 +303,5 @@
 | 290 | 2026-11-20 | tests/client/startup/command-scope-hint.spec.ts:29 |
 | 291 | 2026-11-21 | tests/client/cultivation/cultivation-board.spec.ts:237；tests/client/cultivation/cultivation-board.spec.ts:269 |
 | 292 | 2026-11-21 | tests/client/presence/attention-history.spec.ts:38；tests/client/tabs/attention-tab.spec.ts:62；tests/client/tabs/attention-tab.spec.ts:117 |
+| 293 | 2026-11-21 | tests/client/startup/command-scope-hint.spec.ts:69 |
+| 296 | 2026-11-21 | tests/tools/client-bundle.spec.ts:36 |

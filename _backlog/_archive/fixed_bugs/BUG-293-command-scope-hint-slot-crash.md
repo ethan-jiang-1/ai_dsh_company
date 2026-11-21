@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P1
 opened: 2026-11-21
 ---
 
 # BUG-293：命令作用域提示一渲染就崩——注入的 `list` 是 `undefined`，composer 槽每次加载都报错
 
-> 严重级别：P1（重要：BUG-290 的用户可见缓解 100% 失效，且每个页面在 composer 槽产生一次 TypeError）｜发现：2026-11-21（E2E 设计轮）｜状态：调查中
+> 严重级别：P1（重要：BUG-290 的用户可见缓解 100% 失效，且每个页面在 composer 槽产生一次 TypeError）｜发现：2026-11-21（E2E 设计轮）｜状态：已修｜审查：agent — 逐条核对已修判定（spec 4/4 + 真页面两态 + ui-scene consoleProblems 空）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-21 指令「发现问题直接报 bug，别急着修」）。
+> **留痕**：commit e3588ecc（client 公开行为回归，材料性；批次计划见账本「2026-11-22 修复交接」，批次 Note 覆盖）。
 
 ## 症状
 
@@ -82,3 +82,10 @@ grep -rn "undefined as never" packages/company-pack/src/client
 - 同一条 `node checks/lanes/ui-scene.entry.mjs --isolated`：`consoleProblems`/`exceptions`/`clientErrors` 为空，且 `.wk-command-scope-hint` 在空白会话出现、首条消息后消失；
 - `npx vitest run tests/client/startup/command-scope-hint.spec.ts` 覆盖「真实 inject 产物 → 组件渲染」两态；
 - 不靠旧 `lib/client.js` 产物：真实页面车道必须先过 [BUG-296](BUG-296-real-page-lanes-stale-client-bundle.md) 的新鲜度判据。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/startup/CommandScopeHint.tsx`、`packages/company-pack/src/client/index.ts`、`tests/client/startup/command-scope-hint.spec.ts`
+- 红：`vitest run tests/client/startup/command-scope-hint.spec.ts` —— 把 inject 恢复成 `list: undefined as never` 后 1 failed / 3 passed（渲染真实 inject 产物直接 TypeError）；同窗口真页面 `node checks/lanes/ui-scene.entry.mjs --isolated` EXIT=1 且 `consoleProblems` 含 `slot entry crashed in 'conversation.input.left'`
+- 绿：`vitest run tests/client/startup/command-scope-hint.spec.ts` —— 4/4；真页面同一命令 ALL PASS（`consoleProblems` 空）；隔离实例空白会话出现「斜杠命令要等会话开始后才回话」，发首条消息后同一页面 0 次
+- 提交：commit e3588ecc
