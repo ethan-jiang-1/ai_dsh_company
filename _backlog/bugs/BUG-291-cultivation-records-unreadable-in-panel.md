@@ -55,6 +55,26 @@ source run/env.sh && node tools/dev/company.mjs --no-open     # 取横幅 URL
 
 ⇒ 失败面从"列目录"收窄到**「列出 records → 逐条解析」这一段**：`listDir` 通了，`readRecordHead(…, 240)` / `parseRecord()` 在客户端可能返回 null 或过滤掉，且同样没有任何诊断。Node 侧同两个文件 `parseRecord()` 得 2 条、`recordInbox('ceo').needsDecision = 1`，与面板显示矛盾。
 
+## 第三批证据（2026-11-21，决定性）
+
+在同一实例、新建 CEO 会话（cwd = 公司盘）里，给 `listDir` 与记录加载器各加一行诊断后实测：
+
+```
+console.warning: [company][cultivation] list {"recordNames":[]}
+console.warning: [company][cultivation] {"viewer":"ceo","records":[]}
+```
+
+即：**`listRecords` 调用成功了（不是 null、不是异常），但返回的名字列表是空数组**；同一轮
+`listJournal` 却正常返回（页面上 CEO 8 待审、VP-Eng 7 待审）。查看器 `viewer="ceo"` 正确。
+
+矛盾点很尖锐：同一个 `workspaceFiles.list`、同一个会话、同一轮加载，
+`.dsh-company/kb/ceo/journal` 有结果，`.dsh-company/cultivation/records` 返回空——而直连 RPC
+（`workspaceFileScopeId` = 该会话 id）对后者返回 2 个 `{name,type:'file'}`。
+
+⇒ 下一步只剩一件事：**在 `records` 那次 `list` 里打印原始 `entries`**
+（本轮已加过该行、但按用户要求先停手，未取到读数）。三种可能：路径常量被改写、
+`entries` 形状与 `{name,type}` 不符被过滤、或该次调用命中了不同 scope。
+
 ## 待查（更新后）
 
 `packages/company-pack/src/client/cultivation/cultivation-data.ts:87`：
