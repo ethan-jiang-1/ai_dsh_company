@@ -489,6 +489,25 @@ test('backlog-liveness：删「待落地可执行标记」与「归档去向=not
     assert.match(backlogLivenessProblems(join(rootSelf, '_backlog')).join(), /未解析到 notes\/ 下的真实文件/)
     assert.deepEqual(mutSelf.mod.backlogLivenessProblems(join(rootSelf, '_backlog')), [])
   } finally { mutSelf.cleanup(); rmSync(rootSelf, { recursive: true, force: true }) }
+
+  // 2026-11-22：fixed_bugs 收 `已结`（撤回/非缺陷卡）必须与卡头结论词同时在场。
+  //   阉割这道锚 → 没有撤回结论的已结卡也能住已修区（= 逃 fix-evidence）且本门不报。
+  const cardNoVerdict = [
+    '---', 'status: 已结', 'severity: P2', 'opened: 2026-11-20', '---', '',
+    '# Bug',
+    '> 严重级别：P2（次要）｜发现：2026-11-20｜状态：已结（原主张待查）',
+  ].join('\n')
+  const rootNoVerdict = fixture(minimalBacklogFiles({
+    '_backlog/_archive/README.md': '# archive\n- [r](fixed_bugs/BUG-900-retracted.md)\n',
+    '_backlog/_archive/fixed_bugs/BUG-900-retracted.md': cardNoVerdict,
+  }))
+  const mutVerdict = await libMutant('backlog-liveness',
+    "if (pool === '_archive/fixed_bugs' && data.status === '已结' && !/撤回|非缺陷/.test(headText(text)))",
+    'if (false)')
+  try {
+    assert.match(backlogLivenessProblems(join(rootNoVerdict, '_backlog')).join(), /必须在卡头写明「撤回」或「非缺陷」/)
+    assert.deepEqual(mutVerdict.mod.backlogLivenessProblems(join(rootNoVerdict, '_backlog')), [])
+  } finally { mutVerdict.cleanup(); rmSync(rootNoVerdict, { recursive: true, force: true }) }
 })
 
 // ── 7. keyless-lane 零命中防假绿（真实子进程退出码断言）────────────────────────

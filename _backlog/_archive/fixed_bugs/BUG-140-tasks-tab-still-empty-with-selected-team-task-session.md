@@ -8,7 +8,7 @@ opened: 2026-11-13
 
 > 严重级别：P2（次要）｜发现：2026-11-13｜状态：已结（撤回：非产品缺陷）
 >
-> **关联**：[高复杂度面持续探索卡](./2026-11-12-deep-surface-continuous-bug-hunt.md)（C5 / 任务板真页面）
+> **关联**：[高复杂度面持续探索卡](../settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C5 / 任务板真页面）
 > **留痕**：待修（本轮不修）
 
 ## 撤回（2026-11-13）
@@ -90,5 +90,5 @@ waitText 写 PRD → missing
 
 ## 修复关联
 
-- 复发/未收口 [BUG-103](../fixed_bugs/BUG-103-tasks-tab-empty-despite-team-task-events.md)（已归档「修复」）与 [BUG-104](../fixed_bugs/BUG-104-team-task-merge-no-revision-null-view.md) / [BUG-118](../fixed_bugs/BUG-118-member-events-dropped-without-team-projection.md)（当前活跃）。
+- 复发/未收口 [BUG-103](BUG-103-tasks-tab-empty-despite-team-task-events.md)（已归档「修复」）与 [BUG-104](BUG-104-team-task-merge-no-revision-null-view.md) / [BUG-118](BUG-118-member-events-dropped-without-team-projection.md)（当前活跃）。
 - 相关：`src/client/tabs/company-tabs.tsx` 的 `TasksTab`；`src/client/data/use-company-data.ts` 的 `follow` 订阅/merge。

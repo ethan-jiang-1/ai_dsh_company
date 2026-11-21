@@ -65,7 +65,7 @@
 | **A 判据输入根** | [286](../_archive/fixed_bugs/BUG-286-deliverables-check-v3-layout-unusable.md) | v3 布局后「文件根」与「会话根」不再重合，脚本仍当同一个：judge 以 `deliverables/` 前缀过滤，入口又按外层 workspace 派生 `sessions/` 目录名 | 文件根自动识别 `<ws>/.dsh-company`（存在 deliverables 时），会话根仍用外层 `<ws>`；比对前归一 `.dsh-company/` 前缀；空盘/错根仍 fail-loud（exit 2） | 1 |
 | **B 读面静默** | [291](../_archive/fixed_bugs/BUG-291-cultivation-records-unreadable-in-panel.md) | `list` 成功但返回空——既可能是真空目录，也可能是读到了**另一个 workspace**（`runtime/rehearsal-workspace/.dsh-company/cultivation/records` 存在但 0 文件、同盘 31 篇 journal；`company-workspace` 2 条）。**后者待一次实起取证，未证不写成事实** | 打印原始 `entries` + `result.value.path` + 实际 scope 定性；修法 = 空/不可达必须点名「哪个 workspace + 什么原因」 | 3 |
 | **C 命令无反馈** | [290](../_archive/fixed_bugs/BUG-290-text-command-silent-no-op-without-session.md) | 无会话时命令结果无处可落；「client 丢结果」与「host 未挂会话」两假设未分 | B 政策：client 在无会话时给「命令需要会话」提示 + 新建入口，保留「命令是会话级」不变量 | 4 |
-| **D 投影不完整** | [288](../_archive/settled_issues/BUG-288-attention-panel-list-missing.md) | 待办只来自本页在线期的活体 waterfall 拦截 + 内存登记处；`streamAttention` 只重放升级/present，不重建 `approval/asked`。半修后 lane 仍红 ⇒ 根因还差一层（帧内容 vs 页签 sessionId 绑定） | A 政策：补 pending 重建器并入 `mergeAttention`；空态文案保持「没有等你的事」为真 | 5 |
+| **D 投影不完整** | [288](../_archive/fixed_bugs/BUG-288-attention-panel-list-missing.md) | 待办只来自本页在线期的活体 waterfall 拦截 + 内存登记处；`streamAttention` 只重放升级/present，不重建 `approval/asked`。半修后 lane 仍红 ⇒ 根因还差一层（帧内容 vs 页签 sessionId 绑定） | A 政策：补 pending 重建器并入 `mergeAttention`；空态文案保持「没有等你的事」为真 | 5 |
 
 **次序 = A(286) → 一次实起三诊断(B/C/D) → B(291) → C(290) → D(288)**：
 286 先修——它不需要实例，且是 `demo-scenes` 收场验收第 8 步（现 exit 2），不修它后面任何真验收都收不了场；顺带产出「临时 workspace + `.dsh-company/deliverables`」夹具供 291 复用。291/288/290 都要真实例 + CDP + **同一次** client bundle 重建，诊断合并到一次 bring-up，三份证据互为对照实验。修的顺序 = 291（先落「可诊断失败」约定）→ 290（复用同一约定）→ 288（唯一要真模型 + 真浏览器验收，放最后但必须真绿）。
@@ -466,7 +466,7 @@ D 是独立门禁面。
 
 
 **上一轮收口**（2026-11-13 第四轮）：BUG-147..149 已迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；
-BUG-150 复核不成立，迁 [settled_issues](../_archive/settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md)；
+BUG-150 复核不成立，迁 [settled_issues](../_archive/fixed_bugs/BUG-150-company-root-safety-spec-wrong-api-root.md)；
 BUG-151 由 Safety 矩阵首跑发现，同轮修并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 ## 2026-11-13 focus v2 探索（C8/C9/C10）

@@ -37,7 +37,7 @@ source run/env.sh && DSH_PERMISSION_MODE=workspace-write node tools/dev/company.
 - 「读别人会话的历史」没有现成通路：两轮实跑证实 **`session/follow` 对未打开的会话零 history 帧**
   （20 个候选会话、诊断行一条没打）；vendor 的 `ui-approval` 只有活体 waterfall + per-session
   `PendingApproval`，**没有全局待批查询面**。
-- 裁决证据与 `approval/asked` 原始事件抄在 [BUG-288](../settled_issues/BUG-288-attention-panel-list-missing.md) 的「撤回」节。
+- 裁决证据与 `approval/asked` 原始事件抄在 [BUG-288](../fixed_bugs/BUG-288-attention-panel-list-missing.md) 的「撤回」节。
 
 ## 失败类与同类排查
 

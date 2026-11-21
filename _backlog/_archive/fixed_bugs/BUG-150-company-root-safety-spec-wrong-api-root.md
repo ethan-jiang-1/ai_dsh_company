@@ -6,9 +6,9 @@ opened: 2026-11-13
 
 # BUG-150：`company-root-safety.spec.ts` 把 `join(workspace,'.dsh-company')` 传给要求 workspace 的 catalog/presented API，2 条假红
 
-> 严重级别：P2（次要）｜发现：2026-11-13｜状态：已结｜审查：agent — 复核不成立：当前 spec 已传 workspace，55 passed；无产品改动
+> 严重级别：P2（次要）｜发现：2026-11-13｜状态：已结（撤回：复核不成立）｜审查：agent — 复核不成立：当前 spec 已传 workspace，55 passed；无产品改动
 >
-> **关联**：[高复杂度面持续探索卡](./2026-11-12-deep-surface-continuous-bug-hunt.md)（C4 / 测试资产）
+> **关联**：[高复杂度面持续探索卡](../settled_issues/2026-11-12-deep-surface-continuous-bug-hunt.md)（C4 / 测试资产）
 > **留痕**：Note [2026-11-13-last-direct-writers](../../../notes/implemented/2026-11-13-last-direct-writers.md)
 
 ## 症状
@@ -63,5 +63,5 @@ AssertionError: … 写到了 outside
 
 ## 修复关联
 
-- 发现于 BUG-147/148/149 的 safety 矩阵；与 [BUG-147](../fixed_bugs/BUG-147-export-governance-symlink-root-writes-outside.md) / [BUG-148](../fixed_bugs/BUG-148-bundle-manifest-root-symlink-writes-outside.md) / [BUG-149](../fixed_bugs/BUG-149-cultivation-root-symlink-writes-outside.md) 不同：本卡是**测试误用**，不是产品写外。
+- 发现于 BUG-147/148/149 的 safety 矩阵；与 [BUG-147](BUG-147-export-governance-symlink-root-writes-outside.md) / [BUG-148](BUG-148-bundle-manifest-root-symlink-writes-outside.md) / [BUG-149](BUG-149-cultivation-root-symlink-writes-outside.md) 不同：本卡是**测试误用**，不是产品写外。
 - 相关：`tests/host/contract/company-root-safety.spec.ts`、`src/host/ledger/catalog.ts`、`presented-ledger.ts`。

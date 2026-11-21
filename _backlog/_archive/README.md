@@ -1,6 +1,6 @@
 # _archive/ · 离开活跃区
 - [BUG-292-cross-session-pending-approvals-not-aggregated.md](fixed_bugs/BUG-292-cross-session-pending-approvals-not-aggregated.md) — 待办只覆盖本会话；跨会话聚合无正路（retain source 封闭 / follow 零帧），本轮把作用域写进空态。
-- [BUG-288-attention-panel-list-missing.md](settled_issues/BUG-288-attention-panel-list-missing.md) — 已结（反证）：`ask` 策略下后开的页面能看到挂起审批；lane 红是环境 `never`。
+- [BUG-288-attention-panel-list-missing.md](fixed_bugs/BUG-288-attention-panel-list-missing.md) — 已结（反证）：`ask` 策略下后开的页面能看到挂起审批；lane 红是环境 `never`。
 - [BUG-290-text-command-silent-no-op-without-session.md](fixed_bugs/BUG-290-text-command-silent-no-op-without-session.md) — 空白页敲斜杠命令无反馈；host 实测被调用、结果丢在 vendor transcript 面，本仓落「会话未开始」提示（政策 B）。
 - [BUG-291-cultivation-records-unreadable-in-panel.md](fixed_bugs/BUG-291-cultivation-records-unreadable-in-panel.md) — 面板如实报告自身 workspace，但 UI 从不点名「哪个盘」；收窄为作用域可诊断性，空/不可达/读取中三态分文案。
 - [BUG-286-deliverables-check-v3-layout-unusable.md](fixed_bugs/BUG-286-deliverables-check-v3-layout-unusable.md) — v3 布局把「文件根」与「会话根」拆开后判据入口仍当同一个（默认档 exit 2）；两个根 + present 前缀归一后真盘 assessed。
@@ -186,9 +186,7 @@
 | [2026-11-13-workflow-entry-and-fact-checkpoint.md](settled_issues/2026-11-13-workflow-entry-and-fact-checkpoint.md) | 已结；RFC 成立（P0 入口/一致性 → P1 事实检查点 → P2 可执行验收）；实施不在本卡关闭条件内；去向 = [RFC](../../notes/proposed/2026-11-13-workflow-entry-and-fact-checkpoint.md) | 2026-11-13 |
 | [2026-11-13-test-asset-fence-p0.md](settled_issues/2026-11-13-test-asset-fence-p0.md) | 已结；测试资产围栏 P0：mutation 守卫 + replay `--refresh` + candidate 已耗 + `smoke:fast` 6 条进 pre-push；verify/test 242/1997/pre-push 全绿 | 2026-11-13 |
 | [2026-11-13-adversarial-shape-matrix-p0.md](settled_issues/2026-11-13-adversarial-shape-matrix-p0.md) | 已结；shape 库 + Safety/Agreement 矩阵 + 载体登记 + 门禁；verify ALL PASS、test 242/1997、4 红证 + 进程 smoke ALL PASS；去向 = [Note](../../notes/implemented/2026-11-13-adversarial-shape-matrix.md) | 2026-11-13 |
-| [BUG-140（撤回）](settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md) | 已结（撤回）：真页面默认新空会话；显式选中任务会话后任务板 (2)，原文保留测试方法证据 | 2026-11-13 |
 | [BUG-151（已修）](fixed_bugs/BUG-151-upgrade-log-target-symlink-writes-outside.md) | 已修：upgrade log 叶子目标被 symlink/目录占用时跟随写外/裸抛 EISDIR；`appendUpgradeLog` 预检 unsafe 跳过；Safety 134 passed、KNOWN_GAP 清零 | 2026-11-13 |
-| [BUG-150（撤回）](settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md) | 已结（撤回）：复核时 spec 已传 workspace，company-root-safety 55 passed；无产品改动 | 2026-11-13 |
 | [2026-11-12-startup-strategy-wiki-regression-exploration.md](settled_issues/2026-11-12-startup-strategy-wiki-regression-exploration.md) | 已结；启动策略（界面）+ wiki 知识地图（配置）回归/探索：A1–A5 / B1–B8 + named child；10 张 BUG-080..089；未证 teammate/workflow 等；去向 = none（只产证据/BUG 卡） | 2026-11-12 |
 | [2026-11-12-wiki-knowledge-map-landing.md](settled_issues/2026-11-12-wiki-knowledge-map-landing.md) | 已结；wiki 模板（AK 三层 + OKF 最小 frontmatter）+ 六角色共享协议 skill + 指针三档校验 + 注入按位置分档；verify/test(233 files/1723)/typecheck/preset-smoke 全绿 + 外部只读真会话实测；去向 = [Note](../../notes/implemented/2026-11-12-wiki-knowledge-map-landing.md) | 2026-11-12 |
 | [2026-11-12-startup-settings-landing.md](settled_issues/2026-11-12-startup-settings-landing.md) | 已结；composer 入口 + 右栏「策略」页签（三字段、首项自动、选项从 content 枚举）+ workspace 级 `startup.json` + `company:startup-settings` 软注入；verify/test(231 files/1704)/typecheck/ui-scene-smoke(10 页签) 全绿；去向 = [Note](../../notes/implemented/2026-11-12-startup-settings.md) | 2026-11-12 |
@@ -460,6 +458,16 @@
 | [BUG-087](fixed_bugs/BUG-087-wiki-template-copy-path-repo-only.md) | 模板拷贝命令改安装视图；面板给当前部署绝对路径 | 2026-11-12 |
 | [BUG-088](fixed_bugs/BUG-088-shipped-links-excludes-wiki-template.md) | 模板按自身根验链（不再整目录排除）；坏链接 verify 红 | 2026-11-12 |
 | [BUG-089](fixed_bugs/BUG-089-boot-without-workspace-settings-not-injected.md) | boot 无 workspace 也按 agent 会话 cwd 注册 startup section | 2026-11-12 |
+
+### 已修区里的撤回卡（`status: 已结`）
+
+住 `fixed_bugs/` 但不声称 `已修`——原主张被反证/不成立，没有系统面改动（判据 = [fixed_bugs 门牌](fixed_bugs/AGENTS.md)）。
+
+| 卡 | 结论 | 日期 |
+|---|---|---|
+| [BUG-140（撤回）](fixed_bugs/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md) | 测试选址：真页面默认落在新空会话；显式选中任务会话后任务板 (2)，原文保留测试方法证据 | 2026-11-13 |
+| [BUG-150（撤回）](fixed_bugs/BUG-150-company-root-safety-spec-wrong-api-root.md) | spec 误用：复核时 spec 已传 workspace，company-root-safety 55 passed；无产品改动 | 2026-11-13 |
+| [BUG-288（撤回）](fixed_bugs/BUG-288-attention-panel-list-missing.md) | 反证：`ask` 策略下后开的页面能看到挂起审批；lane 红是环境 `never`（残留跨会话缺口 = BUG-292） | 2026-11-20 |
 
 ## 暂停卡
 

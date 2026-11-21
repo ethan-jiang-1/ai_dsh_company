@@ -68,6 +68,6 @@
 - [policy] **命令锚挡不住所有 output 行**：`git version …` / `npm ERR! …` 这类命令词+空格的输出仍可能过；门只挡常见前缀（node:/sh:/curl:/git:）、裸行与纯散文 → `_backlog/methods/bug-fix.md`、`checks/lib/backlog-liveness.mjs`
 - [policy] **批次的「同根因」是判断**：没有门禁证明一组卡真的共享根因、排序合理或 Note 该写；靠 ledger 批次表 + 独立盲审 + 每卡证据 → `_backlog/bugs/README.md`、`_backlog/methods/bug-fix.md`
 - [policy] **无卡快修没有卡 / 门禁**：非材料性当场修靠 commit body 与轮次回执，机械面不查 → `_backlog/methods/bug-fix.md`、`docs/guides/dev-loop.md`
-- [policy] **非缺陷改判沿用先例**：不新增状态 / 门禁，按问题轨归档 → `_backlog/_archive/settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md`
+- [policy] **非缺陷改判沿用先例**：不新增状态 / 门禁，按问题轨归档 → `_backlog/_archive/fixed_bugs/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md`（2026-11-22 改判：缺陷编号的卡统一住 `fixed_bugs/`，撤回卡 `status: 已结` + 卡头写撤回——被 [2026-11-22-retracted-bugs-in-fixed-bugs](./2026-11-22-retracted-bugs-in-fixed-bugs.md) 部分取代）
 - [covered] **方法与导航的形状**：method frontmatter、md-links、doc-budget 由 `pnpm verify` 覆盖 → `checks/gates/backlog-liveness.mjs`、`checks/gates/doc-budget.mjs`
 - [environment-gap] **真模型 / 真浏览器证据**：按面选择，不在 `pnpm verify` 内重跑；本仓 keyless 面不覆盖 → `docs/testing.md`、`tests/README.md`

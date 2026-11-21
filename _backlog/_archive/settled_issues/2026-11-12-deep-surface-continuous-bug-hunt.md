@@ -920,7 +920,7 @@ opened: 2026-11-12
 
 | H | 判决 | 证据 |
 |---|---|---|
-| 选中会话 + 任务板 | **withdrawn（测试选址）** | [BUG-140（撤回）](../settled_issues/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md)：侧栏显示会话标题「用 team_task_create 创建两个任务」，任务板仍「成员：lead(待命) / 还没有共享任务」；waitText 写 PRD 失败。 |
+| 选中会话 + 任务板 | **withdrawn（测试选址）** | [BUG-140（撤回）](../fixed_bugs/BUG-140-tasks-tab-still-empty-with-selected-team-task-session.md)：侧栏显示会话标题「用 team_task_create 创建两个任务」，任务板仍「成员：lead(待命) / 还没有共享任务」；waitText 写 PRD 失败。 |
 | 会话日志有 team/task | pass | task-1/task-2 两条事件已在会话日志。 |
 | streamError | 无错误条 | 不是 follow 失败；更像 follow 没返回 task 事件或 merge 未适配。 |
 | 旧 BUG-103/104 修复 | **真页面未收口** | 修复验证停在 projection/纯 merge；这是当前 bug。 |
@@ -1422,7 +1422,7 @@ TypeError: Cannot read properties of undefined (reading 'map')
 
 | H | 判决 | 证据 |
 |---|---|---|
-| catalog.regenerate root-symlink-out | **spec 误用** | [BUG-150](../settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md)：spec 传 `join(ws,'.dsh-company')`，但 API 要 workspace；双重 `.dsh-company`。 |
+| catalog.regenerate root-symlink-out | **spec 误用** | [BUG-150](../fixed_bugs/BUG-150-company-root-safety-spec-wrong-api-root.md)：spec 传 `join(ws,'.dsh-company')`，但 API 要 workspace；双重 `.dsh-company`。 |
 | presented.write root-symlink-out | **spec 误用** | 同卡；startup/bootstrap 传 workspace，正常 typed。 |
 | BUG-147/148 | 代码已修（Round 74） | export 返回不安全 warning；bundle plan skip。 |
 | BUG-149 | 仍活跃 | cultivation writeRecord 仍写 outside。 |

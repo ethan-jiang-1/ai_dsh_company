@@ -55,7 +55,11 @@ export function backlogLivenessProblems(backlogRoot) {
     //   修复就绪 = 门票且授权的翻转点，修复已落地 = 修复落树、验收未满，等人拍板 = 通道/用户选择。
     bugs: ['调查中', '修复就绪', '修复已落地', '等人拍板'],
     '_archive/settled_issues': ['已结'], '_archive/suspended_issues': ['叫停'],
-    '_archive/fixed_bugs': ['已修'], '_archive/suspended_bugs': ['待修'],
+    // 2026-11-22（用户决定：BUG-* 卡统一住已修区）：`已结` 也允许住 `_archive/fixed_bugs/`——
+    //   「撤回/非缺陷」卡（反证、测试选址、spec 误用）按缺陷编号命名、按缺陷轨归档，但**不声称 `已修`**
+    //   （`fix-evidence` 只认 `已修`，翻 `已修` 就得凭空补 `## 修复证据`，实测红）。
+    //   规则正文 = `_backlog/_archive/fixed_bugs/AGENTS.md`（迁卡门牌）+ `notes/implemented/2026-11-22-retracted-bugs-in-fixed-bugs.md`（理由与备选）；本处只证形状。
+    '_archive/fixed_bugs': ['已修', '已结'], '_archive/suspended_bugs': ['待修'],
   }
   const topicByDir = { positioning: '定位', upstream: '上游', 'tech-exploration': '技术' }
   const isFresh = (name, undated = true) => {
@@ -224,6 +228,15 @@ export function backlogLivenessProblems(backlogRoot) {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(String(data.opened ?? ''))) problems.push(`${where}:1 缺 opened: YYYY-MM-DD`)
         if (pool.endsWith('bugs') && !['P0', 'P1', 'P2'].includes(data.severity)) problems.push(`${where}:1 缺 severity: P0/P1/P2`)
       }
+      // 2026-11-22：`已结` 住 fixed_bugs 是「没有系统面改动」的自述，必须与撤回结论同时在场。
+      //   为什么：不加这道锚，`已结` 就成了逃 `fix-evidence` 的暗门（把修不动的卡翻成已结即可跳过证据）。
+      //   负例留证 2026-11-22（真卡植入，实跑原话）：
+      //     ① 三张撤回卡（BUG-140/150/288）搬进 fixed_bugs 且保持 `已结` → 不报「不属于此桶」，本门绿；
+      //     ② BUG-150 卡头删掉「撤回」→ `…:1 已结卡住 fixed_bugs 必须在卡头写明「撤回」或「非缺陷」——否则是用 已结 逃 fix-evidence` 红；
+      //     ③ 同一张卡改 `status: 调查中` → `…:2 status "调查中" 不属于此桶` 红；
+      //     ④ 同一张卡改 `status: 已修` 而不加 `## 修复证据` → `fix-evidence: … 缺「## 修复证据」（已修卡必须给改动面/红/绿/提交）` 红。
+      if (pool === '_archive/fixed_bugs' && data.status === '已结' && !/撤回|非缺陷/.test(headText(text)))
+        problems.push(`${where}:1 已结卡住 fixed_bugs 必须在卡头写明「撤回」或「非缺陷」——否则是用 已结 逃 fix-evidence`)
       // 2026-11-02（五道门落地）：门票与去向的守卫——状态声称到了门口，出口物就必须在场。
       //   负例留证见本文件头「五道门」块的 ①–③；规则正本 = _backlog/README.md「五道门」表。
       if (pool === 'issues' && data.status === '待落地') {

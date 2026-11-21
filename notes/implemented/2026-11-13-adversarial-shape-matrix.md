@@ -30,7 +30,7 @@ BUG-080..146 共 66 张卡，**66/66 由探索发现**；`pnpm test` 在缺陷�
 - **引入 fast-check**：形状离散可枚举，属性库只增加依赖与不确定性；手写 shape + `describe.each` 足够。
 - **5 轴全组合**：爆炸；用代表形状 + 载体族控制。
 - **进程/重启矩阵塞进 `tests/`**：`layering.spec.ts` 禁 `child_process`；留 smoke（P2）。
-- **把 catalog/presented 的参数混用当产品 bug**：首跑 2 条红是 spec 把 `.dsh-company` 传给要求 workspace 的 API；修正后 55 passed。它作为 [BUG-150](../../_backlog/_archive/settled_issues/BUG-150-company-root-safety-spec-wrong-api-root.md)（测试误用）留痕，不冒充产品缺陷。
+- **把 catalog/presented 的参数混用当产品 bug**：首跑 2 条红是 spec 把 `.dsh-company` 传给要求 workspace 的 API；修正后 55 passed。它作为 [BUG-150](../../_backlog/_archive/fixed_bugs/BUG-150-company-root-safety-spec-wrong-api-root.md)（测试误用）留痕，不冒充产品缺陷。
 
 ## 验证
 

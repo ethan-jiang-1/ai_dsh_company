@@ -248,6 +248,21 @@ describe('backlog institution, migrated headers and recursive membership', () =>
     expect(check(root).filter(problem => problem.includes('BUG-0'))).toEqual(['_backlog/bugs/BUG-013-old.md:2 status "活跃" 不属于此桶'])
   })
 
+  // 2026-11-22（用户决定：BUG-* 卡统一住已修区）：撤回/非缺陷卡可以住 fixed_bugs，但 status 只能是 `已结`
+  //   ——`已修` 要凭空交 `## 修复证据`（fix-evidence），所以这道门要把「已结」和「撤回结论」绑在一起，
+  //   否则 `已结` 就是逃 fix-evidence 的暗门。三向：撤回结论齐 → 绿；缺结论 → 红；活跃值 → 仍不属于此桶。
+  it('accepts retracted cards (已结) in fixed_bugs only when the head states the retraction', () => {
+    const retracted = (status: string, verdict: string) =>
+      `---\nstatus: ${status}\nseverity: P2\nopened: 2026-11-20\n---\n\n# Bug\n\n> 严重级别：P2（次要）｜发现：2026-11-20｜状态：${status}（${verdict}）\n`
+    put('_archive/fixed_bugs/BUG-900-retracted.md', retracted('已结', '撤回：原主张被反证'))
+    index('_archive/fixed_bugs', 'BUG-900-retracted.md')
+    expect(check(root)).toEqual([])
+    put('_archive/fixed_bugs/BUG-900-retracted.md', retracted('已结', '原主张待查'))
+    expect(check(root).join('\n')).toContain('已结卡住 fixed_bugs 必须在卡头写明「撤回」或「非缺陷」')
+    put('_archive/fixed_bugs/BUG-900-retracted.md', retracted('调查中', '撤回：原主张被反证'))
+    expect(check(root).join('\n')).toContain('status "调查中" 不属于此桶')
+  })
+
   // 2026-10-25（交接契约）：归档「毕业：做」卡必须留下 durable 去向；老卡祖父豁免。
   // 2026-11-02（五道门）：去向升级为封闭集值 + 审查记录在场；生效日 2026-11-03，落地当天的卡不追改。
   // 反证：no-destination → 红；prose → 红；with-typed → 绿；老卡 → 不红。
