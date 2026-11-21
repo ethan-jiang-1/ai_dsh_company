@@ -44,18 +44,31 @@ describe('composer 命令作用域提示（BUG-290）', () => {
 
 /** 注册体：注入闭包在单测里不执行，所以注册这块必须自己有判据（否则等于没人验过）。 */
 describe('registerCommandScopeHint：挂到 composer 槽', () => {
-  it('往 conversation.input.left 注册一个 order 11 的条目，inject 带上会话 id 与 translator', () => {
+  const mountRegistered = (blank: boolean) => {
     const registered: { name?: string, id?: string, order?: number, inject?: (id: string) => unknown }[] = []
     const injected: string[] = []
+    const list = {
+      subscribe: () => () => {},
+      getSnapshot: () => ({ byId: { 'session-1': { blank } } }),
+    }
     registerCommandScopeHint({
       slots: {
         inject: (name, register) => { injected.push(name); register() },
         register: (definition) => { registered.push(definition); return () => {} },
       },
-    }, t)
+    }, t, list)
     expect(injected).toEqual(['conversation.input.left'])
     expect(registered[0]?.id).toBe('company-command-scope')
     expect(registered[0]?.order).toBe(11)
-    expect((registered[0]?.inject?.('session-1') as { sessionId?: string } | undefined)?.sessionId).toBe('session-1')
+    return registered[0]?.inject?.('session-1')
+  }
+
+  // BUG-293 的教训：注册体用例此前只断言 id/order/sessionId，于是「组件本身能用」与「真实注入的面」
+  // 两半各自绿、拼起来崩。判据必须**渲染 inject 的真实产物**。
+  it('真实 inject 产物能渲染：blank=true 出提示，blank=false 不出', () => {
+    const blankFace = mountRegistered(true) as { sessionId: string, list: unknown, t: unknown }
+    expect(renderToStaticMarkup(createElement(CommandScopeHint, blankFace as never))).toContain('斜杠命令要等会话开始后才回话')
+    const startedFace = mountRegistered(false) as { sessionId: string, list: unknown, t: unknown }
+    expect(renderToStaticMarkup(createElement(CommandScopeHint, startedFace as never))).toBe('')
   })
 })

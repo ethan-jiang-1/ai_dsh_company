@@ -7,15 +7,16 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 288 |
+| 已修卡 | 291 |
 | 有具名守卫 | 183 |
-| 无具名守卫 | 105 |
-| 覆盖率 | 63.5% |
+| 无具名守卫 | 108 |
+| 覆盖率 | 62.9% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
 | BUG | opened | slug |
 |---|---|---|
+| 288 | 2026-11-20 | attention-panel-list-missing |
 | 183 | 2026-11-14 | notes-root-symlink-followed |
 | 180 | 2026-11-14 | walk-company-dirs-windows-dotdot |
 | 179 | 2026-11-14 | internal-dotdot-over-rejected |
@@ -30,9 +31,11 @@
 | 155 | 2026-11-13 | prd-gate-stale-session-cwd |
 | 154 | 2026-11-13 | prd-gate-numbering-empty-value |
 | 151 | 2026-11-13 | upgrade-log-target-symlink-writes-outside |
+| 150 | 2026-11-13 | company-root-safety-spec-wrong-api-root |
 | 146 | 2026-11-13 | use-company-data-agent-team-projection-oom |
 | 142 | 2026-11-13 | bootstrap-replace-directory-eisdir |
 | 141 | 2026-11-13 | cultivation-adopt-reject-verify-throws |
+| 140 | 2026-11-13 | tasks-tab-still-empty-with-selected-team-task-session |
 | 137 | 2026-11-13 | presented-ledger-symlink-read-outside |
 | 136 | 2026-11-13 | startup-settings-symlink-read-outside |
 | 135 | 2026-11-13 | catalog-index-symlink-read-outside |

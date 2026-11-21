@@ -63,12 +63,15 @@ export interface CommandScopeHintScope {
  * 搬到这里才有判据（`tests/client/startup/command-scope-hint.spec.ts` 直接调它）。
  * @param scope - 已注入 `slots` 的 scoped context。
  * @param t - 当前语言的 translator。
+ * @param list - 会话列表快照面（`sessions.list`）——组件靠它判断会话是否 `blank`。
  */
-export function registerCommandScopeHint(scope: CommandScopeHintScope, t: CompanyT): void {
+export function registerCommandScopeHint(scope: CommandScopeHintScope, t: CompanyT, list: SessionListFace): void {
   scope.slots.inject('conversation.input.left', () => scope.slots.register({
     name: 'conversation.input.left',
     id: 'company-command-scope',
     order: 11,
-    inject: (sessionId: string) => ({ sessionId, list: undefined as never, t }),
+    // `list` 必须是**真实**的会话列表快照面：写死 undefined 会让组件在渲染期崩（BUG-293），
+    // 而只断言 id/order 的单测看不出来——判据要渲染这个 inject 的真实产物。
+    inject: (sessionId: string) => ({ sessionId, list, t }),
   }, CommandScopeHint))
 }

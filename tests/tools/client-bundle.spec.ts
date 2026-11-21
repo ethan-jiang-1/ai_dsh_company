@@ -18,12 +18,13 @@ import {
 
 function fixture(): string {
   const root = mkdtempSync(join(tmpdir(), 'client-bundle-'))
-  for (const [rel, body] of [
+  const files: readonly (readonly [string, string])[] = [
     ['packages/company-pack/src/client/index.ts', 'export const a = 1\n'],
     ['packages/company-pack/src/lib/helper.ts', 'export const b = 2\n'],
     ['packages/company-pack/content/charter.md', '内容面，不进 client 字节\n'],
     ['packages/company-pack/tsdown.config.ts', 'export default {}\n'],
-  ]) {
+  ]
+  for (const [rel, body] of files) {
     mkdirSync(dirname(join(root, rel)), { recursive: true })
     writeFileSync(join(root, rel), body)
   }

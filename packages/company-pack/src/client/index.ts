@@ -230,7 +230,7 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
         inject: (name, register) => { scoped.slots.inject(name, () => register()) },
         register: (definition, component) => scoped.slots.register(definition as never, component as never),
       },
-    }, ctx.locale.bind(COMPANY_NS))
+    }, ctx.locale.bind(COMPANY_NS), scoped.sessions.list)
   })
 }
 
