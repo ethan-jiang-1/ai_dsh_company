@@ -25,7 +25,8 @@ const render = (blank: boolean | undefined): string => renderToStaticMarkup(crea
   t,
 }))
 
-describe('composer 命令作用域提示', () => {
+// 负例留证 2026-11-21：撤掉 CommandScopeHint 与槽注册后 `vitest run tests/client/startup/command-scope-hint.spec.ts` 无法导入（组件不存在），真页面同期无该提示文本；接回后 3/3 绿、两态复核通过。BUG-290
+describe('composer 命令作用域提示（BUG-290）', () => {
   it('会话还没开始（blank=true）⇒ 提示出现，并说清「命令是会话级的」', () => {
     const markup = render(true)
     expect(markup).toContain('斜杠命令要等会话开始后才回话')

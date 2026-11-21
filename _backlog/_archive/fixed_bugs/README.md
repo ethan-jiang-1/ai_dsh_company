@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-290**（2026-11-21，端到端验收轮 / P2）：空白页敲 `/req` 无任何反馈——
+  [290](BUG-290-text-command-silent-no-op-without-session.md) 用 host instrumentation 定性为
+  「handler 真跑了、结果只落进已打开会话的 transcript（vendor 面）」；本仓按政策 B 落
+  composer 侧提示（会话一开始即消失），vendor 丢弃记上游提案。证据提交 `ad4481be`。
+
 - **BUG-291**（2026-11-21，端到端验收轮 / P2）：培养页「读不到记录」被对照实验证伪为**作用域不可见**——
   [291](BUG-291-cultivation-records-unreadable-in-panel.md) 面板一直如实报告它所在的 workspace，但
   UI 写死「公司盘」，空/不可达/读取中三态不可分；收窄为「点名 workspace + 失败带原因」。

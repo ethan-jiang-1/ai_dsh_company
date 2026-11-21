@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-20
 ---
 
 # BUG-290：空白页里敲 `/req check …` 没有任何反馈——不报错、不建会话、不显示结果
 
-> 严重级别：P2（次要偏重：核心操作员命令在首屏静默失效，用户会以为「按了没反应」）｜发现：2026-11-20（端到端验收第二轮）｜状态：调查中
+> 严重级别：P2（次要偏重：核心操作员命令在首屏静默失效，用户会以为「按了没反应」）｜发现：2026-11-20（端到端验收第二轮）｜状态：已修｜审查：agent — 逐条核对已修判定（spec 3/3 + 真页面两态）；材料性（client 公开文案），按批次授权执行
 >
-> **留痕**：端到端验收轮（2026-11-20）。
+> **留痕**：Note [2026-11-21-diagnosable-failure-and-scope.md](../../../notes/implemented/2026-11-21-diagnosable-failure-and-scope.md)（材料性：client 公开文案；批次 Note 覆盖）。
 
 ## 症状
 
@@ -117,3 +117,18 @@ composer/transcript 面（`vendor/dsh/packages/client/ui-conversation` + `ui-com
 + 真页面复核；**必须在确认 `blank` 在落地页可靠为 true 之后才落**——否则提示不出现，等于又造一个「看起来做了」。
 
 **未做的原因（诚实记）**：`blank` 在落地页是否可读尚未取证；先提上游提案，缓解待下一轮带着 instrument 验证后再落。
+
+## 已修判定（收窄版：修「无反馈」，不修 vendor 的静默）
+
+- 会话还没开始时（落地页），composer 旁常驻提示「斜杠命令要等会话开始后才回话」+ tooltip 说明命令是会话级；
+- 会话发出第一条消息后，同一位置提示消失（不在正常会话里挂废话）；
+- 会话行未加载（状态未知）时不渲染——宁可不出现，也不猜；
+- 判据命令：`vitest run tests/client/startup/command-scope-hint.spec.ts`（blank=true 有 / blank=false 无 / 未加载无）。
+- **明确不在本卡范围**：vendor 的「结果只落进已打开会话 transcript」——已记上游提案，见卡末与批次 Note 的未覆盖轴。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/startup/CommandScopeHint.tsx`、`packages/company-pack/src/client/index.ts`、`packages/company-pack/src/client/locales.ts`、`tests/client/startup/command-scope-hint.spec.ts`
+- 红：`vitest run tests/client/startup/command-scope-hint.spec.ts` —— 组件与槽注册未接线时该 spec 无法导入（模块不存在）；真页面同期落地页无任何提示文本
+- 绿：`vitest run tests/client/startup/command-scope-hint.spec.ts` —— 3/3 通过；真页面两态：隔离 home 落地页出现「斜杠命令要等会话开始后才回话」（「开始」按钮上方），发出首条消息后同一页面该文本 0 次
+- 提交：commit ad4481be
