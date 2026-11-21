@@ -1,5 +1,5 @@
 ---
-status: 已修
+status: 已结
 severity: P2
 opened: 2026-11-20
 ---
