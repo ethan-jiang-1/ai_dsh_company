@@ -1,5 +1,5 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-20
 ---
@@ -38,14 +38,30 @@ source run/env.sh && node checks/lanes/attention-e2e.entry.mjs
 - **签核未发生**：门A 断言 `approval/asked` 已落日志，PASS。
 - **会话未打开**：`openSessionBySearch` 已返回（打印 `session opened`）。
 
-## 待查（根因假设，未证）
+## 根因与证据（2026-11-21 定位，代码级）
 
-1. **列表只在有等待项时渲染**：`AttentionTab.tsx:140` 的 `<ul aria-label={t('attention.waitingList')}>` 在空态不渲染；若面板读的投影在此刻仍为空（跨会话聚合时序），就会没有该 list。
-2. **页签点击未命中**：`clickText` 按包含文本命中元素，可能点到了指南条外层而非页签按钮。
-3. **跨会话聚合范围**：签核发生在 CFO 会话（rehearsal workspace），若面板只聚合当前 workspace/当前 store，则看不到。
+`待办` 的「等人」条目**只来自本页在线期间观察到的请求**，历史里已挂起的审批无法重建：
 
-判据：打开该会话的待办页签后 dump `document.body.innerText` + HTML，看面板实际文案与是否存在 `ul[aria-label=待办事项]`。
+1. `client/wiring/attention-observers.ts:39` 注册 `approval/request`、`:27` 注册 `user-questions/request`，都是**活体 waterfall 拦截**——只有本页在场、由本页中介的那次请求才会 `attention.begin(...)` 进内存登记处（`attention-registry.ts:8` 的 Map，随页面生命周期存亡）。
+2. `lib/presence/attention.ts:90 streamAttention()` 从事件流重放的**只有**升级消息与 `present` 完成事件；**不重建** `approval/asked`、`user-questions/asked` 这类"仍在等人"的历史条目。
+3. `AttentionTab.tsx:136-141`：`waiting.length === 0` 时渲染 `attention.emptyWaiting`（文案 =「没有等你的事——各角色都在正常推进。」），**不渲染** `ul[aria-label=待办事项]`。
+
+于是 lane 的时序（先跑 CFO 会话产生 `approval/asked`，再开浏览器看面板）必然得到空态；用户侧等价场景 = **刷新页面 / 关掉再开 / 另一个人打开同一个盘**——已挂起的审批都会"消失"，而空态还宣称"没有等你的事"。
 
 ## 失败类与同类排查
 
-**失败类 = 面板不渲染/渲染滞后，判据等待 20s（未证）。** 同类：`presence-panel`/`tasks-panel` 探针同样按 aria 名等列表，若属面板空态不渲染，会同样红；修法应落在「面板是否有稳定的空态容器/aria」与「探针是否该等容器而非列表」二选一，而不是单卡拉长超时。
+**失败类 = 只覆盖在线期间的活体事件，历史可重建的事实没重建（空态撒谎）。**
+同类：`presence.emptyActivity` 的文案是「暂无动态（**打开期间的变化会出现在这里**）」，明说了 live-only 范围；`attention.emptyWaiting` 没有这层限定，属于同族问题的第二处（文案与数据范围不一致）。
+
+## 已修判定
+
+二选一（先定政策再动手，别两面都改）：
+
+- **A 补历史重建（推荐）**：`streamAttention` 之外再给一个「pending」重建器——扫会话事件里 `approval/asked` / `user-questions/asked` 且**没有**对应 `decided`/`answered` 的条目，并入 `mergeAttention`；空态文案保持"没有等你的事"；
+- **B 明确 live-only**：`attention.emptyWaiting` 改成与 `presence.emptyActivity` 同款的限定语（如「打开期间挂起的会出现在这里」），并在文档/页签描述里声明范围，同时把 attention-e2e 改成"先开浏览器再触发签核"。
+
+判据：lane 在**当前时序**下（先签核、后开页）也能通过（A），或 lane 改序后通过且文案不再宣称全局空（B）。
+
+## 顺带修车道（不与上面混）
+
+无论选 A 还是 B，`attention-e2e` 的浏览器应在签核**之前**打开——否则永久测不到 live 路径；这条属车道时序问题，单独改。

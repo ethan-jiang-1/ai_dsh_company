@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 3 张**：[BUG-290](BUG-290-text-command-silent-no-op-without-session.md)（调查中：空白页敲 `/req check` 无任何反馈）、[BUG-288](BUG-288-attention-panel-list-missing.md)（调查中：attention-e2e 过语言关后仍卡待办列表 20s）、[BUG-286](BUG-286-deliverables-check-v3-layout-unusable.md)（`deliverables-check` 在 v3 布局下不可用）（修复就绪）。
+**活跃 3 张**：[BUG-290](BUG-290-text-command-silent-no-op-without-session.md)（调查中：空白页敲 `/req check` 无任何反馈）、[BUG-288](BUG-288-attention-panel-list-missing.md)（修复就绪：待办只覆盖本页在线期间，刷新/后开看不到已挂起审批，空态还宣称"没有等你的事"）、[BUG-286](BUG-286-deliverables-check-v3-layout-unusable.md)（`deliverables-check` 在 v3 布局下不可用）（修复就绪）。
 
 **本轮已修并迁出**：BUG-289（human-loop 判据停留在 v3 前的 journal 路径 → 改用 `.dsh-company/kb/<role>/journal`；同命令 12/12 绿）、BUG-287（探针/车道写死英文可访问名 → 14 文件双语正则；attention-e2e 由卡搜索框推进到门A PASS）、BUG-283（dev wrapper `--home` 缺失目录无诊断）、BUG-284（wrapper 不转发信号 ⇒ 孤儿持 writer lease）、BUG-285（upgrade 守卫冻结已废止身份语义）——见 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
