@@ -23,6 +23,12 @@ describe('probe-steps：--steps 的受控动作集', () => {
     expect(() => parseProbeSteps(JSON.stringify([{ clickText: 'a', waitText: 'b' }]))).toThrow(/恰好一个动作键/)
   })
 
+  it('clickSelector 走选择器（图标按钮只有 aria-label，没有可读文本）', () => {
+    const steps = parseProbeSteps(JSON.stringify([{ clickSelector: '[aria-label="搜索会话"]' }]))
+    expect(steps[0]).toEqual({ action: 'clickSelector', value: '[aria-label="搜索会话"]' })
+    expect(() => parseProbeSteps(JSON.stringify([{ clickSelector: '  ' }]))).toThrow(/非空选择器/)
+  })
+
   it('pressKey 只接受受控键，且能进入步骤序列（Enter 提交 = 发消息/跑命令的真实入口）', () => {
     const steps = parseProbeSteps(JSON.stringify([{ typeText: ['[data-composer-input]', '/company-settings'] }, { pressKey: 'Enter' }]))
     expect(steps[1]).toEqual({ action: 'pressKey', value: 'Enter' })

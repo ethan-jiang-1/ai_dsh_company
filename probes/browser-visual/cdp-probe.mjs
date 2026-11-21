@@ -436,6 +436,15 @@ try {
       })()`) === true;
       detail = ok ? `clicked ${step.value}` : `no element containing ${step.value}`;
       if (ok) await sleep(300);
+    } else if (step.action === 'clickSelector') {
+      ok = await evaluate(`(() => {
+        const el = document.querySelector(${JSON.stringify(step.value)});
+        if (el === null) return false;
+        el.click();
+        return true;
+      })()`) === true
+      detail = ok ? `clicked ${step.value}` : `no element for ${step.value}`
+      if (ok) await sleep(300)
     } else if (step.action === 'pressKey') {
       const pressed = await handle.pressKey?.(step.value)
       await sleep(300)

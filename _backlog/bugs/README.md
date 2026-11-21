@@ -2,13 +2,13 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 291；已分配 BUG-001..290。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 292；已分配 BUG-001..291。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 3 张**：[BUG-290](BUG-290-text-command-silent-no-op-without-session.md)（调查中：空白页敲 `/req check` 无任何反馈）、[BUG-288](BUG-288-attention-panel-list-missing.md)（修复就绪：待办只覆盖本页在线期间，刷新/后开看不到已挂起审批，空态还宣称"没有等你的事"）、[BUG-286](BUG-286-deliverables-check-v3-layout-unusable.md)（`deliverables-check` 在 v3 布局下不可用）（修复就绪）。
+**活跃 4 张**：[BUG-291](BUG-291-cultivation-records-unreadable-in-panel.md)（调查中：培养页读不到记录，目录与 RPC 均正常）、[BUG-290](BUG-290-text-command-silent-no-op-without-session.md)（调查中：空白页敲 `/req check` 无任何反馈）、[BUG-288](BUG-288-attention-panel-list-missing.md)（修复就绪：待办只覆盖本页在线期间，刷新/后开看不到已挂起审批，空态还宣称"没有等你的事"）、[BUG-286](BUG-286-deliverables-check-v3-layout-unusable.md)（`deliverables-check` 在 v3 布局下不可用）（修复就绪）。
 
 **本轮已修并迁出**：BUG-289（human-loop 判据停留在 v3 前的 journal 路径 → 改用 `.dsh-company/kb/<role>/journal`；同命令 12/12 绿）、BUG-287（探针/车道写死英文可访问名 → 14 文件双语正则；attention-e2e 由卡搜索框推进到门A PASS）、BUG-283（dev wrapper `--home` 缺失目录无诊断）、BUG-284（wrapper 不转发信号 ⇒ 孤儿持 writer lease）、BUG-285（upgrade 守卫冻结已废止身份语义）——见 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
