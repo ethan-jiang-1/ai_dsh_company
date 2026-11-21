@@ -8,7 +8,7 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { CommandScopeHint } from '../../../packages/company-pack/src/client/startup/CommandScopeHint.tsx'
+import { CommandScopeHint, registerCommandScopeHint } from '../../../packages/company-pack/src/client/startup/CommandScopeHint.tsx'
 import { zh } from '../../../packages/company-pack/src/client/locales.ts'
 
 /** 假会话列表快照面：`blank` 由用例指定。 */
@@ -39,5 +39,23 @@ describe('composer 命令作用域提示（BUG-290）', () => {
 
   it('会话行还没加载（undefined）⇒ 不渲染，不猜', () => {
     expect(render(undefined)).toBe('')
+  })
+})
+
+/** 注册体：注入闭包在单测里不执行，所以注册这块必须自己有判据（否则等于没人验过）。 */
+describe('registerCommandScopeHint：挂到 composer 槽', () => {
+  it('往 conversation.input.left 注册一个 order 11 的条目，inject 带上会话 id 与 translator', () => {
+    const registered: { name?: string, id?: string, order?: number, inject?: (id: string) => unknown }[] = []
+    const injected: string[] = []
+    registerCommandScopeHint({
+      slots: {
+        inject: (name, register) => { injected.push(name); register() },
+        register: (definition) => { registered.push(definition); return () => {} },
+      },
+    }, t)
+    expect(injected).toEqual(['conversation.input.left'])
+    expect(registered[0]?.id).toBe('company-command-scope')
+    expect(registered[0]?.order).toBe(11)
+    expect((registered[0]?.inject?.('session-1') as { sessionId?: string } | undefined)?.sessionId).toBe('session-1')
   })
 })

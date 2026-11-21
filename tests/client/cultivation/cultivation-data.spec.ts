@@ -9,7 +9,9 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
 import { CULTIVATION_CHANGED_EVENT } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
-import { FULL_RECORD_LIMIT, useCultivationPanelData, type CultivationPanelData } from '../../../packages/company-pack/src/client/cultivation/cultivation-data.ts'
+import { FULL_RECORD_LIMIT, useCultivationPanelData, type CultivationPanelData ,
+  workspaceLabelOf,
+} from '../../../packages/company-pack/src/client/cultivation/cultivation-data.ts'
 
 const IS_REACT_ACT_ENVIRONMENT = true
 void IS_REACT_ACT_ENVIRONMENT
@@ -87,5 +89,22 @@ describe('records 摘要全扫 + open/最近 N 全文（2026-10-27 R1）', () =>
     expect(data?.records?.filter(record => record.bodyTruncated === true)).toHaveLength(30)
     await act(async () => { root.unmount() })
     container.remove()
+  })
+})
+
+// 作用域标签与失败原因（BUG-291 的 F2 合同）：`workspaceLabelOf` 是面板「点名哪个盘」的唯一来源，
+// `recordsProblem` 是「读不到」与「空」分家的唯一依据——两者都必须有直接判据。
+describe('workspaceLabelOf（作用域标签）', () => {
+  it('取末段；尾斜杠/Windows 分隔符都能处理', () => {
+    expect(workspaceLabelOf('<repo>/company-workspace')).toBe('company-workspace')
+    expect(workspaceLabelOf('<repo>/company-workspace/')).toBe('company-workspace')
+    expect(workspaceLabelOf('C:\\repo\\rehearsal-workspace')).toBe('rehearsal-workspace')
+  })
+
+  it('缺席/空串 ⇒ null（面板退回不点名，不编一个名字）', () => {
+    expect(workspaceLabelOf(undefined)).toBeNull()
+    expect(workspaceLabelOf(null)).toBeNull()
+    expect(workspaceLabelOf('')).toBeNull()
+    expect(workspaceLabelOf('/')).toBeNull()
   })
 })

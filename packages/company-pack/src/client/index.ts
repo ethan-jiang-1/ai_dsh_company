@@ -18,6 +18,7 @@ import { DreamTeamBrandName } from './ui/Brand.tsx'
 import { COMPANY_NS, en, zh } from './locales.ts'
 import { startInstanceGuard } from './wiring/instance-guard.ts'
 import { createAttentionRegistry } from './wiring/attention-registry.ts'
+import { asSessionPageFace } from './presence/attention-history.ts'
 import { installAttentionObservers } from './wiring/attention-observers.ts'
 import { createCultivationView } from './cultivation/CultivationView.tsx'
 import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './data/company-data-plane.ts'
@@ -33,7 +34,7 @@ import { DelegationCard } from './ui/DelegationCard.tsx'
 import { installStyles } from './ui/styles.ts'
 import { createStartupStore } from './startup/startup-store.ts'
 import { StrategyButton } from './startup/StrategyButton.tsx'
-import { CommandScopeHint } from './startup/CommandScopeHint.tsx'
+import { registerCommandScopeHint } from './startup/CommandScopeHint.tsx'
 import {
   parseStartupOptionsState,
   parseStartupSettings,
@@ -187,11 +188,9 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
 
     // 跨会话挂起项重建：只有 remote.session.page 对**未打开**的会话可读（retain 的 source 是封闭联合、
     // follow 对未打开会话零帧——见 presence/attention-history.ts 头注）。
-    const page = scoped.remote.session.page
-    const pageHistory = (request: Parameters<typeof page>[0], signal?: AbortSignal) => page(request, signal)
     registerCompanyTabs(scoped, {
       attention,
-      pageHistory,
+      pageHistory: asSessionPageFace(scoped.remote.session.page),
       leadOf,
       follow,
       floatTab,
@@ -225,18 +224,13 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
       }),
     }, StrategyButton))
 
-    // BUG-290：会话还没开始时把「命令要等会话开始」说在明处（vendor 会把结果丢进 transcript，
-    // 本仓无法在 vendor 层修；这条是政策 B 的本地缓解，见批次 Note）。
-    scoped.slots.inject('conversation.input.left', () => scoped.slots.register({
-      name: 'conversation.input.left',
-      id: 'company-command-scope',
-      order: 11,
-      inject: (sessionId: SessionId) => ({
-        sessionId,
-        list: scoped.sessions.list,
-        t: ctx.locale.bind(COMPANY_NS),
-      }),
-    }, CommandScopeHint))
+    // BUG-290：会话还没开始时把「命令要等会话开始」说在明处（注册体住组件模块，可单测）。
+    registerCommandScopeHint({
+      slots: {
+        inject: (name, register) => { scoped.slots.inject(name, () => register()) },
+        register: (definition, component) => scoped.slots.register(definition as never, component as never),
+      },
+    }, ctx.locale.bind(COMPANY_NS))
   })
 }
 

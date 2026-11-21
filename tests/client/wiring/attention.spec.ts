@@ -155,3 +155,45 @@ describe('pendingApprovals · 待办历史重建（刷新后仍能看到已挂�
     expect(merged[0]?.time).toBe(1000)
   })
 })
+
+// 分支补齐（coverage ratchet 要求「只升不降」）：重建器的边角形态——缺工具名、reason 只有空白、
+// 无关 id 的 decided、超出上限被截断。这些分支此前只在真页面/事件流里偶然走到。
+describe('pendingApprovals · 边角形态', () => {
+  const asked = (id: string, time: number, data: Record<string, unknown>) => ({ type: 'approval/asked', time, data: { id, ...data } })
+  const decided = (id: string, time: number) => ({ type: 'approval/decided', time, data: { id } })
+
+  it('缺 toolName ⇒ 占位文案，仍算挂起', () => {
+    const [item] = pendingApprovals([asked('a1', 1000, {})], 's1')
+    expect(item?.what).toContain('工具名缺失')
+  })
+
+  it('reason 只有空白 ⇒ 只显示工具名（不挂一串空格）', () => {
+    const [item] = pendingApprovals([asked('a1', 1000, { toolName: 'bash', reason: '   ' })], 's1')
+    expect(item?.what).toBe('bash')
+  })
+
+  it('decided 指向别的 id ⇒ 原挂起项不动', () => {
+    expect(pendingApprovals([asked('a1', 1000, { toolName: 'bash' }), decided('other', 2000)], 's1')).toHaveLength(1)
+  })
+
+  it('非审批事件 / 缺 id 的事件被忽略', () => {
+    const events = [
+      { type: 'user/message', time: 1, data: { text: 'x' } },
+      { type: 'approval/asked', time: 2, data: {} },
+      { type: 'approval/asked', time: 3, data: null },
+    ]
+    expect(pendingApprovals(events as never, 's1')).toHaveLength(0)
+  })
+
+  it('超过 STREAM_ITEM_CAP ⇒ 截断到上限', () => {
+    const many = Array.from({ length: STREAM_ITEM_CAP + 3 }, (_, i) => asked(`a${String(i)}`, 1000 + i, { toolName: 'bash' }))
+    expect(pendingApprovals(many, 's1')).toHaveLength(STREAM_ITEM_CAP)
+  })
+})
+
+describe('attentionTone（类别 → 色调）', () => {
+  it('四类各给一种色调（面板 Tag 外观的唯一来源）', () => {
+    expect([attentionTone('question'), attentionTone('approval'), attentionTone('escalation'), attentionTone('completion')])
+      .toEqual(['warning', 'danger', 'info', 'outline'])
+  })
+})

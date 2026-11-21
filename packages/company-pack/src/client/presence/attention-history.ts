@@ -25,6 +25,16 @@ export type SessionPageFace = (
   | { readonly ok: false, readonly error?: { readonly message?: string } | undefined }
 >
 
+/**
+ * 把 `remote.session.page` 包成本模块的 page 面（唯一用途：让注册处不必为透传多写一行闭包，
+ * 那行在 `client/index.ts` 里是永远测不到的胶水）。
+ * @param page - 生成的 remote 方法。
+ * @returns 同签名的 page 面。
+ */
+export function asSessionPageFace(page: SessionPageFace): SessionPageFace {
+  return (request, signal) => page(request, signal)
+}
+
 /** 从错误文案里读游标（vendor 原话：`session page through seq N is past cursor M`）。 */
 function cursorFromError(message: string | undefined): number | undefined {
   const match = /past cursor (\d+)/.exec(message ?? '')

@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest'
 import { CultivationBoard } from '../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx'
 import type { CultivationRecord, CultivationRow } from '../../../packages/company-pack/src/lib/cultivation/cultivation.ts'
 import type { CultivationContext } from '../../../packages/company-pack/src/lib/cultivation/cultivation-context.ts'
+import { setCultivationLanguage } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
 
 /** 最小行/记录 fixture（形状见 lib/cultivation.ts）。 */
 const journalRow = (over: Partial<CultivationRow> = {}): CultivationRow => ({
@@ -261,5 +262,26 @@ describe('CultivationBoard：作用域与可诊断失败（BUG-291）', () => {
     const markup = render({ records: null })
     expect(markup).toContain('读取中')
     expect(markup).not.toContain('读不到')
+  })
+})
+
+// en 面同判（coverage ratchet 只升不降 + 产品要求 zh/en 同批）：作用域与失败原因在 en 下也要说出来。
+describe('CultivationBoard：作用域与失败原因的 en 面（BUG-291）', () => {
+  it('en 下标题点名 workspace、空态点名 workspace、不可达点名目录与原因', () => {
+    setCultivationLanguage('en')
+    try {
+      const empty = render({ records: [], workspaceLabel: 'company-workspace' })
+      expect(empty).toContain('company-workspace')
+      expect(empty).toContain('No cultivation records')
+      const broken = render({ records: null, recordsProblem: { path: '.dsh-company/cultivation/records', reason: 'boom' }, workspaceLabel: 'company-workspace' })
+      expect(broken).toContain('.dsh-company/cultivation/records')
+      expect(broken).toContain('boom')
+      // 无 workspaceLabel 时的 en 兜底（不点名，也不留空括号）
+      const noLabel = render({ records: [] })
+      expect(noLabel).toContain('No cultivation records in this workspace.')
+      expect(noLabel).toContain('the company disk')
+    } finally {
+      setCultivationLanguage('zh')
+    }
   })
 })

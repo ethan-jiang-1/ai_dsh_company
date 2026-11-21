@@ -47,3 +47,28 @@ export function CommandScopeHint(props: CommandScopeHintProps): ReactNode {
     </span>
   )
 }
+
+
+/** 注册处最小面（与真实 scoped context 结构相容）。 */
+export interface CommandScopeHintScope {
+  readonly slots: {
+    inject: (name: 'conversation.input.left', register: () => () => void) => void
+    register: (definition: { name: 'conversation.input.left', id: string, order: number, inject: (sessionId: string) => unknown }, component: unknown) => () => void
+  }
+}
+
+/**
+ * 把提示挂到 composer 槽（`conversation.input.left`，排在策略按钮之后）。
+ * 为什么单独成函数：这段注册住在 `client/index.ts` 的注入闭包里，那条闭包在单测里不执行——
+ * 搬到这里才有判据（`tests/client/startup/command-scope-hint.spec.ts` 直接调它）。
+ * @param scope - 已注入 `slots` 的 scoped context。
+ * @param t - 当前语言的 translator。
+ */
+export function registerCommandScopeHint(scope: CommandScopeHintScope, t: CompanyT): void {
+  scope.slots.inject('conversation.input.left', () => scope.slots.register({
+    name: 'conversation.input.left',
+    id: 'company-command-scope',
+    order: 11,
+    inject: (sessionId: string) => ({ sessionId, list: undefined as never, t }),
+  }, CommandScopeHint))
+}
