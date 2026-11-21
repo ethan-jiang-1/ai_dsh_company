@@ -67,7 +67,11 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
             ? CULTIVATION_COPY.inboxLoading
             : CULTIVATION_COPY.inboxUnread(recordsProblem.path, recordsProblem.reason)}</div>
           : inbox.needsDecision.length === 0
-            ? <div className="wk-meta">{CULTIVATION_COPY.inboxEmpty(workspaceLabel)}</div>
+            ? <div className="wk-meta">{(records?.length ?? 0) === 0
+              // 记录目录真的空：点名工作区（BUG-291）。
+              ? CULTIVATION_COPY.inboxEmpty(workspaceLabel)
+              // 有记录、但都已处理：不否认工作区里有记录（BUG-294）。
+              : CULTIVATION_COPY.inboxNoPending(records?.length ?? 0)}</div>
             : (
               <>
               <div role="list" aria-label={CULTIVATION_COPY.inboxListAria} className="wk-list wk-cultivation-list">

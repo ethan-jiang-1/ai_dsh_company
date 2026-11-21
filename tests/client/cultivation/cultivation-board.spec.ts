@@ -285,3 +285,22 @@ describe('CultivationBoard：作用域与失败原因的 en 面（BUG-291）', (
     }
   })
 })
+
+// 四态矩阵（BUG-294）：空态必须在「加载 / 不可达 / 目录空 / 有记录无待办」四格里各自说对话。
+// 这条钉的是第四格——盘上有一条已采纳记录、没有任何待办时，不能说「这个工作区还没有培养记录」。
+describe('CultivationBoard：四态矩阵的第四格', () => {
+  it('有记录但零待办 ⇒ 说「没有需要你处理的记录」，不否认工作区里有记录', () => {
+    const markup = render({
+      records: [record({ status: 'adopted', methodSlug: 'm-1' })],
+      workspaceLabel: 'company-workspace',
+    })
+    expect(markup).toContain('没有需要你处理的记录')
+    expect(markup).not.toContain('还没有培养记录')
+  })
+
+  it('记录目录真的空 ⇒ 仍是 BUG-291 的工作区点名空态（两态不混）', () => {
+    const markup = render({ records: [], workspaceLabel: 'company-workspace' })
+    expect(markup).toContain('还没有培养记录')
+    expect(markup).not.toContain('没有需要你处理的记录')
+  })
+})

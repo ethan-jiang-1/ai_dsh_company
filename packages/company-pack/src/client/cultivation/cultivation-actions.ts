@@ -130,6 +130,8 @@ const CULTIVATION_COPY_ZH = {
   inboxLoading: '培养记录读取中…',
   inboxUnread: (path: string, reason: string): string => `培养记录读不到：${path}——${reason}（不算 0 条）。`,
   inboxEmpty: (workspace: string | null): string => `这个工作区${workspace === null ? '' : `（${workspace}）`}下还没有培养记录。`,
+  // 盘上有记录、但没有待你决定的（都处理过了）：不能说「工作区还没有记录」——那是另一态（BUG-294）。
+  inboxNoPending: (total: number): string => `没有需要你处理的记录（共 ${String(total)} 条，已处理的在下面）。`,
   inboxListAria: '待我处理的培养记录',
   inboxRowAria: (id: string): string => `待处理 ${id}`,
   inboxSuggestion: (role: string): string => `${role}的建议`,
@@ -369,6 +371,7 @@ const CULTIVATION_COPY_EN = {
   inboxLoading: 'Reading cultivation records…',
   inboxUnread: (path: string, reason: string): string => `Cultivation records unreadable: ${path} — ${reason} (not zero).`,
   inboxEmpty: (workspace: string | null): string => `No cultivation records in this workspace${workspace === null ? '' : ` (${workspace})`}.`,
+  inboxNoPending: (total: number): string => `Nothing needs your decision (${String(total)} record${total === 1 ? '' : 's'} total; handled ones are below).`,
   inboxListAria: 'Cultivation records awaiting me',
   inboxRowAria: (id: string): string => `Awaiting ${id}`,
   inboxSuggestion: (role: string): string => `Suggestion from ${role}`,

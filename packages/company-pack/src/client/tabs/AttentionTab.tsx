@@ -185,7 +185,7 @@ export function AttentionTab(props: AttentionTabProps) {
               {waiting.map(item => (
                 <li key={itemKey(item)}>
                   <Tag tone={attentionTone(item.kind)}>{t(ATTENTION_KEYS[item.kind])}</Tag>
-                  {' '}{whoOf(item)}：{item.what}
+                  {' '}<span title={item.detail ?? item.what}>{whoOf(item)}：{item.what}</span>
                   <span className="wk-meta"> · {formatWhen(item.time, t)}</span>{' '}
                   <Button
                     size="sm"

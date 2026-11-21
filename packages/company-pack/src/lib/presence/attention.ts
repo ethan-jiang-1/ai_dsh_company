@@ -22,8 +22,10 @@ export interface AttentionItem {
   readonly kind: AttentionKind
   /** 发起方（升级 = senderName；完成 = lead 名；问询/审批 = 占位，面板按 displayTitle 解析）。 */
   readonly who: string
-  /** 一句话摘要。 */
+  /** 一句话摘要（列表行用：已按 {@link ATTENTION_SUMMARY_MAX} 折叠，不随外部文本膨胀）。 */
   readonly what: string
+  /** 完整详情（审批理由/问询全文）；列表不渲染它，只给 hover/详情面（BUG-295）。 */
+  readonly detail?: string
   /** 何时发生（epoch ms）。 */
   readonly time: number
   /** 一键跳转目标会话 id。 */
@@ -35,7 +37,24 @@ export interface LivePending {
   readonly kind: 'question' | 'approval'
   readonly sessionId: string
   readonly what: string
+  /** 完整详情（与 `what` 同源、未折叠）；列表不渲染它。 */
+  readonly detail?: string
   readonly since: number
+}
+
+/** 列表摘要的字符上限（模型写的审批理由可达数 KB；列表行必须可扫）。 */
+export const ATTENTION_SUMMARY_MAX = 160
+
+/**
+ * 把外部文本折叠成列表可扫的一行摘要：换行/连续空白压成单空格，超长截断加省略号。
+ * 活体登记与历史重建**必须**共用它——两处拼接不同源会让 `mergeAttention` 的去重键对不上而重复。
+ * @param text - 外部文本（模型生成的理由/问询/消息）。
+ * @param max - 字符上限。
+ * @returns 单行摘要。
+ */
+export function attentionSummary(text: string, max = ATTENTION_SUMMARY_MAX): string {
+  const flat = String(text).replace(/\s+/g, ' ').trim()
+  return flat.length <= max ? flat : `${flat.slice(0, max - 1)}…`
 }
 
 /** follow 流可折事件的最小形状（team/* 由 presence.ts 同款兜底臂覆盖）。 */
@@ -101,7 +120,7 @@ export function streamAttention(
         escalations.push({
           kind: 'escalation',
           who: event.data.message.senderName,
-          what: text.slice(ESCALATION_MARK.length).trim() || '（空）',
+          what: attentionSummary(text.slice(ESCALATION_MARK.length).trim() || '（空）'),
           time: event.time,
           jumpTo: leadSessionId,
         })
@@ -110,7 +129,7 @@ export function streamAttention(
       completions.push({
         kind: 'completion',
         who: leadName,
-        what: `交付完成：${presentLabel(event.data.arguments)}`,
+        what: attentionSummary(`交付完成：${presentLabel(event.data.arguments)}`),
         time: event.time,
         jumpTo: leadSessionId,
       })
@@ -139,10 +158,12 @@ export function pendingApprovals(events: readonly AttentionEventLike[], sessionI
     if (event.type === 'approval/asked') {
       const toolName = typeof data.toolName === 'string' && data.toolName !== '' ? data.toolName : '（工具名缺失）'
       const reason = typeof data.reason === 'string' ? data.reason.trim() : ''
+      const full = reason === '' ? toolName : `${toolName}：${reason}`
       asked.set(data.id, {
         kind: 'approval',
         who: sessionId,
-        what: reason === '' ? toolName : `${toolName}：${reason}`,
+        what: attentionSummary(full),
+        ...(reason === '' ? {} : { detail: full }),
         time: event.time,
         jumpTo: sessionId,
       })

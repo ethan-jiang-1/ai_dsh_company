@@ -12,6 +12,7 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import type { AttentionRegistry } from './attention-registry.ts'
+import { attentionSummary } from '../../lib/presence/attention.ts'
 
 /** 远端事件面（只用到 $on；handler 的 this = 事件归属 owner）。 */
 export interface AttentionRemote {
@@ -40,7 +41,8 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
     const done = attention.begin({
       kind: 'question',
       sessionId,
-      what: text === '' ? '（问询内容缺失）' : text,
+      what: attentionSummary(text === '' ? '（问询内容缺失）' : text),
+      ...(text === '' ? {} : { detail: text }),
       since: Date.now(),
     })
     return (async () => { try { return await next() } finally { done() } })()
@@ -54,7 +56,8 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
     const done = attention.begin({
       kind: 'approval',
       sessionId,
-      what: reason === '' ? toolName : `${toolName}：${reason}`,
+      what: attentionSummary(reason === '' ? toolName : `${toolName}：${reason}`),
+      ...(reason === '' ? {} : { detail: `${toolName}：${reason}` }),
       since: Date.now(),
     })
     return (async () => { try { return await next() } finally { done() } })()

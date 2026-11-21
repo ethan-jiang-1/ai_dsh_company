@@ -4,6 +4,8 @@ import {
   ESCALATION_MARK,
   PRESENT_TOOL_NAME,
   STREAM_ITEM_CAP,
+  ATTENTION_SUMMARY_MAX,
+  attentionSummary,
   attentionTone,
   mergeAttention,
   pendingApprovals,
@@ -195,5 +197,39 @@ describe('attentionTone（类别 → 色调）', () => {
   it('四类各给一种色调（面板 Tag 外观的唯一来源）', () => {
     expect([attentionTone('question'), attentionTone('approval'), attentionTone('escalation'), attentionTone('completion')])
       .toEqual(['warning', 'danger', 'info', 'outline'])
+  })
+})
+
+// 摘要边界（BUG-295）：外部文本（模型写的审批理由）长度无上界，列表行必须折叠；
+// 活体登记与历史重建必须用**同一个**折叠函数，否则 mergeAttention 的去重键对不上、同一条会重复。
+describe('attentionSummary · 摘要边界', () => {
+  const long = `折扣线双签：${'理由'.repeat(500)}`
+
+  it('短文本原样；长文本被折叠到上限并带省略号', () => {
+    expect(attentionSummary('双签')).toBe('双签')
+    const summary = attentionSummary(long)
+    expect(summary.length).toBeLessThanOrEqual(ATTENTION_SUMMARY_MAX)
+    expect(summary.endsWith('…')).toBe(true)
+  })
+
+  it('换行与连续空白压成单空格（列表行不会被多段撑开）', () => {
+    expect(attentionSummary('第一段\n\n第二段\t第三段')).toBe('第一段 第二段 第三段')
+  })
+
+  it('活体与历史同源折叠 ⇒ 同一条审批去重后只剩一行', () => {
+    const live = [{ kind: 'approval' as const, sessionId: 's-b', what: attentionSummary(`request_signoff：${long}`), since: 1000 }]
+    const items = mergeAttention(live, pendingApprovals([
+      { type: 'approval/asked', time: 1000, data: { id: 'a1', toolName: 'request_signoff', reason: long } },
+    ], 's-b'))
+    expect(items).toHaveLength(1)
+    expect(items[0]?.what.length).toBeLessThanOrEqual(ATTENTION_SUMMARY_MAX)
+  })
+
+  it('完整详情仍可达：重建条目带 detail（未折叠）', () => {
+    const [item] = pendingApprovals([
+      { type: 'approval/asked', time: 1000, data: { id: 'a1', toolName: 'request_signoff', reason: long } },
+    ], 's-b')
+    expect(item?.detail).toContain(long.slice(0, 40))
+    expect(item?.detail?.length).toBeGreaterThan(ATTENTION_SUMMARY_MAX)
   })
 })
