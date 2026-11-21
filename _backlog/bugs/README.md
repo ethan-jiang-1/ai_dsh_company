@@ -20,7 +20,7 @@
 
 **本轮批次**：下方「## 2026-11-22 修复交接（E2E 设计轮遗留：BUG-293/294/295/296）
 
-**用户指令（2026-11-21/22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……是个漫长的计划，所以先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：293/294/295 改 client 公开行为与文案、296 改真页面车道判据；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-22））。
+**用户指令（2026-11-21/22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……是个漫长的计划，所以先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：293/294/295 改 client 公开行为与文案、296 改真页面车道判据；留痕 = 批次 Note [2026-11-22-e2e-round-byte-freshness-state-matrix-summary](../../notes/implemented/2026-11-22-e2e-round-byte-freshness-state-matrix-summary.md)）。
 
 **起点事实（已核，勿再猜）**：293 = `28b19a52` 把 `CommandScopeHint` 注册体的 `list` 写成 `undefined as never`（`CommandScopeHint.tsx:72`）——单测 4/4 绿、真页面每次加载 `slot entry crashed`；296 = 真页面车道只查 `lib/client.js` 存在、不查新鲜，昨日那两条「真绿」跑在 22:05 的旧产物上（重建后 `ui-scene --isolated` EXIT=1）；294 = BUG-291 的三态漏了「有记录但无待办」；295 = 待办把整段 `reason` 当摘要（既有面，被跨会话聚合放大）。
 
@@ -36,7 +36,9 @@
 
 **终点** = 4 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：` 与四行证据齐；`typecheck`/`test`/`verify`/`lint`/`dup` + `coverage:ratchet` 绿；`client-load` 与 `ui-scene --isolated` 真绿且产物新鲜；一篇批次 Note 记 A/B/C 三族与元层教训（「绿的证据形状」）。
 
-**本节是立项与交接，不是落地**：只记批次计划与次序。
+**收口（2026-11-22）**：4 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)，每卡 `审查：` + 四行证据齐。
+证据提交 = `4308138d`（296）/ `e3588ecc`（293）/ `81b7f82a`（294+295）。三族机制与输掉的方案 = 上面的批次 Note。
+`test` 2456 · `verify` ALL PASS · `coverage-ratchet` PASS（208 文件）· `ui-scene --isolated --expected` 金样一致。
 
 ## 2026-11-21 修复交接（e2e 验收遗留：BUG-286/288/290/291）」= 组 A–D、顺序 286 → 一次实起三诊断 → 291 → 290 → 288。
 
