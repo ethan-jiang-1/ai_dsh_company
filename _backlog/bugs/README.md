@@ -10,6 +10,8 @@
 
 **活跃 4 张**：[BUG-291](BUG-291-cultivation-records-unreadable-in-panel.md)（调查中：培养页读不到记录，目录与 RPC 均正常）、[BUG-290](BUG-290-text-command-silent-no-op-without-session.md)（调查中：空白页敲 `/req check` 无任何反馈）、[BUG-288](BUG-288-attention-panel-list-missing.md)（修复就绪：待办只覆盖本页在线期间，刷新/后开看不到已挂起审批，空态还宣称"没有等你的事"）、[BUG-286](BUG-286-deliverables-check-v3-layout-unusable.md)（`deliverables-check` 在 v3 布局下不可用）（修复就绪）。
 
+**本轮批次**：下方「## 2026-11-21 修复交接（e2e 验收遗留：BUG-286/288/290/291）」= 组 A–D、顺序 286 → 一次实起三诊断 → 291 → 290 → 288。
+
 **本轮已修并迁出**：BUG-289（human-loop 判据停留在 v3 前的 journal 路径 → 改用 `.dsh-company/kb/<role>/journal`；同命令 12/12 绿）、BUG-287（探针/车道写死英文可访问名 → 14 文件双语正则；attention-e2e 由卡搜索框推进到门A PASS）、BUG-283（dev wrapper `--home` 缺失目录无诊断）、BUG-284（wrapper 不转发信号 ⇒ 孤儿持 writer lease）、BUG-285（upgrade 守卫冻结已废止身份语义）——见 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 **上一轮收口**：C17 20 张（BUG-263..282）已于 2026-11-19 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，见下方「## 2026-11-19 修复交接（根因组 A–G：BUG-263..282）」的收口行。C16 20 张（BUG-243..262）已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；BUG-212 挂起在 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)。
@@ -27,6 +29,28 @@
 **更早收口**（2026-11-14 focus v3）：8 张已全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接（根因组 A–D：BUG-160..167）」）。
 
 **最早收口**（2026-11-13 focus v2）：8 张已于 2026-11-14 全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)（见下方「## 2026-11-14 修复交接」）。
+
+## 2026-11-21 修复交接（e2e 验收遗留：BUG-286/288/290/291）
+
+**用户指令（2026-11-21）**：「好好盘算盘算 `_backlog/bugs`，第一是修的次序，二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看，如何修复……是个漫长的计划，所以先出一个计划，回头要靠 setup goal 来修。」三个选择已定：BUG-288 = A（补历史重建）、BUG-290 = B（无会话时明确提示 + 可操作新建入口）、范围 = 4 张 + 两族合同。本句即本轮授权（材料性：288/290/291 会改 client 公开文案与空态语义；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-21））。
+
+四张不是四个补丁，是**三族的见证**：F2 静默失败（290/291）、F3 根/路径各自派生（286）、F4 只覆盖在线期的活体状态（288）。判据面近 70 张（C13–C17）未改一行产品代码，而 9 轮真产品验收立刻出 9 个缺陷——本批是产能转回产品面的第一单：先修族、再修卡。
+
+| 组 | 卡 | 共同根因（证据） | 修法（唯一事实源） | 顺序 |
+|---|---|---|---|---|
+| **A 判据输入根** | [286](BUG-286-deliverables-check-v3-layout-unusable.md) | v3 布局后「文件根」与「会话根」不再重合，脚本仍当同一个：judge 以 `deliverables/` 前缀过滤，入口又按外层 workspace 派生 `sessions/` 目录名 | 文件根自动识别 `<ws>/.dsh-company`（存在 deliverables 时），会话根仍用外层 `<ws>`；比对前归一 `.dsh-company/` 前缀；空盘/错根仍 fail-loud（exit 2） | 1 |
+| **B 读面静默** | [291](BUG-291-cultivation-records-unreadable-in-panel.md) | `list` 成功但返回空——既可能是真空目录，也可能是读到了**另一个 workspace**（`runtime/rehearsal-workspace/.dsh-company/cultivation/records` 存在但 0 文件、同盘 31 篇 journal；`company-workspace` 2 条）。**后者待一次实起取证，未证不写成事实** | 打印原始 `entries` + `result.value.path` + 实际 scope 定性；修法 = 空/不可达必须点名「哪个 workspace + 什么原因」 | 3 |
+| **C 命令无反馈** | [290](BUG-290-text-command-silent-no-op-without-session.md) | 无会话时命令结果无处可落；「client 丢结果」与「host 未挂会话」两假设未分 | B 政策：client 在无会话时给「命令需要会话」提示 + 新建入口，保留「命令是会话级」不变量 | 4 |
+| **D 投影不完整** | [288](BUG-288-attention-panel-list-missing.md) | 待办只来自本页在线期的活体 waterfall 拦截 + 内存登记处；`streamAttention` 只重放升级/present，不重建 `approval/asked`。半修后 lane 仍红 ⇒ 根因还差一层（帧内容 vs 页签 sessionId 绑定） | A 政策：补 pending 重建器并入 `mergeAttention`；空态文案保持「没有等你的事」为真 | 5 |
+
+**次序 = A(286) → 一次实起三诊断(B/C/D) → B(291) → C(290) → D(288)**：
+286 先修——它不需要实例，且是 `demo-scenes` 收场验收第 8 步（现 exit 2），不修它后面任何真验收都收不了场；顺带产出「临时 workspace + `.dsh-company/deliverables`」夹具供 291 复用。291/288/290 都要真实例 + CDP + **同一次** client bundle 重建，诊断合并到一次 bring-up，三份证据互为对照实验。修的顺序 = 291（先落「可诊断失败」约定）→ 290（复用同一约定）→ 288（唯一要真模型 + 真浏览器验收，放最后但必须真绿）。
+
+**证据口径**：先落代码提交拿 sha → 再翻 `修复已落地` / 写 `## 修复证据` / `git mv` 归档；每卡红/绿写同一条可执行命令（286 = `vitest run tests/tools/deliverables-audit.spec.ts`；291 = `tests/client/cultivation/` 下的读面 spec；290 = 客户端无会话提交的 spec；288 另以 `node checks/lanes/attention-e2e.entry.mjs` 真绿为准，**不放宽断言**）。守卫标题带 `BUG-nnn` 须等卡已归档再补 `// 负例留证` 行。日志落 `runtime/tmp/bug-286-291/`（gitignored，不入库）。
+
+**终点** = 4 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：` + 四行证据齐；`pnpm verify`/`test`/`typecheck`/`lint`/`dup` 绿；`deliverables-check` 真盘 assessed；一条隔离实例上「培养页说得清 records 归属 / 空白页命令有明确反馈 / 待办页刷新后仍显示已挂起审批」。两族合同（F2 可诊断失败、F4 投影完整）各落 spec + 批次 Note。
+
+**本节是立项与交接，不是落地**：只记批次计划，未改任何系统面。
 
 ## 2026-11-17 修复交接（根因组 A–C：BUG-202..211）
 
