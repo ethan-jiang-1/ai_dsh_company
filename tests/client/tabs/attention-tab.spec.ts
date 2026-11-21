@@ -58,7 +58,8 @@ describe('待办页签：挂起项、空态与断流（R3-10）', () => {
 
   // 作用域诚实（BUG-292）：面板的活体面是整页的，历史重建只覆盖**本会话**——
   // 空态必须说清这条边界，否则「没有等你的事」会被读成「公司里没人等你」（跨会话时是假的）。
-  it('空态说清作用域：本会话的挂起项都在这里，别的会话要打开才看得到', async () => {
+  // 负例留证 2026-11-21：撤掉 locales 的 attention.emptyWaiting 改动后 `vitest run tests/client/tabs/attention-tab.spec.ts` 1 failed / 5 passed；接回后 6/6 绿。BUG-292
+  it('空态说清作用域（BUG-292）：本会话的挂起项都在这里，别的会话要打开才看得到', async () => {
     const host = await mount(createElement(AttentionTab, props()))
     expect(host.textContent).toContain('本会话的挂起项都在这里')
     expect(host.textContent).toContain('别的会话里等着的审批')

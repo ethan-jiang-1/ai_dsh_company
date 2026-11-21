@@ -8,13 +8,13 @@
 
 ## 活跃清单
 
-**活跃 1 张**：[BUG-292](BUG-292-cross-session-pending-approvals-not-aggregated.md)（调查中：待办只重建**本会话**的挂起项——别人会话里等着的审批看不到；修法有 A 宿主查询 / B 客户端按需读 / C 文案诚实三选，需拍板）。
+**活跃 0 张**。
 
 **已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
 **本轮批次**：下方「## 2026-11-21 修复交接（e2e 验收遗留：BUG-286/288/290/291）」= 组 A–D、顺序 286 → 一次实起三诊断 → 291 → 290 → 288。
 
-**本轮已修并迁出**：BUG-288 → 已结（反证，见上）、BUG-290（会话未开始时 composer 旁给「命令要等会话开始」提示 + tooltip，会话开始即消失；vendor 的静默丢弃记上游提案）、BUG-291（培养页点名 workspace + 空/不可达/读取中三态；两盘对照 + `vitest run tests/client/cultivation/cultivation-board.spec.ts` 4/24 红 → 24/24 绿）、BUG-286（`deliverables-check` 认两个根 + present 前缀归一 → 真盘 assessed:true；`vitest run tests/tools/deliverables-audit.spec.ts` 4/45 红 → 45/45 绿）、BUG-289（human-loop 判据停留在 v3 前的 journal 路径 → 改用 `.dsh-company/kb/<role>/journal`；同命令 12/12 绿）、BUG-287（探针/车道写死英文可访问名 → 14 文件双语正则；attention-e2e 由卡搜索框推进到门A PASS）、BUG-283（dev wrapper `--home` 缺失目录无诊断）、BUG-284（wrapper 不转发信号 ⇒ 孤儿持 writer lease）、BUG-285（upgrade 守卫冻结已废止身份语义）——见 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**本轮已修并迁出**：BUG-292（待办空态声明作用域：本会话的挂起项都在这里；跨会话聚合需宿主查询面，记在卡与 Note 里）、BUG-288 → 已结（反证，见上）、BUG-290（会话未开始时 composer 旁给「命令要等会话开始」提示 + tooltip，会话开始即消失；vendor 的静默丢弃记上游提案）、BUG-291（培养页点名 workspace + 空/不可达/读取中三态；两盘对照 + `vitest run tests/client/cultivation/cultivation-board.spec.ts` 4/24 红 → 24/24 绿）、BUG-286（`deliverables-check` 认两个根 + present 前缀归一 → 真盘 assessed:true；`vitest run tests/tools/deliverables-audit.spec.ts` 4/45 红 → 45/45 绿）、BUG-289（human-loop 判据停留在 v3 前的 journal 路径 → 改用 `.dsh-company/kb/<role>/journal`；同命令 12/12 绿）、BUG-287（探针/车道写死英文可访问名 → 14 文件双语正则；attention-e2e 由卡搜索框推进到门A PASS）、BUG-283（dev wrapper `--home` 缺失目录无诊断）、BUG-284（wrapper 不转发信号 ⇒ 孤儿持 writer lease）、BUG-285（upgrade 守卫冻结已废止身份语义）——见 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 **上一轮收口**：C17 20 张（BUG-263..282）已于 2026-11-19 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，见下方「## 2026-11-19 修复交接（根因组 A–G：BUG-263..282）」的收口行。C16 20 张（BUG-243..262）已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；BUG-212 挂起在 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)。
 

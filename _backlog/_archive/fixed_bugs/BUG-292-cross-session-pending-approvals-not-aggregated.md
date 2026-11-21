@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-21
 ---
 
 # BUG-292：待办只重建「本会话」的挂起项——别人会话里等着的审批，在自己的会话里看不到
 
-> 严重级别：P2（次要偏重：多人形态下「等你处理」会漏掉本该你批的事）｜发现：2026-11-21（BUG-288 反证时分离出来的残留）｜状态：调查中
+> 严重级别：P2（次要偏重：多人形态下「等你处理」会漏掉本该你批的事）｜发现：2026-11-21（BUG-288 反证时分离出来的残留）｜状态：已修｜审查：agent — 逐条核对已修判定（spec 6/6 + 真页面空态原文）
 >
-> **留痕**：端到端验收轮（2026-11-21）。
+> **留痕**：Note [2026-11-21-diagnosable-failure-and-scope.md](../../../notes/implemented/2026-11-21-diagnosable-failure-and-scope.md)（材料性：client 公开文案，已在该 Note 的 F4 节记录）。
 
 ## 症状
 
@@ -37,7 +37,7 @@ source run/env.sh && DSH_PERMISSION_MODE=workspace-write node tools/dev/company.
 - 「读别人会话的历史」没有现成通路：两轮实跑证实 **`session/follow` 对未打开的会话零 history 帧**
   （20 个候选会话、诊断行一条没打）；vendor 的 `ui-approval` 只有活体 waterfall + per-session
   `PendingApproval`，**没有全局待批查询面**。
-- 裁决证据与 `approval/asked` 原始事件抄在 [BUG-288](../_archive/settled_issues/BUG-288-attention-panel-list-missing.md) 的「撤回」节。
+- 裁决证据与 `approval/asked` 原始事件抄在 [BUG-288](../settled_issues/BUG-288-attention-panel-list-missing.md) 的「撤回」节。
 
 ## 失败类与同类排查
 
@@ -55,3 +55,26 @@ source run/env.sh && DSH_PERMISSION_MODE=workspace-write node tools/dev/company.
 - **C 只在文案上诚实**：把「等你处理」改成「本会话等你处理」——最便宜，但多人形态的产品承诺缩水。
 
 **不在本卡范围**：BUG-288 的同会话历史重建（已验证可用，保留）。
+
+## 修法选型（2026-11-21，含被结构挡死的那条）
+
+- **B 客户端按需读**：**结构上不可行**。`sessions.retain()` 的 `source` 是 vendor 的封闭联合
+  （`SessionReferenceSource = controllerOperation | gateway | …`），本包不能自造 source；
+  而 `session/follow` 对**未打开**的会话零 history 帧（两轮实跑）。⇒ 客户端没有「打开别人的会话」的正路。
+- **A 宿主聚合查询**：本包目前**一个 `@Remote` 都没有**（`src/host/` 全是 commands/tools），新增查询面
+  等于给插件引入一套远程 API（材料性、需立项），不在本轮量级。
+- **C 文案诚实**（本轮采用）：面板按会话呈现是既成事实，就把这条边界写在空态里——
+  不再让「没有等你的事」被读成「公司里没人等你」。
+
+## 已修判定
+
+- 待办空态必须声明作用域：**本会话**的挂起项都在这里；别的会话里等着的审批要打开那个会话才看得到。
+- 判据命令：`vitest run tests/client/tabs/attention-tab.spec.ts`（新增一条钉这两句话）+ 真页面点「待办」看到原文。
+- 不在本卡范围：跨会话聚合本身（A 路线，需立项）。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/locales.ts`、`tests/client/tabs/attention-tab.spec.ts`
+- 红：`vitest run tests/client/tabs/attention-tab.spec.ts` —— 撤掉 locales 的文案改动后 1 failed / 5 passed（空态不含作用域句）
+- 绿：`vitest run tests/client/tabs/attention-tab.spec.ts` —— 6/6 通过；真页面（隔离 home 落地页点「待办」）实际渲染「没有等你的事——本会话的挂起项都在这里；别的会话里等着的审批，要打开那个会话才看得到。」
+- 提交：commit 8edca3ab

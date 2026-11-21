@@ -1,4 +1,4 @@
-状态：implemented（2026-11-21）｜上游 = [BUG-291](../../_backlog/_archive/fixed_bugs/BUG-291-cultivation-records-unreadable-in-panel.md)、[BUG-288](../../_backlog/_archive/settled_issues/BUG-288-attention-panel-list-missing.md)、[BUG-290](../../_backlog/_archive/fixed_bugs/BUG-290-text-command-silent-no-op-without-session.md)
+状态：implemented（2026-11-21）｜上游 = [BUG-291](../../_backlog/_archive/fixed_bugs/BUG-291-cultivation-records-unreadable-in-panel.md)、[BUG-292](../../_backlog/_archive/fixed_bugs/BUG-292-cross-session-pending-approvals-not-aggregated.md)、[BUG-288](../../_backlog/_archive/settled_issues/BUG-288-attention-panel-list-missing.md)、[BUG-290](../../_backlog/_archive/fixed_bugs/BUG-290-text-command-silent-no-op-without-session.md)
 
 # 可诊断失败：读面必须说得出「哪个盘、为什么」
 
@@ -14,6 +14,13 @@
    空 ≠ 不可达 ≠ 未完成，三种状态各自可判。
 
 判据属「产品合同」级（公开听感面），但授权来自本轮批次（用户 2026-11-21 点名 4 张卡 + 两族合同）。
+
+## F4 的那一半：面板按会话呈现，就把作用域说在明处
+
+「等你处理」是**会话内**的投影：活体登记覆盖整页在场期，历史重建只读当前会话。跨会话聚合在本仓
+**没有正路**——`sessions.retain()` 的 source 是 vendor 的封闭联合（本包不能自造），`session/follow`
+对未打开会话零 history 帧，而新增宿主查询面等于给插件引入远程 API（需立项）。所以本轮的处置是
+**把边界写进空态**：「本会话的挂起项都在这里；别的会话里等着的审批，要打开那个会话才看得到。」
 
 ## 输掉的方案
 

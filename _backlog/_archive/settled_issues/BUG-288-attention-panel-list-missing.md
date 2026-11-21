@@ -8,7 +8,7 @@ opened: 2026-11-20
 
 > 严重级别：P2（次要偏重：人机审批全回路这条唯一真验收入口仍不可用）｜发现：2026-11-20（端到端验收第二轮）｜状态：已结（撤回：原主张被反证——后开的页面**能看到**挂起审批）｜审查：agent — 用 policy=ask 的真实例造出挂起审批后复验，两条判据都实测
 >
-> **留痕**：none — 反证结案，无系统面改动（残留的跨会话缺口另立 [BUG-292](../../bugs/BUG-292-cross-session-pending-approvals-not-aggregated.md)）。
+> **留痕**：none — 反证结案，无系统面改动（残留的跨会话缺口另立 [BUG-292](../fixed_bugs/BUG-292-cross-session-pending-approvals-not-aggregated.md)）。
 >
 > **回翻说明（2026-11-21）**：本机 `approval policy=never`（`run/env.sh` 的 `danger-full-access`）⇒ 挂起项不存在、产品主张不可证；跨会话重建需换数据面。证据见卡末两节，处置见账本批次节的「中途修订」。
 
@@ -146,6 +146,6 @@ keyless 13/13 通过，构建产物 `lib/client.js` 已含新代码。
 `session/follow` 的 history 帧）本来就把它补回来了。lane 长期红是**环境**（policy=never 时审批被
 同毫秒自动拒），不是面板缺陷。
 
-**仍然成立的残留**（已另立 [BUG-292](../../bugs/BUG-292-cross-session-pending-approvals-not-aggregated.md)）：
+**仍然成立的残留**（已另立 [BUG-292](../fixed_bugs/BUG-292-cross-session-pending-approvals-not-aggregated.md)）：
 面板只重建**当前会话**的挂起项；别人会话里等着的审批，在你自己的会话里看不到。它与本卡的原主张
 是两件事，所以分开记账。

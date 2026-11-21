@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-292**（2026-11-21，BUG-288 反证时分离 / P2）：待办只重建**本会话**的挂起项——
+  [292](BUG-292-cross-session-pending-approvals-not-aggregated.md) 选型后确认跨会话聚合无正路
+  （`sessions.retain` 的 source 是 vendor 封闭联合、`session/follow` 对未打开会话零帧、新增宿主
+  查询面需立项），本轮把作用域写进空态。证据提交 `8edca3ab`。
+
 - **BUG-290**（2026-11-21，端到端验收轮 / P2）：空白页敲 `/req` 无任何反馈——
   [290](BUG-290-text-command-silent-no-op-without-session.md) 用 host instrumentation 定性为
   「handler 真跑了、结果只落进已打开会话的 transcript（vendor 面）」；本仓按政策 B 落

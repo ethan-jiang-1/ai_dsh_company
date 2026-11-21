@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 287 |
-| 有具名守卫 | 182 |
+| 已修卡 | 288 |
+| 有具名守卫 | 183 |
 | 无具名守卫 | 105 |
-| 覆盖率 | 63.4% |
+| 覆盖率 | 63.5% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -308,3 +308,4 @@
 | 289 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:63 |
 | 290 | 2026-11-20 | tests/client/startup/command-scope-hint.spec.ts:29 |
 | 291 | 2026-11-21 | tests/client/cultivation/cultivation-board.spec.ts:236 |
+| 292 | 2026-11-21 | tests/client/tabs/attention-tab.spec.ts:62 |

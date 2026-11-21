@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-292-cross-session-pending-approvals-not-aggregated.md](fixed_bugs/BUG-292-cross-session-pending-approvals-not-aggregated.md) — 待办只覆盖本会话；跨会话聚合无正路（retain source 封闭 / follow 零帧），本轮把作用域写进空态。
 - [BUG-288-attention-panel-list-missing.md](settled_issues/BUG-288-attention-panel-list-missing.md) — 已结（反证）：`ask` 策略下后开的页面能看到挂起审批；lane 红是环境 `never`。
 - [BUG-290-text-command-silent-no-op-without-session.md](fixed_bugs/BUG-290-text-command-silent-no-op-without-session.md) — 空白页敲斜杠命令无反馈；host 实测被调用、结果丢在 vendor transcript 面，本仓落「会话未开始」提示（政策 B）。
 - [BUG-291-cultivation-records-unreadable-in-panel.md](fixed_bugs/BUG-291-cultivation-records-unreadable-in-panel.md) — 面板如实报告自身 workspace，但 UI 从不点名「哪个盘」；收窄为作用域可诊断性，空/不可达/读取中三态分文案。
