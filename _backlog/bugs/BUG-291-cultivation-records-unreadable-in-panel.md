@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 修复就绪
 severity: P2
 opened: 2026-11-21
 ---
 
 # BUG-291：培养页显示「培养记录尚未读到」，但目录里有记录、直连 RPC 也读得到
 
-> 严重级别：P2（次要偏重：培养这条人机协作入口在真实盘上整页不可用）｜发现：2026-11-21（端到端验收第七轮）｜状态：调查中
+> 严重级别：P2（次要偏重：培养这条人机协作入口在真实盘上整页不可用）｜发现：2026-11-21（端到端验收第七轮）｜状态：修复就绪
 >
 > **留痕**：端到端验收轮（2026-11-21）。
 
@@ -97,3 +97,53 @@ if (!result.ok) return null
 
 **失败类 = 静默失败（错误被 catch 成 null，UI 只说"读不到"）。**
 同类：`readRecordHead`（同文件 :100）、`readWorkspaceText`（同模式 `catch → null`）都走同款静默路径；`成品`/`台账` 面板同样只能显示"未读到"，无法指出到底缺目录还是被拒。建议统一：失败时带上错误码/原因进 UI（或至少进 console）。
+
+## 根因与证据
+
+**（2026-11-21 对照实验，卡内假设在此收口）结论：不是读失败，也不是解析失败——面板一直在如实报告「它所在的那个 workspace」。**
+
+对照实验（同一台机、同一份代码、隔离 home，各起一个实例，只换 `--workspace`）：
+
+| 实例 | `--workspace` | 培养页「需要我处理」 | journal 待审计数 |
+|---|---|---|---|
+| 1 | `company-workspace`（盘上 `.dsh-company/cultivation/records/` 有 2 个 `.md`） | **列出 2 条**（一条 `kind: correction` 的 CEO 纠正 + 一条已拒绝记录） | CEO 22 / VP-Eng 16 / VP-Sales 6 / COO 6 / CFO 7 / CMO 1 |
+| 2 | `runtime/rehearsal-workspace`（同目录**存在但 0 个 .md**、同盘 31 篇 journal） | 「**没有给我的建议或纠正。**」 | CEO **8** / … / VP-Eng **7** |
+
+实例 2 的输出与卡上「第二批证据」逐字吻合（含 8 / 7 两个计数）——所以那两次观察的目标盘是
+`runtime/rehearsal-workspace`，不是 `company-workspace`。即便会话 cwd 显示为 `company-workspace`，
+观察窗的 landing 会**恢复该 home 上次使用的工作区**（dev home 实测 landing 顶部写的就是
+`rehearsal-workspace`），面板随即按那个工作区取数。
+
+代码侧同向：`client/cultivation/cultivation-data.ts` 的 `listDir` 以 `leadOf(sessionId)` 取
+`workspaceFiles.list`，成功则按 `type === 'file' && name.endsWith('.md')` 过滤；`ok === false` 与异常
+才返回 null（「尚未读到」）。空目录是**成功的空清单**，所以第二批证据里「不再是尚未读到、也没有
+console 警告」正是空目录应有的样子。RPC 直连拿到 2 条，是因为那次直连用的是 `company-workspace`
+那盘的会话——两边说的不是同一个盘。
+
+被证伪的假设（按要求留在卡上）：目录不存在 / 记录解析失败 / RPC 拒绝 / 会话 cwd 错 / 点号目录被禁 /
+AbortSignal 中止 / `remote` 包装差异 / `entries` 字段过滤。
+
+## 失败类与同类排查（补充）
+
+**失败类 = 空态不声明作用域（可诊断性缺口）**：面板说的是真话，但说给一个用户看不见的盘听。
+「0 条」与「读不到」在 UI 上都不点名 workspace，于是**空 = 数据丢了**——上一轮两次误判都由它造成
+（handoff §4 自己记了这条）。同类：成品页 / 台账页同样只说「未读到」；`presence.emptyActivity`
+至少写了「打开期间的变化会出现在这里」。
+
+## 修复方案与范围
+
+1. 培养页（侧栏页签 + 公司整页两个壳）在标题行与空态里**点名当前 workspace**（会话 cwd 的 basename，
+   必要时带 `<repo>/` 相对路径），让「看的是哪个盘」一眼可读。
+2. 空清单与不可达必须给**两种不同文案**：空 = 「这个工作区下还没有培养记录」；不可达 = 点名目录 +
+   原因（`ok:false` 与异常各自的原因，沿用本轮已加的两条 `console.warn`，把它们升成 UI 可读字段）。
+3. 明确不改：判据与读模型语义不动（`空 ≠ 不可达` 的既有 V2 约定保留），不动 workspace 解析；
+   不把「读不到」折成 0 条。
+
+## 已修判定
+
+- 在 `company-workspace` 上开（新会话 → 培养）：标题点名 `company-workspace`，「需要我处理」列出盘上那 2 条；
+- 在 `runtime/rehearsal-workspace` 上开同样操作：标题点名 `rehearsal-workspace`，文案为「这个工作区下还没有培养记录」，
+  **不是**「没有给我的建议或纠正」这类不声明作用域的句子；
+- 目录缺失/不可读的负控：文案点名目录 + 原因，且与「0 条」可区分；
+- 判据命令：`vitest run tests/client/cultivation/cultivation-board.spec.ts`（新增两条：点名 workspace、
+  空 vs 不可达两种文案）。

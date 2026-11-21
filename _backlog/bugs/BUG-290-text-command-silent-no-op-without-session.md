@@ -49,3 +49,38 @@ node probes/browser-visual/cdp-probe.mjs '<横幅URL>' --steps /tmp/steps.json -
 ## 失败类与同类排查
 
 **失败类 = 静默失败（无反馈）——「点了没反应」类。** 同类：`/delivery check`、以及其他文本型命令在无会话首屏大概率同病；`/company-settings` 这类有 UI 副作用的命令不受影响。修法方向 = 要么在无会话时给出统一「先建会话」提示，要么由 client 自动建会话承载命令结果——二选一，不要靠用户猜。
+
+## 2026-11-21 对照实验（第一批实跑）
+
+同一台机、隔离 home（`runtime/e2e-fix-home`，零会话）起实例，CDP 真键盘：
+
+| 输入 | 结果 |
+|---|---|
+| `/req check no-such-dir` + Enter | 输入框被清空；body **746 B → 746 B 逐字节不变**；无 chip、无提示、无 transcript、`consoleProblems`/`exceptions`/`clientErrors` 全空 |
+| `你好，做个连通性检查` + Enter | **成功**：1281 B，消息出现在 transcript（自动建会话） |
+| `/company-settings`（在有会话的页面上）+ Enter | 出现 `/company-settings` 命令 chip（说明 chip 会出现在 `innerText` 里） |
+
+⇒ **不是「回车不生效」，也不是「会话不存在」**：纯文本能发、能建会话；被吞的只有斜杠命令。
+⇒ **host 的错误文案从未出现**：handler 本该返回「未指定 workspace；先选 workspace 再校验。」，但 3 秒轮询
+（`waitText 未指定`）没等到——所以「handler 被调用、结果渲染成瞬时提示」这一支不成立。
+
+**被证伪的假设（留在卡上）**：① 回车不生效（纯文本可发）；② 结果只是瞬间提示（3 s 轮询未捕获）；
+③ 「没有会话」（landing 有 `data-conversation-session="session-…"`，纯文本提交还能把它变成真会话）。
+
+**仍成立的两支（未分）**：
+- **A 命令行目录需要 retained session**：`vendor/dsh/packages/client/ui-commands/src/client/service.ts`
+  的 catalog 在 `sessions.binding(sessionId) === undefined` 时抛
+  `command catalog requires a retained session`；landing 的会话尚未 retained ⇒ claim 路径拿不到
+  descriptor，异常在提交机里被吞（该文件注释称会「surface one composer notice」，实测没有）。
+- **B 结果落在 transcript**：命令结果只能进会话 transcript，landing 还没有 transcript 可落。
+
+**决定性下一步（写进下一轮，不再靠猜）**：在 host 的 `/req` handler 里加一行临时 instrumentation
+（或抓 `command/executed` 事件），看 host 到底有没有被调用——若**没被调用** ⇒ 纯 client 面、落在 vendor
+composer（按纪律 = 上游提案 + 本地缓解 + trigger，不改 vendor）；若**被调用了** ⇒ 结果去向在我们这面
+（可修，例如让 handler 在无会话时改走一个可见的 UI 回执）。
+
+## 修法方向（政策 B，用户 2026-11-21 已定）
+
+无会话时必须有**可见且可操作**的提示（「命令需要先开始一个会话」+ 新建/开始入口），而不是把草稿悄悄吃掉。
+我方载体：pack 已在用的 `conversation.input.left` 槽（`packages/company-pack/src/client/index.ts` 注册处），
+它是 composer 旁边的自有面，可承载提示与按钮；不新造通道、不碰 vendor。
