@@ -9,6 +9,7 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { sessionStoreKey } from '../../tools/lib/session/session-store-key.mjs'
 
 const { load } = createRequire(join(ROOT, 'vendor/dsh/package.json'))('js-yaml')
 const temp = mkdtempSync(join(ROOT, 'runtime/harness-home/snapshot-motion-smoke-'))
@@ -36,7 +37,7 @@ try {
   writeTreeFile(cwd, 'nested/file.txt', 'live')
   writeTreeFile(out, 'workspace.expected/nested/file.txt', 'independent')
 
-  const slug = `-${cwd.replaceAll('/', '-')}--`
+  const slug = sessionStoreKey(cwd)
   const sessionDir = join(home, 'sessions', slug, sessionId)
   mkdirSync(sessionDir, { recursive: true })
   const compressed = run('zstd', ['-q', '-c'], { input: '{"type":"session","version":3,"agentPreset":"ceo"}\n', encoding: undefined })

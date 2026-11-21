@@ -10,6 +10,7 @@
 //         --session session-<lead-id> --out snapshots/replay/<场景名> --motion "动议原文" [--cwd company-workspace]
 import { repositoryRoot as ROOT, snapshotOutputPath } from '../lib/core/repository-layout.mjs'
 import { pickSessionLog } from '../lib/session/session-log-generation.mjs'
+import { sessionStoreKey } from '../lib/session/session-store-key.mjs'
 import { zstdText } from '../drivers/zstd.mjs'
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
@@ -45,7 +46,7 @@ if (SESSION === undefined) {
 const home = requireDevHome('snapshot-motion')
 
 const cwd = resolve(ROOT, CWD_REL)
-const slug = `-${cwd.replaceAll('/', '-')}--`
+const slug = sessionStoreKey(cwd)
 const sessionsDir = join(home, 'sessions', slug)
 if (!existsSync(sessionsDir)) throw new Error(`会话目录不存在：${sessionsDir}`)
 

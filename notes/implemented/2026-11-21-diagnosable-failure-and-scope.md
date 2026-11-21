@@ -40,6 +40,7 @@
 | 读面失败带原因 | `packages/company-pack/src/client/cultivation/cultivation-data.ts`（`DirListing`） | 面板数据面 `recordsProblem` | 远端 `workspaceFiles.list` 的结果态 |
 | 面板作用域点名 | `workspaceLabelOf(cwd)`（同文件） | `CultivationBoard` / `CultivationInbox` | 会话 cwd（`sessions.byId[id].cwd`） |
 | 三态文案（zh/en） | `packages/company-pack/src/client/cultivation/cultivation-actions.ts` | 同文件 `CULTIVATION_COPY` | 缺省 zh，en 同 key |
+| session-store 键派生单一家 | `tools/lib/session/session-store-key.mjs`（门禁 = `checks/gates/company-root-carriers.mjs` 规则⑤） | 审计入口 + 两条 snapshot-motion | 工作区绝对路径 |
 
 ## 未覆盖轴
 
@@ -47,3 +48,4 @@
 - [policy] 跨会话历史挂起项重建要换数据面（`session/page` 或宿主聚合查询），客户端侧无可行路径 → `_backlog/bugs/BUG-288-attention-panel-list-missing.md`
 - [unprovable] 空白页斜杠命令的静默丢失在 vendor 的 composer/transcript 面（host handler 实测被调用、结果从未渲染），上游提案与复现留在卡里 → `_backlog/_archive/fixed_bugs/BUG-290-text-command-silent-no-op-without-session.md`
 - [covered] 培养页作用域与三态文案 → `tests/client/cultivation/cultivation-board.spec.ts`
+- [covered] session-store 键只许从 helper 出（规则⑤，三处已迁移）→ `tools/lib/session/session-store-key.mjs`

@@ -28,6 +28,15 @@ import { parseFrontmatter } from '../../tools/lib/core/repo-markdown.mjs'
 // 负例留证 2026-11-13 / 2026-11-14：
 //   - 新建未登记 host writer → `FAIL company-root-carriers: … → 未登记的公司盘写入口`；
 //   - 在任一非原语门禁植入 `/^##\s+/` 或 `/^---\r?\n/` → `FAIL company-root-carriers: … → 禁止手写裸 …`。
+//
+// ⑤ session-store 键派生单一家（2026-11-21，BUG-286 的 F3 收口）：`sessions/<键>` 的键 = `-<cwd 去斜杠>--`，
+//    此前在审计入口 + 两条 snapshot-motion 各写一遍 ⇒ 「换个根就换个键」有 N 个入口（BUG-286 正是同族：
+//    文件根与会话根被当成同一个）。现在只许经 `tools/lib/session/session-store-key.mjs`。
+//    负例留证 2026-11-21（破坏真文件 → 红 → 还原 → 绿，原话）：
+//      把 `checks/lanes/snapshot-motion.e2e.mjs` 的 `sessionStoreKey(cwd)` 还原成
+//      `` `-${cwd.replaceAll('/', '-')}--` `` →
+//      `FAIL company-root-carriers: checks/lanes/snapshot-motion.e2e.mjs:40 → 手写 session-store 键派生（\`-<cwd>--\` 只许经 tools/lib/session/session-store-key.mjs；三处各写一遍正是 BUG-286「两个根」的同族）`；
+//      接回 helper → `verify: ALL PASS`（store 键单一家 ×211）。
 
 const HOST = 'packages/company-pack/src/host'
 const GOVERNANCE_DIRS = ['checks/gates', 'checks/lib', 'probes/lib', 'tools/lib']
@@ -67,6 +76,35 @@ const WRITE_CALLS = new Set([
   'writeFileSync', 'appendFileSync', 'renameSync', 'mkdirSync', 'rmSync', 'cpSync', 'unlinkSync', 'linkSync', 'writeCompanyAtomic',
   'writeFile', 'appendFile', 'rename', 'mkdir', 'rm', 'cp', 'unlink', 'link',
 ])
+
+/** session-store 键派生的唯一家（BUG-286 / F3「根与键各自派生」同族）。 */
+const SESSION_KEY_HOME = 'tools/lib/session/session-store-key.mjs'
+const SESSION_KEY_RE = /\.replaceAll\(\s*(['"])[/]\1\s*,\s*(['"])-\2\s*\)|\.split\(\s*(['"])[/]\3\s*\)\s*\.join\(\s*(['"])-\4\s*\)/
+
+/**
+ * ⑤ 会话目录键派生只许来自 {@link SESSION_KEY_HOME}：`-<cwd 去斜杠>--` 在三个脚本里各写过一遍，
+ * 于是「换个根就换个键」有 N 个入口（BUG-286 正是同族：文件根与会话根被当成同一个）。
+ * @param root - 仓库根。
+ * @returns 违规清单（`file:line → 说明`）与被扫文件数。
+ */
+function scanSessionStoreKeyProblems(root) {
+  const problems = []
+  let scanned = 0
+  for (const dir of ['checks', 'tools']) {
+    const abs = join(root, dir)
+    if (!existsSync(abs)) continue
+    for (const path of walk(abs, '.mjs')) {
+      const rel = path.slice(root.length + 1)
+      if (rel === SESSION_KEY_HOME || rel === RAW_SCAN_SELF) continue
+      scanned += 1
+      stripComments(readFileSync(path, 'utf8')).split('\n').forEach((line, index) => {
+        if (!SESSION_KEY_RE.test(line)) return
+        problems.push(`${rel}:${String(index + 1)} → 手写 session-store 键派生（\`-<cwd>--\` 只许经 ${SESSION_KEY_HOME}；三处各写一遍正是 BUG-286「两个根」的同族）`)
+      })
+    }
+  }
+  return { problems, scanned }
+}
 
 /** 首参是「内容」而非路径的写调用：只判 args[0]（否则错误消息里出现 `.dsh-company` 会误红）。 */
 const CONTENT_LAST = new Set(['writeFileSync', 'appendFileSync', 'writeFile', 'appendFile'])
@@ -288,7 +326,8 @@ export function run({
     }
   }
   const rawScan = scanRawParsingProblems(root, markdownPrimitives)
-  problems.push(...rawScan.problems, ...scanToolingProblems(root, tooling))
+  const keyScan = scanSessionStoreKeyProblems(root)
+  problems.push(...rawScan.problems, ...keyScan.problems, ...scanToolingProblems(root, tooling))
 
   for (const skillRoot of ['packages/company-pack', '.agents/skills']) {
     const absSkillRoot = join(root, skillRoot)
@@ -306,7 +345,8 @@ export function run({
   const gapText = knownGap.length === 0 ? 'knownGap 0' : `knownGap ${String(knownGap.length)}：${gaps.join('、')}`
   const rawNote = rawScan.scanned > 0 ? ` / 禁裸解析 ×${String(rawScan.scanned)}` : ''
   const toolingNote = tooling.length > 0 ? ` / 工具盘入口 ${String(tooling.length)}` : ''
+  const keyNote = keyScan.scanned > 0 ? ` / store 键单一家 ×${String(keyScan.scanned)}` : ''
   problems.length === 0
-    ? ok(`company-root-carriers ×${String(files.length)} 文件（写面文件 ${String(writers)} / ${gapText}${rawNote}${toolingNote}）`)
+    ? ok(`company-root-carriers ×${String(files.length)} 文件（写面文件 ${String(writers)} / ${gapText}${rawNote}${toolingNote}${keyNote}）`)
     : fail('company-root-carriers', problems.join('；'))
 }

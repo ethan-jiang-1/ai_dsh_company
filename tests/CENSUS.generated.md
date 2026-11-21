@@ -44,7 +44,7 @@
 | workflow-contract | classic | fast + surface + weekly | 工具定义 | example | 3 |
 | present-catalog | classic | fast + surface + weekly | 会话持久化 | example | 4 |
 | company-root-process | classic | fast + surface + weekly | 子进程并发 | example | 3 |
-| snapshot-motion | classic | fast + weekly | 会话持久化 | example | 2 |
+| snapshot-motion | classic | fast + weekly | 会话持久化 | example | 3 |
 | client-load | browser | surface + weekly | client UI | example | 7 |
 | preset | classic | surface + weekly | 配置组合 | example | 8 |
 | replay | classic | surface + weekly | 会话持久化 | example | 11 |

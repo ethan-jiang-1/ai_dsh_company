@@ -27,6 +27,7 @@
 // 退出码：0 = 零违规；1 = 有违规；2 = 无法判定（工作区缺失等，--json 时判词带 assessed:false + reason）。
 import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
 import { pickSessionLog } from '../../tools/lib/session/session-log-generation.mjs'
+import { sessionStoreKey } from '../../tools/lib/session/session-store-key.mjs'
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
@@ -99,7 +100,7 @@ function sessionLogs() {
     console.error(`${error.message}；或用 --sessions 指定明文归档日志目录`)
     process.exit(2)
   }
-  const sessionRoot = join(home, 'sessions', `-${workspaceRoot.replaceAll('/', '-')}--`)
+  const sessionRoot = join(home, 'sessions', sessionStoreKey(workspaceRoot))
   if (!existsSync(sessionRoot)) {
     console.error(`deliverables-check: 该工作区还没有会话目录：${sessionRoot}`)
     process.exit(2)

@@ -189,3 +189,33 @@ test('工具盘直写 .dsh-company 未登记 → 红（file:line）；登记（�
     assert.match(broken.problems.join('；'), /scaffold\.mjs → 登记符号 not-in-file 不在文件里/)
   } finally { rmSync(root, { recursive: true, force: true }) }
 })
+
+// ⑤ session-store 键派生单一家（BUG-286 / F3）：`-<cwd 去斜杠>--` 在三个脚本里各写过一遍，
+// 换个根就换个键的漂移有了 N 个入口。规则 = 只许经 tools/lib/session/session-store-key.mjs。
+test('checks/ 下手写 session-store 键 → 红（报 file:line）；唯一家自身豁免', () => {
+  const root = fixture()
+  try {
+    mkdirSync(join(root, 'checks/lanes'), { recursive: true })
+    writeFileSync(join(root, 'checks/lanes/hand-rolled.mjs'), [
+      "const cwd = '/ws'",
+      'const slug = `-${cwd.replaceAll(\'/\', \'-\')}--`',
+      'export { slug }',
+    ].join('\n'))
+    const red = gate(root)
+    assert.match(red.problems.join(), /checks\/lanes\/hand-rolled\.mjs:2 → 手写 session-store 键派生/)
+
+    // 唯一家自身写这个形状是它的职责，不红
+    mkdirSync(join(root, 'tools/lib/session'), { recursive: true })
+    writeFileSync(join(root, 'tools/lib/session/session-store-key.mjs'), "export const k = cwd => `-${cwd.replaceAll('/', '-')}--`\n")
+    assert.doesNotMatch(gate(root).problems.join(), /session-store-key\.mjs:\d+ → 手写/)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+})
+
+test('split().join() 形态的等价手写也算红（换个写法不等于换了实现）', () => {
+  const root = fixture()
+  try {
+    mkdirSync(join(root, 'tools/repo'), { recursive: true })
+    writeFileSync(join(root, 'tools/repo/x.mjs'), "export const s = '-' + cwd.split('/').join('-') + '--'\n")
+    assert.match(gate(root).problems.join(), /tools\/repo\/x\.mjs:1 → 手写 session-store 键派生/)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+})
