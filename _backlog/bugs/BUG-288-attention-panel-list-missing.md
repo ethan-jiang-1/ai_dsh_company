@@ -97,3 +97,33 @@ keyless 13/13 通过，构建产物 `lib/client.js` 已含新代码。
 - 判据：keyless = 两条 history fixture（一条待批、一条已 decided）→ 只出待批那条；真验收 =
   `node checks/lanes/attention-e2e.entry.mjs` 在**先签核、后开页**的时序下真绿（不放宽断言）。
 - 风险：一次重建要读 ≤20 份会话日志首页——只在面板打开/刷新时触发，不进轮询。
+
+## 2026-11-21 第二批实跑取证（instrumentation，已撤）——**lane 红的主因是环境，不是面板**
+
+在 `AttentionTab` 里加临时诊断（每个候选会话的 history 事件计数 + 当前会话事件类型直方图），
+配合 lane 的 `page.on('console')`，跑了两轮 `attention-e2e`。实测：
+
+1. **页签绑定的是对的会话**：`sid` = 本轮 lane 建的 CFO 会话（`session-f6ad27ac…`），`leadId` 相同，
+   `cwd` = `runtime/rehearsal-workspace`。卡上「页签 sessionId 与签核会话不是同一个」这一支**被证伪**。
+2. **该会话的 history 里 asked 与 decided 同时在场**：
+   `{"type":"approval/asked","seq":70,"time":1795237352162,"data":{"id":"26504d7c…","toolName":"request_signoff",…}}`
+   `{"type":"approval/decided","seq":71,"time":1795237352162,"data":{"id":"26504d7c…","outcome":"rejected"}}`
+   —— **同一毫秒**，`outcome=rejected`。没有人在场，是策略自动拒的（同会话 seq 2 有
+   `{"type":"approval/policy","data":{"policy":"never"}}`）。
+3. 追到根：`run/env.sh` 在本机导出 `DSH_PERMISSION_MODE=danger-full-access`（`sandbox-exec` 被系统禁掉），
+   该模式**同时把审批策略推成 `never`**（env.sh 第 34 行原话）。⇒ 本机上**不存在「等人批」的挂起审批**，
+   面板显示空是**正确**的，lane 的「批准之前断言待批」在这台机器上**不可满足**。
+
+**因此**：`attention-e2e` 的红是**环境缺口**（policy=never），不是待办面板的缺陷；这条要与产品缺陷分开记账。
+可判据的形式 = 在 `sandbox-exec` 可用的机器（approval policy = ask）上跑同一条 lane。
+
+## 顺带证伪的修法（别按它做）
+
+试过「按 workspace 的 root 会话各取首个 `session/follow` history 帧」来重建历史：**不成立**——
+对**未打开**的会话，`session/follow` 在两轮实跑里一次 history 帧都没产出（20 个候选会话零帧，
+诊断行一条没打）。要在客户端读别的会话历史，只能走 `session/page`（lane 自己就是这么轮询的），
+或用宿主侧聚合查询——这已经不是「补一个重建器」的量级，属需要立项的选择。
+
+**当前处置**：本卡留在 `调查中`（产品主张在本机不可证、且重建路径需要换数据面）；
+触发句 = 「在有 `sandbox-exec` 的机器上（或显式 `approval policy = ask`）跑 `node checks/lanes/attention-e2e.entry.mjs`，
+并同时验证刷新后仍能看到挂起审批」。**不翻 `已修`，也不改 lane 断言**。

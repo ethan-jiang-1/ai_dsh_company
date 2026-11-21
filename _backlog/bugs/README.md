@@ -50,6 +50,12 @@
 
 **终点** = 4 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡 `审查：` + 四行证据齐；`pnpm verify`/`test`/`typecheck`/`lint`/`dup` 绿；`deliverables-check` 真盘 assessed；一条隔离实例上「培养页说得清 records 归属 / 空白页命令有明确反馈 / 待办页刷新后仍显示已挂起审批」。两族合同（F2 可诊断失败、F4 投影完整）各落 spec + 批次 Note。
 
+**2026-11-21 中途修订（D 组）**：BUG-288 的 lane 红已定性为**环境缺口**——本机 `sandbox-exec` 被禁，
+`run/env.sh` 因此导出 `danger-full-access`，而该模式把审批策略推成 `never`，于是 `request_signoff` 的
+`approval/asked` 与 `approval/decided(rejected)` 落在**同一毫秒**（会话日志原话见卡），**不存在「等人批」的挂起项**。
+lane 的「批准之前断言待批」在本机不可满足；卡的处置 = 留 `调查中` + 触发句（换有围栏的机器或显式 `ask`）。
+另：跨会话历史重建**不能**走 `session/follow`（未打开的会话零 history 帧，两轮实跑取证），要换 `session/page` 或宿主查询——需立项。
+
 **本节是立项与交接，不是落地**：只记批次计划，未改任何系统面。
 
 ## 2026-11-17 修复交接（根因组 A–C：BUG-202..211）
