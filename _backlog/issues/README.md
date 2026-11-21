@@ -4,7 +4,9 @@
 
 ## 活跃清单
 
-**活跃 0 张**：C12/C13/C14/C16 四张 exploratory 卡与 content 合同族预防试点卡均已于 2026-11-20 归档——50 张缺陷卡（BUG-202..211 / 213..222 / 223..232 / 243..262）全部已修并迁 [fixed_bugs](../_archive/fixed_bugs/)，去向 = 各批次 Note；卡片见[归档](../_archive/README.md)。
+**活跃 1 张**：[2026-11-21 公司页 E2E 设计卡](2026-11-21-company-e2e-test-design.md)（推敲中；本轮只产设计/原型证据 + BUG-293..296，未落 lane）。
+
+**上一轮（2026-11-20）**：C12/C13/C14/C16 四张 exploratory 卡与 content 合同族预防试点卡均已于 2026-11-20 归档——50 张缺陷卡（BUG-202..211 / 213..222 / 223..232 / 243..262）全部已修并迁 [fixed_bugs](../_archive/fixed_bugs/)，去向 = 各批次 Note；卡片见[归档](../_archive/README.md)。
 
 （2026-11-10 四张组织/产品类型卡已结归档：产品类型语义、动议级产品类型、SA/SQA 方法包、COO/CFO 通道；各卡去向 = Note，见[归档](../_archive/README.md)。）
 

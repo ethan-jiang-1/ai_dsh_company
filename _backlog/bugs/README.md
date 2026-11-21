@@ -2,13 +2,15 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 293；已分配 BUG-001..292。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 297；已分配 BUG-001..296。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**。
+**活跃 4 张**：[BUG-293](BUG-293-command-scope-hint-slot-crash.md)（命令作用域提示注入面崩溃，P1）· [BUG-294](BUG-294-cultivation-no-pending-lies-about-empty-workspace.md)（培养页把「无待处理」说成「工作区无记录」，P2）· [BUG-295](BUG-295-attention-item-unbounded-approval-reason.md)（待办列表渲染整段审批理由，P2）· [BUG-296](BUG-296-real-page-lanes-stale-client-bundle.md)（真页面车道跑旧构建仍报绿，P1）。
+
+**本轮批次（2026-11-21 E2E 设计轮，只立卡不修）**：组 A「真页面判据的字节新鲜度」= 293 + 296（共同根因：源码改了、产物没重建，真页面判据对着旧 `lib/client.js` 报绿；293 是 296 藏住的那个回归）；组 B「摘要/空态把人话与内部字段混同」= 294 + 295（共同根因：读模型把「全量/详情」字段直接当「待办/摘要」渲染，空态与摘要各自说了假话）。用户的指令 = 「发现问题直接报 bug，别急着修」——四张 `status: 调查中`，本轮不改产品代码；E2E 设计/证据见 [E2E 设计卡](../issues/2026-11-21-company-e2e-test-design.md)。
 
 **已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
