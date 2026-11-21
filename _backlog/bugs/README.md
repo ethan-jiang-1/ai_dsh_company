@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 1 张**：[BUG-288](BUG-288-attention-panel-list-missing.md)（修复就绪：待办只覆盖本页在线期间，刷新/后开看不到已挂起审批，空态还宣称"没有等你的事"）。
+**活跃 1 张**：[BUG-288](BUG-288-attention-panel-list-missing.md)（调查中：lane 红已定性为**环境缺口**——本机 `danger-full-access` 把审批策略推成 `never`，`approval/asked` 与 `decided(rejected)` 同一毫秒，挂起项不存在；跨会话重建不能走 `session/follow`，需换 `session/page` 或宿主查询）。
 
 **本轮批次**：下方「## 2026-11-21 修复交接（e2e 验收遗留：BUG-286/288/290/291）」= 组 A–D、顺序 286 → 一次实起三诊断 → 291 → 290 → 288。
 
