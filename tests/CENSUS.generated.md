@@ -10,7 +10,7 @@
 | 冒烟 | 30 |
 | 探针 | 66 |
 | 结构门禁 | 75 |
-| keyless spec 文件 | 266 |
+| keyless spec 文件 | 267 |
 | 门禁自测（tests/checks） | 11 |
 | fast lane | 4 |
 | surface lane | 6 |

@@ -327,6 +327,8 @@ export const zh = {
   'strategy.button.loading': '策略',
   'strategy.button.tooltip': '点开调整这个项目的套路（下一轮生效）',
   'strategy.button.tooltip.auto': '现在是全自动：不约束模型，让它自己判断',
+  'command.scopeHint': '斜杠命令要等会话开始后才回话',
+  'command.scopeHint.tooltip': '命令是会话级的：点「开始」发出第一条消息后，命令结果才有地方显示。',
 } as const
 
 /** 本命名空间的 key 联合。 */
@@ -649,6 +651,8 @@ export const en: Record<CompanyKey, string> = {
   'strategy.button.loading': 'Strategy',
   'strategy.button.tooltip': 'Adjust how this project runs (effective next turn)',
   'strategy.button.tooltip.auto': 'Fully automatic right now: the model decides',
+  'command.scopeHint': 'Slash commands answer only after the session starts',
+  'command.scopeHint.tooltip': 'Commands are session-scoped: press Start and send the first message, then command output has a place to land.',
 
 }
 

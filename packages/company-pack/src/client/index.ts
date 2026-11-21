@@ -33,6 +33,7 @@ import { DelegationCard } from './ui/DelegationCard.tsx'
 import { installStyles } from './ui/styles.ts'
 import { createStartupStore } from './startup/startup-store.ts'
 import { StrategyButton } from './startup/StrategyButton.tsx'
+import { CommandScopeHint } from './startup/CommandScopeHint.tsx'
 import {
   parseStartupOptionsState,
   parseStartupSettings,
@@ -218,6 +219,19 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
         t: ctx.locale.bind(COMPANY_NS),
       }),
     }, StrategyButton))
+
+    // BUG-290：会话还没开始时把「命令要等会话开始」说在明处（vendor 会把结果丢进 transcript，
+    // 本仓无法在 vendor 层修；这条是政策 B 的本地缓解，见批次 Note）。
+    scoped.slots.inject('conversation.input.left', () => scoped.slots.register({
+      name: 'conversation.input.left',
+      id: 'company-command-scope',
+      order: 11,
+      inject: (sessionId: SessionId) => ({
+        sessionId,
+        list: scoped.sessions.list,
+        t: ctx.locale.bind(COMPANY_NS),
+      }),
+    }, CommandScopeHint))
   })
 }
 
