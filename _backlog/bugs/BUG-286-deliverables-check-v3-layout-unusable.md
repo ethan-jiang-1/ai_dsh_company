@@ -66,5 +66,8 @@ v3 起数据在 `<workspace>/.dsh-company/deliverables/**`：传外层 workspace
 
 `probes/browser-visual/deliverables-catalog-probe.mjs` 读的也是旧的 workspace 根索引路径
 `company-workspace/kb/deliverables-index.json`（v3 起应为 `.dsh-company/kb/…`），直接 ENOENT 退出。
-本轮已就地改到 v3 路径（探针可启动）；该探针随后另报「成品面板 8 行 vs 索引 62 条」「点打开未开到正文」，
-是否同族待查，不并入本卡结论。
+本轮已就地改到 v3 路径（探针可启动）。随后另报的「成品面板 8 行 vs 索引 62 条」已定位为**探针跨 workspace 对账**：
+面板按当前会话所属 workspace 读索引（`workspaceFiles.read(leadOf(sessionId), …)`，见 `client/cultivation/cultivation-data.ts:66`），
+探针却固定读 `company-workspace` 的索引——dev 盘上最近会话属于 `runtime/rehearsal-workspace`（2 条成品），
+所以面板显示 2/8 都正常，**不是产品缺陷**；要改的是探针按会话 workspace 取期望值。
+「点打开未开到正文」仍未定性（可能是「在应用中打开」依赖本机外部应用，探针不可观测）。
