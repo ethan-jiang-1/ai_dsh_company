@@ -280,6 +280,11 @@ describe('CultivationBoard：作用域与失败原因的 en 面（BUG-291）', (
       const noLabel = render({ records: [] })
       expect(noLabel).toContain('No cultivation records in this workspace.')
       expect(noLabel).toContain('the company disk')
+      // 第四格的 en 文案与单复数（1 条 / 多条各跑一次，分支都要有判据）
+      expect(render({ records: [record({ status: 'adopted', methodSlug: 'm-1' })] })).toContain('1 record total')
+      expect(render({
+        records: [record({ id: 'r-a', status: 'adopted', methodSlug: 'm-1' }), record({ id: 'r-b', status: 'rejected', reason: '口径不同' })],
+      })).toContain('2 records total')
     } finally {
       setCultivationLanguage('zh')
     }
@@ -288,7 +293,8 @@ describe('CultivationBoard：作用域与失败原因的 en 面（BUG-291）', (
 
 // 四态矩阵（BUG-294）：空态必须在「加载 / 不可达 / 目录空 / 有记录无待办」四格里各自说对话。
 // 这条钉的是第四格——盘上有一条已采纳记录、没有任何待办时，不能说「这个工作区还没有培养记录」。
-describe('CultivationBoard：四态矩阵的第四格', () => {
+// 负例留证 2026-11-22：把「有记录但零待办」的文案改回 inboxEmpty（工作区还没有记录）后 `vitest run tests/client/cultivation/cultivation-board.spec.ts` 1 failed（第四格断言）；改回后 27/27 绿。BUG-294
+describe('CultivationBoard：四态矩阵的第四格（BUG-294）', () => {
   it('有记录但零待办 ⇒ 说「没有需要你处理的记录」，不否认工作区里有记录', () => {
     const markup = render({
       records: [record({ status: 'adopted', methodSlug: 'm-1' })],

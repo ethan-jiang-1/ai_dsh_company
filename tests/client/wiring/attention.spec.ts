@@ -202,7 +202,8 @@ describe('attentionTone（类别 → 色调）', () => {
 
 // 摘要边界（BUG-295）：外部文本（模型写的审批理由）长度无上界，列表行必须折叠；
 // 活体登记与历史重建必须用**同一个**折叠函数，否则 mergeAttention 的去重键对不上、同一条会重复。
-describe('attentionSummary · 摘要边界', () => {
+// 负例留证 2026-11-22：把 attentionSummary 改成恒等函数（不折叠）后 `vitest run tests/client/wiring/attention.spec.ts` 3 failed（钳制/压平/去重）；还原后 23/23 绿。BUG-295
+describe('attentionSummary · 摘要边界（BUG-295）', () => {
   const long = `折扣线双签：${'理由'.repeat(500)}`
 
   it('短文本原样；长文本被折叠到上限并带省略号', () => {

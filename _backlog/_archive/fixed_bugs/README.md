@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-294 / BUG-295**（2026-11-22，E2E 设计轮 / P2×2）：空态与摘要各自说假话——
+  [294](BUG-294-cultivation-no-pending-lies-about-empty-workspace.md) 四态矩阵第四格（有记录但零待办）；
+  [295](BUG-295-attention-item-unbounded-approval-reason.md) `attentionSummary` 折叠外部长文本、
+  活体与历史同源（去重键依赖 `what`）、全文留 `detail`。证据提交 `81b7f82a`。
+
 - **BUG-296 / BUG-293**（2026-11-22，E2E 设计轮 / P1×2）：真页面判据的字节新鲜度与它藏住的槽崩溃——
   [296](BUG-296-real-page-lanes-stale-client-bundle.md) 三条真页面车道只查 `lib/client.js` 存在，
   构建指纹缺失/不一致现在 fail-loud（`tools/dev/build-client.mjs` 写指纹）；

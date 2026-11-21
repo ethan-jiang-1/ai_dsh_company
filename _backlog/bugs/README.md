@@ -8,9 +8,11 @@
 
 ## 活跃清单
 
-**活跃 2 张**：[BUG-294](BUG-294-cultivation-no-pending-lies-about-empty-workspace.md)（培养页把「无待处理」说成「工作区无记录」，P2）· [BUG-295](BUG-295-attention-item-unbounded-approval-reason.md)（待办列表渲染整段审批理由，P2）。
+**活跃 0 张**。
 
-**本轮已修并迁出**：BUG-296（真页面车道先过构建指纹，stale → EXIT=2；`node checks/lanes/ui-scene.entry.mjs --isolated` 重建后 ALL PASS）、BUG-293（命令作用域提示接回真实 `sessions.list`；spec 4/4 + 真页面两态 + `consoleProblems` 空）。
+**本轮已修并迁出**：BUG-294（培养页四态矩阵第四格：有记录但零待办说「没有需要你处理的记录」；真页面复核）、BUG-295（`attentionSummary` 把外部长文本折叠到 160 字，活体与历史同源、去重键一致；全文降为 `detail`）。
+
+**更早本轮已修**：BUG-296（真页面车道先过构建指纹，stale → EXIT=2；`node checks/lanes/ui-scene.entry.mjs --isolated` 重建后 ALL PASS）、BUG-293（命令作用域提示接回真实 `sessions.list`；spec 4/4 + 真页面两态 + `consoleProblems` 空）。
 
 **本轮批次（2026-11-21 E2E 设计轮，只立卡不修）**：组 A「真页面判据的字节新鲜度」= 293 + 296（共同根因：源码改了、产物没重建，真页面判据对着旧 `lib/client.js` 报绿；293 是 296 藏住的那个回归）；组 B「摘要/空态把人话与内部字段混同」= 294 + 295（共同根因：读模型把「全量/详情」字段直接当「待办/摘要」渲染，空态与摘要各自说了假话）。用户的指令 = 「发现问题直接报 bug，别急着修」——四张 `status: 调查中`，本轮不改产品代码；E2E 设计/证据见 [E2E 设计卡](../issues/2026-11-21-company-e2e-test-design.md)。
 
@@ -25,8 +27,8 @@
 | 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
 |---|---|---|---|---|
 | **A 字节新鲜度** | [296](../_archive/fixed_bugs/BUG-296-real-page-lanes-stale-client-bundle.md) → [293](../_archive/fixed_bugs/BUG-293-command-scope-hint-slot-crash.md) | 判据跑在旧字节上 ⇒ 假绿；293 正是被它藏住的那个回归 | 296：构建指纹（复用 `devBuildFingerprint` 口径）写 `lib/.build-fingerprint`，三条真页面入口启动前比对、不一致 fail-loud；293：把 `scoped.sessions.list` 真实传入注册体，判据改为「渲染真实 inject 产物」 | 1 → 2 |
-| **B 状态空间没穷举** | [294](BUG-294-cultivation-no-pending-lies-about-empty-workspace.md) | 空态三元链只覆盖两态 | 四态矩阵：`records === null` 加载 ／ `recordsProblem` 不可达 ／ `records.length === 0` 目录空 ／ 有记录但 `needsDecision` 空；新文案 zh+en | 3 |
-| **C 摘要边界** | [295](BUG-295-attention-item-unbounded-approval-reason.md) | 外部长文本（模型写的 `reason`）直接进摘要字段 | `summary`（限长）+ `detail`（全文）分家；活体与历史**同源截断**；去重键用截断值；列表钳制 + 全文可读（照 `LedgerSummary`） | 4 |
+| **B 状态空间没穷举** | [294](../_archive/fixed_bugs/BUG-294-cultivation-no-pending-lies-about-empty-workspace.md) | 空态三元链只覆盖两态 | 四态矩阵：`records === null` 加载 ／ `recordsProblem` 不可达 ／ `records.length === 0` 目录空 ／ 有记录但 `needsDecision` 空；新文案 zh+en | 3 |
+| **C 摘要边界** | [295](../_archive/fixed_bugs/BUG-295-attention-item-unbounded-approval-reason.md) | 外部长文本（模型写的 `reason`）直接进摘要字段 | `summary`（限长）+ `detail`（全文）分家；活体与历史**同源截断**；去重键用截断值；列表钳制 + 全文可读（照 `LedgerSummary`） | 4 |
 
 **次序 = 296 → 293 → 294 → 295**：296 是「判据的判据」，不先修它，其余三张的「已修」都可能再跑在旧字节上；293 是用户可见崩溃、也是 BUG-290 那半条交付的前提；294 是「说假话」（重于 295 的可读性）；295 要动去重键，单独收。
 

@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-21
 ---
 
 # BUG-295：待办把整段审批理由塞进「一句话摘要」——一条挂起项占满整个面板
 
-> 严重级别：P2（次要偏重：待办面板的核心用途是「一屏看清等你的事」，一条超长理由会让其余条目与「刚完成」全部沉到滚动里）｜发现：2026-11-21（E2E 设计轮）｜状态：调查中
+> 严重级别：P2（次要偏重：待办面板的核心用途是「一屏看清等你的事」，一条超长理由会让其余条目与「刚完成」全部沉到滚动里）｜发现：2026-11-21（E2E 设计轮）｜状态：已修｜审查：agent — 逐条核对已修判定（钳制/压平/同源去重/detail 四组断言）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-21 指令「发现问题直接报 bug，别急着修」）。
+> **留痕**：commit 81b7f82a（client 公开呈现面，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -71,3 +71,10 @@ opened: 2026-11-21
 - 长 `reason` 的挂起审批在待办列表里占固定上限（行数/字符数），不再随理由长度膨胀；
 - 同一条审批的活体与历史重建仍去重为一条（截断规则同源）；
 - 完整理由仍能从「去处理」的官方审批卡或展开面读到；zh/en 两态。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/attention.ts`、`packages/company-pack/src/client/wiring/attention-observers.ts`、`packages/company-pack/src/client/tabs/AttentionTab.tsx`、`tests/client/wiring/attention.spec.ts`
+- 红：`vitest run tests/client/wiring/attention.spec.ts` —— 新增「长 reason 钳制 / 同源去重 / detail 可达」四条在修复前失败（`what` 原样等于 1 KB 理由、无 `detail`）
+- 绿：`vitest run tests/client/wiring/attention.spec.ts` —— 23/23（含 1 KB reason 的 fixture：`what ≤ ATTENTION_SUMMARY_MAX`、空白压平、活体+历史同源去重后 1 条、`detail` 保留全文）
+- 提交：commit 81b7f82a

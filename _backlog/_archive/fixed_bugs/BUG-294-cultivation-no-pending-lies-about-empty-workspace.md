@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-21
 ---
 
 # BUG-294：培养页把「没有待处理记录」说成「这个工作区还没有培养记录」——采纳最后一条后自相矛盾
 
-> 严重级别：P2（次要偏重：空态文案说假话，用户会以为记录丢了；采纳/拒绝后的第一眼就是这个状态）｜发现：2026-11-21（E2E 设计轮）｜状态：调查中
+> 严重级别：P2（次要偏重：空态文案说假话，用户会以为记录丢了；采纳/拒绝后的第一眼就是这个状态）｜发现：2026-11-21（E2E 设计轮）｜状态：已修｜审查：agent — 逐条核对已修判定（spec 两态互斥 + 真页面第四格原文）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-21 指令「发现问题直接报 bug，别急着修」）。
+> **留痕**：commit 81b7f82a（client 公开文案，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -76,3 +76,10 @@ opened: 2026-11-21
 - 盘上只有 adopted/rejected 记录时，「需要我处理」不再说「这个工作区下还没有培养记录」，而是明确「没有待处理的记录」；
 - 记录目录真为空时，仍保留 BUG-291 的 workspace 点名空态；
 - `npx vitest run tests/client/cultivation/cultivation-board.spec.ts` 的两种空态各自绿，真实页面同形复核。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/cultivation/CultivationInbox.tsx`、`packages/company-pack/src/client/cultivation/cultivation-actions.ts`、`tests/client/cultivation/cultivation-board.spec.ts`
+- 红：`vitest run tests/client/cultivation/cultivation-board.spec.ts` —— 新增「有记录但零待办」用例在修复前落到 `inboxEmpty`（断言「没有需要你处理的记录」失败）；同窗口真页面渲染「这个工作区（…）下还没有培养记录」而同屏列着「已采纳」
+- 绿：`vitest run tests/client/cultivation/cultivation-board.spec.ts` —— 27/27；真页面（隔离 workspace 放一条 `status: adopted` 记录、零待办）实际渲染「没有需要你处理的记录（共 1 条，已处理的在下面）。」
+- 提交：commit 81b7f82a
