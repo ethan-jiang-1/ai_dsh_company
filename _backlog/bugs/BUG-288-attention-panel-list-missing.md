@@ -62,6 +62,17 @@ source run/env.sh && node checks/lanes/attention-e2e.entry.mjs
 
 判据：lane 在**当前时序**下（先签核、后开页）也能通过（A），或 lane 改序后通过且文案不再宣称全局空（B）。
 
+## 已做的第一步（2026-11-21，未结案）
+
+按 A 的一半落地：`lib/presence/attention.ts` 新增 `pendingApprovals()`（配对 `approval/asked` / `approval/decided`，
+只留"问了没答"），`mergeAttention` 对活体与重建条目按 kind+jumpTo+what 去重，`AttentionTab` 合并两源；
+keyless 13/13 通过，构建产物 `lib/client.js` 已含新代码。
+
+**但 attention-e2e 仍红在同一断言**——所以根因不是"没人重建"，而是更靠下的一层：
+要么 `session/follow` 的 frame 不带 `approval/asked`，要么页签绑定的 sessionId 与签核会话不是同一个
+（lane 的 CFO 会话 cwd 在 rehearsal workspace，而观察窗登记的 workspace 未必是它）。下一步必须
+直接在页面里 dump `events` 与 `waiting`，而不是继续猜；在那之前本卡保持 `修复就绪`。
+
 ## 顺带修车道（不与上面混）
 
 无论选 A 还是 B，`attention-e2e` 的浏览器应在签核**之前**打开——否则永久测不到 live 路径；这条属车道时序问题，单独改。

@@ -6,6 +6,7 @@ import {
   STREAM_ITEM_CAP,
   attentionTone,
   mergeAttention,
+  pendingApprovals,
   streamAttention,
   type AttentionEventLike,
   type LivePending,
@@ -123,5 +124,34 @@ describe('createAttentionRegistry · 生命周期', () => {
     expect(registry.list()).toHaveLength(2)
     doneA()
     expect(registry.list()).toMatchObject([{ kind: 'approval', sessionId: 's-b' }])
+  })
+})
+
+describe('pendingApprovals · 历史重建（BUG-288：刷新后仍能看到已挂起审批）', () => {
+  const asked = (id: string, time: number, toolName = 'request_signoff', reason = '双签线') => ({
+    type: 'approval/asked',
+    time,
+    data: { id, toolName, reason },
+  })
+  const decided = (id: string, time: number) => ({ type: 'approval/decided', time, data: { id, outcome: 'allowed-once' } })
+
+  it('问了没答 → 一条待批；答了 → 消失', () => {
+    expect(pendingApprovals([asked('a1', 1000)], 's1')).toHaveLength(1)
+    expect(pendingApprovals([asked('a1', 1000), decided('a1', 2000)], 's1')).toHaveLength(0)
+  })
+
+  it('多个请求只保留仍挂起的那条，按时间倒序', () => {
+    const items = pendingApprovals([asked('a1', 1000), asked('a2', 3000), decided('a1', 4000)], 's1')
+    expect(items.map(item => item.time)).toEqual([3000])
+    expect(items[0]?.kind).toBe('approval')
+    expect(items[0]?.jumpTo).toBe('s1')
+    expect(items[0]?.what).toContain('request_signoff')
+  })
+
+  it('mergeAttention 对同一条挂起去重（活体优先）', () => {
+    const live = [{ kind: 'approval' as const, sessionId: 's1', what: 'request_signoff：双签线', since: 1000 }]
+    const merged = mergeAttention(live, pendingApprovals([asked('a1', 1000)], 's1'))
+    expect(merged).toHaveLength(1)
+    expect(merged[0]?.time).toBe(1000)
   })
 })

@@ -17,6 +17,7 @@ import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import {
   attentionTone,
   mergeAttention,
+  pendingApprovals,
   streamAttention,
   type AttentionEventLike,
   type AttentionItem,
@@ -111,7 +112,7 @@ export function AttentionTab(props: AttentionTabProps) {
   }, [props.follow, props.sessionId])
 
   const items = useMemo(
-    () => mergeAttention(live, streamAttention(events, leadId, 'CEO')),
+    () => mergeAttention(live, [...pendingApprovals(events, leadId), ...streamAttention(events, leadId, 'CEO')]),
     [live, events, leadId],
   )
   const waiting = items.filter(item => item.kind !== 'completion')

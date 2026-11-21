@@ -120,6 +120,40 @@ export function streamAttention(
 }
 
 /**
+ * 从 lead 会话事件流重建**仍挂起**的审批（历史可重建的部分）。
+ *
+ * 为什么需要（2026-11-21 BUG-288）：`waiting` 原只来自本页活体观察者（waterfall 仅在页面
+ * 在场时登记），于是刷新页面 / 后开观察窗时，已挂起的审批在待办里凭空消失，空态还宣称
+ * 「没有等你的事」。会话日志本身有 `approval/asked {id,toolName,reason?}` 与
+ * `approval/decided {id,outcome}`，配对即可重建"问了但没答"的条目。
+ *
+ * @param events - lead 会话事件流（`session/follow` 累积）。
+ * @param sessionId - 事件所属会话（= 一键跳转目标）。
+ * @returns 按时间倒序、受 {@link STREAM_ITEM_CAP} 限制的审批条目。
+ */
+export function pendingApprovals(events: readonly AttentionEventLike[], sessionId: string): readonly AttentionItem[] {
+  const asked = new Map<string, AttentionItem>()
+  for (const event of events) {
+    const data = event.data as { id?: unknown; toolName?: unknown; reason?: unknown } | null
+    if (typeof data !== 'object' || data === null || typeof data.id !== 'string') continue
+    if (event.type === 'approval/asked') {
+      const toolName = typeof data.toolName === 'string' && data.toolName !== '' ? data.toolName : '（工具名缺失）'
+      const reason = typeof data.reason === 'string' ? data.reason.trim() : ''
+      asked.set(data.id, {
+        kind: 'approval',
+        who: sessionId,
+        what: reason === '' ? toolName : `${toolName}：${reason}`,
+        time: event.time,
+        jumpTo: sessionId,
+      })
+    } else if (event.type === 'approval/decided') {
+      asked.delete(data.id)
+    }
+  }
+  return [...asked.values()].sort((a, b) => b.time - a.time).slice(0, STREAM_ITEM_CAP)
+}
+
+/**
  * 合并两源：**等人**（问询/审批挂起）在前、**告知**（升级/完成）在后，各段按时间倒序。
  * @param live - 远端观察者登记的挂起项。
  * @param streamItems - 流折条目。
@@ -137,7 +171,16 @@ export function mergeAttention(
     time: entry.since,
     jumpTo: entry.sessionId,
   }))
-  return [...waiting.sort(byTimeDesc), ...streamItems.slice().sort(byTimeDesc)]
+  // 活体登记与「历史重建」可能指向同一条挂起（本页看着它发起、刷新后又能重建）——按
+  // kind + 跳转会话 + 摘要去重，优先活体（它带真实 since）。
+  const seen = new Set(waiting.map(item => `${item.kind}\u0000${item.jumpTo}\u0000${item.what}`))
+  const rebuilt = streamItems.filter(item => {
+    const key = `${item.kind}\u0000${item.jumpTo}\u0000${item.what}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+  return [...waiting.sort(byTimeDesc), ...rebuilt.slice().sort(byTimeDesc)]
 }
 
 
