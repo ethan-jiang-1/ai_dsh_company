@@ -87,11 +87,13 @@ export function makeCultivationFiles(remote: RemoteNamespaceFace, leadOf: (sessi
   const listDir = async (sessionId: SessionId, dir: string, signal: AbortSignal): Promise<readonly string[] | null> => {
     try {
       const result = await remote.workspaceFiles.list(leadOf(sessionId), dir, signal)
-      if (!result.ok) return null
+      // 静默 null 曾让「面板说读不到、盘上明明有」无从诊断（BUG-291）：失败必须点名目录与原因。
+      if (!result.ok) { console.warn(`[company] 列目录失败 ${dir}`, JSON.stringify(result)); return null }
       return result.value.entries
         .filter(entry => entry.type === 'file' && entry.name.endsWith('.md'))
         .map(entry => entry.name)
-    } catch {
+    } catch (error) {
+      console.warn(`[company] 列目录异常 ${dir}`, error instanceof Error ? error.message : String(error))
       return null
     }
   }

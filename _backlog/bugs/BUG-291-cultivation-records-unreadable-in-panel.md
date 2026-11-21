@@ -44,7 +44,18 @@ source run/env.sh && node tools/dev/company.mjs --no-open     # 取横幅 URL
 | 会话 cwd 错 | 会话头 `cwd = <repo>/company-workspace`，`agentPreset: ceo` |
 | 点号目录被禁 | 同目录的 `read`（成品索引 `.dsh-company/kb/deliverables-index.json`）在同一会话里能读到内容 |
 
-## 待查（失败点已收窄到客户端 `listDir`）
+## 第二批证据（2026-11-21，加了 console 诊断后）
+
+同一实例、另建一个新会话再开「培养」：
+
+- 段落变成「需要我处理 / **没有给我的建议或纠正。**」——**不再是"尚未读到"**；
+- 同屏的 journal 素材正常列出（CEO 8 待审、VP-Eng 7 待审…）→ 说明 `listDir` 这次**成功**了；
+- 页面 console **零** `[company] 列目录失败/异常`（本轮新加的诊断没触发）；
+- 但盘上那条 `status: open`、`targetRole: ceo` 的记录依然没出现。
+
+⇒ 失败面从"列目录"收窄到**「列出 records → 逐条解析」这一段**：`listDir` 通了，`readRecordHead(…, 240)` / `parseRecord()` 在客户端可能返回 null 或过滤掉，且同样没有任何诊断。Node 侧同两个文件 `parseRecord()` 得 2 条、`recordInbox('ceo').needsDecision = 1`，与面板显示矛盾。
+
+## 待查（更新后）
 
 `packages/company-pack/src/client/cultivation/cultivation-data.ts:87`：
 
@@ -55,6 +66,7 @@ if (!result.ok) return null
 
 三个候选，按可能性排序：
 
+0. **客户端解析/过滤**（新首选）：`readRecordHead` 只有 60 行、`parseRecord` 对 `status`/`proposerKind` 等字段的要求是否比 Node 侧调用更严；以及 id 传的是文件名还是路径；
 1. **AbortSignal 已中止**：React effect 在 StrictMode/重渲染下先 abort，`list` 抛错被 `catch` 吞成 null（`read` 因路径不同/时序不同未触发）——需在 catch 里打印原因，而不是静默 null；
 2. **`remote` 包装差异**：`scoped.remote.workspaceFiles.list` 的实参与声明不一致（声明是 `(scopeId, path, signal)`）；
 3. **`entries` 字段过滤**：`type === 'file'` 与实际条目 `type` 值不符（直连返回的是 `file`，但不排除客户端拿到的是另一种包装）。
