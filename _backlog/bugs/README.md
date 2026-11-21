@@ -2,17 +2,19 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 292；已分配 BUG-001..291。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 293；已分配 BUG-001..292。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 1 张**：[BUG-288](BUG-288-attention-panel-list-missing.md)（调查中：lane 红已定性为**环境缺口**——本机 `danger-full-access` 把审批策略推成 `never`，`approval/asked` 与 `decided(rejected)` 同一毫秒，挂起项不存在；跨会话重建不能走 `session/follow`，需换 `session/page` 或宿主查询）。
+**活跃 1 张**：[BUG-292](BUG-292-cross-session-pending-approvals-not-aggregated.md)（调查中：待办只重建**本会话**的挂起项——别人会话里等着的审批看不到；修法有 A 宿主查询 / B 客户端按需读 / C 文案诚实三选，需拍板）。
+
+**已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
 **本轮批次**：下方「## 2026-11-21 修复交接（e2e 验收遗留：BUG-286/288/290/291）」= 组 A–D、顺序 286 → 一次实起三诊断 → 291 → 290 → 288。
 
-**本轮已修并迁出**：BUG-290（会话未开始时 composer 旁给「命令要等会话开始」提示 + tooltip，会话开始即消失；vendor 的静默丢弃记上游提案）、BUG-291（培养页点名 workspace + 空/不可达/读取中三态；两盘对照 + `vitest run tests/client/cultivation/cultivation-board.spec.ts` 4/24 红 → 24/24 绿）、BUG-286（`deliverables-check` 认两个根 + present 前缀归一 → 真盘 assessed:true；`vitest run tests/tools/deliverables-audit.spec.ts` 4/45 红 → 45/45 绿）、BUG-289（human-loop 判据停留在 v3 前的 journal 路径 → 改用 `.dsh-company/kb/<role>/journal`；同命令 12/12 绿）、BUG-287（探针/车道写死英文可访问名 → 14 文件双语正则；attention-e2e 由卡搜索框推进到门A PASS）、BUG-283（dev wrapper `--home` 缺失目录无诊断）、BUG-284（wrapper 不转发信号 ⇒ 孤儿持 writer lease）、BUG-285（upgrade 守卫冻结已废止身份语义）——见 [fixed_bugs](../_archive/fixed_bugs/README.md)。
+**本轮已修并迁出**：BUG-288 → 已结（反证，见上）、BUG-290（会话未开始时 composer 旁给「命令要等会话开始」提示 + tooltip，会话开始即消失；vendor 的静默丢弃记上游提案）、BUG-291（培养页点名 workspace + 空/不可达/读取中三态；两盘对照 + `vitest run tests/client/cultivation/cultivation-board.spec.ts` 4/24 红 → 24/24 绿）、BUG-286（`deliverables-check` 认两个根 + present 前缀归一 → 真盘 assessed:true；`vitest run tests/tools/deliverables-audit.spec.ts` 4/45 红 → 45/45 绿）、BUG-289（human-loop 判据停留在 v3 前的 journal 路径 → 改用 `.dsh-company/kb/<role>/journal`；同命令 12/12 绿）、BUG-287（探针/车道写死英文可访问名 → 14 文件双语正则；attention-e2e 由卡搜索框推进到门A PASS）、BUG-283（dev wrapper `--home` 缺失目录无诊断）、BUG-284（wrapper 不转发信号 ⇒ 孤儿持 writer lease）、BUG-285（upgrade 守卫冻结已废止身份语义）——见 [fixed_bugs](../_archive/fixed_bugs/README.md)。
 
 **上一轮收口**：C17 20 张（BUG-263..282）已于 2026-11-19 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)，见下方「## 2026-11-19 修复交接（根因组 A–G：BUG-263..282）」的收口行。C16 20 张（BUG-243..262）已于 2026-11-18 修复并迁 [fixed_bugs](../_archive/fixed_bugs/README.md)；BUG-212 挂起在 [suspended_bugs](../_archive/suspended_bugs/BUG-212-pre-push-and-release-tail-budget-overrun.md)。
 
@@ -41,7 +43,7 @@
 | **A 判据输入根** | [286](../_archive/fixed_bugs/BUG-286-deliverables-check-v3-layout-unusable.md) | v3 布局后「文件根」与「会话根」不再重合，脚本仍当同一个：judge 以 `deliverables/` 前缀过滤，入口又按外层 workspace 派生 `sessions/` 目录名 | 文件根自动识别 `<ws>/.dsh-company`（存在 deliverables 时），会话根仍用外层 `<ws>`；比对前归一 `.dsh-company/` 前缀；空盘/错根仍 fail-loud（exit 2） | 1 |
 | **B 读面静默** | [291](../_archive/fixed_bugs/BUG-291-cultivation-records-unreadable-in-panel.md) | `list` 成功但返回空——既可能是真空目录，也可能是读到了**另一个 workspace**（`runtime/rehearsal-workspace/.dsh-company/cultivation/records` 存在但 0 文件、同盘 31 篇 journal；`company-workspace` 2 条）。**后者待一次实起取证，未证不写成事实** | 打印原始 `entries` + `result.value.path` + 实际 scope 定性；修法 = 空/不可达必须点名「哪个 workspace + 什么原因」 | 3 |
 | **C 命令无反馈** | [290](../_archive/fixed_bugs/BUG-290-text-command-silent-no-op-without-session.md) | 无会话时命令结果无处可落；「client 丢结果」与「host 未挂会话」两假设未分 | B 政策：client 在无会话时给「命令需要会话」提示 + 新建入口，保留「命令是会话级」不变量 | 4 |
-| **D 投影不完整** | [288](BUG-288-attention-panel-list-missing.md) | 待办只来自本页在线期的活体 waterfall 拦截 + 内存登记处；`streamAttention` 只重放升级/present，不重建 `approval/asked`。半修后 lane 仍红 ⇒ 根因还差一层（帧内容 vs 页签 sessionId 绑定） | A 政策：补 pending 重建器并入 `mergeAttention`；空态文案保持「没有等你的事」为真 | 5 |
+| **D 投影不完整** | [288](../_archive/settled_issues/BUG-288-attention-panel-list-missing.md) | 待办只来自本页在线期的活体 waterfall 拦截 + 内存登记处；`streamAttention` 只重放升级/present，不重建 `approval/asked`。半修后 lane 仍红 ⇒ 根因还差一层（帧内容 vs 页签 sessionId 绑定） | A 政策：补 pending 重建器并入 `mergeAttention`；空态文案保持「没有等你的事」为真 | 5 |
 
 **次序 = A(286) → 一次实起三诊断(B/C/D) → B(291) → C(290) → D(288)**：
 286 先修——它不需要实例，且是 `demo-scenes` 收场验收第 8 步（现 exit 2），不修它后面任何真验收都收不了场；顺带产出「临时 workspace + `.dsh-company/deliverables`」夹具供 291 复用。291/288/290 都要真实例 + CDP + **同一次** client bundle 重建，诊断合并到一次 bring-up，三份证据互为对照实验。修的顺序 = 291（先落「可诊断失败」约定）→ 290（复用同一约定）→ 288（唯一要真模型 + 真浏览器验收，放最后但必须真绿）。

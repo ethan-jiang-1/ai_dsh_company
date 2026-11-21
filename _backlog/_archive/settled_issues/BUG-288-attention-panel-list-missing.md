@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已结
 severity: P2
 opened: 2026-11-20
 ---
 
 # BUG-288：attention-e2e 过了语言关仍卡在「待办页签 → 待办事项列表」20s 超时
 
-> 严重级别：P2（次要偏重：人机审批全回路这条唯一真验收入口仍不可用）｜发现：2026-11-20（端到端验收第二轮）｜状态：调查中
+> 严重级别：P2（次要偏重：人机审批全回路这条唯一真验收入口仍不可用）｜发现：2026-11-20（端到端验收第二轮）｜状态：已结（撤回：原主张被反证——后开的页面**能看到**挂起审批）｜审查：agent — 用 policy=ask 的真实例造出挂起审批后复验，两条判据都实测
 >
-> **留痕**：端到端验收轮（2026-11-20）。
+> **留痕**：none — 反证结案，无系统面改动（残留的跨会话缺口另立 [BUG-292](../../bugs/BUG-292-cross-session-pending-approvals-not-aggregated.md)）。
 >
 > **回翻说明（2026-11-21）**：本机 `approval policy=never`（`run/env.sh` 的 `danger-full-access`）⇒ 挂起项不存在、产品主张不可证；跨会话重建需换数据面。证据见卡末两节，处置见账本批次节的「中途修订」。
 
@@ -129,3 +129,23 @@ keyless 13/13 通过，构建产物 `lib/client.js` 已含新代码。
 **当前处置**：本卡留在 `调查中`（产品主张在本机不可证、且重建路径需要换数据面）；
 触发句 = 「在有 `sandbox-exec` 的机器上（或显式 `approval policy = ask`）跑 `node checks/lanes/attention-e2e.entry.mjs`，
 并同时验证刷新后仍能看到挂起审批」。**不翻 `已修`，也不改 lane 断言**。
+
+## 撤回（2026-11-21）：原主张被反证
+
+用**同一个实例 + 真实挂起审批**复验，结论与原卡相反：
+
+1. **造出真实挂起项**：本机默认策略是 `never`（`run/env.sh` 的 `danger-full-access`），所以先从
+   审批策略侧取到 `ask`——以 `DSH_PERMISSION_MODE=workspace-write` 起实例（会话日志 `seq 2` 实测
+   `{"type":"approval/policy","data":{"policy":"ask"}}`），RPC 建 CFO 会话并让它调 `request_signoff`，
+   得到**未 decided** 的挂起审批：`PENDING=request_signoff 折扣线双签：…`。
+2. **后开的页面看到了它**：紧接着用一个**全新浏览器**（此前没有任何页面在场、live 登记处为空）
+   打开同一会话的「待办」页签，面板渲染：
+   `等你处理 / 待批审批 BUG-288 挂起审批取证：request_signoff：折扣线双签：… · 刚刚 去处理`。
+
+⇒ 「刷新页面 / 关掉再开 ⇒ 已挂起审批消失」**不成立**：同一会话的历史重建（`pendingApprovals` 折
+`session/follow` 的 history 帧）本来就把它补回来了。lane 长期红是**环境**（policy=never 时审批被
+同毫秒自动拒），不是面板缺陷。
+
+**仍然成立的残留**（已另立 [BUG-292](../../bugs/BUG-292-cross-session-pending-approvals-not-aggregated.md)）：
+面板只重建**当前会话**的挂起项；别人会话里等着的审批，在你自己的会话里看不到。它与本卡的原主张
+是两件事，所以分开记账。

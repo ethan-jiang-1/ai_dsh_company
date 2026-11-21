@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-288-attention-panel-list-missing.md](settled_issues/BUG-288-attention-panel-list-missing.md) — 已结（反证）：`ask` 策略下后开的页面能看到挂起审批；lane 红是环境 `never`。
 - [BUG-290-text-command-silent-no-op-without-session.md](fixed_bugs/BUG-290-text-command-silent-no-op-without-session.md) — 空白页敲斜杠命令无反馈；host 实测被调用、结果丢在 vendor transcript 面，本仓落「会话未开始」提示（政策 B）。
 - [BUG-291-cultivation-records-unreadable-in-panel.md](fixed_bugs/BUG-291-cultivation-records-unreadable-in-panel.md) — 面板如实报告自身 workspace，但 UI 从不点名「哪个盘」；收窄为作用域可诊断性，空/不可达/读取中三态分文案。
 - [BUG-286-deliverables-check-v3-layout-unusable.md](fixed_bugs/BUG-286-deliverables-check-v3-layout-unusable.md) — v3 布局把「文件根」与「会话根」拆开后判据入口仍当同一个（默认档 exit 2）；两个根 + present 前缀归一后真盘 assessed。
