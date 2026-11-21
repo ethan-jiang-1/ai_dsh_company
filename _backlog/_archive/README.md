@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-291-cultivation-records-unreadable-in-panel.md](fixed_bugs/BUG-291-cultivation-records-unreadable-in-panel.md) — 面板如实报告自身 workspace，但 UI 从不点名「哪个盘」；收窄为作用域可诊断性，空/不可达/读取中三态分文案。
 - [BUG-286-deliverables-check-v3-layout-unusable.md](fixed_bugs/BUG-286-deliverables-check-v3-layout-unusable.md) — v3 布局把「文件根」与「会话根」拆开后判据入口仍当同一个（默认档 exit 2）；两个根 + present 前缀归一后真盘 assessed。
 - [BUG-289-human-loop-decision-journal-not-written.md](fixed_bugs/BUG-289-human-loop-decision-journal-not-written.md) — 判据按旧布局找 journal，产品写对了 `.dsh-company/kb/ceo/journal/`；改常量后 12/12 绿。
 - [BUG-287-session-search-locale-hardcoded.md](fixed_bugs/BUG-287-session-search-locale-hardcoded.md) — 探针/车道写死英文可访问名，默认 zh 产品档整批导航超时；14 文件改双语正则。

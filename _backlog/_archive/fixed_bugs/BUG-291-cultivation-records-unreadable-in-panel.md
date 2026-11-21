@@ -1,14 +1,14 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-21
 ---
 
 # BUG-291：培养页显示「培养记录尚未读到」，但目录里有记录、直连 RPC 也读得到
 
-> 严重级别：P2（次要偏重：培养这条人机协作入口在真实盘上整页不可用）｜发现：2026-11-21（端到端验收第七轮）｜状态：修复就绪
+> 严重级别：P2（次要偏重：培养这条人机协作入口在真实盘上整页不可用）｜发现：2026-11-21（端到端验收第七轮）｜状态：已修｜审查：agent — 逐条核对四条已修判定（真盘两盘对照 + spec 4/24 红 → 24/24 绿）；材料性（改 client 公开文案），按批次授权执行
 >
-> **留痕**：端到端验收轮（2026-11-21）。
+> **留痕**：commit 14661a9f（client 文案与读面字段，属材料性改动；批次 Note 覆盖 F2 合同，见账本「2026-11-21 修复交接」）。
 
 ## 症状
 
@@ -147,3 +147,10 @@ AbortSignal 中止 / `remote` 包装差异 / `entries` 字段过滤。
 - 目录缺失/不可读的负控：文案点名目录 + 原因，且与「0 条」可区分；
 - 判据命令：`vitest run tests/client/cultivation/cultivation-board.spec.ts`（新增两条：点名 workspace、
   空 vs 不可达两种文案）。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/cultivation/cultivation-data.ts`、`packages/company-pack/src/client/cultivation/CultivationInbox.tsx`、`packages/company-pack/src/client/cultivation/CultivationBoard.tsx`、`packages/company-pack/src/client/cultivation/cultivation-actions.ts`、`packages/company-pack/src/client/tabs/CultivationTab.tsx`、`tests/client/cultivation/cultivation-board.spec.ts`
+- 红：`vitest run tests/client/cultivation/cultivation-board.spec.ts` —— 新四条未实现时 4/24 失败（标题不点名 workspace、空态不点名、null 说不了原因、不可达与空不可分）；真页面同期：两盘同名「公司盘 × CEO」，rehearsal 盘显示「没有给我的建议或纠正。」
+- 绿：`vitest run tests/client/cultivation/cultivation-board.spec.ts` —— 24/24 通过；真页面同两盘：company-workspace 标题点名并列出 2 条记录，rehearsal-workspace 标题点名且「这个工作区（rehearsal-workspace）下还没有培养记录。」
+- 提交：commit 14661a9f

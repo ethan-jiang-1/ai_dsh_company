@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-291**（2026-11-21，端到端验收轮 / P2）：培养页「读不到记录」被对照实验证伪为**作用域不可见**——
+  [291](BUG-291-cultivation-records-unreadable-in-panel.md) 面板一直如实报告它所在的 workspace，但
+  UI 写死「公司盘」，空/不可达/读取中三态不可分；收窄为「点名 workspace + 失败带原因」。
+  证据提交 `14661a9f`。
+
 - **BUG-286**（2026-11-21，端到端验收轮 / P2）：`deliverables-check` 在 v3 盘上整体不可用——
   [286](BUG-286-deliverables-check-v3-layout-unusable.md) 把「文件根」（`<ws>/.dsh-company`）与「会话根」
   （外层 workspace 派生的 `sessions/` 目录名）当成同一个，两种传法都 exit 2；新增 `resolveRunRoots` 定两个根、

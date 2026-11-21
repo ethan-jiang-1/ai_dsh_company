@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 285 |
-| 有具名守卫 | 180 |
+| 已修卡 | 286 |
+| 有具名守卫 | 181 |
 | 无具名守卫 | 105 |
-| 覆盖率 | 63.2% |
+| 覆盖率 | 63.3% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -306,3 +306,4 @@
 | 286 | 2026-11-20 | tests/tools/deliverables-audit.spec.ts:585 |
 | 287 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:51 |
 | 289 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:63 |
+| 291 | 2026-11-21 | tests/client/cultivation/cultivation-board.spec.ts:236 |
