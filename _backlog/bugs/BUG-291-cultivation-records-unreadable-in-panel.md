@@ -6,13 +6,13 @@ opened: 2026-11-21
 
 # BUG-291：培养页显示「培养记录尚未读到」，但目录里有记录、直连 RPC 也读得到
 
-> 严重级别：P2（次要偏重：培养这条人机协作入口在真实盘上整页不可用）｜发现：2026-11-21（端到端验收第七轮）｜状态：调查中（失败点已收窄，未定根因）
+> 严重级别：P2（次要偏重：培养这条人机协作入口在真实盘上整页不可用）｜发现：2026-11-21（端到端验收第七轮）｜状态：调查中
 >
 > **留痕**：端到端验收轮（2026-11-21）。
 
 ## 症状
 
-在 `company-workspace` 里新建一个 CEO 会话（cwd 已确认 = `/Users/bowhead/ai_dsh_company/company-workspace`），打开「培养」页签：
+在 `company-workspace` 里新建一个 CEO 会话（cwd 已确认 = `<repo>/company-workspace`），打开「培养」页签：
 
 ```
 我的分身：CEO · 首席执行官
@@ -41,7 +41,7 @@ source run/env.sh && node tools/dev/company.mjs --no-open     # 取横幅 URL
 | 目录不存在 | `ls company-workspace/.dsh-company/cultivation/records` → 2 个 .md |
 | 记录解析失败 | 用 `tsx` 直接 `parseRecord()` 两个文件 → 2 条解析成功，`recordInbox(records,'ceo').needsDecision = 1` |
 | RPC 或服务端拒绝 | 直连 `workspaceFiles/list`（`workspaceFileScopeId` = 该会话 id，path = `.dsh-company/cultivation/records`）→ 返回 2 条 `{name, type:'file'}`，`truncated:false` |
-| 会话 cwd 错 | 会话头 `cwd = /Users/bowhead/ai_dsh_company/company-workspace`，`agentPreset: ceo` |
+| 会话 cwd 错 | 会话头 `cwd = <repo>/company-workspace`，`agentPreset: ceo` |
 | 点号目录被禁 | 同目录的 `read`（成品索引 `.dsh-company/kb/deliverables-index.json`）在同一会话里能读到内容 |
 
 ## 待查（失败点已收窄到客户端 `listDir`）
