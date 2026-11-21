@@ -56,6 +56,14 @@ describe('待办页签：挂起项、空态与断流（R3-10）', () => {
     expect(host.textContent).toContain('每 2 秒自动刷新')
   })
 
+  // 作用域诚实（BUG-292）：面板的活体面是整页的，历史重建只覆盖**本会话**——
+  // 空态必须说清这条边界，否则「没有等你的事」会被读成「公司里没人等你」（跨会话时是假的）。
+  it('空态说清作用域：本会话的挂起项都在这里，别的会话要打开才看得到', async () => {
+    const host = await mount(createElement(AttentionTab, props()))
+    expect(host.textContent).toContain('本会话的挂起项都在这里')
+    expect(host.textContent).toContain('别的会话里等着的审批')
+  })
+
   it('登记处的挂起项出现在「等你处理」：标签、会话名与正文都在', async () => {
     const registry = createAttentionRegistry()
     registry.begin({ kind: 'approval', sessionId: 'session-vp-eng', what: '签发技术方案', since: Date.now() })
