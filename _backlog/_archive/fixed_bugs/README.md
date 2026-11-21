@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-286**（2026-11-21，端到端验收轮 / P2）：`deliverables-check` 在 v3 盘上整体不可用——
+  [286](BUG-286-deliverables-check-v3-layout-unusable.md) 把「文件根」（`<ws>/.dsh-company`）与「会话根」
+  （外层 workspace 派生的 `sessions/` 目录名）当成同一个，两种传法都 exit 2；新增 `resolveRunRoots` 定两个根、
+  `presentPrefix` 归一 present 路径（60 个 slug 由「误判未 present」回到正确背书）。证据提交 `afe75dcc`。
+
 - **BUG-283..285**（2026-11-20，端到端验收轮 / P3·P2·P3）：dev 入口与守卫的「沉默失败」——
   [283](BUG-283-dev-wrapper-home-missing-opaque-failure.md) `--home` 目录不存在时模板初始化 spawn 失败被压成
   `exit null`/空 stderr（先建 home + 点名 spawn 错误）；[284](BUG-284-dev-wrapper-orphan-writer-holds-lease.md)

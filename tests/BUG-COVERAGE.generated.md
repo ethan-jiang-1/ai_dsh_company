@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 284 |
-| 有具名守卫 | 179 |
+| 已修卡 | 285 |
+| 有具名守卫 | 180 |
 | 无具名守卫 | 105 |
-| 覆盖率 | 63.0% |
+| 覆盖率 | 63.2% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -127,20 +127,20 @@
 | BUG | opened | 守卫 |
 |---|---|---|
 | 002 | — | tests/host/workspace/workspace-doors.spec.ts:55；tests/lib/presence/doors.spec.ts:13 |
-| 003 | — | tests/tools/deliverables-audit.spec.ts:462 |
-| 004 | — | tests/tools/deliverables-audit.spec.ts:546 |
-| 008 | 2026-10-10 | tests/tools/deliverables-audit.spec.ts:294 |
+| 003 | — | tests/tools/deliverables-audit.spec.ts:463 |
+| 004 | — | tests/tools/deliverables-audit.spec.ts:547 |
+| 008 | 2026-10-10 | tests/tools/deliverables-audit.spec.ts:295 |
 | 011 | 2026-10-11 | tests/tools/candidate-scan-assignments.spec.ts:49 |
 | 013 | 2026-10-12 | tests/repo/security/tracked-secrets.spec.ts:22；tests/repo/security/tracked-token.spec.ts:20 |
 | 014 | 2026-10-12 | tests/tools/converge-rules.spec.ts:149 |
 | 016 | 2026-10-12 | tests/tools/converge-rules.spec.ts:177 |
 | 018 | 2026-10-16 | tests/tools/authorship.spec.ts:19；tests/tools/authorship.spec.ts:29 |
-| 019 | 2026-10-16 | tests/tools/deliverables-audit.spec.ts:504 |
+| 019 | 2026-10-16 | tests/tools/deliverables-audit.spec.ts:505 |
 | 020 | 2026-10-16 | tests/tools/converge-rules.spec.ts:121 |
 | 021 | 2026-10-17 | tests/presets/presets.spec.ts:481 |
 | 022 | 2026-10-18 | tests/tools/question-stop.spec.ts:57 |
 | 027 | 2026-10-19 | tests/client/tabs/board-panel.spec.ts:77；tests/client/tabs/tasks-table.spec.ts:69；tests/lib/presence/board.spec.ts:77 |
-| 028 | 2026-10-19 | tests/tools/deliverables-audit.spec.ts:247；tests/tools/deliverables-audit.spec.ts:275 |
+| 028 | 2026-10-19 | tests/tools/deliverables-audit.spec.ts:248；tests/tools/deliverables-audit.spec.ts:276 |
 | 030 | 2026-10-20 | tests/session/session-diagnose.spec.ts:16 |
 | 033 | 2026-10-27 | tests/host/cultivation/revoke-journal.spec.ts:66 |
 | 041 | 2026-11-08 | tests/host/delegation/delegation-control.spec.ts:359 |
@@ -303,5 +303,6 @@
 | 283 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:24 |
 | 284 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:35 |
 | 285 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:43 |
+| 286 | 2026-11-20 | tests/tools/deliverables-audit.spec.ts:585 |
 | 287 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:51 |
 | 289 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:63 |

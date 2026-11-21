@@ -581,8 +581,8 @@ describe('让位行的机器可查面（BUG-004，2026-10-06 修复轮立——�
 // 规则 = `resolveRunRoots`（纯函数）；present 事件里的 `.dsh-company/` 前缀 = `presentPrefix`。
 // 运行场入口（`checks/audit/deliverables-check.mjs`）只负责把这两个返回值接到 listFiles/sessions 上；
 // 它的红→绿在真盘上验（回归层禁子进程，见 tests/repo/structure/layering.spec.ts）。
-// 标题暂不带事故号：guard-red-record 要求 `BUG-nnn` 对到**已归档**卡；卡归档后再补号与留证行。
-describe('v3 布局双根与 present 前缀', () => {
+// 负例留证 2026-11-21：撤掉 checks/lib 与 checks/audit 两处源码改动后 `vitest run tests/tools/deliverables-audit.spec.ts` 4/45 失败（resolveRunRoots 不在导出面、presentPrefix 不生效）；接回后 45/45 绿。BUG-286
+describe('v3 布局双根与 present 前缀（BUG-286）', () => {
   it('外层 workspace + .dsh-company 数据 ⇒ 文件根下沉，会话根仍是外层', () => {
     expect(resolveRunRoots({ workspace: '/ws', bundleDeliverables: true })).toEqual({
       workspaceRoot: '/ws',

@@ -1,18 +1,18 @@
 ---
-status: 修复就绪
+status: 已修
 severity: P2
 opened: 2026-11-20
 ---
 
 # BUG-286：`deliverables-check` 无法审 v3 布局——runbook 的收场验收命令必 exit 2
 
-> 严重级别：P2（次要偏重：演示/交付收场的审计入口整体不可用）｜发现：2026-11-20（端到端验收）｜状态：修复就绪｜
+> 严重级别：P2（次要偏重：演示/交付收场的审计入口整体不可用）｜发现：2026-11-20（端到端验收）｜状态：已修｜审查：agent — 逐条核对四条「已修判定」（真盘 assessed / 双根 / 前缀归一 / 空盘仍 exit 2）并复跑 spec；工具面非材料性，按 P5 不在必须独立盲审的类（问题卡/门禁/跨模块收口）
 >
-> **留痕**：端到端验收轮（2026-11-20）。
+> **留痕**：commit afe75dcc（工具/判据面修复，非材料性；不建 Note）。
 
 ## 症状
 
-按 [demo-scenes 收场验收](../../docs/guides/demo-scenes.md) 的第 8 步执行：
+按 [demo-scenes 收场验收](../../../docs/guides/demo-scenes.md) 的第 8 步执行：
 
 ```
 node checks/audit/deliverables-check.mjs
@@ -71,3 +71,19 @@ v3 起数据在 `<workspace>/.dsh-company/deliverables/**`：传外层 workspace
 探针却固定读 `company-workspace` 的索引——dev 盘上最近会话属于 `runtime/rehearsal-workspace`（2 条成品），
 所以面板显示 2/8 都正常，**不是产品缺陷**；要改的是探针按会话 workspace 取期望值。
 「点打开未开到正文」仍未定性（可能是「在应用中打开」依赖本机外部应用，探针不可观测）。
+
+## 修复落地（2026-11-21）
+
+- **两个根**：`checks/lib/deliverables-audit.mjs` 新增纯函数 `resolveRunRoots()` —— 给定 `--workspace` 与两级探测结果，返回「外层 workspace 根 / 文件根 / present 前缀」。规则：数据在 `<ws>/.dsh-company/deliverables` ⇒ 文件根下沉、会话根仍外层；直接给 `<ws>/.dsh-company` ⇒ 会话根退回外层；旧布局与已归档快照 ⇒ 两个根同一、前缀空串（口径一字未动）。
+- **入口接线**：`checks/audit/deliverables-check.mjs` 只在入口做 I/O 探测（唯一做 I/O 的地方），之后文件清单 / 台账 / meta / drafts 读**文件根**，`sessions/` 目录名派生仍用**外层根**；判词里多印一行两个根（「审的是哪个盘」不再靠猜）。
+- **present 前缀归一**：`auditDeliverables` 新增 `presentPrefix`，比对前剥掉 `.dsh-company/`。真盘实测效果：修复前 present 事件全军覆没（60 个 slug 会判 `final-not-presented`），修复后只剩 3 个真的没 present 过的（`ai-game-angel-2026`、`portable-overload-detection-v4` / `-v5`）。
+- **回归**：`tests/tools/deliverables-audit.spec.ts` 新增四条（两个根三种形状 + present 前缀的正例/负控）。回归层禁子进程（`layering.spec.ts`），所以入口接线由真盘实跑认证，纯函数由 spec 钉住。
+
+**真盘观察（不是本卡范围）**：默认档现在 `assessed:true`，但带 60+ 条既有违规（大多是 `meta.md` 用旧中文键 `类型:`/`结果:`，`validateMeta` 认 `type:`/`result:`；以及 3 条 `unshaped-file`、6 条 `final-not-presented`）。这是 dev 盘历史数据，属「存量口径」问题，不随本卡改判据。
+
+## 修复证据
+
+- 改动面：`checks/lib/deliverables-audit.mjs`、`checks/audit/deliverables-check.mjs`、`tests/tools/deliverables-audit.spec.ts`
+- 红：`vitest run tests/tools/deliverables-audit.spec.ts` —— 撤掉两个源码文件的改动后 4/45 失败（`resolveRunRoots` 不在导出面、`presentPrefix` 不生效）；同窗口真盘 `node checks/audit/deliverables-check.mjs --json` exit 2「找不到任何 deliverables(-archive)/ 文件」
+- 绿：`vitest run tests/tools/deliverables-audit.spec.ts` —— 45/45 通过；同窗口真盘同一命令 `assessed:true`（sessions 403 / finals 62 / presented 60；`--workspace company-workspace/.dsh-company` 同样 assessed）
+- 提交：commit afe75dcc
