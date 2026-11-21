@@ -399,16 +399,22 @@ describe('走查抓到的四处 UX 缺陷（2026-10-18，图为证）', () => {
 })
 
 describe('首启两态（探索轴 ③：读不到 ≠ 0 条）', () => {
-  it('记录不可达（null）⇒ 说"尚未读到/不算 0 条"，不假装空', () => {
-    const { container } = mount({ records: null, journalRows: null })
+  it('记录不可达（带原因）⇒ 点名目录 + 原因 + 不算 0 条，不假装空', () => {
+    const { container } = mount({
+      records: null,
+      recordsProblem: { path: '.dsh-company/cultivation/records', reason: '列目录被拒' },
+      journalRows: null,
+    })
     const text = container.textContent ?? ''
-    expect(text).toMatch(/尚未读到|目录缺失|读取失败/)
+    expect(text, '点名读的是哪个目录').toContain('.dsh-company/cultivation/records')
+    expect(text, '点名原因').toContain('列目录被拒')
     expect(text).toContain('不算 0 条')
   })
 
-  it('空盘（可达但 0 条）⇒ 说"没有给我的建议或纠正"', () => {
-    const { container } = mount({ records: [] })
-    expect(container.textContent).toContain('没有给我的建议或纠正')
+  it('空盘（可达但 0 条）⇒ 说"这个工作区还没有培养记录"并点名工作区', () => {
+    const { container } = mount({ records: [], workspaceLabel: 'company-workspace' })
+    expect(container.textContent).toContain('还没有培养记录')
+    expect(container.textContent, '空盘要点名看的是哪个盘').toContain('company-workspace')
     expect(container.textContent, '空盘不该说"读不到"').not.toContain('不算 0 条')
   })
 })
@@ -566,7 +572,11 @@ describe('无困惑重排与判断材料（S3/S4）', () => {
 
 describe('渲染入口自检', () => {
   it('空场也能渲染（records 不可达 ≠ 0 条的口径不变）', () => {
-    const { container } = mount({ records: null, journalRows: null })
+    const { container } = mount({
+      records: null,
+      recordsProblem: { path: '.dsh-company/cultivation/records', reason: 'unreachable' },
+      journalRows: null,
+    })
     const tree: ReactElement = createElement('div')
     expect(tree).toBeDefined()
     expect(container.textContent).toContain('不算 0 条')

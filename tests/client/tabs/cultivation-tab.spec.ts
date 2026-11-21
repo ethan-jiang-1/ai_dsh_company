@@ -39,7 +39,7 @@ function props(over: Record<string, unknown> = {}) {
     cultivationFiles: {
       listJournal: async () => [],
       readHead: async () => null,
-      listRecords: async () => [],
+      listRecords: async () => ({ ok: true, names: [] }),
       readRecordHead: async () => null,
       readRecord: async () => null,
     },
@@ -92,7 +92,7 @@ describe('培养页签：外壳、viewer 角色与真实记录（R5-06）', () =
       cultivationFiles: {
         listJournal: async () => [],
         readHead: async () => null,
-        listRecords: async () => ['r1.md'],
+        listRecords: async () => ({ ok: true, names: ['r1.md'] }),
         readRecordHead: async () => record,
         readRecord: async () => record,
       },
@@ -105,7 +105,7 @@ describe('培养页签：外壳、viewer 角色与真实记录（R5-06）', () =
       cultivationFiles: {
         listJournal: async () => [],
         readHead: async () => null,
-        listRecords: async () => null,
+        listRecords: async () => ({ ok: false, reason: 'unreachable' }),
         readRecordHead: async () => null,
         readRecord: async () => null,
       },

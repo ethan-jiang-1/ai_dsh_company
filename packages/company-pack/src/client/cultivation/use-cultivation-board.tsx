@@ -32,6 +32,8 @@ const LIST_CAPS = { inbox: 10, mine: 5, adopted: 5 } as const
 export interface CultivationBoardStateProps {
   readonly viewerRole: string | null
   readonly viewerLabel: string | null
+  readonly workspaceLabel?: string | null | undefined
+  readonly recordsProblem?: import('./cultivation-data.ts').CultivationReadProblem | null | undefined
   readonly records: readonly CultivationRecord[] | null
   readonly brokenRecords?: readonly string[] | undefined
   readonly unexpandedRecords?: number | undefined
@@ -167,6 +169,8 @@ export function useCultivationBoard(props: CultivationBoardStateProps) {
     brokenRecords: props.brokenRecords,
     unexpandedRecords: props.unexpandedRecords,
     records: props.records,
+    workspaceLabel: props.workspaceLabel ?? null,
+    recordsProblem: props.recordsProblem ?? null,
     setRejectingId,
     setExpandedContexts,
     setReason,

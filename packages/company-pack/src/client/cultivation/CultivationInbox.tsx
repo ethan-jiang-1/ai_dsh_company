@@ -22,6 +22,8 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
     inbox,
     actions,
     records,
+    recordsProblem,
+    workspaceLabel,
     brokenRecords,
     unexpandedRecords,
     pendingIds,
@@ -61,9 +63,11 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
           </div>
         )}
         {records === null
-          ? <div className="wk-meta">{CULTIVATION_COPY.inboxUnread}</div>
+          ? <div className="wk-meta">{recordsProblem === null
+            ? CULTIVATION_COPY.inboxLoading
+            : CULTIVATION_COPY.inboxUnread(recordsProblem.path, recordsProblem.reason)}</div>
           : inbox.needsDecision.length === 0
-            ? <div className="wk-meta">{CULTIVATION_COPY.inboxEmpty}</div>
+            ? <div className="wk-meta">{CULTIVATION_COPY.inboxEmpty(workspaceLabel)}</div>
             : (
               <>
               <div role="list" aria-label={CULTIVATION_COPY.inboxListAria} className="wk-list wk-cultivation-list">

@@ -22,7 +22,7 @@ function stubFiles() {
     files: {
       // 形状照 hook 真实用法：listJournal 给"名字数组"（hook 内部 slice/逐个读），listRecords 给记录数组。
       listJournal: async () => { calls.journal++; return [] },
-      listRecords: async () => { calls.records++; return [] },
+      listRecords: async () => { calls.records++; return { ok: true, names: [] } },
       readRecordHead: async (_role: string, name: string) => { calls.read++; void name; return null },
       readRecord: async (_role: string, name: string) => { calls.read++; void name; return null },
     },
@@ -64,7 +64,7 @@ describe('records 摘要全扫 + open/最近 N 全文（2026-10-27 R1）', () =>
     let heads = 0
     const files = {
       listJournal: async () => [],
-      listRecords: async () => names,
+      listRecords: async () => ({ ok: true, names }),
       readRecordHead: async (_role: string, path: string) => { heads += 1; return head(path) },
       readRecord: async (_role: string, path: string) => { full += 1; return head(path) },
     }

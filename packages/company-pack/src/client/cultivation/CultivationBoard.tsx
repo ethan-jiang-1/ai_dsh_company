@@ -27,6 +27,7 @@ import {
 } from './cultivation-actions.ts'
 import { CultivationCompose } from './CultivationCompose.tsx'
 import { useCultivationBoard } from './use-cultivation-board.tsx'
+import type { CultivationReadProblem } from './cultivation-data.ts'
 import { CultivationInbox } from './CultivationInbox.tsx'
 import { roleLabel as defaultRoleLabel } from '../../lib/cultivation/cultivation.ts'
 import { CultivationAdopted, CultivationFeedback, CultivationJournal, CultivationMine } from './CultivationBoardSections.tsx'
@@ -39,6 +40,10 @@ import type { CultivationContext } from '../../lib/cultivation/cultivation-conte
 export interface CultivationBoardProps {
   /** 当前会话的公司角色（viewer；null = 未选角色——提示选择，不猜身份）。 */
   readonly viewerRole: string | null
+  /** 本会话所属工作区名（点名「看的是哪个盘」；缺席 = 不点名）。 */
+  readonly workspaceLabel?: string | null | undefined
+  /** 记录目录读不到时的原因（null/缺席 = 没有失败）。 */
+  readonly recordsProblem?: CultivationReadProblem | null | undefined
   /** viewer 的显示名（viewerRole 缺席时 null）。 */
   readonly viewerLabel: string | null
   /** 五角色 journal 待审行（null = 首读未完成；行内 reach 表达单角色不可达）。 */
@@ -92,7 +97,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
         <div className="wk-meta">
           {viewer === null
             ? CULTIVATION_COPY.boardNotRole
-            : CULTIVATION_COPY.boardTarget(props.viewerLabel ?? viewer)}
+            : CULTIVATION_COPY.boardTarget(props.viewerLabel ?? viewer, props.workspaceLabel ?? null)}
         </div>
       </div>
 

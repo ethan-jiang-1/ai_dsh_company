@@ -55,7 +55,7 @@ function tabData(t: CompanyTabRegistrationData['t'] = ((key: keyof typeof zh) =>
   const cultivationFiles: CultivationFiles = {
     listJournal: vi.fn(async () => []),
     readHead: vi.fn(async () => null),
-    listRecords: vi.fn(async () => []),
+    listRecords: vi.fn(async () => ({ ok: true, names: [] })),
     readRecord: vi.fn(async () => null),
   }
   const roleSource = { getSnapshot: vi.fn(() => ({ projectionsBySession: {} })), subscribe: vi.fn(() => () => {}) }

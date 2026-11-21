@@ -228,3 +228,38 @@ describe('背景卡：有 contexts 的记录（D1=A / D2=A）', () => {
     expect(markup).not.toContain('打开会话')
   })
 })
+
+// 作用域与可诊断失败（BUG-291，F2 合同的第一处）：面板说的是真话，但「说的是哪个盘」必须可见——
+// 上一轮两次误判都来自「0 条」与「读不到」都不点名 workspace（对照实验：company-workspace 有 2 条，
+// rehearsal-workspace 同路径下 0 条，两个盘在 UI 上长得一模一样）。
+// 负例留证 2026-11-21：改回改文案前的实现（不传 workspaceLabel / 无 recordsProblem 分支）时 `vitest run tests/client/cultivation/cultivation-board.spec.ts` 4/24 失败（标题不点名、空态不点名、null 说不了原因、不可达与空不可分）；接回后 24/24 绿。BUG-291
+describe('CultivationBoard：作用域与可诊断失败', () => {
+  it('标题点名会话所属 workspace（默认 zh）', () => {
+    const markup = render({ records: [], workspaceLabel: 'company-workspace' })
+    expect(markup).toContain('company-workspace')
+  })
+
+  it('空清单点名 workspace，且不冒充「读不到」', () => {
+    const markup = render({ records: [], workspaceLabel: 'rehearsal-workspace' })
+    expect(markup).toContain('rehearsal-workspace')
+    expect(markup).toContain('还没有培养记录')
+    expect(markup).not.toContain('读不到')
+  })
+
+  it('不可达点名目录与原因，与「0 条」可区分', () => {
+    const markup = render({
+      records: null,
+      workspaceLabel: 'company-workspace',
+      recordsProblem: { path: '.dsh-company/cultivation/records', reason: 'not found' },
+    })
+    expect(markup).toContain('.dsh-company/cultivation/records')
+    expect(markup).toContain('not found')
+    expect(markup).not.toContain('还没有培养记录')
+  })
+
+  it('首读未完成说「读取中」，不预判成读不到', () => {
+    const markup = render({ records: null })
+    expect(markup).toContain('读取中')
+    expect(markup).not.toContain('读不到')
+  })
+})

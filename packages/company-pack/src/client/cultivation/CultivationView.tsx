@@ -25,6 +25,7 @@ import type { CultivationContext } from '../../lib/cultivation/cultivation-conte
 import {
   useCultivationFeedback,
   useCultivationPanelData,
+  workspaceLabelOf,
   type CultivationFiles,
   type CultivationFollowEvents,
 } from './cultivation-data.ts'
@@ -78,7 +79,7 @@ export function createCultivationView(injected: CultivationViewInjected) {
     const subscribe = useMemo(() => injected.roleSource.subscribe.bind(injected.roleSource), [injected.roleSource])
     const getPreset = useCallback(() => readPresetOf(injected.roleSource, sessionId), [injected.roleSource, sessionId])
     const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
-    const { journalRows, records, brokenRecords, unexpandedRecords, refresh } = useCultivationPanelData(injected.cultivationFiles, sessionId)
+    const { journalRows, records, recordsProblem, brokenRecords, unexpandedRecords, refresh } = useCultivationPanelData(injected.cultivationFiles, sessionId)
     const feedback = useCultivationFeedback(injected.followEvents, sessionId)
     const teammate = props.useSessions(state => state.byId[sessionId]?.origin === 'subagent')
     const sessionCwd = props.useSessions(state => state.byId[sessionId]?.cwd)
@@ -163,6 +164,8 @@ export function createCultivationView(injected: CultivationViewInjected) {
             <CultivationBoard
               viewerRole={viewerRole}
               viewerLabel={viewerRole === null ? null : roleText(viewerRole, 'label', t, roleLabel(viewerRole))}
+              workspaceLabel={workspaceLabelOf(sessionCwd)}
+              recordsProblem={recordsProblem}
               roleLabel={role => roleText(role, 'label', t, roleLabel(role))}
               journalRows={journalRows}
               records={records}

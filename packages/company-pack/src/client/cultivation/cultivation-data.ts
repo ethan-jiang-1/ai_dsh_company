@@ -39,14 +39,22 @@ export interface RemoteNamespaceFace {
   readonly workspaceFiles: WorkspaceFilesFace
 }
 
+/**
+ * 列目录的结果：**成功空清单与失败必须可区分**（F2 可诊断失败，BUG-291）。
+ * 只给 `string[] | null` 时，「这个盘确实没有记录」和「读不到」在 UI 上不可分——正是上一轮误判的根源。
+ */
+export type DirListing =
+  | { readonly ok: true, readonly names: readonly string[] }
+  | { readonly ok: false, readonly reason: string }
+
 /** 培养面板要读的四件：journal 清单/首段 + 记录清单/全文（全部失败给 null，见头注）。 */
 export interface CultivationFiles {
   /** 列某角色 journal 目录的 .md 文件名；不可达给 null。 */
   readonly listJournal: (sessionId: SessionId, role: string, signal: AbortSignal) => Promise<readonly string[] | null>
   /** 读工作区文本文件首窗口；失败给 null。 */
   readonly readHead: (sessionId: SessionId, path: string, signal: AbortSignal) => Promise<string | null>
-  /** 列培养记录目录（cultivation/records）的 .md 文件名；不可达给 null。 */
-  readonly listRecords: (sessionId: SessionId, signal: AbortSignal) => Promise<readonly string[] | null>
+  /** 列培养记录目录（cultivation/records）的 .md 文件名；不可达带原因（不折成空清单）。 */
+  readonly listRecords: (sessionId: SessionId, signal: AbortSignal) => Promise<DirListing>
   /** 读记录头部（frontmatter + 少量正文）；摘要全扫用，失败给 null。 */
   readonly readRecordHead: (sessionId: SessionId, path: string, signal: AbortSignal) => Promise<string | null>
   /** 读培养记录全文；失败给 null。 */
@@ -84,22 +92,33 @@ export function makeWorkspaceTextReader(
  * @param leadOf - 子代理会话归到 Lead（读取经 Lead 的工作区身份）。
  */
 export function makeCultivationFiles(remote: RemoteNamespaceFace, leadOf: (sessionId: SessionId) => SessionId): CultivationFiles {
-  const listDir = async (sessionId: SessionId, dir: string, signal: AbortSignal): Promise<readonly string[] | null> => {
+  const listDir = async (sessionId: SessionId, dir: string, signal: AbortSignal): Promise<DirListing> => {
     try {
       const result = await remote.workspaceFiles.list(leadOf(sessionId), dir, signal)
       // 静默 null 曾让「面板说读不到、盘上明明有」无从诊断（BUG-291）：失败必须点名目录与原因。
-      if (!result.ok) { console.warn(`[company] 列目录失败 ${dir}`, JSON.stringify(result)); return null }
-      return result.value.entries
-        .filter(entry => entry.type === 'file' && entry.name.endsWith('.md'))
-        .map(entry => entry.name)
+      if (!result.ok) {
+        const reason = `列目录被拒（${dir}）`
+        console.warn(`[company] ${reason}`, JSON.stringify(result))
+        return { ok: false, reason }
+      }
+      return {
+        ok: true,
+        names: result.value.entries
+          .filter(entry => entry.type === 'file' && entry.name.endsWith('.md'))
+          .map(entry => entry.name),
+      }
     } catch (error) {
-      console.warn(`[company] 列目录异常 ${dir}`, error instanceof Error ? error.message : String(error))
-      return null
+      const reason = error instanceof Error ? error.message : String(error)
+      console.warn(`[company] 列目录异常 ${dir}`, reason)
+      return { ok: false, reason }
     }
   }
   const readText = makeWorkspaceTextReader(remote, leadOf)
   return {
-    listJournal: (sessionId, role, signal) => listDir(sessionId, `${RUN_BUNDLE_PATHS.kb}/${role}/journal`, signal),
+    listJournal: async (sessionId, role, signal) => {
+      const listing = await listDir(sessionId, `${RUN_BUNDLE_PATHS.kb}/${role}/journal`, signal)
+      return listing.ok ? listing.names : null
+    },
     readHead: (sessionId, path, signal) => readText(path, 240)(sessionId, signal),
     listRecords: (sessionId, signal) => listDir(sessionId, RUN_BUNDLE_PATHS.records, signal),
     readRecordHead: (sessionId, path, signal) => readText(path, 60)(sessionId, signal),
@@ -113,12 +132,20 @@ export interface CultivationPanelData {
   readonly journalRows: readonly CultivationRow[] | null
   /** 培养记录（null = 目录不可达或首读未完成——不折成 0 条）。 */
   readonly records: readonly CultivationRecord[] | null
+  /** 记录目录读不到时的「读的是哪 + 为什么」；null = 没有失败（加载中或已读到）。 */
+  readonly recordsProblem: CultivationReadProblem | null
   /** 读不动的记录文件名（坏形状/读取失败；不静默丢掉，由面板明确提示）。 */
   readonly brokenRecords: readonly string[]
   /** 只读了摘要、未读全文的记录数（旧记录；用 archive 控制规模）。 */
   readonly unexpandedRecords: number
   /** 立即重读（动作/创作成功后台账已变，不等 30s 轮询）。 */
   readonly refresh: () => void
+}
+
+/** 一次读失败的说明（面板必须说得出「哪个目录、什么原因」，F2）。 */
+export interface CultivationReadProblem {
+  readonly path: string
+  readonly reason: string
 }
 
 /** 刷新间隔（journal/记录都不高频变化；30s 足够）——**导出**：页签头文案要照它说真话（别再写死"5 秒"）。 */
@@ -144,6 +171,7 @@ export function useCultivationPanelData(
   const [records, setRecords] = useState<readonly CultivationRecord[] | null>(null)
   const [brokenRecords, setBrokenRecords] = useState<readonly string[]>([])
   const [unexpandedRecords, setUnexpandedRecords] = useState(0)
+  const [recordsProblem, setRecordsProblem] = useState<CultivationReadProblem | null>(null)
   // 动作后立即重读的抓手（2026-10-17 GUI 行动面 S2）：bump 一次 = 重跑下面的读盘 effect。
   const [nonce, setNonce] = useState(0)
   const refresh = useCallback(() => { setNonce(value => value + 1) }, [])
@@ -169,7 +197,10 @@ export function useCultivationPanelData(
       let nextRecords: readonly CultivationRecord[] | null = null
       const broken: string[] = []
       let unexpanded = 0
-      const recordNames = await files.listRecords(sessionId, controller.signal)
+      const listing = await files.listRecords(sessionId, controller.signal)
+      const recordNames = listing.ok ? listing.names : null
+      if (!listing.ok) setRecordsProblem({ path: RUN_BUNDLE_PATHS.records, reason: listing.reason })
+      else setRecordsProblem(null)
       if (recordNames !== null) {
         const summaries: CultivationRecord[] = []
         for (const name of [...recordNames].sort().reverse()) {
@@ -224,7 +255,21 @@ export function useCultivationPanelData(
     }
   }, [enabled, sessionId, files, nonce])
 
-  return { journalRows, records, brokenRecords, unexpandedRecords, refresh }
+  return { journalRows, records, recordsProblem, brokenRecords, unexpandedRecords, refresh }
+}
+
+/**
+ * 会话 cwd → 工作区显示名（面板点名「看的是哪个盘」用；F2/BUG-291）。
+ * 纯函数：末段即工作区目录名；空/缺席给 null（面板退回不点名，而不是编一个名字）。
+ * @param cwd - 会话 header 的 cwd（绝对路径，POSIX 或 Windows）。
+ * @returns 工作区目录名，取不到时 null。
+ */
+export function workspaceLabelOf(cwd: string | null | undefined): string | null {
+  if (typeof cwd !== 'string') return null
+  const trimmed = cwd.replace(/[\\/]+$/, '')
+  if (trimmed === '') return null
+  const name = trimmed.split(/[\\/]/).pop() ?? ''
+  return name === '' ? null : name
 }
 
 /** 事件流闭包的形状（`session/follow`：快照给历史、其后实时；侧栏与公司页共用）。 */
