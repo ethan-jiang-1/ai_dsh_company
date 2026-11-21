@@ -127,7 +127,7 @@ describe('createAttentionRegistry · 生命周期', () => {
   })
 })
 
-describe('pendingApprovals · 历史重建（BUG-288：刷新后仍能看到已挂起审批）', () => {
+describe('pendingApprovals · 待办历史重建（刷新后仍能看到已挂起审批；事故背景见 _backlog/bugs 的同名卡）', () => {
   const asked = (id: string, time: number, toolName = 'request_signoff', reason = '双签线') => ({
     type: 'approval/asked',
     time,
