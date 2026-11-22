@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-302：英文界面混入中文——培养页的时间是「刚刚 / 7 小时前」，读失败原因是「列目录被拒（…）」
 
-> 严重级别：P2（次要偏重：语言开关是产品合同；英文用户会在英文句子里看到整段中文，且无法从上下文判断是「刷新时间」还是「目录名」）｜发现：2026-11-22（E2E 第三轮）｜状态：调查中
+> 严重级别：P2（次要偏重：语言开关是产品合同；英文用户会在英文句子里看到整段中文，且无法从上下文判断是「刷新时间」还是「目录名」）｜发现：2026-11-22（E2E 第三轮）｜状态：已修｜审查：agent — 逐条核对已修判定（en 渲染无 CJK + 五档时间 + 原因代号）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 5–6 个，别管那边怎么修」）。
+> **留痕**：commit c2899fd4（client 公开文案 + 表达层 helper，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -77,3 +77,10 @@ Rejected in the target role context · 7 小时前
 - `en` 页面里培养页的时间与读失败原因不再出现中文；
 - `zh` 页面文案不回归；
 - 两条 keyless（en 失败原因 / en 时间标签）+ 真页面 en 复核各绿。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/cultivation/cultivation-record.ts`（`timeParts`）、`packages/company-pack/src/client/cultivation/cultivation-actions.ts`（`cultivationTimeLabel` + zh/en 时间键）、`packages/company-pack/src/client/cultivation/cultivation-data.ts`（`reason: 'dir-denied'`）、`CultivationInbox.tsx`、`CultivationBoardSections.tsx`、`use-cultivation-board.tsx`
+- 红：`vitest run tests/client/cultivation/cultivation-board.spec.ts` —— 未接本地化前 en 渲染里命中 CJK（「5 分钟前」与「列目录被拒」），两条 en 断言失败
+- 绿：`vitest run tests/client/cultivation/cultivation-board.spec.ts` —— 29/29（en 渲染无 CJK：时间出 "5 minutes ago"、原因出 "the directory listing was denied"）；`vitest run tests/lib/cultivation/cultivation-record-time.spec.ts tests/client/cultivation/cultivation-actions.spec.ts` —— 五档时间 zh/en 各一组
+- 提交：commit c2899fd4

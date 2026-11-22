@@ -316,7 +316,8 @@ describe('CultivationBoard：四态矩阵的第四格（BUG-294）', () => {
 
 // 英文界面不许混中文：时间是「刚刚/7 小时前」、读失败原因是「列目录被拒（…）」，
 // 模板是英文、参数是中文——这是两个只写中文的共享 helper 造成的。判据 = en 渲染里不出现 CJK。
-describe('CultivationBoard · en 渲染无 CJK', () => {
+// 负例留证 2026-11-22：把时间渲染改回 timeLabel（中文）后 `vitest run tests/client/cultivation/cultivation-board.spec.ts` 2 failed（en 里命中 CJK）；还原后 29/29 绿。BUG-302
+describe('CultivationBoard · en 渲染无 CJK（BUG-302）', () => {
   const cjk = /[\u4e00-\u9fff]/
 
   afterEach(() => { setCultivationLanguage('zh') })

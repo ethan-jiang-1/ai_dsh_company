@@ -26,7 +26,8 @@ describe('decidedAtLabel（BUG-300）', () => {
 
 // 时间片段：表达层 helper 只产出结构，语言由渲染层决定；
 // 五档分支各有断言，否则 en 面漏一档就没人发现。
-describe('timeParts', () => {
+// 负例留证 2026-11-22：把 timeParts 的『刚刚』分支阈值去掉后 `vitest run tests/lib/cultivation/cultivation-record-time.spec.ts` 1 failed。BUG-302
+describe('timeParts（BUG-302）', () => {
   const now = Date.parse('2026-11-22T12:00:00.000Z')
 
   it('五档：刚刚 / 分钟 / 小时 / 昨天 / 日期', () => {

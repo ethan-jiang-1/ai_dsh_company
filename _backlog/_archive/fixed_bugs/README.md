@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-302**（2026-11-22，E2E 第三轮 / P2）：en 界面混中文时间与原因——
+  [302](BUG-302-english-ui-chinese-time-and-reason.md) `timeParts` 只产出结构、`cultivationTimeLabel` 按语言渲染，
+  `listDir` 失败给代号 `dir-denied`；判据 = en 渲染无 CJK（`[\u4e00-\u9fff]` 不命中）。证据提交 `c2899fd4`。
+
 - **BUG-303**（2026-11-22，E2E 第三轮 / P2）：台账坏行静默丢——
   [303](BUG-303-ledger-malformed-rows-silent-drop.md) `parseMotionLedger` → `{ rows, badRows }`（坏行带行号/单元格数），
   面板增「跳过 N 行」错误行。证据提交 `1a2a0eb7`。
