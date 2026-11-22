@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-319-attention-questions-not-rebuilt-after-reload.md](fixed_bugs/BUG-319-attention-questions-not-rebuilt-after-reload.md) — 问询刷新后从待办消失；`pendingAsks` 从 tool/call ↔ tool/result 重建问询。
 - [BUG-324-deliverables-catalog-field-shape-silent.md](fixed_bugs/BUG-324-deliverables-catalog-field-shape-silent.md) — catalog 字段形状坏被静默归一化；改为跳过并计数。
 - [BUG-321-cultivation-record-head-60-lines-false-broken.md](fixed_bugs/BUG-321-cultivation-record-head-60-lines-false-broken.md) — 60 行头窗口把合法长 frontmatter 记录判坏；头窗口失败补读全文再判。
 - [BUG-322-cultivation-journal-head-240-title-fallback.md](fixed_bugs/BUG-322-cultivation-journal-head-240-title-fallback.md) — 240 行预览窗口吞标题；无标题时补读更大窗口。

@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-319：刷新页面后挂起的问询从「待办」消失——跨会话重建只配审批，question 只靠活体登记
 
-> 严重级别：P2（次要偏重：待办页把问询与审批都算「等你处理」；审批能重建，问询刷新即丢，用户可能一直不知道有人在等回答）｜发现：2026-11-22（E2E 第五轮）｜状态：调查中
+> 严重级别：P2（次要偏重：待办页把问询与审批都算「等你处理」；审批能重建，问询刷新即丢，用户可能一直不知道有人在等回答）｜发现：2026-11-22（E2E 第五轮）｜状态：已修｜审查：agent — 逐条核对已修判定（未答/答过/坏 arguments/两种答案口径/面板级）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit 86408cc2（client 读模型 + 面板，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -62,3 +62,11 @@ opened: 2026-11-22
 - 答完/取消后从待办消失；
 - 两条同文 question 各自可处理；审批 288/304/305 不回归；
 - 历史重建 spec + 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/attention.ts`（`pendingQuestions` / `pendingAsks` / `ASK_TOOL_NAME`）、`packages/company-pack/src/client/presence/attention-history.ts`、`packages/company-pack/src/client/tabs/AttentionTab.tsx`、`tests/client/wiring/attention.spec.ts`、`tests/client/tabs/attention-tab.spec.ts`
+- 红：`vitest run tests/client/wiring/attention.spec.ts tests/client/tabs/attention-tab.spec.ts` —— 把重建改回只认审批后「未答问询 ⇒ 进等你处理」与面板级用例失败（刷新后问询消失）
+- 绿：`vitest run tests/client/wiring/attention.spec.ts tests/client/tabs/attention-tab.spec.ts` —— 38/38 + 15/15（未答进列表；有 `tool/result` 不出现；`arguments` 坏仍占位；`user-questions/answered` 口径同样算答过；审批+问询按时间合并且共享上限）
+- 提交：commit 86408cc2
+- **未做到的一步（如实记）**：这一条的**真会话日志**没取到（本机现有日志只有 v4 头行，zstd 里没有事件），所以口径是按 `ask_user_question` 的 tool/call ↔ tool/result 推断并用夹具钉住的；真日志复核列入未覆盖轴。

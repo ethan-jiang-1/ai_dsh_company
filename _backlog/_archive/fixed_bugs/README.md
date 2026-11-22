@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-319**（2026-11-22，E2E 第五轮 / P2）：问询刷新后丢失——
+  [319](BUG-319-attention-questions-not-rebuilt-after-reload.md) `pendingQuestions` + `pendingAsks`（审批与问询一起重建）。
+  证据提交 `9e33dc25`。
+
 - **BUG-324**（2026-11-22，E2E 第五轮 / P2）：catalog 字段形状静默猜值——
   [324](BUG-324-deliverables-catalog-field-shape-silent.md) 允许缺省、拒绝错类型（跳过并计入 `skipped`）。证据提交 `0802185b`。
 

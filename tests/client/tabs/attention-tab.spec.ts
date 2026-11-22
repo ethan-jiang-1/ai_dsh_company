@@ -241,7 +241,8 @@ describe('AttentionTab · 审批流被截的信号（BUG-320）', () => {
 })
 
 // 刷新后问询也要在（BUG-319）：历史重建走 pendingAsks，问询与审批同一套。
-describe('AttentionTab · 问询从历史重建', () => {
+// 负例留证 2026-11-23：重建只认审批后 `vitest run tests/client/tabs/attention-tab.spec.ts` 1 failed（刷新后问询消失）。BUG-319
+describe('AttentionTab · 问询从历史重建（BUG-319）', () => {
   it('别的会话里未答的问询 ⇒ 出现在「等你处理」', async () => {
     const byId = { 'session-lead': { id: 'session-lead', cwd: '/ws' }, 'session-x': { id: 'session-x', cwd: '/ws', updatedAt: 1 } }
     const useSessionsStub = (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown => selector({ byId })

@@ -309,7 +309,8 @@ describe('pendingApprovals：上限与计数（BUG-320）', () => {
 
 // 问询也要能从历史重建（BUG-319）：日志里问询是 ask_user_question 的 tool/call，
 // 答案以同 callId 的 tool/result 落回；没有配对结果的就是「问了没答」。
-describe('pendingAsk/重建问询', () => {
+// 负例留证 2026-11-23：`pendingAsks` 只返回审批后 `vitest run tests/client/wiring/attention.spec.ts` 4 failed（未答问询不出现）。BUG-319
+describe('pendingAsk/重建问询（BUG-319）', () => {
   const call = (callId: string, question: string, time: number) => ({
     type: 'tool/call' as const, time, data: { callId, name: 'ask_user_question', arguments: JSON.stringify({ questions: [{ question }] }) },
   })
