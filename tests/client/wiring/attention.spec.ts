@@ -139,12 +139,12 @@ describe('pendingApprovals · 待办历史重建（刷新后仍能看到已挂�
   const decided = (id: string, time: number) => ({ type: 'approval/decided', time, data: { id, outcome: 'allowed-once' } })
 
   it('问了没答 → 一条待批；答了 → 消失', () => {
-    expect(pendingApprovals([asked('a1', 1000)], 's1')).toHaveLength(1)
-    expect(pendingApprovals([asked('a1', 1000), decided('a1', 2000)], 's1')).toHaveLength(0)
+    expect(pendingApprovals([asked('a1', 1000)], 's1').items).toHaveLength(1)
+    expect(pendingApprovals([asked('a1', 1000), decided('a1', 2000)], 's1').items).toHaveLength(0)
   })
 
   it('多个请求只保留仍挂起的那条，按时间倒序', () => {
-    const items = pendingApprovals([asked('a1', 1000), asked('a2', 3000), decided('a1', 4000)], 's1')
+    const items = pendingApprovals([asked('a1', 1000), asked('a2', 3000), decided('a1', 4000)], 's1').items
     expect(items.map(item => item.time)).toEqual([3000])
     expect(items[0]?.kind).toBe('approval')
     expect(items[0]?.jumpTo).toBe('s1')
@@ -154,7 +154,7 @@ describe('pendingApprovals · 待办历史重建（刷新后仍能看到已挂�
   it('mergeAttention 对同一条挂起去重（活体优先）', () => {
     // 同一条 = 同一身份：活体现在带审批 id（观察者从 approval/request 透传），去重按 id 而非摘要。
     const live = [{ kind: 'approval' as const, sessionId: 's1', id: 'a1', what: 'request_signoff：双签线', since: 1000 }]
-    const merged = mergeAttention(live, pendingApprovals([asked('a1', 1000)], 's1'))
+    const merged = mergeAttention(live, pendingApprovals([asked('a1', 1000)], 's1').items)
     expect(merged).toHaveLength(1)
     expect(merged[0]?.time).toBe(1000)
   })
@@ -167,17 +167,17 @@ describe('pendingApprovals · 边角形态', () => {
   const decided = (id: string, time: number) => ({ type: 'approval/decided', time, data: { id } })
 
   it('缺 toolName ⇒ 占位文案，仍算挂起', () => {
-    const [item] = pendingApprovals([asked('a1', 1000, {})], 's1')
+    const [item] = pendingApprovals([asked('a1', 1000, {})], 's1').items
     expect(item?.what).toContain('工具名缺失')
   })
 
   it('reason 只有空白 ⇒ 只显示工具名（不挂一串空格）', () => {
-    const [item] = pendingApprovals([asked('a1', 1000, { toolName: 'bash', reason: '   ' })], 's1')
+    const [item] = pendingApprovals([asked('a1', 1000, { toolName: 'bash', reason: '   ' })], 's1').items
     expect(item?.what).toBe('bash')
   })
 
   it('decided 指向别的 id ⇒ 原挂起项不动', () => {
-    expect(pendingApprovals([asked('a1', 1000, { toolName: 'bash' }), decided('other', 2000)], 's1')).toHaveLength(1)
+    expect(pendingApprovals([asked('a1', 1000, { toolName: 'bash' }), decided('other', 2000)], 's1').items).toHaveLength(1)
   })
 
   it('非审批事件 / 缺 id 的事件被忽略', () => {
@@ -186,12 +186,12 @@ describe('pendingApprovals · 边角形态', () => {
       { type: 'approval/asked', time: 2, data: {} },
       { type: 'approval/asked', time: 3, data: null },
     ]
-    expect(pendingApprovals(events as never, 's1')).toHaveLength(0)
+    expect(pendingApprovals(events as never, 's1').items).toHaveLength(0)
   })
 
   it('超过 STREAM_ITEM_CAP ⇒ 截断到上限', () => {
     const many = Array.from({ length: STREAM_ITEM_CAP + 3 }, (_, i) => asked(`a${String(i)}`, 1000 + i, { toolName: 'bash' }))
-    expect(pendingApprovals(many, 's1')).toHaveLength(STREAM_ITEM_CAP)
+    expect(pendingApprovals(many, 's1').items).toHaveLength(STREAM_ITEM_CAP)
   })
 })
 
@@ -223,7 +223,7 @@ describe('attentionSummary · 摘要边界（BUG-295）', () => {
     const live = [{ kind: 'approval' as const, sessionId: 's-b', id: 'a1', what: attentionSummary(`request_signoff：${long}`), since: 1000 }]
     const items = mergeAttention(live, pendingApprovals([
       { type: 'approval/asked', time: 1000, data: { id: 'a1', toolName: 'request_signoff', reason: long } },
-    ], 's-b'))
+    ], 's-b').items)
     expect(items).toHaveLength(1)
     expect(items[0]?.what.length).toBeLessThanOrEqual(ATTENTION_SUMMARY_MAX)
   })
@@ -231,7 +231,7 @@ describe('attentionSummary · 摘要边界（BUG-295）', () => {
   it('完整详情仍可达：重建条目带 detail（未折叠）', () => {
     const [item] = pendingApprovals([
       { type: 'approval/asked', time: 1000, data: { id: 'a1', toolName: 'request_signoff', reason: long } },
-    ], 's-b')
+    ], 's-b').items
     expect(item?.detail).toContain(long.slice(0, 40))
     expect(item?.detail?.length).toBeGreaterThan(ATTENTION_SUMMARY_MAX)
   })
@@ -247,13 +247,13 @@ describe('mergeAttention · 按身份去重（BUG-299）', () => {
 
   it('两条同摘要、不同 id ⇒ 2 条（不被摘要吞掉）', () => {
     const rebuilt = pendingApprovals([asked('a1', 1000, 'same reason'), asked('a2', 2000, 'same reason')], 's-1')
-    expect(mergeAttention([], rebuilt)).toHaveLength(2)
+    expect(mergeAttention([], rebuilt.items)).toHaveLength(2)
   })
 
   it('同一 id 的 live + history ⇒ 1 条（身份相同不重复）', () => {
     const live = [{ kind: 'approval' as const, sessionId: 's-1', id: 'a1', what: attentionSummary('request_signoff：same reason'), since: 1000 }]
     const rebuilt = pendingApprovals([asked('a1', 1000, 'same reason')], 's-1')
-    expect(mergeAttention(live, rebuilt)).toHaveLength(1)
+    expect(mergeAttention(live, rebuilt.items)).toHaveLength(1)
   })
 
   it('活体条目的 detail 在 merge 后仍在（刷新前后都能看全文）', () => {
@@ -269,8 +269,8 @@ describe('mergeAttention · 按身份去重（BUG-299）', () => {
   })
 
   it('列表 key 同一身份一致、不同身份不同（不会撞 key）', () => {
-    const one = pendingApprovals([asked('a1', 1000, 'same')], 's-1')[0]!
-    const two = pendingApprovals([asked('a2', 1000, 'same')], 's-1')[0]!
+    const one = pendingApprovals([asked('a1', 1000, 'same')], 's-1').items[0]!
+    const two = pendingApprovals([asked('a2', 1000, 'same')], 's-1').items[0]!
     expect(attentionItemKey(one)).not.toBe(attentionItemKey(two))
     expect(attentionItemKey(one)).toBe(attentionItemKey({ ...one }))
   })
@@ -288,5 +288,19 @@ describe('attentionItemKey · 同文不同条不撞 key（BUG-312）', () => {
   it('有 id 的条目按 id 区分（同文同日也各不相同）', () => {
     const base = { kind: 'approval' as const, who: 's-1', what: '同文', time: 1, jumpTo: 's-1' }
     expect(attentionItemKey({ ...base, id: 'a' })).not.toBe(attentionItemKey({ ...base, id: 'b' }))
+  })
+})
+
+// 审批流上限必须报出来（BUG-320）：同一会话 6 条挂起审批只显示 5 条，第 6 条不能静默消失。
+describe('pendingApprovals：上限与计数', () => {
+  it('多出上限 ⇒ capped = 超出的条数', () => {
+    const many = Array.from({ length: STREAM_ITEM_CAP + 1 }, (_, i) => ({ type: 'approval/asked' as const, time: 1000 + i, data: { id: `a${String(i)}`, toolName: 'bash' } }))
+    const rebuilt = pendingApprovals(many, 's1')
+    expect(rebuilt.items).toHaveLength(STREAM_ITEM_CAP)
+    expect(rebuilt.capped).toBe(1)
+  })
+
+  it('没超上限 ⇒ capped = 0', () => {
+    expect(pendingApprovals([{ type: 'approval/asked', time: 1, data: { id: 'a', toolName: 'bash' } }], 's1').capped).toBe(0)
   })
 })

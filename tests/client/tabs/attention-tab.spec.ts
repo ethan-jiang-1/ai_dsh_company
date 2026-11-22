@@ -199,3 +199,40 @@ describe('AttentionTab · cwd 未解析时不跨工作区（BUG-323）', () => {
     expect(host.textContent).not.toContain('别的 workspace 的审批')
   })
 })
+
+// 三处上限都要在面板上说出来（BUG-317/318/320），并且有边界时不许说「没有等你的事」。
+describe('AttentionTab · 注意力管线的边界', () => {
+  const many = (n: number) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`s${String(i)}`, { id: `s${String(i)}`, cwd: '/ws', updatedAt: i }]))
+
+  it('候选被截 ⇒ 「还有 N 个会话没扫」', async () => {
+    const useSessionsStub = (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown =>
+      selector({ byId: { 'session-lead': { id: 'session-lead', cwd: '/ws' }, ...many(25) } })
+    const pageHistory = vi.fn(async () => ({ ok: true as const, value: { records: [], hasMore: false } }))
+    const host = await mount(createElement(AttentionTab, props({ pageHistory, useSessions: useSessionsStub })))
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 30)) })
+    expect(host.textContent).toContain('个会话没扫')
+  })
+
+  it('本会话事件超窗 ⇒ 「只保留最近 N 条事件」，且压住空态', async () => {
+    const frames = Array.from({ length: 1001 }, (_, i) => ({ kind: 'history' as const, events: [{ type: 'turn/start', time: 1000 + i, data: { i } }] }))
+    const follow = async function* () { for (const frame of frames) yield frame as never }
+    const host = await mount(createElement(AttentionTab, props({ follow })))
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 60)) })
+    expect(host.textContent).toContain('只保留最近')
+    expect(host.textContent).not.toContain('没有等你的事——')
+  })
+})
+
+describe('AttentionTab · 审批流被截的信号', () => {
+  it('历史重建里某会话超 5 条 ⇒ 「还有 N 条挂起审批未显示」', async () => {
+    const byId = { 'session-lead': { id: 'session-lead', cwd: '/ws' }, 'session-x': { id: 'session-x', cwd: '/ws', updatedAt: 1 } }
+    const useSessionsStub = (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown => selector({ byId })
+    const asked = Array.from({ length: 6 }, (_, i) => ({ type: 'event', event: { type: 'approval/asked', seq: i + 1, time: 1000 + i, data: { id: `a${String(i)}`, toolName: 'bash', reason: 'r' } } }))
+    const pageHistory = vi.fn(async (request: { maxMessages?: number }) => (request.maxMessages === 1
+      ? { ok: true as const, value: { records: [{ type: 'event', event: { type: 'turn/start', seq: 9, time: 1, data: {} } }], hasMore: false } }
+      : { ok: true as const, value: { records: asked, hasMore: false } }))
+    const host = await mount(createElement(AttentionTab, props({ pageHistory, useSessions: useSessionsStub })))
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 40)) })
+    expect(host.textContent).toContain('条挂起审批未显示')
+  })
+})

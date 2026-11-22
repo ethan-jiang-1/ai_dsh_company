@@ -115,7 +115,7 @@ describe('historyCandidates：fail-closed 与候选边界（BUG-323/318）', () 
   it('cwd 已解析 ⇒ 只取同工作区、排除自己与 subagent', () => {
     const picked = historyCandidates(sessions, 'current', 20)
     expect(picked.ok).toBe(true)
-    if (picked.ok) expect(picked.ids.sort()).toEqual(['same1', 'same2'])
+    if (picked.ok) expect([...picked.ids].sort()).toEqual(['same1', 'same2'])
   })
 
   it('当前会话 cwd 缺失 ⇒ 不扫（不是「都匹配」）', () => {

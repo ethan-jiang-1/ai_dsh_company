@@ -89,6 +89,8 @@ export async function readSessionEvents(
 export interface PendingAcrossSessions {
   /** 仍挂起的审批（`jumpTo` = 所在会话）。 */
   readonly items: readonly AttentionItem[]
+  /** 各会话审批流被 `STREAM_ITEM_CAP` 截掉的条数合计（BUG-320）。 */
+  readonly approvalsCapped: number
   /** 实际扫到的会话数（候选数 − 读不到的）。 */
   readonly scanned: number
   /** 读失败的会话数；>0 时面板必须说「有 N 个会话的历史读不到」。 */
@@ -114,19 +116,21 @@ export async function readPendingAcrossSessions(
   signal?: AbortSignal,
 ): Promise<PendingAcrossSessions> {
   const results = await Promise.all(sessionIds.map(async (sessionId): Promise<
-    { readonly ok: true, readonly items: readonly AttentionItem[], readonly truncated: boolean } | { readonly ok: false }
+    { readonly ok: true, readonly items: readonly AttentionItem[], readonly capped: number, readonly truncated: boolean } | { readonly ok: false }
   > => {
     try {
       const read = await readSessionEvents(page, sessionId, signal)
       if (read === undefined) return { ok: false }
-      return { ok: true, items: pendingApprovals(read.events, sessionId), truncated: read.windowTruncated }
+      const approvals = pendingApprovals(read.events, sessionId)
+      return { ok: true, items: approvals.items, capped: approvals.capped, truncated: read.windowTruncated }
     } catch {
       return { ok: false }
     }
   }))
-  const ok = results.filter((result): result is { readonly ok: true, readonly items: readonly AttentionItem[], readonly truncated: boolean } => result.ok)
+  const ok = results.filter((result): result is { readonly ok: true, readonly items: readonly AttentionItem[], readonly capped: number, readonly truncated: boolean } => result.ok)
   return {
     items: ok.flatMap(result => result.items),
+    approvalsCapped: ok.reduce((sum, result) => sum + result.capped, 0),
     scanned: ok.length,
     failed: results.length - ok.length,
     window: ok.some(result => result.truncated) ? 'some' : 'none',

@@ -155,9 +155,9 @@ export function streamAttention(
  *
  * @param events - lead 会话事件流（`session/follow` 累积）。
  * @param sessionId - 事件所属会话（= 一键跳转目标）。
- * @returns 按时间倒序、受 {@link STREAM_ITEM_CAP} 限制的审批条目。
+ * @returns 按时间倒序的审批条目 + 被上限截掉的条数（BUG-320：第 6 条不能静默消失）。
  */
-export function pendingApprovals(events: readonly AttentionEventLike[], sessionId: string): readonly AttentionItem[] {
+export function pendingApprovals(events: readonly AttentionEventLike[], sessionId: string): PendingApprovals {
   const asked = new Map<string, AttentionItem>()
   for (const event of events) {
     const data = event.data as { id?: unknown; toolName?: unknown; reason?: unknown } | null
@@ -179,7 +179,14 @@ export function pendingApprovals(events: readonly AttentionEventLike[], sessionI
       asked.delete(data.id)
     }
   }
-  return [...asked.values()].sort((a, b) => b.time - a.time).slice(0, STREAM_ITEM_CAP)
+  const sorted = [...asked.values()].sort((a, b) => b.time - a.time)
+  return { items: sorted.slice(0, STREAM_ITEM_CAP), capped: Math.max(0, sorted.length - STREAM_ITEM_CAP) }
+}
+
+/** 审批重建结果：条目 + 被 `STREAM_ITEM_CAP` 截掉多少（面板据此说「还有 N 条审批未显示」）。 */
+export interface PendingApprovals {
+  readonly items: readonly AttentionItem[]
+  readonly capped: number
 }
 
 /**
