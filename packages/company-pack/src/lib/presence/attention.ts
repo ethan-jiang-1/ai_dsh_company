@@ -312,3 +312,42 @@ export function pendingAsks(events: readonly AttentionEventLike[], sessionId: st
   const merged = [...approvals.items, ...questions].sort((a, b) => b.time - a.time)
   return { items: merged.slice(0, STREAM_ITEM_CAP), capped: approvals.capped + Math.max(0, merged.length - STREAM_ITEM_CAP) }
 }
+
+/**
+ * 注意力读取的**全部边界**（BUG-327/328/330 的收口点）。
+ *
+ * 上一轮把边界「沿管线传」却传成三个变量、各自被部分消费：当前会话的 `capped` 没人读、
+ * 空态只认三个边界、字段名在 question 并入后仍叫 approvals。这里收成一个对象：
+ * **一处计算、一处渲染、一处决定空态**——组合起来就不会漏。
+ */
+export interface AttentionBoundaries {
+  /** 本会话事件流被 `MAX_EVENTS` 截断（窗口外的旧事项可能没被看见）。 */
+  readonly eventsTruncated: boolean
+  /** 候选会话：`null` = 工作区未就绪（fail-closed，一个都没扫）；否则给出总数与被截掉多少。 */
+  readonly candidates: { readonly total: number, readonly capped: number } | null
+  /** 本会话 + 跨会话合计的「待你处理」被上限截掉多少条（审批与问询合计）。 */
+  readonly asksCapped: number
+  /** 跨会话历史是否有会话的窗口被截断。 */
+  readonly window: 'none' | 'some'
+  /** 跨会话历史读取失败的会话数。 */
+  readonly failed: number
+}
+
+/**
+ * 是否需要告诉用户「这次没看全」。
+ *
+ * 空态只能用 `!hasBoundary(...)` 当条件——否则「只扫了一部分」会被说成「什么都没有」。
+ * @param boundaries - 上文的边界对象。
+ * @returns 任一维度异常 = true。
+ */
+export function hasBoundary(boundaries: AttentionBoundaries): boolean {
+  return boundaries.eventsTruncated
+    || boundaries.candidates === null
+    || (boundaries.candidates !== null && boundaries.candidates.capped > 0)
+    || boundaries.asksCapped > 0
+    || boundaries.window === 'some'
+    || boundaries.failed > 0
+}
+
+/** 单会话上限文案里的数字（与 `STREAM_ITEM_CAP` 同源，不在面板里写死）。 */
+export const ASKS_CAP = STREAM_ITEM_CAP

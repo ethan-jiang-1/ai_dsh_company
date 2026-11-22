@@ -8,6 +8,7 @@ import {
   attentionItemKey,
   attentionSummary,
   attentionTone,
+  hasBoundary,
   mergeAttention,
   pendingApprovals,
   pendingAsks,
@@ -375,5 +376,23 @@ describe('pendingAsks · 形状边角（重建问询）', () => {
       { type: 'user-questions/answered', time: 2, data: { id: 'c1' } },
     ] as never, 's-1').items
     expect(items).toHaveLength(0)
+  })
+})
+
+// 边界汇总（BUG-327/328/330）：判据只有一处 hasBoundary；任一维度异常就不许说「没有」。
+describe('AttentionBoundaries · 单一空态判据', () => {
+  const none = { eventsTruncated: false, candidates: { total: 0, capped: 0 }, asksCapped: 0, window: 'none' as const, failed: 0 }
+
+  it('六维全清 ⇒ hasBoundary=false（可以说「没有」）', () => {
+    expect(hasBoundary(none)).toBe(false)
+  })
+
+  it('任一维异常 ⇒ true（空态必须压住）', () => {
+    expect(hasBoundary({ ...none, eventsTruncated: true })).toBe(true)
+    expect(hasBoundary({ ...none, candidates: null })).toBe(true)
+    expect(hasBoundary({ ...none, candidates: { total: 25, capped: 5 } })).toBe(true)
+    expect(hasBoundary({ ...none, asksCapped: 1 })).toBe(true)
+    expect(hasBoundary({ ...none, window: 'some' })).toBe(true)
+    expect(hasBoundary({ ...none, failed: 2 })).toBe(true)
   })
 })

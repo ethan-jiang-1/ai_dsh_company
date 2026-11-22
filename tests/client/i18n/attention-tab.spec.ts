@@ -25,7 +25,8 @@ function render(t: CompanyT): string {
     getPending: () => [],
     openSession: () => {},
     leadOf: () => 's1',
-    useSessions: (selector: (state: { byId: Record<string, unknown> }) => unknown) => selector({ byId: {} }),
+    // 工作区已就绪（cwd 已解析）才算「真的没有」；未就绪是边界，会压住空态（BUG-327/328）。
+    useSessions: (selector: (state: { byId: Record<string, unknown> }) => unknown) => selector({ byId: { s1: { id: 's1', cwd: '/ws', updatedAt: 1 } } }),
   } as never))
 }
 

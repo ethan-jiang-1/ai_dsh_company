@@ -16,6 +16,10 @@ import type { LivePending } from '../../../packages/company-pack/src/lib/presenc
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
+/** 工作区已就绪的会话桩：本会话有 cwd ⇒ 跨会话扫描不被 fail-closed 拦。 */
+const resolvedSessions = () => (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown =>
+  selector({ byId: { 'session-lead': { id: 'session-lead', cwd: '/ws', updatedAt: 9 } } })
+
 let mounted: Root | null = null
 afterEach(() => {
   act(() => { mounted?.unmount() })
@@ -48,8 +52,9 @@ async function mount(element: ReturnType<typeof createElement>): Promise<HTMLEle
 }
 
 describe('待办页签：挂起项、空态与断流（R3-10）', () => {
-  it('没有挂起项时给诚实的空态，而不是一张空白面板', async () => {
-    const host = await mount(createElement(AttentionTab, props()))
+  it('没有挂起项且无边界时给诚实的空态，而不是一张空白面板', async () => {
+    // 工作区已就绪（cwd 已解析）才算「真的没有」；未就绪属于边界，按 327/328 的规则压住空态。
+    const host = await mount(createElement(AttentionTab, props({ useSessions: resolvedSessions() })))
     expect(host.textContent).toContain('等你处理')
     expect(host.textContent).toContain('没有等你的事')
     expect(host.textContent).toContain('暂无交付通知')
@@ -60,7 +65,7 @@ describe('待办页签：挂起项、空态与断流（R3-10）', () => {
   // 空态必须说清这条边界，否则「没有等你的事」会被读成「公司里没人等你」（跨会话时是假的）。
   // 负例留证 2026-11-21：撤掉 locales 的 attention.emptyWaiting 改动后 `vitest run tests/client/tabs/attention-tab.spec.ts` 1 failed / 5 passed；接回后 6/6 绿。BUG-292
   it('空态说清作用域（BUG-292）：本会话与同工作区其它会话的挂起项都会出现在这里', async () => {
-    const host = await mount(createElement(AttentionTab, props()))
+    const host = await mount(createElement(AttentionTab, props({ useSessions: resolvedSessions() })))
     expect(host.textContent).toContain('同工作区其它会话')
   })
 
@@ -227,7 +232,7 @@ describe('AttentionTab · 注意力管线的边界', () => {
 })
 
 describe('AttentionTab · 审批流被截的信号（BUG-320）', () => {
-  it('历史重建里某会话超 5 条 ⇒ 「还有 N 条挂起审批未显示」', async () => {
+  it('历史重建里某会话超 5 条 ⇒ 「还有 N 条待你处理的事项未显示」', async () => {
     const byId = { 'session-lead': { id: 'session-lead', cwd: '/ws' }, 'session-x': { id: 'session-x', cwd: '/ws', updatedAt: 1 } }
     const useSessionsStub = (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown => selector({ byId })
     const asked = Array.from({ length: 6 }, (_, i) => ({ type: 'event', event: { type: 'approval/asked', seq: i + 1, time: 1000 + i, data: { id: `a${String(i)}`, toolName: 'bash', reason: 'r' } } }))
@@ -236,7 +241,7 @@ describe('AttentionTab · 审批流被截的信号（BUG-320）', () => {
       : { ok: true as const, value: { records: asked, hasMore: false } }))
     const host = await mount(createElement(AttentionTab, props({ pageHistory, useSessions: useSessionsStub })))
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 40)) })
-    expect(host.textContent).toContain('条挂起审批未显示')
+    expect(host.textContent).toContain('条待你处理的事项未显示')
   })
 })
 
@@ -253,5 +258,53 @@ describe('AttentionTab · 问询从历史重建（BUG-319）', () => {
     const host = await mount(createElement(AttentionTab, props({ pageHistory, useSessions: useSessionsStub })))
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 40)) })
     expect(host.textContent).toContain('刷新后还在吗')
+  })
+})
+
+// 边界组合矩阵（BUG-327/328/330 的验收）：六个边界 × {空 / 有项}，每种组合下
+// 「提示行出现」且「空态被压住」。这是上一轮漏掉的形状——单个边界对、组合起来漏。
+describe('AttentionTab · 边界组合矩阵', () => {
+  const readyById = { 'session-lead': { id: 'session-lead', cwd: '/ws' }, 'session-x': { id: 'session-x', cwd: '/ws', updatedAt: 1 } }
+  const stub = (byId: Record<string, unknown>) => (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown => selector({ byId })
+  /** follow 帧里的事件是**裸事件**（不是 page 的 `{type:'event',event}` 包一层）。 */
+  const ask = (time: number) => ({ type: 'approval/asked', time, data: { id: `a${String(time)}`, toolName: 'bash', reason: 'r' } })
+  const page = (records: unknown[], hasMore = false) => vi.fn(async (request: { maxMessages?: number }) => (request.maxMessages === 1
+    ? { ok: true as const, value: { records: [{ type: 'event', event: { type: 'turn/start', seq: 9, time: 1, data: {} } }], hasMore: false } }
+    : { ok: true as const, value: { records, hasMore } }))
+
+  const expectBoundary = async (element: ReturnType<typeof createElement>, contains: string, absent = '没有等你的事——') => {
+    const host = await mount(element)
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 40)) })
+    expect(host.textContent).toContain(contains)
+    expect(host.textContent).not.toContain(absent)
+  }
+
+  it('① 工作区未就绪 ⇒ 提示「暂不扫描其它会话」且压住空态', async () => {
+    await expectBoundary(createElement(AttentionTab, props()), '工作区还没就绪')
+  })
+
+  it('② 候选被截 ⇒ 提示「还有 N 个会话没扫」且压住空态', async () => {
+    const many = Object.fromEntries(Array.from({ length: 25 }, (_, i) => [`s${String(i)}`, { id: `s${String(i)}`, cwd: '/ws', updatedAt: i }]))
+    await expectBoundary(createElement(AttentionTab, props({ useSessions: stub({ ...readyById, ...many }), pageHistory: page([]) })), '个会话没扫')
+  })
+
+  it('③ 本会话审批被截 ⇒ 提示「还有 N 条待你处理的事项未显示」且压住空态', async () => {
+    const six = Array.from({ length: 6 }, (_, i) => ask(1000 + i))
+    const follow = async function* () { yield { kind: 'history' as const, events: six } as never }
+    await expectBoundary(createElement(AttentionTab, props({ follow, useSessions: stub(readyById) })), '条待你处理的事项未显示')
+  })
+
+  it('④ 历史读取失败 ⇒ 错误行且压住空态', async () => {
+    await expectBoundary(createElement(AttentionTab, props({ useSessions: stub(readyById), pageHistory: vi.fn(async () => ({ ok: false as const })) })), '历史读不到')
+  })
+
+  it('⑤ 历史窗口被截（hasMore）⇒ 提示「只扫描了最近 N 条」且压住空态', async () => {
+    await expectBoundary(createElement(AttentionTab, props({ useSessions: stub(readyById), pageHistory: page([], true) })), '只扫描了最近')
+  })
+
+  it('⑥ 本会话事件超窗 ⇒ 提示「只保留最近 N 条」且压住空态', async () => {
+    const frames = Array.from({ length: 1001 }, (_, i) => ({ kind: 'history' as const, events: [{ type: 'turn/start', time: i, data: {} }] }))
+    const follow = async function* () { for (const frame of frames) yield frame as never }
+    await expectBoundary(createElement(AttentionTab, props({ follow, useSessions: stub(readyById) })), '只保留最近')
   })
 })

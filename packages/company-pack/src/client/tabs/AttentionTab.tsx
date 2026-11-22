@@ -15,15 +15,17 @@ import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import {
+  ASKS_CAP,
   attentionItemKey,
   attentionTone,
+  hasBoundary,
   mergeAttention,
   pendingAsks,
   streamAttention,
+  type AttentionBoundaries,
   type AttentionEventLike,
   type AttentionItem,
   type LivePending,
-
 } from '../../lib/presence/attention.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { HISTORY_PAGE_MESSAGES, historyCandidates, readPendingAcrossSessions, type CandidateSession, type PendingAcrossSessions, type SessionPageFace } from '../presence/attention-history.ts'
@@ -132,7 +134,7 @@ export function AttentionTab(props: AttentionTabProps) {
   // 本会话事件窗口（BUG-317）：`events` 只留最近 MAX_EVENTS 条，所以必须另外记住「一共来过多少条」，
   // 否则更早的挂起审批被截掉后面板还会说「没有等你的事」。
   const [eventsSeen, setEventsSeen] = useState(0)
-  const [history, setHistory] = useState<PendingAcrossSessions>({ items: [], approvalsCapped: 0, scanned: 0, failed: 0, window: 'none' })
+  const [history, setHistory] = useState<PendingAcrossSessions>({ items: [], asksCapped: 0, scanned: 0, failed: 0, window: 'none' })
   // 候选挑选走纯函数（fail-closed，BUG-323）：cwd 未解析时**不扫**，而不是把「未知」当「都匹配」。
   const candidates = useMemo(
     () => historyCandidates(byId as unknown as Readonly<Record<string, CandidateSession>>, props.sessionId, HISTORY_SCAN_CAP),
@@ -143,7 +145,7 @@ export function AttentionTab(props: AttentionTabProps) {
   useEffect(() => {
     const ids = historyKey === '' ? [] : historyKey.split('\n')
     const page = props.pageHistory
-    if (ids.length === 0 || page === undefined) { setHistory({ items: [], approvalsCapped: 0, scanned: 0, failed: 0, window: 'none' }); return }
+    if (ids.length === 0 || page === undefined) { setHistory({ items: [], asksCapped: 0, scanned: 0, failed: 0, window: 'none' }); return }
     const controller = new AbortController()
     const read = async (): Promise<void> => {
       try {
@@ -160,9 +162,19 @@ export function AttentionTab(props: AttentionTabProps) {
   }, [historyKey, props.pageHistory])
 
   const eventsTruncated = eventsSeen > MAX_EVENTS
+  // 本会话的「待你处理」结果算一次：items 与 capped 都从它来（BUG-327：过去 capped 被丢）。
+  const ownAsks = useMemo(() => pendingAsks(events, leadId), [events, leadId])
+  // **单一**边界对象（BUG-327/328/330）：一处算、一处渲染、一处决定空态。
+  const boundaries: AttentionBoundaries = useMemo(() => ({
+    eventsTruncated,
+    candidates: candidates.ok ? { total: candidates.total, capped: candidates.capped } : null,
+    asksCapped: ownAsks.capped + history.asksCapped,
+    window: history.window,
+    failed: history.failed,
+  }), [eventsTruncated, candidates, ownAsks, history])
   const items = useMemo(
-    () => mergeAttention(live, [...pendingAsks(events, leadId).items, ...history.items, ...streamAttention(events, leadId, 'CEO')]),
-    [live, events, leadId, history],
+    () => mergeAttention(live, [...ownAsks.items, ...history.items, ...streamAttention(events, leadId, 'CEO')]),
+    [live, ownAsks, events, leadId, history],
   )
   const waiting = items.filter(item => item.kind !== 'completion')
   const completions = items.filter(item => item.kind === 'completion')
@@ -183,20 +195,23 @@ export function AttentionTab(props: AttentionTabProps) {
     >
       {streamError !== null && <div className="wk-error">{t('attention.streamError', { message: streamError })}</div>}
       {/* 边界必须可见（BUG-304/305）：全失败 ≠ 没有；窗口截断 ≠ 完整。 */}
-      {/* 工作区未就绪就不跨会话（BUG-323）：宁可少扫，不可越界。 */}
-      {!candidates.ok && <div className="wk-meta">{t('attention.historyWorkspaceUnknown')}</div>}
-      {/* 边界必须一路带到面板（BUG-317/318/320）：三处上限各自说出来。 */}
-      {eventsTruncated && <div className="wk-meta">{t('attention.eventsWindow', { count: MAX_EVENTS })}</div>}
-      {candidates.ok && candidates.capped > 0 && <div className="wk-meta">{t('attention.candidatesCapped', { count: candidates.capped })}</div>}
-      {history.approvalsCapped > 0 && <div className="wk-meta">{t('attention.approvalsCapped', { count: history.approvalsCapped })}</div>}
-      {history.failed > 0 && <div className="wk-error">{t('attention.historyFailed', { count: history.failed })}</div>}
-      {history.window === 'some' && <div className="wk-meta">{t('attention.historyWindow', { count: HISTORY_PAGE_MESSAGES })}</div>}
+      {/* 边界只从**一个**对象渲染（BUG-327/328/330）：每一维都在，组合起来就不会漏。 */}
+      {boundaries.candidates === null && <div className="wk-meta">{t('attention.historyWorkspaceUnknown')}</div>}
+      {boundaries.eventsTruncated && <div className="wk-meta">{t('attention.eventsWindow', { count: MAX_EVENTS })}</div>}
+      {boundaries.candidates !== null && boundaries.candidates.capped > 0 && (
+        <div className="wk-meta">{t('attention.candidatesCapped', { count: boundaries.candidates.capped })}</div>
+      )}
+      {boundaries.asksCapped > 0 && (
+        <div className="wk-meta">{t('attention.asksCapped', { count: boundaries.asksCapped, limit: ASKS_CAP })}</div>
+      )}
+      {boundaries.failed > 0 && <div className="wk-error">{t('attention.historyFailed', { count: boundaries.failed })}</div>}
+      {boundaries.window === 'some' && <div className="wk-meta">{t('attention.historyWindow', { count: HISTORY_PAGE_MESSAGES })}</div>}
       <div className="wk-activity-block">
         <strong>{t('attention.waiting')}</strong>
         {waiting.length === 0
-          // 历史读不到时不能说「没有等你的事」（BUG-305）：上面已有错误行，这里只留空白。
-          ? (history.failed > 0 || eventsTruncated || history.approvalsCapped > 0
-            // 有边界时不能说「没有等你的事」（BUG-317/320）：上面已有「只扫了最近 N 条 / 还有 N 条」的提示。
+          // 只要**任一**边界存在就不能说「没有等你的事」（BUG-305/317/318/320/323/328）：
+          // 判据只有一处 = hasBoundary；过去这里是手写的三个条件，组合就漏。
+          ? (hasBoundary(boundaries)
             ? null
             : <div className="wk-meta">{t('attention.emptyWaiting')}</div>)
           : (

@@ -89,8 +89,8 @@ export async function readSessionEvents(
 export interface PendingAcrossSessions {
   /** 仍挂起的审批（`jumpTo` = 所在会话）。 */
   readonly items: readonly AttentionItem[]
-  /** 各会话审批流被 `STREAM_ITEM_CAP` 截掉的条数合计（BUG-320）。 */
-  readonly approvalsCapped: number
+  /** 各会话「待你处理」（审批+问询）被 `STREAM_ITEM_CAP` 截掉的条数合计（BUG-320/330）。 */
+  readonly asksCapped: number
   /** 实际扫到的会话数（候选数 − 读不到的）。 */
   readonly scanned: number
   /** 读失败的会话数；>0 时面板必须说「有 N 个会话的历史读不到」。 */
@@ -131,7 +131,7 @@ export async function readPendingAcrossSessions(
   const ok = results.filter((result): result is { readonly ok: true, readonly items: readonly AttentionItem[], readonly capped: number, readonly truncated: boolean } => result.ok)
   return {
     items: ok.flatMap(result => result.items),
-    approvalsCapped: ok.reduce((sum, result) => sum + result.capped, 0),
+    asksCapped: ok.reduce((sum, result) => sum + result.capped, 0),
     scanned: ok.length,
     failed: results.length - ok.length,
     window: ok.some(result => result.truncated) ? 'some' : 'none',
