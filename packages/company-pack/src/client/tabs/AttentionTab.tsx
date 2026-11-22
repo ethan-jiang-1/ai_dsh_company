@@ -26,7 +26,7 @@ import {
   attentionItemKey,
 } from '../../lib/presence/attention.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
-import { readPendingAcrossSessions, type SessionPageFace } from '../presence/attention-history.ts'
+import { HISTORY_PAGE_MESSAGES, readPendingAcrossSessions, type PendingAcrossSessions, type SessionPageFace } from '../presence/attention-history.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
 import type { CompanyDataInjected } from '../data/use-company-data.ts'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
@@ -125,7 +125,8 @@ export function AttentionTab(props: AttentionTabProps) {
 
   // 跨会话重建（BUG-292）：活体登记只覆盖本页在场期，`session/follow` 对**未打开**的会话零 history 帧，
   // 所以走 `remote.session.page` 读同工作区 root 会话的首页历史，配对 asked/decided 只留「问了没答」。
-  const [historyPending, setHistoryPending] = useState<readonly AttentionItem[]>([])
+  // 结果态（BUG-304/305）：`[]` 分不清「没有」与「读不到/窗口外」，所以连边界一起存。
+  const [history, setHistory] = useState<PendingAcrossSessions>({ items: [], scanned: 0, failed: 0, window: 'none' })
   const historyKey = useMemo(() => {
     const currentCwd = byId[props.sessionId as SessionId]?.cwd
     return Object.values(byId)
@@ -141,12 +142,12 @@ export function AttentionTab(props: AttentionTabProps) {
   useEffect(() => {
     const ids = historyKey === '' ? [] : historyKey.split('\n')
     const page = props.pageHistory
-    if (ids.length === 0 || page === undefined) { setHistoryPending([]); return }
+    if (ids.length === 0 || page === undefined) { setHistory({ items: [], scanned: 0, failed: 0, window: 'none' }); return }
     const controller = new AbortController()
     const read = async (): Promise<void> => {
       try {
         const rebuilt = await readPendingAcrossSessions(page, ids, controller.signal)
-        if (!controller.signal.aborted) setHistoryPending(rebuilt)
+        if (!controller.signal.aborted) setHistory(rebuilt)
       } catch {
         // 整体失败（罕见）：保留上一轮结果，不让面板闪成空。
       }
@@ -158,8 +159,8 @@ export function AttentionTab(props: AttentionTabProps) {
   }, [historyKey, props.pageHistory])
 
   const items = useMemo(
-    () => mergeAttention(live, [...pendingApprovals(events, leadId), ...historyPending, ...streamAttention(events, leadId, 'CEO')]),
-    [live, events, leadId, historyPending],
+    () => mergeAttention(live, [...pendingApprovals(events, leadId), ...history.items, ...streamAttention(events, leadId, 'CEO')]),
+    [live, events, leadId, history],
   )
   const waiting = items.filter(item => item.kind !== 'completion')
   const completions = items.filter(item => item.kind === 'completion')
@@ -179,10 +180,14 @@ export function AttentionTab(props: AttentionTabProps) {
       refreshLabel={t('attention.refresh')}
     >
       {streamError !== null && <div className="wk-error">{t('attention.streamError', { message: streamError })}</div>}
+      {/* 边界必须可见（BUG-304/305）：全失败 ≠ 没有；窗口截断 ≠ 完整。 */}
+      {history.failed > 0 && <div className="wk-error">{t('attention.historyFailed', { count: history.failed })}</div>}
+      {history.window === 'some' && <div className="wk-meta">{t('attention.historyWindow', { count: HISTORY_PAGE_MESSAGES })}</div>}
       <div className="wk-activity-block">
         <strong>{t('attention.waiting')}</strong>
         {waiting.length === 0
-          ? <div className="wk-meta">{t('attention.emptyWaiting')}</div>
+          // 历史读不到时不能说「没有等你的事」（BUG-305）：上面已有错误行，这里只留空白。
+          ? (history.failed > 0 ? null : <div className="wk-meta">{t('attention.emptyWaiting')}</div>)
           : (
             <ul className="wk-activity" aria-label={t('attention.waitingList')}>
               {waiting.map(item => (

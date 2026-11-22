@@ -302,7 +302,7 @@
 | 289 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:63 |
 | 290 | 2026-11-20 | tests/client/startup/command-scope-hint.spec.ts:29 |
 | 291 | 2026-11-21 | tests/client/cultivation/cultivation-board.spec.ts:240；tests/client/cultivation/cultivation-board.spec.ts:272；tests/client/cultivation/cultivation-board.spec.ts:310 |
-| 292 | 2026-11-21 | tests/client/presence/attention-history.spec.ts:38；tests/client/tabs/attention-tab.spec.ts:62；tests/client/tabs/attention-tab.spec.ts:117 |
+| 292 | 2026-11-21 | tests/client/presence/attention-history.spec.ts:39；tests/client/tabs/attention-tab.spec.ts:62；tests/client/tabs/attention-tab.spec.ts:117 |
 | 293 | 2026-11-21 | tests/client/startup/command-scope-hint.spec.ts:69 |
 | 294 | 2026-11-21 | tests/client/cultivation/cultivation-board.spec.ts:300 |
 | 295 | 2026-11-21 | tests/client/wiring/attention.spec.ts:208 |

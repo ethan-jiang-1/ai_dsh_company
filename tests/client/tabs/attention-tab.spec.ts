@@ -147,3 +147,33 @@ describe('待办页签：跨会话挂起项（BUG-292）', () => {
     expect(host.textContent).toContain('同工作区其它会话')
   })
 })
+
+// 边界必须可见：全失败 ≠ 没有；窗口截断 ≠ 完整。
+// 这两条是这一族唯一能被用户看见的地方——面板必须自己说出来。
+describe('AttentionTab · 历史读取的边界', () => {
+  const sessionsById = {
+    'session-lead': { id: 'session-lead', cwd: '/ws', updatedAt: 3 },
+    'session-cfo': { id: 'session-cfo', cwd: '/ws', updatedAt: 1 },
+  }
+  const useSessionsStub = (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown =>
+    selector({ byId: sessionsById })
+
+  it('全部会话读失败 ⇒ 出现错误行，且不说「没有等你的事」', async () => {
+    const pageHistory = vi.fn(async () => ({ ok: false as const, error: { message: 'gateway unavailable' } }))
+    const host = await mount(createElement(AttentionTab, props({ pageHistory, useSessions: useSessionsStub })))
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 30)) })
+    expect(host.textContent).toContain('历史读不到')
+    // 错误行自己会引用「不是『没有等你的事』」，所以这里断言的是空态原句（带破折号）不出现。
+    expect(host.textContent).not.toContain('没有等你的事——')
+  })
+
+  it('窗口拿满一页 ⇒ 出现「只扫描了最近 N 条」提示', async () => {
+    const pageHistory = vi.fn(async (request: { maxMessages?: number }) => (request.maxMessages === 1
+      ? { ok: true as const, value: { records: [{ type: 'event', event: { type: 'turn/start', seq: 9, time: 1, data: {} } }], hasMore: false } }
+      : { ok: true as const, value: { records: [], hasMore: true } }))
+    const host = await mount(createElement(AttentionTab, props({ pageHistory, useSessions: useSessionsStub })))
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 30)) })
+    expect(host.textContent).toContain('只扫描了最近')
+    expect(host.textContent).toContain('800')
+  })
+})
