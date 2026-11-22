@@ -349,7 +349,8 @@ describe('CultivationBoard · en 渲染无 CJK（BUG-302）', () => {
 
 // 声明必须有人用（BUG-306）：`LIST_CAPS.mine = 5` 早就写着，渲染面从不调用——
 // 20 条记录会把「我提交的」整段铺开，把下面的「已采纳/journal」顶没。
-describe('CultivationBoard · 我提交的折叠上限', () => {
+// 负例留证 2026-11-22：不接 capList（恢复全量渲染）后 `vitest run tests/client/cultivation/cultivation-board.spec.ts` 1 failed（6 条全铺开、无控件）；接上后 31/31 绿。BUG-306
+describe('CultivationBoard · 我提交的折叠上限（BUG-306）', () => {
   it('6 条 ⇒ 只显示 5 条 + 「显示全部（共 6 条）」控件', () => {
     const records = Array.from({ length: 6 }, (_, i) => record({ id: `2026112${String(i)}-000000-r${String(i)}`, status: 'open', expectation: `e-${String(i)}` }))
     const markup = render({ records })

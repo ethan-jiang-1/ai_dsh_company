@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-306**（2026-11-22，E2E 第三轮 / P2）：`LIST_CAPS.mine` 死配置——
+  [306](BUG-306-cultivation-mine-list-cap-dead.md) `CultivationMine` 接上 `capList`/`capControl`，
+  控件计数用折叠前总数（cap 之后再取长度永远等于上限）。证据提交 `dff4e34b`。
+
 - **BUG-301**（2026-11-22，E2E 第三轮 / P2）：策略 wiki 输入非受控——
   [301](BUG-301-strategy-wiki-input-stale-after-reset.md) 改受控 + 外部值变化同步；与 store 相同的值失焦不写回。
   证据提交 `40be5b63`。

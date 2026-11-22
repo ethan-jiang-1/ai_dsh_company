@@ -99,7 +99,7 @@ opened: 2026-11-21
 - [BUG-303](../_archive/fixed_bugs/BUG-303-ledger-malformed-rows-silent-drop.md)：台账坏行静默丢，4 行只显示 2 行。
 - [BUG-304](../_archive/fixed_bugs/BUG-304-attention-history-window-misses-old-approvals.md)：跨会话历史只读最近 800 条，老审批漏。
 - [BUG-305](../_archive/fixed_bugs/BUG-305-attention-history-all-read-fail-silent-empty.md)：历史全失败仍显示「没有等你的事」。
-- [BUG-306](../bugs/BUG-306-cultivation-mine-list-cap-dead.md)：`LIST_CAPS.mine=5` 死配置，10 条全铺开无折叠。
+- [BUG-306](../_archive/fixed_bugs/BUG-306-cultivation-mine-list-cap-dead.md)：`LIST_CAPS.mine=5` 死配置，10 条全铺开无折叠。
 
 第三轮跑绿：策略正常设值/刷新/重置；培养创作（空校验 + 跨角色建议落盘）、采纳/拒绝/撤回/验证（通过）、建议路由、journal 不可达；成品归档筛选/打开、unicode+空格路径；台账正常/截断提示；团队任务板/看板/依赖图/在场/用量（3 任务 + 依赖链）；待办身份去重（修后两条同摘要不再塌）；en 页签主体。仍红：301–306。目标 5–6 个，本轮 6 个。
 

@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-306-cultivation-mine-list-cap-dead.md](fixed_bugs/BUG-306-cultivation-mine-list-cap-dead.md) — `LIST_CAPS.mine=5` 是死配置；`CultivationMine` 接上折叠，计数用折叠前总数。
 - [BUG-301-strategy-wiki-input-stale-after-reset.md](fixed_bugs/BUG-301-strategy-wiki-input-stale-after-reset.md) — wiki 输入非受控，重置后仍显示旧值且会回写；改受控 + 外部值同步。
 - [BUG-302-english-ui-chinese-time-and-reason.md](fixed_bugs/BUG-302-english-ui-chinese-time-and-reason.md) — en 界面混入中文时间/原因；`timeParts` 结构化 + 字典渲染 + 原因代号，判据 = en 渲染无 CJK。
 - [BUG-303-ledger-malformed-rows-silent-drop.md](fixed_bugs/BUG-303-ledger-malformed-rows-silent-drop.md) — 台账坏行静默丢；解析返回 `{rows,badRows}`，面板说「跳过 N 行（格式不符）」。

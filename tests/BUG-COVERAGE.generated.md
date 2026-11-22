@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 295 |
-| 有具名守卫 | 193 |
+| 已修卡 | 296 |
+| 有具名守卫 | 194 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 65.4% |
+| 覆盖率 | 65.5% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -316,3 +316,4 @@
 | 303 | 2026-11-22 | tests/client/tabs/ledger-tab.spec.ts:84 |
 | 304 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:81 |
 | 305 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:154 |
+| 306 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:353 |

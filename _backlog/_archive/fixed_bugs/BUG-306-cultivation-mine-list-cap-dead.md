@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-306：培养面板的「我提交的」列表没有接上已声明的 5 条折叠上限——记录一多就整段铺开
 
-> 严重级别：P2（次要偏重：`LIST_CAPS.mine = 5` 已写在状态 hook 里，但渲染面从不调用 `capList`/`capControl`；提交记录多时「我的纠正/建议」整段铺开，把下面的「已采纳的方法 / journal」顶得很远）｜发现：2026-11-22（E2E 第三轮）｜状态：调查中
+> 严重级别：P2（次要偏重：`LIST_CAPS.mine = 5` 已写在状态 hook 里，但渲染面从不调用 `capList`/`capControl`；提交记录多时「我的纠正/建议」整段铺开，把下面的「已采纳的方法 / journal」顶得很远）｜发现：2026-11-22（E2E 第三轮）｜状态：已修｜审查：agent — 逐条核对已修判定（6 条折叠 + 控件计数 + ≤5 不给控件）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 5–6 个，别管那边怎么修」）。
+> **留痕**：commit dff4e34b（client 呈现面，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -77,3 +77,10 @@ grep -rn "capList('mine'\|capControl('mine'" packages/company-pack/src/client
 - 「我提交的」列表受 `LIST_CAPS.mine` 约束，超过 5 条出现折叠控件；
 - 展开/收起可逆，计数正确（不把两个子块重复计）；
 - 20 条夹具 keyless + 真页面各一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx`（`CultivationMine` 接 `capList`/`capControl`）、`packages/company-pack/src/client/cultivation/CultivationBoard.tsx`（解构传入）、`tests/client/cultivation/cultivation-board.spec.ts`
+- 红：`vitest run tests/client/cultivation/cultivation-board.spec.ts` —— 不接 cap 时「6 条 ⇒ 只显示 5 条 + 显示全部（共 6 条）」失败（全部铺开、无控件）
+- 绿：`vitest run tests/client/cultivation/cultivation-board.spec.ts` —— 31/31（6 条 ⇒ 5 条 + 控件；≤5 条不给控件）；`vitest run tests/client/cultivation/cultivation-board-actions.spec.ts` —— 37/37（既有折叠判据仍绿，负断言限定到待办块）
+- 提交：commit dff4e34b
