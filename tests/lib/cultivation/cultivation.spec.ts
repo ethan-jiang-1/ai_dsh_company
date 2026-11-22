@@ -289,3 +289,23 @@ describe('feedbackItems', () => {
     ])).toEqual([])
   })
 })
+
+// 同一记录不能同时出现在两个箱子里（BUG-309）：自己提、自己拒的记录已经在 `mine` 里带回执，
+// 再进 `processedForViewer` 会让面板同一行出现两次。
+describe('recordInbox：自己提自己拒只进 mine', () => {
+  const base = {
+    schema: 1 as const, kind: 'correction' as const, targetRole: 'ceo', proposerRole: 'ceo', proposerKind: 'human' as const,
+    source: 's', expectation: 'e', body: '', title: 't', methodSlug: undefined, reason: 'r', decidedAt: '2026-11-22T00:00:00.000Z',
+  }
+  it('self-rejected ⇒ mine 有、processedForViewer 无', () => {
+    const inbox = recordInbox([{ ...base, id: '20261122-000000-self', status: 'rejected' }] as never, 'ceo')
+    expect(inbox.mine.map(record => record.id)).toEqual(['20261122-000000-self'])
+    expect(inbox.processedForViewer).toEqual([])
+  })
+
+  it('别人提、我拒 ⇒ processedForViewer 有、mine 无', () => {
+    const inbox = recordInbox([{ ...base, id: '20261122-000000-other', proposerRole: 'cfo', status: 'rejected' }] as never, 'ceo')
+    expect(inbox.processedForViewer.map(record => record.id)).toEqual(['20261122-000000-other'])
+    expect(inbox.mine).toEqual([])
+  })
+})

@@ -38,7 +38,8 @@ export function CultivationMine({ inbox, roleLabel = defaultRoleLabel, capList, 
   readonly roleLabel?: (role: string) => string
   /** 折叠：`LIST_CAPS.mine` 声明在 hook 里，渲染面必须真的用上（BUG-306 是它没接上）。 */
   readonly capList: (key: 'mine', list: readonly CultivationRecord[]) => readonly CultivationRecord[]
-  readonly capControl: (key: 'mine', total: number) => ReactNode
+  /** 折叠控件：`hidden` = 实际被隐藏的条数（多列表共用一键时必须显式给，BUG-307）。 */
+  readonly capControl: (key: 'mine', total: number, hidden?: number) => ReactNode
 }) {
   const processed = capList('mine', inbox.processedForViewer)
   const mine = capList('mine', inbox.mine)
@@ -81,7 +82,8 @@ export function CultivationMine({ inbox, roleLabel = defaultRoleLabel, capList, 
             ))}
           </div>
           {/* 计数用**折叠前**的总数：capList 之后再取长度会永远等于上限（BUG-306 的同一坑）。 */}
-          {capControl('mine', inbox.processedForViewer.length + inbox.mine.length)}
+          {capControl('mine', inbox.processedForViewer.length + inbox.mine.length,
+            Math.max(0, inbox.processedForViewer.length - 5) + Math.max(0, inbox.mine.length - 5))}
         </div>
       )}
     </>

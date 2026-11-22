@@ -91,9 +91,16 @@ export function useCultivationBoard(props: CultivationBoardStateProps) {
   /** 列表折叠：默认只给最近的 `LIST_CAPS[key]` 条，超出部分用「显示全部（共 N 条）」打开。 */
   const capList = <T,>(key: keyof typeof LIST_CAPS, list: readonly T[]): readonly T[] =>
     expandedLists[key] === true ? list : list.slice(0, LIST_CAPS[key])
-  /** 折叠控件的渲染（未超阈值就不给）。 */
-  const capControl = (key: keyof typeof LIST_CAPS, total: number): ReactNode =>
-    total <= LIST_CAPS[key]
+  /**
+   * 折叠控件的渲染（**没有真的隐藏任何行就不给**，BUG-307）。
+   * 多列表共用一键时（如「我提交的」两个子列表各折 5 条），`hidden` 必须由调用方算
+   * 「两个子列表实际隐藏数之和」——按总数判断会出现「8 条全显示还挂显示全部」。
+   * @param key - 折叠档位（`LIST_CAPS` 的键）。
+   * @param total - 展开后的总条数（控件文案用）。
+   * @param hidden - 收起时被隐藏的条数（缺省 = 总数 − 上限）。
+   */
+  const capControl = (key: keyof typeof LIST_CAPS, total: number, hidden: number = Math.max(0, total - LIST_CAPS[key])): ReactNode =>
+    hidden <= 0
       ? null
       : (
         <div className="wk-cultivation-actions">

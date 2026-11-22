@@ -364,3 +364,33 @@ describe('CultivationBoard · 我提交的折叠上限（BUG-306）', () => {
     expect(render({ records })).not.toContain('显示全部')
   })
 })
+
+// 声明约束必须被执行（BUG-307 / BUG-309）：
+// ① 控件只在**真的隐藏了行**时出现（两个子列表各折 5 条，不能按和判断）；
+// ② 自己提、自己拒的记录只出现一次（mine 带回执，不进 processedForViewer）。
+describe('CultivationBoard · 我提交的：控件与去重', () => {
+  // 别人提、我拒 ⇒ 进 processedForViewer；自己提 ⇒ 进 mine（309 的去重只针对「自己提自己拒」）。
+  const rejected = (id: string) => record({ id, status: 'rejected', reason: 'r', proposerRole: 'cfo', targetRole: 'ceo', expectation: `e-${id}` })
+  const open = (id: string) => record({ id, status: 'open', expectation: `e-${id}` })
+  // 两块子列表的 aria 前缀不同：mine = 「我提交的」，processed = 「已拒绝」。
+  const count = (markup: string) => (markup.match(/aria-label="(我提交的 |已拒绝 )/g)?.length ?? 0)
+
+  it('4 + 4 ⇒ 一行都没隐藏，不给控件', () => {
+    const markup = render({ records: [...[0, 1, 2, 3].map(i => rejected(`r-${String(i)}`)), ...[0, 1, 2, 3].map(i => open(`m-${String(i)}`))] })
+    expect(count(markup)).toBe(8)
+    expect(markup).not.toContain('显示全部')
+  })
+
+  it('6 + 1 ⇒ 只隐藏 1 条，控件出现且文案是总数 7', () => {
+    const markup = render({ records: [...[0, 1, 2, 3, 4, 5].map(i => rejected(`r-${String(i)}`)), open('m-1')] })
+    expect(count(markup)).toBe(6)
+    expect(markup).toContain('显示全部（共 7 条）')
+  })
+
+  it('自己提、自己拒 ⇒ 只出现一次', () => {
+    const markup = render({ records: [record({ id: 'self-1', status: 'rejected', reason: 'r', expectation: 'e-self' })] })
+    // 同一行只出现一次（mine 带回执；processedForViewer 不再收自己提的）。
+    expect(markup.match(/aria-label="我提交的 self-1"/g)?.length ?? 0).toBe(1)
+    expect(markup).not.toContain('已拒绝 CEO · 首席执行官的纠正')
+  })
+})

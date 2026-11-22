@@ -263,7 +263,10 @@ export interface RecordInbox {
   readonly mine: readonly CultivationRecord[]
   /** 我的分身已采纳的方法（新会话生效；含撤回标记）。 */
   readonly adoptedForViewer: readonly CultivationRecord[]
-  /** 我已处理（目标是我、已拒绝——理由留档，提出者另在「我提交的」见回执）。 */
+  /**
+   * 我已处理（目标是我、已拒绝——理由留档）。
+   * **不含自己提的**：自己的记录已经在 `mine` 里带回执，两处都放会让同一行出现两次（BUG-309）。
+   */
   readonly processedForViewer: readonly CultivationRecord[]
 }
 
@@ -282,7 +285,8 @@ export function recordInbox(records: readonly CultivationRecord[], viewerRole: s
     if (record.status === 'open' && record.targetRole === viewer) needsDecision.push(record)
     if (record.proposerRole === viewer) mine.push(record)
     if (record.status === 'adopted' && record.targetRole === viewer) adoptedForViewer.push(record)
-    if (record.status === 'rejected' && record.targetRole === viewer) processedForViewer.push(record)
+    // 自己提自己拒的记录：只在 `mine` 里出现（带「已拒绝」回执），不再进 processedForViewer。
+    if (record.status === 'rejected' && record.targetRole === viewer && record.proposerRole !== viewer) processedForViewer.push(record)
   }
   return { needsDecision, mine, adoptedForViewer, processedForViewer }
 }
