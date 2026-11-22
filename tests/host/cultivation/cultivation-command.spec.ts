@@ -424,7 +424,8 @@ describe('命令边界：坏 records 根与状态机（BUG-117/127/130/139/141�
 
 // host 回执必须随语言（BUG-316）：en 下成功/失败回执都不许出现中文。
 // 判据用「已知命令 + 真实盘」跑一遍，断言返回文本无 CJK；无法识别的原文才允许原样显示（本实现无此路径）。
-describe('/cultivation 回执的语言', () => {
+// 负例留证 2026-11-23：把 correct/adopt 回执恢复成中文字面量后 `vitest run tests/host/cultivation/cultivation-command.spec.ts` 2 failed（en 回执含 CJK）。BUG-316
+describe('/cultivation 回执的语言（BUG-316）', () => {
   const cjk = /[\u4e00-\u9fff]/
 
   it('en 选择器 ⇒ correct 的成功回执与用法错误都是英文', async () => {

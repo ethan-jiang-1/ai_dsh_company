@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-316**（2026-11-22，E2E 第五轮 / P2）：host 命令回执不随语言——
+  [316](BUG-316-cultivation-host-command-texts-not-localized.md) `registerCultivation` 收 `t(zh, en)`，63 条回执改双语；
+  条件片段收成「一次分支 + 两种语言叶子」。证据提交 `4f1ad457`。
+
 - **BUG-319**（2026-11-22，E2E 第五轮 / P2）：问询刷新后丢失——
   [319](BUG-319-attention-questions-not-rebuilt-after-reload.md) `pendingQuestions` + `pendingAsks`（审批与问询一起重建）。
   证据提交 `9e33dc25`。

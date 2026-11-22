@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-316：培养命令的 host 回执/错误全是中文——en 面板里提交成功仍弹「已提交培养记录…」
 
-> 严重级别：P2（表达层合同：主面板、命令回执、错误行应随 locale；当前 en 下所有 `/cultivation` 动作结果仍是中文）｜发现：2026-11-22（E2E 第五轮）｜状态：调查中
+> 严重级别：P2（表达层合同：主面板、命令回执、错误行应随 locale；当前 en 下所有 `/cultivation` 动作结果仍是中文）｜发现：2026-11-22（E2E 第五轮）｜状态：已修｜审查：agent — 逐条核对已修判定（en 下 correct/adopt/verify/reject 回执与用法错误均无 CJK）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit 4f1ad457（host 回执 + index 接线，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -71,3 +71,11 @@ host 命令面写死了中文，没有随 `command` 的 locale/语言分支：
 - zh 实例保持中文；
 - 提交成功回执不再出现「已提交培养记录」；
 - host 命令 spec + en 真页面各一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/cultivation/cultivation.ts`（`CultivationText` + 63 条回执 `t(zh, en)` + 条件叶子 helper）、`packages/company-pack/src/index.ts`（传 `language.text`）、`tests/support/cultivation-harness.ts`（可注入 en 选择器）、`tests/host/cultivation/cultivation-command.spec.ts`
+- 红：`vitest run tests/host/cultivation/cultivation-command.spec.ts` —— 把 `correct`/`adopt` 回执恢复成中文字面量后，「en 选择器 ⇒ 成功回执无 CJK」失败（含「已提交培养记录」）
+- 绿：`vitest run tests/host/cultivation/cultivation-command.spec.ts` —— 21/21（en 下 correct/adopt/verify/reject 的成功与用法错误回执全部无 CJK）
+- 提交：commit 4f1ad457
+- **做法说明**：回执里的条件片段（回滚情况 / `--orphan` / 状态名 / 有用与否 / 归档未动条数 / 对账缺方法）改成「一次分支 + 两种语言叶子」——否则每加一种语言就多一份未被覆盖的分支，coverage 棘轮会红（本轮实际踩到）。

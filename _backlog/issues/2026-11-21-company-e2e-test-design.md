@@ -123,7 +123,7 @@ opened: 2026-11-21
 
 并行进程收掉 307–315 后，本轮从「en 真提交」和「长会话/多会话/长前置」两组边界切入，新立 9 张（316–324）：
 
-- [BUG-316](../bugs/BUG-316-cultivation-host-command-texts-not-localized.md)：培养命令 host 回执/错误 en 仍中文（真页面「Record it」实测）。
+- [BUG-316](../_archive/fixed_bugs/BUG-316-cultivation-host-command-texts-not-localized.md)：培养命令 host 回执/错误 en 仍中文（真页面「Record it」实测）。
 - [BUG-317](../_archive/fixed_bugs/BUG-317-attention-current-session-1000-cap-silent.md)：当前会话只留 1000 事件，旧审批静默丢。
 - [BUG-318](../_archive/fixed_bugs/BUG-318-attention-history-candidate-cap-silent.md)：跨会话候选只扫 20 个，无边界提示。
 - [BUG-319](../_archive/fixed_bugs/BUG-319-attention-questions-not-rebuilt-after-reload.md)：问询刷新后从待办消失。
