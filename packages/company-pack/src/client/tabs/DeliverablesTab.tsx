@@ -11,6 +11,8 @@
  * - **分组 + 筛选**：按月分组；全部/活跃/归档/台账外四档，44 条也不至于糊成一片。
  * - **空/错/加载**：缺索引不静默给空表，明确提示检查 host 与 workspace。
  */
+import { CATALOG_READ_LIMIT } from '../data/read-limits.ts'
+import type { WorkspaceTextRead } from '../cultivation/cultivation-data.ts'
 import { useMemo, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
@@ -36,7 +38,7 @@ export interface DeliverablesTabInjected {
   readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
   readonly unfloatTab: (paneId: string) => void
   /** 读生成索引全文；不可达给 null（面板显示读取失败，不静默）。 */
-  readonly readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
+  readonly readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<WorkspaceTextRead>
   /** 在右栏打开 final.md（sessionId 用于 file resource 寻址）。 */
   readonly openFinal: (sessionId: SessionId, path: string) => void
 }
@@ -236,14 +238,36 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
  * @param props - 槽 props + 注入面。
  * @returns 成品目录。
  */
+/** 成品索引顶部的错误（纯函数：文案 key + 参数由状态决定，渲染处只翻译）。 */
+export type CatalogProblem =
+  | { readonly key: 'deliverables.unreadable' }
+  | { readonly key: 'deliverables.tooLarge', readonly params: { readonly limit: number } }
+  | { readonly key: 'deliverables.badShape' }
+  | null
+
+/**
+ * 成品索引的错误判定（**顺序即语义**，BUG-298）：截断导致的解析失败必须报「超出读取上限」，
+ * 不能报「形状不符」——后者会让人以为文件坏了、等 host 重建，而重建也解决不了。
+ * @param state - 读取状态机。
+ * @param catalog - 解析结果（null = 解析失败或未就绪）。
+ * @returns 该显示哪一种错误；null = 无错误。
+ */
+export function catalogProblemOf(
+  state: { readonly status: 'loading' | 'unreadable' | 'ready', readonly truncated?: boolean },
+  catalog: DeliverablesCatalog | null,
+): CatalogProblem {
+  if (state.status === 'unreadable') return { key: 'deliverables.unreadable' }
+  if (state.status !== 'ready') return null
+  if (state.truncated === true) return { key: 'deliverables.tooLarge', params: { limit: CATALOG_READ_LIMIT } }
+  return catalog === null ? { key: 'deliverables.badShape' } : null
+}
+
 export function DeliverablesTab(props: DeliverablesTabProps) {
   const { state, reload } = useWorkspaceText(props.readCatalog, props.sessionId)
   const catalog = state.status === 'ready' ? parseCatalog(state.text) : null
-  const error = state.status === 'unreadable'
-    ? props.t('deliverables.unreadable')
-    : state.status === 'ready' && catalog === null
-      ? props.t('deliverables.badShape')
-      : null
+  // 顺序很重要（BUG-298）：截断导致的 parse 失败必须报「超出读取上限」，不能报「形状不符」。
+  const problem = catalogProblemOf(state, catalog)
+  const error = problem === null ? null : props.t(problem.key, 'params' in problem ? problem.params : undefined)
 
   return (
     <PanelFrame

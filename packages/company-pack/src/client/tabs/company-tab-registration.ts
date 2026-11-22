@@ -1,4 +1,5 @@
 /** Company tab type and keyed renderer registrations. */
+import type { WorkspaceTextRead } from '../cultivation/cultivation-data.ts'
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
@@ -48,9 +49,9 @@ export interface CompanyTabRegistrationData {
   /** Session list used as the role-projection source. */
   readonly roleSource: RoleBadgeInjected['roleSource']
   /** Read the current motion ledger for a session. */
-  readonly readLedger: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
+  readonly readLedger: (sessionId: SessionId, signal: AbortSignal) => Promise<WorkspaceTextRead>
   /** Read the generated deliverables index for a session. */
-  readonly readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
+  readonly readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<WorkspaceTextRead>
   /** 背景候选/预览源（按面板所在会话取）。 */
   readonly contextSources: (sessionId: SessionId) => CultivationContextSources
   /** 打开背景原文：容器做可达性预检 + 导航；失败给可读原因。 */

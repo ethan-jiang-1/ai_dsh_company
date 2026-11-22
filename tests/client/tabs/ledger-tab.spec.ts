@@ -9,7 +9,7 @@
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
-import { LedgerTab } from '../../../packages/company-pack/src/client/tabs/LedgerTab.tsx'
+import { LedgerTab, ledgerBannerOf } from '../../../packages/company-pack/src/client/tabs/LedgerTab.tsx'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -29,7 +29,7 @@ afterEach(() => {
 function props(over: Record<string, unknown> = {}) {
   return {
     sessionId: 'session-test',
-    readLedger: async () => SAMPLE,
+    readLedger: async () => ({ ok: true as const, eof: true, text: SAMPLE }),
     useTabInfo: () => ({ tab: { id: 'tab-1', contentId: 'dsh-company-pack/ledger' } }),
     floatTab: () => {},
     unfloatTab: () => {},
@@ -58,7 +58,23 @@ describe('台账页签 ready 路径（R5-09）', () => {
   })
 
   it('读不到台账时明确不可读，不静默空面板', async () => {
-    const host = await mount(createElement(LedgerTab, props({ readLedger: async () => null })))
+    const host = await mount(createElement(LedgerTab, props({ readLedger: async () => ({ ok: false as const, reason: 'missing' }) })))
     expect(host.textContent).toContain('台账不可读')
+  })
+})
+
+
+// 截断 ≠ 完整：300 行台账只读 240 行时，面板必须自己说「只读了前 N 行」。
+describe('ledgerBannerOf：不可读 / 截断 / 正常', () => {
+  it('不可读 ⇒ ledger.unreadable', () => {
+    expect(ledgerBannerOf({ status: 'unreadable' })).toEqual({ key: 'ledger.unreadable' })
+  })
+
+  it('读到但文件更长 ⇒ ledger.truncated 带上限', () => {
+    expect(ledgerBannerOf({ status: 'ready', truncated: true })).toEqual({ key: 'ledger.truncated', params: { limit: 240 } })
+  })
+
+  it('读完 ⇒ 无提示（不制造噪声）', () => {
+    expect(ledgerBannerOf({ status: 'ready', truncated: false })).toBeNull()
   })
 })

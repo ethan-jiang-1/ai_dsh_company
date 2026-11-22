@@ -5,6 +5,7 @@
  * 三条分支（会话在/不在、subagent parent、文件 stat 失败/抛错），不再靠 whole-client 间接覆盖。
  * 证明边界：不证 slot 注册与 remote 真装配（→ company-client-composition / ui-scene）。
  */
+import type { WorkspaceTextRead } from '../cultivation/cultivation-data.ts'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import {
   contextRowsFromStore,
@@ -39,7 +40,7 @@ export function makeContextWiring(
   scoped: ContextWiringScoped,
   leadOf: (sessionId: SessionId) => SessionId,
   rawFollow: FollowLike,
-  readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>,
+  readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<WorkspaceTextRead>,
 ): {
   readonly contextSources: (sessionId: SessionId) => CultivationContextSources
   readonly openContext: (sessionId: SessionId, context: CultivationContext) => Promise<

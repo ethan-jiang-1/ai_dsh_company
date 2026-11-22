@@ -5,14 +5,19 @@
 // 这里收成一台：状态机三种（loading / unreadable / ready），刷新交给 refreshMs + reload。
 import { useCallback, useEffect, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import type { WorkspaceTextRead } from '../cultivation/cultivation-data.ts'
 
-/** 读取闭包（makeWorkspaceTextReader 的产物形状）：失败折成 null。 */
-export type WorkspaceTextLoader = (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
+/**
+ * 读取闭包：**结果态**（内容 + 是否读到末尾 + 失败原因）。
+ * BUG-298 事故：此前失败折成 null、截断当完整，三个消费方各自猜「读完没」，全都猜错。
+ */
+export type WorkspaceTextLoader = (sessionId: SessionId, signal: AbortSignal) => Promise<WorkspaceTextRead>
 
 export type WorkspaceTextState =
   | { readonly status: 'loading' }
   | { readonly status: 'unreadable' }
-  | { readonly status: 'ready'; readonly text: string }
+  /** `truncated = !eof`：面板必须自己决定「说只读了前 N 行」还是「当作完整」，不许默认完整。 */
+  | { readonly status: 'ready'; readonly text: string; readonly truncated: boolean }
 
 export interface WorkspaceTextOptions {
   /** 给定则周期重读（毫秒）；缺省 = 只在挂载与 reload 时读。 */
@@ -38,9 +43,11 @@ export function useWorkspaceText(
     const controller = new AbortController()
     const run = async (): Promise<void> => {
       try {
-        const text = await load(sessionId, controller.signal)
+        const result = await load(sessionId, controller.signal)
         if (controller.signal.aborted) return
-        setState(text === null ? { status: 'unreadable' } : { status: 'ready', text })
+        setState(result.ok
+          ? { status: 'ready', text: result.text, truncated: !result.eof }
+          : { status: 'unreadable' })
       } catch {
         // 读取闭包已把失败折成 null；抛到这里的是闭包之外的意外——按不可读处理，不静默成空白。
         if (!controller.signal.aborted) setState({ status: 'unreadable' })

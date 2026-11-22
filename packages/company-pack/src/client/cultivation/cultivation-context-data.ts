@@ -10,6 +10,7 @@
  *
  * host 仍是记录证据的唯一来源：本模块只做预览，命令只带 ref。
  */
+import type { WorkspaceTextRead } from '../cultivation/cultivation-data.ts'
 import { CULTIVATION_ROLES, roleLabel as defaultRoleLabel } from '../../lib/cultivation/cultivation.ts'
 import {
   pickSessionTurn,
@@ -262,7 +263,7 @@ export async function readSessionPreview(
 export function makeCultivationContextSources(options: {
   readonly getSessions: () => readonly ContextSessionRowLike[]
   readonly follow: FollowLike
-  readonly readCatalog: (sessionId: string, signal: AbortSignal) => Promise<string | null>
+  readonly readCatalog: (sessionId: string, signal: AbortSignal) => Promise<WorkspaceTextRead>
   readonly timeoutMs?: number
 }): CultivationContextSources {
   return {
@@ -270,7 +271,11 @@ export function makeCultivationContextSources(options: {
       ({ ok: true, value: projectContextSessions(options.getSessions(), currentSessionId, targetRole) }),
     listDeliverables: async (sessionId, signal) => {
       try {
-        return projectContextDeliverables(await options.readCatalog(sessionId, signal))
+        const read = await options.readCatalog(sessionId, signal)
+        // 截断的索引 = 读到了前半段：按「不可判定」报，不拿半个 JSON 当清单。
+        if (!read.ok) return { ok: false, problem: `读不到成品目录：${read.reason}。` }
+        if (!read.eof) return { ok: false, problem: '成品索引超出读取上限，未完整读取。' }
+        return projectContextDeliverables(read.text)
       } catch (error) {
         return { ok: false, problem: `读不到成品目录：${error instanceof Error ? error.message : String(error)}。` }
       }

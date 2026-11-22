@@ -26,7 +26,7 @@ function stubFiles() {
       listJournal: async () => { calls.journal++; return [] },
       listRecords: async () => { calls.records++; return { ok: true, names: [] } },
       readRecordHead: async (_role: string, name: string) => { calls.read++; void name; return null },
-      readRecord: async (_role: string, name: string) => { calls.read++; void name; return null },
+      readRecord: async (_role: string, name: string) => { calls.read++; void name; return { ok: false as const, reason: 'unavailable' } },
     },
   }
 }
@@ -68,7 +68,7 @@ describe('records 摘要全扫 + open/最近 N 全文（2026-10-27 R1）', () =>
       listJournal: async () => [],
       listRecords: async () => ({ ok: true, names }),
       readRecordHead: async (_role: string, path: string) => { heads += 1; return head(path) },
-      readRecord: async (_role: string, path: string) => { full += 1; return head(path) },
+      readRecord: async (_role: string, path: string) => { full += 1; return { ok: true as const, eof: true, text: head(path) } },
     }
     let data: CultivationPanelData | undefined
     function Probe(): null {
@@ -87,6 +87,33 @@ describe('records 摘要全扫 + open/最近 N 全文（2026-10-27 R1）', () =>
     expect(data?.unexpandedRecords).toBe(30)
     expect(data?.records?.find(record => record.id.includes('open'))?.bodyTruncated).toBe(false)
     expect(data?.records?.filter(record => record.bodyTruncated === true)).toHaveLength(30)
+    await act(async () => { root.unmount() })
+    container.remove()
+  })
+})
+
+// 截断 ≠ 全文：`readRecord` 的 eof=false 必须让记录保持 bodyTruncated=true，
+// 面板才会说「只加载了前 N 行」；此前 eof 被丢、bodyTruncated 被无条件写 false。
+describe('record 截断', () => {
+  it('eof=false ⇒ 该记录 bodyTruncated 保持 true（不当全文）', async () => {
+    const head = '---\nkind: correction\ntargetRole: ceo\nproposerRole: ceo\nproposerKind: human\nsource: test\nexpectation: e\nstatus: open\n---\n\nbody\n'
+    const files = {
+      listJournal: async () => [],
+      listRecords: async () => ({ ok: true as const, names: ['20261122-000000-long.md'] }),
+      readRecordHead: async () => head,
+      readRecord: async () => ({ ok: true as const, eof: false, text: head }),
+    }
+    let data: CultivationPanelData | undefined
+    function Probe(): null {
+      data = useCultivationPanelData(files as never, 'session-1' as never)
+      return null
+    }
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    await act(async () => { root.render(createElement(Probe)) })
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 30)) })
+    expect(data?.records?.[0]?.bodyTruncated).toBe(true)
     await act(async () => { root.unmount() })
     container.remove()
   })

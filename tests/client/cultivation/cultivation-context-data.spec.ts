@@ -3,6 +3,7 @@
  * 候选会话的角色标签（根 = agentPreset，成员 = parent 的 agentTeam，不 follow Lead）、
  * 成品目录复用、预览读只取第一帧即 return（不拉第二帧 = 不触发 cold promote）。
  */
+import type { WorkspaceTextRead } from '../../../packages/company-pack/src/client/cultivation/cultivation-data.ts'
 import { describe, expect, it } from 'vitest'
 import {
   contextSessionLabel,
@@ -144,7 +145,7 @@ describe('makeCultivationContextSources', () => {
     const sources = makeCultivationContextSources({
       getSessions: () => [row({ sessionId: 'current' })],
       follow,
-      readCatalog: async () => JSON.stringify({ schema: 1, generatedAt: '', entries: [{ slug: 'x', path: 'deliverables/x/final.md', kickoff: '2026-10-01', result: 'completed', summary: 's' }] }),
+      readCatalog: async () => ({ ok: true, eof: true, text: JSON.stringify({ schema: 1, generatedAt: '', entries: [{ slug: 'x', path: 'deliverables/x/final.md', kickoff: '2026-10-01', result: 'completed', summary: 's' }] }) }),
     })
     const sessions = sources.listSessions('current')
     expect(sessions.ok).toBe(true)
@@ -154,5 +155,30 @@ describe('makeCultivationContextSources', () => {
       const preview = await sources.readPreview(sessions.value[0]!, new AbortController().signal)
       expect(preview.ok).toBe(false)
     }
+  })
+})
+
+// 截断的索引 = 读到了前半段：不能拿半个 JSON 当清单，也不能报「读不到」——
+// 明确说「超出读取上限」，与「读失败」分开。
+describe('makeCultivationContextSources：索引截断', () => {
+  const follow: FollowLike = async function* () { yield { type: 'snapshot', records: [] } }
+  const sources = (read: (sessionId: string, signal: AbortSignal) => Promise<WorkspaceTextRead>) => makeCultivationContextSources({
+    getSessions: () => [row({ sessionId: 'current' })],
+    follow,
+    readCatalog: read,
+  })
+
+  it('读失败 ⇒ 点名原因', async () => {
+    const s = sources(async () => ({ ok: false, reason: 'boom' }))
+    const result = await s.listDeliverables('current', new AbortController().signal)
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.problem).toContain('boom')
+  })
+
+  it('读到了但没读完 ⇒ 报「超出读取上限」，不解析半个文件', async () => {
+    const s = sources(async () => ({ ok: true, eof: false, text: '{"schema":1,"entries":[' }))
+    const result = await s.listDeliverables('current', new AbortController().signal)
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.problem).toContain('上限')
   })
 })

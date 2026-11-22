@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import {
   DeliverablesView,
+  catalogProblemOf,
   formatGeneratedAt,
 } from '../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx'
 import {
@@ -180,5 +181,36 @@ describe('sessionFileAddress', () => {
       .toBe('dsh-resource://file/session/session-1/deliverables/2026-10-19-a/final.md')
     expect(sessionFileAddress('session-1', 'deliverables/a b/final #1.md'))
       .toBe('dsh-resource://file/session/session-1/deliverables/a%20b/final%20%231.md')
+  })
+})
+
+// 截断 ≠ 坏形状：2087 行的合法索引被 2000 行上限截断后，不能再报「形状不符」——
+// 那会让人以为文件坏了、等 host 重建，而重建也解决不了。判定顺序本身是判据。
+describe('catalogProblemOf：错误判定的顺序', () => {
+  it('截断 ⇒ too-large（即使解析也失败）', () => {
+    expect(catalogProblemOf({ status: 'ready', truncated: true }, null)).toEqual({ key: 'deliverables.tooLarge', params: { limit: 2000 } })
+  })
+
+  it('完整但解析失败 ⇒ bad-shape', () => {
+    expect(catalogProblemOf({ status: 'ready', truncated: false }, null)).toEqual({ key: 'deliverables.badShape' })
+  })
+
+  it('读不到 ⇒ unreadable 优先于一切', () => {
+    expect(catalogProblemOf({ status: 'unreadable' }, null)).toEqual({ key: 'deliverables.unreadable' })
+  })
+
+  it('完整且解析成功 ⇒ 无错误', () => {
+    expect(catalogProblemOf({ status: 'ready', truncated: false }, CATALOG)).toBeNull()
+  })
+})
+
+// 页签级判据：截断时渲染的是「超出读取上限」，不是「形状不符」——文案面也要钉。
+describe('DeliverablesTab：截断文案', () => {
+  const catalog = (state: { status: 'ready', truncated: boolean }) => catalogProblemOf(state, null)
+  it('truncated ⇒ tooLarge（带上限 2000）', () => {
+    expect(catalog({ status: 'ready', truncated: true })).toEqual({ key: 'deliverables.tooLarge', params: { limit: 2000 } })
+  })
+  it('完整但解析失败 ⇒ badShape', () => {
+    expect(catalog({ status: 'ready', truncated: false })).toEqual({ key: 'deliverables.badShape' })
   })
 })

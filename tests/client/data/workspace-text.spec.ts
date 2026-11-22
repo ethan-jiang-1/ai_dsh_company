@@ -24,6 +24,7 @@ function Probe({ load, refreshMs }: { readonly load: WorkspaceTextLoader; readon
   return createElement('div', null,
     createElement('span', { 'data-status': state.status }, state.status),
     createElement('span', { 'data-text': '' }, state.status === 'ready' ? state.text : ''),
+    createElement('span', { 'data-truncated': '' }, state.status === 'ready' ? String(state.truncated) : ''),
     createElement('button', { onClick: reload }, 'reload'),
   )
 }
@@ -40,14 +41,22 @@ const status = (host: HTMLElement): string | null => host.querySelector('[data-s
 
 describe('useWorkspaceText：loading → ready / null → unreadable / 卸载中止', () => {
   it('读取成功进入 ready，正文可见', async () => {
-    const load = vi.fn(async () => '台账正文')
+    const load = vi.fn(async () => ({ ok: true as const, eof: true, text: '台账正文' }))
     const host = await mount(createElement(Probe, { load }))
     expect(status(host)).toBe('ready')
     expect(host.textContent).toContain('台账正文')
   })
 
+  it('读完但文件更长（eof=false）⇒ ready + truncated，面板能说「只读了前 N 行」', async () => {
+    const load = vi.fn(async () => ({ ok: true as const, eof: false, text: '前半段' }))
+    const host = await mount(createElement(Probe, { load }))
+    expect(status(host)).toBe('ready')
+    expect(host.textContent).toContain('前半段')
+    expect(host.querySelector('[data-truncated]')?.textContent).toBe('true')
+  })
+
   it('读取失败（null）进入 unreadable，不静默成空白', async () => {
-    const load = vi.fn(async () => null)
+    const load = vi.fn(async () => ({ ok: false as const, reason: 'unreadable' }))
     const host = await mount(createElement(Probe, { load }))
     expect(status(host)).toBe('unreadable')
     expect(host.querySelector('[data-text]')?.textContent).toBe('')
@@ -57,7 +66,7 @@ describe('useWorkspaceText：loading → ready / null → unreadable / 卸载中
     let signal: AbortSignal | undefined
     const load = vi.fn((_sessionId: never, nextSignal: AbortSignal) => {
       signal = nextSignal
-      return new Promise<string | null>(() => { /* never resolves */ })
+      return new Promise<never>(() => { /* never resolves */ })
     }) as unknown as WorkspaceTextLoader
     await mount(createElement(Probe, { load }))
     expect(signal?.aborted).toBe(false)
@@ -68,7 +77,7 @@ describe('useWorkspaceText：loading → ready / null → unreadable / 卸载中
 
   it('reload 触发重读，展示最新正文', async () => {
     let value = '第一版'
-    const load = vi.fn(async () => value)
+    const load = vi.fn(async () => ({ ok: true as const, eof: true, text: value }))
     const host = await mount(createElement(Probe, { load }))
     expect(host.textContent).toContain('第一版')
     value = '第二版'

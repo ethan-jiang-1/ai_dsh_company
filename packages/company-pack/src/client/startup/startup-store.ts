@@ -20,6 +20,11 @@ export interface StartupFace {
   readonly options: StartupOptions
   /** `'unreadable'` = 选项文件坏/被截断；空集合不能伪装成「内容里没有可选项」。 */
   readonly optionsProblem?: 'unreadable' | null
+  /**
+   * 设置文件的问题（BUG-297）：`'corrupt' | 'unsupported' | 'unreadable'`。
+   * 缺失/空**不是**问题（合法的「全自动」）；问题存在时面板必须说，不冒充 auto。
+   */
+  readonly settingsProblem?: 'corrupt' | 'unsupported' | 'unreadable' | null
 }
 
 /** 订阅仓（`useSyncExternalStore` 形状）。 */

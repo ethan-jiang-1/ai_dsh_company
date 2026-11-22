@@ -8,6 +8,7 @@
  * keyless 判据 = `tests/client/cultivation/cultivation-board.spec.ts`（纯渲染）+ `tests/host/cultivation/`
  * （读模型）。
  */
+import { RECORD_READ_LIMIT } from '../data/read-limits.ts'
 import { useCallback, useEffect, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import { CULTIVATION_CHANGED_EVENT } from './cultivation-actions.ts'
@@ -29,7 +30,7 @@ export interface WorkspaceFilesFace {
     | { readonly ok: false }
   >
   read(sessionId: SessionId, path: string, options: { readonly limit: number }, signal: AbortSignal): Promise<
-    | { readonly ok: true, readonly value: { readonly text: string } }
+    | { readonly ok: true, readonly value: { readonly text: string, readonly eof?: boolean } }
     | { readonly ok: false }
   >
 }
@@ -38,6 +39,11 @@ export interface WorkspaceFilesFace {
 export interface RemoteNamespaceFace {
   readonly workspaceFiles: WorkspaceFilesFace
 }
+
+/** 读一个工作区文本的结果：内容 + 是否读到末尾 + 失败原因（BUG-298 的读面契约）。 */
+export type WorkspaceTextRead =
+  | { readonly ok: true, readonly text: string, readonly eof: boolean }
+  | { readonly ok: false, readonly reason: string }
 
 /**
  * 列目录的结果：**成功空清单与失败必须可区分**（F2 可诊断失败，BUG-291）。
@@ -57,8 +63,8 @@ export interface CultivationFiles {
   readonly listRecords: (sessionId: SessionId, signal: AbortSignal) => Promise<DirListing>
   /** 读记录头部（frontmatter + 少量正文）；摘要全扫用，失败给 null。 */
   readonly readRecordHead: (sessionId: SessionId, path: string, signal: AbortSignal) => Promise<string | null>
-  /** 读培养记录全文；失败给 null。 */
-  readonly readRecord: (sessionId: SessionId, path: string, signal: AbortSignal) => Promise<string | null>
+  /** 读培养记录全文：带 eof（截断必须说得出，BUG-298）。 */
+  readonly readRecord: (sessionId: SessionId, path: string, signal: AbortSignal) => Promise<WorkspaceTextRead>
 }
 
 /**
@@ -74,15 +80,42 @@ export interface CultivationFiles {
 export function makeWorkspaceTextReader(
   remote: RemoteNamespaceFace,
   leadOf: (sessionId: SessionId) => SessionId,
-): (path: string, limit: number) => (sessionId: SessionId, signal: AbortSignal) => Promise<string | null> {
+): (path: string, limit: number) => (sessionId: SessionId, signal: AbortSignal) => Promise<WorkspaceTextRead> {
   return (path, limit) => async (sessionId, signal) => {
     try {
       const result = await remote.workspaceFiles.read(leadOf(sessionId), path, { limit }, signal)
-      if (!result.ok) return null
-      return result.value.text
-    } catch {
-      return null
+      if (!result.ok) return { ok: false, reason: `读取被拒（${path}）` }
+      // vendor 的 `eof` 是「这一页读到了文件末尾」——**这正是此前丢掉的那一位**（BUG-298）：
+      // 丢掉它 ⇒ 每个消费方自己猜「读完了吗」，于是台账少报、记录把截断当全文、大索引被判坏形状。
+      return { ok: true, text: result.value.text, eof: result.value.eof !== false }
+    } catch (error) {
+      return { ok: false, reason: error instanceof Error ? error.message : String(error) }
     }
+  }
+}
+
+/**
+ * 结果态 → `string | null`（唯一允许「丢掉失败原因」的地方：调用方会把 null 当作「没有内容」，
+ * **不再**兼任「读完了」的判断）。放在这里而不是各调用点，是为了让 composition 里不再多出分支。
+ * @param read - 结果态。
+ * @returns 正文；失败 null。
+ */
+export function textOrNull(read: WorkspaceTextRead): string | null {
+  return read.ok ? read.text : null
+}
+
+/**
+ * 只当「摘要窗」用的空值版：**有意的**固定窗（journal 预览/记录摘要）不需要 eof，
+ * 它们的截断由「摘要/未展开」文案表达，不算 BUG-298 的静默截断。
+ * @param read - `makeWorkspaceTextReader` 的产物。
+ * @returns 失败给 null 的读取闭包。
+ */
+export function asWindowReader(
+  read: (sessionId: SessionId, signal: AbortSignal) => Promise<WorkspaceTextRead>,
+): (sessionId: SessionId, signal: AbortSignal) => Promise<string | null> {
+  return async (sessionId, signal) => {
+    const result = await read(sessionId, signal)
+    return result.ok ? result.text : null
   }
 }
 
@@ -119,10 +152,10 @@ export function makeCultivationFiles(remote: RemoteNamespaceFace, leadOf: (sessi
       const listing = await listDir(sessionId, `${RUN_BUNDLE_PATHS.kb}/${role}/journal`, signal)
       return listing.ok ? listing.names : null
     },
-    readHead: (sessionId, path, signal) => readText(path, 240)(sessionId, signal),
+    readHead: (sessionId, path, signal) => asWindowReader(readText(path, 240))(sessionId, signal),
     listRecords: (sessionId, signal) => listDir(sessionId, RUN_BUNDLE_PATHS.records, signal),
-    readRecordHead: (sessionId, path, signal) => readText(path, 60)(sessionId, signal),
-    readRecord: (sessionId, path, signal) => readText(path, 2000)(sessionId, signal),
+    readRecordHead: (sessionId, path, signal) => asWindowReader(readText(path, 60))(sessionId, signal),
+    readRecord: (sessionId, path, signal) => readText(path, RECORD_READ_LIMIT)(sessionId, signal),
   }
 }
 
@@ -221,10 +254,11 @@ export function useCultivationPanelData(
         for (let index = 0; index < summaries.length; index += 1) {
           const summary = summaries[index]!
           if (!full.has(summary.id)) continue
-          const text = await files.readRecord(sessionId, `${RUN_BUNDLE_PATHS.records}/${summary.id}.md`, controller.signal)
-          const record = text === null ? null : parseRecord(summary.id, text)
+          const read = await files.readRecord(sessionId, `${RUN_BUNDLE_PATHS.records}/${summary.id}.md`, controller.signal)
+          const record = read.ok ? parseRecord(summary.id, read.text) : null
           if (record !== null) {
-            summaries[index] = { ...record, bodyTruncated: false }
+            // 截断 ≠ 全文（BUG-298）：`!eof` 时保留「只加载了前 N 行」的状态，面板才说得出真话。
+            summaries[index] = { ...record, bodyTruncated: !(read.ok && read.eof) }
             fullyRead.add(summary.id)
           }
         }

@@ -1,4 +1,6 @@
 /** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）+ 公司驾驶舱页签（右栏，R5b）。 */
+import { startupFaceFrom } from './startup/startup-load.ts'
+import { CATALOG_READ_LIMIT, LEDGER_READ_LIMIT } from './data/read-limits.ts'
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type { PaneId, TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
@@ -36,8 +38,6 @@ import { createStartupStore } from './startup/startup-store.ts'
 import { StrategyButton } from './startup/StrategyButton.tsx'
 import { registerCommandScopeHint } from './startup/CommandScopeHint.tsx'
 import {
-  parseStartupOptionsState,
-  parseStartupSettings,
   STARTUP_OPTIONS_READ_LIMIT,
   STARTUP_SETTINGS_READ_LIMIT,
   type StartupField,
@@ -147,8 +147,8 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
     const openMember = makeOpenMember({ sessions, uiWorkspace: scoped.uiWorkspace, leadOf })
     // 动作面按会话取（命令作用在面板所在会话；跨角色会被 host 角色闸拒，错误原话回到面板行内）。
     // 读取闭包唯一实现 = data plane 的 readWorkspaceText（Lead 寻址 + 失败 null 都在工厂里）。
-    const readLedger = readWorkspaceText(WORKSPACE_TEXT_PATHS.ledger, 240)
-    const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, 2000)
+    const readLedger = readWorkspaceText(WORKSPACE_TEXT_PATHS.ledger, LEDGER_READ_LIMIT)
+    const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, CATALOG_READ_LIMIT)
     const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
 
     // 启动策略：读走 workspaceFiles（无日志噪声），写走 /company-settings 命令；
@@ -157,18 +157,12 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
     const readStartupText = readWorkspaceText(WORKSPACE_TEXT_PATHS.startup, STARTUP_SETTINGS_READ_LIMIT)
     const readStartupOptionsText = readWorkspaceText(WORKSPACE_TEXT_PATHS.startupOptions, STARTUP_OPTIONS_READ_LIMIT)
     const loadStartup = async (sessionId: SessionId, signal: AbortSignal): Promise<void> => {
-      const [settingsText, optionsText] = await Promise.all([
+      const [settingsRead, optionsRead] = await Promise.all([
         readStartupText(sessionId, signal),
         readStartupOptionsText(sessionId, signal),
       ])
-      const optionsState = parseStartupOptionsState(optionsText)
-      startupStore.set({
-        loaded: true,
-        settings: parseStartupSettings(settingsText),
-        options: optionsState.options,
-        // 截断/坏 JSON 必须说出来；折成空集合会伪装成「内容里没有可选项」（BUG-085）。
-        optionsProblem: optionsState.problem,
-      })
+      // 折算住纯函数（`startup/startup-load.ts`）：坏配置/读不到各自成一态，不折成 auto（BUG-297）。
+      startupStore.set(startupFaceFrom(settingsRead, optionsRead))
     }
     const runSettingsCommand = async (sessionId: SessionId, line: string): Promise<SaveResult> => {
       try {
@@ -241,7 +235,7 @@ function registerCultivationViewWiring(ctx: ClientContext): void {
   ctx.inject(['sessions', 'uiWorkspace', 'remote.session', 'remote.workspaceFiles', 'remote.commands', 'sidebarRight', 'slots'], (scoped) => {
     const sessions = scoped.sessions
     const { leadOf, follow, cultivationFiles, cultivationActions, rawFollow, readWorkspaceText } = createCompanyDataPlane(scoped)
-    const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, 2000)
+    const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, CATALOG_READ_LIMIT)
     const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
     const openCompanyOverview = (): void => { scoped.sidebarRight.openTab('company-board') }
     const CultivationView = createCultivationView({

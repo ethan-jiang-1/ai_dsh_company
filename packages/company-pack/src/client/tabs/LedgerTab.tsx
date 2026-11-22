@@ -4,6 +4,8 @@
  * 素材与场景分镜（demo.md 场景 D/E + 快照）已由新动议条目交付；本页签是"公司累计干了什么、
  * 值不值"的常驻答案。
  */
+import { LEDGER_READ_LIMIT } from '../data/read-limits.ts'
+import type { WorkspaceTextRead } from '../cultivation/cultivation-data.ts'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 // 静态渲染（react-dom/server）没有布局，useLayoutEffect 会打 SSR 警告；浏览器里仍用 layout 版。
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
@@ -23,7 +25,7 @@ export interface LedgerTabInjected {
   readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
   readonly unfloatTab: (paneId: string) => void
   /** 读 `kb/motion-ledger.md` 全文；不可达给 null（面板显示读取失败，不静默）。 */
-  readonly readLedger: (sessionId: SessionId, signal: AbortSignal) => Promise<string | null>
+  readonly readLedger: (sessionId: SessionId, signal: AbortSignal) => Promise<WorkspaceTextRead>
 }
 
 export type LedgerTabProps = PropsRuntime<'sidebar.right.pane.tab'> & LedgerTabInjected & { readonly t: CompanyT }
@@ -127,11 +129,29 @@ export function LedgerSummary({ summary, t = defaultT }: { readonly summary: str
  * @param props - 槽 props + 注入面。
  * @returns 动议台账面板。
  */
+/** 台账顶部的提示（纯函数：文案 key 由状态决定，渲染处只翻译）。 */
+export type LedgerBanner =
+  | { readonly key: 'ledger.unreadable' }
+  | { readonly key: 'ledger.truncated', readonly params: { readonly limit: number } }
+  | null
+
+/**
+ * 台账要显示的提示：不可读 / 截断（**截断 ≠ 完整**，BUG-298）各一句；正常无提示。
+ * @param state - 读取状态机。
+ * @returns 提示描述；null = 不显示。
+ */
+export function ledgerBannerOf(state: { readonly status: 'loading' | 'unreadable' | 'ready', readonly truncated?: boolean }): LedgerBanner {
+  if (state.status === 'unreadable') return { key: 'ledger.unreadable' }
+  if (state.status === 'ready' && state.truncated === true) return { key: 'ledger.truncated', params: { limit: LEDGER_READ_LIMIT } }
+  return null
+}
+
 export function LedgerTab(props: LedgerTabProps) {
   const { t = defaultT } = props
   const { state } = useWorkspaceText(props.readLedger, props.sessionId, { refreshMs: REFRESH_MS })
   const rows = state.status === 'ready' ? [...parseMotionLedger(state.text)] : null
-  const error = state.status === 'unreadable' ? t('ledger.unreadable') : null
+  const banner = ledgerBannerOf(state)
+  const error = banner === null ? null : t(banner.key, 'params' in banner ? banner.params : undefined)
 
   const stats = rows === null ? null : ledgerStats(rows)
 

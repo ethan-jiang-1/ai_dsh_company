@@ -34,14 +34,14 @@ describe('client 面（R3：委派工具卡）', () => {
       workspaceFiles: {
         read: async (_sessionId: string, path: string, options: { limit: number }) => {
           seen.push({ path, limit: options.limit })
-          return { ok: true as const, value: { text: 'x' } }
+          return { ok: true as const, value: { text: 'x', eof: true } }
         },
       },
     }
     const read = makeWorkspaceTextReader(remote as never, sessionId => sessionId)
     const signal = new AbortController().signal
-    expect(await read(WORKSPACE_TEXT_PATHS.ledger, 240)('s' as never, signal)).toBe('x')
-    expect(await read(WORKSPACE_TEXT_PATHS.catalog, 2000)('s' as never, signal)).toBe('x')
+    expect(await read(WORKSPACE_TEXT_PATHS.ledger, 240)('s' as never, signal)).toEqual({ ok: true, text: 'x', eof: true })
+    expect(await read(WORKSPACE_TEXT_PATHS.catalog, 2000)('s' as never, signal)).toEqual({ ok: true, text: 'x', eof: true })
     expect(seen).toEqual([
       { path: '.dsh-company/kb/motion-ledger.md', limit: 240 },
       { path: '.dsh-company/kb/deliverables-index.json', limit: 2000 },
