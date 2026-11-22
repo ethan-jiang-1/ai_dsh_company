@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-312：两条同文问询共用同一个 React key——question 活体没有稳定 id，`attentionItemKey` 退化成摘要
 
-> 严重级别：P2（次要：同会话两条相同问询会撞 key；React 会警告并可能复用/丢行，用户可能只看到一条）｜发现：2026-11-22（E2E 第四轮）｜状态：调查中
+> 严重级别：P2（次要：同会话两条相同问询会撞 key；React 会警告并可能复用/丢行，用户可能只看到一条）｜发现：2026-11-22（E2E 第四轮）｜状态：已修｜审查：agent — 逐条核对已修判定（同文两条 id 不同 + 消息类按时间 + 有 id 按 id）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 8–10 个，别管那边怎么修」）。
+> **留痕**：commit 0025679b（client 身份键，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -80,3 +80,10 @@ console.log(attentionItemKey(a) === attentionItemKey(b), attentionItemKey(a))
 - 单条 question 不重复；
 - approval 的两条同摘要仍按 id 分开（BUG-299 不回归）；
 - keyless merge/key spec + 真页面两条相同问询各一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/wiring/attention-observers.ts`（问询登记合成 id）、`packages/company-pack/src/lib/presence/attention.ts`（`attentionItemKey` 无 id 分支改按时间）、`tests/client/wiring/{attention,attention-observers}.spec.ts`
+- 红：`vitest run tests/client/wiring/attention.spec.ts tests/client/wiring/attention-observers.spec.ts` —— 去掉合成 id 且把 key 改回按 `what` 后 2 failed（同文两条问询 key 相同、id 缺失）
+- 绿：`vitest run tests/client/wiring/attention.spec.ts tests/client/wiring/attention-observers.spec.ts` —— 79/79（同文两条 id 不同；同文消息类时间不同 ⇒ key 不同；有 id 按 id 区分）
+- 提交：commit 0025679b

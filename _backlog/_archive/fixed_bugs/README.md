@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-312**（2026-11-22，E2E 第四轮 / P2）：同文问询撞 key——
+  [312](BUG-312-attention-question-duplicate-key.md) 登记时合成 `question:<ms>:<seq>`，`attentionItemKey` 无 id 分支改按时间。
+  证据提交 `0025679b`。
+
 - **BUG-308**（2026-11-22，E2E 第四轮 / P2）：对话面板双向漏语言——
   [308](BUG-308-cultivation-chat-panel-i18n-leaks.md) 提示与底部状态改走 `CULTIVATION_COPY`（含 `chatSession`）。证据提交 `4fce3944`。
 

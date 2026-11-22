@@ -162,7 +162,8 @@ describe('审批请求的身份透传（BUG-299）', () => {
 })
 
 // 问询活体合成 id（BUG-312）：平台不给 id，登记时必须补一个，否则两条同文问询撞 key。
-describe('问询活体合成身份', () => {
+// 负例留证 2026-11-22：去掉合成 id 后 `vitest run tests/client/wiring/attention-observers.spec.ts` 1 failed（同文两条问询的 id 都是 undefined）。BUG-312
+describe('问询活体合成身份（BUG-312）', () => {
   it('两条同文问询 ⇒ 各自带 id 且互不相同', async () => {
     const { remote, handlers } = fakeRemote()
     const registry = createAttentionRegistry()

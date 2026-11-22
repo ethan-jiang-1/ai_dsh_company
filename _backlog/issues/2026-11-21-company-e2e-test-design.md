@@ -112,7 +112,7 @@ opened: 2026-11-21
 - [BUG-309](../_archive/fixed_bugs/BUG-309-cultivation-self-record-listed-twice.md)：self rejected 在「我提交的」列两次。
 - [BUG-310](../_archive/fixed_bugs/BUG-310-deliverables-index-silent-entry-drop.md)：成品索引坏 entry 静默丢。
 - [BUG-311](../_archive/fixed_bugs/BUG-311-ledger-header-mismatch-silent-empty.md)：台账表头 typo → 共 0 场无提示。
-- [BUG-312](../bugs/BUG-312-attention-question-duplicate-key.md)：同文 question 撞 React key。
+- [BUG-312](../_archive/fixed_bugs/BUG-312-attention-question-duplicate-key.md)：同文 question 撞 React key。
 - [BUG-313](../_archive/fixed_bugs/BUG-313-startup-options-bad-shape-silent-empty.md)：options 字段类型坏冒充「没有可选项」。
 - [BUG-314](../_archive/fixed_bugs/BUG-314-startup-settings-bad-shape-silent-auto.md)：settings 字段类型坏冒充 auto。
 - [BUG-315](../bugs/BUG-315-cultivation-full-view-min-widths-ignored.md)：768 主视图左板/右栏压到 210/176，声明下限未生效。

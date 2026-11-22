@@ -278,7 +278,8 @@ describe('mergeAttention · 按身份去重（BUG-299）', () => {
 
 // 身份不许回落到内容（BUG-312）：问询活体在登记时合成 id；
 // 无 id 的消息类用时间定位，**绝不**用摘要（同文两条会撞 key）。
-describe('attentionItemKey · 同文不同条不撞 key', () => {
+// 负例留证 2026-11-22：把 key 的无 id 分支改回按 what 后 `vitest run tests/client/wiring/attention.spec.ts` 1 failed（同文消息类撞 key）。BUG-312
+describe('attentionItemKey · 同文不同条不撞 key（BUG-312）', () => {
   it('两条时间不同的同文消息类 ⇒ 两个 key（不按摘要）', () => {
     const base = { kind: 'escalation' as const, who: 'CEO', what: '同一句话', jumpTo: 's-1' }
     expect(attentionItemKey({ ...base, time: 1 })).not.toBe(attentionItemKey({ ...base, time: 2 }))

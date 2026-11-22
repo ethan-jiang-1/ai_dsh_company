@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-312-attention-question-duplicate-key.md](fixed_bugs/BUG-312-attention-question-duplicate-key.md) — 同文问询撞 React key；登记时合成 id，key 不再回落摘要。
 - [BUG-308-cultivation-chat-panel-i18n-leaks.md](fixed_bugs/BUG-308-cultivation-chat-panel-i18n-leaks.md) — 对话面板双向漏语言；两处改走 copy 表，判据 en 无 CJK / zh 无裸 session:。
 - [BUG-313-startup-options-bad-shape-silent-empty.md](fixed_bugs/BUG-313-startup-options-bad-shape-silent-empty.md) — options 字段类型坏冒充「没有可选项」；`unreadable + field`。
 - [BUG-314-startup-settings-bad-shape-silent-auto.md](fixed_bugs/BUG-314-startup-settings-bad-shape-silent-auto.md) — settings 字段类型坏冒充 auto；`corrupt + field`，面板点名。
