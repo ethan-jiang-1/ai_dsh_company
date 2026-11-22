@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-303：台账解析静默丢掉列数不对的动议行——4 行文件只显示 2 行，没有「坏行」提示
 
-> 严重级别：P2（次要偏重：台账是「公司累计干了什么」的审计视图；坏行/结论里带竖线的行会静默消失，统计也随之少报）｜发现：2026-11-22（E2E 第三轮）｜状态：调查中
+> 严重级别：P2（次要偏重：台账是「公司累计干了什么」的审计视图；坏行/结论里带竖线的行会静默消失，统计也随之少报）｜发现：2026-11-22（E2E 第三轮）｜状态：已修｜审查：agent — 逐条核对已修判定（解析层记账 + 面板级 4 行夹具）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 5–6 个，别管那边怎么修」）。
+> **留痕**：commit 1a2a0eb7（client 公开呈现面，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -84,3 +84,10 @@ EOF
 - 列数不对/未转义 `|` 的台账行不再静默消失：面板明确说「跳过了 N 行」并给行号或原因；
 - 统计数字旁能看出「有坏行」，不再把 2 当成全部；
 - 正常 4 行文件若全部合法则显示 4；zh/en 两态各一条断言。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/accounting/ledger.ts`（`parseMotionLedger` → `{ rows, badRows }`、`LedgerBadRow`）、`packages/company-pack/src/client/tabs/LedgerTab.tsx`、`packages/company-pack/src/client/locales.ts`
+- 红：`vitest run tests/lib/accounting/ledger.spec.ts tests/client/tabs/ledger-tab.spec.ts` —— 去掉坏行记账（恢复静默 `continue`）后 2 failed（`badRows` 为空 + 面板不提示跳过）
+- 绿：`vitest run tests/lib/accounting/ledger.spec.ts tests/client/tabs/ledger-tab.spec.ts` —— 7/7 + 6/6（4 行文件：坏行 line 6 / 3 列被记账；面板「共 1 场动议」+「有 1 行格式不符已被跳过」）
+- 提交：commit 1a2a0eb7

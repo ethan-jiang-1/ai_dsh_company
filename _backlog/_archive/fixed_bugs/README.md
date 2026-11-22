@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-303**（2026-11-22，E2E 第三轮 / P2）：台账坏行静默丢——
+  [303](BUG-303-ledger-malformed-rows-silent-drop.md) `parseMotionLedger` → `{ rows, badRows }`（坏行带行号/单元格数），
+  面板增「跳过 N 行」错误行。证据提交 `1a2a0eb7`。
+
 - **BUG-304 / BUG-305**（2026-11-22，E2E 第三轮 / P2×2）：跨会话历史的边界不可见——
   [304](BUG-304-attention-history-window-misses-old-approvals.md) 只读最近 800 条、
   [305](BUG-305-attention-history-all-read-fail-silent-empty.md) 全失败折成空数组；一次改成结果态

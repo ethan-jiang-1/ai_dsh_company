@@ -96,7 +96,7 @@ opened: 2026-11-21
 
 - [BUG-301](../bugs/BUG-301-strategy-wiki-input-stale-after-reset.md)：wiki 输入非受控，重置后旧值仍在且失焦会回写。
 - [BUG-302](../bugs/BUG-302-english-ui-chinese-time-and-reason.md)：en 界面混入 `刚刚/7 小时前` 与 `列目录被拒（…）`。
-- [BUG-303](../bugs/BUG-303-ledger-malformed-rows-silent-drop.md)：台账坏行静默丢，4 行只显示 2 行。
+- [BUG-303](../_archive/fixed_bugs/BUG-303-ledger-malformed-rows-silent-drop.md)：台账坏行静默丢，4 行只显示 2 行。
 - [BUG-304](../_archive/fixed_bugs/BUG-304-attention-history-window-misses-old-approvals.md)：跨会话历史只读最近 800 条，老审批漏。
 - [BUG-305](../_archive/fixed_bugs/BUG-305-attention-history-all-read-fail-silent-empty.md)：历史全失败仍显示「没有等你的事」。
 - [BUG-306](../bugs/BUG-306-cultivation-mine-list-cap-dead.md)：`LIST_CAPS.mine=5` 死配置，10 条全铺开无折叠。

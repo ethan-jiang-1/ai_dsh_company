@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-303-ledger-malformed-rows-silent-drop.md](fixed_bugs/BUG-303-ledger-malformed-rows-silent-drop.md) — 台账坏行静默丢；解析返回 `{rows,badRows}`，面板说「跳过 N 行（格式不符）」。
 - [BUG-304-attention-history-window-misses-old-approvals.md](fixed_bugs/BUG-304-attention-history-window-misses-old-approvals.md) — 800 条窗口外的挂起审批看不见；读面带 `windowTruncated`，面板说「只扫描了最近 800 条」。
 - [BUG-305-attention-history-all-read-fail-silent-empty.md](fixed_bugs/BUG-305-attention-history-all-read-fail-silent-empty.md) — 历史全失败仍说「没有等你的事」；结果态带 `failed`，面板出错误行并压住空态。
 - [BUG-300-cultivation-decided-at-raw-iso.md](fixed_bugs/BUG-300-cultivation-decided-at-raw-iso.md) — 采纳/拒绝时间裸 ISO；`decidedAtLabel` 走人话，精确值留 `title`。

@@ -80,7 +80,8 @@ describe('ledgerBannerOf：不可读 / 截断 / 正常', () => {
 })
 
 // 坏行必须可见（BUG-303）：4 行动议里 2 行格式不符时，面板不能只报「共 2 场」而不说它跳过了什么。
-describe('LedgerTab · 坏行提示', () => {
+// 负例留证 2026-11-22：把 parseMotionLedger 的坏行分支改回静默 continue 后 `vitest run tests/client/tabs/ledger-tab.spec.ts` 1 failed（面板不提示跳过）；还原后 6/6 绿。BUG-303
+describe('LedgerTab · 坏行提示（BUG-303）', () => {
   it('有坏行 ⇒ 出现「有 N 行格式不符已被跳过」', async () => {
     const text = [
       '| slug | date | type | participants | wallClock | deliverable | summary |',

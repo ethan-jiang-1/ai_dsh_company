@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 4 张**：[BUG-301](BUG-301-strategy-wiki-input-stale-after-reset.md)（策略 wiki 输入重置后仍显示旧值且会回写，P2）· [BUG-302](BUG-302-english-ui-chinese-time-and-reason.md)（en 界面混入中文时间/原因，P2）· [BUG-303](BUG-303-ledger-malformed-rows-silent-drop.md)（台账坏行静默丢弃，P2）· [BUG-306](BUG-306-cultivation-mine-list-cap-dead.md)（培养「我提交的」没用上 5 条折叠上限，P2）。
+**活跃 3 张**：[BUG-301](BUG-301-strategy-wiki-input-stale-after-reset.md)（策略 wiki 输入重置后仍显示旧值且会回写，P2）· [BUG-302](BUG-302-english-ui-chinese-time-and-reason.md)（en 界面混入中文时间/原因，P2）· [BUG-306](BUG-306-cultivation-mine-list-cap-dead.md)（培养「我提交的」没用上 5 条折叠上限，P2）。
 
 **2026-11-22 E2E 第三轮（只立卡不修）**：293–300 已由并行修复进程处理；本轮继续在隔离实例上找 6 个，立 301–306（301–305 为缺口，306 为死上限），均 `status: 调查中`。四组根因：策略输入重置语义（301）、表达层 helper 未本地化（302）、读/解析/分页的静默缺口（303/304/305）、声明上限未接（306）。不碰修复进程的代码，也不在同一 diff 修产品。
 
@@ -30,7 +30,7 @@
 
 | 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
 |---|---|---|---|---|
-| **D′ 取子集必须报边界** | [304](../_archive/fixed_bugs/BUG-304-attention-history-window-misses-old-approvals.md) + [305](../_archive/fixed_bugs/BUG-305-attention-history-all-read-fail-silent-empty.md)，[303](BUG-303-ledger-malformed-rows-silent-drop.md) | 读/解析只返回子集，不返回「这是子集」 | `readPendingAcrossSessions` → `{ items, scanned, failed, windowTruncated }`（窗口保留 800，面板说「只扫了最近 800 条」；单会话失败降级、全失败报错行）；`parseMotionLedger` → `{ rows, badRows }`（坏行带行号），面板说「跳过 N 行」 | 1 → 2 |
+| **D′ 取子集必须报边界** | [304](../_archive/fixed_bugs/BUG-304-attention-history-window-misses-old-approvals.md) + [305](../_archive/fixed_bugs/BUG-305-attention-history-all-read-fail-silent-empty.md)，[303](../_archive/fixed_bugs/BUG-303-ledger-malformed-rows-silent-drop.md) | 读/解析只返回子集，不返回「这是子集」 | `readPendingAcrossSessions` → `{ items, scanned, failed, windowTruncated }`（窗口保留 800，面板说「只扫了最近 800 条」；单会话失败降级、全失败报错行）；`parseMotionLedger` → `{ rows, badRows }`（坏行带行号），面板说「跳过 N 行」 | 1 → 2 |
 | **H 表达层 helper 结构化** | [302](BUG-302-english-ui-chinese-time-and-reason.md) | 共享 helper 只写中文，被所有语言共用 | `timeLabel`/`decidedAtLabel` 产出结构化值、`listDir` 失败原因给结构化 kind，翻译在调用方 typed 字典做（lib 不反向依赖 client 字典）；判据 = en 渲染无 CJK | 3 |
 | **I 声明必须有唯一消费点** | [306](BUG-306-cultivation-mine-list-cap-dead.md) | 配置声明了但渲染面从不调用 | `CultivationMine` 接 `capList('mine')` + `capControl`；判据 = 6 条时出现展开控件 | 5 |
 | **J 受控输入** | [301](BUG-301-strategy-wiki-input-stale-after-reset.md) | 值来自 store 却用非受控输入：重置不刷新、blur 回写 | wiki 输入改受控（store 是唯一真相），spec 覆盖「reset 后 blur 不写回」 | 4 |
