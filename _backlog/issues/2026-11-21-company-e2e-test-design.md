@@ -83,7 +83,7 @@ opened: 2026-11-21
 
 用户指令：并行修复进程处理 293–296，这边不碰修法，继续找 3–5 个。第二轮在隔离实例上补了策略读坏、读上限（台账/长记录/大索引）、同摘要双审批、时间口径五组场景，新立 4 张：
 
-- [BUG-297](../bugs/BUG-297-strategy-read-failure-silently-auto.md)：策略文件坏/读不到时静默回退 auto（有 `parseStartupSettingsState` 诊断但没接）。
+- [BUG-297](../_archive/fixed_bugs/BUG-297-strategy-read-failure-silently-auto.md)：策略文件坏/读不到时静默回退 auto（有 `parseStartupSettingsState` 诊断但没接）。
 - [BUG-298](../_archive/fixed_bugs/BUG-298-fixed-read-limits-silent-truncation.md)：固定行数读上限静默截断——300 行台账显示 236、2050 行记录显示 1989、2087 行合法索引报「形状不符」。
 - [BUG-299](../bugs/BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md)：待办按 160 字摘要去重，两条不同审批塌成一条；活体 `detail` 在 merge 时丢失。
 - [BUG-300](../bugs/BUG-300-cultivation-decided-at-raw-iso.md)：培养采纳/拒绝时间裸 ISO，与提出时间的「1 小时前」不一致。

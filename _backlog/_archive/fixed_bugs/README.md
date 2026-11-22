@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-297**（2026-11-22，E2E 第二轮 / P2）：策略文件坏了/读不到静默变 auto——
+  [297](BUG-297-strategy-read-failure-silently-auto.md) 接上早已存在的 `parseStartupSettingsState`，
+  `StartupFace.settingsProblem` 分 corrupt/unsupported/unreadable 三态，缺失/空仍是合法 auto；
+  折算搬到纯函数 `startup/startup-load.ts`（composition 闭包单测不执行）。证据提交 `b144371c`。
+
 - **BUG-298**（2026-11-22，E2E 第二轮 / P2）：固定读上限静默截断——
   [298](BUG-298-fixed-read-limits-silent-truncation.md) 读面只带回内容、丢掉 `eof`，三处消费方各自猜
   「读完没」：台账少 64 场、长记录当全文、大索引报「形状不符」；现在读面返回 `{text,eof}`，上限收进

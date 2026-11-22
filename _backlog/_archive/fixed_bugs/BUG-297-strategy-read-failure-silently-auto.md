@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-297：项目策略读失败/损坏时静默变成「全自动」——用户看不到设置已经丢了
 
-> 严重级别：P2（次要偏重：策略是「这一次按什么套路跑」的开关，静默回退 auto 会让人按错口径开工，且没有任何提示）｜发现：2026-11-22（E2E 第二轮）｜状态：调查中
+> 严重级别：P2（次要偏重：策略是「这一次按什么套路跑」的开关，静默回退 auto 会让人按错口径开工，且没有任何提示）｜发现：2026-11-22（E2E 第二轮）｜状态：已修｜审查：agent — 逐条核对已修判定（六态折算 + 五态面板 + 真页面两态）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找，别管那边怎么修」）。
+> **留痕**：commit b144371c（client 公开文案，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -74,3 +74,10 @@ opened: 2026-11-22
 - 文件缺失/空仍是合法 auto，不产生噪声；
 - 读失败（目录/权限）与「文件不存在」能区分（或至少明确说读不到，不静默 auto）；
 - 单测 + 真页面两态（corrupt / missing）各绿。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/startup/startup-load.ts`、`packages/company-pack/src/client/startup/startup-store.ts`、`packages/company-pack/src/client/startup/StrategyPanel.tsx`、`packages/company-pack/src/client/locales.ts`、`tests/client/startup/{startup-load,strategy-panel}.spec.ts`
+- 红：`vitest run tests/client/startup/startup-load.spec.ts` —— 折算把坏 JSON 折成 `EMPTY_STARTUP_SETTINGS` 时，`settingsProblem === 'corrupt'` 断言失败（问题被吞成 auto）；面板侧 `strategy-panel.spec` 三条问题态同时红
+- 绿：`vitest run tests/client/startup/startup-load.spec.ts` —— 6/6（面板侧 `vitest run tests/client/startup/strategy-panel.spec.ts` 12/12 另跑）；真页面（坏 `startup.json`）「策略文件损坏（JSON 读不动），当前按「自动」显示——修好文件后重开面板。」；删掉文件后同一面板**无**错误行（缺失 = 合法 auto）
+- 提交：commit b144371c

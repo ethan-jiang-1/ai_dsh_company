@@ -125,7 +125,8 @@ describe('StrategyPanel · wiki 新鲜度', () => {
 
 // 设置文件坏了/读不到必须说（BUG-297）：此前静默折成 auto，看起来像「你从来没设过」；
 // 而文件缺失/空是**合法的 auto**，不该冒出一条错误（两种状态不许混）。
-describe('StrategyPanel · 策略文件的问题', () => {
+// 负例留证 2026-11-22：把 startupFaceFrom 的 settingsProblem 折掉（恒 null）后 `vitest run tests/client/startup/strategy-panel.spec.ts` 3 failed；还原后 12/12 绿。BUG-297
+describe('StrategyPanel · 策略文件的问题（BUG-297）', () => {
   it('corrupt ⇒ 明说损坏，不冒充「你没设过」', () => {
     const markup = render(EMPTY_STARTUP_SETTINGS, EMPTY_STARTUP_OPTIONS, zh, null, 'corrupt')
     expect(markup).toContain('策略文件损坏')

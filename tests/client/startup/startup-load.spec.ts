@@ -1,5 +1,5 @@
 /**
- * 启动策略折算的**状态判据**：坏 JSON / 未来 schema / 读不到 必须各自成一态，
+ * 启动策略折算的**状态判据**（BUG-297）：坏 JSON / 未来 schema / 读不到 必须各自成一态，
  * 不许折成「合法 auto」；而文件缺失/空才是合法的 auto（不制造噪声）。
  *
  * 为什么这条 spec 重要：这段折算原本内联在 `client/index.ts` 的注入闭包里，单测根本不执行它——
@@ -11,7 +11,8 @@ import { startupFaceFrom } from '../../../packages/company-pack/src/client/start
 const read = (text: string) => ({ ok: true as const, eof: true, text })
 const missing = () => ({ ok: false as const, reason: 'ENOENT' })
 
-describe('startupFaceFrom：设置文件的状态', () => {
+// 负例留证 2026-11-22：把坏 JSON 的 problem 吞成 null 后 `vitest run tests/client/startup/startup-load.spec.ts` 2 failed（corrupt/unsupported）；还原后 6/6 绿。BUG-297
+describe('startupFaceFrom：设置文件的状态（BUG-297）', () => {
   it('合法设置 ⇒ 生效，无问题', () => {
     const face = startupFaceFrom(read(JSON.stringify({ v: 1, productType: 'business-software' })), read(''))
     expect(face.loaded).toBe(true)
