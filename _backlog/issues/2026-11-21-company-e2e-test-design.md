@@ -135,6 +135,21 @@ opened: 2026-11-21
 
 第五轮跑绿：培养主视图/对话面板（含中英切换）、策略 wiki 路径（内/外/缺失）、团队任务分配+在场、en 主体。新红：316–324。目标 8–10，本轮 9。
 
+## 2026-11-23 第六轮（goal：8–10 个）
+
+并行进程收掉 316–324 后，本轮从修复后的接缝切进去，新立 8 张（325–332）：
+
+- [BUG-325](../bugs/BUG-325-attention-question-live-history-id-mismatch.md)：问询 live 合成 id 与历史 callId 不一致，双源会重复。
+- [BUG-326](../bugs/BUG-326-cultivation-command-description-inner-errors-chinese.md)：316 后 command description/hint、dataBlocked、内部路径错误仍中文。
+- [BUG-327](../bugs/BUG-327-attention-current-approval-cap-still-silent.md)：320 只接历史会话的 capped，当前会话自己的 `.capped` 仍丢。
+- [BUG-328](../bugs/BUG-328-attention-empty-state-ignores-boundaries.md)：候选/窗口/工作区边界提示不压空态。
+- [BUG-329](../bugs/BUG-329-cultivation-en-list-delimiters-chinese.md)：en 列表分隔符仍是「、」。
+- [BUG-330](../bugs/BUG-330-attention-question-copy-and-cap-still-approval-only.md)：question 已进待办，capped/文案仍只写审批。
+- [BUG-331](../bugs/BUG-331-attention-multi-question-request-only-first.md)：多问题请求只显示第一个。
+- [BUG-332](../bugs/BUG-332-attention-exact-800-window-false-positive.md)：恰好 800 条也报窗口截断。
+
+第六轮跑绿：316 的 en 回执、319 的问询历史、320 的三处边界提示、321/322 的补读、323 的 fail-closed、324 的字段严格化都在真页面/纯函数复核过。新红：325–332。目标 8–10，本轮 8。
+
 ## 输掉的方案
 
 - **只靠 exploratory 继续人肉点**：本轮 4 个缺陷里 2 个是「单测绿 + 页签能开」的假绿，人肉不点进那个状态就漏；且不可复跑。

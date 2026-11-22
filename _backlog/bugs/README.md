@@ -2,13 +2,15 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 325；已分配 BUG-001..324。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 333；已分配 BUG-001..332。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**。
+**活跃 8 张**：[BUG-325](BUG-325-attention-question-live-history-id-mismatch.md)（问询 live/history 两套 id，刷新/后到会重复，P2）· [BUG-326](BUG-326-cultivation-command-description-inner-errors-chinese.md)（316 后 description/hint 与内部路径错误仍中文，P2）· [BUG-327](BUG-327-attention-current-approval-cap-still-silent.md)（当前会话自己的 capped 仍被丢，P2）· [BUG-328](BUG-328-attention-empty-state-ignores-boundaries.md)（候选/窗口/工作区边界不压空态，P2）· [BUG-329](BUG-329-cultivation-en-list-delimiters-chinese.md)（en 列表分隔符仍是「、」，P2）· [BUG-330](BUG-330-attention-question-copy-and-cap-still-approval-only.md)（question 已进待办，capped/文案仍只写审批，P2）· [BUG-331](BUG-331-attention-multi-question-request-only-first.md)（多问题请求只显第一个，P2）· [BUG-332](BUG-332-attention-exact-800-window-false-positive.md)（恰好 800 条也报窗口截断，P2）。
+
+**2026-11-23 E2E 第六轮（目标 8–10，只立卡不修）**：316–324 由并行修复进程收掉后，本轮从「319 的问询历史身份」「320 的当前/历史 cap 分流」「316 的注册元数据」「en 列表分隔符」四个接缝切，立 325–332 八张，均 `status: 调查中`。根因：同一实体两套身份（325）、边界状态只接一条消费路径（327/328）、数据类别扩了文案/字段没跟（330/331）、保守窗口覆盖明确完整信号（332）。不碰修复进程代码，也不在同一 diff 修产品。
 
 **2026-11-22 E2E 第五轮（目标 8–10，只立卡不修）**：307–315 由并行修复进程收掉后，本轮转攻「host 文案」「注意力读取上限」「预览窗口」三组，立 316–324 九张，均 `status: 调查中`。根因：host 命令面无 locale（316）、注意力读取上限/候选集无边界状态（317–320、323）、预览窗口被当格式判据（321/322）、宽松字段归一化（324）。不碰修复进程代码，也不在同一 diff 修产品。
 
