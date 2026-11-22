@@ -21,7 +21,7 @@ const REAL_LEDGER = hasLive ? readFileSync(LIVE_LEDGER, 'utf8') : ''
 
 describe('parseMotionLedger', () => {
   it('表头不符返回空（台账被改坏 → 面板空态而非渲染错行）', () => {
-    expect(parseMotionLedger('| nope | 表 |\n|---|---|\n| a | b |')).toEqual([])
+    expect(parseMotionLedger('| nope | 表 |\n|---|---|\n| a | b |')).toEqual({ rows: [], badRows: [] })
   })
 
   // 负例留证 2026-11-17：冷树（3 个 live 用例 skip）时该 false 分支无人覆盖、ledger 分支掉到 94.11%（BUG-204）；补本用例后冷/暖同形。
@@ -34,9 +34,10 @@ describe('parseMotionLedger', () => {
       '|---|---|---|---|---|---|---|',
       '| a | 2026-10-13 | decision | CEO | 1h | ✅ | 结论',
     ].join('\n')
-    expect(parseMotionLedger(text)).toEqual([
-      { slug: 'a', date: '2026-10-13', kind: 'decision', roles: 'CEO', wallClock: '1h', final: '✅', summary: '结论' },
-    ])
+    expect(parseMotionLedger(text)).toEqual({
+      rows: [{ slug: 'a', date: '2026-10-13', kind: 'decision', roles: 'CEO', wallClock: '1h', final: '✅', summary: '结论' }],
+      badRows: [],
+    })
   })
 
   it('列数不符的行跳过；分隔行跳过；非表行跳过', () => {
@@ -49,8 +50,10 @@ describe('parseMotionLedger', () => {
       '| 坏行 | 只有 | 三列 |',
       '| b | d2 | k2 | r2 | w2 | ✅ | s2 |',
     ].join('\n')
-    const rows = parseMotionLedger(text)
-    expect(rows.map(row => row.slug)).toEqual(['a', 'b'])
+    const parsed = parseMotionLedger(text)
+    expect(parsed.rows.map(row => row.slug)).toEqual(['a', 'b'])
+    // 坏行不能静默消失：它要被记账，面板才说得出「跳过 N 行」。
+    expect(parsed.badRows).toEqual([{ line: 6, cells: 3, reason: 'cell-count' }])
   })
 })
 
@@ -58,7 +61,7 @@ describe('parseMotionLedger', () => {
 // skip 预期：dev home 真跑 3 例；fresh clone 0 例。新增 skip 的登记守卫 = tests/repo/budget/skip-budget.spec.ts。
 describe.skipIf(!hasLive)('live bundle 台账（dev only）', () => {
   it('真台账：全部行可解析、结构不变形（不钉总行数——台账每场动议都会长一行）', () => {
-    const rows = parseMotionLedger(REAL_LEDGER)
+    const { rows } = parseMotionLedger(REAL_LEDGER)
     expect(rows.length).toBeGreaterThan(0)
     expect(new Set(rows.map(row => row.slug)).size).toBe(rows.length)
     for (const row of rows) {
@@ -68,7 +71,7 @@ describe.skipIf(!hasLive)('live bundle 台账（dev only）', () => {
   })
 
   it('V4 meta（已收敛归档）必须有对应台账行且结论逐字同源', () => {
-    const rows = parseMotionLedger(REAL_LEDGER)
+    const { rows } = parseMotionLedger(REAL_LEDGER)
     const meta = readFileSync(LIVE_META, 'utf8')
     const summary = meta.match(/^一句话结论: (.+)$/m)?.[1]
     expect(summary).toBeDefined()
@@ -83,7 +86,7 @@ describe.skipIf(!hasLive)('live bundle 台账（dev only）', () => {
   })
 
   it('真台账：抽真样本逐列核对（字段解析不漂移）', () => {
-    const rows = parseMotionLedger(REAL_LEDGER)
+    const { rows } = parseMotionLedger(REAL_LEDGER)
     expect(rows[0]).toMatchObject({ slug: 'agentic-coworker', date: '2026-09-22', kind: '评估', final: '✅' })
     const q3 = rows.find(row => row.slug === 'q3-business-review')
     expect(q3).toMatchObject({ wallClock: '241s', roles: 'CEO+COO+CFO' })
@@ -100,7 +103,7 @@ describe.skipIf(!hasLive)('live bundle 台账（dev only）', () => {
 
 describe('ledgerStats', () => {
   it('统计口径（fixture：总场数 / 成品数 / 未记墙钟数）', () => {
-    const rows = parseMotionLedger([
+    const { rows } = parseMotionLedger([
       '| slug | date | type | participants | wallClock | deliverable | summary |',
       '|---|---|---|---|---|---|---|',
       '| a | 2026-09-26 | decision | CEO | 241s | ✅ | 结论一 |',

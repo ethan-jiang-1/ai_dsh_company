@@ -78,3 +78,18 @@ describe('ledgerBannerOf：不可读 / 截断 / 正常', () => {
     expect(ledgerBannerOf({ status: 'ready', truncated: false })).toBeNull()
   })
 })
+
+// 坏行必须可见（BUG-303）：4 行动议里 2 行格式不符时，面板不能只报「共 2 场」而不说它跳过了什么。
+describe('LedgerTab · 坏行提示', () => {
+  it('有坏行 ⇒ 出现「有 N 行格式不符已被跳过」', async () => {
+    const text = [
+      '| slug | date | type | participants | wallClock | deliverable | summary |',
+      '|---|---|---|---|---|---|---|',
+      '| a | 2026-11-22 | decision | CEO | 1h | ✅ | 结论一 |',
+      '| 坏 | 少 | 列 |',
+    ].join('\n')
+    const host = await mount(createElement(LedgerTab, props({ readLedger: async () => ({ ok: true as const, eof: true, text }) })))
+    expect(host.textContent).toContain('行格式不符已被跳过')
+    expect(host.textContent).toContain('共 1 场动议')
+  })
+})

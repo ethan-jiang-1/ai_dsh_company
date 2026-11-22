@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 290 |
-| 有具名守卫 | 188 |
+| 已修卡 | 292 |
+| 有具名守卫 | 190 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 64.8% |
+| 覆盖率 | 65.1% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -311,3 +311,5 @@
 | 298 | 2026-11-22 | tests/client/cultivation/cultivation-data.spec.ts:98；tests/client/data/workspace-read-limits.spec.ts:30；tests/client/tabs/deliverables-catalog.spec.ts:190 |
 | 299 | 2026-11-22 | tests/client/wiring/attention-observers.spec.ts:136；tests/client/wiring/attention.spec.ts:243 |
 | 300 | 2026-11-22 | tests/lib/cultivation/cultivation-record-time.spec.ts:12 |
+| 304 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:81 |
+| 305 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:154 |

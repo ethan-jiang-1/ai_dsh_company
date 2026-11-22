@@ -151,7 +151,7 @@ describe('待办页签：跨会话挂起项（BUG-292）', () => {
 // 边界必须可见：全失败 ≠ 没有；窗口截断 ≠ 完整。
 // 这两条是这一族唯一能被用户看见的地方——面板必须自己说出来。
 // 负例留证 2026-11-22：把空态改回无条件渲染后 `vitest run tests/client/tabs/attention-tab.spec.ts` 1 failed（全失败仍说「没有等你的事」）；还原后 10/10 绿。BUG-305
-describe('AttentionTab · 历史读取的边界（BUG-304/305）', () => {
+describe('AttentionTab · 历史读取的边界（BUG-305）', () => {
   const sessionsById = {
     'session-lead': { id: 'session-lead', cwd: '/ws', updatedAt: 3 },
     'session-cfo': { id: 'session-cfo', cwd: '/ws', updatedAt: 1 },

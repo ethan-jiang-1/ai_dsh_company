@@ -149,7 +149,8 @@ export function ledgerBannerOf(state: { readonly status: 'loading' | 'unreadable
 export function LedgerTab(props: LedgerTabProps) {
   const { t = defaultT } = props
   const { state } = useWorkspaceText(props.readLedger, props.sessionId, { refreshMs: REFRESH_MS })
-  const rows = state.status === 'ready' ? [...parseMotionLedger(state.text)] : null
+  const parsed = state.status === 'ready' ? parseMotionLedger(state.text) : null
+  const rows = parsed === null ? null : [...parsed.rows]
   const banner = ledgerBannerOf(state)
   const error = banner === null ? null : t(banner.key, 'params' in banner ? banner.params : undefined)
 
@@ -163,6 +164,10 @@ export function LedgerTab(props: LedgerTabProps) {
       refreshLabel={t('ledger.refresh', { seconds: REFRESH_MS / 1000 })}
     >
       {error !== null && <div className="wk-error">{error}</div>}
+      {/* 坏行必须可见（BUG-303）：4 行文件声称 2 场动议 = 台账少报。 */}
+      {(parsed?.badRows.length ?? 0) > 0 && (
+        <div className="wk-error">{t('ledger.badRows', { count: parsed?.badRows.length ?? 0 })}</div>
+      )}
       {stats !== null && (
         <div className="wk-meta" aria-label={t('ledger.statsAria')}>
           {t('ledger.stats', { total: stats.total, finals: stats.finals, untimed: stats.untimed })}

@@ -24,17 +24,36 @@ const HEADER = ['slug', 'date', 'type', 'participants', 'wallClock', 'deliverabl
 const LEGACY_HEADER = ['slug', '日期', '类型', '参与', '墙钟', '成品', '一句话结论']
 const HEADERS = [HEADER, LEGACY_HEADER]
 
+/** 一行被跳过的原因（当前只有列数不符；保留联合以便将来扩「日期格式坏」等）。 */
+export type LedgerBadReason = 'cell-count'
+
+/** 被跳过的表行：**必须能被面板说出来**（BUG-303：静默丢行 = 台账少报）。 */
+export interface LedgerBadRow {
+  /** 文件内行号（1 起，便于人去点）。 */
+  readonly line: number
+  /** 单元格数（用于文案「期望 7 列、实际 8 列」）。 */
+  readonly cells: number
+  readonly reason: LedgerBadReason
+}
+
+/** 解析结果：行 + 坏行（两者一起回去，`rows` 的「少」才有解释）。 */
+export interface MotionLedgerParse {
+  readonly rows: readonly MotionRow[]
+  readonly badRows: readonly LedgerBadRow[]
+}
+
 /**
- * 解析台账 markdown 表。容错规则：跳过非表行；列数不符的行跳过（不猜）；表头不符返回空
- * （台账被改坏时面板显示空态而不是渲染错行——fail-loud 留给文件级校验，解析侧宁可少渲染）。
+ * 解析台账 markdown 表。容错规则：跳过非表行；列数不符的行**跳过但要记账**（不猜，也不静默）；
+ * 表头不符返回空（台账被改坏时面板显示空态而不是渲染错行）。
  * @param text - `kb/motion-ledger.md` 全文。
- * @returns 台账行（保持文件顺序 = 时间顺序）。
+ * @returns 行（保持文件顺序）与被跳过的坏行（BUG-303）。
  */
-export function parseMotionLedger(text: string): readonly MotionRow[] {
+export function parseMotionLedger(text: string): MotionLedgerParse {
   const lines = text.split('\n')
   let headerSeen = false
   const rows: MotionRow[] = []
-  for (const line of lines) {
+  const badRows: LedgerBadRow[] = []
+  for (const [index, line] of lines.entries()) {
     const trimmed = line.trim()
     if (!trimmed.startsWith('|')) continue
     const cells = trimmed.slice(1, trimmed.endsWith('|') ? -1 : undefined).split('|').map(cell => cell.trim())
@@ -43,7 +62,11 @@ export function parseMotionLedger(text: string): readonly MotionRow[] {
       continue
     }
     if (cells.every(cell => /^[-: ]*$/.test(cell))) continue // 分隔行
-    if (cells.length !== HEADER.length) continue
+    if (cells.length !== HEADER.length) {
+      // 坏行不能静默消失：面板据此说「跳过 N 行（格式不符）」，否则 4 行文件声称只有 2 场动议。
+      badRows.push({ line: index + 1, cells: cells.length, reason: 'cell-count' })
+      continue
+    }
     rows.push({
       slug: cells[0]!,
       date: cells[1]!,
@@ -54,7 +77,7 @@ export function parseMotionLedger(text: string): readonly MotionRow[] {
       summary: cells[6]!,
     })
   }
-  return rows
+  return { rows, badRows }
 }
 
 /** 统计：总场数 / 成品数 / 未记墙钟数（面板头部的三个数）。 */
