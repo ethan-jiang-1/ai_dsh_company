@@ -5,6 +5,7 @@ import {
   PRESENT_TOOL_NAME,
   STREAM_ITEM_CAP,
   ATTENTION_SUMMARY_MAX,
+  attentionItemKey,
   attentionSummary,
   attentionTone,
   mergeAttention,
@@ -151,7 +152,8 @@ describe('pendingApprovals · 待办历史重建（刷新后仍能看到已挂�
   })
 
   it('mergeAttention 对同一条挂起去重（活体优先）', () => {
-    const live = [{ kind: 'approval' as const, sessionId: 's1', what: 'request_signoff：双签线', since: 1000 }]
+    // 同一条 = 同一身份：活体现在带审批 id（观察者从 approval/request 透传），去重按 id 而非摘要。
+    const live = [{ kind: 'approval' as const, sessionId: 's1', id: 'a1', what: 'request_signoff：双签线', since: 1000 }]
     const merged = mergeAttention(live, pendingApprovals([asked('a1', 1000)], 's1'))
     expect(merged).toHaveLength(1)
     expect(merged[0]?.time).toBe(1000)
@@ -218,7 +220,7 @@ describe('attentionSummary · 摘要边界（BUG-295）', () => {
   })
 
   it('活体与历史同源折叠 ⇒ 同一条审批去重后只剩一行', () => {
-    const live = [{ kind: 'approval' as const, sessionId: 's-b', what: attentionSummary(`request_signoff：${long}`), since: 1000 }]
+    const live = [{ kind: 'approval' as const, sessionId: 's-b', id: 'a1', what: attentionSummary(`request_signoff：${long}`), since: 1000 }]
     const items = mergeAttention(live, pendingApprovals([
       { type: 'approval/asked', time: 1000, data: { id: 'a1', toolName: 'request_signoff', reason: long } },
     ], 's-b'))
@@ -232,5 +234,43 @@ describe('attentionSummary · 摘要边界（BUG-295）', () => {
     ], 's-b')
     expect(item?.detail).toContain(long.slice(0, 40))
     expect(item?.detail?.length).toBeGreaterThan(ATTENTION_SUMMARY_MAX)
+  })
+})
+
+// 身份 ≠ 摘要（BUG-299）：两条**不同 id** 的挂起审批，哪怕理由一字不差，也必须显示两条——
+// 少一条 = 一次审批被藏起来。同一 id 的 live+history 仍只一条（不能反向重复）。
+describe('mergeAttention · 按身份去重', () => {
+  const asked = (id: string, time: number, reason: string) => ({
+    type: 'approval/asked' as const, time, data: { id, toolName: 'request_signoff', reason },
+  })
+
+  it('两条同摘要、不同 id ⇒ 2 条（不被摘要吞掉）', () => {
+    const rebuilt = pendingApprovals([asked('a1', 1000, 'same reason'), asked('a2', 2000, 'same reason')], 's-1')
+    expect(mergeAttention([], rebuilt)).toHaveLength(2)
+  })
+
+  it('同一 id 的 live + history ⇒ 1 条（身份相同不重复）', () => {
+    const live = [{ kind: 'approval' as const, sessionId: 's-1', id: 'a1', what: attentionSummary('request_signoff：same reason'), since: 1000 }]
+    const rebuilt = pendingApprovals([asked('a1', 1000, 'same reason')], 's-1')
+    expect(mergeAttention(live, rebuilt)).toHaveLength(1)
+  })
+
+  it('活体条目的 detail 在 merge 后仍在（刷新前后都能看全文）', () => {
+    const live = [{
+      kind: 'approval' as const, sessionId: 's-1', id: 'a1',
+      what: attentionSummary(`request_signoff：${'长理由'.repeat(50)}`),
+      detail: `request_signoff：${'长理由'.repeat(50)}`,
+      since: 1000,
+    }]
+    const [item] = mergeAttention(live, [])
+    expect(item?.detail).toContain('request_signoff')
+    expect(item?.id).toBe('a1')
+  })
+
+  it('列表 key 同一身份一致、不同身份不同（不会撞 key）', () => {
+    const one = pendingApprovals([asked('a1', 1000, 'same')], 's-1')[0]!
+    const two = pendingApprovals([asked('a2', 1000, 'same')], 's-1')[0]!
+    expect(attentionItemKey(one)).not.toBe(attentionItemKey(two))
+    expect(attentionItemKey(one)).toBe(attentionItemKey({ ...one }))
   })
 })

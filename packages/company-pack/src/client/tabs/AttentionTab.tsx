@@ -22,6 +22,8 @@ import {
   type AttentionEventLike,
   type AttentionItem,
   type LivePending,
+
+  attentionItemKey,
 } from '../../lib/presence/attention.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { readPendingAcrossSessions, type SessionPageFace } from '../presence/attention-history.ts'
@@ -72,7 +74,8 @@ function formatWhen(time: number, t: CompanyT): string {
 
 /** 条目稳定 key（时间 + 类别 + 归属 + 摘要）。 */
 const itemKey = (item: AttentionItem): string =>
-  `${item.time}-${item.kind}-${item.jumpTo}-${item.what}`
+  // 同一条去重身份（BUG-299）：按摘要做 key 会让两条同摘要审批撞 key。
+  attentionItemKey(item)
 
 /**
  * 「待办」页签体。

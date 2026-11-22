@@ -305,7 +305,7 @@
 | 292 | 2026-11-21 | tests/client/presence/attention-history.spec.ts:38；tests/client/tabs/attention-tab.spec.ts:62；tests/client/tabs/attention-tab.spec.ts:117 |
 | 293 | 2026-11-21 | tests/client/startup/command-scope-hint.spec.ts:69 |
 | 294 | 2026-11-21 | tests/client/cultivation/cultivation-board.spec.ts:297 |
-| 295 | 2026-11-21 | tests/client/wiring/attention.spec.ts:206 |
+| 295 | 2026-11-21 | tests/client/wiring/attention.spec.ts:208 |
 | 296 | 2026-11-21 | tests/tools/client-bundle.spec.ts:36 |
 | 297 | 2026-11-22 | tests/client/startup/startup-load.spec.ts:15；tests/client/startup/strategy-panel.spec.ts:129 |
 | 298 | 2026-11-22 | tests/client/cultivation/cultivation-data.spec.ts:98；tests/client/data/workspace-read-limits.spec.ts:30；tests/client/tabs/deliverables-catalog.spec.ts:190 |

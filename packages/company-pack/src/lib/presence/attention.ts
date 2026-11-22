@@ -26,6 +26,11 @@ export interface AttentionItem {
   readonly what: string
   /** 完整详情（审批理由/问询全文）；列表不渲染它，只给 hover/详情面（BUG-295）。 */
   readonly detail?: string
+  /**
+   * 稳定身份（审批/问询 id）。**去重必须用它**——按摘要去重会把两条同摘要的不同审批塌成一条
+   * （BUG-299）。消息类事件（escalation/completion）没有 id，只能退回内容+时间。
+   */
+  readonly id?: string
   /** 何时发生（epoch ms）。 */
   readonly time: number
   /** 一键跳转目标会话 id。 */
@@ -39,6 +44,8 @@ export interface LivePending {
   readonly what: string
   /** 完整详情（与 `what` 同源、未折叠）；列表不渲染它。 */
   readonly detail?: string
+  /** 稳定身份（审批 id / 问询 id）；去重用，见 {@link attentionItemKey}。 */
+  readonly id?: string
   readonly since: number
 }
 
@@ -162,6 +169,7 @@ export function pendingApprovals(events: readonly AttentionEventLike[], sessionI
       asked.set(data.id, {
         kind: 'approval',
         who: sessionId,
+        id: data.id,
         what: attentionSummary(full),
         ...(reason === '' ? {} : { detail: full }),
         time: event.time,
@@ -189,14 +197,16 @@ export function mergeAttention(
     kind: entry.kind,
     who: entry.sessionId,
     what: entry.what,
+    ...(entry.detail === undefined ? {} : { detail: entry.detail }),
+    ...(entry.id === undefined ? {} : { id: entry.id }),
     time: entry.since,
     jumpTo: entry.sessionId,
   }))
-  // 活体登记与「历史重建」可能指向同一条挂起（本页看着它发起、刷新后又能重建）——按
-  // kind + 跳转会话 + 摘要去重，优先活体（它带真实 since）。
-  const seen = new Set(waiting.map(item => `${item.kind}\u0000${item.jumpTo}\u0000${item.what}`))
+  // 活体登记与「历史重建」可能指向同一条挂起（本页看着它发起、刷新后又能重建）——按**身份**去重，
+  // 优先活体（它带真实 since）。按摘要去重会让两条同摘要的不同审批互相吞掉（BUG-299）。
+  const seen = new Set(waiting.map(attentionItemKey))
   const rebuilt = streamItems.filter(item => {
-    const key = `${item.kind}\u0000${item.jumpTo}\u0000${item.what}`
+    const key = attentionItemKey(item)
     if (seen.has(key)) return false
     seen.add(key)
     return true
@@ -204,6 +214,22 @@ export function mergeAttention(
   return [...waiting.sort(byTimeDesc), ...rebuilt.slice().sort(byTimeDesc)]
 }
 
+
+/**
+ * 一条注意力条目的去重身份（`mergeAttention` 与列表 React key 共用）。
+ *
+ * 有 `id` 时 = kind + 跳转会话 + id：**两条同摘要的不同审批是两条**（BUG-299）。
+ * 无 `id` 的消息类（escalation/completion/question 的部分来源）退回 kind + 跳转会话 + 内容：
+ * 这类事件没有稳定 id，内容就是它们的身份；不回退到时间，否则同一条 live/历史会因时间戳
+ * 差几毫秒而重复。
+ * @param item - 待办条目。
+ * @returns 去重键。
+ */
+export function attentionItemKey(item: AttentionItem): string {
+  return item.id === undefined
+    ? `${item.kind}\u0000${item.jumpTo}\u0000${item.what}`
+    : `${item.kind}\u0000${item.jumpTo}\u0000#${item.id}`
+}
 
 /** 类别 → Tag 色调（等人的醒目、告知的低调）。 */
 export function attentionTone(kind: AttentionKind): 'info' | 'danger' | 'warning' | 'outline' {

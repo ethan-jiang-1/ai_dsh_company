@@ -129,3 +129,33 @@ describe('待办观察者：登记、委托与销账（R3-10）', () => {
     await handlers.get('approval/request')?.call('owner-1', {}, next)
   })
 })
+
+// 身份透传（BUG-299）：审批 id 必须从 `approval/request` 带到挂起项上——没有它，
+// 两条同摘要的不同审批在 mergeAttention 里会互相吞掉。缺 id 时也要正常工作（不失登记）。
+describe('审批请求的身份透传', () => {
+  it('带 id ⇒ 挂起项带 id（去重按身份，不按摘要）', async () => {
+    const { remote, handlers } = fakeRemote()
+    const registry = createAttentionRegistry()
+    registerAttentionObservers({ remote, sessions, attention: registry })
+    let release!: () => void
+    const gate = new Promise<void>(resolve => { release = resolve })
+    const pending = handlers.get('approval/request')?.call('owner-1', { id: 'approval-42', toolName: 'request_signoff', reason: '双签' }, async () => { await gate })
+    await Promise.resolve()
+    expect(registry.list()[0]).toEqual(expect.objectContaining({ kind: 'approval', id: 'approval-42', detail: 'request_signoff：双签' }))
+    release()
+    await pending
+  })
+
+  it('缺 id ⇒ 照样登记（退回内容身份，不假装有身份）', async () => {
+    const { remote, handlers } = fakeRemote()
+    const registry = createAttentionRegistry()
+    registerAttentionObservers({ remote, sessions, attention: registry })
+    let release!: () => void
+    const gate = new Promise<void>(resolve => { release = resolve })
+    const pending = handlers.get('approval/request')?.call('owner-1', { toolName: 'request_signoff', reason: '双签' }, async () => { await gate })
+    await Promise.resolve()
+    expect(registry.list()[0]?.id).toBeUndefined()
+    release()
+    await pending
+  })
+})

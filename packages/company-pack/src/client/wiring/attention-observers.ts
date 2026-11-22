@@ -50,12 +50,14 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
   const offApproval = remote.$on('approval/request', function (this: unknown, request: unknown, next: () => unknown) {
     const sessionId = sessions.scopeOf(this)
     if (sessionId === undefined) return next()
-    const approval = request as { readonly toolName?: unknown; readonly reason?: unknown }
+    const approval = request as { readonly id?: unknown; readonly toolName?: unknown; readonly reason?: unknown }
+    const approvalId = typeof approval.id === 'string' && approval.id !== '' ? approval.id : undefined
     const toolName = typeof approval.toolName === 'string' ? approval.toolName : '（工具名缺失）'
     const reason = typeof approval.reason === 'string' ? approval.reason.trim() : ''
     const done = attention.begin({
       kind: 'approval',
       sessionId,
+      ...(approvalId === undefined ? {} : { id: approvalId }),
       what: attentionSummary(reason === '' ? toolName : `${toolName}：${reason}`),
       ...(reason === '' ? {} : { detail: `${toolName}：${reason}` }),
       since: Date.now(),
