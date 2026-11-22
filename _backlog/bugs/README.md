@@ -30,7 +30,7 @@
 
 **本轮批次**：下方「## 2026-11-23 修复交接（E2E 第六轮：BUG-325..332）
 
-**用户指令（2026-11-23）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：八张都改 client 读面/呈现面/公开文案，326 触及 host 元数据；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-23））。
+**用户指令（2026-11-23）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：八张都改 client 读面/呈现面/公开文案，326 触及 host 元数据；留痕 = 批次 Note [2026-11-23-e2e-round6-one-boundary-object](../../notes/implemented/2026-11-23-e2e-round6-one-boundary-object.md)）。
 
 **起点事实（已核）**：327 = 面板只读 `history.approvalsCapped`，当前会话 `pendingAsks(...).capped` 被丢；328 = 空态压制只认三个边界，漏 `candidates.capped`/`window`/`workspaceUnknown`；330 = question 已并入 waiting，字段仍叫 `approvalsCapped`、四条文案仍只写「审批」；325 = 问询活体 id 是 `question:<ms>:<seq>`（312）、历史是 `callId`（319），`mergeAttention` 按 id 去重 → 同一条两行；332 = `records.length >= 800` 当截断，恰好一页误报；331 = 多问题只读 `questions[0]`；326 = 命令 description/hint、`writeBlocked` 文案、`UnsafeCultivationPathError`/`CompanyWriteBlockedError` 的 message 仍中文；329 = en 面板四处列表用中文顿号「、」。
 
@@ -48,7 +48,11 @@
 
 **终点** = 8 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡四行证据与 `审查：` 齐；五连 + `coverage:ratchet` 绿；`client-load`/`ui-scene --isolated` 真绿（带指纹）；一篇批次 Note 记 S/I/B/E 与元层（上轮把「报出边界」当目标，真正目标是「所有边界进同一个状态、名字与内容一致」）。
 
-**本节是立项与交接，不是落地**：只记批次计划与次序。
+**收口（2026-11-23）**：8 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)，每卡 `审查：` + 四行证据齐。
+证据提交 = `fa7a7a8c`（327+328+330）/ `0b3b6428`（325+331+332）/ `6964b619`（326）/ `2e65049c`（329）。
+判据落地：**边界组合矩阵**（六档 × 空/有项）、**跨源身份去重**（live↔history 内容、源内 id）、
+**窗口只看 `hasMore`**、**分隔符与命令元数据 i18n**。
+收尾：`test` 2604 · `verify` ALL PASS · `coverage-ratchet` PASS（211 文件）。
 
 ## 2026-11-22 修复交接（E2E 第五轮：BUG-316..324）
 
