@@ -131,7 +131,7 @@ opened: 2026-11-21
 - [BUG-321](../_archive/fixed_bugs/BUG-321-cultivation-record-head-60-lines-false-broken.md)：60 行头窗口把合法长前置记录判坏。
 - [BUG-322](../_archive/fixed_bugs/BUG-322-cultivation-journal-head-240-title-fallback.md)：240 字窗口吞 journal 标题。
 - [BUG-323](../_archive/fixed_bugs/BUG-323-attention-history-cross-workspace-leak.md)：cwd 未解析时注意力候选 fail-open 到所有工作区。
-- [BUG-324](../bugs/BUG-324-deliverables-catalog-field-shape-silent.md)：catalog 字段形状坏被静默归一化。
+- [BUG-324](../_archive/fixed_bugs/BUG-324-deliverables-catalog-field-shape-silent.md)：catalog 字段形状坏被静默归一化。
 
 第五轮跑绿：培养主视图/对话面板（含中英切换）、策略 wiki 路径（内/外/缺失）、团队任务分配+在场、en 主体。新红：316–324。目标 8–10，本轮 9。
 

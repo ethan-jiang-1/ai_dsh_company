@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-324**（2026-11-22，E2E 第五轮 / P2）：catalog 字段形状静默猜值——
+  [324](BUG-324-deliverables-catalog-field-shape-silent.md) 允许缺省、拒绝错类型（跳过并计入 `skipped`）。证据提交 `0802185b`。
+
 - **BUG-321 / BUG-322**（2026-11-22，E2E 第五轮 / P2×2）：预览窗口被当格式判据——
   [321](BUG-321-cultivation-record-head-60-lines-false-broken.md) 头窗口失败补读全文再判；
   [322](BUG-322-cultivation-journal-head-240-title-fallback.md) 无 `#` 标题时补读更大窗口。证据提交 `bdda0759`。

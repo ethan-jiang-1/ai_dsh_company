@@ -68,7 +68,8 @@ describe('成品目录契约（生成器 ↔ 页签 parser 共钉一份夹具）
     expect(resultTone('未知值')).toBe('outline')
   })
 
-  it('坏行不装成条目：缺 slug / 缺 path / 字段形状坏的行丢弃并计数', () => {
+  // 负例留证 2026-11-23：恢复静默归一化后 `vitest run tests/client/data/catalog-contract.spec.ts` 1 failed（bogus-root 被当 active、skipped 不是 5）。BUG-324
+  it('坏行不装成条目：缺 slug / 缺 path / 字段形状坏的行丢弃并计数（BUG-324）', () => {
     const parsed = parseCatalog(JSON.stringify({
       schema: 1,
       generatedAt: '2026-10-23T00:00:00.000Z',

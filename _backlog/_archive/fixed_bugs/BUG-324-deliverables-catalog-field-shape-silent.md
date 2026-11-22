@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-324：成品索引的 `root`/`ledgered`/`presented` 字段形状坏被静默归一化——审计分类与台账归属可能反了
 
-> 严重级别：P2（次要偏重：成品索引是审计视图；`root` 写错仍按 active 显示、`ledgered:"false"` 仍算已入账、`presented:"true"` 变未核，而 `skipped` 仍是 0）｜发现：2026-11-22（E2E 第五轮）｜状态：调查中
+> 严重级别：P2（次要偏重：成品索引是审计视图；`root` 写错仍按 active 显示、`ledgered:"false"` 仍算已入账、`presented:"true"` 变未核，而 `skipped` 仍是 0）｜发现：2026-11-22（E2E 第五轮）｜状态：已修｜审查：agent — 逐条核对已修判定（三种坏形状各计一次 + 合法的仍收）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit 0802185b（client 解析 + 面板提示，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -87,3 +87,11 @@ console.log(c.skipped, c.entries[0].root, c.entries[0].ledgered, c.entries[0].pr
 - 坏 `ledgered`/`presented` 不再猜 true/null；
 - 缺失字段仍按默认；
 - 解析层 spec + 面板一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/data/deliverables-index.ts`（`parseCatalog` 字段形状严格化）、`tests/client/data/catalog-contract.spec.ts`
+- 红：`vitest run tests/client/data/catalog-contract.spec.ts` —— 去掉字段检查（恢复静默归一化）后「坏形状丢弃并计数」失败（`root:"bogus"` 被当 active、`skipped` 不是 5）
+- 绿：`vitest run tests/client/data/catalog-contract.spec.ts` —— 5/5（缺 slug / 缺 path / root 不合法 / ledgered 非布尔 / presented 非布尔各计一次；合法的仍收）
+- 提交：commit 0802185b
+- **一处既有期望被我改了**：`catalog-contract.spec.ts` 原先断言「`root:"bogus-root"` 回退 active 且仍收」——那正是本卡判定的缺陷行为；改为「跳过并计数」，并在用例标题里写明依据。
