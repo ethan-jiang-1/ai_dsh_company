@@ -26,7 +26,28 @@
 
 **已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
-**本轮批次**：下方「## 2026-11-22 修复交接（E2E 第四轮：BUG-307..315）
+**本轮批次**：下方「## 2026-11-22 修复交接（E2E 第五轮：BUG-316..324）
+
+**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：九张都改 client 读面/呈现面/公开文案，316 触及 host 结果面；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-22））。
+
+**起点事实（已核）**：317 = `AttentionTab` 只留最近 `MAX_EVENTS=1000` 条当前会话事件，旧 `approval/asked` 被截、空态仍说「没有等你的事」；318 = 候选 `slice(0, HISTORY_SCAN_CAP=20)` 无边界提示；320 = `STREAM_ITEM_CAP=5` 把第 6 条挂起审批静默截掉；319 = `pendingApprovals` 只重建审批，question 只靠活体登记，刷新即丢；323 = `currentCwd === undefined` 时 filter 把「未知」当匹配，跨工作区会话全部被扫；321 = `readRecordHead` 只读 60 行，合法长 frontmatter 记录被判坏；322 = journal `readHead` 240 字窗口吞掉标题；324 = catalog 的 `root`/`ledgered`/`presented` 形状坏被静默归一；316 = `/cultivation` 回执/错误串全中文。
+
+| 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
+|---|---|---|---|---|
+| **O 过滤器 fail-closed** | [323](BUG-323-attention-history-cross-workspace-leak.md) | 未知输入被当成「都匹配」（唯一「多」方向） | cwd 未解析 ⇒ **不扫**（候选 0）+ 面板「工作区未就绪，暂不跨会话」 | 1 |
+| **D‴ 边界沿管线传递** | [317](BUG-317-attention-current-session-1000-cap-silent.md) + [318](BUG-318-attention-history-candidate-cap-silent.md) + [320](BUG-320-attention-approval-cap-five-silent.md)，[321](BUG-321-cultivation-record-head-60-lines-false-broken.md) + [322](BUG-322-cultivation-journal-head-240-title-fallback.md)，[324](BUG-324-deliverables-catalog-field-shape-silent.md) | 边界在每一层被重新丢掉 | 注意力管线带 `{ eventsTruncated, candidates, approvalsCapped }` 一路到面板；读面窗口不得当格式判据；catalog 字段形状进 `skipped`/`fieldProblems` | 2 → 5 |
+| **F‴ 重建面覆盖全部类型** | [319](BUG-319-attention-questions-not-rebuilt-after-reload.md) | 只重建审批，问询只靠活体 | `pendingApprovals` → `pendingAsks`（asked/answered 配对，两种类型共用） | 3 |
+| **H″ 宿主文案可翻译** | [316](BUG-316-cultivation-host-command-texts-not-localized.md) | host 回执是中文串 | host 返回结构化结果或 client 对已知 kind 做 typed 映射 + 原文兜底（不伪造翻译） | 6 |
+
+**次序 = 323 → 317+318+320 → 319 → 321+322 → 324 → 316**：323 是唯一越界方向先止血；三个注意力上限同管线一次改完；319 紧接同文件；321/322 同文件；324 单文件；316 跨面最贵。
+
+**证据口径**：每卡红→绿同一条可执行命令；先落代码提交拿 sha → 翻 `修复已落地` / 写 `## 修复证据` / 归档。**修类不修卡**：每卡多跑同类组合（317/318/320 的边界 / 边界+1；321 的 59/60/61 行；322 的 239/240/241 字）。真页面证据过构建指纹。`coverage:ratchet` 只升不降。**只 `git add <paths>`**。`push` 前先 `source run/env.sh`。
+
+**终点** = 9 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡四行证据与 `审查：` 齐；五连 + `coverage:ratchet` 绿；`client-load`/`ui-scene --isolated` 真绿（带指纹）；一篇批次 Note 记 D‴/F‴/O/H″ 与元层（边界一旦在某一层被丢掉，下游就只能靠猜），并落地三条判据：边界汇总类型、fail-closed 过滤器、问询重建。
+
+**本节是立项与交接，不是落地**：只记批次计划与次序。
+
+## 2026-11-22 修复交接（E2E 第四轮：BUG-307..315）
 
 **用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：九张都改 client 读面/呈现面/公开文案/布局；留痕 = 批次 Note [2026-11-22-e2e-round4-parse-boundary-declaration-identity](../../notes/implemented/2026-11-22-e2e-round4-parse-boundary-declaration-identity.md)）。
 
