@@ -8,16 +8,14 @@
 | 指标 | 数量 |
 |---|---|
 | 已修卡 | 302 |
-| 有具名守卫 | 198 |
-| 无具名守卫 | 104 |
-| 覆盖率 | 65.6% |
+| 有具名守卫 | 200 |
+| 无具名守卫 | 102 |
+| 覆盖率 | 66.2% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
 | BUG | opened | slug |
 |---|---|---|
-| 314 | 2026-11-22 | startup-settings-bad-shape-silent-auto |
-| 313 | 2026-11-22 | startup-options-bad-shape-silent-empty |
 | 183 | 2026-11-14 | notes-root-symlink-followed |
 | 180 | 2026-11-14 | walk-company-dirs-windows-dotdot |
 | 179 | 2026-11-14 | internal-dotdot-over-rejected |
@@ -323,3 +321,5 @@
 | 309 | 2026-11-22 | tests/lib/cultivation/cultivation.spec.ts:296 |
 | 310 | 2026-11-22 | tests/client/tabs/deliverables-catalog.spec.ts:221 |
 | 311 | 2026-11-22 | tests/client/tabs/ledger-tab.spec.ts:100；tests/lib/accounting/ledger.spec.ts:121 |
+| 313 | 2026-11-22 | tests/lib/startup/startup-settings.spec.ts:221 |
+| 314 | 2026-11-22 | tests/client/startup/startup-load.spec.ts:88 |

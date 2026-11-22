@@ -177,7 +177,7 @@ export function CultivationChatPanel({ sessions, mainSessionId, cwd, agentPreset
       </header>
 
       <div className="wk-cult-chat-hint">
-        只谈培养：纠正、方法、journal、赞踩；回复不会混进主 Chat。工具审批走平台审批面。
+        {CULTIVATION_COPY.chatHint}
       </div>
 
       {state.status === 'waiting' && <div className="wk-cult-chat-state">{CULTIVATION_COPY.chatWaiting}</div>}
@@ -316,7 +316,7 @@ function CultivationThread({ binding, attachments }: { readonly binding: Session
           }}
         />
         <div className="wk-cult-chat-actions">
-          <span className="wk-cult-chat-session">session: {String(binding.sessionId).slice(0, 8)}</span>
+          <span className="wk-cult-chat-session">{CULTIVATION_COPY.chatSession(String(binding.sessionId).slice(0, 8))}</span>
           <button type="button" className="wk-cult-chat-send" disabled={sending || draft.trim() === ''} onClick={() => { void submit() }}>
             {sending ? CULTIVATION_COPY.chatSending : CULTIVATION_COPY.chatSend}
           </button>

@@ -7,6 +7,7 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { CultivationChatPanel } from '../../../packages/company-pack/src/client/cultivation/CultivationChatPanel.tsx'
+import { setCultivationLanguage } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -177,5 +178,33 @@ describe('CultivationChatPanel（独立培养会话）', () => {
     })
     expect(fake.create).not.toHaveBeenCalled()
     expect(host.textContent).toContain('等待主会话的工作区与角色')
+  })
+})
+
+// 对话面板双向漏语言（BUG-308）：en 出整段中文提示、zh 出裸 `session:`。
+// 判据 = en 渲染无 CJK；zh 渲染不出现裸 `session:`（要本地化）。
+describe('CultivationChatPanel · 语言', () => {
+  afterEach(() => { setCultivationLanguage('zh') })
+
+  it('en：提示与底部状态都是英文（无 CJK）', async () => {
+    setCultivationLanguage('en')
+    const { sessions } = fakeSessions()
+    const host = document.createElement('div')
+    document.body.append(host)
+    mounted = createRoot(host)
+    await act(async () => { mounted?.render(createElement(CultivationChatPanel, { sessions, mainSessionId: 'session-main', cwd: '/ws', agentPreset: 'company-ceo' } as never)) })
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)) })
+    expect(host.textContent ?? '').not.toMatch(/[\u4e00-\u9fff]/)
+  })
+
+  it('zh：底部状态不出现裸 `session:`', async () => {
+    const { sessions } = fakeSessions()
+    const host = document.createElement('div')
+    document.body.append(host)
+    mounted = createRoot(host)
+    await act(async () => { mounted?.render(createElement(CultivationChatPanel, { sessions, mainSessionId: 'session-main', cwd: '/ws', agentPreset: 'company-ceo' } as never)) })
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)) })
+    expect(host.textContent ?? '').toContain('会话：')
+    expect(host.textContent ?? '').not.toContain('session: ')
   })
 })

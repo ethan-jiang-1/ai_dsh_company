@@ -84,7 +84,8 @@ describe('startupFaceFromReads：探针的调用时机', () => {
 })
 
 // 字段级诊断（BUG-314）：v 正确但字段类型坏（数组/对象/数字）过去被折成「自动」。
-describe('startupFaceFrom · 字段类型坏', () => {
+// 负例留证 2026-11-22：去掉字段检查（只查 v）后 `vitest run tests/client/startup/startup-load.spec.ts` 2 failed（字段名丢失）。BUG-314
+describe('startupFaceFrom · 字段类型坏（BUG-314）', () => {
   it('productType 是数组 ⇒ corrupt + 点名字段', async () => {
     const face = await startupFaceFromReads({ settings: read(JSON.stringify({ v: 1, productType: [] })), options: read('') }, async () => false)
     expect(face.settingsProblem).toBe('corrupt')
