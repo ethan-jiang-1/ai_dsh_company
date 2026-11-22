@@ -316,4 +316,4 @@
 | 303 | 2026-11-22 | tests/client/tabs/ledger-tab.spec.ts:84 |
 | 304 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:81 |
 | 305 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:154 |
-| 306 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:353 |
+| 306 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:353；tests/client/cultivation/list-caps-consumed.spec.ts:19 |

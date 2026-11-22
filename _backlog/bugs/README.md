@@ -24,7 +24,7 @@
 
 **本轮批次**：下方「## 2026-11-22 修复交接（E2E 第三轮：BUG-301..306）
 
-**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：六张都改 client 读面/呈现面/公开文案；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-22））。
+**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：六张都改 client 读面/呈现面/公开文案；留痕 = 批次 Note [2026-11-22-e2e-round3-boundary-language-declaration](../../notes/implemented/2026-11-22-e2e-round3-boundary-language-declaration.md)）。
 
 **起点事实（已核）**：303 = `parseMotionLedger` 在 `cells.length !== HEADER.length` 时静默 `continue`（`lib/accounting/ledger.ts:46`）；304 = `readSessionEvents` 只取游标处一页 `maxMessages=800`，更早的挂起审批看不见；305 = `readPendingAcrossSessions` 把每个会话失败 `catch` 成 `[]`，全部失败仍返回空数组；306 = `LIST_CAPS.mine=5` 声明了、`capList`/`capControl` 支持，但 `CultivationMine` 从不调用；301 = 策略 wiki 输入非受控，重置后仍显示旧值、blur 会把旧值写回；302 = `timeLabel` 与 `listDir` 只写中文，en 界面出现「刚刚 / 7 小时前 / 列目录被拒（…）」。
 
@@ -41,7 +41,11 @@
 
 **终点** = 6 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡四行证据与 `审查：` 齐；五连 + `coverage:ratchet` 绿；`client-load`/`ui-scene --isolated` 真绿（带指纹）；一篇批次 Note 记 D′/H/I/J 与元层（4/6 是「取子集或声明了东西但没人把它说出来」），并落地两条判据：en 渲染无 CJK、`LIST_CAPS` 每个键必须被渲染路径引用。
 
-**本节是立项与交接，不是落地**：只记批次计划与次序。
+**收口（2026-11-22）**：6 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)，每卡 `审查：` + 四行证据齐。
+证据提交 = `51747ad0`（304+305）/ `1a2a0eb7`（303）/ `2899fd4`… → `c2899fd4`（302）/ `40be5b63`（301）/ `dff4e34b`（306）。
+两条新判据落地：**en 渲染无 CJK**（`cultivation-board.spec.ts` 两条）、**`LIST_CAPS` 每个键必须有消费点**
+（`tests/client/cultivation/list-caps-consumed.spec.ts`，红证 = 删 `capControl('mine'` 那行）。
+收尾：`test` 2520 · `verify` ALL PASS · `coverage-ratchet` PASS（210 文件）· `client-load` / `ui-scene --isolated --expected` 真绿（指纹 3c38f472）。
 
 ## 2026-11-22 修复交接（E2E 第二轮：BUG-297/298/299/300）
 
