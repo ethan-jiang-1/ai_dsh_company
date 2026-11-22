@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-308：培养主视图的对话面板双向漏语言——英文页显示整段中文提示，中文页显示 `session:` 英文
 
-> 严重级别：P2（次要偏重：语言开关是产品合同；这是主视图右侧常驻面板，不是边缘提示）｜发现：2026-11-22（E2E 第四轮）｜状态：调查中
+> 严重级别：P2（次要偏重：语言开关是产品合同；这是主视图右侧常驻面板，不是边缘提示）｜发现：2026-11-22（E2E 第四轮）｜状态：已修｜审查：agent — 逐条核对已修判定（en 无 CJK + zh 无裸 session:）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 8–10 个，别管那边怎么修」）。
+> **留痕**：commit 4fce3944（client 公开文案，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -71,3 +71,10 @@ opened: 2026-11-22
 - en 主视图对话面板的提示区无中文；
 - zh 主视图对话面板的会话状态行无裸 `session:`；
 - 新 key 在 zh/en 字典各一条，组件无字面量；两条真页面/静态渲染断言。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/cultivation/CultivationChatPanel.tsx`、`packages/company-pack/src/client/cultivation/cultivation-actions.ts`（`chatSession` zh/en）、`tests/client/cultivation/cultivation-chat-panel.spec.ts`
+- 红：`vitest run tests/client/cultivation/cultivation-chat-panel.spec.ts` —— 两处写死恢复后 2 failed（en 面板命中 CJK；zh 面板出现裸 `session: `）
+- 绿：`vitest run tests/client/cultivation/cultivation-chat-panel.spec.ts` —— 7/7（en 无 CJK；zh 出现「会话：」且无裸 `session: `）
+- 提交：commit 4fce3944

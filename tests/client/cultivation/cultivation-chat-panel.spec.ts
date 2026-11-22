@@ -183,7 +183,8 @@ describe('CultivationChatPanel（独立培养会话）', () => {
 
 // 对话面板双向漏语言（BUG-308）：en 出整段中文提示、zh 出裸 `session:`。
 // 判据 = en 渲染无 CJK；zh 渲染不出现裸 `session:`（要本地化）。
-describe('CultivationChatPanel · 语言', () => {
+// 负例留证 2026-11-22：两处写死恢复后 `vitest run tests/client/cultivation/cultivation-chat-panel.spec.ts` 2 failed（en 命中 CJK、zh 出现裸 session:）。BUG-308
+describe('CultivationChatPanel · 语言（BUG-308）', () => {
   afterEach(() => { setCultivationLanguage('zh') })
 
   it('en：提示与底部状态都是英文（无 CJK）', async () => {

@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-308**（2026-11-22，E2E 第四轮 / P2）：对话面板双向漏语言——
+  [308](BUG-308-cultivation-chat-panel-i18n-leaks.md) 提示与底部状态改走 `CULTIVATION_COPY`（含 `chatSession`）。证据提交 `4fce3944`。
+
 - **BUG-313 / BUG-314**（2026-11-22，E2E 第四轮 / P2×2）：配置诊断只查外框——
   [313](BUG-313-startup-options-bad-shape-silent-empty.md) options 字段类型坏 → `unreadable + field`；
   [314](BUG-314-startup-settings-bad-shape-silent-auto.md) settings 字段类型坏 → `corrupt + field`，面板点名。证据提交 `c94655f1`。

@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 302 |
-| 有具名守卫 | 200 |
+| 已修卡 | 303 |
+| 有具名守卫 | 201 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 66.2% |
+| 覆盖率 | 66.3% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -318,6 +318,7 @@
 | 305 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:154 |
 | 306 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:353；tests/client/cultivation/list-caps-consumed.spec.ts:19 |
 | 307 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:372 |
+| 308 | 2026-11-22 | tests/client/cultivation/cultivation-chat-panel.spec.ts:187 |
 | 309 | 2026-11-22 | tests/lib/cultivation/cultivation.spec.ts:296 |
 | 310 | 2026-11-22 | tests/client/tabs/deliverables-catalog.spec.ts:221 |
 | 311 | 2026-11-22 | tests/client/tabs/ledger-tab.spec.ts:100；tests/lib/accounting/ledger.spec.ts:121 |
