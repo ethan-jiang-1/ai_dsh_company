@@ -1,5 +1,6 @@
 /** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）+ 公司驾驶舱页签（右栏，R5b）。 */
-import { startupFaceFrom } from './startup/startup-load.ts'
+import { workspaceFileExists } from './cultivation/cultivation-data.ts'
+import { startupFaceFromReads } from './startup/startup-load.ts'
 import { CATALOG_READ_LIMIT, LEDGER_READ_LIMIT } from './data/read-limits.ts'
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
@@ -161,8 +162,11 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
         readStartupText(sessionId, signal),
         readStartupOptionsText(sessionId, signal),
       ])
-      // 折算住纯函数（`startup/startup-load.ts`）：坏配置/读不到各自成一态，不折成 auto（BUG-297）。
-      startupStore.set(startupFaceFrom(settingsRead, optionsRead))
+      // 折算 + 「缺失/不可读」之分都在 `startup/startup-load.ts`（composition 闭包单测不执行）。
+      startupStore.set(await startupFaceFromReads(
+        { settings: settingsRead, options: optionsRead },
+        () => workspaceFileExists(scoped.remote, leadOf, sessionId, WORKSPACE_TEXT_PATHS.startup, signal),
+      ))
     }
     const runSettingsCommand = async (sessionId: SessionId, line: string): Promise<SaveResult> => {
       try {

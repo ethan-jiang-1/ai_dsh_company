@@ -18,10 +18,14 @@ import type { StartupFace } from './startup-store.ts'
  * - **坏 JSON / 未来 schema** = `'corrupt' | 'unsupported'`，由诊断解析器给出。
  * @param settings - `startup.json` 的读取结果。
  * @param options - `startup-options.json` 的读取结果。
+ * @param settingsPresent - 读取失败时该文件**是否确实存在**（缺失 = 合法 auto，不报错）。
  * @returns 可直接写入共享仓的面。
  */
-export function startupFaceFrom(settings: WorkspaceTextRead, options: WorkspaceTextRead): StartupFace {
-  const settingsState = settings.ok ? parseStartupSettingsState(settings.text) : { settings: undefined, problem: 'unreadable' as const }
+export function startupFaceFrom(settings: WorkspaceTextRead, options: WorkspaceTextRead, settingsPresent = false): StartupFace {
+  // 读失败时：文件存在 ⇒ 'unreadable'（权限/是目录）；不存在 ⇒ 合法 auto（不制造噪声）。
+  const settingsState = settings.ok
+    ? parseStartupSettingsState(settings.text)
+    : { settings: undefined, problem: settingsPresent ? 'unreadable' as const : null }
   // 选项文件：读不到与「解析失败/被截断」同样是不可用——不能折成「没有可选项」（BUG-085）。
   const optionsState = options.ok
     ? parseStartupOptionsState(options.text)
@@ -35,4 +39,20 @@ export function startupFaceFrom(settings: WorkspaceTextRead, options: WorkspaceT
     optionsProblem: optionsState.problem,
   }
   return settingsProblem === null ? face : { ...face, settingsProblem }
+}
+
+/**
+ * 读面结果 + 存在性探针 ⇒ `StartupFace`（composition 的 `loadStartup` 只调这一行）。
+ *
+ * 探针只在「读失败」时调用一次：文件存在 = 不可读（权限/是目录），不存在 = 合法 auto。
+ * @param reads - 两份读取结果。
+ * @param probePresent - 「设置文件确实存在」的探针。
+ * @returns 可直接写入共享仓的面。
+ */
+export async function startupFaceFromReads(
+  reads: { readonly settings: WorkspaceTextRead, readonly options: WorkspaceTextRead },
+  probePresent: () => Promise<boolean>,
+): Promise<StartupFace> {
+  const present = reads.settings.ok ? false : await probePresent()
+  return startupFaceFrom(reads.settings, reads.options, present)
 }

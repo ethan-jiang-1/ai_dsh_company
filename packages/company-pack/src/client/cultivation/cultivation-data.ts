@@ -95,6 +95,34 @@ export function makeWorkspaceTextReader(
 }
 
 /**
+ * 「这个工作区文件在不在」——只在**读取失败之后**用，用来区分「文件不存在」（合法的空）与
+ * 「存在但读不到」（权限/是目录）。读面本身不告诉我们失败原因，只能补这一探（BUG-297 的缺失/不可读之分）。
+ * @param remote - 注册处的 remote 命名空间。
+ * @param leadOf - 子会话归 Lead。
+ * @param sessionId - 面板所在会话。
+ * @param path - 相对工作区根的路径。
+ * @param signal - 中止信号。
+ * @returns 目录列得出来且其中确有该文件 = true；任何失败 = false（不把探针失败说成存在）。
+ */
+export async function workspaceFileExists(
+  remote: RemoteNamespaceFace,
+  leadOf: (sessionId: SessionId) => SessionId,
+  sessionId: SessionId,
+  path: string,
+  signal: AbortSignal,
+): Promise<boolean> {
+  const cut = path.lastIndexOf('/')
+  const dir = cut === -1 ? '' : path.slice(0, cut)
+  const name = cut === -1 ? path : path.slice(cut + 1)
+  try {
+    const listed = await remote.workspaceFiles.list(leadOf(sessionId), dir, signal)
+    return listed.ok && listed.value.entries.some(entry => entry.name === name)
+  } catch {
+    return false
+  }
+}
+
+/**
  * 结果态 → `string | null`（唯一允许「丢掉失败原因」的地方：调用方会把 null 当作「没有内容」，
  * **不再**兼任「读完了」的判断）。放在这里而不是各调用点，是为了让 composition 里不再多出分支。
  * @param read - 结果态。

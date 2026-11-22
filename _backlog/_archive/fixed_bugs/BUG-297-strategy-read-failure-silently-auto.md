@@ -79,5 +79,5 @@ opened: 2026-11-22
 
 - 改动面：`packages/company-pack/src/client/startup/startup-load.ts`、`packages/company-pack/src/client/startup/startup-store.ts`、`packages/company-pack/src/client/startup/StrategyPanel.tsx`、`packages/company-pack/src/client/locales.ts`、`tests/client/startup/{startup-load,strategy-panel}.spec.ts`
 - 红：`vitest run tests/client/startup/startup-load.spec.ts` —— 折算把坏 JSON 折成 `EMPTY_STARTUP_SETTINGS` 时，`settingsProblem === 'corrupt'` 断言失败（问题被吞成 auto）；面板侧 `strategy-panel.spec` 三条问题态同时红
-- 绿：`vitest run tests/client/startup/startup-load.spec.ts` —— 6/6（面板侧 `vitest run tests/client/startup/strategy-panel.spec.ts` 12/12 另跑）；真页面（坏 `startup.json`）「策略文件损坏（JSON 读不动），当前按「自动」显示——修好文件后重开面板。」；删掉文件后同一面板**无**错误行（缺失 = 合法 auto）
+- 绿：`vitest run tests/client/startup/startup-load.spec.ts` —— 10/10（六态折算 + 探针时机两条；「缺失 vs 不可读」由 `workspaceFileExists` 探针区分，spec = `tests/client/data/workspace-file-exists.spec.ts` 4/4；面板侧 `vitest run tests/client/startup/strategy-panel.spec.ts` 12/12 另跑）；真页面（坏 `startup.json`）「策略文件损坏（JSON 读不动），当前按「自动」显示——修好文件后重开面板。」；删掉文件后同一面板**无**错误行（缺失 = 合法 auto）
 - 提交：commit b144371c

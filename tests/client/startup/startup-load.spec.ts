@@ -6,7 +6,7 @@
  * 于是「读坏了会不会说」从来没有判据。
  */
 import { describe, expect, it } from 'vitest'
-import { startupFaceFrom } from '../../../packages/company-pack/src/client/startup/startup-load.ts'
+import { startupFaceFrom, startupFaceFromReads } from '../../../packages/company-pack/src/client/startup/startup-load.ts'
 
 const read = (text: string) => ({ ok: true as const, eof: true, text })
 const missing = () => ({ ok: false as const, reason: 'ENOENT' })
@@ -31,7 +31,8 @@ describe('startupFaceFrom：设置文件的状态（BUG-297）', () => {
   })
 
   it('读不到（目录/权限）⇒ unreadable，与「缺失」分开', () => {
-    const face = startupFaceFrom(missing(), read(''))
+    // 第三个参数 = 「文件确实存在」：读失败 + 存在 = 不可读；不存在 = 合法 auto（下一条用例）。
+    const face = startupFaceFrom(missing(), read(''), true)
     expect(face.settingsProblem).toBe('unreadable')
   })
 
@@ -42,5 +43,42 @@ describe('startupFaceFrom：设置文件的状态（BUG-297）', () => {
   it('选项文件不可读仍走既有的 optionsProblem', () => {
     const face = startupFaceFrom(read(''), { ok: false, reason: 'x' })
     expect(face.optionsProblem).toBe('unreadable')
+  })
+})
+
+// 缺失 ≠ 读不到（BUG-297 的收窄）：读面失败时，先探「文件在不在」——
+// 不在 = 合法 auto（新工作区不该冒错误行），在但读不到 = unreadable。
+describe('startupFaceFrom · 缺失与不可读的区分', () => {
+  it('读失败 + 文件不存在 ⇒ 不报问题（合法 auto）', () => {
+    const face = startupFaceFrom({ ok: false, reason: 'ENOENT' }, read(''), false)
+    expect(face.settingsProblem ?? null).toBeNull()
+  })
+
+  it('读失败 + 文件确实存在 ⇒ unreadable', () => {
+    const face = startupFaceFrom({ ok: false, reason: 'EISDIR' }, read(''), true)
+    expect(face.settingsProblem).toBe('unreadable')
+  })
+})
+
+// 折算的异步壳（composition 只调这一行）：探针只在读失败时调一次——
+// 读成功不探（省一次列目录），读失败才决定「缺失」还是「不可读」。
+describe('startupFaceFromReads：探针的调用时机', () => {
+  it('读成功 ⇒ 不调探针', async () => {
+    let probed = 0
+    const face = await startupFaceFromReads(
+      { settings: read(JSON.stringify({ v: 1 })), options: read('') },
+      async () => { probed += 1; return false },
+    )
+    expect(probed).toBe(0)
+    expect(face.settingsProblem ?? null).toBeNull()
+  })
+
+  it('读失败 ⇒ 调一次；探到存在 = unreadable，探不到 = 合法 auto', async () => {
+    let probed = 0
+    const present = await startupFaceFromReads({ settings: missing(), options: read('') }, async () => { probed += 1; return true })
+    expect(probed).toBe(1)
+    expect(present.settingsProblem).toBe('unreadable')
+    const absent = await startupFaceFromReads({ settings: missing(), options: read('') }, async () => false)
+    expect(absent.settingsProblem ?? null).toBeNull()
   })
 })
