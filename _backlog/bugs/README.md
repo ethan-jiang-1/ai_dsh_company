@@ -24,7 +24,29 @@
 
 **已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
-**本轮批次**：下方「## 2026-11-22 修复交接（E2E 第三轮：BUG-301..306）
+**本轮批次**：下方「## 2026-11-22 修复交接（E2E 第四轮：BUG-307..315）
+
+**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：九张都改 client 读面/呈现面/公开文案/布局；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-22））。
+
+**起点事实（已核）**：307 = 我 306 的回归（两个子列表各折 5 条、`capControl` 的 total 用两者之和：4+4 全显示还挂「显示全部（共 8 条）」）；309 = self-rejected 记录同时进 `processedForViewer` 与 `mine`；310 = 成品索引坏 entry 静默丢；311 = 台账表头 typo 走「零行」不报错；312 = question 活体无 id、`attentionItemKey` 回落摘要（299 的兜底缺陷）；313 = options 字段类型坏被说成「没有可选项」；314 = startup.json 字段类型坏折成「全自动」（诊断器只查 `v`）；315 = 768px 下 board 210.16 < `BOARD_MIN` 380、chat 176.84 < `CHAT_MIN` 280；308 = 对话面板 en 出整段中文、zh 出裸 `session:`。
+
+| 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
+|---|---|---|---|---|
+| **I′ 声明约束必须强制执行** | [307](BUG-307-cultivation-mine-cap-control-combined.md) + [309](BUG-309-cultivation-self-record-listed-twice.md)，[315](BUG-315-cultivation-full-view-min-widths-ignored.md) | 声明了常量/上限，消费点按另一种算法（或根本不消费） | 307：控件 total 改成「两个子列表实际隐藏数」；309：按身份去重只留一行；315：`BOARD_MIN`/`CHAT_MIN` 成为 CSS 与测量的唯一来源 | 1 → 6 |
+| **D″ 解析层必须报 skipped** | [310](BUG-310-deliverables-index-silent-entry-drop.md) + [311](BUG-311-ledger-header-mismatch-silent-empty.md) | 解析只返回成功项，失败形态换了就不说话 | 共用 `{ parsed, skipped }`；成品坏 entry、台账坏表头各出「跳过了 N 条（原因）」 | 2 |
+| **E′ 配置诊断到字段级** | [313](BUG-313-startup-options-bad-shape-silent-empty.md) + [314](BUG-314-startup-settings-bad-shape-silent-auto.md) | 诊断器只查 `v`，字段类型坏折成空/auto | `parseStartup*State` 报 field-problem（字段名 + 期望类型），面板说「字段 X 类型不对」 | 3 |
+| **H′ i18n 判据扩面** | [308](BUG-308-cultivation-chat-panel-i18n-leaks.md) | 对话面板文案没进 typed 字典（双向漏） | en 无 CJK、zh 无裸 `session:`；判据从培养面板扩到该面板 | 4 |
+| **F″ 身份不许回落内容** | [312](BUG-312-attention-question-duplicate-key.md) | 问询活体无 id，key 回落摘要 | 登记时合成 id（session + 时间戳 + 序号）；`attentionItemKey` 不再用摘要兜底 | 5 |
+
+**次序 = 307+309 → 310+311 → 313+314 → 308 → 312 → 315**：同一块的先一起改（307+309 同组件）；解析层与配置层各是同族两卡；i18n 必须在 301/306 那类文案改动之后；312 是 299 的 refinement；315 要真浏览器测量，独立收尾。
+
+**证据口径**：每卡红→绿同一条可执行命令；先落代码提交拿 sha → 翻 `修复已落地` / 写 `## 修复证据` / 归档。**修类不修卡**：每卡验收必须多跑同类组合（307 的 4+4 / 5+0 / 6+1；312 的同文两条 / 不同文两条；313/314 的数组/对象/数字）。真页面证据必须过构建指纹（`node tools/dev/build-client.mjs`）。`coverage:ratchet` 只升不降。**只 `git add <paths>`**。`push` 前先 `source run/env.sh`。
+
+**终点** = 9 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡四行证据与 `审查：` 齐；五连 + `coverage:ratchet` 绿；`client-load`/`ui-scene --isolated` 真绿（带指纹）；一篇批次 Note 记 D″/I′/F″/H′/E′ 与元层（七张是「取了子集/声明了东西/兜了个底但没人说出来或执行」），并落地三条判据：解析器必须报 `skipped`、布局下限三档测量、en 渲染无 CJK 扩到对话面板。
+
+**本节是立项与交接，不是落地**：只记批次计划与次序。
+
+## 2026-11-22 修复交接（E2E 第三轮：BUG-301..306）
 
 **用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：六张都改 client 读面/呈现面/公开文案；留痕 = 批次 Note [2026-11-22-e2e-round3-boundary-language-declaration](../../notes/implemented/2026-11-22-e2e-round3-boundary-language-declaration.md)）。
 
