@@ -164,6 +164,8 @@ export function LedgerTab(props: LedgerTabProps) {
       refreshLabel={t('ledger.refresh', { seconds: REFRESH_MS / 1000 })}
     >
       {error !== null && <div className="wk-error">{error}</div>}
+      {/* 表头不符必须可见（BUG-311）：否则「共 0 场」会被读成「台账是空的」。 */}
+      {parsed !== null && !parsed.headerOk && <div className="wk-error">{t('ledger.headerMismatch')}</div>}
       {/* 坏行必须可见（BUG-303）：4 行文件声称 2 场动议 = 台账少报。 */}
       {(parsed?.badRows.length ?? 0) > 0 && (
         <div className="wk-error">{t('ledger.badRows', { count: parsed?.badRows.length ?? 0 })}</div>

@@ -36,10 +36,15 @@ export interface LedgerBadRow {
   readonly reason: LedgerBadReason
 }
 
-/** 解析结果：行 + 坏行（两者一起回去，`rows` 的「少」才有解释）。 */
+/** 解析结果：行 + 坏行 + 表头诊断（`rows` 的「少」才有解释）。 */
 export interface MotionLedgerParse {
   readonly rows: readonly MotionRow[]
   readonly badRows: readonly LedgerBadRow[]
+  /**
+   * 表头是否对得上（两种口径之一）。false = 表里出现了行但表头不认识——
+   * 面板必须说「表头不符」，不能显示「共 0 场」假装台账是空的（BUG-311）。
+   */
+  readonly headerOk: boolean
 }
 
 /**
@@ -53,6 +58,7 @@ export function parseMotionLedger(text: string): MotionLedgerParse {
   let headerSeen = false
   const rows: MotionRow[] = []
   const badRows: LedgerBadRow[] = []
+  let headerOk = true
   for (const [index, line] of lines.entries()) {
     const trimmed = line.trim()
     if (!trimmed.startsWith('|')) continue
@@ -77,7 +83,9 @@ export function parseMotionLedger(text: string): MotionLedgerParse {
       summary: cells[6]!,
     })
   }
-  return { rows, badRows }
+  // 出现过表行（以 `|` 开头）却一个表头都没认出来 ⇒ 表头不符，而不是「台账空」。
+  if (!headerSeen && lines.some(line => line.trim().startsWith('|'))) headerOk = false
+  return { rows, badRows, headerOk }
 }
 
 /** 统计：总场数 / 成品数 / 未记墙钟数（面板头部的三个数）。 */

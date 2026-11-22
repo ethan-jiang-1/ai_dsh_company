@@ -29,6 +29,11 @@ export interface DeliverablesCatalog {
   readonly schema: 1
   readonly generatedAt: string
   readonly entries: readonly DeliverablesCatalogEntry[]
+  /**
+   * 被跳过的条目数（坏形状：null / 非对象 / slug 空 / path 空）。
+   * 不报出来就会出现「5 条只显示 2 条、面板什么都不说」（BUG-310）。
+   */
+  readonly skipped: number
 }
 
 /** 页签筛选档（UI 词表；纯类型住这里，标签仍在页签体）。 */
@@ -46,14 +51,15 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
   const value = raw as Record<string, unknown>
   if (value.schema !== 1 || !Array.isArray(value.entries)) return null
   const entries: DeliverablesCatalogEntry[] = []
+  let skipped = 0
   for (const item of value.entries) {
-    if (item === null || typeof item !== 'object') continue
+    if (item === null || typeof item !== 'object') { skipped += 1; continue }
     const row = item as Record<string, unknown>
     const root = row.root === RUN_BUNDLE_PATHS.archive ? RUN_BUNDLE_PATHS.archive : RUN_BUNDLE_PATHS.deliverables
     const textOf = (key: string): string => (typeof row[key] === 'string' ? row[key] : '')
     const slug = textOf('slug')
     const path = textOf('path')
-    if (slug === '' || path === '') continue
+    if (slug === '' || path === '') { skipped += 1; continue }
     entries.push({
       slug,
       kickoff: textOf('kickoff'),
@@ -72,6 +78,7 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
     schema: 1,
     generatedAt: typeof value.generatedAt === 'string' ? value.generatedAt : '',
     entries,
+    skipped,
   }
 }
 

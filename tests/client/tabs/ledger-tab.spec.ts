@@ -94,3 +94,16 @@ describe('LedgerTab · 坏行提示（BUG-303）', () => {
     expect(host.textContent).toContain('共 1 场动议')
   })
 })
+
+// 表头不符必须可见（BUG-311）：否则「共 0 场」会被读成「台账是空的」。
+describe('LedgerTab · 表头不符', () => {
+  it('表头写错一个词 ⇒ 出「表头与两种口径都对不上」', async () => {
+    const text = [
+      '| slug | date | type | 参与方 | wallClock | deliverable | summary |',
+      '|---|---|---|---|---|---|---|',
+      '| a | 2026-11-22 | decision | CEO | 1h | ✅ | 结论一 |',
+    ].join('\n')
+    const host = await mount(createElement(LedgerTab, props({ readLedger: async () => ({ ok: true as const, eof: true, text }) })))
+    expect(host.textContent).toContain('表头与两种口径都对不上')
+  })
+})

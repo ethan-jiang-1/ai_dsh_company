@@ -160,6 +160,8 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
 
   return (
     <>
+      {/* 坏条目必须可见（BUG-310）：5 条只显示 2 条而不说，是把审计视图当完整。 */}
+      {catalog.skipped > 0 && <div className="wk-error">{t('deliverables.skipped', { count: catalog.skipped })}</div>}
       <div className="wk-catalog-summary" aria-label={t('deliverables.statsAria')}>
         <span>{t('deliverables.totalPrefix')} <strong>{counts.total}</strong> {t('deliverables.totalSuffix')}</span>
         <Tag tone="info">{t('deliverables.active', { count: counts.active })}</Tag>

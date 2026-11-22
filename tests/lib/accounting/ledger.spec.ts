@@ -21,7 +21,7 @@ const REAL_LEDGER = hasLive ? readFileSync(LIVE_LEDGER, 'utf8') : ''
 
 describe('parseMotionLedger', () => {
   it('表头不符返回空（台账被改坏 → 面板空态而非渲染错行）', () => {
-    expect(parseMotionLedger('| nope | 表 |\n|---|---|\n| a | b |')).toEqual({ rows: [], badRows: [] })
+    expect(parseMotionLedger('| nope | 表 |\n|---|---|\n| a | b |')).toEqual({ rows: [], badRows: [], headerOk: false })
   })
 
   // 负例留证 2026-11-17：冷树（3 个 live 用例 skip）时该 false 分支无人覆盖、ledger 分支掉到 94.11%（BUG-204）；补本用例后冷/暖同形。
@@ -37,6 +37,7 @@ describe('parseMotionLedger', () => {
     expect(parseMotionLedger(text)).toEqual({
       rows: [{ slug: 'a', date: '2026-10-13', kind: 'decision', roles: 'CEO', wallClock: '1h', final: '✅', summary: '结论' }],
       badRows: [],
+      headerOk: true,
     })
   })
 
@@ -111,5 +112,25 @@ describe('ledgerStats', () => {
       '| c | 2026-09-26 | qa | CFO | — | — | 结论三 |',
     ].join('\n'))
     expect(ledgerStats(rows)).toEqual({ total: 3, finals: 2, untimed: 2 })
+  })
+})
+
+// 表头 mismatch 不是「台账空」（BUG-311）：出现过表行却一个表头都没认出来 ⇒ headerOk=false，
+// 面板据此说「表头不符」，而不是显示「共 0 场」。
+describe('parseMotionLedger：表头诊断', () => {
+  it('表头写错一个词 ⇒ headerOk=false（不是静默 0 行）', () => {
+    const text = [
+      '| slug | date | type | 参与方 | wallClock | deliverable | summary |',
+      '|---|---|---|---|---|---|---|',
+      '| a | 2026-11-22 | decision | CEO | 1h | ✅ | 结论一 |',
+    ].join('\n')
+    const parsed = parseMotionLedger(text)
+    expect(parsed.headerOk).toBe(false)
+    expect(parsed.rows).toEqual([])
+  })
+
+  it('空文件/纯文本 ⇒ headerOk=true（没有表行就不算表头错）', () => {
+    expect(parseMotionLedger('').headerOk).toBe(true)
+    expect(parseMotionLedger('# 台账\n\n正文\n').headerOk).toBe(true)
   })
 })

@@ -81,7 +81,7 @@ describe('filterCatalog / formatGeneratedAt', () => {
 describe('DeliverablesView（空态）', () => {
   it('空目录明确说“还没有成品”，不指维护者工具', () => {
     const html = renderToStaticMarkup(createElement(DeliverablesView, {
-      catalog: { schema: 1, generatedAt: '', entries: [] },
+      catalog: { schema: 1, generatedAt: '', entries: [], skipped: 0 },
       sessionId: 'session-empty' as never,
       openFinal: () => {},
     }))
@@ -213,5 +213,28 @@ describe('DeliverablesTab：截断文案', () => {
   })
   it('完整但解析失败 ⇒ badShape', () => {
     expect(catalog({ status: 'ready', truncated: false })).toEqual({ key: 'deliverables.badShape' })
+  })
+})
+
+// 坏条目必须可见（BUG-310）：5 条只渲染 2 条、面板什么都不说，等于把审计视图当完整。
+describe('DeliverablesView：坏条目提示', () => {
+  it('skipped > 0 ⇒ 出「形状不对已被跳过」提示', () => {
+    const catalog = parseCatalog(JSON.stringify({
+      schema: 1,
+      generatedAt: '2026-11-22T00:00:00.000Z',
+      entries: [
+        { slug: 'ok-1', path: 'deliverables/ok-1/final.md', kickoff: '2026-11-22', root: RUN_BUNDLE_PATHS.deliverables },
+        { slug: '', path: 'x', kickoff: '2026-11-22' },
+        null,
+        { slug: 'ok-2', path: 'deliverables/ok-2/final.md', kickoff: '2026-11-22', root: RUN_BUNDLE_PATHS.deliverables },
+      ],
+    }))
+    expect(catalog?.entries).toHaveLength(2)
+    expect(catalog?.skipped).toBe(2)
+    const html = renderToStaticMarkup(createElement(DeliverablesView, {
+      catalog: catalog!, sessionId: 'session-1' as never, openFinal: () => {},
+    }))
+    expect(html).toContain('已被跳过')
+    expect(html).toContain('2')
   })
 })
