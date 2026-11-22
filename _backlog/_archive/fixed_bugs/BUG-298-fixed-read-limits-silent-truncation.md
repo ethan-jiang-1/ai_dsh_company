@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-298：固定行数读上限静默截断——台账少报 64 场、长记录少报几十行、大索引被误判「形状不符」
 
-> 严重级别：P2（次要偏重：三个读面都是给人下判断的材料；截断后仍以「完整」口吻显示，会让人基于半个文件做决定）｜发现：2026-11-22（E2E 第二轮）｜状态：调查中
+> 严重级别：P2（次要偏重：三个读面都是给人下判断的材料；截断后仍以「完整」口吻显示，会让人基于半个文件做决定）｜发现：2026-11-22（E2E 第二轮）｜状态：已修｜审查：agent — 逐条核对已修判定（三夹具边界 spec + 真页面三条原话）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找，别管那边怎么修」）。
+> **留痕**：commit cb15f92c（client 读面契约 + 三个面板文案，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -128,3 +128,11 @@ PY
 - 2050 行记录 → 面板要么读到末尾，要么明确「只加载了前 N 行」且 `bodyTruncated` 为 true；
 - 2087 行合法索引 → 要么完整渲染，要么明确「索引过大，未完整读取」；不能再报「形状不符」；
 - 三条边界 spec（limit±1）与真页面复核均绿。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/cultivation/cultivation-data.ts`、`packages/company-pack/src/client/data/workspace-text.ts`、`packages/company-pack/src/client/data/read-limits.ts`、`packages/company-pack/src/client/tabs/LedgerTab.tsx`、`packages/company-pack/src/client/tabs/DeliverablesTab.tsx`、`packages/company-pack/src/client/startup/startup-load.ts`、`tests/client/data/workspace-read-limits.spec.ts`
+- 红：`vitest run tests/client/data/workspace-read-limits.spec.ts` —— 读面拿掉 `eof`（改回裸 string）后，limit-1 档位断言失败（截断被当完整）；同窗口三个面板原话：台账「共 236 场」无声、索引「形状不符」、记录 `bodyTruncated=false`
+- 绿：`vitest run tests/client/data/workspace-read-limits.spec.ts` —— 4/4（limit-1 ⇒ eof=false、limit/limit+1 ⇒ eof=true、失败带原因）；真页面三条（隔离 workspace 夹具）：
+  台账「只读取了前 240 行（文件更长）——下面的统计与清单都不完整」／索引「成品索引超出读取上限（只读到前 2000 行）——不是形状问题」／记录「正文只加载了摘要，可能不完整；完整原文在 …」
+- 提交：commit cb15f92c

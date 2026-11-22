@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-298**（2026-11-22，E2E 第二轮 / P2）：固定读上限静默截断——
+  [298](BUG-298-fixed-read-limits-silent-truncation.md) 读面只带回内容、丢掉 `eof`，三处消费方各自猜
+  「读完没」：台账少 64 场、长记录当全文、大索引报「形状不符」；现在读面返回 `{text,eof}`，上限收进
+  `data/read-limits.ts`，三个面板各自说真话。证据提交 `cb15f92c`。
+
 - **BUG-294 / BUG-295**（2026-11-22，E2E 设计轮 / P2×2）：空态与摘要各自说假话——
   [294](BUG-294-cultivation-no-pending-lies-about-empty-workspace.md) 四态矩阵第四格（有记录但零待办）；
   [295](BUG-295-attention-item-unbounded-approval-reason.md) `attentionSummary` 折叠外部长文本、

@@ -94,7 +94,8 @@ describe('records 摘要全扫 + open/最近 N 全文（2026-10-27 R1）', () =>
 
 // 截断 ≠ 全文：`readRecord` 的 eof=false 必须让记录保持 bodyTruncated=true，
 // 面板才会说「只加载了前 N 行」；此前 eof 被丢、bodyTruncated 被无条件写 false。
-describe('record 截断', () => {
+// 负例留证 2026-11-22：把 readRecord 的 bodyTruncated 写回 false 后 `vitest run tests/client/cultivation/cultivation-data.spec.ts` 1 failed；改回 !eof 后 5/5 绿。BUG-298
+describe('record 截断（BUG-298）', () => {
   it('eof=false ⇒ 该记录 bodyTruncated 保持 true（不当全文）', async () => {
     const head = '---\nkind: correction\ntargetRole: ceo\nproposerRole: ceo\nproposerKind: human\nsource: test\nexpectation: e\nstatus: open\n---\n\nbody\n'
     const files = {

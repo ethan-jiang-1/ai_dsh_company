@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-298-fixed-read-limits-silent-truncation.md](fixed_bugs/BUG-298-fixed-read-limits-silent-truncation.md) — 固定行数读上限静默截断（台账/记录/索引）；读面返回 `{text,eof}`，三个面板各自说「不完整/超上限/只加载了摘要」。
 - [BUG-294-cultivation-no-pending-lies-about-empty-workspace.md](fixed_bugs/BUG-294-cultivation-no-pending-lies-about-empty-workspace.md) — 有记录但零待办被说成「工作区还没有培养记录」；四态矩阵第四格给新文案。
 - [BUG-295-attention-item-unbounded-approval-reason.md](fixed_bugs/BUG-295-attention-item-unbounded-approval-reason.md) — 待办把整段审批理由当摘要；`attentionSummary` 折叠 + 全文留 `detail`，活体与历史同源。
 - [BUG-296-real-page-lanes-stale-client-bundle.md](fixed_bugs/BUG-296-real-page-lanes-stale-client-bundle.md) — 真页面车道只查产物存在、不查新鲜，旧字节报绿藏住了 293；构建指纹 + 三条车道启动前比对（stale → EXIT=2）。

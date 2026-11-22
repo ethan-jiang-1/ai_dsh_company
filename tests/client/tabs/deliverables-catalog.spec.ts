@@ -186,7 +186,8 @@ describe('sessionFileAddress', () => {
 
 // 截断 ≠ 坏形状：2087 行的合法索引被 2000 行上限截断后，不能再报「形状不符」——
 // 那会让人以为文件坏了、等 host 重建，而重建也解决不了。判定顺序本身是判据。
-describe('catalogProblemOf：错误判定的顺序', () => {
+// 负例留证 2026-11-22：把 catalogProblemOf 的 truncated 分支去掉（截断落到 badShape）后 `vitest run tests/client/tabs/deliverables-catalog.spec.ts` 1 failed；还原后 21/21 绿。BUG-298
+describe('catalogProblemOf：错误判定的顺序（BUG-298）', () => {
   it('截断 ⇒ too-large（即使解析也失败）', () => {
     expect(catalogProblemOf({ status: 'ready', truncated: true }, null)).toEqual({ key: 'deliverables.tooLarge', params: { limit: 2000 } })
   })

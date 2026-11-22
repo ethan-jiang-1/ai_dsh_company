@@ -26,7 +26,8 @@ function remote(lines: readonly string[], over: { fail?: boolean } = {}): Remote
 
 const lines = Array.from({ length: 10 }, (_, i) => `line-${String(i + 1)}`)
 
-describe('makeWorkspaceTextReader：截断与完整可区分', () => {
+// 负例留证 2026-11-22：把 makeWorkspaceTextReader 改回「只返回 text」后 `vitest run tests/client/data/workspace-read-limits.spec.ts` 失败（eof 无法区分，limit-1 档把截断当完整）；还原后 4/4 绿。BUG-298
+describe('makeWorkspaceTextReader：截断与完整可区分（BUG-298）', () => {
   it('limit-1 行 ⇒ eof=false（截断，消费方必须说「只读了前 N 行」）', async () => {
     const read = makeWorkspaceTextReader(remote(lines), id => id)('kb/x.md', 9)
     const result = await read('s1' as never, new AbortController().signal)
