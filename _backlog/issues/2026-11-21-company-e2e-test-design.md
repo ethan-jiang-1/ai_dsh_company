@@ -103,6 +103,22 @@ opened: 2026-11-21
 
 第三轮跑绿：策略正常设值/刷新/重置；培养创作（空校验 + 跨角色建议落盘）、采纳/拒绝/撤回/验证（通过）、建议路由、journal 不可达；成品归档筛选/打开、unicode+空格路径；台账正常/截断提示；团队任务板/看板/依赖图/在场/用量（3 任务 + 依赖链）；待办身份去重（修后两条同摘要不再塌）；en 页签主体。仍红：301–306。目标 5–6 个，本轮 6 个。
 
+## 2026-11-22 第四轮（goal：8–10 个）
+
+并行进程收掉 301–306 后，本轮把主视图/对话面板/表单形状/解析边界/折叠计数补了一遍，新立 9 张（307–315）：
+
+- [BUG-307](../bugs/BUG-307-cultivation-mine-cap-control-combined.md)：两个子列表各折 5 条、控件按合并总数——4+4 全显示仍挂「显示全部」。
+- [BUG-308](../bugs/BUG-308-cultivation-chat-panel-i18n-leaks.md)：培养对话面板 en 中文提示、zh 英文 `session:`。
+- [BUG-309](../bugs/BUG-309-cultivation-self-record-listed-twice.md)：self rejected 在「我提交的」列两次。
+- [BUG-310](../bugs/BUG-310-deliverables-index-silent-entry-drop.md)：成品索引坏 entry 静默丢。
+- [BUG-311](../bugs/BUG-311-ledger-header-mismatch-silent-empty.md)：台账表头 typo → 共 0 场无提示。
+- [BUG-312](../bugs/BUG-312-attention-question-duplicate-key.md)：同文 question 撞 React key。
+- [BUG-313](../bugs/BUG-313-startup-options-bad-shape-silent-empty.md)：options 字段类型坏冒充「没有可选项」。
+- [BUG-314](../bugs/BUG-314-startup-settings-bad-shape-silent-auto.md)：settings 字段类型坏冒充 auto。
+- [BUG-315](../bugs/BUG-315-cultivation-full-view-min-widths-ignored.md)：768 主视图左板/右栏压到 210/176，声明下限未生效。
+
+第四轮跑绿：策略正常、培养创作/采纳/拒绝/撤回/验证、成品归档/筛选/打开/unicode 路径、台账正常/截断/坏行（303 修后）、团队任务板/看板/依赖图/在场/用量、待办身份去重、en 主体。仍红：307–315。目标 8–10，本轮 9。
+
 ## 输掉的方案
 
 - **只靠 exploratory 继续人肉点**：本轮 4 个缺陷里 2 个是「单测绿 + 页签能开」的假绿，人肉不点进那个状态就漏；且不可复跑。

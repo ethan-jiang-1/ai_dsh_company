@@ -2,13 +2,15 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 307；已分配 BUG-001..306。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 316；已分配 BUG-001..315。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**。
+**活跃 9 张**：[BUG-307](BUG-307-cultivation-mine-cap-control-combined.md)（「我提交的」折叠控件按合并总数，4+4 全显示仍有控件，P2）· [BUG-308](BUG-308-cultivation-chat-panel-i18n-leaks.md)（培养对话面板 en 中文提示 / zh 英文 `session:`，P2）· [BUG-309](BUG-309-cultivation-self-record-listed-twice.md)（self rejected 在「我提交的」列两次，P2）· [BUG-310](BUG-310-deliverables-index-silent-entry-drop.md)（成品索引坏 entry 静默丢，P2）· [BUG-311](BUG-311-ledger-header-mismatch-silent-empty.md)（台账表头 typo → 共 0 场无提示，P2）· [BUG-312](BUG-312-attention-question-duplicate-key.md)（同文 question 撞 React key，P2）· [BUG-313](BUG-313-startup-options-bad-shape-silent-empty.md)（options 字段类型坏冒充「无内容」，P2）· [BUG-314](BUG-314-startup-settings-bad-shape-silent-auto.md)（settings 字段类型坏冒充 auto，P2）· [BUG-315](BUG-315-cultivation-full-view-min-widths-ignored.md)（768 主视图压到 210/176，P2）。
+
+**2026-11-22 E2E 第四轮（目标 8–10，只立卡不修）**：并行进程收掉 301–306 后，本轮补主视图/对话面板/表单形状/解析边界/折叠计数五组，立 307–315 九张，均 `status: 调查中`。三组根因：声明约束没有唯一消费点（307/315）、表达层/投影箱重复（308/309/312）、宽松解析吞坏形状（310/311/313/314）。不碰修复进程代码，也不在同一 diff 修产品。
 
 **2026-11-22 E2E 第三轮（只立卡不修）**：293–300 已由并行修复进程处理；本轮继续在隔离实例上找 6 个，立 301–306（301–305 为缺口，306 为死上限），均 `status: 调查中`。四组根因：策略输入重置语义（301）、表达层 helper 未本地化（302）、读/解析/分页的静默缺口（303/304/305）、声明上限未接（306）。不碰修复进程的代码，也不在同一 diff 修产品。
 
