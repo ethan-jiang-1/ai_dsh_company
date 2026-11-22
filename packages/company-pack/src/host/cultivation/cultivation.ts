@@ -23,7 +23,7 @@
  * 隔离/命令 wiring/跨会话生效）= `probes/session-context/cultivation-method-layer-probe.mjs`（不随包分发）。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { blockedCompanyText } from '../commands/blocked-text.ts'
+import { blockedCompanyText, blockedCompanyTextPair } from '../commands/blocked-text.ts'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：ctx.commands 的 Context 增强（服务本体由 base bundle 挂载，vendor patch 钉行）。
 import type {} from '@deepseek-ai/dsh-commands'
@@ -200,7 +200,8 @@ function cultivationCommandHandlerInner(config: CultivationHostConfig, storage: 
       return { kind: 'error' as const, text: t('培养命令需要公司角色会话（当前会话不是公司角色 preset，或 cwd 缺席）。', 'Cultivation commands need a company-role session (this session is not a company-role preset, or its cwd is missing).') }
     }
     if (dataBlocked) {
-      return { kind: 'error' as const, text: blockedCompanyText(blockedReason, '培养') }
+      const paused = blockedCompanyTextPair(blockedReason, '培养', 'cultivating')
+      return { kind: 'error' as const, text: t(paused.zh, paused.en) }
     }
     const scope = companyScopeOf(face, companyHome)
     if (scope.problem !== undefined) return { kind: 'error' as const, text: scope.problem }
@@ -270,7 +271,8 @@ function cultivationCommandHandler(config: CultivationHostConfig, storage: Culti
         return { kind: 'error', text: t(`培养记录目录不是安全目录（文件/symlink）：${error.message}；请修复后重试。`, `The cultivation records directory is not a safe directory (file/symlink): ${error.message}; fix it and retry.`) }
       }
       if (error instanceof CompanyWriteBlockedError) {
-        return { kind: 'error', text: error.message }
+        // en 下给「停写」这句的英文（reason 原文原样附上，不伪造翻译，BUG-326）。
+        return { kind: 'error', text: t(error.message, error.messageEn) }
       }
       throw error
     }
@@ -393,7 +395,7 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
     }
     records = loaded.records
   } catch (error) {
-    if (error instanceof UnsafeCultivationPathError) return { kind: 'error', text: error.message }
+    if (error instanceof UnsafeCultivationPathError) return { kind: 'error', text: t(error.message, error.messageEn) }
     throw error
   }
   const revokedAt = new Date().toISOString()
@@ -454,7 +456,7 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
   } catch (error) {
     const failed = rollback()
     const note = rollbackNoteFailed(failed)
-    if (error instanceof UnsafeCultivationPathError) return { kind: 'error', text: error.message }
+    if (error instanceof UnsafeCultivationPathError) return { kind: 'error', text: t(error.message, error.messageEn) }
     return {
       kind: 'error',
       text: t(`撤回 ${slug} 失败（${(error as Error).message}）；${note.zh}。`, `Revoke of ${slug} failed (${(error as Error).message}); ${note.en}.`),
@@ -509,7 +511,7 @@ function commandAdopt(command: CultivationCommandContext, tokens: readonly strin
       try {
         installed = storage.installMethod(config.cultivationRoot, record.targetRole, slug, methodSkillText({ slug, expectation: record.expectation, body: proposalBody }))
       } catch (error) {
-        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: t(error.message, error.messageEn) }
         throw error
       }
       if (!installed) return { kind: 'error' as const, text: t(`方法 ${slug} 已存在，未覆盖任何文件或记录。`, `Method ${slug} already exists; no file or record was overwritten.`) }
@@ -632,7 +634,7 @@ function commandPurge(command: CultivationCommandContext, tokens: readonly strin
       try {
         result = storage.purgeArchive(archiveDir, Date.now() - days * 86_400_000)
       } catch (error) {
-        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: t(error.message, error.messageEn) }
         throw error
       }
       return {
@@ -663,7 +665,7 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
         try {
           if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) missing.push(`${record.id}（缺方法 ${slug}）`)
         } catch (error) {
-          if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+          if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: t(error.message, error.messageEn) }
           missing.push(`${record.id}（读方法 ${slug} 失败：${(error as Error).message}）`)
         }
       }
@@ -671,7 +673,7 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
       try {
         orphans = storage.listMethods(config.cultivationRoot, face.role).filter(slug => !adoptedSlugs.has(slug))
       } catch (error) {
-        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
+        if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: t(error.message, error.messageEn) }
         throw error
       }
       const brokenNote = loaded.broken > 0 ? `；另有 ${String(loaded.broken)} 条坏记录未计入` : ''
@@ -819,8 +821,16 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
   // ── /cultivation 命令族（V4/V8：人专用直控面，不经模型）─────────────────────
   ctx.commands.register({
     name: 'cultivation',
-    description: '培养回路：给自己的角色提交纠正、给别的角色提建议、采纳/拒绝/验证/撤回方法（采纳仅目标角色本人）',
-    input: { hint: 'correct <期望行为> :: <做法与证据> | suggest <角色> <期望行为> :: <建议> | adopt <id> [as <slug>] | reject <id> :: <理由> | verify <id> <pass|fail> :: <后续相似工作的具体依据> | revoke <slug>' },
+    description: t(
+      '培养回路：给自己的角色提交纠正、给别的角色提建议、采纳/拒绝/验证/撤回方法（采纳仅目标角色本人）',
+      'Cultivation loop: submit corrections for your own role, suggestions for other roles, and adopt/reject/verify/revoke methods (adoption is the target role owner\'s alone)',
+    ),
+    input: {
+      hint: t(
+        'correct <期望行为> :: <做法与证据> | suggest <角色> <期望行为> :: <建议> | adopt <id> [as <slug>] | reject <id> :: <理由> | verify <id> <pass|fail> :: <后续相似工作的具体依据> | revoke <slug>',
+        'correct <expected behavior> :: <method and evidence> | suggest <role> <expected behavior> :: <suggestion> | adopt <id> [as <slug>] | reject <id> :: <reason> | verify <id> <pass|fail> :: <evidence from later similar work> | revoke <slug>',
+      ),
+    },
     handler: cultivationCommandHandler(config, storage, ctx, t, companyHome, dataBlocked, blockedReason, roleLabel, resultLabel),
   })
 }

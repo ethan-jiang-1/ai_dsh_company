@@ -23,6 +23,8 @@ export function cultivationRegistrations(
   text?: (zh: string, en: string) => string,
 ): {
   readonly command: CommandDefinition['handler']
+  /** 注册的命令定义（description/hint 在这里；BUG-326 的判据要用）。 */
+  readonly definition: CommandDefinition | undefined
   readonly proposal: RegisteredCultivationTool
 } {
   const commands: CommandDefinition[] = []
@@ -35,9 +37,10 @@ export function cultivationRegistrations(
   registerCultivation(ctx as Parameters<typeof registerCultivation>[0], config, companyHome, false, undefined, roleLabel, undefined, text)
   const command = commands.find(definition => definition.name === 'cultivation')
   const proposal = tools.find(definition => definition.name === 'cultivation_propose')
+  const definition = commands.find(definition => definition.name === 'cultivation')
   if (command === undefined) throw new Error('registerCultivation 没有注册 /cultivation')
   if (proposal === undefined) throw new Error('registerCultivation 没有注册 cultivation_propose')
-  return { command: command.handler, proposal }
+  return { command: command.handler, definition: command, proposal }
 }
 
 /** 临时培养盘只属于当前用例，vitest fork 并发执行时互不共用路径。 */

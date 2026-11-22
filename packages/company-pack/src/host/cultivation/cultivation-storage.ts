@@ -63,9 +63,12 @@ export function newRecordId(now = new Date()): string {
 }
 
 export class UnsafeCultivationPathError extends Error {
+  /** 英文原话（命令面按 locale 选，BUG-326）。 */
+  readonly messageEn: string
   constructor(path: string) {
     super(`拒绝不安全的培养路径：${path}`)
     this.name = 'UnsafeCultivationPathError'
+    this.messageEn = `Refusing an unsafe cultivation path: ${path}`
   }
 }
 

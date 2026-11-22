@@ -455,3 +455,33 @@ describe('/cultivation 回执的语言（BUG-316）', () => {
     })
   })
 })
+
+// 命令元数据与内部错误也要随语言（BUG-326）：description/hint、dataBlocked、两类错误。
+describe('/cultivation 元数据与内部错误的语言', () => {
+  const cjk = /[\u4e00-\u9fff]/
+
+  it('en 选择器 ⇒ 命令 description/hint 无中文，zh 选择器 ⇒ 有中文', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const en = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace, undefined, undefined, undefined, (_zh, enText) => enText)
+      expect(String(en.definition?.description ?? '')).not.toMatch(cjk)
+      expect(String(en.definition?.input?.hint ?? '')).not.toMatch(cjk)
+      const zh = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)
+      expect(String(zh.definition?.description ?? '')).toMatch(cjk)
+    })
+  })
+
+  it('UnsafeCultivationPathError 在 en 下出英文原话，不伪造翻译', async () => {
+    const { UnsafeCultivationPathError } = await import('../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts')
+    const error = new UnsafeCultivationPathError('../evil')
+    expect(error.message).toMatch(cjk)
+    expect(error.messageEn).not.toMatch(cjk)
+    expect(error.messageEn).toContain('../evil')
+  })
+
+  it('CompanyWriteBlockedError 在 en 下说「停写」这句英文（reason 原文不动）', async () => {
+    const { CompanyWriteBlockedError } = await import('../../../packages/company-pack/src/host/run-bundle/write-gate.ts')
+    const error = new CompanyWriteBlockedError('没有 workspace')
+    expect(error.messageEn).not.toMatch(cjk)
+    expect(error.messageEn).toContain('writes are paused')
+  })
+})

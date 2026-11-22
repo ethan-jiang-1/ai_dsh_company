@@ -9,9 +9,15 @@ let blockedReason: string | null = null
 
 /** 公司盘写被拒绝的 typed error。 */
 export class CompanyWriteBlockedError extends Error {
-  constructor(reason: string) {
+  /**
+   * 英文原话：**不翻译 reason 本身**（那是运行前提的原话，可能是中文），
+   * 只保证「停写」这句在 en 下说得对（BUG-326 的边界：不伪造翻译）。
+   */
+  readonly messageEn: string
+  constructor(reason: string, reasonEn?: string) {
     super(reason)
     this.name = 'CompanyWriteBlockedError'
+    this.messageEn = reasonEn ?? 'Company data writes are paused; resolve the runtime preconditions and retry.'
   }
 }
 
