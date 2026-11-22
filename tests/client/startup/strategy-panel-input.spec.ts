@@ -54,7 +54,8 @@ const wikiInput = (host: HTMLElement): HTMLInputElement => {
   return input as HTMLInputElement
 }
 
-describe('策略 wiki 输入：受控', () => {
+// 负例留证 2026-11-22：把输入换回 defaultValue（非受控）后 `vitest run tests/client/startup/strategy-panel-input.spec.ts` 1 failed（重置后仍显示旧值）；还原后 3/3 绿。BUG-301
+describe('策略 wiki 输入：受控（BUG-301）', () => {
   it('store 重置为 null 后输入框清空（不是还留着旧值）', async () => {
     const store = createStartupStore({ loaded: true, settings: { ...EMPTY_STARTUP_SETTINGS, wiki: 'wiki' }, options: EMPTY_STARTUP_OPTIONS })
     const host = await mountWith(store, async () => ({ ok: true }))

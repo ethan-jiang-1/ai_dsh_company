@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-301**（2026-11-22，E2E 第三轮 / P2）：策略 wiki 输入非受控——
+  [301](BUG-301-strategy-wiki-input-stale-after-reset.md) 改受控 + 外部值变化同步；与 store 相同的值失焦不写回。
+  证据提交 `40be5b63`。
+
 - **BUG-302**（2026-11-22，E2E 第三轮 / P2）：en 界面混中文时间与原因——
   [302](BUG-302-english-ui-chinese-time-and-reason.md) `timeParts` 只产出结构、`cultivationTimeLabel` 按语言渲染，
   `listDir` 失败给代号 `dir-denied`；判据 = en 渲染无 CJK（`[\u4e00-\u9fff]` 不命中）。证据提交 `c2899fd4`。

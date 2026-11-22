@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-301：策略面板的 wiki 输入框是非受控的——「恢复自动」后仍显示旧值，点一下再失焦又把旧值写回去
 
-> 严重级别：P2（次要偏重：重置看起来生效、盘上也确实清空，但输入框显示旧指针；用户再点一下输入框（哪怕不改字）失焦，旧值会被重新保存）｜发现：2026-11-22（E2E 第三轮）｜状态：调查中
+> 严重级别：P2（次要偏重：重置看起来生效、盘上也确实清空，但输入框显示旧指针；用户再点一下输入框（哪怕不改字）失焦，旧值会被重新保存）｜发现：2026-11-22（E2E 第三轮）｜状态：已修｜审查：agent — 逐条核对已修判定（重置清空 / 同值失焦零写入 / 改字写入）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 5–6 个，别管那边怎么修」）。
+> **留痕**：commit 40be5b63（client 公开交互 + 会写盘的 bug，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -77,3 +77,10 @@ after stale-input blur: {"wiki":"wiki"} input=wiki
 - 重置后点输入框再失焦：不再写回旧值；
 - 外部 reload 使 row.value 变化时，输入框显示当前值而不是上次的 DOM 值；
 - keyless 两态 + 真页面复核各绿。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/startup/StrategyPanel.tsx`（wiki 输入改受控 + 外部值同步）、`tests/client/startup/strategy-panel-input.spec.ts`（新）
+- 红：`vitest run tests/client/startup/strategy-panel-input.spec.ts` —— 换回 `defaultValue`（非受控）后「store 重置为 null 后输入框清空」失败（输入框仍 `wiki`）；同条件「同值失焦不写回」在旧实现里会把 `wiki` 写回
+- 绿：`vitest run tests/client/startup/strategy-panel-input.spec.ts` —— 3/3（重置后清空、同值失焦零写入、改字失焦写入 `wiki`）
+- 提交：commit 40be5b63
