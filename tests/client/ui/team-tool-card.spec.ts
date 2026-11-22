@@ -112,7 +112,8 @@ describe('TEAM_TOOL_KEYS 与 vendor 工具注册名同源（防漂移）', () =>
 })
 
 // 依赖清单的分隔符随语言（BUG-329）：令牌参数只带 id 数组，渲染处按语言拼「、」/", "。
-describe('团队工具卡 · 依赖分隔符', () => {
+// 负例留证 2026-11-26：把分隔符预拼进令牌参数后本用例 failure（中文顿号进 en 模板）。BUG-329
+describe('团队工具卡 · 依赖分隔符（BUG-329）', () => {
   it('team_task_create 带 blocked_by ⇒ 模型给出 blockIds（不预拼分隔符）', () => {
     const model = teamCardModel('team_task_create', { argsRaw: JSON.stringify({ subject: '任务', blocked_by: ['t1', 't2'] }) } as never)
     expect(model.blockIds).toEqual(['t1', 't2'])

@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-329-cultivation-en-list-delimiters-chinese.md](fixed_bugs/BUG-329-cultivation-en-list-delimiters-chinese.md) — en 列表分隔符「、」；`listSeparator`/`joinList` 单点取，令牌参数不预拼。
 - [BUG-326-cultivation-command-description-inner-errors-chinese.md](fixed_bugs/BUG-326-cultivation-command-description-inner-errors-chinese.md) — 命令元数据与内部错误仍中文；description/hint/停写/两类错误走 `t`（不伪造 reason 翻译）。
 - [BUG-325-attention-question-live-history-id-mismatch.md](fixed_bugs/BUG-325-attention-question-live-history-id-mismatch.md) — 问询 live/history 两套 id；跨源按内容去重、源内按 id。
 - [BUG-331-attention-multi-question-request-only-first.md](fixed_bugs/BUG-331-attention-multi-question-request-only-first.md) — 多问题只显第一个；摘要带「共 N 个问题」、detail 列全部。

@@ -15,7 +15,8 @@ const tOf = (dict: Record<CompanyKey, string>): CompanyT =>
     return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
   }) as CompanyT
 
-describe('listSeparator / joinList', () => {
+// 负例留证 2026-11-26：把 listSeparator 写死成「、」后 `vitest run tests/client/ui/list-separator.spec.ts` 1 failed（en 出现顿号）。BUG-329
+describe('listSeparator / joinList（BUG-329）', () => {
   it('zh 用顿号、en 用逗号', () => {
     expect(listSeparator(tOf(zh))).toBe('、')
     expect(listSeparator(tOf(en))).toBe(', ')

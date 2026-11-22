@@ -143,7 +143,7 @@ opened: 2026-11-21
 - [BUG-326](../_archive/fixed_bugs/BUG-326-cultivation-command-description-inner-errors-chinese.md)：316 后 command description/hint、dataBlocked、内部路径错误仍中文。
 - [BUG-327](../_archive/fixed_bugs/BUG-327-attention-current-approval-cap-still-silent.md)：320 只接历史会话的 capped，当前会话自己的 `.capped` 仍丢。
 - [BUG-328](../_archive/fixed_bugs/BUG-328-attention-empty-state-ignores-boundaries.md)：候选/窗口/工作区边界提示不压空态。
-- [BUG-329](../bugs/BUG-329-cultivation-en-list-delimiters-chinese.md)：en 列表分隔符仍是「、」。
+- [BUG-329](../_archive/fixed_bugs/BUG-329-cultivation-en-list-delimiters-chinese.md)：en 列表分隔符仍是「、」。
 - [BUG-330](../_archive/fixed_bugs/BUG-330-attention-question-copy-and-cap-still-approval-only.md)：question 已进待办，capped/文案仍只写审批。
 - [BUG-331](../_archive/fixed_bugs/BUG-331-attention-multi-question-request-only-first.md)：多问题请求只显示第一个。
 - [BUG-332](../_archive/fixed_bugs/BUG-332-attention-exact-800-window-false-positive.md)：恰好 800 条也报窗口截断。

@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-23
 ---
 
 # BUG-329：en 列表分隔符仍是中文「、」——任务成员/依赖/坏记录 id 全串成 `a、b`
 
-> 严重级别：P2（表达层：单个分隔符不致命，但 en 面板四处出现中文标点，且 `、` 在英文排版里不是合法逗号）｜发现：2026-11-23（E2E 第六轮）｜状态：调查中
+> 严重级别：P2（表达层：单个分隔符不致命，但 en 面板四处出现中文标点，且 `、` 在英文排版里不是合法逗号）｜发现：2026-11-23（E2E 第六轮）｜状态：已修｜审查：agent — 逐条核对已修判定（zh/en 两侧 + 令牌参数不预拼 + 培养面独立）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-23 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit 2e65049c（client 表达层，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -64,3 +64,10 @@ en 实例里，列表把多个 id/成员拼成中文顿号：
 - zh 保持顿号；
 - 单元素/空列表不回归；
 - 纯函数 spec + en 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/ui/list-separator.ts`（新：`listSeparator` / `joinList`）、`packages/company-pack/src/client/locales.ts`（`ui.listSeparator` zh「、」/ en `", "`）、`company-panels.tsx`、`TasksPanel.tsx`、`TeamToolCard.tsx`（令牌参数只带 id 数组，渲染处拼）、`CultivationInbox.tsx` + `cultivation-actions.ts`（`cultivationListSeparator`）、`tests/client/ui/{list-separator,team-tool-card}.spec.ts`
+- 红：`vitest run tests/client/ui/list-separator.spec.ts tests/client/ui/team-tool-card.spec.ts` —— 把 `listSeparator` 写死成「、」后 en 侧断言失败（en 出现中文顿号）
+- 绿：`vitest run tests/client/ui/list-separator.spec.ts tests/client/ui/team-tool-card.spec.ts` —— 3/3 + 12/12（zh「、」/ en `", "`；joinList 过滤空项；令牌参数里不预拼顿号）
+- 提交：commit 2e65049c

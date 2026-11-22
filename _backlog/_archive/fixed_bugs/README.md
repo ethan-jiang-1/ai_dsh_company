@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-329**（2026-11-23，E2E 第六轮 / P2）：en 列表分隔符仍是顿号——
+  [329](BUG-329-cultivation-en-list-delimiters-chinese.md) `ui/list-separator.ts` 单点取分隔符（zh「、」/ en ", "），
+  团队工具卡的令牌参数只带 id 数组。证据提交 `2e65049c`。
+
 - **BUG-326**（2026-11-23，E2E 第六轮 / P2）：命令元数据与内部错误不随语言——
   [326](BUG-326-cultivation-command-description-inner-errors-chinese.md) description/hint、`blockedCompanyTextPair`、
   两类错误的 `messageEn`（reason 原文保留，不伪造翻译）。证据提交 `6964b619`。
