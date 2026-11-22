@@ -20,7 +20,28 @@
 
 **已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
-**本轮批次**：下方「## 2026-11-22 修复交接（E2E 设计轮遗留：BUG-293/294/295/296）
+**本轮批次**：下方「## 2026-11-22 修复交接（E2E 第二轮：BUG-297/298/299/300）
+
+**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：四张都改 client 读面/呈现面与公开文案；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-22））。
+
+**起点事实（已核）**：298 = `readWorkspaceText` 丢弃 vendor 的 `eof`、返回裸 string/null，三处消费方各自猜「读完没」→ 300 行台账显示 236 场、2050 行记录显示 1989 行且 `bodyTruncated` 被写 false、2087 行合法索引报「形状不符」；297 = `loadStartup` 用宽松解析丢弃诊断（`parseStartupSettingsState` 带 `problem` 却全仓 client 未调用），坏 JSON/目录都静默回显 auto；299 = `AttentionItem` 无 id、`mergeAttention` 按 `kind+jumpTo+what`（160 字摘要）去重会吞掉同摘要的不同审批，且 `live.map` 丢了 `detail`（**上一轮 295 引入/放大的回归**）；300 = 培养采纳/拒绝时间直出 ISO。
+
+| 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
+|---|---|---|---|---|
+| **D 读面契约** | [298](BUG-298-fixed-read-limits-silent-truncation.md) → [297](BUG-297-strategy-read-failure-silently-auto.md) | 读取只带回内容、不带状态（`eof`/失败原因），每个消费方自己猜 | `readWorkspaceText` 返回结果态 `{ text, eof, problem }`；消费方显式声明策略：台账「只读了前 N 行」、记录 `bodyTruncated = !eof`、索引「超出上限 ≠ 形状不符」；297 用同一契约区分「缺失 = 合法 auto / 损坏 / 不可读」 | 1 → 2 |
+| **E 静默回退** | （297 见上） | 坏配置折成合法 auto | 接上已有的 `parseStartupSettingsState` + `StartupFace.settingsProblem` + 面板错误行 zh/en | 2 |
+| **F 身份键** | [299](BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md) | 去重键选了摘要而非稳定身份 | `AttentionItem.id` + 按 `id+kind+jumpTo` 去重 + 列表 key 用 id + `detail` 透传；无 id 回落 `kind+jumpTo+time+seq`，**绝不回落摘要** | 3 |
+| **G 人话面** | [300](BUG-300-cultivation-decided-at-raw-iso.md) | 机器时间直出人话面 | `decidedAt` 走 `timeLabel`，ISO 放 `title`，解析失败回落原值 | 4 |
+
+**次序 = 298 → 297 → 299 → 300**：298 定义读面契约，297 直接吃它（否则读失败判定要写两遍）；299 独立但属「静默丢事实」，且是上轮回归，单独一提交补身份键；300 纯文案收尾。
+
+**证据口径**：每卡红→绿同一条可执行命令；先落代码提交拿 sha → 翻 `修复已落地` / 写 `## 修复证据` / 归档。真页面证据必须过构建指纹（`node tools/dev/build-client.mjs`，车道会自拦 stale）。`coverage:ratchet` 只升不降（新分支同 diff 带断言，别用 `??` 造死分支）。**只 `git add <paths>`，永不 `git add -A`**（共享工作区有并行 agent）。`push` 前先 `source run/env.sh`。
+
+**终点** = 4 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡四行证据与 `审查：` 齐；五连 + `coverage:ratchet` 绿；`client-load`/`ui-scene --isolated` 真绿（带指纹）；一篇批次 Note 记 D/E/F/G 与元层教训（读面必须自带状态：291 空≠不可达 → 294 四态 → 298 截断≠完整）。
+
+**本节是立项与交接，不是落地**：只记批次计划与次序。
+
+## 2026-11-22 修复交接（E2E 设计轮遗留：BUG-293/294/295/296）
 
 **用户指令（2026-11-21/22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……是个漫长的计划，所以先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：293/294/295 改 client 公开行为与文案、296 改真页面车道判据；留痕 = 批次 Note [2026-11-22-e2e-round-byte-freshness-state-matrix-summary](../../notes/implemented/2026-11-22-e2e-round-byte-freshness-state-matrix-summary.md)）。
 
