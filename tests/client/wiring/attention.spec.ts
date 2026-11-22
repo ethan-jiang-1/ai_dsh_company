@@ -10,6 +10,7 @@ import {
   attentionTone,
   mergeAttention,
   pendingApprovals,
+  pendingAsks,
   streamAttention,
   type AttentionEventLike,
   type LivePending,
@@ -303,5 +304,75 @@ describe('pendingApprovals：上限与计数（BUG-320）', () => {
 
   it('没超上限 ⇒ capped = 0', () => {
     expect(pendingApprovals([{ type: 'approval/asked', time: 1, data: { id: 'a', toolName: 'bash' } }], 's1').capped).toBe(0)
+  })
+})
+
+// 问询也要能从历史重建（BUG-319）：日志里问询是 ask_user_question 的 tool/call，
+// 答案以同 callId 的 tool/result 落回；没有配对结果的就是「问了没答」。
+describe('pendingAsk/重建问询', () => {
+  const call = (callId: string, question: string, time: number) => ({
+    type: 'tool/call' as const, time, data: { callId, name: 'ask_user_question', arguments: JSON.stringify({ questions: [{ question }] }) },
+  })
+  const result = (callId: string, time: number) => ({ type: 'tool/result' as const, time, data: { callId } })
+
+  it('未答问询 ⇒ 进「等你处理」（刷新后仍在）', () => {
+    const items = pendingAsks([call('c1', '要不要并行两条线？', 1000)], 's-1').items
+    expect(items).toHaveLength(1)
+    expect(items[0]?.kind).toBe('question')
+    expect(items[0]?.what).toContain('并行')
+  })
+
+  it('有配对的 result ⇒ 不出现（答过的不算）', () => {
+    expect(pendingAsks([call('c1', '要不要并行？', 1000), result('c1', 2000)], 's-1').items).toHaveLength(0)
+  })
+
+  it('arguments 坏 / 缺问题 ⇒ 占位文案，仍算挂起（不静默丢）', () => {
+    const broken = [
+      { type: 'tool/call' as const, time: 1, data: { callId: 'c1', name: 'ask_user_question', arguments: '{not json' } },
+      { type: 'tool/call' as const, time: 2, data: { callId: 'c2', name: 'ask_user_question', arguments: JSON.stringify({ questions: [] }) } },
+    ]
+    const items = pendingAsks(broken, 's-1').items
+    expect(items).toHaveLength(2)
+    expect(items[0]?.what).toContain('问询内容缺失')
+  })
+
+  it('审批与问询一起回来，按时间倒序', () => {
+    const events = [
+      { type: 'approval/asked' as const, time: 1000, data: { id: 'a1', toolName: 'request_signoff', reason: 'r' } },
+      call('c1', '问题', 2000),
+    ]
+    const items = pendingAsks(events, 's-1').items
+    expect(items.map(item => item.kind)).toEqual(['question', 'approval'])
+  })
+})
+
+// 问询重建的分支补齐：缺 arguments / 空字符串 / 非字符串、data 为 null、
+// user-questions/answered 口径、带 detail 的正例。少一条就少一个「下次坏这里没人发现」。
+describe('pendingAsks · 形状边角（重建问询）', () => {
+  it('缺 arguments / 空串 / 非字符串 ⇒ 占位；data null 的事件被忽略', () => {
+    const items = pendingAsks([
+      { type: 'tool/call', time: 1, data: { callId: 'a', name: 'ask_user_question' } },
+      { type: 'tool/call', time: 2, data: { callId: 'b', name: 'ask_user_question', arguments: '   ' } },
+      { type: 'tool/call', time: 3, data: { callId: 'c', name: 'ask_user_question', arguments: 42 } },
+      { type: 'tool/call', time: 4, data: null },
+    ] as never, 's-1').items
+    expect(items).toHaveLength(3)
+    expect(items.every(item => (item.what ?? '').includes('问询内容缺失'))).toBe(true)
+  })
+
+  it('正例带 detail（悬停可看全文）', () => {
+    const items = pendingAsks([{
+      type: 'tool/call', time: 1,
+      data: { callId: 'c1', name: 'ask_user_question', arguments: JSON.stringify({ questions: [{ question: '全文在这里' }] }) },
+    }], 's-1').items
+    expect(items[0]?.detail).toBe('全文在这里')
+  })
+
+  it('user-questions/answered 口径同样算「答过」', () => {
+    const items = pendingAsks([
+      { type: 'tool/call', time: 1, data: { callId: 'c1', name: 'ask_user_question', arguments: JSON.stringify({ questions: [{ question: 'q' }] }) } },
+      { type: 'user-questions/answered', time: 2, data: { id: 'c1' } },
+    ] as never, 's-1').items
+    expect(items).toHaveLength(0)
   })
 })

@@ -11,7 +11,7 @@
  */
 import type { SessionAddress, SessionPage, SessionPageRequest } from '@deepseek-ai/dsh-api-session-controller/types'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import { type AttentionEventLike, type AttentionItem, pendingApprovals } from '../../lib/presence/attention.ts'
+import { type AttentionEventLike, type AttentionItem, pendingAsks } from '../../lib/presence/attention.ts'
 
 /** 一页历史的最大条数（只给重建用：多取一点，避免把 asked 切在页外）。 */
 export const HISTORY_PAGE_MESSAGES = 800
@@ -121,8 +121,9 @@ export async function readPendingAcrossSessions(
     try {
       const read = await readSessionEvents(page, sessionId, signal)
       if (read === undefined) return { ok: false }
-      const approvals = pendingApprovals(read.events, sessionId)
-      return { ok: true, items: approvals.items, capped: approvals.capped, truncated: read.windowTruncated }
+      // 审批 + 问询一起重建（BUG-319）：只重建审批会让「等你的事」在刷新后少一半。
+      const asks = pendingAsks(read.events, sessionId)
+      return { ok: true, items: asks.items, capped: asks.capped, truncated: read.windowTruncated }
     } catch {
       return { ok: false }
     }

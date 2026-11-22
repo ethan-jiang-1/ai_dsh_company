@@ -239,3 +239,18 @@ describe('AttentionTab · 审批流被截的信号（BUG-320）', () => {
     expect(host.textContent).toContain('条挂起审批未显示')
   })
 })
+
+// 刷新后问询也要在（BUG-319）：历史重建走 pendingAsks，问询与审批同一套。
+describe('AttentionTab · 问询从历史重建', () => {
+  it('别的会话里未答的问询 ⇒ 出现在「等你处理」', async () => {
+    const byId = { 'session-lead': { id: 'session-lead', cwd: '/ws' }, 'session-x': { id: 'session-x', cwd: '/ws', updatedAt: 1 } }
+    const useSessionsStub = (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown => selector({ byId })
+    const events = [{ type: 'event', event: { type: 'tool/call', seq: 2, time: 1000, data: { callId: 'c1', name: 'ask_user_question', arguments: JSON.stringify({ questions: [{ question: '刷新后还在吗？' }] }) } } }]
+    const pageHistory = vi.fn(async (request: { maxMessages?: number }) => (request.maxMessages === 1
+      ? { ok: true as const, value: { records: [{ type: 'event', event: { type: 'turn/start', seq: 9, time: 1, data: {} } }], hasMore: false } }
+      : { ok: true as const, value: { records: events, hasMore: false } }))
+    const host = await mount(createElement(AttentionTab, props({ pageHistory, useSessions: useSessionsStub })))
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 40)) })
+    expect(host.textContent).toContain('刷新后还在吗')
+  })
+})

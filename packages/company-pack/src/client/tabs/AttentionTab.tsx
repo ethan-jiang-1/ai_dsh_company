@@ -15,15 +15,15 @@ import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import {
+  attentionItemKey,
   attentionTone,
   mergeAttention,
-  pendingApprovals,
+  pendingAsks,
   streamAttention,
   type AttentionEventLike,
   type AttentionItem,
   type LivePending,
 
-  attentionItemKey,
 } from '../../lib/presence/attention.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { HISTORY_PAGE_MESSAGES, historyCandidates, readPendingAcrossSessions, type CandidateSession, type PendingAcrossSessions, type SessionPageFace } from '../presence/attention-history.ts'
@@ -161,7 +161,7 @@ export function AttentionTab(props: AttentionTabProps) {
 
   const eventsTruncated = eventsSeen > MAX_EVENTS
   const items = useMemo(
-    () => mergeAttention(live, [...pendingApprovals(events, leadId).items, ...history.items, ...streamAttention(events, leadId, 'CEO')]),
+    () => mergeAttention(live, [...pendingAsks(events, leadId).items, ...history.items, ...streamAttention(events, leadId, 'CEO')]),
     [live, events, leadId, history],
   )
   const waiting = items.filter(item => item.kind !== 'completion')

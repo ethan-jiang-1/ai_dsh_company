@@ -249,3 +249,66 @@ export function attentionTone(kind: AttentionKind): 'info' | 'danger' | 'warning
     case 'completion': return 'outline'
   }
 }
+
+/** 问询工具的 wire 名（vendor `ask_user_question`）。 */
+export const ASK_TOOL_NAME = 'ask_user_question'
+
+/** 从 `tool/call` 的 arguments（JSON 字符串）里读第一个问句；读不出给「（问询内容缺失）」。 */
+function questionTextOf(argumentsText: string | undefined): string {
+  if (typeof argumentsText !== 'string' || argumentsText.trim() === '') return '（问询内容缺失）'
+  try {
+    const parsed = JSON.parse(argumentsText) as { questions?: readonly { question?: unknown }[] }
+    const first = parsed.questions?.[0]?.question
+    return typeof first === 'string' && first.trim() !== '' ? first.trim() : '（问询内容缺失）'
+  } catch {
+    return '（问询内容缺失）'
+  }
+}
+
+/**
+ * 从会话历史重建**仍挂着**的问询（BUG-319）：问询在日志里是 `ask_user_question` 的 `tool/call`，
+ * 答案以同 `callId` 的 `tool/result` 落回——没有配对结果的就是「问了没答」。
+ *
+ * 为什么必须有这条：问询的活体登记只覆盖本页在场期，刷新后审批能重建、问询却消失，
+ * 于是「等你处理」少了半张清单（官方问询卡还在该会话里，但待办聚合面不再指向它）。
+ * @param events - 会话事件流。
+ * @param sessionId - 事件所属会话（= 跳转目标）。
+ * @returns 挂起问询（按时间倒序）。
+ */
+export function pendingQuestions(events: readonly AttentionEventLike[], sessionId: string): readonly AttentionItem[] {
+  const open = new Map<string, AttentionItem>()
+  for (const event of events) {
+    const data = event.data as { callId?: unknown; name?: unknown; arguments?: unknown; id?: unknown } | null
+    if (typeof data !== 'object' || data === null) continue
+    if (event.type === 'tool/call' && data.name === ASK_TOOL_NAME && typeof data.callId === 'string') {
+      const text = questionTextOf(typeof data.arguments === 'string' ? data.arguments : undefined)
+      open.set(data.callId, {
+        kind: 'question',
+        who: sessionId,
+        id: data.callId,
+        what: attentionSummary(text),
+        ...(text === '（问询内容缺失）' ? {} : { detail: text }),
+        time: event.time,
+        jumpTo: sessionId,
+      })
+      continue
+    }
+    // 答案的两条落盘口径都认：tool/result（同 callId）与 user-questions/answered（同 id）。
+    if (event.type === 'tool/result' && typeof data.callId === 'string') { open.delete(data.callId); continue }
+    if (event.type === 'user-questions/answered' && typeof data.id === 'string') { open.delete(data.id); continue }
+  }
+  return [...open.values()].sort((a, b) => b.time - a.time)
+}
+
+/**
+ * 「等你处理」的完整重建（BUG-319）：审批 + 问询一起回来，再按同一上限截断并报出被截条数。
+ * @param events - 会话事件流。
+ * @param sessionId - 事件所属会话。
+ * @returns 挂起项（审批在前、问询在后，各自按时间倒序）+ 被截条数。
+ */
+export function pendingAsks(events: readonly AttentionEventLike[], sessionId: string): PendingApprovals {
+  const approvals = pendingApprovals(events, sessionId)
+  const questions = pendingQuestions(events, sessionId)
+  const merged = [...approvals.items, ...questions].sort((a, b) => b.time - a.time)
+  return { items: merged.slice(0, STREAM_ITEM_CAP), capped: approvals.capped + Math.max(0, merged.length - STREAM_ITEM_CAP) }
+}
