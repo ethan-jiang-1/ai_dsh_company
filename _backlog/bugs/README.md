@@ -22,7 +22,7 @@
 
 **本轮批次**：下方「## 2026-11-22 修复交接（E2E 第二轮：BUG-297/298/299/300）
 
-**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：四张都改 client 读面/呈现面与公开文案；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-22））。
+**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：四张都改 client 读面/呈现面与公开文案；留痕 = 批次 Note [2026-11-22-e2e-round2-read-state-identity](../../notes/implemented/2026-11-22-e2e-round2-read-state-identity.md)）。
 
 **起点事实（已核）**：298 = `readWorkspaceText` 丢弃 vendor 的 `eof`、返回裸 string/null，三处消费方各自猜「读完没」→ 300 行台账显示 236 场、2050 行记录显示 1989 行且 `bodyTruncated` 被写 false、2087 行合法索引报「形状不符」；297 = `loadStartup` 用宽松解析丢弃诊断（`parseStartupSettingsState` 带 `problem` 却全仓 client 未调用），坏 JSON/目录都静默回显 auto；299 = `AttentionItem` 无 id、`mergeAttention` 按 `kind+jumpTo+what`（160 字摘要）去重会吞掉同摘要的不同审批，且 `live.map` 丢了 `detail`（**上一轮 295 引入/放大的回归**）；300 = 培养采纳/拒绝时间直出 ISO。
 
@@ -39,7 +39,11 @@
 
 **终点** = 4 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡四行证据与 `审查：` 齐；五连 + `coverage:ratchet` 绿；`client-load`/`ui-scene --isolated` 真绿（带指纹）；一篇批次 Note 记 D/E/F/G 与元层教训（读面必须自带状态：291 空≠不可达 → 294 四态 → 298 截断≠完整）。
 
-**本节是立项与交接，不是落地**：只记批次计划与次序。
+**收口（2026-11-22）**：4 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)，每卡 `审查：` + 四行证据齐。
+证据提交 = `cb15f92c`（298）/ `b144371c`（297）/ `f996ac03`（299）/ `d27c508a`（300），
+另 `b9bc8792` 把 297 的「缺失 vs 不可读」收窄成存在性探针（金样复核发现的第一版假错误行）。
+三族机制与输掉的方案 = 上面的批次 Note。收尾：`test` 2504 · `verify` ALL PASS ·
+`coverage-ratchet` PASS（210 文件）· `client-load` / `ui-scene --isolated --expected` 真绿（指纹 abe19fce）。
 
 ## 2026-11-22 修复交接（E2E 设计轮遗留：BUG-293/294/295/296）
 
