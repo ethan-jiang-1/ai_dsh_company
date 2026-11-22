@@ -293,7 +293,7 @@ describe('attentionItemKey · 同文不同条不撞 key（BUG-312）', () => {
 
 // 负例留证 2026-11-22：`pendingApprovals` 不带 `capped` 后 `vitest run tests/client/wiring/attention.spec.ts` 1 failed。BUG-320
 // 审批流上限必须报出来：同一会话 6 条挂起审批只显示 5 条，第 6 条不能静默消失。
-describe('pendingApprovals：上限与计数', () => {
+describe('pendingApprovals：上限与计数（BUG-320）', () => {
   it('多出上限 ⇒ capped = 超出的条数', () => {
     const many = Array.from({ length: STREAM_ITEM_CAP + 1 }, (_, i) => ({ type: 'approval/asked' as const, time: 1000 + i, data: { id: `a${String(i)}`, toolName: 'bash' } }))
     const rebuilt = pendingApprovals(many, 's1')

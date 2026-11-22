@@ -38,6 +38,15 @@ export const PREVIEW_LIMIT = 3
 const TITLE_CLIP = 60
 
 /**
+ * 这段文本里有没有 `#` 标题行（BUG-322：预览窗口可能把标题挡在窗口外）。
+ * @param text - journal 文本（可能只是窗口）。
+ * @returns 有标题行 = true。
+ */
+export function hasHeading(text: string): boolean {
+  return text.split('\n').some(line => /^#{1,3}\s+\S/.test(line.trim()))
+}
+
+/**
  * 从 journal 文本提取一句话标题：优先首个 `#`/`##` 标题行，退回首段首个非空行；截断到
  * {@link TITLE_CLIP} 字。空文本给「（空）」。
  */

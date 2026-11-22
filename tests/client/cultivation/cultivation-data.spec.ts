@@ -136,3 +136,57 @@ describe('workspaceLabelOf（作用域标签）', () => {
     expect(workspaceLabelOf('/')).toBeNull()
   })
 })
+
+// 预览窗口不是格式判据（BUG-321/322）：
+// ① 头窗口读不出闭合 --- 的合法记录，补读全文后必须按「合法记录」收，不能进坏记录；
+// ② 预览窗口里没有 # 标题时，补读更大窗口拿标题，而不是静默退回文件名。
+describe('头窗口不当作格式判据', () => {
+  it('frontmatter 超 60 行的合法记录 ⇒ 补读全文后算合法（不进坏记录）', async () => {
+    const longHead = `---\nkind: correction\ntargetRole: ceo\nproposerRole: ceo\nproposerKind: human\nsource: test\nexpectation: e\nstatus: open\n${Array.from({ length: 55 }, (_, i) => `# c${String(i)}`).join('\n')}\n---\n\nbody\n`
+    const files = {
+      listJournal: async () => [],
+      listRecords: async () => ({ ok: true as const, names: ['20261122-000000-long.md'] }),
+      readRecordHead: async () => longHead.slice(0, 200), // 头窗口：截在 frontmatter 中间
+      readRecord: async () => ({ ok: true as const, eof: true, text: longHead }),
+    }
+    let data: CultivationPanelData | undefined
+    function Probe(): null {
+      data = useCultivationPanelData(files as never, 'session-1' as never)
+      return null
+    }
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    await act(async () => { root.render(createElement(Probe)) })
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 30)) })
+    expect(data?.brokenRecords).toEqual([])
+    expect(data?.records).toHaveLength(1)
+    await act(async () => { root.unmount() })
+    container.remove()
+  })
+
+  it('journal 预览没有 # 标题 ⇒ 补读更大窗口拿标题', async () => {
+    const files = {
+      listJournal: async () => ['2026-11-22-long.md'],
+      readHead: async () => '一段没有标题的长前言……',
+      readJournalMore: async () => '# 真正的标题\n\n正文',
+      listRecords: async () => ({ ok: true as const, names: [] }),
+      readRecordHead: async () => null,
+      readRecord: async () => ({ ok: false as const, reason: 'x' }),
+    }
+    let data: CultivationPanelData | undefined
+    function Probe(): null {
+      data = useCultivationPanelData(files as never, 'session-1' as never)
+      return null
+    }
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    await act(async () => { root.render(createElement(Probe)) })
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 30)) })
+    const row = data?.journalRows?.find(entry => entry.role === 'ceo')
+    expect(row?.entries?.[0]?.title).toContain('真正的标题')
+    await act(async () => { root.unmount() })
+    container.remove()
+  })
+})

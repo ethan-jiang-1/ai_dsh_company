@@ -15,6 +15,7 @@ import { CULTIVATION_CHANGED_EVENT } from './cultivation-actions.ts'
 import {
   CULTIVATION_ROLES,
   feedbackItems,
+  hasHeading,
   inboxRows,
   parseRecord,
   type CultivationRecord,
@@ -59,6 +60,8 @@ export interface CultivationFiles {
   readonly listJournal: (sessionId: SessionId, role: string, signal: AbortSignal) => Promise<readonly string[] | null>
   /** 读工作区文本文件首窗口；失败给 null。 */
   readonly readHead: (sessionId: SessionId, path: string, signal: AbortSignal) => Promise<string | null>
+  /** 预览窗口里没有标题时的补读（更大窗口，BUG-322）。 */
+  readonly readJournalMore: (sessionId: SessionId, path: string, signal: AbortSignal) => Promise<string | null>
   /** 列培养记录目录（cultivation/records）的 .md 文件名；不可达带原因（不折成空清单）。 */
   readonly listRecords: (sessionId: SessionId, signal: AbortSignal) => Promise<DirListing>
   /** 读记录头部（frontmatter + 少量正文）；摘要全扫用，失败给 null。 */
@@ -181,6 +184,7 @@ export function makeCultivationFiles(remote: RemoteNamespaceFace, leadOf: (sessi
       return listing.ok ? listing.names : null
     },
     readHead: (sessionId, path, signal) => asWindowReader(readText(path, 240))(sessionId, signal),
+    readJournalMore: (sessionId, path, signal) => asWindowReader(readText(path, JOURNAL_MORE_LIMIT))(sessionId, signal),
     listRecords: (sessionId, signal) => listDir(sessionId, RUN_BUNDLE_PATHS.records, signal),
     readRecordHead: (sessionId, path, signal) => asWindowReader(readText(path, 60))(sessionId, signal),
     readRecord: (sessionId, path, signal) => readText(path, RECORD_READ_LIMIT)(sessionId, signal),
@@ -218,6 +222,8 @@ export const CULTIVATION_REFRESH_MS = 30_000
 
 /** 预览条数（与读模型 PREVIEW_LIMIT 同口径：只读每角色前 3 篇的首段）。 */
 const HEAD_LIMIT = 3
+/** 预览窗口里找不到标题时的补读窗口（行数；BUG-322）。 */
+const JOURNAL_MORE_LIMIT = 2000
 
 /** 非 open 记录默认只给最近这么多条读全文；更早的只留摘要，避免面板全量读。 */
 export const FULL_RECORD_LIMIT = 120
@@ -253,8 +259,16 @@ export function useCultivationPanelData(
         listings[role] = names
         if (names !== null) {
           for (const name of names.slice(0, HEAD_LIMIT)) {
-            const text = await files.readHead(sessionId, `${RUN_BUNDLE_PATHS.kb}/${role}/journal/${name}`, controller.signal)
-            if (text !== null) heads[`${role}/${name}`] = text
+            const path = `${RUN_BUNDLE_PATHS.kb}/${role}/journal/${name}`
+            const text = await files.readHead(sessionId, path, controller.signal)
+            if (text === null) continue
+            // 标题可能被 240 字窗口吞掉（BUG-322）：解析不到 `# 标题` 时补读一次更大的窗口。
+            if (!hasHeading(text)) {
+              const wider = await files.readJournalMore(sessionId, path, controller.signal)
+              heads[`${role}/${name}`] = wider ?? text
+            } else {
+              heads[`${role}/${name}`] = text
+            }
           }
         }
       }
@@ -271,7 +285,13 @@ export function useCultivationPanelData(
         for (const name of [...recordNames].sort().reverse()) {
           const id = name.replace(/\.md$/, '')
           const head = await files.readRecordHead(sessionId, `${RUN_BUNDLE_PATHS.records}/${name}`, controller.signal)
-          const summary = head === null ? null : parseRecord(id, head)
+          let summary = head === null ? null : parseRecord(id, head)
+          if (summary === null && head !== null) {
+            // 头窗口解析不出来**不等于**记录坏了（BUG-321）：frontmatter 可能比窗口更长。
+            // 补读一次全文再判；能解析就按合法记录收（正文另按 FULL_RECORD_LIMIT 决定是否读全文）。
+            const whole = await files.readRecord(sessionId, `${RUN_BUNDLE_PATHS.records}/${name}`, controller.signal)
+            summary = whole.ok ? parseRecord(id, whole.text) : null
+          }
           if (summary === null) { broken.push(name); continue }
           summaries.push({ ...summary, bodyTruncated: true })
         }

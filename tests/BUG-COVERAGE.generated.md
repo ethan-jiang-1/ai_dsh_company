@@ -8,17 +8,14 @@
 | 指标 | 数量 |
 |---|---|
 | 已修卡 | 309 |
-| 有具名守卫 | 204 |
-| 无具名守卫 | 105 |
-| 覆盖率 | 66.0% |
+| 有具名守卫 | 207 |
+| 无具名守卫 | 102 |
+| 覆盖率 | 67.0% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
 | BUG | opened | slug |
 |---|---|---|
-| 320 | 2026-11-22 | attention-approval-cap-five-silent |
-| 318 | 2026-11-22 | attention-history-candidate-cap-silent |
-| 317 | 2026-11-22 | attention-current-session-1000-cap-silent |
 | 183 | 2026-11-14 | notes-root-symlink-followed |
 | 180 | 2026-11-14 | walk-company-dirs-windows-dotdot |
 | 179 | 2026-11-14 | internal-dotdot-over-rejected |
@@ -329,4 +326,7 @@
 | 313 | 2026-11-22 | tests/lib/startup/startup-settings.spec.ts:221 |
 | 314 | 2026-11-22 | tests/client/startup/startup-load.spec.ts:88 |
 | 315 | 2026-11-22 | tests/client/cultivation/cultivation-view-layout.spec.ts:13 |
+| 317 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:219 |
+| 318 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:210 |
+| 320 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:229；tests/client/wiring/attention.spec.ts:296 |
 | 323 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:106；tests/client/tabs/attention-tab.spec.ts:184 |

@@ -200,12 +200,14 @@ describe('AttentionTab · cwd 未解析时不跨工作区（BUG-323）', () => {
   })
 })
 
-// 负例留证 2026-11-22：去掉 `eventsSeen`/`capped` 后 `vitest run tests/client/tabs/attention-tab.spec.ts` 2 failed（边界不提示、空态仍说「没有等你的事」）。BUG-317/318/320
+// 负例留证 2026-11-22：去掉 `eventsSeen` 后「本会话事件超窗」用例 failure —— BUG-317
+// 负例留证 2026-11-22：候选不带 `capped` 后「候选被截」用例 failure —— BUG-318
+// 负例留证 2026-11-22：`approvalsCapped` 恒 0 后「审批流被截」用例 failure —— BUG-320
 // 三处上限都要在面板上说出来，并且有边界时不许说「没有等你的事」。
 describe('AttentionTab · 注意力管线的边界', () => {
   const many = (n: number) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`s${String(i)}`, { id: `s${String(i)}`, cwd: '/ws', updatedAt: i }]))
 
-  it('候选被截 ⇒ 「还有 N 个会话没扫」', async () => {
+  it('候选被截 ⇒ 「还有 N 个会话没扫」（BUG-318）', async () => {
     const useSessionsStub = (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown =>
       selector({ byId: { 'session-lead': { id: 'session-lead', cwd: '/ws' }, ...many(25) } })
     const pageHistory = vi.fn(async () => ({ ok: true as const, value: { records: [], hasMore: false } }))
@@ -214,7 +216,7 @@ describe('AttentionTab · 注意力管线的边界', () => {
     expect(host.textContent).toContain('个会话没扫')
   })
 
-  it('本会话事件超窗 ⇒ 「只保留最近 N 条事件」，且压住空态', async () => {
+  it('本会话事件超窗 ⇒ 「只保留最近 N 条事件」，且压住空态（BUG-317）', async () => {
     const frames = Array.from({ length: 1001 }, (_, i) => ({ kind: 'history' as const, events: [{ type: 'turn/start', time: 1000 + i, data: { i } }] }))
     const follow = async function* () { for (const frame of frames) yield frame as never }
     const host = await mount(createElement(AttentionTab, props({ follow })))
@@ -224,7 +226,7 @@ describe('AttentionTab · 注意力管线的边界', () => {
   })
 })
 
-describe('AttentionTab · 审批流被截的信号', () => {
+describe('AttentionTab · 审批流被截的信号（BUG-320）', () => {
   it('历史重建里某会话超 5 条 ⇒ 「还有 N 条挂起审批未显示」', async () => {
     const byId = { 'session-lead': { id: 'session-lead', cwd: '/ws' }, 'session-x': { id: 'session-x', cwd: '/ws', updatedAt: 1 } }
     const useSessionsStub = (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown => selector({ byId })

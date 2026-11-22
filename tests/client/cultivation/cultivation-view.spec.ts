@@ -25,6 +25,7 @@ afterEach(() => {
 const files: CultivationFiles = {
   listJournal: async () => [],
   readHead: async () => null,
+  readJournalMore: async () => null,
   listRecords: async () => ({ ok: true, names: [] }),
   readRecordHead: async () => null,
   readRecord: async () => ({ ok: false, reason: 'unavailable' }),
