@@ -79,6 +79,17 @@ opened: 2026-11-21
 - 原型证据（gitignored）：`runtime/tmp/e2e/company-e2e.mjs`、`runtime/tmp/e2e-evidence/2026-11-21T15-*`、官方车道证据 `runtime/harness-home/diagnosis/cdp-probe-2026-11-21T15-31-00-953Z/`。
 - 结论：这批改动**不是「exploratory 抓不到」，而是 exploratory 没走到那几个状态**；E2E 在约 10 个场景里抓到 4 个，其中 2 个是「单测绿、真页面红」的系统性假绿。跨会话审批、培养三态、成品索引、i18n/窄栏是稳的。
 
+## 2026-11-22 第二轮（pipeline：293–296 在修，这边继续找）
+
+用户指令：并行修复进程处理 293–296，这边不碰修法，继续找 3–5 个。第二轮在隔离实例上补了策略读坏、读上限（台账/长记录/大索引）、同摘要双审批、时间口径五组场景，新立 4 张：
+
+- [BUG-297](../bugs/BUG-297-strategy-read-failure-silently-auto.md)：策略文件坏/读不到时静默回退 auto（有 `parseStartupSettingsState` 诊断但没接）。
+- [BUG-298](../bugs/BUG-298-fixed-read-limits-silent-truncation.md)：固定行数读上限静默截断——300 行台账显示 236、2050 行记录显示 1989、2087 行合法索引报「形状不符」。
+- [BUG-299](../bugs/BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md)：待办按 160 字摘要去重，两条不同审批塌成一条；活体 `detail` 在 merge 时丢失。
+- [BUG-300](../bugs/BUG-300-cultivation-decided-at-raw-iso.md)：培养采纳/拒绝时间裸 ISO，与提出时间的「1 小时前」不一致。
+
+第二轮跑绿：策略正常设值/刷新/重置；选项文件坏/空有显式错误态；培养拒绝空理由校验、采纳、撤回、跨角色建议路由、journal 不可达；台账正常；成品目录/打开 final/unicode+空格路径；浮窗 1440 与 390；命令提示两态。仍红：297/298/299/300。
+
 ## 输掉的方案
 
 - **只靠 exploratory 继续人肉点**：本轮 4 个缺陷里 2 个是「单测绿 + 页签能开」的假绿，人肉不点进那个状态就漏；且不可复跑。
