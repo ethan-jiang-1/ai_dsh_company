@@ -26,7 +26,7 @@
 
 **本轮批次**：下方「## 2026-11-22 修复交接（E2E 第四轮：BUG-307..315）
 
-**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：九张都改 client 读面/呈现面/公开文案/布局；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-22））。
+**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：九张都改 client 读面/呈现面/公开文案/布局；留痕 = 批次 Note [2026-11-22-e2e-round4-parse-boundary-declaration-identity](../../notes/implemented/2026-11-22-e2e-round4-parse-boundary-declaration-identity.md)）。
 
 **起点事实（已核）**：307 = 我 306 的回归（两个子列表各折 5 条、`capControl` 的 total 用两者之和：4+4 全显示还挂「显示全部（共 8 条）」）；309 = self-rejected 记录同时进 `processedForViewer` 与 `mine`；310 = 成品索引坏 entry 静默丢；311 = 台账表头 typo 走「零行」不报错；312 = question 活体无 id、`attentionItemKey` 回落摘要（299 的兜底缺陷）；313 = options 字段类型坏被说成「没有可选项」；314 = startup.json 字段类型坏折成「全自动」（诊断器只查 `v`）；315 = 768px 下 board 210.16 < `BOARD_MIN` 380、chat 176.84 < `CHAT_MIN` 280；308 = 对话面板 en 出整段中文、zh 出裸 `session:`。
 
@@ -44,7 +44,11 @@
 
 **终点** = 9 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡四行证据与 `审查：` 齐；五连 + `coverage:ratchet` 绿；`client-load`/`ui-scene --isolated` 真绿（带指纹）；一篇批次 Note 记 D″/I′/F″/H′/E′ 与元层（七张是「取了子集/声明了东西/兜了个底但没人说出来或执行」），并落地三条判据：解析器必须报 `skipped`、布局下限三档测量、en 渲染无 CJK 扩到对话面板。
 
-**本节是立项与交接，不是落地**：只记批次计划与次序。
+**收口（2026-11-22）**：9 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)，每卡 `审查：` + 四行证据齐。
+证据提交 = `1fcd9497`（307+309）/ `272fd450`（310+311）/ `c94655f1`（313+314）/ `4fce3944`（308）/ `0025679b`（312）/ `170be97a`（315）。
+判据落地：解析层必须报 `skipped`（310/311）、`LIST_CAPS` 每键必须有消费点、en 渲染无 CJK 扩到对话面板（308）、
+布局下限三档（`splitLayout` 单测 + 真 Chromium 量真规则；整页测量列未覆盖轴）。
+收尾：`test` 2548 · `verify` ALL PASS · `coverage-ratchet` PASS（210 文件）。
 
 ## 2026-11-22 修复交接（E2E 第三轮：BUG-301..306）
 
