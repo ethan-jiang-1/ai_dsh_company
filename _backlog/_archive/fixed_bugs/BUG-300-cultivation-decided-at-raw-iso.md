@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-300：培养记录的「采纳/拒绝时间」原样显示 ISO 字符串，与旁边的「1 小时前」不是一种人话
 
-> 严重级别：P2（次要：不影响判断，但同一块面板里一个时间是「11 小时前」、另一个是 `2026-11-21T18:40:21.725Z`，用户要自己脑内换算；审计时间也没有标 UTC）｜发现：2026-11-22（E2E 第二轮）｜状态：调查中
+> 严重级别：P2（次要：不影响判断，但同一块面板里一个时间是「11 小时前」、另一个是 `2026-11-21T18:40:21.725Z`，用户要自己脑内换算；审计时间也没有标 UTC）｜发现：2026-11-22（E2E 第二轮）｜状态：已修｜审查：agent — 逐条核对已修判定（正文人话 + title 精确 + 解析失败回落）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找，别管那边怎么修」）。
+> **留痕**：commit d27c508a（client 公开文案，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -69,3 +69,10 @@ opened: 2026-11-22
 - 不再在正文出现裸 `2026-11-21T18:40:21.725Z`；
 - 解析失败时不崩、不编时间；
 - zh/en 两态各一条断言。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/cultivation/cultivation-record.ts`（`decidedAtLabel`）、`packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx`、`tests/lib/cultivation/cultivation-record-time.spec.ts`
+- 红：`vitest run tests/client/cultivation/cultivation-board.spec.ts` —— 拒绝回执用例断言「正文不出现裸 ISO」在修复前失败（实际 `拒绝时间：2026-10-29T11:20:00.000Z`）
+- 绿：`vitest run tests/client/cultivation/cultivation-board.spec.ts` —— 27/27（正文人话、`title` 仍是精确 ISO）；`vitest run tests/lib/cultivation/cultivation-record-time.spec.ts` —— 2/2（相对人话、解析失败回落原值）
+- 提交：commit d27c508a

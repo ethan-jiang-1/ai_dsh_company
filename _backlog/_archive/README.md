@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-300-cultivation-decided-at-raw-iso.md](fixed_bugs/BUG-300-cultivation-decided-at-raw-iso.md) — 采纳/拒绝时间裸 ISO；`decidedAtLabel` 走人话，精确值留 `title`。
 - [BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md](fixed_bugs/BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md) — 待办按 160 字摘要去重吞掉不同审批；改为身份键（审批 id），活体 detail 透传。
 - [BUG-297-strategy-read-failure-silently-auto.md](fixed_bugs/BUG-297-strategy-read-failure-silently-auto.md) — 策略文件坏/读不到被折成「自动」；三态诊断 + 面板错误行，缺失/空仍是合法 auto。
 - [BUG-298-fixed-read-limits-silent-truncation.md](fixed_bugs/BUG-298-fixed-read-limits-silent-truncation.md) — 固定行数读上限静默截断（台账/记录/索引）；读面返回 `{text,eof}`，三个面板各自说「不完整/超上限/只加载了摘要」。

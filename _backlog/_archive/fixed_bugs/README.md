@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-300**（2026-11-22，E2E 第二轮 / P2）：采纳/拒绝时间裸 ISO——
+  [300](BUG-300-cultivation-decided-at-raw-iso.md) `decidedAtLabel` 统一到 `timeLabel` 人话口径，
+  精确 ISO 放 `title`，解析失败回落原值。证据提交 `d27c508a`。
+
 - **BUG-299**（2026-11-22，E2E 第二轮 / P2）：待办按摘要去重吞掉不同审批——
   [299](BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md) `AttentionItem.id` + `attentionItemKey`
   按身份去重（审批不按摘要）、列表 key 同步、`live.map` 透传 `detail`。证据提交 `f996ac03`。
