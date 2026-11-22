@@ -421,3 +421,36 @@ describe('命令边界：坏 records 根与状态机（BUG-117/127/130/139/141�
     })
   })
 })
+
+// host 回执必须随语言（BUG-316）：en 下成功/失败回执都不许出现中文。
+// 判据用「已知命令 + 真实盘」跑一遍，断言返回文本无 CJK；无法识别的原文才允许原样显示（本实现无此路径）。
+describe('/cultivation 回执的语言', () => {
+  const cjk = /[\u4e00-\u9fff]/
+
+  it('en 选择器 ⇒ correct 的成功回执与用法错误都是英文', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace, undefined, undefined, undefined, (_zh, en) => en)
+      const ok = await invokeCultivation(command, 'ceo', workspace, 'correct 期望行为 :: 做法与证据')
+      expect(ok.kind).toBe('success')
+      expect(ok.text).not.toMatch(cjk)
+      const usage = await invokeCultivation(command, 'ceo', workspace, 'correct')
+      expect(usage.kind).toBe('error')
+      expect(usage.text).not.toMatch(cjk)
+    })
+  })
+
+  it('en 选择器 ⇒ adopt / reject / verify 的回执也全是英文', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace, undefined, undefined, undefined, (_zh, en) => en)
+      const submitted = await invokeCultivation(command, 'ceo', workspace, 'correct 期望行为 :: 做法与证据')
+      const id = /(\d{8}-\d{6}-[a-z0-9]+)/.exec(submitted.text ?? '')?.[1] ?? ''
+      expect(id).not.toBe('')
+      const adopted = await invokeCultivation(command, 'ceo', workspace, `adopt ${String(id)}`)
+      expect(adopted.text).not.toMatch(cjk)
+      const verified = await invokeCultivation(command, 'ceo', workspace, `verify ${String(id)} pass :: 后续同类工作也照此做了`)
+      expect(verified.text).not.toMatch(cjk)
+      const rejected = await invokeCultivation(command, 'ceo', workspace, 'reject 20261010-000000-none :: 不存在')
+      expect(rejected.text).not.toMatch(cjk)
+    })
+  })
+})

@@ -19,6 +19,8 @@ export function cultivationRegistrations(
   fs?: unknown,
   sandboxPolicy?: unknown,
   roleLabel?: (role: string) => string,
+  /** 双语选择器（缺省中文）；`(zh, en) => en` 用来断言 en 回执无中文（BUG-316）。 */
+  text?: (zh: string, en: string) => string,
 ): {
   readonly command: CommandDefinition['handler']
   readonly proposal: RegisteredCultivationTool
@@ -30,7 +32,7 @@ export function cultivationRegistrations(
     commands: { register: (definition: CommandDefinition) => { commands.push(definition); return () => {} } },
     get: (name: string) => name === 'sessionQuery' ? sessionQuery : name === 'fs' ? fs : name === 'sandboxPolicy' ? sandboxPolicy : undefined,
   }
-  registerCultivation(ctx as Parameters<typeof registerCultivation>[0], config, companyHome, false, undefined, roleLabel)
+  registerCultivation(ctx as Parameters<typeof registerCultivation>[0], config, companyHome, false, undefined, roleLabel, undefined, text)
   const command = commands.find(definition => definition.name === 'cultivation')
   const proposal = tools.find(definition => definition.name === 'cultivation_propose')
   if (command === undefined) throw new Error('registerCultivation 没有注册 /cultivation')

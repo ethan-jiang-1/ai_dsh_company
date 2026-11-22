@@ -160,16 +160,44 @@ interface CultivationCommandContext {
   readonly ctx: Context
   readonly roleLabel: (role: string) => string
   readonly resultLabel: (result: string) => string
+  /** 双语选择器（回执/错误都随 `locale.preference`，BUG-316）。 */
+  readonly t: CultivationText
 }
 
 type CultivationCommandResult = { readonly kind: 'error' | 'success'; readonly text: string }
 
+/**
+ * 回滚结果的**两种语言**叶子文案：分支只在这里判一次，整句不再重复三元的两种语言副本
+ * （否则每加一种语言就多一份未被覆盖的分支——覆盖率棘轮会红）。
+ * @param failed - 回滚失败条数。
+ * @returns 中文/英文两个叶子串。
+ */
+function rollbackNote(failed: number): { readonly zh: string, readonly en: string } {
+  return failed > 0
+    ? { zh: `另有 ${String(failed)} 条回滚失败（日志保留）`, en: `${String(failed)} rollbacks failed (journal kept)` }
+    : { zh: '已回滚已改记录', en: 'changed records were rolled back' }
+}
+
+/** 删除方法失败/方法已不在时的回滚叶子文案（与「取消」用词不同，别混）。 */
+function rollbackNoteFailed(failed: number): { readonly zh: string, readonly en: string } {
+  return failed > 0
+    ? { zh: `有 ${String(failed)} 条记录回滚失败（日志保留）`, en: `${String(failed)} record rollbacks failed (journal kept)` }
+    : { zh: '记录已回滚', en: 'records were rolled back' }
+}
+
+/**
+ * host 侧的双语选择（与 `CompanyLanguageState.text` 同签名）。
+ * 命令回执是**给人看的**，必须随 `locale.preference` 走——过去一律中文，en 面板里照原样显示（BUG-316）。
+ */
+type CultivationText = (zh: string, en: string) => string
+
+
 /** 命令行为只依赖会话输入、配置与培养存储；Cordis 注册留在外层适配器。 */
-function cultivationCommandHandlerInner(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result) {
+function cultivationCommandHandlerInner(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, t: CultivationText, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result) {
   return async ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
     const face = sessionFaceOf(agent)
     if (face === null) {
-      return { kind: 'error' as const, text: '培养命令需要公司角色会话（当前会话不是公司角色 preset，或 cwd 缺席）。' }
+      return { kind: 'error' as const, text: t('培养命令需要公司角色会话（当前会话不是公司角色 preset，或 cwd 缺席）。', 'Cultivation commands need a company-role session (this session is not a company-role preset, or its cwd is missing).') }
     }
     if (dataBlocked) {
       return { kind: 'error' as const, text: blockedCompanyText(blockedReason, '培养') }
@@ -184,47 +212,47 @@ function cultivationCommandHandlerInner(config: CultivationHostConfig, storage: 
     // correct [--context=<token>] <期望行为一句话> :: <做法与证据正文>
     // suggest <角色> [--context=<token>] <期望行为一句话> :: <建议与证据>
     if (sub === 'correct' || sub === 'suggest') {
-      return commandCorrectOrSuggest({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, sub, tokens, body)
+      return commandCorrectOrSuggest({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel, t }, sub, tokens, body)
     }
 
     // adopt <id> [as <slug>]
     if (sub === 'adopt') {
-      return commandAdopt({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens)
+      return commandAdopt({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel, t }, tokens)
     }
 
     // reject <id> :: <理由>
     if (sub === 'reject') {
-      return commandReject({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens, body)
+      return commandReject({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel, t }, tokens, body)
     }
 
     // verify <id> <pass|fail> :: <后续相似工作的具体依据>
     if (sub === 'verify') {
-      return commandVerify({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens, body)
+      return commandVerify({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel, t }, tokens, body)
     }
 
     // archive <days>：只归档已处理记录，open 不动（人工保留策略）
     if (sub === 'archive') {
-      return commandArchive({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens)
+      return commandArchive({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel, t }, tokens)
     }
 
     // purge <days>：只清 records-archive 里的旧记录，不动 live records
     if (sub === 'purge') {
-      return commandPurge({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens)
+      return commandPurge({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel, t }, tokens)
     }
 
     // check：只报告孤儿（不自动删/改）
     if (sub === 'check') {
-      return commandCheck({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel })
+      return commandCheck({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel, t })
     }
 
     // revoke <slug>
     if (sub === 'revoke') {
-      return commandRevoke({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel }, tokens)
+      return commandRevoke({ face, root: scope.root, recordsDir, config, storage, ctx, roleLabel, resultLabel, t }, tokens)
     }
 
     return {
       kind: 'error' as const,
-      text: '子命令只认：correct / suggest / adopt / reject / verify / revoke / archive / purge / check（培养页有各命令的一句话用法）。',
+      text: t('子命令只认：correct / suggest / adopt / reject / verify / revoke / archive / purge / check（培养页有各命令的一句话用法）。', 'Known subcommands: correct / suggest / adopt / reject / verify / revoke / archive / purge / check (the cultivation panel shows one-line usage for each).'),
     }
   }
 }
@@ -232,14 +260,14 @@ function cultivationCommandHandlerInner(config: CultivationHostConfig, storage: 
 /**
  * 命令边界统一收口存储 typed error（BUG-127/130/141）：坏形状/写 gate 变可读回执，不抛到命令面。
  */
-function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result) {
-  const inner = cultivationCommandHandlerInner(config, storage, ctx, companyHome, dataBlocked, blockedReason, roleLabel, resultLabel)
+function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, t: CultivationText, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result) {
+  const inner = cultivationCommandHandlerInner(config, storage, ctx, t, companyHome, dataBlocked, blockedReason, roleLabel, resultLabel)
   return async (input: { readonly agent?: AgentLike, readonly rawInput: string }): Promise<CultivationCommandResult> => {
     try {
       return await inner(input)
     } catch (error) {
       if (error instanceof UnsafeCultivationPathError) {
-        return { kind: 'error', text: `培养记录目录不是安全目录（文件/symlink）：${error.message}；请修复后重试。` }
+        return { kind: 'error', text: t(`培养记录目录不是安全目录（文件/symlink）：${error.message}；请修复后重试。`, `The cultivation records directory is not a safe directory (file/symlink): ${error.message}; fix it and retry.`) }
       }
       if (error instanceof CompanyWriteBlockedError) {
         return { kind: 'error', text: error.message }
@@ -256,11 +284,11 @@ async function commandCorrectOrSuggest(
   tokens: readonly string[],
   body: string,
 ): Promise<CultivationCommandResult> {
-  const { face, root, recordsDir, storage, ctx } = command
+  const { face, root, recordsDir, storage, ctx, t } = command
   const isSuggest = sub === 'suggest'
   const targetRole = isSuggest ? tokens[1] : face.role
   if (isSuggest && !ROSTER.has(targetRole ?? '')) {
-    return { kind: 'error', text: '用法：suggest <角色> [--context=…] [--work=…] <期望行为一句话> :: <建议与证据>；角色须在名册。' }
+    return { kind: 'error', text: t('用法：suggest <角色> [--context=…] [--work=…] <期望行为一句话> :: <建议与证据>；角色须在名册。', 'Usage: suggest <role> [--context=…] [--work=…] <one-line expected behavior> :: <suggestion and evidence>; the role must be on the roster.') }
   }
   let from = isSuggest ? 2 : 1
   let contextToken: string | undefined
@@ -280,39 +308,40 @@ async function commandCorrectOrSuggest(
     break
   }
   const expectation = tokens.slice(from).join(' ').trim()
-  if (expectation === '') return { kind: 'error', text: '期望行为不能为空（:: 之前的一句话）。' }
+  if (expectation === '') return { kind: 'error', text: t('期望行为不能为空（:: 之前的一句话）。', 'The expected behavior cannot be empty (the one line before ::).') }
   if (isSuggest && targetRole === face.role) {
-    return { kind: 'error', text: '给自己的角色用 correct；suggest 指向别的角色。' }
+    return { kind: 'error', text: t('给自己的角色用 correct；suggest 指向别的角色。', 'Use correct for your own role; suggest points at another role.') }
   }
   let contexts: readonly CultivationContext[] | undefined
   if (contextToken !== undefined) {
     const decoded = decodeContextToken(contextToken)
     if (!decoded.ok) return { kind: 'error', text: decoded.problem }
     const item = decoded.command.items[0]
-    if (item === undefined) return { kind: 'error', text: '背景只能带一段（v1）。' }
+    if (item === undefined) return { kind: 'error', text: t('背景只能带一段（v1）。', 'Only one context block is supported (v1).') }
     const read = await readContext(ctx, root, item, command.roleLabel, command.resultLabel)
     if ('problem' in read) return { kind: 'error', text: read.problem }
     contexts = [read.context]
   }
   let work: string | undefined
   if (workToken !== undefined) {
-    if (workToken === '') return { kind: 'error', text: '工作事实不能为空（--work= 后面写这次什么工作）。' }
+    if (workToken === '') return { kind: 'error', text: t('工作事实不能为空（--work= 后面写这次什么工作）。', 'The work fact cannot be empty (write what the work was after --work=).') }
     let decoded: string
     try {
       decoded = decodeURIComponent(workToken)
     } catch {
-      return { kind: 'error', text: '工作事实编码坏：不是合法的 URI 编码。' }
+      return { kind: 'error', text: t('工作事实编码坏：不是合法的 URI 编码。', 'Malformed work fact: not a valid URI encoding.') }
     }
     work = decoded.trim()
-    if (work === '') return { kind: 'error', text: '工作事实不能为空（--work= 后面写这次什么工作）。' }
+    if (work === '') return { kind: 'error', text: t('工作事实不能为空（--work= 后面写这次什么工作）。', 'The work fact cannot be empty (write what the work was after --work=).') }
     if (work.length > WORK_TEXT_LIMIT) {
-      return { kind: 'error', text: `工作事实最多 ${String(WORK_TEXT_LIMIT)} 个字符，请保留最相关的一段。` }
+      return { kind: 'error', text: t(`工作事实最多 ${String(WORK_TEXT_LIMIT)} 个字符，请保留最相关的一段。`, `The work fact is limited to ${String(WORK_TEXT_LIMIT)} characters; keep the most relevant part.`) }
     }
   }
   if (body === '' && contexts === undefined && work === undefined) {
-    return { kind: 'error', text: '正文不能为空（:: 之后写做法与证据；或至少写清这次工作）。' }
+    return { kind: 'error', text: t('正文不能为空（:: 之后写做法与证据；或至少写清这次工作）。', 'The body cannot be empty (write the method and evidence after ::, or at least describe this piece of work).') }
   }
-  const source = contexts === undefined ? '（会话内提交）' : contextSummary(contexts[0]!)
+  // 落盘用的 source 是**数据**（中文可接受：它是记录内容，不是回执），回执另走 t()。
+  const source = contexts === undefined ? t('（会话内提交）', '(submitted in-session)') : contextSummary(contexts[0]!)
   const id = storage.writeRecord(recordsDir, {
     kind: isSuggest ? 'suggestion' : 'correction',
     targetRole: targetRole!,
@@ -325,40 +354,42 @@ async function commandCorrectOrSuggest(
     ...(contexts === undefined ? {} : { contexts }),
   })
   const action = isSuggest
-    ? `建议 → ${command.roleLabel(targetRole!)}，待其本人在 ${command.roleLabel(targetRole!)} 会话里处理`
-    : '纠正，待你采纳'
+    ? t(`建议 → ${command.roleLabel(targetRole!)}，待其本人在 ${command.roleLabel(targetRole!)} 会话里处理`,
+        `suggestion → ${command.roleLabel(targetRole!)}; its owner decides in the ${command.roleLabel(targetRole!)} session`)
+    : t('纠正，待你采纳', 'correction, waiting for you to adopt')
   const contextNote = contexts === undefined
     ? ''
-    : `；背景「${contexts[0]!.title}」，以提交时服务端读到的版本为准`
+    : t(`；背景「${contexts[0]!.title}」，以提交时服务端读到的版本为准`,
+        `; context "${contexts[0]!.title}", per the version the server read at submission time`)
   return {
     kind: 'success',
-    text: `已提交培养记录 ${id}（${action}${contextNote}）。培养页可查收件箱。`,
+    text: t(`已提交培养记录 ${id}（${action}${contextNote}）。培养页可查收件箱。`, `Submitted cultivation record ${id} (${action}${contextNote}). The cultivation panel shows the inbox.`),
   }
 }
 
 /** `revoke <slug>`：先写恢复日志、再改记录、最后删方法；失败可回滚。 */
 async function commandRevoke(command: CultivationCommandContext, tokens: readonly string[]): Promise<CultivationCommandResult> {
-  const { face, root, recordsDir, config, storage } = command
+  const { face, root, recordsDir, config, storage, t } = command
   const slug = tokens[1]
   const orphanConfirmed = tokens.includes('--orphan')
-  if (slug === undefined) return { kind: 'error', text: '用法：revoke <方法slug> [--orphan]。' }
+  if (slug === undefined) return { kind: 'error', text: t('用法：revoke <方法slug> [--orphan]。', 'Usage: revoke <method-slug> [--orphan].') }
   if (config.cultivationRoot === undefined) {
-    return { kind: 'error', text: '方法层根未配置（config.cultivationRoot 缺席）。' }
+    return { kind: 'error', text: t('方法层根未配置（config.cultivationRoot 缺席）。', 'The method-layer root is not configured (config.cultivationRoot is missing).') }
   }
-  if (!SLUG_RE.test(slug)) return { kind: 'error', text: `方法 slug 不安全：${slug}。` }
+  if (!SLUG_RE.test(slug)) return { kind: 'error', text: t(`方法 slug 不安全：${slug}。`, `Unsafe method slug: ${slug}.`) }
   const recovered = recoverPendingRevoke(root, config.cultivationRoot, storage)
   if (recovered.status === 'conflict' || recovered.status === 'error') {
-    return { kind: 'error', text: `有一笔未完成的 revoke 需要先处理（${recovered.problem}）；日志在 cultivation/.pending-revoke.json。` }
+    return { kind: 'error', text: t(`有一笔未完成的 revoke 需要先处理（${recovered.problem}）；日志在 cultivation/.pending-revoke.json。`, `An unfinished revoke must be handled first (${recovered.problem}); the journal is at cultivation/.pending-revoke.json.`) }
   }
   let records: readonly CultivationRecord[]
   try {
     if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) {
-      return { kind: 'error', text: `${command.roleLabel(face.role)} 方法层里没有方法 ${slug}。` }
+      return { kind: 'error', text: t(`${command.roleLabel(face.role)} 方法层里没有方法 ${slug}。`, `No method ${slug} in the ${command.roleLabel(face.role)} method layer.`) }
     }
     const loaded = storage.loadRecords(recordsDir)
     // 「当前 records 不可达」不是「0 条记录」：不能据此删掉仍被其它视图引用的方法（BUG-090）。
     if (!loaded.reachable) {
-      return { kind: 'error', text: `记录目录不可达：${recordsDir}；为保护仍被记录引用的方法，拒绝撤回 ${slug}。` }
+      return { kind: 'error', text: t(`记录目录不可达：${recordsDir}；为保护仍被记录引用的方法，拒绝撤回 ${slug}。`, `Records directory unreachable: ${recordsDir}; refusing to revoke ${slug} while records still reference it.`) }
     }
     records = loaded.records
   } catch (error) {
@@ -375,7 +406,7 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
   if (pendingRecords.length === 0 && !orphanConfirmed) {
     return {
       kind: 'error',
-      text: `本 workspace 的 records 里没有引用方法 ${slug} 的采纳记录；它可能被其它 workspace 采纳（方法层是 home 级、records 是 workspace 级）。`
+      text: t(`本 workspace 的 records 里没有引用方法 ${slug} 的采纳记录；它可能被其它 workspace 采纳（方法层是 home 级、records 是 workspace 级）。`, `No adopted record in this workspace references method ${slug}; it may have been adopted in another workspace (the method layer is home-level, records are workspace-level).`)
         + `确认它是孤儿后再执行 /cultivation revoke ${slug} --orphan。`,
     }
   }
@@ -390,7 +421,7 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
         records: pendingRecords,
       })
     } catch (error) {
-      return { kind: 'error', text: `无法写 revoke 恢复日志，撤回未开始：${(error as Error).message}` }
+      return { kind: 'error', text: t(`无法写 revoke 恢复日志，撤回未开始：${(error as Error).message}`, `Cannot write the revoke recovery journal; the revoke did not start: ${(error as Error).message}`) }
     }
   }
   const updated: { readonly id: string, readonly text: string }[] = []
@@ -409,9 +440,10 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
     if (current === null) continue
     if (!storage.updateRecord(recordsDir, record.id, { revokedAt }, current.text)) {
       const failed = rollback()
+      const note = rollbackNote(failed)
       return {
         kind: 'error',
-        text: `撤回 ${slug} 已取消：记录 ${record.id} 在读取后被改过；${failed > 0 ? `另有 ${String(failed)} 条回滚失败（日志保留）` : '已回滚已改记录'}，请重试。`,
+        text: t(`撤回 ${slug} 已取消：记录 ${record.id} 在读取后被改过；${note.zh}，请重试。`, `Revoke of ${slug} was cancelled: record ${record.id} changed after it was read; ${note.en}. Retry.`),
       }
     }
     updated.push({ id: record.id, text: current.text })
@@ -421,53 +453,58 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
     methodDir = storage.removeMethod(config.cultivationRoot, face.role, slug)
   } catch (error) {
     const failed = rollback()
+    const note = rollbackNoteFailed(failed)
     if (error instanceof UnsafeCultivationPathError) return { kind: 'error', text: error.message }
     return {
       kind: 'error',
-      text: `撤回 ${slug} 失败（${(error as Error).message}）；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败（日志保留）` : '记录已回滚'}。`,
+      text: t(`撤回 ${slug} 失败（${(error as Error).message}）；${note.zh}。`, `Revoke of ${slug} failed (${(error as Error).message}); ${note.en}.`),
     }
   }
   if (methodDir === null) {
     const failed = rollback()
+    const note = rollbackNoteFailed(failed)
     return {
       kind: 'error',
-      text: `撤回 ${slug} 时方法已不在；${failed > 0 ? `有 ${String(failed)} 条记录回滚失败（日志保留）` : '记录已回滚'}。`,
+      text: t(`撤回 ${slug} 时方法已不在；${note.zh}。`, `The method was already gone while revoking ${slug}; ${note.en}.`),
     }
   }
   clearPendingRevoke(root)
+  const orphanNote = pendingRecords.length === 0
+    ? { zh: '；--orphan 显式确认：本 workspace 无采纳记录', en: '; --orphan explicitly confirmed: no adopting record in this workspace' }
+    : { zh: '', en: '' }
   return {
     kind: 'success',
-    text: `已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(updated.length)} 条记录${pendingRecords.length === 0 ? '；--orphan 显式确认：本 workspace 无采纳记录' : ''}）。新开的 ${command.roleLabel(face.role)} 会话不再加载它。`,
+    text: t(`已撤回方法 ${slug}（删除 ${methodDir}；标记 ${String(updated.length)} 条记录${orphanNote.zh}）。新开的 ${command.roleLabel(face.role)} 会话不再加载它。`, `Revoked method ${slug} (deleted ${methodDir}; marked ${String(updated.length)} record(s)${orphanNote.en}). New ${command.roleLabel(face.role)} sessions will no longer load it.`),
   }
 }
 
 
 function commandAdopt(command: CultivationCommandContext, tokens: readonly string[]): CultivationCommandResult {
-  const { face, recordsDir, config, storage } = command
+  const { face, recordsDir, config, storage, t } = command
         const id = tokens[1]
-      if (id === undefined) return { kind: 'error' as const, text: '用法：adopt <记录id> [as <方法slug>]。' }
+      if (id === undefined) return { kind: 'error' as const, text: t('用法：adopt <记录id> [as <方法slug>]。', 'Usage: adopt <record-id> [as <method-slug>].') }
       const found = storage.readRecord(recordsDir, id)
-      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在（cultivation/records/ 里没有 ${id}.md）。` }
+      if (found === null) return { kind: 'error' as const, text: t(`记录 ${id} 不存在（cultivation/records/ 里没有 ${id}.md）。`, `Record ${id} does not exist (no ${id}.md under cultivation/records/).`) }
       const { text } = found
       const record = parseRecord(id, text)
-      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏，无法采纳。` }
-      if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已是 ${record.status === 'adopted' ? '已采纳' : '已拒绝'}，不重复处理。` }
+      if (record === null) return { kind: 'error' as const, text: t(`记录 ${id} 形状坏，无法采纳。`, `Record ${id} has a broken shape and cannot be adopted.`) }
+      if (record.status !== 'open') return { kind: 'error' as const, text: t(`记录 ${id} 已是 ${record.status === 'adopted' ? '已采纳' : '已拒绝'}，不重复处理。`, `Record ${id} is already ${record.status === 'adopted' ? 'adopted' : 'rejected'}; it is not processed twice.`) }
       if (record.targetRole !== face.role) {
-        return { kind: 'error' as const, text: `仅建议权：${record.id} 的培养对象是 ${command.roleLabel(record.targetRole)}，请在 ${command.roleLabel(record.targetRole)} 的会话里采纳。` }
+        return { kind: 'error' as const, text: t(`仅建议权：${record.id} 的培养对象是 ${command.roleLabel(record.targetRole)}，请在 ${command.roleLabel(record.targetRole)} 的会话里采纳。`, `Suggestion power only: ${record.id} targets ${command.roleLabel(record.targetRole)}; adopt it in a ${command.roleLabel(record.targetRole)} session.`) }
       }
       if (config.cultivationRoot === undefined) {
-        return { kind: 'error' as const, text: '方法层根未配置（bundle patch 行 config.cultivationRoot 缺席）——无法部署方法。' }
+        return { kind: 'error' as const, text: t('方法层根未配置（bundle patch 行 config.cultivationRoot 缺席）——无法部署方法。', 'The method-layer root is not configured (bundle patch line config.cultivationRoot is missing) — cannot deploy the method.') }
       }
       const rest = tokens.slice(2)
       let slug: string
       if (rest.length === 0) slug = `method-${id}`
       else if (rest.length === 2 && rest[0] === 'as' && (rest[1] ?? '') !== '') slug = rest[1] as string
-      else return { kind: 'error' as const, text: '用法：adopt <记录id> [as <方法slug>]（as 后必须恰好一个 slug）。' }
+      else return { kind: 'error' as const, text: t('用法：adopt <记录id> [as <方法slug>]（as 后必须恰好一个 slug）。', 'Usage: adopt <record-id> [as <method-slug>] (exactly one slug after as).') }
       if (!SLUG_RE.test(slug)) {
-        return { kind: 'error' as const, text: `方法 slug 只认小写字母/数字/连字符（≤64 位）：${slug}。` }
+        return { kind: 'error' as const, text: t(`方法 slug 只认小写字母/数字/连字符（≤64 位）：${slug}。`, `Method slugs allow lowercase letters, digits and hyphens only (≤64): ${slug}.`) }
       }
       const proposalBody = recordBody(text)
-      if (proposalBody === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏，无法采纳。` }
+      if (proposalBody === null) return { kind: 'error' as const, text: t(`记录 ${id} 形状坏，无法采纳。`, `Record ${id} has a broken shape and cannot be adopted.`) }
       let installed: boolean
       try {
         installed = storage.installMethod(config.cultivationRoot, record.targetRole, slug, methodSkillText({ slug, expectation: record.expectation, body: proposalBody }))
@@ -475,11 +512,11 @@ function commandAdopt(command: CultivationCommandContext, tokens: readonly strin
         if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: error.message }
         throw error
       }
-      if (!installed) return { kind: 'error' as const, text: `方法 ${slug} 已存在，未覆盖任何文件或记录。` }
+      if (!installed) return { kind: 'error' as const, text: t(`方法 ${slug} 已存在，未覆盖任何文件或记录。`, `Method ${slug} already exists; no file or record was overwritten.`) }
       try {
         if (!storage.updateRecord(recordsDir, id, { status: 'adopted', methodSlug: slug, decidedAt: new Date().toISOString() }, text)) {
           try { storage.removeMethod(config.cultivationRoot, record.targetRole, slug) } catch { /* Preserve the conflict note. */ }
-          return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，采纳已取消并撤回方法 ${slug}；请重试。` }
+          return { kind: 'error' as const, text: t(`记录 ${id} 在读取后被改过，采纳已取消并撤回方法 ${slug}；请重试。`, `Record ${id} changed after it was read; the adoption was cancelled and method ${slug} was rolled back. Retry.`) }
         }
       } catch (error) {
         try { storage.removeMethod(config.cultivationRoot, record.targetRole, slug) } catch { /* Preserve the original record-update failure. */ }
@@ -487,54 +524,54 @@ function commandAdopt(command: CultivationCommandContext, tokens: readonly strin
       }
       return {
         kind: 'success' as const,
-        text: `已采纳 ${id}：方法 ${slug} 部署到 ${command.roleLabel(record.targetRole)} 方法层。新开的 ${command.roleLabel(record.targetRole)} 会话会带着它开工；已经在跑的会话也会随技能目录刷新看到它（下一步就可能用上）。见效后在培养面板点「这条有用」回填，不灵了点「撤回…」（命令行：/cultivation verify ${id} pass|fail、/cultivation revoke ${slug}）。`,
+        text: t(`已采纳 ${id}：方法 ${slug} 部署到 ${command.roleLabel(record.targetRole)} 方法层。新开的 ${command.roleLabel(record.targetRole)} 会话会带着它开工；已经在跑的会话也会随技能目录刷新看到它（下一步就可能用上）。见效后在培养面板点「这条有用」回填，不灵了点「撤回…」（命令行：/cultivation verify ${id} pass|fail、/cultivation revoke ${slug}）。`, `Adopted ${id}: method ${slug} deployed to the ${command.roleLabel(record.targetRole)} method layer. New ${command.roleLabel(record.targetRole)} sessions start with it; running sessions also see it on their next skill-directory refresh (so it may apply on the next step). After it works, record "This helped" in the cultivation panel; if it stops working, use "Revoke…" (command line: /cultivation verify ${id} pass|fail, /cultivation revoke ${slug}).`),
       }
     
 }
 
 function commandReject(command: CultivationCommandContext, tokens: readonly string[], body: string): CultivationCommandResult {
-  const { face, recordsDir, storage } = command
+  const { face, recordsDir, storage, t } = command
         const id = tokens[1]
-      if (id === undefined || body === '') return { kind: 'error' as const, text: '用法：reject <记录id> :: <一句话理由>。' }
+      if (id === undefined || body === '') return { kind: 'error' as const, text: t('用法：reject <记录id> :: <一句话理由>。', 'Usage: reject <record-id> :: <one-line reason>.') }
       const found = storage.readRecord(recordsDir, id)
-      if (found === null) return { kind: 'error' as const, text: `记录 ${id} 不存在。` }
+      if (found === null) return { kind: 'error' as const, text: t(`记录 ${id} 不存在。`, `Record ${id} does not exist.`) }
       const record = parseRecord(id, found.text)
-      if (record === null) return { kind: 'error' as const, text: `记录 ${id} 形状坏。` }
-      if (record.status !== 'open') return { kind: 'error' as const, text: `记录 ${id} 已处理过（${record.status}）。` }
+      if (record === null) return { kind: 'error' as const, text: t(`记录 ${id} 形状坏。`, `Record ${id} has a broken shape.`) }
+      if (record.status !== 'open') return { kind: 'error' as const, text: t(`记录 ${id} 已处理过（${record.status}）。`, `Record ${id} was already processed (${record.status}).`) }
       if (record.targetRole !== face.role) {
-        return { kind: 'error' as const, text: `${record.id} 的培养对象是 ${command.roleLabel(record.targetRole)}，请在该角色会话里处理。` }
+        return { kind: 'error' as const, text: t(`${record.id} 的培养对象是 ${command.roleLabel(record.targetRole)}，请在该角色会话里处理。`, `${record.id} targets ${command.roleLabel(record.targetRole)}; handle it in that role's session.`) }
       }
       if (!storage.updateRecord(recordsDir, id, { status: 'rejected', reason: body.split('\n')[0]!, decidedAt: new Date().toISOString() }, found.text)) {
-        return { kind: 'error' as const, text: `记录 ${id} 在读取后被改过，拒绝未写；请重试。` }
+        return { kind: 'error' as const, text: t(`记录 ${id} 在读取后被改过，拒绝未写；请重试。`, `Record ${id} changed after it was read; the rejection was not written. Retry.`) }
       }
-      return { kind: 'success' as const, text: `已拒绝 ${id}（理由已留档，提出者可在培养页查回执）。` }
+      return { kind: 'success' as const, text: t(`已拒绝 ${id}（理由已留档，提出者可在培养页查回执）。`, `Rejected ${id} (the reason is on file; the proposer can see the receipt in the cultivation panel).`) }
     
 }
 
 function commandVerify(command: CultivationCommandContext, tokens: readonly string[], evidence: string): CultivationCommandResult {
-  const { face, recordsDir, storage } = command
+  const { face, recordsDir, storage, t } = command
   const id = tokens[1]
   const outcome = tokens[2]
   if (id === undefined || (outcome !== 'pass' && outcome !== 'fail')) {
-    return { kind: 'error', text: '用法：verify <记录id> <pass|fail> :: <后续相似工作的具体依据>。' }
+    return { kind: 'error', text: t('用法：verify <记录id> <pass|fail> :: <后续相似工作的具体依据>。', 'Usage: verify <record-id> <pass|fail> :: <concrete evidence from later similar work>.') }
   }
   const normalizedEvidence = evidence.trim()
   if (normalizedEvidence === '') {
-    return { kind: 'error', text: '验证需要后续相似工作的具体依据；请在 :: 之后写明发生了什么。' }
+    return { kind: 'error', text: t('验证需要后续相似工作的具体依据；请在 :: 之后写明发生了什么。', 'Verification needs concrete evidence from later similar work; write what happened after ::.') }
   }
   if (normalizedEvidence.length > VERIFICATION_EVIDENCE_LIMIT) {
-    return { kind: 'error', text: `验证依据最多 ${String(VERIFICATION_EVIDENCE_LIMIT)} 个字符，请保留最相关的工作事实。` }
+    return { kind: 'error', text: t(`验证依据最多 ${String(VERIFICATION_EVIDENCE_LIMIT)} 个字符，请保留最相关的工作事实。`, `Verification evidence is limited to ${String(VERIFICATION_EVIDENCE_LIMIT)} characters; keep the most relevant work facts.`) }
   }
   const found = storage.readRecord(recordsDir, id)
-  if (found === null) return { kind: 'error', text: `记录 ${id} 不存在。` }
+  if (found === null) return { kind: 'error', text: t(`记录 ${id} 不存在。`, `Record ${id} does not exist.`) }
   const record = parseRecord(id, found.text)
-  if (record === null) return { kind: 'error', text: `记录 ${id} 形状坏。` }
-  if (record.status !== 'adopted') return { kind: 'error', text: `只有已采纳的方法才能回填验证（${id} 现为 ${record.status}）。` }
+  if (record === null) return { kind: 'error', text: t(`记录 ${id} 形状坏。`, `Record ${id} has a broken shape.`) }
+  if (record.status !== 'adopted') return { kind: 'error', text: t(`只有已采纳的方法才能回填验证（${id} 现为 ${record.status}）。`, `Only adopted methods can be verified (${id} is currently ${record.status}).`) }
   if (record.revokedAt !== undefined) {
-    return { kind: 'error', text: `方法 ${record.methodSlug ?? id} 已撤回（${record.revokedAt}），不能再回填验证；如需保留历史观察请另开记录。` }
+    return { kind: 'error', text: t(`方法 ${record.methodSlug ?? id} 已撤回（${record.revokedAt}），不能再回填验证；如需保留历史观察请另开记录。`, `Method ${record.methodSlug ?? id} was revoked (${record.revokedAt}) and cannot be verified; open a new record if you want to keep the observation.`) }
   }
   if (record.targetRole !== face.role) {
-    return { kind: 'error', text: `${record.id} 归 ${command.roleLabel(record.targetRole)}，请在该角色会话里回填。` }
+    return { kind: 'error', text: t(`${record.id} 归 ${command.roleLabel(record.targetRole)}，请在该角色会话里回填。`, `${record.id} belongs to ${command.roleLabel(record.targetRole)}; record the verification in that role's session.`) }
   }
   const entry: CultivationVerification = { outcome, evidence: normalizedEvidence, at: new Date().toISOString() }
   const verificationHistory = [...(record.verificationHistory ?? []), entry].slice(-VERIFICATION_HISTORY_LIMIT)
@@ -543,23 +580,23 @@ function commandVerify(command: CultivationCommandContext, tokens: readonly stri
     verificationHistory: encodeVerificationHistory(verificationHistory),
   }
   if (!storage.updateRecord(recordsDir, id, updates, found.text)) {
-    return { kind: 'error', text: `记录 ${id} 在读取后被改过，验证未写；请重试。` }
+    return { kind: 'error', text: t(`记录 ${id} 在读取后被改过，验证未写；请重试。`, `Record ${id} changed after it was read; the verification was not written. Retry.`) }
   }
   return {
     kind: 'success',
-    text: `已记录后续工作依据并回填验证：${id} → ${outcome === 'pass' ? '有用' : '没起作用'}。失败观察不会自动撤回方法。`,
+    text: t(`已记录后续工作依据并回填验证：${id} → ${outcome === 'pass' ? '有用' : '没起作用'}。失败观察不会自动撤回方法。`, `Recorded the later-work evidence and verification: ${id} → ${outcome === 'pass' ? 'helped' : 'did not help'}. A failed observation never revokes the method automatically.`),
   }
 }
 
 function commandArchive(command: CultivationCommandContext, tokens: readonly string[]): CultivationCommandResult {
-  const { root, recordsDir, storage } = command
+  const { root, recordsDir, storage, t } = command
         const days = Number(tokens[1])
       if (!Number.isSafeInteger(days) || days < 1 || days > 3650) {
-        return { kind: 'error' as const, text: '用法：archive <天数 1..3650>——只归档已处理（非 open）且早于该天数的记录。' }
+        return { kind: 'error' as const, text: t('用法：archive <天数 1..3650>——只归档已处理（非 open）且早于该天数的记录。', 'Usage: archive <days 1..3650> — archives only processed (non-open) records older than that many days.') }
       }
       const archiveDir = join(root, RUN_BUNDLE_PATHS.cultivation, 'records-archive')
       const loaded = storage.loadRecords(recordsDir)
-      if (!loaded.reachable) return { kind: 'error' as const, text: `记录目录不可达：${recordsDir}` }
+      if (!loaded.reachable) return { kind: 'error' as const, text: t(`记录目录不可达：${recordsDir}`, `Records directory unreachable: ${recordsDir}`) }
       const cutoff = Date.now() - days * 86_400_000
       let archived = 0
       let failed = 0
@@ -576,17 +613,19 @@ function commandArchive(command: CultivationCommandContext, tokens: readonly str
       }
       return {
         kind: 'success' as const,
-        text: `已归档 ${String(archived)} 条记录到 cultivation/records-archive/${failed > 0 ? `；${String(failed)} 条未动（碰撞/读取失败）` : ''}`
-          + `${loaded.broken > 0 ? `；另有 ${String(loaded.broken)} 条坏记录未动` : ''}。open 记录与时间戳不识别的记录保持原样。`,
+        text: t(
+          `已归档 ${String(archived)} 条记录到 cultivation/records-archive/${failed > 0 ? `；${String(failed)} 条未动（碰撞/读取失败）` : ''}${loaded.broken > 0 ? `；另有 ${String(loaded.broken)} 条坏记录未动` : ''}。open 记录与时间戳不识别的记录保持原样。`,
+          `Archived ${String(archived)} record(s) into cultivation/records-archive/${failed > 0 ? `; ${String(failed)} left untouched (collision/read failure)` : ''}${loaded.broken > 0 ? `; ${String(loaded.broken)} broken record(s) left untouched` : ''}. Open records and records with unrecognized timestamps are left untouched.`,
+        ),
       }
     
 }
 
 function commandPurge(command: CultivationCommandContext, tokens: readonly string[]): CultivationCommandResult {
-  const { root, storage } = command
+  const { root, storage, t } = command
         const days = Number(tokens[1])
       if (!Number.isSafeInteger(days) || days < 1 || days > 3650) {
-        return { kind: 'error' as const, text: '用法：purge <天数 1..3650>——只删除 cultivation/records-archive/ 里早于该天数的归档记录。' }
+        return { kind: 'error' as const, text: t('用法：purge <天数 1..3650>——只删除 cultivation/records-archive/ 里早于该天数的归档记录。', 'Usage: purge <days 1..3650> — deletes only archived records older than that many days under cultivation/records-archive/.') }
       }
       const archiveDir = join(root, RUN_BUNDLE_PATHS.cultivation, 'records-archive')
       let result: { removed: number, failed: number }
@@ -598,18 +637,18 @@ function commandPurge(command: CultivationCommandContext, tokens: readonly strin
       }
       return {
         kind: 'success' as const,
-        text: `已清理归档 ${String(result.removed)} 条${result.failed > 0 ? `；${String(result.failed)} 条未动（非普通文件/删除失败）` : ''}。live records 未动。`,
+        text: t(`已清理归档 ${String(result.removed)} 条${result.failed > 0 ? `；${String(result.failed)} 条未动（非普通文件/删除失败）` : ''}。live records 未动。`, `Purged ${String(result.removed)} archived record(s)${result.failed > 0 ? `; ${String(result.failed)} left untouched (not a regular file/delete failed)` : ''}. Live records were untouched.`),
       }
     
 }
 
 function commandCheck(command: CultivationCommandContext): CultivationCommandResult {
-  const { face, recordsDir, config, storage } = command
+  const { face, recordsDir, config, storage, t } = command
         if (config.cultivationRoot === undefined) {
-        return { kind: 'error' as const, text: '方法层根未配置（config.cultivationRoot 缺席）。' }
+        return { kind: 'error' as const, text: t('方法层根未配置（config.cultivationRoot 缺席）。', 'The method-layer root is not configured (config.cultivationRoot is missing).') }
       }
       const loaded = storage.loadRecords(recordsDir)
-      if (!loaded.reachable) return { kind: 'error' as const, text: `记录目录不可达：${recordsDir}` }
+      if (!loaded.reachable) return { kind: 'error' as const, text: t(`记录目录不可达：${recordsDir}`, `Records directory unreachable: ${recordsDir}`) }
       const revoked = loaded.records.filter(record => record.revokedAt !== undefined).length
       const adopted = loaded.records.filter(record => record.status === 'adopted' && record.targetRole === face.role && record.revokedAt === undefined)
       const adoptedSlugs = new Set<string>()
@@ -638,20 +677,20 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
       const brokenNote = loaded.broken > 0 ? `；另有 ${String(loaded.broken)} 条坏记录未计入` : ''
       const revokedNote = revoked > 0 ? `；另有 ${String(revoked)} 条已撤回记录` : ''
       if (missing.length === 0 && orphans.length === 0 && invalid.length === 0) {
-        return { kind: 'success' as const, text: `${command.roleLabel(face.role)} 方法层与已采纳记录一致（${String(adopted.length)} 条）${brokenNote}${revokedNote}。` }
+        return { kind: 'success' as const, text: t(`${command.roleLabel(face.role)} 方法层与已采纳记录一致（${String(adopted.length)} 条）${brokenNote}${revokedNote}。`, `The ${command.roleLabel(face.role)} method layer matches the adopted records (${String(adopted.length)})${brokenNote}${revokedNote}.`) }
       }
       return {
         kind: 'success' as const,
-        text: `对账结果：${missing.length > 0 ? `记录缺方法 ${missing.join('、')}` : '记录与方法一一对应'}`
-          + `${invalid.length > 0 ? `；非法记录 ${invalid.join('、')}` : ''}`
-          + `${orphans.length > 0 ? `；方法无本 workspace 记录 ${orphans.join('、')}（可能属于其它 workspace；确认孤儿后再 revoke --orphan）` : ''}。`
-          + `只报告，不自动删改${brokenNote}${revokedNote}。`,
+        text: t(
+          `对账结果：${missing.length > 0 ? `记录缺方法 ${missing.join('、')}` : '记录与方法一一对应'}${invalid.length > 0 ? `；非法记录 ${invalid.join('、')}` : ''}${orphans.length > 0 ? `；方法无本 workspace 记录 ${orphans.join('、')}（可能属于其它 workspace；确认孤儿后再 revoke --orphan）` : ''}。只报告，不自动删改${brokenNote}${revokedNote}。`,
+          `Reconciliation: ${missing.length > 0 ? `records missing a method: ${missing.join(', ')}` : 'records and methods match one to one'}${invalid.length > 0 ? `; invalid records: ${invalid.join(', ')}` : ''}${orphans.length > 0 ? `; methods with no record in this workspace: ${orphans.join(', ')} (they may belong to another workspace; confirm orphans before revoke --orphan)` : ''}. Report only — nothing is deleted or edited${brokenNote}${revokedNote}.`,
+        ),
       }
     
 }
 
 /** 「/cultivation」命令族与提案工具的注册面。 */
-export function registerCultivation(ctx: Context, config: CultivationHostConfig, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result): void {
+export function registerCultivation(ctx: Context, config: CultivationHostConfig, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result, t: CultivationText = zh => zh): void {
   const storage = nodeCultivationStorage
   if (!dataBlocked && companyHome !== undefined && config.cultivationRoot !== undefined) {
     try {
@@ -782,6 +821,6 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
     name: 'cultivation',
     description: '培养回路：给自己的角色提交纠正、给别的角色提建议、采纳/拒绝/验证/撤回方法（采纳仅目标角色本人）',
     input: { hint: 'correct <期望行为> :: <做法与证据> | suggest <角色> <期望行为> :: <建议> | adopt <id> [as <slug>] | reject <id> :: <理由> | verify <id> <pass|fail> :: <后续相似工作的具体依据> | revoke <slug>' },
-    handler: cultivationCommandHandler(config, storage, ctx, companyHome, dataBlocked, blockedReason, roleLabel, resultLabel),
+    handler: cultivationCommandHandler(config, storage, ctx, t, companyHome, dataBlocked, blockedReason, roleLabel, resultLabel),
   })
 }

@@ -130,7 +130,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
     }
   }
 
-  registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked, blockedReason, role => roleLabelFor(role, language.current()), result => resultLabelFor(result, language.current()))
+  registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked, blockedReason, role => roleLabelFor(role, language.current()), result => resultLabelFor(result, language.current()), language.text)
   const contentDir = resolveContentDir(import.meta.url)
   const startupWatch = new StartupOptionsWatch({ contentDir, logger: ctx.logger })
   // 组合测试的最小 ctx 替身可能没有 effect；真实 Cordis 有。缺失时 watcher 随进程退出回收。
