@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 305 |
-| 有具名守卫 | 203 |
+| 已修卡 | 306 |
+| 有具名守卫 | 204 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 66.6% |
+| 覆盖率 | 66.7% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -326,3 +326,4 @@
 | 313 | 2026-11-22 | tests/lib/startup/startup-settings.spec.ts:221 |
 | 314 | 2026-11-22 | tests/client/startup/startup-load.spec.ts:88 |
 | 315 | 2026-11-22 | tests/client/cultivation/cultivation-view-layout.spec.ts:13 |
+| 323 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:106；tests/client/tabs/attention-tab.spec.ts:184 |

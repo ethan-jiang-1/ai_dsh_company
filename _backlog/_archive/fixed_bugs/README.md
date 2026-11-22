@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-323**（2026-11-22，E2E 第五轮 / P2）：跨工作区越界——
+  [323](BUG-323-attention-history-cross-workspace-leak.md) `historyCandidates` 改 fail-closed（cwd 未知 ⇒ 候选 0）并带回候选边界。
+  证据提交 `1d563e89`。
+
 - **BUG-315**（2026-11-22，E2E 第四轮 / P2）：主视图两栏下限没生效——
   [315](BUG-315-cultivation-full-view-min-widths-ignored.md) `splitLayout` 成为布局唯一计算（放不下就上下堆叠），
   CSS 增 `data-stacked` 栅格；判据 = 三档容器 + 真 Chromium 量真规则。证据提交 `170be97a`。

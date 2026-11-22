@@ -180,7 +180,8 @@ describe('AttentionTab · 历史读取的边界（BUG-305）', () => {
 })
 
 // 越界防线（BUG-323）：当前会话 cwd 未解析时，别的 workspace 的挂起审批**不许**出现在这里。
-describe('AttentionTab · cwd 未解析时不跨工作区', () => {
+// 负例留证 2026-11-22：fail-open 过滤下 page 面会被调用并渲染别的 workspace 的审批（越界）。BUG-323
+describe('AttentionTab · cwd 未解析时不跨工作区（BUG-323）', () => {
   it('cwd 缺失 ⇒ 不扫候选、出「工作区还没就绪」提示，且看不到其它工作区的审批', async () => {
     const byId = {
       'session-lead': { id: 'session-lead' },

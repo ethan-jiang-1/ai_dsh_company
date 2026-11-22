@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-323：当前会话 cwd 未加载时，跨会话重建把**所有工作区**的会话都扫进来
 
-> 严重级别：P2（次要偏重：待办声称只看「同工作区」；currentCwd 未解析时 `||` 分支放行全部工作区，别的 workspace 的挂起审批会出现在这里）｜发现：2026-11-22（E2E 第五轮）｜状态：调查中
+> 严重级别：P2（次要偏重：待办声称只看「同工作区」；currentCwd 未解析时 `||` 分支放行全部工作区，别的 workspace 的挂起审批会出现在这里）｜发现：2026-11-22（E2E 第五轮）｜状态：已修｜审查：agent — 逐条核对已修判定（cwd 缺失/空串/不在清单都不扫 + 同工作区过滤）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit 1d563e89（client 读面边界，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -69,3 +69,10 @@ return Object.values(byId).filter(summary =>
 - cwd=A 时只出现 A 的审批；
 - cwd 从缺失到解析后结果收敛；
 - 纯函数/组件 spec + 双 workspace 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/presence/attention-history.ts`（`historyCandidates` fail-closed）、`packages/company-pack/src/client/tabs/AttentionTab.tsx`、`packages/company-pack/src/client/locales.ts`、`tests/client/presence/attention-history.spec.ts`、`tests/client/tabs/attention-tab.spec.ts`
+- 红：`vitest run tests/client/presence/attention-history.spec.ts tests/client/tabs/attention-tab.spec.ts` —— 把过滤改回 fail-open（cwd 未知 ⇒ 都匹配）后 3 failed（不扫的用例与「看不到其它 workspace」失败）
+- 绿：`vitest run tests/client/presence/attention-history.spec.ts tests/client/tabs/attention-tab.spec.ts` —— 23/23（cwd 缺失/空串/当前会话不在清单 ⇒ `ok:false`；同工作区过滤排除自己与 subagent；面板出「工作区还没就绪」且 page 面零调用）
+- 提交：commit 1d563e89

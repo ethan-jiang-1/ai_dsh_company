@@ -102,7 +102,8 @@ describe('跨会话重建的边界（BUG-304）', () => {
 
 // fail-closed（BUG-323）：当前会话 cwd 未解析时**一个都不扫**——过去把「未知」当「都匹配」，
 // 别的 workspace 的挂起审批会出现在本工作区的待办里（越界）。同时带回候选边界（BUG-318）。
-describe('historyCandidates：fail-closed 与候选边界', () => {
+// 负例留证 2026-11-22：把过滤改回 fail-open（cwd 未知 ⇒ 都匹配）后 `vitest run tests/client/presence/attention-history.spec.ts tests/client/tabs/attention-tab.spec.ts` 3 failed（越界）。BUG-323
+describe('historyCandidates：fail-closed 与候选边界（BUG-323/318）', () => {
   const sessions = {
     current: { id: 'current', cwd: '/ws/a', updatedAt: 9 },
     same1: { id: 'same1', cwd: '/ws/a', updatedAt: 5 },
