@@ -4,8 +4,8 @@
  */
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useState } from 'react'
-import { decidedAtLabel, roleLabel as defaultRoleLabel, timeLabel, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../../lib/cultivation/cultivation.ts'
-import { CULTIVATION_COPY, revokeLine, verifyLine } from './cultivation-actions.ts'
+import { roleLabel as defaultRoleLabel, timeParts, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../../lib/cultivation/cultivation.ts'
+import { CULTIVATION_COPY, cultivationTimeLabel, revokeLine, verifyLine } from './cultivation-actions.ts'
 import type { CultivationBoardState } from './use-cultivation-board.tsx'
 
 /** 验证态 → Tag（V8：未验证 ≠ 已掌握）。 */
@@ -30,7 +30,7 @@ function kindNoun(record: CultivationRecord): string {
 /** 观察时间用人话；原始 ISO 只放在 title 里供核对。 */
 function verificationTime(entry: CultivationVerification, now: number): string {
   const at = Date.parse(entry.at)
-  return Number.isNaN(at) ? entry.at : timeLabel(at, now)
+  return Number.isNaN(at) ? entry.at : cultivationTimeLabel(timeParts(at, now))
 }
 
 export function CultivationMine({ inbox, roleLabel = defaultRoleLabel }: { readonly inbox: CultivationBoardState['inbox']; readonly roleLabel?: (role: string) => string }) {
@@ -48,7 +48,7 @@ export function CultivationMine({ inbox, roleLabel = defaultRoleLabel }: { reado
                   <Tag tone="warning">{CULTIVATION_COPY.mineRejectedByTarget}</Tag>
                 </span>
                 <span className="wk-row-task">{CULTIVATION_COPY.mineReason(record.reason ?? CULTIVATION_COPY.inboxNoReason)}</span>
-                {record.decidedAt !== undefined && <span className="wk-meta" title={record.decidedAt}>{CULTIVATION_COPY.mineRejectedAt(decidedAtLabel(record.decidedAt))}</span>}
+                {record.decidedAt !== undefined && <span className="wk-meta" title={record.decidedAt}>{CULTIVATION_COPY.mineRejectedAt(cultivationTimeLabel(timeParts(Date.parse(record.decidedAt), Date.now())))}</span>}
 
               </div>
             ))}
@@ -140,7 +140,7 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
                           ? <span className="wk-meta">{CULTIVATION_COPY.adoptedSourceRecorded(record.source)}</span>
                           : <span className="wk-meta">{CULTIVATION_COPY.adoptedSourceMissing}</span>}
                     {stampOf(record.id) !== null && <span className="wk-meta">{CULTIVATION_COPY.adoptedRaisedAt(String(stampOf(record.id)))}</span>}
-                    {record.decidedAt !== undefined && <span className="wk-meta" title={record.decidedAt}>{CULTIVATION_COPY.adoptedDecidedAt(decidedAtLabel(record.decidedAt))}</span>}
+                    {record.decidedAt !== undefined && <span className="wk-meta" title={record.decidedAt}>{CULTIVATION_COPY.adoptedDecidedAt(cultivationTimeLabel(timeParts(Date.parse(record.decidedAt), Date.now())))}</span>}
                     {record.body !== '' && (() => {
                       const expanded = expandedEvidence[record.id] === true
                       return (

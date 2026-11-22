@@ -51,7 +51,7 @@ export type WorkspaceTextRead =
  */
 export type DirListing =
   | { readonly ok: true, readonly names: readonly string[] }
-  | { readonly ok: false, readonly reason: string }
+  | { readonly ok: false, readonly reason: CultivationReadReason }
 
 /** 培养面板要读的四件：journal 清单/首段 + 记录清单/全文（全部失败给 null，见头注）。 */
 export interface CultivationFiles {
@@ -158,9 +158,9 @@ export function makeCultivationFiles(remote: RemoteNamespaceFace, leadOf: (sessi
       const result = await remote.workspaceFiles.list(leadOf(sessionId), dir, signal)
       // 静默 null 曾让「面板说读不到、盘上明明有」无从诊断（BUG-291）：失败必须点名目录与原因。
       if (!result.ok) {
-        const reason = `列目录被拒（${dir}）`
-        console.warn(`[company] ${reason}`, JSON.stringify(result))
-        return { ok: false, reason }
+        // 代号而不是中文（BUG-302）：这里的结果会进面板文案，翻译必须由字典做。
+        console.warn(`[company] dir listing denied: ${dir}`, JSON.stringify(result))
+        return { ok: false, reason: 'dir-denied' }
       }
       return {
         ok: true,
@@ -169,9 +169,9 @@ export function makeCultivationFiles(remote: RemoteNamespaceFace, leadOf: (sessi
           .map(entry => entry.name),
       }
     } catch (error) {
-      const reason = error instanceof Error ? error.message : String(error)
-      console.warn(`[company] 列目录异常 ${dir}`, reason)
-      return { ok: false, reason }
+      // 抛出的异常也不把原文塞给面板（可能是中英混杂的底层报错）：统一代号，细节进 console。
+      console.warn(`[company] dir listing error: ${dir}`, error instanceof Error ? error.message : String(error))
+      return { ok: false, reason: 'dir-denied' }
     }
   }
   const readText = makeWorkspaceTextReader(remote, leadOf)
@@ -203,10 +203,14 @@ export interface CultivationPanelData {
   readonly refresh: () => void
 }
 
+/** 读失败的原因代号（面板按字典翻译；不在这里写人话——BUG-302）。 */
+export type CultivationReadReason = 'dir-denied'
+
 /** 一次读失败的说明（面板必须说得出「哪个目录、什么原因」，F2）。 */
 export interface CultivationReadProblem {
   readonly path: string
-  readonly reason: string
+  /** 原因代号：翻译在面板（zh/en 共用同一份读模型，不能带死中文）。 */
+  readonly reason: CultivationReadReason
 }
 
 /** 刷新间隔（journal/记录都不高频变化；30s 足够）——**导出**：页签头文案要照它说真话（别再写死"5 秒"）。 */

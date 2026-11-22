@@ -316,3 +316,32 @@ export function decidedAtLabel(iso: string, now: number = Date.now()): string {
   const at = Date.parse(iso)
   return Number.isNaN(at) ? iso : timeLabel(at, now)
 }
+
+/** 时间的人话**片段**（不含语言）：给多语言渲染层用，避免表达层把中文写死（BUG-302）。 */
+export type TimeParts =
+  | { readonly kind: 'just-now' }
+  | { readonly kind: 'minutes', readonly n: number }
+  | { readonly kind: 'hours', readonly n: number }
+  | { readonly kind: 'yesterday', readonly hhmm: string }
+  | { readonly kind: 'date', readonly text: string }
+
+/**
+ * 相对时间 → 片段（`timeLabel` 的中文只是其中一种渲染，不再是唯一出口）。
+ * @param at - 目标时刻（epoch ms）。
+ * @param now - 当前时刻。
+ * @returns 结构片段（调用方按语言渲染）。
+ */
+export function timeParts(at: number, now: number): TimeParts {
+  const pad = (n: number): string => String(n).padStart(2, '0')
+  const date = new Date(at)
+  const hhmm = `${pad(date.getHours())}:${pad(date.getMinutes())}`
+  const delta = now - at
+  if (delta < 60_000) return { kind: 'just-now' }
+  if (delta < 3_600_000) return { kind: 'minutes', n: Math.floor(delta / 60_000) }
+  if (delta < 86_400_000) return { kind: 'hours', n: Math.floor(delta / 3_600_000) }
+  const today = new Date(now)
+  const sameDay = (a: Date, b: Date): boolean => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+  if (sameDay(date, new Date(now - 86_400_000))) return { kind: 'yesterday', hhmm }
+  const md = `${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+  return { kind: 'date', text: date.getFullYear() === today.getFullYear() ? `${md} ${hhmm}` : `${String(date.getFullYear())}-${md} ${hhmm}` }
+}

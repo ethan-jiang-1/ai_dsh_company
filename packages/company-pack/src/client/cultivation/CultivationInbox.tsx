@@ -65,7 +65,7 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
         {records === null
           ? <div className="wk-meta">{recordsProblem === null
             ? CULTIVATION_COPY.inboxLoading
-            : CULTIVATION_COPY.inboxUnread(recordsProblem.path, recordsProblem.reason)}</div>
+            : CULTIVATION_COPY.inboxUnread(recordsProblem.path, recordsProblem.reason === 'dir-denied' ? CULTIVATION_COPY.inboxUnreadDirDenied : recordsProblem.reason)}</div>
           : inbox.needsDecision.length === 0
             ? <div className="wk-meta">{records.length === 0
               // 记录目录真的空：点名工作区（BUG-291）。

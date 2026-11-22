@@ -8,7 +8,7 @@
  */
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { CultivationBoard } from '../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx'
 import type { CultivationRecord, CultivationRow } from '../../../packages/company-pack/src/lib/cultivation/cultivation.ts'
 import type { CultivationContext } from '../../../packages/company-pack/src/lib/cultivation/cultivation-context.ts'
@@ -311,5 +311,37 @@ describe('CultivationBoard：四态矩阵的第四格（BUG-294）', () => {
     const markup = render({ records: [], workspaceLabel: 'company-workspace' })
     expect(markup).toContain('还没有培养记录')
     expect(markup).not.toContain('没有需要你处理的记录')
+  })
+})
+
+// 英文界面不许混中文：时间是「刚刚/7 小时前」、读失败原因是「列目录被拒（…）」，
+// 模板是英文、参数是中文——这是两个只写中文的共享 helper 造成的。判据 = en 渲染里不出现 CJK。
+describe('CultivationBoard · en 渲染无 CJK', () => {
+  const cjk = /[\u4e00-\u9fff]/
+
+  afterEach(() => { setCultivationLanguage('zh') })
+
+  it('采纳/拒绝时间与提出时间都是英文（不出现「刚刚 / 分钟前 / 昨天」）', () => {
+    setCultivationLanguage('en')
+    const markup = render({
+      viewerRole: 'cfo',
+      viewerLabel: 'CFO',
+      records: [
+        // 5 分钟前 ⇒ 相对时间分支（英文应为 "5 minutes ago"，中文会是「5 分钟前」）。
+        // 夹具数据一律 ASCII：这条判据只钉**文案**不带中文，不把用户数据算进来。
+        record({ kind: 'suggestion', proposerRole: 'ceo', targetRole: 'cfo', status: 'rejected', reason: 'x', expectation: 'ascii expectation', title: 'ascii title', decidedAt: new Date(Date.now() - 5 * 60_000).toISOString() }),
+        record({ id: 'r-2', status: 'adopted', methodSlug: 'm-1', expectation: 'ascii expectation', title: 'ascii title', decidedAt: new Date(Date.now() - 5 * 60_000).toISOString() }),
+      ],
+    })
+    const times = markup.match(/\d+ minutes ago|\d+ hours ago|just now|yesterday \d\d:\d\d/g) ?? []
+    expect(times.length).toBeGreaterThan(0)
+    expect(markup).not.toMatch(cjk)
+  })
+
+  it('读不到的原因也走字典（不是硬编码中文）', () => {
+    setCultivationLanguage('en')
+    const markup = render({ records: null, recordsProblem: { path: '.dsh-company/cultivation/records', reason: 'dir-denied' } })
+    expect(markup).toContain('the directory listing was denied')
+    expect(markup).not.toMatch(cjk)
   })
 })

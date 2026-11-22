@@ -4,13 +4,14 @@
  * 组件只负责“把状态排成四块可见面”；状态机、双击护栏、动作回执、列表折叠、时间标签都在这里。
  * 测试仍从组件外向里断言；本 hook 不 import React 组件（只借 `Button` 渲染折叠控件）。
  */
+import { cultivationTimeLabel } from './cultivation-actions.ts'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useRef, useState, type ReactNode } from 'react'
 import {
   CULTIVATION_ROLES,
   recordInbox,
   recordStampOf,
-  timeLabel,
+  timeParts,
   type CultivationRecord,
 } from '../../lib/cultivation/cultivation.ts'
 import {
@@ -101,10 +102,10 @@ export function useCultivationBoard(props: CultivationBoardStateProps) {
           </Button>
         </div>
       )
-  /** 记录的时间标签（id 形状不符给 null——不猜）。 */
+  /** 记录的时间标签（id 形状不符给 null——不猜）；渲染走当前语言（BUG-302）。 */
   const stampOf = (id: string): string | null => {
     const at = recordStampOf(id)
-    return at === null ? null : timeLabel(at, now)
+    return at === null ? null : cultivationTimeLabel(timeParts(at, now))
   }
 
   const run = async (key: string, line: string, after?: () => void): Promise<void> => {

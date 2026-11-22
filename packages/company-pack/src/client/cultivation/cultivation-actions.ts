@@ -17,7 +17,7 @@
  * keyless 判据 = `tests/client/cultivation/cultivation-actions.spec.ts`；真机制（真命令、真落盘）= browser-visual 探针。
  */
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import { CULTIVATION_ROLES, WORK_TEXT_LIMIT } from '../../lib/cultivation/cultivation.ts'
+import { CULTIVATION_ROLES, WORK_TEXT_LIMIT, type TimeParts } from '../../lib/cultivation/cultivation.ts'
 
 /**
  * 面向人的文案（面板按钮、表单、校验提示、通道降级）。**迭代里改得最多的就是这里**——
@@ -129,6 +129,12 @@ const CULTIVATION_COPY_ZH = {
   inboxUnexpanded: (count: number): string => `还有 ${String(count)} 条旧记录只读了摘要（未展开全文）；用 /cultivation archive <天数> 归档后重新加载。`,
   inboxLoading: '培养记录读取中…',
   inboxUnread: (path: string, reason: string): string => `培养记录读不到：${path}——${reason}（不算 0 条）。`,
+  inboxUnreadDirDenied: '列目录被拒',
+  timeJustNow: '刚刚',
+  timeMinutesAgo: (n: number): string => `${String(n)} 分钟前`,
+  timeHoursAgo: (n: number): string => `${String(n)} 小时前`,
+  timeYesterday: (hhmm: string): string => `昨天 ${hhmm}`,
+  timeDate: (text: string): string => text,
   inboxEmpty: (workspace: string | null): string => `这个工作区${workspace === null ? '' : `（${workspace}）`}下还没有培养记录。`,
   // 盘上有记录、但没有待你决定的（都处理过了）：不能说「工作区还没有记录」——那是另一态（BUG-294）。
   inboxNoPending: (total: number): string => `没有需要你处理的记录（共 ${String(total)} 条，已处理的在下面）。`,
@@ -370,6 +376,12 @@ const CULTIVATION_COPY_EN = {
   inboxUnexpanded: (count: number): string => `${String(count)} older records loaded as summaries only; archive with /cultivation archive <days> and reload.`,
   inboxLoading: 'Reading cultivation records…',
   inboxUnread: (path: string, reason: string): string => `Cultivation records unreadable: ${path} — ${reason} (not zero).`,
+  inboxUnreadDirDenied: 'the directory listing was denied',
+  timeJustNow: 'just now',
+  timeMinutesAgo: (n: number): string => `${String(n)} minutes ago`,
+  timeHoursAgo: (n: number): string => `${String(n)} hours ago`,
+  timeYesterday: (hhmm: string): string => `yesterday ${hhmm}`,
+  timeDate: (text: string): string => text,
   inboxEmpty: (workspace: string | null): string => `No cultivation records in this workspace${workspace === null ? '' : ` (${workspace})`}.`,
   inboxNoPending: (total: number): string => `Nothing needs your decision (${String(total)} record${total === 1 ? '' : 's'} total; handled ones are below).`,
   inboxListAria: 'Cultivation records awaiting me',
@@ -530,6 +542,21 @@ export const CULTIVATION_COPY: typeof CULTIVATION_COPY_ZH = new Proxy(CULTIVATIO
     return Reflect.get(target, property, receiver)
   },
 })
+
+/**
+ * 时间片段 → 当前语言的人话（培养面板的唯一时间渲染出口）。
+ * @param parts - `timeParts` 的结构片段。
+ * @returns 人话时间。
+ */
+export function cultivationTimeLabel(parts: TimeParts): string {
+  switch (parts.kind) {
+    case 'just-now': return CULTIVATION_COPY.timeJustNow
+    case 'minutes': return CULTIVATION_COPY.timeMinutesAgo(parts.n)
+    case 'hours': return CULTIVATION_COPY.timeHoursAgo(parts.n)
+    case 'yesterday': return CULTIVATION_COPY.timeYesterday(parts.hhmm)
+    case 'date': return CULTIVATION_COPY.timeDate(parts.text)
+  }
+}
 
 /** 人写文本的校验问题（字段 + 给用户看的一句话）。 */
 export interface DraftProblem {

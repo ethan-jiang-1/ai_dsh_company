@@ -8,7 +8,8 @@
  * 红证（先红后绿）：本 spec 在模块存在前 import 即红（见毕业 Note 的验证节）。
  */
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import { describe, expect, it } from 'vitest'
+import { cultivationTimeLabel, setCultivationLanguage } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
+import { afterEach, describe, expect, it } from 'vitest'
 import {
   CULTIVATION_COPY,
   adoptLine,
@@ -215,5 +216,26 @@ describe('可选背景的命令线（D1=A：只带 ref token）', () => {
     expect(correctLine('--context is confusing', '正文')).toEqual({
       ok: true, line: '/cultivation correct --context is confusing :: 正文',
     })
+  })
+})
+
+// 时间渲染的唯一出口（BUG-302）：五档片段 → 当前语言。
+describe('cultivationTimeLabel：五档都走当前语言', () => {
+  afterEach(() => { setCultivationLanguage('zh') })
+
+  it('zh / en 各五档（en 不出现中文）', () => {
+    const parts = [
+      { kind: 'just-now' as const },
+      { kind: 'minutes' as const, n: 5 },
+      { kind: 'hours' as const, n: 3 },
+      { kind: 'yesterday' as const, hhmm: '09:30' },
+      { kind: 'date' as const, text: '10-29 11:20' },
+    ]
+    const zhTexts = parts.map(part => cultivationTimeLabel(part))
+    expect(zhTexts).toEqual(['刚刚', '5 分钟前', '3 小时前', '昨天 09:30', '10-29 11:20'])
+    setCultivationLanguage('en')
+    const enTexts = parts.map(part => cultivationTimeLabel(part))
+    expect(enTexts).toEqual(['just now', '5 minutes ago', '3 hours ago', 'yesterday 09:30', '10-29 11:20'])
+    expect(enTexts.join('')).not.toMatch(/[\u4e00-\u9fff]/)
   })
 })
