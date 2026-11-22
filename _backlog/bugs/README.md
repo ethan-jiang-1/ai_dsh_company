@@ -28,7 +28,7 @@
 
 **本轮批次**：下方「## 2026-11-22 修复交接（E2E 第五轮：BUG-316..324）
 
-**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：九张都改 client 读面/呈现面/公开文案，316 触及 host 结果面；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-22））。
+**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：九张都改 client 读面/呈现面/公开文案，316 触及 host 结果面；留痕 = 批次 Note [2026-11-23-e2e-round5-boundary-pipeline-asks](../../notes/implemented/2026-11-23-e2e-round5-boundary-pipeline-asks.md)）。
 
 **起点事实（已核）**：317 = `AttentionTab` 只留最近 `MAX_EVENTS=1000` 条当前会话事件，旧 `approval/asked` 被截、空态仍说「没有等你的事」；318 = 候选 `slice(0, HISTORY_SCAN_CAP=20)` 无边界提示；320 = `STREAM_ITEM_CAP=5` 把第 6 条挂起审批静默截掉；319 = `pendingApprovals` 只重建审批，question 只靠活体登记，刷新即丢；323 = `currentCwd === undefined` 时 filter 把「未知」当匹配，跨工作区会话全部被扫；321 = `readRecordHead` 只读 60 行，合法长 frontmatter 记录被判坏；322 = journal `readHead` 240 字窗口吞掉标题；324 = catalog 的 `root`/`ledgered`/`presented` 形状坏被静默归一；316 = `/cultivation` 回执/错误串全中文。
 
@@ -45,7 +45,11 @@
 
 **终点** = 9 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡四行证据与 `审查：` 齐；五连 + `coverage:ratchet` 绿；`client-load`/`ui-scene --isolated` 真绿（带指纹）；一篇批次 Note 记 D‴/F‴/O/H″ 与元层（边界一旦在某一层被丢掉，下游就只能靠猜），并落地三条判据：边界汇总类型、fail-closed 过滤器、问询重建。
 
-**本节是立项与交接，不是落地**：只记批次计划与次序。
+**收口（2026-11-23）**：9 张全部修复并迁 [fixed_bugs](../_archive/fixed_bugs/)，每卡 `审查：` + 四行证据齐。
+证据提交 = `1d563e89`（323）/ `ceb575dd`（317+318+320）/ `86408cc2`（319）/ `bdda0759`（321+322）/ `0802185b`（324）/ `4f1ad457`（316）。
+判据落地：**边界汇总**（事件窗 / 候选 capped / 审批流 capped 一路到面板 + 压住空态）、
+**fail-closed 过滤器**（cwd 未知 ⇒ 候选 0）、**问询重建**（tool/call ↔ tool/result 配对）。
+收尾：`test` 2574 · `verify` ALL PASS · `coverage-ratchet` PASS（210 文件）。
 
 ## 2026-11-22 修复交接（E2E 第四轮：BUG-307..315）
 
