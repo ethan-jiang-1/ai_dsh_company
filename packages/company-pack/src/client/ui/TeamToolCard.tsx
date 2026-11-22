@@ -5,6 +5,7 @@
  * ⚠ keyed slot 的 key 域是开放的：拼错**不报错**，卡只是永远不出现。所以
  * `tests/client/ui/team-tool-card.spec.ts` 有一条守卫把 `TEAM_TOOL_KEYS` 与 vendor 的工具注册名钉在一起。
  */
+import { joinList, listSeparator } from '../ui/list-separator.ts'
 import { useState, type KeyboardEvent } from 'react'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
@@ -56,6 +57,8 @@ export interface TeamCardModel {
   /** 次要细节（任务说明 / 消息正文 / 依赖列表）。 */
   readonly detail: string | null
   readonly detailToken?: CardToken | undefined
+  /** 任务依赖 id（渲染处按语言拼分隔符）。 */
+  readonly blockIds?: readonly string[]
   readonly state: CardState
   readonly output: string | null
 }
@@ -84,6 +87,8 @@ export function teamCardModel(toolName: string, block: ToolCallViewProps['block'
   let detail: string | null = null
   let titleToken: CardToken | undefined
   let detailToken: CardToken | undefined
+  /** 任务依赖的 id 清单：分隔符到渲染处才按语言拼（模型是语言无关的）。 */
+  let blockIds: readonly string[] = []
   switch (toolName) {
     case 'spawn_teammate':
       title = `派活 · ${name === '' ? '新成员' : name}`
@@ -110,8 +115,9 @@ export function teamCardModel(toolName: string, block: ToolCallViewProps['block'
     case 'team_task_create':
       title = `建任务 · ${subject === '' ? '新任务' : subject}`
       titleToken = subject === '' ? { key: 'teamCard.taskCreateNew' } : { key: 'teamCard.taskCreate', params: { subject } }
-      detail = blockers.length === 0 ? null : `依赖 ${blockers.join('、')}`
-      if (blockers.length > 0) detailToken = { key: 'teamCard.taskDeps', params: { ids: blockers.join('、') } }
+      detail = blockers.length === 0 ? null : `依赖 ${joinList(blockers, '、')}`
+      // 分隔符在**渲染处**按语言取（模型层不带语言；BUG-329）。
+      if (blockers.length > 0) blockIds = blockers
       break
     case 'team_task_list':
       title = '读任务板'
@@ -131,7 +137,7 @@ export function teamCardModel(toolName: string, block: ToolCallViewProps['block'
       break
   }
 
-  return { title, titleToken, detail, detailToken, state: cardStateOf(block), output: resultTextOf(block) }
+  return { title, titleToken, detail, detailToken, blockIds, state: cardStateOf(block), output: resultTextOf(block) }
 }
 
 /**
@@ -140,7 +146,7 @@ export function teamCardModel(toolName: string, block: ToolCallViewProps['block'
  * @returns 团队动作卡。
  */
 export function TeamToolCard({ toolName, block, inspect, t = defaultT }: ToolCallViewProps & { readonly t?: CompanyT }) {
-  const { title, titleToken, detail, detailToken, state, output } = teamCardModel(toolName, block)
+  const { title, titleToken, detail, detailToken, blockIds, state, output } = teamCardModel(toolName, block)
   const [expanded, setExpanded] = useState(false)
   const expandable = output !== null || (detail !== null && detail.length > 60)
   const open = expanded && expandable
@@ -167,7 +173,7 @@ export function TeamToolCard({ toolName, block, inspect, t = defaultT }: ToolCal
         {expandable && <span className="wk-delegation-state">{open ? t('teamCard.collapse') : t('teamCard.expand')}</span>}
       </div>
       {detail !== null && (open || detail.length <= 60)
-        ? <div className="wk-delegation-title">{detailToken === undefined ? detail : t(detailToken.key, detailToken.params)}</div>
+        ? <div className="wk-delegation-title">{detailToken === undefined ? detail : t(detailToken.key, { ...detailToken.params, ids: joinList(blockIds ?? [], listSeparator(t)) })}</div>
         : null}
       {open && output !== null ? (
         <div className="wk-mt-sm">

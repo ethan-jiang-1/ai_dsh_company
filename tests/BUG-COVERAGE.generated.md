@@ -336,7 +336,7 @@
 | 323 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:118；tests/client/tabs/attention-tab.spec.ts:189 |
 | 324 | 2026-11-22 | tests/client/data/catalog-contract.spec.ts:72 |
 | 325 | 2026-11-23 | tests/client/wiring/attention.spec.ts:406 |
-| 326 | 2026-11-23 | tests/host/cultivation/cultivation-command.spec.ts:461 |
+| 326 | 2026-11-23 | tests/host/commands/blocked-text.spec.ts:10；tests/host/cultivation/cultivation-command.spec.ts:461；tests/host/cultivation/cultivation-command.spec.ts:491 |
 | 327 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:268 |
 | 328 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:283；tests/client/wiring/attention.spec.ts:386 |
 | 330 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:236 |

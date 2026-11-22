@@ -2,9 +2,10 @@
  * 培养面板 · “需要我处理”块（2026-10-28 R4-E4 自 CultivationBoard 抽出）。
  * 只读 board 状态；控件/文案/错误原话与拆前逐字一致。
  */
+import { joinList } from '../ui/list-separator.ts'
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import { roleLabel as defaultRoleLabel, type CultivationRecord } from '../../lib/cultivation/cultivation.ts'
-import { CULTIVATION_COPY, adoptLine } from './cultivation-actions.ts'
+import { CULTIVATION_COPY, cultivationListSeparator, adoptLine } from './cultivation-actions.ts'
 import { BODY_PREVIEW_LINES, type CultivationBoardState } from './use-cultivation-board.tsx'
 
 function recordKindLabel(record: CultivationRecord, roleLabel: (role: string) => string): string {
@@ -54,7 +55,7 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
         <strong>{CULTIVATION_COPY.inboxTitle}</strong>
         {(brokenRecords ?? []).length > 0 && (
           <div className="wk-meta">
-            {CULTIVATION_COPY.inboxBroken(brokenRecords!.length, (brokenRecords ?? []).join('、'))}
+            {CULTIVATION_COPY.inboxBroken(brokenRecords!.length, joinList(brokenRecords ?? [], cultivationListSeparator()))}
           </div>
         )}
         {(unexpandedRecords ?? 0) > 0 && (

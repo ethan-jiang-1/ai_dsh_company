@@ -4,6 +4,7 @@
  * 视觉纪律：颜色一律 `--dsw-*` 令牌；状态用官方 `StateDot`/`Tag`（platform module，零体积）；
  * DAG 是自绘 SVG（平台无 mermaid / 图表渲染器，研究 §1.5）。
  */
+import { joinList, listSeparator } from '../ui/list-separator.ts'
 import { useEffect, useRef, useState } from 'react'
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { BoardCard, BoardColumn, TaskRow } from '../../lib/presence/board.ts'
@@ -130,7 +131,7 @@ export function BoardPanel({ columns, roleLabel = label => label, t = defaultT }
                       把 pending 的「等 …」也一起吞掉。 */}
                   {column.status === 'pending' && card.blockedBy.length > 0 && (
                     <Tag tone={card.ready ? 'success' : 'warning'}>
-                      {card.ready ? t('board.ready') : t('board.waiting', { ids: card.blockedBy.join('、') })}
+                      {card.ready ? t('board.ready') : t('board.waiting', { ids: joinList(card.blockedBy, listSeparator(t)) })}
                     </Tag>
                   )}
                   {/* 声明 vs 板面：任务文本里写了"依赖 T1,T2"而板面没有这条边 ⇒ 上面那句
@@ -153,8 +154,8 @@ export function BoardPanel({ columns, roleLabel = label => label, t = defaultT }
 /** 声明 vs 板面分叉的文案（不靠 lib 的中文 driftLabel）。 */
 function driftText(drift: NonNullable<BoardCard['drift']>, t: CompanyT): string {
   const parts: string[] = []
-  if (drift.missing.length > 0) parts.push(t('board.drift.missing', { ids: drift.missing.join('、') }))
-  if (drift.unmapped.length > 0) parts.push(t('board.drift.unmapped', { ids: drift.unmapped.join('、') }))
+  if (drift.missing.length > 0) parts.push(t('board.drift.missing', { ids: joinList(drift.missing, listSeparator(t)) }))
+  if (drift.unmapped.length > 0) parts.push(t('board.drift.unmapped', { ids: joinList(drift.unmapped, listSeparator(t)) }))
   return parts.join('；')
 }
 

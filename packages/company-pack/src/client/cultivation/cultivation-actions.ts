@@ -532,6 +532,11 @@ const CULTIVATION_COPY_EN = {
 
 let cultivationLanguage: 'zh' | 'en' = 'zh'
 
+/** 当前培养语言下的列表分隔符（zh「、」/ en ", "，BUG-329）。 */
+export function cultivationListSeparator(): string {
+  return cultivationLanguage === 'en' ? ', ' : '、'
+}
+
 /** Set the expression language for the cultivation copy table (called by CultivationView). */
 export function setCultivationLanguage(language: 'zh' | 'en'): void {
   cultivationLanguage = language

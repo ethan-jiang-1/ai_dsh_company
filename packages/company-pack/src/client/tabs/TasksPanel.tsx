@@ -2,6 +2,7 @@
  * 会话头部动作：任务板的**入口按钮**（条目 ② S3：点开 = 打开右栏平台页签，anchored 弹窗退役）
  * + 任务板表格视图（页签体共用）。
  */
+import { joinList, listSeparator } from '../ui/list-separator.ts'
 import { Button, IconChecklistOutlineMedium } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
@@ -65,7 +66,7 @@ export function TasksTableView({ view, roleLabel = name => name, t = defaultT }:
   return (
     <>
       <div className="wk-meta wk-mb-xs">
-        {t('tasks.members', { members: view.members.map(member => `${roleLabel(member.name)}(${t(`presence.status.${presenceStatusFromPhase(member.phase)}` as CompanyKey)})`).join('、') || t('tasks.noMembers') })}
+        {t('tasks.members', { members: joinList(view.members.map(member => `${roleLabel(member.name)}(${t(`presence.status.${presenceStatusFromPhase(member.phase)}` as CompanyKey)})`), listSeparator(t)) || t('tasks.noMembers') })}
       </div>
       {tasks.length === 0
         ? <StateNote text={t('tasks.empty')} />

@@ -21,6 +21,8 @@ export function cultivationRegistrations(
   roleLabel?: (role: string) => string,
   /** 双语选择器（缺省中文）；`(zh, en) => en` 用来断言 en 回执无中文（BUG-316）。 */
   text?: (zh: string, en: string) => string,
+  /** 是否模拟「公司数据停写」（BUG-326 的停写回执路径）。 */
+  dataBlocked = false,
 ): {
   readonly command: CommandDefinition['handler']
   /** 注册的命令定义（description/hint 在这里；BUG-326 的判据要用）。 */
@@ -34,7 +36,7 @@ export function cultivationRegistrations(
     commands: { register: (definition: CommandDefinition) => { commands.push(definition); return () => {} } },
     get: (name: string) => name === 'sessionQuery' ? sessionQuery : name === 'fs' ? fs : name === 'sandboxPolicy' ? sandboxPolicy : undefined,
   }
-  registerCultivation(ctx as Parameters<typeof registerCultivation>[0], config, companyHome, false, undefined, roleLabel, undefined, text)
+  registerCultivation(ctx as Parameters<typeof registerCultivation>[0], config, companyHome, dataBlocked, '测试用停写原因', roleLabel, undefined, text)
   const command = commands.find(definition => definition.name === 'cultivation')
   const proposal = tools.find(definition => definition.name === 'cultivation_propose')
   const definition = commands.find(definition => definition.name === 'cultivation')

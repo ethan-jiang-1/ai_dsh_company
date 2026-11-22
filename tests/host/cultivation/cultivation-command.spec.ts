@@ -486,3 +486,16 @@ describe('/cultivation 元数据与内部错误的语言（BUG-326）', () => {
     expect(error.messageEn).toContain('writes are paused')
   })
 })
+
+// 停写回执也随语言（BUG-326）：dataBlocked 下 en 只出英文句子（原因原话可能仍是中文）。
+describe('/cultivation 停写回执的语言（BUG-326）', () => {
+  it('dataBlocked + en ⇒ 「writes are paused」，不出现中文模板', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace, undefined, undefined, undefined, (_zh, en) => en, true)
+      const result = await invokeCultivation(command, 'ceo', workspace, 'correct 期望行为 :: 做法')
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain('writes are paused')
+      expect(result.text).not.toContain('公司数据已停写')
+    })
+  })
+})
