@@ -160,3 +160,23 @@ describe('审批请求的身份透传（BUG-299）', () => {
     await pending
   })
 })
+
+// 问询活体合成 id（BUG-312）：平台不给 id，登记时必须补一个，否则两条同文问询撞 key。
+describe('问询活体合成身份', () => {
+  it('两条同文问询 ⇒ 各自带 id 且互不相同', async () => {
+    const { remote, handlers } = fakeRemote()
+    const registry = createAttentionRegistry()
+    registerAttentionObservers({ remote, sessions, attention: registry })
+    const gates: (() => void)[] = []
+    const next = (): Promise<void> => new Promise<void>(resolve => { gates.push(resolve) })
+    const first = handlers.get('user-questions/request')?.call('owner-1', { questions: [{ question: '要不要并行？' }] }, next)
+    const second = handlers.get('user-questions/request')?.call('owner-1', { questions: [{ question: '要不要并行？' }] }, next)
+    await Promise.resolve()
+    const ids = registry.list().map(entry => entry.id)
+    expect(ids).toHaveLength(2)
+    expect(ids[0]).toBeDefined()
+    expect(ids[0]).not.toBe(ids[1])
+    for (const release of gates) release()
+    await Promise.all([first, second])
+  })
+})

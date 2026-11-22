@@ -32,15 +32,20 @@ export interface AttentionObserverDeps {
 
 /** 注册两个观察者；返回退订函数（client fiber 卸载时释放两个 `$on`）。 */
 export function registerAttentionObservers({ remote, sessions, attention }: AttentionObserverDeps): () => void {
+  // 问询活体没有平台 id（与审批不同）：登记时合成一个稳定身份（BUG-312）。
+  // 否则两条同文问询在 `attentionItemKey` 里撞成同一个 key，React 会复用/丢行。
+  let questionSeq = 0
   const offQuestion = remote.$on('user-questions/request', function (this: unknown, request: unknown, next: () => unknown) {
     const sessionId = sessions.scopeOf(this)
     if (sessionId === undefined) return next()
     const questions = (request as { questions?: readonly { question?: unknown }[] }).questions ?? []
     const first = questions[0]
     const text = typeof first?.question === 'string' ? first.question.trim() : ''
+    questionSeq += 1
     const done = attention.begin({
       kind: 'question',
       sessionId,
+      id: `question:${String(Date.now())}:${String(questionSeq)}`,
       what: attentionSummary(text === '' ? '（问询内容缺失）' : text),
       ...(text === '' ? {} : { detail: text }),
       since: Date.now(),

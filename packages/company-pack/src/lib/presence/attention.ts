@@ -226,8 +226,10 @@ export function mergeAttention(
  * @returns 去重键。
  */
 export function attentionItemKey(item: AttentionItem): string {
+  // 无 id 的只剩消息类（escalation/completion，来自事件流、本身唯一）：用时间定位。
+  // **绝不回落到 `what`**——同文两条会撞 key（BUG-312 就是这么冒出来的）。
   return item.id === undefined
-    ? `${item.kind}\u0000${item.jumpTo}\u0000${item.what}`
+    ? `${item.kind}\u0000${item.jumpTo}\u0000${String(item.time)}`
     : `${item.kind}\u0000${item.jumpTo}\u0000#${item.id}`
 }
 

@@ -275,3 +275,17 @@ describe('mergeAttention · 按身份去重（BUG-299）', () => {
     expect(attentionItemKey(one)).toBe(attentionItemKey({ ...one }))
   })
 })
+
+// 身份不许回落到内容（BUG-312）：问询活体在登记时合成 id；
+// 无 id 的消息类用时间定位，**绝不**用摘要（同文两条会撞 key）。
+describe('attentionItemKey · 同文不同条不撞 key', () => {
+  it('两条时间不同的同文消息类 ⇒ 两个 key（不按摘要）', () => {
+    const base = { kind: 'escalation' as const, who: 'CEO', what: '同一句话', jumpTo: 's-1' }
+    expect(attentionItemKey({ ...base, time: 1 })).not.toBe(attentionItemKey({ ...base, time: 2 }))
+  })
+
+  it('有 id 的条目按 id 区分（同文同日也各不相同）', () => {
+    const base = { kind: 'approval' as const, who: 's-1', what: '同文', time: 1, jumpTo: 's-1' }
+    expect(attentionItemKey({ ...base, id: 'a' })).not.toBe(attentionItemKey({ ...base, id: 'b' }))
+  })
+})
