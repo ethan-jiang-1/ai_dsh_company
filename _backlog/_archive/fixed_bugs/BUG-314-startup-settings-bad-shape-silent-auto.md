@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-314：startup.json 字段类型坏（数组/对象/数字）被折成「全自动」——诊断器只查了 `v`
 
-> 严重级别：P2（次要偏重：设置文件是项目策略的唯一持久载体；字段类型坏时面板显示 auto，用户不知道设置已失效）｜发现：2026-11-22（E2E 第四轮）｜状态：调查中
+> 严重级别：P2（次要偏重：设置文件是项目策略的唯一持久载体；字段类型坏时面板显示 auto，用户不知道设置已失效）｜发现：2026-11-22（E2E 第四轮）｜状态：已修｜审查：agent — 逐条核对已修判定（字段名点名 + null/缺省不误报）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 8–10 个，别管那边怎么修」）。
+> **留痕**：commit c94655f1（与 314/313 同批：配置诊断 + 面板文案，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -76,3 +76,10 @@ opened: 2026-11-22
 - 缺失/空文件仍是合法 auto；
 - 坏 JSON 仍是「损坏」；未来 schema 仍是「不支持」；
 - 四种 fixture 各一条 + 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/startup/startup-settings.ts`（两个解析器增字段检查 + `field`）、`packages/company-pack/src/client/startup/{startup-store,startup-load,StrategyPanel}.ts(x)`、`packages/company-pack/src/client/locales.ts`
+- 红：`vitest run tests/client/startup/startup-load.spec.ts tests/lib/startup/startup-settings.spec.ts` —— 去掉字段检查（只查 `v`）后「字段类型坏」用例失败 —— 去掉字段检查（只查 `v`）后「字段类型坏」用例失败（折成 null/空集合、无字段名）
+- 绿：`vitest run tests/client/startup/startup-load.spec.ts tests/lib/startup/startup-settings.spec.ts` —— 28/28 + 10/10（三个字段各自分支、options 双字段、null/缺省不误报、面板点名 `productType`）
+- 提交：commit c94655f1

@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-313-startup-options-bad-shape-silent-empty.md](fixed_bugs/BUG-313-startup-options-bad-shape-silent-empty.md) — options 字段类型坏冒充「没有可选项」；`unreadable + field`。
+- [BUG-314-startup-settings-bad-shape-silent-auto.md](fixed_bugs/BUG-314-startup-settings-bad-shape-silent-auto.md) — settings 字段类型坏冒充 auto；`corrupt + field`，面板点名。
 - [BUG-310-deliverables-index-silent-entry-drop.md](fixed_bugs/BUG-310-deliverables-index-silent-entry-drop.md) — 成品索引坏 entry 静默丢；`skipped` + 面板提示。
 - [BUG-311-ledger-header-mismatch-silent-empty.md](fixed_bugs/BUG-311-ledger-header-mismatch-silent-empty.md) — 台账表头 typo 静默 0 行；`headerOk` + 面板「表头与两种口径都对不上」。
 - [BUG-307-cultivation-mine-cap-control-combined.md](fixed_bugs/BUG-307-cultivation-mine-cap-control-combined.md) — 折叠控件按合并总数判断；改按实际隐藏数（307 是 306 的回归）。

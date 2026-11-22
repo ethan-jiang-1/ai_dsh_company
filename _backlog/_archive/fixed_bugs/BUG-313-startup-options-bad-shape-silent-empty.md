@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-313：派生选项文件字段类型写坏，被当成「公司内容里还没有可选项」——不是「读坏了」
 
-> 严重级别：P2（次要偏重：选项文件是 host 派生、人工可改；字段类型坏时面板把「坏文件」说成「内容没有可选项」，用户会去装内容包而不是修文件）｜发现：2026-11-22（E2E 第四轮）｜状态：调查中
+> 严重级别：P2（次要偏重：选项文件是 host 派生、人工可改；字段类型坏时面板把「坏文件」说成「内容没有可选项」，用户会去装内容包而不是修文件）｜发现：2026-11-22（E2E 第四轮）｜状态：已修｜审查：agent — 逐条核对已修判定（字段名点名 + null/缺省不误报）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 8–10 个，别管那边怎么修」）。
+> **留痕**：commit c94655f1（与 314/313 同批：配置诊断 + 面板文案，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -74,3 +74,10 @@ opened: 2026-11-22
 - 真正空内容/缺字段仍说「没有可选项」；
 - 语法坏仍说「读不出来」；
 - 三种 fixture 各一条断言 + 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/startup/startup-settings.ts`（两个解析器增字段检查 + `field`）、`packages/company-pack/src/client/startup/{startup-store,startup-load,StrategyPanel}.ts(x)`、`packages/company-pack/src/client/locales.ts`
+- 红：`vitest run tests/client/startup/startup-load.spec.ts tests/lib/startup/startup-settings.spec.ts` —— 去掉字段检查（只查 `v`）后「字段类型坏」用例失败 —— 去掉字段检查（只查 `v`）后「字段类型坏」用例失败（折成 null/空集合、无字段名）
+- 绿：`vitest run tests/client/startup/startup-load.spec.ts tests/lib/startup/startup-settings.spec.ts` —— 28/28 + 10/10（三个字段各自分支、options 双字段、null/缺省不误报、面板点名 `productType`）
+- 提交：commit c94655f1

@@ -7,15 +7,17 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 300 |
+| 已修卡 | 302 |
 | 有具名守卫 | 198 |
-| 无具名守卫 | 102 |
-| 覆盖率 | 66.0% |
+| 无具名守卫 | 104 |
+| 覆盖率 | 65.6% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
 | BUG | opened | slug |
 |---|---|---|
+| 314 | 2026-11-22 | startup-settings-bad-shape-silent-auto |
+| 313 | 2026-11-22 | startup-options-bad-shape-silent-empty |
 | 183 | 2026-11-14 | notes-root-symlink-followed |
 | 180 | 2026-11-14 | walk-company-dirs-windows-dotdot |
 | 179 | 2026-11-14 | internal-dotdot-over-rejected |

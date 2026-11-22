@@ -215,7 +215,8 @@ describe('parseStartupOptions / serialize', () => {
   })
 })
 
-// 字段级诊断（BUG-313/314）：坏字段要说「字段 X 类型不对」，不能折成
+// 负例留证 2026-11-22：去掉字段检查（只查 v）后 `vitest run tests/lib/startup/startup-settings.spec.ts` 3 failed（字段名丢失）；还原后 28/28 绿。BUG-313/314
+// 字段级诊断：坏字段要说「字段 X 类型不对」，不能折成
 // 「内容里没有可选项」/「全自动」——后者会让人去装内容包或以为没设过。
 describe('parseStartup*State：字段类型诊断', () => {
   it('options.productTypes 是字符串 ⇒ unreadable + 字段名', () => {

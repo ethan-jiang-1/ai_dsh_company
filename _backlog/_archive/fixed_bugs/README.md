@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-313 / BUG-314**（2026-11-22，E2E 第四轮 / P2×2）：配置诊断只查外框——
+  [313](BUG-313-startup-options-bad-shape-silent-empty.md) options 字段类型坏 → `unreadable + field`；
+  [314](BUG-314-startup-settings-bad-shape-silent-auto.md) settings 字段类型坏 → `corrupt + field`，面板点名。证据提交 `c94655f1`。
+
 - **BUG-310 / BUG-311**（2026-11-22，E2E 第四轮 / P2×2）：解析层静默丢内容——
   [310](BUG-310-deliverables-index-silent-entry-drop.md) `parseCatalog` 增 `skipped`；
   [311](BUG-311-ledger-header-mismatch-silent-empty.md) `parseMotionLedger` 增 `headerOk`。证据提交 `272fd450`。
