@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-315：培养主视图在 768px 下把左板/右栏压到 210/176——声明的 BOARD_MIN/CHAT_MIN 没有生效
 
-> 严重级别：P2（次要偏重：主视图在窄桌面/分屏下仍可打开，但左右两栏都低于自己声明的下限，板面与对话都被压成不可读的窄条）｜发现：2026-11-22（E2E 第四轮）｜状态：调查中
+> 严重级别：P2（次要偏重：主视图在窄桌面/分屏下仍可打开，但左右两栏都低于自己声明的下限，板面与对话都被压成不可读的窄条）｜发现：2026-11-22（E2E 第四轮）｜状态：已修｜审查：agent — 逐条核对已修判定（三档容器 + 边界 + 真 Chromium 量 CSS）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 8–10 个，别管那边怎么修」）。
+> **留痕**：commit 170be97a（client 布局，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -70,3 +70,12 @@ chat.width  176.84   （CHAT_MIN = 280）
 - 拖动分隔条不能产生低于下限的布局；
 - 1440 默认布局不回归；
 - 四档视口各一条几何断言 + 截图。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/cultivation/CultivationView.tsx`（`splitLayout` + `BOARD_MIN`/`CHAT_MIN`/`SPLIT_GAP` 导出 + ResizeObserver + `data-stacked`）、`packages/company-pack/src/client/ui/styles.ts`（堆叠栅格）、`tests/client/cultivation/cultivation-view-layout.spec.ts`
+- 红：`vitest run tests/client/cultivation/cultivation-view-layout.spec.ts` —— 把 `splitLayout` 改回「永远两栏、右栏按期望宽」后「768 视口（容器 393）⇒ 堆叠」与「差 1px ⇒ 堆叠」失败（真实页面即 210/176 的窄条）
+- 绿：`vitest run tests/client/cultivation/cultivation-view-layout.spec.ts` —— 5/5（393 堆叠；1100 两栏且两侧 ≥ 下限；刚好放下 / 差 1px 边界；期望过宽时左板仍 ≥ 下限；首帧未量到不跳）
+  真 Chromium 量真 CSS 规则（从 `styles.ts` 原样抽）：1440 ⇒ board 1044 / chat 390；1100 ⇒ 704 / 390；768 堆叠 ⇒ 768 / 768；375 堆叠 ⇒ 375 / 375
+- 提交：commit 170be97a
+- **未做到的一步（如实记）**：整页（`conversation.view`）的端到端测量没取到——隔离实例无登录/模型，GUI 停在落地页开不出会话；本轮证据是「单元判据 + 真 Chromium 量真规则」两块，页面级测量列入未覆盖轴。

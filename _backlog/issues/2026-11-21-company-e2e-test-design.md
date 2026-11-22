@@ -115,7 +115,7 @@ opened: 2026-11-21
 - [BUG-312](../_archive/fixed_bugs/BUG-312-attention-question-duplicate-key.md)：同文 question 撞 React key。
 - [BUG-313](../_archive/fixed_bugs/BUG-313-startup-options-bad-shape-silent-empty.md)：options 字段类型坏冒充「没有可选项」。
 - [BUG-314](../_archive/fixed_bugs/BUG-314-startup-settings-bad-shape-silent-auto.md)：settings 字段类型坏冒充 auto。
-- [BUG-315](../bugs/BUG-315-cultivation-full-view-min-widths-ignored.md)：768 主视图左板/右栏压到 210/176，声明下限未生效。
+- [BUG-315](../_archive/fixed_bugs/BUG-315-cultivation-full-view-min-widths-ignored.md)：768 主视图左板/右栏压到 210/176，声明下限未生效。
 
 第四轮跑绿：策略正常、培养创作/采纳/拒绝/撤回/验证、成品归档/筛选/打开/unicode 路径、台账正常/截断/坏行（303 修后）、团队任务板/看板/依赖图/在场/用量、待办身份去重、en 主体。仍红：307–315。目标 8–10，本轮 9。
 

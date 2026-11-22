@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-315**（2026-11-22，E2E 第四轮 / P2）：主视图两栏下限没生效——
+  [315](BUG-315-cultivation-full-view-min-widths-ignored.md) `splitLayout` 成为布局唯一计算（放不下就上下堆叠），
+  CSS 增 `data-stacked` 栅格；判据 = 三档容器 + 真 Chromium 量真规则。证据提交 `170be97a`。
+
 - **BUG-312**（2026-11-22，E2E 第四轮 / P2）：同文问询撞 key——
   [312](BUG-312-attention-question-duplicate-key.md) 登记时合成 `question:<ms>:<seq>`，`attentionItemKey` 无 id 分支改按时间。
   证据提交 `0025679b`。

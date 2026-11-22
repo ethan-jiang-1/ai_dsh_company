@@ -9,7 +9,8 @@
 import { describe, expect, it } from 'vitest'
 import { BOARD_MIN, CHAT_MIN, SPLIT_GAP, splitLayout } from '../../../packages/company-pack/src/client/cultivation/CultivationView.tsx'
 
-describe('splitLayout：声明下限成为唯一消费点', () => {
+// 负例留证 2026-11-22：把 splitLayout 改回「永远两栏、右栏按期望宽」后 `vitest run tests/client/cultivation/cultivation-view-layout.spec.ts` 2 failed（393 容器下两侧都低于下限）。BUG-315
+describe('splitLayout：声明下限成为唯一消费点（BUG-315）', () => {
   it('768 视口（容器 393）⇒ 堆叠，而不是 210/176 的窄条', () => {
     const layout = splitLayout(393, 390)
     expect(layout.stacked).toBe(true)

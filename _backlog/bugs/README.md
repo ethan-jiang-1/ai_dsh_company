@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 1 张**：[BUG-315](BUG-315-cultivation-full-view-min-widths-ignored.md)（768 主视图压到 210/176，P2）。
+**活跃 0 张**。
 
 **2026-11-22 E2E 第四轮（目标 8–10，只立卡不修）**：并行进程收掉 301–306 后，本轮补主视图/对话面板/表单形状/解析边界/折叠计数五组，立 307–315 九张，均 `status: 调查中`。三组根因：声明约束没有唯一消费点（307/315）、表达层/投影箱重复（308/309/312）、宽松解析吞坏形状（310/311/313/314）。不碰修复进程代码，也不在同一 diff 修产品。
 
@@ -32,7 +32,7 @@
 
 | 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
 |---|---|---|---|---|
-| **I′ 声明约束必须强制执行** | [307](../_archive/fixed_bugs/BUG-307-cultivation-mine-cap-control-combined.md) + [309](../_archive/fixed_bugs/BUG-309-cultivation-self-record-listed-twice.md)，[315](BUG-315-cultivation-full-view-min-widths-ignored.md) | 声明了常量/上限，消费点按另一种算法（或根本不消费） | 307：控件 total 改成「两个子列表实际隐藏数」；309：按身份去重只留一行；315：`BOARD_MIN`/`CHAT_MIN` 成为 CSS 与测量的唯一来源 | 1 → 6 |
+| **I′ 声明约束必须强制执行** | [307](../_archive/fixed_bugs/BUG-307-cultivation-mine-cap-control-combined.md) + [309](../_archive/fixed_bugs/BUG-309-cultivation-self-record-listed-twice.md)，[315](../_archive/fixed_bugs/BUG-315-cultivation-full-view-min-widths-ignored.md) | 声明了常量/上限，消费点按另一种算法（或根本不消费） | 307：控件 total 改成「两个子列表实际隐藏数」；309：按身份去重只留一行；315：`BOARD_MIN`/`CHAT_MIN` 成为 CSS 与测量的唯一来源 | 1 → 6 |
 | **D″ 解析层必须报 skipped** | [310](../_archive/fixed_bugs/BUG-310-deliverables-index-silent-entry-drop.md) + [311](../_archive/fixed_bugs/BUG-311-ledger-header-mismatch-silent-empty.md) | 解析只返回成功项，失败形态换了就不说话 | 共用 `{ parsed, skipped }`；成品坏 entry、台账坏表头各出「跳过了 N 条（原因）」 | 2 |
 | **E′ 配置诊断到字段级** | [313](../_archive/fixed_bugs/BUG-313-startup-options-bad-shape-silent-empty.md) + [314](../_archive/fixed_bugs/BUG-314-startup-settings-bad-shape-silent-auto.md) | 诊断器只查 `v`，字段类型坏折成空/auto | `parseStartup*State` 报 field-problem（字段名 + 期望类型），面板说「字段 X 类型不对」 | 3 |
 | **H′ i18n 判据扩面** | [308](../_archive/fixed_bugs/BUG-308-cultivation-chat-panel-i18n-leaks.md) | 对话面板文案没进 typed 字典（双向漏） | en 无 CJK、zh 无裸 `session:`；判据从培养面板扩到该面板 | 4 |
