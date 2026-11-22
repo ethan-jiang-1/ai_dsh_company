@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-304-attention-history-window-misses-old-approvals.md](fixed_bugs/BUG-304-attention-history-window-misses-old-approvals.md) — 800 条窗口外的挂起审批看不见；读面带 `windowTruncated`，面板说「只扫描了最近 800 条」。
+- [BUG-305-attention-history-all-read-fail-silent-empty.md](fixed_bugs/BUG-305-attention-history-all-read-fail-silent-empty.md) — 历史全失败仍说「没有等你的事」；结果态带 `failed`，面板出错误行并压住空态。
 - [BUG-300-cultivation-decided-at-raw-iso.md](fixed_bugs/BUG-300-cultivation-decided-at-raw-iso.md) — 采纳/拒绝时间裸 ISO；`decidedAtLabel` 走人话，精确值留 `title`。
 - [BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md](fixed_bugs/BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md) — 待办按 160 字摘要去重吞掉不同审批；改为身份键（审批 id），活体 detail 透传。
 - [BUG-297-strategy-read-failure-silently-auto.md](fixed_bugs/BUG-297-strategy-read-failure-silently-auto.md) — 策略文件坏/读不到被折成「自动」；三态诊断 + 面板错误行，缺失/空仍是合法 auto。

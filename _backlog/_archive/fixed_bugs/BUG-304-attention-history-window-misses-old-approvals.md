@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-304：跨会话历史只读最近 800 条——更早的挂起审批永远不出现在待办
 
-> 严重级别：P2（次要偏重：待办是「等你处理」的完整清单；长会话里的老 pinned 审批会被新事件挤出窗口，面板却仍说「没有等你的事」）｜发现：2026-11-22（E2E 第三轮）｜状态：调查中
+> 严重级别：P2（次要偏重：待办是「等你处理」的完整清单；长会话里的老 pinned 审批会被新事件挤出窗口，面板却仍说「没有等你的事」）｜发现：2026-11-22（E2E 第三轮）｜状态：已修｜审查：agent — 逐条核对已修判定（窗口/失败/扫到数 + 面板两条边界行）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 5–6 个，别管那边怎么修」）。
+> **留痕**：commit 51747ad0（同一提交收 304+305：读面结果态 + 面板边界行，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -95,3 +95,10 @@ rebuilt 0
 - 801 事件边界与 decided 在窗口外两种配对都正确；
 - 正常短会话不回归；
 - 纯函数 spec + 真页面复核各一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/presence/attention-history.ts`（`readSessionEvents` → `{events, windowTruncated}`、`readPendingAcrossSessions` → `{items, scanned, failed, window}`）、`packages/company-pack/src/client/tabs/AttentionTab.tsx`、`packages/company-pack/src/client/locales.ts`
+- 红：`vitest run tests/client/presence/attention-history.spec.ts tests/client/tabs/attention-tab.spec.ts` —— 把 window 强制为 `'none'`、并把空态改回无条件渲染后 3 failed / 15 passed（窗口提示不出现；全失败仍显示「没有等你的事」）
+- 绿：`vitest run tests/client/presence/attention-history.spec.ts tests/client/tabs/attention-tab.spec.ts` —— 18/18（拿满一页 ⇒ window=some；全失败 ⇒ failed=N、items 空；面板出「有 N 个会话的历史读不到」并压住空态；拿满一页出「只扫描了最近 800 条」）
+- 提交：commit 51747ad0

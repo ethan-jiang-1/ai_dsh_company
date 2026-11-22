@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-304 / BUG-305**（2026-11-22，E2E 第三轮 / P2×2）：跨会话历史的边界不可见——
+  [304](BUG-304-attention-history-window-misses-old-approvals.md) 只读最近 800 条、
+  [305](BUG-305-attention-history-all-read-fail-silent-empty.md) 全失败折成空数组；一次改成结果态
+  `{ items, scanned, failed, window }`，面板说「只扫描了最近 800 条 / N 个会话读不到」。证据提交 `51747ad0`。
+
 - **BUG-300**（2026-11-22，E2E 第二轮 / P2）：采纳/拒绝时间裸 ISO——
   [300](BUG-300-cultivation-decided-at-raw-iso.md) `decidedAtLabel` 统一到 `timeLabel` 人话口径，
   精确 ISO 放 `title`，解析失败回落原值。证据提交 `d27c508a`。

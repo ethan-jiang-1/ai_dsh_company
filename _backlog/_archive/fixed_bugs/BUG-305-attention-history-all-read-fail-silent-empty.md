@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-305：跨会话历史全部读失败时，待办仍显示「没有等你的事」——没有错误行，也没有降级提示
 
-> 严重级别：P2（次要偏重：跨会话读取是唯一能看见未打开会话挂起审批的通道；全部失败时面板把「读不到」说成「没有」，用户会漏掉审批）｜发现：2026-11-22（E2E 第三轮）｜状态：调查中
+> 严重级别：P2（次要偏重：跨会话读取是唯一能看见未打开会话挂起审批的通道；全部失败时面板把「读不到」说成「没有」，用户会漏掉审批）｜发现：2026-11-22（E2E 第三轮）｜状态：已修｜审查：agent — 逐条核对已修判定（窗口/失败/扫到数 + 面板两条边界行）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 5–6 个，别管那边怎么修」）。
+> **留痕**：commit 51747ad0（同一提交收 304+305：读面结果态 + 面板边界行，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -85,3 +85,10 @@ rebuilt 0
 - 部分失败时成功条目仍显示，且能看到剩余失败数；
 - 全成功时无错误行、无噪声；
 - 三条 keyless + 真页面（可注入失败 page）各绿。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/presence/attention-history.ts`（`readSessionEvents` → `{events, windowTruncated}`、`readPendingAcrossSessions` → `{items, scanned, failed, window}`）、`packages/company-pack/src/client/tabs/AttentionTab.tsx`、`packages/company-pack/src/client/locales.ts`
+- 红：`vitest run tests/client/presence/attention-history.spec.ts tests/client/tabs/attention-tab.spec.ts` —— 把 window 强制为 `'none'`、并把空态改回无条件渲染后 3 failed / 15 passed（窗口提示不出现；全失败仍显示「没有等你的事」）
+- 绿：`vitest run tests/client/presence/attention-history.spec.ts tests/client/tabs/attention-tab.spec.ts` —— 18/18（拿满一页 ⇒ window=some；全失败 ⇒ failed=N、items 空；面板出「有 N 个会话的历史读不到」并压住空态；拿满一页出「只扫描了最近 800 条」）
+- 提交：commit 51747ad0
