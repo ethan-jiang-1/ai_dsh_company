@@ -96,7 +96,8 @@ describe('LedgerTab · 坏行提示（BUG-303）', () => {
 })
 
 // 表头不符必须可见（BUG-311）：否则「共 0 场」会被读成「台账是空的」。
-describe('LedgerTab · 表头不符', () => {
+// 负例留证 2026-11-22：把 headerOk 恒置 true 后 `vitest run tests/client/tabs/ledger-tab.spec.ts` 1 failed（面板不提示表头不符）。BUG-311
+describe('LedgerTab · 表头不符（BUG-311）', () => {
   it('表头写错一个词 ⇒ 出「表头与两种口径都对不上」', async () => {
     const text = [
       '| slug | date | type | 参与方 | wallClock | deliverable | summary |',

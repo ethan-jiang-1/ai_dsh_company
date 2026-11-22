@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-310：成品索引的坏条目被静默丢掉——5 条只显示 2 条，面板不说「跳过了什么」
 
-> 严重级别：P2（次要偏重：成品目录是审计视图；索引里一条坏形状的 entry 消失后，统计与列表都不完整，且没有任何提示）｜发现：2026-11-22（E2E 第四轮）｜状态：调查中
+> 严重级别：P2（次要偏重：成品目录是审计视图；索引里一条坏形状的 entry 消失后，统计与列表都不完整，且没有任何提示）｜发现：2026-11-22（E2E 第四轮）｜状态：已修｜审查：agent — 逐条核对已修判定（解析层计数 + 面板原话）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 8–10 个，别管那边怎么修」）。
+> **留痕**：commit 272fd450（解析层 + 面板，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -83,3 +83,10 @@ console.log(c.entries.length, c.entries.map(e => e.slug))
 - 全部合法时无提示、统计不变；
 - 整文件坏形状仍走「形状不符/不可读」而不是 row-level；
 - zh/en 两态各一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/data/deliverables-index.ts`（`DeliverablesCatalog.skipped`）、`packages/company-pack/src/client/tabs/DeliverablesTab.tsx`
+- 红：`vitest run tests/client/tabs/deliverables-catalog.spec.ts` —— 把 `skipped` 恒置 0（恢复静默丢）后「skipped > 0 ⇒ 出提示」失败（5 条只渲染 2 条、无提示）
+- 绿：`vitest run tests/client/tabs/deliverables-catalog.spec.ts` —— 19/19（坏 entry 计数 2 + 面板提示）
+- 提交：commit 272fd450

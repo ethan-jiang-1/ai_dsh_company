@@ -217,7 +217,8 @@ describe('DeliverablesTab：截断文案', () => {
 })
 
 // 坏条目必须可见（BUG-310）：5 条只渲染 2 条、面板什么都不说，等于把审计视图当完整。
-describe('DeliverablesView：坏条目提示', () => {
+// 负例留证 2026-11-22：把 parseCatalog 的 skipped 恒置 0 后 `vitest run tests/client/tabs/deliverables-catalog.spec.ts` 1 failed（5 条只渲染 2 条且无提示）。BUG-310
+describe('DeliverablesView：坏条目提示（BUG-310）', () => {
   it('skipped > 0 ⇒ 出「形状不对已被跳过」提示', () => {
     const catalog = parseCatalog(JSON.stringify({
       schema: 1,

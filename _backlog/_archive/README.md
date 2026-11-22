@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-310-deliverables-index-silent-entry-drop.md](fixed_bugs/BUG-310-deliverables-index-silent-entry-drop.md) — 成品索引坏 entry 静默丢；`skipped` + 面板提示。
+- [BUG-311-ledger-header-mismatch-silent-empty.md](fixed_bugs/BUG-311-ledger-header-mismatch-silent-empty.md) — 台账表头 typo 静默 0 行；`headerOk` + 面板「表头与两种口径都对不上」。
 - [BUG-307-cultivation-mine-cap-control-combined.md](fixed_bugs/BUG-307-cultivation-mine-cap-control-combined.md) — 折叠控件按合并总数判断；改按实际隐藏数（307 是 306 的回归）。
 - [BUG-309-cultivation-self-record-listed-twice.md](fixed_bugs/BUG-309-cultivation-self-record-listed-twice.md) — 自己提自己拒的记录进两个箱子；`processedForViewer` 排除自己提的。
 - [BUG-306-cultivation-mine-list-cap-dead.md](fixed_bugs/BUG-306-cultivation-mine-list-cap-dead.md) — `LIST_CAPS.mine=5` 是死配置；`CultivationMine` 接上折叠，计数用折叠前总数。

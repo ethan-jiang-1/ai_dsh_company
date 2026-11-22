@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-311：台账表头写错一个词就整表消失——面板显示「共 0 场」且不报错
 
-> 严重级别：P2（次要偏重：台账是审计视图；表头 typo 会让全部动议静默消失，用户可能以为台账是空的）｜发现：2026-11-22（E2E 第四轮）｜状态：调查中
+> 严重级别：P2（次要偏重：台账是审计视图；表头 typo 会让全部动议静默消失，用户可能以为台账是空的）｜发现：2026-11-22（E2E 第四轮）｜状态：已修｜审查：agent — 逐条核对已修判定（解析层计数 + 面板原话）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 8–10 个，别管那边怎么修」）。
+> **留痕**：commit 272fd450（解析层 + 面板，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -77,3 +77,10 @@ console.log(parseMotionLedger('| slug | 日期 | 类型 | 参与方 | 墙钟 | �
 - 空文件/纯注释台账仍是合法 0 条（无错误）；
 - 中文/英文两种表头正常；
 - 解析层 header 状态 + 面板一条断言。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/accounting/ledger.ts`（`headerOk`）、`packages/company-pack/src/client/tabs/LedgerTab.tsx`、`packages/company-pack/src/client/locales.ts`
+- 红：`vitest run tests/lib/accounting/ledger.spec.ts tests/client/tabs/ledger-tab.spec.ts` —— 把 `headerOk` 恒置 true 后「表头写错一个词 ⇒ headerOk=false」失败（面板显示共 0 场而不报错）
+- 绿：`vitest run tests/lib/accounting/ledger.spec.ts tests/client/tabs/ledger-tab.spec.ts` —— 9/9 + 7/7（表头 typo ⇒ headerOk=false + 面板「表头与两种口径都对不上」）
+- 提交：commit 272fd450

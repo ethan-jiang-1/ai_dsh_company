@@ -117,7 +117,8 @@ describe('ledgerStats', () => {
 
 // 表头 mismatch 不是「台账空」（BUG-311）：出现过表行却一个表头都没认出来 ⇒ headerOk=false，
 // 面板据此说「表头不符」，而不是显示「共 0 场」。
-describe('parseMotionLedger：表头诊断', () => {
+// 负例留证 2026-11-22：把 headerOk 恒置 true 后 `vitest run tests/lib/accounting/ledger.spec.ts` 1 failed（表头 typo 静默 0 行）。BUG-311
+describe('parseMotionLedger：表头诊断（BUG-311）', () => {
   it('表头写错一个词 ⇒ headerOk=false（不是静默 0 行）', () => {
     const text = [
       '| slug | date | type | 参与方 | wallClock | deliverable | summary |',

@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-310 / BUG-311**（2026-11-22，E2E 第四轮 / P2×2）：解析层静默丢内容——
+  [310](BUG-310-deliverables-index-silent-entry-drop.md) `parseCatalog` 增 `skipped`；
+  [311](BUG-311-ledger-header-mismatch-silent-empty.md) `parseMotionLedger` 增 `headerOk`。证据提交 `272fd450`。
+
 - **BUG-307 / BUG-309**（2026-11-22，E2E 第四轮 / P2×2）：折叠控件与投影去重——
   [307](BUG-307-cultivation-mine-cap-control-combined.md) `capControl` 增 `hidden`，控件只在真的隐藏时出现；
   [309](BUG-309-cultivation-self-record-listed-twice.md) `processedForViewer` 排除自己提的（mine 已带回执）。
