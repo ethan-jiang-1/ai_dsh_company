@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-318：跨会话重建只扫 20 个会话——第 21 个会话里的挂起审批静默消失
 
-> 严重级别：P2（次要偏重：工作区超过 20 个 root 会话时，最旧的会话里的审批不会被读；面板没有「候选被截」边界）｜发现：2026-11-22（E2E 第五轮）｜状态：调查中
+> 严重级别：P2（次要偏重：工作区超过 20 个 root 会话时，最旧的会话里的审批不会被读；面板没有「候选被截」边界）｜发现：2026-11-22（E2E 第五轮）｜状态：已修｜审查：agent — 逐条核对已修判定（边界 / 边界+1 各一档）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit ceb575dd（与 317/318/320 同批：注意力边界，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -65,3 +65,10 @@ opened: 2026-11-22
 - ≤20 无提示；
 - 全部扫到且无审批时仍显示真正的空态；
 - 纯函数/组件 spec + 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/attention.ts`（`pendingApprovals` → `{items, capped}`）、`packages/company-pack/src/client/presence/attention-history.ts`（`approvalsCapped`）、`packages/company-pack/src/client/tabs/AttentionTab.tsx`（`eventsSeen` + 三行边界）、`packages/company-pack/src/client/locales.ts`
+- 红：`vitest run tests/client/wiring/attention.spec.ts tests/client/tabs/attention-tab.spec.ts tests/client/presence/attention-history.spec.ts` —— 候选不带 `capped` 后「候选被截 ⇒ 还有 N 个会话没扫」失败 —— 把三处边界去掉（`capped` 恒 0、不记 `eventsSeen`）后对应断言失败（面板不提示、空态仍说「没有等你的事」）
+- 绿：`vitest run tests/client/wiring/attention.spec.ts tests/client/tabs/attention-tab.spec.ts tests/client/presence/attention-history.spec.ts` —— 31/31 + 14/14 + 16/16
+- 提交：commit ceb575dd

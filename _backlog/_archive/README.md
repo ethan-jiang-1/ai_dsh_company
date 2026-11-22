@@ -1,4 +1,7 @@
 # _archive/ · 离开活跃区
+- [BUG-317-attention-current-session-1000-cap-silent.md](fixed_bugs/BUG-317-attention-current-session-1000-cap-silent.md) — 本会话 1000 事件窗口静默截断；面板报「只保留最近 N 条」并压住空态。
+- [BUG-318-attention-history-candidate-cap-silent.md](fixed_bugs/BUG-318-attention-history-candidate-cap-silent.md) — 候选只扫 20 个；带回 `total/capped` 并提示「还有 N 个会话没扫」。
+- [BUG-320-attention-approval-cap-five-silent.md](fixed_bugs/BUG-320-attention-approval-cap-five-silent.md) — 审批流 5 条上限；`pendingApprovals` 返回 `{items, capped}` 并提示「还有 N 条未显示」。
 - [BUG-323-attention-history-cross-workspace-leak.md](fixed_bugs/BUG-323-attention-history-cross-workspace-leak.md) — cwd 未解析时候选过滤 fail-open（越界）；改 fail-closed（不扫 + 面板提示）。
 - [BUG-315-cultivation-full-view-min-widths-ignored.md](fixed_bugs/BUG-315-cultivation-full-view-min-widths-ignored.md) — `BOARD_MIN`/`CHAT_MIN` 没被 CSS 消费；`splitLayout` 单点计算，放不下就堆叠。
 - [BUG-312-attention-question-duplicate-key.md](fixed_bugs/BUG-312-attention-question-duplicate-key.md) — 同文问询撞 React key；登记时合成 id，key 不再回落摘要。

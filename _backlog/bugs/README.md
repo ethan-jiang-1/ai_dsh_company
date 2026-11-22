@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 8 张**：[BUG-316](BUG-316-cultivation-host-command-texts-not-localized.md)（培养命令 host 回执/错误 en 仍中文，P2）· [BUG-317](BUG-317-attention-current-session-1000-cap-silent.md)（当前会话 1000 事件截断静默丢旧审批，P2）· [BUG-318](BUG-318-attention-history-candidate-cap-silent.md)（跨会话候选只扫 20 个、无边界，P2）· [BUG-319](BUG-319-attention-questions-not-rebuilt-after-reload.md)（问询刷新后从待办消失，P2）· [BUG-320](BUG-320-attention-approval-cap-five-silent.md)（6 条挂起审批只显 5 条、无计数，P2）· [BUG-321](BUG-321-cultivation-record-head-60-lines-false-broken.md)（合法长前置记录被 60 行头窗口判坏，P2）· [BUG-322](BUG-322-cultivation-journal-head-240-title-fallback.md)（journal 240 字窗口吞标题，P2）· [BUG-324](BUG-324-deliverables-catalog-field-shape-silent.md)（catalog root/ledgered/presented 字段形状坏被静默猜值，P2）。
+**活跃 5 张**：[BUG-316](BUG-316-cultivation-host-command-texts-not-localized.md)（培养命令 host 回执/错误 en 仍中文，P2）（当前会话 1000 事件截断静默丢旧审批，P2）（跨会话候选只扫 20 个、无边界，P2）· [BUG-319](BUG-319-attention-questions-not-rebuilt-after-reload.md)（问询刷新后从待办消失，P2）（6 条挂起审批只显 5 条、无计数，P2）· [BUG-321](BUG-321-cultivation-record-head-60-lines-false-broken.md)（合法长前置记录被 60 行头窗口判坏，P2）· [BUG-322](BUG-322-cultivation-journal-head-240-title-fallback.md)（journal 240 字窗口吞标题，P2）· [BUG-324](BUG-324-deliverables-catalog-field-shape-silent.md)（catalog root/ledgered/presented 字段形状坏被静默猜值，P2）。
 
 **2026-11-22 E2E 第五轮（目标 8–10，只立卡不修）**：307–315 由并行修复进程收掉后，本轮转攻「host 文案」「注意力读取上限」「预览窗口」三组，立 316–324 九张，均 `status: 调查中`。根因：host 命令面无 locale（316）、注意力读取上限/候选集无边界状态（317–320、323）、预览窗口被当格式判据（321/322）、宽松字段归一化（324）。不碰修复进程代码，也不在同一 diff 修产品。
 
@@ -35,7 +35,7 @@
 | 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
 |---|---|---|---|---|
 | **O 过滤器 fail-closed** | [323](../_archive/fixed_bugs/BUG-323-attention-history-cross-workspace-leak.md) | 未知输入被当成「都匹配」（唯一「多」方向） | cwd 未解析 ⇒ **不扫**（候选 0）+ 面板「工作区未就绪，暂不跨会话」 | 1 |
-| **D‴ 边界沿管线传递** | [317](BUG-317-attention-current-session-1000-cap-silent.md) + [318](BUG-318-attention-history-candidate-cap-silent.md) + [320](BUG-320-attention-approval-cap-five-silent.md)，[321](BUG-321-cultivation-record-head-60-lines-false-broken.md) + [322](BUG-322-cultivation-journal-head-240-title-fallback.md)，[324](BUG-324-deliverables-catalog-field-shape-silent.md) | 边界在每一层被重新丢掉 | 注意力管线带 `{ eventsTruncated, candidates, approvalsCapped }` 一路到面板；读面窗口不得当格式判据；catalog 字段形状进 `skipped`/`fieldProblems` | 2 → 5 |
+| **D‴ 边界沿管线传递** | [317](../_archive/fixed_bugs/BUG-317-attention-current-session-1000-cap-silent.md) + [318](../_archive/fixed_bugs/BUG-318-attention-history-candidate-cap-silent.md) + [320](../_archive/fixed_bugs/BUG-320-attention-approval-cap-five-silent.md)，[321](BUG-321-cultivation-record-head-60-lines-false-broken.md) + [322](BUG-322-cultivation-journal-head-240-title-fallback.md)，[324](BUG-324-deliverables-catalog-field-shape-silent.md) | 边界在每一层被重新丢掉 | 注意力管线带 `{ eventsTruncated, candidates, approvalsCapped }` 一路到面板；读面窗口不得当格式判据；catalog 字段形状进 `skipped`/`fieldProblems` | 2 → 5 |
 | **F‴ 重建面覆盖全部类型** | [319](BUG-319-attention-questions-not-rebuilt-after-reload.md) | 只重建审批，问询只靠活体 | `pendingApprovals` → `pendingAsks`（asked/answered 配对，两种类型共用） | 3 |
 | **H″ 宿主文案可翻译** | [316](BUG-316-cultivation-host-command-texts-not-localized.md) | host 回执是中文串 | host 返回结构化结果或 client 对已知 kind 做 typed 映射 + 原文兜底（不伪造翻译） | 6 |
 

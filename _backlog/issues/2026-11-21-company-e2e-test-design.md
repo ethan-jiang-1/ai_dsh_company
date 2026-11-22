@@ -124,10 +124,10 @@ opened: 2026-11-21
 并行进程收掉 307–315 后，本轮从「en 真提交」和「长会话/多会话/长前置」两组边界切入，新立 9 张（316–324）：
 
 - [BUG-316](../bugs/BUG-316-cultivation-host-command-texts-not-localized.md)：培养命令 host 回执/错误 en 仍中文（真页面「Record it」实测）。
-- [BUG-317](../bugs/BUG-317-attention-current-session-1000-cap-silent.md)：当前会话只留 1000 事件，旧审批静默丢。
-- [BUG-318](../bugs/BUG-318-attention-history-candidate-cap-silent.md)：跨会话候选只扫 20 个，无边界提示。
+- [BUG-317](../_archive/fixed_bugs/BUG-317-attention-current-session-1000-cap-silent.md)：当前会话只留 1000 事件，旧审批静默丢。
+- [BUG-318](../_archive/fixed_bugs/BUG-318-attention-history-candidate-cap-silent.md)：跨会话候选只扫 20 个，无边界提示。
 - [BUG-319](../bugs/BUG-319-attention-questions-not-rebuilt-after-reload.md)：问询刷新后从待办消失。
-- [BUG-320](../bugs/BUG-320-attention-approval-cap-five-silent.md)：6 条挂起审批只显 5 条。
+- [BUG-320](../_archive/fixed_bugs/BUG-320-attention-approval-cap-five-silent.md)：6 条挂起审批只显 5 条。
 - [BUG-321](../bugs/BUG-321-cultivation-record-head-60-lines-false-broken.md)：60 行头窗口把合法长前置记录判坏。
 - [BUG-322](../bugs/BUG-322-cultivation-journal-head-240-title-fallback.md)：240 字窗口吞 journal 标题。
 - [BUG-323](../_archive/fixed_bugs/BUG-323-attention-history-cross-workspace-leak.md)：cwd 未解析时注意力候选 fail-open 到所有工作区。

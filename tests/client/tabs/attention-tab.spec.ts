@@ -200,7 +200,8 @@ describe('AttentionTab · cwd 未解析时不跨工作区（BUG-323）', () => {
   })
 })
 
-// 三处上限都要在面板上说出来（BUG-317/318/320），并且有边界时不许说「没有等你的事」。
+// 负例留证 2026-11-22：去掉 `eventsSeen`/`capped` 后 `vitest run tests/client/tabs/attention-tab.spec.ts` 2 failed（边界不提示、空态仍说「没有等你的事」）。BUG-317/318/320
+// 三处上限都要在面板上说出来，并且有边界时不许说「没有等你的事」。
 describe('AttentionTab · 注意力管线的边界', () => {
   const many = (n: number) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`s${String(i)}`, { id: `s${String(i)}`, cwd: '/ws', updatedAt: i }]))
 

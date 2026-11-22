@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-317 / 318 / 320**（2026-11-22，E2E 第五轮 / P2×3）：注意力管线的三处上限静默——
+  [317](BUG-317-attention-current-session-1000-cap-silent.md) 本会话事件窗、
+  [318](BUG-318-attention-history-candidate-cap-silent.md) 候选 20、
+  [320](BUG-320-attention-approval-cap-five-silent.md) 审批流 5；三处边界一路带到面板并压住空态。证据提交 `ceb575dd`。
+
 - **BUG-323**（2026-11-22，E2E 第五轮 / P2）：跨工作区越界——
   [323](BUG-323-attention-history-cross-workspace-leak.md) `historyCandidates` 改 fail-closed（cwd 未知 ⇒ 候选 0）并带回候选边界。
   证据提交 `1d563e89`。

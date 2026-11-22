@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-317：当前会话只留最近 1000 条事件——更早的挂起审批从「待办」消失且无任何提示
 
-> 严重级别：P2（次要偏重：当前会话的长会话里，旧审批被 `MAX_EVENTS` 截掉；面板反而说「没有等你的事」）｜发现：2026-11-22（E2E 第五轮）｜状态：调查中
+> 严重级别：P2（次要偏重：当前会话的长会话里，旧审批被 `MAX_EVENTS` 截掉；面板反而说「没有等你的事」）｜发现：2026-11-22（E2E 第五轮）｜状态：已修｜审查：agent — 逐条核对已修判定（边界 / 边界+1 各一档）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit ceb575dd（与 317/318/320 同批：注意力边界，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -79,3 +79,10 @@ console.log(pendingApprovals(long, 's').length, pendingApprovals(long.slice(-100
 - 早期审批可重建或明确提示；
 - 短会话（<1000）零回归；
 - 纯函数/组件 spec + 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/attention.ts`（`pendingApprovals` → `{items, capped}`）、`packages/company-pack/src/client/presence/attention-history.ts`（`approvalsCapped`）、`packages/company-pack/src/client/tabs/AttentionTab.tsx`（`eventsSeen` + 三行边界）、`packages/company-pack/src/client/locales.ts`
+- 红：`vitest run tests/client/wiring/attention.spec.ts tests/client/tabs/attention-tab.spec.ts tests/client/presence/attention-history.spec.ts` —— 去掉 `eventsSeen`（只留窗口内条数）后「本会话事件超窗 ⇒ 只保留最近 N 条」失败 —— 把三处边界去掉（`capped` 恒 0、不记 `eventsSeen`）后对应断言失败（面板不提示、空态仍说「没有等你的事」）
+- 绿：`vitest run tests/client/wiring/attention.spec.ts tests/client/tabs/attention-tab.spec.ts tests/client/presence/attention-history.spec.ts` —— 31/31 + 14/14 + 16/16
+- 提交：commit ceb575dd
