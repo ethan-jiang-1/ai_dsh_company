@@ -40,8 +40,9 @@ function render(
   options: StartupOptions,
   dict: Record<CompanyKey, string> = zh,
   optionsProblem: 'unreadable' | null = null,
+  settingsProblem: 'corrupt' | 'unsupported' | 'unreadable' | null = null,
 ): string {
-  const store = createStartupStore({ loaded: true, settings, options, optionsProblem })
+  const store = createStartupStore({ loaded: true, settings, options, optionsProblem, settingsProblem })
   return renderToStaticMarkup(createElement(StrategyPanel, {
     sessionId: 'session-1',
     store,
@@ -118,5 +119,35 @@ describe('StrategyPanel · wiki 新鲜度', () => {
       wikiCheck: { value: '/w', ok: false, problem: 'no-index', location: 'outside', checkedAt: AT },
     })
     expect(html).toContain('/profile/node_modules/dsh-company-pack/content/wiki-template')
+  })
+})
+
+
+// 设置文件坏了/读不到必须说（BUG-297）：此前静默折成 auto，看起来像「你从来没设过」；
+// 而文件缺失/空是**合法的 auto**，不该冒出一条错误（两种状态不许混）。
+describe('StrategyPanel · 策略文件的问题', () => {
+  it('corrupt ⇒ 明说损坏，不冒充「你没设过」', () => {
+    const markup = render(EMPTY_STARTUP_SETTINGS, EMPTY_STARTUP_OPTIONS, zh, null, 'corrupt')
+    expect(markup).toContain('策略文件损坏')
+    expect(markup).toContain('自动')
+  })
+
+  it('unsupported ⇒ 说 schema 不认识', () => {
+    expect(render(EMPTY_STARTUP_SETTINGS, EMPTY_STARTUP_OPTIONS, zh, null, 'unsupported')).toContain('更新版本')
+  })
+
+  it('unreadable ⇒ 说读不到，并点明「不是你沒设过」', () => {
+    expect(render(EMPTY_STARTUP_SETTINGS, EMPTY_STARTUP_OPTIONS, zh, null, 'unreadable')).toContain('这不是「你没设过」')
+  })
+
+  it('无问题（文件缺失/空）⇒ 不出现任何策略文件错误行', () => {
+    const markup = render(EMPTY_STARTUP_SETTINGS, EMPTY_STARTUP_OPTIONS)
+    expect(markup).not.toContain('策略文件损坏')
+    expect(markup).not.toContain('策略文件读不到')
+  })
+
+  it('en 面同步（三种问题各有英文原话）', () => {
+    expect(render(EMPTY_STARTUP_SETTINGS, EMPTY_STARTUP_OPTIONS, en, null, 'corrupt')).toContain('strategy file is corrupt')
+    expect(render(EMPTY_STARTUP_SETTINGS, EMPTY_STARTUP_OPTIONS, en, null, 'unreadable')).toContain('cannot be read')
   })
 })

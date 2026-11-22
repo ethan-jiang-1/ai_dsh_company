@@ -179,6 +179,8 @@ export function StrategyPanel(props: StrategyPanelProps): ReactNode {
 
   const rows = startupRows(face.settings, face.options)
   const optionsUnreadable = face.optionsProblem === 'unreadable'
+  // 设置文件坏了/读不到必须说（BUG-297）：此前静默折成 auto，看起来像「你从来没设过」。
+  const settingsProblem = face.settingsProblem ?? null
   const nothingToPick = !optionsUnreadable && face.options.productTypes.length === 0 && face.options.deliveryModes.length === 0
   // 检查对得上 current settings 且有时间戳，才允许把 wiki 结论说成「现在」。
   const checkCurrent = face.settings.wiki !== null
@@ -192,6 +194,9 @@ export function StrategyPanel(props: StrategyPanelProps): ReactNode {
         <p className="wk-strategy-sub">{t('strategy.subtitle')}</p>
         {error === null ? null : <p className="wk-strategy-error" role="status">{error}</p>}
         {optionsUnreadable ? <p className="wk-strategy-error" role="status">{t('strategy.optionsUnreadable')}</p> : null}
+        {settingsProblem === 'corrupt' ? <p className="wk-strategy-error" role="status">{t('strategy.settingsCorrupt')}</p> : null}
+        {settingsProblem === 'unsupported' ? <p className="wk-strategy-error" role="status">{t('strategy.settingsUnsupported')}</p> : null}
+        {settingsProblem === 'unreadable' ? <p className="wk-strategy-error" role="status">{t('strategy.settingsUnreadable')}</p> : null}
         {nothingToPick ? <p className="wk-strategy-empty">{t('strategy.noOptions')}</p> : null}
         {rows.map(row => (
           <StrategyRow
