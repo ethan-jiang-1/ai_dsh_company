@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-23
 ---
 
 # BUG-332：会话恰好 800 条事件时也被判「历史只扫了最近 800 条」——拿满一页不等于还有更早
 
-> 严重级别：P2（次要：假边界会让用户以为还有未读审批；对恰好一页的完整历史是误报）｜发现：2026-11-23（E2E 第六轮）｜状态：调查中
+> 严重级别：P2（次要：假边界会让用户以为还有未读审批；对恰好一页的完整历史是误报）｜发现：2026-11-23（E2E 第六轮）｜状态：已修｜审查：agent — 逐条核对已修判定（跨源/源内、多问题、恰好一页与 +1）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-23 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit 0b3b6428（与 325/331/332 同批：问询读模型，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -72,3 +72,10 @@ console.log(hasMore === true || records.length >= 800)
 - hasMore=true/缺失 + 800 仍提示；
 - 小于 800 不提示；
 - 纯函数 spec + 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/presence/attention-history.ts`（`windowTruncated` 只看 `hasMore`）、`tests/client/presence/attention-history.spec.ts`
+- 红：`vitest run tests/client/wiring/attention.spec.ts tests/client/wiring/attention-observers.spec.ts tests/client/presence/attention-history.spec.ts` —— 把判据改回 `records.length >= HISTORY_PAGE_MESSAGES` 后「恰好一页 ⇒ window=none」失败（误报）
+- 绿：`vitest run tests/client/wiring/attention.spec.ts tests/client/wiring/attention-observers.spec.ts tests/client/presence/attention-history.spec.ts` —— 47/47 + 12/12 + 17/17
+- 提交：commit 0b3b6428

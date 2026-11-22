@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-23
 ---
 
 # BUG-325：同一条挂起问询在刷新后出现两次——活体 id `question:<ms>:<seq>` 与历史 id `callId` 对不上
 
-> 严重级别：P2（次要偏重：319 补了问询历史重建，但活体与历史用两套身份；刷新/重开后同一条问询可能重叠出现）｜发现：2026-11-23（E2E 第六轮）｜状态：调查中
+> 严重级别：P2（次要偏重：319 补了问询历史重建，但活体与历史用两套身份；刷新/重开后同一条问询可能重叠出现）｜发现：2026-11-23（E2E 第六轮）｜状态：已修｜审查：agent — 逐条核对已修判定（跨源/源内、多问题、恰好一页与 +1）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-23 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit 0b3b6428（与 325/331/332 同批：问询读模型，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -76,3 +76,10 @@ console.log(hist[0].id, mergeAttention(live, hist).length)
 - 同文两条问询仍分开；
 - 刷新、重读、后开观察窗三种时序都不重复；
 - 纯函数 spec（live+history 1 条）+ 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/attention.ts`（`mergeAttention` 跨源去重）、`tests/client/wiring/attention.spec.ts`
+- 红：`vitest run tests/client/wiring/attention.spec.ts tests/client/wiring/attention-observers.spec.ts tests/client/presence/attention-history.spec.ts` —— 去掉跨源内容去重后「活体与历史同文同源 ⇒ 合并成一条」失败（同一条问询两行）
+- 绿：`vitest run tests/client/wiring/attention.spec.ts tests/client/wiring/attention-observers.spec.ts tests/client/presence/attention-history.spec.ts` —— 47/47 + 12/12 + 17/17
+- 提交：commit 0b3b6428

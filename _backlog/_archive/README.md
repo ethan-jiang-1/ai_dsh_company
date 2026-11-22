@@ -1,4 +1,7 @@
 # _archive/ · 离开活跃区
+- [BUG-325-attention-question-live-history-id-mismatch.md](fixed_bugs/BUG-325-attention-question-live-history-id-mismatch.md) — 问询 live/history 两套 id；跨源按内容去重、源内按 id。
+- [BUG-331-attention-multi-question-request-only-first.md](fixed_bugs/BUG-331-attention-multi-question-request-only-first.md) — 多问题只显第一个；摘要带「共 N 个问题」、detail 列全部。
+- [BUG-332-attention-exact-800-window-false-positive.md](fixed_bugs/BUG-332-attention-exact-800-window-false-positive.md) — 恰好一页误报窗口截断；判据只看 `hasMore`。
 - [BUG-327-attention-current-approval-cap-still-silent.md](fixed_bugs/BUG-327-attention-current-approval-cap-still-silent.md) — 当前会话 capped 被丢；`ownAsks` 只算一次、capped 进边界对象。
 - [BUG-328-attention-empty-state-ignores-boundaries.md](fixed_bugs/BUG-328-attention-empty-state-ignores-boundaries.md) — 空态只认三个边界；改由 `hasBoundary` 单一判据。
 - [BUG-330-attention-question-copy-and-cap-still-approval-only.md](fixed_bugs/BUG-330-attention-question-copy-and-cap-still-approval-only.md) — 字段/文案仍只写审批；统一到 asks 语义。

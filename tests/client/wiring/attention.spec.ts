@@ -402,7 +402,8 @@ describe('AttentionBoundaries · 单一空态判据（BUG-328）', () => {
 
 // 跨源身份（BUG-325）：问询的活体 id 是合成的、历史 id 是 callId——同一条问询只许出现一次；
 // 源内仍按 id（保 312：同文两条不同 id 不合并）。
-describe('mergeAttention · 跨源问询去重', () => {
+// 负例留证 2026-11-23：去掉跨源内容去重后 `vitest run tests/client/wiring/attention.spec.ts` 1 failed（同一条问询两行）。BUG-325
+describe('mergeAttention · 跨源问询去重（BUG-325）', () => {
   const live = (what: string, id: string) => ({ kind: 'question' as const, sessionId: 's-1', id, what, since: 1000 })
   const history = (what: string, id: string) => ({ kind: 'question' as const, who: 's-1', id, what, time: 1000, jumpTo: 's-1' })
 
@@ -422,7 +423,8 @@ describe('mergeAttention · 跨源问询去重', () => {
 })
 
 // 多问题（BUG-331）：一次 ask_user_question 带 N 个问题 ⇒ 一条条目 + 「共 N 个问题」，detail 放全部。
-describe('pendingQuestions · 多问题请求', () => {
+// 负例留证 2026-11-23：只读第一个问题后 `vitest run tests/client/wiring/attention.spec.ts` 1 failed（缺「共 N 个问题」）。BUG-331
+describe('pendingQuestions · 多问题请求（BUG-331）', () => {
   const call = (argumentsText: string) => ({ type: 'tool/call' as const, time: 1000, data: { callId: 'c1', name: 'ask_user_question', arguments: argumentsText } })
 
   it('三个问题 ⇒ 一条条目、what 带「共 3 个问题」、detail 列出全部', () => {

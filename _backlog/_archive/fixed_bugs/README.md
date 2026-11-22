@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-325 / 331 / 332**（2026-11-23，E2E 第六轮 / P2×3）：问询读模型三处接缝——
+  [325](BUG-325-attention-question-live-history-id-mismatch.md) 跨源内容去重、
+  [331](BUG-331-attention-multi-question-request-only-first.md) 多问题计数与全文、
+  [332](BUG-332-attention-exact-800-window-false-positive.md) 窗口只看 `hasMore`。证据提交 `0b3b6428`。
+
 - **BUG-327 / 328 / 330**（2026-11-23，E2E 第六轮 / P2×3）：注意力边界只被部分消费——
   [327](BUG-327-attention-current-approval-cap-still-silent.md) 当前会话 capped、
   [328](BUG-328-attention-empty-state-ignores-boundaries.md) 空态判据、

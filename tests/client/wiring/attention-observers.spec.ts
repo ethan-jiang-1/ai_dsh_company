@@ -184,7 +184,8 @@ describe('问询活体合成身份（BUG-312）', () => {
 
 // 多问题（BUG-331）：一次请求带 N 个问题 ⇒ 摘要「共 N 个问题」、detail 列出全部；
 // 单个问题不加后缀。缺 questions / 非字符串问题的形状不崩。
-describe('问询观察者的多问题形状', () => {
+// 负例留证 2026-11-23：只读 questions[0] 后 `vitest run tests/client/wiring/attention-observers.spec.ts` 1 failed（缺「共 N 个问题」）。BUG-331
+describe('问询观察者的多问题形状（BUG-331）', () => {
   // 登记只在 next() 结算前存在（finally 会销账），所以 next 必须挂住。
   const mountObserver = () => {
     const { remote, handlers } = fakeRemote()

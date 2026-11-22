@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-23
 ---
 
 # BUG-331：一次 `ask_user_question` 带多个问题，待办只显示第一个——没有「共 N 个问题」
 
-> 严重级别：P2（次要：多问题请求是工具合同支持的形状；列表只取 `questions[0]`，用户可能只答第一题就离开，第二题仍在等）｜发现：2026-11-23（E2E 第六轮）｜状态：调查中
+> 严重级别：P2（次要：多问题请求是工具合同支持的形状；列表只取 `questions[0]`，用户可能只答第一题就离开，第二题仍在等）｜发现：2026-11-23（E2E 第六轮）｜状态：已修｜审查：agent — 逐条核对已修判定（跨源/源内、多问题、恰好一页与 +1）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-23 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit 0b3b6428（与 325/331/332 同批：问询读模型，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -73,3 +73,10 @@ console.log(q.what, q.detail)
 - 单问题不出现冗余后缀；
 - 答完全部后条目消失；
 - 纯函数 spec + 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/attention.ts`（`questionListOf` / `questionCopy`）、`packages/company-pack/src/client/wiring/attention-observers.ts`、`tests/client/wiring/attention-observers.spec.ts`
+- 红：`vitest run tests/client/wiring/attention.spec.ts tests/client/wiring/attention-observers.spec.ts tests/client/presence/attention-history.spec.ts` —— 只读第一个问题后「三个问题 ⇒ 共 3 个问题 / detail 含 B、C」失败
+- 绿：`vitest run tests/client/wiring/attention.spec.ts tests/client/wiring/attention-observers.spec.ts tests/client/presence/attention-history.spec.ts` —— 47/47 + 12/12 + 17/17
+- 提交：commit 0b3b6428
