@@ -39,7 +39,6 @@ export function cultivationRegistrations(
   registerCultivation(ctx as Parameters<typeof registerCultivation>[0], config, companyHome, dataBlocked, '测试用停写原因', roleLabel, undefined, text)
   const command = commands.find(definition => definition.name === 'cultivation')
   const proposal = tools.find(definition => definition.name === 'cultivation_propose')
-  const definition = commands.find(definition => definition.name === 'cultivation')
   if (command === undefined) throw new Error('registerCultivation 没有注册 /cultivation')
   if (proposal === undefined) throw new Error('registerCultivation 没有注册 cultivation_propose')
   return { command: command.handler, definition: command, proposal }

@@ -283,8 +283,6 @@ describe('AttentionTab · 本会话 capped（BUG-327）', () => {
 describe('AttentionTab · 边界组合矩阵（BUG-328）', () => {
   const readyById = { 'session-lead': { id: 'session-lead', cwd: '/ws' }, 'session-x': { id: 'session-x', cwd: '/ws', updatedAt: 1 } }
   const stub = (byId: Record<string, unknown>) => (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown => selector({ byId })
-  /** follow 帧里的事件是**裸事件**（不是 page 的 `{type:'event',event}` 包一层）。 */
-  const ask = (time: number) => ({ type: 'approval/asked', time, data: { id: `a${String(time)}`, toolName: 'bash', reason: 'r' } })
   const page = (records: unknown[], hasMore = false) => vi.fn(async (request: { maxMessages?: number }) => (request.maxMessages === 1
     ? { ok: true as const, value: { records: [{ type: 'event', event: { type: 'turn/start', seq: 9, time: 1, data: {} } }], hasMore: false } }
     : { ok: true as const, value: { records, hasMore } }))
