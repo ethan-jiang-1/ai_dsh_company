@@ -22,7 +22,28 @@
 
 **已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
-**本轮批次**：下方「## 2026-11-22 修复交接（E2E 第二轮：BUG-297/298/299/300）
+**本轮批次**：下方「## 2026-11-22 修复交接（E2E 第三轮：BUG-301..306）
+
+**用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：六张都改 client 读面/呈现面/公开文案；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-22））。
+
+**起点事实（已核）**：303 = `parseMotionLedger` 在 `cells.length !== HEADER.length` 时静默 `continue`（`lib/accounting/ledger.ts:46`）；304 = `readSessionEvents` 只取游标处一页 `maxMessages=800`，更早的挂起审批看不见；305 = `readPendingAcrossSessions` 把每个会话失败 `catch` 成 `[]`，全部失败仍返回空数组；306 = `LIST_CAPS.mine=5` 声明了、`capList`/`capControl` 支持，但 `CultivationMine` 从不调用；301 = 策略 wiki 输入非受控，重置后仍显示旧值、blur 会把旧值写回；302 = `timeLabel` 与 `listDir` 只写中文，en 界面出现「刚刚 / 7 小时前 / 列目录被拒（…）」。
+
+| 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
+|---|---|---|---|---|
+| **D′ 取子集必须报边界** | [304](BUG-304-attention-history-window-misses-old-approvals.md) + [305](BUG-305-attention-history-all-read-fail-silent-empty.md)，[303](BUG-303-ledger-malformed-rows-silent-drop.md) | 读/解析只返回子集，不返回「这是子集」 | `readPendingAcrossSessions` → `{ items, scanned, failed, windowTruncated }`（窗口保留 800，面板说「只扫了最近 800 条」；单会话失败降级、全失败报错行）；`parseMotionLedger` → `{ rows, badRows }`（坏行带行号），面板说「跳过 N 行」 | 1 → 2 |
+| **H 表达层 helper 结构化** | [302](BUG-302-english-ui-chinese-time-and-reason.md) | 共享 helper 只写中文，被所有语言共用 | `timeLabel`/`decidedAtLabel` 产出结构化值、`listDir` 失败原因给结构化 kind，翻译在调用方 typed 字典做（lib 不反向依赖 client 字典）；判据 = en 渲染无 CJK | 3 |
+| **I 声明必须有唯一消费点** | [306](BUG-306-cultivation-mine-list-cap-dead.md) | 配置声明了但渲染面从不调用 | `CultivationMine` 接 `capList('mine')` + `capControl`；判据 = 6 条时出现展开控件 | 5 |
+| **J 受控输入** | [301](BUG-301-strategy-wiki-input-stale-after-reset.md) | 值来自 store 却用非受控输入：重置不刷新、blur 回写 | wiki 输入改受控（store 是唯一真相），spec 覆盖「reset 后 blur 不写回」 | 4 |
+
+**次序 = 304+305 → 303 → 302 → 301 → 306**：304/305 同文件同契约一次改完（危害最高：审批被藏）；303 同族解析层紧随；302 宽而浅且必须在 301/306 之前（否则 en 真页面要重复核对）；301 会写回错误数据（高于 306 的排版）；306 纯渲染接线最后收。
+
+**证据口径**：每卡红→绿同一条可执行命令；先落代码提交拿 sha → 翻 `修复已落地` / 写 `## 修复证据` / 归档。真页面证据必须过构建指纹（`node tools/dev/build-client.mjs`）。`coverage:ratchet` 只升不降（新分支同 diff 带断言，别用 `??` 造死分支）。**只 `git add <paths>`，永不 `git add -A`**。`push` 前先 `source run/env.sh`。
+
+**终点** = 6 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡四行证据与 `审查：` 齐；五连 + `coverage:ratchet` 绿；`client-load`/`ui-scene --isolated` 真绿（带指纹）；一篇批次 Note 记 D′/H/I/J 与元层（4/6 是「取子集或声明了东西但没人把它说出来」），并落地两条判据：en 渲染无 CJK、`LIST_CAPS` 每个键必须被渲染路径引用。
+
+**本节是立项与交接，不是落地**：只记批次计划与次序。
+
+## 2026-11-22 修复交接（E2E 第二轮：BUG-297/298/299/300）
 
 **用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：四张都改 client 读面/呈现面与公开文案；留痕 = 批次 Note [2026-11-22-e2e-round2-read-state-identity](../../notes/implemented/2026-11-22-e2e-round2-read-state-identity.md)）。
 
