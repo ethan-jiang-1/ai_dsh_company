@@ -346,3 +346,20 @@ describe('CultivationBoard · en 渲染无 CJK（BUG-302）', () => {
     expect(markup).not.toMatch(cjk)
   })
 })
+
+// 声明必须有人用（BUG-306）：`LIST_CAPS.mine = 5` 早就写着，渲染面从不调用——
+// 20 条记录会把「我提交的」整段铺开，把下面的「已采纳/journal」顶没。
+describe('CultivationBoard · 我提交的折叠上限', () => {
+  it('6 条 ⇒ 只显示 5 条 + 「显示全部（共 6 条）」控件', () => {
+    const records = Array.from({ length: 6 }, (_, i) => record({ id: `2026112${String(i)}-000000-r${String(i)}`, status: 'open', expectation: `e-${String(i)}` }))
+    const markup = render({ records })
+    expect(markup).toContain('显示全部（共 6 条）')
+    // 只数「我提交的」那块（inbox 里同样的 6 条不该被算进来）。
+    expect(markup.match(/aria-label="我提交的 /g)?.length ?? 0).toBeLessThanOrEqual(5)
+  })
+
+  it('5 条以内 ⇒ 不给控件（不制造噪声）', () => {
+    const records = Array.from({ length: 5 }, (_, i) => record({ id: `2026112${String(i)}-000000-r${String(i)}`, status: 'open' }))
+    expect(render({ records })).not.toContain('显示全部')
+  })
+})

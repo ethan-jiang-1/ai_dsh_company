@@ -88,6 +88,8 @@ export function CultivationBoard(props: CultivationBoardProps) {
     actions,
     inbox,
     setHighlightId,
+    capList,
+    capControl,
   } = board
 
   return (
@@ -121,7 +123,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
 
       <CultivationInbox board={board} roleLabel={roleLabel} />
 
-      <CultivationMine inbox={inbox} roleLabel={roleLabel} />
+      <CultivationMine inbox={inbox} roleLabel={roleLabel} capList={capList} capControl={capControl} />
 
       <CultivationAdopted board={board} records={board.records} roleLabel={roleLabel} />
 

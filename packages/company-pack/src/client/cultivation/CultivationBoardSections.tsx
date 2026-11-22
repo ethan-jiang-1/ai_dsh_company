@@ -3,7 +3,7 @@
  * 我提交的 · 已采纳 · journal · 赞踩。状态仍由 `useCultivationBoard` 持有，本文件只渲染。
  */
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { roleLabel as defaultRoleLabel, timeParts, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../../lib/cultivation/cultivation.ts'
 import { CULTIVATION_COPY, cultivationTimeLabel, revokeLine, verifyLine } from './cultivation-actions.ts'
 import type { CultivationBoardState } from './use-cultivation-board.tsx'
@@ -33,7 +33,15 @@ function verificationTime(entry: CultivationVerification, now: number): string {
   return Number.isNaN(at) ? entry.at : cultivationTimeLabel(timeParts(at, now))
 }
 
-export function CultivationMine({ inbox, roleLabel = defaultRoleLabel }: { readonly inbox: CultivationBoardState['inbox']; readonly roleLabel?: (role: string) => string }) {
+export function CultivationMine({ inbox, roleLabel = defaultRoleLabel, capList, capControl }: {
+  readonly inbox: CultivationBoardState['inbox']
+  readonly roleLabel?: (role: string) => string
+  /** 折叠：`LIST_CAPS.mine` 声明在 hook 里，渲染面必须真的用上（BUG-306 是它没接上）。 */
+  readonly capList: (key: 'mine', list: readonly CultivationRecord[]) => readonly CultivationRecord[]
+  readonly capControl: (key: 'mine', total: number) => ReactNode
+}) {
+  const processed = capList('mine', inbox.processedForViewer)
+  const mine = capList('mine', inbox.mine)
   return (
     <>
       {(inbox.mine.length > 0 || inbox.processedForViewer.length > 0) && (
@@ -41,7 +49,7 @@ export function CultivationMine({ inbox, roleLabel = defaultRoleLabel }: { reado
           <strong>{CULTIVATION_COPY.mineTitle}</strong>
           <div className="wk-meta">{CULTIVATION_COPY.mineSub}</div>
           <div role="list" aria-label={CULTIVATION_COPY.mineListAria} className="wk-list wk-cultivation-list">
-            {inbox.processedForViewer.map(record => (
+            {processed.map(record => (
               <div key={record.id} role="listitem" className="wk-row" aria-label={CULTIVATION_COPY.mineRejectedAria(record.id)}>
                 <span className="wk-row-name">
                   {CULTIVATION_COPY.mineRejectedLine(roleLabel(record.proposerRole), kindNoun(record))}<Tag tone="outline">{record.expectation}</Tag>
@@ -52,7 +60,7 @@ export function CultivationMine({ inbox, roleLabel = defaultRoleLabel }: { reado
 
               </div>
             ))}
-            {inbox.mine.map(record => (
+            {mine.map(record => (
               <div key={record.id} role="listitem" className="wk-row" aria-label={CULTIVATION_COPY.mineRowAria(record.id)}>
                 <span className="wk-row-name">
                   {record.kind === 'suggestion' ? CULTIVATION_COPY.mineSuggestionFor(roleLabel(record.targetRole)) : CULTIVATION_COPY.mineMyCorrection}
@@ -72,6 +80,8 @@ export function CultivationMine({ inbox, roleLabel = defaultRoleLabel }: { reado
               </div>
             ))}
           </div>
+          {/* 计数用**折叠前**的总数：capList 之后再取长度会永远等于上限（BUG-306 的同一坑）。 */}
+          {capControl('mine', inbox.processedForViewer.length + inbox.mine.length)}
         </div>
       )}
     </>

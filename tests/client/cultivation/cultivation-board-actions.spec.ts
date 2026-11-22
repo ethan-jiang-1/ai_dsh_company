@@ -458,10 +458,12 @@ describe('大规模折叠（2026-10-19：300 条一屏滚 = 能用但不好用�
     expect(rowsIn(container)).toBe(10)
   })
 
-  it('不超过阈值（10 条）⇒ 不给折叠控件', () => {
+  it('不超过阈值（10 条）⇒ 待办块不给折叠控件', () => {
     const { container } = mount({ records: many(10) })
     expect(rowsIn(container)).toBe(10)
-    expect(container.textContent).not.toContain('显示全部')
+    // 断言要**限定在待办块**：我提交的另有一套 5 条上限（BUG-306），10 条记录在那里本来就有控件。
+    const inboxBlock = container.querySelector('[aria-label="待我处理的培养记录"]')?.closest('.wk-activity-block')
+    expect(inboxBlock?.textContent ?? '').not.toContain('显示全部')
   })
 })
 
