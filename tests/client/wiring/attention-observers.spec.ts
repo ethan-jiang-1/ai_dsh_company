@@ -181,3 +181,45 @@ describe('问询活体合成身份（BUG-312）', () => {
     await Promise.all([first, second])
   })
 })
+
+// 多问题（BUG-331）：一次请求带 N 个问题 ⇒ 摘要「共 N 个问题」、detail 列出全部；
+// 单个问题不加后缀。缺 questions / 非字符串问题的形状不崩。
+describe('问询观察者的多问题形状', () => {
+  // 登记只在 next() 结算前存在（finally 会销账），所以 next 必须挂住。
+  const mountObserver = () => {
+    const { remote, handlers } = fakeRemote()
+    const registry = createAttentionRegistry()
+    registerAttentionObservers({ remote, sessions, attention: registry })
+    let release!: () => void
+    const gate = new Promise<void>(resolve => { release = resolve })
+    const handler = (request: unknown) => handlers.get('user-questions/request')?.call('owner-1', request, async () => { await gate })
+    return { registry, handler, release }
+  }
+
+  it('三个问题 ⇒ 摘要带「共 3 个问题」，detail 列出 B/C', async () => {
+    const { registry, handler, release } = mountObserver()
+    const pending = handler({ questions: [{ question: 'A' }, { question: 'B' }, { question: 'C' }] })
+    await Promise.resolve()
+    const entry = registry.list()[0]
+    expect(entry?.what).toContain('共 3 个问题')
+    expect(entry?.detail).toContain('B')
+    release()
+    await pending
+  })
+
+  it('单个问题 ⇒ 不加后缀；缺 questions ⇒ 占位文案', async () => {
+    const single = mountObserver()
+    const pending = single.handler({ questions: [{ question: '只有一个' }] })
+    await Promise.resolve()
+    expect(single.registry.list()[0]?.what).toBe('只有一个')
+    single.release()
+    await pending
+
+    const missing = mountObserver()
+    const pending2 = missing.handler({})
+    await Promise.resolve()
+    expect(missing.registry.list()[0]?.what).toContain('问询内容缺失')
+    missing.release()
+    await pending2
+  })
+})

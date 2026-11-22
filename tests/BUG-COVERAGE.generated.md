@@ -8,17 +8,14 @@
 | 指标 | 数量 |
 |---|---|
 | 已修卡 | 317 |
-| 有具名守卫 | 212 |
-| 无具名守卫 | 105 |
-| 覆盖率 | 66.9% |
+| 有具名守卫 | 215 |
+| 无具名守卫 | 102 |
+| 覆盖率 | 67.8% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
 | BUG | opened | slug |
 |---|---|---|
-| 330 | 2026-11-23 | attention-question-copy-and-cap-still-approval-only |
-| 328 | 2026-11-23 | attention-empty-state-ignores-boundaries |
-| 327 | 2026-11-23 | attention-current-approval-cap-still-silent |
 | 183 | 2026-11-14 | notes-root-symlink-followed |
 | 180 | 2026-11-14 | walk-company-dirs-windows-dotdot |
 | 179 | 2026-11-14 | internal-dotdot-over-rejected |
@@ -308,11 +305,11 @@
 | 292 | 2026-11-21 | tests/client/presence/attention-history.spec.ts:40；tests/client/tabs/attention-tab.spec.ts:67；tests/client/tabs/attention-tab.spec.ts:122 |
 | 293 | 2026-11-21 | tests/client/startup/command-scope-hint.spec.ts:69 |
 | 294 | 2026-11-21 | tests/client/cultivation/cultivation-board.spec.ts:300 |
-| 295 | 2026-11-21 | tests/client/wiring/attention.spec.ts:210 |
+| 295 | 2026-11-21 | tests/client/wiring/attention.spec.ts:212 |
 | 296 | 2026-11-21 | tests/tools/client-bundle.spec.ts:36 |
 | 297 | 2026-11-22 | tests/client/startup/startup-load.spec.ts:15；tests/client/startup/strategy-panel.spec.ts:129 |
 | 298 | 2026-11-22 | tests/client/cultivation/cultivation-data.spec.ts:98；tests/client/data/workspace-read-limits.spec.ts:30；tests/client/tabs/deliverables-catalog.spec.ts:190 |
-| 299 | 2026-11-22 | tests/client/wiring/attention-observers.spec.ts:136；tests/client/wiring/attention.spec.ts:245 |
+| 299 | 2026-11-22 | tests/client/wiring/attention-observers.spec.ts:136；tests/client/wiring/attention.spec.ts:247 |
 | 300 | 2026-11-22 | tests/lib/cultivation/cultivation-record-time.spec.ts:12 |
 | 301 | 2026-11-22 | tests/client/startup/strategy-panel-input.spec.ts:58 |
 | 302 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:320；tests/lib/cultivation/cultivation-record-time.spec.ts:30 |
@@ -325,16 +322,19 @@
 | 309 | 2026-11-22 | tests/lib/cultivation/cultivation.spec.ts:296 |
 | 310 | 2026-11-22 | tests/client/tabs/deliverables-catalog.spec.ts:221 |
 | 311 | 2026-11-22 | tests/client/tabs/ledger-tab.spec.ts:100；tests/lib/accounting/ledger.spec.ts:121 |
-| 312 | 2026-11-22 | tests/client/wiring/attention-observers.spec.ts:166；tests/client/wiring/attention.spec.ts:284 |
+| 312 | 2026-11-22 | tests/client/wiring/attention-observers.spec.ts:166；tests/client/wiring/attention.spec.ts:286 |
 | 313 | 2026-11-22 | tests/lib/startup/startup-settings.spec.ts:221 |
 | 314 | 2026-11-22 | tests/client/startup/startup-load.spec.ts:88 |
 | 315 | 2026-11-22 | tests/client/cultivation/cultivation-view-layout.spec.ts:13 |
 | 316 | 2026-11-22 | tests/host/cultivation/cultivation-command.spec.ts:428 |
 | 317 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:224 |
 | 318 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:215 |
-| 319 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:250；tests/client/wiring/attention.spec.ts:314 |
-| 320 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:234；tests/client/wiring/attention.spec.ts:298 |
+| 319 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:251；tests/client/wiring/attention.spec.ts:316 |
+| 320 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:234；tests/client/wiring/attention.spec.ts:300 |
 | 321 | 2026-11-22 | tests/client/cultivation/cultivation-data.spec.ts:145 |
 | 322 | 2026-11-22 | tests/client/cultivation/cultivation-data.spec.ts:172 |
-| 323 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:106；tests/client/tabs/attention-tab.spec.ts:189 |
+| 323 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:117；tests/client/tabs/attention-tab.spec.ts:189 |
 | 324 | 2026-11-22 | tests/client/data/catalog-contract.spec.ts:72 |
+| 327 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:268 |
+| 328 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:283；tests/client/wiring/attention.spec.ts:386 |
+| 330 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:236 |

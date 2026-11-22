@@ -232,7 +232,8 @@ describe('AttentionTab · 注意力管线的边界', () => {
 })
 
 describe('AttentionTab · 审批流被截的信号（BUG-320）', () => {
-  it('历史重建里某会话超 5 条 ⇒ 「还有 N 条待你处理的事项未显示」', async () => {
+  // 负例留证 2026-11-23：把文案改回只写「审批」后本用例 failure（问询被截时说成审批）。BUG-330
+  it('历史重建里某会话超 5 条 ⇒ 「还有 N 条待你处理的事项未显示」（BUG-330）', async () => {
     const byId = { 'session-lead': { id: 'session-lead', cwd: '/ws' }, 'session-x': { id: 'session-x', cwd: '/ws', updatedAt: 1 } }
     const useSessionsStub = (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown => selector({ byId })
     const asked = Array.from({ length: 6 }, (_, i) => ({ type: 'event', event: { type: 'approval/asked', seq: i + 1, time: 1000 + i, data: { id: `a${String(i)}`, toolName: 'bash', reason: 'r' } } }))
@@ -261,10 +262,25 @@ describe('AttentionTab · 问询从历史重建（BUG-319）', () => {
   })
 })
 
-// 负例留证 2026-11-23：去掉 ownAsks.capped 或把空态改回手写三条件后 `vitest run tests/client/tabs/attention-tab.spec.ts` 2 failed（提示不出现、空态照旧）。BUG-327/328/330
+// 负例留证 2026-11-23：去掉 ownAsks.capped 后「本会话审批被截」用例 failure；把空态改回手写三条件后矩阵五档 failure。BUG-327 / BUG-328
 // 边界组合矩阵：六个边界 × {空 / 有项}，每种组合下
 // 「提示行出现」且「空态被压住」。这是上一轮漏掉的形状——单个边界对、组合起来漏。
-describe('AttentionTab · 边界组合矩阵', () => {
+describe('AttentionTab · 本会话 capped（BUG-327）', () => {
+  const readyById = { 'session-lead': { id: 'session-lead', cwd: '/ws' }, 'session-x': { id: 'session-x', cwd: '/ws', updatedAt: 1 } }
+  const stub = (byId: Record<string, unknown>) => (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown => selector({ byId })
+  const ask = (time: number) => ({ type: 'approval/asked', time, data: { id: `a${String(time)}`, toolName: 'bash', reason: 'r' } })
+
+  it('本会话 6 条挂起审批被截 ⇒ 提示「还有 N 条待你处理的事项未显示」且压住空态', async () => {
+    const six = Array.from({ length: 6 }, (_, i) => ask(1000 + i))
+    const follow = async function* () { yield { kind: 'history' as const, events: six } as never }
+    const host = await mount(createElement(AttentionTab, props({ follow, useSessions: stub(readyById) })))
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 40)) })
+    expect(host.textContent).toContain('条待你处理的事项未显示')
+    expect(host.textContent).not.toContain('没有等你的事——')
+  })
+})
+
+describe('AttentionTab · 边界组合矩阵（BUG-328）', () => {
   const readyById = { 'session-lead': { id: 'session-lead', cwd: '/ws' }, 'session-x': { id: 'session-x', cwd: '/ws', updatedAt: 1 } }
   const stub = (byId: Record<string, unknown>) => (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown => selector({ byId })
   /** follow 帧里的事件是**裸事件**（不是 page 的 `{type:'event',event}` 包一层）。 */
@@ -287,12 +303,6 @@ describe('AttentionTab · 边界组合矩阵', () => {
   it('② 候选被截 ⇒ 提示「还有 N 个会话没扫」且压住空态', async () => {
     const many = Object.fromEntries(Array.from({ length: 25 }, (_, i) => [`s${String(i)}`, { id: `s${String(i)}`, cwd: '/ws', updatedAt: i }]))
     await expectBoundary(createElement(AttentionTab, props({ useSessions: stub({ ...readyById, ...many }), pageHistory: page([]) })), '个会话没扫')
-  })
-
-  it('③ 本会话审批被截 ⇒ 提示「还有 N 条待你处理的事项未显示」且压住空态', async () => {
-    const six = Array.from({ length: 6 }, (_, i) => ask(1000 + i))
-    const follow = async function* () { yield { kind: 'history' as const, events: six } as never }
-    await expectBoundary(createElement(AttentionTab, props({ follow, useSessions: stub(readyById) })), '条待你处理的事项未显示')
   })
 
   it('④ 历史读取失败 ⇒ 错误行且压住空态', async () => {

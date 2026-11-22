@@ -80,9 +80,20 @@ describe('跨会话挂起审批重建（BUG-292）', () => {
 // 结果态把三件事一起带回来：扫到几个、失败几个、有没有会话被窗口截断。
 // 负例留证 2026-11-22：把 window 强制为 'none' 后 `vitest run tests/client/presence/attention-history.spec.ts tests/client/tabs/attention-tab.spec.ts` 2 failed（窗口提示与全失败错误行）；还原后 18/18 绿。BUG-304/305
 describe('跨会话重建的边界（BUG-304）', () => {
-  it('窗口拿满一页 ⇒ window=some（更早的事件没看）', async () => {
+  // 332：恰好一页 ≠ 还有更早。判据只看 vendor 的 hasMore。
+  it('恰好一页且 hasMore=false ⇒ window=none（完整历史，不误报）', async () => {
     const events = Array.from({ length: HISTORY_PAGE_MESSAGES }, (_, i) => ({ type: 'turn/start', time: i, data: { i } }))
     const rebuilt = await readPendingAcrossSessions(face({ events }), ['session-b'])
+    expect(rebuilt.window).toBe('none')
+  })
+
+  it('hasMore=true ⇒ window=some（真的还有更早）', async () => {
+    const events = Array.from({ length: 3 }, (_, i) => ({ type: 'turn/start', time: i, data: { i } }))
+    const rebuilt = await readPendingAcrossSessions(async (request, signal) => {
+      const result = await face({ events })(request, signal)
+      if (request.maxMessages === 1 || !result.ok) return result
+      return { ok: true as const, value: { ...result.value, hasMore: true } }
+    }, ['session-b'])
     expect(rebuilt.window).toBe('some')
   })
 

@@ -212,9 +212,14 @@ export function mergeAttention(
   // 活体登记与「历史重建」可能指向同一条挂起（本页看着它发起、刷新后又能重建）——按**身份**去重，
   // 优先活体（它带真实 since）。按摘要去重会让两条同摘要的不同审批互相吞掉（BUG-299）。
   const seen = new Set(waiting.map(attentionItemKey))
+  // 跨源身份（BUG-325）：问询的活体 id 是合成的（312）、历史 id 是 `callId`（319）——两套 id 各自都对，
+  // 拼起来会让同一条问询显示两行。这里只对 **live ↔ history** 之间的问询按内容去重；
+  // 源内仍按 id（保 312：同文两条不同 id 的问询不合并）。
+  const liveQuestionContent = new Set(waiting.filter(item => item.kind === 'question').map(questionContentKey))
   const rebuilt = streamItems.filter(item => {
     const key = attentionItemKey(item)
     if (seen.has(key)) return false
+    if (item.kind === 'question' && liveQuestionContent.has(questionContentKey(item))) return false
     seen.add(key)
     return true
   })
@@ -240,6 +245,11 @@ export function attentionItemKey(item: AttentionItem): string {
     : `${item.kind}\u0000${item.jumpTo}\u0000#${item.id}`
 }
 
+/** 问询的**跨源**内容键（只在 live↔history 之间用；源内仍按 id）。 */
+function questionContentKey(item: AttentionItem): string {
+  return `${item.kind}\u0000${item.jumpTo}\u0000${item.what}`
+}
+
 /** 类别 → Tag 色调（等人的醒目、告知的低调）。 */
 export function attentionTone(kind: AttentionKind): 'info' | 'danger' | 'warning' | 'outline' {
   switch (kind) {
@@ -253,16 +263,34 @@ export function attentionTone(kind: AttentionKind): 'info' | 'danger' | 'warning
 /** 问询工具的 wire 名（vendor `ask_user_question`）。 */
 export const ASK_TOOL_NAME = 'ask_user_question'
 
-/** 从 `tool/call` 的 arguments（JSON 字符串）里读第一个问句；读不出给「（问询内容缺失）」。 */
-function questionTextOf(argumentsText: string | undefined): string {
-  if (typeof argumentsText !== 'string' || argumentsText.trim() === '') return '（问询内容缺失）'
+/**
+ * 从 `tool/call` 的 arguments（JSON 字符串）里读问题清单（BUG-331：一次请求可以带多个问题）。
+ * @param argumentsText - 工具的 arguments（JSON 字符串）。
+ * @returns 全部有效问句；读不出给空数组。
+ */
+export function questionListOf(argumentsText: string | undefined): readonly string[] {
+  if (typeof argumentsText !== 'string' || argumentsText.trim() === '') return []
   try {
     const parsed = JSON.parse(argumentsText) as { questions?: readonly { question?: unknown }[] }
-    const first = parsed.questions?.[0]?.question
-    return typeof first === 'string' && first.trim() !== '' ? first.trim() : '（问询内容缺失）'
+    return (parsed.questions ?? [])
+      .map(item => (typeof item?.question === 'string' ? item.question.trim() : ''))
+      .filter(text => text !== '')
   } catch {
-    return '（问询内容缺失）'
+    return []
   }
+}
+
+/**
+ * 问询条目的摘要：第一个问题 + 「共 N 个问题」（多问题时才加）。
+ * @param questions - 全部问句。
+ * @returns `{ what, detail }`；无问句时给占位且无 detail。
+ */
+function questionCopy(questions: readonly string[]): { readonly what: string, readonly detail?: string } {
+  if (questions.length === 0) return { what: '（问询内容缺失）' }
+  const first = questions[0]!
+  const what = questions.length === 1 ? first : `${first}（共 ${String(questions.length)} 个问题）`
+  const detail = questions.length === 1 ? first : questions.map((text, i) => `${String(i + 1)}. ${text}`).join('\n')
+  return { what: attentionSummary(what), detail }
 }
 
 /**
@@ -281,13 +309,13 @@ export function pendingQuestions(events: readonly AttentionEventLike[], sessionI
     const data = event.data as { callId?: unknown; name?: unknown; arguments?: unknown; id?: unknown } | null
     if (typeof data !== 'object' || data === null) continue
     if (event.type === 'tool/call' && data.name === ASK_TOOL_NAME && typeof data.callId === 'string') {
-      const text = questionTextOf(typeof data.arguments === 'string' ? data.arguments : undefined)
+      const copy = questionCopy(questionListOf(typeof data.arguments === 'string' ? data.arguments : undefined))
       open.set(data.callId, {
         kind: 'question',
         who: sessionId,
         id: data.callId,
-        what: attentionSummary(text),
-        ...(text === '（问询内容缺失）' ? {} : { detail: text }),
+        what: copy.what,
+        ...(copy.detail === undefined ? {} : { detail: copy.detail }),
         time: event.time,
         jumpTo: sessionId,
       })

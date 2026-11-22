@@ -75,8 +75,9 @@ export async function readSessionEvents(
   const records = full.value.records
   return {
     events: records.map(record => record.event as unknown as AttentionEventLike),
-    // 拿满一页 ≠ 只有这一页：vender 的 hasMore 若有就直接用，否则「拿满」即视为可能还有更早的（保守）。
-    windowTruncated: full.value.hasMore === true || records.length >= HISTORY_PAGE_MESSAGES,
+    // 窗口是否被截断**只看 vendor 的 hasMore**（BUG-332）：「拿满一页」不等于「还有更早」——
+    // 恰好 800 条的完整历史过去会被误报成「只扫了最近 800 条」。没有 hasMore 才退化为「多取一条」判断。
+    windowTruncated: full.value.hasMore === true,
   }
 }
 

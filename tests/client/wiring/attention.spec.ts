@@ -12,6 +12,8 @@ import {
   mergeAttention,
   pendingApprovals,
   pendingAsks,
+  pendingQuestions,
+  questionListOf,
   streamAttention,
   type AttentionEventLike,
   type LivePending,
@@ -381,7 +383,7 @@ describe('pendingAsks · 形状边角（重建问询）', () => {
 
 // 负例留证 2026-11-23：去掉 hasBoundary 的任一维后 `vitest run tests/client/wiring/attention.spec.ts` 1 failed。BUG-327/328/330
 // 边界汇总：判据只有一处 hasBoundary；任一维度异常就不许说「没有」。
-describe('AttentionBoundaries · 单一空态判据', () => {
+describe('AttentionBoundaries · 单一空态判据（BUG-328）', () => {
   const none = { eventsTruncated: false, candidates: { total: 0, capped: 0 }, asksCapped: 0, window: 'none' as const, failed: 0 }
 
   it('六维全清 ⇒ hasBoundary=false（可以说「没有」）', () => {
@@ -395,5 +397,57 @@ describe('AttentionBoundaries · 单一空态判据', () => {
     expect(hasBoundary({ ...none, asksCapped: 1 })).toBe(true)
     expect(hasBoundary({ ...none, window: 'some' })).toBe(true)
     expect(hasBoundary({ ...none, failed: 2 })).toBe(true)
+  })
+})
+
+// 跨源身份（BUG-325）：问询的活体 id 是合成的、历史 id 是 callId——同一条问询只许出现一次；
+// 源内仍按 id（保 312：同文两条不同 id 不合并）。
+describe('mergeAttention · 跨源问询去重', () => {
+  const live = (what: string, id: string) => ({ kind: 'question' as const, sessionId: 's-1', id, what, since: 1000 })
+  const history = (what: string, id: string) => ({ kind: 'question' as const, who: 's-1', id, what, time: 1000, jumpTo: 's-1' })
+
+  it('活体与历史同文同源 ⇒ 合并成一条（活体优先）', () => {
+    const merged = mergeAttention([live('要不要并行？', 'question:1:1')], [history('要不要并行？', 'call-1')])
+    expect(merged).toHaveLength(1)
+    expect(merged[0]?.id).toBe('question:1:1')
+  })
+
+  it('两条活体同文不同 id ⇒ 仍是两条（312 的成果不许回退）', () => {
+    expect(mergeAttention([live('要不要并行？', 'question:1:1'), live('要不要并行？', 'question:1:2')], [])).toHaveLength(2)
+  })
+
+  it('两条历史同文不同 callId ⇒ 仍是两条（源内按 id）', () => {
+    expect(mergeAttention([], [history('要不要并行？', 'call-1'), history('要不要并行？', 'call-2')])).toHaveLength(2)
+  })
+})
+
+// 多问题（BUG-331）：一次 ask_user_question 带 N 个问题 ⇒ 一条条目 + 「共 N 个问题」，detail 放全部。
+describe('pendingQuestions · 多问题请求', () => {
+  const call = (argumentsText: string) => ({ type: 'tool/call' as const, time: 1000, data: { callId: 'c1', name: 'ask_user_question', arguments: argumentsText } })
+
+  it('三个问题 ⇒ 一条条目、what 带「共 3 个问题」、detail 列出全部', () => {
+    const [item] = pendingQuestions([call(JSON.stringify({ questions: [{ question: 'A' }, { question: 'B' }, { question: 'C' }] }))], 's-1')
+    expect(item?.what).toContain('共 3 个问题')
+    expect(item?.detail).toContain('B')
+    expect(item?.detail).toContain('C')
+  })
+
+  it('单个问题 ⇒ 不加计数后缀', () => {
+    const [item] = pendingQuestions([call(JSON.stringify({ questions: [{ question: '只有一个' }] }))], 's-1')
+    expect(item?.what).toBe('只有一个')
+  })
+})
+
+// questionListOf 的形状边角（331 的读取函数）：非字符串问题 / 空问题被过滤；
+// arguments 不是 JSON 时返回空数组（调用方给占位）。
+describe('questionListOf · 形状边角', () => {
+  it('非字符串与空问题被过滤', () => {
+    expect(questionListOf(JSON.stringify({ questions: [{ question: 42 }, { question: '  ' }, { question: '真问题' }] }))).toEqual(['真问题'])
+  })
+
+  it('坏 JSON / 缺 questions ⇒ 空数组', () => {
+    expect(questionListOf('{not json')).toEqual([])
+    expect(questionListOf(JSON.stringify({}))).toEqual([])
+    expect(questionListOf(undefined)).toEqual([])
   })
 })

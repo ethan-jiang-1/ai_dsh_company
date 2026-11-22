@@ -39,15 +39,20 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
     const sessionId = sessions.scopeOf(this)
     if (sessionId === undefined) return next()
     const questions = (request as { questions?: readonly { question?: unknown }[] }).questions ?? []
-    const first = questions[0]
-    const text = typeof first?.question === 'string' ? first.question.trim() : ''
+    const texts = questions
+      .map(item => (typeof item?.question === 'string' ? item.question.trim() : ''))
+      .filter(text => text !== '')
+    const first = texts[0] ?? ''
+    // 多问题（BUG-331）：摘要带「共 N 个问题」，全文都进 detail——只显第一个会让人只答第一题就离开。
+    const summary = texts.length <= 1 ? first : `${first}（共 ${String(texts.length)} 个问题）`
+    const detailText = texts.length <= 1 ? first : texts.map((text, i) => `${String(i + 1)}. ${text}`).join('\n')
     questionSeq += 1
     const done = attention.begin({
       kind: 'question',
       sessionId,
       id: `question:${String(Date.now())}:${String(questionSeq)}`,
-      what: attentionSummary(text === '' ? '（问询内容缺失）' : text),
-      ...(text === '' ? {} : { detail: text }),
+      what: attentionSummary(summary === '' ? '（问询内容缺失）' : summary),
+      ...(detailText === '' ? {} : { detail: detailText }),
       since: Date.now(),
     })
     return (async () => { try { return await next() } finally { done() } })()
