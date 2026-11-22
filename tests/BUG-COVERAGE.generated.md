@@ -7,15 +7,18 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 314 |
+| 已修卡 | 317 |
 | 有具名守卫 | 212 |
-| 无具名守卫 | 102 |
-| 覆盖率 | 67.5% |
+| 无具名守卫 | 105 |
+| 覆盖率 | 66.9% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
 | BUG | opened | slug |
 |---|---|---|
+| 330 | 2026-11-23 | attention-question-copy-and-cap-still-approval-only |
+| 328 | 2026-11-23 | attention-empty-state-ignores-boundaries |
+| 327 | 2026-11-23 | attention-current-approval-cap-still-silent |
 | 183 | 2026-11-14 | notes-root-symlink-followed |
 | 180 | 2026-11-14 | walk-company-dirs-windows-dotdot |
 | 179 | 2026-11-14 | internal-dotdot-over-rejected |

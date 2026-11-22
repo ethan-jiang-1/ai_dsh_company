@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-23
 ---
 
 # BUG-327：320 只把「历史会话」的审批截断数带回来了——当前会话自己的 `.capped` 仍被丢掉
 
-> 严重级别：P2（次要偏重：当前会话 6 条挂起审批，面板仍只显 5 条；`history.approvalsCapped` 只统计别的会话，当前会话没有提示）｜发现：2026-11-23（E2E 第六轮）｜状态：调查中
+> 严重级别：P2（次要偏重：当前会话 6 条挂起审批，面板仍只显 5 条；`history.approvalsCapped` 只统计别的会话，当前会话没有提示）｜发现：2026-11-23（E2E 第六轮）｜状态：已修｜审查：agent — 逐条核对已修判定（边界组合矩阵六档 + 单一空态判据）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-23 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit fa7a7a8c（与 327/328/330 同批：边界收一个对象，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -84,3 +84,10 @@ console.log(pendingApprovals(Array.from({length:6},(_,i)=>asked('a'+i,i+1)),'s')
 - 历史与当前会话的 capped 合计不重复/不遗漏；
 - 5 条以内无提示；zh/en 同步；
 - 组件 spec + 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/attention.ts`（`AttentionBoundaries` + `hasBoundary` + `ASKS_CAP`）、`packages/company-pack/src/client/presence/attention-history.ts`（`approvalsCapped` → `asksCapped`）、`packages/company-pack/src/client/tabs/AttentionTab.tsx`、`packages/company-pack/src/client/locales.ts`
+- 红：`vitest run tests/client/tabs/attention-tab.spec.ts tests/client/wiring/attention.spec.ts` —— 去掉 `ownAsks.capped` 后「本会话审批被截 ⇒ 还有 N 条未显示」失败 —— 去掉 `ownAsks.capped` / 把空态改回手写三条件后，边界组合矩阵中「本会话审批被截」与「候选被截」两条失败（提示不出现、空态照旧）
+- 绿：`vitest run tests/client/tabs/attention-tab.spec.ts tests/client/wiring/attention.spec.ts` —— 21/21 + 40/40（六维全清才 `hasBoundary=false`；六种边界各自让提示出现且空态被压住）
+- 提交：commit fa7a7a8c

@@ -261,7 +261,8 @@ describe('AttentionTab · 问询从历史重建（BUG-319）', () => {
   })
 })
 
-// 边界组合矩阵（BUG-327/328/330 的验收）：六个边界 × {空 / 有项}，每种组合下
+// 负例留证 2026-11-23：去掉 ownAsks.capped 或把空态改回手写三条件后 `vitest run tests/client/tabs/attention-tab.spec.ts` 2 failed（提示不出现、空态照旧）。BUG-327/328/330
+// 边界组合矩阵：六个边界 × {空 / 有项}，每种组合下
 // 「提示行出现」且「空态被压住」。这是上一轮漏掉的形状——单个边界对、组合起来漏。
 describe('AttentionTab · 边界组合矩阵', () => {
   const readyById = { 'session-lead': { id: 'session-lead', cwd: '/ws' }, 'session-x': { id: 'session-x', cwd: '/ws', updatedAt: 1 } }

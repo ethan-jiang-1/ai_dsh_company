@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 8 张**：[BUG-325](BUG-325-attention-question-live-history-id-mismatch.md)（问询 live/history 两套 id，刷新/后到会重复，P2）· [BUG-326](BUG-326-cultivation-command-description-inner-errors-chinese.md)（316 后 description/hint 与内部路径错误仍中文，P2）· [BUG-327](BUG-327-attention-current-approval-cap-still-silent.md)（当前会话自己的 capped 仍被丢，P2）· [BUG-328](BUG-328-attention-empty-state-ignores-boundaries.md)（候选/窗口/工作区边界不压空态，P2）· [BUG-329](BUG-329-cultivation-en-list-delimiters-chinese.md)（en 列表分隔符仍是「、」，P2）· [BUG-330](BUG-330-attention-question-copy-and-cap-still-approval-only.md)（question 已进待办，capped/文案仍只写审批，P2）· [BUG-331](BUG-331-attention-multi-question-request-only-first.md)（多问题请求只显第一个，P2）· [BUG-332](BUG-332-attention-exact-800-window-false-positive.md)（恰好 800 条也报窗口截断，P2）。
+**活跃 5 张**：[BUG-325](BUG-325-attention-question-live-history-id-mismatch.md)（问询 live/history 两套 id，刷新/后到会重复，P2）· [BUG-326](BUG-326-cultivation-command-description-inner-errors-chinese.md)（316 后 description/hint 与内部路径错误仍中文，P2）（当前会话自己的 capped 仍被丢，P2）（候选/窗口/工作区边界不压空态，P2）· [BUG-329](BUG-329-cultivation-en-list-delimiters-chinese.md)（en 列表分隔符仍是「、」，P2）（question 已进待办，capped/文案仍只写审批，P2）· [BUG-331](BUG-331-attention-multi-question-request-only-first.md)（多问题请求只显第一个，P2）· [BUG-332](BUG-332-attention-exact-800-window-false-positive.md)（恰好 800 条也报窗口截断，P2）。
 
 **2026-11-23 E2E 第六轮（目标 8–10，只立卡不修）**：316–324 由并行修复进程收掉后，本轮从「319 的问询历史身份」「320 的当前/历史 cap 分流」「316 的注册元数据」「en 列表分隔符」四个接缝切，立 325–332 八张，均 `status: 调查中`。根因：同一实体两套身份（325）、边界状态只接一条消费路径（327/328）、数据类别扩了文案/字段没跟（330/331）、保守窗口覆盖明确完整信号（332）。不碰修复进程代码，也不在同一 diff 修产品。
 
@@ -36,7 +36,7 @@
 
 | 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
 |---|---|---|---|---|
-| **S 一条管线一个边界对象** | [327](BUG-327-attention-current-approval-cap-still-silent.md) + [328](BUG-328-attention-empty-state-ignores-boundaries.md) + [330](BUG-330-attention-question-copy-and-cap-still-approval-only.md) | 边界值分成三个变量、各自被部分消费 | `AttentionBoundaries` 单一对象（events/candidates/asksCapped/window/failed/workspace），一处算、一处渲染、一处决定空态；字段与文案统一到「等你处理/asks」 | 1 |
+| **S 一条管线一个边界对象** | [327](../_archive/fixed_bugs/BUG-327-attention-current-approval-cap-still-silent.md) + [328](../_archive/fixed_bugs/BUG-328-attention-empty-state-ignores-boundaries.md) + [330](../_archive/fixed_bugs/BUG-330-attention-question-copy-and-cap-still-approval-only.md) | 边界值分成三个变量、各自被部分消费 | `AttentionBoundaries` 单一对象（events/candidates/asksCapped/window/failed/workspace），一处算、一处渲染、一处决定空态；字段与文案统一到「等你处理/asks」 | 1 |
 | **I 身份跨源一致** | [325](BUG-325-attention-question-live-history-id-mismatch.md) | 两套 id 各自正确、拼起来错 | `mergeAttention` 增**跨源**去重（live↔history 问询按内容），源内仍按 id（保 312） | 2 |
 | **B 启发式可证伪** | [332](BUG-332-attention-exact-800-window-false-positive.md) | 用「拿满一页」猜「还有更早」 | `hasMore` 优先；退化时多取一条（limit+1），绝不用 `>= limit` | 3 |
 | **功能缺口** | [331](BUG-331-attention-multi-question-request-only-first.md) | 多问题请求只取第一个 | 一条条目 + 「共 N 个问题」，`detail` 放全部问题；活体与历史同源 | 4 |

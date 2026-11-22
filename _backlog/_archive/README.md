@@ -1,4 +1,7 @@
 # _archive/ · 离开活跃区
+- [BUG-327-attention-current-approval-cap-still-silent.md](fixed_bugs/BUG-327-attention-current-approval-cap-still-silent.md) — 当前会话 capped 被丢；`ownAsks` 只算一次、capped 进边界对象。
+- [BUG-328-attention-empty-state-ignores-boundaries.md](fixed_bugs/BUG-328-attention-empty-state-ignores-boundaries.md) — 空态只认三个边界；改由 `hasBoundary` 单一判据。
+- [BUG-330-attention-question-copy-and-cap-still-approval-only.md](fixed_bugs/BUG-330-attention-question-copy-and-cap-still-approval-only.md) — 字段/文案仍只写审批；统一到 asks 语义。
 - [BUG-316-cultivation-host-command-texts-not-localized.md](fixed_bugs/BUG-316-cultivation-host-command-texts-not-localized.md) — 培养命令 host 回执全中文；`t(zh,en)` 贯穿 63 条回执，判据 en 回执无 CJK。
 - [BUG-319-attention-questions-not-rebuilt-after-reload.md](fixed_bugs/BUG-319-attention-questions-not-rebuilt-after-reload.md) — 问询刷新后从待办消失；`pendingAsks` 从 tool/call ↔ tool/result 重建问询。
 - [BUG-324-deliverables-catalog-field-shape-silent.md](fixed_bugs/BUG-324-deliverables-catalog-field-shape-silent.md) — catalog 字段形状坏被静默归一化；改为跳过并计数。

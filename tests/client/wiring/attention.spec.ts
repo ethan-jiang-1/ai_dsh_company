@@ -379,7 +379,8 @@ describe('pendingAsks · 形状边角（重建问询）', () => {
   })
 })
 
-// 边界汇总（BUG-327/328/330）：判据只有一处 hasBoundary；任一维度异常就不许说「没有」。
+// 负例留证 2026-11-23：去掉 hasBoundary 的任一维后 `vitest run tests/client/wiring/attention.spec.ts` 1 failed。BUG-327/328/330
+// 边界汇总：判据只有一处 hasBoundary；任一维度异常就不许说「没有」。
 describe('AttentionBoundaries · 单一空态判据', () => {
   const none = { eventsTruncated: false, candidates: { total: 0, capped: 0 }, asksCapped: 0, window: 'none' as const, failed: 0 }
 

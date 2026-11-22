@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-327 / 328 / 330**（2026-11-23，E2E 第六轮 / P2×3）：注意力边界只被部分消费——
+  [327](BUG-327-attention-current-approval-cap-still-silent.md) 当前会话 capped、
+  [328](BUG-328-attention-empty-state-ignores-boundaries.md) 空态判据、
+  [330](BUG-330-attention-question-copy-and-cap-still-approval-only.md) 字段与文案；收成 `AttentionBoundaries` + `hasBoundary` 单一判据。证据提交 `fa7a7a8c`。
+
 - **BUG-316**（2026-11-22，E2E 第五轮 / P2）：host 命令回执不随语言——
   [316](BUG-316-cultivation-host-command-texts-not-localized.md) `registerCultivation` 收 `t(zh, en)`，63 条回执改双语；
   条件片段收成「一次分支 + 两种语言叶子」。证据提交 `4f1ad457`。
