@@ -79,6 +79,15 @@ function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck, checkCurrent, te
 }): ReactNode {
   const label = t(FIELD_LABEL[row.field])
   const options = optionsFor(row)
+  // wiki 输入必须受控（BUG-301）：值来自 store，重置/保存生效时输入框要跟着变；
+  // 非受控时「恢复自动」只在盘上生效，输入框仍显示旧值，碰一下失焦还会把旧值写回去。
+  const [draft, setDraft] = useState<string>(row.value ?? '')
+  const [synced, setSynced] = useState<string | null>(row.value)
+  if (row.value !== synced) {
+    // 外部值变了（保存生效 / 恢复自动 / 别的观察窗改了）：以 store 为准刷新草稿。
+    setSynced(row.value)
+    setDraft(row.value ?? '')
+  }
   // wiki 的失效原因来自 host 的盘上检查；另两行的失效是「值不在枚举里」。
   // 检查过期 / 对不上当前值时，失效结论也不许冒充（BUG-082 的对称面）。
   const invalid = row.invalid && (row.field !== 'wiki' || checkCurrent)
@@ -101,11 +110,13 @@ function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck, checkCurrent, te
           <div className="wk-strategy-row-control">
             <input
               className="wk-strategy-input"
-              defaultValue={row.value ?? ''}
+              value={draft}
               placeholder={t('strategy.placeholder.wiki')}
               disabled={busy}
-              onBlur={(event) => {
-                const next = event.currentTarget.value.trim()
+              onChange={(event) => { setDraft(event.currentTarget.value) }}
+              onBlur={() => {
+                const next = draft.trim()
+                // 与 store 相同就什么都不写——「碰一下再失焦」不能撤销重置（BUG-301）。
                 if ((next === '' ? null : next) === row.value) return
                 onWiki(next === '' ? null : next)
               }}

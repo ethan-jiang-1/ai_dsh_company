@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-11-18",
+  "generatedAt": "2026-11-22",
   "files": {
     "checks/lib/authorship.mjs": {
       "statements": 100,
       "branches": 100
     },
     "checks/lib/backlog-liveness.mjs": {
-      "statements": 98.29,
-      "branches": 93.89
+      "statements": 98.31,
+      "branches": 94
     },
     "checks/lib/carrier-registry.mjs": {
       "statements": 0,
@@ -18,8 +18,8 @@
       "branches": 94.64
     },
     "checks/lib/deliverables-audit.mjs": {
-      "statements": 91.21,
-      "branches": 76.22
+      "statements": 91.66,
+      "branches": 78.48
     },
     "checks/lib/entry-probe.mjs": {
       "statements": 94.64,
@@ -70,7 +70,7 @@
       "branches": 58.33
     },
     "packages/company-pack/src/client/index.ts": {
-      "statements": 68.65,
+      "statements": 69.56,
       "branches": 14.28
     },
     "packages/company-pack/src/client/locales.ts": {
@@ -83,11 +83,11 @@
     },
     "packages/company-pack/src/client/cultivation/CultivationBoard.tsx": {
       "statements": 100,
-      "branches": 84.61
+      "branches": 86.66
     },
     "packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx": {
       "statements": 85.71,
-      "branches": 75.77
+      "branches": 77.63
     },
     "packages/company-pack/src/client/cultivation/CultivationChatPanel.tsx": {
       "statements": 78.87,
@@ -103,27 +103,27 @@
     },
     "packages/company-pack/src/client/cultivation/CultivationInbox.tsx": {
       "statements": 84.61,
-      "branches": 79.61
+      "branches": 80.73
     },
     "packages/company-pack/src/client/cultivation/CultivationView.tsx": {
       "statements": 65.82,
       "branches": 50
     },
     "packages/company-pack/src/client/cultivation/cultivation-actions.ts": {
-      "statements": 63.77,
-      "branches": 87.14
+      "statements": 74.53,
+      "branches": 90.58
     },
     "packages/company-pack/src/client/cultivation/cultivation-context-data.ts": {
-      "statements": 92,
-      "branches": 71.29
+      "statements": 92.5,
+      "branches": 72.32
     },
     "packages/company-pack/src/client/cultivation/cultivation-data.ts": {
-      "statements": 70,
-      "branches": 56.81
+      "statements": 73.24,
+      "branches": 63.51
     },
     "packages/company-pack/src/client/cultivation/use-cultivation-board.tsx": {
       "statements": 84.93,
-      "branches": 82.14
+      "branches": 84.37
     },
     "packages/company-pack/src/client/data/company-data-plane.ts": {
       "statements": 60,
@@ -137,6 +137,10 @@
       "statements": 94.28,
       "branches": 92.1
     },
+    "packages/company-pack/src/client/data/read-limits.ts": {
+      "statements": 100,
+      "branches": 100
+    },
     "packages/company-pack/src/client/data/session-source.ts": {
       "statements": 100,
       "branches": 100
@@ -149,24 +153,36 @@
       "statements": 83.33,
       "branches": 72.72
     },
+    "packages/company-pack/src/client/presence/attention-history.ts": {
+      "statements": 93.33,
+      "branches": 94.44
+    },
+    "packages/company-pack/src/client/startup/CommandScopeHint.tsx": {
+      "statements": 100,
+      "branches": 100
+    },
     "packages/company-pack/src/client/startup/StrategyButton.tsx": {
       "statements": 75,
       "branches": 91.66
     },
     "packages/company-pack/src/client/startup/StrategyPanel.tsx": {
-      "statements": 44.82,
-      "branches": 77.5
+      "statements": 78.46,
+      "branches": 86.95
+    },
+    "packages/company-pack/src/client/startup/startup-load.ts": {
+      "statements": 100,
+      "branches": 100
     },
     "packages/company-pack/src/client/startup/startup-store.ts": {
-      "statements": 40,
+      "statements": 100,
       "branches": 100
     },
     "packages/company-pack/src/client/tabs/AttentionTab.tsx": {
-      "statements": 84.48,
-      "branches": 58.62
+      "statements": 89.41,
+      "branches": 71.69
     },
     "packages/company-pack/src/client/tabs/CultivationTab.tsx": {
-      "statements": 94.44,
+      "statements": 95,
       "branches": 50
     },
     "packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx": {
@@ -174,20 +190,20 @@
       "branches": 77.14
     },
     "packages/company-pack/src/client/tabs/DeliverablesTab.tsx": {
-      "statements": 89.65,
-      "branches": 68.81
+      "statements": 96.96,
+      "branches": 85.85
     },
     "packages/company-pack/src/client/tabs/LedgerTab.tsx": {
-      "statements": 97.87,
+      "statements": 98.14,
       "branches": 87.5
     },
     "packages/company-pack/src/client/tabs/TasksPanel.tsx": {
       "statements": 80,
-      "branches": 60.6
+      "branches": 64.86
     },
     "packages/company-pack/src/client/tabs/company-panels.tsx": {
       "statements": 70.96,
-      "branches": 77.39
+      "branches": 78.15
     },
     "packages/company-pack/src/client/tabs/company-tab-registration.ts": {
       "statements": 97.82,
@@ -230,8 +246,8 @@
       "branches": 25
     },
     "packages/company-pack/src/client/wiring/attention-observers.ts": {
-      "statements": 96.66,
-      "branches": 87.5
+      "statements": 96.77,
+      "branches": 92.3
     },
     "packages/company-pack/src/client/wiring/attention-registry.ts": {
       "statements": 100,
@@ -362,12 +378,12 @@
       "branches": 92
     },
     "packages/company-pack/src/host/ledger/catalog-state.ts": {
-      "statements": 80.64,
-      "branches": 75.86
+      "statements": 85.71,
+      "branches": 85.18
     },
     "packages/company-pack/src/host/ledger/catalog.ts": {
-      "statements": 91.91,
-      "branches": 91.93
+      "statements": 94.87,
+      "branches": 93.24
     },
     "packages/company-pack/src/host/ledger/governance-export.ts": {
       "statements": 91.54,
@@ -378,8 +394,8 @@
       "branches": 66.21
     },
     "packages/company-pack/src/host/ledger/presented-ledger.ts": {
-      "statements": 75.42,
-      "branches": 62.5
+      "statements": 76.16,
+      "branches": 64.08
     },
     "packages/company-pack/src/host/logging/rotating-log.ts": {
       "statements": 100,
@@ -402,15 +418,15 @@
       "branches": 80
     },
     "packages/company-pack/src/host/run-bundle/bootstrap.ts": {
-      "statements": 86.6,
-      "branches": 80.18
+      "statements": 88.59,
+      "branches": 82.6
     },
     "packages/company-pack/src/host/run-bundle/bundle-manifest.ts": {
-      "statements": 89.25,
-      "branches": 88.46
+      "statements": 90.16,
+      "branches": 89.39
     },
     "packages/company-pack/src/host/run-bundle/company-root.ts": {
-      "statements": 88.72,
+      "statements": 89.1,
       "branches": 88.23
     },
     "packages/company-pack/src/host/run-bundle/config.ts": {
@@ -446,8 +462,8 @@
       "branches": 93.1
     },
     "packages/company-pack/src/host/startup/startup-store.ts": {
-      "statements": 95.65,
-      "branches": 87.5
+      "statements": 98.41,
+      "branches": 96.42
     },
     "packages/company-pack/src/host/startup/startup-watch.ts": {
       "statements": 77.77,
@@ -498,8 +514,8 @@
       "branches": 91.66
     },
     "packages/company-pack/src/lib/cultivation/cultivation-record.ts": {
-      "statements": 94.01,
-      "branches": 91.73
+      "statements": 94.89,
+      "branches": 91.97
     },
     "packages/company-pack/src/lib/cultivation/cultivation.ts": {
       "statements": 100,
@@ -546,8 +562,8 @@
       "branches": 90
     },
     "packages/company-pack/src/lib/presence/attention.ts": {
-      "statements": 97.29,
-      "branches": 95.83
+      "statements": 100,
+      "branches": 98.14
     },
     "packages/company-pack/src/lib/presence/board.ts": {
       "statements": 100,
@@ -598,8 +614,8 @@
       "branches": 100
     },
     "packages/company-pack/src/lib/startup/startup-settings.ts": {
-      "statements": 96.47,
-      "branches": 94.62
+      "statements": 98.82,
+      "branches": 96.77
     },
     "probes/lib/claim-loser-evidence.mjs": {
       "statements": 100,
@@ -622,8 +638,8 @@
       "branches": 88.04
     },
     "probes/lib/probe-steps.mjs": {
-      "statements": 93.75,
-      "branches": 90.24
+      "statements": 94.73,
+      "branches": 92.45
     },
     "probes/lib/probe-window.mjs": {
       "statements": 0,
@@ -653,6 +669,10 @@
       "statements": 100,
       "branches": 100
     },
+    "tools/lib/company/content-contract.mjs": {
+      "statements": 91.66,
+      "branches": 89.09
+    },
     "tools/lib/company/converge-rules.mjs": {
       "statements": 96.66,
       "branches": 91.5
@@ -681,6 +701,14 @@
       "statements": 95.79,
       "branches": 85.93
     },
+    "tools/lib/core/client-bundle.mjs": {
+      "statements": 95.74,
+      "branches": 75
+    },
+    "tools/lib/core/dev-command.mjs": {
+      "statements": 98.24,
+      "branches": 95.12
+    },
     "tools/lib/core/dev-install.mjs": {
       "statements": 92.15,
       "branches": 89.06
@@ -699,7 +727,7 @@
     },
     "tools/lib/core/pack-source.mjs": {
       "statements": 100,
-      "branches": 90
+      "branches": 92.85
     },
     "tools/lib/core/pin.mjs": {
       "statements": 0,
@@ -749,6 +777,10 @@
       "statements": 97.61,
       "branches": 100
     },
+    "tools/lib/release/docs-only.mjs": {
+      "statements": 97.05,
+      "branches": 90
+    },
     "tools/lib/release/install-manual.mjs": {
       "statements": 100,
       "branches": 100
@@ -761,9 +793,13 @@
       "statements": 95.31,
       "branches": 83.78
     },
+    "tools/lib/release/readiness.mjs": {
+      "statements": 94.64,
+      "branches": 92
+    },
     "tools/lib/release/shipped-shape.mjs": {
-      "statements": 99.77,
-      "branches": 94.64
+      "statements": 100,
+      "branches": 98.52
     },
     "tools/lib/repo/asset-consumers.mjs": {
       "statements": 97.87,
@@ -775,7 +811,7 @@
     },
     "tools/lib/repo/bug-coverage.mjs": {
       "statements": 100,
-      "branches": 92.85
+      "branches": 93.33
     },
     "tools/lib/repo/test-census.mjs": {
       "statements": 100,
@@ -800,6 +836,10 @@
     "tools/lib/session/session-log.mjs": {
       "statements": 53.84,
       "branches": 58.33
+    },
+    "tools/lib/session/session-store-key.mjs": {
+      "statements": 100,
+      "branches": 100
     }
   },
   "exemptions": [
@@ -817,16 +857,6 @@
       "path": "probes/lib/probe-window.mjs",
       "reason": "探针窗口 helpers，当前无直接 spec",
       "removeWhen": "下一次动 probe 基础设施时补 spec 或删掉该文件"
-    },
-    {
-      "path": "packages/company-pack/src/client/startup/startup-store.ts",
-      "reason": "启动策略面板的既有状态层，当前 40%（2026-11-13 实测）；补测另卡",
-      "removeWhen": "下一次改启动策略面时补测并删除本豁免"
-    },
-    {
-      "path": "packages/company-pack/src/client/startup/StrategyPanel.tsx",
-      "reason": "启动策略面板组件，当前 44.8%（2026-11-13 实测）；静态渲染断言不全",
-      "removeWhen": "下一次改启动策略面时补测并删除本豁免"
     },
     {
       "path": "tools/lib/core/pin.mjs",
