@@ -130,7 +130,10 @@ describe('CultivationBoard：数据诚实与能力呈现（V2/V8/V9）', () => {
       reason: '缺少后续案例', decidedAt: '2026-10-29T11:20:00.000Z',
     })] })
     expect(markup).toContain('目标角色语境下的人已拒绝')
-    expect(markup).toContain('拒绝时间：2026-10-29T11:20:00.000Z')
+    // 时间口径（BUG-300）：正文是人话相对时间，完整 ISO 只在 title 里（审计要看精确值）。
+    expect(markup).toContain('拒绝时间：')
+    expect(markup).toContain('title="2026-10-29T11:20:00.000Z"')
+    expect(markup).not.toContain('拒绝时间：2026-10-29T11:20:00.000Z')
   })
 
   it('自纠正的 open 状态说「待我决定」，不再说「待对方处理」', () => {

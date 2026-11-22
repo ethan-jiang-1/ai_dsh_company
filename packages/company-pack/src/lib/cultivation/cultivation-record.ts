@@ -304,3 +304,15 @@ export function methodSkillText(input: { readonly slug: string; readonly expecta
     '',
   ].join('\n')
 }
+
+/**
+ * 采纳/拒绝时间的人话（BUG-300）：host 把 `decidedAt` 写成完整 ISO（审计需要精确值），
+ * 但正文里给用户看的是「1 小时前」这种相对时间——同一个面板不能有两种时间口径。
+ * @param iso - ISO 时间串（host 写入）。
+ * @param now - 当前时刻（epoch ms；判据注入以求稳定，缺省 = 现在）。
+ * @returns 相对时间；解析失败时原样返回（不编时间、也不吞掉值）。
+ */
+export function decidedAtLabel(iso: string, now: number = Date.now()): string {
+  const at = Date.parse(iso)
+  return Number.isNaN(at) ? iso : timeLabel(at, now)
+}
