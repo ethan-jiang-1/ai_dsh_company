@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-23
 ---
 
 # BUG-326：316 只翻了回执/错误正文——命令 description/参数 hint 与内部路径错误仍是中文
 
-> 严重级别：P2（表达层合同：en 命令面板仍显示中文 description/hint；部分路径/写 gate 错误仍原样中文）｜发现：2026-11-23（E2E 第六轮）｜状态：调查中
+> 严重级别：P2（表达层合同：en 命令面板仍显示中文 description/hint；部分路径/写 gate 错误仍原样中文）｜发现：2026-11-23（E2E 第六轮）｜状态：已修｜审查：agent — 逐条核对已修判定（元数据无 CJK / 两类错误 messageEn 无 CJK 且保留原文片段）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-23 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit 6964b619（host 元数据 + 错误类，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -66,3 +66,11 @@ opened: 2026-11-23
 - en dataBlocked/写 gate/内部路径错误全英文（用户路径/slug 除外）；
 - zh 不回归；
 - host spec + en 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/cultivation/cultivation.ts`（描述/hint/停写/错误走 `t`）、`packages/company-pack/src/host/commands/blocked-text.ts`（`blockedCompanyTextPair`）、`packages/company-pack/src/host/cultivation/cultivation-storage.ts`（`messageEn`）、`packages/company-pack/src/host/run-bundle/write-gate.ts`（`messageEn`）、`tests/support/cultivation-harness.ts`（暴露 `definition`）、`tests/host/cultivation/cultivation-command.spec.ts`
+- 红：`vitest run tests/host/cultivation/cultivation-command.spec.ts` —— 把 description/hint 改回中文后「en 选择器 ⇒ 无中文」失败
+- 绿：`vitest run tests/host/cultivation/cultivation-command.spec.ts` —— 24/24（en 下 description/hint 无 CJK；`UnsafeCultivationPathError.messageEn` 含 `../evil` 且无 CJK；`CompanyWriteBlockedError.messageEn` 含 "writes are paused" 且无 CJK）
+- 提交：commit 6964b619
+- **边界（不伪造翻译）**：`CompanyWriteBlockedError` 的 `messageEn` 只保证「停写」这句是英文，`reason` 原文（可能是中文）原样保留；这一取舍写进用例注释。

@@ -457,7 +457,8 @@ describe('/cultivation 回执的语言（BUG-316）', () => {
 })
 
 // 命令元数据与内部错误也要随语言（BUG-326）：description/hint、dataBlocked、两类错误。
-describe('/cultivation 元数据与内部错误的语言', () => {
+// 负例留证 2026-11-23：把 description/hint 改回中文后 `vitest run tests/host/cultivation/cultivation-command.spec.ts` 1 failed。BUG-326
+describe('/cultivation 元数据与内部错误的语言（BUG-326）', () => {
   const cjk = /[\u4e00-\u9fff]/
 
   it('en 选择器 ⇒ 命令 description/hint 无中文，zh 选择器 ⇒ 有中文', async () => {

@@ -140,7 +140,7 @@ opened: 2026-11-21
 并行进程收掉 316–324 后，本轮从修复后的接缝切进去，新立 8 张（325–332）：
 
 - [BUG-325](../_archive/fixed_bugs/BUG-325-attention-question-live-history-id-mismatch.md)：问询 live 合成 id 与历史 callId 不一致，双源会重复。
-- [BUG-326](../bugs/BUG-326-cultivation-command-description-inner-errors-chinese.md)：316 后 command description/hint、dataBlocked、内部路径错误仍中文。
+- [BUG-326](../_archive/fixed_bugs/BUG-326-cultivation-command-description-inner-errors-chinese.md)：316 后 command description/hint、dataBlocked、内部路径错误仍中文。
 - [BUG-327](../_archive/fixed_bugs/BUG-327-attention-current-approval-cap-still-silent.md)：320 只接历史会话的 capped，当前会话自己的 `.capped` 仍丢。
 - [BUG-328](../_archive/fixed_bugs/BUG-328-attention-empty-state-ignores-boundaries.md)：候选/窗口/工作区边界提示不压空态。
 - [BUG-329](../bugs/BUG-329-cultivation-en-list-delimiters-chinese.md)：en 列表分隔符仍是「、」。

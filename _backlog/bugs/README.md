@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 2 张**：[BUG-326](BUG-326-cultivation-command-description-inner-errors-chinese.md)（命令 description/hint 与内部错误仍中文，P2）· [BUG-329](BUG-329-cultivation-en-list-delimiters-chinese.md)（en 列表分隔符仍是「、」，P2）。
+**活跃 1 张**：[BUG-329](BUG-329-cultivation-en-list-delimiters-chinese.md)（en 列表分隔符仍是「、」，P2）。
 
 **2026-11-23 E2E 第六轮（目标 8–10，只立卡不修）**：316–324 由并行修复进程收掉后，本轮从「319 的问询历史身份」「320 的当前/历史 cap 分流」「316 的注册元数据」「en 列表分隔符」四个接缝切，立 325–332 八张，均 `status: 调查中`。根因：同一实体两套身份（325）、边界状态只接一条消费路径（327/328）、数据类别扩了文案/字段没跟（330/331）、保守窗口覆盖明确完整信号（332）。不碰修复进程代码，也不在同一 diff 修产品。
 
@@ -40,7 +40,7 @@
 | **I 身份跨源一致** | [325](../_archive/fixed_bugs/BUG-325-attention-question-live-history-id-mismatch.md) | 两套 id 各自正确、拼起来错 | `mergeAttention` 增**跨源**去重（live↔history 问询按内容），源内仍按 id（保 312） | 2 |
 | **B 启发式可证伪** | [332](../_archive/fixed_bugs/BUG-332-attention-exact-800-window-false-positive.md) | 用「拿满一页」猜「还有更早」 | `hasMore` 优先；退化时多取一条（limit+1），绝不用 `>= limit` | 3 |
 | **功能缺口** | [331](../_archive/fixed_bugs/BUG-331-attention-multi-question-request-only-first.md) | 多问题请求只取第一个 | 一条条目 + 「共 N 个问题」，`detail` 放全部问题；活体与历史同源 | 4 |
-| **E 表达层（元数据/标点）** | [326](BUG-326-cultivation-command-description-inner-errors-chinese.md)，[329](BUG-329-cultivation-en-list-delimiters-chinese.md) | i18n 只做了句子，没做元数据与分隔符 | 命令 description/hint、两类错误 message 走 `t`；四处列表分隔符按 locale | 5 → 6 |
+| **E 表达层（元数据/标点）** | [326](../_archive/fixed_bugs/BUG-326-cultivation-command-description-inner-errors-chinese.md)，[329](BUG-329-cultivation-en-list-delimiters-chinese.md) | i18n 只做了句子，没做元数据与分隔符 | 命令 description/hint、两类错误 message 走 `t`；四处列表分隔符按 locale | 5 → 6 |
 
 **次序 = 327+328+330 → 325 → 332 → 331 → 326 → 329**：前四张同文件同状态，一次收；326/329 是独立的表达层收口。
 

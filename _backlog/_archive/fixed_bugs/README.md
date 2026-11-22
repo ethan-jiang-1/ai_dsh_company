@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-326**（2026-11-23，E2E 第六轮 / P2）：命令元数据与内部错误不随语言——
+  [326](BUG-326-cultivation-command-description-inner-errors-chinese.md) description/hint、`blockedCompanyTextPair`、
+  两类错误的 `messageEn`（reason 原文保留，不伪造翻译）。证据提交 `6964b619`。
+
 - **BUG-325 / 331 / 332**（2026-11-23，E2E 第六轮 / P2×3）：问询读模型三处接缝——
   [325](BUG-325-attention-question-live-history-id-mismatch.md) 跨源内容去重、
   [331](BUG-331-attention-multi-question-request-only-first.md) 多问题计数与全文、

@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 320 |
-| 有具名守卫 | 218 |
+| 已修卡 | 321 |
+| 有具名守卫 | 219 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 68.1% |
+| 覆盖率 | 68.2% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -333,11 +333,12 @@
 | 320 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:234；tests/client/wiring/attention.spec.ts:300 |
 | 321 | 2026-11-22 | tests/client/cultivation/cultivation-data.spec.ts:145 |
 | 322 | 2026-11-22 | tests/client/cultivation/cultivation-data.spec.ts:172 |
-| 323 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:117；tests/client/tabs/attention-tab.spec.ts:189 |
+| 323 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:118；tests/client/tabs/attention-tab.spec.ts:189 |
 | 324 | 2026-11-22 | tests/client/data/catalog-contract.spec.ts:72 |
 | 325 | 2026-11-23 | tests/client/wiring/attention.spec.ts:406 |
+| 326 | 2026-11-23 | tests/host/cultivation/cultivation-command.spec.ts:461 |
 | 327 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:268 |
 | 328 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:283；tests/client/wiring/attention.spec.ts:386 |
 | 330 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:236 |
 | 331 | 2026-11-23 | tests/client/wiring/attention-observers.spec.ts:188；tests/client/wiring/attention.spec.ts:427 |
-| 332 | 2026-11-23 | tests/client/presence/attention-history.spec.ts:84 |
+| 332 | 2026-11-23 | tests/client/presence/attention-history.spec.ts:85 |
