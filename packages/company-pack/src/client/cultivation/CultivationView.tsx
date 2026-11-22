@@ -48,10 +48,32 @@ export type CultivationViewProps = PropsRuntime<'conversation.view'> & { readonl
 
 /** 右栏宽度状态（拖动分界/键盘 Home 复位；按浏览器持久化）。 */
 const CHAT_WIDTH_KEY = 'dsh-company-cultivation-chat-width'
-const CHAT_MIN = 280
-const CHAT_MAX = 720
-const BOARD_MIN = 380
+
+/** 左板（培养板）可用的**最小**宽度——布局与判据的唯一来源（BUG-315）。 */
+export const BOARD_MIN = 380
+/** 右栏（培养对话）可用的**最小**宽度。 */
+export const CHAT_MIN = 280
+/** 右栏可拖到的最大宽度。 */
+export const CHAT_MAX = 720
+/** 分界条宽度（grid 的中间列）。 */
+export const SPLIT_GAP = 6
 const CHAT_DEFAULT = 390
+
+/**
+ * 两栏布局的**唯一**计算（BUG-315：常量声明了但没人执行——768px 下左板被压到 210、右栏 176）。
+ *
+ * 语义：容器放不下 `BOARD_MIN + CHAT_MIN + SPLIT_GAP` 时**上下堆叠**（各自拿满容器宽），
+ * 而不是把两侧都压到声明的下限以下；放得下时右栏 = clamp(期望值, CHAT_MIN, 容器剩余)。
+ * @param available - 容器（`wk-cult-view-split`）的可用宽度。
+ * @param desiredChat - 用户拖出来的右栏期望宽度。
+ * @returns 是否堆叠 + 右栏实际宽度。
+ */
+export function splitLayout(available: number, desiredChat: number): { readonly stacked: boolean, readonly chat: number } {
+  if (!Number.isFinite(available) || available <= 0) return { stacked: false, chat: clampChatWidth(desiredChat) }
+  if (available < BOARD_MIN + CHAT_MIN + SPLIT_GAP) return { stacked: true, chat: available }
+  const room = available - BOARD_MIN - SPLIT_GAP
+  return { stacked: false, chat: clampChatWidth(Math.min(desiredChat, room)) }
+}
 
 function clampChatWidth(value: number): number {
   return Math.max(CHAT_MIN, Math.min(CHAT_MAX, Math.round(value)))
@@ -91,6 +113,19 @@ export function createCultivationView(injected: CultivationViewInjected) {
     const splitRef = useRef<HTMLDivElement | null>(null)
     const [chatWidth, setChatWidth] = useState(initialChatWidth)
     const [dragging, setDragging] = useState(false)
+    // 容器可用宽度：两栏/堆叠由 splitLayout 一处决定（BUG-315：声明了下限却没有消费点）。
+    const [splitAvailable, setSplitAvailable] = useState(0)
+    useEffect(() => {
+      const split = splitRef.current
+      if (split === null) return
+      const measure = (): void => { setSplitAvailable(split.clientWidth) }
+      measure()
+      if (typeof ResizeObserver === 'undefined') return
+      const observer = new ResizeObserver(measure)
+      observer.observe(split)
+      return () => { observer.disconnect() }
+    }, [])
+    const layout = splitLayout(splitAvailable, chatWidth)
 
     useEffect(() => {
       try {
@@ -105,7 +140,7 @@ export function createCultivationView(injected: CultivationViewInjected) {
       event.preventDefault()
       const split = splitRef.current
       if (split === null) return
-      const max = Math.max(CHAT_MIN, Math.min(CHAT_MAX, split.clientWidth - BOARD_MIN))
+      const max = Math.max(CHAT_MIN, Math.min(CHAT_MAX, split.clientWidth - BOARD_MIN - SPLIT_GAP))
       const startX = event.clientX
       const startWidth = chatWidth
       const onMove = (move: PointerEvent): void => {
@@ -158,7 +193,8 @@ export function createCultivationView(injected: CultivationViewInjected) {
         <div
           ref={splitRef}
           className={`wk-cult-view-split${dragging ? ' dragging' : ''}`}
-          style={{ '--wk-cult-chat-width': `${chatWidth}px` } as CSSProperties}
+          data-stacked={layout.stacked ? 'true' : 'false'}
+          style={{ '--wk-cult-chat-width': `${layout.chat}px` } as CSSProperties}
         >
           <div className="wk-cult-view-board">
             <CultivationBoard

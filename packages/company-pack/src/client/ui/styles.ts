@@ -789,8 +789,15 @@ html[data-dsh-cultivation-view] [data-composer-seat] { display: none !important;
 .wk-cult-chat-session { color: var(--dsw-alias-label-tertiary); font-size: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .wk-cult-chat-send { margin-left: auto; border: 0; border-radius: 6px; background: var(--dsw-alias-brand-primary); color: #16111f; font-size: 10.5px; padding: 5px 10px; cursor: pointer; }
 .wk-cult-chat-send:disabled { opacity: .45; cursor: default; }
+/* 堆叠（BUG-315）：容器放不下 BOARD_MIN + CHAT_MIN + 分界条时上下排，而不是把两侧压到下限以下。
+   两栏模式下右栏宽度仍由 --wk-cult-chat-width 给（splitLayout 已经 clamp 过）。 */
+.wk-cult-view-split[data-stacked='true'] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) 6px minmax(220px, 42%);
+}
+.wk-cult-view-split[data-stacked='true'] .wk-cult-resize { cursor: row-resize; }
 @media (max-width: 1180px) {
-  .wk-cult-view-split { grid-template-columns: minmax(0, 1fr) 6px min(var(--wk-cult-chat-width, 320px), 45%); }
+  .wk-cult-view-split:not([data-stacked='true']) { grid-template-columns: minmax(0, 1fr) 6px min(var(--wk-cult-chat-width, 320px), 45%); }
 }
 
 /* ── 项目策略（2026-11-12）：composer 入口按钮 + 右栏面板 ─────────────────────────
