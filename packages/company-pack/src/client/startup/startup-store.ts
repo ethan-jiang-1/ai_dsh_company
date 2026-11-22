@@ -25,6 +25,8 @@ export interface StartupFace {
    * 缺失/空**不是**问题（合法的「全自动」）；问题存在时面板必须说，不冒充 auto。
    */
   readonly settingsProblem?: 'corrupt' | 'unsupported' | 'unreadable' | null
+  /** 设置问题落在哪个字段（BUG-314 的字段级诊断；缺省 = 不指明）。 */
+  readonly settingsField?: 'productType' | 'deliveryMode' | 'wiki'
 }
 
 /** 订阅仓（`useSyncExternalStore` 形状）。 */

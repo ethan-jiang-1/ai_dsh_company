@@ -38,7 +38,9 @@ export function startupFaceFrom(settings: WorkspaceTextRead, options: WorkspaceT
     // 选项文件坏/被截断必须说出来（BUG-085 的既有语义，保持）。
     optionsProblem: optionsState.problem,
   }
-  return settingsProblem === null ? face : { ...face, settingsProblem }
+  if (settingsProblem === null) return face
+  const field = 'field' in settingsState ? settingsState.field : undefined
+  return field === undefined ? { ...face, settingsProblem } : { ...face, settingsProblem, settingsField: field }
 }
 
 /**

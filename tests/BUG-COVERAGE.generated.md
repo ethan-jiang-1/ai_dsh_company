@@ -320,4 +320,4 @@
 | 307 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:372 |
 | 309 | 2026-11-22 | tests/lib/cultivation/cultivation.spec.ts:296 |
 | 310 | 2026-11-22 | tests/client/tabs/deliverables-catalog.spec.ts:221 |
-| 311 | 2026-11-22 | tests/client/tabs/ledger-tab.spec.ts:99；tests/lib/accounting/ledger.spec.ts:121 |
+| 311 | 2026-11-22 | tests/client/tabs/ledger-tab.spec.ts:100；tests/lib/accounting/ledger.spec.ts:121 |

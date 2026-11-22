@@ -205,7 +205,7 @@ export function StrategyPanel(props: StrategyPanelProps): ReactNode {
         <p className="wk-strategy-sub">{t('strategy.subtitle')}</p>
         {error === null ? null : <p className="wk-strategy-error" role="status">{error}</p>}
         {optionsUnreadable ? <p className="wk-strategy-error" role="status">{t('strategy.optionsUnreadable')}</p> : null}
-        {settingsProblem === 'corrupt' ? <p className="wk-strategy-error" role="status">{t('strategy.settingsCorrupt')}</p> : null}
+        {settingsProblem === 'corrupt' ? <p className="wk-strategy-error" role="status">{face.settingsField === undefined ? t('strategy.settingsCorrupt') : t('strategy.settingsFieldCorrupt', { field: face.settingsField })}</p> : null}
         {settingsProblem === 'unsupported' ? <p className="wk-strategy-error" role="status">{t('strategy.settingsUnsupported')}</p> : null}
         {settingsProblem === 'unreadable' ? <p className="wk-strategy-error" role="status">{t('strategy.settingsUnreadable')}</p> : null}
         {nothingToPick ? <p className="wk-strategy-empty">{t('strategy.noOptions')}</p> : null}

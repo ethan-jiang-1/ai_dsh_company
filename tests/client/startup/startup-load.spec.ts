@@ -82,3 +82,19 @@ describe('startupFaceFromReads：探针的调用时机', () => {
     expect(absent.settingsProblem ?? null).toBeNull()
   })
 })
+
+// 字段级诊断（BUG-314）：v 正确但字段类型坏（数组/对象/数字）过去被折成「自动」。
+describe('startupFaceFrom · 字段类型坏', () => {
+  it('productType 是数组 ⇒ corrupt + 点名字段', async () => {
+    const face = await startupFaceFromReads({ settings: read(JSON.stringify({ v: 1, productType: [] })), options: read('') }, async () => false)
+    expect(face.settingsProblem).toBe('corrupt')
+    expect(face.settingsField).toBe('productType')
+  })
+
+  it('wiki 是对象 / deliveryMode 是数字 ⇒ 也报 corrupt（数字是合法标量，不报）', async () => {
+    const wiki = await startupFaceFromReads({ settings: read(JSON.stringify({ v: 1, wiki: {} })), options: read('') }, async () => false)
+    expect(wiki.settingsField).toBe('wiki')
+    const num = await startupFaceFromReads({ settings: read(JSON.stringify({ v: 1, deliveryMode: 42 })), options: read('') }, async () => false)
+    expect(num.settingsProblem ?? null).toBeNull()
+  })
+})

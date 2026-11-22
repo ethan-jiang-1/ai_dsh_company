@@ -22,6 +22,7 @@ import {
   parseStartupOptions,
   parseStartupOptionsState,
   parseStartupSettings,
+  parseStartupSettingsState,
   patchStartupSettings,
   serializeStartupOptions,
   serializeStartupSettings,
@@ -211,5 +212,45 @@ describe('parseStartupOptions / serialize', () => {
   it('overriddenEntries 只列已设项', () => {
     expect(overriddenEntries({ ...EMPTY_STARTUP_SETTINGS, deliveryMode: 'project-services' }))
       .toEqual([['deliveryMode', 'project-services']])
+  })
+})
+
+// 字段级诊断（BUG-313/314）：坏字段要说「字段 X 类型不对」，不能折成
+// 「内容里没有可选项」/「全自动」——后者会让人去装内容包或以为没设过。
+describe('parseStartup*State：字段类型诊断', () => {
+  it('options.productTypes 是字符串 ⇒ unreadable + 字段名', () => {
+    const state = parseStartupOptionsState(JSON.stringify({ v: 1, productTypes: 'not-an-array', deliveryModes: [] }))
+    expect(state.problem).toBe('unreadable')
+    expect(state.field).toBe('productTypes')
+  })
+
+  it('options 正常 ⇒ 无问题（不误报）', () => {
+    expect(parseStartupOptionsState(JSON.stringify({ v: 1, productTypes: ['a'], deliveryModes: [] })).problem).toBeNull()
+  })
+
+  it('settings.wiki 是对象 ⇒ corrupt + 字段名', () => {
+    const state = parseStartupSettingsState(JSON.stringify({ v: 1, wiki: {} }))
+    expect(state.problem).toBe('corrupt')
+    expect(state.field).toBe('wiki')
+  })
+})
+
+// 三个字段各自的类型分支（BUG-314）：漏一个字段就等于「下次改坏它没人发现」。
+describe('parseStartupSettingsState：三个字段的类型分支', () => {
+  it('deliveryMode 是对象 ⇒ corrupt + deliveryMode', () => {
+    const state = parseStartupSettingsState(JSON.stringify({ v: 1, deliveryMode: {} }))
+    expect(state.problem).toBe('corrupt')
+    expect(state.field).toBe('deliveryMode')
+  })
+
+  it('字段为 null / 缺省 ⇒ 合法（不误报）', () => {
+    expect(parseStartupSettingsState(JSON.stringify({ v: 1, productType: null })).problem).toBeNull()
+    expect(parseStartupSettingsState(JSON.stringify({ v: 1 })).problem).toBeNull()
+  })
+
+  it('options 的 deliveryModes 类型坏 ⇒ unreadable + deliveryModes', () => {
+    const state = parseStartupOptionsState(JSON.stringify({ v: 1, deliveryModes: 5 }))
+    expect(state.problem).toBe('unreadable')
+    expect(state.field).toBe('deliveryModes')
   })
 })

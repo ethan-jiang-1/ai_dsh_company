@@ -152,3 +152,18 @@ describe('StrategyPanel · 策略文件的问题（BUG-297）', () => {
     expect(render(EMPTY_STARTUP_SETTINGS, EMPTY_STARTUP_OPTIONS, en, null, 'unreadable')).toContain('cannot be read')
   })
 })
+
+// 字段级诊断的文案（BUG-314）：panel 要把「哪个字段类型不对」说出来，而不是笼统「文件损坏」。
+describe('StrategyPanel · 字段级诊断', () => {
+  it('settingsField 给出时点名该字段', () => {
+    const markup = renderToStaticMarkup(createElement(StrategyPanel, {
+      sessionId: 'session-1',
+      store: createStartupStore({ loaded: true, settings: EMPTY_STARTUP_SETTINGS, options: EMPTY_STARTUP_OPTIONS, settingsProblem: 'corrupt', settingsField: 'productType' }),
+      load: async () => {}, save: async () => ({ ok: true }), reset: async () => ({ ok: true }),
+      floatTab: () => {}, unfloatTab: () => {},
+      useTabInfo: () => ({ tab: { id: 'tab1', contentId: 'dsh-company-pack/strategy' }, layout: 'dock' }),
+      t: translator(zh),
+    } as never))
+    expect(markup).toContain('productType')
+  })
+})
