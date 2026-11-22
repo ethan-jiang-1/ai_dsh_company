@@ -178,3 +178,23 @@ describe('AttentionTab · 历史读取的边界（BUG-305）', () => {
     expect(host.textContent).toContain('800')
   })
 })
+
+// 越界防线（BUG-323）：当前会话 cwd 未解析时，别的 workspace 的挂起审批**不许**出现在这里。
+describe('AttentionTab · cwd 未解析时不跨工作区', () => {
+  it('cwd 缺失 ⇒ 不扫候选、出「工作区还没就绪」提示，且看不到其它工作区的审批', async () => {
+    const byId = {
+      'session-lead': { id: 'session-lead' },
+      'session-other-ws': { id: 'session-other-ws', cwd: '/other-ws', updatedAt: 1 },
+    }
+    const useSessionsStub = (selector: (state: { byId: Record<string, unknown> }) => unknown): unknown => selector({ byId })
+    const pageHistory = vi.fn(async () => ({
+      ok: true as const,
+      value: { records: [{ type: 'event', event: { type: 'approval/asked', seq: 1, time: 1_000, data: { id: 'x', toolName: 'request_signoff', reason: '别的 workspace 的审批' } } }], hasMore: false },
+    }))
+    const host = await mount(createElement(AttentionTab, props({ pageHistory, useSessions: useSessionsStub })))
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 30)) })
+    expect(pageHistory).not.toHaveBeenCalled()
+    expect(host.textContent).toContain('工作区还没就绪')
+    expect(host.textContent).not.toContain('别的 workspace 的审批')
+  })
+})

@@ -26,7 +26,7 @@ import {
   attentionItemKey,
 } from '../../lib/presence/attention.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
-import { HISTORY_PAGE_MESSAGES, readPendingAcrossSessions, type PendingAcrossSessions, type SessionPageFace } from '../presence/attention-history.ts'
+import { HISTORY_PAGE_MESSAGES, historyCandidates, readPendingAcrossSessions, type CandidateSession, type PendingAcrossSessions, type SessionPageFace } from '../presence/attention-history.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
 import type { CompanyDataInjected } from '../data/use-company-data.ts'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
@@ -127,17 +127,12 @@ export function AttentionTab(props: AttentionTabProps) {
   // 所以走 `remote.session.page` 读同工作区 root 会话的首页历史，配对 asked/decided 只留「问了没答」。
   // 结果态（BUG-304/305）：`[]` 分不清「没有」与「读不到/窗口外」，所以连边界一起存。
   const [history, setHistory] = useState<PendingAcrossSessions>({ items: [], scanned: 0, failed: 0, window: 'none' })
-  const historyKey = useMemo(() => {
-    const currentCwd = byId[props.sessionId as SessionId]?.cwd
-    return Object.values(byId)
-      .filter(summary => summary.id !== props.sessionId
-        && summary.origin !== 'subagent'
-        && (currentCwd === undefined || summary.cwd === currentCwd))
-      .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
-      .slice(0, HISTORY_SCAN_CAP)
-      .map(summary => summary.id)
-      .join('\n')
-  }, [byId, props.sessionId])
+  // 候选挑选走纯函数（fail-closed，BUG-323）：cwd 未解析时**不扫**，而不是把「未知」当「都匹配」。
+  const candidates = useMemo(
+    () => historyCandidates(byId as unknown as Readonly<Record<string, CandidateSession>>, props.sessionId, HISTORY_SCAN_CAP),
+    [byId, props.sessionId],
+  )
+  const historyKey = candidates.ok ? candidates.ids.join('\n') : ''
 
   useEffect(() => {
     const ids = historyKey === '' ? [] : historyKey.split('\n')
@@ -181,6 +176,8 @@ export function AttentionTab(props: AttentionTabProps) {
     >
       {streamError !== null && <div className="wk-error">{t('attention.streamError', { message: streamError })}</div>}
       {/* 边界必须可见（BUG-304/305）：全失败 ≠ 没有；窗口截断 ≠ 完整。 */}
+      {/* 工作区未就绪就不跨会话（BUG-323）：宁可少扫，不可越界。 */}
+      {!candidates.ok && <div className="wk-meta">{t('attention.historyWorkspaceUnknown')}</div>}
       {history.failed > 0 && <div className="wk-error">{t('attention.historyFailed', { count: history.failed })}</div>}
       {history.window === 'some' && <div className="wk-meta">{t('attention.historyWindow', { count: HISTORY_PAGE_MESSAGES })}</div>}
       <div className="wk-activity-block">

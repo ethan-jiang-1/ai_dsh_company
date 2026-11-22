@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest'
 import type { SessionPageRequest } from '@deepseek-ai/dsh-api-session-controller/types'
 import {
   HISTORY_PAGE_MESSAGES,
+  historyCandidates,
   readPendingAcrossSessions,
   readSessionEvents,
   type SessionPageFace,
@@ -96,5 +97,81 @@ describe('跨会话重建的边界（BUG-304）', () => {
     expect(rebuilt.items).toHaveLength(0)
     expect(rebuilt.failed).toBe(2)
     expect(rebuilt.scanned).toBe(0)
+  })
+})
+
+// fail-closed（BUG-323）：当前会话 cwd 未解析时**一个都不扫**——过去把「未知」当「都匹配」，
+// 别的 workspace 的挂起审批会出现在本工作区的待办里（越界）。同时带回候选边界（BUG-318）。
+describe('historyCandidates：fail-closed 与候选边界', () => {
+  const sessions = {
+    current: { id: 'current', cwd: '/ws/a', updatedAt: 9 },
+    same1: { id: 'same1', cwd: '/ws/a', updatedAt: 5 },
+    same2: { id: 'same2', cwd: '/ws/a', updatedAt: 4 },
+    other: { id: 'other', cwd: '/ws/b', updatedAt: 8 },
+    child: { id: 'child', cwd: '/ws/a', origin: 'subagent', updatedAt: 7 },
+  }
+
+  it('cwd 已解析 ⇒ 只取同工作区、排除自己与 subagent', () => {
+    const picked = historyCandidates(sessions, 'current', 20)
+    expect(picked.ok).toBe(true)
+    if (picked.ok) expect(picked.ids.sort()).toEqual(['same1', 'same2'])
+  })
+
+  it('当前会话 cwd 缺失 ⇒ 不扫（不是「都匹配」）', () => {
+    const unknown = historyCandidates({ current: { id: 'current' }, same1: sessions.same1, other: sessions.other }, 'current', 20)
+    expect(unknown).toEqual({ ok: false, reason: 'workspace-unknown' })
+  })
+
+  it('当前会话根本不在清单里 ⇒ 同样不扫', () => {
+    expect(historyCandidates({ same1: sessions.same1 }, 'current', 20).ok).toBe(false)
+  })
+
+  it('候选超上限 ⇒ 带 total/capped（面板说「还有 N 个会话没扫」）', () => {
+    const many = { current: sessions.current, ...Object.fromEntries(Array.from({ length: 5 }, (_, i) => [`s${String(i)}`, { id: `s${String(i)}`, cwd: '/ws/a', updatedAt: i }])) }
+    const picked = historyCandidates(many, 'current', 2)
+    expect(picked.ok).toBe(true)
+    if (picked.ok) {
+      expect(picked.ids).toHaveLength(2)
+      expect(picked.total).toBe(5)
+      expect(picked.capped).toBe(3)
+    }
+  })
+})
+
+// 补齐候选函数的分支（coverage ratchet 只升不降）：updatedAt 缺失、origin 显式 undefined。
+describe('historyCandidates：形状边角', () => {
+  it('updatedAt 缺失按 0 排；非 subagent 的 origin 都算 root', () => {
+    const picked = historyCandidates({
+      current: { id: 'current', cwd: '/ws' },
+      a: { id: 'a', cwd: '/ws' },
+      b: { id: 'b', cwd: '/ws', updatedAt: 5, origin: 'root' },
+      child: { id: 'child', cwd: '/ws', origin: 'subagent' },
+    }, 'current', 10)
+    expect(picked.ok).toBe(true)
+    if (picked.ok) expect(picked.ids).toEqual(['b', 'a'])
+  })
+})
+
+describe('historyCandidates：cwd 为空串也当「未解析」', () => {
+  it('cwd: "" ⇒ 不扫（与 undefined 同待遇）', () => {
+    expect(historyCandidates({ current: { id: 'current', cwd: '' }, other: { id: 'other', cwd: '/ws' } }, 'current', 20).ok).toBe(false)
+  })
+})
+
+describe('historyCandidates：排序两侧都可能缺 updatedAt', () => {
+  it('a 与 b 都缺 updatedAt ⇒ 按 0 比较，不抛', () => {
+    const picked = historyCandidates({
+      current: { id: 'current', cwd: '/ws' },
+      x: { id: 'x', cwd: '/ws' },
+      y: { id: 'y', cwd: '/ws' },
+    }, 'current', 10)
+    expect(picked.ok && picked.ids.length).toBe(2)
+  })
+})
+
+describe('cursorFromError：错误对象没有 message 时按「探不到游标」处理', () => {
+  it('page 失败且无 message ⇒ undefined（读不到这条会话，不猜游标）', async () => {
+    const events = await readSessionEvents(async () => ({ ok: false as const, error: {} }), 'session-x')
+    expect(events).toBeUndefined()
   })
 })

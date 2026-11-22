@@ -132,3 +132,49 @@ export async function readPendingAcrossSessions(
     window: ok.some(result => result.truncated) ? 'some' : 'none',
   }
 }
+
+/** 候选会话的挑选结果（BUG-318/323）：要么明确「这一轮不扫」，要么给出扫哪些 + 被截掉多少。 */
+export type HistoryCandidates =
+  | { readonly ok: false, readonly reason: 'workspace-unknown' }
+  | { readonly ok: true, readonly ids: readonly string[], readonly total: number, readonly capped: number }
+
+/** 候选会话的最小形状（`sessions.list` 的 byId 值）。 */
+export interface CandidateSession {
+  readonly id: string
+  readonly cwd?: string
+  readonly origin?: string
+  readonly updatedAt?: number
+}
+
+/**
+ * 从会话清单里挑「跨会话重建」的候选（**fail-closed**，BUG-323）。
+ *
+ * 规矩：当前会话的 cwd 还没解析出来时**一个都不扫**——过去这里写的是
+ * `currentCwd === undefined || summary.cwd === currentCwd`，把「未知」当成了「都匹配」，
+ * 于是别的 workspace 的挂起审批会出现在本工作区的待办里（越界）。
+ * 同时把「候选总数 / 被截掉多少」带回去（BUG-318：第 21 个会话静默消失）。
+ * @param byId - 会话清单。
+ * @param currentSessionId - 面板所在会话。
+ * @param cap - 单次最多扫几个候选。
+ * @returns 不扫的原因，或候选列表与边界。
+ */
+export function historyCandidates(
+  byId: Readonly<Record<string, CandidateSession>>,
+  currentSessionId: string,
+  cap: number,
+): HistoryCandidates {
+  const currentCwd = byId[currentSessionId]?.cwd
+  // cwd 未解析（会话刚建/清单还没加载）⇒ 不扫：宁可少扫，不可越界。
+  if (currentCwd === undefined || currentCwd === '') return { ok: false, reason: 'workspace-unknown' }
+  const sameWorkspace = Object.values(byId)
+    .filter(summary => summary.id !== currentSessionId
+      && summary.origin !== 'subagent'
+      && summary.cwd === currentCwd)
+    .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
+  return {
+    ok: true,
+    ids: sameWorkspace.slice(0, cap).map(summary => summary.id),
+    total: sameWorkspace.length,
+    capped: Math.max(0, sameWorkspace.length - cap),
+  }
+}
