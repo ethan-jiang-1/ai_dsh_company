@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-321-cultivation-record-head-60-lines-false-broken.md](fixed_bugs/BUG-321-cultivation-record-head-60-lines-false-broken.md) — 60 行头窗口把合法长 frontmatter 记录判坏；头窗口失败补读全文再判。
+- [BUG-322-cultivation-journal-head-240-title-fallback.md](fixed_bugs/BUG-322-cultivation-journal-head-240-title-fallback.md) — 240 行预览窗口吞标题；无标题时补读更大窗口。
 - [BUG-317-attention-current-session-1000-cap-silent.md](fixed_bugs/BUG-317-attention-current-session-1000-cap-silent.md) — 本会话 1000 事件窗口静默截断；面板报「只保留最近 N 条」并压住空态。
 - [BUG-318-attention-history-candidate-cap-silent.md](fixed_bugs/BUG-318-attention-history-candidate-cap-silent.md) — 候选只扫 20 个；带回 `total/capped` 并提示「还有 N 个会话没扫」。
 - [BUG-320-attention-approval-cap-five-silent.md](fixed_bugs/BUG-320-attention-approval-cap-five-silent.md) — 审批流 5 条上限；`pendingApprovals` 返回 `{items, capped}` 并提示「还有 N 条未显示」。

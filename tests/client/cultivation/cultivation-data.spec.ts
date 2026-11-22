@@ -140,7 +140,9 @@ describe('workspaceLabelOf（作用域标签）', () => {
 // 预览窗口不是格式判据（BUG-321/322）：
 // ① 头窗口读不出闭合 --- 的合法记录，补读全文后必须按「合法记录」收，不能进坏记录；
 // ② 预览窗口里没有 # 标题时，补读更大窗口拿标题，而不是静默退回文件名。
-describe('头窗口不当作格式判据', () => {
+// 负例留证 2026-11-23：去掉「头窗口失败补读全文」后 `vitest run tests/client/cultivation/cultivation-data.spec.ts` 1 failed（合法长前置记录被判坏）。BUG-321
+// 负例留证 2026-11-23：去掉「补读更大窗口」后同一命令 1 failed（标题退回文件名）。BUG-322
+describe('头窗口不当作格式判据（BUG-321/322）', () => {
   it('frontmatter 超 60 行的合法记录 ⇒ 补读全文后算合法（不进坏记录）', async () => {
     const longHead = `---\nkind: correction\ntargetRole: ceo\nproposerRole: ceo\nproposerKind: human\nsource: test\nexpectation: e\nstatus: open\n${Array.from({ length: 55 }, (_, i) => `# c${String(i)}`).join('\n')}\n---\n\nbody\n`
     const files = {

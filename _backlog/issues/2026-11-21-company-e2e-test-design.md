@@ -128,8 +128,8 @@ opened: 2026-11-21
 - [BUG-318](../_archive/fixed_bugs/BUG-318-attention-history-candidate-cap-silent.md)：跨会话候选只扫 20 个，无边界提示。
 - [BUG-319](../bugs/BUG-319-attention-questions-not-rebuilt-after-reload.md)：问询刷新后从待办消失。
 - [BUG-320](../_archive/fixed_bugs/BUG-320-attention-approval-cap-five-silent.md)：6 条挂起审批只显 5 条。
-- [BUG-321](../bugs/BUG-321-cultivation-record-head-60-lines-false-broken.md)：60 行头窗口把合法长前置记录判坏。
-- [BUG-322](../bugs/BUG-322-cultivation-journal-head-240-title-fallback.md)：240 字窗口吞 journal 标题。
+- [BUG-321](../_archive/fixed_bugs/BUG-321-cultivation-record-head-60-lines-false-broken.md)：60 行头窗口把合法长前置记录判坏。
+- [BUG-322](../_archive/fixed_bugs/BUG-322-cultivation-journal-head-240-title-fallback.md)：240 字窗口吞 journal 标题。
 - [BUG-323](../_archive/fixed_bugs/BUG-323-attention-history-cross-workspace-leak.md)：cwd 未解析时注意力候选 fail-open 到所有工作区。
 - [BUG-324](../bugs/BUG-324-deliverables-catalog-field-shape-silent.md)：catalog 字段形状坏被静默归一化。
 

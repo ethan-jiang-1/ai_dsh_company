@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-321 / BUG-322**（2026-11-22，E2E 第五轮 / P2×2）：预览窗口被当格式判据——
+  [321](BUG-321-cultivation-record-head-60-lines-false-broken.md) 头窗口失败补读全文再判；
+  [322](BUG-322-cultivation-journal-head-240-title-fallback.md) 无 `#` 标题时补读更大窗口。证据提交 `bdda0759`。
+
 - **BUG-317 / 318 / 320**（2026-11-22，E2E 第五轮 / P2×3）：注意力管线的三处上限静默——
   [317](BUG-317-attention-current-session-1000-cap-silent.md) 本会话事件窗、
   [318](BUG-318-attention-history-candidate-cap-silent.md) 候选 20、

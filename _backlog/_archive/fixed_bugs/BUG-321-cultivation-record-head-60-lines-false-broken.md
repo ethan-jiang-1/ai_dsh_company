@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-321：合法的长前置记录只读前 60 行——被当成「坏记录」整条丢掉，且没有「只读了头」的提示
 
-> 严重级别：P2（次要偏重：记录只要 frontmatter 超过 60 行（长 contexts/多注释）就会被判坏；它是合法记录，全文可读，但列表用头部窗口判定）｜发现：2026-11-22（E2E 第五轮）｜状态：调查中
+> 严重级别：P2（次要偏重：记录只要 frontmatter 超过 60 行（长 contexts/多注释）就会被判坏；它是合法记录，全文可读，但列表用头部窗口判定）｜发现：2026-11-22（E2E 第五轮）｜状态：已修｜审查：agent — 逐条核对已修判定（59/60/61 行与无标题补读）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit bdda0759（与 321/322 同批：培养读面窗口，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -71,3 +71,10 @@ console.log(parseRecord('r', full) !== null, parseRecord('r', full.split('\n').s
 - 真坏记录仍报 broken；
 - 读取失败与形状坏可区分；
 - 纯函数/组件 spec + 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/cultivation/cultivation-data.ts`（头窗口补读全文 / `readJournalMore`）、`packages/company-pack/src/lib/cultivation/cultivation-inbox.ts`（`hasHeading`）、`tests/client/cultivation/cultivation-data.spec.ts`
+- 红：`vitest run tests/client/cultivation/cultivation-data.spec.ts` —— 去掉「头窗口失败补读全文」后「61 行 frontmatter 的合法记录算合法」失败（进 brokenRecords） —— 去掉补读（头窗口失败即判坏）后对应用例失败（合法长前置记录进了 brokenRecords / 标题退回文件名）
+- 绿：`vitest run tests/client/cultivation/cultivation-data.spec.ts` —— 7/7（61 行 frontmatter 的记录不进坏记录；无标题预览补读后拿到真标题）
+- 提交：commit bdda0759

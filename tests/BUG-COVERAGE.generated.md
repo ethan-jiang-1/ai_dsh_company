@@ -7,15 +7,16 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 309 |
-| 有具名守卫 | 207 |
-| 无具名守卫 | 102 |
-| 覆盖率 | 67.0% |
+| 已修卡 | 311 |
+| 有具名守卫 | 208 |
+| 无具名守卫 | 103 |
+| 覆盖率 | 66.9% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
 | BUG | opened | slug |
 |---|---|---|
+| 322 | 2026-11-22 | cultivation-journal-head-240-title-fallback |
 | 183 | 2026-11-14 | notes-root-symlink-followed |
 | 180 | 2026-11-14 | walk-company-dirs-windows-dotdot |
 | 179 | 2026-11-14 | internal-dotdot-over-rejected |
@@ -329,4 +330,5 @@
 | 317 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:219 |
 | 318 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:210 |
 | 320 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:229；tests/client/wiring/attention.spec.ts:296 |
+| 321 | 2026-11-22 | tests/client/cultivation/cultivation-data.spec.ts:145 |
 | 323 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:106；tests/client/tabs/attention-tab.spec.ts:184 |

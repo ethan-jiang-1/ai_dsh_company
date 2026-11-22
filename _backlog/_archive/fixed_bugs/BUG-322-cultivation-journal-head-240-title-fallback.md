@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-322：journal 只读前 240 字——长前言的标题读不到，面板静默退回文件名
 
-> 严重级别：P2（次要：journal 预览标题是「这一篇讲什么」的唯一线索；长前言吞掉标题后，面板显示文件名，用户看不出内容）｜发现：2026-11-22（E2E 第五轮）｜状态：调查中
+> 严重级别：P2（次要：journal 预览标题是「这一篇讲什么」的唯一线索；长前言吞掉标题后，面板显示文件名，用户看不出内容）｜发现：2026-11-22（E2E 第五轮）｜状态：已修｜审查：agent — 逐条核对已修判定（59/60/61 行与无标题补读）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续争取搞个 8–10 个，setup goal」）。
+> **留痕**：commit bdda0759（与 321/322 同批：培养读面窗口，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -75,3 +75,10 @@ console.log(journalTitle(full), '|', journalTitle(full.slice(0,240)))
 - 真无标题仍退文件名；
 - 短 journal 不回归；
 - 纯函数/组件 spec + 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/cultivation/cultivation-data.ts`（头窗口补读全文 / `readJournalMore`）、`packages/company-pack/src/lib/cultivation/cultivation-inbox.ts`（`hasHeading`）、`tests/client/cultivation/cultivation-data.spec.ts`
+- 红：`vitest run tests/client/cultivation/cultivation-data.spec.ts` —— 去掉补读更大窗口后「无标题预览拿到真标题」失败（标题退回文件名） —— 去掉补读（头窗口失败即判坏）后对应用例失败（合法长前置记录进了 brokenRecords / 标题退回文件名）
+- 绿：`vitest run tests/client/cultivation/cultivation-data.spec.ts` —— 7/7（61 行 frontmatter 的记录不进坏记录；无标题预览补读后拿到真标题）
+- 提交：commit bdda0759
