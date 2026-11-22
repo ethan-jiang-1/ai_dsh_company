@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 288 |
-| 有具名守卫 | 186 |
+| 已修卡 | 289 |
+| 有具名守卫 | 187 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 64.6% |
+| 覆盖率 | 64.7% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -309,3 +309,4 @@
 | 296 | 2026-11-21 | tests/tools/client-bundle.spec.ts:36 |
 | 297 | 2026-11-22 | tests/client/startup/startup-load.spec.ts:15；tests/client/startup/strategy-panel.spec.ts:129 |
 | 298 | 2026-11-22 | tests/client/cultivation/cultivation-data.spec.ts:98；tests/client/data/workspace-read-limits.spec.ts:30；tests/client/tabs/deliverables-catalog.spec.ts:190 |
+| 299 | 2026-11-22 | tests/client/wiring/attention-observers.spec.ts:136；tests/client/wiring/attention.spec.ts:243 |

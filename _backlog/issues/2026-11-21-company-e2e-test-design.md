@@ -85,8 +85,8 @@ opened: 2026-11-21
 
 - [BUG-297](../_archive/fixed_bugs/BUG-297-strategy-read-failure-silently-auto.md)：策略文件坏/读不到时静默回退 auto（有 `parseStartupSettingsState` 诊断但没接）。
 - [BUG-298](../_archive/fixed_bugs/BUG-298-fixed-read-limits-silent-truncation.md)：固定行数读上限静默截断——300 行台账显示 236、2050 行记录显示 1989、2087 行合法索引报「形状不符」。
-- [BUG-299](../bugs/BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md)：待办按 160 字摘要去重，两条不同审批塌成一条；活体 `detail` 在 merge 时丢失。
-- [BUG-300](../bugs/BUG-300-cultivation-decided-at-raw-iso.md)：培养采纳/拒绝时间裸 ISO，与提出时间的「1 小时前」不一致。
+- [BUG-299](../_archive/fixed_bugs/BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md)：待办按 160 字摘要去重，两条不同审批塌成一条；活体 `detail` 在 merge 时丢失。
+- [BUG-300](../_archive/fixed_bugs/BUG-300-cultivation-decided-at-raw-iso.md)：培养采纳/拒绝时间裸 ISO，与提出时间的「1 小时前」不一致。
 
 第二轮跑绿：策略正常设值/刷新/重置；选项文件坏/空有显式错误态；培养拒绝空理由校验、采纳、撤回、跨角色建议路由、journal 不可达；台账正常；成品目录/打开 final/unicode+空格路径；浮窗 1440 与 390；命令提示两态。仍红：297/298/299/300。
 

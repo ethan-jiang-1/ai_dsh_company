@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-299：待办按「160 字摘要」去重，两条不同审批会塌成一条；活体条目的全文详情也被丢掉
 
-> 严重级别：P2（次要偏重：待办是「等你处理」的清单，少一条 = 一次审批被藏起来；同源摘要碰撞在多审批时并不罕见）｜发现：2026-11-22（E2E 第二轮）｜状态：调查中
+> 严重级别：P2（次要偏重：待办是「等你处理」的清单，少一条 = 一次审批被藏起来；同源摘要碰撞在多审批时并不罕见）｜发现：2026-11-22（E2E 第二轮）｜状态：已修｜审查：agent — 逐条核对已修判定（四条 keyless 断言 + 观察者两条）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找，别管那边怎么修」）。
+> **留痕**：commit f996ac03（client 待办呈现面，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -91,3 +91,10 @@ mergeAttention = 1
 - 同一条 live+history 仍只显示一条（按 id 去重）；
 - 活体条目的 `detail` 在 merge 后保留，悬停/详情能看到完整理由；
 - 上述三条在 `mergeAttention` 的 keyless spec 里各有断言。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/attention.ts`、`packages/company-pack/src/client/wiring/attention-observers.ts`、`packages/company-pack/src/client/tabs/AttentionTab.tsx`、`tests/client/wiring/attention.spec.ts`、`tests/client/wiring/attention-observers.spec.ts`
+- 红：`vitest run tests/client/wiring/attention.spec.ts` —— 去掉 `attentionItemKey` 改回摘要键后，「两条同摘要不同 id ⇒ 2 条」断言得到 1 条；同窗口活体条目 `detail` 丢失（`title` 退回摘要）
+- 绿：`vitest run tests/client/wiring/attention.spec.ts` —— 27/27（同摘要不同 id ⇒ 2、同 id live+history ⇒ 1、live detail 保留、key 不撞）；`vitest run tests/client/wiring/attention-observers.spec.ts` —— 9/9（带 id / 缺 id 两条）
+- 提交：commit f996ac03

@@ -132,7 +132,8 @@ describe('待办观察者：登记、委托与销账（R3-10）', () => {
 
 // 身份透传（BUG-299）：审批 id 必须从 `approval/request` 带到挂起项上——没有它，
 // 两条同摘要的不同审批在 mergeAttention 里会互相吞掉。缺 id 时也要正常工作（不失登记）。
-describe('审批请求的身份透传', () => {
+// 负例留证 2026-11-22：去掉观察者的 id 透传后 `vitest run tests/client/wiring/attention-observers.spec.ts` 1 failed（挂起项没有 id）；还原后 9/9 绿。BUG-299
+describe('审批请求的身份透传（BUG-299）', () => {
   it('带 id ⇒ 挂起项带 id（去重按身份，不按摘要）', async () => {
     const { remote, handlers } = fakeRemote()
     const registry = createAttentionRegistry()

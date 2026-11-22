@@ -239,7 +239,8 @@ describe('attentionSummary · 摘要边界（BUG-295）', () => {
 
 // 身份 ≠ 摘要（BUG-299）：两条**不同 id** 的挂起审批，哪怕理由一字不差，也必须显示两条——
 // 少一条 = 一次审批被藏起来。同一 id 的 live+history 仍只一条（不能反向重复）。
-describe('mergeAttention · 按身份去重', () => {
+// 负例留证 2026-11-22：把 attentionItemKey 改回 kind+jumpTo+what 后 `vitest run tests/client/wiring/attention.spec.ts` 1 failed（两条同摘要审批塌成一条）；还原后 27/27 绿。BUG-299
+describe('mergeAttention · 按身份去重（BUG-299）', () => {
   const asked = (id: string, time: number, reason: string) => ({
     type: 'approval/asked' as const, time, data: { id, toolName: 'request_signoff', reason },
   })

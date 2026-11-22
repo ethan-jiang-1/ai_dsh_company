@@ -4,6 +4,10 @@
 
 ## 修复流水（倒序）
 
+- **BUG-299**（2026-11-22，E2E 第二轮 / P2）：待办按摘要去重吞掉不同审批——
+  [299](BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md) `AttentionItem.id` + `attentionItemKey`
+  按身份去重（审批不按摘要）、列表 key 同步、`live.map` 透传 `detail`。证据提交 `f996ac03`。
+
 - **BUG-297**（2026-11-22，E2E 第二轮 / P2）：策略文件坏了/读不到静默变 auto——
   [297](BUG-297-strategy-read-failure-silently-auto.md) 接上早已存在的 `parseStartupSettingsState`，
   `StartupFace.settingsProblem` 分 corrupt/unsupported/unreadable 三态，缺失/空仍是合法 auto；

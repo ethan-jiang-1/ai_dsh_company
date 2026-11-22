@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 2 张**：[BUG-299](BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md)（待办按 160 字摘要去重吞掉不同审批，P2）· [BUG-300](BUG-300-cultivation-decided-at-raw-iso.md)（培养采纳/拒绝时间裸 ISO，P2）。
+**活跃 1 张**：[BUG-300](BUG-300-cultivation-decided-at-raw-iso.md)（培养采纳/拒绝时间裸 ISO，P2）。
 
 **2026-11-22 E2E 第二轮（只立卡不修）**：用户在 293–296 修复流水线之外要求「继续找 3–5 个」；本轮在隔离实例上补了策略读坏、读上限、长台账/长记录/大索引、同摘要双审批、时间口径五组场景，立 297–300 四张，均 `status: 调查中`。293–296 已由并行修复进程处理并归档；本批不碰那四张，也不在同一 diff 修产品代码。
 
@@ -30,7 +30,7 @@
 |---|---|---|---|---|
 | **D 读面契约** | [298](../_archive/fixed_bugs/BUG-298-fixed-read-limits-silent-truncation.md) → [297](../_archive/fixed_bugs/BUG-297-strategy-read-failure-silently-auto.md) | 读取只带回内容、不带状态（`eof`/失败原因），每个消费方自己猜 | `readWorkspaceText` 返回结果态 `{ text, eof, problem }`；消费方显式声明策略：台账「只读了前 N 行」、记录 `bodyTruncated = !eof`、索引「超出上限 ≠ 形状不符」；297 用同一契约区分「缺失 = 合法 auto / 损坏 / 不可读」 | 1 → 2 |
 | **E 静默回退** | （297 见上） | 坏配置折成合法 auto | 接上已有的 `parseStartupSettingsState` + `StartupFace.settingsProblem` + 面板错误行 zh/en | 2 |
-| **F 身份键** | [299](BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md) | 去重键选了摘要而非稳定身份 | `AttentionItem.id` + 按 `id+kind+jumpTo` 去重 + 列表 key 用 id + `detail` 透传；无 id 回落 `kind+jumpTo+time+seq`，**绝不回落摘要** | 3 |
+| **F 身份键** | [299](../_archive/fixed_bugs/BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md) | 去重键选了摘要而非稳定身份 | `AttentionItem.id` + 按 `id+kind+jumpTo` 去重 + 列表 key 用 id + `detail` 透传；无 id 回落 `kind+jumpTo+time+seq`，**绝不回落摘要** | 3 |
 | **G 人话面** | [300](BUG-300-cultivation-decided-at-raw-iso.md) | 机器时间直出人话面 | `decidedAt` 走 `timeLabel`，ISO 放 `title`，解析失败回落原值 | 4 |
 
 **次序 = 298 → 297 → 299 → 300**：298 定义读面契约，297 直接吃它（否则读失败判定要写两遍）；299 独立但属「静默丢事实」，且是上轮回归，单独一提交补身份键；300 纯文案收尾。
