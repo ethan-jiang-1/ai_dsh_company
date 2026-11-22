@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 2 张**：[BUG-316](BUG-316-cultivation-host-command-texts-not-localized.md)（培养命令 host 回执/错误 en 仍中文，P2）（当前会话 1000 事件截断静默丢旧审批，P2）（跨会话候选只扫 20 个、无边界，P2）· [BUG-319](BUG-319-attention-questions-not-rebuilt-after-reload.md)（问询刷新后从待办消失，P2）（6 条挂起审批只显 5 条、无计数，P2）（合法长前置记录被 60 行头窗口判坏，P2）（journal 240 字窗口吞标题，P2）。
+**活跃 2 张**：[BUG-316](BUG-316-cultivation-host-command-texts-not-localized.md)（培养命令 host 回执/错误 en 仍中文，P2）· [BUG-319](BUG-319-attention-questions-not-rebuilt-after-reload.md)（问询刷新后从待办消失，P2）。
 
 **2026-11-22 E2E 第五轮（目标 8–10，只立卡不修）**：307–315 由并行修复进程收掉后，本轮转攻「host 文案」「注意力读取上限」「预览窗口」三组，立 316–324 九张，均 `status: 调查中`。根因：host 命令面无 locale（316）、注意力读取上限/候选集无边界状态（317–320、323）、预览窗口被当格式判据（321/322）、宽松字段归一化（324）。不碰修复进程代码，也不在同一 diff 修产品。
 
