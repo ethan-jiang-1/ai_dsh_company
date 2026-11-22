@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 9 张**：[BUG-307](BUG-307-cultivation-mine-cap-control-combined.md)（「我提交的」折叠控件按合并总数，4+4 全显示仍有控件，P2）· [BUG-308](BUG-308-cultivation-chat-panel-i18n-leaks.md)（培养对话面板 en 中文提示 / zh 英文 `session:`，P2）· [BUG-309](BUG-309-cultivation-self-record-listed-twice.md)（self rejected 在「我提交的」列两次，P2）· [BUG-310](BUG-310-deliverables-index-silent-entry-drop.md)（成品索引坏 entry 静默丢，P2）· [BUG-311](BUG-311-ledger-header-mismatch-silent-empty.md)（台账表头 typo → 共 0 场无提示，P2）· [BUG-312](BUG-312-attention-question-duplicate-key.md)（同文 question 撞 React key，P2）· [BUG-313](BUG-313-startup-options-bad-shape-silent-empty.md)（options 字段类型坏冒充「无内容」，P2）· [BUG-314](BUG-314-startup-settings-bad-shape-silent-auto.md)（settings 字段类型坏冒充 auto，P2）· [BUG-315](BUG-315-cultivation-full-view-min-widths-ignored.md)（768 主视图压到 210/176，P2）。
+**活跃 7 张**：[BUG-308](BUG-308-cultivation-chat-panel-i18n-leaks.md)（培养对话面板 en 中文提示 / zh 英文 `session:`，P2）· [BUG-310](BUG-310-deliverables-index-silent-entry-drop.md)（成品索引坏 entry 静默丢，P2）· [BUG-311](BUG-311-ledger-header-mismatch-silent-empty.md)（台账表头 typo → 共 0 场无提示，P2）· [BUG-312](BUG-312-attention-question-duplicate-key.md)（同文 question 撞 React key，P2）· [BUG-313](BUG-313-startup-options-bad-shape-silent-empty.md)（options 字段类型坏冒充「无内容」，P2）· [BUG-314](BUG-314-startup-settings-bad-shape-silent-auto.md)（settings 字段类型坏冒充 auto，P2）· [BUG-315](BUG-315-cultivation-full-view-min-widths-ignored.md)（768 主视图压到 210/176，P2）。
 
 **2026-11-22 E2E 第四轮（目标 8–10，只立卡不修）**：并行进程收掉 301–306 后，本轮补主视图/对话面板/表单形状/解析边界/折叠计数五组，立 307–315 九张，均 `status: 调查中`。三组根因：声明约束没有唯一消费点（307/315）、表达层/投影箱重复（308/309/312）、宽松解析吞坏形状（310/311/313/314）。不碰修复进程代码，也不在同一 diff 修产品。
 
@@ -32,7 +32,7 @@
 
 | 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
 |---|---|---|---|---|
-| **I′ 声明约束必须强制执行** | [307](BUG-307-cultivation-mine-cap-control-combined.md) + [309](BUG-309-cultivation-self-record-listed-twice.md)，[315](BUG-315-cultivation-full-view-min-widths-ignored.md) | 声明了常量/上限，消费点按另一种算法（或根本不消费） | 307：控件 total 改成「两个子列表实际隐藏数」；309：按身份去重只留一行；315：`BOARD_MIN`/`CHAT_MIN` 成为 CSS 与测量的唯一来源 | 1 → 6 |
+| **I′ 声明约束必须强制执行** | [307](../_archive/fixed_bugs/BUG-307-cultivation-mine-cap-control-combined.md) + [309](../_archive/fixed_bugs/BUG-309-cultivation-self-record-listed-twice.md)，[315](BUG-315-cultivation-full-view-min-widths-ignored.md) | 声明了常量/上限，消费点按另一种算法（或根本不消费） | 307：控件 total 改成「两个子列表实际隐藏数」；309：按身份去重只留一行；315：`BOARD_MIN`/`CHAT_MIN` 成为 CSS 与测量的唯一来源 | 1 → 6 |
 | **D″ 解析层必须报 skipped** | [310](BUG-310-deliverables-index-silent-entry-drop.md) + [311](BUG-311-ledger-header-mismatch-silent-empty.md) | 解析只返回成功项，失败形态换了就不说话 | 共用 `{ parsed, skipped }`；成品坏 entry、台账坏表头各出「跳过了 N 条（原因）」 | 2 |
 | **E′ 配置诊断到字段级** | [313](BUG-313-startup-options-bad-shape-silent-empty.md) + [314](BUG-314-startup-settings-bad-shape-silent-auto.md) | 诊断器只查 `v`，字段类型坏折成空/auto | `parseStartup*State` 报 field-problem（字段名 + 期望类型），面板说「字段 X 类型不对」 | 3 |
 | **H′ i18n 判据扩面** | [308](BUG-308-cultivation-chat-panel-i18n-leaks.md) | 对话面板文案没进 typed 字典（双向漏） | en 无 CJK、zh 无裸 `session:`；判据从培养面板扩到该面板 | 4 |

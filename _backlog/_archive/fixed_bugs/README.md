@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-307 / BUG-309**（2026-11-22，E2E 第四轮 / P2×2）：折叠控件与投影去重——
+  [307](BUG-307-cultivation-mine-cap-control-combined.md) `capControl` 增 `hidden`，控件只在真的隐藏时出现；
+  [309](BUG-309-cultivation-self-record-listed-twice.md) `processedForViewer` 排除自己提的（mine 已带回执）。
+  证据提交 `1fcd9497`。
+
 - **BUG-306**（2026-11-22，E2E 第三轮 / P2）：`LIST_CAPS.mine` 死配置——
   [306](BUG-306-cultivation-mine-list-cap-dead.md) `CultivationMine` 接上 `capList`/`capControl`，
   控件计数用折叠前总数（cap 之后再取长度永远等于上限）。证据提交 `dff4e34b`。

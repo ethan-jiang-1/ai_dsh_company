@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-22
 ---
 
 # BUG-309：自己提、自己拒的记录在「我提交的」里出现两次——一次当「已拒绝回执」，一次当「我的纠正」
 
-> 严重级别：P2（次要：同一记录在同一块面板出现两行，用户会以为提交了两次或处理了两次）｜发现：2026-11-22（E2E 第四轮）｜状态：调查中
+> 严重级别：P2（次要：同一记录在同一块面板出现两行，用户会以为提交了两次或处理了两次）｜发现：2026-11-22（E2E 第四轮）｜状态：已修｜审查：agent — 逐条核对已修判定（同类组合 4+4 / 6+1 / 两箱互斥）
 >
-> **留痕**：待定（本轮只立卡，不修——用户 2026-11-22 指令「继续找 8–10 个，别管那边怎么修」）。
+> **留痕**：commit 1fcd9497（与 307/309 同批：client 呈现面 + 读模型，材料性；批次 Note 覆盖）。
 
 ## 症状
 
@@ -76,3 +76,10 @@ if (record.status === 'rejected' && record.targetRole === viewer) processedForVi
 - self rejected 在「我提交的 · 我已处理」只出现一次；
 - 他人提我拒、我提他人拒各自仍出现一次；
 - 读模型 spec（1/1 → 1/0 或渲染去重）+ 真页面一条。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/cultivation/use-cultivation-board.tsx`（`capControl` 增 `hidden`）、`packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx`、`packages/company-pack/src/lib/cultivation/cultivation-record.ts`（`processedForViewer` 排除自己提的）、`tests/client/cultivation/cultivation-board.spec.ts`、`tests/lib/cultivation/cultivation.spec.ts`
+- 红：`vitest run tests/client/cultivation/cultivation-board.spec.ts tests/lib/cultivation/cultivation.spec.ts` —— 去掉 `proposerRole !== viewer` 过滤后「self-rejected ⇒ processedForViewer 无」失败（同一记录进两个箱子）
+- 绿：`vitest run tests/client/cultivation/cultivation-board.spec.ts tests/lib/cultivation/cultivation.spec.ts` —— 34/34 + 23/23（4+4 无控件；6+1 出「共 7 条」；self-rejected 只进 mine）
+- 提交：commit 1fcd9497

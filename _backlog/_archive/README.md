@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-307-cultivation-mine-cap-control-combined.md](fixed_bugs/BUG-307-cultivation-mine-cap-control-combined.md) — 折叠控件按合并总数判断；改按实际隐藏数（307 是 306 的回归）。
+- [BUG-309-cultivation-self-record-listed-twice.md](fixed_bugs/BUG-309-cultivation-self-record-listed-twice.md) — 自己提自己拒的记录进两个箱子；`processedForViewer` 排除自己提的。
 - [BUG-306-cultivation-mine-list-cap-dead.md](fixed_bugs/BUG-306-cultivation-mine-list-cap-dead.md) — `LIST_CAPS.mine=5` 是死配置；`CultivationMine` 接上折叠，计数用折叠前总数。
 - [BUG-301-strategy-wiki-input-stale-after-reset.md](fixed_bugs/BUG-301-strategy-wiki-input-stale-after-reset.md) — wiki 输入非受控，重置后仍显示旧值且会回写；改受控 + 外部值同步。
 - [BUG-302-english-ui-chinese-time-and-reason.md](fixed_bugs/BUG-302-english-ui-chinese-time-and-reason.md) — en 界面混入中文时间/原因；`timeParts` 结构化 + 字典渲染 + 原因代号，判据 = en 渲染无 CJK。

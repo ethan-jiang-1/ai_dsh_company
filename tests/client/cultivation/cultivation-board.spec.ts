@@ -368,7 +368,8 @@ describe('CultivationBoard · 我提交的折叠上限（BUG-306）', () => {
 // 声明约束必须被执行（BUG-307 / BUG-309）：
 // ① 控件只在**真的隐藏了行**时出现（两个子列表各折 5 条，不能按和判断）；
 // ② 自己提、自己拒的记录只出现一次（mine 带回执，不进 processedForViewer）。
-describe('CultivationBoard · 我提交的：控件与去重', () => {
+// 负例留证 2026-11-22：控件 total 改回「两个子列表之和」后 `vitest run tests/client/cultivation/cultivation-board.spec.ts` 1 failed（4+4 全显示还挂控件）；还原后 34/34 绿。BUG-307
+describe('CultivationBoard · 我提交的：控件与去重（BUG-307）', () => {
   // 别人提、我拒 ⇒ 进 processedForViewer；自己提 ⇒ 进 mine（309 的去重只针对「自己提自己拒」）。
   const rejected = (id: string) => record({ id, status: 'rejected', reason: 'r', proposerRole: 'cfo', targetRole: 'ceo', expectation: `e-${id}` })
   const open = (id: string) => record({ id, status: 'open', expectation: `e-${id}` })

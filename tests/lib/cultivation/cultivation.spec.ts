@@ -292,7 +292,8 @@ describe('feedbackItems', () => {
 
 // 同一记录不能同时出现在两个箱子里（BUG-309）：自己提、自己拒的记录已经在 `mine` 里带回执，
 // 再进 `processedForViewer` 会让面板同一行出现两次。
-describe('recordInbox：自己提自己拒只进 mine', () => {
+// 负例留证 2026-11-22：去掉 proposerRole 过滤后 `vitest run tests/lib/cultivation/cultivation.spec.ts` 1 failed（self-rejected 同时进两个箱子）。BUG-309
+describe('recordInbox：自己提自己拒只进 mine（BUG-309）', () => {
   const base = {
     schema: 1 as const, kind: 'correction' as const, targetRole: 'ceo', proposerRole: 'ceo', proposerKind: 'human' as const,
     source: 's', expectation: 'e', body: '', title: 't', methodSlug: undefined, reason: 'r', decidedAt: '2026-11-22T00:00:00.000Z',
