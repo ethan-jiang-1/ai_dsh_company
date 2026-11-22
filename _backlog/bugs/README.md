@@ -2,13 +2,15 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 301；已分配 BUG-001..300。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 307；已分配 BUG-001..306。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**。
+**活跃 6 张**：[BUG-301](BUG-301-strategy-wiki-input-stale-after-reset.md)（策略 wiki 输入重置后仍显示旧值且会回写，P2）· [BUG-302](BUG-302-english-ui-chinese-time-and-reason.md)（en 界面混入中文时间/原因，P2）· [BUG-303](BUG-303-ledger-malformed-rows-silent-drop.md)（台账坏行静默丢弃，P2）· [BUG-304](BUG-304-attention-history-window-misses-old-approvals.md)（跨会话历史 800 条窗口，P2）· [BUG-305](BUG-305-attention-history-all-read-fail-silent-empty.md)（历史全失败仍说「没有」，P2）· [BUG-306](BUG-306-cultivation-mine-list-cap-dead.md)（培养「我提交的」没用上 5 条折叠上限，P2）。
+
+**2026-11-22 E2E 第三轮（只立卡不修）**：293–300 已由并行修复进程处理；本轮继续在隔离实例上找 6 个，立 301–306（301–305 为缺口，306 为死上限），均 `status: 调查中`。四组根因：策略输入重置语义（301）、表达层 helper 未本地化（302）、读/解析/分页的静默缺口（303/304/305）、声明上限未接（306）。不碰修复进程的代码，也不在同一 diff 修产品。
 
 **2026-11-22 E2E 第二轮（只立卡不修）**：用户在 293–296 修复流水线之外要求「继续找 3–5 个」；本轮在隔离实例上补了策略读坏、读上限、长台账/长记录/大索引、同摘要双审批、时间口径五组场景，立 297–300 四张，均 `status: 调查中`。293–296 已由并行修复进程处理并归档；本批不碰那四张，也不在同一 diff 修产品代码。
 
