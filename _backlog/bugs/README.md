@@ -28,7 +28,29 @@
 
 **已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
-**本轮批次**：下方「## 2026-11-22 修复交接（E2E 第五轮：BUG-316..324）
+**本轮批次**：下方「## 2026-11-23 修复交接（E2E 第六轮：BUG-325..332）
+
+**用户指令（2026-11-23）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：八张都改 client 读面/呈现面/公开文案，326 触及 host 元数据；留痕 = 批次 Note（落 `notes/implemented/`，2026-11-23））。
+
+**起点事实（已核）**：327 = 面板只读 `history.approvalsCapped`，当前会话 `pendingAsks(...).capped` 被丢；328 = 空态压制只认三个边界，漏 `candidates.capped`/`window`/`workspaceUnknown`；330 = question 已并入 waiting，字段仍叫 `approvalsCapped`、四条文案仍只写「审批」；325 = 问询活体 id 是 `question:<ms>:<seq>`（312）、历史是 `callId`（319），`mergeAttention` 按 id 去重 → 同一条两行；332 = `records.length >= 800` 当截断，恰好一页误报；331 = 多问题只读 `questions[0]`；326 = 命令 description/hint、`writeBlocked` 文案、`UnsafeCultivationPathError`/`CompanyWriteBlockedError` 的 message 仍中文；329 = en 面板四处列表用中文顿号「、」。
+
+| 组 | 卡 | 共同根因 | 修法（唯一事实源） | 序 |
+|---|---|---|---|---|
+| **S 一条管线一个边界对象** | [327](BUG-327-attention-current-approval-cap-still-silent.md) + [328](BUG-328-attention-empty-state-ignores-boundaries.md) + [330](BUG-330-attention-question-copy-and-cap-still-approval-only.md) | 边界值分成三个变量、各自被部分消费 | `AttentionBoundaries` 单一对象（events/candidates/asksCapped/window/failed/workspace），一处算、一处渲染、一处决定空态；字段与文案统一到「等你处理/asks」 | 1 |
+| **I 身份跨源一致** | [325](BUG-325-attention-question-live-history-id-mismatch.md) | 两套 id 各自正确、拼起来错 | `mergeAttention` 增**跨源**去重（live↔history 问询按内容），源内仍按 id（保 312） | 2 |
+| **B 启发式可证伪** | [332](BUG-332-attention-exact-800-window-false-positive.md) | 用「拿满一页」猜「还有更早」 | `hasMore` 优先；退化时多取一条（limit+1），绝不用 `>= limit` | 3 |
+| **功能缺口** | [331](BUG-331-attention-multi-question-request-only-first.md) | 多问题请求只取第一个 | 一条条目 + 「共 N 个问题」，`detail` 放全部问题；活体与历史同源 | 4 |
+| **E 表达层（元数据/标点）** | [326](BUG-326-cultivation-command-description-inner-errors-chinese.md)，[329](BUG-329-cultivation-en-list-delimiters-chinese.md) | i18n 只做了句子，没做元数据与分隔符 | 命令 description/hint、两类错误 message 走 `t`；四处列表分隔符按 locale | 5 → 6 |
+
+**次序 = 327+328+330 → 325 → 332 → 331 → 326 → 329**：前四张同文件同状态，一次收；326/329 是独立的表达层收口。
+
+**证据口径**：每卡红→绿同一条可执行命令；先落代码提交拿 sha → 翻 `修复已落地` / 写 `## 修复证据` / 归档。**验收标准升级**：注意力卡必须跑**边界组合矩阵**（6 个边界 × 空/有项），断言提示行出现且空态被压住；字段名必须与内容一致（并入 question 后不许再叫 `approvals*`）；启发式不许猜「还有更多」。真页面证据过构建指纹；`coverage:ratchet` 只升不降（双语别复制分支）；**只 `git add <paths>`**；`push` 前先 `source run/env.sh`。
+
+**终点** = 8 张全部迁 [fixed_bugs](../_archive/fixed_bugs/)、每卡四行证据与 `审查：` 齐；五连 + `coverage:ratchet` 绿；`client-load`/`ui-scene --isolated` 真绿（带指纹）；一篇批次 Note 记 S/I/B/E 与元层（上轮把「报出边界」当目标，真正目标是「所有边界进同一个状态、名字与内容一致」）。
+
+**本节是立项与交接，不是落地**：只记批次计划与次序。
+
+## 2026-11-22 修复交接（E2E 第五轮：BUG-316..324）
 
 **用户指令（2026-11-22）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：九张都改 client 读面/呈现面/公开文案，316 触及 host 结果面；留痕 = 批次 Note [2026-11-23-e2e-round5-boundary-pipeline-asks](../../notes/implemented/2026-11-23-e2e-round5-boundary-pipeline-asks.md)）。
 
