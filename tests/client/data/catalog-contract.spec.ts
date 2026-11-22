@@ -68,17 +68,22 @@ describe('成品目录契约（生成器 ↔ 页签 parser 共钉一份夹具）
     expect(resultTone('未知值')).toBe('outline')
   })
 
-  it('坏行不装成条目：缺 slug / 缺 path 的行丢弃，root 只认两值', () => {
+  it('坏行不装成条目：缺 slug / 缺 path / 字段形状坏的行丢弃并计数', () => {
     const parsed = parseCatalog(JSON.stringify({
       schema: 1,
       generatedAt: '2026-10-23T00:00:00.000Z',
       entries: [
         { slug: '', path: 'deliverables/x/final.md' },
         { slug: 'ok', path: '' },
-        { slug: 'kept', path: 'deliverables/kept/final.md', root: 'bogus-root', ledgered: undefined },
+        // 给了却是错的类型 ⇒ 跳过（过去会静默归一化成 active / 已入账 / 未核，审计分类就反了）
+        { slug: 'bogus-root', path: 'deliverables/kept/final.md', root: 'bogus-root' },
+        { slug: 'string-ledgered', path: 'deliverables/kept/final.md', ledgered: 'false' },
+        { slug: 'string-presented', path: 'deliverables/kept/final.md', presented: 'true' },
+        { slug: 'kept', path: 'deliverables/kept/final.md' },
       ],
     }))
-    expect(parsed?.entries).toHaveLength(1)
-    expect(parsed?.entries[0]).toMatchObject({ slug: 'kept', root: RUN_BUNDLE_PATHS.deliverables, ledgered: true, presented: null })
+    expect(parsed?.entries.map(entry => entry.slug)).toEqual(['kept'])
+    expect(parsed?.skipped).toBe(5)
+    expect(parsed?.entries[0]).toMatchObject({ root: RUN_BUNDLE_PATHS.deliverables, ledgered: true, presented: null })
   })
 })

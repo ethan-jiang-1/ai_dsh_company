@@ -55,6 +55,12 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
   for (const item of value.entries) {
     if (item === null || typeof item !== 'object') { skipped += 1; continue }
     const row = item as Record<string, unknown>
+    // 字段形状（BUG-324）：**允许缺省**，但不允许「给了却是错的类型」——
+    // 过去的归一化会把 root:"bogus" 当 active、ledgered:"false" 当已入账、presented:"true" 当未核，
+    // 审计分类悄无声息地反掉。宁可跳过并计数，也不猜。
+    if (row.root !== undefined && row.root !== RUN_BUNDLE_PATHS.deliverables && row.root !== RUN_BUNDLE_PATHS.archive) { skipped += 1; continue }
+    if (row.ledgered !== undefined && typeof row.ledgered !== 'boolean') { skipped += 1; continue }
+    if (row.presented !== undefined && row.presented !== null && typeof row.presented !== 'boolean') { skipped += 1; continue }
     const root = row.root === RUN_BUNDLE_PATHS.archive ? RUN_BUNDLE_PATHS.archive : RUN_BUNDLE_PATHS.deliverables
     const textOf = (key: string): string => (typeof row[key] === 'string' ? row[key] : '')
     const slug = textOf('slug')
