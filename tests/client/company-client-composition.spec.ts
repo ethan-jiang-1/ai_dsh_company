@@ -17,7 +17,9 @@ import { bundleRoster, WEB_PROFILE_BUNDLES } from '../../vendor/dsh/packages/tes
 import { createClientTest } from '../../vendor/dsh/packages/test-support/client-runtime/src/assembly/index.ts'
 // 源码面供本包 client 行（tier 的 provide 机制）：动态 import 走 exports 落到 tsdown 的 CJS
 // 构建产物会炸；provide 与根仓「vitest 一律走 src 源码面」纪律一致，模块本体仍是生产实现。
+// 负例留证 2026-11-23：把 registerSidebarIdentity 的 sessions.list 订阅去掉改回一次性 void loadIdentity() ⇒ BUG-341 冷启动用例红；还原 ⇒ 绿。BUG-341
 import * as companyClient from '../../packages/company-pack/src/client/index.ts'
+import { companyIdentity, resetCompanyIdentity } from '../../packages/company-pack/src/client/data/company-identity.ts'
 import { HEARTBEAT_KEY } from '../../packages/company-pack/src/client/wiring/instance-guard.ts'
 import { en as companyEn, zh as companyZh } from '../../packages/company-pack/src/client/locales.ts'
 import { DELEGATION_TOOL_KEYS } from '../../packages/company-pack/src/client/wiring/delegation-keys.ts'
@@ -137,6 +139,54 @@ describe('company client apply through the whole-client tier', () => {
     // The guard's disposer is fiber-owned (ctx.effect): unload removes its heartbeat.
     const beats = JSON.parse(localStorage.getItem(HEARTBEATS) ?? '{}') as Record<string, number>
     expect(Object.keys(beats).filter(id => id.startsWith('tab-'))).toEqual([])
+  })
+
+  test('BUG-341：冷启动 sessions.list 为 pending 空快照后到达会话时自动加载 company.md', async ({ mock, start }) => {
+    resetCompanyIdentity()
+    let readCount = 0
+    const readSessionIds: string[] = []
+    mock.load({
+      unary: {
+        'workspaceFiles/read': (sessionId?: string) => {
+          readCount += 1
+          if (sessionId !== undefined) readSessionIds.push(sessionId)
+          return ok({ text: '---\ncompany: Cold Boot Inc\nproductName: Cold Brand\n---\n', eof: true })
+        },
+      },
+      stream: {
+        'session/follow': frames([]),
+      },
+    })
+    const client = await start()
+    expect(readCount).toBe(0)
+    expect(companyIdentity().company).toBe('')
+
+    const sessions = client.ctx.get('sessions') as {
+      handleSessionAdded(summary: {
+        sessionId: string
+        cwd?: string
+        running: boolean
+        blank: boolean
+        updatedAt: number
+      }): void
+    }
+    sessions.handleSessionAdded({
+      sessionId: 's-cold-boot-1',
+      cwd: '/tmp/ws-cold',
+      running: false,
+      blank: false,
+      updatedAt: 1000,
+    })
+    await vi.waitFor(() => {
+      expect(readCount).toBe(1)
+      expect(companyIdentity()).toEqual({
+        company: 'Cold Boot Inc',
+        productName: 'Cold Brand',
+        productType: '',
+        timeZone: '',
+      })
+    })
+    expect(readSessionIds).toEqual(['s-cold-boot-1'])
   })
 
   test('reloading the pack row re-registers the same surface', async ({ mock, start }) => {

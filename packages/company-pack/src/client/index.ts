@@ -25,7 +25,7 @@ import { asSessionPageFace } from './presence/attention-history.ts'
 import { installAttentionObservers } from './wiring/attention-observers.ts'
 import { createCultivationView } from './cultivation/CultivationView.tsx'
 import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './data/company-data-plane.ts'
-import { applyCompanyIdentityRead } from './data/company-identity.ts'
+import { applyCompanyIdentityRead, resetCompanyIdentity } from './data/company-identity.ts'
 import { RUN_BUNDLE_PATHS } from '../lib/shared/run-bundle-paths.ts'
 import { makeContextWiring, type ContextWiringScoped } from './wiring/context-wiring.ts'
 import { makeOpenMember } from './wiring/member-navigation.ts'
@@ -332,20 +332,59 @@ function registerSidebarIdentity(ctx: ClientContext): void {
     const sessions = scoped.sessions
     const leadSessionId = createLeadLookup(sessions)
 
-    // 部署身份（2026-11-09）：读一次 workspace 的 company.md，品牌从它取 productName。
-    // 读不到（无会话/无文件/读失败）保持出厂词标——品牌是装饰面，不阻塞页面。
+    // 部署身份（2026-11-09）：订阅 sessions.list 等到可用会话后读一次 workspace 的 company.md，
+    // 品牌从它取 productName；读不到（无会话/无文件/读失败）保持出厂词标——品牌是装饰面，不阻塞页面。
     const identityFiles = scoped.remote.workspaceFiles
-    const loadIdentity = async (): Promise<void> => {
-      try {
-        const first = Object.values(sessions.list.getSnapshot().byId as Record<string, { id: SessionId }>)[0]
-        if (first === undefined) return
-        const result = await identityFiles.read(first.id, RUN_BUNDLE_PATHS.company, { limit: 200 }, new AbortController().signal)
-        applyCompanyIdentityRead(result)
-      } catch {
-        // 品牌读不到就用出厂词标；不把装饰面错误升级成页面错误。
+    scoped.effect(() => {
+      const list = scoped.sessions.list
+      let disposed = false
+      let activeController: AbortController | null = null
+      let lastTargetKey: string | null = null
+
+      const pickTarget = (): { readonly id: SessionId; readonly cwd?: string } | undefined => {
+        const rows = Object.values(list.getSnapshot().byId as Record<string, {
+          readonly id: SessionId
+          readonly cwd?: string
+          readonly origin?: 'subagent'
+          readonly parentId?: SessionId
+          readonly retainedBy?: { readonly mainView?: number }
+        }>)
+        return rows.find(s => (s.retainedBy?.mainView ?? 0) > 0)
+          ?? rows.find(s => s.origin !== 'subagent' && s.parentId === undefined)
+          ?? rows[0]
       }
-    }
-    void loadIdentity()
+
+      const syncIdentity = (): void => {
+        if (disposed) return
+        const target = pickTarget()
+        if (target === undefined) return
+        const targetKey = `${target.id}:${target.cwd ?? ''}`
+        if (targetKey === lastTargetKey) return
+        lastTargetKey = targetKey
+        activeController?.abort()
+        const controller = new AbortController()
+        activeController = controller
+        void (async () => {
+          try {
+            const result = await identityFiles.read(target.id, RUN_BUNDLE_PATHS.company, { limit: 200 }, controller.signal)
+            if (!disposed && !controller.signal.aborted) {
+              applyCompanyIdentityRead(result)
+            }
+          } catch {
+            // intentional-fallback: 品牌读不到就用出厂词标；不把装饰面错误升级成页面错误。
+          }
+        })()
+      }
+
+      syncIdentity()
+      const offList = list.subscribe(syncIdentity)
+      return () => {
+        disposed = true
+        activeController?.abort()
+        offList()
+        resetCompanyIdentity()
+      }
+    })
 
     // 条目 ② S3：头部按钮从 anchored 弹窗改为打开右栏平台页签（与官方 Agent Team 弹窗不再互盖）。
     scoped.slots.inject('conversation.session.header.actions', () =>

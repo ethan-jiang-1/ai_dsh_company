@@ -5,6 +5,8 @@
  * 客户端通过 `remote.workspaceFiles` 读一次身份文件，解析 frontmatter 后广播给订阅者。
  * 失败（无 workspace/会话/文件）保持出厂词标，不阻塞渲染。
  */
+import { yamlScalar } from '../../lib/docs/yaml-scalar.ts'
+
 export interface CompanyIdentity {
   readonly company: string
   readonly productName: string
@@ -56,7 +58,10 @@ export function parseCompanyIdentity(text: string | null): CompanyIdentity | nul
   const fields: Record<string, string> = {}
   for (const line of (match[1] ?? '').split('\n')) {
     const field = /^([A-Za-z][\w-]*):\s*(.*)$/.exec(line.trim())
-    if (field !== null) fields[field[1] ?? ''] = (field[2] ?? '').trim()
+    if (field !== null) {
+      const value = yamlScalar(field[2] ?? '')
+      fields[field[1] ?? ''] = value.startsWith('<') && value.endsWith('>') ? '' : value
+    }
   }
   const company = fields.company ?? ''
   if (company === '') return null

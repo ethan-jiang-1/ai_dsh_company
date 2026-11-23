@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, describe, expect, it } from 'vitest'
+// 负例留证 2026-11-23：把 parseCompanyIdentity 的 yamlScalar 改回 (field[2] ?? '').trim() ⇒ BUG-341（出厂 productName: '' 解析成字面量 ''）红；还原 ⇒ 绿。BUG-341
 import {
   applyCompanyIdentityRead,
   companyIdentity,
@@ -47,6 +48,24 @@ describe('Brand', () => {
     expect(companyIdentity()).toEqual(FALLBACK_IDENTITY)
     expect(applyCompanyIdentityRead({ ok: true, value: { text: '---\ncompany: X\nproductName: Y\n---\n', eof: true } })).toBe(true)
     expect(companyIdentity().productName).toBe('Y')
+  })
+
+  it('BUG-341：出厂 company.md 的 productName: "" / 引号与占位符正确解包，不渲染字面量空引号', () => {
+    const factoryText = readFileSync(new URL('../../../packages/company-pack/content/state/company.md', import.meta.url), 'utf8')
+    const factoryParsed = parseCompanyIdentity(factoryText)
+    expect(factoryParsed?.company).toBe('Dream Team (sample)')
+    expect(factoryParsed?.productName).toBe('')
+    setCompanyIdentity(factoryParsed!)
+    expect(renderToStaticMarkup(createElement(DreamTeamBrandName, { t }))).toContain(zh['brand.name'])
+    expect(renderToStaticMarkup(createElement(DreamTeamBrandName, { t: tEn }))).toContain(en['brand.name'])
+
+    const quoted = parseCompanyIdentity('---\ncompany: "Acme Corp" # 注释\nproductName: "Acme Brand"\nproductType: \'<your-type>\'\n---\n')
+    expect(quoted).toEqual({
+      company: 'Acme Corp',
+      productName: 'Acme Brand',
+      productType: '',
+      timeZone: '',
+    })
   })
 })
 
