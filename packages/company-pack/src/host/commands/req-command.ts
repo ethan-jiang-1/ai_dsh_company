@@ -8,7 +8,7 @@
  * 追溯/退役词/计数（五层全链）。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { blockedCompanyText } from './blocked-text.ts'
 import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
@@ -237,12 +237,14 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
           : `；动议类型 = ${resolution.id}（company.md 默认，未在 meta 声明）`
       const metaText = readTextInside(companyRoot, join(root, 'meta.md'))
       const deliveryMode = parseDeliveryMode(metaText)
-      if (options.contentDir !== undefined && deliveryMode !== 'productized'
-        && !existsSync(join(options.contentDir, 'delivery-modes', deliveryMode))) {
-        const available = ['productized', ...availableDeliveryModes(options.contentDir)]
-        return {
-          kind: 'error' as const,
-          text: `未知交付模式「${deliveryMode}」（来自 meta.md）；可用：${available.join(' / ')}`,
+      if (options.contentDir !== undefined && deliveryMode !== 'productized') {
+        const availableModes = availableDeliveryModes(options.contentDir)
+        if (!isSafeContentId(deliveryMode) || !availableModes.includes(deliveryMode)) {
+          const available = ['productized', ...availableModes]
+          return {
+            kind: 'error' as const,
+            text: `未知交付模式「${deliveryMode}」（来自 meta.md）；可用：${available.join(' / ')}`,
+          }
         }
       }
       const deliveryDeclared = hasDeclaredDeliveryMode(metaText)

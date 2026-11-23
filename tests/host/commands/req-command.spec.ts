@@ -15,6 +15,7 @@
 // 负例留证 2026-11-10：去掉 blockedReason / 改回旧「无 workspace/身份/lease 问题」文案 ⇒「回执点名真实原因（BUG-058）」用例红；还原即绿。
 
 // 负例留证 2026-11-10：删掉 slug 校验 ⇒「越界 slug」用例红（读根外 + 调用 checker；BUG-057）；还原即绿。
+// 负例留证 2026-11-23：deliveryMode 校验改回 existsSync(join(..., deliveryMode)) ⇒ BUG-343（`..` 与 `../product-types/business-software` 绕过）红；还原即绿。BUG-343
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -220,6 +221,18 @@ describe('registerReqCommand', () => {
       expect(result.text).toContain('project-services')
       expect(result.text).toContain('managed-service')
     } finally { cleanup() }
+  })
+
+  it('BUG-343：deliveryMode 含路径穿越（.. / ../product-types/business-software / 斜杠）→ error 拒绝', async () => {
+    for (const badMode of ['..', '.', '../product-types/business-software', 'project-services/sub']) {
+      const { workspace, cleanup } = fixture(['mrd.md', 'strs.md', 'prd.md'], `${META}deliveryMode: ${badMode}\n`)
+      try {
+        const result = await mount(workspace, { contentDir: CONTENT_DIR }).handler({ rawInput: 'check 2026-11-07-demo' })
+        expect(result.kind, badMode).toBe('error')
+        expect(result.text, badMode).toContain(`未知交付模式「${badMode}」`)
+        expect(result.text, badMode).toContain('project-services')
+      } finally { cleanup() }
+    }
   })
 
   it('交付模式 productized（显式）→ success，回执点名', async () => {
