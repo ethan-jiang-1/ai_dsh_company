@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-341**（2026-11-23，质量防线批顺位 1 / P1）：`registerSidebarIdentity` 通过 `scoped.effect` 订阅 `sessions.list` 解决冷启动漏加载，`parseCompanyIdentity` 复用 `yamlScalar` 避免出厂 `productName: ''` 渲染成 `''`——
+  [341](BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md)。证据提交 `1b48e829`。
+
 - **BUG-342**（2026-11-23，质量防线批顺位 1 / P1）：`readHandbook` 读取 `.dsh-company/overrides/AGENTS.md` 改走 `readCompanyFile` 拒绝 symlink/目录/越界并告警回退默认手册——
   [342](BUG-342-handbook-override-follows-symlinks-and-crashes-on-dir.md)。证据提交 `4ee3c49c`。
 
