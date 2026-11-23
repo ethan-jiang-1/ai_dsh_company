@@ -27,6 +27,15 @@ function kindNoun(record: CultivationRecord): string {
   return record.kind === 'suggestion' ? CULTIVATION_COPY.mineKindSuggestion : CULTIVATION_COPY.mineKindCorrection
 }
 
+/**
+ * `decidedAt` → 人话（BUG-335）：非法 ISO 回退原串而不是拼出 `NaN-NaN-NaN`；
+ * 原始 ISO 仍放在 `title` 里供核对。
+ */
+export function decidedTime(iso: string, now: number): string {
+  const at = Date.parse(iso)
+  return Number.isNaN(at) ? iso : cultivationTimeLabel(timeParts(at, now))
+}
+
 /** 观察时间用人话；原始 ISO 只放在 title 里供核对。 */
 function verificationTime(entry: CultivationVerification, now: number): string {
   const at = Date.parse(entry.at)
@@ -57,7 +66,7 @@ export function CultivationMine({ inbox, roleLabel = defaultRoleLabel, capList, 
                   <Tag tone="warning">{CULTIVATION_COPY.mineRejectedByTarget}</Tag>
                 </span>
                 <span className="wk-row-task">{CULTIVATION_COPY.mineReason(record.reason ?? CULTIVATION_COPY.inboxNoReason)}</span>
-                {record.decidedAt !== undefined && <span className="wk-meta" title={record.decidedAt}>{CULTIVATION_COPY.mineRejectedAt(cultivationTimeLabel(timeParts(Date.parse(record.decidedAt), Date.now())))}</span>}
+                {record.decidedAt !== undefined && <span className="wk-meta" title={record.decidedAt}>{CULTIVATION_COPY.mineRejectedAt(decidedTime(record.decidedAt, Date.now()))}</span>}
 
               </div>
             ))}
@@ -152,7 +161,7 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
                           ? <span className="wk-meta">{CULTIVATION_COPY.adoptedSourceRecorded(record.source)}</span>
                           : <span className="wk-meta">{CULTIVATION_COPY.adoptedSourceMissing}</span>}
                     {stampOf(record.id) !== null && <span className="wk-meta">{CULTIVATION_COPY.adoptedRaisedAt(String(stampOf(record.id)))}</span>}
-                    {record.decidedAt !== undefined && <span className="wk-meta" title={record.decidedAt}>{CULTIVATION_COPY.adoptedDecidedAt(cultivationTimeLabel(timeParts(Date.parse(record.decidedAt), Date.now())))}</span>}
+                    {record.decidedAt !== undefined && <span className="wk-meta" title={record.decidedAt}>{CULTIVATION_COPY.adoptedDecidedAt(decidedTime(record.decidedAt, Date.now()))}</span>}
                     {record.body !== '' && (() => {
                       const expanded = expandedEvidence[record.id] === true
                       return (

@@ -344,6 +344,8 @@ export type TimeParts =
   | { readonly kind: 'hours', readonly n: number }
   | { readonly kind: 'yesterday', readonly hhmm: string }
   | { readonly kind: 'date', readonly text: string }
+  /** 非法时间（`NaN`/`Infinity`）：调用方不得渲染出 `NaN-NaN-NaN`（BUG-335）。 */
+  | { readonly kind: 'invalid' }
 
 /**
  * 相对时间 → 片段（`timeLabel` 的中文只是其中一种渲染，不再是唯一出口）。
@@ -352,6 +354,8 @@ export type TimeParts =
  * @returns 结构片段（调用方按语言渲染）。
  */
 export function timeParts(at: number, now: number): TimeParts {
+  // 非法时间不编造日期：`new Date(NaN)` 的 getter 全是 NaN，直出会渲染成 `NaN-NaN-NaN`（BUG-335）。
+  if (!Number.isFinite(at) || !Number.isFinite(now)) return { kind: 'invalid' }
   const pad = (n: number): string => String(n).padStart(2, '0')
   const date = new Date(at)
   const hhmm = `${pad(date.getHours())}:${pad(date.getMinutes())}`

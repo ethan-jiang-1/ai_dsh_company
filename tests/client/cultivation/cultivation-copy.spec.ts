@@ -7,6 +7,9 @@ import {
   renderThrown,
   setCultivationLanguage,
 } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
+import { cultivationTimeLabel } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
+import { decidedTime } from '../../../packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx'
+import { timeParts } from '../../../packages/company-pack/src/lib/cultivation/cultivation-record.ts'
 import { assertEnglishUiClean } from '../../support/i18n-assertions.ts'
 
 afterEach(() => { setCultivationLanguage('zh') })
@@ -56,5 +59,15 @@ describe('CULTIVATION_COPY 语言代理', () => {
     expect(formatCultivationReadReason('raw-err')).toBe('raw-err')
     const poisoned = { toString() { throw new Error('bad') } }
     expect(renderThrown(poisoned)).toBe(CULTIVATION_COPY.unreadableThrown)
+  })
+})
+
+// 负例留证 2026-11-23：让 decidedTime 直连 cultivationTimeLabel(timeParts(...)) ⇒ 本用例红（NaN-NaN-NaN）。BUG-335
+describe('非法 decidedAt 的时间渲染（BUG-335）', () => {
+  it('非法 ISO 回退原串；timeParts 的 invalid 片段给语言化「未知时间」', () => {
+    expect(decidedTime('invalid-date-xyz', Date.now())).toBe('invalid-date-xyz')
+    expect(cultivationTimeLabel(timeParts(Number.NaN, Date.now()))).not.toContain('NaN')
+    setCultivationLanguage('en')
+    expect(cultivationTimeLabel(timeParts(Number.NaN, Date.now()))).toBe('unknown time')
   })
 })

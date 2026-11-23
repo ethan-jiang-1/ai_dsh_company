@@ -39,3 +39,12 @@ describe('timeParts（BUG-302）', () => {
     expect(timeParts(Date.parse('2026-01-02T03:04:00.000Z'), now).kind).toBe('date')
   })
 })
+
+// 负例留证 2026-11-23：去掉 timeParts 的 Number.isFinite 守卫 ⇒ 本用例红（返回 date 且拼出 NaN）。BUG-335
+describe('timeParts 非法时间（BUG-335）', () => {
+  it('NaN / Infinity ⇒ invalid，不产出 NaN 日期串', () => {
+    expect(timeParts(Number.NaN, Date.now())).toEqual({ kind: 'invalid' })
+    expect(timeParts(Date.now(), Number.NaN)).toEqual({ kind: 'invalid' })
+    expect(timeParts(Number.POSITIVE_INFINITY, Date.now())).toEqual({ kind: 'invalid' })
+  })
+})

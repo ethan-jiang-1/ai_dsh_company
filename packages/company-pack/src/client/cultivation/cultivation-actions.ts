@@ -149,6 +149,7 @@ const CULTIVATION_COPY_ZH = {
   timeHoursAgo: (n: number): string => `${String(n)} 小时前`,
   timeYesterday: (hhmm: string): string => `昨天 ${hhmm}`,
   timeDate: (text: string): string => text,
+  timeInvalid: '时间未知',
   inboxEmpty: (workspace: string | null): string => `这个工作区${workspace === null ? '' : `（${workspace}）`}下还没有培养记录。`,
   // 盘上有记录、但没有待你决定的（都处理过了）：不能说「工作区还没有记录」——那是另一态（BUG-294）。
   inboxNoPending: (total: number): string => `没有需要你处理的记录（共 ${String(total)} 条，已处理的在下面）。`,
@@ -411,6 +412,7 @@ const CULTIVATION_COPY_EN = {
   timeHoursAgo: (n: number): string => `${String(n)} hours ago`,
   timeYesterday: (hhmm: string): string => `yesterday ${hhmm}`,
   timeDate: (text: string): string => text,
+  timeInvalid: 'unknown time',
   inboxEmpty: (workspace: string | null): string => `No cultivation records in this workspace${workspace === null ? '' : ` (${workspace})`}.`,
   inboxNoPending: (total: number): string => `Nothing needs your decision (${String(total)} record${total === 1 ? '' : 's'} total; handled ones are below).`,
   inboxListAria: 'Cultivation records awaiting me',
@@ -604,6 +606,7 @@ export function cultivationTimeLabel(parts: TimeParts): string {
     case 'hours': return CULTIVATION_COPY.timeHoursAgo(parts.n)
     case 'yesterday': return CULTIVATION_COPY.timeYesterday(parts.hhmm)
     case 'date': return CULTIVATION_COPY.timeDate(parts.text)
+    case 'invalid': return CULTIVATION_COPY.timeInvalid
   }
 }
 
