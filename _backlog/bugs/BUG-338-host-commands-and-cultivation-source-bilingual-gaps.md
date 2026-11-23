@@ -8,7 +8,9 @@ opened: 2026-11-23
 
 > 严重级别：P2（表达层：`BUG-316/326` 仅收口 `/cultivation` 与部分 `/company-settings`，`en` 实例执行其余命令或阻塞态仍返回整段中文）｜发现：2026-11-23｜状态：调查中
 >
-> **留痕**：（待修复时裁决；触及 `host` 命令面回执与元数据）
+> **留痕**：Note [2026-11-23-quality-defenses-bugfix-batch](../../notes/implemented/2026-11-23-quality-defenses-bugfix-batch.md)
+>
+> **进展（2026-11-24，阶段一已落 `25489edf`）**：`/company-settings` 停写/损坏路径改 `blockedCompanyTextPair`；`/deliverables` `/prd` `/req` `/delivery` 接入 `CompanyLanguageState`（描述/提示/停写/成功回执，语言切换重注册）；`contextSummaryPair` 与 `/cultivation` 对账/撤回回执补英文；`tests/host/commands/command-language.spec.ts` 守 en 描述/提示/停写回执。**剩余**：`/req`/`/prd` 校验器内部 `errors` 明细仍中文（`requirements-check.ts` / `prd-check.ts`），需按 `tr` 参数贯通后翻 `修复就绪`/归档。
 
 ## 症状
 
