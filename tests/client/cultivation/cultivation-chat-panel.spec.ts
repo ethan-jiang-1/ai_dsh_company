@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// 负例留证 2026-11-23：去掉 catch 与 create 后的 cancelled 守卫 ⇒ BUG-348 用例红（卸载后删 key + 建孤儿会话）。
 /**
  * 培养对话面板（2026-10-28 培养主视图）：独立培养会话的创建/复用、
  * prompt 发送、eventSource 历史渲染、不混主 Chat。
@@ -207,5 +208,36 @@ describe('CultivationChatPanel · 语言（BUG-308）', () => {
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)) })
     expect(host.textContent ?? '').toContain('会话：')
     expect(host.textContent ?? '').not.toContain('session: ')
+  })
+})
+
+describe('卸载竞态（BUG-348）', () => {
+  it('卸载后旧会话 ready 才 reject ⇒ 不删 key、不新建孤儿会话', async () => {
+    const key = 'dsh-company-cultivation-session:main-348'
+    localStorage.setItem(key, 'stale-sess')
+    let rejectReady: ((error: unknown) => void) | undefined
+    const ready = new Promise<never>((_, reject) => { rejectReady = reject })
+    const release = vi.fn()
+    const retain = vi.fn(() => ({ sessionId: 'stale-sess', binding: undefined as never, ready, release }))
+    const create = vi.fn(async () => 'orphan-sess')
+    const host = document.createElement('div')
+    document.body.append(host)
+    mounted = createRoot(host)
+    await act(async () => {
+      mounted?.render(createElement(CultivationChatPanel, {
+        sessions: { create, retain } as never,
+        mainSessionId: 'main-348' as never,
+        cwd: '/tmp/company',
+        agentPreset: 'ceo',
+      }))
+    })
+    await act(async () => { mounted?.unmount(); mounted = null })
+    await act(async () => {
+      rejectReady?.(new Error('stale session gone'))
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    expect(create).not.toHaveBeenCalled()
+    expect(localStorage.getItem(key)).toBe('stale-sess')
   })
 })

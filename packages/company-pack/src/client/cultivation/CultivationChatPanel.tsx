@@ -147,10 +147,14 @@ export function CultivationChatPanel({ sessions, mainSessionId, cwd, agentPreset
         } catch {
           try { reference?.release() } catch { /* already released */ }
           reference = undefined
+          // BUG-348：卸载/切换后 `ready` 才 reject 时不再清 key、更不新建会话。
+          if (cancelled) return
           if (typeof localStorage !== 'undefined') localStorage.removeItem(key)
         }
       }
       const created = await sessions.create({ cwd, agentPreset })
+      // 建会话期间效应失效：不认领、不覆写 key（已建出的会话留给 Host 的 blank 复用）。
+      if (cancelled) return
       if (typeof localStorage !== 'undefined') localStorage.setItem(key, String(created))
       await open(created)
     }
