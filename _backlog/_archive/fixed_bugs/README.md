@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-336**（2026-11-23，质量防线批顺位 4 / P2）：消息动态补 `token`（冒号/「（空）」进字典），`currentTask` 改 `currentTasks` 列表由渲染层拼分隔符——
+  [336](BUG-336-presence-message-activity-chinese-in-en.md)。证据提交 `d3386c23`。
+
 - **BUG-333**（2026-11-23，质量防线批顺位 4 / P2）：团队工具卡依赖行改为语言无关令牌（`ids` 渲染处拼分隔符），en 零汉字/顿号——
   [333](BUG-333-team-tool-card-deps-chinese-in-en.md)。证据提交 `a02b996a`。
 - **BUG-337**（2026-11-23，质量防线批顺位 4 / P2）：`delegationFlow.missing` 进 zh/en 字典，委派流程缺失标签随语言——
