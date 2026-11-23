@@ -314,7 +314,7 @@
 | 301 | 2026-11-22 | tests/client/startup/strategy-panel-input.spec.ts:58 |
 | 302 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:320；tests/lib/cultivation/cultivation-record-time.spec.ts:30 |
 | 303 | 2026-11-22 | tests/client/tabs/ledger-tab.spec.ts:84 |
-| 304 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:82 |
+| 304 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:82；tests/client/presence/attention-parity.property.spec.ts:45 |
 | 305 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:159 |
 | 306 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:353；tests/client/cultivation/list-caps-consumed.spec.ts:19 |
 | 307 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:372 |

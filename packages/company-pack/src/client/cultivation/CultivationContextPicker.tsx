@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Input } from '@deepseek-ai/dsh-client-ui-primitives'
 import { CULTIVATION_COPY } from './cultivation-actions.ts'
 import {
+  CONTEXT_CANDIDATE_CAP,
   contextSessionLabel,
   type ContextDeliverableRow,
   type ContextSessionRow,
@@ -45,12 +46,15 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
   const [query, setQuery] = useState('')
   const [deliverables, setDeliverables] = useState<readonly ContextDeliverableRow[]>([])
   const [deliverablesSkipped, setDeliverablesSkipped] = useState(0)
+  const [deliverablesCapped, setDeliverablesCapped] = useState(0)
   const [problem, setProblem] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const panel = useRef<HTMLDivElement>(null)
-  const sessions = useMemo(() => {
+  const { sessions, sessionsCapped } = useMemo(() => {
     const result = props.sources.listSessions(props.currentSessionId, props.targetRole)
-    return result.ok ? result.value : []
+    return result.ok
+      ? { sessions: result.value, sessionsCapped: result.capped ?? 0 }
+      : { sessions: [], sessionsCapped: 0 }
   }, [props.sources, props.currentSessionId, props.targetRole])
 
   useEffect(() => {
@@ -63,8 +67,10 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
         setProblem(null)
         setDeliverables(result.value)
         setDeliverablesSkipped(result.skipped ?? 0)
+        setDeliverablesCapped(result.capped ?? 0)
       } else {
         setDeliverablesSkipped(0)
+        setDeliverablesCapped(0)
         setProblem(result.problem)
       }
     })
@@ -109,6 +115,8 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
       </div>
       <div className="wk-meta wk-cultivation-context-privacy">{CULTIVATION_COPY.contextPrivacy}</div>
       {loading && <div className="wk-meta">{CULTIVATION_COPY.contextLoading}</div>}
+      {sessionsCapped > 0 && <div className="wk-meta">{CULTIVATION_COPY.contextSessionsCapped(sessionsCapped, CONTEXT_CANDIDATE_CAP)}</div>}
+      {deliverablesCapped > 0 && <div className="wk-meta">{CULTIVATION_COPY.contextDeliverablesCapped(deliverablesCapped, CONTEXT_CANDIDATE_CAP)}</div>}
       {deliverablesSkipped > 0 && <div className="wk-meta">{CULTIVATION_COPY.contextCatalogSkipped(deliverablesSkipped)}</div>}
       {problem !== null && <div className="wk-meta wk-cultivation-problem">{problem}</div>}
       <div className="wk-cultivation-context-list" role="listbox" aria-label={CULTIVATION_COPY.contextPickTitle}>

@@ -11,6 +11,7 @@
  */
 import type { SessionAddress, SessionPage, SessionPageRequest } from '@deepseek-ai/dsh-api-session-controller/types'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import { takeBounded } from '../../lib/shared/bounded.ts'
 import { type AttentionEventLike, type AttentionItem, pendingAsks } from '../../lib/presence/attention.ts'
 
 /** 一页历史的最大条数（只给重建用：多取一点，避免把 asked 切在页外）。 */
@@ -177,10 +178,11 @@ export function historyCandidates(
       && summary.origin !== 'subagent'
       && summary.cwd === currentCwd)
     .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
+  const bounded = takeBounded(sameWorkspace, cap)
   return {
     ok: true,
-    ids: sameWorkspace.slice(0, cap).map(summary => summary.id),
-    total: sameWorkspace.length,
-    capped: Math.max(0, sameWorkspace.length - cap),
+    ids: bounded.items.map(summary => summary.id),
+    total: bounded.total,
+    capped: bounded.capped,
   }
 }

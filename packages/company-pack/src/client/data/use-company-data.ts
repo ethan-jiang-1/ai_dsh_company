@@ -20,6 +20,7 @@ import type {} from '@deepseek-ai/dsh-token-meter/client'
 // `agentTeam` 是 agent-team 通过 module augmentation 加进 SessionProjectionMap 的；不引这个 type
 // 时 `useSessions` 的 store 快照与本地 SessionsStoreLike 结构不兼容（2026-11-03 client test project 现场）。
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
+import { takeBounded } from '../../lib/shared/bounded.ts'
 import { boardColumns, tasksFromTeamView, type BoardColumn, type TaskRow } from '../../lib/presence/board.ts'
 import { budgetSummary, type BudgetSummary } from '../../lib/accounting/budget.ts'
 import { layoutDag, type DagLayout } from '../../lib/presence/dag.ts'
@@ -71,13 +72,14 @@ export interface CompanyData {
   readonly dag: DagLayout
   readonly rows: readonly PresenceRow[]
   readonly activity: readonly ActivityEntry[]
+  readonly activityCapped: number
   readonly summary: BudgetSummary
   readonly error: string | null
   readonly streamError: string | null
 }
 
 /** 动态流保留条数上限。 */
-const MAX_ACTIVITY = 50
+export const MAX_ACTIVITY = 50
 
 /**
  * 读 Lead 的 `agentTeam` 投影 + （可选）订阅事件流 + 折四个读模型。
@@ -132,10 +134,11 @@ export function useCompanyData(
     return () => { controller.abort() }
   }, [follow, sessionId, stream])
 
-  const activity = useMemo(
-    () => (stream ? activityFromEvents(events, names).slice(-MAX_ACTIVITY).reverse() : []),
+  const activityBounded = useMemo(
+    () => (stream ? takeBounded(activityFromEvents(events, names), MAX_ACTIVITY, 'tail') : takeBounded([], MAX_ACTIVITY, 'tail')),
     [events, names, stream],
   )
+  const activity = useMemo(() => activityBounded.items.slice().reverse(), [activityBounded])
 
   // 任务板/看板/依赖图消费同一视图：用 follow 流里的 team/task 补齐可能过期的 agentTeam 投影。
   const effectiveTeam = useMemo(() => teamWithEventTasks(team, stream ? events : []), [team, events, stream])
@@ -147,5 +150,5 @@ export function useCompanyData(
   const stats = useProjection('sessionStats')
   const summary = useMemo(() => budgetSummary(usage, stats), [usage, stats])
 
-  return { team: effectiveTeam, tasks, columns, dag, rows, activity, summary, error, streamError }
+  return { team: effectiveTeam, tasks, columns, dag, rows, activity, activityCapped: activityBounded.capped, summary, error, streamError }
 }

@@ -31,8 +31,10 @@ describe('PresencePanel i18n', () => {
         text: 'placeholder',
         token: { key: 'presence.activity.taskCompleted', params: { owner: 'CEO', id: 't1' } },
       }],
+      activityCapped: 4,
     }))
     expect(html).toContain('CEO completed t1')
+    expect(html).toContain('Only the most recent 50 activity items are shown (4 older items are omitted).')
     expect(html).toContain('Running')
     expect(html).toContain('Idle')
     expect(html).toContain('Failed')

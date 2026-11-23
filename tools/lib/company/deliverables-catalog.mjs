@@ -32,13 +32,14 @@ export const CATALOG_ROOTS = ['.dsh-company/deliverables', '.dsh-company/deliver
 export function metaProblemsOf(fields) {
   const problems = []
   for (const key of ['kickoff', 'type', 'result']) {
-    if (!fields.has(key)) problems.push(`缺行「${key}:」`)
+    const raw = fields.get(key)
+    if (raw === undefined || raw.trim() === '') problems.push(`缺行「${key}:」`)
   }
-  const kickoff = fields.get('kickoff') ?? ''
+  const kickoff = (fields.get('kickoff') ?? '').trim()
   if (kickoff !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(kickoff)) problems.push(`kickoff 不是 YYYY-MM-DD：「${kickoff}」`)
-  const type = fields.get('type') ?? ''
+  const type = (fields.get('type') ?? '').trim()
   if (type !== '' && !META_TYPES.includes(type)) problems.push(`type 不在词表：「${type}」`)
-  const result = fields.get('result') ?? ''
+  const result = (fields.get('result') ?? '').trim()
   if (result !== '' && !META_RESULTS.includes(result)) problems.push(`result 不在词表：「${result}」`)
   return problems
 }

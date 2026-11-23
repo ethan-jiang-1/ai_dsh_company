@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [2026-11-23-fuzz-bounded-differential-guards.md](settled_issues/2026-11-23-fuzz-bounded-differential-guards.md) — 质量预防二期（四件套）：6 大解析器契约加固与 seeded 畸形 Fuzz 矩阵（120 组×6）、`Bounded<T>` 原语及静态审计 R1 纳管、`attention` 读模型性质 + `Live↔History` 同源差分（200 轮）与共享安全提取；独立盲审 2 阻断 + 4 非阻断全清；去向 = [实施Note](../../notes/implemented/2026-11-23-fuzz-bounded-differential-guards.md)。
 - [2026-11-23-client-static-guards-and-contract-sweep.md](settled_issues/2026-11-23-client-static-guards-and-contract-sweep.md) — 质量预防首批（四件套）：oxlint hooks/正确性规则、TS Compiler API R1–R4 静态审计器、满态双语断言 + 残留清零、全 Slot 真 `inject` + `happy-dom` 挂载守卫；独立盲审 0 阻断；去向 = [实施Note](../../notes/implemented/2026-11-23-client-static-guards-and-contract-sweep.md)。
 - [BUG-329-cultivation-en-list-delimiters-chinese.md](fixed_bugs/BUG-329-cultivation-en-list-delimiters-chinese.md) — en 列表分隔符「、」；`listSeparator`/`joinList` 单点取，令牌参数不预拼。
 - [BUG-326-cultivation-command-description-inner-errors-chinese.md](fixed_bugs/BUG-326-cultivation-command-description-inner-errors-chinese.md) — 命令元数据与内部错误仍中文；description/hint/停写/两类错误走 `t`（不伪造 reason 翻译）。

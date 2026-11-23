@@ -61,10 +61,13 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
     if (row.root !== undefined && row.root !== RUN_BUNDLE_PATHS.deliverables && row.root !== RUN_BUNDLE_PATHS.archive) { skipped += 1; continue }
     if (row.ledgered !== undefined && typeof row.ledgered !== 'boolean') { skipped += 1; continue }
     if (row.presented !== undefined && row.presented !== null && typeof row.presented !== 'boolean') { skipped += 1; continue }
+    const optionalStringKeys = ['slug', 'path', 'kickoff', 'type', 'result', 'summary', 'dir'] as const
+    if (optionalStringKeys.some(key => row[key] !== undefined && typeof row[key] !== 'string')) { skipped += 1; continue }
+    if (row.metaProblem !== undefined && row.metaProblem !== null && typeof row.metaProblem !== 'string') { skipped += 1; continue }
     const root = row.root === RUN_BUNDLE_PATHS.archive ? RUN_BUNDLE_PATHS.archive : RUN_BUNDLE_PATHS.deliverables
     const textOf = (key: string): string => (typeof row[key] === 'string' ? row[key] : '')
-    const slug = textOf('slug')
-    const path = textOf('path')
+    const slug = textOf('slug').trim()
+    const path = textOf('path').trim()
     if (slug === '' || path === '') { skipped += 1; continue }
     entries.push({
       slug,

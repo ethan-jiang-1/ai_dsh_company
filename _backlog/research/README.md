@@ -60,7 +60,7 @@ opened: YYYY-MM-DD
 
 | 研究题 | 状态 | 问题 | 消费者 | 产出的卡 |
 |---|---|---|---|---|
-| [bug-prevention-and-discovery](bug-prevention-and-discovery/README.md) | 已定性 | 11-20 试点后仍靠 E2E 找到 50 个 bug：代码实践如何源头预防 + E2E 之外（含自研定制工具）如何系统找虫 | 用户 2026-11-23 直接委托先期研究 | [2026-11-23-client-static-guards-and-contract-sweep.md](../_archive/settled_issues/2026-11-23-client-static-guards-and-contract-sweep.md)（首卡已结；二期 Fuzz/Bounded 待立卡） |
+| [bug-prevention-and-discovery](bug-prevention-and-discovery/README.md) | 已定性 | 11-20 试点后仍靠 E2E 找到 50 个 bug：代码实践如何源头预防 + E2E 之外（含自研定制工具）如何系统找虫 | 用户 2026-11-23 直接委托先期研究 | [首卡](../_archive/settled_issues/2026-11-23-client-static-guards-and-contract-sweep.md) + [二期卡](../_archive/settled_issues/2026-11-23-fuzz-bounded-differential-guards.md)（Tier 0 与 Tier 1 核心已结；Tier 1-4 RAII / Tier 2 按触发待议） |
 
 （2026-11-20 quality-prevention 与 maintenance-surface-taxonomy 随末张活卡/请求收口迁入[研究归档](../_archive/research/README.md)。）
 

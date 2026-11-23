@@ -4,8 +4,8 @@
  * Rules:
  * - R1 (`must-use-boundary`, blocking): TypeChecker-based check ensuring callers that read data
  *   fields from boundary-bearing types (`WorkspaceTextRead`, `DeliverablesCatalog`, `PendingApprovals`,
- *   `MotionLedger`, or `workspaceFiles.read`) also consume at least one corresponding diagnostic/boundary
- *   field (`eof`, `skipped`, `capped`, `badRows`, `headerOk`) or forward the whole container.
+ *   `MotionLedger`, `Bounded`, or `workspaceFiles.read`) also consume at least one corresponding diagnostic/boundary
+ *   field (`eof`, `skipped`, `capped`, `truncated`, `badRows`, `headerOk`) or forward the whole container.
  * - R2 (`no-literal-cjk-or-punct`, blocking): AST check ensuring zero literal CJK strings or JSX text
  *   or hardcoded Chinese joiners (`.join('、'|'；')`) inside `src/client/**` (outside explicit dictionaries)
  *   and strict ratchet/zero in `src/lib/**`.
@@ -53,6 +53,12 @@ const BOUNDARY_SPECS = [
     name: 'DeliverablesCatalog',
     dataProps: ['entries'],
     boundaryProps: ['skipped'],
+  },
+  {
+    name: 'Bounded',
+    requiredProps: ['items', 'capped', 'truncated'],
+    dataProps: ['items'],
+    boundaryProps: ['capped', 'truncated'],
   },
   {
     name: 'PendingApprovals',
@@ -132,9 +138,10 @@ function matchBoundarySpec(checker, type, callExpr) {
   for (const member of members) {
     if (member.flags & (ts.TypeFlags.Null | ts.TypeFlags.Undefined)) continue
     for (const spec of BOUNDARY_SPECS) {
+      const hasRequired = (spec.requiredProps ?? []).every(p => member.getProperty(p) !== undefined)
       const hasData = spec.dataProps.some(p => member.getProperty(p) !== undefined)
       const hasBoundary = spec.boundaryProps.some(p => member.getProperty(p) !== undefined)
-      if (hasData && hasBoundary) return { ...spec, viaValueWrapper: false }
+      if (hasRequired && hasData && hasBoundary) return { ...spec, viaValueWrapper: false }
     }
     // Check workspaceFiles.read style wrapper: { ok: true; value: { text: string; eof?: boolean } }
     const okProp = member.getProperty('ok')

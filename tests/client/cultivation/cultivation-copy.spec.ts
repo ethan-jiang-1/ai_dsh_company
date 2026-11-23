@@ -7,6 +7,7 @@ import {
   renderThrown,
   setCultivationLanguage,
 } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
+import { assertEnglishUiClean } from '../../support/i18n-assertions.ts'
 
 afterEach(() => { setCultivationLanguage('zh') })
 
@@ -43,6 +44,10 @@ describe('CULTIVATION_COPY 语言代理', () => {
     expect(CULTIVATION_COPY.contextCatalogBadShape).toContain('invalid shape')
     expect(CULTIVATION_COPY.contextCatalogReadFailed('boom')).toContain('boom')
     expect(CULTIVATION_COPY.contextCatalogSkipped(2)).toContain('2')
+    expect(CULTIVATION_COPY.contextSessionsCapped(3, 8)).toContain('3')
+    expect(CULTIVATION_COPY.contextDeliverablesCapped(5, 8)).toContain('5')
+    assertEnglishUiClean(CULTIVATION_COPY.contextSessionsCapped(3, 8), 'contextSessionsCapped en')
+    assertEnglishUiClean(CULTIVATION_COPY.contextDeliverablesCapped(5, 8), 'contextDeliverablesCapped en')
     expect(CULTIVATION_COPY.contextOpenSessionMissing).toContain('no longer be opened')
     expect(CULTIVATION_COPY.contextOpenFileMissing).toContain('missing')
     expect(CULTIVATION_COPY.contextOpenFileFailed('EIO')).toContain('EIO')

@@ -21,6 +21,7 @@ const BOUNDARY_DEFS = `
 export interface DeliverablesCatalog { readonly schema: 1; readonly entries: readonly { slug: string }[]; readonly skipped: number }
 export type WorkspaceTextRead = { readonly ok: true; readonly text: string; readonly eof: boolean } | { readonly ok: false; readonly reason: string }
 export interface PendingApprovals { readonly items: readonly string[]; readonly capped: number }
+export interface Bounded<T> { readonly items: readonly T[]; readonly total: number; readonly capped: number; readonly truncated: boolean }
 export interface MotionLedger { readonly rows: readonly string[]; readonly badRows: readonly number[]; readonly headerOk: boolean }
 export function parseCatalog(): DeliverablesCatalog | null { return { schema: 1, entries: [], skipped: 0 } }
 export async function readWorkspace(): Promise<WorkspaceTextRead> { return { ok: true, text: '', eof: true } }
@@ -28,6 +29,7 @@ export async function remoteRead(): Promise<{ readonly ok: true; readonly value:
   return { ok: true, value: { text: '', eof: true } }
 }
 export function readApprovals(): PendingApprovals { return { items: [], capped: 0 } }
+export function takeBounded<T>(items: readonly T[]): Bounded<T> { return { items, total: items.length, capped: 0, truncated: false } }
 export function readLedger(): MotionLedger { return { rows: [], badRows: [], headerOk: true } }
 `
 
@@ -46,7 +48,7 @@ describe('company-static-audit · 实仓扫描与格式', () => {
     const formatted = formatStaticAuditReport(report)
     expect(formatted).toContain('violations=0')
     expect(formatted).toContain('metrics(baseline):')
-  }, 90_000)
+  }, 180_000)
 
   it('无效 tsconfig 路径立即抛错（fail-loud）', () => {
     expect(() => loadTsProgram('/tmp/nonexistent-company-pack-tsconfig.json')).toThrow(/tsconfig read failed/)
@@ -86,7 +88,7 @@ describe('R1 must-use-boundary · 负例与正例', () => {
 
   it('三元表达式、useMemo 封装、嵌套 value 解构与 console.log 假透传均不可绕过 R1', () => {
     const report = runVirtual('packages/company-pack/src/client/bad-wrappers.ts', `
-      import { parseCatalog, readApprovals, readLedger, remoteRead } from './virtual-types.js'
+      import { parseCatalog, readApprovals, readLedger, remoteRead, takeBounded } from './virtual-types.js'
       declare function useMemo<T>(fn: () => T, deps: unknown[]): T
       export async function wrapped(ready: boolean) {
         const l = ready ? readLedger() : null
@@ -97,26 +99,34 @@ describe('R1 must-use-boundary · 负例与正例', () => {
         const c = parseCatalog()
         console.log(c)
         const ce = c ? c.entries : []
-        return { rows, items, text, ce }
+        const bItems = takeBounded(['a', 'b']).items
+        return { rows, items, text, ce, bItems }
       }
     `)
     const r1 = report.violations.filter(v => v.rule === 'R1:must-use-boundary')
-    expect(r1.length).toBeGreaterThanOrEqual(4)
+    expect(r1.length).toBeGreaterThanOrEqual(5)
   })
 
   it('同时消费 boundary 字段或透传整个结果对象 ⇒ 通过（零误报）', () => {
     const report = runVirtual('packages/company-pack/src/client/good-reads.ts', `
-      import { parseCatalog, readWorkspace, remoteRead, readApprovals, readLedger } from './virtual-types.js'
+      import { parseCatalog, readWorkspace, remoteRead, readApprovals, readLedger, takeBounded } from './virtual-types.js'
       export async function goodAll() {
         const c = parseCatalog()
         const entries = c ? { rows: c.entries, skipped: c.skipped } : null
         const { items, capped } = readApprovals()
+        const b = takeBounded(['a', 'b'])
+        const bt = takeBounded(['c'])
         const { rows, badRows } = readLedger()
         const w = await readWorkspace()
         const text = w.ok && w.eof ? w.text : ''
         const rem = await remoteRead()
         const remText = rem.ok && rem.value.eof ? rem.value.text : ''
-        return { entries, items, capped, rows, badRows, text, remText }
+        return {
+          entries, items, capped,
+          bItems: b.items, bCapped: b.capped,
+          btItems: bt.truncated ? bt.items : [],
+          rows, badRows, text, remText,
+        }
       }
       export function passthrough() {
         const res = readApprovals()

@@ -138,6 +138,7 @@ describe('useCompanyData 订阅生命周期', () => {
     const h = mountHarness({ sessionId: 's-1' as never, store, injected: injectedOf(ch.follow), stream: true })
     await h.rerender({})
     expect(h.last().activity).toHaveLength(50)
+    expect(h.last().activityCapped).toBe(5)
     expect(h.last().activity[0]?.text, '最新一条还在').toContain('m-54')
     h.unmount()
   })

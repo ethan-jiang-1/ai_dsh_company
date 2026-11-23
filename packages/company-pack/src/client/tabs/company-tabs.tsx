@@ -24,7 +24,7 @@ import { BoardPanel, BudgetPanel, DagPanel, StateNote, StreamErrorNotice, activi
 import { DelegationFlowPanel } from './DelegationFlowPanel.tsx'
 import { buildDelegationTree, type DelegationSessionSummaryLike } from '../../lib/delegation/delegation-tree.ts'
 import { TasksTableView } from './TasksPanel.tsx'
-import { useCompanyData, type CompanyDataInjected } from '../data/use-company-data.ts'
+import { MAX_ACTIVITY, useCompanyData, type CompanyDataInjected } from '../data/use-company-data.ts'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 import { presenceRoleText, roleText, roleTextForCanonical } from '../roles.ts'
 
@@ -259,6 +259,9 @@ export function PresenceTab(props: PresenceTabProps) {
         )}
       <div className="wk-activity-block">
         <strong>{t('presence.activity')}</strong>
+        {data.activityCapped > 0 && (
+          <div className="wk-meta">{t('presence.activityCapped', { count: data.activityCapped, limit: MAX_ACTIVITY })}</div>
+        )}
         {data.activity.length === 0
           ? <StateNote text={t('presence.emptyActivity')} />
           : (

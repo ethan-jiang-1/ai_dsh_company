@@ -114,6 +114,19 @@ describe('背景选择面板（R5-27）', () => {
     expect(host.textContent).toContain('成品索引不可读')
   })
 
+  it('会话或成品候选被上限截断时明确显示截断数量（不静默少条目）', async () => {
+    const host = await mount(createElement(CultivationContextPicker, props({
+      sources: {
+        listSessions: () => ({ ok: true as const, value: [current, recent], capped: 3 }),
+        listDeliverables: async () => ({ ok: true as const, value: [deliverable], skipped: 2, capped: 5 }),
+        readPreview: async () => ({ ok: true as const }),
+      },
+    })))
+    expect(host.textContent).toContain('另有 3 条未显示')
+    expect(host.textContent).toContain('另有 5 条未显示')
+    expect(host.textContent).toContain('2 条坏形状成品索引条目已跳过')
+  })
+
   it('Escape 取消（不选中任何项）', async () => {
     const onCancel = vi.fn()
     const host = await mount(createElement(CultivationContextPicker, props({ onCancel })))

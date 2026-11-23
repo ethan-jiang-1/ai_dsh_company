@@ -12,7 +12,7 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import type { AttentionRegistry } from './attention-registry.ts'
-import { buildApprovalCopy, buildQuestionCopy } from '../../lib/presence/attention.ts'
+import { approvalFromPayload, buildApprovalCopy, buildQuestionCopy, questionsFromPayload } from '../../lib/presence/attention.ts'
 
 /** 远端事件面（只用到 $on；handler 的 this = 事件归属 owner）。 */
 export interface AttentionRemote {
@@ -38,11 +38,7 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
   const offQuestion = remote.$on('user-questions/request', function (this: unknown, request: unknown, next: () => unknown) {
     const sessionId = sessions.scopeOf(this)
     if (sessionId === undefined) return next()
-    const questions = (request as { questions?: readonly { question?: unknown }[] }).questions ?? []
-    const texts = questions
-      .map(item => (typeof item?.question === 'string' ? item.question.trim() : ''))
-      .filter(text => text !== '')
-    const copy = buildQuestionCopy(texts)
+    const copy = buildQuestionCopy(questionsFromPayload(request))
     questionSeq += 1
     const done = attention.begin({
       kind: 'question',
@@ -58,9 +54,9 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
   const offApproval = remote.$on('approval/request', function (this: unknown, request: unknown, next: () => unknown) {
     const sessionId = sessions.scopeOf(this)
     if (sessionId === undefined) return next()
-    const approval = request as { readonly id?: unknown; readonly toolName?: unknown; readonly reason?: unknown }
-    const approvalId = typeof approval.id === 'string' && approval.id !== '' ? approval.id : undefined
-    const copy = buildApprovalCopy(approval.toolName, approval.reason)
+    const approval = approvalFromPayload(request)
+    const approvalId = approval?.id
+    const copy = buildApprovalCopy(approval?.toolName, approval?.reason)
     const done = attention.begin({
       kind: 'approval',
       sessionId,

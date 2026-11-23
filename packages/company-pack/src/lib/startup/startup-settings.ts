@@ -192,7 +192,7 @@ export interface StartupSettingsState {
 }
 
 /**
- * 已知字段的类型检查：有值但不是字符串/数字 ⇒ 返回字段名。
+ * 已知字段的类型检查：有值但不是字符串/数字 ⇒ 返回字段名（数字按 legacy scalar 合同不报 corrupt）。
  * @param record - 解析后的对象。
  * @returns 第一个类型坏的字段；全好为 null。
  */
@@ -283,8 +283,13 @@ export function parseStartupOptionsState(text: string | null | undefined): Start
   const record = raw as Record<string, unknown>
   // 字段类型坏 = 文件坏了，不是「内容里没有可选项」（BUG-313）：数组字段给了字符串时，
   // cleanList 会安静地折成空数组，面板于是把「坏文件」说成「内容没装」。
-  const badField = ['productTypes', 'deliveryModes'].find(key => record[key] !== undefined && record[key] !== null && !Array.isArray(record[key]))
-  if (badField !== undefined) return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable', field: badField as 'productTypes' | 'deliveryModes' }
+  const isValidStringList = (value: unknown): boolean =>
+    value === undefined || value === null || (Array.isArray(value) && value.every(item => typeof item === 'string'))
+  const badField = (['productTypes', 'deliveryModes'] as const).find(key => !isValidStringList(record[key]))
+  if (badField !== undefined) return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable', field: badField }
+  if (record.wikiCheck !== undefined && record.wikiCheck !== null && (typeof record.wikiCheck !== 'object' || Array.isArray(record.wikiCheck))) {
+    return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable' }
+  }
   return {
     options: {
       productTypes: cleanList(record.productTypes),

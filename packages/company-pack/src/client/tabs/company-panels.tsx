@@ -5,6 +5,7 @@
  * DAG 是自绘 SVG（平台无 mermaid / 图表渲染器，研究 §1.5）。
  */
 import { clauseSeparator, joinList, listSeparator } from '../ui/list-separator.ts'
+import { MAX_ACTIVITY } from '../data/use-company-data.ts'
 import { useEffect, useRef, useState } from 'react'
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { BoardCard, BoardColumn, TaskRow } from '../../lib/presence/board.ts'
@@ -287,9 +288,11 @@ export function DagPanel({ layout, roleLabel = label => label, t = defaultT }: {
  * @param props.activity - 动态（打开期间的变化；流式升级见 S1 后续步）。
  * @returns 在场面板。
  */
-export function PresencePanel({ rows, activity, t = defaultT }: {
+export function PresencePanel({ rows, activity, activityCapped = 0, activityLimit = MAX_ACTIVITY, t = defaultT }: {
   readonly rows: readonly PresenceRow[]
   readonly activity: readonly ActivityEntry[]
+  readonly activityCapped?: number
+  readonly activityLimit?: number
   readonly t?: CompanyT
 }) {
   return (
@@ -310,6 +313,9 @@ export function PresencePanel({ rows, activity, t = defaultT }: {
           </div>
         ))}
       <div className="wk-section-title">{t('presence.activity')}</div>
+      {activityCapped > 0 && (
+        <div className="wk-meta">{t('presence.activityCapped', { count: activityCapped, limit: activityLimit })}</div>
+      )}
       {activity.length === 0
         ? <StateNote text={t('presence.emptyActivity')} />
         : (

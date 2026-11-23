@@ -49,7 +49,7 @@ describe('会话候选投影', () => {
   ]
 
   it('当前会话第一行；空白/跨 cwd 过滤；根按 preset、成员按 parent 的 agentTeam 标角色', () => {
-    const projected = projectContextSessions(rows, 'current')
+    const { items: projected } = projectContextSessions(rows, 'current')
     expect(projected[0]?.sessionId).toBe('current')
     expect(projected.map(item => item.sessionId)).not.toContain('blank')
     expect(projected.map(item => item.sessionId)).not.toContain('other-cwd')
@@ -65,12 +65,14 @@ describe('会话候选投影', () => {
     expect(projected.find(item => item.sessionId === 'no-preset')?.role).toBeUndefined()
   })
 
-  it('targetRole 匹配的根会话排在其它根之前；最多 8 行', () => {
-    const projected = projectContextSessions(rows, 'current', 'cfo')
+  it('targetRole 匹配的根会话排在其它根之前；最多 8 行并上报 capped', () => {
+    const { items: projected } = projectContextSessions(rows, 'current', 'cfo')
     const order = projected.map(item => item.sessionId)
     expect(order.indexOf('root-cfo')).toBeLessThan(order.indexOf('lead-1'))
     const many = Array.from({ length: 20 }, (_, index) => row({ sessionId: `s-${String(index)}`, updatedAt: index }))
-    expect(projectContextSessions(many, 's-19')).toHaveLength(8)
+    const bounded = projectContextSessions(many, 's-19')
+    expect(bounded.items).toHaveLength(8)
+    expect(bounded.capped).toBe(12)
   })
 })
 
@@ -84,10 +86,24 @@ describe('成品候选投影', () => {
     ],
   })
 
-  it('按 kickoff 倒序；读不到/形状坏给可读错误', () => {
+  it('按 kickoff 倒序并上报 capped；读不到/形状坏给可读错误', () => {
     const result = projectContextDeliverables(catalog)
     expect(result.ok).toBe(true)
-    if (result.ok) expect(result.value.map(item => item.slug)).toEqual(['new', 'old'])
+    if (result.ok) {
+      expect(result.value.map(item => item.slug)).toEqual(['new', 'old'])
+      expect(result.capped).toBe(0)
+    }
+    const manyEntries = Array.from({ length: 12 }, (_, index) => ({
+      slug: `d-${String(index)}`,
+      path: `deliverables/d-${String(index)}/final.md`,
+      kickoff: `2026-10-${String(index + 10)}`,
+    }))
+    const bounded = projectContextDeliverables(JSON.stringify({ schema: 1, generatedAt: 'x', entries: manyEntries }))
+    expect(bounded.ok).toBe(true)
+    if (bounded.ok) {
+      expect(bounded.value).toHaveLength(8)
+      expect(bounded.capped).toBe(4)
+    }
     expect(projectContextDeliverables(null).ok).toBe(false)
     expect(projectContextDeliverables('{bad').ok).toBe(false)
   })
@@ -152,9 +168,17 @@ describe('makeCultivationContextSources', () => {
     const deliverables = await sources.listDeliverables('current', new AbortController().signal)
     expect(deliverables.ok).toBe(true)
     if (sessions.ok) {
+      expect(sessions.capped).toBeUndefined()
       const preview = await sources.readPreview(sessions.value[0]!, new AbortController().signal)
       expect(preview.ok).toBe(false)
     }
+    const cappedSources = makeCultivationContextSources({
+      getSessions: () => Array.from({ length: 10 }, (_, idx) => row({ sessionId: `s-${String(idx)}`, updatedAt: idx })),
+      follow,
+      readCatalog: async () => ({ ok: false, reason: 'missing' }),
+    })
+    const cappedList = cappedSources.listSessions('s-9')
+    expect(cappedList.ok && cappedList.capped).toBe(2)
   })
 })
 

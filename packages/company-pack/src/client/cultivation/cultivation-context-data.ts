@@ -11,6 +11,7 @@
  * host 仍是记录证据的唯一来源：本模块只做预览，命令只带 ref。
  */
 import type { WorkspaceTextRead } from '../cultivation/cultivation-data.ts'
+import { takeBounded, type Bounded } from '../../lib/shared/bounded.ts'
 import { CULTIVATION_ROLES, roleLabel as defaultRoleLabel } from '../../lib/cultivation/cultivation.ts'
 import {
   pickSessionTurn,
@@ -57,8 +58,11 @@ export interface ContextDeliverableRow {
   readonly summary: string
 }
 
+/** 每组参考背景候选面板最多展示的条目数（会话与成品共用）。 */
+export const CONTEXT_CANDIDATE_CAP = 8
+
 export type ContextSourceResult<T> =
-  | { readonly ok: true; readonly value: readonly T[]; readonly skipped?: number }
+  | { readonly ok: true; readonly value: readonly T[]; readonly skipped?: number; readonly capped?: number }
   | { readonly ok: false; readonly problem: string }
 
 export interface SessionPreviewResult {
@@ -144,13 +148,13 @@ export function contextRowsFromStore(
  * @param rows - 客户端 sessions store 的行。
  * @param currentSessionId - 当前会话（固定第一行、默认带背景）。
  * @param targetRole - 建议的目标角色（匹配的根会话排前；仅排序）。
- * @returns 同 cwd、非空白、最多 8 行。
+ * @returns 同 cwd、非空白、最多 {@link CONTEXT_CANDIDATE_CAP} 行，连同 `capped` 上报。
  */
 export function projectContextSessions(
   rows: readonly ContextSessionRowLike[],
   currentSessionId: string,
   targetRole?: string,
-): readonly ContextSessionRow[] {
+): Bounded<ContextSessionRow> {
   const byId = new Map(rows.map(row => [row.sessionId, row]))
   const current = byId.get(currentSessionId)
   const cwd = current?.cwd
@@ -190,10 +194,10 @@ export function projectContextSessions(
     if (leftMatch !== rightMatch) return leftMatch ? -1 : 1
     return right.at - left.at
   })
-  return projected.slice(0, 8)
+  return takeBounded(projected, CONTEXT_CANDIDATE_CAP)
 }
 
-/** 成品候选（复用成品页签的 parser；按 kickoff 倒序，最多 8 行）。 */
+/** 成品候选（复用成品页签的 parser；按 kickoff 倒序，最多 {@link CONTEXT_CANDIDATE_CAP} 行并上报 `capped`）。 */
 export function projectContextDeliverables(catalogText: string | null): ContextSourceResult<ContextDeliverableRow> {
   if (catalogText === null) return { ok: false, problem: CULTIVATION_COPY.contextCatalogMissing }
   const catalog = parseCatalog(catalogText)
@@ -207,8 +211,8 @@ export function projectContextDeliverables(catalogText: string | null): ContextS
       summary: entry.summary,
     }))
     .sort((left, right) => right.kickoff.localeCompare(left.kickoff))
-    .slice(0, 8)
-  return { ok: true, value: rows, skipped: catalog.skipped }
+  const bounded = takeBounded(rows, CONTEXT_CANDIDATE_CAP)
+  return { ok: true, value: bounded.items, skipped: catalog.skipped, capped: bounded.capped }
 }
 
 /**
@@ -268,8 +272,10 @@ export function makeCultivationContextSources(options: {
   readonly timeoutMs?: number
 }): CultivationContextSources {
   return {
-    listSessions: (currentSessionId, targetRole) =>
-      ({ ok: true, value: projectContextSessions(options.getSessions(), currentSessionId, targetRole) }),
+    listSessions: (currentSessionId, targetRole) => {
+      const projected = projectContextSessions(options.getSessions(), currentSessionId, targetRole)
+      return { ok: true, value: projected.items, ...(projected.capped > 0 ? { capped: projected.capped } : {}) }
+    },
     listDeliverables: async (sessionId, signal) => {
       try {
         const read = await options.readCatalog(sessionId, signal)

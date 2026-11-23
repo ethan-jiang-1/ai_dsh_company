@@ -12,6 +12,8 @@
  * 纯函数、只依赖文本工具；wire 形状 → 领域形状，UI 只消费 {@link AttentionItem}。
  * keyless 单测 = `tests/client/wiring/attention.spec.ts`。
  */
+import { takeBounded } from '../shared/bounded.ts'
+import { isRecord } from '../shared/guards.ts'
 import { firstText } from '../shared/text.ts'
 
 /** 注意力条目类别。 */
@@ -181,6 +183,22 @@ export function streamAttention(
 }
 
 /**
+ * 从审批载体（远端 `approval/request` 或会话事件 `approval/asked` / `approval/decided`）安全提取字段。
+ * 非对象返回 null（防止畸形事件或远端 payload 在解引用时抛错中断流水线）。
+ */
+export function approvalFromPayload(
+  payload: unknown,
+): { readonly id?: string; readonly toolName: unknown; readonly reason: unknown } | null {
+  if (!isRecord(payload)) return null
+  const id = typeof payload.id === 'string' && payload.id !== '' ? payload.id : undefined
+  return {
+    ...(id === undefined ? {} : { id }),
+    toolName: payload.toolName,
+    reason: payload.reason,
+  }
+}
+
+/**
  * 从 lead 会话事件流重建**仍挂起**的审批（历史可重建的部分）。
  *
  * 为什么需要（2026-11-21 BUG-288）：`waiting` 原只来自本页活体观察者（waterfall 仅在页面
@@ -195,8 +213,8 @@ export function streamAttention(
 export function pendingApprovals(events: readonly AttentionEventLike[], sessionId: string): PendingApprovals {
   const asked = new Map<string, AttentionItem>()
   for (const event of events) {
-    const data = event.data as { id?: unknown; toolName?: unknown; reason?: unknown } | null
-    if (typeof data !== 'object' || data === null || typeof data.id !== 'string') continue
+    const data = approvalFromPayload(event.data)
+    if (data === null || data.id === undefined) continue
     if (event.type === 'approval/asked') {
       const copy = buildApprovalCopy(data.toolName, data.reason)
       asked.set(data.id, {
@@ -214,7 +232,8 @@ export function pendingApprovals(events: readonly AttentionEventLike[], sessionI
     }
   }
   const sorted = [...asked.values()].sort((a, b) => b.time - a.time)
-  return { items: sorted.slice(0, STREAM_ITEM_CAP), capped: Math.max(0, sorted.length - STREAM_ITEM_CAP) }
+  const bounded = takeBounded(sorted, STREAM_ITEM_CAP)
+  return { items: bounded.items, capped: bounded.capped }
 }
 
 /** 审批重建结果：条目 + 被 `STREAM_ITEM_CAP` 截掉多少（面板据此说「还有 N 条审批未显示」）。 */
@@ -248,13 +267,25 @@ export function mergeAttention(
   // 优先活体（它带真实 since）。按摘要去重会让两条同摘要的不同审批互相吞掉（BUG-299）。
   const seen = new Set(waiting.map(attentionItemKey))
   // 跨源身份（BUG-325）：问询的活体 id 是合成的（312）、历史 id 是 `callId`（319）——两套 id 各自都对，
-  // 拼起来会让同一条问询显示两行。这里只对 **live ↔ history** 之间的问询按内容去重；
-  // 源内仍按 id（保 312：同文两条不同 id 的问询不合并）。
-  const liveQuestionContent = new Set(waiting.filter(item => item.kind === 'question').map(questionContentKey))
+  // 拼起来会让同一条问询显示两行。这里对 **live ↔ history** 之间的问询按多重集配额去重（1:1 抵消），
+  // 既防止同一条被重复渲染，也不吞掉仅有历史或同文多条的问询；源内仍按 id（保 312）。
+  const liveQuestionBudget = new Map<string, number>()
+  for (const item of waiting) {
+    if (item.kind !== 'question') continue
+    const qKey = questionContentKey(item)
+    liveQuestionBudget.set(qKey, (liveQuestionBudget.get(qKey) ?? 0) + 1)
+  }
   const rebuilt = streamItems.filter(item => {
     const key = attentionItemKey(item)
     if (seen.has(key)) return false
-    if (item.kind === 'question' && liveQuestionContent.has(questionContentKey(item))) return false
+    if (item.kind === 'question') {
+      const qKey = questionContentKey(item)
+      const budget = liveQuestionBudget.get(qKey) ?? 0
+      if (budget > 0) {
+        liveQuestionBudget.set(qKey, budget - 1)
+        return false
+      }
+    }
     seen.add(key)
     return true
   })
@@ -299,6 +330,18 @@ export function attentionTone(kind: AttentionKind): 'info' | 'danger' | 'warning
 export const ASK_TOOL_NAME = 'ask_user_question'
 
 /**
+ * 从结构化问询载体（远端 `user-questions/request` 或已解析的 `ask_user_question` 参数）中安全提取有效问句（BUG-331）。
+ * @param payload - 原始对象；非对象或 `questions` 非数组时返回空数组（不抛错）。
+ * @returns 去空白后的有效问句列表。
+ */
+export function questionsFromPayload(payload: unknown): readonly string[] {
+  if (!isRecord(payload) || !Array.isArray(payload.questions)) return []
+  return payload.questions
+    .map(item => (isRecord(item) && typeof item.question === 'string' ? item.question.trim() : ''))
+    .filter(text => text !== '')
+}
+
+/**
  * 从 `tool/call` 的 arguments（JSON 字符串）里读问题清单（BUG-331：一次请求可以带多个问题）。
  * @param argumentsText - 工具的 arguments（JSON 字符串）。
  * @returns 全部有效问句；读不出给空数组。
@@ -306,10 +349,7 @@ export const ASK_TOOL_NAME = 'ask_user_question'
 export function questionListOf(argumentsText: string | undefined): readonly string[] {
   if (typeof argumentsText !== 'string' || argumentsText.trim() === '') return []
   try {
-    const parsed = JSON.parse(argumentsText) as { questions?: readonly { question?: unknown }[] }
-    return (parsed.questions ?? [])
-      .map(item => (typeof item?.question === 'string' ? item.question.trim() : ''))
-      .filter(text => text !== '')
+    return questionsFromPayload(JSON.parse(argumentsText) as unknown)
   } catch {
     return []
   }
@@ -379,7 +419,8 @@ export function pendingAsks(events: readonly AttentionEventLike[], sessionId: st
   const approvals = pendingApprovals(events, sessionId)
   const questions = pendingQuestions(events, sessionId)
   const merged = [...approvals.items, ...questions].sort((a, b) => b.time - a.time)
-  return { items: merged.slice(0, STREAM_ITEM_CAP), capped: approvals.capped + Math.max(0, merged.length - STREAM_ITEM_CAP) }
+  const bounded = takeBounded(merged, STREAM_ITEM_CAP)
+  return { items: bounded.items, capped: approvals.capped + bounded.capped }
 }
 
 /**
