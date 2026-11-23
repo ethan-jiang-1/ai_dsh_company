@@ -67,6 +67,7 @@ export function CultivationMine({ inbox, roleLabel = defaultRoleLabel, capList, 
                 </span>
                 <span className="wk-row-task">{CULTIVATION_COPY.mineReason(record.reason ?? CULTIVATION_COPY.inboxNoReason)}</span>
                 {record.decidedAt !== undefined && <span className="wk-meta" title={record.decidedAt}>{CULTIVATION_COPY.mineRejectedAt(decidedTime(record.decidedAt, Date.now()))}</span>}
+                {record.contextProblem != null && <span className="wk-meta wk-cultivation-problem">{CULTIVATION_COPY.contextCorrupt}</span>}
 
               </div>
             ))}
@@ -162,6 +163,7 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
                           : <span className="wk-meta">{CULTIVATION_COPY.adoptedSourceMissing}</span>}
                     {stampOf(record.id) !== null && <span className="wk-meta">{CULTIVATION_COPY.adoptedRaisedAt(String(stampOf(record.id)))}</span>}
                     {record.decidedAt !== undefined && <span className="wk-meta" title={record.decidedAt}>{CULTIVATION_COPY.adoptedDecidedAt(decidedTime(record.decidedAt, Date.now()))}</span>}
+                    {record.contextProblem != null && <span className="wk-meta wk-cultivation-problem">{CULTIVATION_COPY.contextCorrupt}</span>}
                     {record.body !== '' && (() => {
                       const expanded = expandedEvidence[record.id] === true
                       return (
@@ -172,7 +174,7 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
                       )
                     })()}
                     {record.bodyTruncated === true && <span className="wk-meta">{CULTIVATION_COPY.adoptedEvidenceTruncated}</span>}
-                    {record.verificationHistoryProblem !== null && record.verificationHistoryProblem !== undefined && <span className="wk-meta wk-cultivation-problem">{record.verificationHistoryProblem}</span>}
+                    {record.verificationHistoryProblem !== null && record.verificationHistoryProblem !== undefined && <span className="wk-meta wk-cultivation-problem">{CULTIVATION_COPY.verificationHistoryCorrupt}</span>}
                     {record.verification !== undefined && (record.verificationHistory?.length ?? 0) === 0 && record.verificationHistoryProblem == null && <span className="wk-meta">{CULTIVATION_COPY.adoptedHistoryNotRecorded}</span>}
                     {(record.verificationHistory?.length ?? 0) > 0 && (() => {
                       const history = record.verificationHistory ?? []

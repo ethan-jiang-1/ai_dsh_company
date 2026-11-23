@@ -62,6 +62,7 @@ export interface CultivationRecord {
   /** 每次验证对应的一条后续工作证据；旧记录缺席时按空历史读取。 */
   readonly verificationHistory?: readonly CultivationVerification[]
   /** 坏历史单独告警，主培养记录仍保留。 */
+  /** 验证历史损坏代号（`corrupt`）；人话在 client 字典。 */
   readonly verificationHistoryProblem?: string | null
   readonly decidedAt?: string
   /** 方法撤回时间（在场 = 方法已从方法层删除，新会话不再加载）。 */
@@ -79,6 +80,7 @@ export interface CultivationRecord {
   /** 自包含背景（2026-10-23 背景卡 D1=A；host 读后写）。旧记录缺席 = `[]`。 */
   readonly contexts?: readonly CultivationContext[]
   /** `contexts` 坏形状时的可读原因；记录本身仍显示。 */
+  /** 背景负载损坏代号（`corrupt`）；人话在 client 字典。 */
   readonly contextProblem?: string | null
 }
 
@@ -205,7 +207,8 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
   const verification = fields.get('verification')
   if (verification !== undefined && verification !== 'pending' && verification !== 'pass' && verification !== 'fail') return null
   const verificationHistory = parseVerificationHistory(fields.get('verificationHistory'))
-  const verificationHistoryProblem = verificationHistory === null ? '验证历史格式损坏；当前状态与原始提案仍可查看。' : null
+  // 只给代号，不产出人话：翻译在 client 字典（BUG-334，R2 棘轮也要能收）。
+  const verificationHistoryProblem = verificationHistory === null ? 'corrupt' : null
   const body = parsed.body
   const contextRead = parseContextPayload(fields.get('contexts'))
   // 可选字段先聚成普通对象再收窄成领域形状（避免对 readonly 接口的索引签名强转）。
@@ -222,7 +225,8 @@ export function parseRecord(id: string, text: string): CultivationRecord | null 
     title: journalTitle(body),
     body: body.trim(),
     contexts: contextRead.contexts,
-    contextProblem: contextRead.problem,
+    // 同上：记录侧只记「背景坏了」，命令/选择器那条路仍有可读 reason。
+    contextProblem: contextRead.problem === null ? null : 'corrupt',
     verificationHistory: verificationHistory ?? [],
     verificationHistoryProblem,
   }

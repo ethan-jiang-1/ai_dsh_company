@@ -100,6 +100,9 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
                             ? CULTIVATION_COPY.inboxSourceSession
                             : record.source !== '' ? `${stampOf(record.id) === null ? '' : ' · '}${CULTIVATION_COPY.inboxSourceRecorded(record.source).replace(' · ', '')}` : CULTIVATION_COPY.inboxSourceMissing}
                       </span>
+                      {record.contextProblem != null && (
+                        <div className="wk-meta wk-cultivation-problem">{CULTIVATION_COPY.contextCorrupt}</div>
+                      )}
                       {(record.contexts?.length ?? 0) > 0 && (() => {
                         const background = record.contexts![0]!
                         const open = expandedContexts[record.id] === true

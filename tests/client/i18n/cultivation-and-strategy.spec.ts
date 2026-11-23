@@ -114,3 +114,55 @@ describe('CultivationTab i18n（en 填充态 / 边界态 / 错态）', () => {
     assertEnglishUiClean(host.textContent ?? '', 'CultivationTab populated en')
   })
 })
+
+// 负例留证 2026-11-23：把损坏诊断改回 lib 中文串（或删掉 contextProblem 渲染）⇒ 本用例红（en 漏中文/背景静默消失）。BUG-334
+describe('CultivationTab 损坏诊断（BUG-334）', () => {
+  it('en：损坏 verificationHistory 与 contexts 都给英文告警，零中文', async () => {
+    const openCorrupt = [
+      '---', 'schema: 2', 'kind: correction', 'targetRole: ceo', 'proposerRole: ceo', 'proposerKind: agent',
+      'work: Keep handoffs clean', 'expectation: check the boundary', 'status: open', 'contexts: %ZZ',
+      '---', 'Body in English.',
+    ].join('\n')
+    const adoptedCorrupt = [
+      '---', 'schema: 2', 'kind: correction', 'targetRole: ceo', 'proposerRole: ceo', 'proposerKind: agent',
+      'work: Keep handoffs clean', 'expectation: check the boundary', 'status: adopted', 'methodSlug: retry-check',
+      'verification: pass', 'verificationHistory: %E0%A4%A', 'decidedAt: 2026-11-23T08:00:00.000Z',
+      '---', 'Body in English.',
+    ].join('\n')
+    const contents: Record<string, string> = { 'open.md': openCorrupt, 'adopted.md': adoptedCorrupt }
+    const host = document.createElement('div')
+    document.body.append(host)
+    mounted = createRoot(host)
+    await act(async () => {
+      mounted?.render(createElement(CultivationTab, {
+        sessionId: 's1',
+        t: tEn,
+        useTabInfo: () => ({ tab: { id: 'tab-c', contentId: 'dsh-company-pack/cultivation' } }),
+        floatTab: () => {},
+        unfloatTab: () => {},
+        useSessions: (selector: (state: { byId: Record<string, unknown> }) => unknown) =>
+          selector({ byId: { s1: { origin: undefined, cwd: '/ws/company' } } }),
+        roleSource: {
+          subscribe: () => () => {},
+          getSnapshot: () => ({ projectionsBySession: { s1: { values: { agentPreset: 'ceo' } } } }),
+        },
+        cultivationActions: () => ({ run: async () => ({ ok: true, text: 'ok' }) }),
+        cultivationFiles: {
+          listJournal: async () => [],
+          readHead: async () => null,
+          readJournalMore: async () => null,
+          listRecords: async () => ({ ok: true as const, names: ['open.md', 'adopted.md'] }),
+          readRecordHead: async (_s: string, path: string) => contents[path.split('/').pop() ?? ''] ?? null,
+          readRecord: async (_s: string, path: string) => {
+            const text = contents[path.split('/').pop() ?? '']
+            return text === undefined ? { ok: false as const, reason: 'missing' } : { ok: true as const, eof: true, text }
+          },
+        },
+      } as never))
+    })
+    await act(async () => { await new Promise(resolve => { setTimeout(resolve, 0) }) })
+    expect(host.textContent).toContain('Verification history is malformed')
+    expect(host.textContent).toContain('Background context is malformed')
+    assertEnglishUiClean(host.textContent ?? '', 'CultivationTab corrupt records en')
+  })
+})
