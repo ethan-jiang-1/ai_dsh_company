@@ -19,7 +19,7 @@ import {
   type Domain,
   type DomainFacility,
 } from '@deepseek-ai/dsh-storage-domain'
-import { createHash } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -118,7 +118,7 @@ function fileStore(dshHome: string, workspace: string): PresentedLedgerStore {
     async write(ledger) {
       try {
         mkdirSync(dirname(path), { recursive: true })
-        const temporary = `${path}.${String(process.pid)}.${String(Date.now())}.tmp`
+        const temporary = `${path}.${String(process.pid)}.${randomUUID()}.tmp`
         try {
           writeFileSync(temporary, `${JSON.stringify({ workspace, ...ledger }, null, 2)}\n`, { flag: 'wx' })
           renameSync(temporary, path)
@@ -199,12 +199,16 @@ export async function createPresentedLedgerStore(
   }
 }
 
-/**
- * 启动时准备账本：现有值优先；缺时给空账本并标记回扫。坏/更高 schema 保留原文件。
- * @param store - 账本 store。
- * @param now - 时钟（测试注入）。
- */
-export async function ensureLedger(
+const storeQueues = new WeakMap<PresentedLedgerStore, Promise<void>>()
+
+function serializeStore<T>(store: PresentedLedgerStore, task: () => Promise<T>): Promise<T> {
+  const prev = storeQueues.get(store) ?? Promise.resolve()
+  const next = prev.then(task, task)
+  storeQueues.set(store, next.then(() => undefined, () => undefined))
+  return next
+}
+
+async function ensureLedgerUnlocked(
   store: PresentedLedgerStore,
   now: Date = new Date(),
 ): Promise<LedgerBootstrap> {
@@ -228,20 +232,34 @@ export async function ensureLedger(
   }
 }
 
+/**
+ * 启动时准备账本：现有值优先；缺时给空账本并标记回扫。坏/更高 schema 保留原文件。
+ * @param store - 账本 store。
+ * @param now - 时钟（测试注入）。
+ */
+export function ensureLedger(
+  store: PresentedLedgerStore,
+  now: Date = new Date(),
+): Promise<LedgerBootstrap> {
+  return serializeStore(store, () => ensureLedgerUnlocked(store, now))
+}
+
 /** 记录一次 live present；坏账本不覆盖。 */
-export async function recordLedger(
+export function recordLedger(
   store: PresentedLedgerStore,
   observation: PresentedObservation,
   now: Date = new Date(),
 ): Promise<{ readonly ledger?: PresentedLedger; readonly warning?: string }> {
-  const state = store.read()
-  if (state.status === 'corrupt' || state.status === 'unsupported') {
-    return { warning: `presented 账本损坏（${'error' in state ? state.error : '未知'}），本次 present 不写账本` }
-  }
-  const base = state.status === 'ok' ? state.ledger : (await ensureLedger(store, now)).ledger
-  const ledger = mergePresented(base, observation, now)
-  const written = await store.write(ledger)
-  return written.ledger === undefined ? { warning: written.warning ?? 'presented 账本写入失败' } : { ledger }
+  return serializeStore(store, async () => {
+    const state = store.read()
+    if (state.status === 'corrupt' || state.status === 'unsupported') {
+      return { warning: `presented 账本损坏（${'error' in state ? state.error : '未知'}），本次 present 不写账本` }
+    }
+    const base = state.status === 'ok' ? state.ledger : (await ensureLedgerUnlocked(store, now)).ledger
+    const ledger = mergePresented(base, observation, now)
+    const written = await store.write(ledger)
+    return written.ledger === undefined ? { warning: written.warning ?? 'presented 账本写入失败' } : { ledger }
+  })
 }
 
 /** 人侧交付审计：写 true/false；路径校验只认 `.dsh-company/deliverables/<dir>/final.md`。 */
@@ -257,17 +275,19 @@ export async function auditLedger(
   const rel = resolved.rel
   const targetProblem = auditTargetProblem(workspace, rel)
   if (targetProblem !== undefined) return { warning: targetProblem }
-  const state = store.read()
-  if (state.status === 'corrupt' || state.status === 'unsupported') {
-    return { warning: `presented 账本损坏（${'error' in state ? state.error : '未知'}），未写` }
-  }
-  const base = state.status === 'ok' ? state.ledger : (await ensureLedger(store, now)).ledger
-  const paths: Record<string, boolean> = { ...base.paths, [rel]: presented }
-  let next: PresentedLedger = { schema: 1, updatedAt: now.toISOString(), paths, slugs: base.slugs }
-  if (presented) {
-    const slug = rel.split('/')[2] ?? ''
-    if (slug !== '') next = { ...next, slugs: { ...next.slugs, [slug.replace(/^\d{4}-\d{2}-\d{2}-/, '')]: true } }
-  }
-  const written = await store.write(next)
-  return written.ledger === undefined ? { warning: written.warning ?? 'presented 账本写入失败' } : { ledger: next, path: rel }
+  return await serializeStore(store, async () => {
+    const state = store.read()
+    if (state.status === 'corrupt' || state.status === 'unsupported') {
+      return { warning: `presented 账本损坏（${'error' in state ? state.error : '未知'}），未写` }
+    }
+    const base = state.status === 'ok' ? state.ledger : (await ensureLedgerUnlocked(store, now)).ledger
+    const paths: Record<string, boolean> = { ...base.paths, [rel]: presented }
+    let next: PresentedLedger = { schema: 1, updatedAt: now.toISOString(), paths, slugs: base.slugs }
+    if (presented) {
+      const slug = rel.split('/')[2] ?? ''
+      if (slug !== '') next = { ...next, slugs: { ...next.slugs, [slug.replace(/^\d{4}-\d{2}-\d{2}-/, '')]: true } }
+    }
+    const written = await store.write(next)
+    return written.ledger === undefined ? { warning: written.warning ?? 'presented 账本写入失败' } : { ledger: next, path: rel }
+  })
 }

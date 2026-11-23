@@ -5,6 +5,7 @@
  * - `record`/`audit` 只写 store；模型写 workspace 文件不会改账本；
  * - 两个 workspace 的账本不串。
  */
+// 负例留证 2026-11-23：去掉 presented-domain.ts 的 store 串行队列或 fileStore 临时文件 randomUUID() ⇒ BUG-346 并发写入丢更与 EEXIST 用例红；还原即绿。BUG-346
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -131,5 +132,57 @@ describe('presented domain v3', () => {
     await recordLedger(a, { paths: [rel] })
     expect((a.read() as { ledger: { paths: Record<string, boolean> } }).ledger.paths[rel]).toBe(true)
     expect((b.read() as { ledger: { paths: Record<string, boolean> } }).ledger.paths[rel]).toBeUndefined()
+  })
+
+  it('BUG-346：异步 domainStore 下并发 recordLedger/auditLedger 串行落盘不丢更，fileStore 同毫秒并发不撞 EEXIST', async () => {
+    const records = new Map<string, unknown>()
+    const slowTable = {
+      get: (key: string) => records.get(key),
+      put: async (key: string, value: unknown) => {
+        await Promise.resolve()
+        await new Promise(resolve => setTimeout(resolve, 10))
+        records.set(key, value)
+      },
+    }
+    const { ctx } = ctxWith({ open: async () => ({ name: presentedDomain.name, table: () => slowTable, close: async () => {} }) })
+    const dStore = await createPresentedLedgerStore(ctx as never, env.home, env.workspace)
+    const relA = `${RUN_BUNDLE_PATHS.deliverables}/2026-11-23-a/final.md`
+    const relB = `${RUN_BUNDLE_PATHS.deliverables}/2026-11-23-b/final.md`
+    const relC = `${RUN_BUNDLE_PATHS.deliverables}/2026-11-23-c/final.md`
+    mkdirSync(join(env.workspace, RUN_BUNDLE_PATHS.deliverables, '2026-11-23-c'), { recursive: true })
+    writeFileSync(join(env.workspace, relC), '# final c\n')
+
+    await Promise.all([
+      recordLedger(dStore, { paths: [relA] }),
+      recordLedger(dStore, { paths: [relB] }),
+      auditLedger(env.workspace, dStore, relC, true),
+    ])
+    const dState = dStore.read()
+    expect(dState.status).toBe('ok')
+    if (dState.status === 'ok') {
+      expect(dState.ledger.paths[relA]).toBe(true)
+      expect(dState.ledger.paths[relB]).toBe(true)
+      expect(dState.ledger.paths[relC]).toBe(true)
+    }
+
+    const fCtx = ctxWith(undefined)
+    const fStore = await createPresentedLedgerStore(fCtx.ctx as never, env.home, env.workspace)
+    const fStorePeer = await createPresentedLedgerStore(fCtx.ctx as never, env.home, env.workspace)
+    const writes = await Promise.all([
+      recordLedger(fStore, { paths: [relA] }),
+      recordLedger(fStore, { paths: [relB] }),
+    ])
+    expect(writes.every(w => w.warning === undefined)).toBe(true)
+    const directWrites = await Promise.all([
+      fStore.write({ schema: 1, updatedAt: '2026-11-23T00:00:00.000Z', paths: { [relA]: true, [relB]: true }, slugs: {} }),
+      fStorePeer.write({ schema: 1, updatedAt: '2026-11-23T00:00:00.000Z', paths: { [relA]: true, [relB]: true }, slugs: {} }),
+    ])
+    expect(directWrites.every(w => w.warning === undefined)).toBe(true)
+    const fState = fStore.read()
+    expect(fState.status).toBe('ok')
+    if (fState.status === 'ok') {
+      expect(fState.ledger.paths[relA]).toBe(true)
+      expect(fState.ledger.paths[relB]).toBe(true)
+    }
   })
 })
