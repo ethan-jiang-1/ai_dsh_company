@@ -36,7 +36,7 @@ pnpm exec vitest run tests/client/i18n/cultivation-and-strategy.spec.ts
 
 ## 失败类与同类排查
 
-- **失败类**：`client UI` / `lib` 表达层泄露与边界诊断未消费（[`BUG-302`](../_archive/fixed_bugs/BUG-302-english-ui-chinese-time-and-reason.md)、[`BUG-310`](../_archive/fixed_bugs/BUG-310-deliverables-index-silent-entry-drop.md) 同族）。
+- **失败类**：`client UI` / `lib` 表达层泄露与边界诊断未消费（[`BUG-302`](BUG-302-english-ui-chinese-time-and-reason.md)、[`BUG-310`](BUG-310-deliverables-index-silent-entry-drop.md) 同族）。
 - **同类排查**：`CultivationRecord` 上的其余诊断状态：`bodyTruncated` 已在 `CultivationInbox.tsx:143` 和 `CultivationBoardSections.tsx:165` 接入 `CULTIVATION_COPY`；`brokenRecords` 与 `recordsProblem` 已在 `CultivationInbox.tsx:56-69` 接入 `CULTIVATION_COPY`。唯独 `verificationHistoryProblem` 与 `contextProblem` 遗漏。
 
 ## 修复方案与范围
