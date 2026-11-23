@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-333**（2026-11-23，质量防线批顺位 4 / P2）：团队工具卡依赖行改为语言无关令牌（`ids` 渲染处拼分隔符），en 零汉字/顿号——
+  [333](BUG-333-team-tool-card-deps-chinese-in-en.md)。证据提交 `a02b996a`。
+- **BUG-337**（2026-11-23，质量防线批顺位 4 / P2）：`delegationFlow.missing` 进 zh/en 字典，委派流程缺失标签随语言——
+  [337](BUG-337-delegation-flow-missing-tag-not-localized.md)。证据提交 `e88459fa`。
+
 - **BUG-348**（2026-11-23，质量防线批顺位 3 / P2）：`CultivationChatPanel` 在 catch 与 `create` 之后补 `cancelled` 守卫，卸载后不再清 key 或建孤儿会话——
   [348](BUG-348-cultivation-chat-panel-creates-orphan-session-after-unmount.md)。证据提交 `b28716fc`。
 
