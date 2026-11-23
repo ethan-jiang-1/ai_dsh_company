@@ -15,6 +15,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { NON_ROLE_PRESETS } from '../../lib/delegation/delegation-surface.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
+import { readCompanyFile } from '../run-bundle/company-root.ts'
 
 export const HANDBOOK_SECTION = 'company:handbook'
 /** 注入预算：build gate 核 `content/AGENTS.md` 字节数；运行时超限只告警，不静默截断。 */
@@ -28,17 +29,24 @@ export interface HandbookInjection {
   readonly text: string
   readonly source: string
   readonly bytes: number
+  readonly warning?: string
 }
 
-/** 读手册：workspace override 优先，否则 pack content。 */
+/** 读手册：workspace override 优先（经安全读面拒绝 symlink/目录/越界），否则 pack content。 */
 export function readHandbook(contentDir: string, workspace?: string): HandbookInjection {
-  const override = workspace === undefined
-    ? undefined
-    : join(workspace, RUN_BUNDLE_PATHS.overrides, 'AGENTS.md')
-  const source = override !== undefined && existsSync(override)
-    ? override
-    : join(contentDir, 'AGENTS.md')
-  const raw = existsSync(source) ? readFileSync(source, 'utf8') : ''
+  const defaultSource = join(contentDir, 'AGENTS.md')
+  const overrideRel = `${RUN_BUNDLE_PATHS.overrides}/AGENTS.md`
+  const overrideRead = workspace === undefined ? undefined : readCompanyFile(workspace, overrideRel)
+  const useOverride = overrideRead?.kind === 'text'
+  const source = useOverride && workspace !== undefined
+    ? join(workspace, overrideRel)
+    : defaultSource
+  const raw = useOverride
+    ? overrideRead.text
+    : (existsSync(defaultSource) ? readFileSync(defaultSource, 'utf8') : '')
+  const warning = overrideRead?.kind === 'unsafe'
+    ? `company-pack：忽略不安全的公司手册覆盖 ${overrideRel}（${overrideRead.reason}），回退默认手册`
+    : undefined
   const text = [
     `Company content (read-only): ${contentDir}`,
     `When a role or skill says \`<company-content>/...\`, read that absolute path.`,
@@ -47,7 +55,12 @@ export function readHandbook(contentDir: string, workspace?: string): HandbookIn
     '',
     raw,
   ].join('\n')
-  return { text, source, bytes: Buffer.byteLength(text, 'utf8') }
+  return {
+    text,
+    source,
+    bytes: Buffer.byteLength(text, 'utf8'),
+    ...(warning === undefined ? {} : { warning }),
+  }
 }
 
 /**
@@ -69,6 +82,9 @@ export function registerHandbook(
   options: { readonly skipPresets?: readonly string[] } = {},
 ): void {
   const handbook = readHandbook(contentDir, workspace)
+  if (handbook.warning !== undefined) {
+    ctx.logger?.warn?.(handbook.warning)
+  }
   if (handbook.bytes > HANDBOOK_MAX_BYTES) {
     ctx.logger?.warn?.(`company-pack：公司手册 ${String(handbook.bytes)}B 超过注入预算 ${String(HANDBOOK_MAX_BYTES)}B；`
       + 'handbook-budget 门禁会红；运行时仍注入全文，不静默截断')
