@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-340**（2026-11-24，质量防线批顺位 6 / P2）：静态审计补 `??`/`||` 左枝、`Promise.all` 位次解构、`badRows` 必读、四个新边界类型、`src/host` CJK 棘轮与字典拆分（`cultivation-copy.ts`）——
+  [340](BUG-340-static-audit-r1-r2-bypass-gaps.md)。证据提交 `7c795245`。
+
 - **BUG-338**（2026-11-24，质量防线批顺位 4 / P2）：`/company-settings` 停写/损坏路径、`/deliverables` `/prd` `/req` `/delivery` 命令面与 `/req` `/prd` 校验器错误明细全部随语言；重注册收成 `registerLocalizedCommand`——
   [338](BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md)。证据提交 `fc963758`。
 

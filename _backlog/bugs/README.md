@@ -8,11 +8,10 @@
 
 ## 活跃清单
 
-**活跃 10 张（2026-11-23–24 质量防线审查与构造场景探查新立，只报不修）**：
+**活跃 9 张（2026-11-23–24 质量防线审查与构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
-| [BUG-340](BUG-340-static-audit-r1-r2-bypass-gaps.md) | P2 | checks / tooling | `company-static-audit`（R1/R2）存在 6 条可被代码直接绕过的检查漏洞 | 调查中 |
 | [BUG-351](BUG-351-method-skill-text-unescaped-yaml-description.md) | P1 | lib + host | `methodSkillText` 未对 `expectation` 做 YAML 转义，含 `: ` 等合法期望语句采纳后写坏 `SKILL.md` 被 DSH 静默丢弃 | 调查中 |
 | [BUG-352](BUG-352-session-diagnose-reads-flat-team-member-shape.md) | P2 | tools | `session-diagnose` 按想象扁平形状读 `team/member`，真实队友失败被完全漏报 | 调查中 |
 | [BUG-353](BUG-353-converge-and-journal-audit-broken-on-v3-dot-dsh-company.md) | P1 | tools + checks | `converge.mjs` 与 `journal-audit.mjs` 仍硬编码 v3 之前的扁平工作区路径，v3 公司盘全量失效 | 调查中 |
@@ -54,7 +53,7 @@
 | **3 Client 生命周期与边界** | [348](../_archive/fixed_bugs/BUG-348-cultivation-chat-panel-creates-orphan-session-after-unmount.md)（已修 `b28716fc`），[350](../_archive/fixed_bugs/BUG-350-cultivation-compose-stale-target-role-across-session-switch.md)（已修 `b46caa24`），[335](../_archive/fixed_bugs/BUG-335-cultivation-invalid-decided-at-nan.md)（已修 `51e38f8b`） | 各自独立；`335` 紧邻 `334` 同改培养看板与 `timeParts` | 异步恢复 `cancelled` 守卫 / 会话+视角 `key` / `Number.isFinite` 回退（各自 `commit <sha>`） | 3 |
 | **4 表达层双语闭环** | [333](../_archive/fixed_bugs/BUG-333-team-tool-card-deps-chinese-in-en.md)（已修 `a02b996a`） + [334](../_archive/fixed_bugs/BUG-334-cultivation-record-problems-i18n-and-unrendered-context.md)（已修 `dd019422`） + [336](../_archive/fixed_bugs/BUG-336-presence-message-activity-chinese-in-en.md)（已修 `d3386c23`） + [337](../_archive/fixed_bugs/BUG-337-delegation-flow-missing-tag-not-localized.md)（已修 `e88459fa`），[338](../_archive/fixed_bugs/BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md)（已修 `fc963758`） | `client`/`lib`/`host` 字典与结构化 token 缺口（须先清存量再收紧顺位 6 R2） | 补齐 token/字典与 `contextProblem` 渲染；其余 host 命令接 `CompanyLanguageState` + `blockedCompanyTextPair`（记入批次伞形 Note） | 4 |
 | **5 读模型契约与 TS/JS 单源** | [347](../_archive/fixed_bugs/BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md)（已修 `2eeee377`），[339](../_archive/fixed_bugs/BUG-339-parsers-edge-malformed-inputs-silent-fold.md)（已修 `f3c4f821`） | `tools` 未对齐 `BUG-232` 空 `slug:` 判据；四大解析器边缘坏形状静默吞错 | 对齐 `deliverableSlug` + 收紧 4 处边界校验并扩入 `parsers-fuzz`（记入批次伞形 Note） | 5 |
-| **6 静态防线加固** | [340](BUG-340-static-audit-r1-r2-bypass-gaps.md) | `company-static-audit` R1/R2 6 条可绕过缝隙 | 修左枝/解构/全字段/新边界类型 + 收窄 `cultivation-actions.ts` + 纳管 `src/host/**`（记入批次伞形 Note + 独立只读盲审） | 6 |
+| **6 静态防线加固** | [340](../_archive/fixed_bugs/BUG-340-static-audit-r1-r2-bypass-gaps.md)（已修 `7c795245`） | `company-static-audit` R1/R2 6 条可绕过缝隙 | 修左枝/解构/全字段/新边界类型 + 收窄 `cultivation-actions.ts` + 纳管 `src/host/**`（记入批次伞形 Note + 独立只读盲审） | 6 |
 
 **终点**：18 张卡全部带红/绿真证据迁入 `fixed_bugs/`，1 篇批次伞形 Note（含 P5 盲审），`verify` / `test` / `typecheck` / `lint` / `dup` / `coverage:ratchet` 与 client 双语/挂载冒烟全绿并 `push`。
 

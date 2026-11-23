@@ -1,18 +1,18 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-23
 ---
 
 # BUG-340：`company-static-audit`（R1/R2）存在 6 条可被代码直接绕过的静态检查漏洞
 
-> 严重级别：P2（质量防线本身存在可绕过缝隙，导致同族回归仍可 0 违规滑过 `pnpm lint`）｜发现：2026-11-23｜状态：调查中
+> 严重级别：P2（质量防线本身存在可绕过缝隙，导致同族回归仍可 0 违规滑过 `pnpm lint`）｜发现：2026-11-23｜状态：已修｜审查：agent + 独立只读盲审 — 六条负控可复现，盲审见批次伞形 Note
 >
-> **留痕**：（待修复时裁决；触及 `checks/lib/company-static-audit.mjs` 静态审计判据与负控测试）
+> **留痕**：Note [2026-11-23-quality-defenses-bugfix-batch](../../../notes/implemented/2026-11-23-quality-defenses-bugfix-batch.md)（材料性：审计判据 + 字典拆分）
 
 ## 症状
 
-对 [`checks/lib/company-static-audit.mjs`](../../checks/lib/company-static-audit.mjs) 构造虚拟 TS 程序实测，以下 6 种明显违反 R1（边界消费）与 R2（双语字面量）规则的写法全部返回 `0 violations`：
+对 [`checks/lib/company-static-audit.mjs`](../../../checks/lib/company-static-audit.mjs) 构造虚拟 TS 程序实测，以下 6 种明显违反 R1（边界消费）与 R2（双语字面量）规则的写法全部返回 `0 violations`：
 
 1. **R1 `??`/`||` 左枝漏查**：`const { entries } = parseCatalog() ?? fallback` → `0 violations`；
 2. **R1 `Promise.all` / 数组解构漏查**：`const [a] = await Promise.all([readWorkspace()]); return a.ok ? a.text : ''` → `0 violations`；
@@ -23,7 +23,7 @@ opened: 2026-11-23
 
 ## 运行面
 
-- **面 = checks / tooling**：[`checks/lib/company-static-audit.mjs`](../../checks/lib/company-static-audit.mjs)、[`tests/tools/company-static-audit.spec.ts`](../../tests/tools/company-static-audit.spec.ts)。
+- **面 = checks / tooling**：[`checks/lib/company-static-audit.mjs`](../../../checks/lib/company-static-audit.mjs)、[`tests/tools/company-static-audit.spec.ts`](../../../tests/tools/company-static-audit.spec.ts)。
 
 ## 复现
 
@@ -44,14 +44,14 @@ console.log('violations:', runStaticAudit(ROOT, { programs: [p] }).violations.le
 
 ## 根因与证据
 
-1. [`unwrapBoundaryWrapper`](../../checks/lib/company-static-audit.mjs#L291) 只在 `p.right === valueExpr` 时解包 `??`/`||`，忽略了更常见的左枝默认兜底 `call() ?? fallback`。
-2. [`checkCallBoundaryUse`](../../checks/lib/company-static-audit.mjs#L373) 在 `varDecl.name` 不是 `Identifier` 时直接 `return`，未追踪 `ArrayBindingPattern` / `Promise.all([...])` 元素绑定。
-3. [`BOUNDARY_SPECS`](../../checks/lib/company-static-audit.mjs#L46-L73) 仅列 5 种类型，且 [`L359,377`](../../checks/lib/company-static-audit.mjs#L359) 用 `boundaryProps.some(...)` 允许 `MotionLedger` 丢弃 `badRows`。
-4. [`checkCjkInFile`](../../checks/lib/company-static-audit.mjs#L401-L403) 只扫 `client/` 与 `lib/`，不扫 `host/`；[`CLIENT_DICT_FILES`](../../checks/lib/company-static-audit.mjs#L21-L25) 整文件豁免混合了逻辑代码的 `cultivation-actions.ts`。
+1. [`unwrapBoundaryWrapper`](../../../checks/lib/company-static-audit.mjs#L291) 只在 `p.right === valueExpr` 时解包 `??`/`||`，忽略了更常见的左枝默认兜底 `call() ?? fallback`。
+2. [`checkCallBoundaryUse`](../../../checks/lib/company-static-audit.mjs#L373) 在 `varDecl.name` 不是 `Identifier` 时直接 `return`，未追踪 `ArrayBindingPattern` / `Promise.all([...])` 元素绑定。
+3. [`BOUNDARY_SPECS`](../../../checks/lib/company-static-audit.mjs#L46-L73) 仅列 5 种类型，且 [`L359,377`](../../../checks/lib/company-static-audit.mjs#L359) 用 `boundaryProps.some(...)` 允许 `MotionLedger` 丢弃 `badRows`。
+4. [`checkCjkInFile`](../../../checks/lib/company-static-audit.mjs#L401-L403) 只扫 `client/` 与 `lib/`，不扫 `host/`；[`CLIENT_DICT_FILES`](../../../checks/lib/company-static-audit.mjs#L21-L25) 整文件豁免混合了逻辑代码的 `cultivation-actions.ts`。
 
 ## 失败类与同类排查
 
-- **失败类**：`tooling` / 门禁空洞（与 [`BUG-296`](../_archive/fixed_bugs/BUG-296-real-page-lanes-stale-client-bundle.md) 同属检查器本身漏网）。
+- **失败类**：`tooling` / 门禁空洞（与 [`BUG-296`](BUG-296-real-page-lanes-stale-client-bundle.md) 同属检查器本身漏网）。
 - **同类排查**：对照 `tests/tools/company-static-audit.spec.ts` 现有 9 条用例，全集中于右枝/`useMemo`/顶层变量/`client`+`lib`；需补 6 条负例与正向零误报验证。
 
 ## 修复方案与范围
@@ -68,3 +68,10 @@ console.log('violations:', runStaticAudit(ROOT, { programs: [p] }).violations.le
 
 - 上述 6 条绕过构造场景在 `tests/tools/company-static-audit.spec.ts` 均触发 `FAIL [R1:must-use-boundary]` 或 `FAIL [R2:no-literal-cjk-or-punct]`；
 - 修复存量违例/建立清晰基线后，实仓 `pnpm lint` 与 `pnpm test` 全绿。
+
+## 修复证据
+
+- 改动面：`checks/lib/company-static-audit.mjs`、`tests/tools/company-static-audit.spec.ts`、`packages/company-pack/src/client/cultivation/cultivation-copy.ts`、`packages/company-pack/src/client/cultivation/cultivation-actions.ts`、`packages/company-pack/src/client/cultivation/CultivationCompose.tsx`、`packages/company-pack/src/client/cultivation/CultivationContextPicker.tsx`、`tests/client/cultivation/cultivation-copy.spec.ts`
+- 红：`pnpm test tests/tools/company-static-audit.spec.ts` —— 六条负控注入后（左枝/Promise.all/只读 headerOk/新边界/host 中文/actions 中文）对应断言红；还原实现前 4 failed
+- 绿：`pnpm test tests/tools/company-static-audit.spec.ts` —— 13/13 passed（六条负控全红 + 正例零误报）；`pnpm test` 2684/2684、`pnpm lint`、`coverage-ratchet` PASS
+- 提交：commit 7c795245

@@ -1,3 +1,4 @@
+// 负例留证 2026-11-24：把字典拆回去/删掉 sweep ⇒ 本 spec 的条目可执行与覆盖率用例红。BUG-340
 /** 培养文案表：按视图语言切换；zh 是缺省，en 不混中文。 */
 import { afterEach, describe, expect, it } from 'vitest'
 import {
