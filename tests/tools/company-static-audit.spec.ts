@@ -31,6 +31,14 @@ export async function remoteRead(): Promise<{ readonly ok: true; readonly value:
 export function readApprovals(): PendingApprovals { return { items: [], capped: 0 } }
 export function takeBounded<T>(items: readonly T[]): Bounded<T> { return { items, total: items.length, capped: 0, truncated: false } }
 export function readLedger(): MotionLedger { return { rows: [], badRows: [], headerOk: true } }
+export interface PendingAcrossSessions { readonly items: readonly string[]; readonly asksCapped: number; readonly scanned: number; readonly failed: number; readonly window: 'none' | 'some' }
+export type HistoryCandidates = { readonly ok: true; readonly ids: readonly string[]; readonly total: number; readonly capped: number } | { readonly ok: false; readonly reason: 'workspace-unknown' }
+export type ContextSourceResult = { readonly ok: true; readonly value: readonly string[]; readonly skipped?: number; readonly capped?: number } | { readonly ok: false; readonly problem: string }
+export interface CultivationPanelData { readonly journalRows: readonly string[] | null; readonly records: readonly string[] | null; readonly recordsProblem: string | null; readonly brokenRecords: readonly string[]; readonly unexpandedRecords: number; readonly refresh: () => void }
+export function readAcross(): PendingAcrossSessions { return { items: [], asksCapped: 0, scanned: 0, failed: 0, window: 'none' } }
+export function pickCandidates(): HistoryCandidates { return { ok: true, ids: [], total: 0, capped: 0 } }
+export function listContext(): ContextSourceResult { return { ok: true, value: [], skipped: 0, capped: 0 } }
+export function readPanel(): CultivationPanelData { return { journalRows: null, records: null, recordsProblem: null, brokenRecords: [], unexpandedRecords: 0, refresh: () => {} } }
 `
 
 function runVirtual(relPath: string, code: string) {
@@ -188,5 +196,63 @@ describe('R2 no-literal-cjk-or-punct · R3 no-type-escape · R4 hygiene', () => 
     expect(report.metrics.jsxDefaultValue).toBe(1)
     expect(report.metrics.failOpenUndefined).toBe(1)
     expect(formatStaticAuditReport(report)).toContain('FAIL [R3:no-type-escape]')
+  })
+})
+
+// 负例留证 2026-11-24：删掉左枝解包 / Promise.all 绑定 / requireAllBoundaryProps / host 扫描 / 字典拆分任一项 ⇒ 对应用例红。BUG-340
+describe('BUG-340 · 六条绕过缝隙的负控', () => {
+  it('?? 左枝默认兜底、Promise.all 数组解构、MotionLedger 只读 headerOk 都被 R1 拦住', () => {
+    const report = runVirtual('packages/company-pack/src/client/bad-bypass.ts', `
+      import { parseCatalog, readWorkspace, readLedger } from './virtual-types.js'
+      export async function leftDefault() {
+        const { entries } = parseCatalog() ?? { schema: 1 as const, entries: [], skipped: 0 }
+        return entries
+      }
+      export async function viaPromiseAll() {
+        const [a] = await Promise.all([readWorkspace()])
+        return a.ok ? a.text : ''
+      }
+      export function partialLedger() {
+        const { rows, headerOk } = readLedger()
+        return { rows, headerOk }
+      }
+    `)
+    const r1 = report.violations.filter(v => v.rule === 'R1:must-use-boundary')
+    expect(r1.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('新纳管的边界类型（跨会话/候选/背景源/培养面板）丢边界字段都拦住', () => {
+    const report = runVirtual('packages/company-pack/src/client/bad-new-boundaries.ts', `
+      import { readAcross, pickCandidates, listContext, readPanel } from './virtual-types.js'
+      export function across() { const p = readAcross(); return p.items }
+      export function candidates() { const h = pickCandidates(); if (!h.ok) return []; return h.ids }
+      export function context() { const c = listContext(); return c.ok ? c.value : [] }
+      export function panel() { const d = readPanel(); return d.records }
+    `)
+    const r1 = report.violations.filter(v => v.rule === 'R1:must-use-boundary')
+    expect(r1.length).toBeGreaterThanOrEqual(4)
+  })
+
+  it('src/host 新增文件写死中文被 R2 拦住；已有基线文件不误报', () => {
+    const hostBad = runVirtual('packages/company-pack/src/host/commands/new-leak.ts', `
+      export const message = 'host 新写死的中文回执'
+    `)
+    expect(hostBad.violations.map(v => v.rule)).toContain('R2:no-literal-cjk-or-punct')
+
+    const hostBaseline = runVirtual('packages/company-pack/src/host/commands/blocked-text.ts', `
+      export const message = '公司数据已停写（原因：运行前提未满足）；先处理该原因再设置。'
+    `)
+    expect(hostBaseline.violations).toEqual([])
+  })
+
+  it('cultivation-actions 逻辑区不再整文件豁免；字典文件仍是白名单', () => {
+    const logic = runVirtual('packages/company-pack/src/client/cultivation/cultivation-actions.ts', `
+      export const bad = '逻辑区写死的中文'
+    `)
+    expect(logic.violations.map(v => v.rule)).toContain('R2:no-literal-cjk-or-punct')
+    const dict = runVirtual('packages/company-pack/src/client/cultivation/cultivation-copy.ts', `
+      export const zh = { title: '字典里的中文标题' }
+    `)
+    expect(dict.violations).toEqual([])
   })
 })

@@ -2,13 +2,13 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 356；已分配 BUG-001..355。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 360；已分配 BUG-001..359。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 6 张（2026-11-23–24 质量防线审查与构造场景探查新立）**：
+**活跃 10 张（2026-11-23–24 质量防线审查与构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
@@ -18,6 +18,10 @@
 | [BUG-353](BUG-353-converge-and-journal-audit-broken-on-v3-dot-dsh-company.md) | P1 | tools + checks | `converge.mjs` 与 `journal-audit.mjs` 仍硬编码 v3 之前的扁平工作区路径，v3 公司盘全量失效 | 调查中 |
 | [BUG-354](BUG-354-presence-activity-unassigned-owner-leaks-chinese-in-en.md) | P2 | lib + client | `presence` 读模型在无负责人的任务变更中硬编码中文 `'未分配'`，英文界面泄漏未翻译词 | 调查中 |
 | [BUG-355](BUG-355-cultivation-data-stale-feedback-abort-problem-and-load-race.md) | P2 | client UI | `useCultivationFeedback` 切换会话保留旧赞踩，`useCultivationPanelData` 中止报错且并发 `load` 缺代次守卫 | 调查中 |
+| [BUG-356](BUG-356-motion-ledger-escaped-pipe-row-dropped.md) | P2 | lib + tools | `parseMotionLedger` 裸 `\|` 拆行，正确转义的 `\|` 让整行动议变坏行并从台账面板消失 | 调查中 |
+| [BUG-357](BUG-357-presented-slug-carryover-broken-by-custom-meta-slug.md) | P2 | host | `presented=true` 的 slug 延续写目录名 slug、查 `meta` 的 `slug:`，自定义 slug 成品归档后端变「未核」 | 调查中 |
+| [BUG-358](BUG-358-board-unassigned-label-chinese-in-en-and-missing-role-label.md) | P2 | lib + client | 任务看板把 `lib` 的中文 `'未分配'` 直出 `en` 界面，且 `BoardTab` 漏接 `roleLabel` | 调查中 |
+| [BUG-359](BUG-359-attention-same-millisecond-stream-items-collapse.md) | P2 | lib + client | `mergeAttention` 用毫秒时间当无 id 条目身份，同毫秒两条升级/完成互相吞掉 | 调查中 |
 
 **2026-11-23 E2E 第六轮（目标 8–10，只立卡不修）**：316–324 由并行修复进程收掉后，本轮从「319 的问询历史身份」「320 的当前/历史 cap 分流」「316 的注册元数据」「en 列表分隔符」四个接缝切，立 325–332 八张，均 `status: 调查中`。根因：同一实体两套身份（325）、边界状态只接一条消费路径（327/328）、数据类别扩了文案/字段没跟（330/331）、保守窗口覆盖明确完整信号（332）。不碰修复进程代码，也不在同一 diff 修产品。
 

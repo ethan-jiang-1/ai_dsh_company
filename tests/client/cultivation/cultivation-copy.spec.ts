@@ -11,6 +11,11 @@ import { cultivationTimeLabel } from '../../../packages/company-pack/src/client/
 import { decidedTime } from '../../../packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx'
 import { timeParts } from '../../../packages/company-pack/src/lib/cultivation/cultivation-record.ts'
 import { assertEnglishUiClean } from '../../support/i18n-assertions.ts'
+import {
+  cultivationListSeparator as listSepFromCopy,
+  cultivationTimeLabel as timeLabelFromCopy,
+  CULTIVATION_COPY_ZH_FOR_TEST,
+} from '../../../packages/company-pack/src/client/cultivation/cultivation-copy.ts'
 
 afterEach(() => { setCultivationLanguage('zh') })
 
@@ -69,5 +74,41 @@ describe('非法 decidedAt 的时间渲染（BUG-335）', () => {
     expect(cultivationTimeLabel(timeParts(Number.NaN, Date.now()))).not.toContain('NaN')
     setCultivationLanguage('en')
     expect(cultivationTimeLabel(timeParts(Number.NaN, Date.now()))).toBe('unknown time')
+  })
+})
+
+// 覆盖 cultivation-copy 独立文件的六档时间与两种分隔符（BUG-340 拆文件后的下限）。
+describe('cultivation-copy 独立字典面（BUG-340）', () => {
+  it('六档时间片段 + 两种分隔符随语言', () => {
+    setCultivationLanguage('zh')
+    expect(listSepFromCopy()).toBe('、')
+    expect(timeLabelFromCopy({ kind: 'just-now' })).toBe(CULTIVATION_COPY.timeJustNow)
+    expect(timeLabelFromCopy({ kind: 'minutes', n: 5 })).toContain('5')
+    expect(timeLabelFromCopy({ kind: 'hours', n: 2 })).toContain('2')
+    expect(timeLabelFromCopy({ kind: 'yesterday', hhmm: '08:00' })).toContain('08:00')
+    expect(timeLabelFromCopy({ kind: 'date', text: '11-23 08:00' })).toContain('11-23')
+    expect(timeLabelFromCopy({ kind: 'invalid' })).toBe(CULTIVATION_COPY.timeInvalid)
+    setCultivationLanguage('en')
+    expect(listSepFromCopy()).toBe(', ')
+    expect(timeLabelFromCopy({ kind: 'minutes', n: 5 })).toContain('5')
+    assertEnglishUiClean(timeLabelFromCopy({ kind: 'yesterday', hhmm: '08:00' }), 'time yesterday en')
+    setCultivationLanguage('zh')
+  })
+})
+
+// 字典条目全部可执行：函数项用占位参数调一次，保证没有死文案/抛错分支（也是文件覆盖率下限的来源）。
+describe('cultivation-copy 条目可执行（BUG-340）', () => {
+  it('每个函数项都能被调用并返回非空字符串', () => {
+    for (const [key, value] of Object.entries(CULTIVATION_COPY_ZH_FOR_TEST)) {
+      if (typeof value !== 'function') continue
+      let result: unknown
+      try {
+        result = (value as (...args: unknown[]) => unknown)(...Array.from({ length: Math.max(0, value.length) }, () => '占位'))
+      } catch (error) {
+        throw new Error(`copy.${key} 调用抛错：${String(error)}`)
+      }
+      expect(typeof result, `copy.${key}`).toBe('string')
+      expect((result as string).length, `copy.${key}`).toBeGreaterThan(0)
+    }
   })
 })

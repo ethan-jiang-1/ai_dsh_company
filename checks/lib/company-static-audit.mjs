@@ -20,7 +20,7 @@ import ts from 'typescript'
 
 const CLIENT_DICT_FILES = new Set([
   'packages/company-pack/src/client/locales.ts',
-  'packages/company-pack/src/client/cultivation/cultivation-actions.ts',
+  'packages/company-pack/src/client/cultivation/cultivation-copy.ts',
   'packages/company-pack/src/client/ui/list-separator.ts',
 ])
 
@@ -70,8 +70,77 @@ const BOUNDARY_SPECS = [
     name: 'MotionLedger',
     dataProps: ['rows'],
     boundaryProps: ['badRows', 'headerOk'],
+    // BUG-340：只读 headerOk 而丢 badRows = 静默少报坏行，故 badRows 必读（headerOk 仍算边界）。
+    requiredBoundaryProps: ['badRows'],
+  },
+  {
+    // BUG-340：跨会话重建结果（BUG-304/305/318/323）过去不在纳管面。
+    name: 'PendingAcrossSessions',
+    dataProps: ['items'],
+    boundaryProps: ['asksCapped', 'failed', 'window'],
+    requireAllBoundaryProps: true,
+  },
+  {
+    name: 'HistoryCandidates',
+    dataProps: ['ids'],
+    boundaryProps: ['capped', 'total'],
+    requireAllBoundaryProps: true,
+  },
+  {
+    name: 'ContextSourceResult',
+    dataProps: ['value'],
+    boundaryProps: ['skipped', 'capped'],
+    requireAllBoundaryProps: true,
+  },
+  {
+    name: 'CultivationPanelData',
+    dataProps: ['journalRows', 'records'],
+    boundaryProps: ['recordsProblem', 'brokenRecords', 'unexpandedRecords'],
+    requireAllBoundaryProps: true,
   },
 ]
+
+/**
+ * `src/host/**` 的 CJK 基线（BUG-340）：host 命令/日志面向用户时也该随语言，但存量很大。
+ * 先按文件棘轮上线（新文件 = 0），确认真实面零误报后再逐文件收紧/阻断。
+ */
+export const HOST_CJK_RATCHET = new Map([
+  ['packages/company-pack/src/host/commands/blocked-text.ts', 5],
+  ['packages/company-pack/src/host/commands/client-diagnostics.ts', 10],
+  ['packages/company-pack/src/host/commands/deliverable-path.ts', 7],
+  ['packages/company-pack/src/host/commands/deliverables-command.ts', 12],
+  ['packages/company-pack/src/host/commands/delivery-command.ts', 33],
+  ['packages/company-pack/src/host/commands/prd-command.ts', 14],
+  ['packages/company-pack/src/host/commands/prd-gate.ts', 28],
+  ['packages/company-pack/src/host/commands/req-command.ts', 52],
+  ['packages/company-pack/src/host/commands/settings-command.ts', 31],
+  ['packages/company-pack/src/host/commands/signoff-tool.ts', 3],
+  ['packages/company-pack/src/host/cultivation/cultivation-context-read.ts', 21],
+  ['packages/company-pack/src/host/cultivation/cultivation-storage.ts', 13],
+  ['packages/company-pack/src/host/cultivation/cultivation.ts', 211],
+  ['packages/company-pack/src/host/cultivation/revoke-journal.ts', 10],
+  ['packages/company-pack/src/host/delegation/subagent-retry.ts', 11],
+  ['packages/company-pack/src/host/language/company-language.ts', 7],
+  ['packages/company-pack/src/host/ledger/catalog-state.ts', 8],
+  ['packages/company-pack/src/host/ledger/catalog.ts', 28],
+  ['packages/company-pack/src/host/ledger/governance-export.ts', 6],
+  ['packages/company-pack/src/host/ledger/presented-domain.ts', 22],
+  ['packages/company-pack/src/host/ledger/presented-ledger.ts', 29],
+  ['packages/company-pack/src/host/prompt/contracts.ts', 1],
+  ['packages/company-pack/src/host/prompt/delegation-contracts.ts', 1],
+  ['packages/company-pack/src/host/prompt/handbook.ts', 7],
+  ['packages/company-pack/src/host/prompt/language-policy.ts', 6],
+  ['packages/company-pack/src/host/run-bundle/bootstrap.ts', 62],
+  ['packages/company-pack/src/host/run-bundle/bundle-manifest.ts', 24],
+  ['packages/company-pack/src/host/run-bundle/company-root.ts', 43],
+  ['packages/company-pack/src/host/run-bundle/config.ts', 4],
+  ['packages/company-pack/src/host/run-bundle/lease.ts', 12],
+  ['packages/company-pack/src/host/run-bundle/runtime-guard.ts', 36],
+  ['packages/company-pack/src/host/run-bundle/write-gate.ts', 1],
+  ['packages/company-pack/src/host/startup/startup-prompt.ts', 20],
+  ['packages/company-pack/src/host/startup/startup-watch.ts', 4],
+  ['packages/company-pack/src/host/workspace/workspace-resolution.ts', 2],
+])
 
 const CJK_RE = /[\u3400-\u9fff\u3001-\u303f\uff00-\uffef]/u
 const CHINESE_JOINER_RE = /^[、；]$/
@@ -289,7 +358,8 @@ function unwrapBoundaryWrapper(callExpr) {
     if (
       ts.isBinaryExpression(p) &&
       (p.operatorToken.kind === ts.SyntaxKind.BarBarToken || p.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken) &&
-      p.right === valueExpr
+      // BUG-340：`call() ?? fallback` 的左枝同样是「消费边界结果」，过去只解右枝。
+      (p.right === valueExpr || p.left === valueExpr)
     ) {
       valueExpr = p
       continue
@@ -318,7 +388,27 @@ function unwrapBoundaryWrapper(callExpr) {
 
 /** R1: Inspect a variable/expression receiving a boundary-bearing call result. */
 function checkCallBoundaryUse(checker, sf, relFile, callExpr, spec, violations) {
-  const valueExpr = unwrapBoundaryWrapper(callExpr)
+  // BUG-340：`const [a] = await Promise.all([readA(), readB()])` 的位置绑定也要追踪。
+  let tracked = callExpr
+  let promiseAllIndex = -1
+  const container = callExpr.parent
+  if (ts.isArrayLiteralExpression(container) && container.elements.includes(callExpr)) {
+    // `Promise.all([...])`：数组字面量的 parent 就是 all(...) 调用，callee 在它上面。
+    const allCall = container.parent
+    if (ts.isCallExpression(allCall) && allCall.arguments.includes(container)) {
+      const callee = allCall.expression
+      if (
+        ts.isPropertyAccessExpression(callee) &&
+        callee.name.text === 'all' &&
+        ts.isIdentifier(callee.expression) &&
+        callee.expression.text === 'Promise'
+      ) {
+        promiseAllIndex = container.elements.indexOf(callExpr)
+        tracked = allCall
+      }
+    }
+  }
+  const valueExpr = unwrapBoundaryWrapper(tracked)
   const parent = valueExpr.parent
   // Case 1: Inline property access: `(parseCatalog(x))?.entries`
   if (ts.isPropertyAccessExpression(parent) && parent.expression === valueExpr) {
@@ -357,7 +447,10 @@ function checkCallBoundaryUse(checker, sf, relFile, callExpr, spec, violations) 
       : false
     if (forwarded) return
     const readsData = spec.dataProps.some(p => accessedProps.has(p))
-    const readsBoundary = spec.boundaryProps.some(p => accessedProps.has(p))
+    const readsBoundary = (spec.requireAllBoundaryProps === true
+      ? spec.boundaryProps.every(p => accessedProps.has(p))
+      : spec.boundaryProps.some(p => accessedProps.has(p)))
+      && (spec.requiredBoundaryProps ?? []).every(p => accessedProps.has(p))
     if (readsData && !readsBoundary) {
       const { line, col } = lineOf(sf, callExpr)
       violations.push({
@@ -371,11 +464,38 @@ function checkCallBoundaryUse(checker, sf, relFile, callExpr, spec, violations) 
     return
   }
 
+  // Case 2b: Array destructuring from Promise.all — track the element at the same position.
+  if (ts.isArrayBindingPattern(varDecl.name) && promiseAllIndex >= 0) {
+    const element = varDecl.name.elements[promiseAllIndex]
+    if (element === undefined || !ts.isIdentifier(element.name)) return
+    const forwardedArray = scanSymbolProps(checker, scope, [element.name], spec, accessedProps)
+    if (forwardedArray) return
+    const readsDataArray = spec.dataProps.some(p => accessedProps.has(p))
+    const readsBoundaryArray = (spec.requireAllBoundaryProps === true
+      ? spec.boundaryProps.every(p => accessedProps.has(p))
+      : spec.boundaryProps.some(p => accessedProps.has(p)))
+      && (spec.requiredBoundaryProps ?? []).every(p => accessedProps.has(p))
+    if (readsDataArray && !readsBoundaryArray) {
+      const { line, col } = lineOf(sf, callExpr)
+      violations.push({
+        rule: 'R1:must-use-boundary',
+        file: relFile,
+        line,
+        col,
+        message: `${spec.name} destructures data from Promise.all without ${spec.boundaryProps.join('/')}`,
+      })
+    }
+    return
+  }
+
   if (!ts.isIdentifier(varDecl.name)) return
   const forwarded = scanSymbolProps(checker, scope, [varDecl.name], spec, accessedProps)
   if (forwarded) return
   const readsData = spec.dataProps.some(p => accessedProps.has(p))
-  const readsBoundary = spec.boundaryProps.some(p => accessedProps.has(p))
+  const readsBoundary = (spec.requireAllBoundaryProps === true
+    ? spec.boundaryProps.every(p => accessedProps.has(p))
+    : spec.boundaryProps.some(p => accessedProps.has(p)))
+    && (spec.requiredBoundaryProps ?? []).every(p => accessedProps.has(p))
   if (readsData && !readsBoundary) {
     const { line, col } = lineOf(sf, callExpr)
     violations.push({
@@ -401,7 +521,8 @@ function isInTypeContext(node) {
 function checkCjkInFile(sf, relFile, violations, libCounts) {
   const isClient = relFile.startsWith('packages/company-pack/src/client/')
   const isLib = relFile.startsWith('packages/company-pack/src/lib/')
-  if (!isClient && !isLib) return
+  const isHost = relFile.startsWith('packages/company-pack/src/host/')
+  if (!isClient && !isLib && !isHost) return
   const isClientDict = CLIENT_DICT_FILES.has(relFile)
 
   let cjkCount = 0
@@ -468,16 +589,16 @@ function checkCjkInFile(sf, relFile, violations, libCounts) {
   }
   ts.forEachChild(sf, visit)
 
-  if (isLib) {
+  if (isLib || isHost) {
     libCounts.set(relFile, cjkCount)
-    const allowed = LIB_CJK_RATCHET.get(relFile) ?? 0
+    const allowed = isHost ? (HOST_CJK_RATCHET.get(relFile) ?? 0) : (LIB_CJK_RATCHET.get(relFile) ?? 0)
     if (cjkCount > allowed) {
       violations.push({
         rule: 'R2:no-literal-cjk-or-punct',
         file: relFile,
         line: 1,
         col: 1,
-        message: `src/lib CJK count ${cjkCount} exceeds ratchet ${allowed} — render user-visible text in client locales`,
+        message: `${isHost ? 'src/host' : 'src/lib'} CJK count ${cjkCount} exceeds ratchet ${allowed} — render user-visible text in client locales`,
       })
     }
   }
