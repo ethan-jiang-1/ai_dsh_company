@@ -1,4 +1,4 @@
-状态：implemented（2026-11-23）；批准：用户 2026-11-23 批准 `BUG-333..350` 批次计划并启动 `/goal` 推进｜上游 = [BUG-338](../../_backlog/_archive/fixed_bugs/BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md)、[BUG-342](../../_backlog/_archive/fixed_bugs/BUG-342-handbook-override-follows-symlinks-and-crashes-on-dir.md)、[BUG-341](../../_backlog/_archive/fixed_bugs/BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md)
+状态：implemented（2026-11-23）；批准：用户 2026-11-23 批准 `BUG-333..350` 批次计划并启动 `/goal` 推进｜上游 = [BUG-340](../../_backlog/_archive/fixed_bugs/BUG-340-static-audit-r1-r2-bypass-gaps.md)、[BUG-338](../../_backlog/_archive/fixed_bugs/BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md)、[BUG-342](../../_backlog/_archive/fixed_bugs/BUG-342-handbook-override-follows-symlinks-and-crashes-on-dir.md)、[BUG-341](../../_backlog/_archive/fixed_bugs/BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md)
 
 # 质量防线审查与探查批次收口（BUG-333..350 伞形记录）
 
@@ -17,6 +17,8 @@
 5. **顺位 5 · 读模型与 TS/JS 同判据（[BUG-347](../../_backlog/_archive/fixed_bugs/BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md) / [BUG-339](../../_backlog/_archive/fixed_bugs/BUG-339-parsers-edge-malformed-inputs-silent-fold.md)）**：
    tools 目录索引抽出 `deliverableSlug`；四类解析器边缘坏形状（版本/标量/空行/生成时间/空 `callId`）改为显式诊断，并扩进 `parsers-fuzz`。
 6. **顺位 2/4 · host 命令面双语（[BUG-338](../../_backlog/_archive/fixed_bugs/BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md)）**：`/company-settings` 停写/损坏路径换 `blockedCompanyTextPair`，`/deliverables` `/prd` `/req` `/delivery` 接入 `CompanyLanguageState`（描述/提示/停写/成功/失败回执；语言切换经共享 `registerLocalizedCommand` 重注册）；`contextSummaryPair` 与 `/cultivation` 对账/撤回回执补齐英文；`/req` `/prd` 校验器的错误明细经 `text`/`tr` 参数贯通后也随语言。
+7. **顺位 6 · 静态防线加固（[BUG-340](../../_backlog/_archive/fixed_bugs/BUG-340-static-audit-r1-r2-bypass-gaps.md)）**：
+   R1 补 `??`/`||` 左枝解包、`Promise.all([...])` 位次解构追踪、`MotionLedger.badRows` 必读，并纳管 `PendingAcrossSessions` / `HistoryCandidates` / `ContextSourceResult` / `CultivationPanelData` 四个边界类型；R2 新增 `HOST_CJK_RATCHET`（`src/host/**` 按文件棘轮，新文件 0 容忍），`cultivation-actions.ts` 的整文件字典豁免改为独立字典件 `cultivation-copy.ts`（逻辑区恢复 R2 严格检查）。顺带修掉审计新发现的 2 处真实边界消费缺口（`CultivationContextPicker` / `CultivationCompose` 丢 `skipped`/`capped`）。
 
 ## 输掉的方案
 

@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 339 |
-| 有具名守卫 | 237 |
+| 已修卡 | 340 |
+| 有具名守卫 | 238 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 69.9% |
+| 覆盖率 | 70.0% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -345,11 +345,12 @@
 | 332 | 2026-11-23 | tests/client/presence/attention-history.spec.ts:85 |
 | 333 | 2026-11-23 | tests/client/ui/team-tool-card.spec.ts:128 |
 | 334 | 2026-11-23 | tests/client/i18n/cultivation-and-strategy.spec.ts:119 |
-| 335 | 2026-11-23 | tests/client/cultivation/cultivation-copy.spec.ts:71；tests/lib/cultivation/cultivation-record-time.spec.ts:44 |
+| 335 | 2026-11-23 | tests/client/cultivation/cultivation-copy.spec.ts:72；tests/lib/cultivation/cultivation-record-time.spec.ts:44 |
 | 336 | 2026-11-23 | tests/client/i18n/presence-budget.spec.ts:79 |
 | 337 | 2026-11-23 | tests/client/tabs/delegation-flow-panel.spec.ts:51 |
 | 338 | 2026-11-23 | tests/host/commands/command-language.spec.ts:30；tests/host/commands/prd-command.spec.ts:222；tests/host/commands/settings-command.spec.ts:261；tests/lib/docs/prd-check.spec.ts:429；tests/lib/docs/requirements-check.spec.ts:353；tests/lib/docs/requirements-check.spec.ts:367 |
 | 339 | 2026-11-23 | tests/lib/shared/parsers-fuzz.property.spec.ts:415 |
+| 340 | 2026-11-23 | tests/client/cultivation/cultivation-copy.spec.ts:82；tests/client/cultivation/cultivation-copy.spec.ts:101；tests/tools/company-static-audit.spec.ts:203 |
 | 341 | 2026-11-23 | tests/client/company-client-composition.spec.ts:144；tests/client/ui/brand.spec.ts:53 |
 | 342 | 2026-11-23 | tests/host/prompt/handbook.spec.ts:45；tests/host/prompt/handbook.spec.ts:153 |
 | 343 | 2026-11-23 | tests/host/commands/req-command.spec.ts:226 |
