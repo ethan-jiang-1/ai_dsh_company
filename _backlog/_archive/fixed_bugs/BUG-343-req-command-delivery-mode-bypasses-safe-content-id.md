@@ -49,4 +49,4 @@ pnpm vitest run tests/host/commands/req-command.spec.ts
 - 改动面：`packages/company-pack/src/host/commands/req-command.ts`、`tests/host/commands/req-command.spec.ts`
 - 红：`pnpm test tests/host/commands/req-command.spec.ts` —— 还原修复前 1 failed / 25 passed（`..`、`.`、`../product-types/business-software`、含斜杠值全被放行）
 - 绿：`pnpm test tests/host/commands/req-command.spec.ts` —— 26/26 passed（四类构造值均返回「未知交付模式」）
-- 提交：commit 751c82d0
+- 提交：commit 2c760f7a
