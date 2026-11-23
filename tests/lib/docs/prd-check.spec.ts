@@ -424,3 +424,13 @@ describe('围栏示例与跨行行内代码（BUG-176/181）', () => {
     expect(result).toMatchObject({ ok: true, reqCount: 1 })
   })
 })
+
+// 负例留证 2026-11-24：不给 validateProductDocs 传 text（错误明细回中文）⇒ 本用例红。BUG-338
+describe('错误明细语言（BUG-338）', () => {
+  it('en：坏 MRD/PRD 的诊断零汉字', () => {
+    const result = validateProductDocs('no json block', 'no slices', { text: (_zh: string, en: string) => en })
+    expect(result.ok).toBe(false)
+    expect(result.errors.length).toBeGreaterThan(0)
+    for (const error of result.errors) expect(error).not.toMatch(/[\u3400-\u9fff]/u)
+  })
+})

@@ -348,3 +348,40 @@ describe('未闭合注释的根因报错（BUG-169）', () => {
     expect(result.errors.join()).not.toContain('缺层 PRD')
   })
 })
+
+// 负例留证 2026-11-24：不给 checkRequirements 传 text（错误明细回中文）⇒ 本用例红。BUG-338
+describe('错误明细语言（BUG-338）', () => {
+  it('en：坏文档的诊断零汉字', () => {
+    const result = checkRequirements({
+      docs: [
+        { rel: 'drafts/prd.md', text: '---\nlayer: PRD\ndefinition: headings\n---\n\n## Slices\n| slice | Goal | Requirements | Exit |\n|---|---|---|---|\n| S1 | x | REQ-001 | y |\n' },
+      ],
+    }, { text: (_zh: string, en: string) => en })
+    expect(result.ok).toBe(false)
+    expect(result.errors.length).toBeGreaterThan(0)
+    for (const error of result.errors) expect(error).not.toMatch(/[\u3400-\u9fff]/u)
+  })
+})
+
+// 覆盖 BUG-338 新增的语言/诊断分支（默认 zh 与 en 两路）。
+describe('诊断分支覆盖（BUG-338）', () => {
+  it('numbering 词表外 / meta 层未知 / json-ledger 缺块都出诊断', () => {
+    const badNumbering = checkRequirements({
+      meta: { rel: 'meta.md', text: 'numbering: bogus\n' },
+      docs: [],
+    })
+    expect(badNumbering.ok).toBe(false)
+    expect(badNumbering.errors.join('\n')).toContain('不在词表')
+
+    const unknownLayer = checkRequirements({
+      meta: { rel: 'meta.md', text: 'numbering: identity\nlayers: MRD,Nope\n' },
+      docs: [],
+    })
+    expect(unknownLayer.errors.join('\n')).toContain('未知层')
+
+    const missingLedger = checkRequirements({
+      docs: [{ rel: 'drafts/mrd.md', text: yaml('MRD', 'json-ledger', 'no block') }],
+    })
+    expect(missingLedger.errors.join('\n')).toContain('没有 json 账本代码块')
+  })
+})

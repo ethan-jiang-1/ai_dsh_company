@@ -219,7 +219,7 @@ describe('registerPrdCommand', () => {
 })
 
 // 负例留证 2026-11-24：给 resolveDeliverablePath 去 text 参数 ⇒ 本用例红（英文分支回到中文）。BUG-338
-describe('deliverable-path 语言分支', () => {
+describe('deliverable-path 语言分支（BUG-338）', () => {
   const text = (zh: string, en: string) => en
   it('en：非法 slug / symlink / 非目录的错误句都是英文', () => {
     const invalid = resolveDeliverablePath('/tmp/none', '../out', text)

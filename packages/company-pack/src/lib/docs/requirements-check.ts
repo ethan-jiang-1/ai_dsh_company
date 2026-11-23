@@ -68,6 +68,8 @@ export interface CheckOptions {
   readonly defaultLayers?: readonly Layer[]
   /** 退役号前缀（产品类型包给；缺省 = 本仓默认）。空数组 = 该产品类型没有退役号概念。 */
   readonly retiredPrefixes?: readonly string[]
+  /** 错误明细的双语选择（host 命令按当前 locale 传；缺省 zh，BUG-338）。 */
+  readonly text?: (zh: string, en: string) => string
 }
 
 export interface Definition {
@@ -243,12 +245,12 @@ interface JsonRequirement {
   readonly acceptance?: unknown
 }
 
-function jsonLedgerDefinitions(rel: string, text: string, layer: Layer, errors: string[]): Definition[] {
+function jsonLedgerDefinitions(rel: string, text: string, layer: Layer, errors: string[], tr: (zh: string, en: string) => string): Definition[] {
   text = normalizeDocument(text)
   // 只认顶层 json 围栏块（与 `/prd check` 同源）：示例围栏不再抢先（BUG-176）。
   const block = scanDocumentDetailed(text).fences.find(fence => /^json\b/i.test(fence.info.trim()))
   if (block === undefined) {
-    errors.push(`${rel} 声明 definition: json-ledger 但没有 json 账本代码块`)
+    errors.push(tr(`${rel} 声明 definition: json-ledger 但没有 json 账本代码块`, `${rel} declares definition: json-ledger but has no JSON ledger block`))
     return []
   }
   const lines = text.split('\n')
@@ -260,7 +262,7 @@ function jsonLedgerDefinitions(rel: string, text: string, layer: Layer, errors: 
   try {
     parsed = JSON.parse(block.content)
   } catch {
-    errors.push(`${rel} 的 json 账本不可解析`)
+    errors.push(tr(`${rel} 的 json 账本不可解析`, `${rel}: the JSON ledger is unparsable`))
     return []
   }
   const definitions: Definition[] = []
@@ -271,7 +273,7 @@ function jsonLedgerDefinitions(rel: string, text: string, layer: Layer, errors: 
       const record = item as { id?: unknown; status?: unknown }
       const id = typeof record.id === 'string' ? record.id : ''
       if (!ID_PATTERN.test(id) || idKind(id) !== 'MR') {
-        errors.push(`${rel} 的机会条目 id 非法：${String(record.id)}`)
+        errors.push(tr(`${rel} 的机会条目 id 非法：${String(record.id)}`, `${rel}: invalid opportunity id ${String(record.id)}`))
         continue
       }
       definitions.push({
@@ -292,7 +294,7 @@ function jsonLedgerDefinitions(rel: string, text: string, layer: Layer, errors: 
     for (const item of requirements) {
       const id = typeof item.id === 'string' ? item.id : ''
       if (!ID_PATTERN.test(id) || idKind(id) !== 'REQ') {
-        errors.push(`${rel} 的需求条目 id 非法：${String(item.id)}`)
+        errors.push(tr(`${rel} 的需求条目 id 非法：${String(item.id)}`, `${rel}: invalid requirement id ${String(item.id)}`))
         continue
       }
       const source = Array.isArray(item.source) ? item.source.filter((value): value is string => typeof value === 'string') : []
@@ -313,7 +315,7 @@ function jsonLedgerDefinitions(rel: string, text: string, layer: Layer, errors: 
         const entry = criterion as { id?: unknown }
         const acId = typeof entry.id === 'string' ? entry.id : ''
         if (!AC_PATTERN.test(acId)) {
-          errors.push(`${rel} 的验收条目 id 非法：${String(entry.id)}`)
+          errors.push(tr(`${rel} 的验收条目 id 非法：${String(entry.id)}`, `${rel}: invalid acceptance id ${String(entry.id)}`))
           continue
         }
         definitions.push({
@@ -415,16 +417,24 @@ export function numberingMarker(meta: string | undefined): NumberingMarker {
 }
 
 /** 声明了但值不在词表时的统一报错句（命令与闸门复用，避免两套文案）。 */
-export function numberingVocabularyError(value: string): string {
-  return `meta 的 \`numbering: ${value}\` 不在词表（只认 ${NUMBERING_VOCABULARY.join('|')}）`
+export function numberingVocabularyError(
+  value: string,
+  text: (zh: string, en: string) => string = zh => zh,
+): string {
+  return text(
+    `meta 的 \`numbering: ${value}\` 不在词表（只认 ${NUMBERING_VOCABULARY.join('|')}）`,
+    `meta \`numbering: ${value}\` is not in the vocabulary (only ${NUMBERING_VOCABULARY.join('|')})`,
+  )
 }
 
-function metaLayers(meta: string | undefined, errors: string[]): { layers: readonly Layer[] | undefined; skipped: boolean; reason: string } {
+function metaLayers(meta: string | undefined, errors: string[], text: (zh: string, en: string) => string): { layers: readonly Layer[] | undefined; skipped: boolean; reason: string } {
   if (meta === undefined) return { layers: undefined, skipped: false, reason: '' }
   const marker = numberingMarker(meta)
-  if (!marker.declared) return { layers: undefined, skipped: true, reason: 'meta 无 `numbering:` 标记——旧动议只读豁免' }
+  if (!marker.declared) {
+    return { layers: undefined, skipped: true, reason: text('meta 无 `numbering:` 标记——旧动议只读豁免', 'meta has no `numbering:` marker — legacy motions are read-only exempt') }
+  }
   if (!marker.valid) {
-    errors.push(numberingVocabularyError(marker.value))
+    errors.push(numberingVocabularyError(marker.value, text))
     return { layers: undefined, skipped: false, reason: '' }
   }
   const declaredLine = metaFieldLines(meta).find(line => /^layers:\s*/.test(line))
@@ -433,7 +443,7 @@ function metaLayers(meta: string | undefined, errors: string[]): { layers: reado
   const layers: Layer[] = []
   for (const item of parseList(declared[1] ?? '')) {
     if (!isLayer(item)) {
-      errors.push(`meta 的 \`需求层\` 含未知层：${item}`)
+      errors.push(text(`meta 的 \`需求层\` 含未知层：${item}`, `meta \`需求层\` contains an unknown layer: ${item}`))
       continue
     }
     if (!layers.includes(item)) layers.push(item)
@@ -445,7 +455,8 @@ function metaLayers(meta: string | undefined, errors: string[]): { layers: reado
 export function checkRequirements(snapshot: MotionSnapshot, options: CheckOptions = {}): RequirementsCheckResult {
   const errors: string[] = []
   const warnings: string[] = []
-  const scope = metaLayers(snapshot.meta?.text, errors)
+  const text = options.text ?? ((zh: string) => zh)
+  const scope = metaLayers(snapshot.meta?.text, errors, text)
   if (scope.skipped) {
     return { ok: true, skipped: true, reason: scope.reason, errors: [], warnings: [], layers: [], index: emptyIndex() }
   }
@@ -459,51 +470,51 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
     const header = parseHeader(doc.text)
     const canonicalLayer = (Object.entries(CANONICAL) as [Layer, string][]).find(([, name]) => doc.rel.endsWith(`/${name}`) || doc.rel === name)?.[0]
     if (header === null) {
-      if (canonicalLayer !== undefined) errors.push(`${doc.rel} 缺 layer/definition 头——机器读不到层与定义形态`)
+      if (canonicalLayer !== undefined) errors.push(text(`${doc.rel} 缺 layer/definition 头——机器读不到层与定义形态`, `${doc.rel} has no layer/definition header — the machine cannot read its layer or definition form`))
       continue
     }
     const layerValue = header.layer ?? ''
     const formValue = header.definition ?? ''
     if (layerValue === '' && formValue === 'none') continue // 附录（allocation）：不立号
     if (layerValue === '') {
-      errors.push(`${doc.rel} 缺 layer（只有 definition: none 的附录可以不声明层）`)
+      errors.push(text(`${doc.rel} 缺 layer（只有 definition: none 的附录可以不声明层）`, `${doc.rel} is missing layer (only appendix documents with definition: none may omit it)`))
       continue
     }
     if (!isLayer(layerValue)) {
-      errors.push(`${doc.rel} 的 layer 非法：${layerValue}`)
+      errors.push(text(`${doc.rel} 的 layer 非法：${layerValue}`, `${doc.rel}: invalid layer ${layerValue}`))
       continue
     }
     const layer = layerValue
     if (!isDefinitionForm(formValue)) {
-      errors.push(`${doc.rel} 的 definition 非法：${formValue === '' ? '（缺失）' : formValue}`)
+      errors.push(text(`${doc.rel} 的 definition 非法：${formValue === '' ? '（缺失）' : formValue}`, `${doc.rel}: invalid definition ${formValue === '' ? '(missing)' : formValue}`))
       continue
     }
     if (formValue !== LAYER_FORMS[layer] && !(LEGACY_LAYER_FORMS[layer] ?? []).includes(formValue)) {
       const legacy = LEGACY_LAYER_FORMS[layer] ?? []
       const suffix = legacy.length === 0 ? '' : `（旧动议兼容 ${legacy.join('/')}）`
-      errors.push(`${doc.rel} 的 definition 与层不匹配：${layer} 应为 ${LAYER_FORMS[layer]}${suffix}，实际 ${formValue}`)
+      errors.push(text(`${doc.rel} 的 definition 与层不匹配：${layer} 应为 ${LAYER_FORMS[layer]}${suffix}，实际 ${formValue}`, `${doc.rel}: definition does not match layer ${layer} (expected ${LAYER_FORMS[layer]}${suffix}, got ${formValue})`))
       continue
     }
     const scan = scanDocumentDetailed(doc.text)
     if (scan.unclosedCommentLine !== undefined) {
-      errors.push(`${doc.rel}：第 ${scan.unclosedCommentLine} 行的 HTML 注释未闭合——后文会被当成注释内容（先补 -->；BUG-169）`)
+      errors.push(text(`${doc.rel}：第 ${scan.unclosedCommentLine} 行的 HTML 注释未闭合——后文会被当成注释内容（先补 -->；BUG-169）`, `${doc.rel}: the HTML comment on line ${String(scan.unclosedCommentLine)} is unclosed — later text is treated as comment content (add --> first; BUG-169)`))
       presentLayers.add(layer)
       continue
     }
     presentLayers.add(layer)
-    if (formValue === 'json-ledger') definitions.push(...jsonLedgerDefinitions(doc.rel, doc.text, layer, errors))
+    if (formValue === 'json-ledger') definitions.push(...jsonLedgerDefinitions(doc.rel, doc.text, layer, errors, text))
     else if (formValue === 'headings') definitions.push(...headingDefinitions(doc.rel, doc.text, layer))
     else if (formValue === 'table-rows') definitions.push(...tableRowDefinitions(doc.rel, doc.text, layer))
     // 退役词 / 区间断言：只扫声明了层的需求文档（评审稿与 final 是引用面）。
     for (const [index, line] of normalizeDocument(doc.text).split('\n').entries()) {
-      for (const match of line.matchAll(retired)) errors.push(`${doc.rel}:${String(index + 1)} 退役词 ${match[0]}`)
-      for (const match of line.matchAll(RANGE_CLAIM)) errors.push(`${doc.rel}:${String(index + 1)} 区间计数断言 ${match[0]}（R8：计数由索引派生）`)
+      for (const match of line.matchAll(retired)) errors.push(text(`${doc.rel}:${String(index + 1)} 退役词 ${match[0]}`, `${doc.rel}:${String(index + 1)} retired word ${match[0]}`))
+      for (const match of line.matchAll(RANGE_CLAIM)) errors.push(text(`${doc.rel}:${String(index + 1)} 区间计数断言 ${match[0]}（R8：计数由索引派生）`, `${doc.rel}:${String(index + 1)} range count claim ${match[0]} (R8: counts are derived from the index)`))
     }
   }
 
   // 期望层到场（meta 声明 / options / 默认）。
   for (const layer of layers) {
-    if (!presentLayers.has(layer)) errors.push(`缺层 ${layer}：没有声明 layer: ${layer} 的文档（layers 声明要求它到场）`)
+    if (!presentLayers.has(layer)) errors.push(text(`缺层 ${layer}：没有声明 layer: ${layer} 的文档（layers 声明要求它到场）`, `Missing layer ${layer}: no document declares layer: ${layer} (the layers declaration requires it)`))
   }
 
   // 重复定义。
@@ -515,7 +526,7 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
   }
   for (const [id, list] of byId) {
     if (list.length < 2) continue
-    errors.push(`重复定义 ${id}：${list.map(item => `${item.rel}:${String(item.line)}`).join(' / ')}（一个号只能有一个定义点）`)
+    errors.push(text(`重复定义 ${id}：${list.map(item => `${item.rel}:${String(item.line)}`).join(' / ')}（一个号只能有一个定义点）`, `Duplicate definition ${id}: ${list.map(item => `${item.rel}:${String(item.line)}`).join(' / ')} (an id may have exactly one definition)`))
   }
 
   // 边的派生：source / traces / covers / AC 父号。
@@ -532,20 +543,20 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
   for (const edge of edges) {
     const targets = byId.get(edge.to)
     if (targets === undefined) {
-      errors.push(`悬空 ${edge.type} ${edge.from} → ${edge.to}（${edge.rel}:${String(edge.line)}）`)
+      errors.push(text(`悬空 ${edge.type} ${edge.from} → ${edge.to}（${edge.rel}:${String(edge.line)}）`, `Dangling ${edge.type} ${edge.from} → ${edge.to} (${edge.rel}:${String(edge.line)})`))
       continue
     }
     const source = byId.get(edge.from)?.[0]
     if (source === undefined) continue
     if (edge.type === 'parent') {
-      if (targets[0]?.kind !== 'REQ') errors.push(`AC 父号类型不符 ${edge.from} → ${edge.to}（父号必须是 REQ）`)
+      if (targets[0]?.kind !== 'REQ') errors.push(text(`AC 父号类型不符 ${edge.from} → ${edge.to}（父号必须是 REQ）`, `AC parent type mismatch ${edge.from} → ${edge.to} (the parent must be a REQ)`))
       continue
     }
     const allowed = source.layer === null ? [] : (UPSTREAM_LAYER[source.layer] ?? [])
     if (allowed.length > 0) {
       const targetLayer = targets[0]?.layer ?? null
       if (targetLayer !== null && !allowed.includes(targetLayer)) {
-        errors.push(`追溯指向了不该指的层 ${edge.from} → ${edge.to}（${source.layer} 的上游只能是 ${allowed.join('/')}）`)
+        errors.push(text(`追溯指向了不该指的层 ${edge.from} → ${edge.to}（${source.layer} 的上游只能是 ${allowed.join('/')}）`, `Trace points at a disallowed layer ${edge.from} → ${edge.to} (upstream of ${source.layer} may only be ${allowed.join('/')})`))
       }
     }
   }
@@ -555,7 +566,7 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
     const upstreamEdges = definition.source.length + definition.traces.length + definition.covers.length
     const needsUpstream = definition.kind !== 'MR' && definition.kind !== 'AC'
     if (needsUpstream && upstreamEdges === 0) {
-      errors.push(`孤儿 ${definition.id}（${definition.rel}:${String(definition.line)}）：没有 source/traces/covers 上游边`)
+      errors.push(text(`孤儿 ${definition.id}（${definition.rel}:${String(definition.line)}）：没有 source/traces/covers 上游边`, `Orphan ${definition.id} (${definition.rel}:${String(definition.line)}): no source/traces/covers upstream edge`))
     }
   }
 
@@ -594,7 +605,7 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
     const downstream = referencedBy.get(definition.id)
     if (downstream === undefined || downstream.size === 0) uncovered.push(definition.id)
   }
-  for (const id of uncovered) errors.push(`未覆盖 ${id}：没有下游条目引用它（覆盖缺口）`)
+  for (const id of uncovered) errors.push(text(`未覆盖 ${id}：没有下游条目引用它（覆盖缺口）`, `Uncovered ${id}: no downstream item references it (coverage gap)`))
 
   const counts: Record<IdKind, number> = { MR: 0, REQ: 0, IF: 0, TC: 0, AC: 0 }
   const matrix: Record<string, string[]> = {}

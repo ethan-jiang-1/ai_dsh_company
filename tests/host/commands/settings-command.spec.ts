@@ -258,7 +258,7 @@ describe('en 命令面（双语单一源）', () => {
 })
 
 // 负例留证 2026-11-24：problemNote 只写中文分支 ⇒ 本用例红（en 的 show 漏出「⚠ startup.json 损坏」）。BUG-338
-describe('/company-settings en 损坏路径', () => {
+describe('/company-settings en 损坏路径（BUG-338）', () => {
   it('en：损坏 startup.json 的 show 回执零中文并给出警告', async () => {
     const language = createCompanyLanguageState('en')
     let definition: Definition | undefined

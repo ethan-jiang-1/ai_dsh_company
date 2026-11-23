@@ -80,7 +80,7 @@ export function registerPrdCommand(ctx: Context, options: PrdCommandOptions): vo
       if (prd === undefined) {
         return { kind: 'error' as const, text: text(`缺 PRD（或不是 company root 内普通文件）：${prdPath}`, `Missing PRD (or it is not a regular file inside the company root): ${prdPath}`) }
       }
-      const result = check(mrd, prd)
+      const result = check(mrd, prd, { text })
       if (!result.ok) {
         return {
           kind: 'error' as const,

@@ -320,12 +320,15 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
           ),
         }
       }
-      const checkOptions = rules === null
-        ? {}
-        : {
-            ...(rules.defaultLayers === undefined ? {} : { defaultLayers: rules.defaultLayers.filter(isLayer) }),
-            ...(rules.retiredPrefixes === undefined ? {} : { retiredPrefixes: rules.retiredPrefixes }),
-          }
+      const checkOptions = {
+        text: tr,
+        ...(rules === null
+          ? {}
+          : {
+              ...(rules.defaultLayers === undefined ? {} : { defaultLayers: rules.defaultLayers.filter(isLayer) }),
+              ...(rules.retiredPrefixes === undefined ? {} : { retiredPrefixes: rules.retiredPrefixes }),
+            }),
+      }
       const result = check({ docs, ...(metaText === undefined ? {} : { meta: { rel: 'meta.md', text: metaText } }) }, checkOptions)
       if (result.skipped) {
         return { kind: 'success' as const, text: tr(`编号校验跳过（${parsed.slug}）：旧动议只读豁免（skipped）——${result.reason}。`, `Numbering check skipped (${parsed.slug}): legacy motion read-only exemption (skipped) — ${result.reason}.`) }

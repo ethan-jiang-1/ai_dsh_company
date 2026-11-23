@@ -27,8 +27,7 @@ const register = (fn: (ctx: Context, options: never) => void, options: Record<st
   return definition as Definition
 }
 
-// 卡未归档前标题不写事故号（guard-red-record 要求已归档卡），归档 BUG-338 时补回。
-describe('host 命令面语言合同', () => {
+describe('host 命令面语言合同（BUG-338）', () => {
   it('en：四条操作员命令的描述/提示/停写回执零中文', async () => {
     const language = createCompanyLanguageState('en')
     const definitions = [

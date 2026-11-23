@@ -110,71 +110,71 @@ export function parsePrdHeader(text: string): { readonly layer?: string; readonl
  * 从 Markdown 中取第一个 ```json 代码块（MRD 的机器可读头；旧 PRD 也走这里）。
  * 先屏蔽 HTML 注释：注释里的账本是「停用」的，不能被当成定义（BUG-173）。
  */
-export function extractJsonBlock(text: string): { readonly ok: true; readonly value: unknown } | { readonly ok: false; readonly error: string } {
+export function extractJsonBlock(text: string, tr: Tr = ZH_ONLY): { readonly ok: true; readonly value: unknown } | { readonly ok: false; readonly error: string } {
   // 只认**顶层**围栏块：示例围栏（markdown 块里嵌 json 块）不会被当成账本（BUG-176）；
   // 注释里的围栏在结构扫描里已经不算围栏，天然被排除。
   const block = scanDocumentDetailed(text).fences.find(fence => /^json\b/i.test(fence.info.trim()))
-  if (block === undefined) return { ok: false, error: '缺 ```json 需求块（模板见 content/templates/mrd.md；PRD 新形状见 prd.md）' }
+  if (block === undefined) return { ok: false, error: tr('缺 ```json 需求块（模板见 content/templates/mrd.md；PRD 新形状见 prd.md）', 'Missing the ```json requirements block (template: content/templates/mrd.md; new PRD shape: prd.md)') }
   try {
     return { ok: true, value: JSON.parse(block.content) as unknown }
   } catch (error) {
-    return { ok: false, error: `json 需求块不可解析：${(error as Error).message}` }
+    return { ok: false, error: tr(`json 需求块不可解析：${(error as Error).message}`, `The JSON requirements block is unparsable: ${(error as Error).message}`) }
   }
 }
 
-function requireArray(value: unknown, where: string, name: string, errors: string[]): void {
-  if (value !== undefined && !Array.isArray(value)) errors.push(`${where}.${name} 必须是数组`)
+function requireArray(value: unknown, where: string, name: string, errors: string[], tr: Tr): void {
+  if (value !== undefined && !Array.isArray(value)) errors.push(tr(`${where}.${name} 必须是数组`, `${where}.${name} must be an array`))
 }
 
-function readEvidence(raw: unknown, where: string, errors: string[]): MrdEvidence[] {
-  requireArray(raw, where, 'evidence', errors)
+function readEvidence(raw: unknown, where: string, errors: string[], tr: Tr): MrdEvidence[] {
+  requireArray(raw, where, 'evidence', errors, tr)
   const out: MrdEvidence[] = []
   for (const [index, item] of asArray(raw).entries()) {
-    if (!isRecord(item)) { errors.push(`${where}.evidence[${index}] 不是对象`); continue }
+    if (!isRecord(item)) { errors.push(tr(`${where}.evidence[${index}] 不是对象`, `${where}.evidence[${index}] is not an object`)); continue }
     const kind = asString(item.kind)
     const source = asString(item.source)
-    if (kind !== 'fact' && kind !== 'assumption') errors.push(`${where}.evidence[${index}].kind 必须是 fact|assumption`)
-    if (source === undefined) errors.push(`${where}.evidence[${index}].source 缺失（每条证据必须带出处或待验证说明）`)
+    if (kind !== 'fact' && kind !== 'assumption') errors.push(tr(`${where}.evidence[${index}].kind 必须是 fact|assumption`, `${where}.evidence[${index}].kind must be fact|assumption`))
+    if (source === undefined) errors.push(tr(`${where}.evidence[${index}].source 缺失（每条证据必须带出处或待验证说明）`, `${where}.evidence[${index}].source is missing (each evidence item needs a citation or a pending-verification note)`))
     if ((kind === 'fact' || kind === 'assumption') && source !== undefined) out.push({ kind, source })
   }
   if (out.length === 0 && errors.every(error => !error.startsWith(`${where}.evidence`))) {
-    errors.push(`${where}.evidence 不能为空（至少一条证据）`)
+    errors.push(tr(`${where}.evidence 不能为空（至少一条证据）`, `${where}.evidence must not be empty (at least one evidence item)`))
   }
   return out
 }
 
-function coerceMrd(root: unknown): { readonly doc?: MrdDoc; readonly errors: string[] } {
+function coerceMrd(root: unknown, tr: Tr = ZH_ONLY): { readonly doc?: MrdDoc; readonly errors: string[] } {
   const errors: string[] = []
-  if (!isRecord(root) || !isRecord(root.mrd)) return { errors: ['MRD 缺顶层 mrd 对象'] }
+  if (!isRecord(root) || !isRecord(root.mrd)) return { errors: [tr('MRD 缺顶层 mrd 对象', 'MRD is missing the top-level mrd object')] }
   const mrd = root.mrd
   const version = asString(mrd.version) ?? '0.1'
   const status = asString(mrd.status) ?? 'draft'
-  requireArray(mrd.opportunities, 'mrd', 'opportunities', errors)
+  requireArray(mrd.opportunities, 'mrd', 'opportunities', errors, tr)
   const opportunities: MrdOpportunity[] = []
   const seen = new Set<string>()
   const raw = asArray(mrd.opportunities)
-  if (raw.length === 0) errors.push('MRD opportunities 不能为空')
+  if (raw.length === 0) errors.push(tr('MRD opportunities 不能为空', 'MRD opportunities must not be empty'))
   for (const [index, item] of raw.entries()) {
     if (!isRecord(item)) { errors.push(`opportunities[${index}] 不是对象`); continue }
     const where = `opportunities[${index}]`
     const id = asString(item.id)
-    if (id === undefined || !/^MR-\d{3}$/.test(id)) errors.push(`${where}.id 必须是 MR-###（如 MR-001）`)
-    else if (seen.has(id)) errors.push(`${where}.id 重号：${id}`)
+    if (id === undefined || !/^MR-\d{3}$/.test(id)) errors.push(tr(`${where}.id 必须是 MR-###（如 MR-001）`, `${where}.id must be MR-### (e.g. MR-001)`))
+    else if (seen.has(id)) errors.push(tr(`${where}.id 重号：${id}`, `${where}.id is duplicated: ${id}`))
     else seen.add(id)
     const title = asString(item.title)
     const segment = asString(item.segment)
     const pain = asString(item.pain)
-    if (title === undefined) errors.push(`${where}.title 缺失`)
-    if (segment === undefined) errors.push(`${where}.segment 缺失`)
-    if (pain === undefined) errors.push(`${where}.pain 缺失`)
-    const evidence = readEvidence(item.evidence, where, errors)
+    if (title === undefined) errors.push(tr(`${where}.title 缺失`, `${where}.title is missing`))
+    if (segment === undefined) errors.push(tr(`${where}.segment 缺失`, `${where}.segment is missing`))
+    if (pain === undefined) errors.push(tr(`${where}.pain 缺失`, `${where}.pain is missing`))
+    const evidence = readEvidence(item.evidence, where, errors, tr)
     const recommendation = asString(item.recommendation)
     if (recommendation !== 'go' && recommendation !== 'no-go' && recommendation !== 'defer') {
-      errors.push(`${where}.recommendation 必须是 go|no-go|defer`)
+      errors.push(tr(`${where}.recommendation 必须是 go|no-go|defer`, `${where}.recommendation must be go|no-go|defer`))
     }
     const confidence = asString(item.confidence)
     if (confidence !== undefined && confidence !== 'high' && confidence !== 'medium' && confidence !== 'low') {
-      errors.push(`${where}.confidence 必须是 high|medium|low`)
+      errors.push(tr(`${where}.confidence 必须是 high|medium|low`, `${where}.confidence must be high|medium|low`))
     }
     if (id !== undefined && title !== undefined && segment !== undefined && pain !== undefined
       && (recommendation === 'go' || recommendation === 'no-go' || recommendation === 'defer')) {
@@ -186,39 +186,39 @@ function coerceMrd(root: unknown): { readonly doc?: MrdDoc; readonly errors: str
 
 // ── 旧形状：json-ledger（只读兼容，2026-11-07 起；新 PRD 不再写）────────────────
 
-function coerceLegacyPrd(root: unknown): { readonly doc?: PrdDoc; readonly errors: string[] } {
+function coerceLegacyPrd(root: unknown, tr: Tr = ZH_ONLY): { readonly doc?: PrdDoc; readonly errors: string[] } {
   const errors: string[] = []
-  if (!isRecord(root) || !isRecord(root.prd)) return { errors: ['PRD 缺顶层 prd 对象'] }
+  if (!isRecord(root) || !isRecord(root.prd)) return { errors: [tr('PRD 缺顶层 prd 对象', 'PRD is missing the top-level prd object')] }
   const prd = root.prd
   const version = asString(prd.version) ?? '0.1'
   const status = asString(prd.status) ?? 'draft'
-  if (!['draft', 'ready', 'in-dev', 'accepted'].includes(status)) errors.push(`prd.status 必须是 draft|ready|in-dev|accepted（实际 ${status}）`)
+  if (!['draft', 'ready', 'in-dev', 'accepted'].includes(status)) errors.push(tr(`prd.status 必须是 draft|ready|in-dev|accepted（实际 ${status}）`, `prd.status must be draft|ready|in-dev|accepted (got ${status})`))
   const slices: PrdSlice[] = []
-  requireArray(prd.slices, 'prd', 'slices', errors)
-  requireArray(prd.requirements, 'prd', 'requirements', errors)
+  requireArray(prd.slices, 'prd', 'slices', errors, tr)
+  requireArray(prd.requirements, 'prd', 'requirements', errors, tr)
   const sliceSeen = new Set<string>()
   for (const [index, item] of asArray(prd.slices).entries()) {
-    if (!isRecord(item)) { errors.push(`slices[${index}] 不是对象`); continue }
+    if (!isRecord(item)) { errors.push(tr(`slices[${index}] 不是对象`, `slices[${index}] is not an object`)); continue }
     const id = asString(item.id)
     const goal = asString(item.goal)
-    if (id === undefined) errors.push(`slices[${index}].id 缺失`)
-    else if (sliceSeen.has(id)) errors.push(`slices[${index}].id 重号：${id}`)
+    if (id === undefined) errors.push(tr(`slices[${index}].id 缺失`, `slices[${index}].id is missing`))
+    else if (sliceSeen.has(id)) errors.push(tr(`slices[${index}].id 重号：${id}`, `slices[${index}].id is duplicated: ${id}`))
     else sliceSeen.add(id)
-    if (goal === undefined) errors.push(`slices[${index}].goal 缺失`)
-    requireArray(item.requirements, `slices[${index}]`, 'requirements', errors)
+    if (goal === undefined) errors.push(tr(`slices[${index}].goal 缺失`, `slices[${index}].goal is missing`))
+    requireArray(item.requirements, `slices[${index}]`, 'requirements', errors, tr)
     const requirements = asArray(item.requirements).map(value => asString(value)).filter((value): value is string => value !== undefined)
-    if (requirements.length === 0) errors.push(`slices[${index}].requirements 不能为空`)
+    if (requirements.length === 0) errors.push(tr(`slices[${index}].requirements 不能为空`, `slices[${index}].requirements must not be empty`))
     if (id !== undefined && goal !== undefined && requirements.length > 0) slices.push({ id, goal, requirements })
   }
-  if (slices.length === 0) errors.push('PRD 至少要有 1 个 slice（先给最小端到端 S1）')
+  if (slices.length === 0) errors.push(tr('PRD 至少要有 1 个 slice（先给最小端到端 S1）', 'PRD needs at least one slice (start with a minimal end-to-end S1)'))
   const requirements: PrdRequirement[] = []
   const reqSeen = new Set<string>()
   for (const [index, item] of asArray(prd.requirements).entries()) {
-    if (!isRecord(item)) { errors.push(`requirements[${index}] 不是对象`); continue }
+    if (!isRecord(item)) { errors.push(tr(`requirements[${index}] 不是对象`, `requirements[${index}] is not an object`)); continue }
     const where = `requirements[${index}]`
     const id = asString(item.id)
-    if (id === undefined || !/^REQ-\d{3}$/.test(id)) errors.push(`${where}.id 必须是 REQ-###（如 REQ-001）`)
-    else if (reqSeen.has(id)) errors.push(`${where}.id 重号：${id}`)
+    if (id === undefined || !/^REQ-\d{3}$/.test(id)) errors.push(tr(`${where}.id 必须是 REQ-###（如 REQ-001）`, `${where}.id must be REQ-### (e.g. REQ-001)`))
+    else if (reqSeen.has(id)) errors.push(tr(`${where}.id 重号：${id}`, `${where}.id is duplicated: ${id}`))
     else reqSeen.add(id)
     const title = asString(item.title)
     const userStory = asString(item.userStory)
@@ -228,52 +228,52 @@ function coerceLegacyPrd(root: unknown): { readonly doc?: PrdDoc; readonly error
     const statusValue = asString(item.status)
     const verification = asString(item.verification)
     if (title === undefined) errors.push(`${where}.title 缺失`)
-    if (userStory === undefined) errors.push(`${where}.userStory 缺失`)
-    if (slice === undefined) errors.push(`${where}.slice 缺失`)
-    if (type !== 'functional' && type !== 'non-functional' && type !== 'constraint') errors.push(`${where}.type 必须是 functional|non-functional|constraint`)
-    if (priority !== 'P0' && priority !== 'P1' && priority !== 'P2') errors.push(`${where}.priority 必须是 P0|P1|P2`)
+    if (userStory === undefined) errors.push(tr(`${where}.userStory 缺失`, `${where}.userStory is missing`))
+    if (slice === undefined) errors.push(tr(`${where}.slice 缺失`, `${where}.slice is missing`))
+    if (type !== 'functional' && type !== 'non-functional' && type !== 'constraint') errors.push(tr(`${where}.type 必须是 functional|non-functional|constraint`, `${where}.type must be functional|non-functional|constraint`))
+    if (priority !== 'P0' && priority !== 'P1' && priority !== 'P2') errors.push(tr(`${where}.priority 必须是 P0|P1|P2`, `${where}.priority must be P0|P1|P2`))
     if (statusValue !== 'draft' && statusValue !== 'ready' && statusValue !== 'in-dev' && statusValue !== 'accepted' && statusValue !== 'deferred' && statusValue !== 'withdrawn') {
-      errors.push(`${where}.status 必须是 draft|ready|in-dev|accepted|deferred|withdrawn`)
+      errors.push(tr(`${where}.status 必须是 draft|ready|in-dev|accepted|deferred|withdrawn`, `${where}.status must be draft|ready|in-dev|accepted|deferred|withdrawn`))
     }
-    if (verification !== 'test' && verification !== 'demo' && verification !== 'review') errors.push(`${where}.verification 必须是 test|demo|review`)
-    requireArray(item.source, where, 'source', errors)
+    if (verification !== 'test' && verification !== 'demo' && verification !== 'review') errors.push(tr(`${where}.verification 必须是 test|demo|review`, `${where}.verification must be test|demo|review`))
+    requireArray(item.source, where, 'source', errors, tr)
     const source = asArray(item.source).map(value => asString(value)).filter((value): value is string => value !== undefined)
-    if (source.length === 0) errors.push(`${where}.source 不能为空（每条 REQ 至少指回一个 MR id）`)
+    if (source.length === 0) errors.push(tr(`${where}.source 不能为空（每条 REQ 至少指回一个 MR id）`, `${where}.source must not be empty (each REQ must point back to at least one MR id)`))
     for (const sourceId of source) {
-      if (!/^MR-\d{3}$/.test(sourceId)) errors.push(`${where}.source 含非法 MR id：${sourceId}`)
+      if (!/^MR-\d{3}$/.test(sourceId)) errors.push(tr(`${where}.source 含非法 MR id：${sourceId}`, `${where}.source contains an invalid MR id: ${sourceId}`))
     }
-    requireArray(item.dependsOn, where, 'dependsOn', errors)
+    requireArray(item.dependsOn, where, 'dependsOn', errors, tr)
     const dependsOn = asArray(item.dependsOn).map(value => asString(value)).filter((value): value is string => value !== undefined)
     for (const dep of dependsOn) {
-      if (!/^REQ-\d{3}$/.test(dep)) errors.push(`${where}.dependsOn 含非法 REQ id：${dep}`)
-      if (dep === id) errors.push(`${where}.dependsOn 不能依赖自己`)
+      if (!/^REQ-\d{3}$/.test(dep)) errors.push(tr(`${where}.dependsOn 含非法 REQ id：${dep}`, `${where}.dependsOn contains an invalid REQ id: ${dep}`))
+      if (dep === id) errors.push(tr(`${where}.dependsOn 不能依赖自己`, `${where}.dependsOn cannot depend on itself`))
     }
-    requireArray(item.acceptance, where, 'acceptance', errors)
+    requireArray(item.acceptance, where, 'acceptance', errors, tr)
     const acceptance: AcceptanceCriterion[] = []
     const acSeen = new Set<string>()
     for (const [acIndex, acRaw] of asArray(item.acceptance).entries()) {
-      if (!isRecord(acRaw)) { errors.push(`${where}.acceptance[${acIndex}] 不是对象`); continue }
+      if (!isRecord(acRaw)) { errors.push(tr(`${where}.acceptance[${acIndex}] 不是对象`, `${where}.acceptance[${acIndex}] is not an object`)); continue }
       const acWhere = `${where}.acceptance[${acIndex}]`
       const acId = asString(acRaw.id)
       const given = asString(acRaw.given)
       const when = asString(acRaw.when)
       const then = asString(acRaw.then)
-      if (acId === undefined || !/^AC-\d{3}-\d+$/.test(acId)) errors.push(`${acWhere}.id 必须是 AC-<REQ编号>-<n>（如 AC-001-1）`)
-      else if (acSeen.has(acId)) errors.push(`${acWhere}.id 重号：${acId}`)
+      if (acId === undefined || !/^AC-\d{3}-\d+$/.test(acId)) errors.push(tr(`${acWhere}.id 必须是 AC-<REQ编号>-<n>（如 AC-001-1）`, `${acWhere}.id must be AC-<REQ-number>-<n> (e.g. AC-001-1)`))
+      else if (acSeen.has(acId)) errors.push(tr(`${acWhere}.id 重号：${acId}`, `${acWhere}.id is duplicated: ${acId}`))
       else acSeen.add(acId)
-      if (given === undefined) errors.push(`${acWhere}.given 缺失`)
-      if (when === undefined) errors.push(`${acWhere}.when 缺失`)
-      if (then === undefined) errors.push(`${acWhere}.then 缺失`)
+      if (given === undefined) errors.push(tr(`${acWhere}.given 缺失`, `${acWhere}.given is missing`))
+      if (when === undefined) errors.push(tr(`${acWhere}.when 缺失`, `${acWhere}.when is missing`))
+      if (then === undefined) errors.push(tr(`${acWhere}.then 缺失`, `${acWhere}.then is missing`))
       if (acId !== undefined && id !== undefined && /^AC-(\d{3})-\d+$/.exec(acId)?.[1] !== id.slice(4, 7)) {
-        errors.push(`${acWhere}.id 与父 REQ 编号不一致（${acId} vs ${id}）`)
+        errors.push(tr(`${acWhere}.id 与父 REQ 编号不一致（${acId} vs ${id}）`, `${acWhere}.id does not match the parent REQ number (${acId} vs ${id})`))
       }
       if (acId !== undefined && given !== undefined && when !== undefined && then !== undefined) {
         // oxlint-disable-next-line unicorn/no-thenable -- `then` 是 AC 的给定字段名（Given/When/Then 与模板、/prd check 同源），不是 thenable
         acceptance.push({ id: acId, given, when, then })
       }
     }
-    if (asArray(item.acceptance).length === 0) errors.push(`${where}.acceptance 不能为空（每条 REQ 至少一条可判真假的 AC）`)
-    requireArray(item.changeLog, where, 'changeLog', errors)
+    if (asArray(item.acceptance).length === 0) errors.push(tr(`${where}.acceptance 不能为空（每条 REQ 至少一条可判真假的 AC）`, `${where}.acceptance must not be empty (each REQ needs at least one falsifiable AC)`))
+    requireArray(item.changeLog, where, 'changeLog', errors, tr)
     const changeLog = asArray(item.changeLog).map(entry => {
       if (!isRecord(entry)) return undefined
       const at = asString(entry.at)
@@ -281,10 +281,10 @@ function coerceLegacyPrd(root: unknown): { readonly doc?: PrdDoc; readonly error
       const change = asString(entry.change)
       return at !== undefined && by !== undefined && change !== undefined ? { at, by, change } : undefined
     }).filter((entry): entry is { at: string; by: string; change: string } => entry !== undefined)
-    requireArray(item.openQuestions, where, 'openQuestions', errors)
+    requireArray(item.openQuestions, where, 'openQuestions', errors, tr)
     const openQuestions = asArray(item.openQuestions).map(value => asString(value)).filter((value): value is string => value !== undefined)
     if (statusValue !== undefined && statusValue !== 'draft' && changeLog.length === 0) {
-      errors.push(`${where}.changeLog 不能为空（状态离开 draft 必须留痕）`)
+      errors.push(tr(`${where}.changeLog 不能为空（状态离开 draft 必须留痕）`, `${where}.changeLog must not be empty (leaving draft must leave a trail)`))
     }
     if (id !== undefined && title !== undefined && userStory !== undefined && slice !== undefined
       && (type === 'functional' || type === 'non-functional' || type === 'constraint')
@@ -294,7 +294,7 @@ function coerceLegacyPrd(root: unknown): { readonly doc?: PrdDoc; readonly error
       requirements.push({ id, title, type, priority, status: statusValue, source, slice, userStory, acceptance, dependsOn, verification, openQuestions, changeLog })
     }
   }
-  if (requirements.length === 0) errors.push('PRD 至少要有一条需求（无需求 = 没定义产品）')
+  if (requirements.length === 0) errors.push(tr('PRD 至少要有一条需求（无需求 = 没定义产品）', 'PRD needs at least one requirement (no requirements = no product defined)'))
   return { doc: { version, status: status as PrdDocStatus, slices, requirements }, errors }
 }
 
@@ -332,11 +332,11 @@ function parseBracketList(raw: string): string[] {
 
 
 /** 解析 `## Slices` 表；每个 slice 必须列出显式 REQ id（R8 禁区间断言）。围栏/注释里的表不算定义（BUG-153/162）。 */
-export function parsePrdSlices(text: string, errors: string[]): PrdSlice[] {
+export function parsePrdSlices(text: string, errors: string[], tr: Tr = ZH_ONLY): PrdSlice[] {
   const lines = scanDocument(text)
   const start = lines.findIndex(scanned => scanned.structural && /^[ ]{0,3}##\s+Slices\b/i.test(scanned.text))
   if (start === -1) {
-    errors.push('PRD 缺「## Slices」表（slice 与 REQ 的归属没有声明面）')
+    errors.push(tr('PRD 缺「## Slices」表（slice 与 REQ 的归属没有声明面）', 'PRD is missing the "## Slices" table (slice-to-REQ ownership has no declaration)'))
     return []
   }
   const slices: PrdSlice[] = []
@@ -354,33 +354,33 @@ export function parsePrdSlices(text: string, errors: string[]): PrdSlice[] {
     const id = cells[0] ?? ''
     if (id === '' || /^slice$/i.test(id) || /^-+$/.test(id)) continue
     if (!/^S\d+$/.test(id)) {
-      errors.push(`Slices 表首列必须是 slice id（S1…），实际：${id}`)
+      errors.push(tr(`Slices 表首列必须是 slice id（S1…），实际：${id}`, `The first Slices column must be a slice id (S1…), got: ${id}`))
       continue
     }
     if (seen.has(id)) {
-      errors.push(`slice ${id} 重号（一个 slice 号只能有一行；同一个 REQ 只能属于一个 slice）`)
+      errors.push(tr(`slice ${id} 重号（一个 slice 号只能有一行；同一个 REQ 只能属于一个 slice）`, `slice ${id} is duplicated (one slice id may have exactly one row; one REQ may belong to exactly one slice)`))
       continue
     }
     seen.add(id)
     const goal = cells[1] ?? ''
     const requirementCell = cells[2] ?? ''
-    if (/…|\.\.\.|~/.test(requirementCell)) errors.push(`slice ${id} 的 requirements 必须是显式 REQ id（不用区间）`)
+    if (/…|\.\.\.|~/.test(requirementCell)) errors.push(tr(`slice ${id} 的 requirements 必须是显式 REQ id（不用区间）`, `slice ${id} requirements must list explicit REQ ids (no ranges)`))
     const requirements = requirementCell.split(',').map(item => item.trim()).filter(item => item !== '')
     for (const reqId of requirements) {
       if (!/^REQ-\d{3}$/.test(reqId)) {
-        errors.push(`slice ${id} 含非法 REQ id：${reqId}`)
+        errors.push(tr(`slice ${id} 含非法 REQ id：${reqId}`, `slice ${id} contains an invalid REQ id: ${reqId}`))
         continue
       }
       const owner = reqOwner.get(reqId)
       if (owner === undefined) reqOwner.set(reqId, id)
-      else if (owner === id) errors.push(`slice ${id} 重复列出 ${reqId}（同一 slice 里一个 REQ 只能列一次）`)
-      else errors.push(`${reqId} 同时列在 slice ${owner} 与 ${id}（一个 REQ 只能属于一个 slice）`)
+      else if (owner === id) errors.push(tr(`slice ${id} 重复列出 ${reqId}（同一 slice 里一个 REQ 只能列一次）`, `slice ${id} lists ${reqId} twice (a REQ may appear once per slice)`))
+      else errors.push(tr(`${reqId} 同时列在 slice ${owner} 与 ${id}（一个 REQ 只能属于一个 slice）`, `${reqId} appears in both slice ${owner} and ${id} (a REQ may belong to exactly one slice)`))
     }
-    if (goal === '') errors.push(`slice ${id} 缺 goal`)
-    if (requirements.length === 0) errors.push(`slice ${id} 的 requirements 不能为空`)
+    if (goal === '') errors.push(tr(`slice ${id} 缺 goal`, `slice ${id} is missing goal`))
+    if (requirements.length === 0) errors.push(tr(`slice ${id} 的 requirements 不能为空`, `slice ${id} requirements must not be empty`))
     slices.push({ id, goal, requirements })
   }
-  if (slices.length === 0) errors.push('Slices 表没有数据行（至少 1 个 slice：先给最小端到端 S1）')
+  if (slices.length === 0) errors.push(tr('Slices 表没有数据行（至少 1 个 slice：先给最小端到端 S1）', 'The Slices table has no data rows (at least one slice: start with a minimal end-to-end S1)'))
   return slices
 }
 
@@ -425,7 +425,7 @@ interface RequirementFields {
 }
 
 /** 读一个小节的行首字段；`acceptance` / `openQuestions` / `changeLog` 用缩进子项。 */
-function readRequirementFields(id: string, body: readonly string[], errors: string[]): RequirementFields {
+function readRequirementFields(id: string, body: readonly string[], errors: string[], tr: Tr): RequirementFields {
   const scalars = new Map<string, string>()
   const lists = new Map<string, string[]>()
   const acceptance: AcceptanceCriterion[] = []
@@ -438,10 +438,10 @@ function readRequirementFields(id: string, body: readonly string[], errors: stri
     if (field === null) continue
     const name = (field[1] ?? '').toLowerCase()
     const value = (field[2] ?? '').trim()
-    if (seen.has(name)) errors.push(`${id} 字段 ${name} 重复`)
+    if (seen.has(name)) errors.push(tr(`${id} 字段 ${name} 重复`, `${id} repeats field ${name}`))
     seen.add(name)
     if (name === 'acceptance') {
-      if (value !== '') { errors.push(`${id}.acceptance 必须用「  - AC-…」子项书写（不在字段行内联）`); continue }
+      if (value !== '') { errors.push(tr(`${id}.acceptance 必须用「  - AC-…」子项书写（不在字段行内联）`, `${id}.acceptance must use "  - AC-…" child items (not an inline field)`)); continue }
       let cursor = index + 1
       while (cursor < body.length) {
         const acHead = /^\s{2}-\s+(AC-\d{3}-\d+)\s*$/.exec(body[cursor] ?? '')
@@ -457,7 +457,7 @@ function readRequirementFields(id: string, body: readonly string[], errors: stri
           inner += 1
         }
         acceptance.push(ac)
-        if (acSeen.has(ac.id)) errors.push(`${id}.acceptance 的 ${ac.id} 重号（一个判据号只能有一个定义）`)
+        if (acSeen.has(ac.id)) errors.push(tr(`${id}.acceptance 的 ${ac.id} 重号（一个判据号只能有一个定义）`, `${id}.acceptance repeats ${ac.id} (one criterion id may have exactly one definition)`))
         else acSeen.add(ac.id)
         cursor = inner
       }
@@ -476,11 +476,11 @@ function readRequirementFields(id: string, body: readonly string[], errors: stri
       else {
         for (const entry of items) {
           const parts = entry.split('·').map(part => part.trim())
-          if (parts.length !== 3) { errors.push(`${id}.changeLog 条目必须是「日期 · 作者 · 变更」：${entry}`); continue }
+          if (parts.length !== 3) { errors.push(tr(`${id}.changeLog 条目必须是「日期 · 作者 · 变更」：${entry}`, `${id}.changeLog entries must be "date · author · change": ${entry}`)); continue }
           const [at, by, change] = parts as [string, string, string]
-          if (!isCalendarDate(at)) errors.push(`${id}.changeLog 日期必须是真实日历日期 YYYY-MM-DD：${entry}`)
-          if (by === '') errors.push(`${id}.changeLog 作者不能为空：${entry}`)
-          if (change === '') errors.push(`${id}.changeLog 变更说明不能为空：${entry}`)
+          if (!isCalendarDate(at)) errors.push(tr(`${id}.changeLog 日期必须是真实日历日期 YYYY-MM-DD：${entry}`, `${id}.changeLog date must be a real calendar date YYYY-MM-DD: ${entry}`))
+          if (by === '') errors.push(tr(`${id}.changeLog 作者不能为空：${entry}`, `${id}.changeLog author must not be empty: ${entry}`))
+          if (change === '') errors.push(tr(`${id}.changeLog 变更说明不能为空：${entry}`, `${id}.changeLog description must not be empty: ${entry}`))
           changeLog.push({ at, by, change })
         }
       }
@@ -495,57 +495,57 @@ function readRequirementFields(id: string, body: readonly string[], errors: stri
 }
 
 /** 解析 headings PRD：slices + `### REQ-###` 定义小节。 */
-export function parsePrdHeadings(text: string): { readonly doc?: PrdDoc; readonly errors: string[] } {
+export function parsePrdHeadings(text: string, tr: Tr = ZH_ONLY): { readonly doc?: PrdDoc; readonly errors: string[] } {
   const errors: string[] = []
-  const slices = parsePrdSlices(text, errors)
+  const slices = parsePrdSlices(text, errors, tr)
   const blocks = prdRequirementBlocks(text)
-  if (blocks.length === 0) errors.push('PRD 没有 `### REQ-###` 定义小节（没有需求 = 没定义产品）')
+  if (blocks.length === 0) errors.push(tr('PRD 没有 `### REQ-###` 定义小节（没有需求 = 没定义产品）', 'PRD has no `### REQ-###` definition sections (no requirements = no product defined)'))
   const requirements: PrdRequirement[] = []
   const seen = new Set<string>()
   for (const block of blocks) {
     const where = block.id
-    if (seen.has(where)) errors.push(`${where} 重号（一个号只能有一个定义点）`)
+    if (seen.has(where)) errors.push(tr(`${where} 重号（一个号只能有一个定义点）`, `${where} is duplicated (an id may have exactly one definition site)`))
     seen.add(where)
-    const fields = readRequirementFields(where, block.body, errors)
+    const fields = readRequirementFields(where, block.body, errors, tr)
     const scalar = (name: string): string => fields.scalars.get(name) ?? ''
     const list = (name: string): readonly string[] => fields.lists.get(name) ?? []
     const title = block.title
-    if (title === '') errors.push(`${where}.title 缺失（标题写在 ### REQ-### 后）`)
+    if (title === '') errors.push(tr(`${where}.title 缺失（标题写在 ### REQ-### 后）`, `${where}.title is missing (the title follows ### REQ-###)`))
     const userStory = scalar('userstory')
-    if (userStory === '') errors.push(`${where}.userStory 缺失`)
+    if (userStory === '') errors.push(tr(`${where}.userStory 缺失`, `${where}.userStory is missing`))
     const source = list('source')
-    if (source.length === 0) errors.push(`${where}.source 不能为空（每条 REQ 至少指回一个 MR id）`)
-    for (const sourceId of source) if (!/^MR-\d{3}$/.test(sourceId)) errors.push(`${where}.source 含非法 MR id：${sourceId}`)
-    for (const trace of list('traces')) if (!/^REQ-\d{3}$/.test(trace)) errors.push(`${where}.traces 含非法 REQ id：${trace}`)
+    if (source.length === 0) errors.push(tr(`${where}.source 不能为空（每条 REQ 至少指回一个 MR id）`, `${where}.source must not be empty (each REQ must point back to at least one MR id)`))
+    for (const sourceId of source) if (!/^MR-\d{3}$/.test(sourceId)) errors.push(tr(`${where}.source 含非法 MR id：${sourceId}`, `${where}.source contains an invalid MR id: ${sourceId}`))
+    for (const trace of list('traces')) if (!/^REQ-\d{3}$/.test(trace)) errors.push(tr(`${where}.traces 含非法 REQ id：${trace}`, `${where}.traces contains an invalid REQ id: ${trace}`))
     const slice = scalar('slice')
-    if (slice === '') errors.push(`${where}.slice 缺失`)
+    if (slice === '') errors.push(tr(`${where}.slice 缺失`, `${where}.slice is missing`))
     const typeValue = normalizeToken(scalar('type'))
     const type = TYPES.find(candidate => candidate === typeValue)
-    if (type === undefined) errors.push(`${where}.type 必须是 functional|non-functional|constraint（实际 ${scalar('type') === '' ? '缺失' : scalar('type')}）`)
+    if (type === undefined) errors.push(tr(`${where}.type 必须是 functional|non-functional|constraint（实际 ${scalar('type') === '' ? '缺失' : scalar('type')}）`, `${where}.type must be functional|non-functional|constraint (got ${scalar('type') === '' ? 'missing' : scalar('type')})`))
     const priorityValue = scalar('priority')
     const priority = PRIORITIES.find(candidate => candidate === priorityValue.toUpperCase())
-    if (priority === undefined) errors.push(`${where}.priority 必须是 P0|P1|P2（实际 ${priorityValue === '' ? '缺失' : priorityValue}）`)
+    if (priority === undefined) errors.push(tr(`${where}.priority 必须是 P0|P1|P2（实际 ${priorityValue === '' ? '缺失' : priorityValue}）`, `${where}.priority must be P0|P1|P2 (got ${priorityValue === '' ? 'missing' : priorityValue})`))
     const statusValue = scalar('status')
     const status = STATUSES.find(candidate => candidate === statusValue)
-    if (status === undefined) errors.push(`${where}.status 必须是 draft|ready|in-dev|accepted|deferred|withdrawn（实际 ${statusValue === '' ? '缺失' : statusValue}）`)
+    if (status === undefined) errors.push(tr(`${where}.status 必须是 draft|ready|in-dev|accepted|deferred|withdrawn（实际 ${statusValue === '' ? '缺失' : statusValue}）`, `${where}.status must be draft|ready|in-dev|accepted|deferred|withdrawn (got ${statusValue === '' ? 'missing' : statusValue})`))
     const verificationValue = scalar('verification').toLowerCase()
     const verification = VERIFICATIONS.find(candidate => candidate === verificationValue)
-    if (verification === undefined) errors.push(`${where}.verification 必须是 test|demonstration|analysis|inspection（实际 ${scalar('verification') === '' ? '缺失' : scalar('verification')}）`)
-    if (fields.acceptance.length === 0) errors.push(`${where}.acceptance 不能为空（每条 REQ 至少一条可判真假的 AC）`)
+    if (verification === undefined) errors.push(tr(`${where}.verification 必须是 test|demonstration|analysis|inspection（实际 ${scalar('verification') === '' ? '缺失' : scalar('verification')}）`, `${where}.verification must be test|demonstration|analysis|inspection (got ${scalar('verification') === '' ? 'missing' : scalar('verification')})`))
+    if (fields.acceptance.length === 0) errors.push(tr(`${where}.acceptance 不能为空（每条 REQ 至少一条可判真假的 AC）`, `${where}.acceptance must not be empty (each REQ needs at least one falsifiable AC)`))
     for (const ac of fields.acceptance) {
-      if (!/^AC-\d{3}-\d+$/.test(ac.id)) errors.push(`${where}.acceptance 的 id 必须是 AC-<REQ编号>-<n>：${ac.id}`)
-      else if (/^AC-(\d{3})-\d+$/.exec(ac.id)?.[1] !== where.slice(4, 7)) errors.push(`${where}.acceptance 的 id 与父 REQ 编号不一致：${ac.id}`)
-      if (ac.given === '') errors.push(`${ac.id}.given 缺失`)
-      if (ac.when === '') errors.push(`${ac.id}.when 缺失`)
-      if (ac.then === '') errors.push(`${ac.id}.then 缺失`)
+      if (!/^AC-\d{3}-\d+$/.test(ac.id)) errors.push(tr(`${where}.acceptance 的 id 必须是 AC-<REQ编号>-<n>：${ac.id}`, `${where}.acceptance id must be AC-<REQ-number>-<n>: ${ac.id}`))
+      else if (/^AC-(\d{3})-\d+$/.exec(ac.id)?.[1] !== where.slice(4, 7)) errors.push(tr(`${where}.acceptance 的 id 与父 REQ 编号不一致：${ac.id}`, `${where}.acceptance id does not match the parent REQ number: ${ac.id}`))
+      if (ac.given === '') errors.push(tr(`${ac.id}.given 缺失`, `${ac.id}.given is missing`))
+      if (ac.when === '') errors.push(tr(`${ac.id}.when 缺失`, `${ac.id}.when is missing`))
+      if (ac.then === '') errors.push(tr(`${ac.id}.then 缺失`, `${ac.id}.then is missing`))
     }
     const dependsOn = list('dependson')
     for (const dep of dependsOn) {
-      if (!/^REQ-\d{3}$/.test(dep)) errors.push(`${where}.dependsOn 含非法 REQ id：${dep}`)
-      if (dep === where) errors.push(`${where}.dependsOn 不能依赖自己`)
+      if (!/^REQ-\d{3}$/.test(dep)) errors.push(tr(`${where}.dependsOn 含非法 REQ id：${dep}`, `${where}.dependsOn contains an invalid REQ id: ${dep}`))
+      if (dep === where) errors.push(tr(`${where}.dependsOn 不能依赖自己`, `${where}.dependsOn cannot depend on itself`))
     }
     if (status !== undefined && status !== 'draft' && fields.changeLog.length === 0) {
-      errors.push(`${where}.changeLog 不能为空（状态离开 draft 必须留痕）`)
+      errors.push(tr(`${where}.changeLog 不能为空（状态离开 draft 必须留痕）`, `${where}.changeLog must not be empty (leaving draft must leave a trail)`))
     }
     // 有定义（id 合法且唯一）就进集合：字段错误已单独报，跨文档检查不应再产生级联假红。
     requirements.push({
@@ -568,7 +568,7 @@ export function parsePrdHeadings(text: string): { readonly doc?: PrdDoc; readonl
 }
 
 /** 按 `definition` 头分派：headings（新）/ json-ledger（旧，只读兼容）。入口归一化平台差异（BUG-152）。 */
-export function parsePrdDocument(text: string): { readonly doc?: PrdDoc; readonly errors: string[]; readonly form?: PrdForm } {
+export function parsePrdDocument(text: string, tr: Tr = ZH_ONLY): { readonly doc?: PrdDoc; readonly errors: string[]; readonly form?: PrdForm } {
   const normalized = normalizeDocument(text)
   const scan = scanDocumentDetailed(normalized)
   if (scan.unclosedCommentLine !== undefined) {
@@ -576,25 +576,30 @@ export function parsePrdDocument(text: string): { readonly doc?: PrdDoc; readonl
   }
   const header = parsePrdHeader(normalized)
   const form = header?.definition ?? ''
-  if (form === 'headings') return { ...parsePrdHeadings(normalized), form }
+  if (form === 'headings') return { ...parsePrdHeadings(normalized, tr), form }
   if (form === 'json-ledger') {
     const block = extractJsonBlock(normalized)
     if (!block.ok) return { errors: [`PRD：${block.error}`], form }
-    return { ...coerceLegacyPrd(block.value), form }
+    return { ...coerceLegacyPrd(block.value, tr), form }
   }
   return { errors: [`PRD：缺 definition 头或非法（新 PRD 应为 headings；旧动议可保持 json-ledger；实际 ${form === '' ? '（缺失）' : form}）`] }
 }
 
+/** 错误明细的双语选择（host 命令按当前 locale 传；缺省 zh，BUG-338）。 */
+type Tr = (zh: string, en: string) => string
+const ZH_ONLY: Tr = zh => zh
+
 /** 校验 MRD + PRD 一对文档；返回所有结构性问题（空 = 通过）。 */
-export function validateProductDocs(mrdText: string, prdText: string): ProductDocsCheck {
+export function validateProductDocs(mrdText: string, prdText: string, options: { readonly text?: Tr } = {}): ProductDocsCheck {
+  const tr = options.text ?? ZH_ONLY
   const errors: string[] = []
-  const mrdBlock = extractJsonBlock(mrdText)
+  const mrdBlock = extractJsonBlock(mrdText, tr)
   if (!mrdBlock.ok) {
-    errors.push(`MRD：${mrdBlock.error}`)
+    errors.push(tr(`MRD：${mrdBlock.error}`, `MRD: ${mrdBlock.error}`))
     return { ok: false, errors, mrdCount: 0, reqCount: 0, acCount: 0 }
   }
-  const mrd = coerceMrd(mrdBlock.value)
-  const prd = parsePrdDocument(prdText)
+  const mrd = coerceMrd(mrdBlock.value, tr)
+  const prd = parsePrdDocument(prdText, tr)
   errors.push(...mrd.errors, ...prd.errors)
   if (mrd.doc === undefined || prd.doc === undefined) {
     return { ok: false, errors: [...new Set(errors)], mrdCount: mrd.doc?.opportunities.length ?? 0, reqCount: 0, acCount: 0 }
@@ -606,25 +611,25 @@ export function validateProductDocs(mrdText: string, prdText: string): ProductDo
   const reqIds = new Set(prd.doc.requirements.map(requirement => requirement.id))
   for (const requirement of prd.doc.requirements) {
     for (const sourceId of requirement.source) {
-      if (!opportunityIds.has(sourceId)) errors.push(`${requirement.id}.source 指向不存在的 MR：${sourceId}`)
+      if (!opportunityIds.has(sourceId)) errors.push(tr(`${requirement.id}.source 指向不存在的 MR：${sourceId}`, `${requirement.id}.source points at a nonexistent MR: ${sourceId}`))
       else {
         const recommendation = recommendationById.get(sourceId)
-        if (recommendation === 'no-go') errors.push(`${requirement.id}.source 指向 no-go 机会 ${sourceId}（no-go 不得进 PRD）`)
+        if (recommendation === 'no-go') errors.push(tr(`${requirement.id}.source 指向 no-go 机会 ${sourceId}（no-go 不得进 PRD）`, `${requirement.id}.source points at no-go opportunity ${sourceId} (no-go must not enter the PRD)`))
         if (recommendation === 'defer' && requirement.priority === 'P0') {
-          errors.push(`${requirement.id}.source 指向 defer 机会 ${sourceId}（defer 不得进 P0，应落 P2/deferred）`)
+          errors.push(tr(`${requirement.id}.source 指向 defer 机会 ${sourceId}（defer 不得进 P0，应落 P2/deferred）`, `${requirement.id}.source points at deferred opportunity ${sourceId} (defer must not enter P0; use P2/deferred)`))
         }
       }
     }
     const slice = prd.doc.slices.find(candidate => candidate.id === requirement.slice)
-    if (slice === undefined) errors.push(`${requirement.id}.slice 指向不存在的 slice：${requirement.slice}`)
-    else if (!slice.requirements.includes(requirement.id)) errors.push(`slice ${slice.id} 的 requirements 未列出 ${requirement.id}`)
+    if (slice === undefined) errors.push(tr(`${requirement.id}.slice 指向不存在的 slice：${requirement.slice}`, `${requirement.id}.slice points at a nonexistent slice: ${requirement.slice}`))
+    else if (!slice.requirements.includes(requirement.id)) errors.push(tr(`slice ${slice.id} 的 requirements 未列出 ${requirement.id}`, `slice ${slice.id} requirements do not list ${requirement.id}`))
     for (const dep of requirement.dependsOn) {
-      if (!reqIds.has(dep)) errors.push(`${requirement.id}.dependsOn 指向不存在的 REQ：${dep}`)
+      if (!reqIds.has(dep)) errors.push(tr(`${requirement.id}.dependsOn 指向不存在的 REQ：${dep}`, `${requirement.id}.dependsOn points at a nonexistent REQ: ${dep}`))
     }
   }
   for (const slice of prd.doc.slices) {
     for (const reqId of slice.requirements) {
-      if (!reqIds.has(reqId)) errors.push(`slice ${slice.id} 列出不存在的 REQ：${reqId}`)
+      if (!reqIds.has(reqId)) errors.push(tr(`slice ${slice.id} 列出不存在的 REQ：${reqId}`, `slice ${slice.id} lists a nonexistent REQ: ${reqId}`))
     }
   }
   // 依赖环（DFS）
@@ -633,7 +638,7 @@ export function validateProductDocs(mrdText: string, prdText: string): ProductDo
   const visit = (id: string, trail: string[]): void => {
     const status = state.get(id)
     if (status === 'done') return
-    if (status === 'visiting') { errors.push(`依赖环：${[...trail, id].join(' → ')}`); return }
+    if (status === 'visiting') { errors.push(tr(`依赖环：${[...trail, id].join(' → ')}`, `Dependency cycle: ${[...trail, id].join(' → ')}`)); return }
     state.set(id, 'visiting')
     for (const dep of byId.get(id)?.dependsOn ?? []) visit(dep, [...trail, id])
     state.set(id, 'done')
