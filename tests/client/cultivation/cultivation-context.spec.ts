@@ -211,7 +211,7 @@ describe('截取 / 摘要 / 地址', () => {
       .toBe('成品「budget-review」（已采纳）')
     // BUG-338：host 回执按语言取；英文分支不许再落中文。
     expect(contextSummaryPair(context)).toEqual({ zh: '会话「收口检查」', en: 'session "收口检查"' })
-    expect(contextSummaryPair({ ...context, kind: 'deliverable', title: 'budget-review', subtitle: undefined }))
+    expect(contextSummaryPair({ kind: 'deliverable', title: 'budget-review' }))
       .toEqual({ zh: '成品「budget-review」', en: 'deliverable "budget-review"' })
     expect(contextSummaryPair({ ...context, kind: 'deliverable', title: 'budget-review', subtitle: 'accepted' }))
       .toEqual({ zh: '成品「budget-review」（accepted）', en: 'deliverable "budget-review" (accepted)' })
