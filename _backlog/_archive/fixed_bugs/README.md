@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-334**（2026-11-23，质量防线批顺位 4 / P2）：损坏诊断在 lib 只留代号、client 字典翻译，`contextProblem` 在收件/我的/已采纳三处显式渲染——
+  [334](BUG-334-cultivation-record-problems-i18n-and-unrendered-context.md)。证据提交 `dd019422`。
+
 - **BUG-336**（2026-11-23，质量防线批顺位 4 / P2）：消息动态补 `token`（冒号/「（空）」进字典），`currentTask` 改 `currentTasks` 列表由渲染层拼分隔符——
   [336](BUG-336-presence-message-activity-chinese-in-en.md)。证据提交 `d3386c23`。
 
