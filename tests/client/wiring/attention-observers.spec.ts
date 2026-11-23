@@ -89,7 +89,7 @@ describe('待办观察者：登记、委托与销账（R3-10）', () => {
     const pending = handlers.get('approval/request')?.call('owner-1', { toolName: 'request_signoff', reason: ' 签发发布 ' }, next)
     await Promise.resolve()
     expect(registry.list()).toEqual([
-      expect.objectContaining({ kind: 'approval', sessionId: 'session-vp-eng', what: 'request_signoff：签发发布' }),
+      expect.objectContaining({ kind: 'approval', sessionId: 'session-vp-eng', what: 'request_signoff: 签发发布', whatToken: { kind: 'approval', toolName: 'request_signoff', reason: '签发发布' } }),
     ])
     release()
     await expect(pending).rejects.toThrow('denied')
@@ -101,7 +101,7 @@ describe('待办观察者：登记、委托与销账（R3-10）', () => {
     const registry = createAttentionRegistry()
     registerAttentionObservers({ remote, sessions, attention: registry })
     const next = vi.fn(async () => {
-      expect(registry.list()[0]?.what).toBe('（问询内容缺失）')
+      expect(registry.list()[0]?.whatToken).toEqual({ kind: 'question-missing' })
       return 'ok'
     })
     await handlers.get('user-questions/request')?.call('owner-1', { questions: [] }, next)
@@ -114,7 +114,8 @@ describe('待办观察者：登记、委托与销账（R3-10）', () => {
     const next = vi.fn(() => 'passthrough')
     const result = handlers.get('approval/request')?.call('owner-unknown', { toolName: 'request_signoff' }, next)
     expect(result).toBe('passthrough')
-    expect(next).toHaveBeenCalledTimes(1)
+    expect(handlers.get('user-questions/request')?.call('owner-unknown', { questions: [] }, next)).toBe('passthrough')
+    expect(next).toHaveBeenCalledTimes(2)
     expect(registry.list()).toEqual([])
   })
 
@@ -123,7 +124,7 @@ describe('待办观察者：登记、委托与销账（R3-10）', () => {
     const registry = createAttentionRegistry()
     registerAttentionObservers({ remote, sessions, attention: registry })
     const next = vi.fn(async () => {
-      expect(registry.list()[0]?.what).toBe('（工具名缺失）')
+      expect(registry.list()[0]?.whatToken).toEqual({ kind: 'approval-missing-tool' })
       return 'ok'
     })
     await handlers.get('approval/request')?.call('owner-1', {}, next)
@@ -142,7 +143,7 @@ describe('审批请求的身份透传（BUG-299）', () => {
     const gate = new Promise<void>(resolve => { release = resolve })
     const pending = handlers.get('approval/request')?.call('owner-1', { id: 'approval-42', toolName: 'request_signoff', reason: '双签' }, async () => { await gate })
     await Promise.resolve()
-    expect(registry.list()[0]).toEqual(expect.objectContaining({ kind: 'approval', id: 'approval-42', detail: 'request_signoff：双签' }))
+    expect(registry.list()[0]).toEqual(expect.objectContaining({ kind: 'approval', id: 'approval-42', detail: 'request_signoff: 双签', whatToken: { kind: 'approval', toolName: 'request_signoff', reason: '双签' } }))
     release()
     await pending
   })
@@ -202,13 +203,13 @@ describe('问询观察者的多问题形状（BUG-331）', () => {
     const pending = handler({ questions: [{ question: 'A' }, { question: 'B' }, { question: 'C' }] })
     await Promise.resolve()
     const entry = registry.list()[0]
-    expect(entry?.what).toContain('共 3 个问题')
+    expect(entry?.whatToken).toEqual({ kind: 'question-multi', first: 'A', count: 3 })
     expect(entry?.detail).toContain('B')
     release()
     await pending
   })
 
-  it('单个问题 ⇒ 不加后缀；缺 questions ⇒ 占位文案', async () => {
+  it('单个问题 ⇒ 不加后缀；缺 questions ⇒ question-missing token', async () => {
     const single = mountObserver()
     const pending = single.handler({ questions: [{ question: '只有一个' }] })
     await Promise.resolve()
@@ -219,7 +220,7 @@ describe('问询观察者的多问题形状（BUG-331）', () => {
     const missing = mountObserver()
     const pending2 = missing.handler({})
     await Promise.resolve()
-    expect(missing.registry.list()[0]?.what).toContain('问询内容缺失')
+    expect(missing.registry.list()[0]?.whatToken).toEqual({ kind: 'question-missing' })
     missing.release()
     await pending2
   })

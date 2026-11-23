@@ -87,7 +87,7 @@ export function makeWorkspaceTextReader(
   return (path, limit) => async (sessionId, signal) => {
     try {
       const result = await remote.workspaceFiles.read(leadOf(sessionId), path, { limit }, signal)
-      if (!result.ok) return { ok: false, reason: `读取被拒（${path}）` }
+      if (!result.ok) return { ok: false, reason: `read-denied: ${path}` }
       // vendor 的 `eof` 是「这一页读到了文件末尾」——**这正是此前丢掉的那一位**（BUG-298）：
       // 丢掉它 ⇒ 每个消费方自己猜「读完了吗」，于是台账少报、记录把截断当全文、大索引被判坏形状。
       return { ok: true, text: result.value.text, eof: result.value.eof !== false }
@@ -146,7 +146,9 @@ export function asWindowReader(
 ): (sessionId: SessionId, signal: AbortSignal) => Promise<string | null> {
   return async (sessionId, signal) => {
     const result = await read(sessionId, signal)
-    return result.ok ? result.text : null
+    if (!result.ok) return null
+    const { text, eof: _windowOnly } = result
+    return text
   }
 }
 
@@ -286,14 +288,18 @@ export function useCultivationPanelData(
           const id = name.replace(/\.md$/, '')
           const head = await files.readRecordHead(sessionId, `${RUN_BUNDLE_PATHS.records}/${name}`, controller.signal)
           let summary = head === null ? null : parseRecord(id, head)
+          let summaryTruncated = true
           if (summary === null && head !== null) {
             // 头窗口解析不出来**不等于**记录坏了（BUG-321）：frontmatter 可能比窗口更长。
             // 补读一次全文再判；能解析就按合法记录收（正文另按 FULL_RECORD_LIMIT 决定是否读全文）。
             const whole = await files.readRecord(sessionId, `${RUN_BUNDLE_PATHS.records}/${name}`, controller.signal)
-            summary = whole.ok ? parseRecord(id, whole.text) : null
+            if (whole.ok) {
+              summary = parseRecord(id, whole.text)
+              summaryTruncated = !whole.eof
+            }
           }
           if (summary === null) { broken.push(name); continue }
-          summaries.push({ ...summary, bodyTruncated: true })
+          summaries.push({ ...summary, bodyTruncated: summaryTruncated })
         }
         // open 全部读全文（不能藏旧待办）；非 open 只给最近 FULL_RECORD_LIMIT 条。
         const full = new Set<string>(summaries.filter(record => record.status === 'open').map(record => record.id))

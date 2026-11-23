@@ -1,6 +1,8 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { HEARTBEAT_KEY, shouldWarn, startInstanceGuard } from '../../../packages/company-pack/src/client/wiring/instance-guard.ts'
+import { en } from '../../../packages/company-pack/src/client/locales.ts'
+import { assertEnglishUiClean, translateWith } from '../../support/i18n-assertions.ts'
 
 // 负例留证 2026-10-10：卡② UX 依据 = 现场实测 3 个 web 实例并存 + E2 实证（多实例同文件
 // ×20 = 20/20 静默互踩）——用户拍板「警告横幅」：第二实例照常启动但被明确告知。
@@ -60,5 +62,20 @@ describe('多实例探活（instance-guard）', () => {
     expect(document.getElementById(BANNER_ID)).toBeNull()
     expect(JSON.parse(localStorage.getItem(KEY) ?? '{}') as Record<string, number>).toEqual(after)
     expect(selfId).toMatch(/^tab-/)
+  })
+
+  it('en：多实例横幅使用传入的 translator，不残留中文', () => {
+    const raw = JSON.stringify({ 'tab-a': NOW - 5_000 })
+    const msg = shouldWarn(raw, NOW, 'self', translateWith(en))
+    expect(msg).toContain('Detected 1 other observation window')
+    assertEnglishUiClean(msg ?? '', 'instance-guard en')
+
+    vi.useFakeTimers()
+    localStorage.setItem(KEY, JSON.stringify({ 'tab-other': Date.now() }))
+    const dispose = startInstanceGuard(document, translateWith(en))
+    const banner = document.getElementById(BANNER_ID)?.textContent ?? ''
+    expect(banner).toContain('Detected 1 other observation window')
+    assertEnglishUiClean(banner, 'startInstanceGuard banner en')
+    dispose()
   })
 })

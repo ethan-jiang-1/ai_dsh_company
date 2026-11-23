@@ -16,7 +16,7 @@
  */
 import { Button, Input, Pill } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useRef, useState } from 'react'
-import { CULTIVATION_ROLES, roleLabel as defaultRoleLabel } from '../../lib/cultivation/cultivation.ts'
+import { CULTIVATION_ROLES, extractSubmittedRecordId, roleLabel as defaultRoleLabel } from '../../lib/cultivation/cultivation.ts'
 import { clipExcerpt, encodeContextToken, secretLikeFindings, type CultivationContextRef } from '../../lib/cultivation/cultivation-context.ts'
 import {
   CULTIVATION_COPY,
@@ -60,9 +60,6 @@ export interface CultivationComposeProps {
 }
 
 type ContextStatus = 'idle' | 'loading'
-
-/** host 提交回执里取记录 id（`已提交培养记录 <id>（…）`）；取不到就只刷新、不高亮。 */
-const SAVED_ID_RE = /已提交培养记录\s+(\S+)/
 
 const cardFromSession = (row: ContextSessionRow, text: string, turn: number | undefined): ComposeContextCard => {
   const clipped = clipExcerpt(text, 1_200)
@@ -220,10 +217,10 @@ export function CultivationCompose(props: CultivationComposeProps) {
     setPending(false)
     setOutcome(result)
     if (!result.ok) return
-    const savedId = SAVED_ID_RE.exec(result.text)?.[1]
+    const savedId = extractSubmittedRecordId(result.text)
     closeForm()
     props.onRefresh?.()
-    if (savedId !== undefined) props.onSubmitted?.(savedId)
+    if (savedId !== null) props.onSubmitted?.(savedId)
   }
 
   const previewRows: readonly { readonly label: string, readonly value: string }[] = [

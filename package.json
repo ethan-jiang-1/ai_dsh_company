@@ -22,7 +22,7 @@
     "smoke:all": "node checks/lanes/keyless-lane.mjs",
     "coverage:ratchet": "node checks/audit/coverage-ratchet.mjs",
     "typecheck": "node ./node_modules/typescript/bin/tsc -b packages/company-pack && node ./node_modules/typescript/bin/tsc -p tsconfig.test-client.json && node ./node_modules/typescript/bin/tsc -p tsconfig.test-company.json && node ./node_modules/typescript/bin/tsc -p tsconfig.test-harness.json",
-    "lint": "oxlint --config .oxlintrc.json --deny-warnings packages/company-pack/src tests",
+    "lint": "oxlint --config .oxlintrc.json --deny-warnings packages/company-pack/src tests && node checks/audit/company-static-audit.mjs --strict",
     "dup": "jscpd --config .jscpd.json",
     "release": "node tools/release/release.mjs",
     "release:check": "node tools/release/release.mjs --check",

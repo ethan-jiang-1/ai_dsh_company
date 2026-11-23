@@ -21,6 +21,7 @@ import {
 } from '../../lib/cultivation/cultivation-context.ts'
 import { parseCatalog } from '../data/deliverables-index.ts'
 import { isRecord } from '../../lib/shared/guards.ts'
+import { CULTIVATION_COPY, formatCultivationReadReason } from './cultivation-actions.ts'
 
 /** 客户端 sessions store 的行（`SessionListState.byId` 的读子集）。 */
 export interface ContextSessionRowLike {
@@ -57,7 +58,7 @@ export interface ContextDeliverableRow {
 }
 
 export type ContextSourceResult<T> =
-  | { readonly ok: true; readonly value: readonly T[] }
+  | { readonly ok: true; readonly value: readonly T[]; readonly skipped?: number }
   | { readonly ok: false; readonly problem: string }
 
 export interface SessionPreviewResult {
@@ -194,9 +195,9 @@ export function projectContextSessions(
 
 /** 成品候选（复用成品页签的 parser；按 kickoff 倒序，最多 8 行）。 */
 export function projectContextDeliverables(catalogText: string | null): ContextSourceResult<ContextDeliverableRow> {
-  if (catalogText === null) return { ok: false, problem: '读不到成品目录（生成器未跑或索引缺失）——仍可选会话，或直接手写。' }
+  if (catalogText === null) return { ok: false, problem: CULTIVATION_COPY.contextCatalogMissing }
   const catalog = parseCatalog(catalogText)
-  if (catalog === null) return { ok: false, problem: '成品目录形状不符（schema 1 / entries 缺失）。' }
+  if (catalog === null) return { ok: false, problem: CULTIVATION_COPY.contextCatalogBadShape }
   const rows = catalog.entries
     .map(entry => ({
       slug: entry.slug,
@@ -207,7 +208,7 @@ export function projectContextDeliverables(catalogText: string | null): ContextS
     }))
     .sort((left, right) => right.kickoff.localeCompare(left.kickoff))
     .slice(0, 8)
-  return { ok: true, value: rows }
+  return { ok: true, value: rows, skipped: catalog.skipped }
 }
 
 /**
@@ -241,15 +242,15 @@ export async function readSessionPreview(
         .filter((event): event is SessionEventLike => event !== undefined)
       const turn = pickSessionTurn(events, ref.turn)
       return turn === null
-        ? { ok: false, problem: '这段会话没有可用的文字背景（可能只有工具调用）；换一段，或不带背景提交。' }
+        ? { ok: false, problem: CULTIVATION_COPY.contextNoText }
         : { ok: true, turn }
     }
-    return { ok: false, problem: '这段会话没有可用的文字背景。' }
+    return { ok: false, problem: CULTIVATION_COPY.contextNoTextShort }
   } catch (error) {
     if (!signal.aborted && timeout.aborted) {
-      return { ok: false, problem: '这段背景读得太慢——已停止。可以不带走背景继续，或重试。', timeout: true }
+      return { ok: false, problem: CULTIVATION_COPY.contextTimeout, timeout: true }
     }
-    return { ok: false, problem: `这段背景读不到：${error instanceof Error ? error.message : String(error)}。可以换一段，或不带背景提交。` }
+    return { ok: false, problem: CULTIVATION_COPY.contextReadFailed(error instanceof Error ? error.message : String(error)) }
   }
 }
 
@@ -273,11 +274,11 @@ export function makeCultivationContextSources(options: {
       try {
         const read = await options.readCatalog(sessionId, signal)
         // 截断的索引 = 读到了前半段：按「不可判定」报，不拿半个 JSON 当清单。
-        if (!read.ok) return { ok: false, problem: `读不到成品目录：${read.reason}。` }
-        if (!read.eof) return { ok: false, problem: '成品索引超出读取上限，未完整读取。' }
+        if (!read.ok) return { ok: false, problem: CULTIVATION_COPY.contextCatalogReadFailed(formatCultivationReadReason(read.reason)) }
+        if (!read.eof) return { ok: false, problem: CULTIVATION_COPY.contextCatalogTruncated }
         return projectContextDeliverables(read.text)
       } catch (error) {
-        return { ok: false, problem: `读不到成品目录：${error instanceof Error ? error.message : String(error)}。` }
+        return { ok: false, problem: CULTIVATION_COPY.contextCatalogReadFailed(error instanceof Error ? error.message : String(error)) }
       }
     },
     readPreview: async (row, signal) => readSessionPreview(options.follow, row.ref, signal, options.timeoutMs),
@@ -287,5 +288,5 @@ export function makeCultivationContextSources(options: {
 /** 会话行的展示名（根 = 角色名；成员 = “成员 <name>（CEO 团队）”）。 */
 export function contextSessionLabel(row: ContextSessionRow, roleLabel: (role: string) => string = defaultRoleLabel): string {
   if (row.role === undefined) return row.title
-  return row.member ? `成员 ${row.role}（CEO 团队）` : roleLabel(row.role)
+  return row.member ? CULTIVATION_COPY.memberBadge(row.role) : roleLabel(row.role)
 }

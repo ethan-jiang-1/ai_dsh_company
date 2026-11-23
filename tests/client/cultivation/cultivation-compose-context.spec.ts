@@ -182,4 +182,24 @@ describe('可选背景：默认值 / 移除 / 手选 / 明说', () => {
     expect(lines).toHaveLength(0)
     expect(container.textContent).toContain(CULTIVATION_COPY.problemBodyEmpty)
   })
+
+  it('手动选择会话预览失败时显式报原因（不静默吞错）', async () => {
+    let calls = 0
+    const container = mount({
+      sources: stubSources({
+        readPreview: async () => {
+          calls += 1
+          return calls === 1 ? { ok: true, turn: { turn: 1, text: '首轮摘要' } } : { ok: false, problem: '手动预览不可用' }
+        },
+      }),
+      currentSessionId: 'session-1',
+    })
+    await openCorrection(container)
+    await flush()
+    await click(button(container, CULTIVATION_COPY.contextChange))
+    await flush()
+    await click(buttonContaining(container, '收口检查'))
+    await flush()
+    expect(container.textContent).toContain('手动预览不可用')
+  })
 })

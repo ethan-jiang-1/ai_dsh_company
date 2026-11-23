@@ -69,7 +69,7 @@ export interface TeamCardModel {
  * @param block - 冻结的 running call 或 settled result 节点。
  * @returns 展示模型。
  */
-export function teamCardModel(toolName: string, block: ToolCallViewProps['block']): TeamCardModel {
+export function teamCardModel(toolName: string, block: ToolCallViewProps['block'], t: CompanyT = defaultT): TeamCardModel {
   const settled = 'kind' in block
   // rc.2：`PreparingToolCall`（参数未到）没有 `argsRaw`，只有 `StartedToolCall` 有 ⇒ 收窄后读；未到按空串。
   const source = settled ? block.call : block
@@ -91,51 +91,44 @@ export function teamCardModel(toolName: string, block: ToolCallViewProps['block'
   let blockIds: readonly string[] = []
   switch (toolName) {
     case 'spawn_teammate':
-      title = `派活 · ${name === '' ? '新成员' : name}`
       titleToken = name === '' ? { key: 'teamCard.spawnNew' } : { key: 'teamCard.spawn', params: { name } }
       detail = textOf(args, 'description') || textOf(args, 'prompt') || null
       break
     case 'send_message':
-      title = `发消息 · → ${target === '' ? '成员' : target}`
       titleToken = target === '' ? { key: 'teamCard.sendMember' } : { key: 'teamCard.send', params: { target } }
       detail = textOf(args, 'message') || null
       break
     case 'list_agents':
-      title = '看名册'
       titleToken = { key: 'teamCard.list' }
       break
     case 'wait_agent':
-      title = '等成员收工'
       titleToken = { key: 'teamCard.wait' }
       break
     case 'interrupt_agent':
-      title = `叫停 · ${name === '' ? '成员' : name}`
       titleToken = name === '' ? { key: 'teamCard.interruptMember' } : { key: 'teamCard.interrupt', params: { name } }
       break
     case 'team_task_create':
-      title = `建任务 · ${subject === '' ? '新任务' : subject}`
       titleToken = subject === '' ? { key: 'teamCard.taskCreateNew' } : { key: 'teamCard.taskCreate', params: { subject } }
-      detail = blockers.length === 0 ? null : `依赖 ${joinList(blockers, '、')}`
       // 分隔符在**渲染处**按语言取（模型层不带语言；BUG-329）。
       if (blockers.length > 0) blockIds = blockers
       break
     case 'team_task_list':
-      title = '读任务板'
       titleToken = { key: 'teamCard.taskList' }
       break
     case 'team_task_get':
-      title = `读任务 · ${taskId}`
       titleToken = { key: 'teamCard.taskGet', params: { id: taskId } }
       break
     case 'team_task_update':
-      title = `改任务 · ${taskId}${action === '' ? '' : ` ${action}`}`
       titleToken = { key: 'teamCard.taskUpdate', params: { id: taskId, action: action === '' ? '' : ` ${action}` } }
-      detail = owner === '' ? null : `指派 ${owner}`
       if (owner !== '') detailToken = { key: 'teamCard.taskAssign', params: { owner } }
       break
     default:
       break
   }
+
+  if (titleToken !== undefined) title = t(titleToken.key, titleToken.params)
+  if (detailToken !== undefined) detail = t(detailToken.key, detailToken.params)
+  else if (blockers.length > 0) detail = t('teamCard.taskDeps', { ids: joinList(blockers, listSeparator(t)) })
 
   return { title, titleToken, detail, detailToken, blockIds, state: cardStateOf(block), output: resultTextOf(block) }
 }

@@ -14,7 +14,7 @@
 /** 本包 client 面的样式：S1 视图类名、S2 皮肤类名、S3 动效 keyframes 都加在这里。 */
 const CSS = `
 :root {
-  /* 公司视图的布局旋钮（本包私有；颜色不在此声明，一律用 --dsw-* 令牌） */
+  /* company view layout knobs (package-private; colors use --dsw-* tokens) */
   --wk-board-column-min: 13rem;
   --wk-row-gap: 0.35rem;
 }

@@ -17,6 +17,7 @@ import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import {
   ASKS_CAP,
   attentionItemKey,
+  attentionSummary,
   attentionTone,
   hasBoundary,
   mergeAttention,
@@ -89,21 +90,40 @@ const defaultAttentionT = ((key: CompanyKey, params?: Record<string, string | nu
   return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
 }) as CompanyT
 
+/** 将 {@link AttentionItem.whatToken} 按当前语言字典展开为文案；旧条目/无 token 退回 `what`。 */
+export function formatAttentionWhat(item: Pick<AttentionItem, 'what' | 'whatToken'>, t: CompanyT): string {
+  const tok = item.whatToken
+  if (tok === undefined) return item.what
+  switch (tok.kind) {
+    case 'escalation-empty': return t('attention.escalationEmpty')
+    case 'completion': return t('attention.completionSummary', {
+      label: tok.label ?? t('attention.deliverableFallback'),
+    })
+    case 'approval-missing-tool': return t('attention.toolMissing')
+    case 'approval': return tok.reason === undefined
+      ? tok.toolName
+      : t('attention.approvalWithReason', { tool: tok.toolName, reason: tok.reason })
+    case 'question-missing': return t('attention.questionMissing')
+    case 'question-multi': return t('attention.questionMulti', { first: tok.first, count: tok.count })
+  }
+}
+
 export function AttentionTab(props: AttentionTabProps) {
-  const { t = defaultAttentionT } = props
+  const { t = defaultAttentionT, getPending, follow, pageHistory, sessionId } = props
   const [live, setLive] = useState<readonly LivePending[]>([])
   const [events, setEvents] = useState<readonly AttentionEventLike[]>([])
+  const [eventsSeen, setEventsSeen] = useState(0)
   const [streamError, setStreamError] = useState<string | null>(null)
   const byId = props.useSessions(state => state.byId)
-  const leadId = props.leadOf(props.sessionId)
+  const leadId = props.leadOf(sessionId)
 
   // 挂起项：本地快照轮询（内存读，2s 即时感足够；观察者实时写入登记处）。
   useEffect(() => {
-    const read = (): void => { setLive(props.getPending()) }
+    const read = (): void => { setLive(getPending()) }
     read()
     const timer = setInterval(read, 2_000)
     return () => { clearInterval(timer) }
-  }, [props.getPending])
+  }, [getPending])
 
   // follow 流：快照给历史，其后逐条实时；断流显式落错误行（不静默）。
   useEffect(() => {
@@ -113,7 +133,7 @@ export function AttentionTab(props: AttentionTabProps) {
     setStreamError(null)
     void (async () => {
       try {
-        for await (const frame of props.follow(props.sessionId, controller.signal)) {
+        for await (const frame of follow(sessionId, controller.signal)) {
           if (controller.signal.aborted) return
           const incoming = frame.kind === 'history' ? frame.events.length : 1
           setEventsSeen(seen => seen + incoming)
@@ -126,30 +146,28 @@ export function AttentionTab(props: AttentionTabProps) {
       }
     })()
     return () => { controller.abort() }
-  }, [props.follow, props.sessionId])
+  }, [follow, sessionId])
 
   // 跨会话重建（BUG-292）：活体登记只覆盖本页在场期，`session/follow` 对**未打开**的会话零 history 帧，
   // 所以走 `remote.session.page` 读同工作区 root 会话的首页历史，配对 asked/decided 只留「问了没答」。
   // 结果态（BUG-304/305）：`[]` 分不清「没有」与「读不到/窗口外」，所以连边界一起存。
   // 本会话事件窗口（BUG-317）：`events` 只留最近 MAX_EVENTS 条，所以必须另外记住「一共来过多少条」，
   // 否则更早的挂起审批被截掉后面板还会说「没有等你的事」。
-  const [eventsSeen, setEventsSeen] = useState(0)
   const [history, setHistory] = useState<PendingAcrossSessions>({ items: [], asksCapped: 0, scanned: 0, failed: 0, window: 'none' })
   // 候选挑选走纯函数（fail-closed，BUG-323）：cwd 未解析时**不扫**，而不是把「未知」当「都匹配」。
   const candidates = useMemo(
-    () => historyCandidates(byId as unknown as Readonly<Record<string, CandidateSession>>, props.sessionId, HISTORY_SCAN_CAP),
-    [byId, props.sessionId],
+    () => historyCandidates(byId as unknown as Readonly<Record<string, CandidateSession>>, sessionId, HISTORY_SCAN_CAP),
+    [byId, sessionId],
   )
   const historyKey = candidates.ok ? candidates.ids.join('\n') : ''
 
   useEffect(() => {
     const ids = historyKey === '' ? [] : historyKey.split('\n')
-    const page = props.pageHistory
-    if (ids.length === 0 || page === undefined) { setHistory({ items: [], asksCapped: 0, scanned: 0, failed: 0, window: 'none' }); return }
+    if (ids.length === 0 || pageHistory === undefined) { setHistory({ items: [], asksCapped: 0, scanned: 0, failed: 0, window: 'none' }); return }
     const controller = new AbortController()
     const read = async (): Promise<void> => {
       try {
-        const rebuilt = await readPendingAcrossSessions(page, ids, controller.signal)
+        const rebuilt = await readPendingAcrossSessions(pageHistory, ids, controller.signal)
         if (!controller.signal.aborted) setHistory(rebuilt)
       } catch {
         // 整体失败（罕见）：保留上一轮结果，不让面板闪成空。
@@ -159,7 +177,7 @@ export function AttentionTab(props: AttentionTabProps) {
     // 别的会话里新挂起的审批不会像活体那样推过来（观察者只覆盖本页在场期），所以按慢周期重读。
     const timer = setInterval(() => { void read() }, HISTORY_REFRESH_MS)
     return () => { controller.abort(); clearInterval(timer) }
-  }, [historyKey, props.pageHistory])
+  }, [historyKey, pageHistory])
 
   const eventsTruncated = eventsSeen > MAX_EVENTS
   // 本会话的「待你处理」结果算一次：items 与 capped 都从它来（BUG-327：过去 capped 被丢）。
@@ -216,10 +234,13 @@ export function AttentionTab(props: AttentionTabProps) {
             : <div className="wk-meta">{t('attention.emptyWaiting')}</div>)
           : (
             <ul className="wk-activity" aria-label={t('attention.waitingList')}>
-              {waiting.map(item => (
+              {waiting.map(item => {
+                const fullWhat = formatAttentionWhat(item, t)
+                const summaryWhat = attentionSummary(fullWhat)
+                return (
                 <li key={itemKey(item)}>
                   <Tag tone={attentionTone(item.kind)}>{t(ATTENTION_KEYS[item.kind])}</Tag>
-                  {' '}<span title={item.detail ?? item.what}>{whoOf(item)}：{item.what}</span>
+                  {' '}<span title={item.detail ?? fullWhat}>{t('attention.itemLine', { who: whoOf(item), what: summaryWhat })}</span>
                   <span className="wk-meta"> · {formatWhen(item.time, t)}</span>{' '}
                   <Button
                     size="sm"
@@ -230,7 +251,8 @@ export function AttentionTab(props: AttentionTabProps) {
                     {t('attention.handle')}
                   </Button>
                 </li>
-              ))}
+                )
+              })}
             </ul>
           )}
       </div>
@@ -243,7 +265,7 @@ export function AttentionTab(props: AttentionTabProps) {
               {completions.map(item => (
                 <li key={itemKey(item)}>
                   <Tag tone={attentionTone(item.kind)}>{t(ATTENTION_KEYS[item.kind])}</Tag>
-                  {' '}{whoOf(item)} · {item.what}
+                  {' '}{whoOf(item)} · {attentionSummary(formatAttentionWhat(item, t))}
                   <span className="wk-meta"> · {formatWhen(item.time, t)}</span>
                 </li>
               ))}

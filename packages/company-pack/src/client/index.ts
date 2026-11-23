@@ -25,7 +25,7 @@ import { asSessionPageFace } from './presence/attention-history.ts'
 import { installAttentionObservers } from './wiring/attention-observers.ts'
 import { createCultivationView } from './cultivation/CultivationView.tsx'
 import { createCompanyDataPlane, WORKSPACE_TEXT_PATHS } from './data/company-data-plane.ts'
-import { parseCompanyIdentity, setCompanyIdentity } from './data/company-identity.ts'
+import { applyCompanyIdentityRead } from './data/company-identity.ts'
 import { RUN_BUNDLE_PATHS } from '../lib/shared/run-bundle-paths.ts'
 import { makeContextWiring, type ContextWiringScoped } from './wiring/context-wiring.ts'
 import { makeOpenMember } from './wiring/member-navigation.ts'
@@ -89,7 +89,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // 多实例探活横幅（卡②，2026-10-10 拍板：警告横幅）：同一浏览器多实例并存 = 静默互踩
   // （E2 实证）⇒ localStorage 心跳互见即挂横幅。纯 DOM、无服务依赖，apply 即启。
   // 探活的清理函数挂 fiber（effect 惯例）：卸载/重载时移除心跳、横幅与定时器，不泄漏。
-  ctx.effect(() => startInstanceGuard(document))
+  ctx.effect(() => startInstanceGuard(document, ctx.locale.bind(COMPANY_NS)))
 
   registerTitle(ctx)
 
@@ -105,7 +105,7 @@ export async function apply(ctx: ClientContext): Promise<void> {
       onSendError: (error) => {
         if (reporterWarned) return
         reporterWarned = true
-        console.warn(`company diagnostics 写入失败（错误仍在 __DSH_COMPANY_ERRORS__）：${String((error as Error)?.message ?? error)}`)
+        console.warn(`[company] diagnostics write failed (errors kept in __DSH_COMPANY_ERRORS__): ${String((error as Error)?.message ?? error)}`)
       },
     })
     // 会话出现/切换时补送队列里排着的条目（首屏报错 → 开会话后仍能落盘）。
@@ -269,20 +269,23 @@ function registerTitle(ctx: ClientContext): void {
   // 并把当前角色写到 :root[data-wk-role] 供 CSS 顶部色条使用。
   // 数据 = 上游 agentPreset 投影（A 段已验）+ 会话列表标题；订阅快照，无轮询。
   ctx.inject(['sessions'], (scoped) => {
+    const tCompany = ctx.locale.bind(COMPANY_NS)
     scoped.effect(() => {
       const list = scoped.sessions.list
       const update = (): void => {
         const state = list.getSnapshot()
         const current = Object.values(state.byId).find(s => (s.retainedBy.mainView ?? 0) > 0)
         const preset = current === undefined ? null : readPresetOf(list, current.id)
-        const result = titleUpdateFor({ current, preset, roleShort: ROLE_SHORT, titleOf: sessionTitleOf })
+        const result = titleUpdateFor({ current, preset, roleShort: ROLE_SHORT, titleOf: sessionTitleOf, t: tCompany })
         if (result.title !== undefined) document.title = result.title
         const root = document.documentElement
         if (result.role === undefined) delete root.dataset.wkRole
         else root.dataset.wkRole = result.role
       }
       update()
-      return list.subscribe(update)
+      const offList = list.subscribe(update)
+      const offLocale = ctx.on('locale/change', update)
+      return () => { offList(); offLocale() }
     })
   })
 }
@@ -334,12 +337,10 @@ function registerSidebarIdentity(ctx: ClientContext): void {
     const identityFiles = scoped.remote.workspaceFiles
     const loadIdentity = async (): Promise<void> => {
       try {
-        const first = Object.values(sessions.list.getSnapshot().byId as Record<string, { id: string }>)[0]
+        const first = Object.values(sessions.list.getSnapshot().byId as Record<string, { id: SessionId }>)[0]
         if (first === undefined) return
-        const result = await identityFiles.read(first.id as never, RUN_BUNDLE_PATHS.company, { limit: 200 }, new AbortController().signal)
-        if (!result.ok) return
-        const parsed = parseCompanyIdentity(result.value.text)
-        if (parsed !== null) setCompanyIdentity(parsed)
+        const result = await identityFiles.read(first.id, RUN_BUNDLE_PATHS.company, { limit: 200 }, new AbortController().signal)
+        applyCompanyIdentityRead(result)
       } catch {
         // 品牌读不到就用出厂词标；不把装饰面错误升级成页面错误。
       }

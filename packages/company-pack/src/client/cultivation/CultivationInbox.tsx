@@ -4,8 +4,8 @@
  */
 import { joinList } from '../ui/list-separator.ts'
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
-import { roleLabel as defaultRoleLabel, type CultivationRecord } from '../../lib/cultivation/cultivation.ts'
-import { CULTIVATION_COPY, cultivationListSeparator, adoptLine } from './cultivation-actions.ts'
+import { isInSessionSource, roleLabel as defaultRoleLabel, type CultivationRecord } from '../../lib/cultivation/cultivation.ts'
+import { CULTIVATION_COPY, cultivationListSeparator, formatCultivationReadReason, adoptLine } from './cultivation-actions.ts'
 import { BODY_PREVIEW_LINES, type CultivationBoardState } from './use-cultivation-board.tsx'
 
 function recordKindLabel(record: CultivationRecord, roleLabel: (role: string) => string): string {
@@ -66,7 +66,7 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
         {records === null
           ? <div className="wk-meta">{recordsProblem === null
             ? CULTIVATION_COPY.inboxLoading
-            : CULTIVATION_COPY.inboxUnread(recordsProblem.path, recordsProblem.reason === 'dir-denied' ? CULTIVATION_COPY.inboxUnreadDirDenied : recordsProblem.reason)}</div>
+            : CULTIVATION_COPY.inboxUnread(recordsProblem.path, formatCultivationReadReason(recordsProblem.reason))}</div>
           : inbox.needsDecision.length === 0
             ? <div className="wk-meta">{records.length === 0
               // 记录目录真的空：点名工作区（BUG-291）。
@@ -96,7 +96,7 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
                         {stampOf(record.id) === null ? '' : CULTIVATION_COPY.inboxStamp(String(stampOf(record.id)))}
                         {(record.contexts?.length ?? 0) > 0
                           ? ''
-                          : record.source === '（会话内提交）'
+                          : isInSessionSource(record.source)
                             ? CULTIVATION_COPY.inboxSourceSession
                             : record.source !== '' ? `${stampOf(record.id) === null ? '' : ' · '}${CULTIVATION_COPY.inboxSourceRecorded(record.source).replace(' · ', '')}` : CULTIVATION_COPY.inboxSourceMissing}
                       </span>

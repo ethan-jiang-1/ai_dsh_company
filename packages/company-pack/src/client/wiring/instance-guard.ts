@@ -4,13 +4,18 @@
  * 检测面 = 同浏览器标签页（跨浏览器实例不在此列，已知边界，卡②已登记）。
  */
 
+import { zh, type CompanyT } from '../locales.ts'
+
 export const HEARTBEAT_KEY = 'dsh-company-pack/instances/v1'
 const KEY = HEARTBEAT_KEY
 const STALE_MS = 20_000
 const BANNER_ID = 'dsh-instance-guard-banner'
 
+const fallbackWarning = (count: number): string =>
+  zh['instanceGuard.warning'].replace('{count}', String(count))
+
 /** 纯判据：心跳簿里是否有别人（非 selfId）的新鲜（<20s）心跳。有 ⇒ 返回横幅文案。 */
-export function shouldWarn(raw: string | null, now: number, selfId: string): string | null {
+export function shouldWarn(raw: string | null, now: number, selfId: string, t?: CompanyT): string | null {
   let beats: Record<string, number> = {}
   try {
     beats = raw ? JSON.parse(raw) as Record<string, number> : {}
@@ -19,7 +24,7 @@ export function shouldWarn(raw: string | null, now: number, selfId: string): str
   }
   const others = Object.entries(beats).filter(([id, ts]) => id !== selfId && typeof ts === 'number' && now - ts < STALE_MS)
   if (others.length === 0) return null
-  return `⚠ 检测到另有 ${others.length} 个观察窗实例在运行——多实例同写共享盘会静默互踩（E2 实证），建议只保留一个。`
+  return t ? t('instanceGuard.warning', { count: others.length }) : fallbackWarning(others.length)
 }
 
 function writeBeat(selfId: string): void {
@@ -48,12 +53,12 @@ function removeBanner(doc: Document): void {
 }
 
 /** 启动探活：心跳每 5s 一跳、判据每 10s 一查；返回清理函数（卸载/单实例时移除横幅）。 */
-export function startInstanceGuard(doc: Document = document): () => void {
+export function startInstanceGuard(doc: Document = document, t?: CompanyT): () => void {
   const selfId = `tab-${Math.random().toString(36).slice(2, 10)}`
   writeBeat(selfId)
   const beatTimer = window.setInterval(() => writeBeat(selfId), 5_000)
   const check = () => {
-    const message = shouldWarn(doc.defaultView?.localStorage?.getItem(KEY) ?? null, Date.now(), selfId)
+    const message = shouldWarn(doc.defaultView?.localStorage?.getItem(KEY) ?? null, Date.now(), selfId, t)
     if (message === null) {
       removeBanner(doc)
     } else {

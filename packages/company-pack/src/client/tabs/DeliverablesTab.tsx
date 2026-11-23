@@ -23,6 +23,7 @@ import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { LedgerSummary } from './LedgerTab.tsx'
 import { useWorkspaceText } from '../data/workspace-text.ts'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
+import { joinList, listSeparator } from '../ui/list-separator.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
 import {
   filterCatalog,
@@ -69,7 +70,7 @@ function rowAria(entry: DeliverablesCatalogEntry, t: CompanyT): string {
   if (!entry.ledgered) tags.push(t('deliverables.unledgeredTag'))
   if (entry.presented === false) tags.push(t('deliverables.notPresentedTag'))
   if (entry.presented === null) tags.push(t('deliverables.presentUnknownTag'))
-  return [`${entry.kickoff || t('deliverables.dateMissing')} ${entry.slug}`, type, result, ...tags].join(', ')
+  return joinList([`${entry.kickoff || t('deliverables.dateMissing')} ${entry.slug}`, type, result, ...tags], listSeparator(t))
 }
 
 /** 结果词表（唯一家 = 手册 meta 模板的枚举）→ Tag 色调。新增值必须在这里点名。 */
@@ -151,7 +152,7 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
       byMonth.set(month, [...(byMonth.get(month) ?? []), entry])
     }
     return [...byMonth.entries()]
-  }, [filtered])
+  }, [filtered, t])
   const filterCount = (key: Filter): number => key === 'all' ? counts.total
     : key === 'active' ? counts.active
       : key === 'archive' ? counts.archive

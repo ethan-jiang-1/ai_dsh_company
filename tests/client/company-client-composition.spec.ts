@@ -9,8 +9,10 @@
  * including their removal on unload and return on reload. Remote endpoints are
  * answered by the tier's RemoteMock (network boundary only; real composition
  * everywhere else). */
-import { describe, expect } from 'vitest'
-import { ok } from '../../vendor/dsh/packages/test-support/remote-mock/src/index.ts'
+import { act, createElement, type ComponentType } from 'react'
+import { createRoot } from 'react-dom/client'
+import { describe, expect, vi } from 'vitest'
+import { frames, ok } from '../../vendor/dsh/packages/test-support/remote-mock/src/index.ts'
 import { bundleRoster, WEB_PROFILE_BUNDLES } from '../../vendor/dsh/packages/test-support/client-runtime/src/assembly/bundle-roster.ts'
 import { createClientTest } from '../../vendor/dsh/packages/test-support/client-runtime/src/assembly/index.ts'
 // 源码面供本包 client 行（tier 的 provide 机制）：动态 import 走 exports 落到 tsdown 的 CJS
@@ -18,6 +20,10 @@ import { createClientTest } from '../../vendor/dsh/packages/test-support/client-
 import * as companyClient from '../../packages/company-pack/src/client/index.ts'
 import { HEARTBEAT_KEY } from '../../packages/company-pack/src/client/wiring/instance-guard.ts'
 import { en as companyEn, zh as companyZh } from '../../packages/company-pack/src/client/locales.ts'
+import { DELEGATION_TOOL_KEYS } from '../../packages/company-pack/src/client/wiring/delegation-keys.ts'
+import { TEAM_TOOL_KEYS } from '../../packages/company-pack/src/client/ui/TeamToolCard.tsx'
+
+;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
 /** The web profile's browser roster with the company pack as an extra bundle layer. */
 const roster = bundleRoster(
@@ -48,7 +54,13 @@ const COMPANY_SLOTS = [
 const HEARTBEATS = HEARTBEAT_KEY
 
 interface TabsRegistry { entries(): ReadonlyArray<{ id: string }> }
-interface SlotsRegistry { entries(key: string): ReadonlyArray<{ options: { key: string } }> }
+interface StoredSlotEntry {
+  component: ComponentType<Record<string, unknown>>
+  options: { key?: string; id?: string }
+  inject?: ((...args: unknown[]) => Record<string, unknown>) | undefined
+  locale?: string | undefined
+}
+interface SlotsRegistry { entries(key: string): ReadonlyArray<StoredSlotEntry> }
 
 /** The tab registration injects `remote.workspaceFiles`; the tier's namespace
  * derivation needs a mock rule with that URL prefix (real browser: the dropped
@@ -139,4 +151,115 @@ describe('company client apply through the whole-client tier', () => {
     const beats = JSON.parse(localStorage.getItem(HEARTBEATS) ?? '{}') as Record<string, number>
     expect(Object.keys(beats).filter(id => id.startsWith('tab-'))).toHaveLength(1)
   })
+
+  test('invokes every company slot inject() and mounts every tab and non-tab slot in happy-dom with zero errors', async ({ mock, start }) => {
+    mock.load({
+      unary: {
+        'workspaceFiles/read': ok({ text: '', eof: true }),
+        'workspaceFiles/list': ok({ entries: [] }),
+        'settings/mutate': ok({
+          autoGenerate: false, ns: 'locale', schema: {}, value: { preference: 'zh' },
+          applies: 'live', secrets: [], revision: 1,
+        }),
+      },
+      stream: {
+        'session/follow': frames([]),
+      },
+    })
+    const client = await start()
+    const slots = client.ctx.get('slots') as SlotsRegistry
+    const locale = client.ctx.get('locale') as { bind(ns: string): (key: string) => unknown }
+    const sessions = client.ctx.get('sessions') as {
+      list: { getSnapshot(): Record<string, unknown>; subscribe(fn: () => void): () => void }
+    }
+
+    const sessionId = 's-mount-1'
+    const useSessions = (selector: (s: unknown) => unknown) => selector(sessions.list.getSnapshot())
+    const useProjection = () => undefined
+    const tCompany = locale.bind('company')
+
+    const errors: unknown[] = []
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation((...args) => { errors.push(args) })
+
+    const targets: Array<{ slot: string; entry: StoredSlotEntry; owner: Record<string, unknown> }> = []
+    for (const key of COMPANY_TAB_IDS) {
+      const body = slots.entries('sidebar.right.pane.tab').find(e => e.options.key === key)
+      const title = slots.entries('sidebar.right.pane.tab.title').find(e => e.options.key === key)
+      const guide = slots.entries('sidebar.right.tab.guide.entry').find(e => e.options.key === key)
+      expect(body, `missing tab body ${key}`).toBeDefined()
+      expect(title, `missing tab title ${key}`).toBeDefined()
+      expect(guide, `missing guide entry ${key}`).toBeDefined()
+      targets.push(
+        { slot: `tab.body:${key}`, entry: body!, owner: { sessionId, useSessions, useProjection, useTabInfo: () => ({ tab: { id: 'tab-1', contentId: key }, floating: false }) } },
+        { slot: `tab.title:${key}`, entry: title!, owner: { sessionId, active: true, tab: { id: 'tab-1', contentId: key } } },
+        { slot: `tab.guide:${key}`, entry: guide!, owner: { id: key, title: key, description: key } },
+      )
+    }
+
+    const inputLeft = slots.entries('conversation.input.left').filter(e => e.options.id === 'company-strategy' || e.options.id === 'company-command-scope')
+    expect(inputLeft).toHaveLength(2)
+    for (const entry of inputLeft) {
+      targets.push({ slot: `conversation.input.left:${entry.options.id}`, entry, owner: { sessionId, useSessions, useProjection } })
+    }
+
+    const cultView = slots.entries('conversation.view').find(e => e.options.id === 'dsh-company-pack/cultivation')
+    expect(cultView).toBeDefined()
+    targets.push({ slot: 'conversation.view:cultivation', entry: cultView!, owner: { sessionId, useSessions, useProjection } })
+
+    const brand = slots.entries('sidebar.brand.name').find(e => e.locale === 'company')
+    expect(brand).toBeDefined()
+    targets.push({ slot: 'sidebar.brand.name', entry: brand!, owner: {} })
+
+    const badge = slots.entries('sidebar.session.row.leading').find(e => e.options.id === 'company-role-badge')
+    expect(badge).toBeDefined()
+    targets.push({ slot: 'sidebar.session.row.leading', entry: badge!, owner: { sessionId } })
+
+    const tasksAct = slots.entries('conversation.session.header.actions').find(e => e.options.id === 'company-tasks')
+    expect(tasksAct).toBeDefined()
+    targets.push({ slot: 'conversation.session.header.actions', entry: tasksAct!, owner: { sessionId, useSessions } })
+
+    // `tool.call.toolview` only activates once an owner declares it; if the minimal web closure
+    // didn't mount ui-tool's conversation node owner, declare it via `shell.overlay` so our own
+    // `scoped.slots.inject('tool.call.toolview', ...)` fires for every DELEGATION + TEAM key.
+    if (slots.entries('tool.call.toolview').filter(e => e.locale === 'company').length === 0) {
+      await client.ctx.plugin({
+        inject: ['slots'],
+        apply: (scoped) => {
+          scoped.slots.inject('shell.overlay', () =>
+            scoped.slots.register({
+              name: 'shell.overlay',
+              id: 'test-toolview-host',
+              children: { 'tool.call.toolview': { kind: 'keyed', scope: 'session' } },
+            }, () => null))
+        },
+      })
+    }
+
+    for (const key of [...DELEGATION_TOOL_KEYS, ...TEAM_TOOL_KEYS]) {
+      const tool = slots.entries('tool.call.toolview').find(e => e.options.key === key && e.locale === 'company')
+      expect(tool, `missing tool.call.toolview ${key}`).toBeDefined()
+      targets.push({ slot: `tool.call.toolview:${key}`, entry: tool!, owner: { sessionId, toolName: key, block: { name: key, argsRaw: '{}' } } })
+    }
+
+    try {
+      for (const target of targets) {
+        const injected = target.entry.inject !== undefined ? target.entry.inject(sessionId) : {}
+        const props = {
+          ...target.owner,
+          ...injected,
+          ...(target.entry.locale ? { t: tCompany } : {}),
+        }
+        const host = document.createElement('div')
+        document.body.append(host)
+        const root = createRoot(host)
+        await act(async () => { root.render(createElement(target.entry.component, props)) })
+        await act(async () => { await new Promise(resolve => { setTimeout(resolve, 0) }) })
+        act(() => { root.unmount() })
+        host.remove()
+      }
+    } finally {
+      errorSpy.mockRestore()
+    }
+    expect(errors).toEqual([])
+  }, 90_000)
 })

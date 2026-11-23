@@ -27,12 +27,12 @@
 [upgrade-while-running.entry](lanes/upgrade-while-running.entry.mjs)
 [workflow-contract.e2e](lanes/workflow-contract.e2e.mjs)
 
-## 盘面审计（checks/audit/，8）
+## 盘面审计（checks/audit/，9）
 
 [authorship-audit](audit/authorship-audit.mjs) · [candidate-scan-eval](audit/candidate-scan-eval.mjs)
-[coverage-ratchet](audit/coverage-ratchet.mjs) · [deliverables-check](audit/deliverables-check.mjs)
-[journal-audit](audit/journal-audit.mjs) · [quality-loop-audit](audit/quality-loop-audit.mjs)
-[refactor-drift-audit](audit/refactor-drift-audit.mjs)
+[company-static-audit](audit/company-static-audit.mjs) · [coverage-ratchet](audit/coverage-ratchet.mjs)
+[deliverables-check](audit/deliverables-check.mjs) · [journal-audit](audit/journal-audit.mjs)
+[quality-loop-audit](audit/quality-loop-audit.mjs) · [refactor-drift-audit](audit/refactor-drift-audit.mjs)
 [surface-matrix-audit](audit/surface-matrix-audit.mjs)
 
 ## 窄机制与视觉探针（probes/，67 = 66 probes + 1 fixture）

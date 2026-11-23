@@ -19,6 +19,15 @@ import {
   type LivePending,
 } from '../../../packages/company-pack/src/lib/presence/attention.ts'
 import { createAttentionRegistry } from '../../../packages/company-pack/src/client/wiring/attention-registry.ts'
+import { formatAttentionWhat } from '../../../packages/company-pack/src/client/tabs/AttentionTab.tsx'
+import { en, zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
+
+const dictT = (dict: Record<string, string>) => ((key: string, params?: Record<string, string | number>) => {
+  const template = dict[key] ?? ''
+  return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+}) as CompanyT
+const zhT = dictT(zh)
+const enT = dictT(en)
 
 /**
  * 只测纯函数与登记处生命周期（毫秒级）。真页面的观察者链路（远端事件 → 面板行）是认证档：
@@ -58,13 +67,15 @@ describe('streamAttention · 升级待处理', () => {
     expect(items[0]).toMatchObject({ kind: 'escalation', what: '现场支持谁顶？' })
   })
 
-  it('多行消息取首行；空升级消息给（空）占位', () => {
+  it('多行消息取首行；空升级消息给 escalation-empty token', () => {
     const items = streamAttention([
       messageEvent('coo', `${ESCALATION_MARK}并行池已满\n要不要挪项目？`),
       messageEvent('cfo', ESCALATION_MARK),
     ], 'lead-1', 'CEO')
     expect(items[0]!.what).toBe('并行池已满')
-    expect(items[1]!.what).toBe('（空）')
+    expect(items[1]!.whatToken).toEqual({ kind: 'escalation-empty' })
+    expect(formatAttentionWhat(items[1]!, zhT)).toBe('（空）')
+    expect(formatAttentionWhat(items[1]!, enT)).toBe('(empty)')
   })
 
   it('超过上限只留最近 STREAM_ITEM_CAP 条', () => {
@@ -77,22 +88,30 @@ describe('streamAttention · 升级待处理', () => {
 })
 
 describe('streamAttention · 完成通知', () => {
-  it('只折 present 工具调用；参数解析出 title 摘要', () => {
+  it('只折 present 工具调用；参数解析出 title token', () => {
     const items = streamAttention([
       toolCallEvent('skill', '{"name":"chairing"}', 900),
       toolCallEvent(PRESENT_TOOL_NAME, '{"title":"支持 SLA 承诺页","slug":"support-sla-page"}', 1_000),
     ], 'lead-1', 'CEO')
     expect(items).toHaveLength(1)
-    expect(items[0]).toMatchObject({ kind: 'completion', who: 'CEO', what: '交付完成：支持 SLA 承诺页', jumpTo: 'lead-1' })
+    expect(items[0]).toMatchObject({ kind: 'completion', who: 'CEO', whatToken: { kind: 'completion', label: '支持 SLA 承诺页' }, jumpTo: 'lead-1' })
+    expect(formatAttentionWhat(items[0]!, zhT)).toBe('交付完成：支持 SLA 承诺页')
+    expect(formatAttentionWhat(items[0]!, enT)).toBe('Delivered: 支持 SLA 承诺页')
   })
 
-  it('参数缺失 / 非法 JSON / 无已知字段都给「交付物」兜底', () => {
+  it('参数缺失 / 非法 JSON / 无已知字段都给 completion fallback token', () => {
     const items = streamAttention([
       toolCallEvent(PRESENT_TOOL_NAME, undefined, 1),
       toolCallEvent(PRESENT_TOOL_NAME, '{oops', 2),
       toolCallEvent(PRESENT_TOOL_NAME, '{"other":1}', 3),
     ], 'lead-1', 'CEO')
-    expect(items.map(item => item.what)).toEqual(['交付完成：交付物', '交付完成：交付物', '交付完成：交付物'])
+    expect(items.map(item => item.whatToken)).toEqual([
+      { kind: 'completion', label: null },
+      { kind: 'completion', label: null },
+      { kind: 'completion', label: null },
+    ])
+    expect(items.map(item => formatAttentionWhat(item, zhT))).toEqual(['交付完成：交付物', '交付完成：交付物', '交付完成：交付物'])
+    expect(items.map(item => formatAttentionWhat(item, enT))).toEqual(['Delivered: Deliverable', 'Delivered: Deliverable', 'Delivered: Deliverable'])
   })
 })
 
@@ -170,9 +189,11 @@ describe('pendingApprovals · 边角形态', () => {
   const asked = (id: string, time: number, data: Record<string, unknown>) => ({ type: 'approval/asked', time, data: { id, ...data } })
   const decided = (id: string, time: number) => ({ type: 'approval/decided', time, data: { id } })
 
-  it('缺 toolName ⇒ 占位文案，仍算挂起', () => {
+  it('缺 toolName ⇒ approval-missing-tool token，仍算挂起', () => {
     const [item] = pendingApprovals([asked('a1', 1000, {})], 's1').items
-    expect(item?.what).toContain('工具名缺失')
+    expect(item?.whatToken).toEqual({ kind: 'approval-missing-tool' })
+    expect(formatAttentionWhat(item!, zhT)).toBe('（工具名缺失）')
+    expect(formatAttentionWhat(item!, enT)).toBe('(tool name missing)')
   })
 
   it('reason 只有空白 ⇒ 只显示工具名（不挂一串空格）', () => {
@@ -330,14 +351,15 @@ describe('pendingAsk/重建问询（BUG-319）', () => {
     expect(pendingAsks([call('c1', '要不要并行？', 1000), result('c1', 2000)], 's-1').items).toHaveLength(0)
   })
 
-  it('arguments 坏 / 缺问题 ⇒ 占位文案，仍算挂起（不静默丢）', () => {
+  it('arguments 坏 / 缺问题 ⇒ question-missing token，仍算挂起（不静默丢）', () => {
     const broken = [
       { type: 'tool/call' as const, time: 1, data: { callId: 'c1', name: 'ask_user_question', arguments: '{not json' } },
       { type: 'tool/call' as const, time: 2, data: { callId: 'c2', name: 'ask_user_question', arguments: JSON.stringify({ questions: [] }) } },
     ]
     const items = pendingAsks(broken, 's-1').items
     expect(items).toHaveLength(2)
-    expect(items[0]?.what).toContain('问询内容缺失')
+    expect(items[0]?.whatToken).toEqual({ kind: 'question-missing' })
+    expect(formatAttentionWhat(items[0]!, zhT)).toBe('（问询内容缺失）')
   })
 
   it('审批与问询一起回来，按时间倒序', () => {
@@ -353,7 +375,7 @@ describe('pendingAsk/重建问询（BUG-319）', () => {
 // 问询重建的分支补齐：缺 arguments / 空字符串 / 非字符串、data 为 null、
 // user-questions/answered 口径、带 detail 的正例。少一条就少一个「下次坏这里没人发现」。
 describe('pendingAsks · 形状边角（重建问询）', () => {
-  it('缺 arguments / 空串 / 非字符串 ⇒ 占位；data null 的事件被忽略', () => {
+  it('缺 arguments / 空串 / 非字符串 ⇒ question-missing token；data null 的事件被忽略', () => {
     const items = pendingAsks([
       { type: 'tool/call', time: 1, data: { callId: 'a', name: 'ask_user_question' } },
       { type: 'tool/call', time: 2, data: { callId: 'b', name: 'ask_user_question', arguments: '   ' } },
@@ -361,7 +383,7 @@ describe('pendingAsks · 形状边角（重建问询）', () => {
       { type: 'tool/call', time: 4, data: null },
     ] as never, 's-1').items
     expect(items).toHaveLength(3)
-    expect(items.every(item => (item.what ?? '').includes('问询内容缺失'))).toBe(true)
+    expect(items.every(item => item.whatToken?.kind === 'question-missing')).toBe(true)
   })
 
   it('正例带 detail（悬停可看全文）', () => {
@@ -427,9 +449,11 @@ describe('mergeAttention · 跨源问询去重（BUG-325）', () => {
 describe('pendingQuestions · 多问题请求（BUG-331）', () => {
   const call = (argumentsText: string) => ({ type: 'tool/call' as const, time: 1000, data: { callId: 'c1', name: 'ask_user_question', arguments: argumentsText } })
 
-  it('三个问题 ⇒ 一条条目、what 带「共 3 个问题」、detail 列出全部', () => {
+  it('三个问题 ⇒ 一条条目、whatToken 为 question-multi(3)、detail 列出全部', () => {
     const [item] = pendingQuestions([call(JSON.stringify({ questions: [{ question: 'A' }, { question: 'B' }, { question: 'C' }] }))], 's-1')
-    expect(item?.what).toContain('共 3 个问题')
+    expect(item?.whatToken).toEqual({ kind: 'question-multi', first: 'A', count: 3 })
+    expect(formatAttentionWhat(item!, zhT)).toBe('A（共 3 个问题）')
+    expect(formatAttentionWhat(item!, enT)).toBe('A (3 questions)')
     expect(item?.detail).toContain('B')
     expect(item?.detail).toContain('C')
   })

@@ -82,8 +82,14 @@ const CULTIVATION_COPY_ZH = {
   contextEmpty: '还没有可引用的会话或成品。',
   contextLoading: '正在读取这段背景…',
   contextNoText: '这段会话没有可用的文字背景（可能只有工具调用）；换一段，或不带背景提交。',
+  contextNoTextShort: '这段会话没有可用的文字背景。',
   contextReadFailed: (reason: string): string => `这段背景读不到：${reason}。可以换一段，或不带背景提交。`,
   contextTimeout: '这段背景读得太慢——已停止。可以不带走背景继续，或重试。',
+  contextCatalogMissing: '读不到成品目录（生成器未跑或索引缺失）——仍可选会话，或直接手写。',
+  contextCatalogBadShape: '成品目录形状不符（schema 1 / entries 缺失）。',
+  contextCatalogReadFailed: (reason: string): string => `读不到成品目录：${reason}。`,
+  contextCatalogTruncated: '成品索引超出读取上限，未完整读取。',
+  contextCatalogSkipped: (count: number): string => `${String(count)} 条坏形状成品索引条目已跳过。`,
   contextRemove: '移除',
   contextChange: '更换',
   contextExpand: '展开',
@@ -93,6 +99,9 @@ const CULTIVATION_COPY_ZH = {
   contextChangeTurn: '换一轮',
   contextOpenSession: '打开会话',
   contextOpenFile: '打开原文',
+  contextOpenSessionMissing: '这个会话现在打不开了（可能已删除）。',
+  contextOpenFileMissing: '原文不在了（文件可能已归档/移动）。',
+  contextOpenFileFailed: (reason: string): string => `打不开原文：${reason}`,
   contextTruncated: (turn: number, chars: number): string => `已截取最近 ${String(turn)} 轮，约 ${String(chars)} 字；原文可打开。`,
   contextBadPayload: (reason: string): string => `背景格式坏：${reason}`,
   contextTooLarge: (bytes: number): string => `背景太大（超过 ${String(bytes)} 字节），请选短一点的材料。`,
@@ -130,6 +139,9 @@ const CULTIVATION_COPY_ZH = {
   inboxLoading: '培养记录读取中…',
   inboxUnread: (path: string, reason: string): string => `培养记录读不到：${path}——${reason}（不算 0 条）。`,
   inboxUnreadDirDenied: '列目录被拒',
+  inboxUnreadReadDenied: '读取被拒',
+  colonJoin: '：',
+  unreadableThrown: '<无法显示的原因>',
   timeJustNow: '刚刚',
   timeMinutesAgo: (n: number): string => `${String(n)} 分钟前`,
   timeHoursAgo: (n: number): string => `${String(n)} 小时前`,
@@ -336,8 +348,14 @@ const CULTIVATION_COPY_EN = {
   contextEmpty: 'No session or deliverable to reference yet.',
   contextLoading: 'Reading this background…',
   contextNoText: 'This session has no usable text background (maybe only tool calls); pick another or submit without background.',
+  contextNoTextShort: 'This session has no usable text background.',
   contextReadFailed: (reason: string): string => `Cannot read this background: ${reason}. Pick another or submit without background.`,
   contextTimeout: 'This background took too long — stopped. Continue without it, or retry.',
+  contextCatalogMissing: 'Cannot read the deliverables catalog (generator has not run or index is missing) — you can still pick a session or write directly.',
+  contextCatalogBadShape: 'Deliverables catalog has an invalid shape (schema 1 / entries missing).',
+  contextCatalogReadFailed: (reason: string): string => `Cannot read the deliverables catalog: ${reason}.`,
+  contextCatalogTruncated: 'Deliverables index exceeded the read limit and was truncated.',
+  contextCatalogSkipped: (count: number): string => `${String(count)} malformed deliverable index entries were skipped.`,
   contextRemove: 'Remove',
   contextChange: 'Change',
   contextExpand: 'Expand',
@@ -347,6 +365,9 @@ const CULTIVATION_COPY_EN = {
   contextChangeTurn: 'Change turn',
   contextOpenSession: 'Open session',
   contextOpenFile: 'Open source',
+  contextOpenSessionMissing: 'This session can no longer be opened (it may have been deleted).',
+  contextOpenFileMissing: 'Source file is missing (it may have been archived or moved).',
+  contextOpenFileFailed: (reason: string): string => `Cannot open source: ${reason}`,
   contextTruncated: (turn: number, chars: number): string => `Clipped to the latest ${String(turn)} turns, about ${String(chars)} characters; the source can be opened.`,
   contextBadPayload: (reason: string): string => `Bad background payload: ${reason}`,
   contextTooLarge: (bytes: number): string => `Background too large (over ${String(bytes)} bytes); pick shorter material.`,
@@ -378,6 +399,9 @@ const CULTIVATION_COPY_EN = {
   inboxLoading: 'Reading cultivation records…',
   inboxUnread: (path: string, reason: string): string => `Cultivation records unreadable: ${path} — ${reason} (not zero).`,
   inboxUnreadDirDenied: 'the directory listing was denied',
+  inboxUnreadReadDenied: 'read denied',
+  colonJoin: ': ',
+  unreadableThrown: '<unreadable reason>',
   timeJustNow: 'just now',
   timeMinutesAgo: (n: number): string => `${String(n)} minutes ago`,
   timeHoursAgo: (n: number): string => `${String(n)} hours ago`,
@@ -535,6 +559,20 @@ let cultivationLanguage: 'zh' | 'en' = 'zh'
 /** 当前培养语言下的列表分隔符（zh「、」/ en ", "，BUG-329）。 */
 export function cultivationListSeparator(): string {
   return cultivationLanguage === 'en' ? ', ' : '、'
+}
+
+/** 当前培养语言下的从句分隔符（zh「；」/ en "; "）。 */
+export function cultivationClauseSeparator(): string {
+  return cultivationLanguage === 'en' ? '; ' : '；'
+}
+
+/** 将数据层返回的机器读取失败 reason token 折成当前语言文案。 */
+export function formatCultivationReadReason(reason: string): string {
+  if (reason === 'dir-denied') return CULTIVATION_COPY.inboxUnreadDirDenied
+  if (reason.startsWith('read-denied: ')) {
+    return `${CULTIVATION_COPY.inboxUnreadReadDenied} (${reason.slice('read-denied: '.length)})`
+  }
+  return reason
 }
 
 /** Set the expression language for the cultivation copy table (called by CultivationView). */
@@ -707,7 +745,8 @@ export function renderThrown(value: unknown): string {
   try {
     return String(value)
   } catch {
-    return '<无法显示的原因>'
+    // intentional-fallback: String(value) 抛错（Poisoned toString）时退回安全占位。
+    return CULTIVATION_COPY.unreadableThrown
   }
 }
 

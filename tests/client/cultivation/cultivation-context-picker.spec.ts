@@ -122,4 +122,21 @@ describe('背景选择面板（R5-27）', () => {
     })
     expect(onCancel).toHaveBeenCalledTimes(1)
   })
+
+  it('成品目录有 skipped 时展示提示条，切回无 skipped 源后清除', async () => {
+    const withSkipped = props({
+      sources: {
+        listSessions: () => ({ ok: true as const, value: [current] }),
+        listDeliverables: async () => ({ ok: true as const, value: [deliverable], skipped: 3 }),
+        readPreview: async () => ({ ok: true as const }),
+      },
+    })
+    const host = await mount(createElement(CultivationContextPicker, withSkipped))
+    expect(host.textContent).toContain('3')
+    await act(async () => {
+      mounted?.render(createElement(CultivationContextPicker, props({ currentSessionId: 'session-2' })))
+    })
+    await flush()
+    expect(host.textContent).not.toContain('3 条坏形状')
+  })
 })

@@ -95,21 +95,22 @@ function initialChatWidth(): number {
  * @returns 可注册到 `conversation.view` 的组件。
  */
 export function createCultivationView(injected: CultivationViewInjected) {
+  const { roleSource, contextSources: makeContextSources, cultivationActions } = injected
   return function CultivationView(props: CultivationViewProps) {
     const { sessionId, t } = props
     setCultivationLanguage(t('meta.language') === 'en' ? 'en' : 'zh')
-    const subscribe = useMemo(() => injected.roleSource.subscribe.bind(injected.roleSource), [injected.roleSource])
-    const getPreset = useCallback(() => readPresetOf(injected.roleSource, sessionId), [injected.roleSource, sessionId])
+    const subscribe = useMemo(() => roleSource.subscribe.bind(roleSource), [])
+    const getPreset = useCallback(() => readPresetOf(roleSource, sessionId), [sessionId])
     const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
     const { journalRows, records, recordsProblem, brokenRecords, unexpandedRecords, refresh } = useCultivationPanelData(injected.cultivationFiles, sessionId)
     const feedback = useCultivationFeedback(injected.followEvents, sessionId)
     const teammate = props.useSessions(state => state.byId[sessionId]?.origin === 'subagent')
     const sessionCwd = props.useSessions(state => state.byId[sessionId]?.cwd)
-    const contextSources = useMemo(() => injected.contextSources?.(sessionId), [injected.contextSources, sessionId])
+    const contextSources = useMemo(() => makeContextSources?.(sessionId), [sessionId])
     const openContext = injected.openContext === undefined
       ? undefined
       : (context: CultivationContext) => injected.openContext!(sessionId, context)
-    const actions = useMemo(() => injected.cultivationActions(sessionId), [injected.cultivationActions, sessionId])
+    const actions = useMemo(() => cultivationActions(sessionId), [sessionId])
     const splitRef = useRef<HTMLDivElement | null>(null)
     const [chatWidth, setChatWidth] = useState(initialChatWidth)
     const [dragging, setDragging] = useState(false)

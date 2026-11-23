@@ -11,7 +11,23 @@
 import { parseContextPayload, contextPayloadText, type CultivationContext } from './cultivation-context.ts'
 import { journalTitle } from './cultivation-inbox.ts'
 
-/** 一条培养记录（frontmatter 的领域投影）。 */
+/** 来源为“会话内提交”的落盘标记（host 按当前语言写中/英文，读侧统一识别）。 */
+const IN_SESSION_SOURCES = new Set(['（会话内提交）', '(submitted in-session)'])
+
+/** 判断记录来源是否属于“会话内提交”占位。 */
+export function isInSessionSource(source: string): boolean {
+  return IN_SESSION_SOURCES.has(source)
+}
+
+const SUBMITTED_RECORD_ID_RE = /(?:已提交培养记录|Submitted cultivation record)\s+(\S+)/
+
+/** 从 host `/cultivation` 提交回执里提取新记录 id；提取不到返回 null。 */
+export function extractSubmittedRecordId(text: string): string | null {
+  const match = SUBMITTED_RECORD_ID_RE.exec(text)
+  return match?.[1] ?? null
+}
+
+/** 一次培养记录（frontmatter 的领域投影）。 */
 export interface CultivationVerification {
   readonly outcome: 'pass' | 'fail'
   readonly evidence: string

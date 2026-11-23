@@ -1,15 +1,15 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-23
 ---
 
-# 推敲：客户端静态猎手、满态双语扫面与全 Slot 真挂载（质量预防首批）
+# 落地：客户端静态猎手、满态双语扫面与全 Slot 真挂载（质量预防首批）
 
-> 立卡：2026-11-23 ｜ 状态：推敲中 ｜ 类型：Task ｜ 毕业：做（待用户确认范围与实施授权） ｜ 可关闭：否
+> 立卡：2026-11-23 ｜ 状态：已结 ｜ 类型：Task ｜ 毕业：做 ｜ 批准：用户 2026-11-23「同意按这个落地，记着需要高质量的落地」「先提交一下git, 好的，没问题，我看你都已经搞得很清楚了，那我们就set up goal 推动落地吧」（R1/R2/R3 直接设为阻断防线、R4 保留只读基线） ｜ 可关闭：是 ｜ 审查：agent（独立只读盲审 `817492aa-e94a-4732-8f2a-3ea225b30465` 发现 2 阻断 + 4 非阻断，已全部修复并复验通过）
 >
-> **结论/去向**：（实施授权后拟定 `note` — 计划落点为 `notes/implemented/` 下的实施 Note，拟名 `2026-11-23-client-static-guards-and-contract-sweep.md`；当前仅立卡推敲，尚未实施）
+> **结论/去向**：`note` — [实施Note](../../../notes/implemented/2026-11-23-client-static-guards-and-contract-sweep.md)
 >
-> 来源：[缺陷预防与非 E2E 发现手段研究](../research/bug-prevention-and-discovery/README.md)（特别是 [实盘可行性核验与自研定制工具方案](../research/bug-prevention-and-discovery/2026-11-23-custom-linters-and-feasibility-audit.md)）。
+> 来源：[缺陷预防与非 E2E 发现手段研究](../../research/bug-prevention-and-discovery/README.md)（特别是 [实盘可行性核验与自研定制工具方案](../../research/bug-prevention-and-discovery/2026-11-23-custom-linters-and-feasibility-audit.md)）。
 
 **问题与期望结果：** 2026-11-20 试点后 3 天内通过 6 轮 E2E 又挖出 49 张有效缺陷卡（`BUG-283`–`BUG-332`，另 1 撤回），其中 81.6% 在 `src/client/` 与 `src/lib/`、87.8% 只需秒级 keyless `vitest` 即可打红；甚至第 6 轮刚收口，一次只读静态/lint 扫描就在 1 秒内再次命中现行残留（`DeliverablesTab.tsx:154` `useMemo` 漏 `t` 依赖、`attention.ts` 6 处硬编码中文含 `BUG-331` 新引入文案、`company-panels.tsx:159` 与 `CultivationBoardSections.tsx:286` 裸 `join('；')`、`cultivation-data.ts:90` 与 `cultivation-context-data.ts` 中文错误、`cultivation-context-data.ts:198` 丢弃 `catalog.skipped`、`client/index.ts:339` 读 200 行忽略 `eof`）。期望通过**零新第三方依赖**的首批机械防线，把“hooks 依赖洞、领域边界/诊断字段静默丢弃、双语满态/标点泄漏、Slot 接线崩溃”前移到秒级自动捕获，并同步清掉上述已曝光的现行残留。
 
@@ -44,7 +44,7 @@ opened: 2026-11-23
 - 不在本卡实施第二批（6 大解析器畸形 Fuzz 矩阵、统一 `Bounded<T>` 重构、Live↔History 差分——另立第二卡）；
 - 不在本卡引入新 npm 依赖（不装 `fast-check`、StrykerJS、`knip`、`oxlint-tsgolint`）；
 - 不做品牌类型试点（Tier 2）或一次性清理全仓 138 处历史静默 `catch`（本卡只建基线，不搞全仓重写）；
-- 不改 `vendor/`，不改角色 persona/skill/content，不取代或关闭活跃卡 [2026-11-21-company-e2e-test-design.md](2026-11-21-company-e2e-test-design.md)（本卡负责把能前移的静态/无模型缺陷从 E2E 卸载出来，E2E 卡专注真浏览器/真边界）。
+- 不改 `vendor/`，不改角色 persona/skill/content，不取代或关闭活跃卡 [2026-11-21-company-e2e-test-design.md](../../issues/2026-11-21-company-e2e-test-design.md)（本卡负责把能前移的静态/无模型缺陷从 E2E 卸载出来，E2E 卡专注真浏览器/真边界）。
 
 ## 已知与未决
 
@@ -92,3 +92,8 @@ opened: 2026-11-23
 
 - 用户确认范围与取舍并明确授权实施后，翻 `待落地` 并按 `## 验收标准` 落地交付；交付后产出真实 `notes/implemented/` Note、通过独立盲审、补齐 `## 落地证据` 与 `审查：`，再迁档 `settled_issues`。
 - 若用户裁决缩减范围或改为先落第二批，先同步更新本卡范围/验收或按裁决另立卡再关停。
+
+## 落地证据
+
+- **系统改动面**：[`.oxlintrc.json`](../../../.oxlintrc.json)、[`package.json`](../../../package.json)、[`checks/lib/company-static-audit.mjs`](../../../checks/lib/company-static-audit.mjs)、[`checks/audit/company-static-audit.mjs`](../../../checks/audit/company-static-audit.mjs)、[`packages/company-pack/src/client/`](../../../packages/company-pack/src/client/index.ts)、[`packages/company-pack/src/lib/presence/attention.ts`](../../../packages/company-pack/src/lib/presence/attention.ts)、[`tests/tools/company-static-audit.spec.ts`](../../../tests/tools/company-static-audit.spec.ts)、[`tests/client/i18n/`](../../../tests/client/i18n/panels.spec.ts)、[`tests/client/company-client-composition.spec.ts`](../../../tests/client/company-client-composition.spec.ts)、[`notes/implemented/2026-11-23-client-static-guards-and-contract-sweep.md`](../../../notes/implemented/2026-11-23-client-static-guards-and-contract-sweep.md)。
+- **实跑命令**：`pnpm lint`（0 errors/warnings + static-audit 0 violations）、`pnpm typecheck`、`pnpm coverage:ratchet`（283/283 files, 2629 tests PASS, 212 文件覆盖率棘轮 PASS）、`pnpm verify`、`pnpm dup`（0 clones）、`pnpm test:checks`（11 PASS / 0 FAIL）、`ui-scene.entry.mjs --isolated --expected` & `--isolated --lang en`（ALL PASS）。

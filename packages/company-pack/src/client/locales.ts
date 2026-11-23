@@ -104,6 +104,14 @@ export const zh = {
   'attention.kind.approval': '待批审批',
   'attention.kind.escalation': '升级待处理',
   'attention.kind.completion': '完成通知',
+  'attention.itemLine': '{who}：{what}',
+  'attention.escalationEmpty': '（空）',
+  'attention.deliverableFallback': '交付物',
+  'attention.completionSummary': '交付完成：{label}',
+  'attention.toolMissing': '（工具名缺失）',
+  'attention.approvalWithReason': '{tool}：{reason}',
+  'attention.questionMissing': '（问询内容缺失）',
+  'attention.questionMulti': '{first}（共 {count} 个问题）',
   'panel.float': '浮出',
   'panel.floatTitle': '把这个面板拽出成浮窗（可移动 / 可缩放；下次浮出回到上次位置）',
   'panel.dock': '收回',
@@ -191,6 +199,7 @@ export const zh = {
   'ledger.refresh': '每 {seconds} 秒自动刷新',
   'ledger.unreadable': '台账不可读（kb/motion-ledger.md 缺失？）',
   'ui.listSeparator': '、',
+  'ui.clauseSeparator': '；',
   'ledger.badRows': '有 {count} 行格式不符已被跳过（列数不对，多为结论里有裸竖线）——上面的统计与清单都不完整。',
   'ledger.headerMismatch': '台账表头与两种口径都对不上（列名被改过？）——下面的「共 0 场」是解析不出表，不是台账真的空。',
   'ledger.truncated': '只读取了前 {limit} 行（文件更长）——下面的统计与清单都不完整；需要全量请直接看原文。',
@@ -345,6 +354,8 @@ export const zh = {
   'strategy.button.tooltip.auto': '现在是全自动：不约束模型，让它自己判断',
   'command.scopeHint': '斜杠命令要等会话开始后才回话',
   'command.scopeHint.tooltip': '命令是会话级的：点「开始」发出第一条消息后，命令结果才有地方显示。',
+  'instanceGuard.warning': '⚠ 检测到另有 {count} 个观察窗实例在运行——多实例同写共享盘会静默互踩（E2 实证），建议只保留一个。',
+  'window.roleTitle': '【{short}】{title}',
 } as const
 
 /** 本命名空间的 key 联合。 */
@@ -444,6 +455,14 @@ export const en: Record<CompanyKey, string> = {
   'attention.kind.approval': 'Approval',
   'attention.kind.escalation': 'Escalation',
   'attention.kind.completion': 'Completion',
+  'attention.itemLine': '{who}: {what}',
+  'attention.escalationEmpty': '(empty)',
+  'attention.deliverableFallback': 'Deliverable',
+  'attention.completionSummary': 'Delivered: {label}',
+  'attention.toolMissing': '(tool name missing)',
+  'attention.approvalWithReason': '{tool}: {reason}',
+  'attention.questionMissing': '(question missing)',
+  'attention.questionMulti': '{first} ({count} questions)',
   'panel.float': 'Float',
   'panel.floatTitle': 'Tear this panel out into a floating window (move / resize; it returns to its last position)',
   'panel.dock': 'Dock',
@@ -531,6 +550,7 @@ export const en: Record<CompanyKey, string> = {
   'ledger.refresh': 'Refreshes every {seconds} seconds',
   'ledger.unreadable': 'Ledger unreadable (missing kb/motion-ledger.md?)',
   'ui.listSeparator': ', ',
+  'ui.clauseSeparator': '; ',
   'ledger.badRows': '{count} rows were skipped as malformed (wrong cell count — often a bare "|" in the summary) — the stats and list above are incomplete.',
   'ledger.headerMismatch': 'The ledger header matches neither known layout (a column name was edited?) — "0 motions" below means the table could not be parsed, not that the ledger is empty.',
   'ledger.truncated': 'Only the first {limit} lines were read (the file is longer) — the stats and list below are incomplete; open the raw file for the full ledger.',
@@ -685,6 +705,8 @@ export const en: Record<CompanyKey, string> = {
   'strategy.button.tooltip.auto': 'Fully automatic right now: the model decides',
   'command.scopeHint': 'Slash commands answer only after the session starts',
   'command.scopeHint.tooltip': 'Commands are session-scoped: press Start and send the first message, then command output has a place to land.',
+  'instanceGuard.warning': '⚠ Detected {count} other observation window instance(s) running — multiple instances writing the shared disk will silently overwrite each other; keep only one open.',
+  'window.roleTitle': '[{short}] {title}',
 
 }
 

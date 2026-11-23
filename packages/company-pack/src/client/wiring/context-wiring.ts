@@ -13,6 +13,7 @@ import {
   type CultivationContextSources,
   type FollowLike,
 } from '../cultivation/cultivation-context-data.ts'
+import { CULTIVATION_COPY } from '../cultivation/cultivation-actions.ts'
 import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
 import { sessionFileAddress } from '../../lib/deliverables/deliverables-address.ts'
 
@@ -62,7 +63,7 @@ export function makeContextWiring(
           const exists = state.byId[context.ref as SessionId] !== undefined
             || (context.parentSessionId !== undefined
               && scoped.sessions.subagentAddress(context.ref as SessionId) !== undefined)
-          if (!exists) return { ok: false, problem: '这个会话现在打不开了（可能已删除）。' }
+          if (!exists) return { ok: false, problem: CULTIVATION_COPY.contextOpenSessionMissing }
           const target = context.parentSessionId === undefined
             ? context.ref
             : { parentSessionId: context.parentSessionId, childSessionId: context.ref, mode: context.mode ?? 'unknown' }
@@ -71,11 +72,11 @@ export function makeContextWiring(
         }
         const lead = leadOf(sessionId)
         const stat = await scoped.remote.workspaceFiles.stat(lead, context.ref, new AbortController().signal)
-        if (!stat.ok) return { ok: false, problem: '原文不在了（文件可能已归档/移动）。' }
+        if (!stat.ok) return { ok: false, problem: CULTIVATION_COPY.contextOpenFileMissing }
         scoped.sidebarRight.openResource(sessionFileAddress(lead, context.ref))
         return { ok: true }
       } catch (error) {
-        return { ok: false, problem: `打不开原文：${error instanceof Error ? error.message : String(error)}` }
+        return { ok: false, problem: CULTIVATION_COPY.contextOpenFileFailed(error instanceof Error ? error.message : String(error)) }
       }
     },
   }

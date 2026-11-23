@@ -6,8 +6,8 @@ opened: 2026-11-23
 # 缺陷预防与非 E2E 发现手段：为什么 11 月 20 日试点后仍持续靠 E2E 找 Bug
 
 > 问题：在 [content 合同族预防试点](../../_archive/settled_issues/2026-11-20-quality-prevention-contract-pilot.md) 与 [公司盘读取结果收口](../../_archive/settled_issues/2026-11-20-company-file-read-state.md) 落地后，11 月 20–23 日仍通过六轮端到端验收发现了 50 张缺陷卡（`BUG-283`–`BUG-332`，49 修 + 1 撤回）。根本上：（1）在代码实践与程序设计上还有哪些办法能更早预防 bug？（2）除了靠端到端，还有哪些更低成本、更系统的手段（含项目自研定制 linter / 契约工具）能主动发现代码里的 bug？
-> 消费者：用户 2026-11-23 直接委托的先期研究；现由 [首卡：客户端静态猎手、满态双语扫面与全 Slot 真挂载](../../issues/2026-11-23-client-static-guards-and-contract-sweep.md) 承接首批落地推敲。
-> 产出的卡：[2026-11-23-client-static-guards-and-contract-sweep.md](../../issues/2026-11-23-client-static-guards-and-contract-sweep.md)（推敲中，待用户确认范围与实施授权）。
+> 消费者：用户 2026-11-23 直接委托的先期研究；首卡 [客户端静态猎手、满态双语扫面与全 Slot 真挂载](../../_archive/settled_issues/2026-11-23-client-static-guards-and-contract-sweep.md) 已落地结项，二期（解析器畸形 Fuzz / `Bounded<T>` / Live↔History 差分）待按需另行立卡。
+> 产出的卡：[2026-11-23-client-static-guards-and-contract-sweep.md](../../_archive/settled_issues/2026-11-23-client-static-guards-and-contract-sweep.md)（已结）。
 > 结论：11-20 试点加固的 content 面后续 0 缺陷，11-20～23 的 49 张已修卡 81.6% 落在 client/lib 且 87.8% 只需 keyless vitest 即可打红；根因是错误使用宽容兜底与缺少“单测↔E2E”之间的静态/生成式防线。实盘核验后建议拆成小卡顺序推进：首卡零新依赖落地（精选 oxlint 规则 + 基于 TS Compiler API 的自研领域静态审计含 must-use-boundary/双语/类型逃逸 + 现有 i18n 补满态与全角标点 + composition 补真 Slot inject 挂载），随后第二卡推进解析器畸形 Fuzz、Bounded 管线与 Live↔History 差分；品牌类型/变异/状态机按触发延后。
 
 > **性质声明**：本题全部材料为**研究与立项前置材料，不是系统面落地或缺陷修复**；未修改任何产品代码、测试、配置或门禁。文内提及的现行源码扫描命中点仅为只读维护观察，进入首卡实施前需逐条确认。

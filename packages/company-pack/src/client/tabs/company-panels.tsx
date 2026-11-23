@@ -4,7 +4,7 @@
  * 视觉纪律：颜色一律 `--dsw-*` 令牌；状态用官方 `StateDot`/`Tag`（platform module，零体积）；
  * DAG 是自绘 SVG（平台无 mermaid / 图表渲染器，研究 §1.5）。
  */
-import { joinList, listSeparator } from '../ui/list-separator.ts'
+import { clauseSeparator, joinList, listSeparator } from '../ui/list-separator.ts'
 import { useEffect, useRef, useState } from 'react'
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { BoardCard, BoardColumn, TaskRow } from '../../lib/presence/board.ts'
@@ -112,7 +112,7 @@ export function BoardPanel({ columns, roleLabel = label => label, t = defaultT }
   return (
     <div className="wk-board" role="list" aria-label={t('board.aria')}>
       {columns.map(column => (
-        <section className="wk-column" key={column.status} role="listitem" aria-label={t('board.columnAria', { label: columnLabel(column) })}>
+        <section className="wk-column" key={column.status} role="listitem" aria-label={t('board.columnAria', { label: columnLabel(column, t) })}>
           <div className="wk-column-head">
             <span>{columnLabel(column, t)}</span>
             <span className="wk-column-count">{column.cards.length}</span>
@@ -156,7 +156,7 @@ function driftText(drift: NonNullable<BoardCard['drift']>, t: CompanyT): string 
   const parts: string[] = []
   if (drift.missing.length > 0) parts.push(t('board.drift.missing', { ids: joinList(drift.missing, listSeparator(t)) }))
   if (drift.unmapped.length > 0) parts.push(t('board.drift.unmapped', { ids: joinList(drift.unmapped, listSeparator(t)) }))
-  return parts.join('；')
+  return joinList(parts, clauseSeparator(t))
 }
 
 /** 画布缩放下限（占布局宽的比例）：再缩 11px 标题就不到 8px，宁可回退横向滚动。 */
@@ -257,7 +257,7 @@ export function DagPanel({ layout, roleLabel = label => label, t = defaultT }: {
                 stroke="var(--dsw-alias-border-l2)"
               />
               <g className="wk-dag-node" transform={`translate(9 7)`}>
-                <title>{`${node.id}：${node.subject}`}</title>
+                <title>{`${node.id}: ${node.subject}`}</title>
                 <circle className="wk-dag-dot" data-status={node.status} cx={4} cy={9} r={4} />
                 <text className="wk-dag-node-title" x={13} y={16}>{titleLine1}</text>
                 {titleLine2 !== null && <text className="wk-dag-node-title" x={13} y={29}>{titleLine2}</text>}

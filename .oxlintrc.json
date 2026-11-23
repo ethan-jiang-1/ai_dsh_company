@@ -6,12 +6,19 @@
   // 开了会把「未来才生效的注释」判成噪声；重开条件与 react 插件启用一起评估（Note 记触发）。
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "env": { "builtin": true },
+  "plugins": ["typescript", "oxc", "unicorn", "react"],
   "ignorePatterns": [
     "vendor/**",
     "packages/company-pack/lib/**",
     "**/node_modules/**",
     "runtime/**"
   ],
+  "rules": {
+    "react/set-state-in-effect": "off",
+    "react/purity": "off",
+    "react/refs": "off",
+    "react/immutability": "off"
+  },
   "overrides": [
     {
       // 未使用绑定：测试里的死 import 也是债（tsc 不查未使用导入）。`_` 前缀保留为「有意不用」的记号（vendor 同款）。
@@ -22,6 +29,24 @@
           "varsIgnorePattern": "^_",
           "caughtErrorsIgnorePattern": "^_"
         }]
+      }
+    },
+    {
+      // 测试探针里有用闭包的 hook 变量接返回值与 createElement({ children: null })，保留 src 严格检查、只豁免 tests/ 的这两条样式告警。
+      "files": ["tests/**/*.{ts,tsx}"],
+      "rules": {
+        "react/globals": "off",
+        "react/no-children-prop": "off"
+      }
+    },
+    {
+      // 生产面（client + host + lib）：禁止静默空块、any、hooks 规则与依赖漂移。
+      "files": ["packages/company-pack/src/**/*.{ts,tsx}"],
+      "rules": {
+        "no-empty": "error",
+        "typescript/no-explicit-any": "error",
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "error"
       }
     }
   ]

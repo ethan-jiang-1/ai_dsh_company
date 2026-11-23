@@ -4,6 +4,8 @@
  */
 import { describe, expect, it } from 'vitest'
 import { titleUpdateFor } from '../../../packages/company-pack/src/client/wiring/title-state.ts'
+import { en } from '../../../packages/company-pack/src/client/locales.ts'
+import { assertEnglishUiClean, translateWith } from '../../support/i18n-assertions.ts'
 
 const roleShort = { ceo: 'CEO', 'vp-eng': 'E' }
 const titleOf = (row: { title?: string }) => row.title
@@ -25,13 +27,21 @@ describe('titleUpdateFor', () => {
       .toEqual({ title: '问候' })
   })
 
-  it('ceo + 空标题 → 只写 role，不改 title', () => {
+  it('ceo + 空/缺失标题 → 只写 role，不改 title', () => {
     expect(titleUpdateFor({ current: row({ title: '' }), preset: 'ceo', roleShort, titleOf }))
+      .toEqual({ role: 'ceo' })
+    expect(titleUpdateFor({ current: row({ title: undefined }), preset: 'ceo', roleShort, titleOf }))
       .toEqual({ role: 'ceo' })
   })
 
   it('preset=null + 标题 → 原题无 role', () => {
     expect(titleUpdateFor({ current: row(), preset: null, roleShort, titleOf }))
       .toEqual({ title: '问候' })
+  })
+
+  it('en：传入 en translator 时使用 [CEO] 而非【CEO】', () => {
+    const updated = titleUpdateFor({ current: row({ title: 'Hello' }), preset: 'ceo', roleShort, titleOf, t: translateWith(en) })
+    expect(updated).toEqual({ title: '[CEO] Hello', role: 'ceo' })
+    assertEnglishUiClean(updated.title ?? '', 'titleUpdateFor en')
   })
 })

@@ -5,6 +5,18 @@
  * 本模块只做**纯解析**（表行 → 领域行），渲染与文件读取分离。keyless 单测 = `tests/lib/accounting/ledger.spec.ts`。
  */
 
+/** 动议类型磁盘值（旧中文 / 现行英文）到 canonical id 的映射（UI 字典查词用）。 */
+export const LEDGER_KIND_CANONICAL: Readonly<Record<string, 'decision' | 'production' | 'diagnostic' | 'qa'>> = {
+  decision: 'decision',
+  production: 'production',
+  diagnostic: 'diagnostic',
+  qa: 'qa',
+  '决策': 'decision',
+  '生产': 'production',
+  '诊断': 'diagnostic',
+  '口径问答': 'qa',
+}
+
 /** 一场动议的台账行。 */
 export interface MotionRow {
   readonly slug: string

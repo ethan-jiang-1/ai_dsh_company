@@ -67,3 +67,17 @@ export function parseCompanyIdentity(text: string | null): CompanyIdentity | nul
     timeZone: fields.timeZone ?? '',
   }
 }
+
+/**
+ * 消费一次 workspaceFiles.read 结果（拒绝半文件 `eof === false` 与失败结果）。
+ * 解析有效时更新全局品牌缓存并返 true，否则保留既有值并返 false。
+ */
+export function applyCompanyIdentityRead(
+  result: { readonly ok: true; readonly value: { readonly text: string; readonly eof?: boolean } } | { readonly ok: false },
+): boolean {
+  if (!result.ok || result.value.eof === false) return false
+  const parsed = parseCompanyIdentity(result.value.text)
+  if (parsed === null) return false
+  setCompanyIdentity(parsed)
+  return true
+}

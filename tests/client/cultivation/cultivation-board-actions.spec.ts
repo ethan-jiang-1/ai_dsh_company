@@ -260,6 +260,16 @@ describe('创作面：不看说明也能提交一条（S5，判据 ①/G1；2026
     expect(lines[0]).not.toContain('做法与证据')
   })
 
+  it('英文提交回执也能提取新记录 id 并触发高亮', async () => {
+    const { actions } = stubActions({ ok: true, text: 'Submitted cultivation record 20261123-000001-en01 (correction).' })
+    const { container } = mount({ actions })
+    await startComposition(container)
+    await type(textareas(container)[0]!, 'Budget review work')
+    await type(container.querySelector('input') as HTMLInputElement, 'List assumptions')
+    await click(button(container, CULTIVATION_COPY.submit)!)
+    expect(container.textContent).toContain('Submitted cultivation record 20261123-000001-en01')
+  })
+
   it('提交前预览显示目标角色/工作/下次希望，随输入更新', async () => {
     const { actions } = stubActions()
     const { container } = mount({ actions, viewerRole: 'ceo', viewerLabel: 'CEO' })

@@ -48,7 +48,8 @@
   "include": [
     "tests/client/**/*.ts",
     "tests/client/**/*.tsx",
-    "tests/support/temp-env.ts"
+    "tests/support/temp-env.ts",
+    "tests/support/i18n-assertions.ts"
   ],
   // 这些 spec 直接引 vendor 源码（Cordis/SlotRegistry/LocaleRuntime），单面项目无法同时满足两半类型；
   // 运行由 vitest 的 Vite transform 负责，类型面不在这里重复编译 vendor。

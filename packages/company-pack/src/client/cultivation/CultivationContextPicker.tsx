@@ -44,6 +44,7 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
   const roleLabel = props.roleLabel ?? (role => role)
   const [query, setQuery] = useState('')
   const [deliverables, setDeliverables] = useState<readonly ContextDeliverableRow[]>([])
+  const [deliverablesSkipped, setDeliverablesSkipped] = useState(0)
   const [problem, setProblem] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const panel = useRef<HTMLDivElement>(null)
@@ -58,8 +59,14 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
     void props.sources.listDeliverables(props.currentSessionId, controller.signal).then(result => {
       if (!live) return
       setLoading(false)
-      if (result.ok) setDeliverables(result.value)
-      else setProblem(result.problem)
+      if (result.ok) {
+        setProblem(null)
+        setDeliverables(result.value)
+        setDeliverablesSkipped(result.skipped ?? 0)
+      } else {
+        setDeliverablesSkipped(0)
+        setProblem(result.problem)
+      }
     })
     return () => { live = false; controller.abort() }
   }, [props.sources, props.currentSessionId])
@@ -102,6 +109,7 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
       </div>
       <div className="wk-meta wk-cultivation-context-privacy">{CULTIVATION_COPY.contextPrivacy}</div>
       {loading && <div className="wk-meta">{CULTIVATION_COPY.contextLoading}</div>}
+      {deliverablesSkipped > 0 && <div className="wk-meta">{CULTIVATION_COPY.contextCatalogSkipped(deliverablesSkipped)}</div>}
       {problem !== null && <div className="wk-meta wk-cultivation-problem">{problem}</div>}
       <div className="wk-cultivation-context-list" role="listbox" aria-label={CULTIVATION_COPY.contextPickTitle}>
         {currentMatches && current !== null && (

@@ -12,7 +12,7 @@
  *   （`options.stream`）：看板/依赖图/任务板不需要，省一条 WebSocket
  * - **用量**：标准 props 的 `useProjection('tokenUsage'|'sessionStats')`（客户端可见投影）
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { UseProjection } from '@deepseek-ai/dsh-api-session-controller/client'
 import type {} from '@deepseek-ai/dsh-session-stats/client'
@@ -95,47 +95,33 @@ export function useCompanyData(
   useSessions: UseSessions,
   options: CompanyDataOptions = {},
 ): CompanyData {
+  const { follow, leadOf } = injected
   const stream = options.stream === true
-  const [activity, setActivity] = useState<readonly ActivityEntry[]>([])
+  const [events, setEvents] = useState<readonly TeamEventLike[]>([])
   const [streamError, setStreamError] = useState<string | null>(null)
 
-  const eventsRef = useRef<readonly TeamEventLike[]>([])
-  const namesRef = useRef<ReadonlyMap<string, string>>(new Map())
-
   // team 态：Lead 会话的 Host 投影（0.1.7 官方读法；投影帧保持最新，故无轮询）。
-  const lead = injected.leadOf(sessionId)
+  const lead = leadOf(sessionId)
   const projection = useSessions((state) => state.projectionsBySession[lead]?.values.agentTeam)
   // team 态唯一来源 = sessions store 的 agentTeam；不用 useProjection 兜底（BUG-140 撤回、BUG-146 OOM）。
   const team = projection ?? null
   const error = (projection as { readonly failure?: string } | undefined)?.failure ?? null
 
-  /** 重算动态（事件或名册任一变化都重算：名册迟到时把裸会话 id 换成成员名）。 */
-  const refreshActivity = (): void => {
-    setActivity(activityFromEvents(eventsRef.current, namesRef.current).slice(-MAX_ACTIVITY).reverse())
-  }
-
   // 名册来自投影：改了就把裸 id 映射刷新一遍（流里先到的裸 id 会被改名）。
-  useEffect(() => {
-    namesRef.current = team === null ? new Map() : memberNames(team)
-    if (stream) refreshActivity()
-  }, [team, stream])
+  const names = useMemo(() => (team === null ? new Map<string, string>() : memberNames(team)), [team])
 
   // 协作动态：`session/follow` 流（快照给历史 ⇒ 打开即见全程；其后逐条实时）。
   // 流断了不致命（任务板/在场仍由投影维持），但**不静默**：错误显式落面板（fail-loud）。
   useEffect(() => {
     if (!stream) return
     const controller = new AbortController()
-    eventsRef.current = []
-    setActivity([])
+    setEvents([])
     setStreamError(null)
     void (async () => {
       try {
-        for await (const frame of injected.follow(sessionId, controller.signal)) {
+        for await (const frame of follow(sessionId, controller.signal)) {
           if (controller.signal.aborted) return
-          eventsRef.current = frame.kind === 'history'
-            ? frame.events
-            : [...eventsRef.current, frame.event]
-          refreshActivity()
+          setEvents(prev => (frame.kind === 'history' ? frame.events : [...prev, frame.event]))
         }
       } catch (cause) {
         if (!controller.signal.aborted) {
@@ -144,11 +130,15 @@ export function useCompanyData(
       }
     })()
     return () => { controller.abort() }
-  }, [sessionId, stream])
+  }, [follow, sessionId, stream])
+
+  const activity = useMemo(
+    () => (stream ? activityFromEvents(events, names).slice(-MAX_ACTIVITY).reverse() : []),
+    [events, names, stream],
+  )
 
   // 任务板/看板/依赖图消费同一视图：用 follow 流里的 team/task 补齐可能过期的 agentTeam 投影。
-  // 依赖 `activity`（每帧更新）促发重算；没有 stream 时 eventsRef 为空，等价于原视图。
-  const effectiveTeam = useMemo(() => teamWithEventTasks(team, eventsRef.current), [team, activity])
+  const effectiveTeam = useMemo(() => teamWithEventTasks(team, stream ? events : []), [team, events, stream])
   const tasks = useMemo(() => (effectiveTeam === null ? [] : tasksFromTeamView(effectiveTeam)), [effectiveTeam])
   const columns = useMemo(() => boardColumns(tasks), [tasks])
   const dag = useMemo(() => layoutDag(tasks), [tasks])

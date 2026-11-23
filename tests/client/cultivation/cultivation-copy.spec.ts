@@ -1,14 +1,21 @@
 /** 培养文案表：按视图语言切换；zh 是缺省，en 不混中文。 */
 import { afterEach, describe, expect, it } from 'vitest'
-import { CULTIVATION_COPY, setCultivationLanguage } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
+import {
+  CULTIVATION_COPY,
+  cultivationClauseSeparator,
+  formatCultivationReadReason,
+  renderThrown,
+  setCultivationLanguage,
+} from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
 
 afterEach(() => { setCultivationLanguage('zh') })
 
 describe('CULTIVATION_COPY 语言代理', () => {
-  it('zh 缺省：采纳 / 处理中', () => {
+  it('zh 缺省：采纳 / 处理中 / 从句分隔符', () => {
     setCultivationLanguage('zh')
     expect(CULTIVATION_COPY.adopt).toBe('采纳')
     expect(CULTIVATION_COPY.running).toBe('处理中…')
+    expect(cultivationClauseSeparator()).toBe('；')
   })
 
   it('en：Adopt / Working / 函数仍带参数', () => {
@@ -31,5 +38,18 @@ describe('CULTIVATION_COPY 语言代理', () => {
     expect(CULTIVATION_COPY.chatSend).toBe('Send')
     expect(CULTIVATION_COPY.composeAria).toContain('proposal')
     expect(CULTIVATION_COPY.composeTurn(2)).toContain('2')
+    expect(cultivationClauseSeparator()).toBe('; ')
+    expect(CULTIVATION_COPY.contextCatalogMissing).toContain('deliverables catalog')
+    expect(CULTIVATION_COPY.contextCatalogBadShape).toContain('invalid shape')
+    expect(CULTIVATION_COPY.contextCatalogReadFailed('boom')).toContain('boom')
+    expect(CULTIVATION_COPY.contextCatalogSkipped(2)).toContain('2')
+    expect(CULTIVATION_COPY.contextOpenSessionMissing).toContain('no longer be opened')
+    expect(CULTIVATION_COPY.contextOpenFileMissing).toContain('missing')
+    expect(CULTIVATION_COPY.contextOpenFileFailed('EIO')).toContain('EIO')
+    expect(formatCultivationReadReason('dir-denied')).toBe(CULTIVATION_COPY.inboxUnreadDirDenied)
+    expect(formatCultivationReadReason('read-denied: kb/a.md')).toContain('kb/a.md')
+    expect(formatCultivationReadReason('raw-err')).toBe('raw-err')
+    const poisoned = { toString() { throw new Error('bad') } }
+    expect(renderThrown(poisoned)).toBe(CULTIVATION_COPY.unreadableThrown)
   })
 })

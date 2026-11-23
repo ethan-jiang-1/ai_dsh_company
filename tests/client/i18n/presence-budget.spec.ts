@@ -1,41 +1,50 @@
-/** 在场/用量的表达层 keyless 检查（P0 UI 双语）。协作动态文本的结构化 token 留下一批。 */
+/** 在场/用量的表达层 keyless 检查（P0 UI 双语）：空态、填充态、全部状态 enum 与错误态。 */
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { BudgetPanel, PresencePanel } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
-import { en, type CompanyKey, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
+import { BudgetPanel, PresencePanel, StreamErrorNotice } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
+import { en } from '../../../packages/company-pack/src/client/locales.ts'
+import { assertEnglishUiClean, translateWith } from '../../support/i18n-assertions.ts'
 
-const tEn = ((key: CompanyKey, params?: Record<string, string | number>) => {
-  const template = en[key]
-  return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
-}) as CompanyT
+const tEn = translateWith(en)
 
 describe('PresencePanel i18n', () => {
-  it('en：空态与活动标题', () => {
+  it('en：空态与活动标题无中文', () => {
     const html = renderToStaticMarkup(createElement(PresencePanel, { rows: [], activity: [], t: tEn }))
     expect(html).toContain('No team motion right now.')
     expect(html).toContain('Collaboration activity')
     expect(html).toContain('No activity yet')
+    assertEnglishUiClean(html, 'PresencePanel empty en')
   })
 
-  it('en：动态 token 渲染，不显示中文 text', () => {
+  it('en：填充成员全状态与结构化动态 token + StreamErrorNotice 无中文与全角标点', () => {
     const html = renderToStaticMarkup(createElement(PresencePanel, {
-      rows: [],
       t: tEn,
+      rows: [
+        { id: '1', name: 'ceo', displayName: 'CEO', role: 'lead', status: 'running', statusLabel: 'running', currentTask: 'Chairing motion' },
+        { id: '2', name: 'vp-eng', displayName: 'VP Eng', role: 'teammate', status: 'idle', statusLabel: 'idle', currentTask: null },
+        { id: '3', name: 'cfo', displayName: 'CFO', role: 'teammate', status: 'failed', statusLabel: 'failed', currentTask: 'Budget review' },
+      ],
       activity: [{
         time: 1,
         kind: 'task',
-        text: '中文占位',
+        text: 'placeholder',
         token: { key: 'presence.activity.taskCompleted', params: { owner: 'CEO', id: 't1' } },
       }],
     }))
     expect(html).toContain('CEO completed t1')
-    expect(html).not.toContain('中文占位')
+    expect(html).toContain('Running')
+    expect(html).toContain('Idle')
+    expect(html).toContain('Failed')
+    assertEnglishUiClean(html, 'PresencePanel populated en')
+
+    const errHtml = renderToStaticMarkup(createElement(StreamErrorNotice, { message: 'socket closed', t: tEn }))
+    assertEnglishUiClean(errHtml, 'StreamErrorNotice en')
   })
 })
 
 describe('BudgetPanel i18n', () => {
-  it('en：轮次/步数/工具耗时/四路行/只令牌说明', () => {
+  it('en：轮次/步数/工具耗时/四路行/只令牌说明无中文', () => {
     const html = renderToStaticMarkup(createElement(BudgetPanel, {
       t: tEn,
       summary: {
@@ -44,8 +53,10 @@ describe('BudgetPanel i18n', () => {
         steps: 5,
         toolShare: 0.25,
         rows: [
-          { id: 'uncachedInput', label: '未缓存输入', tokens: 100, share: 0.5 },
-          { id: 'output', label: '输出', tokens: 100, share: 0.5 },
+          { id: 'uncachedInput', label: 'uncachedInput', tokens: 100, share: 0.25 },
+          { id: 'cacheRead', label: 'cacheRead', tokens: 100, share: 0.25 },
+          { id: 'cacheWrite', label: 'cacheWrite', tokens: 100, share: 0.25 },
+          { id: 'output', label: 'output', tokens: 100, share: 0.25 },
         ],
       },
     }))
@@ -53,7 +64,10 @@ describe('BudgetPanel i18n', () => {
     expect(html).toContain('Steps 5')
     expect(html).toContain('Tool time 25%')
     expect(html).toContain('Uncached input')
+    expect(html).toContain('Cache read')
+    expect(html).toContain('Cache write')
     expect(html).toContain('Output')
     expect(html).toContain('Tokens only')
+    assertEnglishUiClean(html, 'BudgetPanel populated en')
   })
 })

@@ -53,21 +53,22 @@ export type CultivationTabProps = PropsRuntime<'sidebar.right.pane.tab'> & Culti
  * @returns 培养面板。
  */
 export function CultivationTab(props: CultivationTabProps) {
+  const { roleSource, contextSources: makeContextSources, cultivationActions, sessionId } = props
   setCultivationLanguage(props.t('meta.language') === 'en' ? 'en' : 'zh')
   // viewer 角色（上游 agentPreset 投影；订阅制，无轮询——照 RoleBadge 的手法）。
-  const subscribe = useMemo(() => props.roleSource.subscribe.bind(props.roleSource), [props.roleSource])
-  const getPreset = useCallback(() => readPresetOf(props.roleSource, props.sessionId), [props.roleSource, props.sessionId])
+  const subscribe = useMemo(() => roleSource.subscribe.bind(roleSource), [roleSource])
+  const getPreset = useCallback(() => readPresetOf(roleSource, sessionId), [roleSource, sessionId])
   const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
-  const { journalRows, records, recordsProblem, brokenRecords, unexpandedRecords, refresh } = useCultivationPanelData(props.cultivationFiles, props.sessionId)
-  const feedback = useCultivationFeedback(props.followEvents, props.sessionId)
-  const teammate = props.useSessions(state => state.byId[props.sessionId]?.origin === 'subagent')
-  const workspaceCwd = props.useSessions(state => state.byId[props.sessionId]?.cwd)
-  const contextSources = useMemo(() => props.contextSources?.(props.sessionId), [props.contextSources, props.sessionId])
+  const { journalRows, records, recordsProblem, brokenRecords, unexpandedRecords, refresh } = useCultivationPanelData(props.cultivationFiles, sessionId)
+  const feedback = useCultivationFeedback(props.followEvents, sessionId)
+  const teammate = props.useSessions(state => state.byId[sessionId]?.origin === 'subagent')
+  const workspaceCwd = props.useSessions(state => state.byId[sessionId]?.cwd)
+  const contextSources = useMemo(() => makeContextSources?.(sessionId), [makeContextSources, sessionId])
   const openContext = props.openContext === undefined
     ? undefined
-    : (context: CultivationContext) => props.openContext!(props.sessionId, context)
+    : (context: CultivationContext) => props.openContext!(sessionId, context)
   // 动作面按会话取（页签槽 scope=session ⇒ sessionId 就是本会话；角色闸在 host）。
-  const actions = useMemo(() => props.cultivationActions(props.sessionId), [props.cultivationActions, props.sessionId])
+  const actions = useMemo(() => cultivationActions(sessionId), [cultivationActions, sessionId])
 
   return (
     <PanelFrame

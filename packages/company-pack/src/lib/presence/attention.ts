@@ -17,6 +17,15 @@ import { firstText } from '../shared/text.ts'
 /** 注意力条目类别。 */
 export type AttentionKind = 'question' | 'approval' | 'escalation' | 'completion'
 
+/** 语义化的待办摘要 token，供 UI 按当前语言渲染（lib 层不硬编码中文，UI 层调 locales）。 */
+export type AttentionWhatToken =
+  | { readonly kind: 'escalation-empty' }
+  | { readonly kind: 'completion'; readonly label: string | null }
+  | { readonly kind: 'approval-missing-tool' }
+  | { readonly kind: 'approval'; readonly toolName: string; readonly reason?: string }
+  | { readonly kind: 'question-missing' }
+  | { readonly kind: 'question-multi'; readonly first: string; readonly count: number }
+
 /** 一条注意力条目（面板行）。 */
 export interface AttentionItem {
   readonly kind: AttentionKind
@@ -24,6 +33,8 @@ export interface AttentionItem {
   readonly who: string
   /** 一句话摘要（列表行用：已按 {@link ATTENTION_SUMMARY_MAX} 折叠，不随外部文本膨胀）。 */
   readonly what: string
+  /** 可选语义 token；在场时面板按 zh/en 字典本地化，否则展示 {@link what}。 */
+  readonly whatToken?: AttentionWhatToken
   /** 完整详情（审批理由/问询全文）；列表不渲染它，只给 hover/详情面（BUG-295）。 */
   readonly detail?: string
   /**
@@ -42,6 +53,8 @@ export interface LivePending {
   readonly kind: 'question' | 'approval'
   readonly sessionId: string
   readonly what: string
+  /** 与 {@link AttentionItem.whatToken} 同义；透传到面板做 zh/en 渲染。 */
+  readonly whatToken?: AttentionWhatToken
   /** 完整详情（与 `what` 同源、未折叠）；列表不渲染它。 */
   readonly detail?: string
   /** 稳定身份（审批 id / 问询 id）；去重用，见 {@link attentionItemKey}。 */
@@ -89,9 +102,9 @@ const isToolCall = (event: AttentionEventLike):
 const isMessage = (event: AttentionEventLike):
   event is Extract<AttentionEventLike, { type: 'team/message/queued' }> => event.type === 'team/message/queued'
 
-/** present 调用参数里取可读摘要（title / slug / path 字段；取不到给「交付物」）。 */
-function presentLabel(argumentsJson: string | undefined): string {
-  if (argumentsJson === undefined) return '交付物'
+/** present 调用参数里取可读摘要（title / slug / path 字段；取不到返回 null 交 UI 本地化）。 */
+function presentLabel(argumentsJson: string | undefined): string | null {
+  if (argumentsJson === undefined) return null
   try {
     const parsed: unknown = JSON.parse(argumentsJson)
     if (parsed !== null && typeof parsed === 'object') {
@@ -101,9 +114,27 @@ function presentLabel(argumentsJson: string | undefined): string {
       }
     }
   } catch {
-    // 解析失败按无摘要处理；present 的参数形状不是本读模型的契约。
+    // intentional-fallback: 解析失败按无摘要处理；present 的参数形状不是本读模型的契约。
   }
-  return '交付物'
+  return null
+}
+
+/** 审批条目文案/token 构造（观察者与历史重建共用，保证跨源一致且不硬编码 UI 中文）。 */
+export function buildApprovalCopy(
+  toolNameRaw: unknown,
+  reasonRaw: unknown,
+): { readonly what: string, readonly detail?: string, readonly whatToken: AttentionWhatToken } {
+  if (typeof toolNameRaw !== 'string' || toolNameRaw === '') {
+    return { what: '(tool name missing)', whatToken: { kind: 'approval-missing-tool' } }
+  }
+  const toolName = toolNameRaw
+  const reason = typeof reasonRaw === 'string' ? reasonRaw.trim() : ''
+  const full = reason === '' ? toolName : `${toolName}: ${reason}`
+  return {
+    what: attentionSummary(full),
+    ...(reason === '' ? {} : { detail: full }),
+    whatToken: reason === '' ? { kind: 'approval', toolName } : { kind: 'approval', toolName, reason },
+  }
 }
 
 /**
@@ -124,19 +155,23 @@ export function streamAttention(
     if (isMessage(event)) {
       const text = firstText(event.data.message.content)
       if (text.startsWith(ESCALATION_MARK)) {
+        const body = text.slice(ESCALATION_MARK.length).trim()
         escalations.push({
           kind: 'escalation',
           who: event.data.message.senderName,
-          what: attentionSummary(text.slice(ESCALATION_MARK.length).trim() || '（空）'),
+          what: body === '' ? '(empty)' : attentionSummary(body),
+          ...(body === '' ? { whatToken: { kind: 'escalation-empty' } as const } : {}),
           time: event.time,
           jumpTo: leadSessionId,
         })
       }
     } else if (isToolCall(event) && event.data.name === PRESENT_TOOL_NAME) {
+      const label = presentLabel(event.data.arguments)
       completions.push({
         kind: 'completion',
         who: leadName,
-        what: attentionSummary(`交付完成：${presentLabel(event.data.arguments)}`),
+        what: attentionSummary(label === null ? 'Deliverable' : `Delivered: ${label}`),
+        whatToken: { kind: 'completion', label },
         time: event.time,
         jumpTo: leadSessionId,
       })
@@ -163,15 +198,14 @@ export function pendingApprovals(events: readonly AttentionEventLike[], sessionI
     const data = event.data as { id?: unknown; toolName?: unknown; reason?: unknown } | null
     if (typeof data !== 'object' || data === null || typeof data.id !== 'string') continue
     if (event.type === 'approval/asked') {
-      const toolName = typeof data.toolName === 'string' && data.toolName !== '' ? data.toolName : '（工具名缺失）'
-      const reason = typeof data.reason === 'string' ? data.reason.trim() : ''
-      const full = reason === '' ? toolName : `${toolName}：${reason}`
+      const copy = buildApprovalCopy(data.toolName, data.reason)
       asked.set(data.id, {
         kind: 'approval',
         who: sessionId,
         id: data.id,
-        what: attentionSummary(full),
-        ...(reason === '' ? {} : { detail: full }),
+        what: copy.what,
+        whatToken: copy.whatToken,
+        ...(copy.detail === undefined ? {} : { detail: copy.detail }),
         time: event.time,
         jumpTo: sessionId,
       })
@@ -204,6 +238,7 @@ export function mergeAttention(
     kind: entry.kind,
     who: entry.sessionId,
     what: entry.what,
+    ...(entry.whatToken === undefined ? {} : { whatToken: entry.whatToken }),
     ...(entry.detail === undefined ? {} : { detail: entry.detail }),
     ...(entry.id === undefined ? {} : { id: entry.id }),
     time: entry.since,
@@ -281,16 +316,21 @@ export function questionListOf(argumentsText: string | undefined): readonly stri
 }
 
 /**
- * 问询条目的摘要：第一个问题 + 「共 N 个问题」（多问题时才加）。
+ * 问询条目的摘要与语义 token（观察者与历史重建共用）。
  * @param questions - 全部问句。
- * @returns `{ what, detail }`；无问句时给占位且无 detail。
+ * @returns `{ what, detail?, whatToken? }`；无问句时给占位 token 且无 detail。
  */
-function questionCopy(questions: readonly string[]): { readonly what: string, readonly detail?: string } {
-  if (questions.length === 0) return { what: '（问询内容缺失）' }
+export function buildQuestionCopy(
+  questions: readonly string[],
+): { readonly what: string, readonly detail?: string, readonly whatToken?: AttentionWhatToken } {
+  if (questions.length === 0) return { what: '(question missing)', whatToken: { kind: 'question-missing' } }
   const first = questions[0]!
-  const what = questions.length === 1 ? first : `${first}（共 ${String(questions.length)} 个问题）`
-  const detail = questions.length === 1 ? first : questions.map((text, i) => `${String(i + 1)}. ${text}`).join('\n')
-  return { what: attentionSummary(what), detail }
+  if (questions.length === 1) {
+    return { what: attentionSummary(first), detail: first }
+  }
+  const what = attentionSummary(`${first} (${String(questions.length)} questions)`)
+  const detail = questions.map((text, i) => `${String(i + 1)}. ${text}`).join('\n')
+  return { what, detail, whatToken: { kind: 'question-multi', first, count: questions.length } }
 }
 
 /**
@@ -309,12 +349,13 @@ export function pendingQuestions(events: readonly AttentionEventLike[], sessionI
     const data = event.data as { callId?: unknown; name?: unknown; arguments?: unknown; id?: unknown } | null
     if (typeof data !== 'object' || data === null) continue
     if (event.type === 'tool/call' && data.name === ASK_TOOL_NAME && typeof data.callId === 'string') {
-      const copy = questionCopy(questionListOf(typeof data.arguments === 'string' ? data.arguments : undefined))
+      const copy = buildQuestionCopy(questionListOf(typeof data.arguments === 'string' ? data.arguments : undefined))
       open.set(data.callId, {
         kind: 'question',
         who: sessionId,
         id: data.callId,
         what: copy.what,
+        ...(copy.whatToken === undefined ? {} : { whatToken: copy.whatToken }),
         ...(copy.detail === undefined ? {} : { detail: copy.detail }),
         time: event.time,
         jumpTo: sessionId,

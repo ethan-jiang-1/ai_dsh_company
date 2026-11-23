@@ -4,8 +4,8 @@
  */
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import { useState, type ReactNode } from 'react'
-import { roleLabel as defaultRoleLabel, timeParts, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../../lib/cultivation/cultivation.ts'
-import { CULTIVATION_COPY, cultivationTimeLabel, revokeLine, verifyLine } from './cultivation-actions.ts'
+import { isInSessionSource, roleLabel as defaultRoleLabel, timeParts, VERIFICATION_EVIDENCE_LIMIT, type CultivationRecord, type CultivationRow, type CultivationVerification, type FeedbackItem } from '../../lib/cultivation/cultivation.ts'
+import { CULTIVATION_COPY, cultivationClauseSeparator, cultivationTimeLabel, revokeLine, verifyLine } from './cultivation-actions.ts'
 import type { CultivationBoardState } from './use-cultivation-board.tsx'
 
 /** 验证态 → Tag（V8：未验证 ≠ 已掌握）。 */
@@ -146,7 +146,7 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
                     {record.work !== undefined && record.work !== '' && <span className="wk-row-task">{CULTIVATION_COPY.adoptedWork(record.work)}</span>}
                     {(record.contexts?.length ?? 0) > 0
                       ? <span className="wk-meta">{CULTIVATION_COPY.adoptedBasisContext(record.contexts![0]!.title)}</span>
-                      : record.source === '（会话内提交）'
+                      : isInSessionSource(record.source)
                         ? <span className="wk-meta">{CULTIVATION_COPY.adoptedSourceSession}</span>
                         : record.source !== ''
                           ? <span className="wk-meta">{CULTIVATION_COPY.adoptedSourceRecorded(record.source)}</span>
@@ -283,7 +283,7 @@ export function CultivationJournal({ rows }: { readonly rows: readonly Cultivati
                       ? '—'
                       : row.entries.length === 0
                         ? '—'
-                        : row.entries.map(entry => entry.title).join('；')}
+                        : row.entries.map(entry => entry.title).join(cultivationClauseSeparator())}
                     {row.reach === 'ok' && row.count > row.entries.length ? CULTIVATION_COPY.journalMore(row.count) : ''}
                   </span>
                 </div>
@@ -311,7 +311,7 @@ export function CultivationFeedback({ feedback, reachable }: { readonly feedback
                   <div key={item.messageId} role="listitem" className="wk-row" aria-label={item.rating === 'positive' ? CULTIVATION_COPY.feedbackPositive : CULTIVATION_COPY.feedbackNegative}>
                     <span className="wk-row-name">
                       {item.rating === 'positive' ? CULTIVATION_COPY.feedbackPositive : CULTIVATION_COPY.feedbackNegative}
-                      {item.note !== undefined && item.note !== '' ? `：${item.note}` : ''}
+                      {item.note !== undefined && item.note !== '' ? `${CULTIVATION_COPY.colonJoin}${item.note}` : ''}
                     </span>
                   </div>
                 ))}

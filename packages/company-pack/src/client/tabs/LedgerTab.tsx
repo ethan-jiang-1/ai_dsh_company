@@ -14,7 +14,7 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
-import { ledgerStats, parseMotionLedger } from '../../lib/accounting/ledger.ts'
+import { LEDGER_KIND_CANONICAL, ledgerStats, parseMotionLedger } from '../../lib/accounting/ledger.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { useWorkspaceText } from '../data/workspace-text.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
@@ -35,20 +35,16 @@ const defaultT = ((key: CompanyKey, params?: Record<string, string | number>) =>
   return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
 }) as CompanyT
 
-const LEDGER_KIND_KEYS: Record<string, CompanyKey> = {
+const LEDGER_KIND_KEYS: Record<'decision' | 'production' | 'diagnostic' | 'qa', CompanyKey> = {
   decision: 'catalog.type.decision',
   production: 'catalog.type.production',
   diagnostic: 'catalog.type.diagnostic',
   qa: 'catalog.type.qa',
-  '决策': 'catalog.type.decision',
-  '生产': 'catalog.type.production',
-  '诊断': 'catalog.type.diagnostic',
-  '口径问答': 'catalog.type.qa',
 }
 
 function ledgerKindLabel(kind: string, t: CompanyT): string {
-  const key = LEDGER_KIND_KEYS[kind]
-  return key === undefined ? kind : t(key)
+  const canonical = LEDGER_KIND_CANONICAL[kind]
+  return canonical === undefined ? kind : t(LEDGER_KIND_KEYS[canonical])
 }
 
 /** 刷新间隔（台账随当轮收敛更新，低频）。 */

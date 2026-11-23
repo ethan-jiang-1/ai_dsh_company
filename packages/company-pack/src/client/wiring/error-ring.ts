@@ -160,7 +160,7 @@ export function installErrorCapture(target: ErrorCaptureTarget, ring?: ErrorRing
 
   const onError = (event: unknown): void => {
     const value = event as { error?: unknown; message?: unknown; filename?: unknown }
-    const message = redactTokenUrls(textOf(value.error) || textOf(value.message) || '（未知页面错误）')
+    const message = redactTokenUrls(textOf(value.error) || textOf(value.message) || '(unknown page error)')
     if (BENIGN_ERROR_NOTICES.some(notice => message.includes(notice))) return
     capture.push({
       kind: 'error',
@@ -174,7 +174,7 @@ export function installErrorCapture(target: ErrorCaptureTarget, ring?: ErrorRing
     const value = event as { reason?: unknown }
     capture.push({
       kind: 'rejection',
-      message: redactTokenUrls(textOf(value.reason) || '（未知 unhandled rejection）'),
+      message: redactTokenUrls(textOf(value.reason) || '(unknown unhandled rejection)'),
       ...(stackOf(value.reason) !== undefined ? { stack: redactTokenUrls(stackOf(value.reason) as string) } : {}),
       at: Date.now(),
       ...(typeof target.location?.href === 'string' ? { href: redactTokenUrls(target.location.href) } : {}),

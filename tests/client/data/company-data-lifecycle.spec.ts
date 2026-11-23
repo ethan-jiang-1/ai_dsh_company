@@ -179,4 +179,24 @@ describe('useCompanyData 订阅生命周期', () => {
     expect(h.last().activity[0]?.text, '名册到达后换显示名').toContain('VP-Sales')
     h.unmount()
   })
+
+  it('卸载后流再吐帧直接退场（controller.signal.aborted 中止后续迭代）', async () => {
+    let release!: () => void
+    let continuedAfterAbort = false
+    const gate = new Promise<void>(resolve => { release = resolve })
+    const lateFollow: CompanyDataInjected['follow'] = async function* () {
+      await gate
+      yield { kind: 'history', events: [memberActive('m-1', 1)] }
+      continuedAfterAbort = true
+      yield { kind: 'event', event: messageTo('m-1', '不应再读', 2) }
+    }
+    const store: SessionsStoreLike = { projectionsBySession: {} }
+    const h = mountHarness({ sessionId: 's-1' as never, store, injected: injectedOf(lateFollow), stream: true })
+    await h.rerender({})
+    h.unmount()
+    release()
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)) })
+    expect(continuedAfterAbort).toBe(false)
+    expect(h.last().activity).toHaveLength(0)
+  })
 })

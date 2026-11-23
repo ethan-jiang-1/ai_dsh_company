@@ -12,7 +12,7 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import type { AttentionRegistry } from './attention-registry.ts'
-import { attentionSummary } from '../../lib/presence/attention.ts'
+import { buildApprovalCopy, buildQuestionCopy } from '../../lib/presence/attention.ts'
 
 /** 远端事件面（只用到 $on；handler 的 this = 事件归属 owner）。 */
 export interface AttentionRemote {
@@ -42,17 +42,15 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
     const texts = questions
       .map(item => (typeof item?.question === 'string' ? item.question.trim() : ''))
       .filter(text => text !== '')
-    const first = texts[0] ?? ''
-    // 多问题（BUG-331）：摘要带「共 N 个问题」，全文都进 detail——只显第一个会让人只答第一题就离开。
-    const summary = texts.length <= 1 ? first : `${first}（共 ${String(texts.length)} 个问题）`
-    const detailText = texts.length <= 1 ? first : texts.map((text, i) => `${String(i + 1)}. ${text}`).join('\n')
+    const copy = buildQuestionCopy(texts)
     questionSeq += 1
     const done = attention.begin({
       kind: 'question',
       sessionId,
       id: `question:${String(Date.now())}:${String(questionSeq)}`,
-      what: attentionSummary(summary === '' ? '（问询内容缺失）' : summary),
-      ...(detailText === '' ? {} : { detail: detailText }),
+      what: copy.what,
+      ...(copy.whatToken === undefined ? {} : { whatToken: copy.whatToken }),
+      ...(copy.detail === undefined ? {} : { detail: copy.detail }),
       since: Date.now(),
     })
     return (async () => { try { return await next() } finally { done() } })()
@@ -62,14 +60,14 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
     if (sessionId === undefined) return next()
     const approval = request as { readonly id?: unknown; readonly toolName?: unknown; readonly reason?: unknown }
     const approvalId = typeof approval.id === 'string' && approval.id !== '' ? approval.id : undefined
-    const toolName = typeof approval.toolName === 'string' ? approval.toolName : '（工具名缺失）'
-    const reason = typeof approval.reason === 'string' ? approval.reason.trim() : ''
+    const copy = buildApprovalCopy(approval.toolName, approval.reason)
     const done = attention.begin({
       kind: 'approval',
       sessionId,
       ...(approvalId === undefined ? {} : { id: approvalId }),
-      what: attentionSummary(reason === '' ? toolName : `${toolName}：${reason}`),
-      ...(reason === '' ? {} : { detail: `${toolName}：${reason}` }),
+      what: copy.what,
+      whatToken: copy.whatToken,
+      ...(copy.detail === undefined ? {} : { detail: copy.detail }),
       since: Date.now(),
     })
     return (async () => { try { return await next() } finally { done() } })()

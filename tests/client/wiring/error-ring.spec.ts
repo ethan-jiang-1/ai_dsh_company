@@ -82,7 +82,7 @@ describe('客户端错误环（R3-03）', () => {
     emit('error', { error: { reason: 'promise said no' } })
     emit('error', { error: {} })
     expect(ring.list().map(entry => entry.message)).toEqual([
-      'real cross-realm message', 'TypeError: cross realm', 'promise said no', '（未知页面错误）',
+      'real cross-realm message', 'TypeError: cross realm', 'promise said no', '(unknown page error)',
     ])
     uninstall()
   })

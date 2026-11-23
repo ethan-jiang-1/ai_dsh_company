@@ -4,6 +4,9 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
+  applyCompanyIdentityRead,
+  companyIdentity,
+  FALLBACK_IDENTITY,
   parseCompanyIdentity,
   resetCompanyIdentity,
   setCompanyIdentity,
@@ -36,6 +39,14 @@ describe('Brand', () => {
     expect(parseCompanyIdentity(null)).toBeNull()
     expect(parseCompanyIdentity('# 无头\n')).toBeNull()
     expect(parseCompanyIdentity('---\nproductName: Acme\n---\n')).toBeNull()
+  })
+
+  it('applyCompanyIdentityRead：失败或截断（eof=false）不覆盖；完整且有效才写入', () => {
+    expect(applyCompanyIdentityRead({ ok: false })).toBe(false)
+    expect(applyCompanyIdentityRead({ ok: true, value: { text: '---\ncompany: X\nproductName: Y\n---\n', eof: false } })).toBe(false)
+    expect(companyIdentity()).toEqual(FALLBACK_IDENTITY)
+    expect(applyCompanyIdentityRead({ ok: true, value: { text: '---\ncompany: X\nproductName: Y\n---\n', eof: true } })).toBe(true)
+    expect(companyIdentity().productName).toBe('Y')
   })
 })
 
