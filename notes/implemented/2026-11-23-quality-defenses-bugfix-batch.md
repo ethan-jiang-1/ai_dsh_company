@@ -10,6 +10,8 @@
    [`readHandbook`](../../packages/company-pack/src/host/prompt/handbook.ts) 读取 `.dsh-company/overrides/AGENTS.md` 改走共享安全读面 [`readCompanyFile`](../../packages/company-pack/src/host/run-bundle/company-root.ts)，拒绝叶子/中间段 symlink、目录及越界路径；遇 `unsafe` 时安全回退到 pack 默认 `content/AGENTS.md`，并在 [`registerHandbook`](../../packages/company-pack/src/host/prompt/handbook.ts) 记录 `logger.warn` 而非抛 `EISDIR` 打崩 `apply()`。
 2. **顺位 1 · P1 冷启动身份订阅与 YAML 标量同源（[BUG-341](../../_backlog/_archive/fixed_bugs/BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md)）**：
    [`registerSidebarIdentity`](../../packages/company-pack/src/client/index.ts) 改为通过 `scoped.effect` 订阅 `sessions.list`（优先 `retainedBy.mainView > 0`、其次非 `subagent` 根会话），按 `${sessionId}:${cwd}` 变化触发读取并在卸载时中止在途请求且重置缓存；[`parseCompanyIdentity`](../../packages/company-pack/src/client/data/company-identity.ts) 复用共享 [`yamlScalar`](../../packages/company-pack/src/lib/docs/yaml-scalar.ts) 解引号与行尾注释并过滤 `<...>` 占位符，确保出厂 `productName: ''` 正常回退出厂词标。
+3. **顺位 2 · host 独立缺陷收口（[BUG-345](../../_backlog/_archive/fixed_bugs/BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md) / [BUG-346](../../_backlog/_archive/fixed_bugs/BUG-346-presented-ledger-concurrent-write-lost-update.md) / [BUG-344](../../_backlog/_archive/fixed_bugs/BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md) / [BUG-343](../../_backlog/_archive/fixed_bugs/BUG-343-req-command-delivery-mode-bypasses-safe-content-id.md)）**：
+   租约重入释放抽共享 `releaseLease` 统一清理心跳定时器；账本 store 写操作按实例串行化并给临时文件补 UUID 后缀；`subagent_retry` 启动取消时以 `childIds.length` 上报 `attempts`；`/req check` 的 `deliveryMode` 改走 `isSafeContentId` + 目录枚举（与 `/delivery check` 同口径）。
 
 ## 输掉的方案
 
@@ -28,6 +30,7 @@
 
 - **BUG-342**：`pnpm test tests/host/prompt/handbook.spec.ts` —— 修复前 2 failed / 6 passed（外部 symlink 透传 `OUTSIDE_SECRET`、目录抛 `EISDIR`）；修复后 8/8 passed，联动 `pnpm typecheck`、`pnpm lint`（`company-static-audit` 141 文件 0 违规）及 `tests/host/contract/file-shape-agreement.spec.ts`（94/94）全绿。
 - **BUG-341**：`pnpm test tests/client/ui/brand.spec.ts tests/client/company-client-composition.spec.ts` —— 修复前双红（`expected '\'\'' to be ''`、冷启动 `readCount` 为 `0`）；修复后 11/11 passed，`pnpm typecheck`、`pnpm lint`、`node tools/dev/build-client.mjs` 全绿。
+- **BUG-345/346/344/343**（并行进程与接管人实跑）：各 spec 修复前 1 failed（心跳定时器泄漏 / 并发写丢更 / `attempts: 0` 与 `childIds` 矛盾 / `..` 被放行），修复后 26/26、对应 host spec 全绿；`pnpm typecheck`、`pnpm lint` 随批复核。
 
 ## 未覆盖轴
 

@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-343**（2026-11-23，质量防线批顺位 2 / P2）：`/req check` 的 `deliveryMode` 改走 `isSafeContentId` + 目录枚举，`..` 等穿越值回归 error——
+  [343](BUG-343-req-command-delivery-mode-bypasses-safe-content-id.md)。证据提交 `751c82d0`。
+
 - **BUG-344**（2026-11-23，质量防线批顺位 2 / P2）：`subagent_retry` 在 `startActivation` 取消分支改用 `attempts: childIds.length`，避免第 2 次启动取消时上报 `attempts: 0`——
   [344](BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md)。证据提交 `4a6f464e`。
 
