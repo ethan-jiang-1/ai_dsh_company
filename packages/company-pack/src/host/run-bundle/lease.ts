@@ -81,6 +81,27 @@ function parseHolder(text: string): LeaseHolder | null {
   }
 }
 
+function releaseLease(path: string): void {
+  const entry = held.get(path)
+  if (entry === undefined) return
+  if (entry.refs > 1) { entry.refs -= 1; return }
+  if (entry.timer !== undefined) clearInterval(entry.timer)
+  try {
+    const current = parseHolder(readFileSync(path, 'utf8'))
+    if (current?.token === entry.holder.token) unlinkSync(path)
+  } catch { /* intentional-fallback: 文件已被删/替换，不删别人的锁 */ }
+  held.delete(path)
+}
+
+function makeRelease(path: string): () => void {
+  let released = false
+  return () => {
+    if (released) return
+    released = true
+    releaseLease(path)
+  }
+}
+
 /**
  * 获取/共享同 home 的 writer lease。
  * @param dshHome - DSH home。
@@ -96,16 +117,7 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
     return {
       acquired: true,
       path,
-      release: () => {
-        const entry = held.get(path)
-        if (entry === undefined) return
-        if (entry.refs > 1) { entry.refs -= 1; return }
-        try {
-          const current = parseHolder(readFileSync(path, 'utf8'))
-          if (current?.token === entry.holder.token) unlinkSync(path)
-        } catch { /* 文件已被删/替换：不删别人的锁 */ }
-        held.delete(path)
-      },
+      release: makeRelease(path),
     }
   }
   const holder: LeaseHolder = {
@@ -129,17 +141,7 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
         acquired: true,
         path,
         ...(takeover === null ? {} : { warning: `接管了 stale writer lease（pid ${String(takeover.pid)}，PID 存活但锁 mtime 已过期；可能是 PID 复用）` }),
-        release: () => {
-          const entry = held.get(path)
-          if (entry === undefined) return
-          if (entry.refs > 1) { entry.refs -= 1; return }
-          if (entry.timer !== undefined) clearInterval(entry.timer)
-          try {
-            const current = parseHolder(readFileSync(path, 'utf8'))
-            if (current?.token === entry.holder.token) unlinkSync(path)
-          } catch { /* 文件已被删/替换：不删别人的锁 */ }
-          held.delete(path)
-        },
+        release: makeRelease(path),
       }
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {

@@ -1,9 +1,10 @@
 // 负例留证 2026-11-13：EEXIST 后直接 read/unlink ⇒ 目录锁报 generic 竞争（BUG-124）；lstat 分类即绿。
 // 负例留证 2026-11-18：不可读 live lease 被当 stale 删除并抢占（BUG-254）；读失败 fail-closed 后绿。
+// 负例留证 2026-11-23：重入分支 release 漏掉 clearInterval ⇒ BUG-345（first 先释放、second 后释放时心跳定时器永久泄漏）红；抽出共享 releaseLease 即绿。BUG-345
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, utimesSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { acquireCompanyLease, leasePath, touchLease } from '../../../packages/company-pack/src/host/run-bundle/lease.ts'
 
 describe('同 home writer lease（2026-10-27 R2）', () => {
@@ -128,5 +129,25 @@ describe('同 home writer lease（2026-10-27 R2）', () => {
       expect(touchLease(leasePath(home), original)).toBe(false)
       acquired.release()
     } finally { rmSync(home, { recursive: true, force: true }) }
+  })
+
+  it('BUG-345：重入按 first→second 顺序释放时同样清理心跳定时器，不泄漏也不误停写', () => {
+    const home = mkdtempSync(join(tmpdir(), 'company-lease-'))
+    const clearSpy = vi.spyOn(globalThis, 'clearInterval')
+    try {
+      const first = acquireCompanyLease(home)
+      const second = acquireCompanyLease(home)
+      expect(first.acquired).toBe(true)
+      expect(second.acquired).toBe(true)
+      if (!first.acquired || !second.acquired) return
+      first.release()
+      expect(clearSpy).toHaveBeenCalledTimes(0)
+      second.release()
+      expect(clearSpy).toHaveBeenCalledTimes(1)
+      expect(existsSync(leasePath(home))).toBe(false)
+    } finally {
+      clearSpy.mockRestore()
+      rmSync(home, { recursive: true, force: true })
+    }
   })
 })
