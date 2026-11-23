@@ -31,7 +31,7 @@ opened: 2026-11-23
 ## 关联既有沉淀（不重复造轮子）
 
 - 上一轮预防试点与生产源头研究：[quality-prevention 归档题](../../_archive/research/quality-prevention/README.md)、[source-prevention-design 归档题](../../_archive/research/source-prevention-design/README.md)
-- 活跃 E2E 设计卡（分工衔接）：[2026-11-21-company-e2e-test-design.md](../../issues/2026-11-21-company-e2e-test-design.md)
+- 历史 E2E 设计卡（已消化归档，由两篇 2026-11-23 质量预防 Note 承接防线）：[2026-11-21-company-e2e-test-design.md](../../_archive/settled_issues/2026-11-21-company-e2e-test-design.md)
 - 上游 DSH 防御模式权威库：[vendor/dsh/docs/defensive-patterns/README.zh.md](../../../vendor/dsh/docs/defensive-patterns/README.zh.md)
 - 本仓测试宪法与失败类决策表：[docs/testing.md](../../../docs/testing.md)、[tests/failure-classes.md](../../../tests/failure-classes.md)
 - 本仓既有生成式差分范本：[tests/lib/docs/markdown-shape.property.spec.ts](../../../tests/lib/docs/markdown-shape.property.spec.ts)、[checks/lanes/generative.e2e.mjs](../../../checks/lanes/generative.e2e.mjs)

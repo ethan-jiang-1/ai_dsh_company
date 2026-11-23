@@ -1,15 +1,15 @@
 ---
-status: 推敲中
+status: 已结
 opened: 2026-11-21
 ---
 
 # 推敲：从 exploratory 转向公司页端到端（E2E）——设计、首批场景与 2026-11-21 实跑结果
 
-> 立卡：2026-11-21 ｜ 状态：推敲中 ｜ 类型：Design ｜ 毕业：未定 ｜ 可关闭：否 ｜ 审查：待
+> 立卡：2026-11-21 ｜ 状态：已结 ｜ 类型：Design ｜ 毕业：消化 ｜ 可关闭：是 ｜ 审查：用户（2026-11-23「这个可以淘汰了是吧？算是结束了? 如果是的话，就归档了」确认收口）
 >
-> **结论/去向**：none — 本轮只产设计、原型证据与 4 张 BUG 卡（293–296）；未改产品代码、未落 lane。
+> **结论/去向**：`none` — 已消化并完成历史使命：6 轮实战产出的 `BUG-293`–`BUG-332`（49 修 + 1 撤回）已全部迁入 [fixed_bugs](../fixed_bugs/README.md)；`BUG-296` 构建指纹已内置 `ui-scene`/`client-load` 车道；「从 E2E 卸载常见缺陷」的系统防线已由 [质量预防首批 Note](../../../notes/implemented/2026-11-23-client-static-guards-and-contract-sweep.md) 与 [二期 Note](../../../notes/implemented/2026-11-23-fuzz-bounded-differential-guards.md) 承接；原 `runtime/tmp/e2e/company-e2e.mjs` 单体原型不再作为独立 lane 收编，按需再另行立卡。
 >
-> **授权边界**：用户 2026-11-21 指令 = 「改向端到端来测试……设计设计端到端……发现问题直接报 bug，别急着修」。本卡是设计/交接，不是实施授权；落探针/车道需用户再点名。
+> **授权边界**：用户 2026-11-21 指令 = 「改向端到端来测试……设计设计端到端……发现问题直接报 bug，别急着修」；2026-11-23 用户确认本卡使命完成并归档。
 
 ## 问题
 
@@ -75,7 +75,7 @@ opened: 2026-11-21
 
 - 隔离实例：官方 web 模板建 company profile + pack link；临时 workspace + 夹具；Playwright Chromium 1440×960 / 390×844。
 - S1/S2/S4/S6/S7/S8/S9 绿；S3、S5（空态）、S10 红。
-- 4 张卡：[BUG-293](../_archive/fixed_bugs/BUG-293-command-scope-hint-slot-crash.md)（P1，注入面 `list: undefined`，单测绿/真页面崩）、[BUG-294](../_archive/fixed_bugs/BUG-294-cultivation-no-pending-lies-about-empty-workspace.md)（P2，无待办被说成工作区无记录）、[BUG-295](../_archive/fixed_bugs/BUG-295-attention-item-unbounded-approval-reason.md)（P2，整段审批理由进列表摘要）、[BUG-296](../_archive/fixed_bugs/BUG-296-real-page-lanes-stale-client-bundle.md)（P1，真页面车道旧构建假绿）。
+- 4 张卡：[BUG-293](../fixed_bugs/BUG-293-command-scope-hint-slot-crash.md)（P1，注入面 `list: undefined`，单测绿/真页面崩）、[BUG-294](../fixed_bugs/BUG-294-cultivation-no-pending-lies-about-empty-workspace.md)（P2，无待办被说成工作区无记录）、[BUG-295](../fixed_bugs/BUG-295-attention-item-unbounded-approval-reason.md)（P2，整段审批理由进列表摘要）、[BUG-296](../fixed_bugs/BUG-296-real-page-lanes-stale-client-bundle.md)（P1，真页面车道旧构建假绿）。
 - 原型证据（gitignored）：`runtime/tmp/e2e/company-e2e.mjs`、`runtime/tmp/e2e-evidence/2026-11-21T15-*`、官方车道证据 `runtime/harness-home/diagnosis/cdp-probe-2026-11-21T15-31-00-953Z/`。
 - 结论：这批改动**不是「exploratory 抓不到」，而是 exploratory 没走到那几个状态**；E2E 在约 10 个场景里抓到 4 个，其中 2 个是「单测绿、真页面红」的系统性假绿。跨会话审批、培养三态、成品索引、i18n/窄栏是稳的。
 
@@ -83,10 +83,10 @@ opened: 2026-11-21
 
 用户指令：并行修复进程处理 293–296，这边不碰修法，继续找 3–5 个。第二轮在隔离实例上补了策略读坏、读上限（台账/长记录/大索引）、同摘要双审批、时间口径五组场景，新立 4 张：
 
-- [BUG-297](../_archive/fixed_bugs/BUG-297-strategy-read-failure-silently-auto.md)：策略文件坏/读不到时静默回退 auto（有 `parseStartupSettingsState` 诊断但没接）。
-- [BUG-298](../_archive/fixed_bugs/BUG-298-fixed-read-limits-silent-truncation.md)：固定行数读上限静默截断——300 行台账显示 236、2050 行记录显示 1989、2087 行合法索引报「形状不符」。
-- [BUG-299](../_archive/fixed_bugs/BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md)：待办按 160 字摘要去重，两条不同审批塌成一条；活体 `detail` 在 merge 时丢失。
-- [BUG-300](../_archive/fixed_bugs/BUG-300-cultivation-decided-at-raw-iso.md)：培养采纳/拒绝时间裸 ISO，与提出时间的「1 小时前」不一致。
+- [BUG-297](../fixed_bugs/BUG-297-strategy-read-failure-silently-auto.md)：策略文件坏/读不到时静默回退 auto（有 `parseStartupSettingsState` 诊断但没接）。
+- [BUG-298](../fixed_bugs/BUG-298-fixed-read-limits-silent-truncation.md)：固定行数读上限静默截断——300 行台账显示 236、2050 行记录显示 1989、2087 行合法索引报「形状不符」。
+- [BUG-299](../fixed_bugs/BUG-299-attention-dedupe-by-summary-drops-distinct-approvals.md)：待办按 160 字摘要去重，两条不同审批塌成一条；活体 `detail` 在 merge 时丢失。
+- [BUG-300](../fixed_bugs/BUG-300-cultivation-decided-at-raw-iso.md)：培养采纳/拒绝时间裸 ISO，与提出时间的「1 小时前」不一致。
 
 第二轮跑绿：策略正常设值/刷新/重置；选项文件坏/空有显式错误态；培养拒绝空理由校验、采纳、撤回、跨角色建议路由、journal 不可达；台账正常；成品目录/打开 final/unicode+空格路径；浮窗 1440 与 390；命令提示两态。仍红：297/298/299/300。
 
@@ -94,12 +94,12 @@ opened: 2026-11-21
 
 并行进程收掉 297–300 后，本轮在隔离实例上补了策略交互、英文动作面、台账坏行、跨会话历史窗口/全失败、培养列表上限、成品归档/筛选、培养创作/验证、团队任务板/依赖图/在场/用量。新立 6 张：
 
-- [BUG-301](../_archive/fixed_bugs/BUG-301-strategy-wiki-input-stale-after-reset.md)：wiki 输入非受控，重置后旧值仍在且失焦会回写。
-- [BUG-302](../_archive/fixed_bugs/BUG-302-english-ui-chinese-time-and-reason.md)：en 界面混入 `刚刚/7 小时前` 与 `列目录被拒（…）`。
-- [BUG-303](../_archive/fixed_bugs/BUG-303-ledger-malformed-rows-silent-drop.md)：台账坏行静默丢，4 行只显示 2 行。
-- [BUG-304](../_archive/fixed_bugs/BUG-304-attention-history-window-misses-old-approvals.md)：跨会话历史只读最近 800 条，老审批漏。
-- [BUG-305](../_archive/fixed_bugs/BUG-305-attention-history-all-read-fail-silent-empty.md)：历史全失败仍显示「没有等你的事」。
-- [BUG-306](../_archive/fixed_bugs/BUG-306-cultivation-mine-list-cap-dead.md)：`LIST_CAPS.mine=5` 死配置，10 条全铺开无折叠。
+- [BUG-301](../fixed_bugs/BUG-301-strategy-wiki-input-stale-after-reset.md)：wiki 输入非受控，重置后旧值仍在且失焦会回写。
+- [BUG-302](../fixed_bugs/BUG-302-english-ui-chinese-time-and-reason.md)：en 界面混入 `刚刚/7 小时前` 与 `列目录被拒（…）`。
+- [BUG-303](../fixed_bugs/BUG-303-ledger-malformed-rows-silent-drop.md)：台账坏行静默丢，4 行只显示 2 行。
+- [BUG-304](../fixed_bugs/BUG-304-attention-history-window-misses-old-approvals.md)：跨会话历史只读最近 800 条，老审批漏。
+- [BUG-305](../fixed_bugs/BUG-305-attention-history-all-read-fail-silent-empty.md)：历史全失败仍显示「没有等你的事」。
+- [BUG-306](../fixed_bugs/BUG-306-cultivation-mine-list-cap-dead.md)：`LIST_CAPS.mine=5` 死配置，10 条全铺开无折叠。
 
 第三轮跑绿：策略正常设值/刷新/重置；培养创作（空校验 + 跨角色建议落盘）、采纳/拒绝/撤回/验证（通过）、建议路由、journal 不可达；成品归档筛选/打开、unicode+空格路径；台账正常/截断提示；团队任务板/看板/依赖图/在场/用量（3 任务 + 依赖链）；待办身份去重（修后两条同摘要不再塌）；en 页签主体。仍红：301–306。目标 5–6 个，本轮 6 个。
 
@@ -107,15 +107,15 @@ opened: 2026-11-21
 
 并行进程收掉 301–306 后，本轮把主视图/对话面板/表单形状/解析边界/折叠计数补了一遍，新立 9 张（307–315）：
 
-- [BUG-307](../_archive/fixed_bugs/BUG-307-cultivation-mine-cap-control-combined.md)：两个子列表各折 5 条、控件按合并总数——4+4 全显示仍挂「显示全部」。
-- [BUG-308](../_archive/fixed_bugs/BUG-308-cultivation-chat-panel-i18n-leaks.md)：培养对话面板 en 中文提示、zh 英文 `session:`。
-- [BUG-309](../_archive/fixed_bugs/BUG-309-cultivation-self-record-listed-twice.md)：self rejected 在「我提交的」列两次。
-- [BUG-310](../_archive/fixed_bugs/BUG-310-deliverables-index-silent-entry-drop.md)：成品索引坏 entry 静默丢。
-- [BUG-311](../_archive/fixed_bugs/BUG-311-ledger-header-mismatch-silent-empty.md)：台账表头 typo → 共 0 场无提示。
-- [BUG-312](../_archive/fixed_bugs/BUG-312-attention-question-duplicate-key.md)：同文 question 撞 React key。
-- [BUG-313](../_archive/fixed_bugs/BUG-313-startup-options-bad-shape-silent-empty.md)：options 字段类型坏冒充「没有可选项」。
-- [BUG-314](../_archive/fixed_bugs/BUG-314-startup-settings-bad-shape-silent-auto.md)：settings 字段类型坏冒充 auto。
-- [BUG-315](../_archive/fixed_bugs/BUG-315-cultivation-full-view-min-widths-ignored.md)：768 主视图左板/右栏压到 210/176，声明下限未生效。
+- [BUG-307](../fixed_bugs/BUG-307-cultivation-mine-cap-control-combined.md)：两个子列表各折 5 条、控件按合并总数——4+4 全显示仍挂「显示全部」。
+- [BUG-308](../fixed_bugs/BUG-308-cultivation-chat-panel-i18n-leaks.md)：培养对话面板 en 中文提示、zh 英文 `session:`。
+- [BUG-309](../fixed_bugs/BUG-309-cultivation-self-record-listed-twice.md)：self rejected 在「我提交的」列两次。
+- [BUG-310](../fixed_bugs/BUG-310-deliverables-index-silent-entry-drop.md)：成品索引坏 entry 静默丢。
+- [BUG-311](../fixed_bugs/BUG-311-ledger-header-mismatch-silent-empty.md)：台账表头 typo → 共 0 场无提示。
+- [BUG-312](../fixed_bugs/BUG-312-attention-question-duplicate-key.md)：同文 question 撞 React key。
+- [BUG-313](../fixed_bugs/BUG-313-startup-options-bad-shape-silent-empty.md)：options 字段类型坏冒充「没有可选项」。
+- [BUG-314](../fixed_bugs/BUG-314-startup-settings-bad-shape-silent-auto.md)：settings 字段类型坏冒充 auto。
+- [BUG-315](../fixed_bugs/BUG-315-cultivation-full-view-min-widths-ignored.md)：768 主视图左板/右栏压到 210/176，声明下限未生效。
 
 第四轮跑绿：策略正常、培养创作/采纳/拒绝/撤回/验证、成品归档/筛选/打开/unicode 路径、台账正常/截断/坏行（303 修后）、团队任务板/看板/依赖图/在场/用量、待办身份去重、en 主体。仍红：307–315。目标 8–10，本轮 9。
 
@@ -123,15 +123,15 @@ opened: 2026-11-21
 
 并行进程收掉 307–315 后，本轮从「en 真提交」和「长会话/多会话/长前置」两组边界切入，新立 9 张（316–324）：
 
-- [BUG-316](../_archive/fixed_bugs/BUG-316-cultivation-host-command-texts-not-localized.md)：培养命令 host 回执/错误 en 仍中文（真页面「Record it」实测）。
-- [BUG-317](../_archive/fixed_bugs/BUG-317-attention-current-session-1000-cap-silent.md)：当前会话只留 1000 事件，旧审批静默丢。
-- [BUG-318](../_archive/fixed_bugs/BUG-318-attention-history-candidate-cap-silent.md)：跨会话候选只扫 20 个，无边界提示。
-- [BUG-319](../_archive/fixed_bugs/BUG-319-attention-questions-not-rebuilt-after-reload.md)：问询刷新后从待办消失。
-- [BUG-320](../_archive/fixed_bugs/BUG-320-attention-approval-cap-five-silent.md)：6 条挂起审批只显 5 条。
-- [BUG-321](../_archive/fixed_bugs/BUG-321-cultivation-record-head-60-lines-false-broken.md)：60 行头窗口把合法长前置记录判坏。
-- [BUG-322](../_archive/fixed_bugs/BUG-322-cultivation-journal-head-240-title-fallback.md)：240 字窗口吞 journal 标题。
-- [BUG-323](../_archive/fixed_bugs/BUG-323-attention-history-cross-workspace-leak.md)：cwd 未解析时注意力候选 fail-open 到所有工作区。
-- [BUG-324](../_archive/fixed_bugs/BUG-324-deliverables-catalog-field-shape-silent.md)：catalog 字段形状坏被静默归一化。
+- [BUG-316](../fixed_bugs/BUG-316-cultivation-host-command-texts-not-localized.md)：培养命令 host 回执/错误 en 仍中文（真页面「Record it」实测）。
+- [BUG-317](../fixed_bugs/BUG-317-attention-current-session-1000-cap-silent.md)：当前会话只留 1000 事件，旧审批静默丢。
+- [BUG-318](../fixed_bugs/BUG-318-attention-history-candidate-cap-silent.md)：跨会话候选只扫 20 个，无边界提示。
+- [BUG-319](../fixed_bugs/BUG-319-attention-questions-not-rebuilt-after-reload.md)：问询刷新后从待办消失。
+- [BUG-320](../fixed_bugs/BUG-320-attention-approval-cap-five-silent.md)：6 条挂起审批只显 5 条。
+- [BUG-321](../fixed_bugs/BUG-321-cultivation-record-head-60-lines-false-broken.md)：60 行头窗口把合法长前置记录判坏。
+- [BUG-322](../fixed_bugs/BUG-322-cultivation-journal-head-240-title-fallback.md)：240 字窗口吞 journal 标题。
+- [BUG-323](../fixed_bugs/BUG-323-attention-history-cross-workspace-leak.md)：cwd 未解析时注意力候选 fail-open 到所有工作区。
+- [BUG-324](../fixed_bugs/BUG-324-deliverables-catalog-field-shape-silent.md)：catalog 字段形状坏被静默归一化。
 
 第五轮跑绿：培养主视图/对话面板（含中英切换）、策略 wiki 路径（内/外/缺失）、团队任务分配+在场、en 主体。新红：316–324。目标 8–10，本轮 9。
 
@@ -139,14 +139,14 @@ opened: 2026-11-21
 
 并行进程收掉 316–324 后，本轮从修复后的接缝切进去，新立 8 张（325–332）：
 
-- [BUG-325](../_archive/fixed_bugs/BUG-325-attention-question-live-history-id-mismatch.md)：问询 live 合成 id 与历史 callId 不一致，双源会重复。
-- [BUG-326](../_archive/fixed_bugs/BUG-326-cultivation-command-description-inner-errors-chinese.md)：316 后 command description/hint、dataBlocked、内部路径错误仍中文。
-- [BUG-327](../_archive/fixed_bugs/BUG-327-attention-current-approval-cap-still-silent.md)：320 只接历史会话的 capped，当前会话自己的 `.capped` 仍丢。
-- [BUG-328](../_archive/fixed_bugs/BUG-328-attention-empty-state-ignores-boundaries.md)：候选/窗口/工作区边界提示不压空态。
-- [BUG-329](../_archive/fixed_bugs/BUG-329-cultivation-en-list-delimiters-chinese.md)：en 列表分隔符仍是「、」。
-- [BUG-330](../_archive/fixed_bugs/BUG-330-attention-question-copy-and-cap-still-approval-only.md)：question 已进待办，capped/文案仍只写审批。
-- [BUG-331](../_archive/fixed_bugs/BUG-331-attention-multi-question-request-only-first.md)：多问题请求只显示第一个。
-- [BUG-332](../_archive/fixed_bugs/BUG-332-attention-exact-800-window-false-positive.md)：恰好 800 条也报窗口截断。
+- [BUG-325](../fixed_bugs/BUG-325-attention-question-live-history-id-mismatch.md)：问询 live 合成 id 与历史 callId 不一致，双源会重复。
+- [BUG-326](../fixed_bugs/BUG-326-cultivation-command-description-inner-errors-chinese.md)：316 后 command description/hint、dataBlocked、内部路径错误仍中文。
+- [BUG-327](../fixed_bugs/BUG-327-attention-current-approval-cap-still-silent.md)：320 只接历史会话的 capped，当前会话自己的 `.capped` 仍丢。
+- [BUG-328](../fixed_bugs/BUG-328-attention-empty-state-ignores-boundaries.md)：候选/窗口/工作区边界提示不压空态。
+- [BUG-329](../fixed_bugs/BUG-329-cultivation-en-list-delimiters-chinese.md)：en 列表分隔符仍是「、」。
+- [BUG-330](../fixed_bugs/BUG-330-attention-question-copy-and-cap-still-approval-only.md)：question 已进待办，capped/文案仍只写审批。
+- [BUG-331](../fixed_bugs/BUG-331-attention-multi-question-request-only-first.md)：多问题请求只显示第一个。
+- [BUG-332](../fixed_bugs/BUG-332-attention-exact-800-window-false-positive.md)：恰好 800 条也报窗口截断。
 
 第六轮跑绿：316 的 en 回执、319 的问询历史、320 的三处边界提示、321/322 的补读、323 的 fail-closed、324 的字段严格化都在真页面/纯函数复核过。新红：325–332。目标 8–10，本轮 8。
 

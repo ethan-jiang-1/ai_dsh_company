@@ -4,8 +4,9 @@
 
 ## 活跃清单
 
-**活跃 1 张**：
-- [2026-11-21 公司页 E2E 设计卡](2026-11-21-company-e2e-test-design.md)（推敲中；本轮只产设计/原型证据 + BUG-293..296，未落 lane）。
+**活跃 0 张**。
+
+（2026-11-23 公司页 E2E 设计卡已消化归档：`BUG-293`–`BUG-332` 已全部清零迁入 [fixed_bugs](../_archive/fixed_bugs/README.md)，防线诉求已分别由两篇 2026-11-23 质量预防 Note 承接；卡片见[归档](../_archive/settled_issues/2026-11-21-company-e2e-test-design.md)。）
 
 （2026-11-23 质量预防二期卡「六大解析器畸形 Fuzz、Bounded<T> 边界原语与 Live↔History 同源差分」已结归档：去向 = [实施Note](../../notes/implemented/2026-11-23-fuzz-bounded-differential-guards.md)，卡片见[归档](../_archive/settled_issues/2026-11-23-fuzz-bounded-differential-guards.md)。）
 

@@ -44,7 +44,7 @@ intent: 记录首轮研究后的实盘可行性核验（4 项修正）并系统�
 
 ### 修正 4：全历史分布、现行 10 处 `as never` 与活跃 E2E 卡的边界对齐
 
-1. **全历史 331 张卡对照**：11-20 前的 281 张卡分布为工具/车道 110、会话/委派/其他 82、`client/lib` 37、`host` 26、`preset/content` 26；11-20 后的 50 张集中于 `client/lib`（40 张）是因为活跃卡 [2026-11-21 公司页 E2E 设计卡](../../issues/2026-11-21-company-e2e-test-design.md) 连续 6 轮定向打 UI 面。因此首批 issue 明确标注聚焦「通用静态防线 + client/lib 高发面」，与 E2E 设计卡分工互补、不替代它。
+1. **全历史 331 张卡对照**：11-20 前的 281 张卡分布为工具/车道 110、会话/委派/其他 82、`client/lib` 37、`host` 26、`preset/content` 26；11-20 后的 50 张集中于 `client/lib`（40 张）是因为当时活跃的 [2026-11-21 公司页 E2E 设计卡](../../_archive/settled_issues/2026-11-21-company-e2e-test-design.md) 连续 6 轮定向打 UI 面。因此首批 issue 明确标注聚焦「通用静态防线 + client/lib 高发面」，与 E2E 设计卡分工互补、不替代它。
 2. **现行 10 处 `as never` 逐条核查**：已核实无一处是 `undefined as never`（`BUG-293` 已修），多位于 vendor RPC / DOM 事件 / 未增强 Cordis 事件窄边界（`company-data-plane.ts:60`、`client/index.ts:229,339`、`context-wiring.ts:51`、`error-ring.ts:183-198`、`company-language.ts:87-89`）。因此规则设计为：**无条件禁止 `undefined/null as never`**，其余 `as never` 收拢为窄白名单或逐步清零，不搞一刀切破坏构建。
 3. **额外顺手发现 1 处现行中文残留**：[cultivation-data.ts](../../../packages/company-pack/src/client/cultivation/cultivation-data.ts) 第 90 行 `return { ok: false, reason: \`读取被拒（${path}）\` }`——`BUG-302` 修了 `dir-denied` 但漏了紧邻的文件读失败分支。
 

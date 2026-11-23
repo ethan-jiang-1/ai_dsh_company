@@ -44,7 +44,7 @@ opened: 2026-11-23
 - 不在本卡实施第二批（6 大解析器畸形 Fuzz 矩阵、统一 `Bounded<T>` 重构、Live↔History 差分——另立第二卡）；
 - 不在本卡引入新 npm 依赖（不装 `fast-check`、StrykerJS、`knip`、`oxlint-tsgolint`）；
 - 不做品牌类型试点（Tier 2）或一次性清理全仓 138 处历史静默 `catch`（本卡只建基线，不搞全仓重写）；
-- 不改 `vendor/`，不改角色 persona/skill/content，不取代或关闭活跃卡 [2026-11-21-company-e2e-test-design.md](../../issues/2026-11-21-company-e2e-test-design.md)（本卡负责把能前移的静态/无模型缺陷从 E2E 卸载出来，E2E 卡专注真浏览器/真边界）。
+- 不改 `vendor/`，不改角色 persona/skill/content，不取代或关闭当时的活跃卡 [2026-11-21-company-e2e-test-design.md](2026-11-21-company-e2e-test-design.md)（本卡负责把能前移的静态/无模型缺陷从 E2E 卸载出来，E2E 卡专注真浏览器/真边界）。
 
 ## 已知与未决
 
