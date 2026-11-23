@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-344**（2026-11-23，质量防线批顺位 2 / P2）：`subagent_retry` 在 `startActivation` 取消分支改用 `attempts: childIds.length`，避免第 2 次启动取消时上报 `attempts: 0`——
+  [344](BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md)。证据提交 `4a6f464e`。
+
 - **BUG-346**（2026-11-23，质量防线批顺位 2 / P2）：`presented-domain` 为 `ensureLedger`/`recordLedger`/`auditLedger` 增加按 store 实例的 Promise 串行队列，并为 `fileStore` 临时文件补充 `randomUUID()`——
   [346](BUG-346-presented-ledger-concurrent-write-lost-update.md)。证据提交 `bbb13b8d`。
 
