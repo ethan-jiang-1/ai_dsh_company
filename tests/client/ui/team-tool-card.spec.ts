@@ -7,6 +7,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { TEAM_TOOL_KEYS, TeamToolCard, teamCardModel } from '../../../packages/company-pack/src/client/ui/TeamToolCard.tsx'
 import { en, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
+import { assertEnglishUiClean } from '../../support/i18n-assertions.ts'
 
 type Block = Parameters<typeof teamCardModel>[1]
 
@@ -114,11 +115,23 @@ describe('TEAM_TOOL_KEYS 与 vendor 工具注册名同源（防漂移）', () =>
 // 依赖清单的分隔符随语言（BUG-329）：令牌参数只带 id 数组，渲染处按语言拼「、」/", "。
 // 负例留证 2026-11-26：把分隔符预拼进令牌参数后本用例 failure（中文顿号进 en 模板）。BUG-329
 describe('团队工具卡 · 依赖分隔符（BUG-329）', () => {
-  it('team_task_create 带 blocked_by ⇒ 模型给出 blockIds（不预拼分隔符）', () => {
+  it('team_task_create 带 blocked_by ⇒ 模型给出 blockIds 与 taskDeps 令牌（不预拼分隔符）', () => {
     const model = teamCardModel('team_task_create', { argsRaw: JSON.stringify({ subject: '任务', blocked_by: ['t1', 't2'] }) } as never)
     expect(model.blockIds).toEqual(['t1', 't2'])
+    // BUG-333：有依赖就必须给 detailToken，渲染处才会按语言取模板与分隔符。
+    expect(model.detailToken).toEqual({ key: 'teamCard.taskDeps', ids: ['t1', 't2'] })
     // 令牌参数里只有原始 id（分隔符在渲染处按语言取），所以不会出现中文顿号。
     expect(JSON.stringify(model.detailToken?.params ?? {})).not.toContain('、')
+  })
+
+  it('BUG-333：en 组件渲染依赖行用 ", "，零汉字/顿号', () => {
+    const html = renderToStaticMarkup(createElement(TeamToolCard, {
+      toolName: 'team_task_create',
+      block: running('team_task_create', JSON.stringify({ subject: 'Design API', blocked_by: ['t1', 't2'] })),
+      t: tEn,
+    } as Parameters<typeof TeamToolCard>[0]))
+    expect(html).toContain('Depends on t1, t2')
+    assertEnglishUiClean(html)
   })
 
   it('无 blocked_by ⇒ blockIds 为空（渲染处走空数组兜底）', () => {

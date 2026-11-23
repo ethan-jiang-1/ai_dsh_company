@@ -47,7 +47,8 @@ const defaultT = ((key: CompanyKey, params?: Record<string, string | number>) =>
   return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
 }) as CompanyT
 
-interface CardToken { key: CompanyKey; params?: Record<string, string> }
+/** 延迟翻译令牌：`ids` 在渲染处按当前语言拼分隔符（模型是语言无关的；BUG-329/333）。 */
+interface CardToken { key: CompanyKey; params?: Record<string, string>; readonly ids?: readonly string[] }
 
 /** 一张团队工具卡的展示事实（纯函数产物，keyless 可测）。 */
 export interface TeamCardModel {
@@ -110,7 +111,11 @@ export function teamCardModel(toolName: string, block: ToolCallViewProps['block'
     case 'team_task_create':
       titleToken = subject === '' ? { key: 'teamCard.taskCreateNew' } : { key: 'teamCard.taskCreate', params: { subject } }
       // 分隔符在**渲染处**按语言取（模型层不带语言；BUG-329）。
-      if (blockers.length > 0) blockIds = blockers
+      if (blockers.length > 0) {
+        blockIds = blockers
+        detailToken = { key: 'teamCard.taskDeps', ids: blockers }
+        detail = t('teamCard.taskDeps', { ids: joinList(blockers, listSeparator(t)) })
+      }
       break
     case 'team_task_list':
       titleToken = { key: 'teamCard.taskList' }
@@ -127,7 +132,7 @@ export function teamCardModel(toolName: string, block: ToolCallViewProps['block'
   }
 
   if (titleToken !== undefined) title = t(titleToken.key, titleToken.params)
-  if (detailToken !== undefined) detail = t(detailToken.key, detailToken.params)
+  if (detailToken !== undefined) detail = t(detailToken.key, { ...detailToken.params, ...(detailToken.ids === undefined ? {} : { ids: joinList(detailToken.ids, listSeparator(t)) }) })
   else if (blockers.length > 0) detail = t('teamCard.taskDeps', { ids: joinList(blockers, listSeparator(t)) })
 
   return { title, titleToken, detail, detailToken, blockIds, state: cardStateOf(block), output: resultTextOf(block) }
@@ -139,7 +144,7 @@ export function teamCardModel(toolName: string, block: ToolCallViewProps['block'
  * @returns 团队动作卡。
  */
 export function TeamToolCard({ toolName, block, inspect, t = defaultT }: ToolCallViewProps & { readonly t?: CompanyT }) {
-  const { title, titleToken, detail, detailToken, blockIds, state, output } = teamCardModel(toolName, block)
+  const { title, titleToken, detail, detailToken, blockIds, state, output } = teamCardModel(toolName, block, t)
   const [expanded, setExpanded] = useState(false)
   const expandable = output !== null || (detail !== null && detail.length > 60)
   const open = expanded && expandable
@@ -166,7 +171,7 @@ export function TeamToolCard({ toolName, block, inspect, t = defaultT }: ToolCal
         {expandable && <span className="wk-delegation-state">{open ? t('teamCard.collapse') : t('teamCard.expand')}</span>}
       </div>
       {detail !== null && (open || detail.length <= 60)
-        ? <div className="wk-delegation-title">{detailToken === undefined ? detail : t(detailToken.key, { ...detailToken.params, ids: joinList(blockIds ?? [], listSeparator(t)) })}</div>
+        ? <div className="wk-delegation-title">{detailToken === undefined ? detail : t(detailToken.key, { ...detailToken.params, ...(detailToken.ids === undefined ? { ids: joinList(blockIds ?? [], listSeparator(t)) } : { ids: joinList(detailToken.ids, listSeparator(t)) }) })}</div>
         : null}
       {open && output !== null ? (
         <div className="wk-mt-sm">
