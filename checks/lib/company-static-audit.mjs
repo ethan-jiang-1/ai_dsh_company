@@ -4,11 +4,12 @@
  * Rules:
  * - R1 (`must-use-boundary`, blocking): TypeChecker-based check ensuring callers that read data
  *   fields from boundary-bearing types (`WorkspaceTextRead`, `DeliverablesCatalog`, `PendingApprovals`,
- *   `MotionLedger`, `Bounded`, or `workspaceFiles.read`) also consume at least one corresponding diagnostic/boundary
- *   field (`eof`, `skipped`, `capped`, `truncated`, `badRows`, `headerOk`) or forward the whole container.
+ *   `MotionLedger`, `Bounded`, `PendingAcrossSessions`, `HistoryCandidates`, `ContextSourceResult`,
+ *   `CultivationPanelData`, or `workspaceFiles.read`) also consume the corresponding diagnostic/boundary
+ *   fields (`eof`, `skipped`, `capped`, `truncated`, `badRows`, `headerOk`, ...) or forward the whole container.
  * - R2 (`no-literal-cjk-or-punct`, blocking): AST check ensuring zero literal CJK strings or JSX text
- *   or hardcoded Chinese joiners (`.join('、'|'；')`) inside `src/client/**` (outside explicit dictionaries)
- *   and strict ratchet/zero in `src/lib/**`.
+ *   or hardcoded Chinese joiners (`.join('、'|'；')`) inside `src/client/**` (outside explicit dictionaries),
+ *   ratchet in `src/lib/**` and `src/host/**` (host ratchet map; host entry `src/index.ts` included).
  * - R3 (`no-type-escape`, blocking for `undefined/null as never`; baseline for remaining): AST check for
  *   type escapes (`undefined/null as never`, general `as never`, and `JSON.parse(...) as T`).
  * - R4 (`hygiene-smells`, read-only): Counts silent catches without `// intentional-fallback:`, JSX
@@ -70,8 +71,8 @@ const BOUNDARY_SPECS = [
     name: 'MotionLedger',
     dataProps: ['rows'],
     boundaryProps: ['badRows', 'headerOk'],
-    // BUG-340：只读 headerOk 而丢 badRows = 静默少报坏行，故 badRows 必读（headerOk 仍算边界）。
-    requiredBoundaryProps: ['badRows'],
+    // BUG-340：坏行与表头都不能单丢（badRows=静默少报行；headerOk=false=把空表说成 0 场，BUG-311）。
+    requiredBoundaryProps: ['badRows', 'headerOk'],
   },
   {
     // BUG-340：跨会话重建结果（BUG-304/305/318/323）过去不在纳管面。
@@ -90,7 +91,8 @@ const BOUNDARY_SPECS = [
     name: 'ContextSourceResult',
     dataProps: ['value'],
     boundaryProps: ['skipped', 'capped'],
-    requireAllBoundaryProps: true,
+    // 会话路径只产 capped，skipped 仅成品索引路径；只把共同产物 capped 设为必读（盲审 finding 5）。
+    requiredBoundaryProps: ['capped'],
   },
   {
     name: 'CultivationPanelData',
@@ -105,6 +107,7 @@ const BOUNDARY_SPECS = [
  * 先按文件棘轮上线（新文件 = 0），确认真实面零误报后再逐文件收紧/阻断。
  */
 export const HOST_CJK_RATCHET = new Map([
+  ['packages/company-pack/src/index.ts', 88], // host 入口（盲审 finding 7：此前完全跳过扫描；88 = 模板片段计数）
   ['packages/company-pack/src/host/commands/blocked-text.ts', 5],
   ['packages/company-pack/src/host/commands/client-diagnostics.ts', 10],
   ['packages/company-pack/src/host/commands/deliverable-path.ts', 7],
@@ -201,6 +204,12 @@ function unwrapPromiseType(checker, type) {
   return checker.getAwaitedType(type) ?? type
 }
 
+function hasBoundaryPropsOf(member, spec) {
+  return spec.requireAllBoundaryProps === true
+    ? spec.boundaryProps.every(p => member.getProperty(p) !== undefined)
+    : spec.boundaryProps.some(p => member.getProperty(p) !== undefined)
+}
+
 function matchBoundarySpec(checker, type, callExpr) {
   const target = unwrapPromiseType(checker, type)
   // Direct or nullable union of named boundary interface (e.g. DeliverablesCatalog | null)
@@ -210,7 +219,9 @@ function matchBoundarySpec(checker, type, callExpr) {
     for (const spec of BOUNDARY_SPECS) {
       const hasRequired = (spec.requiredProps ?? []).every(p => member.getProperty(p) !== undefined)
       const hasData = spec.dataProps.some(p => member.getProperty(p) !== undefined)
-      const hasBoundary = spec.boundaryProps.some(p => member.getProperty(p) !== undefined)
+      // 盲审 finding 2：匹配口径必须与判据一致，否则「只带部分边界」的无关类型会被永久误报。
+      const hasBoundary = (hasBoundaryPropsOf(member, spec)) &&
+        (spec.requiredBoundaryProps ?? []).every(p => member.getProperty(p) !== undefined)
       if (hasRequired && hasData && hasBoundary) return { ...spec, viaValueWrapper: false }
     }
     // Check workspaceFiles.read style wrapper: { ok: true; value: { text: string; eof?: boolean } }
@@ -403,11 +414,19 @@ function checkCallBoundaryUse(checker, sf, relFile, callExpr, spec, violations) 
         ts.isIdentifier(callee.expression) &&
         callee.expression.text === 'Promise'
       ) {
-        promiseAllIndex = container.elements.indexOf(callExpr)
-        tracked = allCall
+        const index = container.elements.indexOf(callExpr)
+        // 盲审 finding 4：前面有 spread 时源码下标 ≠ 运行时下标，按位置追踪会误判。
+        if (container.elements.slice(0, index).some(element => ts.isSpreadElement(element))) {
+          promiseAllIndex = -2
+          tracked = allCall
+        } else {
+          promiseAllIndex = index
+          tracked = allCall
+        }
       }
     }
   }
+  if (promiseAllIndex === -2) return
   const valueExpr = unwrapBoundaryWrapper(tracked)
   const parent = valueExpr.parent
   // Case 1: Inline property access: `(parseCatalog(x))?.entries`
@@ -467,7 +486,28 @@ function checkCallBoundaryUse(checker, sf, relFile, callExpr, spec, violations) 
   // Case 2b: Array destructuring from Promise.all — track the element at the same position.
   if (ts.isArrayBindingPattern(varDecl.name) && promiseAllIndex >= 0) {
     const element = varDecl.name.elements[promiseAllIndex]
-    if (element === undefined || !ts.isIdentifier(element.name)) return
+    if (element === undefined) return
+    // 盲审 finding 3：`const [{ rows }] = await Promise.all([...])` 也要按对象解构判。
+    if (ts.isObjectBindingPattern(element.name)) {
+      collectObjectBindingProps(element.name, accessedProps)
+      const readsDataNested = spec.dataProps.some(p => accessedProps.has(p))
+      const readsBoundaryNested = (spec.requireAllBoundaryProps === true
+        ? spec.boundaryProps.every(p => accessedProps.has(p))
+        : spec.boundaryProps.some(p => accessedProps.has(p)))
+        && (spec.requiredBoundaryProps ?? []).every(p => accessedProps.has(p))
+      if (readsDataNested && !readsBoundaryNested) {
+        const { line, col } = lineOf(sf, callExpr)
+        violations.push({
+          rule: 'R1:must-use-boundary',
+          file: relFile,
+          line,
+          col,
+          message: `${spec.name} destructures data from Promise.all without ${spec.boundaryProps.join('/')}`,
+        })
+      }
+      return
+    }
+    if (!ts.isIdentifier(element.name)) return
     const forwardedArray = scanSymbolProps(checker, scope, [element.name], spec, accessedProps)
     if (forwardedArray) return
     const readsDataArray = spec.dataProps.some(p => accessedProps.has(p))
@@ -521,7 +561,7 @@ function isInTypeContext(node) {
 function checkCjkInFile(sf, relFile, violations, libCounts) {
   const isClient = relFile.startsWith('packages/company-pack/src/client/')
   const isLib = relFile.startsWith('packages/company-pack/src/lib/')
-  const isHost = relFile.startsWith('packages/company-pack/src/host/')
+  const isHost = relFile.startsWith('packages/company-pack/src/host/') || relFile === 'packages/company-pack/src/index.ts'
   if (!isClient && !isLib && !isHost) return
   const isClientDict = CLIENT_DICT_FILES.has(relFile)
 

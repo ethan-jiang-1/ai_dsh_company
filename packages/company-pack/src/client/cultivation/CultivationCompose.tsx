@@ -152,8 +152,8 @@ export function CultivationCompose(props: CultivationComposeProps) {
     setTargetRole(props.viewerRole)
     if (canContext) {
       const result = sources.listSessions(currentSessionId, props.viewerRole)
-      // BUG-340：capped/skipped 一起消费；结果被截或跳过时不自动带背景（宁可让用户手选）。
-      if (result.ok && (result.capped ?? 0) === 0 && (result.skipped ?? 0) === 0) {
+      // BUG-340：capped 必须消费；结果被截时不自动带背景（宁可让用户手选）。
+      if (result.ok && (result.capped ?? 0) === 0) {
         const current = result.value.find(row => row.current)
         if (current !== undefined) void pickSession(current, true)
       }

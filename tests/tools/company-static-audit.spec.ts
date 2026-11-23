@@ -124,7 +124,7 @@ describe('R1 must-use-boundary · 负例与正例', () => {
         const { items, capped } = readApprovals()
         const b = takeBounded(['a', 'b'])
         const bt = takeBounded(['c'])
-        const { rows, badRows } = readLedger()
+        const { rows, badRows, headerOk } = readLedger()
         const w = await readWorkspace()
         const text = w.ok && w.eof ? w.text : ''
         const rem = await remoteRead()
@@ -133,7 +133,7 @@ describe('R1 must-use-boundary · 负例与正例', () => {
           entries, items, capped,
           bItems: b.items, bCapped: b.capped,
           btItems: bt.truncated ? bt.items : [],
-          rows, badRows, text, remText,
+          rows, badRows, headerOk, text, remText,
         }
       }
       export function passthrough() {
@@ -213,12 +213,33 @@ describe('BUG-340 · 六条绕过缝隙的负控', () => {
         return a.ok ? a.text : ''
       }
       export function partialLedger() {
-        const { rows, headerOk } = readLedger()
-        return { rows, headerOk }
+        const { rows, badRows } = readLedger()
+        return { rows, badRows }
       }
     `)
     const r1 = report.violations.filter(v => v.rule === 'R1:must-use-boundary')
     expect(r1.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('Promise.all 里嵌套对象解构不放过；spread 前移的位次不误报', () => {
+    const nested = runVirtual('packages/company-pack/src/client/bad-nested-all.ts', `
+      import { readLedger } from './virtual-types.js'
+      export async function nested() {
+        const [{ rows }] = await Promise.all([Promise.resolve(readLedger())])
+        return rows
+      }
+    `)
+    expect(nested.violations.filter(v => v.rule === 'R1:must-use-boundary').length).toBeGreaterThanOrEqual(1)
+
+    const spread = runVirtual('packages/company-pack/src/client/spread-all.ts', `
+      import { readLedger } from './virtual-types.js'
+      export async function spread(rest: Promise<unknown>[]) {
+        const [, y] = await Promise.all([...rest, readLedger()])
+        return y.rows
+      }
+    `)
+    // spread 前面的位置不可静态确定：按「位置未知」跳过，不误报。
+    expect(spread.violations).toEqual([])
   })
 
   it('新纳管的边界类型（跨会话/候选/背景源/培养面板）丢边界字段都拦住', () => {

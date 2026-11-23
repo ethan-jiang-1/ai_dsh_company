@@ -40,6 +40,20 @@
 - **BUG-338**：`pnpm test tests/host/commands tests/lib/docs` —— 接线前 4 failed（en 描述/停写/两份校验器明细），接入后全绿；`pnpm typecheck`、`pnpm lint`、`coverage-ratchet` 通过。
 - **BUG-345/346/344/343/349**（并行进程与接管人实跑）：各 spec 修复前 1 failed（心跳定时器泄漏 / 并发写丢更 / `attempts: 0` 与 `childIds` 矛盾 / `..` 被放行），修复后 26/26、对应 host spec 全绿；`pnpm typecheck`、`pnpm lint` 随批复核。
 
+## 独立只读盲审（BUG-340 + 跨模块原语）
+
+2026-11-24 由无本次历史上下文、只读的独立子代理审 `7c795245`（审计判据、字典拆分、边界消费修复、负控 spec）：**PASS（无阻断）**，实仓 `--strict` 0 违规、13/13 负控绿、host 棘轮 35 条基线与 `--json` 计数逐条一致。
+
+非阻断发现与处置：
+1. `MotionLedger.headerOk` 仍可单丢 → 已加进 `requiredBoundaryProps`（正例补读 headerOk）。
+2. `matchBoundarySpec` 的「有边界」判定未遵循 `requireAll/required` → 已改为同口径（避免无关类型永久误报）。
+3. `Promise.all` 元素为对象解构时漏判 → 已按对象解构分支处理。
+4. `Promise.all` 源码下标 ≠ 运行时下标（spread 前移）→ 前置 spread 时按「位置未知」跳过，不误报。
+5. `ContextSourceResult` 的 `skipped` 在会话路径不产、提示词也错位 → 改为只必读 `capped`，删掉死分支。
+6. `.then(cb)` 消费未追踪（既有局限，非本次回归）→ 记录为已知边界，未改。
+7. host 入口 `src/index.ts` 未纳入 CJK 扫描 → 已纳入棘轮（基线 88 个模板片段）。
+8. 审计脚本头注的判据描述过期 → 已同步（host + 四个新边界类型）。
+
 ## 未覆盖轴
 
 - [covered] `readHandbook` 对叶子 symlink、中间段 symlink、目录及合法 override 的行为与 `registerHandbook` 降级日志 → [`tests/host/prompt/handbook.spec.ts`](../../tests/host/prompt/handbook.spec.ts)

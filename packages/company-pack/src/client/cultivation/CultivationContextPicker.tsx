@@ -50,12 +50,12 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
   const [problem, setProblem] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const panel = useRef<HTMLDivElement>(null)
-  const { sessions, sessionsCapped, sessionsSkipped } = useMemo(() => {
+  const { sessions, sessionsCapped } = useMemo(() => {
     const result = props.sources.listSessions(props.currentSessionId, props.targetRole)
-    // BUG-340：边界字段（capped/skipped）必须跟着结果一起消费，不能只取 value。
+    // BUG-340：边界字段 capped 必须跟着结果一起消费（会话路径不产 skipped）。
     return result.ok
-      ? { sessions: result.value, sessionsCapped: result.capped ?? 0, sessionsSkipped: result.skipped ?? 0 }
-      : { sessions: [], sessionsCapped: 0, sessionsSkipped: 0 }
+      ? { sessions: result.value, sessionsCapped: result.capped ?? 0 }
+      : { sessions: [], sessionsCapped: 0 }
   }, [props.sources, props.currentSessionId, props.targetRole])
 
   useEffect(() => {
@@ -117,7 +117,6 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
       <div className="wk-meta wk-cultivation-context-privacy">{CULTIVATION_COPY.contextPrivacy}</div>
       {loading && <div className="wk-meta">{CULTIVATION_COPY.contextLoading}</div>}
       {sessionsCapped > 0 && <div className="wk-meta">{CULTIVATION_COPY.contextSessionsCapped(sessionsCapped, CONTEXT_CANDIDATE_CAP)}</div>}
-      {sessionsSkipped > 0 && <div className="wk-meta">{CULTIVATION_COPY.contextCatalogSkipped(sessionsSkipped)}</div>}
       {deliverablesCapped > 0 && <div className="wk-meta">{CULTIVATION_COPY.contextDeliverablesCapped(deliverablesCapped, CONTEXT_CANDIDATE_CAP)}</div>}
       {deliverablesSkipped > 0 && <div className="wk-meta">{CULTIVATION_COPY.contextCatalogSkipped(deliverablesSkipped)}</div>}
       {problem !== null && <div className="wk-meta wk-cultivation-problem">{problem}</div>}
