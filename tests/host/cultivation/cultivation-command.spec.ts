@@ -1,5 +1,6 @@
 // 负例留证 2026-11-13：adopt 把 `as` 缺 slug 当默认 ⇒「adopt id as」写方法（BUG-117）；严格解析即红转绿。
 // 负例留证 2026-11-13：verify 不判 revokedAt ⇒ revoke 后 verify success（BUG-139）；加判断即绿。
+// 负例留证 2026-11-23：撤回筛选漏判 revokedAt ⇒ 历史已撤回记录的 revokedAt 被覆盖（BUG-349）；接入共享谓词即绿。
 /** 培养 /cultivation 命令与 propose 的 host 行为（R5-23 从 640 行 spec 拆族；临时真实盘）。 */
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -213,6 +214,28 @@ describe('/cultivation 注册命令的 host 行为', () => {
       expect(existsSync(methodDir)).toBe(false)
       expect(parseRecord('r-revoke', readFileSync(recordPath, 'utf8'))?.revokedAt).toBeDefined()
       expect(readFileSync(recordPath, 'utf8')).toContain(suggestion.body)
+    })
+  })
+
+  it('BUG-349：再次 revoke 同 slug 只更新未撤回记录，不覆盖历史 revokedAt', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
+      const historical = '2026-01-01T00:00:00.000Z'
+      const oldPath = join(recordsDir, 'r-old.md')
+      const newPath = join(recordsDir, 'r-new.md')
+      writeFileSync(oldPath, recordText(suggestion).replace(
+        'status: open',
+        `status: adopted\nmethodSlug: review-numbers\nrevokedAt: ${historical}`,
+      ))
+      writeFileSync(newPath, recordText(suggestion).replace('status: open', 'status: adopted\nmethodSlug: review-numbers'))
+      const methodDir = join(methods, 'cfo', 'review-numbers')
+      mkdirSync(methodDir, { recursive: true })
+      writeFileSync(join(methodDir, 'SKILL.md'), 'installed method')
+      const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+
+      expect(await invokeCultivation(handler, 'cfo', workspace, 'revoke review-numbers')).toMatchObject({ kind: 'success' })
+      expect(parseRecord('r-old', readFileSync(oldPath, 'utf8'))?.revokedAt).toBe(historical)
+      expect(parseRecord('r-new', readFileSync(newPath, 'utf8'))?.revokedAt).toBeDefined()
     })
   })
 

@@ -369,6 +369,15 @@ async function commandCorrectOrSuggest(
   }
 }
 
+/**
+ * 「当前仍生效的已采纳记录」：状态 adopted、目标角色匹配、且尚未被撤回。
+ * 撤回与完整性核对共用同一谓词（BUG-349：撤回漏判 `revokedAt`，会把历史已撤回记录
+ * 当成待撤回再写一次 `revokedAt`）。
+ */
+function isActiveAdoptedRecord(record: CultivationRecord, role: string): boolean {
+  return record.status === 'adopted' && record.targetRole === role && record.revokedAt === undefined
+}
+
 /** `revoke <slug>`：先写恢复日志、再改记录、最后删方法；失败可回滚。 */
 async function commandRevoke(command: CultivationCommandContext, tokens: readonly string[]): Promise<CultivationCommandResult> {
   const { face, root, recordsDir, config, storage, t } = command
@@ -401,7 +410,7 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
   const revokedAt = new Date().toISOString()
   const pendingRecords: { readonly id: string, readonly text: string }[] = []
   for (const record of records) {
-    if (record.status !== 'adopted' || record.methodSlug !== slug || record.targetRole !== face.role) continue
+    if (!isActiveAdoptedRecord(record, face.role) || record.methodSlug !== slug) continue
     const current = storage.readRecord(recordsDir, record.id)
     if (current !== null) pendingRecords.push({ id: record.id, text: current.text })
   }
@@ -437,7 +446,7 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
   }
   // 先写 journal、再改记录、最后删方法：崩溃后由 recoverPendingRevoke 判定回滚/补完。
   for (const record of records) {
-    if (record.status !== 'adopted' || record.methodSlug !== slug || record.targetRole !== face.role) continue
+    if (!isActiveAdoptedRecord(record, face.role) || record.methodSlug !== slug) continue
     const current = storage.readRecord(recordsDir, record.id)
     if (current === null) continue
     if (!storage.updateRecord(recordsDir, record.id, { revokedAt }, current.text)) {
@@ -652,7 +661,7 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
       const loaded = storage.loadRecords(recordsDir)
       if (!loaded.reachable) return { kind: 'error' as const, text: t(`记录目录不可达：${recordsDir}`, `Records directory unreachable: ${recordsDir}`) }
       const revoked = loaded.records.filter(record => record.revokedAt !== undefined).length
-      const adopted = loaded.records.filter(record => record.status === 'adopted' && record.targetRole === face.role && record.revokedAt === undefined)
+      const adopted = loaded.records.filter(record => isActiveAdoptedRecord(record, face.role))
       const adoptedSlugs = new Set<string>()
       const missing: string[] = []
       const invalid: string[] = []
