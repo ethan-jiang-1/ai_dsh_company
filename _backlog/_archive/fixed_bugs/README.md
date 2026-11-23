@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-348**（2026-11-23，质量防线批顺位 3 / P2）：`CultivationChatPanel` 在 catch 与 `create` 之后补 `cancelled` 守卫，卸载后不再清 key 或建孤儿会话——
+  [348](BUG-348-cultivation-chat-panel-creates-orphan-session-after-unmount.md)。证据提交 `b28716fc`。
+
 - **BUG-350**（2026-11-23，质量防线批顺位 3 / P2）：养成表单按 `currentSessionId:viewer` 重建，旧 `targetRole` 不再把自我纠正翻成跨角色建议——
   [350](BUG-350-cultivation-compose-stale-target-role-across-session-switch.md)。证据提交 `b46caa24`。
 
