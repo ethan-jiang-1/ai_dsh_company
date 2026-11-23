@@ -1,4 +1,4 @@
-状态：implemented（2026-11-23）；批准：用户 2026-11-23 批准 `BUG-333..350` 批次计划并启动 `/goal` 推进｜上游 = [BUG-342](../../_backlog/_archive/fixed_bugs/BUG-342-handbook-override-follows-symlinks-and-crashes-on-dir.md)、[BUG-341](../../_backlog/_archive/fixed_bugs/BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md)
+状态：implemented（2026-11-23）；批准：用户 2026-11-23 批准 `BUG-333..350` 批次计划并启动 `/goal` 推进｜上游 = [BUG-338](../../_backlog/_archive/fixed_bugs/BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md)、[BUG-342](../../_backlog/_archive/fixed_bugs/BUG-342-handbook-override-follows-symlinks-and-crashes-on-dir.md)、[BUG-341](../../_backlog/_archive/fixed_bugs/BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md)
 
 # 质量防线审查与探查批次收口（BUG-333..350 伞形记录）
 
@@ -16,8 +16,7 @@
    工具卡依赖行改为语言无关 `ids` 令牌；培养记录损坏诊断在 lib 只留代号、client 字典翻译并在收件/我的/已采纳三处渲染背景告警；消息动态与多任务行令牌化（`currentTask` → `currentTasks` 列表）；`delegationFlow.missing` 进 zh/en 字典。
 5. **顺位 5 · 读模型与 TS/JS 同判据（[BUG-347](../../_backlog/_archive/fixed_bugs/BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md) / [BUG-339](../../_backlog/_archive/fixed_bugs/BUG-339-parsers-edge-malformed-inputs-silent-fold.md)）**：
    tools 目录索引抽出 `deliverableSlug`；四类解析器边缘坏形状（版本/标量/空行/生成时间/空 `callId`）改为显式诊断，并扩进 `parsers-fuzz`。
-6. **顺位 2/4 · host 命令面双语（BUG-338 阶段一）**：`/company-settings` 停写/损坏路径换 `blockedCompanyTextPair`，`/deliverables` `/prd` `/req` `/delivery` 接入 `CompanyLanguageState`（描述/提示/停写/成功回执；语言切换重注册），`contextSummaryPair` 与 `/cultivation` 对账/撤回回执补齐英文。
-   **剩余**：`/req` 与 `/prd` 校验器内部的错误明细仍为中文（`requirements-check.ts` / `prd-check.ts` 的 `errors` 串），待下一轮按 `tr` 参数贯通后再归档 BUG-338。
+6. **顺位 2/4 · host 命令面双语（[BUG-338](../../_backlog/_archive/fixed_bugs/BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md)）**：`/company-settings` 停写/损坏路径换 `blockedCompanyTextPair`，`/deliverables` `/prd` `/req` `/delivery` 接入 `CompanyLanguageState`（描述/提示/停写/成功/失败回执；语言切换经共享 `registerLocalizedCommand` 重注册）；`contextSummaryPair` 与 `/cultivation` 对账/撤回回执补齐英文；`/req` `/prd` 校验器的错误明细经 `text`/`tr` 参数贯通后也随语言。
 
 ## 输掉的方案
 
@@ -36,6 +35,7 @@
 
 - **BUG-342**：`pnpm test tests/host/prompt/handbook.spec.ts` —— 修复前 2 failed / 6 passed（外部 symlink 透传 `OUTSIDE_SECRET`、目录抛 `EISDIR`）；修复后 8/8 passed，联动 `pnpm typecheck`、`pnpm lint`（`company-static-audit` 141 文件 0 违规）及 `tests/host/contract/file-shape-agreement.spec.ts`（94/94）全绿。
 - **BUG-341**：`pnpm test tests/client/ui/brand.spec.ts tests/client/company-client-composition.spec.ts` —— 修复前双红（`expected '\'\'' to be ''`、冷启动 `readCount` 为 `0`）；修复后 11/11 passed，`pnpm typecheck`、`pnpm lint`、`node tools/dev/build-client.mjs` 全绿。
+- **BUG-338**：`pnpm test tests/host/commands tests/lib/docs` —— 接线前 4 failed（en 描述/停写/两份校验器明细），接入后全绿；`pnpm typecheck`、`pnpm lint`、`coverage-ratchet` 通过。
 - **BUG-345/346/344/343/349**（并行进程与接管人实跑）：各 spec 修复前 1 failed（心跳定时器泄漏 / 并发写丢更 / `attempts: 0` 与 `childIds` 矛盾 / `..` 被放行），修复后 26/26、对应 host spec 全绿；`pnpm typecheck`、`pnpm lint` 随批复核。
 
 ## 未覆盖轴

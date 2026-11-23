@@ -6,6 +6,7 @@
 - [BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md](fixed_bugs/BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md) — `acquireCompanyLease` 抽出共享 `releaseLease` 与幂等 `makeRelease`，修复重入 `first→second` 释放泄漏心跳定时器。
 - [BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md](fixed_bugs/BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md) — `subagent_retry` 在 `startActivation` 被取消时按 `childIds.length` 返回 `attempts`，消除 `attempts: 0` 与 `childIds` 矛盾。
 - [BUG-346-presented-ledger-concurrent-write-lost-update.md](fixed_bugs/BUG-346-presented-ledger-concurrent-write-lost-update.md) — `presented-domain` 为 `ensureLedger`/`recordLedger`/`auditLedger` 增加按 store 维度的 Promise 串行队列并给 `fileStore` 临时文件补充 `randomUUID()`。
+- [BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md](fixed_bugs/BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md) — host 命令面与 req/prd 校验器诊断随语言，语言切换重注册。
 - [BUG-339-parsers-edge-malformed-inputs-silent-fold.md](fixed_bugs/BUG-339-parsers-edge-malformed-inputs-silent-fold.md) — 四个读模型解析器的边缘坏形状显式诊断，不再静默折成正常值。
 - [BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md](fixed_bugs/BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md) — tools 目录索引与 host 同 slug 回落判据，客户端不再丢成品。
 - [BUG-334-cultivation-record-problems-i18n-and-unrendered-context.md](fixed_bugs/BUG-334-cultivation-record-problems-i18n-and-unrendered-context.md) — 损坏诊断代号化 + 背景告警渲染，en 零中文。

@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-338**（2026-11-24，质量防线批顺位 4 / P2）：`/company-settings` 停写/损坏路径、`/deliverables` `/prd` `/req` `/delivery` 命令面与 `/req` `/prd` 校验器错误明细全部随语言；重注册收成 `registerLocalizedCommand`——
+  [338](BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md)。证据提交 `fc963758`。
+
 - **BUG-339**（2026-11-24，质量防线批顺位 5 / P2）：四类解析器边缘坏形状改为显式诊断/拒绝（版本、`wikiTemplate`/`wikiCheck` 子字段、全空台账行、空白 `metaProblem`、非串 `generatedAt`、空 `callId`）——
   [339](BUG-339-parsers-edge-malformed-inputs-silent-fold.md)。证据提交 `f3c4f821`。
 
