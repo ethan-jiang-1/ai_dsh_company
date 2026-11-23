@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-342**（2026-11-23，质量防线批顺位 1 / P1）：`readHandbook` 读取 `.dsh-company/overrides/AGENTS.md` 改走 `readCompanyFile` 拒绝 symlink/目录/越界并告警回退默认手册——
+  [342](BUG-342-handbook-override-follows-symlinks-and-crashes-on-dir.md)。证据提交 `4ee3c49c`。
+
 - **BUG-329**（2026-11-23，E2E 第六轮 / P2）：en 列表分隔符仍是顿号——
   [329](BUG-329-cultivation-en-list-delimiters-chinese.md) `ui/list-separator.ts` 单点取分隔符（zh「、」/ en ", "），
   团队工具卡的令牌参数只带 id 数组。证据提交 `2e65049c`。

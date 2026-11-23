@@ -8,7 +8,7 @@
 
 ## 活跃清单
 
-**活跃 18 张（2026-11-23 质量防线审查与构造场景探查新立，只报不修）**：
+**活跃 17 张（2026-11-23 质量防线审查与构造场景探查新立）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
@@ -21,7 +21,6 @@
 | [BUG-339](BUG-339-parsers-edge-malformed-inputs-silent-fold.md) | P2 | lib + client | 四大解析器边缘坏形状静默吞错（`startup-options` 内嵌字段与版本、`ledger` 全空行、`catalog` 空白 `metaProblem`/`generatedAt`、`pendingQuestions` 空 `callId`） | 调查中 |
 | [BUG-340](BUG-340-static-audit-r1-r2-bypass-gaps.md) | P2 | checks / tooling | `company-static-audit`（R1/R2）存在 6 条可被代码直接绕过的检查漏洞 | 调查中 |
 | [BUG-341](BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md) | P1 | client | 冷启动 `loadIdentity` 因 `sessions.list` 初始 `pending` 永不加载，且 `parseCompanyIdentity` 把出厂 `productName: ''` 解析成字面量 `''` | 调查中 |
-| [BUG-342](BUG-342-handbook-override-follows-symlinks-and-crashes-on-dir.md) | P1 | host | `readHandbook` 读 `.dsh-company/overrides/AGENTS.md` 未检查 symlink 与普通文件（可越界注入并在目录时抛 `EISDIR`） | 调查中 |
 | [BUG-343](BUG-343-req-command-delivery-mode-bypasses-safe-content-id.md) | P2 | host | `/req check` 校验 `deliveryMode` 未走 `isSafeContentId`，`..` 等路径穿越可绕过未知模式拒绝 | 调查中 |
 | [BUG-344](BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md) | P2 | host | `subagent_retry` 第 2 次尝试在 `startActivation` 被取消时仍返回 `attempts: 0`（与已有 `childIds` 矛盾） | 调查中 |
 | [BUG-345](BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md) | P2 | host | `acquireCompanyLease` 重入释放分支漏 `clearInterval`，主持有先释放时心跳定时器永久泄漏并可误触发停写 | 调查中 |
@@ -57,7 +56,7 @@
 
 | 组 / 顺位 | 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
 |---|---|---|---|---|
-| **1 P1 安全与冷启动** | [342](BUG-342-handbook-override-follows-symlinks-and-crashes-on-dir.md)，[341](BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md) | `342` 读可写 override 绕过 `readCompanyFile`；`341` 冷启动漏订 `sessions.list` 且未复用 `yamlScalar` | `342` 改走 `readCompanyFile` + warn 降级；`341` 订阅 `sessions.list` + `yamlScalar` 解引号（记入批次伞形 Note） | 1 |
+| **1 P1 安全与冷启动** | [342](../_archive/fixed_bugs/BUG-342-handbook-override-follows-symlinks-and-crashes-on-dir.md)（已修 `4ee3c49c`），[341](BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md) | `342` 读可写 override 绕过 `readCompanyFile`；`341` 冷启动漏订 `sessions.list` 且未复用 `yamlScalar` | `342` 改走 `readCompanyFile` + warn 降级；`341` 订阅 `sessions.list` + `yamlScalar` 解引号（记入批次伞形 Note） | 1 |
 | **2 Host 独立修复** | [345](BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md)，[346](BUG-346-presented-ledger-concurrent-write-lost-update.md)，[344](BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md)，[343](BUG-343-req-command-delivery-mode-bypasses-safe-content-id.md)，[349](BUG-349-cultivation-revoke-overwrites-already-revoked-records.md) | 各自独立；`343`/`349` 先于 `338` 收口同文件校验/过滤口径 | 抽共享 `releaseLease` / 串行写队列+UUID tmp / `childIds.length` / `isSafeContentId` / `isActiveAdoptedRecord`（各自 `commit <sha>`） | 2 |
 | **3 Client 生命周期与边界** | [348](BUG-348-cultivation-chat-panel-creates-orphan-session-after-unmount.md)，[350](BUG-350-cultivation-compose-stale-target-role-across-session-switch.md)，[335](BUG-335-cultivation-invalid-decided-at-nan.md) | 各自独立；`335` 紧邻 `334` 同改培养看板与 `timeParts` | 异步恢复 `cancelled` 守卫 / 会话+视角 `key` / `Number.isFinite` 回退（各自 `commit <sha>`） | 3 |
 | **4 表达层双语闭环** | [333](BUG-333-team-tool-card-deps-chinese-in-en.md) + [334](BUG-334-cultivation-record-problems-i18n-and-unrendered-context.md) + [336](BUG-336-presence-message-activity-chinese-in-en.md) + [337](BUG-337-delegation-flow-missing-tag-not-localized.md)，[338](BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md) | `client`/`lib`/`host` 字典与结构化 token 缺口（须先清存量再收紧顺位 6 R2） | 补齐 token/字典与 `contextProblem` 渲染；其余 host 命令接 `CompanyLanguageState` + `blockedCompanyTextPair`（记入批次伞形 Note） | 4 |
