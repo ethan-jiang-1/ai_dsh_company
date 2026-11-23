@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-350**（2026-11-23，质量防线批顺位 3 / P2）：养成表单按 `currentSessionId:viewer` 重建，旧 `targetRole` 不再把自我纠正翻成跨角色建议——
+  [350](BUG-350-cultivation-compose-stale-target-role-across-session-switch.md)。证据提交 `b46caa24`。
+
 - **BUG-335**（2026-11-23，质量防线批顺位 3 / P2）：`timeParts` 新增 `invalid` 档、非法 `decidedAt` 回退原串，面板不再渲染 `NaN-NaN-NaN`——
   [335](BUG-335-cultivation-invalid-decided-at-nan.md)。证据提交 `51e38f8b`。
 
