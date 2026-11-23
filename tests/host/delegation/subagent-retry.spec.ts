@@ -10,6 +10,7 @@
 // 还原 ⇒ 22 passed。BUG-045
 // 负例留证 2026-11-10：把 `abortable(activation.result, exec.signal)` 改回裸 `await activation.result`
 // ⇒「abort parent signal」用例在 1s 守卫上红（hung）；还原 ⇒ 绿。BUG-053
+// 负例留证 2026-11-23：把 startActivation abort catch 的 attempts 改回 0 ⇒ BUG-344 第 2 次尝试在 startActivation 被取消仍返 attempts: 0 用例红；还原 ⇒ 绿。BUG-344
 import { describe, expect, it } from 'vitest'
 import { registerSubagentRetry } from '../../../packages/company-pack/src/host/delegation/subagent-retry.ts'
 import { SUBAGENT_RETRY_SURFACE } from '../../../packages/company-pack/src/lib/delegation/retry-policy.ts'
@@ -35,6 +36,8 @@ interface HarnessOptions {
   readonly results: Array<FakeResult | Error>
   /** 模拟永不 resolve 的 activation.result（取消探针）。 */
   readonly neverResolve?: boolean
+  /** 指定第几次 startActivation 调用永不 resolve（模拟启动阶段取消）。 */
+  readonly hangStartOnAttempt?: number
 }
 
 function harness(options: HarnessOptions): Harness {
@@ -67,6 +70,9 @@ function harness(options: HarnessOptions): Harness {
         maxDepth: spec.request.maxDepth,
         prompt: spec.request.prompt[0]?.text ?? '',
       })
+      if (options.hangStartOnAttempt === calls.length) {
+        return await new Promise<never>(() => {})
+      }
       if (options.neverResolve === true) {
         return { childId: `child-${String(calls.length)}`, result: new Promise<never>(() => {}) }
       }
@@ -238,5 +244,23 @@ describe('subagent_retry：取消收敛（BUG-053）', () => {
     const result = await run(h, true, controller.signal)
     expect(result).toMatchObject({ attempts: 0, childIds: [], stopReason: 'aborted' })
     expect(h.calls).toHaveLength(0)
+  })
+
+  it('BUG-344：第 1 次 startActivation 被取消返 attempts: 0，第 2 次重试在 startActivation 被取消返 attempts: 1', async () => {
+    const h1 = harness({ preset: 'vp-eng', hangStartOnAttempt: 1, results: [] })
+    const c1 = new AbortController()
+    const p1 = run(h1, true, c1.signal)
+    for (let i = 0; i < 100 && h1.calls.length === 0; i += 1) await new Promise(resolve => setTimeout(resolve, 2))
+    c1.abort(new Error('cancel-1'))
+    expect(await p1).toMatchObject({ attempts: 0, childIds: [], stopReason: 'aborted', exhausted: false })
+
+    const h2 = harness({ preset: 'vp-eng', hangStartOnAttempt: 2, results: [failure('error')] })
+    const c2 = new AbortController()
+    const p2 = run(h2, true, c2.signal)
+    for (let i = 0; i < 100 && h2.calls.length < 2; i += 1) await new Promise(resolve => setTimeout(resolve, 2))
+    expect(h2.calls).toHaveLength(2)
+    c2.abort(new Error('cancel-2'))
+    const r2 = await p2
+    expect(r2).toMatchObject({ attempts: 1, childIds: ['child-1'], stopReason: 'aborted', exhausted: false })
   })
 })

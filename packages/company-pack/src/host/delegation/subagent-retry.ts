@@ -216,7 +216,7 @@ export function registerSubagentRetry(ctx: Context, options: SubagentRetryOption
               } catch (error) {
                 if (exec.signal.aborted) {
                   return {
-                    attempts: 0,
+                    attempts: childIds.length,
                     childIds,
                     stopReason: 'aborted',
                     exhausted: false,
