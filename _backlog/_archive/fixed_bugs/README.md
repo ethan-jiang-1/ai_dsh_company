@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-335**（2026-11-23，质量防线批顺位 3 / P2）：`timeParts` 新增 `invalid` 档、非法 `decidedAt` 回退原串，面板不再渲染 `NaN-NaN-NaN`——
+  [335](BUG-335-cultivation-invalid-decided-at-nan.md)。证据提交 `51e38f8b`。
+
 - **BUG-349**（2026-11-23，质量防线批顺位 2 / P2）：撤回与完整性核对共用 `isActiveAdoptedRecord`，历史已撤回记录的 `revokedAt` 不再被覆盖——
   [349](BUG-349-cultivation-revoke-overwrites-already-revoked-records.md)。证据提交 `011e15bf`。
 
