@@ -6,6 +6,7 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { blockedCompanyTextPair } from './blocked-text.ts'
+import { registerLocalizedCommand } from './localized-command.ts'
 import type { CompanyLanguageState } from '../language/company-language.ts'
 import { auditLedger, type PresentedLedgerStore } from '../ledger/presented-domain.ts'
 import { regenerateCatalog } from '../ledger/catalog.ts'
@@ -92,10 +93,5 @@ export function registerDeliverablesCommand(ctx: Context, options: DeliverablesC
       }
     },
   })
-  let dispose = ctx.commands.register(definition())
-  if (options.language !== undefined) {
-    const unsubscribe = options.language.subscribe(() => { dispose(); dispose = ctx.commands.register(definition()) })
-    const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
-    if (typeof effect === 'function') effect.call(ctx, () => () => { unsubscribe(); dispose() })
-  }
+  registerLocalizedCommand(ctx, definition, options.language)
 }

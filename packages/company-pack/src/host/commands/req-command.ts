@@ -11,6 +11,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { blockedCompanyTextPair } from './blocked-text.ts'
+import { registerLocalizedCommand } from './localized-command.ts'
 import type { CompanyLanguageState } from '../language/company-language.ts'
 import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { contentMemberFile, isSafeContentId } from './content-id.ts'
@@ -343,10 +344,5 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
       }
     },
   })
-  let dispose = ctx.commands.register(definition())
-  if (options.language !== undefined) {
-    const unsubscribe = options.language.subscribe(() => { dispose(); dispose = ctx.commands.register(definition()) })
-    const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
-    if (typeof effect === 'function') effect.call(ctx, () => () => { unsubscribe(); dispose() })
-  }
+  registerLocalizedCommand(ctx, definition, options.language)
 }

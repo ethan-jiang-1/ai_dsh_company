@@ -7,6 +7,7 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { blockedCompanyTextPair } from './blocked-text.ts'
+import { registerLocalizedCommand } from './localized-command.ts'
 import { resolveStartupWorkspace } from '../startup/startup-workspace.ts'
 import {
   clearStartupSettings,
@@ -224,13 +225,5 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
       }
     },
   })
-  let dispose = ctx.commands.register(definition())
-  if (options.language !== undefined) {
-    const unsubscribe = options.language.subscribe(() => {
-      dispose()
-      dispose = ctx.commands.register(definition())
-    })
-    const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
-    if (typeof effect === 'function') effect.call(ctx, () => () => { unsubscribe(); dispose() })
-  }
+  registerLocalizedCommand(ctx, definition, options.language)
 }
