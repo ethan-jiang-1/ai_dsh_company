@@ -2,13 +2,34 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 333；已分配 BUG-001..332。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 351；已分配 BUG-001..350。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张**。
+**活跃 18 张（2026-11-23 质量防线审查与构造场景探查新立，只报不修）**：
+
+| 卡 | 级别 | 运行面 | 摘要 | 状态 |
+|---|---|---|---|---|
+| [BUG-333](BUG-333-team-tool-card-deps-chinese-in-en.md) | P2 | client UI | `TeamToolCard` `en` 模式下 `team_task_create` 带 `blocked_by` 仍渲染中文「依赖 t1、t2」（`BUG-329` 漏网） | 调查中 |
+| [BUG-334](BUG-334-cultivation-record-problems-i18n-and-unrendered-context.md) | P2 | lib + client | `CultivationRecord` 损坏诊断 `verificationHistoryProblem` 在 `en` 漏中文，且 `contextProblem` 未在 UI 渲染 | 调查中 |
+| [BUG-335](BUG-335-cultivation-invalid-decided-at-nan.md) | P2 | client UI + lib | `CultivationBoardSections` 渲染非法 `decidedAt` 时输出 `NaN-NaN-NaN NaN:NaN` | 调查中 |
+| [BUG-336](BUG-336-presence-message-activity-chinese-in-en.md) | P2 | lib + client | `PresencePanel` / `PresenceTab` 在 `en` 下对 `team/message/queued` 动态漏出中文冒号与「（空）」 | 调查中 |
+| [BUG-337](BUG-337-delegation-flow-missing-tag-not-localized.md) | P2 | client UI | `DelegationFlowPanel` 中文界面硬编码英文 `missing` 标签 | 调查中 |
+| [BUG-338](BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md) | P2 | host + lib | `host` 命令（`/company-settings`、`/deliverables` `/req` `/prd` `/delivery`、`/cultivation revoke/check`）与 `contextSummary` 双语缺口 | 调查中 |
+| [BUG-339](BUG-339-parsers-edge-malformed-inputs-silent-fold.md) | P2 | lib + client | 四大解析器边缘坏形状静默吞错（`startup-options` 内嵌字段与版本、`ledger` 全空行、`catalog` 空白 `metaProblem`/`generatedAt`、`pendingQuestions` 空 `callId`） | 调查中 |
+| [BUG-340](BUG-340-static-audit-r1-r2-bypass-gaps.md) | P2 | checks / tooling | `company-static-audit`（R1/R2）存在 6 条可被代码直接绕过的检查漏洞 | 调查中 |
+| [BUG-341](BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md) | P1 | client | 冷启动 `loadIdentity` 因 `sessions.list` 初始 `pending` 永不加载，且 `parseCompanyIdentity` 把出厂 `productName: ''` 解析成字面量 `''` | 调查中 |
+| [BUG-342](BUG-342-handbook-override-follows-symlinks-and-crashes-on-dir.md) | P1 | host | `readHandbook` 读 `.dsh-company/overrides/AGENTS.md` 未检查 symlink 与普通文件（可越界注入并在目录时抛 `EISDIR`） | 调查中 |
+| [BUG-343](BUG-343-req-command-delivery-mode-bypasses-safe-content-id.md) | P2 | host | `/req check` 校验 `deliveryMode` 未走 `isSafeContentId`，`..` 等路径穿越可绕过未知模式拒绝 | 调查中 |
+| [BUG-344](BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md) | P2 | host | `subagent_retry` 第 2 次尝试在 `startActivation` 被取消时仍返回 `attempts: 0`（与已有 `childIds` 矛盾） | 调查中 |
+| [BUG-345](BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md) | P2 | host | `acquireCompanyLease` 重入释放分支漏 `clearInterval`，主持有先释放时心跳定时器永久泄漏并可误触发停写 | 调查中 |
+| [BUG-346](BUG-346-presented-ledger-concurrent-write-lost-update.md) | P2 | host | `recordLedger` / `auditLedger` 异步写账本缺少串行化，并发写会丢更；`fileStore` 临时文件缺唯一后缀 | 调查中 |
+| [BUG-347](BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md) | P2 | tools + client | `tools` 侧成品目录索引未复用 `BUG-232` 空 `slug:` 判据，产物被客户端 `parseCatalog` 整条丢弃 | 调查中 |
+| [BUG-348](BUG-348-cultivation-chat-panel-creates-orphan-session-after-unmount.md) | P2 | client UI | `CultivationChatPanel` `open(stored)` 异步失败时若组件已卸载/切换，catch 仍清 `localStorage` 并新建孤儿会话 | 调查中 |
+| [BUG-349](BUG-349-cultivation-revoke-overwrites-already-revoked-records.md) | P2 | host | `/cultivation revoke` 筛选记录漏判 `revokedAt === undefined`，再次撤回同名方法会覆盖历史撤回时间 | 调查中 |
+| [BUG-350](BUG-350-cultivation-compose-stale-target-role-across-session-switch.md) | P2 | client UI | `CultivationCompose` 跨会话切换时保留旧 `targetRole`，把自我纠正静默翻转成跨角色建议 | 调查中 |
 
 **2026-11-23 E2E 第六轮（目标 8–10，只立卡不修）**：316–324 由并行修复进程收掉后，本轮从「319 的问询历史身份」「320 的当前/历史 cap 分流」「316 的注册元数据」「en 列表分隔符」四个接缝切，立 325–332 八张，均 `status: 调查中`。根因：同一实体两套身份（325）、边界状态只接一条消费路径（327/328）、数据类别扩了文案/字段没跟（330/331）、保守窗口覆盖明确完整信号（332）。不碰修复进程代码，也不在同一 diff 修产品。
 
@@ -28,7 +49,24 @@
 
 **已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
-**本轮批次**：下方「## 2026-11-23 修复交接（E2E 第六轮：BUG-325..332）
+**本轮批次**：下方「## 2026-11-23 修复交接（质量防线与探查批次：BUG-333..350）」
+
+## 2026-11-23 修复交接（质量防线与探查批次：BUG-333..350）
+
+**用户指令（2026-11-23）**：批准批次计划并启动 `/goal` 推进（「按已批准的 BUG-333..350 批次计划（顺位 1→6：342 → 341 → 345/346/344/343/349 → 348/350/335 → 333+334+336+337/338 → 347/339 → 340）逐单元执行……并落 1 篇批次伞形 Note」）。
+
+| 组 / 顺位 | 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
+|---|---|---|---|---|
+| **1 P1 安全与冷启动** | [342](BUG-342-handbook-override-follows-symlinks-and-crashes-on-dir.md)，[341](BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md) | `342` 读可写 override 绕过 `readCompanyFile`；`341` 冷启动漏订 `sessions.list` 且未复用 `yamlScalar` | `342` 改走 `readCompanyFile` + warn 降级；`341` 订阅 `sessions.list` + `yamlScalar` 解引号（记入批次伞形 Note） | 1 |
+| **2 Host 独立修复** | [345](BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md)，[346](BUG-346-presented-ledger-concurrent-write-lost-update.md)，[344](BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md)，[343](BUG-343-req-command-delivery-mode-bypasses-safe-content-id.md)，[349](BUG-349-cultivation-revoke-overwrites-already-revoked-records.md) | 各自独立；`343`/`349` 先于 `338` 收口同文件校验/过滤口径 | 抽共享 `releaseLease` / 串行写队列+UUID tmp / `childIds.length` / `isSafeContentId` / `isActiveAdoptedRecord`（各自 `commit <sha>`） | 2 |
+| **3 Client 生命周期与边界** | [348](BUG-348-cultivation-chat-panel-creates-orphan-session-after-unmount.md)，[350](BUG-350-cultivation-compose-stale-target-role-across-session-switch.md)，[335](BUG-335-cultivation-invalid-decided-at-nan.md) | 各自独立；`335` 紧邻 `334` 同改培养看板与 `timeParts` | 异步恢复 `cancelled` 守卫 / 会话+视角 `key` / `Number.isFinite` 回退（各自 `commit <sha>`） | 3 |
+| **4 表达层双语闭环** | [333](BUG-333-team-tool-card-deps-chinese-in-en.md) + [334](BUG-334-cultivation-record-problems-i18n-and-unrendered-context.md) + [336](BUG-336-presence-message-activity-chinese-in-en.md) + [337](BUG-337-delegation-flow-missing-tag-not-localized.md)，[338](BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md) | `client`/`lib`/`host` 字典与结构化 token 缺口（须先清存量再收紧顺位 6 R2） | 补齐 token/字典与 `contextProblem` 渲染；其余 host 命令接 `CompanyLanguageState` + `blockedCompanyTextPair`（记入批次伞形 Note） | 4 |
+| **5 读模型契约与 TS/JS 单源** | [347](BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md)，[339](BUG-339-parsers-edge-malformed-inputs-silent-fold.md) | `tools` 未对齐 `BUG-232` 空 `slug:` 判据；四大解析器边缘坏形状静默吞错 | 对齐 `deliverableSlug` + 收紧 4 处边界校验并扩入 `parsers-fuzz`（记入批次伞形 Note） | 5 |
+| **6 静态防线加固** | [340](BUG-340-static-audit-r1-r2-bypass-gaps.md) | `company-static-audit` R1/R2 6 条可绕过缝隙 | 修左枝/解构/全字段/新边界类型 + 收窄 `cultivation-actions.ts` + 纳管 `src/host/**`（记入批次伞形 Note + 独立只读盲审） | 6 |
+
+**终点**：18 张卡全部带红/绿真证据迁入 `fixed_bugs/`，1 篇批次伞形 Note（含 P5 盲审），`verify` / `test` / `typecheck` / `lint` / `dup` / `coverage:ratchet` 与 client 双语/挂载冒烟全绿并 `push`。
+
+## 2026-11-23 修复交接（E2E 第六轮：BUG-325..332）
 
 **用户指令（2026-11-23）**：「我们有新发现的bug……第一是修的次序。二是保障我们沿着我们自己定义的流程能修复，第三是不是可以系统视角看……先出一个计划 回头要靠 setup goal 来修。」——本句即本轮授权（材料性：八张都改 client 读面/呈现面/公开文案，326 触及 host 元数据；留痕 = 批次 Note [2026-11-23-e2e-round6-one-boundary-object](../../notes/implemented/2026-11-23-e2e-round6-one-boundary-object.md)）。
 
