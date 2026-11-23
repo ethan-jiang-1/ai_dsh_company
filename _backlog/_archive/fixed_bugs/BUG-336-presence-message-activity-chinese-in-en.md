@@ -43,7 +43,7 @@ console.log(activityFromEvents([
 
 ## 失败类与同类排查
 
-- **失败类**：`client UI` / `lib` 动态片段未令牌化（[`BUG-302`](../_archive/fixed_bugs/BUG-302-english-ui-chinese-time-and-reason.md) 同族）。
+- **失败类**：`client UI` / `lib` 动态片段未令牌化（[`BUG-302`](BUG-302-english-ui-chinese-time-and-reason.md) 同族）。
 - **同类排查**：`presenceFromEvents` 内所有分支：
   - `team/member`：均有 `token`；
   - `team/task`：均有 `token`；
