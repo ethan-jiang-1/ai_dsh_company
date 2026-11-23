@@ -388,7 +388,7 @@ export function pendingQuestions(events: readonly AttentionEventLike[], sessionI
   for (const event of events) {
     const data = event.data as { callId?: unknown; name?: unknown; arguments?: unknown; id?: unknown } | null
     if (typeof data !== 'object' || data === null) continue
-    if (event.type === 'tool/call' && data.name === ASK_TOOL_NAME && typeof data.callId === 'string') {
+    if (event.type === 'tool/call' && data.name === ASK_TOOL_NAME && typeof data.callId === 'string' && data.callId !== '') {
       const copy = buildQuestionCopy(questionListOf(typeof data.arguments === 'string' ? data.arguments : undefined))
       open.set(data.callId, {
         kind: 'question',

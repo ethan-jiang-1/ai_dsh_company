@@ -260,7 +260,7 @@ export interface StartupOptionsState {
   /** `'unreadable'` = 文件存在但读不出合法形状（典型：超过读上限被截断）；缺失不算错。 */
   readonly problem: 'unreadable' | null
   /** `problem === 'unreadable'` 时具体哪个字段类型不对（BUG-313 的字段级诊断）。 */
-  readonly field?: 'productTypes' | 'deliveryModes'
+  readonly field?: 'productTypes' | 'deliveryModes' | 'wikiTemplate' | 'wikiCheck.ok' | 'wikiCheck.problem' | 'wikiCheck.value' | 'wikiCheck.location' | 'wikiCheck.checkedAt'
 }
 
 /**
@@ -281,14 +281,33 @@ export function parseStartupOptionsState(text: string | null | undefined): Start
     return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable' }
   }
   const record = raw as Record<string, unknown>
+  // 版本与标量也要核（BUG-339）：`v: 999` / `wikiTemplate: 123` 过去被静默折成 auto。
+  if (record.v !== undefined && record.v !== 1) return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable' }
+  if (record.wikiTemplate !== undefined && record.wikiTemplate !== null && typeof record.wikiTemplate !== 'string') {
+    return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable', field: 'wikiTemplate' }
+  }
   // 字段类型坏 = 文件坏了，不是「内容里没有可选项」（BUG-313）：数组字段给了字符串时，
   // cleanList 会安静地折成空数组，面板于是把「坏文件」说成「内容没装」。
   const isValidStringList = (value: unknown): boolean =>
     value === undefined || value === null || (Array.isArray(value) && value.every(item => typeof item === 'string'))
   const badField = (['productTypes', 'deliveryModes'] as const).find(key => !isValidStringList(record[key]))
   if (badField !== undefined) return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable', field: badField }
-  if (record.wikiCheck !== undefined && record.wikiCheck !== null && (typeof record.wikiCheck !== 'object' || Array.isArray(record.wikiCheck))) {
-    return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable' }
+  if (record.wikiCheck !== undefined && record.wikiCheck !== null) {
+    if (typeof record.wikiCheck !== 'object' || Array.isArray(record.wikiCheck)) {
+      return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable' }
+    }
+    // 对象壳里字段类型错也是坏文件（BUG-339）：继续折会把「ok: 'yes'」当成功。
+    const check = record.wikiCheck as Record<string, unknown>
+    const badCheckField = (
+      ['ok', 'problem', 'value', 'location', 'checkedAt'] as const
+    ).find(key => {
+      const field = check[key]
+      if (field === undefined || field === null) return false
+      if (key === 'ok') return typeof field !== 'boolean'
+      if (key === 'location') return field !== 'inside' && field !== 'outside'
+      return typeof field !== 'string'
+    })
+    if (badCheckField !== undefined) return { options: EMPTY_STARTUP_OPTIONS, problem: 'unreadable', field: `wikiCheck.${badCheckField}` as const }
   }
   return {
     options: {

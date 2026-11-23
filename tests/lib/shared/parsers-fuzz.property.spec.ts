@@ -410,3 +410,43 @@ describe('6. attention 解析与有界重建畸形 Fuzz', () => {
     }
   })
 })
+
+// 负例留证 2026-11-24：放宽任一收紧 ⇒ 本组对应用例红（`v:999`/`wikiTemplate:123` 折成 auto、空行被当分隔行、空白 metaProblem 原样、空 callId 进面板）。BUG-339
+describe('7. 解析器边缘坏形状（BUG-339）', () => {
+  it('startup-options：非 1 版本 / 非串 wikiTemplate / 坏 wikiCheck 子字段都报 unreadable', () => {
+    for (const payload of [
+      { v: 999, productTypes: ['a'] },
+      { v: 1, wikiTemplate: 123 },
+      { v: 1, wikiCheck: { ok: 'yes', problem: 'bogus', value: {} } },
+      { v: 1, wikiCheck: { ok: true, problem: 7 } },
+    ]) {
+      expect(parseStartupOptionsState(JSON.stringify(payload)).problem).toBe('unreadable')
+    }
+  })
+
+  it('ledger：全空 7 列行不再被当分隔行吞掉，计入 badRows', () => {
+    const text = '| slug | date | type | participants | wallClock | deliverable | summary |\n|---|---|---|---|---|---|---|\n| | | | | | | |'
+    const parsed = parseMotionLedger(text)
+    expect(parsed.rows).toHaveLength(0)
+    expect(parsed.badRows).toEqual([{ line: 3, cells: 7, reason: 'empty-row' }])
+  })
+
+  it('catalog：空白 metaProblem 归一为 null；非串 generatedAt 整份拒绝', () => {
+    const catalog = {
+      schema: 1,
+      generatedAt: '2026-11-24T00:00:00.000Z',
+      entries: [{ slug: 'a', path: '.dsh-company/deliverables/a/final.md', metaProblem: '   ' }],
+    }
+    expect(parseCatalog(JSON.stringify(catalog))?.entries[0]?.metaProblem).toBeNull()
+    expect(parseCatalog(JSON.stringify({ ...catalog, generatedAt: 123 }))).toBeNull()
+  })
+
+  it('attention：空串 callId 与 approval 同口径，不进挂起问询', () => {
+    const items = pendingQuestions([{
+      type: 'tool/call',
+      time: 1,
+      data: { callId: '', name: ASK_TOOL_NAME, arguments: '{"questions":[{"question":"hi"}]}' },
+    }], 's1')
+    expect(items).toHaveLength(0)
+  })
+})

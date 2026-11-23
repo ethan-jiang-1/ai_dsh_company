@@ -91,6 +91,8 @@ describe('tools 侧空 slug 回落（BUG-347）', () => {
     expect(catalog.entries[0]).toMatchObject({ slug: 'fallback', ledgered: true, presented: true })
     const { parseCatalog } = await import('../../packages/company-pack/src/client/data/deliverables-index.ts')
     const parsed = parseCatalog(JSON.stringify(catalog))
+    expect(parsed).not.toBeNull()
+    if (parsed === null) throw new Error('catalog should parse')
     expect(parsed.skipped).toBe(0)
     expect(parsed.entries).toHaveLength(1)
     expect(parsed.entries[0]?.slug).toBe('fallback')

@@ -37,7 +37,7 @@ const LEGACY_HEADER = ['slug', '日期', '类型', '参与', '墙钟', '成品',
 const HEADERS = [HEADER, LEGACY_HEADER]
 
 /** 一行被跳过的原因（当前只有列数不符；保留联合以便将来扩「日期格式坏」等）。 */
-export type LedgerBadReason = 'cell-count'
+export type LedgerBadReason = 'cell-count' | 'empty-row'
 
 /** 被跳过的表行：**必须能被面板说出来**（BUG-303：静默丢行 = 台账少报）。 */
 export interface LedgerBadRow {
@@ -79,7 +79,12 @@ export function parseMotionLedger(text: string): MotionLedgerParse {
       if (HEADERS.some(header => cells.length === header.length && header.every((name, i) => cells[i] === name))) headerSeen = true
       continue
     }
-    if (cells.every(cell => /^[-: ]*$/.test(cell))) continue // 分隔行
+    // 分隔行必须带 `-`（BUG-339）：`| | | | | | | |` 过去因 `*` 被当分隔行整行吞掉。
+    if (cells.every(cell => cell.includes('-') && /^[-: ]*$/.test(cell))) continue
+    if (cells.every(cell => cell === '')) {
+      badRows.push({ line: index + 1, cells: cells.length, reason: 'empty-row' })
+      continue
+    }
     if (cells.length !== HEADER.length) {
       // 坏行不能静默消失：面板据此说「跳过 N 行（格式不符）」，否则 4 行文件声称只有 2 场动议。
       badRows.push({ line: index + 1, cells: cells.length, reason: 'cell-count' })

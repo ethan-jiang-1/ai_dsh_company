@@ -50,6 +50,8 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
   if (raw === null || typeof raw !== 'object') return null
   const value = raw as Record<string, unknown>
   if (value.schema !== 1 || !Array.isArray(value.entries)) return null
+  // 生成时间给了却不是串 = 目录文件坏了（BUG-339），不要静默折成空串后照常渲染。
+  if (value.generatedAt !== undefined && typeof value.generatedAt !== 'string') return null
   const entries: DeliverablesCatalogEntry[] = []
   let skipped = 0
   for (const item of value.entries) {
@@ -80,7 +82,7 @@ export function parseCatalog(text: string): DeliverablesCatalog | null {
       path,
       ledgered: row.ledgered !== false,
       presented: row.presented === true ? true : row.presented === false ? false : null,
-      metaProblem: typeof row.metaProblem === 'string' && row.metaProblem !== '' ? row.metaProblem : null,
+      metaProblem: typeof row.metaProblem === 'string' && row.metaProblem.trim() !== '' ? row.metaProblem.trim() : null,
     })
   }
   return {

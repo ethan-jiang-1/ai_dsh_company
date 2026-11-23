@@ -110,7 +110,7 @@ describe('useCompanyData 订阅生命周期', () => {
     expect(h.last().streamError).toBeNull()
     expect(h.last().tasks[0]?.subject).toBe('出评审意见')
     expect(h.last().rows, 'rowsFromTeamView：成员一行、带在办任务').toEqual([
-      expect.objectContaining({ id: 'm-1', displayName: 'VP-Eng', currentTask: '出评审意见' }),
+      expect.objectContaining({ id: 'm-1', displayName: 'VP-Eng', currentTasks: ['出评审意见'] }),
     ])
     expect(h.last().summary.turns).toBe(3)
     h.unmount()
