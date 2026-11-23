@@ -13,7 +13,7 @@
  * 红配方：把 `parseSettingsCommand` 的 `auto` 分支删掉 → 「恢复自动」用例红；
  * 把未知值校验去掉 → 「未知值 fail-closed」用例红。
  */
-import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -23,6 +23,7 @@ import {
 } from '../../../packages/company-pack/src/host/commands/settings-command.ts'
 import { STARTUP_COMMAND_COPY } from '../../../packages/company-pack/src/lib/startup/startup-command-copy.ts'
 import { readStartupSettings } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
+import { createCompanyLanguageState } from '../../../packages/company-pack/src/host/language/company-language.ts'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
 const CONTENT_DIR = join(ROOT, 'packages/company-pack/content')
@@ -253,5 +254,28 @@ describe('en 命令面（双语单一源）', () => {
     const result = await def.handler({ rawInput: 'set productType business-software', agent } as never)
     expect(result.kind).toBe('error')
     expect(result.text).toContain('目录占用')
+  })
+})
+
+// 负例留证 2026-11-24：problemNote 只写中文分支 ⇒ 本用例红（en 的 show 漏出「⚠ startup.json 损坏」）。BUG-338
+describe('/company-settings en 损坏路径', () => {
+  it('en：损坏 startup.json 的 show 回执零中文并给出警告', async () => {
+    const language = createCompanyLanguageState('en')
+    let definition: Definition | undefined
+    const ctx = { commands: { register: (def: Definition) => { definition = def } } }
+    registerSettingsCommand(ctx as never, {
+      workspace: '',
+      dataBlocked: false,
+      contentDir: CONTENT_DIR,
+      text: (zh, en) => language.text(zh, en),
+      language,
+    })
+    const root = workspace()
+    mkdirSync(join(root, '.dsh-company'), { recursive: true })
+    writeFileSync(join(root, '.dsh-company', 'startup.json'), '{ not json')
+    const result = await (definition as Definition).handler({ rawInput: `show`, agent: { session: { header: { cwd: root } } } } as never)
+    expect(result.kind).toBe('success')
+    expect(result.text).toContain('startup.json')
+    expect(result.text).not.toMatch(/[\u3400-\u9fff]/u)
   })
 })

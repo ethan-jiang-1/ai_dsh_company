@@ -11,6 +11,7 @@
 
 // 负例留证 2026-11-10：删掉 slug 校验 ⇒「越界 slug」用例红（读根外 + 调用 checker；BUG-057）；还原即绿。
 import { describe, expect, it } from 'vitest'
+import { resolveDeliverablePath } from '../../../packages/company-pack/src/host/commands/deliverable-path.ts'
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -213,6 +214,35 @@ describe('registerPrdCommand', () => {
     } finally {
       rmSync(workspace, { recursive: true, force: true })
       rmSync(outside, { recursive: true, force: true })
+    }
+  })
+})
+
+// 负例留证 2026-11-24：给 resolveDeliverablePath 去 text 参数 ⇒ 本用例红（英文分支回到中文）。BUG-338
+describe('deliverable-path 语言分支', () => {
+  const text = (zh: string, en: string) => en
+  it('en：非法 slug / symlink / 非目录的错误句都是英文', () => {
+    const invalid = resolveDeliverablePath('/tmp/none', '../out', text)
+    expect(invalid.ok).toBe(false)
+    if (invalid.ok) throw new Error('unreachable')
+    expect(invalid.text).toContain('Invalid deliverables directory')
+    expect(invalid.text).not.toMatch(/[\u3400-\u9fff]/u)
+
+    const root = mkdtempSync(join(tmpdir(), 'deliverable-path-'))
+    try {
+      const companyRoot = join(root, '.dsh-company')
+      mkdirSync(join(companyRoot, 'deliverables'), { recursive: true })
+      expect(resolveDeliverablePath(root, 'demo', text).ok).toBe(true)
+      symlinkSync(join(root, 'elsewhere'), join(companyRoot, 'deliverables', 'linked'))
+      const linked = resolveDeliverablePath(root, 'linked', text)
+      expect(linked.ok).toBe(false)
+      if (!linked.ok) expect(linked.text).toContain('symlink')
+      writeFileSync(join(companyRoot, 'deliverables', 'plain'), 'x')
+      const plain = resolveDeliverablePath(root, 'plain', text)
+      expect(plain.ok).toBe(false)
+      if (!plain.ok) expect(plain.text).toContain('not a directory')
+    } finally {
+      rmSync(root, { recursive: true, force: true })
     }
   })
 })

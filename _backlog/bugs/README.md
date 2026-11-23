@@ -2,18 +2,23 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 351；已分配 BUG-001..350。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 356；已分配 BUG-001..355。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 2 张（2026-11-23 质量防线审查与构造场景探查新立）**：
+**活跃 7 张（2026-11-23–24 质量防线审查与构造场景探查新立）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
 | [BUG-338](BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md) | P2 | host + lib | `host` 命令（`/company-settings`、`/deliverables` `/req` `/prd` `/delivery`、`/cultivation revoke/check`）与 `contextSummary` 双语缺口 | 调查中 |
 | [BUG-340](BUG-340-static-audit-r1-r2-bypass-gaps.md) | P2 | checks / tooling | `company-static-audit`（R1/R2）存在 6 条可被代码直接绕过的检查漏洞 | 调查中 |
+| [BUG-351](BUG-351-method-skill-text-unescaped-yaml-description.md) | P1 | lib + host | `methodSkillText` 未对 `expectation` 做 YAML 转义，含 `: ` 等合法期望语句采纳后写坏 `SKILL.md` 被 DSH 静默丢弃 | 调查中 |
+| [BUG-352](BUG-352-session-diagnose-reads-flat-team-member-shape.md) | P2 | tools | `session-diagnose` 按想象扁平形状读 `team/member`，真实队友失败被完全漏报 | 调查中 |
+| [BUG-353](BUG-353-converge-and-journal-audit-broken-on-v3-dot-dsh-company.md) | P1 | tools + checks | `converge.mjs` 与 `journal-audit.mjs` 仍硬编码 v3 之前的扁平工作区路径，v3 公司盘全量失效 | 调查中 |
+| [BUG-354](BUG-354-presence-activity-unassigned-owner-leaks-chinese-in-en.md) | P2 | lib + client | `presence` 读模型在无负责人的任务变更中硬编码中文 `'未分配'`，英文界面泄漏未翻译词 | 调查中 |
+| [BUG-355](BUG-355-cultivation-data-stale-feedback-abort-problem-and-load-race.md) | P2 | client UI | `useCultivationFeedback` 切换会话保留旧赞踩，`useCultivationPanelData` 中止报错且并发 `load` 缺代次守卫 | 调查中 |
 
 **2026-11-23 E2E 第六轮（目标 8–10，只立卡不修）**：316–324 由并行修复进程收掉后，本轮从「319 的问询历史身份」「320 的当前/历史 cap 分流」「316 的注册元数据」「en 列表分隔符」四个接缝切，立 325–332 八张，均 `status: 调查中`。根因：同一实体两套身份（325）、边界状态只接一条消费路径（327/328）、数据类别扩了文案/字段没跟（330/331）、保守窗口覆盖明确完整信号（332）。不碰修复进程代码，也不在同一 diff 修产品。
 
