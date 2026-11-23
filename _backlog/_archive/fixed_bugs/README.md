@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-347**（2026-11-24，质量防线批顺位 5 / P2）：tools 目录索引抽出 `deliverableSlug` 与 host 同判据，空/空白 `slug:` 回落目录名——
+  [347](BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md)。证据提交 `2eeee377`。
+
 - **BUG-334**（2026-11-23，质量防线批顺位 4 / P2）：损坏诊断在 lib 只留代号、client 字典翻译，`contextProblem` 在收件/我的/已采纳三处显式渲染——
   [334](BUG-334-cultivation-record-problems-i18n-and-unrendered-context.md)。证据提交 `dd019422`。
 

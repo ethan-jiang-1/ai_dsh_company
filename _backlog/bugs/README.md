@@ -8,14 +8,13 @@
 
 ## 活跃清单
 
-**活跃 4 张（2026-11-23 质量防线审查与构造场景探查新立）**：
+**活跃 3 张（2026-11-23 质量防线审查与构造场景探查新立）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
 | [BUG-338](BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md) | P2 | host + lib | `host` 命令（`/company-settings`、`/deliverables` `/req` `/prd` `/delivery`、`/cultivation revoke/check`）与 `contextSummary` 双语缺口 | 调查中 |
 | [BUG-339](BUG-339-parsers-edge-malformed-inputs-silent-fold.md) | P2 | lib + client | 四大解析器边缘坏形状静默吞错（`startup-options` 内嵌字段与版本、`ledger` 全空行、`catalog` 空白 `metaProblem`/`generatedAt`、`pendingQuestions` 空 `callId`） | 调查中 |
 | [BUG-340](BUG-340-static-audit-r1-r2-bypass-gaps.md) | P2 | checks / tooling | `company-static-audit`（R1/R2）存在 6 条可被代码直接绕过的检查漏洞 | 调查中 |
-| [BUG-347](BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md) | P2 | tools + client | `tools` 侧成品目录索引未复用 `BUG-232` 空 `slug:` 判据，产物被客户端 `parseCatalog` 整条丢弃 | 调查中 |
 
 **2026-11-23 E2E 第六轮（目标 8–10，只立卡不修）**：316–324 由并行修复进程收掉后，本轮从「319 的问询历史身份」「320 的当前/历史 cap 分流」「316 的注册元数据」「en 列表分隔符」四个接缝切，立 325–332 八张，均 `status: 调查中`。根因：同一实体两套身份（325）、边界状态只接一条消费路径（327/328）、数据类别扩了文案/字段没跟（330/331）、保守窗口覆盖明确完整信号（332）。不碰修复进程代码，也不在同一 diff 修产品。
 
@@ -47,7 +46,7 @@
 | **2 Host 独立修复** | [345](../_archive/fixed_bugs/BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md)（已修 `40a751cc`），[346](../_archive/fixed_bugs/BUG-346-presented-ledger-concurrent-write-lost-update.md)（已修 `bbb13b8d`），[344](../_archive/fixed_bugs/BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md)（已修 `4a6f464e`），[343](../_archive/fixed_bugs/BUG-343-req-command-delivery-mode-bypasses-safe-content-id.md)（已修 `2c760f7a`），[349](../_archive/fixed_bugs/BUG-349-cultivation-revoke-overwrites-already-revoked-records.md)（已修 `011e15bf`） | 各自独立；`343`/`349` 先于 `338` 收口同文件校验/过滤口径 | 抽共享 `releaseLease` / 串行写队列+UUID tmp / `childIds.length` / `isSafeContentId` / `isActiveAdoptedRecord`（各自 `commit <sha>`） | 2 |
 | **3 Client 生命周期与边界** | [348](../_archive/fixed_bugs/BUG-348-cultivation-chat-panel-creates-orphan-session-after-unmount.md)（已修 `b28716fc`），[350](../_archive/fixed_bugs/BUG-350-cultivation-compose-stale-target-role-across-session-switch.md)（已修 `b46caa24`），[335](../_archive/fixed_bugs/BUG-335-cultivation-invalid-decided-at-nan.md)（已修 `51e38f8b`） | 各自独立；`335` 紧邻 `334` 同改培养看板与 `timeParts` | 异步恢复 `cancelled` 守卫 / 会话+视角 `key` / `Number.isFinite` 回退（各自 `commit <sha>`） | 3 |
 | **4 表达层双语闭环** | [333](../_archive/fixed_bugs/BUG-333-team-tool-card-deps-chinese-in-en.md)（已修 `a02b996a`） + [334](../_archive/fixed_bugs/BUG-334-cultivation-record-problems-i18n-and-unrendered-context.md)（已修 `dd019422`） + [336](../_archive/fixed_bugs/BUG-336-presence-message-activity-chinese-in-en.md)（已修 `d3386c23`） + [337](../_archive/fixed_bugs/BUG-337-delegation-flow-missing-tag-not-localized.md)（已修 `e88459fa`），[338](BUG-338-host-commands-and-cultivation-source-bilingual-gaps.md) | `client`/`lib`/`host` 字典与结构化 token 缺口（须先清存量再收紧顺位 6 R2） | 补齐 token/字典与 `contextProblem` 渲染；其余 host 命令接 `CompanyLanguageState` + `blockedCompanyTextPair`（记入批次伞形 Note） | 4 |
-| **5 读模型契约与 TS/JS 单源** | [347](BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md)，[339](BUG-339-parsers-edge-malformed-inputs-silent-fold.md) | `tools` 未对齐 `BUG-232` 空 `slug:` 判据；四大解析器边缘坏形状静默吞错 | 对齐 `deliverableSlug` + 收紧 4 处边界校验并扩入 `parsers-fuzz`（记入批次伞形 Note） | 5 |
+| **5 读模型契约与 TS/JS 单源** | [347](../_archive/fixed_bugs/BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md)（已修 `2eeee377`），[339](BUG-339-parsers-edge-malformed-inputs-silent-fold.md) | `tools` 未对齐 `BUG-232` 空 `slug:` 判据；四大解析器边缘坏形状静默吞错 | 对齐 `deliverableSlug` + 收紧 4 处边界校验并扩入 `parsers-fuzz`（记入批次伞形 Note） | 5 |
 | **6 静态防线加固** | [340](BUG-340-static-audit-r1-r2-bypass-gaps.md) | `company-static-audit` R1/R2 6 条可绕过缝隙 | 修左枝/解构/全字段/新边界类型 + 收窄 `cultivation-actions.ts` + 纳管 `src/host/**`（记入批次伞形 Note + 独立只读盲审） | 6 |
 
 **终点**：18 张卡全部带红/绿真证据迁入 `fixed_bugs/`，1 篇批次伞形 Note（含 P5 盲审），`verify` / `test` / `typecheck` / `lint` / `dup` / `coverage:ratchet` 与 client 双语/挂载冒烟全绿并 `push`。
