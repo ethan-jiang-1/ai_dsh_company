@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-339**（2026-11-24，质量防线批顺位 5 / P2）：四类解析器边缘坏形状改为显式诊断/拒绝（版本、`wikiTemplate`/`wikiCheck` 子字段、全空台账行、空白 `metaProblem`、非串 `generatedAt`、空 `callId`）——
+  [339](BUG-339-parsers-edge-malformed-inputs-silent-fold.md)。证据提交 `f3c4f821`。
+
 - **BUG-347**（2026-11-24，质量防线批顺位 5 / P2）：tools 目录索引抽出 `deliverableSlug` 与 host 同判据，空/空白 `slug:` 回落目录名——
   [347](BUG-347-tools-deliverables-catalog-empty-slug-dropped-by-client.md)。证据提交 `2eeee377`。
 
