@@ -127,9 +127,9 @@ describe('presenceFromEvents（回放 / 离线路径，验收判据 4：非空�
 
   it('当前任务 = 本人 in_progress 任务的 subject（D-a 第三列）', () => {
     const byName = new Map(board.rows.map(row => [row.name, row]))
-    expect(byName.get('vp-eng')!.currentTask).toBe('VP-Eng：合稿引用校对（防数字漂移）')
-    expect(byName.get('vp-sales')!.currentTask).toBeNull()
-    expect(byName.get('cfo')!.currentTask).toBeNull()
+    expect(byName.get('vp-eng')!.currentTasks).toEqual(['VP-Eng：合稿引用校对（防数字漂移）'])
+    expect(byName.get('vp-sales')!.currentTasks).toBeNull()
+    expect(byName.get('cfo')!.currentTasks).toBeNull()
   })
 
   it('动态流含成员上线 / 任务生命周期 / 消息投递（sender → target + 首行预览）', () => {
@@ -161,16 +161,16 @@ describe('rowsFromTeamView（live 路径：Lead 的 agentTeam 投影 → 行）'
   it('lead 行显示 CEO 显示名；phase 按 D-c 中文映射（active → 待命）', () => {
     const rows = rowsFromTeamView(view)
     expect(rows).toHaveLength(3)
-    expect(rows[0]).toMatchObject({ displayName: 'CEO', statusLabel: '待命', currentTask: null })
+    expect(rows[0]).toMatchObject({ displayName: 'CEO', statusLabel: '待命', currentTasks: null })
     const eng = rows.find(row => row.name === 'vp-eng')
     expect(eng).toMatchObject({ displayName: 'VP-Eng', statusLabel: '待命' })
-    expect(eng!.currentTask).toBe('VP-Eng：技术可行性结论')
-    expect(rows.find(row => row.name === 'coo')).toMatchObject({ statusLabel: '启动中', currentTask: null })
+    expect(eng!.currentTasks).toEqual(['VP-Eng：技术可行性结论'])
+    expect(rows.find(row => row.name === 'coo')).toMatchObject({ statusLabel: '启动中', currentTasks: null })
   })
 
   it('按 ownerName 关联当前任务（TeamTaskView 无 ownerId，只有 ownerName）', () => {
     const rows = rowsFromTeamView(view)
-    expect(rows.every(row => row.currentTask === null || row.name === 'vp-eng')).toBe(true)
+    expect(rows.every(row => row.currentTasks === null || row.name === 'vp-eng')).toBe(true)
   })
 })
 
@@ -197,7 +197,7 @@ describe('缺失 / 未知不崩（验收判据 1 的后半句）', () => {
       memberEvent(VP_SALES, 'vp-sales', 'active', 1),
       taskEvent('task-9', 2, '幽灵任务', 'in_progress', 'ghost-session-id', 2),
     ])
-    expect(board.rows.map(row => row.currentTask)).toEqual([null, null])
+    expect(board.rows.map(row => row.currentTasks)).toEqual([null, null])
   })
 })
 

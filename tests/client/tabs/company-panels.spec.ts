@@ -22,8 +22,8 @@ describe('在场面板', () => {
 
   it('成员行：显示名、Lead 标记、状态标签与当前任务（无任务给破折号）', () => {
     const rows: PresenceRow[] = [
-      { id: 't1', name: 'lead', displayName: 'CEO', role: 'lead', status: 'running', statusLabel: '执行中', currentTask: '拆解动议' },
-      { id: 'm1', name: 'vp-eng', displayName: 'VP-Eng', role: 'teammate', status: 'idle', statusLabel: '待命', currentTask: null },
+      { id: 't1', name: 'lead', displayName: 'CEO', role: 'lead', status: 'running', statusLabel: '执行中', currentTasks: ['拆解动议'] },
+      { id: 'm1', name: 'vp-eng', displayName: 'VP-Eng', role: 'teammate', status: 'idle', statusLabel: '待命', currentTasks: null },
     ]
     const html = renderToStaticMarkup(createElement(PresencePanel, { rows, activity: [] }))
     expect(html).toContain('CEO')

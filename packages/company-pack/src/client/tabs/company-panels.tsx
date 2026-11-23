@@ -309,7 +309,7 @@ export function PresencePanel({ rows, activity, activityCapped = 0, activityLimi
             <Tag tone={row.status === 'failed' ? 'danger' : row.status === 'running' ? 'info' : 'outline'}>
               {t(`presence.status.${row.status}` as CompanyKey)}
             </Tag>
-            <span className="wk-row-task" title={row.currentTask ?? ''}>{row.currentTask ?? '—'}</span>
+            <span className="wk-row-task" title={row.currentTasks === null ? '' : joinList(row.currentTasks, listSeparator(t))}>{row.currentTasks === null ? '—' : joinList(row.currentTasks, listSeparator(t))}</span>
           </div>
         ))}
       <div className="wk-section-title">{t('presence.activity')}</div>

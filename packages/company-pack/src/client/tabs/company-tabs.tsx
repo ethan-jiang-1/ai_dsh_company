@@ -18,6 +18,7 @@ import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { PresenceRow } from '../../lib/presence/presence.ts'
+import { joinList, listSeparator } from '../ui/list-separator.ts'
 import { memberDot } from '../../lib/presence/presence-status.ts'
 import { clampRect, loadFloatRect, saveFloatRect, type FloatRectLike } from '../ui/float-geometry.ts'
 import { BoardPanel, BudgetPanel, DagPanel, StateNote, StreamErrorNotice, activityText } from './company-panels.tsx'
@@ -240,7 +241,7 @@ export function PresenceTab(props: PresenceTabProps) {
                   type="button"
                   role="listitem"
                   className="wk-row wk-row-button"
-                  aria-label={t('presence.rowAria', { name: row.displayName, status: t(`presence.status.${row.status}` as CompanyKey), task: row.currentTask === null ? t('presence.noTask') : t('presence.task', { task: row.currentTask }) })}
+                  aria-label={t('presence.rowAria', { name: row.displayName, status: t(`presence.status.${row.status}` as CompanyKey), task: row.currentTasks === null ? t('presence.noTask') : t('presence.task', { task: joinList(row.currentTasks, listSeparator(t)) }) })}
                   title={row.role === 'lead' ? t('presence.openLead') : t('presence.openMember')}
                   onClick={() => { void openMember(props.sessionId, { id: row.id, role: row.role }) }}
                 >
@@ -250,7 +251,7 @@ export function PresenceTab(props: PresenceTabProps) {
                     {row.role === 'lead' ? <Tag tone="neutral">Lead</Tag> : null}
                   </span>
                   <span className="wk-row-status"><Tag tone={memberTone(row.status)}>{t(`presence.status.${row.status}` as CompanyKey)}</Tag></span>
-                  <span className="wk-row-task" title={row.currentTask ?? ''}>{row.currentTask ?? '—'}</span>
+                  <span className="wk-row-task" title={row.currentTasks === null ? '' : joinList(row.currentTasks, listSeparator(t))}>{row.currentTasks === null ? '—' : joinList(row.currentTasks, listSeparator(t))}</span>
                 </button>
               ))}
             </div>

@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { BudgetPanel, PresencePanel, StreamErrorNotice } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
 import { en } from '../../../packages/company-pack/src/client/locales.ts'
 import { assertEnglishUiClean, translateWith } from '../../support/i18n-assertions.ts'
+import { activityFromEvents, presenceFromEvents } from '../../../packages/company-pack/src/lib/presence/presence.ts'
 
 const tEn = translateWith(en)
 
@@ -21,9 +22,9 @@ describe('PresencePanel i18n', () => {
     const html = renderToStaticMarkup(createElement(PresencePanel, {
       t: tEn,
       rows: [
-        { id: '1', name: 'ceo', displayName: 'CEO', role: 'lead', status: 'running', statusLabel: 'running', currentTask: 'Chairing motion' },
-        { id: '2', name: 'vp-eng', displayName: 'VP Eng', role: 'teammate', status: 'idle', statusLabel: 'idle', currentTask: null },
-        { id: '3', name: 'cfo', displayName: 'CFO', role: 'teammate', status: 'failed', statusLabel: 'failed', currentTask: 'Budget review' },
+        { id: '1', name: 'ceo', displayName: 'CEO', role: 'lead', status: 'running', statusLabel: 'running', currentTasks: ['Chairing motion'] },
+        { id: '2', name: 'vp-eng', displayName: 'VP Eng', role: 'teammate', status: 'idle', statusLabel: 'idle', currentTasks: null },
+        { id: '3', name: 'cfo', displayName: 'CFO', role: 'teammate', status: 'failed', statusLabel: 'failed', currentTasks: ['Budget review'] },
       ],
       activity: [{
         time: 1,
@@ -71,5 +72,34 @@ describe('BudgetPanel i18n', () => {
     expect(html).toContain('Output')
     expect(html).toContain('Tokens only')
     assertEnglishUiClean(html, 'BudgetPanel populated en')
+  })
+})
+
+// 负例留证 2026-11-23：去掉消息动态的 token（只留中文 text）⇒ 本用例红（`CEO → VP-Eng：（空）` 漏进 en）。BUG-336
+describe('PresencePanel 消息动态（BUG-336）', () => {
+  const nameById = new Map([['m2', 'vp-eng']])
+  const events = [
+    { type: 'team/message/queued', time: 1000, data: { teamId: 't1', message: { id: 'm1', senderId: 't1', senderName: 'ceo', targetId: 'm2', content: [] } } },
+    { type: 'team/message/queued', time: 2000, data: { teamId: 't1', message: { id: 'm2', senderId: 't1', senderName: 'ceo', targetId: 'm2', content: [{ type: 'text', text: 'ship it' }] } } },
+  ] as const
+
+  it('空消息与有正文消息都由字典渲染：en 零汉字/全角标点', () => {
+    const activity = activityFromEvents(events as never, nameById)
+    expect(activity.map(entry => entry.token?.key)).toEqual(['presence.activity.messageEmpty', 'presence.activity.message'])
+    const html = renderToStaticMarkup(createElement(PresencePanel, { rows: [], activity, t: tEn }))
+    expect(html).toContain('CEO → VP-Eng: (empty)')
+    expect(html).toContain('CEO → VP-Eng: ship it')
+    assertEnglishUiClean(html, 'PresencePanel message activity en')
+  })
+
+  it('多任务并行时 currentTasks 由渲染层按语言拼分隔符（en 不出现「、」）', () => {
+    const board = presenceFromEvents([
+      { type: 'team/member', time: 1, data: { teamId: 't1', member: { id: 'm2', name: 'vp-eng', phase: 'active' } } },
+      { type: 'team/task', time: 2, data: { teamId: 't1', task: { id: 'a', revision: 1, subject: 'Design API', status: 'in_progress', ownerId: 'm2' } } },
+      { type: 'team/task', time: 3, data: { teamId: 't1', task: { id: 'b', revision: 1, subject: 'Ship API', status: 'in_progress', ownerId: 'm2' } } },
+    ] as never)
+    const html = renderToStaticMarkup(createElement(PresencePanel, { rows: board.rows, activity: [], t: tEn }))
+    expect(html).toContain('Design API, Ship API')
+    assertEnglishUiClean(html, 'PresencePanel rows en')
   })
 })

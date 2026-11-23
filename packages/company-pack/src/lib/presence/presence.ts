@@ -38,7 +38,8 @@ export interface PresenceRow {
   readonly status: PresenceStatus
   readonly statusLabel: string
   /** 本人 in_progress 任务的 subject（多条用「；」连接）；无则 null。 */
-  readonly currentTask: string | null
+  /** 进行中任务（原始 subject 列表；分隔符由渲染层按语言拼，BUG-336）。 */
+  readonly currentTasks: readonly string[] | null
 }
 
 /** 协作动态的结构化文案 token（UI 走字典；text 保留给旧夹具/离线回放）。 */
@@ -243,10 +244,12 @@ export function rowsFromTeamView(view: TeamViewLike): PresenceRow[] {
     role: member.role,
     status: presenceStatusFromPhase(member.phase),
     statusLabel: statusLabelFor(presenceStatusFromPhase(member.phase)),
-    currentTask: (view.tasks ?? [])
-      .filter(task => task.status === 'in_progress' && task.ownerName === member.name)
-      .map(task => task.subject)
-      .join('；') || null,
+    currentTasks: (() => {
+      const subjects = (view.tasks ?? [])
+        .filter(task => task.status === 'in_progress' && task.ownerName === member.name)
+        .map(task => task.subject)
+      return subjects.length === 0 ? null : subjects
+    })(),
   }))
 }
 
@@ -377,10 +380,16 @@ export function presenceFromEvents(
       const { message } = event.data
       teamId ??= event.data.teamId
       const preview = clip(firstText(message.content), 60)
+      const from = displayOf(message.senderId, message.senderName)
+      const to = displayOf(message.targetId)
       activity.push({
         time: event.time,
         kind: 'message',
-        text: `${displayOf(message.senderId, message.senderName)} → ${displayOf(message.targetId)}：${preview === '' ? '（空）' : preview}`,
+        text: `${from} → ${to}：${preview === '' ? '（空）' : preview}`,
+        // 动态片段只给结构化 token，冒号与「（空）」由字典按语言给（BUG-336）。
+        token: preview === ''
+          ? { key: 'presence.activity.messageEmpty', params: { from, to } }
+          : { key: 'presence.activity.message', params: { from, to, text: preview } },
       })
     }
     // 其他事件类型（team/message/delivered 等）忽略——投递回执不进动态流。
@@ -395,7 +404,7 @@ export function presenceFromEvents(
       role: 'lead',
       status: 'inactive',
       statusLabel: STATUS_LABEL.inactive,
-      currentTask: null,
+      currentTasks: null,
     })
   }
   for (const [id, member] of members) {
@@ -410,10 +419,12 @@ export function presenceFromEvents(
       role: 'teammate',
       status,
       statusLabel: STATUS_LABEL[status],
-      currentTask: [...tasks.values()]
-        .filter(task => task.status === 'in_progress' && task.ownerId === id)
-        .map(task => task.subject)
-        .join('；') || null,
+      currentTasks: (() => {
+        const subjects = [...tasks.values()]
+          .filter(task => task.status === 'in_progress' && task.ownerId === id)
+          .map(task => task.subject)
+        return subjects.length === 0 ? null : subjects
+      })(),
     })
   }
 
