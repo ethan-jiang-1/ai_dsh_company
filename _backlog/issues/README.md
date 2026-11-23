@@ -4,7 +4,9 @@
 
 ## 活跃清单
 
-**活跃 1 张**：[2026-11-21 公司页 E2E 设计卡](2026-11-21-company-e2e-test-design.md)（推敲中；本轮只产设计/原型证据 + BUG-293..296，未落 lane）。
+**活跃 2 张**：
+- [2026-11-23 客户端静态猎手、满态双语扫面与全 Slot 真挂载](2026-11-23-client-static-guards-and-contract-sweep.md)（推敲中；承接 [bug-prevention-and-discovery](../research/bug-prevention-and-discovery/README.md) 首批窄切片，待用户确认范围与实施授权）。
+- [2026-11-21 公司页 E2E 设计卡](2026-11-21-company-e2e-test-design.md)（推敲中；本轮只产设计/原型证据 + BUG-293..296，未落 lane）。
 
 **上一轮（2026-11-20）**：C12/C13/C14/C16 四张 exploratory 卡与 content 合同族预防试点卡均已于 2026-11-20 归档——50 张缺陷卡（BUG-202..211 / 213..222 / 223..232 / 243..262）全部已修并迁 [fixed_bugs](../_archive/fixed_bugs/)，去向 = 各批次 Note；卡片见[归档](../_archive/README.md)。
 
