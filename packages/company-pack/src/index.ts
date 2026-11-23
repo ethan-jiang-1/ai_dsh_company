@@ -153,12 +153,12 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   registerDelegationTerminal(ctx)
   registerClientDiagnostics(ctx, runtime.dshHome)
 
-  registerDeliverablesCommand(ctx, { dataBlocked, ...blockedFields, workspace, ledgerStorePromise, exportNow })
-  registerPrdCommand(ctx, { dataBlocked, ...blockedFields, workspace })
+  registerDeliverablesCommand(ctx, { dataBlocked, ...blockedFields, workspace, ledgerStorePromise, exportNow, language })
+  registerPrdCommand(ctx, { dataBlocked, ...blockedFields, workspace, language })
   // 交付闸门：present 前跑 `/prd check` 同一判据（2026-11-13 方案 A；旧动议按 numbering 标记豁免）。
   registerPrdGate(ctx)
-  registerReqCommand(ctx, { dataBlocked, ...blockedFields, workspace, contentDir })
-  registerDeliveryCommand(ctx, { dataBlocked, ...blockedFields, workspace, contentDir })
+  registerReqCommand(ctx, { dataBlocked, ...blockedFields, workspace, contentDir, language })
+  registerDeliveryCommand(ctx, { dataBlocked, ...blockedFields, workspace, contentDir, language })
   registerSettingsCommand(ctx, {
     workspace, dataBlocked, ...blockedFields, contentDir,
     text: (zhText, enText) => language.text(zhText, enText),

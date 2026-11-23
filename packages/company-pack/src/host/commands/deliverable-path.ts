@@ -25,11 +25,15 @@ export type DeliverablePath =
  * @param slug 操作员输入的单段目录名。
  * @returns `ok: false` 时 text 是可直接回给操作员的错误；`ok: true` 时 root=交付物目录、dir=drafts。
  */
-export function resolveDeliverablePath(workspace: string, slug: string): DeliverablePath {
+export function resolveDeliverablePath(
+  workspace: string,
+  slug: string,
+  text: (zh: string, en: string) => string = zh => zh,
+): DeliverablePath {
   if (!SLUG.test(slug) || slug === '.' || slug === '..') {
     return {
       ok: false,
-      text: `非法 deliverables 目录名「${slug}」：只允许单段目录名（字母/数字/._-；不能含 /、\\、. 或 ..）`,
+      text: text(`非法 deliverables 目录名「${slug}」：只允许单段目录名（字母/数字/._-；不能含 /、\\、. 或 ..）`, `Invalid deliverables directory "${slug}": a single path segment is required (letters/digits/._-; no /, \\, . or ..)`),
     }
   }
   let companyRoot: string
@@ -41,14 +45,14 @@ export function resolveDeliverablePath(workspace: string, slug: string): Deliver
   const dir = join(root, 'drafts')
   const rel = relative(deliverablesRoot, dir)
   if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
-    return { ok: false, text: `非法 deliverables 目录名「${slug}」：越出 deliverables 根` }
+    return { ok: false, text: text(`非法 deliverables 目录名「${slug}」：越出 deliverables 根`, `Invalid deliverables directory "${slug}": it escapes the deliverables root`) }
   }
   // 交付物目录本身是 symlink / 真实目标在 company root 外 → 不读（BUG-113）。
   try {
     const info = lstatSync(root)
-    if (info.isSymbolicLink()) return { ok: false, text: `交付物目录是 symlink，拒绝读取：${root}` }
-    if (!info.isDirectory()) return { ok: false, text: `交付物目录不是目录：${root}` }
-    if (!isInside(companyRoot, root)) return { ok: false, text: `交付物目录真实路径越出 company root：${root}` }
+    if (info.isSymbolicLink()) return { ok: false, text: text(`交付物目录是 symlink，拒绝读取：${root}`, `The deliverable directory is a symlink; refusing to read: ${root}`) }
+    if (!info.isDirectory()) return { ok: false, text: text(`交付物目录不是目录：${root}`, `The deliverable path is not a directory: ${root}`) }
+    if (!isInside(companyRoot, root)) return { ok: false, text: text(`交付物目录真实路径越出 company root：${root}`, `The deliverable directory resolves outside the company root: ${root}`) }
   } catch { /* 目录缺失：交给命令报缺文档 */ }
   return { ok: true, root, dir }
 }

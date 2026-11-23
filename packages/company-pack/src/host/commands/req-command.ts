@@ -10,7 +10,8 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { blockedCompanyText } from './blocked-text.ts'
+import { blockedCompanyTextPair } from './blocked-text.ts'
+import type { CompanyLanguageState } from '../language/company-language.ts'
 import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { contentMemberFile, isSafeContentId } from './content-id.ts'
 import { isPlainFileInside, readTextInside } from '../fs/safe-file.ts'
@@ -21,6 +22,7 @@ import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 import { yamlScalar } from '../../lib/docs/yaml-scalar.ts'
 
 export const REQ_USAGE = '用法：/req check <deliverables 目录名>（读 .dsh-company/deliverables/<name>/drafts/{mrd,strs,prd,syrs,irs,vv-plan}.md + meta.md）'
+const REQ_USAGE_EN = 'Usage: /req check <deliverables-directory> (reads .dsh-company/deliverables/<name>/drafts/{mrd,strs,prd,syrs,irs,vv-plan}.md + meta.md)'
 
 /** 需求文档清单（存在即读；缺的不报错——缺层由 checker 的 `需求层` 声明判）。 */
 const REQ_DOCS = ['mrd.md', 'strs.md', 'prd.md', 'syrs.md', 'irs.md', 'vv-plan.md', 'allocation.md'] as const
@@ -30,9 +32,12 @@ export type ParsedReqCheck =
   | { readonly ok: false; readonly text: string }
 
 /** 解析 `check <slug>`；slug 只认一个 token（目录名）。 */
-export function parseReqCheck(rawInput: string): ParsedReqCheck {
+export function parseReqCheck(
+  rawInput: string,
+  text: (zh: string, en: string) => string = zh => zh,
+): ParsedReqCheck {
   const tokens = rawInput.trim().split(/\s+/).filter(token => token !== '')
-  if (tokens[0] !== 'check' || tokens.length !== 2) return { ok: false, text: REQ_USAGE }
+  if (tokens[0] !== 'check' || tokens.length !== 2) return { ok: false, text: text(REQ_USAGE, REQ_USAGE_EN) }
   return { ok: true, slug: tokens[1] as string }
 }
 
@@ -43,6 +48,8 @@ export interface ReqCommandOptions {
   readonly workspace: string
   /** pack 的 content 目录；给了才读产品类型包的 check-rules（缺省 = 五层默认）。 */
   readonly contentDir?: string
+  /** 当前公司语言（可选）：命令面描述/提示/回执随语言（BUG-338）。 */
+  readonly language?: CompanyLanguageState
   /** 测试注入；缺省 = 真实校验器。 */
   readonly check?: typeof checkRequirements
 }
@@ -151,7 +158,12 @@ function availableDeliveryModes(contentDir: string): string[] {
  * 解析当前动议的产品类型规则：动议 `meta.md` 的 `产品类型` 优先，回落 `company.md` 的
  * `productType`；都没有 = 五层默认。声明了类型但 check-rules 不在 = 报错，不静默用错规则。
  */
-function resolveProductType(contentDir: string | undefined, workspace: string, root: string): ProductTypeResolution {
+function resolveProductType(
+  contentDir: string | undefined,
+  workspace: string,
+  root: string,
+  text: (zh: string, en: string) => string,
+): ProductTypeResolution {
   if (contentDir === undefined) return { rules: null, id: null, source: null, error: null }
   const companyRoot = join(workspace, '.dsh-company')
   const motionType = parseProductType(readTextInside(companyRoot, join(root, 'meta.md')))
@@ -161,24 +173,25 @@ function resolveProductType(contentDir: string | undefined, workspace: string, r
   if (id === null) return { rules: null, id: null, source: null, error: null }
   // 类型 id 来自模型可写文件：必须是盘上可用的单段成员，不拿它拼 content 外路径。
   const available = availableProductTypes(contentDir)
-  const where = source === 'motion' ? '动议 meta.md' : 'company.md'
+  const whereZh = source === 'motion' ? '动议 meta.md' : 'company.md'
+  const whereEn = source === 'motion' ? 'motion meta.md' : 'company.md'
   if (!isSafeContentId(id) || !available.includes(id)) {
     return {
       rules: null,
       id,
       source,
-      error: `未知产品类型「${id}」（来自 ${where}）；可用类型：${available.length > 0 ? available.join(' / ') : '（无）'}`,
+      error: text(`未知产品类型「${id}」（来自 ${whereZh}）；可用类型：${available.length > 0 ? available.join(' / ') : '（无）'}`, `Unknown product type "${id}" (from ${whereEn}); available types: ${available.length > 0 ? available.join(' / ') : '(none)'}`),
     }
   }
   const rulesPath = contentMemberFile(contentDir, 'product-types', id, 'check-rules.json')
   const rulesText = rulesPath === null ? undefined : readIfExists(rulesPath)
   if (rulesText === undefined) {
-    return { rules: null, id, source, error: `产品类型「${id}」的 check-rules.json 缺失` }
+    return { rules: null, id, source, error: text(`产品类型「${id}」的 check-rules.json 缺失`, `check-rules.json is missing for product type "${id}"`) }
   }
   try {
     return { rules: JSON.parse(rulesText) as ProductTypeRules, id, source, error: null }
   } catch {
-    return { rules: null, id, source, error: `产品类型「${id}」的 check-rules.json 不可解析` }
+    return { rules: null, id, source, error: text(`产品类型「${id}」的 check-rules.json 不可解析`, `check-rules.json is unparsable for product type "${id}"`) }
   }
 }
 
@@ -193,27 +206,32 @@ const readIfExists = (path: string): string | undefined => {
 /** 注册 `/req` 命令。 */
 export function registerReqCommand(ctx: Context, options: ReqCommandOptions): void {
   const check = options.check ?? checkRequirements
-  ctx.commands.register({
+  const tr = (zh: string, en: string): string => options.language?.text(zh, en) ?? zh
+  const paused = blockedCompanyTextPair(options.blockedReason, '校验', 'validating')
+  const definition = () => ({
     name: 'req',
-    description: '需求编号与追溯校验：层/定义形态、重复/悬空/退役词/孤儿/覆盖/计数（操作员命令，角色不自证）',
-    input: { hint: 'check <deliverables 目录名>' },
+    description: tr(
+      '需求编号与追溯校验：层/定义形态、重复/悬空/退役词/孤儿/覆盖/计数（操作员命令，角色不自证）',
+      'Requirement numbering and traceability check: layers/definition forms, duplicates/dangling ids/retired words/orphans/coverage/counts (operator command; roles cannot self-certify)',
+    ),
+    input: { hint: tr('check <deliverables 目录名>', 'check <deliverables-directory>') },
     handler: async ({ rawInput, agent }: { readonly rawInput: string, readonly agent?: CommandAgent }) => {
       const workspace = commandWorkspace(options.workspace, agent)
       if (workspace === '') {
         return {
           kind: 'error' as const,
           text: options.dataBlocked
-            ? blockedCompanyText(options.blockedReason, '校验')
-            : '未指定 workspace；先选 workspace 再校验。',
+            ? tr(paused.zh, paused.en)
+            : tr('未指定 workspace；先选 workspace 再校验。', 'No workspace is selected; select a workspace before validating.'),
         }
       }
       let companyRoot: string
       try { companyRoot = ensureCompanyRoot(workspace) } catch (error) {
         return { kind: 'error' as const, text: (error as Error).message }
       }
-      const parsed = parseReqCheck(rawInput)
+      const parsed = parseReqCheck(rawInput, tr)
       if (!parsed.ok) return { kind: 'error' as const, text: parsed.text }
-      const resolved = resolveDeliverablePath(workspace, parsed.slug)
+      const resolved = resolveDeliverablePath(workspace, parsed.slug, tr)
       if (!resolved.ok) return { kind: 'error' as const, text: resolved.text }
       const { root, dir } = resolved
       const docs: MotionDoc[] = []
@@ -222,19 +240,24 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
         if (text !== undefined) docs.push({ rel: `drafts/${name}`, text })
       }
       if (docs.length === 0) {
-        return { kind: 'error' as const, text: `缺需求文档：${dir}（至少要有 mrd.md / strs.md / prd.md）` }
+        return { kind: 'error' as const, text: tr(`缺需求文档：${dir}（至少要有 mrd.md / strs.md / prd.md）`, `Missing requirement documents: ${dir} (at least mrd.md / strs.md / prd.md are required)`) }
       }
-      const resolution = resolveProductType(options.contentDir, workspace, root)
+      const resolution = resolveProductType(options.contentDir, workspace, root, tr)
       if (resolution.error !== null) {
         return { kind: 'error' as const, text: resolution.error }
       }
       const rules = resolution.rules
       // 回落不再静默（BUG-062）：回执点名来源，用户能看见「没在 meta 声明」。
-      const typeNote = resolution.id === null
+      const typeNoteZh = resolution.id === null
         ? ''
         : resolution.source === 'motion'
           ? `；动议类型 = ${resolution.id}（meta.md）`
           : `；动议类型 = ${resolution.id}（company.md 默认，未在 meta 声明）`
+      const typeNoteEn = resolution.id === null
+        ? ''
+        : resolution.source === 'motion'
+          ? `; motion type = ${resolution.id} (meta.md)`
+          : `; motion type = ${resolution.id} (company.md default, not declared in meta)`
       const metaText = readTextInside(companyRoot, join(root, 'meta.md'))
       const deliveryMode = parseDeliveryMode(metaText)
       if (options.contentDir !== undefined && deliveryMode !== 'productized') {
@@ -243,40 +266,57 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
           const available = ['productized', ...availableModes]
           return {
             kind: 'error' as const,
-            text: `未知交付模式「${deliveryMode}」（来自 meta.md）；可用：${available.join(' / ')}`,
+            text: tr(`未知交付模式「${deliveryMode}」（来自 meta.md）；可用：${available.join(' / ')}`, `Unknown delivery mode "${deliveryMode}" (from meta.md); available: ${available.join(' / ')}`),
           }
         }
       }
       const deliveryDeclared = hasDeclaredDeliveryMode(metaText)
-      const deliveryNote = deliveryMode === 'project-services'
+      const deliveryNoteZh = deliveryMode === 'project-services'
         ? '；交付模式 = project-services（SOW/UAT/RACI 归 COO；项目经济性归 CFO；文档见 content/delivery-modes/project-services/）'
         : deliveryMode === 'managed-service'
           ? '；交付模式 = managed-service（SLA/值班/月报归 COO；续费经济性归 CFO；文档见 content/delivery-modes/managed-service/）'
           : `；交付模式 = ${deliveryMode}${deliveryDeclared ? '' : '（默认）'}`
+      const deliveryNoteEn = deliveryMode === 'project-services'
+        ? '; delivery mode = project-services (SOW/UAT/RACI belong to COO; project economics to CFO; docs in content/delivery-modes/project-services/)'
+        : deliveryMode === 'managed-service'
+          ? '; delivery mode = managed-service (SLA/on-call/monthly reports belong to COO; renewal economics to CFO; docs in content/delivery-modes/managed-service/)'
+          : `; delivery mode = ${deliveryMode}${deliveryDeclared ? '' : ' (default)'}`
       if (rules !== null && rules.layers !== undefined) {
         const allowed = new Set(rules.layers)
         const unsupported = parseDeclaredLayers(metaText).filter(isLayer).filter(layer => !allowed.has(layer))
         if (unsupported.length > 0) {
           return {
             kind: 'error' as const,
-            text: `产品类型「${rules.productType ?? resolution.id ?? '未知'}」不支持需求层 ${unsupported.join('/')}；可用层：${rules.layers.join('/')}`,
+            text: tr(
+              `产品类型「${rules.productType ?? resolution.id ?? '未知'}」不支持需求层 ${unsupported.join('/')}；可用层：${rules.layers.join('/')}`,
+              `Product type "${rules.productType ?? resolution.id ?? 'unknown'}" does not support requirement layer(s) ${unsupported.join('/')}; available layers: ${rules.layers.join('/')}`,
+            ),
           }
         }
       }
       const hasDoc = (name: string): boolean => isPlainFileInside(companyRoot, join(dir, name))
-      const deliveryWarnings: string[] = []
+      const deliveryWarningsZh: string[] = []
+      const deliveryWarningsEn: string[] = []
       if (deliveryMode === 'project-services' || deliveryMode === 'managed-service') {
         const missing = deliveryReminderFiles(options.contentDir, deliveryMode).filter(name => !hasDoc(name))
-        if (missing.length > 0) deliveryWarnings.push(`缺 ${missing.join(' / ')}（${deliveryMode} 需要）`)
+        if (missing.length > 0) {
+          deliveryWarningsZh.push(`缺 ${missing.join(' / ')}（${deliveryMode} 需要）`)
+          deliveryWarningsEn.push(`missing ${missing.join(' / ')} (required by ${deliveryMode})`)
+        }
       } else if (hasDoc('sow.md') || hasDoc('sla.md')) {
-        deliveryWarnings.push('productized 动议出现 SOW/SLA 文档，确认交付模式是否选错')
+        deliveryWarningsZh.push('productized 动议出现 SOW/SLA 文档，确认交付模式是否选错')
+        deliveryWarningsEn.push('a productized motion contains SOW/SLA documents; confirm the delivery mode is not wrong')
       }
-      const deliveryWarningNote = deliveryWarnings.length === 0 ? '' : `；交付提醒：${deliveryWarnings.join('；')}`
+      const deliveryWarningNoteZh = deliveryWarningsZh.length === 0 ? '' : `；交付提醒：${deliveryWarningsZh.join('；')}`
+      const deliveryWarningNoteEn = deliveryWarningsEn.length === 0 ? '' : `; delivery reminders: ${deliveryWarningsEn.join('; ')}`
       const customLayers = (rules?.layers ?? []).filter(layer => !isLayer(layer))
       if (rules !== null && customLayers.length > 0) {
         return {
           kind: 'success' as const,
-          text: `本产品类型（${rules.productType ?? '未知'}）不走五层编号体系（层 = ${(rules.layers ?? []).join('/')}）；按 product-types/${rules.productType ?? ''}/overview.md 的文档链自查。`,
+          text: tr(
+            `本产品类型（${rules.productType ?? '未知'}）不走五层编号体系（层 = ${(rules.layers ?? []).join('/')}）；按 product-types/${rules.productType ?? ''}/overview.md 的文档链自查。`,
+            `This product type (${rules.productType ?? 'unknown'}) does not use the five-layer numbering system (layers = ${(rules.layers ?? []).join('/')}); self-check against the document chain in product-types/${rules.productType ?? ''}/overview.md.`,
+          ),
         }
       }
       const checkOptions = rules === null
@@ -287,17 +327,26 @@ export function registerReqCommand(ctx: Context, options: ReqCommandOptions): vo
           }
       const result = check({ docs, ...(metaText === undefined ? {} : { meta: { rel: 'meta.md', text: metaText } }) }, checkOptions)
       if (result.skipped) {
-        return { kind: 'success' as const, text: `编号校验跳过（${parsed.slug}）：旧动议只读豁免（skipped）——${result.reason}。` }
+        return { kind: 'success' as const, text: tr(`编号校验跳过（${parsed.slug}）：旧动议只读豁免（skipped）——${result.reason}。`, `Numbering check skipped (${parsed.slug}): legacy motion read-only exemption (skipped) — ${result.reason}.`) }
       }
       if (!result.ok) {
         const detail = result.errors.map(error => `- ${error}`).join('\n')
-        return { kind: 'error' as const, text: `编号校验失败（${parsed.slug}）：\n${detail}` }
+        return { kind: 'error' as const, text: tr(`编号校验失败（${parsed.slug}）：\n${detail}`, `Numbering check failed (${parsed.slug}):\n${detail}`) }
       }
       const { counts, definitions, edges } = result.index
       return {
         kind: 'success' as const,
-        text: `编号校验通过（${parsed.slug}）：MR ${String(counts.MR)} / REQ ${String(counts.REQ)} / IF ${String(counts.IF)} / TC ${String(counts.TC)} / AC ${String(counts.AC)}；层 = ${result.layers.join('/')}${typeNote}${deliveryNote}${deliveryWarningNote}；索引 = ${String(definitions.length)} 条定义 / ${String(edges.length)} 条追溯。`,
+        text: tr(
+          `编号校验通过（${parsed.slug}）：MR ${String(counts.MR)} / REQ ${String(counts.REQ)} / IF ${String(counts.IF)} / TC ${String(counts.TC)} / AC ${String(counts.AC)}；层 = ${result.layers.join('/')}${typeNoteZh}${deliveryNoteZh}${deliveryWarningNoteZh}；索引 = ${String(definitions.length)} 条定义 / ${String(edges.length)} 条追溯。`,
+          `Numbering check passed (${parsed.slug}): MR ${String(counts.MR)} / REQ ${String(counts.REQ)} / IF ${String(counts.IF)} / TC ${String(counts.TC)} / AC ${String(counts.AC)}; layers = ${result.layers.join('/')}${typeNoteEn}${deliveryNoteEn}${deliveryWarningNoteEn}; index = ${String(definitions.length)} definitions / ${String(edges.length)} trace edges.`,
+        ),
       }
     },
   })
+  let dispose = ctx.commands.register(definition())
+  if (options.language !== undefined) {
+    const unsubscribe = options.language.subscribe(() => { dispose(); dispose = ctx.commands.register(definition()) })
+    const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
+    if (typeof effect === 'function') effect.call(ctx, () => () => { unsubscribe(); dispose() })
+  }
 }

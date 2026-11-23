@@ -6,7 +6,7 @@
  * 读不走命令：每次读都往会话里写 `command/run`，面板一打开就多一个命令条；读走 `workspaceFiles`。
  */
 import type { Context } from '@deepseek-ai/cordis'
-import { blockedCompanyText } from './blocked-text.ts'
+import { blockedCompanyTextPair } from './blocked-text.ts'
 import { resolveStartupWorkspace } from '../startup/startup-workspace.ts'
 import {
   clearStartupSettings,
@@ -114,19 +114,22 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
     description: text(STARTUP_COMMAND_COPY.description.zh, STARTUP_COMMAND_COPY.description.en),
     input: { hint: text(STARTUP_COMMAND_COPY.hint.zh, STARTUP_COMMAND_COPY.hint.en) },
     handler: async ({ rawInput, agent }: { readonly rawInput: string, readonly agent?: StartupAgentLike }) => {
+      // 停写回执也随语言（BUG-338）：与 /cultivation 同用成对措辞。
+      const paused = blockedCompanyTextPair(options.blockedReason, '设置', 'changing settings')
+      const pausedText = (): string => text(paused.zh, paused.en)
       // 会话 cwd 优先：面板按 Lead 会话读，写必须落在同一份（BUG-081）。
       const workspace = resolveStartupWorkspace(options.workspace, agent)
       if (workspace === '') {
         return {
           kind: 'error' as const,
           text: options.dataBlocked
-            ? blockedCompanyText(options.blockedReason, '设置')
+            ? pausedText()
             : text(STARTUP_COMMAND_COPY.noWorkspace.zh, STARTUP_COMMAND_COPY.noWorkspace.en),
         }
       }
       const parsed = parseSettingsCommand(rawInput)
       if (options.dataBlocked && parsed.kind !== 'show') {
-        return { kind: 'error' as const, text: blockedCompanyText(options.blockedReason, '设置') }
+        return { kind: 'error' as const, text: pausedText() }
       }
       if (parsed.kind === 'error') {
         const copy = parsed.code === 'unknown-field'
@@ -140,7 +143,10 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
       if (parsed.kind === 'show') {
         const available = enumerateStartupOptions(options.contentDir)
         const wikiCheck = checkWikiPointer(workspace, current.wiki)
-        const problemNote = currentState.problem === null ? '' : `⚠ startup.json ${currentState.problem === 'unsupported' ? 'schema 高于本包支持' : '损坏'}；当前按 auto 显示，重新 set 会覆盖。\n`
+        const problemNote = currentState.problem === null ? '' : text(
+          `⚠ startup.json ${currentState.problem === 'unsupported' ? 'schema 高于本包支持' : '损坏'}；当前按 auto 显示，重新 set 会覆盖。\n`,
+          `Warning: startup.json ${currentState.problem === 'unsupported' ? 'schema is newer than this pack supports' : 'is corrupt'}; showing auto for now, and a new set overwrites it.\n`,
+        )
         const wikiLine = current.wiki === null
           ? text('wiki=auto', 'wiki=auto')
           : wikiCheck.ok
@@ -152,7 +158,7 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
           kind: 'success' as const,
           text: text(
             `${problemNote}当前：${describe(current)}\n${wikiLine}\n可选 产品类型：${available.productTypes.join(' / ') || '（无）'}\n可选 交付模式：${available.deliveryModes.join(' / ') || '（无）'}`,
-            `Current: ${describe(current)}\n${wikiLine}\nProduct types: ${available.productTypes.join(' / ') || '(none)'}\nDelivery modes: ${available.deliveryModes.join(' / ') || '(none)'}`,
+            `${problemNote}Current: ${describe(current)}\n${wikiLine}\nProduct types: ${available.productTypes.join(' / ') || '(none)'}\nDelivery modes: ${available.deliveryModes.join(' / ') || '(none)'}`,
           ),
         }
       }
@@ -162,7 +168,7 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
         try {
           writeStartupSettings(workspace, next)
         } catch (error) {
-          return { kind: 'error' as const, text: `恢复自动失败：${(error as Error).message}` }
+          return { kind: 'error' as const, text: text(`恢复自动失败：${(error as Error).message}`, `Reset to auto failed: ${(error as Error).message}`) }
         }
         try { refresh(workspace) } catch { /* 派生失败不回滚设置 */ }
         return {
@@ -196,7 +202,7 @@ export function registerSettingsCommand(ctx: Context, options: SettingsCommandOp
       try {
         writeStartupSettings(workspace, parseStartupSettings(JSON.stringify(next)))
       } catch (error) {
-        return { kind: 'error' as const, text: `写入 startup.json 失败：${(error as Error).message}` }
+        return { kind: 'error' as const, text: text(`写入 startup.json 失败：${(error as Error).message}`, `Writing startup.json failed: ${(error as Error).message}`) }
       }
       try { refresh(workspace) } catch { /* 派生失败不回滚设置 */ }
       // A3：wiki 指针写进去就查一次——失效要说出来，不能等模型去 read 一个空气目录。

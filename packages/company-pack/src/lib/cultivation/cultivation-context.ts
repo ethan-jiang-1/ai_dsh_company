@@ -340,10 +340,21 @@ export function secretLikeFindings(text: string): string[] {
 
 /** `source` 的人话摘要（旧 UI/工具/外部读者仍能读懂）。 */
 export function contextSummary(context: Pick<CultivationContext, 'kind' | 'title' | 'subtitle'>): string {
-  if (context.kind === 'session') return `会话「${context.title}」`
-  return context.subtitle === undefined || context.subtitle === ''
-    ? `成品「${context.title}」`
-    : `成品「${context.title}」（${context.subtitle}）`
+  return contextSummaryPair(context).zh
+}
+
+/** 双语摘要（host 命令回执随语言；BUG-338）。 */
+export function contextSummaryPair(context: Pick<CultivationContext, 'kind' | 'title' | 'subtitle'>): { readonly zh: string, readonly en: string } {
+  if (context.kind === 'session') {
+    return { zh: `会话「${context.title}」`, en: `session "${context.title}"` }
+  }
+  if (context.subtitle === undefined || context.subtitle === '') {
+    return { zh: `成品「${context.title}」`, en: `deliverable "${context.title}"` }
+  }
+  return {
+    zh: `成品「${context.title}」（${context.subtitle}）`,
+    en: `deliverable "${context.title}" (${context.subtitle})`,
+  }
 }
 
 /** 打开原文/读会话用的地址；成品返回 null（走文件资源地址）。 */

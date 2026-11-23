@@ -8,7 +8,8 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { blockedCompanyText } from './blocked-text.ts'
+import { blockedCompanyTextPair } from './blocked-text.ts'
+import type { CompanyLanguageState } from '../language/company-language.ts'
 import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { contentMemberFile, isSafeContentId } from './content-id.ts'
 import { isPlainFileInside, readTextInside } from '../fs/safe-file.ts'
@@ -16,15 +17,19 @@ import { resolveDeliverablePath } from './deliverable-path.ts'
 import { yamlScalar } from '../../lib/docs/yaml-scalar.ts'
 
 export const DELIVERY_USAGE = '用法：/delivery check <deliverables 目录名>（读 meta.md 的 交付模式 + content/delivery-modes/<id>/delivery-rules.json）'
+const DELIVERY_USAGE_EN = 'Usage: /delivery check <deliverables-directory> (reads the delivery mode in meta.md + content/delivery-modes/<id>/delivery-rules.json)'
 
 export type ParsedDeliveryCheck =
   | { readonly ok: true; readonly slug: string }
   | { readonly ok: false; readonly text: string }
 
 /** 解析 `check <slug>`；slug 只认一个 token（目录名）。 */
-export function parseDeliveryCheck(rawInput: string): ParsedDeliveryCheck {
+export function parseDeliveryCheck(
+  rawInput: string,
+  text: (zh: string, en: string) => string = zh => zh,
+): ParsedDeliveryCheck {
   const tokens = rawInput.trim().split(/\s+/).filter(token => token !== '')
-  if (tokens[0] !== 'check' || tokens.length !== 2) return { ok: false, text: DELIVERY_USAGE }
+  if (tokens[0] !== 'check' || tokens.length !== 2) return { ok: false, text: text(DELIVERY_USAGE, DELIVERY_USAGE_EN) }
   return { ok: true, slug: tokens[1] as string }
 }
 
@@ -35,6 +40,8 @@ export interface DeliveryCommandOptions {
   readonly workspace: string
   /** pack 的 content 目录；给了才读交付模式规则（缺省 = 只支持 productized）。 */
   readonly contentDir?: string
+  /** 当前公司语言（可选）：命令面描述/提示/回执随语言（BUG-338）。 */
+  readonly language?: CompanyLanguageState
 }
 
 interface DeliveryDocument {
@@ -80,29 +87,34 @@ const readIfExists = (path: string): string | undefined => {
 
 /** 注册 `/delivery` 命令。 */
 export function registerDeliveryCommand(ctx: Context, options: DeliveryCommandOptions): void {
-  ctx.commands.register({
+  const tr = (zh: string, en: string): string => options.language?.text(zh, en) ?? zh
+  const paused = blockedCompanyTextPair(options.blockedReason, '交付检查', 'checking delivery documents')
+  const definition = () => ({
     name: 'delivery',
-    description: '交付模式文档检查：productized 无要求；project-services / managed-service 按 rules 查文档与 section（操作员命令）',
-    input: { hint: 'check <deliverables 目录名>' },
+    description: tr(
+      '交付模式文档检查：productized 无要求；project-services / managed-service 按 rules 查文档与 section（操作员命令）',
+      'Delivery mode document check: productized has no requirement; project-services / managed-service check documents and sections against their rules (operator command)',
+    ),
+    input: { hint: tr('check <deliverables 目录名>', 'check <deliverables-directory>') },
     handler: async ({ rawInput, agent }: { readonly rawInput: string, readonly agent?: CommandAgent }) => {
       const workspace = commandWorkspace(options.workspace, agent)
       if (workspace === '') {
         return {
           kind: 'error' as const,
           text: options.dataBlocked
-            ? blockedCompanyText(options.blockedReason, '交付检查')
-            : '未指定 workspace；先选 workspace 再检查。',
+            ? tr(paused.zh, paused.en)
+            : tr('未指定 workspace；先选 workspace 再检查。', 'No workspace is selected; select a workspace before checking.'),
         }
       }
-      const parsed = parseDeliveryCheck(rawInput)
+      const parsed = parseDeliveryCheck(rawInput, tr)
       if (!parsed.ok) return { kind: 'error' as const, text: parsed.text }
-      const resolved = resolveDeliverablePath(workspace, parsed.slug)
+      const resolved = resolveDeliverablePath(workspace, parsed.slug, tr)
       if (!resolved.ok) return { kind: 'error' as const, text: resolved.text }
       const { root } = resolved
       const companyRoot = join(workspace, '.dsh-company')
       const metaText = readTextInside(companyRoot, join(root, 'meta.md'))
       if (metaText === undefined) {
-        return { kind: 'error' as const, text: `缺 meta.md：${root}（交付模式写在动议户口）` }
+        return { kind: 'error' as const, text: tr(`缺 meta.md：${root}（交付模式写在动议户口）`, `Missing meta.md: ${root} (the delivery mode lives with the motion)`) }
       }
       const mode = parseDeliveryMode(metaText)
       if (mode === 'productized') {
@@ -110,29 +122,29 @@ export function registerDeliveryCommand(ctx: Context, options: DeliveryCommandOp
         return {
           kind: 'success' as const,
           text: extras.length === 0
-            ? `交付检查跳过（${parsed.slug}）：productized 无交付文档要求。`
-            : `交付检查通过（${parsed.slug}）：productized；提醒：出现 ${extras.join(' / ')}，确认交付模式是否选错。`,
+            ? tr(`交付检查跳过（${parsed.slug}）：productized 无交付文档要求。`, `Delivery check skipped (${parsed.slug}): productized has no delivery-document requirement.`)
+            : tr(`交付检查通过（${parsed.slug}）：productized；提醒：出现 ${extras.join(' / ')}，确认交付模式是否选错。`, `Delivery check passed (${parsed.slug}): productized; note that ${extras.join(' / ')} is present, so confirm the delivery mode is not wrong.`),
         }
       }
       if (options.contentDir === undefined) {
-        return { kind: 'error' as const, text: `无法读取交付模式「${mode}」的规则（contentDir 未配置）。` }
+        return { kind: 'error' as const, text: tr(`无法读取交付模式「${mode}」的规则（contentDir 未配置）。`, `Cannot read rules for delivery mode "${mode}" (contentDir is not configured).`) }
       }
       // 模式来自模型可写 meta：先做成员校验，再拼 content 路径；未知/穿越就报错，不读 workspace 规则。
       const available = availableModes(options.contentDir)
       if (!isSafeContentId(mode) || !available.includes(mode)) {
         const choices = ['productized', ...available]
-        return { kind: 'error' as const, text: `未知交付模式「${mode}」；可用：${choices.join(' / ')}` }
+        return { kind: 'error' as const, text: tr(`未知交付模式「${mode}」；可用：${choices.join(' / ')}`, `Unknown delivery mode "${mode}"; available: ${choices.join(' / ')}`) }
       }
       const rulesPath = contentMemberFile(options.contentDir, 'delivery-modes', mode, 'delivery-rules.json')
       const rulesText = rulesPath === null ? undefined : readIfExists(rulesPath)
       if (rulesText === undefined) {
-        return { kind: 'error' as const, text: `交付模式「${mode}」的 delivery-rules.json 缺失` }
+        return { kind: 'error' as const, text: tr(`交付模式「${mode}」的 delivery-rules.json 缺失`, `delivery-rules.json is missing for delivery mode "${mode}"`) }
       }
       let rules: DeliveryRules
       try {
         rules = JSON.parse(rulesText) as DeliveryRules
       } catch {
-        return { kind: 'error' as const, text: `交付规则不可解析：${rulesPath}` }
+        return { kind: 'error' as const, text: tr(`交付规则不可解析：${rulesPath}`, `Delivery rules are unparsable: ${rulesPath}`) }
       }
       const errors: string[] = []
       let docs = 0
@@ -140,31 +152,37 @@ export function registerDeliveryCommand(ctx: Context, options: DeliveryCommandOp
       for (const [key, doc] of Object.entries(rules.documents ?? {})) {
         const file = doc.file
         if (typeof file !== 'string' || !file.startsWith('drafts/')) {
-          errors.push(`${key}.file 不是 drafts/<name>.md：${String(file)}`)
+          errors.push(tr(`${key}.file 不是 drafts/<name>.md：${String(file)}`, `${key}.file is not drafts/<name>.md: ${String(file)}`))
           continue
         }
         const path = join(root, file)
         const text = readTextInside(companyRoot, path)
         if (text === undefined) {
-          errors.push(`缺 ${key}（${file}）`)
+          errors.push(tr(`缺 ${key}（${file}）`, `Missing ${key} (${file})`))
           continue
         }
         docs += 1
         for (const needle of rules.requiredSections?.[key] ?? []) {
           sections += 1
-          if (!text.includes(needle)) errors.push(`${key} 缺 section「${needle}」`)
+          if (!text.includes(needle)) errors.push(tr(`${key} 缺 section「${needle}」`, `${key} is missing section "${needle}"`))
         }
       }
       if (errors.length > 0) {
         return {
           kind: 'error' as const,
-          text: `交付检查失败（${parsed.slug}，${mode}）：\n${errors.map(error => `- ${error}`).join('\n')}`,
+          text: tr(`交付检查失败（${parsed.slug}，${mode}）：\n${errors.map(error => `- ${error}`).join('\n')}`, `Delivery check failed (${parsed.slug}, ${mode}):\n${errors.map(error => `- ${error}`).join('\n')}`),
         }
       }
       return {
         kind: 'success' as const,
-        text: `交付检查通过（${parsed.slug}）：交付模式 = ${mode}；文档 ${String(docs)} 份；section ${String(sections)} 条。`,
+        text: tr(`交付检查通过（${parsed.slug}）：交付模式 = ${mode}；文档 ${String(docs)} 份；section ${String(sections)} 条。`, `Delivery check passed (${parsed.slug}): delivery mode = ${mode}; ${String(docs)} document(s); ${String(sections)} section(s).`),
       }
     },
   })
+  let dispose = ctx.commands.register(definition())
+  if (options.language !== undefined) {
+    const unsubscribe = options.language.subscribe(() => { dispose(); dispose = ctx.commands.register(definition()) })
+    const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
+    if (typeof effect === 'function') effect.call(ctx, () => () => { unsubscribe(); dispose() })
+  }
 }

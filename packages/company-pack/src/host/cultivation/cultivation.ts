@@ -29,7 +29,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 import type {} from '@deepseek-ai/dsh-commands'
 import { join } from 'node:path'
 import {
-  contextSummary,
+  contextSummaryPair,
   decodeContextToken,
   type CultivationContext,
 } from '../../lib/cultivation/cultivation-context.ts'
@@ -133,7 +133,7 @@ function sessionFaceOf(agent: AgentLike | undefined): SessionFace | null {
  * @param companyHome - bundle 解析出的公司盘根（已 canonical）。
  * @returns 可写根；或一句给用户看的问题。
  */
-function companyScopeOf(face: SessionFace, companyHome: string | undefined): { readonly root: string; readonly problem?: string } {
+function companyScopeOf(face: SessionFace, companyHome: string | undefined): { readonly root: string; readonly problem?: string; readonly problemEn?: string } {
   const cwd = canonicalPath(face.cwd)
   if (companyHome === undefined) return { root: cwd }
   const root = canonicalPath(companyHome)
@@ -141,6 +141,7 @@ function companyScopeOf(face: SessionFace, companyHome: string | undefined): { r
   return {
     root,
     problem: `公司数据只写 bundle 的公司盘根（${root}）；当前会话 cwd 是 ${cwd}。请在侧栏以公司盘根开新会话，不要在子目录/盘外会话里培养。`,
+    problemEn: `Company data writes are limited to the bundle company root (${root}); this session cwd is ${cwd}. Open a new session at the company root in the sidebar instead of cultivating in a subdirectory or outside the root.`,
   }
 }
 
@@ -204,7 +205,7 @@ function cultivationCommandHandlerInner(config: CultivationHostConfig, storage: 
       return { kind: 'error' as const, text: t(paused.zh, paused.en) }
     }
     const scope = companyScopeOf(face, companyHome)
-    if (scope.problem !== undefined) return { kind: 'error' as const, text: scope.problem }
+    if (scope.problem !== undefined) return { kind: 'error' as const, text: t(scope.problem, scope.problemEn ?? scope.problem) }
     const { head, body } = splitBody(rawInput)
     const tokens = head.split(/\s+/).filter(t => t !== '')
     const sub = tokens[0] ?? ''
@@ -343,7 +344,7 @@ async function commandCorrectOrSuggest(
     return { kind: 'error', text: t('正文不能为空（:: 之后写做法与证据；或至少写清这次工作）。', 'The body cannot be empty (write the method and evidence after ::, or at least describe this piece of work).') }
   }
   // 落盘用的 source 是**数据**（中文可接受：它是记录内容，不是回执），回执另走 t()。
-  const source = contexts === undefined ? t('（会话内提交）', '(submitted in-session)') : contextSummary(contexts[0]!)
+  const source = contexts === undefined ? t('（会话内提交）', '(submitted in-session)') : t(contextSummaryPair(contexts[0]!).zh, contextSummaryPair(contexts[0]!).en)
   const id = storage.writeRecord(recordsDir, {
     kind: isSuggest ? 'suggestion' : 'correction',
     targetRole: targetRole!,
@@ -418,7 +419,7 @@ async function commandRevoke(command: CultivationCommandContext, tokens: readonl
     return {
       kind: 'error',
       text: t(`本 workspace 的 records 里没有引用方法 ${slug} 的采纳记录；它可能被其它 workspace 采纳（方法层是 home 级、records 是 workspace 级）。`, `No adopted record in this workspace references method ${slug}; it may have been adopted in another workspace (the method layer is home-level, records are workspace-level).`)
-        + `确认它是孤儿后再执行 /cultivation revoke ${slug} --orphan。`,
+        + t(`确认它是孤儿后再执行 /cultivation revoke ${slug} --orphan。`, `Confirm it is an orphan before running /cultivation revoke ${slug} --orphan.`),
     }
   }
   if (pendingRecords.length > 0) {
@@ -663,19 +664,27 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
       const revoked = loaded.records.filter(record => record.revokedAt !== undefined).length
       const adopted = loaded.records.filter(record => isActiveAdoptedRecord(record, face.role))
       const adoptedSlugs = new Set<string>()
-      const missing: string[] = []
-      const invalid: string[] = []
+      const missing: { readonly zh: string, readonly en: string }[] = []
+      const invalid: { readonly zh: string, readonly en: string }[] = []
       for (const record of adopted) {
         const slug = record.methodSlug
-        if (slug === undefined || slug === '') { missing.push(`${record.id}（缺 methodSlug）`); continue }
+        if (slug === undefined || slug === '') {
+          missing.push({ zh: `${record.id}（缺 methodSlug）`, en: `${record.id} (missing methodSlug)` })
+          continue
+        }
         // 非法 methodSlug 是「记录坏」，不是「方法缺失」；先按目标域校验，别把普通 Error 抛到命令面（BUG-091）。
-        if (!SLUG_RE.test(slug)) { invalid.push(`${record.id}（methodSlug ${JSON.stringify(slug)} 不合法）`); continue }
+        if (!SLUG_RE.test(slug)) {
+          invalid.push({ zh: `${record.id}（methodSlug ${JSON.stringify(slug)} 不合法）`, en: `${record.id} (invalid methodSlug ${JSON.stringify(slug)})` })
+          continue
+        }
         adoptedSlugs.add(slug)
         try {
-          if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) missing.push(`${record.id}（缺方法 ${slug}）`)
+          if (storage.readMethod(config.cultivationRoot, face.role, slug) === null) {
+            missing.push({ zh: `${record.id}（缺方法 ${slug}）`, en: `${record.id} (missing method ${slug})` })
+          }
         } catch (error) {
           if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: t(error.message, error.messageEn) }
-          missing.push(`${record.id}（读方法 ${slug} 失败：${(error as Error).message}）`)
+          missing.push({ zh: `${record.id}（读方法 ${slug} 失败：${(error as Error).message}）`, en: `${record.id} (reading method ${slug} failed: ${(error as Error).message})` })
         }
       }
       let orphans: string[] = []
@@ -685,16 +694,18 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
         if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: t(error.message, error.messageEn) }
         throw error
       }
-      const brokenNote = loaded.broken > 0 ? `；另有 ${String(loaded.broken)} 条坏记录未计入` : ''
-      const revokedNote = revoked > 0 ? `；另有 ${String(revoked)} 条已撤回记录` : ''
+      const brokenNoteZh = loaded.broken > 0 ? `；另有 ${String(loaded.broken)} 条坏记录未计入` : ''
+      const brokenNoteEn = loaded.broken > 0 ? `; ${String(loaded.broken)} malformed record(s) are not counted` : ''
+      const revokedNoteZh = revoked > 0 ? `；另有 ${String(revoked)} 条已撤回记录` : ''
+      const revokedNoteEn = revoked > 0 ? `; ${String(revoked)} revoked record(s) are not counted` : ''
       if (missing.length === 0 && orphans.length === 0 && invalid.length === 0) {
-        return { kind: 'success' as const, text: t(`${command.roleLabel(face.role)} 方法层与已采纳记录一致（${String(adopted.length)} 条）${brokenNote}${revokedNote}。`, `The ${command.roleLabel(face.role)} method layer matches the adopted records (${String(adopted.length)})${brokenNote}${revokedNote}.`) }
+        return { kind: 'success' as const, text: t(`${command.roleLabel(face.role)} 方法层与已采纳记录一致（${String(adopted.length)} 条）${brokenNoteZh}${revokedNoteZh}。`, `The ${command.roleLabel(face.role)} method layer matches the adopted records (${String(adopted.length)})${brokenNoteEn}${revokedNoteEn}.`) }
       }
       return {
         kind: 'success' as const,
         text: t(
-          `对账结果：${missing.length > 0 ? `记录缺方法 ${missing.join('、')}` : '记录与方法一一对应'}${invalid.length > 0 ? `；非法记录 ${invalid.join('、')}` : ''}${orphans.length > 0 ? `；方法无本 workspace 记录 ${orphans.join('、')}（可能属于其它 workspace；确认孤儿后再 revoke --orphan）` : ''}。只报告，不自动删改${brokenNote}${revokedNote}。`,
-          `Reconciliation: ${missing.length > 0 ? `records missing a method: ${missing.join(', ')}` : 'records and methods match one to one'}${invalid.length > 0 ? `; invalid records: ${invalid.join(', ')}` : ''}${orphans.length > 0 ? `; methods with no record in this workspace: ${orphans.join(', ')} (they may belong to another workspace; confirm orphans before revoke --orphan)` : ''}. Report only — nothing is deleted or edited${brokenNote}${revokedNote}.`,
+          `对账结果：${missing.length > 0 ? `记录缺方法 ${missing.map(item => item.zh).join('、')}` : '记录与方法一一对应'}${invalid.length > 0 ? `；非法记录 ${invalid.map(item => item.zh).join('、')}` : ''}${orphans.length > 0 ? `；方法无本 workspace 记录 ${orphans.join('、')}（可能属于其它 workspace；确认孤儿后再 revoke --orphan）` : ''}。只报告，不自动删改${brokenNoteZh}${revokedNoteZh}。`,
+          `Reconciliation: ${missing.length > 0 ? `records missing a method: ${missing.map(item => item.en).join(', ')}` : 'records and methods match one to one'}${invalid.length > 0 ? `; invalid records: ${invalid.map(item => item.en).join(', ')}` : ''}${orphans.length > 0 ? `; methods with no record in this workspace: ${orphans.join(', ')} (they may belong to another workspace; confirm orphans before revoke --orphan)` : ''}. Report only — nothing is deleted or edited${brokenNoteEn}${revokedNoteEn}.`,
         ),
       }
     
