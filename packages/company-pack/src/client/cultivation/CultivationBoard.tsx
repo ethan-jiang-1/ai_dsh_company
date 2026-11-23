@@ -110,6 +110,9 @@ export function CultivationBoard(props: CultivationBoardProps) {
 
       {viewer !== null && actions !== undefined && (
         <CultivationCompose
+          // BUG-350：按「会话 + 视角」重建表单——否则切角色后旧 targetRole 会把
+          // 自我纠正静默翻成跨角色建议，背景摘录与草稿也会跨会话串味。
+          key={`${props.currentSessionId ?? ''}:${viewer}`}
           viewerRole={viewer}
           actions={actions}
           onRefresh={props.onRefresh}

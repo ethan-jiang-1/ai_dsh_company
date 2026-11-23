@@ -8,6 +8,7 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
 import { CultivationCompose } from '../../../packages/company-pack/src/client/cultivation/CultivationCompose.tsx'
+import { CultivationBoard } from '../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx'
 import { CULTIVATION_COPY, type ActionOutcome, type CultivationActions } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
 import { decodeContextToken } from '../../../packages/company-pack/src/lib/cultivation/cultivation-context.ts'
 import type {
@@ -201,5 +202,33 @@ describe('可选背景：默认值 / 移除 / 手选 / 明说', () => {
     await click(buttonContaining(container, '收口检查'))
     await flush()
     expect(container.textContent).toContain('手动预览不可用')
+  })
+})
+
+// 负例留证 2026-11-23：去掉 CultivationBoard 上 CultivationCompose 的 key ⇒ 本用例红（切换视角后仍显示「这是给 CEO 的建议」）。BUG-350
+describe('跨会话/视角切换的表单隔离（BUG-350）', () => {
+  it('同一挂载切换 viewerRole ⇒ 表单重建，不把自我纠正翻成跨角色建议', async () => {
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    const base = {
+      viewerRole: 'ceo',
+      viewerLabel: 'CEO',
+      journalRows: [],
+      records: [],
+      feedback: null,
+      feedbackReachable: false,
+      actions: stubActions().actions,
+      currentSessionId: 'session-1',
+    }
+    act(() => { root.render(createElement(CultivationBoard, base)) })
+    mounted.push({ root, container })
+
+    await openCorrection(container)
+    expect(container.textContent).toContain(CULTIVATION_COPY.selfNote('CEO'))
+
+    act(() => { root.render(createElement(CultivationBoard, { ...base, viewerRole: 'vp-eng', viewerLabel: 'VP-Eng' })) })
+    expect(container.textContent).not.toContain('这是给 CEO 的建议')
+    expect(container.textContent).toContain(CULTIVATION_COPY.composeOpen)
   })
 })
