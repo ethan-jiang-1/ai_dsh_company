@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process'
 import { join, relative } from 'node:path'
 import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 import { parseAuditVerdict } from '../lib/repo/audit-verdict.mjs'
-import { parseMeta, slugFromDirName } from '../lib/company/deliverables.mjs'
+import { parseMeta } from '../lib/company/deliverables.mjs'
 import { buildDeliverablesCatalog, CATALOG_ROOTS } from '../lib/company/deliverables-catalog.mjs'
 
 // 测试缝（2026-10-23）：converge 的端到端探针把工作区重定向到 runtime/ 下的临时目录。
@@ -72,7 +72,7 @@ for (const root of CATALOG_ROOTS) {
     const metaPath = join(dir, item.name, 'meta.md')
     const body = existsSync(metaPath) ? readFileSync(metaPath, 'utf8') : ''
     const fields = parseMeta(body).fields
-    const slug = fields.get('slug') ?? slugFromDirName(item.name)
+    const slug = deliverableSlug(fields, item.name)
     entries.push({ root, dir: item.name, fields, final, presented: presentedSet === null ? null : presentedSet.has(slug) })
   }
 }

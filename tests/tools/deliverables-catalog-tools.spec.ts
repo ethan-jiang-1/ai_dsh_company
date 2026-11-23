@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildDeliverablesCatalog } from '../../tools/lib/company/deliverables-catalog.mjs'
+import { buildDeliverablesCatalog, deliverableSlug } from '../../tools/lib/company/deliverables-catalog.mjs'
 
 /**
  * 成品目录的 keyless 形状判据（2026-10-19 成品台账卡）。
@@ -66,5 +66,33 @@ describe('buildDeliverablesCatalog', () => {
   it('空输入给零计数，不抛', () => {
     expect(buildDeliverablesCatalog({ entries: [], ledgerSlugs: new Set(), generatedAt: 'x' }))
       .toMatchObject({ schema: 1, counts: { total: 0, active: 0, archive: 0, unledgered: 0, presented: 0, notPresented: 0, presentUnknown: 0 }, entries: [] })
+  })
+})
+
+// 负例留证 2026-11-24：把 tools 侧 slug 改回 `fields.get('slug') ?? dir` ⇒ 空 `slug:` 用例红（产出 slug ""、客户端整条丢弃）。BUG-347
+describe('tools 侧空 slug 回落（BUG-347）', () => {
+  it('缺失 / 空串 / 纯空白 slug 都回落到目录名', () => {
+    expect(deliverableSlug(new Map(), '2026-10-16-fallback')).toBe('fallback')
+    expect(deliverableSlug(new Map([['slug', '']]), '2026-10-16-fallback')).toBe('fallback')
+    expect(deliverableSlug(new Map([['slug', '   ']]), '2026-10-16-fallback')).toBe('fallback')
+  })
+
+  it('空 slug 的成品仍按回退 slug 对上台账，客户端 parseCatalog 不丢条', async () => {
+    const catalog = buildDeliverablesCatalog({
+      generatedAt: '2026-11-24T00:00:00.000Z',
+      ledgerSlugs: new Set(['fallback']),
+      entries: [{
+        root: '.dsh-company/deliverables',
+        dir: '2026-10-16-fallback',
+        fields: new Map([['slug', '  '], ['kickoff', '2026-10-16'], ['type', 'diagnostic'], ['result', 'completed']]),
+        final: true, presented: true,
+      }],
+    })
+    expect(catalog.entries[0]).toMatchObject({ slug: 'fallback', ledgered: true, presented: true })
+    const { parseCatalog } = await import('../../packages/company-pack/src/client/data/deliverables-index.ts')
+    const parsed = parseCatalog(JSON.stringify(catalog))
+    expect(parsed.skipped).toBe(0)
+    expect(parsed.entries).toHaveLength(1)
+    expect(parsed.entries[0]?.slug).toBe('fallback')
   })
 })

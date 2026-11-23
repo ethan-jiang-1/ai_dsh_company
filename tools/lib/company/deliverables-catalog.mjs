@@ -45,6 +45,17 @@ export function metaProblemsOf(fields) {
 }
 
 /**
+ * 成品 slug：`slug:` 缺失或空/空白 → 目录名（与 host `lib/deliverables` 的 `deliverableSlug` 同判据；BUG-232/347）。
+ * @param {ReadonlyMap<string,string>} fields parseMeta 的字段表
+ * @param {string} dir 成品目录名
+ * @returns {string} 生效 slug
+ */
+export function deliverableSlug(fields, dir) {
+  const raw = (fields.get('slug') ?? '').trim()
+  return raw === '' ? slugFromDirName(dir) : raw
+}
+
+/**
  * 把交付物扫描结果折成稳定目录（按 kickoff 倒序、同日起 slug 升序）。
  * @param {object} input
  * @param {ReadonlyArray<{ root: '.dsh-company/deliverables'|'.dsh-company/deliverables-archive', dir: string, fields: Map<string,string>, final: boolean, presented?: boolean|null }>} input.entries 扫描结果（fields 来自 parseMeta）
@@ -56,7 +67,7 @@ export function buildDeliverablesCatalog({ entries, ledgerSlugs, generatedAt }) 
   const rows = []
   for (const entry of entries) {
     if (!entry.final) continue
-    const slug = entry.fields.get('slug') ?? slugFromDirName(entry.dir)
+    const slug = deliverableSlug(entry.fields, entry.dir)
     const metaProblems = metaProblemsOf(entry.fields)
     rows.push({
       slug,
