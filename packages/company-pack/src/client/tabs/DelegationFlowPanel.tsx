@@ -66,7 +66,7 @@ export function DelegationFlowPanel({ tree, t = defaultT }: { readonly tree: Del
             {node.terminal === 'max-tokens' && <Tag tone="warning">{t('delegationFlow.terminal.max-tokens')}</Tag>}
             {node.terminal === 'refusal' && <Tag tone="danger">{t('delegationFlow.terminal.refusal')}</Tag>}
             {node.terminal === 'lost' && <Tag tone="danger">{t('delegationFlow.terminal.lost')}</Tag>}
-            {node.missing && <Tag tone="warning">missing</Tag>}
+            {node.missing && <Tag tone="warning">{t('delegationFlow.missing')}</Tag>}
           </li>
         ))}
       </ol>

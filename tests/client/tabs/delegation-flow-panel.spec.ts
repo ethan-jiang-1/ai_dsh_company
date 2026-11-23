@@ -4,6 +4,8 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { DelegationFlowPanel } from '../../../packages/company-pack/src/client/tabs/DelegationFlowPanel.tsx'
 import { buildDelegationTree } from '../../../packages/company-pack/src/lib/delegation/delegation-tree.ts'
+import { en, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
+import { assertEnglishUiClean } from '../../support/i18n-assertions.ts'
 
 const tree = buildDelegationTree({
   byId: {
@@ -42,5 +44,24 @@ describe('DelegationFlowPanel', () => {
     const html = renderToStaticMarkup(createElement(DelegationFlowPanel, { tree: buildDelegationTree({ byId: {} }, 'root') }))
     expect(html).toContain('当前会话还没有委派记录')
     expect(html).not.toContain('data-company-delegation="flow"')
+  })
+})
+
+// 负例留证 2026-11-23：把 missing 标签改回硬编码英文 ⇒ 中文用例红（BUG-337）。
+describe('DelegationFlowPanel 的缺失标签（BUG-337）', () => {
+  const missingTree = buildDelegationTree({
+    byId: { root: { displayTitle: 'Lead', projectionValues: { subagentCatalog: [{ id: 'gone', label: 'vp-eng', mode: 'one-shot' }] } } },
+  }, 'root')
+  const tEn = ((key: keyof typeof en, params?: Record<string, string | number>) => {
+    const template = en[key]
+    return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+  }) as CompanyT
+
+  it('zh 渲染「缺失」，en 渲染 missing', () => {
+    const zhHtml = renderToStaticMarkup(createElement(DelegationFlowPanel, { tree: missingTree }))
+    expect(zhHtml).toContain('缺失')
+    const enHtml = renderToStaticMarkup(createElement(DelegationFlowPanel, { tree: missingTree, t: tEn }))
+    expect(enHtml).toContain('>missing<')
+    assertEnglishUiClean(enHtml)
   })
 })
