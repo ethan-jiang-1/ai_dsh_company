@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-345**（2026-11-23，质量防线批顺位 2 / P2）：`acquireCompanyLease` 抽出共享 `releaseLease` 与幂等 `makeRelease`，修复重入按 `first→second` 顺序释放泄漏心跳定时器——
+  [345](BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md)。证据提交 `40a751cc`。
+
 - **BUG-341**（2026-11-23，质量防线批顺位 1 / P1）：`registerSidebarIdentity` 通过 `scoped.effect` 订阅 `sessions.list` 解决冷启动漏加载，`parseCompanyIdentity` 复用 `yamlScalar` 避免出厂 `productName: ''` 渲染成 `''`——
   [341](BUG-341-cold-boot-company-identity-skipped-and-quoted-empty-product-name.md)。证据提交 `1b48e829`。
 

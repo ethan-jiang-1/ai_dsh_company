@@ -1,22 +1,22 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-23
 ---
 
 # BUG-345：`acquireCompanyLease` 重入分支 `release()` 漏掉 `clearInterval`，主持有先释放时心跳定时器永久泄漏
 
-> 严重级别：P2（资源/定时器泄漏：同进程内若先由首次持有方释放再由重入方最后释放，30s 心跳 `setInterval` 永远不清理）｜发现：2026-11-23｜状态：调查中
+> 严重级别：P2（资源/定时器泄漏：同进程内若先由首次持有方释放再由重入方最后释放，30s 心跳 `setInterval` 永远不清理）｜发现：2026-11-23｜状态：已修｜审查：agent — 逐条核对已修判定（抽出共享 `releaseLease` 与幂等 `makeRelease`）
 >
-> **留痕**：（待修复时裁决；可走机械修复）
+> **留痕**：commit 40a751cc（内部重入释放定时器清理，非材料性）。
 
 ## 症状
 
-同一 `dshHome` 在同进程内被 [`acquireCompanyLease`](../../packages/company-pack/src/host/run-bundle/lease.ts#L91-L143) 连续获取两次（`first`、`second`）且释放顺序为 `first.release()` → `second.release()` 时，`held` 表与磁盘 `.lock` 文件都被清理，但首次获取时启动的 `LEASE_HEARTBEAT_MS`（30s）`setInterval` **从未被 `clearInterval`**，持续在进程内每 30 秒尝试读取锁文件并在发现文件消失后再次调用 `blockCompanyWrites(...)`。
+同一 `dshHome` 在同进程内被 [`acquireCompanyLease`](../../../packages/company-pack/src/host/run-bundle/lease.ts#L91-L143) 连续获取两次（`first`、`second`）且释放顺序为 `first.release()` → `second.release()` 时，`held` 表与磁盘 `.lock` 文件都被清理，但首次获取时启动的 `LEASE_HEARTBEAT_MS`（30s）`setInterval` **从未被 `clearInterval`**，持续在进程内每 30 秒尝试读取锁文件并在发现文件消失后再次调用 `blockCompanyWrites(...)`。
 
 ## 运行面
 
-- **面 = host**：[`packages/company-pack/src/host/run-bundle/lease.ts`](../../packages/company-pack/src/host/run-bundle/lease.ts#L94-L143)。
+- **面 = host**：[`packages/company-pack/src/host/run-bundle/lease.ts`](../../../packages/company-pack/src/host/run-bundle/lease.ts#L94-L143)。
 
 ## 复现
 
@@ -57,3 +57,10 @@ console.log({ cleared });
 ## 已修判定
 
 - 重入 `acquireCompanyLease` 无论按 `a→b` 还是 `b→a` 顺序释放，`clearInterval` 均恰好触发 1 次，且后续不会有残留心跳误触发 `blockCompanyWrites`。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/run-bundle/lease.ts`、`tests/host/run-bundle/lease.spec.ts`
+- 红：`pnpm test tests/host/run-bundle/lease.spec.ts` —— 修复前 1 failed / 8 passed（`first→second` 释放顺序下 `clearInterval` 调用次数为 `0`）
+- 绿：`pnpm test tests/host/run-bundle/lease.spec.ts` —— 9/9 passed（`first→second` 释放顺序下 `clearInterval` 恰好触发 1 次且锁文件删除）
+- 提交：commit 40a751cc
