@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-346**（2026-11-23，质量防线批顺位 2 / P2）：`presented-domain` 为 `ensureLedger`/`recordLedger`/`auditLedger` 增加按 store 实例的 Promise 串行队列，并为 `fileStore` 临时文件补充 `randomUUID()`——
+  [346](BUG-346-presented-ledger-concurrent-write-lost-update.md)。证据提交 `bbb13b8d`。
+
 - **BUG-345**（2026-11-23，质量防线批顺位 2 / P2）：`acquireCompanyLease` 抽出共享 `releaseLease` 与幂等 `makeRelease`，修复重入按 `first→second` 顺序释放泄漏心跳定时器——
   [345](BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md)。证据提交 `40a751cc`。
 
