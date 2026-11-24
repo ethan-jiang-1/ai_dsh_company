@@ -376,7 +376,7 @@
 | 363 | 2026-11-24 | tests/client/wiring/error-ring.spec.ts:176 |
 | 364 | 2026-11-24 | tests/client/wiring/instance-guard.spec.ts:84 |
 | 365 | 2026-11-24 | tests/client/data/company-stream.spec.ts:9 |
-| 366 | 2026-11-24 | tests/client/cultivation/cultivation-context-data.spec.ts:159；tests/client/cultivation/cultivation-context-data.spec.ts:223；tests/client/cultivation/cultivation-context-picker.spec.ts:70；tests/client/wiring/company-context-wiring.spec.ts:112 |
+| 366 | 2026-11-24 | tests/client/cultivation/cultivation-context-data.spec.ts:159；tests/client/cultivation/cultivation-context-data.spec.ts:223；tests/client/cultivation/cultivation-context-picker.spec.ts:72；tests/client/wiring/company-context-wiring.spec.ts:114 |
 | 367 | 2026-11-24 | tests/host/commands/signoff-language.spec.ts:25；tests/host/commands/signoff-language.spec.ts:45；tests/host/commands/signoff-language.spec.ts:55；tests/lib/accounting/signoff.spec.ts:38 |
 | 368 | 2026-11-24 | tests/client/ui/brand.spec.ts:40；tests/lib/docs/yaml-scalar.spec.ts:27 |
 | 369 | 2026-11-24 | tests/host/workspace/workspace-doors.spec.ts:86；tests/host/workspace/workspace-doors.spec.ts:106；tests/lib/presence/doors.spec.ts:41；tests/lib/presence/doors.spec.ts:54；tests/lib/presence/doors.spec.ts:75 |
