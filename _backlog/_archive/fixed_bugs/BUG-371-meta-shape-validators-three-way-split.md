@@ -27,7 +27,7 @@ opened: 2026-11-24
 
 ## 运行面
 
-- **面 = lib + tools**：[`deliverables-catalog.ts`](../../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts#L100-L114)、[`deliverables.mjs`](../../../tools/lib/company/deliverables.mjs#L118-L140)、[`deliverables-audit.mjs`](../../checks/lib/deliverables-audit.mjs#L196-L205)。
+- **面 = lib + tools**：[`deliverables-catalog.ts`](../../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts#L100-L114)、[`deliverables.mjs`](../../../tools/lib/company/deliverables.mjs#L118-L140)、[`deliverables-audit.mjs`](../../../checks/lib/deliverables-audit.mjs#L196-L205)。
 
 ## 复现
 
@@ -67,5 +67,5 @@ for (const [k, body] of Object.entries(cases)) console.log(k, 'panel=', JSON.str
 
 - 改动面：`packages/company-pack/src/lib/deliverables/deliverables-catalog.ts`、`tools/lib/company/deliverables-catalog.mjs`、`tools/lib/company/deliverables.mjs`、`tests/tools/meta-shape-parity.spec.ts`、`tests/lib/shared/parsers-fuzz.property.spec.ts`、`tests/tools/deliverables-catalog-tools.spec.ts`
 - 红：`pnpm test tests/tools/meta-shape-parity.spec.ts tests/lib/shared/parsers-fuzz.property.spec.ts` —— 还原三处判据前 5 failed（缺 slug/日期前缀/空 result 结论相反）
-- 绿：`pnpm test tests/tools/meta-shape-parity.spec.ts` —— 10/10 passed（面板 / 孪生 / 审计逐字相等；result 留空与缺行都合法）
+- 绿：`pnpm test tests/tools/meta-shape-parity.spec.ts tests/lib/shared/parsers-fuzz.property.spec.ts` —— 10/10 passed（面板 / 孪生 / 审计逐字相等；result 留空与缺行都合法）
 - 提交：commit 7d81872c
