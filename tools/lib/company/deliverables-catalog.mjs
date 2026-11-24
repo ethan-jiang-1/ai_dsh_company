@@ -8,7 +8,10 @@
 // - `ledgered` = slug 能在 `kb/motion-ledger.md` 找到；false 的成品在面板上标「台账外」。
 // - 只做**派生视图**：不新建第二份手写事实；跑生成器即可重建。
 import { splitTableRow } from './markdown-table.mjs'
-import { META_RESULTS, META_TYPES, slugFromDirName } from './deliverables.mjs'
+import { META_RESULTS, META_TYPES, metaProblemsOf, slugFromDirName } from './deliverables.mjs'
+
+// 形状判据唯一实现住 deliverables.mjs（与 validateMeta 同文件），本模块只再导出（BUG-371/dedup）。
+export { metaProblemsOf }
 
 /** 目录条目的根（活跃 / 归档）。 */
 export const CATALOG_ROOTS = ['.dsh-company/deliverables', '.dsh-company/deliverables-archive']
@@ -29,28 +32,6 @@ export const CATALOG_ROOTS = ['.dsh-company/deliverables', '.dsh-company/deliver
  * @property {string|null} metaProblem meta 形状问题（null = 通过）
  */
 
-/**
- * meta 形状检查（与 TS `metaProblemsOf` 同判据；BUG-371）。
- * `kickoff`/`type` 缺失或空 = 缺行；`result` 可留空；`slug` 可省，但日期前缀形式判红。
- * @param {ReadonlyMap<string,string>} fields
- * @returns {string[]}
- */
-export function metaProblemsOf(fields) {
-  const problems = []
-  for (const key of ['kickoff', 'type']) {
-    const raw = fields.get(key)
-    if (raw === undefined || raw.trim() === '') problems.push(`缺行「${key}:」`)
-  }
-  const kickoff = (fields.get('kickoff') ?? '').trim()
-  if (kickoff !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(kickoff)) problems.push(`kickoff 不是 YYYY-MM-DD：「${kickoff}」`)
-  const type = (fields.get('type') ?? '').trim()
-  if (type !== '' && !META_TYPES.includes(type)) problems.push(`type 不在词表：「${type}」`)
-  const result = (fields.get('result') ?? '').trim()
-  if (result !== '' && !META_RESULTS.includes(result)) problems.push(`result 不在词表：「${result}」`)
-  const slug = (fields.get('slug') ?? '').trim()
-  if (slug !== '' && /^\d{4}-\d{2}-\d{2}-/.test(slug)) problems.push('slug 字段写剥前缀形式（不带日期前缀——日期住 kickoff 字段）')
-  return problems
-}
 /**
  * 成品 slug：`slug:` 缺失或空/空白 → 目录名（与 host `lib/deliverables` 的 `deliverableSlug` 同判据；BUG-232/347）。
  * @param {ReadonlyMap<string,string>} fields parseMeta 的字段表
