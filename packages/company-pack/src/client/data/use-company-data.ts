@@ -21,6 +21,7 @@ import type {} from '@deepseek-ai/dsh-token-meter/client'
 // 时 `useSessions` 的 store 快照与本地 SessionsStoreLike 结构不兼容（2026-11-03 client test project 现场）。
 import type {} from '@deepseek-ai/dsh-experimental-agent-team/client'
 import { takeBounded } from '../../lib/shared/bounded.ts'
+import { applyStreamFrame, EMPTY_STREAM_WINDOW, type StreamWindow } from './company-stream.ts'
 import { boardColumns, tasksFromTeamView, type BoardColumn, type TaskRow } from '../../lib/presence/board.ts'
 import { budgetSummary, type BudgetSummary } from '../../lib/accounting/budget.ts'
 import { layoutDag, type DagLayout } from '../../lib/presence/dag.ts'
@@ -31,7 +32,6 @@ import {
   rowsFromTeamView,
   type ActivityEntry,
   type PresenceRow,
-  type TeamEventLike,
   type TeamStreamFrame,
   type TeamViewLike,
 } from '../../lib/presence/presence.ts'
@@ -99,7 +99,8 @@ export function useCompanyData(
 ): CompanyData {
   const { follow, leadOf } = injected
   const stream = options.stream === true
-  const [events, setEvents] = useState<readonly TeamEventLike[]>([])
+  const [streamWindow, setStreamWindow] = useState<StreamWindow>(EMPTY_STREAM_WINDOW)
+  const events = streamWindow.items
   const [streamError, setStreamError] = useState<string | null>(null)
 
   // team 态：Lead 会话的 Host 投影（0.1.7 官方读法；投影帧保持最新，故无轮询）。
@@ -117,13 +118,13 @@ export function useCompanyData(
   useEffect(() => {
     if (!stream) return
     const controller = new AbortController()
-    setEvents([])
+    setStreamWindow(EMPTY_STREAM_WINDOW)
     setStreamError(null)
     void (async () => {
       try {
         for await (const frame of follow(sessionId, controller.signal)) {
           if (controller.signal.aborted) return
-          setEvents(prev => (frame.kind === 'history' ? frame.events : [...prev, frame.event]))
+          setStreamWindow(prev => applyStreamFrame(prev, frame))
         }
       } catch (cause) {
         if (!controller.signal.aborted) {
@@ -139,6 +140,8 @@ export function useCompanyData(
     [events, names, stream],
   )
   const activity = useMemo(() => activityBounded.items.slice().reverse(), [activityBounded])
+  // 窗口外还有多少条更早动态：数据窗口丢弃 + 展示窗口截断（BUG-365 的 capped 语义）。
+  const eventsCapped = streamWindow.dropped
 
   // 任务板/看板/依赖图消费同一视图：用 follow 流里的 team/task 补齐可能过期的 agentTeam 投影。
   const effectiveTeam = useMemo(() => teamWithEventTasks(team, stream ? events : []), [team, events, stream])
@@ -150,5 +153,5 @@ export function useCompanyData(
   const stats = useProjection('sessionStats')
   const summary = useMemo(() => budgetSummary(usage, stats), [usage, stats])
 
-  return { team: effectiveTeam, tasks, columns, dag, rows, activity, activityCapped: activityBounded.capped, summary, error, streamError }
+  return { team: effectiveTeam, tasks, columns, dag, rows, activity, activityCapped: activityBounded.capped + eventsCapped, summary, error, streamError }
 }
