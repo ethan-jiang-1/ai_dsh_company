@@ -6,6 +6,8 @@
 - [BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md](fixed_bugs/BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md) — `acquireCompanyLease` 抽出共享 `releaseLease` 与幂等 `makeRelease`，修复重入 `first→second` 释放泄漏心跳定时器。
 - [BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md](fixed_bugs/BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md) — `subagent_retry` 在 `startActivation` 被取消时按 `childIds.length` 返回 `attempts`，消除 `attempts: 0` 与 `childIds` 矛盾。
 - [BUG-346-presented-ledger-concurrent-write-lost-update.md](fixed_bugs/BUG-346-presented-ledger-concurrent-write-lost-update.md) — `presented-domain` 为 `ensureLedger`/`recordLedger`/`auditLedger` 增加按 store 维度的 Promise 串行队列并给 `fileStore` 临时文件补充 `randomUUID()`。
+- [BUG-354-presence-activity-unassigned-owner-leaks-chinese-in-en.md](fixed_bugs/BUG-354-presence-activity-unassigned-owner-leaks-chinese-in-en.md) — 无负责人动态 token 化。
+- [BUG-358-board-unassigned-label-chinese-in-en-and-missing-role-label.md](fixed_bugs/BUG-358-board-unassigned-label-chinese-in-en-and-missing-role-label.md) — 看板 ownerLabel 归 null + roleLabel。
 - [BUG-351-method-skill-text-unescaped-yaml-description.md](fixed_bugs/BUG-351-method-skill-text-unescaped-yaml-description.md) — 方法 SKILL.md description 编码 + 采纳前自检。
 - [BUG-353-converge-and-journal-audit-broken-on-v3-dot-dsh-company.md](fixed_bugs/BUG-353-converge-and-journal-audit-broken-on-v3-dot-dsh-company.md) — converge/journal-audit 迁 v3 双根，索引生成器导入补齐。
 - [BUG-340-static-audit-r1-r2-bypass-gaps.md](fixed_bugs/BUG-340-static-audit-r1-r2-bypass-gaps.md) — 静态审计六条绕过缝隙补齐，host 纳入 CJK 棘轮、字典独立成件。

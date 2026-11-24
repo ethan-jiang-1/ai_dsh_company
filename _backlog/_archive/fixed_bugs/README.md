@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-354**（2026-11-24，351..359 批顺位 3 / P2）：无负责人任务迁移改用 `...Unassigned` 专用 token，en 输出 `Unassigned claimed/completed`——
+  [354](BUG-354-presence-activity-unassigned-owner-leaks-chinese-in-en.md)。证据提交 `39e5acab`。
+- **BUG-358**（2026-11-24，351..359 批顺位 3 / P2）：看板 `ownerLabel` 改 null、由 `t('tasks.unassigned')` 渲染，`BoardTab` 补 `roleLabel`——
+  [358](BUG-358-board-unassigned-label-chinese-in-en-and-missing-role-label.md)。证据提交 `9c27cb8c`。
+
 - **BUG-351**（2026-11-24，351..359 批顺位 2 / P1）：方法 `SKILL.md` 的 `description` 用 JSON/YAML 双引号标量编码，采纳前用 `methodSkillProblem` 自检 frontmatter，坏产物拒绝 adopted——
   [351](BUG-351-method-skill-text-unescaped-yaml-description.md)。证据提交 `b781937f`。
 
