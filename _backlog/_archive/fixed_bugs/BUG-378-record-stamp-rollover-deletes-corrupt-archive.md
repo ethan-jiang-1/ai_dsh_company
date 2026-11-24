@@ -1,18 +1,18 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-378：`recordStampOf` 把越界日期「进位」成合法时间戳——`/cultivation purge` 会删掉文件名时间戳损坏的归档记录
 
-> 严重级别：P2（数据销毁：`recordStampOf` 只做形状正则，随后 `new Date(y, mo-1, d, h, mi, s)` 会把 `20260000-…`（月 00 日 00）、`20261361-…`（月 13 日 61）这类**不存在的日期**自动进位成合法时间。`purgeArchiveFiles` 与 `commandArchive` 用它决定「是否早于 cutoff」：进位到过去的坏文件名会被**直接删除**（purge）或被归档（archive），而两条命令的回执都写着「时间戳不识别的记录保持原样」）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（数据销毁：`recordStampOf` 只做形状正则，随后 `new Date(y, mo-1, d, h, mi, s)` 会把 `20260000-…`（月 00 日 00）、`20261361-…`（月 13 日 61）这类**不存在的日期**自动进位成合法时间。`purgeArchiveFiles` 与 `commandArchive` 用它决定「是否早于 cutoff」：进位到过去的坏文件名会被**直接删除**（purge）或被归档（archive），而两条命令的回执都写着「时间戳不识别的记录保持原样」）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（往返校验 + purge 真入口）
 >
-> **留痕**：（待修复时裁决）
+> **留痕**：Note [2026-11-24-degrade-and-structure-batch](../../../notes/implemented/2026-11-24-degrade-and-structure-batch.md)（批次 377..383：时间戳往返校验）
 
 ## 症状
 
-[`recordStampOf`](../../packages/company-pack/src/lib/cultivation/cultivation-record.ts#L245-L253)：
+[`recordStampOf`](../../../packages/company-pack/src/lib/cultivation/cultivation-record.ts#L245-L253)：
 
 ```ts
 const match = /^(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})-/.exec(id)
@@ -25,7 +25,7 @@ return Number.isNaN(at) ? null : at
 
 ## 运行面
 
-- **面 = lib + host**：[`cultivation-record.ts`](../../packages/company-pack/src/lib/cultivation/cultivation-record.ts#L245-L253) 的 `recordStampOf`；消费方 [`cultivation-storage.ts purgeArchiveFiles`](../../packages/company-pack/src/host/cultivation/cultivation-storage.ts#L390-L408) 与 [`cultivation.ts commandArchive`](../../packages/company-pack/src/host/cultivation/cultivation.ts#L655-L680)。
+- **面 = lib + host**：[`cultivation-record.ts`](../../../packages/company-pack/src/lib/cultivation/cultivation-record.ts#L245-L253) 的 `recordStampOf`；消费方 [`cultivation-storage.ts purgeArchiveFiles`](../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts#L390-L408) 与 [`cultivation.ts commandArchive`](../../../packages/company-pack/src/host/cultivation/cultivation.ts#L655-L680)。
 
 ## 复现
 
@@ -48,7 +48,7 @@ rmSync(root, { recursive: true, force: true });
 
 ## 根因与证据
 
-1. `Number.isNaN(at)` 只能挡住「Date 无法解析」，挡不住「Date 把它进位了」；本仓其它日期判据早已用往返比较（[`isCalendarDate`](../../packages/company-pack/src/lib/docs/prd-check.ts#L319-L326)：「`2026-13-99` 往返串不相等即判非法」，成因 = BUG-166）。
+1. `Number.isNaN(at)` 只能挡住「Date 无法解析」，挡不住「Date 把它进位了」；本仓其它日期判据早已用往返比较（[`isCalendarDate`](../../../packages/company-pack/src/lib/docs/prd-check.ts#L319-L326)：「`2026-13-99` 往返串不相等即判非法」，成因 = BUG-166）。
 2. `commandPurge` 的回执文案写「时间戳不识别的记录保持原样」——实现与回执相反。
 
 ## 失败类与同类排查
@@ -65,3 +65,10 @@ rmSync(root, { recursive: true, force: true });
 - `recordStampOf('20260000-000000-x')`、`recordStampOf('20261361-990000-x')` 均返回 `null`；`recordStampOf('20261120-153000-abcd')` 仍返回原值；
 - 上述复现里 `removed = 0`、文件仍在，且回执把它算进「未动」；
 - 新增表驱动用例（合法/月越界/日越界/时越界/非数字）。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/cultivation/cultivation-record.ts`、`tests/lib/cultivation/cultivation.spec.ts`、`tests/host/cultivation/cultivation-maintenance.spec.ts`
+- 红：`pnpm test tests/lib/cultivation/cultivation.spec.ts tests/host/cultivation/cultivation-maintenance.spec.ts` —— 还原前 2 failed（坏日期被进位、purge 误删）
+- 绿：`pnpm test tests/lib/cultivation/cultivation.spec.ts tests/host/cultivation/cultivation-maintenance.spec.ts` —— 全绿（坏 stamp 返回 null、purge 不动）
+- 提交：commit db1fbb11

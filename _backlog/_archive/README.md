@@ -16,6 +16,9 @@
 - [BUG-365-company-data-unbounded-event-accumulation.md](fixed_bugs/BUG-365-company-data-unbounded-event-accumulation.md) — follow 事件数据层有界。
 - [BUG-366-context-candidates-fail-open-on-unknown-cwd.md](fixed_bugs/BUG-366-context-candidates-fail-open-on-unknown-cwd.md) — 背景候选未知 cwd fail-closed。
 - [BUG-371-meta-shape-validators-three-way-split.md](fixed_bugs/BUG-371-meta-shape-validators-three-way-split.md) — meta 形状单一判据（result 可空）。
+- [BUG-377-gov-export-drops-ledger-snapshot-on-missing.md](fixed_bugs/BUG-377-gov-export-drops-ledger-snapshot-on-missing.md) — 导出快照按 missing 沿用。
+- [BUG-378-record-stamp-rollover-deletes-corrupt-archive.md](fixed_bugs/BUG-378-record-stamp-rollover-deletes-corrupt-archive.md) — 时间戳往返校验。
+- [BUG-379-load-records-throws-on-unreadable-file.md](fixed_bugs/BUG-379-load-records-throws-on-unreadable-file.md) — 单文件读取降级。
 - [BUG-373-delivery-check-required-sections-substring-only.md](fixed_bugs/BUG-373-delivery-check-required-sections-substring-only.md) — 必填小节结构行判据。
 - [BUG-372-diff-activity-shows-raw-lead-owner.md](fixed_bugs/BUG-372-diff-activity-shows-raw-lead-owner.md) — CEO 身份单一映射。
 - [BUG-376-replay-lead-row-loses-current-tasks.md](fixed_bugs/BUG-376-replay-lead-row-loses-current-tasks.md) — 回放 CEO 行与 live 同口径。

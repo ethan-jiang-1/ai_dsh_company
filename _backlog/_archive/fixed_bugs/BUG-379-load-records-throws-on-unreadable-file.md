@@ -1,18 +1,18 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-379：`loadRecords` 遇到不可读的记录文件直接抛 `EACCES`，`/cultivation check` 与 `archive` 整条命令崩掉（`broken` 计数形同虚设）
 
-> 严重级别：P2（容错边界：`loadRecords` 的返回值里专门有 `broken` 计数，注释与命令回执都说「另有 N 条坏记录未计入」；但每个文件只有 `parseRecord` 失败才算 broken，`readFileSync` 抛错（权限/IO）会**穿透**整个函数。命令 handler 只捕获 `UnsafeCultivationPathError`/`CompanyWriteBlockedError`，其余原样重抛 ⇒ 一个 chmod 000 的记录文件就让 `/cultivation check`、`/cultivation archive` 直接失败，而不是报「1 条坏记录」）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（容错边界：`loadRecords` 的返回值里专门有 `broken` 计数，注释与命令回执都说「另有 N 条坏记录未计入」；但每个文件只有 `parseRecord` 失败才算 broken，`readFileSync` 抛错（权限/IO）会**穿透**整个函数。命令 handler 只捕获 `UnsafeCultivationPathError`/`CompanyWriteBlockedError`，其余原样重抛 ⇒ 一个 chmod 000 的记录文件就让 `/cultivation check`、`/cultivation archive` 直接失败，而不是报「1 条坏记录」）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（单文件降级）
 >
-> **留痕**：（待修复时裁决）
+> **留痕**：Note [2026-11-24-degrade-and-structure-batch](../../../notes/implemented/2026-11-24-degrade-and-structure-batch.md)（批次 377..383：单文件读取降级）
 
 ## 症状
 
-[`loadRecords`](../../packages/company-pack/src/host/cultivation/cultivation-storage.ts#L270-L290)：
+[`loadRecords`](../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts#L270-L290)：
 
 ```ts
 const record = parseRecord(id, readFileSync(path, 'utf8'))
@@ -20,11 +20,11 @@ if (record === null) broken++
 else records.push(record)
 ```
 
-`readFileSync` 没有 try。同仓对「不可读」的既有口径是降级成 warning + 计数（见 [`catalog.ts`](../../packages/company-pack/src/host/ledger/catalog.ts#L75-L96) 的 BUG-238/239：「不可读的 final/meta 必须降级成 warning，不能整盘抛」）。
+`readFileSync` 没有 try。同仓对「不可读」的既有口径是降级成 warning + 计数（见 [`catalog.ts`](../../../packages/company-pack/src/host/ledger/catalog.ts#L75-L96) 的 BUG-238/239：「不可读的 final/meta 必须降级成 warning，不能整盘抛」）。
 
 ## 运行面
 
-- **面 = host**：[`cultivation-storage.ts`](../../packages/company-pack/src/host/cultivation/cultivation-storage.ts#L270-L290)；消费方 [`cultivation.ts`](../../packages/company-pack/src/host/cultivation/cultivation.ts) 的 `commandCheck` / `commandArchive`（handler 见 [cultivationCommandHandler](../../packages/company-pack/src/host/cultivation/cultivation.ts#L800-L820)）。
+- **面 = host**：[`cultivation-storage.ts`](../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts#L270-L290)；消费方 [`cultivation.ts`](../../../packages/company-pack/src/host/cultivation/cultivation.ts) 的 `commandCheck` / `commandArchive`（handler 见 [cultivationCommandHandler](../../../packages/company-pack/src/host/cultivation/cultivation.ts#L800-L820)）。
 
 ## 复现
 
@@ -65,3 +65,10 @@ chmodSync(join(dir, '20261120-160000-bbbb.md'), 0o644); rmSync(root, { recursive
 - 上述复现返回 `records.length === 1`、`broken === 1`（或 `unreadable === 1`），不抛；
 - 一个记录文件都读不到时 `/cultivation check` 返回结构化回执（不崩）；
 - 新增 host 用例覆盖不可读文件（旧实现红、新实现绿）。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/cultivation/cultivation-storage.ts`、`tests/host/cultivation/cultivation-maintenance.spec.ts`
+- 红：`pnpm test tests/host/cultivation/cultivation-maintenance.spec.ts` —— 还原前 1 failed（EACCES 穿透）
+- 绿：`pnpm test tests/host/cultivation/cultivation-maintenance.spec.ts` —— 全绿（不可读计 broken、check 成功）
+- 提交：commit db1fbb11

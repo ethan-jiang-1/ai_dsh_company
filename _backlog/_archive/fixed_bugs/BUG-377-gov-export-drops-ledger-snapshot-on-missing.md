@@ -1,18 +1,18 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-377：账本源报 `missing` 时 `exportGovernance` 会静默删掉上一份可用的 `exports/ledger.json`（零告警）
 
-> 严重级别：P2（快照静默丢失：导出目录整体替换，只有在 `status === 'ok'` 或 `corrupt/unsupported` 时才写/复制 `ledger.json`；`missing` 分支什么都不做 ⇒ 新 staging 里没有这个文件 ⇒ 替换后**上一份可用快照被删**，且 `warnings` 为空、调用方无从得知）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（快照静默丢失：导出目录整体替换，只有在 `status === 'ok'` 或 `corrupt/unsupported` 时才写/复制 `ledger.json`；`missing` 分支什么都不做 ⇒ 新 staging 里没有这个文件 ⇒ 替换后**上一份可用快照被删**，且 `warnings` 为空、调用方无从得知）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（五态组合）
 >
-> **留痕**：（待修复时裁决）
+> **留痕**：Note [2026-11-24-degrade-and-structure-batch](../../../notes/implemented/2026-11-24-degrade-and-structure-batch.md)（批次 377..383：导出快照保留）
 
 ## 症状
 
-[`exportGovernance`](../../packages/company-pack/src/host/ledger/governance-export.ts#L115-L143)：
+[`exportGovernance`](../../../packages/company-pack/src/host/ledger/governance-export.ts#L115-L143)：
 
 ```ts
 if (options.ledger === undefined) { try { cpSync(旧 exports/ledger.json) } catch {} }
@@ -28,7 +28,7 @@ else {
 
 ## 运行面
 
-- **面 = host**：[`packages/company-pack/src/host/ledger/governance-export.ts`](../../packages/company-pack/src/host/ledger/governance-export.ts#L88-L152)。
+- **面 = host**：[`packages/company-pack/src/host/ledger/governance-export.ts`](../../../packages/company-pack/src/host/ledger/governance-export.ts#L88-L152)。
 
 ## 复现
 
@@ -69,3 +69,10 @@ rmSync(root, { recursive: true, force: true });
 - 上述复现里 `ledgerJsonSurvived === true` 且 `warnings` 含一句可读说明；
 - 真正「从未导出过」的场景（无旧文件）仍不产生文件、不告警；
 - 新增 host 用例覆盖 `ok / corrupt / unsupported / missing / 无旧快照` 五种组合。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/ledger/governance-export.ts`、`tests/host/ledger/governance-export.spec.ts`
+- 红：`pnpm test tests/host/ledger/governance-export.spec.ts` —— 还原前 1 failed（missing 后旧快照消失）
+- 绿：`pnpm test tests/host/ledger/governance-export.spec.ts` —— 全绿（有旧快照沿用+告警；无旧快照静默）
+- 提交：commit db1fbb11

@@ -8,13 +8,10 @@
 
 ## 活跃清单
 
-**活跃 7 张（2026-11-24 第八轮构造场景探查新立，只报不修）**：
+**活跃 4 张（2026-11-24 第八轮构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
-| [BUG-377](BUG-377-gov-export-drops-ledger-snapshot-on-missing.md) | P2 | host | 账本源报 `missing` 时 `exportGovernance` 静默删掉上一份 `exports/ledger.json`（零告警） | 调查中 |
-| [BUG-378](BUG-378-record-stamp-rollover-deletes-corrupt-archive.md) | P2 | lib + host | `recordStampOf` 把越界日期进位成合法时间戳，`/cultivation purge` 会删掉文件名时间戳损坏的归档记录 | 调查中 |
-| [BUG-379](BUG-379-load-records-throws-on-unreadable-file.md) | P2 | host | `loadRecords` 遇不可读记录直接抛 `EACCES`，`/cultivation check`/`archive` 整条命令崩（`broken` 计数失效） | 调查中 |
 | [BUG-380](BUG-380-required-sections-heading-level-mismatch.md) | P2 | host + lib | `/delivery check` 声称支持 `#`–`######` 必填小节，实现只认 `##`——三级标题 needle 永远判缺 | 调查中 |
 | [BUG-381](BUG-381-tools-meta-parsers-fence-blind.md) | P2 | tools | 收敛/审计链仍各自解析 `meta.md` 且不感知围栏——样例 `closed:` 让未收口动议被判「已收口」 | 调查中 |
 | [BUG-382](BUG-382-retired-word-scan-fence-blind.md) | P2 | lib | `/req check` 退役词与区间计数是裸全文扫描，围栏/行内代码里引用退役号即判红并挡住交付 | 调查中 |
@@ -30,7 +27,7 @@
 
 | 顺位 | 组 / 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
 |---|---|---|---|---|
-| **1 降级而非毁掉/崩溃** | [377](BUG-377-gov-export-drops-ledger-snapshot-on-missing.md) + [378](BUG-378-record-stamp-rollover-deletes-corrupt-archive.md) + [379](BUG-379-load-records-throws-on-unreadable-file.md) | 整目录替换把「源缺失」当「目标应为空」；坏日期被 Date 进位成合法时间；单文件读失败穿透整盘 | 377：`missing` 与 `corrupt` 同处理（沿用旧快照 + warning，无旧快照才静默）；378：`recordStampOf` 加日期往返校验，坏 timestamp 返回 null（purge/archive 跳过）；379：`loadRecords` 包 try、读失败计 `broken`（或 `unreadable`）不抛；三卡各自红→绿 + 真入口用例 | 1 |
+| **1 降级而非毁掉/崩溃** | [377](../_archive/fixed_bugs/BUG-377-gov-export-drops-ledger-snapshot-on-missing.md)（已修 `db1fbb11`） + [378](../_archive/fixed_bugs/BUG-378-record-stamp-rollover-deletes-corrupt-archive.md)（已修 `db1fbb11`） + [379](../_archive/fixed_bugs/BUG-379-load-records-throws-on-unreadable-file.md)（已修 `db1fbb11`） | 整目录替换把「源缺失」当「目标应为空」；坏日期被 Date 进位成合法时间；单文件读失败穿透整盘 | 377：`missing` 与 `corrupt` 同处理（沿用旧快照 + warning，无旧快照才静默）；378：`recordStampOf` 加日期往返校验，坏 timestamp 返回 null（purge/archive 跳过）；379：`loadRecords` 包 try、读失败计 `broken`（或 `unreadable`）不抛；三卡各自红→绿 + 真入口用例 | 1 |
 | **2 结构敏感一致** | [380](BUG-380-required-sections-heading-level-mismatch.md) + [381](BUG-381-tools-meta-parsers-fence-blind.md) + [382](BUG-382-retired-word-scan-fence-blind.md) | 声明支持 1–6 级标题但 `sectionRange` 只认 `##`；tools 两份 meta 解析不看围栏；退役词/区间扫描是裸全文 | 380：`sectionRange` 加 level 参数（`#{1,6}`），`sectionStructuralText` 透传，`hasStructuralSection` 用层级；381：tools 的 `converge.metaField`/`deliverables.parseMeta` 用 `scanDocumentDetailed` 结构行（复用 `markdown-shape-core.js`）；382：退役词/区间改用结构行（围栏+行内代码豁免，正文仍禁）；三卡表驱动用例 | 2 |
 | **3 账本结论反转** | [383](BUG-383-presented-false-overridden-by-slug-after-archive.md) | `setPresentedAudit(false)` 只写 path，不撤 `slugs[slug]`；归档后 slug 旧 true 胜出 | false 时写 `slugs[slug]=false`（显式否决），`presentedOf` 的 slug 分支返回 false；`presentedFromLegacyCatalog` 同步；补「true → false → 归档」序列用例 + 既有 true 延续回归 | 3 |
 

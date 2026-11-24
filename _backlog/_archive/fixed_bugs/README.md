@@ -4,6 +4,13 @@
 
 ## 修复流水（倒序）
 
+- **BUG-377**（2026-11-24，377..383 批顺位 1 / P2）：`exportGovernance` 的 missing 账本沿用旧快照并告警，不再整目录替换删数据——
+  [377](BUG-377-gov-export-drops-ledger-snapshot-on-missing.md)。证据提交 `db1fbb11`。
+- **BUG-378**（2026-11-24，377..383 批顺位 1 / P2）：`recordStampOf` 加日期往返校验，坏日期不再被 purge/archive 当真——
+  [378](BUG-378-record-stamp-rollover-deletes-corrupt-archive.md)。证据提交 `db1fbb11`。
+- **BUG-379**（2026-11-24，377..383 批顺位 1 / P2）：`loadRecords` 单文件读失败计 broken，不再穿透整个命令——
+  [379](BUG-379-load-records-throws-on-unreadable-file.md)。证据提交 `db1fbb11`。
+
 - **BUG-373**（2026-11-24，370..376 批顺位 4 / P2）：`/delivery check` 的 requiredSections 改结构行判据（标题/表格/结构行），围栏与注释样例不算——
   [373](BUG-373-delivery-check-required-sections-substring-only.md)。证据提交 `df7bfda8`。
 
