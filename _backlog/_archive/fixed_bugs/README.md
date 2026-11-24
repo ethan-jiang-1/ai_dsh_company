@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-365**（2026-11-24，360..369 批顺位 2 / P2）：follow 事件窗口在数据层有界（`EVENT_WINDOW`），history 裁剪并记丢弃数——
+  [365](BUG-365-company-data-unbounded-event-accumulation.md)。证据提交 `64fc1a5f`。
+- **BUG-366**（2026-11-24，360..369 批顺位 2 / P2）：培养背景候选 cwd 未知零候选 + reason，行 cwd 缺失排除、子会话继承 parent、路径归一——
+  [366](BUG-366-context-candidates-fail-open-on-unknown-cwd.md)。证据提交 `19b95966`。
+
 - **BUG-363**（2026-11-24，360..369 批顺位 1 / P2）：`console.error` 捕获改成每 target 单层包装 + 环栈，重复安装只栈顶收、卸载到零恢复原始函数——
   [363](BUG-363-error-capture-install-not-idempotent.md)。证据提交 `105010d2`。
 
