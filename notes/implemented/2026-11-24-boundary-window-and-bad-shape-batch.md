@@ -18,7 +18,7 @@
    `signoffReason`/`signoffDecisionNote` 增加可选 `text(zh,en)`（缺省 zh 兼容旧调用）；`registerSignoffTool` 接
    `{ language }` 并订阅切换重注册；`/company-diagnostics` 改走 `registerLocalizedCommand`，描述与全部错误/成功回执成对。
 5. **坏形状与缺失值不折成好值（[BUG-362](../../_backlog/_archive/fixed_bugs/BUG-362-ledger-slugs-accept-malformed-rows.md) / [BUG-368](../../_backlog/_archive/fixed_bugs/BUG-368-yaml-scalar-unbalanced-quote-kept-and-trailing-dropped.md) / [BUG-369](../../_backlog/_archive/fixed_bugs/BUG-369-workspace-doors-unset-preset-chinese-placeholder.md)）**：
-   台账 slug 集合复用 `parseMotionLedger` 的行有效性（列数/空行/表头）；`yamlScalarOrProblem` 对未闭合/带尾巴引号报
+   台账 slug 集合用「表头列数 / 非全空行 / 非分隔行」的行有效性（与 tools 孪生同判据）；`yamlScalarOrProblem` 对未闭合/带尾巴引号报
    `problem`，宽松版返回空串、身份文件整份作废；`DoorRow.preset` 用 `string | null`，`workspace_doors` 省略未设置键。
 6. **时间窗口双边（[BUG-364](../../_backlog/_archive/fixed_bugs/BUG-364-instance-guard-future-heartbeat-never-expires.md)）**：
    `shouldWarn` 加 `SKEW_MS` 下界（`ts <= now + SKEW`），`writeBeat` 写自己的同时裁掉过期/超前邻居；

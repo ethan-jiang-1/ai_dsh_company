@@ -52,4 +52,4 @@ console.log([999_949, 999_950, 999_999, 1_000_000].map(v => v + ' -> ' + formatT
 - 改动面：`packages/company-pack/src/lib/accounting/budget.ts`、`tests/lib/accounting/budget.spec.ts`
 - 红：`pnpm test tests/lib/accounting/budget.spec.ts` —— 还原前 1 failed（999 950 输出 `1000k`）
 - 绿：`pnpm test tests/lib/accounting/budget.spec.ts` —— 全绿（999 949 `999.9k`；999 950+ `1M`）
-- 提交：commit 0f9bc30f
+- 提交：commit c585eb9a

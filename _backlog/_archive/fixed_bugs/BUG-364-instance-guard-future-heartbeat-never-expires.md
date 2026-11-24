@@ -54,4 +54,4 @@ console.log('stale beat :', shouldWarn(JSON.stringify({ other: now - 60_000 }), 
 - 改动面：`packages/company-pack/src/client/wiring/instance-guard.ts`、`tests/client/wiring/instance-guard.spec.ts`
 - 红：`pnpm test tests/client/wiring/instance-guard.spec.ts` —— 还原单边判据前 2 failed（未来心跳永久告警、坏记录不被清理）
 - 绿：`pnpm test tests/client/wiring/instance-guard.spec.ts` —— 7/7 passed（未来 null、19s 新鲜告警、60s 过期 null；写心跳裁掉 stale/future）
-- 提交：commit 1597828a
+- 提交：commit 1d7e92e0

@@ -53,4 +53,4 @@ console.log(JSON.stringify(out), out.length);
 - 改动面：`packages/company-pack/src/lib/shared/text.ts`、`tests/lib/shared/text-and-status.spec.ts`
 - 红：`pnpm test tests/lib/shared/text-and-status.spec.ts` —— 还原前 1 failed（CRLF 首行带 `\r`）
 - 绿：`pnpm test tests/lib/shared/text-and-status.spec.ts` —— 全绿（CRLF/孤立 CR 都只留 `a`）
-- 提交：commit 0f9bc30f
+- 提交：commit c585eb9a

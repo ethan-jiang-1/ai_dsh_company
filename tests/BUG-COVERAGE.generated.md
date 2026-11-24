@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 349 |
-| 有具名守卫 | 247 |
+| 已修卡 | 359 |
+| 有具名守卫 | 257 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 70.8% |
+| 覆盖率 | 71.6% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -348,16 +348,16 @@
 | 335 | 2026-11-23 | tests/client/cultivation/cultivation-copy.spec.ts:72；tests/lib/cultivation/cultivation-record-time.spec.ts:44 |
 | 336 | 2026-11-23 | tests/client/i18n/presence-budget.spec.ts:79 |
 | 337 | 2026-11-23 | tests/client/tabs/delegation-flow-panel.spec.ts:51 |
-| 338 | 2026-11-23 | tests/host/commands/command-language.spec.ts:30；tests/host/commands/prd-command.spec.ts:222；tests/host/commands/settings-command.spec.ts:261；tests/lib/docs/prd-check.spec.ts:429；tests/lib/docs/requirements-check.spec.ts:353；tests/lib/docs/requirements-check.spec.ts:367 |
+| 338 | 2026-11-23 | tests/host/commands/command-language.spec.ts:31；tests/host/commands/prd-command.spec.ts:222；tests/host/commands/settings-command.spec.ts:261；tests/lib/docs/prd-check.spec.ts:429；tests/lib/docs/requirements-check.spec.ts:353；tests/lib/docs/requirements-check.spec.ts:367 |
 | 339 | 2026-11-23 | tests/lib/shared/parsers-fuzz.property.spec.ts:415 |
 | 340 | 2026-11-23 | tests/client/cultivation/cultivation-copy.spec.ts:82；tests/client/cultivation/cultivation-copy.spec.ts:101；tests/tools/company-static-audit.spec.ts:203 |
-| 341 | 2026-11-23 | tests/client/company-client-composition.spec.ts:144；tests/client/ui/brand.spec.ts:53 |
+| 341 | 2026-11-23 | tests/client/company-client-composition.spec.ts:144；tests/client/ui/brand.spec.ts:59 |
 | 342 | 2026-11-23 | tests/host/prompt/handbook.spec.ts:45；tests/host/prompt/handbook.spec.ts:153 |
 | 343 | 2026-11-23 | tests/host/commands/req-command.spec.ts:226 |
 | 344 | 2026-11-23 | tests/host/delegation/subagent-retry.spec.ts:249 |
 | 345 | 2026-11-23 | tests/host/run-bundle/lease.spec.ts:134 |
 | 346 | 2026-11-23 | tests/host/ledger/presented-domain.spec.ts:137 |
-| 347 | 2026-11-23 | tests/tools/deliverables-catalog-tools.spec.ts:74 |
+| 347 | 2026-11-23 | tests/tools/deliverables-catalog-tools.spec.ts:75 |
 | 348 | 2026-11-23 | tests/client/cultivation/cultivation-chat-panel.spec.ts:214 |
 | 349 | 2026-11-23 | tests/host/cultivation/cultivation-command.spec.ts:221 |
 | 350 | 2026-11-23 | tests/client/cultivation/cultivation-compose-context.spec.ts:209 |
@@ -366,7 +366,17 @@
 | 353 | 2026-11-24 | tests/tools/workspace-roots.spec.ts:6 |
 | 354 | 2026-11-24 | tests/client/i18n/presence-budget.spec.ts:108 |
 | 355 | 2026-11-24 | tests/client/cultivation/cultivation-data-races.spec.ts:32；tests/client/cultivation/cultivation-data-races.spec.ts:61 |
-| 356 | 2026-11-24 | tests/lib/accounting/ledger.spec.ts:140；tests/tools/deliverables-catalog-tools.spec.ts:104；tests/tools/deliverables-catalog-tools.spec.ts:135；tests/tools/deliverables-catalog-tools.spec.ts:150；tests/tools/markdown-table-parity.spec.ts:18 |
+| 356 | 2026-11-24 | tests/lib/accounting/ledger.spec.ts:140；tests/tools/deliverables-catalog-tools.spec.ts:105；tests/tools/deliverables-catalog-tools.spec.ts:147；tests/tools/deliverables-catalog-tools.spec.ts:162；tests/tools/markdown-table-parity.spec.ts:18 |
 | 357 | 2026-11-24 | tests/host/ledger/catalog.spec.ts:511；tests/host/ledger/catalog.spec.ts:540 |
 | 358 | 2026-11-24 | tests/client/tabs/board-panel.spec.ts:164；tests/client/tabs/board-panel.spec.ts:185 |
 | 359 | 2026-11-24 | tests/client/wiring/attention.spec.ts:482 |
+| 360 | 2026-11-24 | tests/lib/accounting/budget.spec.ts:16 |
+| 361 | 2026-11-24 | tests/lib/shared/text-and-status.spec.ts:25 |
+| 362 | 2026-11-24 | tests/tools/deliverables-catalog-tools.spec.ts:113 |
+| 363 | 2026-11-24 | tests/client/wiring/error-ring.spec.ts:176 |
+| 364 | 2026-11-24 | tests/client/wiring/instance-guard.spec.ts:84 |
+| 365 | 2026-11-24 | tests/client/data/company-stream.spec.ts:9 |
+| 366 | 2026-11-24 | tests/client/cultivation/cultivation-context-data.spec.ts:211 |
+| 367 | 2026-11-24 | tests/host/commands/signoff-language.spec.ts:25；tests/lib/accounting/signoff.spec.ts:38 |
+| 368 | 2026-11-24 | tests/client/ui/brand.spec.ts:40；tests/lib/docs/yaml-scalar.spec.ts:27 |
+| 369 | 2026-11-24 | tests/host/workspace/workspace-doors.spec.ts:86；tests/host/workspace/workspace-doors.spec.ts:106；tests/lib/presence/doors.spec.ts:40 |

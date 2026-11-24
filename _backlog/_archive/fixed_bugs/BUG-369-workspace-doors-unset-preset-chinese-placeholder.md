@@ -59,4 +59,4 @@ for (const p of [undefined, '', '(未选 preset)']) console.log(JSON.stringify(p
 - 改动面：`packages/company-pack/src/lib/presence/doors.ts`、`packages/company-pack/src/host/workspace/workspace-doors.ts`、`tests/lib/presence/doors.spec.ts`、`tests/host/workspace/workspace-doors.spec.ts`
 - 红：`pnpm test tests/lib/presence/doors.spec.ts tests/host/workspace/workspace-doors.spec.ts` —— 还原展示串前 3 failed（未设置被折叠成中文串）
 - 绿：`pnpm test tests/lib/presence/doors.spec.ts tests/host/workspace/workspace-doors.spec.ts` —— 全绿（未设置省略 preset 键；真叫展示串的 preset 保留）
-- 提交：commit 18f9f5b8
+- 提交：commit bbf4dc79

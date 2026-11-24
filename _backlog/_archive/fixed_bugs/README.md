@@ -5,19 +5,19 @@
 ## 修复流水（倒序）
 
 - **BUG-360**（2026-11-24，360..369 批顺位 6 / P2）：`formatTokens` 按舍入后档位判定，999 950+ 进 M 档——
-  [360](BUG-360-format-tokens-1000k-instead-of-1m.md)。证据提交 `0f9bc30f`。
+  [360](BUG-360-format-tokens-1000k-instead-of-1m.md)。证据提交 `c585eb9a`。
 - **BUG-361**（2026-11-24，360..369 批顺位 6 / P2）：`firstText` 先归一 CRLF/孤立 CR 再取首行并 trim——
-  [361](BUG-361-first-text-keeps-crlf-carriage-return.md)。证据提交 `0f9bc30f`。
+  [361](BUG-361-first-text-keeps-crlf-carriage-return.md)。证据提交 `c585eb9a`。
 
 - **BUG-364**（2026-11-24，360..369 批顺位 5 / P2）：实例心跳新鲜度改双边窗口（容忍时钟偏差），写心跳时清理过期/超前邻居——
-  [364](BUG-364-instance-guard-future-heartbeat-never-expires.md)。证据提交 `1597828a`。
+  [364](BUG-364-instance-guard-future-heartbeat-never-expires.md)。证据提交 `1d7e92e0`。
 
 - **BUG-362**（2026-11-24，360..369 批顺位 4 / P2）：台账 slug 集合复用 `parseMotionLedger` 行有效性，坏行不进「已入账」——
-  [362](BUG-362-ledger-slugs-accept-malformed-rows.md)。证据提交 `d58e6fc1`。
+  [362](BUG-362-ledger-slugs-accept-malformed-rows.md)。证据提交 `c62865ac`。
 - **BUG-368**（2026-11-24，360..369 批顺位 4 / P2）：`yamlScalarOrProblem` 对未闭合/带尾巴引号报 problem，身份文件拒绝并保留出厂词标——
-  [368](BUG-368-yaml-scalar-unbalanced-quote-kept-and-trailing-dropped.md)。证据提交 `8bfc44a9`。
+  [368](BUG-368-yaml-scalar-unbalanced-quote-kept-and-trailing-dropped.md)。证据提交 `5d877e75`。
 - **BUG-369**（2026-11-24，360..369 批顺位 4 / P2）：`DoorRow.preset` 改 `string | null`，工具输出省略未设置键，不再用展示串——
-  [369](BUG-369-workspace-doors-unset-preset-chinese-placeholder.md)。证据提交 `18f9f5b8`。
+  [369](BUG-369-workspace-doors-unset-preset-chinese-placeholder.md)。证据提交 `bbf4dc79`。
 
 - **BUG-367**（2026-11-24，360..369 批顺位 3 / P2）：`request_signoff` 回执/理由与 `/company-diagnostics` 命令面接语言状态，en 零中文、zh 不变——
   [367](BUG-367-signoff-tool-result-and-reason-always-chinese.md)。证据提交 `fe4ffe2e`。
