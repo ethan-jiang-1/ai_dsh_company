@@ -9,11 +9,12 @@ describe('历史缺陷 → 具名守卫覆盖（生成物）', () => {
   let cachedReport: ReturnType<typeof coverageReport> | undefined
   const getReport = () => (cachedReport ??= coverageReport(ROOT))
 
+  // 覆盖率车道全量运行时扫描慢（>30s）：给宽松超时，避免棘轮把「慢」误判成「红」。
   it('tests/BUG-COVERAGE.generated.md 与盘面一致（漂了就跑 --write）', () => {
     const expected = renderCoverage(getReport())
     const current = readFileSync(join(ROOT, 'tests/BUG-COVERAGE.generated.md'), 'utf8')
     expect(current, 'bug-coverage 是生成物：运行 node tools/repo/bug-coverage.mjs --write').toBe(expected)
-  })
+  }, 120_000)
 
   it('覆盖率是保守下界：已修卡与守卫两向都能解析', () => {
     const report = getReport()

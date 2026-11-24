@@ -109,6 +109,7 @@ describe('makeContextWiring / openContext', () => {
   })
 })
 
+// 负例留证 2026-11-24：删掉 `makeCultivationContextSources.listSessions` 的 `projected.problem` 早退后 `vitest run tests/client/wiring/company-context-wiring.spec.ts` 1 failed（当前会话不在快照时返回 ok:true 而不是 fail-closed）；还原后 8/8 绿。BUG-366
 describe('makeContextWiring / contextSources', () => {
   it('listSessions：当前会话不在快照里 ⇒ ok:false + 原因（fail-closed，BUG-366）', () => {
     const scoped = makeScoped({ sessions: { list: { getSnapshot: () => ({ byId: {} }) }, subagentAddress: vi.fn() } })

@@ -67,6 +67,7 @@ function option(root: HTMLElement, text: string): HTMLButtonElement {
   return found
 }
 
+// 负例留证 2026-11-24：把 `listSessions` 的 `ok:false` 分支折回空候选（`sessionsProblem: null`）后 `vitest run tests/client/cultivation/cultivation-context-picker.spec.ts` 1 failed（面板说「没有可用的参考背景」而不是原因）；还原后 8/8 绿。BUG-366
 describe('背景选择面板（R5-27）', () => {
   it('会话源 ok:false 时显示具体原因而不是「没有候选」（BUG-366）', async () => {
     const host = await mount(createElement(CultivationContextPicker, props({
