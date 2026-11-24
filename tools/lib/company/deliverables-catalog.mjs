@@ -7,7 +7,7 @@
 // - 数据面 = 盘上 meta/final（D20 的 `present` 背书仍归 `deliverables-check`；本目录首版不冒充它）。
 // - `ledgered` = slug 能在 `kb/motion-ledger.md` 找到；false 的成品在面板上标「台账外」。
 // - 只做**派生视图**：不新建第二份手写事实；跑生成器即可重建。
-import { splitTableRow } from '../../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
+import { splitTableRow } from './markdown-table.mjs'
 import { META_RESULTS, META_TYPES, slugFromDirName } from './deliverables.mjs'
 
 /** 目录条目的根（活跃 / 归档）。 */

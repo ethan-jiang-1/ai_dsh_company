@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildDeliverablesCatalog, deliverableSlug, ledgerSlugsFromText } from '../../tools/lib/company/deliverables-catalog.mjs'
+import { buildDeliverablesCatalog, deliverableSlug, ledgerSlugsFromText, metaProblemsOf } from '../../tools/lib/company/deliverables-catalog.mjs'
 import { ledgerSlugsFromText as ledgerSlugsFromTextTs } from '../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts'
 
 /**
@@ -109,10 +109,56 @@ describe('台账 slug 集合：TS/JS 同方言（BUG-356）', () => {
     '| b | 2026-11-21 | decision | ceo | 1m | ✅ | plain |',
   ].join('\n')
 
+  it('无表头 / 分隔行 / 空首列都被跳过且两侧一致', () => {
+    const edge = [
+      '正文行不是表格',
+      '| date | slug |',
+      '|---|---|',
+      '| x | y |',
+      '| slug | date | type | participants | wallClock | deliverable | summary |',
+      '|---|---|---|---|---|---|---|',
+      '|  | 2026-11-20 | decision | ceo | 1m | ✅ | empty first |',
+      '| a | 2026-11-20 | decision | ceo | 1m | ✅ | A\\|B |',
+    ].join('\n')
+    expect([...ledgerSlugsFromText(edge)]).toEqual([...ledgerSlugsFromTextTs(edge)])
+    expect([...ledgerSlugsFromText(edge)]).toEqual(['a'])
+  })
+
   it('两侧解析同一份含 \\| 的台账得到相同 slug 集合', () => {
     const js = ledgerSlugsFromText(TEXT)
     const ts = ledgerSlugsFromTextTs(TEXT)
     expect([...js].sort()).toEqual(['a', 'b'])
     expect([...ts].sort()).toEqual([...js].sort())
+  })
+})
+
+describe('metaProblemsOf / deliverableSlug 分支（BUG-356 复查）', () => {
+  it('缺行/枚举外/日期格式都记账', () => {
+    expect(metaProblemsOf(new Map())).toHaveLength(3)
+    const problems = metaProblemsOf(new Map([['kickoff', '2026/11/20'], ['type', 'bogus'], ['result', 'bogus']]))
+    expect(problems.join('\n')).toContain('YYYY-MM-DD')
+    expect(problems.join('\n')).toContain('type 不在词表')
+    expect(problems.join('\n')).toContain('result 不在词表')
+  })
+
+  it('显式 slug 原样返回；空/空白回落目录名', () => {
+    expect(deliverableSlug(new Map([['slug', 'explicit']]), '2026-11-20-dir')).toBe('explicit')
+    expect(deliverableSlug(new Map([['slug', ' ']]), '2026-11-20-dir')).toBe('dir')
+  })
+})
+
+describe('catalog metaProblem 分支（BUG-356 复查）', () => {
+  it('meta 字段坏 ⇒ metaProblem 非空', () => {
+    const catalog = buildDeliverablesCatalog({
+      generatedAt: '2026-11-24T00:00:00.000Z',
+      ledgerSlugs: new Set(),
+      entries: [{
+        root: '.dsh-company/deliverables',
+        dir: '2026-11-24-bad',
+        fields: new Map([['slug', 'bad'], ['kickoff', '2026/11/24'], ['type', 'bogus'], ['result', 'bogus']]),
+        final: true, presented: null,
+      }],
+    })
+    expect(catalog.entries[0]?.metaProblem).toBeTruthy()
   })
 })

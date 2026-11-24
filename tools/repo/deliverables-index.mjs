@@ -12,7 +12,6 @@ import { join, relative } from 'node:path'
 import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 import { parseAuditVerdict } from '../lib/repo/audit-verdict.mjs'
 import { parseMeta } from '../lib/company/deliverables.mjs'
-import { splitTableRow } from '../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
 import { buildDeliverablesCatalog, CATALOG_ROOTS, deliverableSlug, ledgerSlugsFromText } from '../lib/company/deliverables-catalog.mjs'
 
 // 测试缝（2026-10-23）：converge 的端到端探针把工作区重定向到 runtime/ 下的临时目录。

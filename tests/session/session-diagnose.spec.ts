@@ -143,7 +143,7 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
   })
 
   // 负例留证 2026-11-24：按扁平 data.phase 读 ⇒ 真实 v2 事件用例红（teamFailures 空）。BUG-352
-  it('team/member v2（phase 嵌在 data.member）折进 teamFailures；扁平旧形状仍兼容', () => {
+  it('team/member v2 折进 teamFailures；扁平旧形状仍兼容（BUG-352）', () => {
     const summary = summarize([
       {
         type: 'team/member',

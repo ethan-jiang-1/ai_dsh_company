@@ -26,6 +26,12 @@ export interface PresentedLedger {
   readonly paths: Readonly<Record<string, boolean>>
   /** slug → true（归档/搬迁后按 slug 延续背书；false 只认精确 path）。 */
   readonly slugs: Readonly<Record<string, boolean>>
+  /**
+   * 目录名派生 slug → true（只给**旧账本兼容**的归档延续用；BUG-357 复审）。
+   * 新写入同时写 `slugs[meta slug]` 与 `dirSlugs[目录名 slug]`；`presentedOf` 的回退只查本表，
+   * 不再拿自定 meta slug 与目录名混在同一命名空间里。
+   */
+  readonly dirSlugs?: Readonly<Record<string, boolean>>
 }
 
 export type PresentedLedgerState =
@@ -55,6 +61,7 @@ export function readPresentedLedger(workspace: string): PresentedLedgerState {
     if (typeof raw.updatedAt !== 'string') return { status: 'corrupt', path, error: '缺 updatedAt' }
     if (!validateBooleanMap(raw.paths)) return { status: 'corrupt', path, error: 'paths 不是 boolean map' }
     if (!validateBooleanMap(raw.slugs)) return { status: 'corrupt', path, error: 'slugs 不是 boolean map' }
+    if (raw.dirSlugs !== undefined && !validateBooleanMap(raw.dirSlugs)) return { status: 'corrupt', path, error: 'dirSlugs 不是 boolean map' }
     // SAFETY: 上方已逐字段校验 schema/updatedAt/paths/slugs 的形状与版本，剩余字段即合同本身；
     // isRecord 只保证 Record<string, unknown>，这里按已验证字段收窄成只读账本视图。
     return { status: 'ok', path, ledger: raw as unknown as PresentedLedger }
@@ -150,10 +157,12 @@ export function presentedOf(ledger: PresentedLedger, path: string, slug: string)
   const byPath = ledger.paths[normalizeRel(path)]
   if (byPath === true || byPath === false) return byPath
   if (ledger.slugs[slug] === true) return true
-  // 兼容升级前账本（只写目录名 slug）：从路径回推目录名 slug 再比一次（BUG-357）。
+  // 兼容升级前账本（只写目录名 slug）：回退只查 dirSlugs（老账本没有该字段时把 slugs 视作目录名集），
+  // 避免新账本里的自定 meta slug 与目录名 slug 混用（BUG-357 复审 finding 3）。
   const dirMatch = /\.dsh-company\/deliverables(?:-archive)?\/([^/]+)\/final\.md$/.exec(normalizeRel(path))
   const dirSlug = dirMatch === null ? '' : slugFromDirName(dirMatch[1] ?? '')
-  return dirSlug !== '' && ledger.slugs[dirSlug] === true ? true : null
+  const dirSlugs = ledger.dirSlugs ?? ledger.slugs
+  return dirSlug !== '' && dirSlugs[dirSlug] === true ? true : null
 }
 
 /**
@@ -259,8 +268,16 @@ export function setPresentedAudit(
   if (presented) {
     // v3 路径是 `.dsh-company/deliverables/<dir>/final.md`：身份 = meta 的 slug（与 catalog 读侧同判据）。
     const rootRel = rel.startsWith(`${RUN_BUNDLE_PATHS.archive}/`) ? RUN_BUNDLE_PATHS.archive : RUN_BUNDLE_PATHS.deliverables
-    const slug = presentedSlugOf(companyHome, rootRel, rel.split('/').slice(-2)[0] ?? '')
-    if (slug !== '') next = { ...next, slugs: { ...next.slugs, [slug]: true } }
+    const dirName = rel.split('/').slice(-2)[0] ?? ''
+    const slug = presentedSlugOf(companyHome, rootRel, dirName)
+    const dirSlug = slugFromDirName(dirName)
+    if (slug !== '') {
+      next = {
+        ...next,
+        slugs: { ...next.slugs, [slug]: true },
+        ...(dirSlug === '' ? {} : { dirSlugs: { ...(next.dirSlugs ?? {}), [dirSlug]: true } }),
+      }
+    }
   }
   try {
     writePresentedLedger(companyHome, next)

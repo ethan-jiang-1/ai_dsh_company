@@ -163,13 +163,16 @@ function memberTone(status: PresenceRow['status']): 'info' | 'danger' | 'warning
  * @param props - 槽 props + 注入数据面。
  * @returns 看板。
  */
+/** 看板 owner 名的表达层映射（BUG-358）：canonical → 当前语言；抽成具名函数便于单测覆盖。 */
+export const boardRoleLabel = (t: CompanyT) => (label: string): string => roleTextForCanonical(label, t)
+
 export function BoardTab(props: CompanyTabProps) {
   const data = useCompanyData(props, props.sessionId, props.useProjection, props.useSessions, { stream: true })
   return (
     <PanelFrame title={props.t('tabs.board.label')} tone="overview" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       {data.streamError === null ? null : <StreamErrorNotice message={data.streamError} t={props.t} />}
-      <BoardPanel columns={data.columns} roleLabel={label => roleTextForCanonical(label, props.t)} t={props.t} />
+      <BoardPanel columns={data.columns} roleLabel={boardRoleLabel(props.t)} t={props.t} />
     </PanelFrame>
   )
 }

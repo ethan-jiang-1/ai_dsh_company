@@ -497,7 +497,14 @@ describe('attention 事件身份（BUG-359）', () => {
 
   it('同一条事件在 live/历史两源出现仍只显示一条（回归 BUG-325）', () => {
     const items = streamAttention([escalation(7, 'dup')], 'lead-1', 'CEO')
-    expect(mergeAttention([], items)).toHaveLength(1)
-    expect(mergeAttention([], [...items, ...items])).toHaveLength(2) // 历史内部重复不去重（仅跨源）
+    const historyApproval = { kind: 'approval' as const, who: 's1', what: '预算', id: 'a1', time: 1_700_000_000_000, jumpTo: 's1' }
+    const liveApproval = { kind: 'approval' as const, sessionId: 's1', what: '预算', id: 'a1', since: 1_700_000_000_000 }
+    // live 与历史各一份同 id 审批 → 一条
+    expect(mergeAttention([liveApproval], [historyApproval])).toHaveLength(1)
+    // 历史内部重复的同一条无 id 事件：seq 键相同但无强 id → 保留（seq 才是个体身份）
+    expect(mergeAttention([], [...items, ...items])).toHaveLength(2)
+    // 有 id 的审批在历史内部重复 = 同一条被重建两次 → 去重
+    const approval = { kind: 'approval' as const, who: 's1', what: '预算', id: 'a1', time: 1, jumpTo: 's1' }
+    expect(mergeAttention([], [approval, approval])).toHaveLength(1)
   })
 })

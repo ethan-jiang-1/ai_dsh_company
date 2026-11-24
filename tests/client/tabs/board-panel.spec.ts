@@ -16,9 +16,11 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { BoardPanel } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
+import { boardRoleLabel } from '../../../packages/company-pack/src/client/tabs/company-tabs.tsx'
 import { boardColumns, tasksFromTeamView } from '../../../packages/company-pack/src/lib/presence/board.ts'
 import type { TeamViewLike } from '../../../packages/company-pack/src/lib/presence/presence.ts'
-import { en } from '../../../packages/company-pack/src/client/locales.ts'
+import { en, zh } from '../../../packages/company-pack/src/client/locales.ts'
+import { roleTextForCanonical } from '../../../packages/company-pack/src/client/roles.ts'
 import { translateWith } from '../../support/i18n-assertions.ts'
 
 const tEn = translateWith(en)
@@ -177,5 +179,12 @@ describe('BoardPanel：未分配与表达层（BUG-358）', () => {
     expect(html).toContain('Unassigned')
     expect(html).toContain('VP Eng')
     expect(html).not.toMatch(/[\u3400-\u9fff]/u)
+  })
+})
+
+describe('boardRoleLabel（BUG-358）', () => {
+  it('对 canonical owner 名按当前语言委托 roleTextForCanonical', () => {
+    expect(boardRoleLabel(tEn)('VP-Eng')).toBe(roleTextForCanonical('VP-Eng', tEn))
+    expect(boardRoleLabel(translateWith(zh))('COO')).toBe(roleTextForCanonical('COO', translateWith(zh)))
   })
 })

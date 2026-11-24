@@ -22,6 +22,7 @@ import {
   emptyPresentedLedger,
   mergePresented,
   presentedFromEvent,
+  presentedOf,
   presentedFromSessions,
   readCatalog,
   readCatalogState,
@@ -527,13 +528,35 @@ describe('presented 身份与归档延续（BUG-357）', () => {
     expect(regenerateCatalog(root, ledger).catalog?.entries[0]?.presented).toBe(true)
   })
 
+  it('presentedFromEvent：meta 缺失退回目录名 slug', () => {
+    const root = workspace()
+    const dir = `${RUN_BUNDLE_PATHS.deliverables}/2026-11-20-no-meta`
+    mkdirSync(join(root, dir), { recursive: true })
+    writeFileSync(join(root, dir, 'final.md'), '# final\n')
+    const observed = presentedFromEvent({ data: { files: [{ path: join(root, dir, 'final.md') }] } }, root)
+    expect([...observed.slugs]).toEqual(['no-meta'])
+  })
+
+  it('自定义 meta slug 不会拿别处的目录名 slug 冒领（BUG-357 复审 finding 3）', () => {
+    const other = mergePresented(emptyPresentedLedger(), { paths: [], slugs: ['demo'] })
+    expect(presentedOf(other, `${RUN_BUNDLE_PATHS.deliverables}/2026-11-21-demo/final.md`, 'my-custom')).toBe(true) // 旧语义：无 dirSlugs 时 slugs 视作目录名集
+    const upgraded = { ...other, dirSlugs: {} }
+    expect(presentedOf(upgraded, `${RUN_BUNDLE_PATHS.deliverables}/2026-11-21-demo/final.md`, 'my-custom')).toBeNull()
+  })
+
+  it('presentedOf：旧账本只有目录名 slug 时，归档路径也能回退命中', () => {
+    const legacy = mergePresented(emptyPresentedLedger(), { paths: [], slugs: ['dir-name'] })
+    expect(presentedOf(legacy, `${RUN_BUNDLE_PATHS.archive}/2026-11-20-dir-name/final.md`, 'custom-name')).toBe(true)
+  })
+
   it('升级前账本只有目录名 slug：presentedOf 回退比对，不丢背书', () => {
     const root = workspace()
     const dir = `${RUN_BUNDLE_PATHS.deliverables}/2026-11-20-dir-name`
     mkdirSync(join(root, dir), { recursive: true })
     writeFileSync(join(root, dir, 'final.md'), '# final\n')
     writeFileSync(join(root, dir, 'meta.md'), 'slug: custom-name\nkickoff: 2026-11-20\ntype: decision\nresult: completed\n')
-    const legacy = mergePresented(emptyPresentedLedger(), { paths: [`${dir}/final.md`], slugs: ['dir-name'] })
+    // 故意只给 slug（不给精确 path），逼 presentedOf 走 dirSlugs 回退（BUG-357 复审 finding 2）。
+    const legacy = mergePresented(emptyPresentedLedger(), { paths: [], slugs: ['dir-name'] })
     expect(regenerateCatalog(root, legacy).catalog?.entries[0]?.presented).toBe(true)
   })
 })

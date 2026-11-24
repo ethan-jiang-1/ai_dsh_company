@@ -118,6 +118,34 @@ describe('PresencePanel 无负责人任务迁移（BUG-354）', () => {
     assertEnglishUiClean(html, 'PresencePanel unassigned en')
   })
 
+  it('team/member provisioning 走专用 token', () => {
+    const board = presenceFromEvents([
+      { type: 'team/member', time: 1, data: { teamId: 't1', member: { id: 'm1', name: 'vp-eng', phase: 'provisioning' } } },
+    ] as never)
+    expect(board.activity[0]?.token?.key).toBe('presence.activity.memberProvisioning')
+  })
+
+  it('有负责人时 token 带 owner；en 仍是英文', () => {
+    const board = presenceFromEvents([
+      { type: 'team/member', time: 1, data: { teamId: 't1', member: { id: 'm1', name: 'vp-eng', phase: 'active' } } },
+      { type: 'team/task', time: 2, data: { teamId: 't1', task: { id: 'T3', revision: 1, subject: 'x', status: 'pending' } } },
+      { type: 'team/task', time: 3, data: { teamId: 't1', task: { id: 'T3', revision: 2, subject: 'x', status: 'completed', ownerId: 'm1' } } },
+    ] as never)
+    const html = renderToStaticMarkup(createElement(PresencePanel, { rows: [], activity: board.activity, t: tEn }))
+    expect(html).toContain('VP-Eng completed T3')
+    assertEnglishUiClean(html, 'PresencePanel owned activity en')
+  })
+
+  it('diffActivity：成员 idle/inactive/failed/未知 phase 都走字典 token', () => {
+    const prev = { members: [{ id: 'm1', name: 'vp-eng', role: 'teammate', phase: 'provisioning' }] }
+    for (const phase of ['active', 'failed', 'quantum']) {
+      const next = { members: [{ id: 'm1', name: 'vp-eng', role: 'teammate', phase }] }
+      const entries = diffActivity(prev as never, next as never, 1000)
+      expect(entries.length, phase).toBeGreaterThan(0)
+      expect(entries[0]?.token, phase).toBeDefined()
+    }
+  })
+
   it('diffActivity：同一迁移 en 输出 Unassigned；zh 缺省仍含「未分配」', () => {
     const prev = { tasks: [{ id: 'T2', subject: 'y', status: 'pending', revision: 1 }] }
     const next = { tasks: [{ id: 'T2', subject: 'y', status: 'completed', revision: 2 }] }

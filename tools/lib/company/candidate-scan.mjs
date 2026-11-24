@@ -6,7 +6,7 @@
 // ⚠ 命名纪律（评审 §五 B 的零容忍条款）：未达判据前，输出只能叫「**待核工作候选**」，
 // 不叫"我的待办"，不自动通知。候选项必须带「待核实」标记。
 
-import { splitTableRow } from '../../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
+import { splitTableRow } from './markdown-table.mjs'
 import { headingSections } from '../core/repo-markdown.mjs'
 
 /**

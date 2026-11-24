@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 340 |
-| 有具名守卫 | 238 |
+| 已修卡 | 349 |
+| 有具名守卫 | 247 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 70.0% |
+| 覆盖率 | 70.8% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -133,7 +133,7 @@
 | 020 | 2026-10-16 | tests/tools/converge-rules.spec.ts:121 |
 | 021 | 2026-10-17 | tests/presets/presets.spec.ts:481 |
 | 022 | 2026-10-18 | tests/tools/question-stop.spec.ts:57 |
-| 027 | 2026-10-19 | tests/client/tabs/board-panel.spec.ts:77；tests/client/tabs/tasks-table.spec.ts:69；tests/lib/presence/board.spec.ts:77 |
+| 027 | 2026-10-19 | tests/client/tabs/board-panel.spec.ts:83；tests/client/tabs/tasks-table.spec.ts:69；tests/lib/presence/board.spec.ts:79 |
 | 028 | 2026-10-19 | tests/tools/deliverables-audit.spec.ts:248；tests/tools/deliverables-audit.spec.ts:276 |
 | 030 | 2026-10-20 | tests/session/session-diagnose.spec.ts:16 |
 | 033 | 2026-10-27 | tests/host/cultivation/revoke-journal.spec.ts:66 |
@@ -159,7 +159,7 @@
 | 079 | 2026-11-11 | tests/host/delegation/seat.spec.ts:77；tests/host/delegation/seat.spec.ts:84；tests/host/prompt/delegation-contracts.spec.ts:200 |
 | 103 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:418 |
 | 114 | 2026-11-13 | tests/host/ledger/governance-export.spec.ts:89 |
-| 117 | 2026-11-13 | tests/host/cultivation/cultivation-command.spec.ts:401 |
+| 117 | 2026-11-13 | tests/host/cultivation/cultivation-command.spec.ts:421 |
 | 118 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:451 |
 | 119 | 2026-11-13 | tests/host/startup/startup-prompt.spec.ts:186 |
 | 121 | 2026-11-13 | tests/host/commands/settings-command.spec.ts:233 |
@@ -169,8 +169,8 @@
 | 128 | 2026-11-13 | tests/host/run-bundle/bootstrap.spec.ts:452 |
 | 133 | 2026-11-13 | tests/host/commands/settings-command.spec.ts:249 |
 | 134 | 2026-11-13 | tests/host/commands/prd-command.spec.ts:202 |
-| 138 | 2026-11-13 | tests/host/ledger/catalog.spec.ts:499 |
-| 139 | 2026-11-13 | tests/host/cultivation/cultivation-command.spec.ts:430 |
+| 138 | 2026-11-13 | tests/host/ledger/catalog.spec.ts:500 |
+| 139 | 2026-11-13 | tests/host/cultivation/cultivation-command.spec.ts:450 |
 | 143 | 2026-11-13 | tests/host/run-bundle/bootstrap.spec.ts:478 |
 | 144 | 2026-11-13 | tests/host/run-bundle/write-gate.spec.ts:55 |
 | 145 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:458 |
@@ -242,15 +242,15 @@
 | 228 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:450；tests/repo/release/shipped-shape.spec.ts:503 |
 | 229 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:314 |
 | 230 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:205 |
-| 231 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:212 |
-| 232 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:288 |
+| 231 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:213 |
+| 232 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:289 |
 | 233 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:255 |
 | 234 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:260；tests/repo/release/shipped-shape.spec.ts:279；tests/repo/release/shipped-shape.spec.ts:284；tests/repo/release/shipped-shape.spec.ts:489 |
 | 235 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:376 |
 | 236 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:397 |
 | 237 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:265；tests/repo/release/shipped-shape.spec.ts:293；tests/repo/release/shipped-shape.spec.ts:476 |
-| 238 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:224 |
-| 239 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:274 |
+| 238 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:225 |
+| 239 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:275 |
 | 240 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:255；tests/lib/presence/presence-board.spec.ts:256 |
 | 241 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:263；tests/lib/presence/presence-board.spec.ts:264；tests/lib/presence/presence-board.spec.ts:276 |
 | 242 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:296 |
@@ -270,8 +270,8 @@
 | 256 | 2026-11-18 | tests/host/run-bundle/bundle-manifest.spec.ts:214；tests/host/run-bundle/bundle-manifest.spec.ts:234；tests/host/run-bundle/bundle-manifest.spec.ts:313；tests/repo/release/shipped-shape.spec.ts:524 |
 | 257 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:234；tests/lib/presence/presence-board.spec.ts:235 |
 | 258 | 2026-11-18 | tests/lib/presence/presence-board.spec.ts:243 |
-| 259 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:243 |
-| 260 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:263 |
+| 259 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:244 |
+| 260 | 2026-11-18 | tests/host/ledger/catalog.spec.ts:264 |
 | 261 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:300 |
 | 262 | 2026-11-18 | tests/repo/release/shipped-shape.spec.ts:346 |
 | 263 | 2026-11-19 | tests/repo/release/shipped-shape.spec.ts:673；tests/repo/structure/pack-source.spec.ts:69 |
@@ -286,10 +286,10 @@
 | 272 | 2026-11-19 | tests/repo/release/shipped-shape.spec.ts:564；tests/tools/dev-command.spec.ts:39 |
 | 273 | 2026-11-19 | tests/tools/content-contract.spec.ts:103 |
 | 274 | 2026-11-19 | tests/tools/content-contract.spec.ts:73 |
-| 275 | 2026-11-19 | tests/host/ledger/catalog.spec.ts:253 |
-| 276 | 2026-11-19 | tests/host/ledger/catalog.spec.ts:163；tests/host/ledger/catalog.spec.ts:175；tests/host/ledger/catalog.spec.ts:192 |
-| 277 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:129；tests/client/tabs/board-panel.spec.ts:149；tests/client/tabs/tasks-table.spec.ts:122；tests/lib/presence/board.spec.ts:247 |
-| 278 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:142 |
+| 275 | 2026-11-19 | tests/host/ledger/catalog.spec.ts:254 |
+| 276 | 2026-11-19 | tests/host/ledger/catalog.spec.ts:164；tests/host/ledger/catalog.spec.ts:176；tests/host/ledger/catalog.spec.ts:193 |
+| 277 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:135；tests/client/tabs/board-panel.spec.ts:155；tests/client/tabs/tasks-table.spec.ts:122；tests/lib/presence/board.spec.ts:249 |
+| 278 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:148 |
 | 279 | 2026-11-19 | tests/host/run-bundle/bundle-manifest.spec.ts:250 |
 | 280 | 2026-11-19 | tests/repo/release/docs-only.spec.ts:31；tests/repo/release/docs-only.spec.ts:93 |
 | 281 | 2026-11-19 | tests/repo/release/docs-only.spec.ts:17；tests/repo/release/docs-only.spec.ts:42；tests/repo/release/docs-only.spec.ts:47 |
@@ -319,14 +319,14 @@
 | 306 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:353；tests/client/cultivation/list-caps-consumed.spec.ts:19 |
 | 307 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:372 |
 | 308 | 2026-11-22 | tests/client/cultivation/cultivation-chat-panel.spec.ts:188 |
-| 309 | 2026-11-22 | tests/lib/cultivation/cultivation.spec.ts:296 |
+| 309 | 2026-11-22 | tests/lib/cultivation/cultivation.spec.ts:327 |
 | 310 | 2026-11-22 | tests/client/tabs/deliverables-catalog.spec.ts:221 |
 | 311 | 2026-11-22 | tests/client/tabs/ledger-tab.spec.ts:100；tests/lib/accounting/ledger.spec.ts:121 |
 | 312 | 2026-11-22 | tests/client/wiring/attention-observers.spec.ts:167；tests/client/wiring/attention.spec.ts:307 |
 | 313 | 2026-11-22 | tests/lib/startup/startup-settings.spec.ts:221 |
 | 314 | 2026-11-22 | tests/client/startup/startup-load.spec.ts:88 |
 | 315 | 2026-11-22 | tests/client/cultivation/cultivation-view-layout.spec.ts:13 |
-| 316 | 2026-11-22 | tests/host/cultivation/cultivation-command.spec.ts:451 |
+| 316 | 2026-11-22 | tests/host/cultivation/cultivation-command.spec.ts:471 |
 | 317 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:224 |
 | 318 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:215 |
 | 319 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:251；tests/client/wiring/attention.spec.ts:337 |
@@ -335,8 +335,8 @@
 | 322 | 2026-11-22 | tests/client/cultivation/cultivation-data.spec.ts:172 |
 | 323 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:118；tests/client/tabs/attention-tab.spec.ts:189 |
 | 324 | 2026-11-22 | tests/client/data/catalog-contract.spec.ts:72 |
-| 325 | 2026-11-23 | tests/client/wiring/attention.spec.ts:428 |
-| 326 | 2026-11-23 | tests/host/commands/blocked-text.spec.ts:11；tests/host/cultivation/cultivation-command.spec.ts:484；tests/host/cultivation/cultivation-command.spec.ts:514 |
+| 325 | 2026-11-23 | tests/client/wiring/attention.spec.ts:428；tests/client/wiring/attention.spec.ts:498 |
+| 326 | 2026-11-23 | tests/host/commands/blocked-text.spec.ts:11；tests/host/cultivation/cultivation-command.spec.ts:504；tests/host/cultivation/cultivation-command.spec.ts:534 |
 | 327 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:268 |
 | 328 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:283；tests/client/wiring/attention.spec.ts:408 |
 | 329 | 2026-11-23 | tests/client/ui/list-separator.spec.ts:19；tests/client/ui/team-tool-card.spec.ts:118 |
@@ -357,7 +357,16 @@
 | 344 | 2026-11-23 | tests/host/delegation/subagent-retry.spec.ts:249 |
 | 345 | 2026-11-23 | tests/host/run-bundle/lease.spec.ts:134 |
 | 346 | 2026-11-23 | tests/host/ledger/presented-domain.spec.ts:137 |
-| 347 | 2026-11-23 | tests/tools/deliverables-catalog-tools.spec.ts:73 |
+| 347 | 2026-11-23 | tests/tools/deliverables-catalog-tools.spec.ts:74 |
 | 348 | 2026-11-23 | tests/client/cultivation/cultivation-chat-panel.spec.ts:214 |
-| 349 | 2026-11-23 | tests/host/cultivation/cultivation-command.spec.ts:220 |
+| 349 | 2026-11-23 | tests/host/cultivation/cultivation-command.spec.ts:221 |
 | 350 | 2026-11-23 | tests/client/cultivation/cultivation-compose-context.spec.ts:209 |
+| 351 | 2026-11-24 | tests/host/cultivation/cultivation-command.spec.ts:244 |
+| 352 | 2026-11-24 | tests/session/session-diagnose.spec.ts:146 |
+| 353 | 2026-11-24 | tests/tools/workspace-roots.spec.ts:6 |
+| 354 | 2026-11-24 | tests/client/i18n/presence-budget.spec.ts:108 |
+| 355 | 2026-11-24 | tests/client/cultivation/cultivation-data-races.spec.ts:32；tests/client/cultivation/cultivation-data-races.spec.ts:61 |
+| 356 | 2026-11-24 | tests/lib/accounting/ledger.spec.ts:140；tests/tools/deliverables-catalog-tools.spec.ts:104；tests/tools/deliverables-catalog-tools.spec.ts:135；tests/tools/deliverables-catalog-tools.spec.ts:150；tests/tools/markdown-table-parity.spec.ts:18 |
+| 357 | 2026-11-24 | tests/host/ledger/catalog.spec.ts:511；tests/host/ledger/catalog.spec.ts:540 |
+| 358 | 2026-11-24 | tests/client/tabs/board-panel.spec.ts:164；tests/client/tabs/board-panel.spec.ts:185 |
+| 359 | 2026-11-24 | tests/client/wiring/attention.spec.ts:482 |

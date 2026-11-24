@@ -295,6 +295,9 @@ export function mergeAttention(
         return false
       }
     }
+    // 有强身份的条目（审批/问询 id）在历史流内部重复 = 同一条被重建两次，必须去重（BUG-357 复审 finding 4）；
+    // 无 id 的 seq 条目键已逐事件唯一，重复保留是 BUG-359 要的（同毫秒两条不同事件）。
+    if (item.id !== undefined) seen.add(key)
     return true
   })
   return [...waiting.sort(byTimeDesc), ...rebuilt.slice().sort(byTimeDesc)]

@@ -212,3 +212,41 @@ describe('标注解析与打分纯逻辑（parseLabelsText + scoreLabels）', ()
     expect(() => scoreLabels([{ id: 'ghost', kind: 'synthetic', closed: false, approvals: 0, remind: '', zeroNote: '', tasks: [] }], new Map())).toThrow(/ghost/)
   })
 })
+
+// 覆盖 R1 纯规则与零容忍记账（BUG-356 复查：tools/lib 覆盖率只升不降）。
+describe('scanR1 与 scoreLabels 零容忍', () => {
+  it('scanR1：点名的角色缺稿才报候选', () => {
+    expect(scanR1('### T1 · VP-Eng 负责\n', ['vp-eng.md'])).toEqual([])
+    expect(scanR1('### T2 · CFO 负责\n', ['ceo.md'])).toEqual([
+      { rule: 'R1', role: 'cfo', why: '任务书点名 cfo，drafts/ 无其稿', needsVerify: true },
+    ])
+  })
+
+  it('scoreLabels：取消/阻塞/审批/关闭都进零容忍计数', () => {
+    const rows = [{
+      id: 'x',
+      tasks: [
+        { task: 't1', role: 'ceo', status: '取消' },
+        { task: 't2', role: 'cfo', status: '阻塞' },
+      ],
+      approvals: 1,
+      closed: true,
+    }]
+    const scans = new Map([['x', {
+      r1: [], r2: [{ task: 't1' }], r3: { candidates: [], blocked: [] }, drafts: ['cfo.md'],
+      r2c: [{ task: 't2' }, { task: 'ghost' }], r3d: { candidates: [], blocked: [] },
+    }]])
+    const scored = scoreLabels(rows as never, scans as never)
+    expect(scored.zeroTol).toMatchObject({
+      cancelReported: 1,
+      cancelSilent: 1,
+      blockedMissR1: 1,
+      blockedMissR2: 1,
+      blockedMissR3: 1,
+      blockedMissR2C: 0,
+      blockedMissR3D: 1,
+      approvalMiss: 1,
+      closedButReported: 1,
+    })
+  })
+})

@@ -9,6 +9,9 @@ import {
   BOARD_STATUS_ORDER,
   boardColumns,
   declaredDependencyLabels,
+  driftLabel,
+  paperToTaskId,
+  declaredDependencyLabels,
   dependencyDrift,
   dependencyEdges,
   driftLabel,
@@ -266,5 +269,26 @@ describe('降级事实（BUG-277/278）', () => {
     const cards = boardColumns(tasks).flatMap(column => column.cards)
     expect(cards.find(card => card.id === 't1')?.revisionGap).toBe(true)
     expect(cards.find(card => card.id === 't2')?.revisionGap).toBe(false)
+  })
+})
+
+// 覆盖 board 的分支死角（BUG-358 复查：棘轮只升不降）。
+describe('board 工具函数分支', () => {
+  it('paperToTaskId：非 T<n> 开头的 subject 不进映射', () => {
+    const tasks = tasksFromTeamView(view([
+      { id: 'a', subject: 'T1 · 正常' },
+      { id: 'b', subject: '没有纸面号' },
+    ]))
+    expect([...paperToTaskId(tasks).entries()]).toEqual([['T1', 'a']])
+  })
+
+  it('declaredDependencyLabels：否定句不算声明', () => {
+    expect(declaredDependencyLabels('不依赖 T1，可先做别的')).toEqual([])
+    expect(declaredDependencyLabels('依赖 T1、T2')).toEqual(['T1', 'T2'])
+  })
+
+  it('driftLabel：只有无法核对项也给出标签', () => {
+    expect(driftLabel({ taskId: 't1', missing: [], unmapped: ['T9'] })).toContain('无法核对')
+    expect(driftLabel({ taskId: 't1', missing: [], unmapped: [] })).toBeNull()
   })
 })
