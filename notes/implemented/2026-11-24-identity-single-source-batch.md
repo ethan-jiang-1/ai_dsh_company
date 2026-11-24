@@ -46,7 +46,18 @@
 
 - `pnpm test` 全量通过（本批收口后将在推送前复跑）；逐卡红→绿证据见各卡 `## 修复证据`。
 - `node checks/audit/company-static-audit.mjs --strict`：0 违规（host CJK 棘轮按新增成对句小幅上调，见审计表注释）。
-- `pnpm verify` ALL PASS。
+- `pnpm verify` ALL PASS；盲审复审后 `pnpm test` 2720/2720、`coverage-ratchet` PASS（217 文件）。
+
+## 独立只读盲审（356/357/359）
+
+2026-11-24 由无本次历史上下文的只读子代理审 `ed54ef17` / `07f90eb3` / `0ab2f43d`：**BLOCKING**（1 条门禁红 + 6 条边界问题），处置如下：
+1. **BLOCKING** `tools/lib` 跨目录 import 破坏 keyless 隔离 → 新增 `tools/lib/company/markdown-table.mjs` 孪生 + `tests/tools/markdown-table-parity.spec.ts` 对拍；tools 两处改引孪生，`deliverables-index` 删死导入。
+2. 357 的旧账本用例走 path 早退、未覆盖回退 → 用例改 `paths: []`，并加「自定义 slug 不冒领」用例。
+3. 回退可能把别处目录名 slug 判给自定 slug 成品 → 账本新增 `dirSlugs` 命名空间：新写入同时写 `slugs[meta]` 与 `dirSlugs[dir]`，回退只查 `dirSlugs`（老账本无字段时以 `slugs` 视作目录名集）。
+4. `mergeAttention` 误伤有 id 的历史重复 → 恢复「有 id 条目在历史内去重」，seq 条目仍逐事件保留。
+5. React key 加 index 后缀会掩盖重复/重挂 → 回退为 `attentionItemKey`；重复身份由第 4 条在模型层消掉。
+6. 跨源去重用例 `live=[]` 空转 → 改为真实 live 审批 + 历史同 id。
+7. `deliverables-index` 死导入删除。
 
 ## 未覆盖轴
 
