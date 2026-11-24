@@ -70,4 +70,4 @@ for (const v of ['MRD, SyRS', '[MRD, SyRS]', '\"MRD, SyRS\"']) {
 - 红：`pnpm test tests/host/commands/req-command.spec.ts` —— 还原裸拆分前 1 failed（`[MRD, SyRS]` 不触发不支持层提醒）
 - 绿：`pnpm test tests/host/commands/req-command.spec.ts` —— 全绿（方括号/引号两种写法都报 SyRS 不支持）
 - 提交：commit d700c76a
-- 复审修正：commit 裸值 `MRD SyRS` / `MRD;SyRS` 仍拆分（方括号/引号走 parseList）
+- 复审修正：commit 99522759 裸值 `MRD SyRS` / `MRD;SyRS` 仍拆分（方括号/引号走 parseList）
