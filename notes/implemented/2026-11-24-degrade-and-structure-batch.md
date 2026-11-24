@@ -10,6 +10,10 @@
 2. **日期合法性看往返（[BUG-378](../../_backlog/_archive/fixed_bugs/BUG-378-record-stamp-rollover-deletes-corrupt-archive.md)）**：
    `recordStampOf` 在 `new Date` 后回读 `getFullYear/getMonth/getDate/getHours/getMinutes/getSeconds`，任一分量不等即 `null`；
    `00 月/13 月/61 日/99 时` 这类「形状对、日期不存在」的文件名不再被 purge/archive 当成有效时间。
+3. **标题层级与 tools/退役词结构一致（[BUG-380](../../_backlog/_archive/fixed_bugs/BUG-380-required-sections-heading-level-mismatch.md) / [BUG-381](../../_backlog/_archive/fixed_bugs/BUG-381-tools-meta-parsers-fence-blind.md) / [BUG-382](../../_backlog/_archive/fixed_bugs/BUG-382-retired-word-scan-fence-blind.md)）**：
+   `sectionRange`/`sectionStructuralText` 增加 level（默认 2），delivery 按 needle 的 `#` 数量透传；
+   tools 新增 `markdown-lines.mjs`（结构行孪生）+ `meta-fields.mjs`，`parseMeta`/`converge.metaField` 只读结构行，与 core 对拍；
+   `checkRequirements` 的退役词/区间断言只扫结构行并剥行内代码，正文仍判红。
 
 ## 输掉的方案
 
@@ -23,10 +27,13 @@
 | 导出快照保留 | [`exportGovernance`](../../packages/company-pack/src/host/ledger/governance-export.ts) | `tests/host/ledger/governance-export.spec.ts` 五态组合 |
 | 记录时间戳 | [`recordStampOf`](../../packages/company-pack/src/lib/cultivation/cultivation-record.ts) | purge/archive 消费；表驱动用例 |
 | 记录目录读取 | [`loadRecords`](../../packages/company-pack/src/host/cultivation/cultivation-storage.ts) | `/cultivation check|archive` 消费；EACCES 用例 |
+| 标题层级定位 | [`sectionStructuralText`](../../packages/company-pack/src/lib/docs/markdown-shape.ts) | delivery 按 needle 层级透传 |
+| tools 结构行 | [`structuralLines`](../../tools/lib/company/markdown-lines.mjs) | `parseMeta`/`metaFieldFromText` 消费；与 core 对拍 |
 
 ## 验证（真跑过）
 
 - **U1**：`pnpm test tests/host/ledger/governance-export.spec.ts tests/lib/cultivation/cultivation.spec.ts tests/host/cultivation/cultivation-maintenance.spec.ts` —— 还原前 4 failed（旧快照丢失 / 坏日期删除 / EACCES 抛）；修复后 40/40 passed。
+- **U2**：`pnpm test tests/host/commands/delivery-command.spec.ts tests/lib/docs/markdown-shape.property.spec.ts tests/tools/deliverables.spec.ts tests/tools/markdown-lines-parity.spec.ts tests/lib/docs/requirements-check.spec.ts` —— 还原层级透传/逐行首现/裸全文扫描时分别红；修复后 84/84、联动 tools+host+lib 617/617。
 - `pnpm verify` ALL PASS。
 
 ## 未覆盖轴

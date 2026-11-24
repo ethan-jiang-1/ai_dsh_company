@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-381：收尾/审计链仍各自解析 `meta.md` 且不感知围栏——围栏里的模板样例会让收敛器把未收口动议当成「已收口」
 
-> 严重级别：P2（维护面误判：`lib`/`host` 侧的 `meta.md` 解析刚在 BUG-370/374/375 收成「结构行 + `yamlScalar`」，但 `tools/` 侧还有两份**独立的**行解析——`converge.mjs` 的 `metaField`（`/^${field}:\s*(.*)$/m`）与 `deliverables.mjs` 的 `parseMeta`（按行取首现）。两份都不跳过代码围栏：`meta.md` 里粘过模板片段时，围栏里的 `closed: 2020-01-01` 会被当真实收口日期，`assess()` 于是不再报 `closed-missing` ⇒ 收敛器把未收口动议推进归档；`result:` 同理，审计会用样例值判形状）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（维护面误判：`lib`/`host` 侧的 `meta.md` 解析刚在 BUG-370/374/375 收成「结构行 + `yamlScalar`」，但 `tools/` 侧还有两份**独立的**行解析——`converge.mjs` 的 `metaField`（`/^${field}:\s*(.*)$/m`）与 `deliverables.mjs` 的 `parseMeta`（按行取首现）。两份都不跳过代码围栏：`meta.md` 里粘过模板片段时，围栏里的 `closed: 2020-01-01` 会被当真实收口日期，`assess()` 于是不再报 `closed-missing` ⇒ 收敛器把未收口动议推进归档；`result:` 同理，审计会用样例值判形状）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（tools meta 结构解析）
 >
-> **留痕**：（待修复时裁决）
+> **留痕**：Note [2026-11-24-degrade-and-structure-batch](../../../notes/implemented/2026-11-24-degrade-and-structure-batch.md)（批次 377..383：tools meta 结构解析）
 
 ## 症状
 
@@ -19,11 +19,11 @@ opened: 2026-11-24
 | `closed` | `declared:true, value:''` | `"2020-01-01"` | `"2020-01-01"` |
 | `result` | `declared:true, value:''` | `"accepted"` | `"accepted"` |
 
-`assess()` 的判据是 `/\d{4}-\d{2}-\d{2}/.test(state.closed ?? '')`（[`converge-rules.mjs`](../../tools/lib/company/converge-rules.mjs#L234-L238)）——拿到样例日期就不报 `closed-missing`。
+`assess()` 的判据是 `/\d{4}-\d{2}-\d{2}/.test(state.closed ?? '')`（[`converge-rules.mjs`](../../../tools/lib/company/converge-rules.mjs#L234-L238)）——拿到样例日期就不报 `closed-missing`。
 
 ## 运行面
 
-- **面 = tools**：[`tools/repo/converge.mjs`](../../tools/repo/converge.mjs#L73-L76)（`metaField`）、[`tools/lib/company/deliverables.mjs`](../../tools/lib/company/deliverables.mjs#L102-L140)（`parseMeta`/`validateMeta`）、[`tools/lib/company/converge-rules.mjs`](../../tools/lib/company/converge-rules.mjs#L234-L249)（`assess`）。
+- **面 = tools**：[`tools/repo/converge.mjs`](../../../tools/repo/converge.mjs#L73-L76)（`metaField`）、[`tools/lib/company/deliverables.mjs`](../../../tools/lib/company/deliverables.mjs#L102-L140)（`parseMeta`/`validateMeta`）、[`tools/lib/company/converge-rules.mjs`](../../../tools/lib/company/converge-rules.mjs#L234-L249)（`assess`）。
 
 ## 复现
 
@@ -58,3 +58,10 @@ console.log('converge result =', JSON.stringify(converge('result')), '| lib =', 
 - 上述复现里 `converge.mjs` 与 `deliverables.mjs` 读出的 `closed`/`result` 与 `metaScalarField` 相等（都为空）；
 - 围栏外的真值仍正常读到；`assess` 对「只有样例日期」的动议仍报 `closed-missing`；
 - 新增 `tests/tools/` 用例（旧实现红、新实现绿）。
+
+## 修复证据
+
+- 改动面：`tools/lib/company/markdown-lines.mjs`、`tools/lib/company/meta-fields.mjs`、`tools/lib/company/deliverables.mjs`、`tools/repo/converge.mjs`、`tests/tools/markdown-lines-parity.spec.ts`、`tests/tools/deliverables.spec.ts`
+- 红：`pnpm test tests/tools/deliverables.spec.ts tests/tools/markdown-lines-parity.spec.ts` —— 还原逐行首现前 1 failed（围栏样例覆盖真值）
+- 绿：`pnpm test tests/tools/deliverables.spec.ts tests/tools/markdown-lines-parity.spec.ts` —— 全绿（结构行与 core 对拍一致）
+- 提交：commit 6dd7676c

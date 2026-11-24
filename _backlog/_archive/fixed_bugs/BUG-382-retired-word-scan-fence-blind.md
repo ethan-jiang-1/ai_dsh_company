@@ -1,18 +1,18 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-382：`/req check` 的退役词与区间计数扫描是裸全文扫描——代码围栏里引用一个退役号就被判红并挡住交付
 
-> 严重级别：P2（假红挡住交付：`checkRequirements` 的退役词与区间计数断言遍历 `normalizeDocument(doc.text).split('\n')` 的**每一行**，不看 `structural`。需求文档里记录「旧编号 `STR-12` 已退役」「覆盖 REQ-001 ~ REQ-004」是正常的迁移说明/样例，写在代码围栏里也会被判违规 ⇒ `/req check` 返回 error，present 闸门随之拒绝交付；而同一函数的其它判据（定义点、表头、小节）全部走 `scanDocumentDetailed` 的结构行）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（假红挡住交付：`checkRequirements` 的退役词与区间计数断言遍历 `normalizeDocument(doc.text).split('\n')` 的**每一行**，不看 `structural`。需求文档里记录「旧编号 `STR-12` 已退役」「覆盖 REQ-001 ~ REQ-004」是正常的迁移说明/样例，写在代码围栏里也会被判违规 ⇒ `/req check` 返回 error，present 闸门随之拒绝交付；而同一函数的其它判据（定义点、表头、小节）全部走 `scanDocumentDetailed` 的结构行）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（退役词结构扫描）
 >
-> **留痕**：（待修复时裁决）
+> **留痕**：Note [2026-11-24-degrade-and-structure-batch](../../../notes/implemented/2026-11-24-degrade-and-structure-batch.md)（批次 377..383：退役词结构扫描）
 
 ## 症状
 
-[`requirements-check.ts`](../../packages/company-pack/src/lib/docs/requirements-check.ts#L556-L562)：
+[`requirements-check.ts`](../../../packages/company-pack/src/lib/docs/requirements-check.ts#L556-L562)：
 
 ```ts
 for (const [index, line] of normalizeDocument(doc.text).split('\n').entries()) {
@@ -25,7 +25,7 @@ for (const [index, line] of normalizeDocument(doc.text).split('\n').entries()) {
 
 ## 运行面
 
-- **面 = lib**：[`requirements-check.ts`](../../packages/company-pack/src/lib/docs/requirements-check.ts#L556-L562)；消费方 `/req check`（[`req-command`](../../packages/company-pack/src/host/commands/req-command.ts)）与 present 闸门（[`prd-gate`](../../packages/company-pack/src/host/commands/prd-gate.ts)）。
+- **面 = lib**：[`requirements-check.ts`](../../../packages/company-pack/src/lib/docs/requirements-check.ts#L556-L562)；消费方 `/req check`（[`req-command`](../../../packages/company-pack/src/host/commands/req-command.ts)）与 present 闸门（[`prd-gate`](../../../packages/company-pack/src/host/commands/prd-gate.ts)）。
 
 ## 复现
 
@@ -62,3 +62,10 @@ console.log('inline REQ range', JSON.stringify(run('\n不要把旧编号写成 \
 - 上述两份文档（围栏内 `STR-12`、行内代码内区间）都不再产生错误，`/req check` 回 success；
 - 正文里写 `STR-12` / `REQ-001 ~ REQ-004` 仍判红（负例不退化）；
 - 新增 `tests/lib/docs/requirements-check.spec.ts` 用例（旧实现红、新实现绿）。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/docs/requirements-check.ts`、`tests/lib/docs/requirements-check.spec.ts`
+- 红：`pnpm test tests/lib/docs/requirements-check.spec.ts` —— 还原裸全文扫描前 1 failed（围栏/行内代码引用被判红）
+- 绿：`pnpm test tests/lib/docs/requirements-check.spec.ts` —— 全绿（围栏/行内豁免，正文仍红）
+- 提交：commit 6dd7676c

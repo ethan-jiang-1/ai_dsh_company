@@ -4,6 +4,13 @@
 
 ## 修复流水（倒序）
 
+- **BUG-380**（2026-11-24，377..383 批顺位 2 / P2）：`sectionRange` 加 level 透传，`#`/`##`/`###` 必填小节都按结构命中——
+  [380](BUG-380-required-sections-heading-level-mismatch.md)。证据提交 `6dd7676c`。
+- **BUG-381**（2026-11-24，377..383 批顺位 2 / P2）：tools 侧 `parseMeta`/`converge.metaField` 改结构行扫描（孪生 + 对拍）——
+  [381](BUG-381-tools-meta-parsers-fence-blind.md)。证据提交 `6dd7676c`。
+- **BUG-382**（2026-11-24，377..383 批顺位 2 / P2）：退役词/区间断言只扫结构行（围栏/行内代码豁免，正文仍禁）——
+  [382](BUG-382-retired-word-scan-fence-blind.md)。证据提交 `6dd7676c`。
+
 - **BUG-377**（2026-11-24，377..383 批顺位 1 / P2）：`exportGovernance` 的 missing 账本沿用旧快照并告警，不再整目录替换删数据——
   [377](BUG-377-gov-export-drops-ledger-snapshot-on-missing.md)。证据提交 `db1fbb11`。
 - **BUG-378**（2026-11-24，377..383 批顺位 1 / P2）：`recordStampOf` 加日期往返校验，坏日期不再被 purge/archive 当真——
