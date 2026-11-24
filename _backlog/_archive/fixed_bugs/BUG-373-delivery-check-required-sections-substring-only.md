@@ -1,18 +1,18 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-373：`/delivery check` 用裸子串 `includes` 判「必填小节」，把交付文档里**围栏/注释中的**模板样例当成真小节
 
-> 严重级别：P2（闸门可绕过：交付规则里的 `requiredSections` 是形如 `## 2. Scope` 的标题串，检查器只做 `text.includes(needle)`。模型写的 `drafts/sow.md` 里只要**粘贴过模板片段**（放进代码围栏）或把标题写进 `<!-- -->` 注释，就会被判「小节齐了」；而同一批文档走 `/prd check` 时用的是结构感知扫描（围栏/注释里的假标题不算，BUG-160/162 的判据）——同一份文档两个消费者两种结论）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（闸门可绕过：交付规则里的 `requiredSections` 是形如 `## 2. Scope` 的标题串，检查器只做 `text.includes(needle)`。模型写的 `drafts/sow.md` 里只要**粘贴过模板片段**（放进代码围栏）或把标题写进 `<!-- -->` 注释，就会被判「小节齐了」；而同一批文档走 `/prd check` 时用的是结构感知扫描（围栏/注释里的假标题不算，BUG-160/162 的判据）——同一份文档两个消费者两种结论）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（围栏/注释红，真标题绿）
 >
-> **留痕**：（待修复时裁决）
+> **留痕**：Note [2026-11-24-meta-single-source-and-presence-parity](../../../notes/implemented/2026-11-24-meta-single-source-and-presence-parity.md)（批次 370..376：结构行判据）
 
 ## 症状
 
-[`delivery-command.ts`](../../packages/company-pack/src/host/commands/delivery-command.ts#L168-L176)：
+[`delivery-command.ts`](../../../packages/company-pack/src/host/commands/delivery-command.ts#L168-L176)：
 
 ```ts
 for (const needle of rules.requiredSections?.[key] ?? []) {
@@ -25,7 +25,7 @@ for (const needle of rules.requiredSections?.[key] ?? []) {
 
 ## 运行面
 
-- **面 = host**：[`delivery-command.ts`](../../packages/company-pack/src/host/commands/delivery-command.ts#L160-L185)；对照判据 [`markdown-shape.sectionStructuralText`](../../packages/company-pack/src/lib/docs/markdown-shape.ts) 被 `/prd check` / `/req check` 使用。
+- **面 = host**：[`delivery-command.ts`](../../../packages/company-pack/src/host/commands/delivery-command.ts#L160-L185)；对照判据 [`markdown-shape.sectionStructuralText`](../../../packages/company-pack/src/lib/docs/markdown-shape.ts) 被 `/prd check` / `/req check` 使用。
 
 ## 复现
 
@@ -63,3 +63,10 @@ for (const [name, text] of [['fenced', fenced], ['commented', commented]]) {
 - 上述两份只有围栏/注释样例的文档分别被判 `缺 section`（红）；
 - 正常文档（真标题）仍通过；
 - 新增 host 用例覆盖围栏与注释两种绕过（旧实现红、新实现绿）。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/commands/delivery-command.ts`、`tests/host/commands/delivery-command.spec.ts`
+- 红：`pnpm test tests/host/commands/delivery-command.spec.ts` —— 还原裸 `includes` 前 2 failed（围栏/注释样例通过）
+- 绿：`pnpm test tests/host/commands/delivery-command.spec.ts` —— 29/29 passed（样例不算、真标题通过）
+- 提交：commit df7bfda8

@@ -18,6 +18,9 @@
 3. **在场 live/replay 同口径（[BUG-372](../../_backlog/_archive/fixed_bugs/BUG-372-diff-activity-shows-raw-lead-owner.md) / [BUG-376](../../_backlog/_archive/fixed_bugs/BUG-376-replay-lead-row-loses-current-tasks.md)）**：
    新增 `taskOwnerDisplayName`（`lead → CEO`）供看板与 `diffActivity` 共用；回放 lead 行不再手拼
    `inactive/currentTasks:null`，改用与 live 相同的 `idle` 和「按 ownerId 现算进行中任务」。
+4. **交付小节结构敏感（[BUG-373](../../_backlog/_archive/fixed_bugs/BUG-373-delivery-check-required-sections-substring-only.md)）**：
+   `hasStructuralSection`：`## x` 走 `sectionStructuralText`，`| a | b |` 走结构表行前缀匹配，其它走结构行包含；
+   围栏/HTML 注释里的模板样例不再满足闸门。
 
 ## 输掉的方案
 
@@ -38,6 +41,7 @@
 - **U1**：`pnpm test tests/lib/docs/requirements-check.spec.ts tests/host/commands/req-command.spec.ts tests/host/commands/delivery-command.spec.ts` —— 还原三处解析前 6 failed（引号/注释/冒号空格/占位符/围栏/方括号）；修复后 90/90 passed。
 - **U2**：`pnpm test tests/tools/meta-shape-parity.spec.ts tests/lib/shared/parsers-fuzz.property.spec.ts` —— 还原三处判据前 5 failed；修复后 parity 10/10、`tests/content tests/tools tests/client/data` 490/490。
 - **U3**：`pnpm test tests/lib/presence/presence-board.spec.ts` —— 还原前 2 failed（裸 `lead`；回放 `inactive/null`）；修复后 34/34、联动 presence 面 141/141。
+- **U4**：`pnpm test tests/host/commands/delivery-command.spec.ts` —— 还原裸 `includes` 前 2 failed；修复后 29/29 passed。
 - `pnpm verify` ALL PASS。
 
 ## 未覆盖轴

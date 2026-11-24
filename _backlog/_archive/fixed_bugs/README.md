@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-373**（2026-11-24，370..376 批顺位 4 / P2）：`/delivery check` 的 requiredSections 改结构行判据（标题/表格/结构行），围栏与注释样例不算——
+  [373](BUG-373-delivery-check-required-sections-substring-only.md)。证据提交 `df7bfda8`。
+
 - **BUG-372**（2026-11-24，370..376 批顺位 3 / P2）：`taskOwnerDisplayName` 统一 `lead → CEO`，看板/动态/回放共用——
   [372](BUG-372-diff-activity-shows-raw-lead-owner.md)。证据提交 `7e35a053`。
 - **BUG-376**（2026-11-24，370..376 批顺位 3 / P2）：回放 lead 行用 live 同口径（idle + currentTasks 现算）——

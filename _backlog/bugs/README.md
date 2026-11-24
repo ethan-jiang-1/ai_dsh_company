@@ -8,11 +8,10 @@
 
 ## 活跃清单
 
-**活跃 1 张（2026-11-24 第七轮构造场景探查新立，只报不修）**：
+**活跃 0 张（2026-11-24 第七轮构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
-| [BUG-373](BUG-373-delivery-check-required-sections-substring-only.md) | P2 | host | `/delivery check` 用裸 `includes` 判必填小节，围栏/注释里的模板样例即可通过 | 调查中 |
 
 **本轮查过但不入卡**（避免下轮重复排查）：`delivery-rules` 的 `requiredFields` 没有任何检查器消费，但 `content/delivery-modes/*/document-map.md` 只声明 `documents.file` 与 `requiredSections` 会被 `/delivery check` 校验——属「未声明要校验」，不是缺陷；`catalog` 的 2000 行读上限在 ~153 条成品处触发但已有专档文案（第六轮已记）；`TEAM_TOOL_KEYS`（9 个）与 vendor `tool-agent-team` 的工具名逐字一致（已核）；`DELEGATION_TOOL_KEYS` 与 preset `toolName:` 声明一致（已核）；`formatTokens`/`firstText`/`yamlScalar`/`instance-guard` 四处上一轮修复经本轮复核未见回归。
 
@@ -25,7 +24,7 @@
 | **1 元数据字段解析单一来源** | [370](../_archive/fixed_bugs/BUG-370-numbering-parser-differs-from-yaml-scalar.md)（已修 `d700c76a`） + [374](../_archive/fixed_bugs/BUG-374-req-declared-layers-splitter-diverges.md)（已修 `d700c76a`） + [375](../_archive/fixed_bugs/BUG-375-meta-field-parsers-fence-blind.md)（已修 `d700c76a`） | `meta.md` 同一族字段各写一套解析：numbering 裸正则、layers 裸拆分、productType/deliveryMode 围栏不感知；标量口径与结构口径都分叉 | 抽 `metaField(text, name)`（`metaFieldLines` 结构行 + `yamlScalarOrProblem` + 占位符）与 `metaListField`（复用 `parseList`），`numberingMarker`/`parseProductType`/`parseDeliveryMode`/`hasDeclaredDeliveryMode`/`parseDeclaredLayers` 全部改用它；表驱动用例覆盖引号/注释/冒号前空格/围栏/`[…]` | 1 |
 | **2 元数据形状校验单一判据** | [371](../_archive/fixed_bugs/BUG-371-meta-shape-validators-three-way-split.md)（已修 `7d81872c`） | 面板 `metaProblemsOf` 与仓库审计 `validateMeta` 各自演化，缺 slug/日期前缀/空 result 三处裁决相反 | 以 `metaProblemsOf` 为唯一判据（tools 侧 parity 引用），统一「空值与缺行」语义：`result` 空=合法、`kickoff`/`type` 空=缺行、`slug` 允许回退但日期前缀判红；三输入 parity 用例 | 2 |
 | **3 在场身份 live/replay 一致** | [372](../_archive/fixed_bugs/BUG-372-diff-activity-shows-raw-lead-owner.md)（已修 `7e35a053`） + [376](../_archive/fixed_bugs/BUG-376-replay-lead-row-loses-current-tasks.md)（已修 `7e35a053`） | 同一 `lead` 特殊值两条消费路径：`diffActivity` 硬编码 `teammate`；回放 lead 行手拼 `inactive/currentTasks:null`，与 live 投影不一致 | 抽共享 `ownerDisplayName` 与「任务 → owner 的 currentTasks」helper；`diffActivity`/`tasksFromTeamView`/`presenceFromEvents` 同用；lead 行状态与 live 同口径并补 live↔replay 对比用例 | 3 |
-| **4 交付小节结构敏感** | [373](BUG-373-delivery-check-required-sections-substring-only.md) | `/delivery check` 用裸 `includes` 判必填小节，围栏/注释里的样例也算 | `requiredSections` 改为结构行匹配（标题用 `scanDocument`/`sectionStructuralText`，表格行用 `splitTableRow` + 结构扫描）；围栏/注释两份绕过文档用例 + 正常文档回归 | 4 |
+| **4 交付小节结构敏感** | [373](../_archive/fixed_bugs/BUG-373-delivery-check-required-sections-substring-only.md)（已修 `df7bfda8`） | `/delivery check` 用裸 `includes` 判必填小节，围栏/注释里的样例也算 | `requiredSections` 改为结构行匹配（标题用 `scanDocument`/`sectionStructuralText`，表格行用 `splitTableRow` + 结构扫描）；围栏/注释两份绕过文档用例 + 正常文档回归 | 4 |
 
 **横向原则**：同一份文件/字段的解析、形状、结构判定各只有一份实现；提醒/闸门等消费面只选「怎么显示」，不另写判据；未知/坏形状保持 fail-closed 且有信号。
 **终点**：7 张全部带红/绿证据迁入 `fixed_bugs/`；1 篇批次伞形 Note；370/371/376 的跨模块解析/校验/回放判据过独立只读盲审；`verify`/`test`/`typecheck`/`lint`/`dup`/`coverage-ratchet` 与 client 真加载冒烟全绿并 `push`。批次外新卡不动。
