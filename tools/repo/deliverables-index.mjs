@@ -12,7 +12,8 @@ import { join, relative } from 'node:path'
 import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 import { parseAuditVerdict } from '../lib/repo/audit-verdict.mjs'
 import { parseMeta } from '../lib/company/deliverables.mjs'
-import { buildDeliverablesCatalog, CATALOG_ROOTS, deliverableSlug } from '../lib/company/deliverables-catalog.mjs'
+import { splitTableRow } from '../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
+import { buildDeliverablesCatalog, CATALOG_ROOTS, deliverableSlug, ledgerSlugsFromText } from '../lib/company/deliverables-catalog.mjs'
 
 // 测试缝（2026-10-23）：converge 的端到端探针把工作区重定向到 runtime/ 下的临时目录。
 // 默认值不变；只有显式设了 DELIVERABLES_WS_REL 才重定向（converge 会把它传给本生成器）。
@@ -39,22 +40,6 @@ function presentedSlugs() {
  * @param {string} text - 动议台账全文。
  * @returns {Set<string>} slug 集合。
  */
-function ledgerSlugs(text) {
-  const slugs = new Set()
-  let headerSeen = false
-  for (const line of text.split('\n')) {
-    const trimmed = line.trim()
-    if (!trimmed.startsWith('|')) continue
-    const cells = trimmed.slice(1, trimmed.endsWith('|') ? -1 : undefined).split('|').map(cell => cell.trim())
-    if (!headerSeen) {
-      if (cells[0] === 'slug') headerSeen = true
-      continue
-    }
-    if (cells.every(cell => /^[-: ]*$/.test(cell))) continue
-    if (cells[0] !== undefined && cells[0] !== '') slugs.add(cells[0])
-  }
-  return slugs
-}
 
 if (!existsSync(WORKSPACE)) {
   console.error(`company-workspace 不存在：${WORKSPACE}`)
@@ -80,7 +65,7 @@ for (const root of CATALOG_ROOTS) {
 const ledgerPath = join(WORKSPACE, '.dsh-company', 'kb', 'motion-ledger.md')
 const catalog = buildDeliverablesCatalog({
   entries,
-  ledgerSlugs: existsSync(ledgerPath) ? ledgerSlugs(readFileSync(ledgerPath, 'utf8')) : new Set(),
+  ledgerSlugs: existsSync(ledgerPath) ? ledgerSlugsFromText(readFileSync(ledgerPath, 'utf8')) : new Set(),
   generatedAt: new Date().toISOString(),
 })
 

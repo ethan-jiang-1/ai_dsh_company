@@ -7,6 +7,7 @@
 // - 数据面 = 盘上 meta/final（D20 的 `present` 背书仍归 `deliverables-check`；本目录首版不冒充它）。
 // - `ledgered` = slug 能在 `kb/motion-ledger.md` 找到；false 的成品在面板上标「台账外」。
 // - 只做**派生视图**：不新建第二份手写事实；跑生成器即可重建。
+import { splitTableRow } from '../../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
 import { META_RESULTS, META_TYPES, slugFromDirName } from './deliverables.mjs'
 
 /** 目录条目的根（活跃 / 归档）。 */
@@ -53,6 +54,29 @@ export function metaProblemsOf(fields) {
 export function deliverableSlug(fields, dir) {
   const raw = (fields.get('slug') ?? '').trim()
   return raw === '' ? slugFromDirName(dir) : raw
+}
+
+
+/**
+ * 动议台账里的 slug 集合（与 host `ledgerSlugsFromText` 同判据；BUG-356 起共用 `splitTableRow`）。
+ * @param {string} text kb/motion-ledger.md 全文
+ * @returns {Set<string>}
+ */
+export function ledgerSlugsFromText(text) {
+  const slugs = new Set()
+  let headerSeen = false
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim()
+    if (!trimmed.startsWith('|')) continue
+    const cells = splitTableRow(trimmed)
+    if (!headerSeen) {
+      if (cells[0] === 'slug') headerSeen = true
+      continue
+    }
+    if (cells.every(cell => /^[-: ]*$/.test(cell))) continue
+    if (cells[0] !== undefined && cells[0] !== '') slugs.add(cells[0])
+  }
+  return slugs
 }
 
 /**

@@ -135,3 +135,20 @@ describe('parseMotionLedger：表头诊断（BUG-311）', () => {
     expect(parseMotionLedger('# 台账\n\n正文\n').headerOk).toBe(true)
   })
 })
+
+// 负例留证 2026-11-24：把 splitTableRow 换回裸 split('|') ⇒ 本用例红（8 列坏行）。BUG-356
+describe('台账表格方言：转义竖线（BUG-356）', () => {
+  const LEDGER = [
+    '| slug | date | type | participants | wallClock | deliverable | summary |',
+    '|---|---|---|---|---|---|---|',
+    '| 2026-11-20-a | 2026-11-20 | decision | ceo | 1m | ✅ | A\\|B 方案对比 |',
+  ].join('\n')
+
+  it('单元格里的 \\| 留在列内：1 行、0 坏行、summary 保留字面竖线', () => {
+    const parsed = parseMotionLedger(LEDGER)
+    expect(parsed.badRows).toEqual([])
+    expect(parsed.rows).toHaveLength(1)
+    expect(parsed.rows[0]?.summary).toBe('A|B 方案对比')
+    expect(parsed.rows[0]?.slug).toBe('2026-11-20-a')
+  })
+})

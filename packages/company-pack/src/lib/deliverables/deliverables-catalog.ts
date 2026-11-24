@@ -6,6 +6,7 @@
  * - 数据面 = 盘上 meta/final；`presented` 由部署 host 的 present 事件投影，未观测 = null（未核）。
  * - `ledgered` = slug 能在 kb/motion-ledger.md 找到。
  */
+import { splitTableRow } from '../docs/markdown-shape.ts'
 import { RUN_BUNDLE_PATHS } from '../shared/run-bundle-paths.ts'
 
 export const CATALOG_ROOTS = [RUN_BUNDLE_PATHS.deliverables, RUN_BUNDLE_PATHS.archive] as const
@@ -162,7 +163,7 @@ export function ledgerSlugsFromText(text: string): Set<string> {
   for (const line of text.split('\n')) {
     const trimmed = line.trim()
     if (!trimmed.startsWith('|')) continue
-    const cells = trimmed.slice(1, trimmed.endsWith('|') ? -1 : undefined).split('|').map(cell => cell.trim())
+    const cells = splitTableRow(trimmed)
     if (!headerSeen) {
       if (cells[0] === 'slug') headerSeen = true
       continue

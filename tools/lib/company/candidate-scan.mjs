@@ -6,6 +6,7 @@
 // ⚠ 命名纪律（评审 §五 B 的零容忍条款）：未达判据前，输出只能叫「**待核工作候选**」，
 // 不叫"我的待办"，不自动通知。候选项必须带「待核实」标记。
 
+import { splitTableRow } from '../../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
 import { headingSections } from '../core/repo-markdown.mjs'
 
 /**
@@ -173,7 +174,7 @@ export function parseLabelsText(text) {
     })
   for (const [section, line] of labelLines) {
     if (!line.trim().startsWith('|') || /\|-{2,}/.test(line)) continue
-    const cells = line.split('|').slice(1, -1).map(c => c.trim())
+    const cells = splitTableRow(line)
     if (cells.length < 4 || !cells[0] || cells[0] === 'case' || cells[0] === 'slug') continue
     const tasks = []
     // 分隔符 = `；`，但描述文字里也可能出现 `；` ⇒ 碎片不以下一条的「角色·」开头时并回上一条

@@ -4,6 +4,7 @@
  * 台账唯一事实家 = `kb/motion-ledger.md`（维护规矩见该文件头注——当轮收敛时维护者追加一行）；
  * 本模块只做**纯解析**（表行 → 领域行），渲染与文件读取分离。keyless 单测 = `tests/lib/accounting/ledger.spec.ts`。
  */
+import { splitTableRow } from '../docs/markdown-shape.ts'
 
 /** 动议类型磁盘值（旧中文 / 现行英文）到 canonical id 的映射（UI 字典查词用）。 */
 export const LEDGER_KIND_CANONICAL: Readonly<Record<string, 'decision' | 'production' | 'diagnostic' | 'qa'>> = {
@@ -74,7 +75,8 @@ export function parseMotionLedger(text: string): MotionLedgerParse {
   for (const [index, line] of lines.entries()) {
     const trimmed = line.trim()
     if (!trimmed.startsWith('|')) continue
-    const cells = trimmed.slice(1, trimmed.endsWith('|') ? -1 : undefined).split('|').map(cell => cell.trim())
+    // BUG-356：与 /req /prd 同一表格方言（识别 `\\|` 转义）；裸 split 会把合法单元格判成坏行。
+    const cells = splitTableRow(trimmed)
     if (!headerSeen) {
       if (HEADERS.some(header => cells.length === header.length && header.every((name, i) => cells[i] === name))) headerSeen = true
       continue

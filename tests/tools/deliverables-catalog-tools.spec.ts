@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { buildDeliverablesCatalog, deliverableSlug } from '../../tools/lib/company/deliverables-catalog.mjs'
+import { buildDeliverablesCatalog, deliverableSlug, ledgerSlugsFromText } from '../../tools/lib/company/deliverables-catalog.mjs'
+import { ledgerSlugsFromText as ledgerSlugsFromTextTs } from '../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts'
 
 /**
  * 成品目录的 keyless 形状判据（2026-10-19 成品台账卡）。
@@ -96,5 +97,22 @@ describe('tools 侧空 slug 回落（BUG-347）', () => {
     expect(parsed.skipped).toBe(0)
     expect(parsed.entries).toHaveLength(1)
     expect(parsed.entries[0]?.slug).toBe('fallback')
+  })
+})
+
+// 负例留证 2026-11-24：tools 侧裸 split('|') ⇒ 与 TS 侧转义竖线用例红/发散。BUG-356
+describe('台账 slug 集合：TS/JS 同方言（BUG-356）', () => {
+  const TEXT = [
+    '| slug | date | type | participants | wallClock | deliverable | summary |',
+    '|---|---|---|---|---|---|---|',
+    '| a | 2026-11-20 | decision | ceo | 1m | ✅ | A\\|B |',
+    '| b | 2026-11-21 | decision | ceo | 1m | ✅ | plain |',
+  ].join('\n')
+
+  it('两侧解析同一份含 \\| 的台账得到相同 slug 集合', () => {
+    const js = ledgerSlugsFromText(TEXT)
+    const ts = ledgerSlugsFromTextTs(TEXT)
+    expect([...js].sort()).toEqual(['a', 'b'])
+    expect([...ts].sort()).toEqual([...js].sort())
   })
 })
