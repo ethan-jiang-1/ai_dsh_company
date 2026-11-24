@@ -11,6 +11,7 @@ import { registerPrdCommand } from '../../../packages/company-pack/src/host/comm
 import { registerReqCommand } from '../../../packages/company-pack/src/host/commands/req-command.ts'
 import { registerDeliveryCommand } from '../../../packages/company-pack/src/host/commands/delivery-command.ts'
 import { registerSettingsCommand } from '../../../packages/company-pack/src/host/commands/settings-command.ts'
+import { registerClientDiagnostics } from '../../../packages/company-pack/src/host/commands/client-diagnostics.ts'
 import { assertEnglishUiClean } from '../../support/i18n-assertions.ts'
 
 interface Definition {
@@ -43,6 +44,17 @@ describe('host 命令面语言合同（BUG-338）', () => {
       expect(result.kind).toBe('error')
       assertEnglishUiClean(result.text, `${definition.name} en blocked receipt`)
     }
+  })
+
+  it('en：/company-diagnostics 的描述与错误回执零中文', async () => {
+    const language = createCompanyLanguageState('en')
+    let definition: Definition | undefined
+    const ctx = { commands: { register: (def: Definition) => { definition = def } } }
+    registerClientDiagnostics(ctx as unknown as Context, '/tmp/dsh-home', { language })
+    assertEnglishUiClean(definition!.description, 'diagnostics en description')
+    const result = await definition!.handler({ rawInput: ' client-error' })
+    expect(result.kind).toBe('error')
+    assertEnglishUiClean(result.text, 'diagnostics en usage')
   })
 
   it('en：/company-settings 的停写回执与缺 workspace 回执零中文', async () => {

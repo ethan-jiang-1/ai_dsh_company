@@ -17,20 +17,23 @@ export interface SignoffRequest {
   readonly detail?: string
 }
 
+/** 语言选择（与 `CompanyLanguageState.text` 同签名；缺省 zh 保持旧调用方行为）。 */
+type SignoffText = (zh: string, en: string) => string
+
 /** 审批请求的 reason（给应答人看的）：`<签字线>：<摘要>（<补充>）`；空补充忽略。 */
-export function signoffReason(request: SignoffRequest): string {
-  const base = `${request.line}：${request.summary}`
+export function signoffReason(request: SignoffRequest, text: SignoffText = zh => zh): string {
+  const base = text(`${request.line}：${request.summary}`, `${request.line}: ${request.summary}`)
   return request.detail === undefined || request.detail.trim() === ''
     ? base
-    : `${base}（${request.detail.trim()}）`
+    : text(`${base}（${request.detail.trim()}）`, `${base} (${request.detail.trim()})`)
 }
 
 /** 审批结果 → 模型侧提示语（工具结果带一句人话，模型据此决定落稿 / 调整 / veto）。 */
-export function signoffDecisionNote(decision: string): string {
+export function signoffDecisionNote(decision: string, text: SignoffText = zh => zh): string {
   switch (decision) {
-    case 'allowed-once': return '已批准本次（一次性）——可按结论落稿。'
-    case 'rejected': return '被拒绝——按拒绝意见调整结论，或行使 veto。'
-    case 'cancelled': return '请求被撤回——不要按原结论落稿，等待新指令。'
-    default: return '无人应答（fail-closed）——不要按原结论落稿；把该事项写进稿件未决项并告知 CEO。'
+    case 'allowed-once': return text('已批准本次（一次性）——可按结论落稿。', 'Allowed once — you may finalize the conclusion.')
+    case 'rejected': return text('被拒绝——按拒绝意见调整结论，或行使 veto。', 'Rejected — adjust the conclusion per the rejection note, or exercise your veto.')
+    case 'cancelled': return text('请求被撤回——不要按原结论落稿，等待新指令。', 'The request was withdrawn — do not finalize the original conclusion; wait for new instructions.')
+    default: return text('无人应答（fail-closed）——不要按原结论落稿；把该事项写进稿件未决项并告知 CEO。', 'No decision (fail-closed) — do not finalize the original conclusion; record the item as an open question in the deliverable and tell the CEO.')
   }
 }

@@ -8,10 +8,12 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { signoffDecisionNote, signoffReason } from '../../lib/accounting/signoff.ts'
+import type { CompanyLanguageState } from '../language/company-language.ts'
 
 /** 注册签字工具；无 agent 会话时回 unavailable（不抛错、不发审批）。 */
-export function registerSignoffTool(ctx: Context): void {
-  ctx.tools.register(defineTool({
+export function registerSignoffTool(ctx: Context, options: { readonly language?: Pick<CompanyLanguageState, 'text' | 'subscribe'> } = {}): void {
+  const text = (zh: string, en: string): string => options.language?.text(zh, en) ?? zh
+  const definition = () => defineTool({
     name: 'request_signoff',
     description: 'Request human sign-off for a company sign-line (双签 / 会签线). '
       + 'Call this BEFORE finalizing any conclusion that crosses a sign line — for example a proposal below the margin floor or a discount below the discount floor (values live in the deployment policy file). '
@@ -20,7 +22,7 @@ export function registerSignoffTool(ctx: Context): void {
       line: {
         type: 'string',
         required: true,
-        description: 'Which sign line this hits, e.g. "毛利线双签" or "折扣线双签"（具体数值见部署 policy）. ',
+        description: 'Which sign line this hits, e.g. "margin sign line" / "毛利线双签" or "discount sign line" / "折扣线双签" (values live in the deployment policy).',
       },
       summary: {
         type: 'string',
@@ -46,16 +48,23 @@ export function registerSignoffTool(ctx: Context): void {
     async execute(args, exec) {
       // approval.request() 读取 agent.session（轮内审计配对），无发起会话时不请求。
       if (exec.agent === undefined) {
-        return { decision: 'unavailable', note: '审批请求需要发起会话（agent）上下文。' }
+        return { decision: 'unavailable', note: text('审批请求需要发起会话（agent）上下文。', 'A sign-off request needs the originating agent session context.') }
       }
       const decision = await ctx.approval.request({
         agent: exec.agent,
         toolName: 'request_signoff',
         ...(exec.callId !== undefined ? { callId: exec.callId } : {}),
-        reason: signoffReason(args),
+        reason: signoffReason(args, text),
         signal: exec.signal,
       })
-      return { decision, note: signoffDecisionNote(decision) }
+      return { decision, note: signoffDecisionNote(decision, text) }
     },
-  }))
+  })
+
+  // 工具描述/参数是注册期字符串：语言切换时重注册（BUG-367，同命令面 `registerLocalizedCommand` 手法）。
+  let dispose = ctx.tools.register(definition())
+  if (options.language === undefined) return
+  const unsubscribe = options.language.subscribe(() => { dispose(); dispose = ctx.tools.register(definition()) })
+  const effect = (ctx as unknown as { effect?: (callback: () => () => void) => unknown }).effect
+  if (typeof effect === 'function') effect.call(ctx, () => () => { unsubscribe(); dispose() })
 }

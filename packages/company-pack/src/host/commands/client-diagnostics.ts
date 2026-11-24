@@ -10,6 +10,8 @@
  * 长度有界、token URL 脱敏。日志是用户/操作员可读的普通文件，不冒充审计账本。
  */
 import type { Context } from '@deepseek-ai/cordis'
+import { registerLocalizedCommand } from './localized-command.ts'
+import type { CompanyLanguageState } from '../language/company-language.ts'
 import { join } from 'node:path'
 import { appendRotatingLine } from '../logging/rotating-log.ts'
 
@@ -25,11 +27,20 @@ function redact(text: string): string {
   return text.replace(/([?&]token=)[^\s&"'<>]+/g, '$1<redacted>')
 }
 
-/** 注册 `/company-diagnostics client-error <encoded>`。 */
-export function registerClientDiagnostics(ctx: Context, dshHome: string): void {
-  ctx.commands.register({
+/** 注册 `/company-diagnostics client-error <encoded>`（命令面随语言；BUG-367）。 */
+export function registerClientDiagnostics(
+  ctx: Context,
+  dshHome: string,
+  options: { readonly language?: CompanyLanguageState } = {},
+): void {
+  const text = (zh: string, en: string): string => options.language?.text(zh, en) ?? zh
+  const usage = (): string => text('用法：/company-diagnostics client-error <URI-encoded JSON>', 'Usage: /company-diagnostics client-error <URI-encoded JSON>')
+  const definition = () => ({
     name: 'company-diagnostics',
-    description: '把一条浏览器侧诊断写入 logs/company-client-errors.log（Web 错误环内部用；人可读）',
+    description: text(
+      '把一条浏览器侧诊断写入 logs/company-client-errors.log（Web 错误环内部用；人可读）',
+      'Write one browser-side diagnostic into logs/company-client-errors.log (used by the Web error ring; human-readable)',
+    ),
     input: { hint: 'client-error <URI-encoded JSON>' },
     handler: async ({ rawInput }: { readonly rawInput: string }) => {
       // 诊断日志住 DSH_HOME（不是公司数据）：公司盘 dataBlocked 时，“用户那一页”的错误仍必须留痕。
@@ -40,27 +51,27 @@ export function registerClientDiagnostics(ctx: Context, dshHome: string): void {
       const input = rawInput.trimStart()
       const prefix = 'client-error '
       if (!input.startsWith(prefix)) {
-        return { kind: 'error' as const, text: '用法：/company-diagnostics client-error <URI-encoded JSON>' }
+        return { kind: 'error' as const, text: usage() }
       }
       const encoded = input.slice(prefix.length).trim()
       if (encoded === '' || encoded.length > MAX_INPUT_CHARS) {
-        return { kind: 'error' as const, text: `诊断载荷为空或超过 ${String(MAX_INPUT_CHARS)} 字符。` }
+        return { kind: 'error' as const, text: text(`诊断载荷为空或超过 ${String(MAX_INPUT_CHARS)} 字符。`, `The diagnostic payload is empty or longer than ${String(MAX_INPUT_CHARS)} characters.`) }
       }
       let raw: unknown
       try {
         raw = JSON.parse(decodeURIComponent(encoded))
       } catch {
-        return { kind: 'error' as const, text: '诊断载荷不是合法的 URI-encoded JSON。' }
+        return { kind: 'error' as const, text: text('诊断载荷不是合法的 URI-encoded JSON。', 'The diagnostic payload is not valid URI-encoded JSON.') }
       }
       if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
-        return { kind: 'error' as const, text: '诊断载荷必须是对象。' }
+        return { kind: 'error' as const, text: text('诊断载荷必须是对象。', 'The diagnostic payload must be an object.') }
       }
       const source = raw as Record<string, unknown>
       const kind = source.kind === 'error' || source.kind === 'rejection' || source.kind === 'console'
         ? source.kind
         : 'error'
       const message = typeof source.message === 'string' ? redact(source.message).slice(0, 1_000) : ''
-      if (message === '') return { kind: 'error' as const, text: '诊断载荷缺 message。' }
+      if (message === '') return { kind: 'error' as const, text: text('诊断载荷缺 message。', 'The diagnostic payload has no message.') }
       const entry = {
         kind,
         message,
@@ -72,9 +83,10 @@ export function registerClientDiagnostics(ctx: Context, dshHome: string): void {
       try {
         appendRotatingLine(path, `${JSON.stringify({ at: new Date().toISOString(), entry })}\n`, CLIENT_ERRORS_MAX_BYTES)
       } catch (error) {
-        return { kind: 'error' as const, text: `诊断写入失败：${(error as Error).message}` }
+        return { kind: 'error' as const, text: text(`诊断写入失败：${(error as Error).message}`, `Writing the diagnostic failed: ${(error as Error).message}`) }
       }
-      return { kind: 'success' as const, text: `已记录客户端错误（${CLIENT_ERRORS_REL}）。` }
+      return { kind: 'success' as const, text: text(`已记录客户端错误（${CLIENT_ERRORS_REL}）。`, `Client error recorded (${CLIENT_ERRORS_REL}).`) }
     },
   })
+  registerLocalizedCommand(ctx, definition, options.language)
 }

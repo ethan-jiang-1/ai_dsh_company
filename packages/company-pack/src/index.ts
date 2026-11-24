@@ -77,7 +77,6 @@ export type HostConfig = CultivationHostConfig & {
  */
 export async function apply(ctx: Context, config: HostConfig = {}): Promise<void> {
   validateHostConfig(config)
-  registerSignoffTool(ctx)
   // BUG-037/041 真修：根会话被团队版控制名 shadow 时，仍能列出/续驶自己的 subagent child。
   registerDelegationControl(ctx)
   // BUG-044 修复：后台 workflow run 的 durable 视图（job 注册表随进程死，run 记录不死）。
@@ -85,6 +84,8 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
 
   const runtime = prepareCompanyRuntime(ctx)
   const language = createCompanyLanguage(ctx)
+  // 工具描述/回执随公司语言（BUG-367）：必须在 language 之后注册。
+  registerSignoffTool(ctx, { language })
   const workspace = runtime.workspace
   const hasWorkspace = workspace !== ''
   const dataBlocked = runtime.dataBlocked || !hasWorkspace
@@ -151,7 +152,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   // 模型 retrySurface() 同源，parity spec 钉着）；这里不再写第二份 preset 列表（BUG-045/049）。
   registerSubagentRetry(ctx, { surface: SUBAGENT_RETRY_SURFACE })
   registerDelegationTerminal(ctx)
-  registerClientDiagnostics(ctx, runtime.dshHome)
+  registerClientDiagnostics(ctx, runtime.dshHome, { language })
 
   registerDeliverablesCommand(ctx, { dataBlocked, ...blockedFields, workspace, ledgerStorePromise, exportNow, language })
   registerPrdCommand(ctx, { dataBlocked, ...blockedFields, workspace, language })

@@ -33,3 +33,19 @@ describe('signoffDecisionNote · 结果 → 模型提示语', () => {
     expect(signoffDecisionNote('whatever')).toContain('fail-closed')
   })
 })
+
+// 负例留证 2026-11-24：signoffDecisionNote/signoffReason 去掉 text 参数 ⇒ 本组红（en 仍中文/全角标点）。BUG-367
+describe('signoff 双语（BUG-367）', () => {
+  const en = (_zh: string, text: string): string => text
+  it('en：四种结局与 reason 分隔符全 ASCII', () => {
+    for (const decision of ['allowed-once', 'rejected', 'cancelled', 'timeout']) {
+      const note = signoffDecisionNote(decision, en)
+      expect(note).not.toMatch(/[\u3400-\u9fff]/u)
+      expect(note.length).toBeGreaterThan(0)
+    }
+    const reason = signoffReason({ line: 'Margin line', summary: 'discount 22%', detail: 'also considered 20%' }, en)
+    expect(reason).toContain('Margin line: discount 22%')
+    expect(reason).toContain('(also considered 20%)')
+    expect(reason).not.toMatch(/[：（）]/)
+  })
+})
