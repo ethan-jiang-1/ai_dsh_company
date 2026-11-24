@@ -36,6 +36,11 @@ describe('Brand', () => {
     expect(renderToStaticMarkup(createElement(DreamTeamBrandName, { t: tEn }))).toContain(en['brand.name'])
   })
 
+  it('坏引号的身份文件 ⇒ 整份作废，不出带引号的品牌名（BUG-368）', () => {
+    expect(parseCompanyIdentity("---\ncompany: Acme\nproductName: 'Acme AI\n---\n")).toBeNull()
+    expect(parseCompanyIdentity("---\ncompany: Acme\nproductName: 'Acme AI' trailing\n---\n")).toBeNull()
+  })
+
   it('身份解析：缺 frontmatter / 缺 company ⇒ 不覆盖出厂词标', () => {
     expect(parseCompanyIdentity(null)).toBeNull()
     expect(parseCompanyIdentity('# 无头\n')).toBeNull()
