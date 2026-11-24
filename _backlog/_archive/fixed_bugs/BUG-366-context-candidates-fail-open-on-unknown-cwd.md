@@ -66,3 +66,4 @@ console.log('unknown row cwd     ->', projectContextSessions([row('cur', '/ws-a'
 - 红：`pnpm test tests/client/cultivation/cultivation-context-data.spec.ts` —— 还原 fail-open 过滤前 3 failed（跨 workspace/无 cwd 候选混入）
 - 绿：`pnpm test tests/client/cultivation/cultivation-context-data.spec.ts` —— 12/12 passed（未知 cwd 零候选 + problem；子会话继承 parent cwd；尾斜杠归一）
 - 提交：commit 19b95966
+- 复审修正：commit cb668231（盲审后收敛判据/暴露原因/转义边界）

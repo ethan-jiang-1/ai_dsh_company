@@ -70,3 +70,4 @@ console.log('brand =', JSON.stringify(id?.productName));
 - 红：`pnpm test tests/lib/docs/yaml-scalar.spec.ts tests/client/ui/brand.spec.ts` —— 还原前 3 failed（未闭合引号被当值、带尾巴被静默截断、品牌带引号）
 - 绿：`pnpm test tests/lib/docs/yaml-scalar.spec.ts tests/client/ui/brand.spec.ts` —— 全绿（problem 结构化；身份文件返回 null，出厂词标保留）
 - 提交：commit 5d877e75
+- 复审修正：commit cb668231（盲审后收敛判据/暴露原因/转义边界）

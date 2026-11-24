@@ -55,7 +55,19 @@
 - **BUG-369**：`pnpm test tests/lib/presence/doors.spec.ts tests/host/workspace/workspace-doors.spec.ts` —— 还原前 3 failed；修复后全绿。
 - **BUG-364**：`pnpm test tests/client/wiring/instance-guard.spec.ts` —— 还原单边判据前 2 failed；修复后 7/7 passed。
 - **BUG-360/361**：`pnpm test tests/lib/accounting/budget.spec.ts tests/lib/shared/text-and-status.spec.ts` —— 还原前 2 failed；修复后全绿。
+- 盲审复审后：`pnpm test` 2749/2749、`coverage-ratchet` PASS（218 文件）、`pnpm lint` 0 违规。
 - `pnpm verify` ALL PASS。
+
+## 独立只读盲审（362/366/368/369）
+
+2026-11-24 由无本次历史上下文的只读子代理审 `c62865ac` / `19b95966` / `5d877e75` / `bbf4dc79`：**BLOCKING**（2 阻断 + 3 中低），处置：
+1. **阻断 · 366** 未知 cwd 的 `problem` 只到 `listSessions` 类型层，picker 仍按 `.ok` 折成空列表 → `listSessions` 返回 `ok:false`，picker 新增 `sessionsProblem` 并优先渲染原因、抑制通用空态；补 sources + picker 两层用例。
+2. **阻断 · 362** 授权提交 `c62865ac` 用 `headerWidth` 收窄，导致 host 台账夹具（2 列表头）红，且与台账面板判据分叉 → 恢复 `parseMotionLedger` 委托、tools 孪生只认两种权威 7 列表头；host 夹具改权威表头，并补「非权威表头 / 重复表头」用例。
+3. **中 · 368** 双引号里 `\` 后只跳过 `"`，合法 Windows 路径被判未闭合 → 反斜杠后任意字符都跳过；补路径用例。
+4. **中 · 368 消费面** 坏标量在 `/req`、bootstrap、delivery 退化成「未声明」而非报错 → 本轮不做响亮错误（改动跨三个命令面），按 fail-closed 保留默认并在「未覆盖轴」登记；身份面已整份作废。
+5. **低 · 362** 重复表头被当数据行产出字面量 `slug` → `parseMotionLedger` 显式跳过重复表头；两侧同判据。
+6. **369 PASS**；顺手把排序比较器抽成具名 `compareDoorPreset` 并补四组合用例（覆盖率）。
+
 
 ## 未覆盖轴
 
@@ -64,4 +76,6 @@
 - [covered] 事件窗口的封顶/丢弃计数与 history 裁剪 → 去向：[company-stream.spec.ts](../../tests/client/data/company-stream.spec.ts)
 - [covered] 未知 cwd / 子会话继承 / 尾斜杠归一 → 去向：[cultivation-context-data.spec.ts](../../tests/client/cultivation/cultivation-context-data.spec.ts)
 - [covered] 签核工具 en/zh 回执与 ASCII 分隔符、诊断命令 en 描述/用法 → 去向：[signoff-language.spec.ts](../../tests/host/commands/signoff-language.spec.ts) 与 [command-language.spec.ts](../../tests/host/commands/command-language.spec.ts)
+- [policy] 368 的非身份消费面（`/req`、bootstrap、delivery）对坏标量仍按「未声明」回退默认，不报响亮错误；身份面已拒绝。→ 去向：[yaml-scalar.ts](../../packages/company-pack/src/lib/docs/yaml-scalar.ts)
+- [covered] 362 非权威/重复表头、366 picker 原因、368 转义反斜杠、369 排序四组合 → 去向：[catalog.spec.ts](../../tests/host/ledger/catalog.spec.ts) / [cultivation-context-picker.spec.ts](../../tests/client/cultivation/cultivation-context-picker.spec.ts) / [yaml-scalar.spec.ts](../../tests/lib/docs/yaml-scalar.spec.ts) / [doors.spec.ts](../../tests/lib/presence/doors.spec.ts)
 - [policy] 浏览器侧没有 realpath，`/var` 与 `/private/var` 这类 symlink 别名仍可能漏配（host 侧 canonical 化不适用于 client）→ 去向：[cultivation-context-data.ts](../../packages/company-pack/src/client/cultivation/cultivation-context-data.ts)

@@ -1,3 +1,4 @@
+// 负例留证 2026-11-24：让 picker 在 listSessions ok:false 时忽略 problem、回落通用空态 ⇒ 本用例红。BUG-366
 // @vitest-environment happy-dom
 /**
  * 背景选择面板的 keyless 渲染/交互判据（R5-27，2026-11-03 第五轮七维审计）。

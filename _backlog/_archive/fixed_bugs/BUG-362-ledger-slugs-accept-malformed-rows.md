@@ -57,3 +57,4 @@ console.log('rows =', parsed.rows.map(r => r.slug), 'badRows =', parsed.badRows)
 - 红：`pnpm test tests/tools/deliverables-catalog-tools.spec.ts` —— 还原前 1 failed（列数不符的 `broken` 进了 slug 集合）
 - 绿：`pnpm test tests/tools/deliverables-catalog-tools.spec.ts` —— 13/13 passed（坏行不进集合，TS/JS 两侧一致）
 - 提交：commit c62865ac
+- 复审修正：commit cb668231（盲审后收敛判据/暴露原因/转义边界）
