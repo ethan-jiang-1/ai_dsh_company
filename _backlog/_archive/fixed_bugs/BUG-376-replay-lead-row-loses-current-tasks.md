@@ -1,18 +1,18 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-376：事件回放（durable）路径的 CEO 行恒为「未上线 + 无当前任务」，与 live 路径对同一数据给出不同在场结论
 
-> 严重级别：P2（同一实体两副脸：`rowsFromTeamView`（live）里 CEO 的 `status` 是 `idle`、`currentTasks` 是 `["CEO work"]`；`presenceFromEvents`（从 `team/*` 事件回放/重建）里同一个 CEO 恒为 `status: 'inactive'`、`currentTasks: null`。判定「CEO 现在在做什么」的在场页，在页面刷新/回放场景下会显示 CEO **没有任何进行中任务**，而 live 视图说他在做 task-1）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（同一实体两副脸：`rowsFromTeamView`（live）里 CEO 的 `status` 是 `idle`、`currentTasks` 是 `["CEO work"]`；`presenceFromEvents`（从 `team/*` 事件回放/重建）里同一个 CEO 恒为 `status: 'inactive'`、`currentTasks: null`。判定「CEO 现在在做什么」的在场页，在页面刷新/回放场景下会显示 CEO **没有任何进行中任务**，而 live 视图说他在做 task-1）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（身份/任务与 live 一致）
 >
-> **留痕**：（待修复时裁决）
+> **留痕**：Note [2026-11-24-meta-single-source-and-presence-parity](../../../notes/implemented/2026-11-24-meta-single-source-and-presence-parity.md)（批次 370..376：live/replay 行构造同源）
 
 ## 症状
 
-[`presenceFromEvents`](../../packages/company-pack/src/lib/presence/presence.ts#L400-L415) 构造 lead 行时把两个字段写死：
+[`presenceFromEvents`](../../../packages/company-pack/src/lib/presence/presence.ts#L400-L415) 构造 lead 行时把两个字段写死：
 
 ```ts
 rows.push({ id: teamId, name: 'lead', displayName: PRESET_DISPLAY_NAMES.ceo, role: 'lead',
@@ -21,11 +21,11 @@ rows.push({ id: teamId, name: 'lead', displayName: PRESET_DISPLAY_NAMES.ceo, rol
 
 而 teammate 行会从 `tasks` 里按 `ownerId` 现算 `currentTasks`。durable 的 `team/task` 事件里 lead 拥有的任务 `ownerId === teamId`，数据是齐的——只是没有算。
 
-对照 live 路径 [`rowsFromTeamView`](../../packages/company-pack/src/lib/presence/presence.ts#L233-L252)：`status` 来自 `member.phase`（lead 的 phase 在投影里恒为 `'active'` → `idle`），`currentTasks` 按 `task.ownerName === member.name`（= `'lead'`）算出非空。
+对照 live 路径 [`rowsFromTeamView`](../../../packages/company-pack/src/lib/presence/presence.ts#L233-L252)：`status` 来自 `member.phase`（lead 的 phase 在投影里恒为 `'active'` → `idle`），`currentTasks` 按 `task.ownerName === member.name`（= `'lead'`）算出非空。
 
 ## 运行面
 
-- **面 = lib**：[`presence.ts`](../../packages/company-pack/src/lib/presence/presence.ts#L400-L432)；两个消费方分别是 live 投影与事件回放（`presence.e2e` / 独立重建）。
+- **面 = lib**：[`presence.ts`](../../../packages/company-pack/src/lib/presence/presence.ts#L400-L432)；两个消费方分别是 live 投影与事件回放（`presence.e2e` / 独立重建）。
 
 ## 复现
 
@@ -62,3 +62,10 @@ console.log('live  ', pick(rowsFromTeamView({ members: [{ id: 'team-1', name: 'l
 
 - 上述复现里 `replay` 与 `live` 的 `currentTasks` 相等（`["CEO work"]`），`status` 按选定口径一致；
 - 新增 `tests/lib/presence/` 对比用例（旧实现红、新实现绿）。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/presence.ts`、`tests/lib/presence/presence-board.spec.ts`
+- 红：`pnpm test tests/lib/presence/presence-board.spec.ts` —— 还原手拼 lead 行前 1 failed（回放 `inactive/null` vs live `idle/[CEO work]`）
+- 绿：`pnpm test tests/lib/presence/presence-board.spec.ts` —— 34/34 passed（lead 行 status/currentTasks 与 live 相等）
+- 提交：commit 7e35a053

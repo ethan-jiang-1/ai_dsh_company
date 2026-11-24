@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-372**（2026-11-24，370..376 批顺位 3 / P2）：`taskOwnerDisplayName` 统一 `lead → CEO`，看板/动态/回放共用——
+  [372](BUG-372-diff-activity-shows-raw-lead-owner.md)。证据提交 `7e35a053`。
+- **BUG-376**（2026-11-24，370..376 批顺位 3 / P2）：回放 lead 行用 live 同口径（idle + currentTasks 现算）——
+  [376](BUG-376-replay-lead-row-loses-current-tasks.md)。证据提交 `7e35a053`。
+
 - **BUG-371**（2026-11-24，370..376 批顺位 2 / P2）：`meta.md` 形状判据收成一份（面板/孪生/审计逐字相等），result 留空合法、日期前缀 slug 判红——
   [371](BUG-371-meta-shape-validators-three-way-split.md)。证据提交 `7d81872c`。
 

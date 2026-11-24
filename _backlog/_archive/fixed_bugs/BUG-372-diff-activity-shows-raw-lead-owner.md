@@ -1,14 +1,14 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-372：`diffActivity` 把 CEO（lead）认领/完成的任务显示成 `lead`，同一数据在看板里是正确的「CEO」
 
-> 严重级别：P2（同一实体两副脸：vendor 的 `projectTaskView` 对 lead 拥有的任务把 `ownerName` 解析成**字面量 `'lead'`**（`vendor/dsh/packages/experimental/agent-team/src/task-view.ts:38-41`）。看板读模型 [`tasksFromTeamView`](../../packages/company-pack/src/lib/presence/board.ts#L204-L225) 有 `owner === 'lead' ? 'lead' : 'teammate'` 的特判所以显示 CEO；而在场动态的差分 [`diffActivity`](../../packages/company-pack/src/lib/presence/presence.ts#L291) 把角色硬编码成 `'teammate'`，于是英文界面出现 `lead claimed task-1`、中文出现 `lead 认领 task-1`）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（同一实体两副脸：vendor 的 `projectTaskView` 对 lead 拥有的任务把 `ownerName` 解析成**字面量 `'lead'`**（`vendor/dsh/packages/experimental/agent-team/src/task-view.ts:38-41`）。看板读模型 [`tasksFromTeamView`](../../../packages/company-pack/src/lib/presence/board.ts#L204-L225) 有 `owner === 'lead' ? 'lead' : 'teammate'` 的特判所以显示 CEO；而在场动态的差分 [`diffActivity`](../../../packages/company-pack/src/lib/presence/presence.ts#L291) 把角色硬编码成 `'teammate'`，于是英文界面出现 `lead claimed task-1`、中文出现 `lead 认领 task-1`）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（身份/任务与 live 一致）
 >
-> **留痕**：（待修复时裁决；可走机械修复）
+> **留痕**：Note [2026-11-24-meta-single-source-and-presence-parity](../../../notes/implemented/2026-11-24-meta-single-source-and-presence-parity.md)（批次 370..376：CEO 身份单一映射）
 
 ## 症状
 
@@ -16,7 +16,7 @@ CEO 自己在任务板上认领/完成一个任务后，在场页「协作动态
 
 ## 运行面
 
-- **面 = lib**：[`presence.ts`](../../packages/company-pack/src/lib/presence/presence.ts#L288-L300)（`diffActivity`）；对照 [`board.ts`](../../packages/company-pack/src/lib/presence/board.ts#L214-L218)（正确写法）。
+- **面 = lib**：[`presence.ts`](../../../packages/company-pack/src/lib/presence/presence.ts#L288-L300)（`diffActivity`）；对照 [`board.ts`](../../../packages/company-pack/src/lib/presence/board.ts#L214-L218)（正确写法）。
 
 ## 复现
 
@@ -52,3 +52,10 @@ console.log(rowsFromTeamView(after).map(r => [r.name, r.displayName]));
 
 - 上述复现里动态文本为 `CEO 认领 task-1`（en：`CEO claimed task-1`），与 `rowsFromTeamView` 的显示名一致；
 - presence 活动读模型新增 lead owner 用例（旧实现红、新实现绿）。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/presence-status.ts`、`packages/company-pack/src/lib/presence/presence.ts`、`packages/company-pack/src/lib/presence/board.ts`、`tests/lib/presence/presence-board.spec.ts`
+- 红：`pnpm test tests/lib/presence/presence-board.spec.ts` —— 还原硬编码 `teammate` 前 1 failed（动态显示裸 `lead`）
+- 绿：`pnpm test tests/lib/presence/presence-board.spec.ts` —— 34/34 passed（文本与 token 都是 `CEO`）
+- 提交：commit 7e35a053

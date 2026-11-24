@@ -16,6 +16,8 @@
 - [BUG-365-company-data-unbounded-event-accumulation.md](fixed_bugs/BUG-365-company-data-unbounded-event-accumulation.md) — follow 事件数据层有界。
 - [BUG-366-context-candidates-fail-open-on-unknown-cwd.md](fixed_bugs/BUG-366-context-candidates-fail-open-on-unknown-cwd.md) — 背景候选未知 cwd fail-closed。
 - [BUG-371-meta-shape-validators-three-way-split.md](fixed_bugs/BUG-371-meta-shape-validators-three-way-split.md) — meta 形状单一判据（result 可空）。
+- [BUG-372-diff-activity-shows-raw-lead-owner.md](fixed_bugs/BUG-372-diff-activity-shows-raw-lead-owner.md) — CEO 身份单一映射。
+- [BUG-376-replay-lead-row-loses-current-tasks.md](fixed_bugs/BUG-376-replay-lead-row-loses-current-tasks.md) — 回放 CEO 行与 live 同口径。
 - [BUG-370-numbering-parser-differs-from-yaml-scalar.md](fixed_bugs/BUG-370-numbering-parser-differs-from-yaml-scalar.md) — meta 标量字段共用解析。
 - [BUG-374-req-declared-layers-splitter-diverges.md](fixed_bugs/BUG-374-req-declared-layers-splitter-diverges.md) — layers 列表同口径。
 - [BUG-375-meta-field-parsers-fence-blind.md](fixed_bugs/BUG-375-meta-field-parsers-fence-blind.md) — meta 字段结构感知。
