@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { BudgetPanel, PresencePanel, StreamErrorNotice } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
 import { en } from '../../../packages/company-pack/src/client/locales.ts'
 import { assertEnglishUiClean, translateWith } from '../../support/i18n-assertions.ts'
-import { activityFromEvents, presenceFromEvents } from '../../../packages/company-pack/src/lib/presence/presence.ts'
+import { activityFromEvents, diffActivity, presenceFromEvents } from '../../../packages/company-pack/src/lib/presence/presence.ts'
 
 const tEn = translateWith(en)
 
@@ -101,5 +101,30 @@ describe('PresencePanel 消息动态（BUG-336）', () => {
     const html = renderToStaticMarkup(createElement(PresencePanel, { rows: board.rows, activity: [], t: tEn }))
     expect(html).toContain('Design API, Ship API')
     assertEnglishUiClean(html, 'PresencePanel rows en')
+  })
+})
+
+// 负例留证 2026-11-24：把 token.params.owner 改回中文 '未分配' ⇒ 本组红（en 漏中文）。BUG-354
+describe('PresencePanel 无负责人任务迁移（BUG-354）', () => {
+  it('activityFromEvents：en 输出 Unassigned claimed/completed，零中文', () => {
+    const board = presenceFromEvents([
+      { type: 'team/task', time: 1, data: { teamId: 't1', task: { id: 'T1', revision: 1, subject: 'x', status: 'pending' } } },
+      { type: 'team/task', time: 2, data: { teamId: 't1', task: { id: 'T1', revision: 2, subject: 'x', status: 'in_progress' } } },
+      { type: 'team/task', time: 3, data: { teamId: 't1', task: { id: 'T1', revision: 3, subject: 'x', status: 'completed' } } },
+    ] as never)
+    const html = renderToStaticMarkup(createElement(PresencePanel, { rows: [], activity: board.activity, t: tEn }))
+    expect(html).toContain('Unassigned claimed T1')
+    expect(html).toContain('Unassigned completed T1')
+    assertEnglishUiClean(html, 'PresencePanel unassigned en')
+  })
+
+  it('diffActivity：同一迁移 en 输出 Unassigned；zh 缺省仍含「未分配」', () => {
+    const prev = { tasks: [{ id: 'T2', subject: 'y', status: 'pending', revision: 1 }] }
+    const next = { tasks: [{ id: 'T2', subject: 'y', status: 'completed', revision: 2 }] }
+    const entries = diffActivity(prev as never, next as never, 1000)
+    const html = renderToStaticMarkup(createElement(PresencePanel, { rows: [], activity: entries, t: translateWith(en) }))
+    expect(html).toContain('Unassigned completed T2')
+    const zhHtml = renderToStaticMarkup(createElement(PresencePanel, { rows: [], activity: entries }))
+    expect(zhHtml).toContain('未分配 完成 T2')
   })
 })

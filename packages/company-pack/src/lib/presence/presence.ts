@@ -288,12 +288,13 @@ export function diffActivity(prev: TeamViewLike | undefined, next: TeamViewLike,
       continue
     }
     if (before.status === task.status) continue
-    const owner = task.ownerName === undefined ? '未分配' : displayNameFor(task.ownerName, 'teammate')
+    const owner = task.ownerName === undefined ? null : displayNameFor(task.ownerName, 'teammate')
     // 状态机有 4 个值：显式分派，别让「pending/未知」落进删除兜底（BUG-098）。
     if (task.status === 'in_progress') {
-      entries.push({ time: now, kind: 'task', text: `${owner} 认领 ${task.id}`, token: { key: 'presence.activity.taskClaimed', params: { owner, id: task.id } } })
+      // BUG-354：无负责人时不给 owner 参数（中文展示串不能进 token）；client 字典出「未分配/Unassigned」。
+      entries.push({ time: now, kind: 'task', text: `${owner ?? '未分配'} 认领 ${task.id}`, token: owner === null ? { key: 'presence.activity.taskClaimedUnassigned', params: { id: task.id } } : { key: 'presence.activity.taskClaimed', params: { owner, id: task.id } } })
     } else if (task.status === 'completed') {
-      entries.push({ time: now, kind: 'task', text: `${owner} 完成 ${task.id}`, token: { key: 'presence.activity.taskCompleted', params: { owner, id: task.id } } })
+      entries.push({ time: now, kind: 'task', text: `${owner ?? '未分配'} 完成 ${task.id}`, token: owner === null ? { key: 'presence.activity.taskCompletedUnassigned', params: { id: task.id } } : { key: 'presence.activity.taskCompleted', params: { owner, id: task.id } } })
     } else if (task.status === 'pending') {
       entries.push({ time: now, kind: 'task', text: `${task.id} 退回待办`, token: { key: 'presence.activity.taskReopened', params: { id: task.id } } })
     } else if (task.status === 'deleted') {
@@ -362,11 +363,11 @@ export function presenceFromEvents(
           activity.push({ time: event.time, kind: 'task', text: `新任务 ${task.id}：${clip(task.subject, 32)}`, token: { key: 'presence.activity.taskNew', params: { id: task.id, subject: clip(task.subject, 32) } } })
         }
       } else if (previous.status !== task.status) {
-        const owner = task.ownerId === undefined ? '未分配' : displayOf(task.ownerId)
+        const owner = task.ownerId === undefined ? null : displayOf(task.ownerId)
         if (status === 'in_progress') {
-          activity.push({ time: event.time, kind: 'task', text: `${owner} 认领 ${task.id}`, token: { key: 'presence.activity.taskClaimed', params: { owner, id: task.id } } })
+          activity.push({ time: event.time, kind: 'task', text: `${owner ?? '未分配'} 认领 ${task.id}`, token: owner === null ? { key: 'presence.activity.taskClaimedUnassigned', params: { id: task.id } } : { key: 'presence.activity.taskClaimed', params: { owner, id: task.id } } })
         } else if (status === 'completed') {
-          activity.push({ time: event.time, kind: 'task', text: `${owner} 完成 ${task.id}`, token: { key: 'presence.activity.taskCompleted', params: { owner, id: task.id } } })
+          activity.push({ time: event.time, kind: 'task', text: `${owner ?? '未分配'} 完成 ${task.id}`, token: owner === null ? { key: 'presence.activity.taskCompletedUnassigned', params: { id: task.id } } : { key: 'presence.activity.taskCompleted', params: { owner, id: task.id } } })
         } else if (status === 'pending') {
           activity.push({ time: event.time, kind: 'task', text: `${task.id} 退回待办`, token: { key: 'presence.activity.taskReopened', params: { id: task.id } } })
         } else if (status === 'deleted') {
