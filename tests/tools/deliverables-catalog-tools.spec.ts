@@ -1,3 +1,4 @@
+// 负例留证 2026-11-24：让 slug 集合继续收列数不符的行 ⇒ 本文件 BUG-362 用例红。BUG-362
 import { describe, expect, it } from 'vitest'
 import { buildDeliverablesCatalog, deliverableSlug, ledgerSlugsFromText, metaProblemsOf } from '../../tools/lib/company/deliverables-catalog.mjs'
 import { ledgerSlugsFromText as ledgerSlugsFromTextTs } from '../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts'

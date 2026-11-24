@@ -1,28 +1,28 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-369：`workspace_doors` 把「没选 preset」写成中文字面量 `(未选 preset)`，模型看到中文且与同名字面 preset 不可区分
 
-> 严重级别：P2·低影响（机器可见面口径：`doorsFromSessions` 用**展示用中文串**当 preset 值，直接进 `workspace_doors` 工具的 JSON 输出——模型在英文任务里读到中文字段值；同时该值把「未设置」编码成一个合法字符串，无法与真的名叫 `(未选 preset)` 的 preset 区分）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2·低影响（机器可见面口径：`doorsFromSessions` 用**展示用中文串**当 preset 值，直接进 `workspace_doors` 工具的 JSON 输出——模型在英文任务里读到中文字段值；同时该值把「未设置」编码成一个合法字符串，无法与真的名叫 `(未选 preset)` 的 preset 区分）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（缺失用 null，不用展示串）
 >
-> **留痕**：（待修复时裁决；可走机械修复）
+> **留痕**：Note [2026-11-24-boundary-window-and-bad-shape-batch](../../../notes/implemented/2026-11-24-boundary-window-and-bad-shape-batch.md)（批次 360..369）
 
 ## 症状
 
-[`doorsFromSessions`](../../packages/company-pack/src/lib/presence/doors.ts#L47-L50)：
+[`doorsFromSessions`](../../../packages/company-pack/src/lib/presence/doors.ts#L47-L50)：
 
 ```ts
 const preset = fact.agentPreset !== undefined && fact.agentPreset !== '' ? fact.agentPreset : '(未选 preset)'
 ```
 
-`workspace_doors` 工具逐行输出 `preset`（[`workspace-doors.ts`](../../packages/company-pack/src/host/workspace/workspace-doors.ts#L74-L85)），所以模型拿到的是 `{"preset":"(未选 preset)","sessionCount":1,…}`——中文常量进了机器可见载荷；且三种不同输入（缺字段、空串、真叫这个名字的 preset）折叠成同一个值。
+`workspace_doors` 工具逐行输出 `preset`（[`workspace-doors.ts`](../../../packages/company-pack/src/host/workspace/workspace-doors.ts#L74-L85)），所以模型拿到的是 `{"preset":"(未选 preset)","sessionCount":1,…}`——中文常量进了机器可见载荷；且三种不同输入（缺字段、空串、真叫这个名字的 preset）折叠成同一个值。
 
 ## 运行面
 
-- **面 = lib + host**：[`packages/company-pack/src/lib/presence/doors.ts`](../../packages/company-pack/src/lib/presence/doors.ts#L47-L50)、[`packages/company-pack/src/host/workspace/workspace-doors.ts`](../../packages/company-pack/src/host/workspace/workspace-doors.ts#L52-L90)。
+- **面 = lib + host**：[`packages/company-pack/src/lib/presence/doors.ts`](../../../packages/company-pack/src/lib/presence/doors.ts#L47-L50)、[`packages/company-pack/src/host/workspace/workspace-doors.ts`](../../../packages/company-pack/src/host/workspace/workspace-doors.ts#L52-L90)。
 
 ## 复现
 
@@ -53,3 +53,10 @@ for (const p of [undefined, '', '(未选 preset)']) console.log(JSON.stringify(p
 ## 已修判定
 
 - 缺 preset / 空串两种输入下 `workspace_doors` 的输出不再含中文，且能区分「未设置」（`null`/缺键）与「真叫这个名字的 preset」；`pnpm exec tsx` 复现三行结果不再折叠成同一值。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/presence/doors.ts`、`packages/company-pack/src/host/workspace/workspace-doors.ts`、`tests/lib/presence/doors.spec.ts`、`tests/host/workspace/workspace-doors.spec.ts`
+- 红：`pnpm test tests/lib/presence/doors.spec.ts tests/host/workspace/workspace-doors.spec.ts` —— 还原展示串前 3 failed（未设置被折叠成中文串）
+- 绿：`pnpm test tests/lib/presence/doors.spec.ts tests/host/workspace/workspace-doors.spec.ts` —— 全绿（未设置省略 preset 键；真叫展示串的 preset 保留）
+- 提交：commit 18f9f5b8

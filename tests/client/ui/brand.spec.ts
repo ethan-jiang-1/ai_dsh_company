@@ -1,3 +1,4 @@
+// 负例留证 2026-11-24：让 parseCompanyIdentity 不检查 yamlScalarOrProblem ⇒ BUG-368 用例红（品牌带引号）。BUG-368
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { createElement } from 'react'

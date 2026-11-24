@@ -17,6 +17,9 @@
 4. **工具面/诊断命令语言注入（[BUG-367](../../_backlog/_archive/fixed_bugs/BUG-367-signoff-tool-result-and-reason-always-chinese.md)）**：
    `signoffReason`/`signoffDecisionNote` 增加可选 `text(zh,en)`（缺省 zh 兼容旧调用）；`registerSignoffTool` 接
    `{ language }` 并订阅切换重注册；`/company-diagnostics` 改走 `registerLocalizedCommand`，描述与全部错误/成功回执成对。
+5. **坏形状与缺失值不折成好值（[BUG-362](../../_backlog/_archive/fixed_bugs/BUG-362-ledger-slugs-accept-malformed-rows.md) / [BUG-368](../../_backlog/_archive/fixed_bugs/BUG-368-yaml-scalar-unbalanced-quote-kept-and-trailing-dropped.md) / [BUG-369](../../_backlog/_archive/fixed_bugs/BUG-369-workspace-doors-unset-preset-chinese-placeholder.md)）**：
+   台账 slug 集合复用 `parseMotionLedger` 的行有效性（列数/空行/表头）；`yamlScalarOrProblem` 对未闭合/带尾巴引号报
+   `problem`，宽松版返回空串、身份文件整份作废；`DoorRow.preset` 用 `string | null`，`workspace_doors` 省略未设置键。
 
 ## 输掉的方案
 
@@ -30,6 +33,8 @@
 |---|---|---|
 | 错误捕获安装/卸载 | [`installErrorCapture`](../../packages/company-pack/src/client/wiring/error-ring.ts) | `WeakMap` 单例状态；`tests/client/wiring/error-ring.spec.ts` 钉双层语义 |
 | follow 事件窗口 | [`applyStreamFrame`](../../packages/company-pack/src/client/data/company-stream.ts) | `useCompanyData` 消费；`tests/client/data/company-stream.spec.ts` |
+| YAML 标量坏引号 | [`yamlScalarOrProblem`](../../packages/company-pack/src/lib/docs/yaml-scalar.ts) | `parseCompanyIdentity` / bootstrap / req 消费；`yaml-scalar.spec.ts` |
+| 门投影未设置 preset | [`doorsFromSessions`](../../packages/company-pack/src/lib/presence/doors.ts) | `workspace_doors` 工具省略键；`workspace-doors.spec.ts` |
 | 背景候选作用域 | [`projectContextSessions`](../../packages/company-pack/src/client/cultivation/cultivation-context-data.ts) | `listSessions` 消费；`tests/client/cultivation/cultivation-context-data.spec.ts` |
 
 ## 验证（真跑过）
@@ -38,6 +43,9 @@
 - **BUG-365**：`pnpm test tests/client/data/company-stream.spec.ts` —— 无界实现下「追加封顶」红；窗口化后 2/2 passed。
 - **BUG-366**：`pnpm test tests/client/cultivation/cultivation-context-data.spec.ts` —— fail-open 过滤还原后 3 failed；修复后 12/12 passed。
 - **BUG-367**：`pnpm test tests/lib/accounting/signoff.spec.ts tests/host/commands/signoff-language.spec.ts tests/host/commands/command-language.spec.ts` —— 还原语言注入前 4 failed；修复后 10/10 passed。
+- **BUG-362**：`pnpm test tests/tools/deliverables-catalog-tools.spec.ts` —— 还原前 1 failed；修复后 13/13。
+- **BUG-368**：`pnpm test tests/lib/docs/yaml-scalar.spec.ts tests/client/ui/brand.spec.ts` —— 还原前 3 failed；修复后全绿。
+- **BUG-369**：`pnpm test tests/lib/presence/doors.spec.ts tests/host/workspace/workspace-doors.spec.ts` —— 还原前 3 failed；修复后全绿。
 - `pnpm verify` ALL PASS。
 
 ## 未覆盖轴

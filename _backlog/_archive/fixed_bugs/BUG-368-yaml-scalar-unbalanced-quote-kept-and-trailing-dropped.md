@@ -1,18 +1,18 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-368：`yamlScalar` 对不成对引号把引号当内容返回，品牌名会带上一个 `'`；带尾巴的引号值又被静默截断
 
-> 严重级别：P2·低影响（解析口径：`yamlScalar` 是 `company.md` / `meta.md` / `startup` 等字段的共用标量解析器。引号没闭合时它退化成「去注释」，把起始引号留在值里（品牌名变成 `'Acme AI`）；引号闭合但有尾巴时（`'a' trailing`）又把尾巴静默丢掉——两种都是「坏 YAML 被当成好值」）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2·低影响（解析口径：`yamlScalar` 是 `company.md` / `meta.md` / `startup` 等字段的共用标量解析器。引号没闭合时它退化成「去注释」，把起始引号留在值里（品牌名变成 `'Acme AI`）；引号闭合但有尾巴时（`'a' trailing`）又把尾巴静默丢掉——两种都是「坏 YAML 被当成好值」）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（坏引号不折成好值）
 >
-> **留痕**：（待修复时裁决；可走机械修复）
+> **留痕**：Note [2026-11-24-boundary-window-and-bad-shape-batch](../../../notes/implemented/2026-11-24-boundary-window-and-bad-shape-batch.md)（批次 360..369）
 
 ## 症状
 
-[`yamlScalar`](../../packages/company-pack/src/lib/docs/yaml-scalar.ts#L9-L17)：
+[`yamlScalar`](../../../packages/company-pack/src/lib/docs/yaml-scalar.ts#L9-L17)：
 
 ```ts
 const quote = value[0]
@@ -29,7 +29,7 @@ return (comment === -1 ? value : value.slice(0, comment)).trim()
 
 ## 运行面
 
-- **面 = lib**：[`packages/company-pack/src/lib/docs/yaml-scalar.ts`](../../packages/company-pack/src/lib/docs/yaml-scalar.ts#L9-L17)；消费方 [`company-identity.parseCompanyIdentity`](../../packages/company-pack/src/client/data/company-identity.ts#L60-L76)（侧栏品牌）、`bootstrap`、`req-command` 的 `productType`。
+- **面 = lib**：[`packages/company-pack/src/lib/docs/yaml-scalar.ts`](../../../packages/company-pack/src/lib/docs/yaml-scalar.ts#L9-L17)；消费方 [`company-identity.parseCompanyIdentity`](../../../packages/company-pack/src/client/data/company-identity.ts#L60-L76)（侧栏品牌）、`bootstrap`、`req-command` 的 `productType`。
 
 ## 复现
 
@@ -63,3 +63,10 @@ console.log('brand =', JSON.stringify(id?.productName));
 
 - `yamlScalar("'abc")` 不再被当成已解引号的值（要么返回 `'abc` 但由结构化版本报 problem，要么按坏值处理）；`'a' trailing` 不再静默返回 `a`；
 - `parseCompanyIdentity` 对未闭合引号返回 `null`（身份无效、保留出厂词标），不产出带引号的品牌名。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/docs/yaml-scalar.ts`、`packages/company-pack/src/client/data/company-identity.ts`、`tests/lib/docs/yaml-scalar.spec.ts`、`tests/client/ui/brand.spec.ts`
+- 红：`pnpm test tests/lib/docs/yaml-scalar.spec.ts tests/client/ui/brand.spec.ts` —— 还原前 3 failed（未闭合引号被当值、带尾巴被静默截断、品牌带引号）
+- 绿：`pnpm test tests/lib/docs/yaml-scalar.spec.ts tests/client/ui/brand.spec.ts` —— 全绿（problem 结构化；身份文件返回 null，出厂词标保留）
+- 提交：commit 8bfc44a9

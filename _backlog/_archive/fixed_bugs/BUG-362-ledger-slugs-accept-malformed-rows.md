@@ -1,22 +1,22 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-362：`ledgerSlugsFromText` 把列数不符的坏行首列也当 slug 收进「已入账」集合，与台账面板的坏行判据相反
 
-> 严重级别：P2（跨消费者同一份数据两种结论：台账面板把列数不符的行报成坏行并说「共 N 场」少报，同一行的首列却进了「已入账」集合，让成品目录把一条**台账里根本不存在的行**标成 `ledgered: true`）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（跨消费者同一份数据两种结论：台账面板把列数不符的行报成坏行并说「共 N 场」少报，同一行的首列却进了「已入账」集合，让成品目录把一条**台账里根本不存在的行**标成 `ledgered: true`）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（行有效性单一判据）
 >
-> **留痕**：（待修复时裁决；可走机械修复）
+> **留痕**：Note [2026-11-24-boundary-window-and-bad-shape-batch](../../../notes/implemented/2026-11-24-boundary-window-and-bad-shape-batch.md)（批次 360..369）
 
 ## 症状
 
-[`ledgerSlugsFromText`](../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts#L159-L174) 收集 slug 时**不校验列数**：只要表头见过、该行不是分隔行、首列非空，就把首列当 slug。而同一个表的权威解析 [`parseMotionLedger`](../../packages/company-pack/src/lib/accounting/ledger.ts#L70-L106) 在该行 `cells.length !== 7` 时记进 `badRows` 并**不**产出该场动议。
+[`ledgerSlugsFromText`](../../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts#L159-L174) 收集 slug 时**不校验列数**：只要表头见过、该行不是分隔行、首列非空，就把首列当 slug。而同一个表的权威解析 [`parseMotionLedger`](../../../packages/company-pack/src/lib/accounting/ledger.ts#L70-L106) 在该行 `cells.length !== 7` 时记进 `badRows` 并**不**产出该场动议。
 
 ## 运行面
 
-- **面 = lib**：[`deliverables-catalog.ts`](../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts#L159-L174) 与 [`ledger.ts`](../../packages/company-pack/src/lib/accounting/ledger.ts#L70-L106)；消费方 = host 目录生成 [`catalog.ts`](../../packages/company-pack/src/host/ledger/catalog.ts#L191-L195)（`ledgerSlugs:`）。
+- **面 = lib**：[`deliverables-catalog.ts`](../../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts#L159-L174) 与 [`ledger.ts`](../../../packages/company-pack/src/lib/accounting/ledger.ts#L70-L106)；消费方 = host 目录生成 [`catalog.ts`](../../../packages/company-pack/src/host/ledger/catalog.ts#L191-L195)（`ledgerSlugs:`）。
 
 ## 复现
 
@@ -50,3 +50,10 @@ console.log('rows =', parsed.rows.map(r => r.slug), 'badRows =', parsed.badRows)
 ## 已修判定
 
 - 上述复现里 `slugs` 只剩 `['ok-1']`；`parseMotionLedger` 对同一文本的结论不变（1 行 + 1 坏行）；两份解析器对任意输入给出同一批 slug。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/deliverables/deliverables-catalog.ts`、`tools/lib/company/deliverables-catalog.mjs`、`tests/tools/deliverables-catalog-tools.spec.ts`
+- 红：`pnpm test tests/tools/deliverables-catalog-tools.spec.ts` —— 还原前 1 failed（列数不符的 `broken` 进了 slug 集合）
+- 绿：`pnpm test tests/tools/deliverables-catalog-tools.spec.ts` —— 13/13 passed（坏行不进集合，TS/JS 两侧一致）
+- 提交：commit d58e6fc1

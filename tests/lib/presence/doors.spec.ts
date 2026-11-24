@@ -1,3 +1,4 @@
+// 负例留证 2026-11-24：把未设置 preset 折回 '(未选 preset)' 展示串 ⇒ BUG-369 用例红。BUG-369
 /** 工作区门投影读模型（BUG-002：同 cwd × preset 双开检测，keyless 完成定义）。 */
 import { describe, expect, it } from 'vitest'
 
