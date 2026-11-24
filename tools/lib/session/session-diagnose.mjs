@@ -166,11 +166,16 @@ export function summarizeSessionEvents(records, { recent = 1 } = {}) {
       }
       if (name === 'present') summary.presentCalls.push({ callId: data.id ?? data.callId ?? '' })
     } else if (type === 'team/member' || type === 'agent-team/member') {
-      const phase = data.phase ?? data.status ?? ''
+      // BUG-352：vendor 真实 v2 事件把 phase/error/name 嵌在 `data.member` 下；旧扁平形状只作退化兼容。
+      const member = data.member !== null && typeof data.member === 'object' && !Array.isArray(data.member) ? data.member : null
+      const phase = member?.phase ?? data.phase ?? data.status ?? ''
       if (phase === 'failed') {
+        const name = member === null
+          ? (typeof data.member === 'string' ? data.member : (data.id ?? data.name ?? ''))
+          : (typeof member.name === 'string' && member.name !== '' ? member.name : (typeof member.id === 'string' ? member.id : ''))
         summary.teamFailures.push({
-          member: data.member ?? data.id ?? data.name ?? '',
-          detail: redactTokenUrls(detailOf(data.error ?? data.detail ?? data.reason)).slice(0, 300),
+          member: name,
+          detail: redactTokenUrls(detailOf(member?.error ?? data.error ?? data.detail ?? data.reason)).slice(0, 300),
         })
       }
     } else if (type === 'assistant/message') {

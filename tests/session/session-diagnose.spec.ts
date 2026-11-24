@@ -142,11 +142,23 @@ describe('session-diagnose 纯逻辑（BUG-030 审批判读守卫）', () => {
     expect(summary.interruptedHints).toEqual([{ turn: 3, kind: 'waiting-approval', detail: 'request_signoff' }])
   })
 
-  it('team/member.phase=failed 折进 teamFailures', () => {
+  // 负例留证 2026-11-24：按扁平 data.phase 读 ⇒ 真实 v2 事件用例红（teamFailures 空）。BUG-352
+  it('team/member v2（phase 嵌在 data.member）折进 teamFailures；扁平旧形状仍兼容', () => {
     const summary = summarize([
-      { type: 'team/member', data: { member: 'vp-eng', phase: 'failed', error: 'provision timeout' } },
+      {
+        type: 'team/member',
+        data: {
+          version: 2,
+          teamId: 'lead-1',
+          member: { id: 'member-vp-eng', name: 'vp-eng', description: 'VP Engineering', provider: 'deepseek', context: 'fresh', phase: 'failed', error: 'provision timeout' },
+        },
+      },
+      { type: 'team/member', data: { member: 'cfo', phase: 'failed', detail: 'legacy flat' } },
     ])
-    expect(summary.teamFailures).toEqual([{ member: 'vp-eng', detail: 'provision timeout' }])
+    expect(summary.teamFailures).toEqual([
+      { member: 'vp-eng', detail: 'provision timeout' },
+      { member: 'cfo', detail: 'legacy flat' },
+    ])
   })
 
   it('redactTokenUrls 只脱敏值，不吞 URL 结构', () => {
