@@ -16,6 +16,7 @@ import { contentMemberFile, isSafeContentId } from './content-id.ts'
 import { isPlainFileInside, readTextInside } from '../fs/safe-file.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
 import { metaScalarField } from '../../lib/docs/requirements-check.ts'
+import { scanDocumentDetailed, sectionStructuralText, splitTableRow } from '../../lib/docs/markdown-shape.ts'
 
 export const DELIVERY_USAGE = '用法：/delivery check <deliverables 目录名>（读 meta.md 的 交付模式 + content/delivery-modes/<id>/delivery-rules.json）'
 const DELIVERY_USAGE_EN = 'Usage: /delivery check <deliverables-directory> (reads the delivery mode in meta.md + content/delivery-modes/<id>/delivery-rules.json)'
@@ -55,6 +56,29 @@ interface DeliveryRules {
   readonly deliveryMode?: string
   readonly documents?: Record<string, DeliveryDocument>
   readonly requiredSections?: Record<string, string[]>
+}
+
+/**
+ * 必填小节是否以**结构**出现（BUG-373）：围栏/HTML 注释里的模板样例不算。
+ * `## x` → 结构标题；`| a | b |` → 结构表行的前缀匹配；其它 → 结构行包含。
+ * @param text - 文档全文。
+ * @param needle - 规则里的 requiredSections 原串。
+ * @returns 结构上存在即 true。
+ */
+function hasStructuralSection(text: string, needle: string): boolean {
+  const wanted = needle.trim()
+  const heading = /^#{1,6}\s+(.*)$/.exec(wanted)
+  if (heading !== null) return sectionStructuralText(text, heading[1] ?? '') !== undefined
+  const scan = scanDocumentDetailed(text)
+  if (wanted.startsWith('|')) {
+    const cells = splitTableRow(wanted)
+    return scan.lines.some(line => {
+      if (!line.structural || !line.text.trim().startsWith('|')) return false
+      const row = splitTableRow(line.text)
+      return cells.length <= row.length && cells.every((cell, index) => row[index] === cell)
+    })
+  }
+  return scan.lines.some(line => line.structural && line.text.includes(wanted))
 }
 
 /** 读 `deliveryMode:` 行；缺省/占位符 = productized。 */
@@ -166,7 +190,7 @@ export function registerDeliveryCommand(ctx: Context, options: DeliveryCommandOp
         docs += 1
         for (const needle of rules.requiredSections?.[key] ?? []) {
           sections += 1
-          if (!text.includes(needle)) errors.push(tr(`${key} 缺 section「${needle}」`, `${key} is missing section "${needle}"`))
+          if (!hasStructuralSection(text, needle)) errors.push(tr(`${key} 缺 section「${needle}」`, `${key} is missing section "${needle}"`))
         }
       }
       if (errors.length > 0) {

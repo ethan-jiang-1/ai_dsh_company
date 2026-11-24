@@ -296,3 +296,35 @@ describe('deliveryMode 结构感知（BUG-375）', () => {
     } finally { cleanup() }
   })
 })
+
+// 负例留证 2026-11-24：把 requiredSections 判据退回裸 `text.includes` ⇒ 本组红（围栏/注释样例即可通过）。BUG-373
+describe('requiredSections 结构敏感（BUG-373）', () => {
+  const needles = ['## 2. Scope', '## 4. Milestones and acceptance', '## 5. Change control']
+  const bypass = (wrap: (needle: string) => string): string => ['# SOW', '', ...needles.map(wrap)].join('\n')
+
+  for (const [name, body] of [
+    ['围栏', bypass(needle => `\`\`\`markdown\n${needle}\n\`\`\``)],
+    ['HTML 注释', bypass(needle => `<!-- ${needle} -->`)],
+  ] as const) {
+    it(`${name}里的样例不算真小节`, async () => {
+      const { workspace, root, cleanup } = fixture('project-services')
+      try {
+        copyTemplates(root, 'project-services')
+        writeFileSync(join(root, 'drafts/sow.md'), body)
+        const result = await mount(workspace).handler({ rawInput: `check ${SLUG}` })
+        expect(result.kind).toBe('error')
+        expect(result.text).toContain('SOW 缺 section')
+      } finally { cleanup() }
+    })
+  }
+
+  it('真标题仍通过', async () => {
+    const { workspace, root, cleanup } = fixture('project-services')
+    try {
+      copyTemplates(root, 'project-services')
+      writeFileSync(join(root, 'drafts/sow.md'), ['# SOW', '', ...needles].join('\n'))
+      const result = await mount(workspace).handler({ rawInput: `check ${SLUG}` })
+      expect(result.kind).toBe('success')
+    } finally { cleanup() }
+  })
+})
