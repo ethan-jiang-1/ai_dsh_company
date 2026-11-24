@@ -2,16 +2,39 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 370；已分配 BUG-001..369。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 377；已分配 BUG-001..376。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张（2026-11-24 第六轮构造场景探查新立，只报不修）**：
+**活跃 7 张（2026-11-24 第七轮构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
+| [BUG-370](BUG-370-numbering-parser-differs-from-yaml-scalar.md) | P2 | lib + host | `numbering:` 解析不认 YAML 引号/注释/占位符（误拒），`numbering :` 反被当未声明（整道编号闸门静默豁免） | 调查中 |
+| [BUG-371](BUG-371-meta-shape-validators-three-way-split.md) | P2 | lib + tools | `meta.md` 形状校验三分家：缺 `slug:`／日期前缀 slug／空 `result:` 三处裁决相反 | 调查中 |
+| [BUG-372](BUG-372-diff-activity-shows-raw-lead-owner.md) | P2 | lib | `diffActivity` 把 CEO 认领/完成的任务显示成裸 `lead`，看板同一数据是 `CEO` | 调查中 |
+| [BUG-373](BUG-373-delivery-check-required-sections-substring-only.md) | P2 | host | `/delivery check` 用裸 `includes` 判必填小节，围栏/注释里的模板样例即可通过 | 调查中 |
+| [BUG-374](BUG-374-req-declared-layers-splitter-diverges.md) | P2 | host | `parseDeclaredLayers` 不认 `[…]`/引号，「产品类型不支持该层」的提醒静默失效 | 调查中 |
+| [BUG-375](BUG-375-meta-field-parsers-fence-blind.md) | P2 | host | `productType`/`deliveryMode` 行解析不感知围栏，`meta.md` 里引用的模板样例会盖过真值 | 调查中 |
+| [BUG-376](BUG-376-replay-lead-row-loses-current-tasks.md) | P2 | lib | 事件回放路径的 CEO 行恒「未上线 + 无当前任务」，与 live 路径对同一数据结论不同 | 调查中 |
+
+**本轮查过但不入卡**（避免下轮重复排查）：`delivery-rules` 的 `requiredFields` 没有任何检查器消费，但 `content/delivery-modes/*/document-map.md` 只声明 `documents.file` 与 `requiredSections` 会被 `/delivery check` 校验——属「未声明要校验」，不是缺陷；`catalog` 的 2000 行读上限在 ~153 条成品处触发但已有专档文案（第六轮已记）；`TEAM_TOOL_KEYS`（9 个）与 vendor `tool-agent-team` 的工具名逐字一致（已核）；`DELEGATION_TOOL_KEYS` 与 preset `toolName:` 声明一致（已核）；`formatTokens`/`firstText`/`yamlScalar`/`instance-guard` 四处上一轮修复经本轮复核未见回归。
+
+## 2026-11-24 修复交接（第七轮构造场景批次：BUG-370..376）
+
+**用户指令（2026-11-24）**：修最新一批缺陷；先按根因聚类立批次计划，再建 goal 按 REPO 流程推进。
+
+| 顺位 | 组 / 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
+|---|---|---|---|---|
+| **1 元数据字段解析单一来源** | [370](BUG-370-numbering-parser-differs-from-yaml-scalar.md) + [374](BUG-374-req-declared-layers-splitter-diverges.md) + [375](BUG-375-meta-field-parsers-fence-blind.md) | `meta.md` 同一族字段各写一套解析：numbering 裸正则、layers 裸拆分、productType/deliveryMode 围栏不感知；标量口径与结构口径都分叉 | 抽 `metaField(text, name)`（`metaFieldLines` 结构行 + `yamlScalarOrProblem` + 占位符）与 `metaListField`（复用 `parseList`），`numberingMarker`/`parseProductType`/`parseDeliveryMode`/`hasDeclaredDeliveryMode`/`parseDeclaredLayers` 全部改用它；表驱动用例覆盖引号/注释/冒号前空格/围栏/`[…]` | 1 |
+| **2 元数据形状校验单一判据** | [371](BUG-371-meta-shape-validators-three-way-split.md) | 面板 `metaProblemsOf` 与仓库审计 `validateMeta` 各自演化，缺 slug/日期前缀/空 result 三处裁决相反 | 以 `metaProblemsOf` 为唯一判据（tools 侧 parity 引用），统一「空值与缺行」语义：`result` 空=合法、`kickoff`/`type` 空=缺行、`slug` 允许回退但日期前缀判红；三输入 parity 用例 | 2 |
+| **3 在场身份 live/replay 一致** | [372](BUG-372-diff-activity-shows-raw-lead-owner.md) + [376](BUG-376-replay-lead-row-loses-current-tasks.md) | 同一 `lead` 特殊值两条消费路径：`diffActivity` 硬编码 `teammate`；回放 lead 行手拼 `inactive/currentTasks:null`，与 live 投影不一致 | 抽共享 `ownerDisplayName` 与「任务 → owner 的 currentTasks」helper；`diffActivity`/`tasksFromTeamView`/`presenceFromEvents` 同用；lead 行状态与 live 同口径并补 live↔replay 对比用例 | 3 |
+| **4 交付小节结构敏感** | [373](BUG-373-delivery-check-required-sections-substring-only.md) | `/delivery check` 用裸 `includes` 判必填小节，围栏/注释里的样例也算 | `requiredSections` 改为结构行匹配（标题用 `scanDocument`/`sectionStructuralText`，表格行用 `splitTableRow` + 结构扫描）；围栏/注释两份绕过文档用例 + 正常文档回归 | 4 |
+
+**横向原则**：同一份文件/字段的解析、形状、结构判定各只有一份实现；提醒/闸门等消费面只选「怎么显示」，不另写判据；未知/坏形状保持 fail-closed 且有信号。
+**终点**：7 张全部带红/绿证据迁入 `fixed_bugs/`；1 篇批次伞形 Note；370/371/376 的跨模块解析/校验/回放判据过独立只读盲审；`verify`/`test`/`typecheck`/`lint`/`dup`/`coverage-ratchet` 与 client 真加载冒烟全绿并 `push`。批次外新卡不动。
 
 **2026-11-24 第六轮探查的排除项**（看过但不入卡，避免下一轮重复排查）：`BoardPanel`/`DagPanel` 的 `未分配` 已在 `BUG-358` 修复（本轮复核为绿）；成品目录 `CATALOG_READ_LIMIT` 与生成器行数的关系在 ~153 条处触发，但已有「超出读取上限」专档文案，属设计边界；`enumerateStartupOptions` 跳过 symlink 内容目录（包内内容，非模型可写）；`rotating-log` 轮转按「写入前」判大小，最多超一行。
 
