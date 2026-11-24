@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-359**（2026-11-24，351..359 批顺位 5 / P2）：注意力条目带 `eventKey`（会话事件 `seq`），`attentionItemKey` 优先 eventKey，`mergeAttention` 只做跨源去重——
+  [359](BUG-359-attention-same-millisecond-stream-items-collapse.md)。证据提交 `0ab2f43d`。
+
 - **BUG-356**（2026-11-24，351..359 批顺位 4 / P2）：台账与 slug 集合统一 `splitTableRow`（lib TS/JS + tools 两处），`\|` 不再判坏行——
   [356](BUG-356-motion-ledger-escaped-pipe-row-dropped.md)。证据提交 `ed54ef17`。
 - **BUG-357**（2026-11-24，351..359 批顺位 4 / P2）：present 写入口径改读 `meta.md` 的 `deliverableSlug`，`presentedOf` 兼容目录名 slug 旧账本——
