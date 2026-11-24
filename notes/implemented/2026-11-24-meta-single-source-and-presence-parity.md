@@ -44,6 +44,10 @@
 - **U4**：`pnpm test tests/host/commands/delivery-command.spec.ts` —— 还原裸 `includes` 前 2 failed；修复后 29/29 passed。
 - `pnpm verify` ALL PASS。
 
+## 独立只读盲审（370/371/376）
+
+2026-11-24 按计划启动独立只读子代理审 `d700c76a` / `7d81872c` / `7e35a053`。连续三次（含一次只读、不跑命令的窄面复审）均未在时限内返回结论（子代理运行挂起，属基础设施阻塞，非代码红）；本轮以「批次可交付、盲审未完成」收口，复审结论待子代理恢复后补记，不阻塞已推送的修复与门禁绿。
+
 ## 未覆盖轴
 
 - [covered] numbering 六种写法、围栏里的 productType、layers 的 `[…]`/引号 → 去向：[requirements-check.spec.ts](../../tests/lib/docs/requirements-check.spec.ts) / [req-command.spec.ts](../../tests/host/commands/req-command.spec.ts)
