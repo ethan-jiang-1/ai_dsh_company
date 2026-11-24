@@ -577,3 +577,22 @@ describe('台账 slug 集合与权威解析同判据（BUG-362 复审）', () =>
     expect([...ledgerSlugsFromText(text)]).toEqual(['a'])
   })
 })
+
+// 负例留证 2026-11-24：false 审计不写 slug ⇒ 归档后被旧 true 覆盖，本用例红。BUG-383
+describe('presented 结论反转随归档延续（BUG-383）', () => {
+  it('true → false → 归档：呈现 false，不是旧 true', () => {
+    const root = workspace()
+    const dir = '2026-11-20-foo'
+    const live = join(root, RUN_BUNDLE_PATHS.deliverables, dir, 'final.md')
+    mkdirSync(join(root, RUN_BUNDLE_PATHS.deliverables, dir), { recursive: true })
+    writeFileSync(join(root, RUN_BUNDLE_PATHS.deliverables, dir, 'meta.md'), 'slug: foo\nkickoff: 2026-11-20\ntype: decision\nresult: accepted\n')
+    writeFileSync(live, 'body\n')
+    const rel = `${RUN_BUNDLE_PATHS.deliverables}/${dir}/final.md`
+    expect(setPresentedAudit(root, rel, true).ledger).toBeDefined()
+    const after = setPresentedAudit(root, rel, false).ledger
+    expect(after).toBeDefined()
+    expect((after as { dirVeto?: Record<string, boolean> }).dirVeto?.['2026-11-20-foo']).toBe(false)
+    expect(presentedOf(after!, rel, 'foo')).toBe(false)
+    expect(presentedOf(after!, `${RUN_BUNDLE_PATHS.archive}/${dir}/final.md`, 'foo')).toBe(false)
+  })
+})

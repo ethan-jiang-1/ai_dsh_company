@@ -32,6 +32,11 @@ export interface PresentedLedger {
    * 不再拿自定 meta slug 与目录名混在同一命名空间里。
    */
   readonly dirSlugs?: Readonly<Record<string, boolean>>
+  /**
+   * 目录名 → 人工审计否决（BUG-383）。目录名在 live→archive 迁移中保持不变，
+   * 用它承载「这条成品被判定未交付」，避免 slug 旧 true 在归档后翻案，也不污染同 slug 的新成品。
+   */
+  readonly dirVeto?: Readonly<Record<string, boolean>>
 }
 
 export type PresentedLedgerState =
@@ -62,6 +67,7 @@ export function readPresentedLedger(workspace: string): PresentedLedgerState {
     if (!validateBooleanMap(raw.paths)) return { status: 'corrupt', path, error: 'paths 不是 boolean map' }
     if (!validateBooleanMap(raw.slugs)) return { status: 'corrupt', path, error: 'slugs 不是 boolean map' }
     if (raw.dirSlugs !== undefined && !validateBooleanMap(raw.dirSlugs)) return { status: 'corrupt', path, error: 'dirSlugs 不是 boolean map' }
+    if (raw.dirVeto !== undefined && !validateBooleanMap(raw.dirVeto)) return { status: 'corrupt', path, error: 'dirVeto 不是 boolean map' }
     // SAFETY: 上方已逐字段校验 schema/updatedAt/paths/slugs 的形状与版本，剩余字段即合同本身；
     // isRecord 只保证 Record<string, unknown>，这里按已验证字段收窄成只读账本视图。
     return { status: 'ok', path, ledger: raw as unknown as PresentedLedger }
@@ -156,12 +162,18 @@ export function ensurePresentedLedger(companyHome: string, now: Date = new Date(
 export function presentedOf(ledger: PresentedLedger, path: string, slug: string): boolean | null {
   const byPath = ledger.paths[normalizeRel(path)]
   if (byPath === true || byPath === false) return byPath
+  // 目录名在归档迁移中稳定：人工否决随目录延续，但不污染同 slug 的新成品（BUG-383）。
+  const dirKey = /\.dsh-company\/deliverables(?:-archive)?\/([^/]+)\/final\.md$/.exec(normalizeRel(path))?.[1] ?? ''
+  const veto = dirKey === '' ? undefined : ledger.dirVeto?.[dirKey]
+  if (veto === false) return false
+  // slug 只承载「背书延续」；显式 false 走 dirVeto（同 slug 新成品不应继承旧 false）。
   if (ledger.slugs[slug] === true) return true
   // 兼容升级前账本（只写目录名 slug）：回退只查 dirSlugs（老账本没有该字段时把 slugs 视作目录名集），
   // 避免新账本里的自定 meta slug 与目录名 slug 混用（BUG-357 复审 finding 3）。
   const dirMatch = /\.dsh-company\/deliverables(?:-archive)?\/([^/]+)\/final\.md$/.exec(normalizeRel(path))
   const dirSlug = dirMatch === null ? '' : slugFromDirName(dirMatch[1] ?? '')
   const dirSlugs = ledger.dirSlugs ?? ledger.slugs
+  // 回退只认 true（旧账本的 false 是路径级结论，不随目录名泛化）。
   return dirSlug !== '' && dirSlugs[dirSlug] === true ? true : null
 }
 
@@ -264,19 +276,22 @@ export function setPresentedAudit(
   const base = state.status === 'ok' ? state.ledger : ensurePresentedLedger(companyHome, now).ledger
   const paths: Record<string, boolean> = { ...base.paths, [rel]: presented }
   let next: PresentedLedger = { schema: 1, updatedAt: now.toISOString(), paths, slugs: base.slugs }
-  // true 同时写 slug 便于归档后延续；false 只认精确 path，不写 slug。
-  if (presented) {
-    // v3 路径是 `.dsh-company/deliverables/<dir>/final.md`：身份 = meta 的 slug（与 catalog 读侧同判据）。
+  // true 写 slug（归档后延续背书）；false 写目录否决（BUG-383），避免同 slug 新成品继承旧 false。
+  {
     const rootRel = rel.startsWith(`${RUN_BUNDLE_PATHS.archive}/`) ? RUN_BUNDLE_PATHS.archive : RUN_BUNDLE_PATHS.deliverables
     const dirName = rel.split('/').slice(-2)[0] ?? ''
-    const slug = presentedSlugOf(companyHome, rootRel, dirName)
     const dirSlug = slugFromDirName(dirName)
-    if (slug !== '') {
-      next = {
-        ...next,
-        slugs: { ...next.slugs, [slug]: true },
-        ...(dirSlug === '' ? {} : { dirSlugs: Object.assign({}, next.dirSlugs, { [dirSlug]: true }) }),
+    if (presented) {
+      const slug = presentedSlugOf(companyHome, rootRel, dirName)
+      if (slug !== '') {
+        next = {
+          ...next,
+          slugs: { ...next.slugs, [slug]: true },
+          ...(dirSlug === '' ? {} : { dirSlugs: Object.assign({}, next.dirSlugs, { [dirSlug]: true }) }),
+        }
       }
+    } else if (dirName !== '') {
+      next = { ...next, dirVeto: Object.assign({}, next.dirVeto, { [dirName]: false }) }
     }
   }
   try {
