@@ -109,6 +109,17 @@ describe('台账 slug 集合：TS/JS 同方言（BUG-356）', () => {
     '| b | 2026-11-21 | decision | ceo | 1m | ✅ | plain |',
   ].join('\n')
 
+  it('列数不符的坏行不进 slug 集合（BUG-362）', () => {
+    const text = [
+      '| slug | date | type | participants | wallClock | deliverable | summary |',
+      '|---|---|---|---|---|---|---|',
+      '| ok-1 | 2026-01-01 | decision | ceo | 1m | ✅ | s |',
+      '| broken | x |',
+    ].join('\n')
+    expect([...ledgerSlugsFromText(text)]).toEqual(['ok-1'])
+    expect([...ledgerSlugsFromTextTs(text)]).toEqual(['ok-1'])
+  })
+
   it('无表头 / 分隔行 / 空首列都被跳过且两侧一致', () => {
     const edge = [
       '正文行不是表格',

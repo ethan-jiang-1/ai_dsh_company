@@ -58,21 +58,22 @@ export function deliverableSlug(fields, dir) {
 
 
 /**
- * 动议台账里的 slug 集合（与 host `ledgerSlugsFromText` 同判据；BUG-356 起共用 `splitTableRow`）。
+ * 动议台账里的 slug 集合（与 host `ledgerSlugsFromText` 同判据：表头列数/空行/坏行都排除；BUG-362）。
  * @param {string} text kb/motion-ledger.md 全文
  * @returns {Set<string>}
  */
 export function ledgerSlugsFromText(text) {
   const slugs = new Set()
-  let headerSeen = false
+  let headerWidth = 0
   for (const line of text.split('\n')) {
     const trimmed = line.trim()
     if (!trimmed.startsWith('|')) continue
     const cells = splitTableRow(trimmed)
-    if (!headerSeen) {
-      if (cells[0] === 'slug') headerSeen = true
+    if (headerWidth === 0) {
+      if (cells[0] === 'slug') headerWidth = cells.length
       continue
     }
+    if (cells.length !== headerWidth) continue
     if (cells.every(cell => /^[-: ]*$/.test(cell))) continue
     if (cells[0] !== undefined && cells[0] !== '') slugs.add(cells[0])
   }

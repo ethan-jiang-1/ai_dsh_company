@@ -156,20 +156,27 @@ export function buildDeliverablesCatalog(input: {
   }
 }
 
-/** 动议台账里的 slug 集合（只认表行首列；格式家 = kb/motion-ledger.md）。 */
+/**
+ * 动议台账里的 slug 集合（只认表行首列；格式家 = kb/motion-ledger.md）。
+ * 行有效性 = 表头列数 / 非全空行 / 非分隔行（BUG-362）；与 tools 侧孪生同判据。
+ * @param text - 台账全文。
+ * @returns slug 集合。
+ */
 export function ledgerSlugsFromText(text: string): Set<string> {
   const slugs = new Set<string>()
-  let headerSeen = false
+  let headerWidth = 0
   for (const line of text.split('\n')) {
     const trimmed = line.trim()
     if (!trimmed.startsWith('|')) continue
     const cells = splitTableRow(trimmed)
-    if (!headerSeen) {
-      if (cells[0] === 'slug') headerSeen = true
+    if (headerWidth === 0) {
+      if (cells[0] === 'slug') headerWidth = cells.length
       continue
     }
+    if (cells.length !== headerWidth) continue
     if (cells.every(cell => /^[-: ]*$/.test(cell))) continue
-    if (cells[0] !== undefined && cells[0] !== '') slugs.add(cells[0])
+    const slug = cells[0]
+    if (slug !== undefined && slug !== '') slugs.add(slug)
   }
   return slugs
 }
