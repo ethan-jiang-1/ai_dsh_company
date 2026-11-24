@@ -6,6 +6,8 @@
 - [BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md](fixed_bugs/BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md) — `acquireCompanyLease` 抽出共享 `releaseLease` 与幂等 `makeRelease`，修复重入 `first→second` 释放泄漏心跳定时器。
 - [BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md](fixed_bugs/BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md) — `subagent_retry` 在 `startActivation` 被取消时按 `childIds.length` 返回 `attempts`，消除 `attempts: 0` 与 `childIds` 矛盾。
 - [BUG-346-presented-ledger-concurrent-write-lost-update.md](fixed_bugs/BUG-346-presented-ledger-concurrent-write-lost-update.md) — `presented-domain` 为 `ensureLedger`/`recordLedger`/`auditLedger` 增加按 store 维度的 Promise 串行队列并给 `fileStore` 临时文件补充 `randomUUID()`。
+- [BUG-360-format-tokens-1000k-instead-of-1m.md](fixed_bugs/BUG-360-format-tokens-1000k-instead-of-1m.md) — 令牌档位按舍入后判定。
+- [BUG-361-first-text-keeps-crlf-carriage-return.md](fixed_bugs/BUG-361-first-text-keeps-crlf-carriage-return.md) — 首行文本先归一换行。
 - [BUG-364-instance-guard-future-heartbeat-never-expires.md](fixed_bugs/BUG-364-instance-guard-future-heartbeat-never-expires.md) — 实例心跳双边新鲜度 + 写时清理。
 - [BUG-362-ledger-slugs-accept-malformed-rows.md](fixed_bugs/BUG-362-ledger-slugs-accept-malformed-rows.md) — 台账 slug 集合复用行有效性。
 - [BUG-368-yaml-scalar-unbalanced-quote-kept-and-trailing-dropped.md](fixed_bugs/BUG-368-yaml-scalar-unbalanced-quote-kept-and-trailing-dropped.md) — YAML 坏引号 fail-closed。

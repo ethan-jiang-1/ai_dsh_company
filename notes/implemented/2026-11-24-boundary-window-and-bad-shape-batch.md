@@ -23,6 +23,9 @@
 6. **时间窗口双边（[BUG-364](../../_backlog/_archive/fixed_bugs/BUG-364-instance-guard-future-heartbeat-never-expires.md)）**：
    `shouldWarn` 加 `SKEW_MS` 下界（`ts <= now + SKEW`），`writeBeat` 写自己的同时裁掉过期/超前邻居；
    未来心跳不再永久告警，坏记录不再长期留在 localStorage。
+7. **文本与格式归一（[BUG-361](../../_backlog/_archive/fixed_bugs/BUG-361-first-text-keeps-crlf-carriage-return.md) / [BUG-360](../../_backlog/_archive/fixed_bugs/BUG-360-format-tokens-1000k-instead-of-1m.md)）**：
+   `firstText` 先用 `\r\n?`→`\n` 归一、切首行后再 trim；`formatTokens` 对舍入后的 k 档值再判一次档，
+   999 950 及以上进 M，不再出现 `1000k`。
 
 ## 输掉的方案
 
@@ -51,6 +54,7 @@
 - **BUG-368**：`pnpm test tests/lib/docs/yaml-scalar.spec.ts tests/client/ui/brand.spec.ts` —— 还原前 3 failed；修复后全绿。
 - **BUG-369**：`pnpm test tests/lib/presence/doors.spec.ts tests/host/workspace/workspace-doors.spec.ts` —— 还原前 3 failed；修复后全绿。
 - **BUG-364**：`pnpm test tests/client/wiring/instance-guard.spec.ts` —— 还原单边判据前 2 failed；修复后 7/7 passed。
+- **BUG-360/361**：`pnpm test tests/lib/accounting/budget.spec.ts tests/lib/shared/text-and-status.spec.ts` —— 还原前 2 failed；修复后全绿。
 - `pnpm verify` ALL PASS。
 
 ## 未覆盖轴

@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-360**（2026-11-24，360..369 批顺位 6 / P2）：`formatTokens` 按舍入后档位判定，999 950+ 进 M 档——
+  [360](BUG-360-format-tokens-1000k-instead-of-1m.md)。证据提交 `0f9bc30f`。
+- **BUG-361**（2026-11-24，360..369 批顺位 6 / P2）：`firstText` 先归一 CRLF/孤立 CR 再取首行并 trim——
+  [361](BUG-361-first-text-keeps-crlf-carriage-return.md)。证据提交 `0f9bc30f`。
+
 - **BUG-364**（2026-11-24，360..369 批顺位 5 / P2）：实例心跳新鲜度改双边窗口（容忍时钟偏差），写心跳时清理过期/超前邻居——
   [364](BUG-364-instance-guard-future-heartbeat-never-expires.md)。证据提交 `1597828a`。
 

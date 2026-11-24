@@ -1,22 +1,22 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-360：`formatTokens` 在 999 950–999 999 区间输出 `1000k`，永远升不到 `1M`
 
-> 严重级别：P2·低影响（显示口径：用量面板把接近一百万的令牌数写成 `1000k`，与同函数「`1.2k`/`3.4M`」的量纲约定冲突，读者会以为还在千级）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2·低影响（显示口径：用量面板把接近一百万的令牌数写成 `1000k`，与同函数「`1.2k`/`3.4M`」的量纲约定冲突，读者会以为还在千级）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（舍入后判档）
 >
-> **留痕**：（待修复时裁决；可走机械修复）
+> **留痕**：Note [2026-11-24-boundary-window-and-bad-shape-batch](../../../notes/implemented/2026-11-24-boundary-window-and-bad-shape-batch.md)（批次 360..369：格式档位进位）
 
 ## 症状
 
-[`formatTokens`](../../packages/company-pack/src/lib/accounting/budget.ts#L49-L53) 先判 `>= 1_000_000` 走 M 档，否则按 k 档除以 1000 并四舍五入到一位小数。`999_950 <= v < 1_000_000` 时 `v/1000` 落在 `[999.95, 1000)`，`Math.round(x*10)/10` 得到 `1000`，`Number.isInteger(1000)` 为真 ⇒ 输出字符串 `"1000k"`。
+[`formatTokens`](../../../packages/company-pack/src/lib/accounting/budget.ts#L49-L53) 先判 `>= 1_000_000` 走 M 档，否则按 k 档除以 1000 并四舍五入到一位小数。`999_950 <= v < 1_000_000` 时 `v/1000` 落在 `[999.95, 1000)`，`Math.round(x*10)/10` 得到 `1000`，`Number.isInteger(1000)` 为真 ⇒ 输出字符串 `"1000k"`。
 
 ## 运行面
 
-- **面 = lib**：[`packages/company-pack/src/lib/accounting/budget.ts`](../../packages/company-pack/src/lib/accounting/budget.ts#L49-L62)；消费方 [`BudgetPanel`](../../packages/company-pack/src/client/tabs/company-panels.tsx#L392-L401)。
+- **面 = lib**：[`packages/company-pack/src/lib/accounting/budget.ts`](../../../packages/company-pack/src/lib/accounting/budget.ts#L49-L62)；消费方 [`BudgetPanel`](../../../packages/company-pack/src/client/tabs/company-panels.tsx#L392-L401)。
 
 ## 复现
 
@@ -46,3 +46,10 @@ console.log([999_949, 999_950, 999_999, 1_000_000].map(v => v + ' -> ' + formatT
 ## 已修判定
 
 - `formatTokens(999_950)`、`formatTokens(999_999)` 输出 `1M`（或至少不再是 `1000k`）；`999_949` 仍为 `999.9k`；`formatTokens(1_000_000)` 仍为 `1M`。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/accounting/budget.ts`、`tests/lib/accounting/budget.spec.ts`
+- 红：`pnpm test tests/lib/accounting/budget.spec.ts` —— 还原前 1 failed（999 950 输出 `1000k`）
+- 绿：`pnpm test tests/lib/accounting/budget.spec.ts` —— 全绿（999 949 `999.9k`；999 950+ `1M`）
+- 提交：commit 0f9bc30f
