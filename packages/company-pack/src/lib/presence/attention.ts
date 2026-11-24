@@ -44,6 +44,11 @@ export interface AttentionItem {
    * （BUG-299）。消息类事件（escalation/completion）没有 id，只能退回内容+时间。
    */
   readonly id?: string
+  /**
+   * 事件流身份（vendor 会话事件的 `seq`）。无 id 的消息类条目用它去重——毫秒时间不是身份
+   * （BUG-359：同毫秒两条不同升级会互相吞掉）。
+   */
+  readonly eventKey?: number
   /** 何时发生（epoch ms）。 */
   readonly time: number
   /** 一键跳转目标会话 id。 */
@@ -81,14 +86,15 @@ export function attentionSummary(text: string, max = ATTENTION_SUMMARY_MAX): str
 
 /** follow 流可折事件的最小形状（team/* 由 presence.ts 同款兜底臂覆盖）。 */
 export type AttentionEventLike =
-  | { type: 'tool/call'; time: number; data: { callId?: string; name?: string; arguments?: string } }
+  | { type: 'tool/call'; time: number; seq?: number; data: { callId?: string; name?: string; arguments?: string } }
   | {
     type: 'team/message/queued'
     time: number
+    seq?: number
     data: { message: { senderName: string; content: readonly { type: string; text?: string }[] } }
   }
   // 兜底：其他事件类型忽略不折。
-  | { type: string; time: number; data: unknown }
+  | { type: string; time: number; seq?: number; data: unknown }
 
 /** 升级消息的标记约定（切片三甲；VP skill 侧将配合输出此前缀——内容步随培养节奏落）。 */
 export const ESCALATION_MARK = '[NEEDS-CLARIFICATION]'
@@ -163,6 +169,7 @@ export function streamAttention(
           who: event.data.message.senderName,
           what: body === '' ? '(empty)' : attentionSummary(body),
           ...(body === '' ? { whatToken: { kind: 'escalation-empty' } as const } : {}),
+          ...(event.seq === undefined ? {} : { eventKey: event.seq }),
           time: event.time,
           jumpTo: leadSessionId,
         })
@@ -174,6 +181,7 @@ export function streamAttention(
         who: leadName,
         what: attentionSummary(label === null ? 'Deliverable' : `Delivered: ${label}`),
         whatToken: { kind: 'completion', label },
+        ...(event.seq === undefined ? {} : { eventKey: event.seq }),
         time: event.time,
         jumpTo: leadSessionId,
       })
@@ -275,6 +283,7 @@ export function mergeAttention(
     const qKey = questionContentKey(item)
     liveQuestionBudget.set(qKey, (liveQuestionBudget.get(qKey) ?? 0) + 1)
   }
+  // BUG-359：只在 **live ↔ history** 之间去重；历史流内部两条不同事件（同毫秒、同 kind）都保留。
   const rebuilt = streamItems.filter(item => {
     const key = attentionItemKey(item)
     if (seen.has(key)) return false
@@ -286,7 +295,6 @@ export function mergeAttention(
         return false
       }
     }
-    seen.add(key)
     return true
   })
   return [...waiting.sort(byTimeDesc), ...rebuilt.slice().sort(byTimeDesc)]
@@ -304,11 +312,11 @@ export function mergeAttention(
  * @returns 去重键。
  */
 export function attentionItemKey(item: AttentionItem): string {
-  // 无 id 的只剩消息类（escalation/completion，来自事件流、本身唯一）：用时间定位。
+  // 无 id 的消息类：优先事件 seq（真实身份，BUG-359）；没有 seq 的旧流才退回毫秒时间。
   // **绝不回落到 `what`**——同文两条会撞 key（BUG-312 就是这么冒出来的）。
-  return item.id === undefined
-    ? `${item.kind}\u0000${item.jumpTo}\u0000${String(item.time)}`
-    : `${item.kind}\u0000${item.jumpTo}\u0000#${item.id}`
+  if (item.id !== undefined) return `${item.kind}\u0000${item.jumpTo}\u0000#${item.id}`
+  if (item.eventKey !== undefined) return `${item.kind}\u0000${item.jumpTo}\u0000@${String(item.eventKey)}`
+  return `${item.kind}\u0000${item.jumpTo}\u0000${String(item.time)}`
 }
 
 /** 问询的**跨源**内容键（只在 live↔history 之间用；源内仍按 id）。 */

@@ -477,3 +477,27 @@ describe('questionListOf · 形状边角', () => {
     expect(questionListOf(undefined)).toEqual([])
   })
 })
+
+// 负例留证 2026-11-24：attentionItemKey 去掉 eventKey 分支、或 merge 恢复「流内 seen.add」⇒ 本组红。BUG-359
+describe('attention 事件身份（BUG-359）', () => {
+  const escalation = (seq: number, body: string, time = 1_700_000_000_000): AttentionEventLike => ({
+    type: 'team/message/queued',
+    time,
+    seq,
+    data: { message: { senderName: 'ceo', content: [{ type: 'text', text: `[NEEDS-CLARIFICATION] ${body}` }] } },
+  })
+
+  it('同毫秒两条不同升级（seq 不同）都保留且 key 不同', () => {
+    const items = streamAttention([escalation(1, 'first'), escalation(2, 'second')], 'lead-1', 'CEO')
+    expect(items).toHaveLength(2)
+    const merged = mergeAttention([], items)
+    expect(merged).toHaveLength(2)
+    expect(attentionItemKey(merged[0]!)).not.toBe(attentionItemKey(merged[1]!))
+  })
+
+  it('同一条事件在 live/历史两源出现仍只显示一条（回归 BUG-325）', () => {
+    const items = streamAttention([escalation(7, 'dup')], 'lead-1', 'CEO')
+    expect(mergeAttention([], items)).toHaveLength(1)
+    expect(mergeAttention([], [...items, ...items])).toHaveLength(2) // 历史内部重复不去重（仅跨源）
+  })
+})

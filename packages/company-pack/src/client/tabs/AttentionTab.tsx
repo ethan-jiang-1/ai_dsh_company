@@ -234,11 +234,11 @@ export function AttentionTab(props: AttentionTabProps) {
             : <div className="wk-meta">{t('attention.emptyWaiting')}</div>)
           : (
             <ul className="wk-activity" aria-label={t('attention.waitingList')}>
-              {waiting.map(item => {
+              {waiting.map((item, index) => {
                 const fullWhat = formatAttentionWhat(item, t)
                 const summaryWhat = attentionSummary(fullWhat)
                 return (
-                <li key={itemKey(item)}>
+                <li key={`${itemKey(item)}#${String(index)}`}>
                   <Tag tone={attentionTone(item.kind)}>{t(ATTENTION_KEYS[item.kind])}</Tag>
                   {' '}<span title={item.detail ?? fullWhat}>{t('attention.itemLine', { who: whoOf(item), what: summaryWhat })}</span>
                   <span className="wk-meta"> · {formatWhen(item.time, t)}</span>{' '}
@@ -262,8 +262,8 @@ export function AttentionTab(props: AttentionTabProps) {
           ? <div className="wk-meta">{t('attention.emptyDone')}</div>
           : (
             <ul className="wk-activity" aria-label={t('attention.doneList')}>
-              {completions.map(item => (
-                <li key={itemKey(item)}>
+              {completions.map((item, index) => (
+                <li key={`${itemKey(item)}#${String(index)}`}>
                   <Tag tone={attentionTone(item.kind)}>{t(ATTENTION_KEYS[item.kind])}</Tag>
                   {' '}{whoOf(item)} · {attentionSummary(formatAttentionWhat(item, t))}
                   <span className="wk-meta"> · {formatWhen(item.time, t)}</span>
