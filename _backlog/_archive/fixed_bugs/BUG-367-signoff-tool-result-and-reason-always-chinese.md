@@ -56,6 +56,5 @@ console.log(signoffReason({ line: 'Margin line', summary: 'discount 22%', detail
 
 - 改动面：`packages/company-pack/src/lib/accounting/signoff.ts`、`packages/company-pack/src/host/commands/signoff-tool.ts`、`packages/company-pack/src/host/commands/client-diagnostics.ts`、`packages/company-pack/src/index.ts`、`tests/lib/accounting/signoff.spec.ts`、`tests/host/commands/signoff-language.spec.ts`、`tests/host/commands/command-language.spec.ts`
 - 红：`pnpm test tests/lib/accounting/signoff.spec.ts tests/host/commands/signoff-language.spec.ts tests/host/commands/command-language.spec.ts` —— 还原语言注入前 4 failed（en 回执/理由/诊断命令仍中文）
-- 绿：同命令 —— 10/10 passed（en 四结局与 reason 全 ASCII；诊断描述/用法英文；zh 行为不变）
-- 提交：commit 
+- 绿：`pnpm test tests/lib/accounting/signoff.spec.ts tests/host/commands/signoff-language.spec.ts tests/host/commands/command-language.spec.ts` —— 10/10 passed（en 四结局与 reason 全 ASCII；诊断描述/用法英文；zh 行为不变）
 - 提交：commit fe4ffe2e
