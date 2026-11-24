@@ -8,14 +8,13 @@
 
 ## 活跃清单
 
-**活跃 10 张（2026-11-24 第六轮构造场景探查新立，只报不修）**：
+**活跃 9 张（2026-11-24 第六轮构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
 | [BUG-360](BUG-360-format-tokens-1000k-instead-of-1m.md) | P2·低影响 | lib | `formatTokens` 在 999 950–999 999 区间输出 `1000k`，永远升不到 `1M` | 调查中 |
 | [BUG-361](BUG-361-first-text-keeps-crlf-carriage-return.md) | P2 | lib | `firstText` 只按 `\n` 切行，CRLF 消息首行带一个 `\r` 进动态与摘要 | 调查中 |
 | [BUG-362](BUG-362-ledger-slugs-accept-malformed-rows.md) | P2 | lib | `ledgerSlugsFromText` 把列数不符的坏行首列也当 slug 收进「已入账」，与台账面板判据相反 | 调查中 |
-| [BUG-363](BUG-363-error-capture-install-not-idempotent.md) | P2 | client | `installErrorCapture` 不幂等：重复安装把每条 `console.error` 记两遍，卸载后包装仍指向旧环 | 调查中 |
 | [BUG-364](BUG-364-instance-guard-future-heartbeat-never-expires.md) | P2 | client | `shouldWarn` 把未来时间戳的心跳当永久新鲜，时钟回拨后多实例横幅长期挂着 | 调查中 |
 | [BUG-365](BUG-365-company-data-unbounded-event-accumulation.md) | P2 | client | `useCompanyData` 把 follow 流事件无界追加进 state，长会话内存与渲染开销线性增长 | 调查中 |
 | [BUG-366](BUG-366-context-candidates-fail-open-on-unknown-cwd.md) | P2 | client | 培养背景候选按「未知 cwd = 都匹配」放行，跨 workspace 会话会进参考背景 | 调查中 |
@@ -49,7 +48,7 @@
 
 | 顺位 | 组 / 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
 |---|---|---|---|---|
-| **1 全局安装幂等** | [363](BUG-363-error-capture-install-not-idempotent.md) | 全局 monkey-patch 每次安装都叠加包装、卸载不收敛 | 在 target 上记原始 `console.error` + 安装计数；重复安装只换环引用，计数归零才恢复原始函数；happy-dom 复现用例红→绿 | 1 |
+| **1 全局安装幂等** | [363](../_archive/fixed_bugs/BUG-363-error-capture-install-not-idempotent.md)（已修 `105010d2`） | 全局 monkey-patch 每次安装都叠加包装、卸载不收敛 | 在 target 上记原始 `console.error` + 安装计数；重复安装只换环引用，计数归零才恢复原始函数；happy-dom 复现用例红→绿 | 1 |
 | **2 有界流与作用域** | [365](BUG-365-company-data-unbounded-event-accumulation.md) + [366](BUG-366-context-candidates-fail-open-on-unknown-cwd.md) | 无限流原样累积进 state；作用域过滤把「未知」当「匹配」（fail-open） | `useCompanyData` 在写入点按窗口裁剪并保留 `capped/total`；`projectContextSessions` 与 `historyCandidates` 同口径 fail-closed（cwd 未知不产候选、行 cwd 缺失排除、canonical 比较）；两侧各补窗口/未知 cwd 用例 | 2 |
 | **3 工具/命令语言面** | [367](BUG-367-signoff-tool-result-and-reason-always-chinese.md) | 工具面与 `/company-diagnostics` 没有语言注入面（BUG-338 只收了五个斜杠命令） | `signoffDecisionNote`/`signoffReason` 出 `{zh,en}` 或 `text(zh,en)`；`registerSignoffTool` 按公司语言取值并订阅切换；诊断命令改走 `registerLocalizedCommand`；en 用例断言零中文 | 3 |
 | **4 坏形状/缺失值单一判据** | [362](BUG-362-ledger-slugs-accept-malformed-rows.md) + [368](BUG-368-yaml-scalar-unbalanced-quote-kept-and-trailing-dropped.md) + [369](BUG-369-workspace-doors-unset-preset-chinese-placeholder.md) | 同一数据两种解析器；宽容解析把语法错误折成好值；缺失值编码成展示串 | slug 集合复用 `parseMotionLedger` 的行有效性（列数/空行）；`yamlScalar` 增结构化 `problem` 版本、未闭合/带尾巴按坏形状处理，`parseCompanyIdentity` 拒绝坏标量；`DoorRow.preset` 改 `string | null`、工具 schema 允许 null；TS/JS 双份同步 | 4 |

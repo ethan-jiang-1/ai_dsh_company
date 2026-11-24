@@ -6,6 +6,7 @@
 - [BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md](fixed_bugs/BUG-345-lease-reentrant-release-leaks-heartbeat-interval.md) — `acquireCompanyLease` 抽出共享 `releaseLease` 与幂等 `makeRelease`，修复重入 `first→second` 释放泄漏心跳定时器。
 - [BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md](fixed_bugs/BUG-344-subagent-retry-reports-zero-attempts-when-second-start-aborts.md) — `subagent_retry` 在 `startActivation` 被取消时按 `childIds.length` 返回 `attempts`，消除 `attempts: 0` 与 `childIds` 矛盾。
 - [BUG-346-presented-ledger-concurrent-write-lost-update.md](fixed_bugs/BUG-346-presented-ledger-concurrent-write-lost-update.md) — `presented-domain` 为 `ensureLedger`/`recordLedger`/`auditLedger` 增加按 store 维度的 Promise 串行队列并给 `fileStore` 临时文件补充 `randomUUID()`。
+- [BUG-363-error-capture-install-not-idempotent.md](fixed_bugs/BUG-363-error-capture-install-not-idempotent.md) — 错误捕获单层安装、逐层卸载可逆。
 - [BUG-352-session-diagnose-reads-flat-team-member-shape.md](fixed_bugs/BUG-352-session-diagnose-reads-flat-team-member-shape.md) — 诊断解包真实 team/member v2。
 - [BUG-355-cultivation-data-stale-feedback-abort-problem-and-load-race.md](fixed_bugs/BUG-355-cultivation-data-stale-feedback-abort-problem-and-load-race.md) — 培养数据 hook 切换复位 + 中止守卫 + 代次。
 - [BUG-359-attention-same-millisecond-stream-items-collapse.md](fixed_bugs/BUG-359-attention-same-millisecond-stream-items-collapse.md) — 注意力身份用事件 seq，仅跨源去重。
