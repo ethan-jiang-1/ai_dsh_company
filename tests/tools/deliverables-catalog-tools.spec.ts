@@ -156,7 +156,7 @@ describe('台账 slug 集合：TS/JS 同方言（BUG-356）', () => {
 
 describe('metaProblemsOf / deliverableSlug 分支（BUG-356 复查）', () => {
   it('缺行/枚举外/日期格式都记账', () => {
-    expect(metaProblemsOf(new Map())).toHaveLength(3)
+    expect(metaProblemsOf(new Map())).toHaveLength(2) // kickoff/type 缺行；result/slug 可省（BUG-371）
     const problems = metaProblemsOf(new Map([['kickoff', '2026/11/20'], ['type', 'bogus'], ['result', 'bogus']]))
     expect(problems.join('\n')).toContain('YYYY-MM-DD')
     expect(problems.join('\n')).toContain('type 不在词表')

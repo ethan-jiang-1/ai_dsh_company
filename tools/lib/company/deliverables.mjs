@@ -112,30 +112,28 @@ export function parseMeta(body) {
 }
 
 /**
- * 校验 meta.md 形状（机器可查的字段面；缺行/枚举外/日期格式不对 = 红，走 `META_SHAPE_BAD`）。
- * 「结果」行允许**留空**（存量迁移的回填态）——留空归观察（`META_RESULT_PENDING`），不判红。
+ * 校验 meta.md 形状（仓库审计侧；与 lib `metaProblemsOf` 同一判据，BUG-371）。
+ * `kickoff`/`type` 缺失或空 = 红；`result` 可留空（未收口）；`slug` 可省略，但日期前缀形式判红。
+ * @param {string} body - meta.md 全文
+ * @returns {{ ok: boolean, fields: Map<string,string>, problems: string[] }}
  */
 export function validateMeta(body) {
   const { fields } = parseMeta(body)
   const problems = []
-  for (const key of ['slug', 'kickoff', 'type', 'result']) {
-    if (!fields.has(key)) problems.push(`缺行「${key}:」`)
+  for (const key of ['kickoff', 'type']) {
+    const raw = fields.get(key)
+    if (raw === undefined || raw.trim() === '') problems.push(`缺行「${key}:」`)
   }
-  if (fields.has('kickoff') && !/^\d{4}-\d{2}-\d{2}$/.test(fields.get('kickoff'))) {
-    problems.push(`kickoff 不是 YYYY-MM-DD：「${fields.get('kickoff')}」`)
-  }
-  if (fields.has('type') && fields.get('type') !== '' && !META_TYPES.includes(fields.get('type'))) {
-    problems.push(`type 不在词表 ${JSON.stringify(META_TYPES)}：「${fields.get('type')}」`)
-  }
-  if (fields.has('result') && fields.get('result') !== '' && !META_RESULTS.includes(fields.get('result'))) {
-    problems.push(`result 不在词表 ${JSON.stringify(META_RESULTS)}：「${fields.get('result')}」`)
-  }
-  if (fields.has('slug') && /\d{4}-\d{2}-\d{2}-/.test(fields.get('slug'))) {
-    problems.push('slug 字段写剥前缀形式（不带日期前缀——日期住 kickoff 字段）')
-  }
+  const kickoff = (fields.get('kickoff') ?? '').trim()
+  if (kickoff !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(kickoff)) problems.push(`kickoff 不是 YYYY-MM-DD：「${kickoff}」`)
+  const type = (fields.get('type') ?? '').trim()
+  if (type !== '' && !META_TYPES.includes(type)) problems.push(`type 不在词表：「${type}」`)
+  const result = (fields.get('result') ?? '').trim()
+  if (result !== '' && !META_RESULTS.includes(result)) problems.push(`result 不在词表：「${result}」`)
+  const slug = (fields.get('slug') ?? '').trim()
+  if (slug !== '' && /^\d{4}-\d{2}-\d{2}-/.test(slug)) problems.push('slug 字段写剥前缀形式（不带日期前缀——日期住 kickoff 字段）')
   return { ok: problems.length === 0, problems, fields }
 }
-
 /** 把路径归一成工作区相对的正斜杠形式，便于两侧比较。 */
 export function normalizeRel(path) {
   return path.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/{2,}/g, '/')

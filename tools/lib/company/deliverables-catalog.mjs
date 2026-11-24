@@ -29,10 +29,15 @@ export const CATALOG_ROOTS = ['.dsh-company/deliverables', '.dsh-company/deliver
  * @property {string|null} metaProblem meta 形状问题（null = 通过）
  */
 
-/** meta 形状问题（缺行/枚举外/日期格式）；与产品 side 的 metaProblemsOf 同判据。 */
+/**
+ * meta 形状检查（与 TS `metaProblemsOf` 同判据；BUG-371）。
+ * `kickoff`/`type` 缺失或空 = 缺行；`result` 可留空；`slug` 可省，但日期前缀形式判红。
+ * @param {ReadonlyMap<string,string>} fields
+ * @returns {string[]}
+ */
 export function metaProblemsOf(fields) {
   const problems = []
-  for (const key of ['kickoff', 'type', 'result']) {
+  for (const key of ['kickoff', 'type']) {
     const raw = fields.get(key)
     if (raw === undefined || raw.trim() === '') problems.push(`缺行「${key}:」`)
   }
@@ -42,9 +47,10 @@ export function metaProblemsOf(fields) {
   if (type !== '' && !META_TYPES.includes(type)) problems.push(`type 不在词表：「${type}」`)
   const result = (fields.get('result') ?? '').trim()
   if (result !== '' && !META_RESULTS.includes(result)) problems.push(`result 不在词表：「${result}」`)
+  const slug = (fields.get('slug') ?? '').trim()
+  if (slug !== '' && /^\d{4}-\d{2}-\d{2}-/.test(slug)) problems.push('slug 字段写剥前缀形式（不带日期前缀——日期住 kickoff 字段）')
   return problems
 }
-
 /**
  * 成品 slug：`slug:` 缺失或空/空白 → 目录名（与 host `lib/deliverables` 的 `deliverableSlug` 同判据；BUG-232/347）。
  * @param {ReadonlyMap<string,string>} fields parseMeta 的字段表

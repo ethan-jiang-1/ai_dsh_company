@@ -99,10 +99,16 @@ export function deliverableSlug(fields: ReadonlyMap<string, string>, dir: string
   return raw === '' ? slugFromDirName(dir) : raw
 }
 
-/** meta 形状检查（与仓库 `deliverables-check` 的核心词表一致；缺行/枚举外/日期格式）。 */
+/**
+ * meta 形状检查（唯一判据；成品面板与 tools/parity 共用；BUG-371）。
+ * 语义：`kickoff`/`type` 缺失或空 = 缺行；`result` 可留空（未收口），只在非空时校验词表；
+ * `slug` 可省略（由 `deliverableSlug` 回退目录名），但写成日期前缀形式 = 红（与台账 slug 对不上）。
+ * @param fields - `parseMeta` 的字段表。
+ * @returns 问题串（空 = 形状合法）。
+ */
 export function metaProblemsOf(fields: ReadonlyMap<string, string>): string[] {
   const problems: string[] = []
-  for (const key of ['kickoff', 'type', 'result']) {
+  for (const key of ['kickoff', 'type']) {
     const raw = fields.get(key)
     if (raw === undefined || raw.trim() === '') problems.push(`缺行「${key}:」`)
   }
@@ -112,9 +118,10 @@ export function metaProblemsOf(fields: ReadonlyMap<string, string>): string[] {
   if (type !== '' && !META_TYPES.some(value => value === type)) problems.push(`type 不在词表：「${type}」`)
   const result = (fields.get('result') ?? '').trim()
   if (result !== '' && !META_RESULTS.some(value => value === result)) problems.push(`result 不在词表：「${result}」`)
+  const slug = (fields.get('slug') ?? '').trim()
+  if (slug !== '' && /^\d{4}-\d{2}-\d{2}-/.test(slug)) problems.push('slug 字段写剥前缀形式（不带日期前缀——日期住 kickoff 字段）')
   return problems
 }
-
 /** 把扫描结果折成稳定目录（kickoff 倒序、同日起 slug 升序）。 */
 export function buildDeliverablesCatalog(input: {
   readonly entries: readonly CatalogScanEntry[]

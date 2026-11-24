@@ -281,9 +281,10 @@ describe('4. parseCatalog & metaProblemsOf 畸形 Fuzz 与双端差分', () => {
       const tsProblems = metaProblemsTs(map)
       const jsProblems = metaProblemsJs(map)
       expect(tsProblems).toEqual(jsProblems)
+      // BUG-371：result 留空 = 合法（未收口），只有「非空且不在词表」才算问题。
       const hasBlankOrBad = (k ?? '').trim() === '' || !/^\d{4}-\d{2}-\d{2}$/.test((k ?? '').trim())
         || (t ?? '').trim() === '' || !(META_TYPES as readonly string[]).includes((t ?? '').trim())
-        || (r ?? '').trim() === '' || !(META_RESULTS as readonly string[]).includes((r ?? '').trim())
+        || ((r ?? '').trim() !== '' && !(META_RESULTS as readonly string[]).includes((r ?? '').trim()))
       expect(tsProblems.length > 0).toBe(hasBlankOrBad)
       if ((k ?? '').trim() === '') {
         expect(tsProblems.filter(p => p.includes('kickoff'))).toEqual(['缺行「kickoff:」'])
