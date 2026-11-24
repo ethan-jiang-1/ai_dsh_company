@@ -8,8 +8,6 @@ import { describe, expect, it } from 'vitest'
 import {
   BOARD_STATUS_ORDER,
   boardColumns,
-  declaredDependencyLabels,
-  driftLabel,
   paperToTaskId,
   declaredDependencyLabels,
   dependencyDrift,
@@ -276,8 +274,8 @@ describe('降级事实（BUG-277/278）', () => {
 describe('board 工具函数分支', () => {
   it('paperToTaskId：非 T<n> 开头的 subject 不进映射', () => {
     const tasks = tasksFromTeamView(view([
-      { id: 'a', subject: 'T1 · 正常' },
-      { id: 'b', subject: '没有纸面号' },
+      { id: 'a', subject: 'T1 · 正常', status: 'pending' },
+      { id: 'b', subject: '没有纸面号', status: 'pending' },
     ]))
     expect([...paperToTaskId(tasks).entries()]).toEqual([['T1', 'a']])
   })
@@ -288,7 +286,7 @@ describe('board 工具函数分支', () => {
   })
 
   it('driftLabel：只有无法核对项也给出标签', () => {
-    expect(driftLabel({ taskId: 't1', missing: [], unmapped: ['T9'] })).toContain('无法核对')
-    expect(driftLabel({ taskId: 't1', missing: [], unmapped: [] })).toBeNull()
+    expect(driftLabel({ taskId: 't1', declared: [], missing: [], unmapped: ['T9'] })).toContain('无法核对')
+    expect(driftLabel({ taskId: 't1', declared: [], missing: [], unmapped: [] })).toBeNull()
   })
 })

@@ -133,7 +133,7 @@
 | 020 | 2026-10-16 | tests/tools/converge-rules.spec.ts:121 |
 | 021 | 2026-10-17 | tests/presets/presets.spec.ts:481 |
 | 022 | 2026-10-18 | tests/tools/question-stop.spec.ts:57 |
-| 027 | 2026-10-19 | tests/client/tabs/board-panel.spec.ts:83；tests/client/tabs/tasks-table.spec.ts:69；tests/lib/presence/board.spec.ts:79 |
+| 027 | 2026-10-19 | tests/client/tabs/board-panel.spec.ts:83；tests/client/tabs/tasks-table.spec.ts:69；tests/lib/presence/board.spec.ts:77 |
 | 028 | 2026-10-19 | tests/tools/deliverables-audit.spec.ts:248；tests/tools/deliverables-audit.spec.ts:276 |
 | 030 | 2026-10-20 | tests/session/session-diagnose.spec.ts:16 |
 | 033 | 2026-10-27 | tests/host/cultivation/revoke-journal.spec.ts:66 |
@@ -288,7 +288,7 @@
 | 274 | 2026-11-19 | tests/tools/content-contract.spec.ts:73 |
 | 275 | 2026-11-19 | tests/host/ledger/catalog.spec.ts:254 |
 | 276 | 2026-11-19 | tests/host/ledger/catalog.spec.ts:164；tests/host/ledger/catalog.spec.ts:176；tests/host/ledger/catalog.spec.ts:193 |
-| 277 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:135；tests/client/tabs/board-panel.spec.ts:155；tests/client/tabs/tasks-table.spec.ts:122；tests/lib/presence/board.spec.ts:249 |
+| 277 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:135；tests/client/tabs/board-panel.spec.ts:155；tests/client/tabs/tasks-table.spec.ts:122；tests/lib/presence/board.spec.ts:247 |
 | 278 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:148 |
 | 279 | 2026-11-19 | tests/host/run-bundle/bundle-manifest.spec.ts:250 |
 | 280 | 2026-11-19 | tests/repo/release/docs-only.spec.ts:31；tests/repo/release/docs-only.spec.ts:93 |

@@ -275,7 +275,7 @@ export function setPresentedAudit(
       next = {
         ...next,
         slugs: { ...next.slugs, [slug]: true },
-        ...(dirSlug === '' ? {} : { dirSlugs: { ...(next.dirSlugs ?? {}), [dirSlug]: true } }),
+        ...(dirSlug === '' ? {} : { dirSlugs: Object.assign({}, next.dirSlugs, { [dirSlug]: true }) }),
       }
     }
   }

@@ -237,7 +237,8 @@ describe('scanR1 与 scoreLabels 零容忍', () => {
       r2c: [{ task: 't2' }, { task: 'ghost' }], r3d: { candidates: [], blocked: [] },
     }]])
     const scored = scoreLabels(rows as never, scans as never)
-    expect(scored.zeroTol).toMatchObject({
+    const zeroTol = (scored as { readonly zeroTol?: Record<string, number> }).zeroTol
+    expect(zeroTol).toMatchObject({
       cancelReported: 1,
       cancelSilent: 1,
       blockedMissR1: 1,
