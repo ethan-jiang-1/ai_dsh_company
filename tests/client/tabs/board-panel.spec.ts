@@ -18,6 +18,10 @@ import { describe, expect, it } from 'vitest'
 import { BoardPanel } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
 import { boardColumns, tasksFromTeamView } from '../../../packages/company-pack/src/lib/presence/board.ts'
 import type { TeamViewLike } from '../../../packages/company-pack/src/lib/presence/presence.ts'
+import { en } from '../../../packages/company-pack/src/client/locales.ts'
+import { translateWith } from '../../support/i18n-assertions.ts'
+
+const tEn = translateWith(en)
 
 /** 真事故的板面（task-3 声明了依赖 T1,T2，板面 blockedBy 为空）。 */
 const INCIDENT: TeamViewLike = {
@@ -151,5 +155,27 @@ describe('BoardPanel：降级标记到卡面（BUG-277/278）', () => {
     const byId = (id: string) => cards.find(card => card.includes(`${id}@`))
     expect(byId('g2')).toContain('修订缺失')
     expect(byId('g3')).not.toContain('修订缺失')
+  })
+})
+
+// 负例留证 2026-11-24：ownerLabel 改回 `?? UNASSIGNED_LABEL`、或不传 roleLabel ⇒ 本组红。BUG-358
+describe('BoardPanel：未分配与表达层（BUG-358）', () => {
+  const UNASSIGNED: TeamViewLike = {
+    members: [{ id: 'session-lead', name: 'lead', role: 'lead', phase: 'running' }],
+    tasks: [
+      { id: 't1', subject: 'unassigned work', status: 'pending' },
+      { id: 't2', subject: 'assigned work', status: 'pending', ownerName: 'vp-eng' },
+    ],
+  }
+
+  it('en：未分配渲染 Unassigned，零汉字；roleLabel 仍作用于已认领名', () => {
+    const html = renderToStaticMarkup(createElement(BoardPanel, {
+      columns: boardColumns(tasksFromTeamView(UNASSIGNED)),
+      roleLabel: label => label === 'VP-Eng' ? 'VP Eng' : label,
+      t: tEn,
+    }))
+    expect(html).toContain('Unassigned')
+    expect(html).toContain('VP Eng')
+    expect(html).not.toMatch(/[\u3400-\u9fff]/u)
   })
 })

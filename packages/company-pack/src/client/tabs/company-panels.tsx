@@ -9,7 +9,6 @@ import { MAX_ACTIVITY } from '../data/use-company-data.ts'
 import { useEffect, useRef, useState } from 'react'
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { BoardCard, BoardColumn, TaskRow } from '../../lib/presence/board.ts'
-import { UNASSIGNED_LABEL } from '../../lib/presence/board.ts'
 import type { BudgetSummary } from '../../lib/accounting/budget.ts'
 import { formatTokens } from '../../lib/accounting/budget.ts'
 import type { DagLayout } from '../../lib/presence/dag.ts'
@@ -124,7 +123,7 @@ export function BoardPanel({ columns, roleLabel = label => label, t = defaultT }
               <article className="wk-card" key={card.id}>
                 <div className="wk-card-subject">{card.subject}</div>
                 <div className="wk-card-foot">
-                  <Tag tone={taskTone(column.status)}>{roleLabel(card.ownerLabel)}</Tag>
+                  <Tag tone={taskTone(column.status)}>{card.ownerLabel === null ? t('tasks.unassigned') : roleLabel(card.ownerLabel)}</Tag>
                   {/* 「依赖已就绪 / 等 …」只在**待办**卡上有意义：它是"这活现在能不能开工"的答案。
                       已完成/进行中的卡挂这枚徽章只会制造噪声——2026-10-19 真投影实测：147 枚徽章里
                       129 枚挂在已完成的卡上、2 枚挂在进行中的卡上，全是「等 …」的死信息（BUG-027）。
@@ -416,5 +415,3 @@ export function activityText(entry: ActivityEntry, t: CompanyT): string {
   return entry.token === undefined ? entry.text : t(entry.token.key as CompanyKey, entry.token.params)
 }
 
-/** 未分配文案的再导出（面板内已用，避免调用方各自拼字符串）。 */
-export { UNASSIGNED_LABEL }

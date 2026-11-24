@@ -7,7 +7,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   BOARD_STATUS_ORDER,
-  UNASSIGNED_LABEL,
   boardColumns,
   declaredDependencyLabels,
   dependencyDrift,
@@ -148,7 +147,7 @@ describe('boardColumns', () => {
     })
     const todo = columns.find(column => column.status === 'pending')
     expect(todo?.cards[0]).toMatchObject({
-      id: 't2', ownerLabel: UNASSIGNED_LABEL, blockedBy: ['t1'], ready: false,
+      id: 't2', ownerLabel: null, blockedBy: ['t1'], ready: false,
     })
   })
 })

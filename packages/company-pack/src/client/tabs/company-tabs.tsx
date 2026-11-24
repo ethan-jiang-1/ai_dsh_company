@@ -169,7 +169,7 @@ export function BoardTab(props: CompanyTabProps) {
     <PanelFrame title={props.t('tabs.board.label')} tone="overview" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       {data.streamError === null ? null : <StreamErrorNotice message={data.streamError} t={props.t} />}
-      <BoardPanel columns={data.columns} t={props.t} />
+      <BoardPanel columns={data.columns} roleLabel={label => roleTextForCanonical(label, props.t)} t={props.t} />
     </PanelFrame>
   )
 }

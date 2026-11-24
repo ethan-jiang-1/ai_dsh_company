@@ -25,7 +25,6 @@ export const TASK_STATUS_LABEL: Record<TaskStatus, string> = {
 export const BOARD_STATUS_ORDER: readonly BoardStatus[] = ['pending', 'in_progress', 'completed']
 
 /** 未分配文案。 */
-export const UNASSIGNED_LABEL = '未分配'
 
 const KNOWN_STATUS: readonly TaskStatus[] = ['pending', 'in_progress', 'completed', 'deleted']
 
@@ -139,7 +138,8 @@ export function driftLabel(drift: DependencyDrift): string | null {
 export interface BoardCard {
   readonly id: string
   readonly subject: string
-  readonly ownerLabel: string
+  /** 负责人显示名；null = 未分配（由 client 按语言渲染，BUG-358）。 */
+  readonly ownerLabel: string | null
   readonly revision: number
   readonly blockedBy: readonly string[]
   readonly ready: boolean
@@ -241,7 +241,7 @@ export function boardColumns(tasks: readonly TaskRow[]): BoardColumn[] {
       .map(task => ({
         id: task.id,
         subject: task.subject,
-        ownerLabel: task.ownerName ?? UNASSIGNED_LABEL,
+        ownerLabel: task.ownerName,
         revision: task.revision,
         blockedBy: task.blockedBy,
         ready: task.ready,
