@@ -42,11 +42,16 @@
 - **U2**：`pnpm test tests/tools/meta-shape-parity.spec.ts tests/lib/shared/parsers-fuzz.property.spec.ts` —— 还原三处判据前 5 failed；修复后 parity 10/10、`tests/content tests/tools tests/client/data` 490/490。
 - **U3**：`pnpm test tests/lib/presence/presence-board.spec.ts` —— 还原前 2 failed（裸 `lead`；回放 `inactive/null`）；修复后 34/34、联动 presence 面 141/141。
 - **U4**：`pnpm test tests/host/commands/delivery-command.spec.ts` —— 还原裸 `includes` 前 2 failed；修复后 29/29 passed。
+- **盲审复审**：`pnpm test` 定向用例全绿（placeholder 不豁免 / 缺 result 有 pending / 裸 layers 拆分）；`pnpm test` 2775/2775、`coverage-ratchet` PASS。
 - `pnpm verify` ALL PASS。
 
 ## 独立只读盲审（370/371/376）
 
-2026-11-24 按计划启动独立只读子代理审 `d700c76a` / `7d81872c` / `7e35a053`。连续三次（含一次只读、不跑命令的窄面复审）均未在时限内返回结论（子代理运行挂起，属基础设施阻塞，非代码红）；本轮以「批次可交付、盲审未完成」收口，复审结论待子代理恢复后补记，不阻塞已推送的修复与门禁绿。
+2026-11-24 由无本次历史上下文的只读子代理审 `d700c76a` / `7d81872c` / `7e35a053`：**BLOCKING**（3 条，前两次子代理运行挂起、第三次窄面审返回），全部处置：
+1. **阻断 · 370** `numberingMarker` 把 `<…>` 占位符折成 `declared:false`，未编辑的交付物走「旧动议豁免」，编号/PRD 闸门整道跳过 → 占位符保持 `declared:true, valid:false`（报词表错误），补 `checkRequirements` 不 skipped 用例。
+2. **阻断 · 371/审计** `result` 变可选后，缺 `result:` 行的 meta 既无形状红也无 pending 观察 → `deliverables-audit` 的 pending 判据改 `(result ?? '') === ''`，补审计用例。
+3. **阻断 · 374** `parseDeclaredLayers` 退化为 parseList 后，裸值 `MRD SyRS` / `MRD;SyRS` 不再拆分（历史上合法）→ 方括号/引号走 parseList，裸值仍按 `[,，、;；\s]+` 拆分；补表驱动用例。
+4. 376 未发现阻断问题（`taskOwnerDisplayName` 与 replay lead 行口径正确）。
 
 ## 未覆盖轴
 

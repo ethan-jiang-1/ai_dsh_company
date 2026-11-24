@@ -216,7 +216,8 @@ export function metaLedgerFindings(input) {
     }
   }
   for (const [slug, meta] of metas) {
-    if (meta.fields.get('result') === '') {
+    // `result:` 行缺失与留空都算未收口（BUG-371 后 result 可选；盲审 2026-11-24）。
+    if ((meta.fields.get('result') ?? '') === '') {
       results.push({
         kind: 'warning',
         code: WARNING.META_RESULT_PENDING,

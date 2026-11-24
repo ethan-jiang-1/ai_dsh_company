@@ -90,8 +90,13 @@ function parseDeliveryMode(text: string | undefined): string {
 
 /** 读 meta 的 `layers:` 声明（空 = 未声明）。 */
 function parseDeclaredLayers(text: string | undefined): string[] {
-  // 与 `checkRequirements` 的 `metaLayers`/`parseList` 同一判据（BUG-374）：`[MRD, SyRS]` 与引号都认。
-  return [...metaListField(text, 'layers')]
+  const field = metaScalarField(text, 'layers')
+  if (!field.declared || field.problem !== null) return []
+  // `[...]`/引号走与 `checkRequirements` 相同的 parseList（BUG-374）；裸值仍按空白/分号逗号拆分
+  // （盲审 2026-11-24：`MRD SyRS` / `MRD;SyRS` 历史上就是合法写法）。
+  const raw = field.value.trim()
+  if (raw.startsWith('[') || raw.startsWith('"') || raw.startsWith("'")) return [...metaListField(text, 'layers')]
+  return raw.split(/[,，、;；\s]+/).map(item => item.trim()).filter(item => item !== '')
 }
 
 /** 是否显式声明了真实交付模式（缺省/占位符不算）。 */

@@ -129,7 +129,7 @@
 | 014 | 2026-10-12 | tests/tools/converge-rules.spec.ts:149 |
 | 016 | 2026-10-12 | tests/tools/converge-rules.spec.ts:177 |
 | 018 | 2026-10-16 | tests/tools/authorship.spec.ts:19；tests/tools/authorship.spec.ts:29 |
-| 019 | 2026-10-16 | tests/tools/deliverables-audit.spec.ts:505 |
+| 019 | 2026-10-16 | tests/tools/deliverables-audit.spec.ts:517 |
 | 020 | 2026-10-16 | tests/tools/converge-rules.spec.ts:121 |
 | 021 | 2026-10-17 | tests/presets/presets.spec.ts:481 |
 | 022 | 2026-10-18 | tests/tools/question-stop.spec.ts:57 |
@@ -181,13 +181,13 @@
 | 153 | 2026-11-13 | tests/lib/docs/prd-check.spec.ts:253 |
 | 156 | 2026-11-13 | tests/host/contract/file-shape-agreement.spec.ts:331 |
 | 157 | 2026-11-13 | tests/lib/docs/prd-check.spec.ts:281 |
-| 160 | 2026-11-14 | tests/lib/docs/requirements-check.spec.ts:308 |
+| 160 | 2026-11-14 | tests/lib/docs/requirements-check.spec.ts:314 |
 | 162 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:298 |
 | 164 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:316 |
 | 165 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:334 |
 | 166 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:344 |
 | 168 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:358 |
-| 169 | 2026-11-14 | tests/lib/docs/requirements-check.spec.ts:340 |
+| 169 | 2026-11-14 | tests/lib/docs/requirements-check.spec.ts:346 |
 | 170 | 2026-11-14 | tests/host/contract/file-shape-agreement.spec.ts:402 |
 | 172 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:376 |
 | 173 | 2026-11-14 | tests/lib/docs/prd-check.spec.ts:383 |
@@ -297,7 +297,7 @@
 | 283 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:24 |
 | 284 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:35 |
 | 285 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:43 |
-| 286 | 2026-11-20 | tests/tools/deliverables-audit.spec.ts:585 |
+| 286 | 2026-11-20 | tests/tools/deliverables-audit.spec.ts:597 |
 | 287 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:51 |
 | 289 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:63 |
 | 290 | 2026-11-20 | tests/client/startup/command-scope-hint.spec.ts:29 |
@@ -348,7 +348,7 @@
 | 335 | 2026-11-23 | tests/client/cultivation/cultivation-copy.spec.ts:72；tests/lib/cultivation/cultivation-record-time.spec.ts:44 |
 | 336 | 2026-11-23 | tests/client/i18n/presence-budget.spec.ts:79 |
 | 337 | 2026-11-23 | tests/client/tabs/delegation-flow-panel.spec.ts:51 |
-| 338 | 2026-11-23 | tests/host/commands/command-language.spec.ts:31；tests/host/commands/prd-command.spec.ts:222；tests/host/commands/settings-command.spec.ts:261；tests/lib/docs/prd-check.spec.ts:429；tests/lib/docs/requirements-check.spec.ts:353；tests/lib/docs/requirements-check.spec.ts:367 |
+| 338 | 2026-11-23 | tests/host/commands/command-language.spec.ts:31；tests/host/commands/prd-command.spec.ts:222；tests/host/commands/settings-command.spec.ts:261；tests/lib/docs/prd-check.spec.ts:429；tests/lib/docs/requirements-check.spec.ts:359；tests/lib/docs/requirements-check.spec.ts:373 |
 | 339 | 2026-11-23 | tests/lib/shared/parsers-fuzz.property.spec.ts:416 |
 | 340 | 2026-11-23 | tests/client/cultivation/cultivation-copy.spec.ts:82；tests/client/cultivation/cultivation-copy.spec.ts:101；tests/tools/company-static-audit.spec.ts:203 |
 | 341 | 2026-11-23 | tests/client/company-client-composition.spec.ts:144；tests/client/ui/brand.spec.ts:59 |
@@ -380,7 +380,7 @@
 | 367 | 2026-11-24 | tests/host/commands/signoff-language.spec.ts:25；tests/host/commands/signoff-language.spec.ts:45；tests/host/commands/signoff-language.spec.ts:55；tests/lib/accounting/signoff.spec.ts:38 |
 | 368 | 2026-11-24 | tests/client/ui/brand.spec.ts:40；tests/lib/docs/yaml-scalar.spec.ts:27 |
 | 369 | 2026-11-24 | tests/host/workspace/workspace-doors.spec.ts:86；tests/host/workspace/workspace-doors.spec.ts:106；tests/lib/presence/doors.spec.ts:41；tests/lib/presence/doors.spec.ts:54；tests/lib/presence/doors.spec.ts:75 |
-| 370 | 2026-11-24 | tests/lib/docs/requirements-check.spec.ts:390 |
+| 370 | 2026-11-24 | tests/lib/docs/requirements-check.spec.ts:396 |
 | 371 | 2026-11-24 | tests/tools/meta-shape-parity.spec.ts:20 |
 | 372 | 2026-11-24 | tests/lib/presence/presence-board.spec.ts:467 |
 | 373 | 2026-11-24 | tests/host/commands/delivery-command.spec.ts:301 |

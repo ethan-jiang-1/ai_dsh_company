@@ -452,9 +452,9 @@ function metaFieldLines(meta: string): readonly string[] {
 export function numberingMarker(meta: string | undefined): NumberingMarker {
   const field = metaScalarField(meta, 'numbering')
   if (!field.declared) return { declared: false, value: '', valid: false }
-  // 模板占位符 `<…>` = 未设置（与 productType 的占位符规则同源），不是坏声明。
+  // 模板占位符 **不**折成未声明（盲审 2026-11-24）：未编辑的交付物若走「旧动议豁免」，
+  // 编号/PRD 闸门会被整道跳过；占位符必须是「已声明但非法」，让消费者报错。
   const value = field.value.trim()
-  if (value.startsWith('<') && value.endsWith('>')) return { declared: false, value: '', valid: false }
   return {
     declared: true,
     // 坏标量保留原文报错，不折成「未声明」而豁免闸门。

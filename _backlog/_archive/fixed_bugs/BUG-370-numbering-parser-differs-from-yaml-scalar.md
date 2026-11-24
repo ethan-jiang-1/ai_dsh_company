@@ -67,3 +67,4 @@ for (const meta of ['numbering: identity', 'numbering: \"identity\"', \"numberin
 - 红：`pnpm test tests/lib/docs/requirements-check.spec.ts` —— 还原前 5 failed（引号/注释/冒号空格/占位符写法）
 - 绿：`pnpm test tests/lib/docs/requirements-check.spec.ts` —— 全绿（六种写法；ghost 仍 invalid）
 - 提交：commit d700c76a
+- 复审修正：commit 占位符保持 `declared:true, valid:false`（盲审：折成未声明会豁免整道闸门）

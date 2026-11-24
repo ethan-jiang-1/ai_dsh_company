@@ -324,7 +324,19 @@ describe('交付物三态判据（R4：keyless 行为层）', () => {
       readMeta: () => badBody,
     })
     expect(metas.has('bad'), '形状坏也必须登记「这个 slug 有户口」').toBe(true)
-    expect(results.map(r => r.code)).toEqual([VIOLATION.META_SHAPE_BAD])
+    expect(results.map(r => r.code)).toContain(VIOLATION.META_SHAPE_BAD)
+    expect(results.map(r => r.code)).not.toContain(WARNING.FINAL_WITHOUT_META)
+  })
+
+  it('result 行缺失 = 未收口观察（result 可选后仍要有信号，盲审 2026-11-24）', () => {
+    const body = 'slug: pilot\nkickoff: 2026-10-13\ntype: decision\n'
+    const { results } = metaLedgerFindings({
+      finalSlugs: ['pilot'],
+      metas: [{ slug: 'pilot', path: 'deliverables/pilot/meta.md' }],
+      readMeta: () => body,
+    })
+    expect(results.map(r => r.code)).toContain(WARNING.META_RESULT_PENDING)
+    expect(results.map(r => r.code)).not.toContain(VIOLATION.META_SHAPE_BAD)
   })
 
   it('户口缺失（成品在盘、meta 真不在）仍照报 final-without-meta——两档分开报的守卫', () => {

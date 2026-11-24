@@ -69,3 +69,4 @@ for (const [k, body] of Object.entries(cases)) console.log(k, 'panel=', JSON.str
 - 红：`pnpm test tests/tools/meta-shape-parity.spec.ts tests/lib/shared/parsers-fuzz.property.spec.ts` —— 还原三处判据前 5 failed（缺 slug/日期前缀/空 result 结论相反）
 - 绿：`pnpm test tests/tools/meta-shape-parity.spec.ts tests/lib/shared/parsers-fuzz.property.spec.ts` —— 10/10 passed（面板 / 孪生 / 审计逐字相等；result 留空与缺行都合法）
 - 提交：commit 7d81872c
+- 复审修正：commit 审计侧 `result` 缺行也计 pending（`(result ?? '') === ''`）

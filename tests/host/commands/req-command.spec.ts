@@ -473,7 +473,7 @@ describe('meta 字段结构感知与列表口径（BUG-374/375）', () => {
   })
 
   it('layers 的 YAML 序列/引号写法触发不支持层提醒', async () => {
-    for (const layers of ['[MRD, SyRS]', '"MRD, SyRS"']) {
+    for (const layers of ['[MRD, SyRS]', '"MRD, SyRS"', 'MRD SyRS', 'MRD;SyRS']) {
       const { workspace, cleanup } = fixture(undefined, `${META}productType: business-software\nlayers: ${layers}\n`)
       const contentDir = typeContentDir()
       try {

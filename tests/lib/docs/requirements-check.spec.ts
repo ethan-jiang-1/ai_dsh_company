@@ -262,6 +262,12 @@ describe('范围与豁免（meta 标记）', () => {
     expect(result.errors.join()).toContain('缺层 SyRS')
   })
 
+  it('模板占位符是「已声明但非法」，不豁免闸门（盲审 2026-11-24）', () => {
+    const result = checkRequirements({ meta: meta(['numbering: <identity (write it here)>']), docs: clean() })
+    expect(result.skipped).toBe(false)
+    expect(result.errors.join()).toContain('不在词表')
+  })
+
   it('未知编号体系值 → 红（不静默跳过）', () => {
     const result = checkRequirements({ meta: meta(['numbering: legacy']), docs: clean() })
     expect(result.errors.join()).toContain('不在词表')
@@ -394,7 +400,7 @@ describe('numberingMarker 与 meta 标量同口径（BUG-370）', () => {
     ["numbering: 'identity'", { declared: true, valid: true }],
     ['numbering: identity # 旧动议', { declared: true, valid: true }],
     ['numbering : identity', { declared: true, valid: true }],
-    ['numbering: <identity (write it here)>', { declared: false, valid: false }],
+    ['numbering: <identity (write it here)>', { declared: true, valid: false }],
     ['numbering: ghost', { declared: true, valid: false }],
     ['numbering:', { declared: true, valid: false }],
   ]
