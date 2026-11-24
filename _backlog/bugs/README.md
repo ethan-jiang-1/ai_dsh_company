@@ -2,18 +2,40 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 377；已分配 BUG-001..376。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 384；已分配 BUG-001..383。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张（2026-11-24 第七轮构造场景探查新立，只报不修）**：
+**活跃 7 张（2026-11-24 第八轮构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
+| [BUG-377](BUG-377-gov-export-drops-ledger-snapshot-on-missing.md) | P2 | host | 账本源报 `missing` 时 `exportGovernance` 静默删掉上一份 `exports/ledger.json`（零告警） | 调查中 |
+| [BUG-378](BUG-378-record-stamp-rollover-deletes-corrupt-archive.md) | P2 | lib + host | `recordStampOf` 把越界日期进位成合法时间戳，`/cultivation purge` 会删掉文件名时间戳损坏的归档记录 | 调查中 |
+| [BUG-379](BUG-379-load-records-throws-on-unreadable-file.md) | P2 | host | `loadRecords` 遇不可读记录直接抛 `EACCES`，`/cultivation check`/`archive` 整条命令崩（`broken` 计数失效） | 调查中 |
+| [BUG-380](BUG-380-required-sections-heading-level-mismatch.md) | P2 | host + lib | `/delivery check` 声称支持 `#`–`######` 必填小节，实现只认 `##`——三级标题 needle 永远判缺 | 调查中 |
+| [BUG-381](BUG-381-tools-meta-parsers-fence-blind.md) | P2 | tools | 收敛/审计链仍各自解析 `meta.md` 且不感知围栏——样例 `closed:` 让未收口动议被判「已收口」 | 调查中 |
+| [BUG-382](BUG-382-retired-word-scan-fence-blind.md) | P2 | lib | `/req check` 退役词与区间计数是裸全文扫描，围栏/行内代码里引用退役号即判红并挡住交付 | 调查中 |
+| [BUG-383](BUG-383-presented-false-overridden-by-slug-after-archive.md) | P2 | host | 先 present 后审计 false，归档后又被 slug 延续成 true——「未交付」结论被旧背书覆盖 | 调查中 |
+
+**本轮查过但不入卡**：第七轮 7 张修复已逐条复核（`numbering` 引号/注释/占位符/空格变体、`layers` 方括号、围栏内 `productType`、meta 三分家、CEO 身份与回放、`/delivery` 结构行判据）**全部绿**；`delivery-rules` 的模板路径按模式目录解析且 `content-contract` 已校验存在（初查误报，已核）；`/company-settings` 的并发读改写实测无丢失（Node 单线程 + 同步读写，已核）；`requiredFields` 仍属「未声明要校验」不入卡。
 
 **本轮查过但不入卡**（避免下轮重复排查）：`delivery-rules` 的 `requiredFields` 没有任何检查器消费，但 `content/delivery-modes/*/document-map.md` 只声明 `documents.file` 与 `requiredSections` 会被 `/delivery check` 校验——属「未声明要校验」，不是缺陷；`catalog` 的 2000 行读上限在 ~153 条成品处触发但已有专档文案（第六轮已记）；`TEAM_TOOL_KEYS`（9 个）与 vendor `tool-agent-team` 的工具名逐字一致（已核）；`DELEGATION_TOOL_KEYS` 与 preset `toolName:` 声明一致（已核）；`formatTokens`/`firstText`/`yamlScalar`/`instance-guard` 四处上一轮修复经本轮复核未见回归。
+
+## 2026-11-24 修复交接（第八轮构造场景批次：BUG-377..383）
+
+**用户指令（2026-11-24）**：修最新一批缺陷；先按根因聚类立批次计划，再建 goal 按 REPO 流程推进。
+
+| 顺位 | 组 / 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
+|---|---|---|---|---|
+| **1 降级而非毁掉/崩溃** | [377](BUG-377-gov-export-drops-ledger-snapshot-on-missing.md) + [378](BUG-378-record-stamp-rollover-deletes-corrupt-archive.md) + [379](BUG-379-load-records-throws-on-unreadable-file.md) | 整目录替换把「源缺失」当「目标应为空」；坏日期被 Date 进位成合法时间；单文件读失败穿透整盘 | 377：`missing` 与 `corrupt` 同处理（沿用旧快照 + warning，无旧快照才静默）；378：`recordStampOf` 加日期往返校验，坏 timestamp 返回 null（purge/archive 跳过）；379：`loadRecords` 包 try、读失败计 `broken`（或 `unreadable`）不抛；三卡各自红→绿 + 真入口用例 | 1 |
+| **2 结构敏感一致** | [380](BUG-380-required-sections-heading-level-mismatch.md) + [381](BUG-381-tools-meta-parsers-fence-blind.md) + [382](BUG-382-retired-word-scan-fence-blind.md) | 声明支持 1–6 级标题但 `sectionRange` 只认 `##`；tools 两份 meta 解析不看围栏；退役词/区间扫描是裸全文 | 380：`sectionRange` 加 level 参数（`#{1,6}`），`sectionStructuralText` 透传，`hasStructuralSection` 用层级；381：tools 的 `converge.metaField`/`deliverables.parseMeta` 用 `scanDocumentDetailed` 结构行（复用 `markdown-shape-core.js`）；382：退役词/区间改用结构行（围栏+行内代码豁免，正文仍禁）；三卡表驱动用例 | 2 |
+| **3 账本结论反转** | [383](BUG-383-presented-false-overridden-by-slug-after-archive.md) | `setPresentedAudit(false)` 只写 path，不撤 `slugs[slug]`；归档后 slug 旧 true 胜出 | false 时写 `slugs[slug]=false`（显式否决），`presentedOf` 的 slug 分支返回 false；`presentedFromLegacyCatalog` 同步；补「true → false → 归档」序列用例 + 既有 true 延续回归 | 3 |
+
+**横向原则**：单源缺失/单文件失败只能降级为「保留旧值 + 可读信号」，不许静默毁数据或整盘抛；结构判据（标题层级/围栏/行内代码）只有一套；账本 false 是一等结论，必须能随路径迁移延续。
+**终点**：7 张全部带红/绿证据迁入 `fixed_bugs/`；1 篇批次伞形 Note；378/381/383 的删除/解析/账本判据过独立只读盲审；`verify`/`test`/`typecheck`/`lint`/`dup`/`coverage-ratchet` 与 client 真加载冒烟全绿并 `push`。批次外新卡不动。
 
 ## 2026-11-24 修复交接（第七轮构造场景批次：BUG-370..376）
 
