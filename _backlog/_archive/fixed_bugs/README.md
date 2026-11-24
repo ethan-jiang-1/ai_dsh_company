@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-356**（2026-11-24，351..359 批顺位 4 / P2）：台账与 slug 集合统一 `splitTableRow`（lib TS/JS + tools 两处），`\|` 不再判坏行——
+  [356](BUG-356-motion-ledger-escaped-pipe-row-dropped.md)。证据提交 `ed54ef17`。
+- **BUG-357**（2026-11-24，351..359 批顺位 4 / P2）：present 写入口径改读 `meta.md` 的 `deliverableSlug`，`presentedOf` 兼容目录名 slug 旧账本——
+  [357](BUG-357-presented-slug-carryover-broken-by-custom-meta-slug.md)。证据提交 `07f90eb3`。
+
 - **BUG-354**（2026-11-24，351..359 批顺位 3 / P2）：无负责人任务迁移改用 `...Unassigned` 专用 token，en 输出 `Unassigned claimed/completed`——
   [354](BUG-354-presence-activity-unassigned-owner-leaks-chinese-in-en.md)。证据提交 `39e5acab`。
 - **BUG-358**（2026-11-24，351..359 批顺位 3 / P2）：看板 `ownerLabel` 改 null、由 `t('tasks.unassigned')` 渲染，`BoardTab` 补 `roleLabel`——

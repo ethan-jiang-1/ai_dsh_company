@@ -8,14 +8,12 @@
 
 ## 活跃清单
 
-**活跃 5 张（2026-11-23–24 质量防线审查与构造场景探查新立，只报不修）**：
+**活跃 1 张（2026-11-23–24 质量防线审查与构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
 | [BUG-352](BUG-352-session-diagnose-reads-flat-team-member-shape.md) | P2 | tools | `session-diagnose` 按想象扁平形状读 `team/member`，真实队友失败被完全漏报 | 调查中 |
 | [BUG-355](BUG-355-cultivation-data-stale-feedback-abort-problem-and-load-race.md) | P2 | client UI | `useCultivationFeedback` 切换会话保留旧赞踩，`useCultivationPanelData` 中止报错且并发 `load` 缺代次守卫 | 调查中 |
-| [BUG-356](BUG-356-motion-ledger-escaped-pipe-row-dropped.md) | P2 | lib + tools | `parseMotionLedger` 裸 `\|` 拆行，正确转义的 `\|` 让整行动议变坏行并从台账面板消失 | 调查中 |
-| [BUG-357](BUG-357-presented-slug-carryover-broken-by-custom-meta-slug.md) | P2 | host | `presented=true` 的 slug 延续写目录名 slug、查 `meta` 的 `slug:`，自定义 slug 成品归档后端变「未核」 | 调查中 |
 | [BUG-359](BUG-359-attention-same-millisecond-stream-items-collapse.md) | P2 | lib + client | `mergeAttention` 用毫秒时间当无 id 条目身份，同毫秒两条升级/完成互相吞掉 | 调查中 |
 
 **2026-11-23 E2E 第六轮（目标 8–10，只立卡不修）**：316–324 由并行修复进程收掉后，本轮从「319 的问询历史身份」「320 的当前/历史 cap 分流」「316 的注册元数据」「en 列表分隔符」四个接缝切，立 325–332 八张，均 `status: 调查中`。根因：同一实体两套身份（325）、边界状态只接一条消费路径（327/328）、数据类别扩了文案/字段没跟（330/331）、保守窗口覆盖明确完整信号（332）。不碰修复进程代码，也不在同一 diff 修产品。
@@ -45,7 +43,7 @@
 | **1 P1 v3 双根** | [353](../_archive/fixed_bugs/BUG-353-converge-and-journal-audit-broken-on-v3-dot-dsh-company.md)（已修 `7010fa85`） | `converge.mjs` / `journal-audit.mjs` 绕过 `resolveRunRoots` 仍拼扁平根 | 复用 `workspaceRoot`/`companyRoot` 双根；`DELIVERABLES_WS_REL` 传外层根、文件操作走 companyRoot；临时 v3 盘 e2e（计划/索引/审计） | 1 |
 | **2 P1 采用回路** | [351](../_archive/fixed_bugs/BUG-351-method-skill-text-unescaped-yaml-description.md)（已修 `b781937f`） | 自拼 YAML frontmatter 未编码任意用户输入；adopt 不校验产物 | `methodSkillText` 用 JSON/YAML 双引号标量编码 `description`；写入前用共享 frontmatter 解析器自检，失败则拒绝 adopted；host spec 红→绿 | 2 |
 | **3 表达层** | [354](../_archive/fixed_bugs/BUG-354-presence-activity-unassigned-owner-leaks-chinese-in-en.md)（已修 `39e5acab`） + [358](../_archive/fixed_bugs/BUG-358-board-unassigned-label-chinese-in-en-and-missing-role-label.md)（已修 `9c27cb8c`） | `lib` 把「未分配」折进 token/label；`BoardTab` 漏接 `roleLabel` | token 改无 owner 专用键 / `ownerLabel: null` 由 client 渲染；`BoardTab` 补 `roleLabel`；`UNASSIGNED_LABEL` 退役；en 满态零 CJK | 3 |
-| **4 台账/成品身份** | [356](BUG-356-motion-ledger-escaped-pipe-row-dropped.md) + [357](BUG-357-presented-slug-carryover-broken-by-custom-meta-slug.md) | 表格方言两套解析；成品身份写入用目录名 slug、读取用 `deliverableSlug` | 4 处裸 `split('|')` 统一到 `splitTableRow`；presented 写入读 `meta.md` 取 `deliverableSlug` + 旧账本回退；归档后仍 `presented: true` | 4 |
+| **4 台账/成品身份** | [356](../_archive/fixed_bugs/BUG-356-motion-ledger-escaped-pipe-row-dropped.md)（已修 `ed54ef17`） + [357](../_archive/fixed_bugs/BUG-357-presented-slug-carryover-broken-by-custom-meta-slug.md)（已修 `07f90eb3`） | 表格方言两套解析；成品身份写入用目录名 slug、读取用 `deliverableSlug` | 4 处裸 `split('|')` 统一到 `splitTableRow`；presented 写入读 `meta.md` 取 `deliverableSlug` + 旧账本回退；归档后仍 `presented: true` | 4 |
 | **5 注意力身份** | [359](BUG-359-attention-same-millisecond-stream-items-collapse.md) | 无 id 条目用毫秒时间当身份；`mergeAttention` 流内误去重 | `AttentionEventLike.seq` → `eventKey`；`attentionItemKey` 优先 eventKey；merge 只跨源去重；AttentionTab key 同步 | 5 |
 | **6 客户端异步** | [355](BUG-355-cultivation-data-stale-feedback-abort-problem-and-load-race.md) | 切换会话缺态复位；中止后写 problem；并发 `load()` 无代次 | `setFeedback(null)`；中止判定先于 state 写入；单调 `loadSeq` 丢弃过期结果；happy-dom 三场景 | 6 |
 | **7 诊断 schema** | [352](BUG-352-session-diagnose-reads-flat-team-member-shape.md) | 诊断器读想象扁平形状，夹具同款（BUG-030 同族） | 解包 `data.member.{phase,name,id,error}`，扁平仅退化兼容；夹具换真实 v2；`tests/session` 红→绿 | 7 |
