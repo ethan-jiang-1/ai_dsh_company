@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-353**（2026-11-24，351..359 批顺位 1 / P1）：converge 与 journal-audit 改用共享 `resolveCompanyRoots` 双根解析，v3 `.dsh-company/` 计划/索引/审计三路恢复；顺带修回 `deliverables-index.mjs` 缺失的 `deliverableSlug` 导入——
+  [353](BUG-353-converge-and-journal-audit-broken-on-v3-dot-dsh-company.md)。证据提交 `7010fa85`。
+
 - **BUG-340**（2026-11-24，质量防线批顺位 6 / P2）：静态审计补 `??`/`||` 左枝、`Promise.all` 位次解构、`badRows` 必读、四个新边界类型、`src/host` CJK 棘轮与字典拆分（`cultivation-copy.ts`）——
   [340](BUG-340-static-audit-r1-r2-bypass-gaps.md)。证据提交 `7c795245`。
 
