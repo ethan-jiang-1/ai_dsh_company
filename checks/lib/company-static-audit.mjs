@@ -129,7 +129,8 @@ export const HOST_CJK_RATCHET = new Map([
   ['packages/company-pack/src/host/language/company-language.ts', 7],
   ['packages/company-pack/src/host/ledger/catalog-state.ts', 8],
   ['packages/company-pack/src/host/ledger/catalog.ts', 28],
-  ['packages/company-pack/src/host/ledger/governance-export.ts', 6],
+  // 7（2026-11-24）：BUG-377 missing 账本沿用快照的告警句。
+  ['packages/company-pack/src/host/ledger/governance-export.ts', 7],
   ['packages/company-pack/src/host/ledger/presented-domain.ts', 22],
   // 30（2026-11-24）：BUG-357 复审新增 dirSlugs 校验错误句。
   ['packages/company-pack/src/host/ledger/presented-ledger.ts', 30],

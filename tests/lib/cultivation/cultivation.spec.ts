@@ -35,6 +35,16 @@ describe('recordStampOf / timeLabel（S9 场景轮：面板此前完全没有时
     expect(recordStampOf('uxwalk-20261018-reject')).toBeNull()   // 前缀有日期但缺 HHMMSS ⇒ 不认
   })
 
+  // 负例留证 2026-11-24：只判 NaN 不判往返 ⇒ 00 月/13 月/61 日被 Date 进位成合法时间。BUG-378
+  it('不存在的日期/时间返回 null（不靠 Date 进位）', () => {
+    expect(recordStampOf('20260000-000000-x')).toBeNull()
+    expect(recordStampOf('20261301-000000-x')).toBeNull()
+    expect(recordStampOf('20261132-000000-x')).toBeNull()
+    expect(recordStampOf('20261120-246000-x')).toBeNull()
+    expect(recordStampOf('20261120-235960-x')).toBeNull()
+    expect(recordStampOf('20261120-153000-abcd')).not.toBeNull()
+  })
+
   it('标签从"刚刚"到"年-月-日"分档（越近越粗，人一眼能比新旧）', () => {
     const at = new Date(2026, 9, 18, 14, 11, 7).getTime()
     const at2 = (ms: number) => at + ms

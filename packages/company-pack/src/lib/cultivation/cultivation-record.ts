@@ -248,8 +248,16 @@ export function recordStampOf(id: string): number | null {
   const match = /^(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})-/.exec(id)
   if (match === null) return null
   const [, y, mo, d, h, mi, s] = match
-  const at = new Date(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s)).getTime()
-  return Number.isNaN(at) ? null : at
+  const parts = [Number(y), Number(mo), Number(d), Number(h), Number(mi), Number(s)] as const
+  const date = new Date(parts[0], parts[1] - 1, parts[2], parts[3], parts[4], parts[5])
+  const at = date.getTime()
+  if (Number.isNaN(at)) return null
+  // 往返校验（BUG-378）：`new Date` 会把 00 月/13 月/61 日进位成合法时间，
+  // 只有回读分量全部相等才是真实存在的本地时间戳（与 isCalendarDate 同思路）。
+  const roundTrip = date.getFullYear() === parts[0] && date.getMonth() === parts[1] - 1
+    && date.getDate() === parts[2] && date.getHours() === parts[3]
+    && date.getMinutes() === parts[4] && date.getSeconds() === parts[5]
+  return roundTrip ? at : null
 }
 
 /**

@@ -274,7 +274,10 @@ function loadRecords(recordsDir: string): { readonly records: readonly Cultivati
       broken++
       continue
     }
-    const record = parseRecord(id, readFileSync(path, 'utf8'))
+    // 单文件读失败（权限/IO）只算一条坏记录，不能让 `/cultivation check|archive` 整条崩（BUG-379）。
+    let text: string
+    try { text = readFileSync(path, 'utf8') } catch { broken++; continue }
+    const record = parseRecord(id, text)
     if (record === null) broken++
     else records.push(record)
   }

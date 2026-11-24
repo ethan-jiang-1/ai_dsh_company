@@ -1,5 +1,5 @@
 /** 培养记录 CAS/回滚/archive/check 的 host 行为（R5-23 拆族；临时真实盘）。 */
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -128,6 +128,42 @@ describe('/cultivation check 对账（2026-10-27 R5）', () => {
       const orphan = await invokeCultivation(command, 'ceo', workspace, 'check')
       expect(String((orphan as { text: string }).text)).toContain('方法无本 workspace 记录')
       expect(existsSync(join(methods, 'ceo/orphan-method/SKILL.md'))).toBe(true)
+    })
+  })
+})
+
+// 负例留证 2026-11-24：recordStampOf 不判往返 ⇒ purge 删掉 20260000 文件名；loadRecords 不包 try ⇒ EACCES 抛。BUG-378/379
+describe('培养存储的降级边界（BUG-378/379）', () => {
+  const front = (): string => '---\nkind: correction\ntargetRole: ceo\nproposerRole: ceo\nproposerKind: human\nsource: test\nexpectation: E\nstatus: open\n---\n\nbody\n'
+
+  it('purge：文件名日期不存在 ⇒ 不删、计入失败/未动', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)
+      const archive = join(workspace, '.dsh-company/cultivation/records-archive')
+      mkdirSync(archive, { recursive: true })
+      writeFileSync(join(archive, '20260000-000000-bad.md'), front())
+      writeFileSync(join(archive, '20200101-000000-old.md'), front())
+      const outcome = await invokeCultivation(command, 'ceo', workspace, 'purge 30')
+      expect(outcome.kind).toBe('success')
+      expect(existsSync(join(archive, '20260000-000000-bad.md'))).toBe(true)
+      expect(existsSync(join(archive, '20200101-000000-old.md'))).toBe(false)
+    })
+  })
+
+  it('loadRecords：单个文件不可读只计 broken，不抛', async () => {
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)
+      const records = join(workspace, '.dsh-company/cultivation/records')
+      writeFileSync(join(records, '20261120-153000-good.md'), front())
+      writeFileSync(join(records, '20261120-160000-locked.md'), front())
+      chmodSync(join(records, '20261120-160000-locked.md'), 0o000)
+      try {
+        const outcome = await invokeCultivation(command, 'ceo', workspace, 'check')
+        expect(outcome.kind).toBe('success')
+        expect(String((outcome as { text: string }).text)).toContain('1 条坏记录')
+      } finally {
+        chmodSync(join(records, '20261120-160000-locked.md'), 0o644)
+      }
     })
   })
 })

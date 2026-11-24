@@ -118,3 +118,30 @@ describe('导出目录替换的回滚', () => {
     } finally { rmSync(root, { recursive: true, force: true }); rmSync(outside, { recursive: true, force: true }) }
   })
 })
+
+// 负例留证 2026-11-24：missing 分支不复制旧 ledger ⇒ 整目录替换后旧快照消失（BUG-377）；沿用旧快照即绿。
+describe('missing 账本沿用旧快照（BUG-377）', () => {
+  const missing = (): PresentedLedgerState => ({ status: 'missing', path: 'x' })
+
+  it('有旧快照：复制进新导出并告警', () => {
+    const { home, ws, cleanup } = make()
+    try {
+      mkdirSync(join(ws, '.dsh-company/exports'), { recursive: true })
+      writeFileSync(join(ws, '.dsh-company/exports/ledger.json'), '{"schema":1,"ledger":{"paths":{"a":true}}}')
+      const result = exportGovernance({ dshHome: home, workspace: ws, ledger: { kind: 'domain', read: missing } })
+      expect(result.ledger).toBe(true)
+      expect(result.warnings.join('\n')).toContain('尚未建立')
+      expect(existsSync(join(ws, '.dsh-company/exports/ledger.json'))).toBe(true)
+    } finally { cleanup() }
+  })
+
+  it('从未导出过：不产文件、不告警', () => {
+    const { home, ws, cleanup } = make()
+    try {
+      const result = exportGovernance({ dshHome: home, workspace: ws, ledger: { kind: 'domain', read: missing } })
+      expect(result.ledger).toBe(false)
+      expect(result.warnings).toEqual([])
+      expect(existsSync(join(ws, '.dsh-company/exports/ledger.json'))).toBe(false)
+    } finally { cleanup() }
+  })
+})

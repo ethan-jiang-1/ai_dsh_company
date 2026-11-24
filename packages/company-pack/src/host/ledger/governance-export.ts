@@ -112,8 +112,16 @@ export function exportGovernance(options: {
       warnings.push('methods 源不可用，沿用上次导出快照')
     }
 
+    /** 把上一份可用快照带进 staging（整目录替换不能因「本次没有源」而删数据；BUG-377）。 */
+    const carryOldLedger = (): boolean => {
+      try {
+        cpSync(join(exportRoot, 'ledger.json'), join(staging, 'ledger.json'))
+        return true
+      } catch { return false }
+    }
+
     if (options.ledger === undefined) {
-      try { cpSync(join(exportRoot, 'ledger.json'), join(staging, 'ledger.json')) } catch { /* 没有旧快照 */ }
+      carryOldLedger()
     } else {
       const state = options.ledger.read()
       if (state.status === 'ok') {
@@ -138,7 +146,15 @@ export function exportGovernance(options: {
         ledger = true
       } else if (state.status === 'corrupt' || state.status === 'unsupported') {
         warnings.push(`账本不可导出（${state.status}），本次不更新，沿用上次快照`)
-        try { cpSync(join(exportRoot, 'ledger.json'), join(staging, 'ledger.json')) } catch { /* 没有旧快照 */ }
+        carryOldLedger()
+      } else {
+        // BUG-377：账本尚未建立（missing）与「坏账本」同处理——有旧快照就沿用并告警，
+        // 没有旧快照才静默（真正的「从未导出过」）。
+        const carried = carryOldLedger()
+        if (carried) {
+          ledger = true
+          warnings.push('账本尚未建立（missing），沿用上次导出快照（可能是旧 workspace 的）')
+        }
       }
     }
 
