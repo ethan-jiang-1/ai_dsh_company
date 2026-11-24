@@ -474,7 +474,7 @@ describe('live/replay 的 CEO 身份与任务（BUG-372/376）', () => {
     expect(entry?.token).toEqual({ key: 'presence.activity.taskClaimed', params: { owner: 'CEO', id: 'task-1' } })
   })
 
-  it('presenceFromEvents：lead 行的 status/currentTasks 与 live 投影一致', () => {
+  it('presenceFromEvents：lead 行的 status/currentTasks 与 live 投影一致（BUG-376）', () => {
     const events = [
       { type: 'team/member', time: 1, seq: 1, data: { teamId: 'team-1', member: { id: 'm-vp', name: 'vp-eng', phase: 'active' } } },
       { type: 'team/task', time: 2, seq: 2, data: { teamId: 'team-1', task: { id: 'task-1', revision: 1, subject: 'CEO work', status: 'in_progress', ownerId: 'team-1' } } },

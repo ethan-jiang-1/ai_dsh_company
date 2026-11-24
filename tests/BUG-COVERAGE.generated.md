@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 359 |
-| 有具名守卫 | 257 |
+| 已修卡 | 366 |
+| 有具名守卫 | 264 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 71.6% |
+| 覆盖率 | 72.1% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -349,7 +349,7 @@
 | 336 | 2026-11-23 | tests/client/i18n/presence-budget.spec.ts:79 |
 | 337 | 2026-11-23 | tests/client/tabs/delegation-flow-panel.spec.ts:51 |
 | 338 | 2026-11-23 | tests/host/commands/command-language.spec.ts:31；tests/host/commands/prd-command.spec.ts:222；tests/host/commands/settings-command.spec.ts:261；tests/lib/docs/prd-check.spec.ts:429；tests/lib/docs/requirements-check.spec.ts:353；tests/lib/docs/requirements-check.spec.ts:367 |
-| 339 | 2026-11-23 | tests/lib/shared/parsers-fuzz.property.spec.ts:415 |
+| 339 | 2026-11-23 | tests/lib/shared/parsers-fuzz.property.spec.ts:416 |
 | 340 | 2026-11-23 | tests/client/cultivation/cultivation-copy.spec.ts:82；tests/client/cultivation/cultivation-copy.spec.ts:101；tests/tools/company-static-audit.spec.ts:203 |
 | 341 | 2026-11-23 | tests/client/company-client-composition.spec.ts:144；tests/client/ui/brand.spec.ts:59 |
 | 342 | 2026-11-23 | tests/host/prompt/handbook.spec.ts:45；tests/host/prompt/handbook.spec.ts:153 |
@@ -380,3 +380,10 @@
 | 367 | 2026-11-24 | tests/host/commands/signoff-language.spec.ts:25；tests/host/commands/signoff-language.spec.ts:45；tests/host/commands/signoff-language.spec.ts:55；tests/lib/accounting/signoff.spec.ts:38 |
 | 368 | 2026-11-24 | tests/client/ui/brand.spec.ts:40；tests/lib/docs/yaml-scalar.spec.ts:27 |
 | 369 | 2026-11-24 | tests/host/workspace/workspace-doors.spec.ts:86；tests/host/workspace/workspace-doors.spec.ts:106；tests/lib/presence/doors.spec.ts:41；tests/lib/presence/doors.spec.ts:54；tests/lib/presence/doors.spec.ts:75 |
+| 370 | 2026-11-24 | tests/lib/docs/requirements-check.spec.ts:390 |
+| 371 | 2026-11-24 | tests/tools/meta-shape-parity.spec.ts:20 |
+| 372 | 2026-11-24 | tests/lib/presence/presence-board.spec.ts:466 |
+| 373 | 2026-11-24 | tests/host/commands/delivery-command.spec.ts:301 |
+| 374 | 2026-11-24 | tests/host/commands/req-command.spec.ts:459 |
+| 375 | 2026-11-24 | tests/host/commands/delivery-command.spec.ts:288 |
+| 376 | 2026-11-24 | tests/lib/presence/presence-board.spec.ts:477 |
