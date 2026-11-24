@@ -8,13 +8,12 @@
 
 ## 活跃清单
 
-**活跃 3 张（2026-11-24 第六轮构造场景探查新立，只报不修）**：
+**活跃 2 张（2026-11-24 第六轮构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
 | [BUG-360](BUG-360-format-tokens-1000k-instead-of-1m.md) | P2·低影响 | lib | `formatTokens` 在 999 950–999 999 区间输出 `1000k`，永远升不到 `1M` | 调查中 |
 | [BUG-361](BUG-361-first-text-keeps-crlf-carriage-return.md) | P2 | lib | `firstText` 只按 `\n` 切行，CRLF 消息首行带一个 `\r` 进动态与摘要 | 调查中 |
-| [BUG-364](BUG-364-instance-guard-future-heartbeat-never-expires.md) | P2 | client | `shouldWarn` 把未来时间戳的心跳当永久新鲜，时钟回拨后多实例横幅长期挂着 | 调查中 |
 
 **2026-11-24 第六轮探查的排除项**（看过但不入卡，避免下一轮重复排查）：`BoardPanel`/`DagPanel` 的 `未分配` 已在 `BUG-358` 修复（本轮复核为绿）；成品目录 `CATALOG_READ_LIMIT` 与生成器行数的关系在 ~153 条处触发，但已有「超出读取上限」专档文案，属设计边界；`enumerateStartupOptions` 跳过 symlink 内容目录（包内内容，非模型可写）；`rotating-log` 轮转按「写入前」判大小，最多超一行。
 
@@ -46,7 +45,7 @@
 | **2 有界流与作用域** | [365](../_archive/fixed_bugs/BUG-365-company-data-unbounded-event-accumulation.md)（已修 `64fc1a5f`） + [366](../_archive/fixed_bugs/BUG-366-context-candidates-fail-open-on-unknown-cwd.md)（已修 `19b95966`） | 无限流原样累积进 state；作用域过滤把「未知」当「匹配」（fail-open） | `useCompanyData` 在写入点按窗口裁剪并保留 `capped/total`；`projectContextSessions` 与 `historyCandidates` 同口径 fail-closed（cwd 未知不产候选、行 cwd 缺失排除、canonical 比较）；两侧各补窗口/未知 cwd 用例 | 2 |
 | **3 工具/命令语言面** | [367](../_archive/fixed_bugs/BUG-367-signoff-tool-result-and-reason-always-chinese.md)（已修 `fe4ffe2e`） | 工具面与 `/company-diagnostics` 没有语言注入面（BUG-338 只收了五个斜杠命令） | `signoffDecisionNote`/`signoffReason` 出 `{zh,en}` 或 `text(zh,en)`；`registerSignoffTool` 按公司语言取值并订阅切换；诊断命令改走 `registerLocalizedCommand`；en 用例断言零中文 | 3 |
 | **4 坏形状/缺失值单一判据** | [362](../_archive/fixed_bugs/BUG-362-ledger-slugs-accept-malformed-rows.md)（已修 `d58e6fc1`） + [368](../_archive/fixed_bugs/BUG-368-yaml-scalar-unbalanced-quote-kept-and-trailing-dropped.md)（已修 `8bfc44a9`） + [369](../_archive/fixed_bugs/BUG-369-workspace-doors-unset-preset-chinese-placeholder.md)（已修 `18f9f5b8`） | 同一数据两种解析器；宽容解析把语法错误折成好值；缺失值编码成展示串 | slug 集合复用 `parseMotionLedger` 的行有效性（列数/空行）；`yamlScalar` 增结构化 `problem` 版本、未闭合/带尾巴按坏形状处理，`parseCompanyIdentity` 拒绝坏标量；`DoorRow.preset` 改 `string | null`、工具 schema 允许 null；TS/JS 双份同步 | 4 |
-| **5 时间双边窗口** | [364](BUG-364-instance-guard-future-heartbeat-never-expires.md) | 新鲜度只防旧不防未来（负年龄恒新鲜） | `shouldWarn` 加下界（`ts <= now + SKEW`），`writeBeat` 顺手裁掉过期/超前邻居；未来心跳/真新鲜/过期三态用例 | 5 |
+| **5 时间双边窗口** | [364](../_archive/fixed_bugs/BUG-364-instance-guard-future-heartbeat-never-expires.md)（已修 `1597828a`） | 新鲜度只防旧不防未来（负年龄恒新鲜） | `shouldWarn` 加下界（`ts <= now + SKEW`），`writeBeat` 顺手裁掉过期/超前邻居；未来心跳/真新鲜/过期三态用例 | 5 |
 | **6 文本与格式归一** | [361](BUG-361-first-text-keeps-crlf-carriage-return.md) + [360](BUG-360-format-tokens-1000k-instead-of-1m.md) | 取首行未做换行归一；格式化档位用原始值判、输出用舍入值 | `firstText` 先归一 `
 ?`→`
 ` 再切行并 trim；`formatTokens` 对舍入结果再判档（999 950+ 进 M）；共享 helper 用例覆盖边界 | 6 |

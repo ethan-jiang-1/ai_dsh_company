@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-364**（2026-11-24，360..369 批顺位 5 / P2）：实例心跳新鲜度改双边窗口（容忍时钟偏差），写心跳时清理过期/超前邻居——
+  [364](BUG-364-instance-guard-future-heartbeat-never-expires.md)。证据提交 `1597828a`。
+
 - **BUG-362**（2026-11-24，360..369 批顺位 4 / P2）：台账 slug 集合复用 `parseMotionLedger` 行有效性，坏行不进「已入账」——
   [362](BUG-362-ledger-slugs-accept-malformed-rows.md)。证据提交 `d58e6fc1`。
 - **BUG-368**（2026-11-24，360..369 批顺位 4 / P2）：`yamlScalarOrProblem` 对未闭合/带尾巴引号报 problem，身份文件拒绝并保留出厂词标——
