@@ -9,7 +9,7 @@
  * （读模型）。
  */
 import { RECORD_READ_LIMIT } from '../data/read-limits.ts'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import { CULTIVATION_CHANGED_EVENT } from './cultivation-actions.ts'
 import {
@@ -248,25 +248,32 @@ export function useCultivationPanelData(
   // 动作后立即重读的抓手（2026-10-17 GUI 行动面 S2）：bump 一次 = 重跑下面的读盘 effect。
   const [nonce, setNonce] = useState(0)
   const refresh = useCallback(() => { setNonce(value => value + 1) }, [])
+  // 同一 effect 内 timer/focus/广播会并发 load()：只让最新代次提交状态（BUG-355）。
+  const loadSeq = useRef(0)
 
   useEffect(() => {
     if (!enabled) return
     const controller = new AbortController()
     const load = async (): Promise<void> => {
+      const seq = ++loadSeq.current
+      const stale = (): boolean => controller.signal.aborted || seq !== loadSeq.current
       // journal 面：单角色失败 → null（行呈「不可达」）；整体异常保持上次态。
       const listings: Record<string, readonly string[] | null> = {}
       const heads: Record<string, string> = {}
       for (const role of CULTIVATION_ROLES) {
         const names = await files.listJournal(sessionId, role, controller.signal)
+        if (stale()) return
         listings[role] = names
         if (names !== null) {
           for (const name of names.slice(0, HEAD_LIMIT)) {
             const path = `${RUN_BUNDLE_PATHS.kb}/${role}/journal/${name}`
             const text = await files.readHead(sessionId, path, controller.signal)
+            if (stale()) return
             if (text === null) continue
             // 标题可能被 240 字窗口吞掉（BUG-322）：解析不到 `# 标题` 时补读一次更大的窗口。
             if (!hasHeading(text)) {
               const wider = await files.readJournalMore(sessionId, path, controller.signal)
+              if (stale()) return
               heads[`${role}/${name}`] = wider ?? text
             } else {
               heads[`${role}/${name}`] = text
@@ -279,6 +286,8 @@ export function useCultivationPanelData(
       const broken: string[] = []
       let unexpanded = 0
       const listing = await files.listRecords(sessionId, controller.signal)
+      // 中止/过期时不写 problem（BUG-355）：AbortError 会被 listDir 折成 dir-denied。
+      if (stale()) return
       const recordNames = listing.ok ? listing.names : null
       if (!listing.ok) setRecordsProblem({ path: RUN_BUNDLE_PATHS.records, reason: listing.reason })
       else setRecordsProblem(null)
@@ -287,12 +296,14 @@ export function useCultivationPanelData(
         for (const name of [...recordNames].sort().reverse()) {
           const id = name.replace(/\.md$/, '')
           const head = await files.readRecordHead(sessionId, `${RUN_BUNDLE_PATHS.records}/${name}`, controller.signal)
+          if (stale()) return
           let summary = head === null ? null : parseRecord(id, head)
           let summaryTruncated = true
           if (summary === null && head !== null) {
             // 头窗口解析不出来**不等于**记录坏了（BUG-321）：frontmatter 可能比窗口更长。
             // 补读一次全文再判；能解析就按合法记录收（正文另按 FULL_RECORD_LIMIT 决定是否读全文）。
             const whole = await files.readRecord(sessionId, `${RUN_BUNDLE_PATHS.records}/${name}`, controller.signal)
+            if (stale()) return
             if (whole.ok) {
               summary = parseRecord(id, whole.text)
               summaryTruncated = !whole.eof
@@ -313,6 +324,7 @@ export function useCultivationPanelData(
           const summary = summaries[index]!
           if (!full.has(summary.id)) continue
           const read = await files.readRecord(sessionId, `${RUN_BUNDLE_PATHS.records}/${summary.id}.md`, controller.signal)
+          if (stale()) return
           const record = read.ok ? parseRecord(summary.id, read.text) : null
           if (record !== null) {
             // 截断 ≠ 全文（BUG-298）：`!eof` 时保留「只加载了前 N 行」的状态，面板才说得出真话。
@@ -323,7 +335,7 @@ export function useCultivationPanelData(
         nextRecords = summaries
         unexpanded = summaries.filter(record => !fullyRead.has(record.id)).length
       }
-      if (controller.signal.aborted) return
+      if (stale()) return
       setJournalRows([...inboxRows(listings, heads)])
       setRecords(nextRecords)
       setBrokenRecords(broken)
@@ -381,6 +393,7 @@ export function useCultivationFeedback(
 ): readonly FeedbackItem[] | null {
   const [feedback, setFeedback] = useState<readonly FeedbackItem[] | null>(null)
   useEffect(() => {
+    setFeedback(null)
     if (!enabled || followEvents === undefined) return
     const controller = new AbortController()
     const consume = async (): Promise<void> => {
