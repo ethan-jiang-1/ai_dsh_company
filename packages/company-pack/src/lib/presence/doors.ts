@@ -22,7 +22,8 @@ export interface RootSessionFact {
 
 /** 工作区 × preset 的门投影行。 */
 export interface DoorRow {
-  readonly preset: string
+  /** preset id；null = 未设置（由消费方决定文案/缺省，BUG-369）。 */
+  readonly preset: string | null
   readonly sessionCount: number
   readonly sessionIds: readonly string[]
   readonly running: boolean
@@ -43,9 +44,10 @@ export interface WorkspaceDoorsModel {
  * @returns 按 preset 聚合的投影行 + duplicate 警告面。
  */
 export function doorsFromSessions(facts: readonly RootSessionFact[]): WorkspaceDoorsModel {
-  const byPreset = new Map<string, { ids: string[]; running: boolean }>()
+  const byPreset = new Map<string | null, { ids: string[]; running: boolean }>()
   for (const fact of facts) {
-    const preset = fact.agentPreset !== undefined && fact.agentPreset !== '' ? fact.agentPreset : '(未选 preset)'
+    // 缺失 = null（不是展示串，BUG-369）；真叫展示串的 preset 仍是字符串，二者可区分。
+    const preset = fact.agentPreset !== undefined && fact.agentPreset !== '' ? fact.agentPreset : null
     const entry = byPreset.get(preset) ?? { ids: [], running: false }
     entry.ids.push(fact.sessionId)
     if (fact.running) entry.running = true
@@ -59,6 +61,6 @@ export function doorsFromSessions(facts: readonly RootSessionFact[]): WorkspaceD
       running: entry.running,
       duplicateWarning: entry.ids.length >= 2,
     }))
-    .sort((a, b) => a.preset.localeCompare(b.preset))
+    .sort((a, b) => a.preset === null ? (b.preset === null ? 0 : 1) : b.preset === null ? -1 : a.preset.localeCompare(b.preset))
   return { rows, hasDuplicate: rows.some(row => row.duplicateWarning) }
 }

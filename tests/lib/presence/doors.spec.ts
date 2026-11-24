@@ -36,14 +36,14 @@ describe('工作区门投影——双 CEO 检测面（BUG-002 修复轮，2026-1
     ])
   })
 
-  it('未选 preset（undefined）归入「(未选 preset)」行 ⇒ 双未选也是双门警告', async () => {
+  it('未选 preset（undefined）归入 null 行 ⇒ 双未选也是双门警告（BUG-369）', async () => {
     const { doorsFromSessions } = await import('../../../packages/company-pack/src/lib/presence/doors.ts')
     const model = doorsFromSessions([
       { sessionId: 's1', cwd: '/ws', running: false, agentPreset: undefined as never },
       { sessionId: 's2', cwd: '/ws', running: false, agentPreset: undefined as never },
     ])
     expect(model.rows).toEqual([
-      { preset: '(未选 preset)', sessionCount: 2, sessionIds: ['s1', 's2'], running: false, duplicateWarning: true },
+      { preset: null, sessionCount: 2, sessionIds: ['s1', 's2'], running: false, duplicateWarning: true },
     ])
   })
 })

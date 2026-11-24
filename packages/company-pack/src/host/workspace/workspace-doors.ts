@@ -54,7 +54,7 @@ export function registerWorkspaceDoors(ctx: Context): void {
               type: 'object',
               additionalProperties: false,
               properties: {
-                preset: { type: 'string', required: true },
+                preset: { type: 'string' },
                 sessionCount: { type: 'number', required: true },
                 duplicateWarning: { type: 'boolean', required: true },
               },
@@ -77,7 +77,8 @@ export function registerWorkspaceDoors(ctx: Context): void {
       return {
         hasDuplicate: model.hasDuplicate,
         rows: model.rows.map(row => ({
-          preset: row.preset,
+          // 未设置 = 省略该键（null 也行；schema 不要求必填），不给展示串充当数据（BUG-369）。
+          ...(row.preset === null ? {} : { preset: row.preset }),
           sessionCount: row.sessionCount,
           duplicateWarning: row.duplicateWarning,
         })),

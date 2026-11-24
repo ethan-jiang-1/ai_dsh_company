@@ -83,14 +83,14 @@ describe('workspace_doors 接线（BUG-002 双 CEO 检测面）', () => {
     expect(value.rows[0]?.sessionCount).toBe(1)
   })
 
-  it('会话移除后不再计入；未选 preset 的根会话归到显式占位行', async () => {
+  it('会话移除后不再计入；未选 preset 的根会话输出省略 preset 键（BUG-369）', async () => {
     const { ctx, emit, tools } = fakeCtx()
     registerWorkspaceDoors(ctx as never)
     emit('api-session/added', added('s1', '/ws/a', 'ceo'))
     emit('api-session/added', added('s2', '/ws/a'))
     emit('api-session/removed', 's1')
     const value = await tools[0]!.execute({}, execFor('/ws/a')) as { rows: { preset: string; sessionCount: number }[] }
-    expect(value.rows).toEqual([{ preset: '(未选 preset)', sessionCount: 1, duplicateWarning: false }])
+    expect(value.rows).toEqual([{ sessionCount: 1, duplicateWarning: false }])
   })
 
   it('没有当前 agent（无 cwd 语境）→ 空投影，不猜', async () => {
@@ -99,5 +99,18 @@ describe('workspace_doors 接线（BUG-002 双 CEO 检测面）', () => {
     emit('api-session/added', added('s1', '/ws/a', 'ceo'))
     const value = await tools[0]!.execute({}, {}) as { hasDuplicate: boolean; rows: unknown[] }
     expect(value).toEqual({ hasDuplicate: false, rows: [] })
+  })
+})
+
+// 负例留证 2026-11-24：把未设置折叠成 '(未选 preset)' 展示串 ⇒ 本用例红（中文进工具载荷/与真 preset 混同）。BUG-369
+describe('workspace_doors 未设置与同名 preset 可区分（BUG-369）', () => {
+  it('null 省略 preset 键；真叫展示串的 preset 原样保留', async () => {
+    const { ctx, emit, tools } = fakeCtx()
+    registerWorkspaceDoors(ctx as never)
+    emit('api-session/added', added('s1', '/ws/a'))
+    emit('api-session/added', added('s2', '/ws/a', '(未选 preset)'))
+    const value = await tools[0]!.execute({}, execFor('/ws/a')) as { rows: { preset?: string, sessionCount: number }[] }
+    expect(value.rows).toContainEqual({ sessionCount: 1, duplicateWarning: false })
+    expect(value.rows).toContainEqual({ preset: '(未选 preset)', sessionCount: 1, duplicateWarning: false })
   })
 })
