@@ -79,3 +79,29 @@ describe('多实例探活（instance-guard）', () => {
     dispose()
   })
 })
+
+// 负例留证 2026-11-24：把新鲜度判据改回单边 `now - ts < STALE_MS` ⇒ 本组红（未来心跳永久告警/不被清理）。BUG-364
+describe('心跳新鲜度双边窗口（BUG-364）', () => {
+  it('未来时间戳的心跳不告警；真新鲜仍告警；过期不告警', () => {
+    expect(shouldWarn(JSON.stringify({ other: NOW + 600_000 }), NOW, 'self')).toBeNull()
+    expect(shouldWarn(JSON.stringify({ other: NOW - 19_000 }), NOW, 'self')).not.toBeNull()
+    expect(shouldWarn(JSON.stringify({ other: NOW - 60_000 }), NOW, 'self')).toBeNull()
+  })
+
+  it('writeBeat 清理超前/过期邻居，保留新鲜邻居与 self', () => {
+    const realNow = Date.now()
+    localStorage.setItem(KEY, JSON.stringify({
+      stale: realNow - 60_000,
+      future: realNow + 600_000,
+      fresh: realNow - 1_000,
+    }))
+    // startInstanceGuard 写入 self 并触发一次 check；立即停止，避免定时器泄漏。
+    const stop = startInstanceGuard(document)
+    const beats = JSON.parse(localStorage.getItem(KEY) ?? '{}') as Record<string, number>
+    stop()
+    expect(beats).not.toHaveProperty('stale')
+    expect(beats).not.toHaveProperty('future')
+    expect(beats).toHaveProperty('fresh')
+    expect(Object.keys(beats).some(key => key.startsWith('tab-'))).toBe(true)
+  })
+})

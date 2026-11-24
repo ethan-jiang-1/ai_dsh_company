@@ -9,6 +9,8 @@ import { zh, type CompanyT } from '../locales.ts'
 export const HEARTBEAT_KEY = 'dsh-company-pack/instances/v1'
 const KEY = HEARTBEAT_KEY
 const STALE_MS = 20_000
+/** 允许的时钟偏差：超过 now + SKEW 的心跳视为「不存在」（时钟回拨/换机残留），不告警（BUG-364）。 */
+const SKEW_MS = 5_000
 const BANNER_ID = 'dsh-instance-guard-banner'
 
 const fallbackWarning = (count: number): string =>
@@ -22,7 +24,10 @@ export function shouldWarn(raw: string | null, now: number, selfId: string, t?: 
   } catch {
     return null
   }
-  const others = Object.entries(beats).filter(([id, ts]) => id !== selfId && typeof ts === 'number' && now - ts < STALE_MS)
+  // 双边窗口：既不能太旧，也不能来自未来（负年龄不是新鲜，BUG-364）。
+  const others = Object.entries(beats).filter(([id, ts]) => id !== selfId
+    && typeof ts === 'number' && Number.isFinite(ts)
+    && ts <= now + SKEW_MS && now - ts < STALE_MS)
   if (others.length === 0) return null
   return t ? t('instanceGuard.warning', { count: others.length }) : fallbackWarning(others.length)
 }
@@ -32,7 +37,13 @@ function writeBeat(selfId: string): void {
     const win = window
     let beats: Record<string, number> = {}
     try { beats = JSON.parse(win.localStorage.getItem(KEY) ?? '{}') as Record<string, number> } catch { beats = {} }
-    beats[selfId] = Date.now()
+    const now = Date.now()
+    beats[selfId] = now
+    // 顺手裁掉过期/超前邻居：坏记录不再长期留在存储里反复判真（BUG-364）。
+    for (const [id, ts] of Object.entries(beats)) {
+      if (id === selfId) continue
+      if (typeof ts !== 'number' || !Number.isFinite(ts) || ts > now + SKEW_MS || now - ts >= STALE_MS) delete beats[id]
+    }
     win.localStorage.setItem(KEY, JSON.stringify(beats))
   } catch { /* localStorage 不可用（隐私模式等）＝探活静默退场 */ }
 }
