@@ -35,6 +35,7 @@ import {
 } from '../../lib/cultivation/cultivation-context.ts'
 import {
   CULTIVATION_ROLES,
+  methodSkillProblem,
   methodSkillText,
   parseRecord,
   recordText,
@@ -517,9 +518,15 @@ function commandAdopt(command: CultivationCommandContext, tokens: readonly strin
       }
       const proposalBody = recordBody(text)
       if (proposalBody === null) return { kind: 'error' as const, text: t(`记录 ${id} 形状坏，无法采纳。`, `Record ${id} has a broken shape and cannot be adopted.`) }
+      const skillText = methodSkillText({ slug, expectation: record.expectation, body: proposalBody })
+      // BUG-351：写盘前先自检 frontmatter；不自洽就拒绝采纳，不把「已采纳」写进记录。
+      const skillProblem = methodSkillProblem(skillText, slug, record.expectation)
+      if (skillProblem !== null) {
+        return { kind: 'error' as const, text: t(`生成的 SKILL.md frontmatter 不自洽（${skillProblem}），已拒绝采纳 ${id}。`, `The generated SKILL.md frontmatter is not self-consistent (${skillProblem}); adoption of ${id} was refused.`) }
+      }
       let installed: boolean
       try {
-        installed = storage.installMethod(config.cultivationRoot, record.targetRole, slug, methodSkillText({ slug, expectation: record.expectation, body: proposalBody }))
+        installed = storage.installMethod(config.cultivationRoot, record.targetRole, slug, skillText)
       } catch (error) {
         if (error instanceof UnsafeCultivationPathError) return { kind: 'error' as const, text: t(error.message, error.messageEn) }
         throw error

@@ -120,7 +120,8 @@ export const HOST_CJK_RATCHET = new Map([
   ['packages/company-pack/src/host/commands/signoff-tool.ts', 3],
   ['packages/company-pack/src/host/cultivation/cultivation-context-read.ts', 21],
   ['packages/company-pack/src/host/cultivation/cultivation-storage.ts', 13],
-  ['packages/company-pack/src/host/cultivation/cultivation.ts', 211],
+  // 214（2026-11-24）：BUG-351 采纳前自检新增一条成对错误句（zh+en）。
+  ['packages/company-pack/src/host/cultivation/cultivation.ts', 214],
   ['packages/company-pack/src/host/cultivation/revoke-journal.ts', 10],
   ['packages/company-pack/src/host/delegation/subagent-retry.ts', 11],
   ['packages/company-pack/src/host/language/company-language.ts', 7],

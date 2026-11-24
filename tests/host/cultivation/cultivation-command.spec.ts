@@ -6,6 +6,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, 
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { parseRecord, recordText } from '../../../packages/company-pack/src/lib/cultivation/cultivation.ts'
+import { parseFrontmatter } from '../../../tools/lib/core/repo-markdown.mjs'
 
 import { cultivationRegistrations, invokeCultivation, withCultivationWorkspace } from '../../support/cultivation-harness.ts'
 
@@ -239,6 +240,25 @@ describe('/cultivation 注册命令的 host 行为', () => {
     })
   })
 
+  // 负例留证 2026-11-24：methodSkillText 改回裸插值 description ⇒ 本用例红（frontmatter YAML 不可解析）。BUG-351
+  it('BUG-351：期望句含 ": " / "[tag]" / 纯数字时 adopt 写出的 SKILL.md 仍可解析', async () => {
+    for (const expectation of ['接口报错: 收口前先列未决项', '[TODO] 先核对基线', '123']) {
+      await withCultivationWorkspace(async (workspace, methods) => {
+        const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
+        const doc = { ...suggestion, targetRole: 'ceo', expectation } as const
+        writeFileSync(join(recordsDir, 'r-yaml.md'), recordText(doc))
+        const handler = cultivationRegistrations({ cultivationRoot: methods }).command
+
+        expect(await invokeCultivation(handler, 'ceo', workspace, 'adopt r-yaml as yaml-method'))
+          .toMatchObject({ kind: 'success' })
+        const skill = readFileSync(join(methods, 'ceo', 'yaml-method', 'SKILL.md'), 'utf8')
+        const parsed = parseFrontmatter(skill)
+        expect(parsed.error, expectation).toBeUndefined()
+        expect((parsed.data as Record<string, unknown>)['description'], expectation).toBe(expectation)
+      })
+    }
+  })
+
   it('record and method collisions preserve existing files and leave the proposal open', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
       const recordsDir = join(workspace, '.dsh-company', 'cultivation', 'records')
@@ -294,7 +314,7 @@ describe('/cultivation 注册命令的 host 行为', () => {
         text: '已采纳 r1：方法 review-numbers 部署到 CFO 方法层。新开的 CFO 会话会带着它开工；已经在跑的会话也会随技能目录刷新看到它（下一步就可能用上）。见效后在培养面板点「这条有用」回填，不灵了点「撤回…」（命令行：/cultivation verify r1 pass|fail、/cultivation revoke review-numbers）。',
       })
       expect(readFileSync(join(methods, 'cfo', 'review-numbers', 'SKILL.md'), 'utf8')).toBe(
-        '---\nname: review-numbers\ndescription: 复核数字口径\n---\n\n# review-numbers\n\n先对照底稿，再给出数字结论。\n',
+        '---\nname: review-numbers\ndescription: "复核数字口径"\n---\n\n# review-numbers\n\n先对照底稿，再给出数字结论。\n',
       )
       const adopted = parseRecord('r1', readFileSync(recordPath, 'utf8'))
       expect(adopted?.status).toBe('adopted')

@@ -316,10 +316,13 @@ export function recordInbox(records: readonly CultivationRecord[], viewerRole: s
  * name/description frontmatter）。正文只写方法论（D17）——来源与验证留记录，不进方法文件。
  */
 export function methodSkillText(input: { readonly slug: string; readonly expectation: string; readonly body: string }): string {
+  // BUG-351：description 是任意用户文本，必须按 YAML 标量编码——JSON.stringify 产出合法的
+  // YAML 双引号标量（`: `/`[`/`*`/引号/纯数字都不再改语义），否则 DSH 会静默丢弃整份技能。
+  const description = JSON.stringify(oneLine(input.expectation))
   return [
     '---',
     `name: ${input.slug}`,
-    `description: ${oneLine(input.expectation)}`,
+    `description: ${description}`,
     '---',
     '',
     `# ${input.slug}`,
@@ -327,6 +330,28 @@ export function methodSkillText(input: { readonly slug: string; readonly expecta
     input.body.trim() === '' ? oneLine(input.expectation) : input.body.trim(),
     '',
   ].join('\n')
+}
+
+/**
+ * 落盘前自检（BUG-351）：确认生成的 `SKILL.md` frontmatter 只有 name/description 且
+ * description 能逐字还原期望行为。返回 null = 自洽；否则给原因代号（host 负责按语言说人话）。
+ * @param text - `methodSkillText` 的产物。
+ * @param slug - 期望的方法 slug。
+ * @param expectation - 期望行为原文。
+ * @returns 问题代号（`frontmatter-shape` / `name-mismatch` / `description-mismatch`）或 null。
+ */
+export function methodSkillProblem(text: string, slug: string, expectation: string): string | null {
+  const match = /^---\n([\s\S]*?)\n---\n/.exec(text)
+  if (match === null) return 'frontmatter-shape'
+  const lines = (match[1] ?? '').split('\n')
+  const nameLine = lines.find(line => line.startsWith('name:'))
+  const descriptionLine = lines.find(line => line.startsWith('description:'))
+  if (lines.length !== 2 || nameLine === undefined || descriptionLine === undefined) return 'frontmatter-shape'
+  if (nameLine.slice('name:'.length).trim() !== slug) return 'name-mismatch'
+  const raw = descriptionLine.slice('description:'.length).trim()
+  let decoded: unknown
+  try { decoded = JSON.parse(raw) } catch { return 'description-mismatch' }
+  return decoded === oneLine(expectation) ? null : 'description-mismatch'
 }
 
 /**

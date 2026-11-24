@@ -5,12 +5,14 @@
  * 只报一个 929 行文件。纯函数（毫秒级、无 I/O）与真临时盘 host 行为分开，导航与失败定位都更短。
  */
 import { describe, expect, it } from 'vitest'
+import { parseFrontmatter } from '../../../tools/lib/core/repo-markdown.mjs'
 import {
   CULTIVATION_ROLES,
   PREVIEW_LIMIT,
   feedbackItems,
   inboxRows,
   journalTitle,
+  methodSkillProblem,
   methodSkillText,
   parseRecord,
   recordInbox,
@@ -253,8 +255,37 @@ describe('methodSkillText：部署进方法层的 SKILL.md（D17 只写方法论
   it('frontmatter 带 name/description（skill-filesystem 发现必需），正文为做法', () => {
     const text = methodSkillText({ slug: 'closing-checklist', expectation: '收口前逐项列出未决项', body: '收口三步：列未决、对稿面、再结论。' })
     expect(text).toContain('---\nname: closing-checklist\n')
-    expect(text).toContain('description: 收口前逐项列出未决项')
+    expect(text).toContain('description: "收口前逐项列出未决项"')
     expect(text).toContain('收口三步：列未决、对稿面、再结论。')
+  })
+
+  // 负例留证 2026-11-24：description 改回裸插值 ⇒ 下面用例红（parseFrontmatter 报 YAML 错误）。BUG-351
+  it('任意合法期望句都编码成可解析 YAML，description 逐字还原', () => {
+    const expectations = [
+      '接口报错: 收口前先列未决项',
+      '[TODO] 先核对基线',
+      'a * b 与 c # d',
+      '含 "引号" 与 \\ 反斜杠',
+      '123',
+      'true',
+      '{x: y}',
+    ]
+    for (const expectation of expectations) {
+      const text = methodSkillText({ slug: 'm-1', expectation, body: '' })
+      const parsed = parseFrontmatter(text)
+      expect(parsed.present, expectation).toBe(true)
+      expect(parsed.error, expectation).toBeUndefined()
+      expect((parsed.data as Record<string, unknown>)['description'], expectation).toBe(expectation)
+      expect(methodSkillProblem(text, 'm-1', expectation), expectation).toBeNull()
+    }
+  })
+
+  it('自检能识别被改坏的 frontmatter', () => {
+    const good = methodSkillText({ slug: 'm-1', expectation: '正常期望', body: '' })
+    expect(methodSkillProblem(good, 'm-1', '正常期望')).toBeNull()
+    expect(methodSkillProblem(good, 'm-2', '正常期望')).toBe('name-mismatch')
+    expect(methodSkillProblem(good.replace('"正常期望"', '正常期望'), 'm-1', '正常期望')).toBe('description-mismatch')
+    expect(methodSkillProblem('no-frontmatter', 'm-1', '正常期望')).toBe('frontmatter-shape')
   })
 })
 
