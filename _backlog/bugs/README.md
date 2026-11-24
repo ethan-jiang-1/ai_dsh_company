@@ -2,16 +2,28 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 360；已分配 BUG-001..359。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 370；已分配 BUG-001..369。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张（2026-11-23–24 质量防线审查与构造场景探查新立，只报不修）**：
+**活跃 10 张（2026-11-24 第六轮构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
+| [BUG-360](BUG-360-format-tokens-1000k-instead-of-1m.md) | P2·低影响 | lib | `formatTokens` 在 999 950–999 999 区间输出 `1000k`，永远升不到 `1M` | 调查中 |
+| [BUG-361](BUG-361-first-text-keeps-crlf-carriage-return.md) | P2 | lib | `firstText` 只按 `\n` 切行，CRLF 消息首行带一个 `\r` 进动态与摘要 | 调查中 |
+| [BUG-362](BUG-362-ledger-slugs-accept-malformed-rows.md) | P2 | lib | `ledgerSlugsFromText` 把列数不符的坏行首列也当 slug 收进「已入账」，与台账面板判据相反 | 调查中 |
+| [BUG-363](BUG-363-error-capture-install-not-idempotent.md) | P2 | client | `installErrorCapture` 不幂等：重复安装把每条 `console.error` 记两遍，卸载后包装仍指向旧环 | 调查中 |
+| [BUG-364](BUG-364-instance-guard-future-heartbeat-never-expires.md) | P2 | client | `shouldWarn` 把未来时间戳的心跳当永久新鲜，时钟回拨后多实例横幅长期挂着 | 调查中 |
+| [BUG-365](BUG-365-company-data-unbounded-event-accumulation.md) | P2 | client | `useCompanyData` 把 follow 流事件无界追加进 state，长会话内存与渲染开销线性增长 | 调查中 |
+| [BUG-366](BUG-366-context-candidates-fail-open-on-unknown-cwd.md) | P2 | client | 培养背景候选按「未知 cwd = 都匹配」放行，跨 workspace 会话会进参考背景 | 调查中 |
+| [BUG-367](BUG-367-signoff-tool-result-and-reason-always-chinese.md) | P2 | lib + host | `request_signoff` 的模型侧回执与人侧审批理由恒为中文（含全角标点），`en` 公司不随语言 | 调查中 |
+| [BUG-368](BUG-368-yaml-scalar-unbalanced-quote-kept-and-trailing-dropped.md) | P2·低影响 | lib | `yamlScalar` 对不成对引号把引号当内容返回（品牌名带 `'`），带尾巴的引号值又被静默截断 | 调查中 |
+| [BUG-369](BUG-369-workspace-doors-unset-preset-chinese-placeholder.md) | P2·低影响 | lib + host | `workspace_doors` 把「没选 preset」写成中文 `(未选 preset)`，进模型可见载荷且与同名字面 preset 不可区分 | 调查中 |
+
+**2026-11-24 第六轮探查的排除项**（看过但不入卡，避免下一轮重复排查）：`BoardPanel`/`DagPanel` 的 `未分配` 已在 `BUG-358` 修复（本轮复核为绿）；成品目录 `CATALOG_READ_LIMIT` 与生成器行数的关系在 ~153 条处触发，但已有「超出读取上限」专档文案，属设计边界；`enumerateStartupOptions` 跳过 symlink 内容目录（包内内容，非模型可写）；`rotating-log` 轮转按「写入前」判大小，最多超一行。
 
 **2026-11-23 E2E 第六轮（目标 8–10，只立卡不修）**：316–324 由并行修复进程收掉后，本轮从「319 的问询历史身份」「320 的当前/历史 cap 分流」「316 的注册元数据」「en 列表分隔符」四个接缝切，立 325–332 八张，均 `status: 调查中`。根因：同一实体两套身份（325）、边界状态只接一条消费路径（327/328）、数据类别扩了文案/字段没跟（330/331）、保守窗口覆盖明确完整信号（332）。不碰修复进程代码，也不在同一 diff 修产品。
 
@@ -31,7 +43,25 @@
 
 **已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
-**本轮批次**：下方「## 2026-11-24 修复交接（新发现批次：BUG-351..359）
+**本轮批次**：下方「## 2026-11-24 修复交接（第六轮构造场景批次：BUG-360..369）
+
+**用户指令（2026-11-24）**：修 `_backlog/bugs` 最新发现的问题；先按根因聚类立批次计划，再建 goal 按 REPO 流程推进。
+
+| 顺位 | 组 / 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
+|---|---|---|---|---|
+| **1 全局安装幂等** | [363](BUG-363-error-capture-install-not-idempotent.md) | 全局 monkey-patch 每次安装都叠加包装、卸载不收敛 | 在 target 上记原始 `console.error` + 安装计数；重复安装只换环引用，计数归零才恢复原始函数；happy-dom 复现用例红→绿 | 1 |
+| **2 有界流与作用域** | [365](BUG-365-company-data-unbounded-event-accumulation.md) + [366](BUG-366-context-candidates-fail-open-on-unknown-cwd.md) | 无限流原样累积进 state；作用域过滤把「未知」当「匹配」（fail-open） | `useCompanyData` 在写入点按窗口裁剪并保留 `capped/total`；`projectContextSessions` 与 `historyCandidates` 同口径 fail-closed（cwd 未知不产候选、行 cwd 缺失排除、canonical 比较）；两侧各补窗口/未知 cwd 用例 | 2 |
+| **3 工具/命令语言面** | [367](BUG-367-signoff-tool-result-and-reason-always-chinese.md) | 工具面与 `/company-diagnostics` 没有语言注入面（BUG-338 只收了五个斜杠命令） | `signoffDecisionNote`/`signoffReason` 出 `{zh,en}` 或 `text(zh,en)`；`registerSignoffTool` 按公司语言取值并订阅切换；诊断命令改走 `registerLocalizedCommand`；en 用例断言零中文 | 3 |
+| **4 坏形状/缺失值单一判据** | [362](BUG-362-ledger-slugs-accept-malformed-rows.md) + [368](BUG-368-yaml-scalar-unbalanced-quote-kept-and-trailing-dropped.md) + [369](BUG-369-workspace-doors-unset-preset-chinese-placeholder.md) | 同一数据两种解析器；宽容解析把语法错误折成好值；缺失值编码成展示串 | slug 集合复用 `parseMotionLedger` 的行有效性（列数/空行）；`yamlScalar` 增结构化 `problem` 版本、未闭合/带尾巴按坏形状处理，`parseCompanyIdentity` 拒绝坏标量；`DoorRow.preset` 改 `string | null`、工具 schema 允许 null；TS/JS 双份同步 | 4 |
+| **5 时间双边窗口** | [364](BUG-364-instance-guard-future-heartbeat-never-expires.md) | 新鲜度只防旧不防未来（负年龄恒新鲜） | `shouldWarn` 加下界（`ts <= now + SKEW`），`writeBeat` 顺手裁掉过期/超前邻居；未来心跳/真新鲜/过期三态用例 | 5 |
+| **6 文本与格式归一** | [361](BUG-361-first-text-keeps-crlf-carriage-return.md) + [360](BUG-360-format-tokens-1000k-instead-of-1m.md) | 取首行未做换行归一；格式化档位用原始值判、输出用舍入值 | `firstText` 先归一 `
+?`→`
+` 再切行并 trim；`formatTokens` 对舍入结果再判档（999 950+ 进 M）；共享 helper 用例覆盖边界 | 6 |
+
+**横向原则**：① 未知 / 坏形状不折成「匹配」或「好值」（fail-closed + 结构化 problem）；② 缺失值用 `null`，不拿展示串当数据；③ 全局安装必须可逆、幂等；④ 可见/模型可见文案一律经语言注入面。
+**终点**：10 张全部带红/绿证据迁入 `fixed_bugs/`；1 篇批次伞形 Note（362/366/368/369 的跨模块判据过独立只读盲审）；`verify`/`test`/`typecheck`/`lint`/`dup`/`coverage-ratchet` 与 client 真加载冒烟全绿并 `push`。批次外新卡不动。
+
+## 2026-11-24 修复交接（新发现批次：BUG-351..359）
 
 **用户指令（2026-11-24）**：修 `_backlog/bugs` 最新发现的问题；先按根因聚类立批次计划，再建 goal 按 REPO 流程推进。
 
