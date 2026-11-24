@@ -1,3 +1,4 @@
+// 负例留证 2026-11-24：loadRecords 不包 try ⇒ 单个不可读文件让 /cultivation check 抛 EACCES，本用例红。BUG-379
 /** 培养记录 CAS/回滚/archive/check 的 host 行为（R5-23 拆族；临时真实盘）。 */
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -150,7 +151,7 @@ describe('培养存储的降级边界（BUG-378/379）', () => {
     })
   })
 
-  it('loadRecords：单个文件不可读只计 broken，不抛', async () => {
+  it('loadRecords：单个文件不可读只计 broken，不抛（BUG-379）', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
       const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace)
       const records = join(workspace, '.dsh-company/cultivation/records')

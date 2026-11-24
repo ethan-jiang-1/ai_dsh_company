@@ -39,9 +39,18 @@
 - **U1**：`pnpm test tests/host/ledger/governance-export.spec.ts tests/lib/cultivation/cultivation.spec.ts tests/host/cultivation/cultivation-maintenance.spec.ts` —— 还原前 4 failed（旧快照丢失 / 坏日期删除 / EACCES 抛）；修复后 40/40 passed。
 - **U2**：`pnpm test tests/host/commands/delivery-command.spec.ts tests/lib/docs/markdown-shape.property.spec.ts tests/tools/deliverables.spec.ts tests/tools/markdown-lines-parity.spec.ts tests/lib/docs/requirements-check.spec.ts` —— 还原层级透传/逐行首现/裸全文扫描时分别红；修复后 84/84、联动 tools+host+lib 617/617。
 - **U3**：`pnpm test tests/host/ledger/catalog.spec.ts` —— 还原前 1 failed（归档后旧 true 翻案）；修复后 43/43 passed。
+- **盲审复审**：`pnpm test tests/tools/markdown-lines-parity.spec.ts tests/host/ledger/catalog.spec.ts` —— 12/12 与 47/47；全量 `pnpm test` 2790/2790、`coverage-ratchet` PASS。
 - `pnpm verify` ALL PASS。
+
+## 独立只读盲审（378/381/383）
+
+2026-11-24 由无本次历史上下文的只读子代理审 `db1fbb11` / `6dd7676c` / `b5a3ea4b`：**BLOCKING**（2 条），全部处置：
+1. **阻断 · 383** `setPresentedAudit` 的 `next` 从零重建（只带 paths/slugs），每次写入丢掉 `base.dirVeto`/`dirSlugs`；连续否决两个目录后只剩最后一个，归档旧否决就消失 → 改为 `{ ...base, schema, updatedAt, paths, slugs }` 保留历史，并补「两次 false + 归档各保留」用例。
+2. **阻断 · 381** tools 结构行孪生与 core 在「行内 `<!--` 开启块注释」与「孤立首行 `---`」两处不一致（实测 core `110011` vs 孪生 `111111`；`---\ntype` core `111` vs 孪生 `000`）→ 孪生改为「有闭合 `---` 才算 frontmatter」「整行以注释开头才非结构、行中开注释保留前文」，两条探针进对拍 DOCS。
+3. 378 复审通过：00/13 月、32 日、24 时、<100 年均被往返拒绝；DST 春令缺失时刻会返回 null（记录不归档/不清理），秋令重复时刻取较早实例——已登记。
 
 ## 未覆盖轴
 
 - [covered] missing 有/无旧快照两态、bad stamp 表驱动、不可读记录 → 去向：[governance-export.spec.ts](../../tests/host/ledger/governance-export.spec.ts) / [cultivation.spec.ts](../../tests/lib/cultivation/cultivation.spec.ts) / [cultivation-maintenance.spec.ts](../../tests/host/cultivation/cultivation-maintenance.spec.ts)
 - [policy] purge 对「不可读但时间戳合法」的文件仍计 failed 跳过（不删），不新增 unreadable 计数 → 去向：[cultivation-storage.ts](../../packages/company-pack/src/host/cultivation/cultivation-storage.ts)
+- [policy] recordStampOf 用本地时间往返：DST 春令缺失的 02:xx 返回 null（不归档/不清理），秋令重复的 01:xx 取较早实例（约 1h 偏差）→ 去向：[cultivation-record.ts](../../packages/company-pack/src/lib/cultivation/cultivation-record.ts)

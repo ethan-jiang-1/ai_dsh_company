@@ -595,4 +595,21 @@ describe('presented 结论反转随归档延续（BUG-383）', () => {
     expect(presentedOf(after!, rel, 'foo')).toBe(false)
     expect(presentedOf(after!, `${RUN_BUNDLE_PATHS.archive}/${dir}/final.md`, 'foo')).toBe(false)
   })
+
+  it('两次 false 写入不互相覆盖；归档后各自保留否决', () => {
+    const root = workspace()
+    const makeOne = (dir: string, slug: string): string => {
+      const abs = join(root, RUN_BUNDLE_PATHS.deliverables, dir)
+      mkdirSync(abs, { recursive: true })
+      writeFileSync(join(abs, 'meta.md'), `slug: ${slug}\nkickoff: 2026-11-20\ntype: decision\nresult: accepted\n`)
+      writeFileSync(join(abs, 'final.md'), 'body\n')
+      return `${RUN_BUNDLE_PATHS.deliverables}/${dir}/final.md`
+    }
+    const a = makeOne('2026-11-20-a', 'a')
+    const b = makeOne('2026-11-21-b', 'b')
+    setPresentedAudit(root, a, false)
+    const ledger = setPresentedAudit(root, b, false).ledger!
+    expect(presentedOf(ledger, `${RUN_BUNDLE_PATHS.archive}/2026-11-20-a/final.md`, 'a')).toBe(false)
+    expect(presentedOf(ledger, `${RUN_BUNDLE_PATHS.archive}/2026-11-21-b/final.md`, 'b')).toBe(false)
+  })
 })

@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 366 |
-| 有具名守卫 | 264 |
+| 已修卡 | 373 |
+| 有具名守卫 | 271 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 72.1% |
+| 覆盖率 | 72.7% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -319,7 +319,7 @@
 | 306 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:353；tests/client/cultivation/list-caps-consumed.spec.ts:19 |
 | 307 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:372 |
 | 308 | 2026-11-22 | tests/client/cultivation/cultivation-chat-panel.spec.ts:188 |
-| 309 | 2026-11-22 | tests/lib/cultivation/cultivation.spec.ts:327 |
+| 309 | 2026-11-22 | tests/lib/cultivation/cultivation.spec.ts:337 |
 | 310 | 2026-11-22 | tests/client/tabs/deliverables-catalog.spec.ts:221 |
 | 311 | 2026-11-22 | tests/client/tabs/ledger-tab.spec.ts:100；tests/lib/accounting/ledger.spec.ts:121 |
 | 312 | 2026-11-22 | tests/client/wiring/attention-observers.spec.ts:167；tests/client/wiring/attention.spec.ts:307 |
@@ -387,3 +387,10 @@
 | 374 | 2026-11-24 | tests/host/commands/req-command.spec.ts:459 |
 | 375 | 2026-11-24 | tests/host/commands/delivery-command.spec.ts:288 |
 | 376 | 2026-11-24 | tests/lib/presence/presence-board.spec.ts:478 |
+| 377 | 2026-11-24 | tests/host/ledger/governance-export.spec.ts:123 |
+| 378 | 2026-11-24 | tests/host/cultivation/cultivation-maintenance.spec.ts:137 |
+| 379 | 2026-11-24 | tests/host/cultivation/cultivation-maintenance.spec.ts:154 |
+| 380 | 2026-11-24 | tests/host/commands/delivery-command.spec.ts:333；tests/lib/docs/markdown-shape.property.spec.ts:178 |
+| 381 | 2026-11-24 | tests/tools/deliverables.spec.ts:100；tests/tools/markdown-lines-parity.spec.ts:23 |
+| 382 | 2026-11-24 | tests/lib/docs/requirements-check.spec.ts:415 |
+| 383 | 2026-11-24 | tests/host/ledger/catalog.spec.ts:582 |

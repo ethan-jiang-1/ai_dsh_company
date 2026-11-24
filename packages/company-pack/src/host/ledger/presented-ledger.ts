@@ -275,7 +275,8 @@ export function setPresentedAudit(
   }
   const base = state.status === 'ok' ? state.ledger : ensurePresentedLedger(companyHome, now).ledger
   const paths: Record<string, boolean> = { ...base.paths, [rel]: presented }
-  let next: PresentedLedger = { schema: 1, updatedAt: now.toISOString(), paths, slugs: base.slugs }
+  // 保留 base 的 dirVeto/dirSlugs/未知字段（BUG-383 复审）：每次重写不能丢历史否决。
+  let next: PresentedLedger = { ...base, schema: 1, updatedAt: now.toISOString(), paths, slugs: base.slugs }
   // true 写 slug（归档后延续背书）；false 写目录否决（BUG-383），避免同 slug 新成品继承旧 false。
   {
     const rootRel = rel.startsWith(`${RUN_BUNDLE_PATHS.archive}/`) ? RUN_BUNDLE_PATHS.archive : RUN_BUNDLE_PATHS.deliverables

@@ -11,6 +11,13 @@ const DOCS = [
   '```\nclosed: 2020-01-01\nresult: accepted\n```\nclosed:\nresult:\n',
   '<!-- closed: 2020-01-01 -->\nclosed:\n',
   '~~~text\nclosed: 2020-01-01\n~~~\nclosed: 2026-11-20\n',
+  '<!-- block start\nclosed: 2020-01-01\n-->\nclosed: 2026-11-20\n',
+  '<!-- unclosed\nclosed: 2020-01-01\n',
+  '```\nclosed: 2020-01-01\n', // 未闭合围栏：其后全部非结构
+  '---\r\nslug: x\r\n---\r\nclosed: 2026-11-20\r\n',
+  'before <!-- inline --> closed: 2026-11-20\n',
+  'a: 1\nx <!-- open\nstatus: bogus\n-->\nstatus: real\n',
+  '---\ntype: decision\n',
 ]
 
 describe('tools structuralLines 与 core 对拍（BUG-381）', () => {
@@ -20,6 +27,17 @@ describe('tools structuralLines 与 core 对拍（BUG-381）', () => {
       const core = scanDocumentDetailed(doc).lines.filter(line => line.structural).map(line => line.text).filter(text => text !== '')
       expect(tools, doc).toEqual(core)
     }
+  })
+
+  it('frontmatter / 块注释 / 未闭合围栏的正确性（结构位）', () => {
+    // 末尾换行会生成一个空结构行，断言时去掉（与 core 一致）。
+    const flags = (doc: string): boolean[] => structuralLines(doc).map(line => line.structural).slice(0, -1)
+    expect(flags('---\nslug: x\n---\nclosed: 1\n')).toEqual([false, false, false, true])
+    expect(flags('<!-- a\nclosed: 1\n-->\nclosed: 2\n')).toEqual([false, false, false, true])
+    expect(flags('```\nclosed: 1\n')).toEqual([false, false])
+    // 行内开启的块注释屏蔽后续行；孤立 `---` 不是 frontmatter（与 core 一致）。
+    expect(flags('a: 1\nx <!-- open\nstatus: bogus\n-->\nstatus: real\n')).toEqual([true, true, false, false, true])
+    expect(flags('---\ntype: decision\n')).toEqual([true, true])
   })
 
   it('metaFieldFromText 跳过围栏样例，读正文真值', () => {
