@@ -410,3 +410,23 @@ describe('numberingMarker 与 meta 标量同口径（BUG-370）', () => {
     })
   }
 })
+
+// 负例留证 2026-11-24：退役词/区间断言改回裸全文扫描 ⇒ 围栏/行内代码引用被判红（BUG-382）。结构行过滤即绿。
+describe('退役词/区间断言的结构敏感（BUG-382）', () => {
+  const scope = meta(['numbering: identity', 'layers: MRD, PRD'])
+  it('围栏与行内代码里的引用不算声明；正文仍判红', () => {
+    const base = clean()
+    const fenced = base.map(doc => doc.rel === 'drafts/prd.md'
+      ? { ...doc, text: `${doc.text}\n\`\`\`\nSTR-12 已退役\n\`\`\`\n` }
+      : doc)
+    expect(checkRequirements({ meta: scope, docs: fenced }).errors).toEqual([])
+    const inline = base.map(doc => doc.rel === 'drafts/prd.md'
+      ? { ...doc, text: `${doc.text}\n不要把旧编号写成 \`REQ-001 ~ REQ-004\`。\n` }
+      : doc)
+    expect(checkRequirements({ meta: scope, docs: inline }).errors).toEqual([])
+    const body = base.map(doc => doc.rel === 'drafts/prd.md'
+      ? { ...doc, text: `${doc.text}\nSTR-12 已退役，覆盖 REQ-001 ~ REQ-004。\n` }
+      : doc)
+    expect(checkRequirements({ meta: scope, docs: body }).errors.length).toBeGreaterThan(0)
+  })
+})

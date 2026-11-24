@@ -328,3 +328,39 @@ describe('requiredSections 结构敏感（BUG-373）', () => {
     } finally { cleanup() }
   })
 })
+
+// 负例留证 2026-11-24：sectionRange 只认 `##` ⇒ 三级/一级必填小节永远判缺（BUG-380）。层级透传后绿。
+describe('requiredSections 的标题层级（BUG-380）', () => {
+  const contentDir = (): string => {
+    const dir = mkdtempSync(join(tmpdir(), 'delivery-levels-'))
+    mkdirSync(join(dir, 'delivery-modes/custom'), { recursive: true })
+    writeFileSync(join(dir, 'delivery-modes/custom/delivery-rules.json'), JSON.stringify({
+      deliveryMode: 'custom',
+      documents: { SOW: { file: 'drafts/sow.md' } },
+      requiredSections: { SOW: ['# Top', '## Mid', '### Deep', '| # | M |'] },
+    }))
+    return dir
+  }
+  const doc = (needles: readonly string[]): string => ['# Doc', '', ...needles].join('\n')
+
+  it('# / ## / ### / 表格行四种 needle 都按结构匹配', async () => {
+    const { workspace, root, cleanup } = fixture('custom')
+    const content = contentDir()
+    try {
+      writeFileSync(join(root, 'drafts/sow.md'), doc(['# Top', '## Mid', '### Deep', '| # | M |']))
+      const result = await mount(workspace, content).handler({ rawInput: `check ${SLUG}` })
+      expect(result.kind, result.text).toBe('success')
+    } finally { cleanup(); rmSync(content, { recursive: true, force: true }) }
+  })
+
+  it('只缺三级小节 ⇒ 报缺（旧实现里三级永远缺，此例在两侧都红但原因不同）', async () => {
+    const { workspace, root, cleanup } = fixture('custom')
+    const content = contentDir()
+    try {
+      writeFileSync(join(root, 'drafts/sow.md'), doc(['# Top', '## Mid', '| # | M |']))
+      const result = await mount(workspace, content).handler({ rawInput: `check ${SLUG}` })
+      expect(result.kind).toBe('error')
+      expect(result.text).toContain('### Deep')
+    } finally { cleanup(); rmSync(content, { recursive: true, force: true }) }
+  })
+})

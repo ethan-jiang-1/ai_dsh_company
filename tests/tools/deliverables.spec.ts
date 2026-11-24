@@ -95,3 +95,14 @@ describe('meta.md 形状校验（validateMeta / parseMeta）', () => {
 
 // 工作区门投影（doors.ts）的 keyless 守卫已迁 tests/lib/presence/doors.spec.ts（2026-10-14 重构轮：
 // 本文件主体守 tools/lib/company/deliverables.mjs，doors 块是唯一跨模块寄居——迁出恢复一一对应）。
+
+// 负例留证 2026-11-24：parseMeta 回退成逐行首现（不看围栏）⇒ 围栏里的 closed 样例覆盖真值，本用例红。BUG-381
+describe('parseMeta 的结构敏感（BUG-381）', () => {
+  it('围栏里的样例字段不算；正文的首现才生效', () => {
+    const text = ['```', 'closed: 2020-01-01', 'result: accepted', '```', 'closed:', 'result:', 'slug: foo'].join('\n')
+    const { fields } = parseMeta(text)
+    expect(fields.get('closed')).toBe('')
+    expect(fields.get('result')).toBe('')
+    expect(fields.get('slug')).toBe('foo')
+  })
+})

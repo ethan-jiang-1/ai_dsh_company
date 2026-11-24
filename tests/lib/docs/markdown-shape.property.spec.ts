@@ -173,3 +173,15 @@ describe(`markdown-shape × mdast 独立真值差分（seeded，${String(CASES)}
     expect(sectionRange(multilineSpan, '修复证据')?.start).toBe(4)
   })
 })
+
+// 负例留证 2026-11-24：sectionRange 写死 `##` ⇒ 三级/一级 needle 永远找不到（BUG-380）。加 level 透传即绿。
+describe('sectionStructuralText 的标题层级（BUG-380）', () => {
+  it('按 needle 的层级定位（# / ## / ### 各自生效）', () => {
+    for (const [level, marker] of [[1, '#'], [2, '##'], [3, '###']] as const) {
+      const text = `${marker} Foo\nbody-${String(level)}\n`
+      expect(sectionStructuralText(text, 'Foo', level)).toContain(`body-${String(level)}`)
+      // 其它层级不串味
+      expect(sectionStructuralText(text, 'Foo', level === 1 ? 2 : 1)).toBeUndefined()
+    }
+  })
+})

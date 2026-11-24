@@ -551,7 +551,10 @@ export function checkRequirements(snapshot: MotionSnapshot, options: CheckOption
     else if (formValue === 'headings') definitions.push(...headingDefinitions(doc.rel, doc.text, layer))
     else if (formValue === 'table-rows') definitions.push(...tableRowDefinitions(doc.rel, doc.text, layer))
     // 退役词 / 区间断言：只扫声明了层的需求文档（评审稿与 final 是引用面）。
-    for (const [index, line] of normalizeDocument(doc.text).split('\n').entries()) {
+    // 结构与正文一致（BUG-382）：围栏/块注释/行内代码里的引用不是文档声明，正文里仍禁止。
+    for (const [index, entry] of scan.lines.entries()) {
+      if (!entry.structural) continue
+      const line = entry.text.replace(/`[^`]*`/g, '')
       for (const match of line.matchAll(retired)) errors.push(text(`${doc.rel}:${String(index + 1)} 退役词 ${match[0]}`, `${doc.rel}:${String(index + 1)} retired word ${match[0]}`))
       for (const match of line.matchAll(RANGE_CLAIM)) errors.push(text(`${doc.rel}:${String(index + 1)} 区间计数断言 ${match[0]}（R8：计数由索引派生）`, `${doc.rel}:${String(index + 1)} range count claim ${match[0]} (R8: counts are derived from the index)`))
     }

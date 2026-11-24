@@ -419,9 +419,10 @@ function escapeRegExp(value) {
  * @param {{ readonly lines: readonly { readonly text: string, readonly structural: boolean }[] }} [preScanned] 可选复用已扫描结果。
  * @returns {{ start: number, end: number } | undefined} 归一化行下标；缺节返回 undefined。
  */
-export function sectionRange(text, heading, preScanned) {
+export function sectionRange(text, heading, preScanned, level = 2) {
   const { lines } = preScanned ?? scanDocumentDetailed(text)
-  const pattern = new RegExp(`^[ ]{0,3}##\\s+${escapeRegExp(heading)}\\s*$`)
+  const hashes = '#'.repeat(level)
+  const pattern = new RegExp(`^[ ]{0,3}${hashes}\\s+${escapeRegExp(heading)}\\s*$`)
   let start = -1
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index]
@@ -434,7 +435,7 @@ export function sectionRange(text, heading, preScanned) {
   let end = lines.length
   for (let index = start + 1; index < lines.length; index += 1) {
     const line = lines[index]
-    if (line !== undefined && line.structural && /^[ ]{0,3}#{1,2}\s+/.test(line.text)) {
+    if (line !== undefined && line.structural && new RegExp(`^[ ]{0,3}#{1,${String(level)}}\\s+`).test(line.text)) {
       end = index
       break
     }
@@ -448,9 +449,9 @@ export function sectionRange(text, heading, preScanned) {
  * @param {string} heading 节标题（不含 `## `）。
  * @returns {string | undefined} 结构行正文；缺节返回 undefined。
  */
-export function sectionStructuralText(text, heading) {
+export function sectionStructuralText(text, heading, level = 2) {
   const scan = scanDocumentDetailed(text)
-  const range = sectionRange(text, heading, scan)
+  const range = sectionRange(text, heading, scan, level)
   if (range === undefined) return undefined
   const out = []
   for (let index = range.start + 1; index < range.end; index += 1) {

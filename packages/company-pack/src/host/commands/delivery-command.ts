@@ -67,8 +67,8 @@ interface DeliveryRules {
  */
 function hasStructuralSection(text: string, needle: string): boolean {
   const wanted = needle.trim()
-  const heading = /^#{1,6}\s+(.*)$/.exec(wanted)
-  if (heading !== null) return sectionStructuralText(text, heading[1] ?? '') !== undefined
+  const heading = /^(#{1,6})\s+(.*)$/.exec(wanted)
+  if (heading !== null) return sectionStructuralText(text, heading[2] ?? '', (heading[1] ?? '##').length) !== undefined
   const scan = scanDocumentDetailed(text)
   if (wanted.startsWith('|')) {
     const cells = splitTableRow(wanted)

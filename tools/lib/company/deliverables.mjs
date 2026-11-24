@@ -11,6 +11,7 @@
 // 本模块**不做 I/O**、不读文件系统：调用方把"工作区文件清单"喂进来——分层纪律见
 // `docs/guides/dev-loop.md` §9.1。
 import { COMPANY_ROLE_IDS } from './company-roles.mjs'
+import { structuralLines } from './markdown-lines.mjs'
 
 /** 成品文件名与过程稿目录名（三态的字面约定）。 */
 export const FINAL_BASENAME = 'final.md'
@@ -102,7 +103,10 @@ export const META_RESULTS = ['in-progress', 'accepted', 'rejected', 'deferred', 
 export function parseMeta(body) {
   const fields = new Map()
   const events = []
-  for (const line of body.split('\n')) {
+  // 只读结构行（BUG-381）：围栏/HTML 注释里的模板样例不算字段。
+  for (const entry of structuralLines(body)) {
+    if (!entry.structural) continue
+    const line = entry.text
     const m = /^([\w一-鿿]+)\s*[:：]\s*(.*)$/.exec(line.trim())
     if (m === null) continue
     if (m[1] === 'events') { if (m[2].trim() !== '') events.push(m[2].trim()); continue }

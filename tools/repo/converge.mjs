@@ -23,6 +23,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, cpSync, renameSync, rmSync } from 'node:fs'
 import { join, basename, relative, resolve, sep } from 'node:path'
 import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
+import { metaFieldFromText } from '../lib/company/meta-fields.mjs'
 import { assess, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalSlug, parseFlags, steps } from '../lib/company/converge-rules.mjs'
 import { parseAuditVerdict } from '../lib/repo/audit-verdict.mjs'
 import { COMPANY_ROLE_IDS } from '../lib/company/company-roles.mjs'
@@ -65,10 +66,7 @@ const git = (args_, opts = {}) => {
   if (r.status !== 0) throw new Error(`git ${args_.join(' ')} 失败：${r.stderr.trim().slice(0, 200)}`)
   return r.stdout
 }
-const metaField = (dir, field) => {
-  const m = readFileSync(join(dir, 'meta.md'), 'utf8').match(new RegExp(`^${field}:\\s*(.*)$`, 'm'))
-  return m ? m[1].trim() : ''
-}
+const metaField = (dir, field) => metaFieldFromText(readFileSync(join(dir, 'meta.md'), 'utf8'), field)
 /**
  * 本 slug 的**未结审计发现**（复用 `checks/audit/deliverables-check.mjs --only <slug>` 的裁决）。
  *

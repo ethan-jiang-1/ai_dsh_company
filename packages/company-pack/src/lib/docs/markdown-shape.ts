@@ -60,4 +60,4 @@ export const sectionRange: (
 ) => SectionRange | undefined = sectionRangeCore
 
 /** 取 `## <heading>` 节内的结构行正文（围栏/注释/跨行代码内的假字段清零）。 */
-export const sectionStructuralText: (text: string, heading: string) => string | undefined = sectionStructuralTextCore
+export const sectionStructuralText: (text: string, heading: string, level?: number) => string | undefined = sectionStructuralTextCore
