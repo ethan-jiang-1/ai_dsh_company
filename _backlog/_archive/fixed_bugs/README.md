@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-371**（2026-11-24，370..376 批顺位 2 / P2）：`meta.md` 形状判据收成一份（面板/孪生/审计逐字相等），result 留空合法、日期前缀 slug 判红——
+  [371](BUG-371-meta-shape-validators-three-way-split.md)。证据提交 `7d81872c`。
+
 - **BUG-370**（2026-11-24，370..376 批顺位 1 / P2）：`numbering:` 与 meta 其它字段共用 `metaScalarField`（引号/注释/冒号空格/占位符）——
   [370](BUG-370-numbering-parser-differs-from-yaml-scalar.md)。证据提交 `d700c76a`。
 - **BUG-374**（2026-11-24，370..376 批顺位 1 / P2）：`parseDeclaredLayers` 改用 `metaListField`/`parseList`，`[…]` 与引号都认——

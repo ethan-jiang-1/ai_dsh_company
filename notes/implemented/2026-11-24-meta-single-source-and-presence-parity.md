@@ -11,6 +11,10 @@
    - 模板占位 `<…>` = 未声明（不报错、不放行闸门）；
    - 坏引号 = 已声明但非法（保留原文报错，不折成未声明）；
    - `numbering :`（冒号前空格）、引号、行尾注释、`[MRD, SyRS]` 与引号列表都按同一口径解析。
+2. **`meta.md` 形状单一判据（[BUG-371](../../_backlog/_archive/fixed_bugs/BUG-371-meta-shape-validators-three-way-split.md)）**：
+   面板 `metaProblemsOf`（TS）、catalog 孪生（JS）、仓库审计 `validateMeta` 三处逐字同判据：
+   `kickoff`/`type` 缺失或空 = 缺行；`result` 可留空（未收口），只在非空时校验词表；`slug` 可省略（回退目录名），
+   但写成日期前缀形式判红。`tests/tools/meta-shape-parity.spec.ts` 对拍三处，fuzz 同步更新。
 
 ## 输掉的方案
 
@@ -28,6 +32,7 @@
 ## 验证（真跑过）
 
 - **U1**：`pnpm test tests/lib/docs/requirements-check.spec.ts tests/host/commands/req-command.spec.ts tests/host/commands/delivery-command.spec.ts` —— 还原三处解析前 6 failed（引号/注释/冒号空格/占位符/围栏/方括号）；修复后 90/90 passed。
+- **U2**：`pnpm test tests/tools/meta-shape-parity.spec.ts tests/lib/shared/parsers-fuzz.property.spec.ts` —— 还原三处判据前 5 failed；修复后 parity 10/10、`tests/content tests/tools tests/client/data` 490/490。
 - `pnpm verify` ALL PASS。
 
 ## 未覆盖轴

@@ -8,11 +8,10 @@
 
 ## 活跃清单
 
-**活跃 4 张（2026-11-24 第七轮构造场景探查新立，只报不修）**：
+**活跃 3 张（2026-11-24 第七轮构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
-| [BUG-371](BUG-371-meta-shape-validators-three-way-split.md) | P2 | lib + tools | `meta.md` 形状校验三分家：缺 `slug:`／日期前缀 slug／空 `result:` 三处裁决相反 | 调查中 |
 | [BUG-372](BUG-372-diff-activity-shows-raw-lead-owner.md) | P2 | lib | `diffActivity` 把 CEO 认领/完成的任务显示成裸 `lead`，看板同一数据是 `CEO` | 调查中 |
 | [BUG-373](BUG-373-delivery-check-required-sections-substring-only.md) | P2 | host | `/delivery check` 用裸 `includes` 判必填小节，围栏/注释里的模板样例即可通过 | 调查中 |
 | [BUG-376](BUG-376-replay-lead-row-loses-current-tasks.md) | P2 | lib | 事件回放路径的 CEO 行恒「未上线 + 无当前任务」，与 live 路径对同一数据结论不同 | 调查中 |
@@ -26,7 +25,7 @@
 | 顺位 | 组 / 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
 |---|---|---|---|---|
 | **1 元数据字段解析单一来源** | [370](../_archive/fixed_bugs/BUG-370-numbering-parser-differs-from-yaml-scalar.md)（已修 `d700c76a`） + [374](../_archive/fixed_bugs/BUG-374-req-declared-layers-splitter-diverges.md)（已修 `d700c76a`） + [375](../_archive/fixed_bugs/BUG-375-meta-field-parsers-fence-blind.md)（已修 `d700c76a`） | `meta.md` 同一族字段各写一套解析：numbering 裸正则、layers 裸拆分、productType/deliveryMode 围栏不感知；标量口径与结构口径都分叉 | 抽 `metaField(text, name)`（`metaFieldLines` 结构行 + `yamlScalarOrProblem` + 占位符）与 `metaListField`（复用 `parseList`），`numberingMarker`/`parseProductType`/`parseDeliveryMode`/`hasDeclaredDeliveryMode`/`parseDeclaredLayers` 全部改用它；表驱动用例覆盖引号/注释/冒号前空格/围栏/`[…]` | 1 |
-| **2 元数据形状校验单一判据** | [371](BUG-371-meta-shape-validators-three-way-split.md) | 面板 `metaProblemsOf` 与仓库审计 `validateMeta` 各自演化，缺 slug/日期前缀/空 result 三处裁决相反 | 以 `metaProblemsOf` 为唯一判据（tools 侧 parity 引用），统一「空值与缺行」语义：`result` 空=合法、`kickoff`/`type` 空=缺行、`slug` 允许回退但日期前缀判红；三输入 parity 用例 | 2 |
+| **2 元数据形状校验单一判据** | [371](../_archive/fixed_bugs/BUG-371-meta-shape-validators-three-way-split.md)（已修 `7d81872c`） | 面板 `metaProblemsOf` 与仓库审计 `validateMeta` 各自演化，缺 slug/日期前缀/空 result 三处裁决相反 | 以 `metaProblemsOf` 为唯一判据（tools 侧 parity 引用），统一「空值与缺行」语义：`result` 空=合法、`kickoff`/`type` 空=缺行、`slug` 允许回退但日期前缀判红；三输入 parity 用例 | 2 |
 | **3 在场身份 live/replay 一致** | [372](BUG-372-diff-activity-shows-raw-lead-owner.md) + [376](BUG-376-replay-lead-row-loses-current-tasks.md) | 同一 `lead` 特殊值两条消费路径：`diffActivity` 硬编码 `teammate`；回放 lead 行手拼 `inactive/currentTasks:null`，与 live 投影不一致 | 抽共享 `ownerDisplayName` 与「任务 → owner 的 currentTasks」helper；`diffActivity`/`tasksFromTeamView`/`presenceFromEvents` 同用；lead 行状态与 live 同口径并补 live↔replay 对比用例 | 3 |
 | **4 交付小节结构敏感** | [373](BUG-373-delivery-check-required-sections-substring-only.md) | `/delivery check` 用裸 `includes` 判必填小节，围栏/注释里的样例也算 | `requiredSections` 改为结构行匹配（标题用 `scanDocument`/`sectionStructuralText`，表格行用 `splitTableRow` + 结构扫描）；围栏/注释两份绕过文档用例 + 正常文档回归 | 4 |
 
