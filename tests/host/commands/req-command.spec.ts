@@ -454,3 +454,36 @@ describe('规则 id 信任边界', () => {
     } finally { cleanup() }
   })
 })
+
+// 负例留证 2026-11-24：让 productType/deliveryMode/layers 退回裸正则 ⇒ 本组红（围栏示例胜出/方括号层丢失）。BUG-374/375
+describe('meta 字段结构感知与列表口径（BUG-374/375）', () => {
+  it('围栏里的 productType/deliveryMode 示例不盖过真值', async () => {
+    const meta = `${META}\`\`\`\nproductType: ghost\n\`\`\`\nproductType: business-software\n`
+    const { workspace, cleanup } = fixture(undefined, meta)
+    const contentDir = typeContentDir()
+    try {
+      const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
+      expect(result.kind, result.text).toBe('success')
+      expect(result.text).toContain('动议类型 = business-software（meta.md）')
+      expect(result.text).not.toContain('ghost')
+    } finally {
+      cleanup()
+      rmSync(contentDir, { recursive: true, force: true })
+    }
+  })
+
+  it('layers 的 YAML 序列/引号写法触发不支持层提醒', async () => {
+    for (const layers of ['[MRD, SyRS]', '"MRD, SyRS"']) {
+      const { workspace, cleanup } = fixture(undefined, `${META}productType: business-software\nlayers: ${layers}\n`)
+      const contentDir = typeContentDir()
+      try {
+        const result = await mount(workspace, { contentDir }).handler({ rawInput: 'check 2026-11-07-demo' })
+        expect(result.kind, layers).toBe('error')
+        expect(result.text, layers).toContain('SyRS')
+      } finally {
+        cleanup()
+        rmSync(contentDir, { recursive: true, force: true })
+      }
+    }
+  })
+})

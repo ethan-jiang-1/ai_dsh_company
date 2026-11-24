@@ -385,3 +385,22 @@ describe('诊断分支覆盖（BUG-338）', () => {
     expect(missingLedger.errors.join('\n')).toContain('没有 json 账本代码块')
   })
 })
+
+// 负例留证 2026-11-24：让 numberingMarker 退回裸正则（不认引号/注释/冒号前空格/占位符）⇒ 本组红。BUG-370
+describe('numberingMarker 与 meta 标量同口径（BUG-370）', () => {
+  const cases: Array<[string, { declared: boolean, valid: boolean }]> = [
+    ['numbering: identity', { declared: true, valid: true }],
+    ['numbering: "identity"', { declared: true, valid: true }],
+    ["numbering: 'identity'", { declared: true, valid: true }],
+    ['numbering: identity # 旧动议', { declared: true, valid: true }],
+    ['numbering : identity', { declared: true, valid: true }],
+    ['numbering: <identity (write it here)>', { declared: false, valid: false }],
+    ['numbering: ghost', { declared: true, valid: false }],
+    ['numbering:', { declared: true, valid: false }],
+  ]
+  for (const [line, expected] of cases) {
+    it(`${JSON.stringify(line)} → declared=${String(expected.declared)} valid=${String(expected.valid)}`, () => {
+      expect(numberingMarker(`slug: demo\n${line}\n`)).toMatchObject(expected)
+    })
+  }
+})

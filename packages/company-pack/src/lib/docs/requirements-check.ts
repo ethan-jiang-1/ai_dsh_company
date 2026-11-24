@@ -18,6 +18,7 @@
  * `markdown-shape.ts`——BOM 不再让合法文档「缺头」，围栏/注释里的示例不再进编号索引（BUG-160/162）。
  */
 import { normalizeDocument, scanDocument, scanDocumentDetailed, splitTableRow } from './markdown-shape.ts'
+import { yamlScalarOrProblem, type YamlScalarProblem } from './yaml-scalar.ts'
 
 export type Layer = 'MRD' | 'StRS' | 'PRD' | 'SyRS' | 'IRS' | 'V&V'
 export type DefinitionForm = 'json-ledger' | 'headings' | 'table-rows' | 'none'
@@ -393,6 +394,49 @@ export interface NumberingMarker {
 /** 词表唯一源；`/req check` 的报错文案与闸门同读它。 */
 export const NUMBERING_VOCABULARY = ['identity'] as const
 
+/** meta 标量字段的结构化读取结果（BUG-370/375：所有 `meta.md` 字段共用这一份判据）。 */
+export interface MetaScalarField {
+  /** 结构行里是否存在 `name:`（值可空）。 */
+  readonly declared: boolean
+  /** 冒号后的原始值（未解引号/未去注释）。 */
+  readonly raw: string
+  /** `yamlScalarOrProblem` 解析后的值（坏标量时为空串）。 */
+  readonly value: string
+  /** 坏引号等标量问题；合法时 null。 */
+  readonly problem: YamlScalarProblem | null
+}
+
+/**
+ * 读 `meta.md` 的一个标量字段：结构行（跳过围栏/注释）+ YAML 标量解析。
+ * @param meta - 全文；undefined = 无 meta。
+ * @param name - 字段名（大小写敏感，如 `productType`）。
+ * @returns declared/raw/value/problem；未声明时 declared=false。
+ */
+export function metaScalarField(meta: string | undefined, name: string): MetaScalarField {
+  if (meta === undefined) return { declared: false, raw: '', value: '', problem: null }
+  const pattern = new RegExp(`^${name}\\s*[:：]\\s*(.*)$`)
+  for (const line of metaFieldLines(meta)) {
+    const match = pattern.exec(line)
+    if (match === null) continue
+    const raw = (match[1] ?? '').trim()
+    const read = yamlScalarOrProblem(raw)
+    return { declared: true, raw, value: read.value, problem: read.problem }
+  }
+  return { declared: false, raw: '', value: '', problem: null }
+}
+
+/**
+ * 读 `meta.md` 的一个列表字段（`[A, B]` / `A, B` / 引号包裹），复用 `parseList`。
+ * @param meta - 全文。
+ * @param name - 字段名。
+ * @returns 列表项（未声明/坏标量为空数组）。
+ */
+export function metaListField(meta: string | undefined, name: string): readonly string[] {
+  const field = metaScalarField(meta, name)
+  if (!field.declared || field.problem !== null) return []
+  return parseList(field.value)
+}
+
 function metaFieldLines(meta: string): readonly string[] {
   const scan = scanDocumentDetailed(meta)
   return scan.lines
@@ -406,14 +450,17 @@ function metaFieldLines(meta: string): readonly string[] {
  * @returns declared / value / valid 三态。
  */
 export function numberingMarker(meta: string | undefined): NumberingMarker {
-  if (meta === undefined) return { declared: false, value: '', valid: false }
-  for (const line of metaFieldLines(meta)) {
-    const marker = /^numbering:\s*(.*)$/.exec(line)
-    if (marker === null) continue
-    const value = (marker[1] ?? '').trim()
-    return { declared: true, value, valid: (NUMBERING_VOCABULARY as readonly string[]).includes(value) }
+  const field = metaScalarField(meta, 'numbering')
+  if (!field.declared) return { declared: false, value: '', valid: false }
+  // 模板占位符 `<…>` = 未设置（与 productType 的占位符规则同源），不是坏声明。
+  const value = field.value.trim()
+  if (value.startsWith('<') && value.endsWith('>')) return { declared: false, value: '', valid: false }
+  return {
+    declared: true,
+    // 坏标量保留原文报错，不折成「未声明」而豁免闸门。
+    value: field.problem === null ? value : field.raw,
+    valid: field.problem === null && (NUMBERING_VOCABULARY as readonly string[]).includes(value),
   }
-  return { declared: false, value: '', valid: false }
 }
 
 /** 声明了但值不在词表时的统一报错句（命令与闸门复用，避免两套文案）。 */
@@ -437,11 +484,9 @@ function metaLayers(meta: string | undefined, errors: string[], text: (zh: strin
     errors.push(numberingVocabularyError(marker.value, text))
     return { layers: undefined, skipped: false, reason: '' }
   }
-  const declaredLine = metaFieldLines(meta).find(line => /^layers:\s*/.test(line))
-  const declared = declaredLine === undefined ? null : /^layers:\s*(.*)$/.exec(declaredLine)
-  if (declared === null) return { layers: undefined, skipped: false, reason: '' }
+  if (!metaScalarField(meta, 'layers').declared) return { layers: undefined, skipped: false, reason: '' }
   const layers: Layer[] = []
-  for (const item of parseList(declared[1] ?? '')) {
+  for (const item of metaListField(meta, 'layers')) {
     if (!isLayer(item)) {
       errors.push(text(`meta 的 \`需求层\` 含未知层：${item}`, `meta \`需求层\` contains an unknown layer: ${item}`))
       continue

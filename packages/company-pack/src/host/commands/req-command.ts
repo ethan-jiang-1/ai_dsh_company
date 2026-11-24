@@ -18,9 +18,8 @@ import { contentMemberFile, isSafeContentId } from './content-id.ts'
 import { isPlainFileInside, readTextInside } from '../fs/safe-file.ts'
 import { ensureCompanyRoot } from '../run-bundle/company-root.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
-import { checkRequirements, isLayer, type MotionDoc } from '../../lib/docs/requirements-check.ts'
+import { checkRequirements, isLayer, metaListField, metaScalarField, type MotionDoc } from '../../lib/docs/requirements-check.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
-import { yamlScalar } from '../../lib/docs/yaml-scalar.ts'
 
 export const REQ_USAGE = '用法：/req check <deliverables 目录名>（读 .dsh-company/deliverables/<name>/drafts/{mrd,strs,prd,syrs,irs,vv-plan}.md + meta.md）'
 const REQ_USAGE_EN = 'Usage: /req check <deliverables-directory> (reads .dsh-company/deliverables/<name>/drafts/{mrd,strs,prd,syrs,irs,vv-plan}.md + meta.md)'
@@ -73,35 +72,33 @@ interface ProductTypeResolution {
 
 /** 读 `productType:` 行；模板占位 `<...>` 视为未声明。 */
 function parseProductType(text: string | undefined): string | null {
-  if (text === undefined) return null
-  const match = /^productType\s*[:：]\s*(.+)$/m.exec(text)
-  const value = yamlScalar(match?.[1] ?? '')
+  const field = metaScalarField(text, 'productType')
+  if (!field.declared || field.problem !== null) return null
+  const value = field.value.trim()
   if (value === '' || (value.startsWith('<') && value.endsWith('>'))) return null
   return value
 }
 
 /** 读 `deliveryMode:` 行；缺省 = productized（不阻塞旧动议）。 */
 function parseDeliveryMode(text: string | undefined): string {
-  if (text === undefined) return 'productized'
-  const match = /^deliveryMode\s*[:：]\s*(.+)$/m.exec(text)
-  const value = yamlScalar(match?.[1] ?? '')
+  const field = metaScalarField(text, 'deliveryMode')
+  if (!field.declared || field.problem !== null) return 'productized'
+  const value = field.value.trim()
   if (value === '' || (value.startsWith('<') && value.endsWith('>'))) return 'productized'
   return value
 }
 
 /** 读 meta 的 `layers:` 声明（空 = 未声明）。 */
 function parseDeclaredLayers(text: string | undefined): string[] {
-  if (text === undefined) return []
-  const match = /^layers:\s*(.*)$/m.exec(text)
-  if (match === null) return []
-  return (match[1] ?? '').split(/[,，、;；\s]+/).map(item => item.trim()).filter(item => item !== '')
+  // 与 `checkRequirements` 的 `metaLayers`/`parseList` 同一判据（BUG-374）：`[MRD, SyRS]` 与引号都认。
+  return [...metaListField(text, 'layers')]
 }
 
 /** 是否显式声明了真实交付模式（缺省/占位符不算）。 */
 function hasDeclaredDeliveryMode(text: string | undefined): boolean {
-  if (text === undefined) return false
-  const match = /^deliveryMode\s*[:：]\s*(.+)$/m.exec(text)
-  const value = yamlScalar(match?.[1] ?? '')
+  const field = metaScalarField(text, 'deliveryMode')
+  if (!field.declared || field.problem !== null) return false
+  const value = field.value.trim()
   return value !== '' && !(value.startsWith('<') && value.endsWith('>'))
 }
 

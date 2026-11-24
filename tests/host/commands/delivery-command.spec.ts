@@ -283,3 +283,16 @@ describe('规则 id 信任边界', () => {
     }
   })
 })
+
+// 负例留证 2026-11-24：让 delivery-command 的 deliveryMode 退回裸正则 ⇒ 本用例红（围栏示例 ghost-mode 胜出）。BUG-375
+describe('deliveryMode 结构感知（BUG-375）', () => {
+  it('围栏里的示例行不盖过真值', async () => {
+    const { workspace, root, cleanup } = fixture('project-services')
+    try {
+      writeFileSync(join(root, 'meta.md'), 'slug: demo\nkickoff: 2026-11-11\nproductType: business-software\n```\ndeliveryMode: ghost-mode\n```\ndeliveryMode: project-services\n')
+      const result = await mount(workspace).handler({ rawInput: `check ${SLUG}` })
+      expect(result.text).not.toContain('ghost-mode')
+      expect(result.text).toContain('project-services')
+    } finally { cleanup() }
+  })
+})

@@ -15,7 +15,7 @@ import { commandWorkspace, type CommandAgent } from './command-workspace.ts'
 import { contentMemberFile, isSafeContentId } from './content-id.ts'
 import { isPlainFileInside, readTextInside } from '../fs/safe-file.ts'
 import { resolveDeliverablePath } from './deliverable-path.ts'
-import { yamlScalar } from '../../lib/docs/yaml-scalar.ts'
+import { metaScalarField } from '../../lib/docs/requirements-check.ts'
 
 export const DELIVERY_USAGE = '用法：/delivery check <deliverables 目录名>（读 meta.md 的 交付模式 + content/delivery-modes/<id>/delivery-rules.json）'
 const DELIVERY_USAGE_EN = 'Usage: /delivery check <deliverables-directory> (reads the delivery mode in meta.md + content/delivery-modes/<id>/delivery-rules.json)'
@@ -59,9 +59,10 @@ interface DeliveryRules {
 
 /** 读 `deliveryMode:` 行；缺省/占位符 = productized。 */
 function parseDeliveryMode(text: string | undefined): string {
-  if (text === undefined) return 'productized'
-  const match = /^deliveryMode\s*[:：]\s*(.+)$/m.exec(text)
-  const value = yamlScalar(match?.[1] ?? '')
+  // 与 `/req check` 同一结构感知判据（BUG-375）：围栏里的示例行不算。
+  const field = metaScalarField(text, 'deliveryMode')
+  if (!field.declared || field.problem !== null) return 'productized'
+  const value = field.value.trim()
   if (value === '' || (value.startsWith('<') && value.endsWith('>'))) return 'productized'
   return value
 }

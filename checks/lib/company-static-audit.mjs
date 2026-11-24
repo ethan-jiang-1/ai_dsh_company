@@ -36,7 +36,8 @@ export const LIB_CJK_RATCHET = new Map([
   ['packages/company-pack/src/lib/deliverables/deliverables-catalog.ts', 9],
   ['packages/company-pack/src/lib/docs/prd-check.ts', 120],
   // 46（2026-11-24）：BUG-338 把诊断句成对化后，模板片段计数 +1；en 对已随 `text` 参数走命令面。
-  ['packages/company-pack/src/lib/docs/requirements-check.ts', 46],
+  // 47（2026-11-24）：BUG-370/375 共用 meta 字段 helper 的中文注释。
+  ['packages/company-pack/src/lib/docs/requirements-check.ts', 47],
   ['packages/company-pack/src/lib/presence/board.ts', 11],
   ['packages/company-pack/src/lib/presence/doors.ts', 1],
   ['packages/company-pack/src/lib/presence/presence-status.ts', 6],
