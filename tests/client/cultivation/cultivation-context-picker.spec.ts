@@ -67,6 +67,18 @@ function option(root: HTMLElement, text: string): HTMLButtonElement {
 }
 
 describe('背景选择面板（R5-27）', () => {
+  it('会话源 ok:false 时显示具体原因而不是「没有候选」（BUG-366）', async () => {
+    const host = await mount(createElement(CultivationContextPicker, props({
+      sources: {
+        listSessions: () => ({ ok: false as const, problem: '还不知道这个会话属于哪个工作区' }),
+        listDeliverables: async () => ({ ok: true as const, value: [] }),
+        readPreview: async () => ({ ok: true as const }),
+      },
+    })))
+    expect(host.textContent).toContain('还不知道这个会话属于哪个工作区')
+    expect(host.textContent).not.toContain('没有可用的参考背景')
+  })
+
   it('渲染三组候选与隐私说明（不是空面板）', async () => {
     const host = await mount(createElement(CultivationContextPicker, props()))
     expect(host.textContent).toContain('选择参考背景')

@@ -32,6 +32,16 @@ export interface DoorRow {
 }
 
 /** 同 cwd 的门投影。 */
+/**
+ * preset 排序：字典序，`null`（未设置）排最后（BUG-369）。
+ * @param left - 左 preset。
+ * @param right - 右 preset。
+ * @returns localeCompare 结果（null 用哨兵映射）。
+ */
+export function compareDoorPreset(left: string | null, right: string | null): number {
+  return (left === null ? '\uffff' : left).localeCompare(right === null ? '\uffff' : right)
+}
+
 export interface WorkspaceDoorsModel {
   readonly rows: readonly DoorRow[]
   /** ≥1 行带 duplicateWarning ⇒ true（UI 高亮入口）。 */
@@ -61,6 +71,6 @@ export function doorsFromSessions(facts: readonly RootSessionFact[]): WorkspaceD
       running: entry.running,
       duplicateWarning: entry.ids.length >= 2,
     }))
-    .sort((a, b) => a.preset === null ? (b.preset === null ? 0 : 1) : b.preset === null ? -1 : a.preset.localeCompare(b.preset))
+    .sort((a, b) => compareDoorPreset(a.preset, b.preset))
   return { rows, hasDuplicate: rows.some(row => row.duplicateWarning) }
 }

@@ -36,5 +36,9 @@ describe('yamlScalar 坏引号（BUG-368）', () => {
   it('闭合后接注释仍合法；转义引号可闭合', () => {
     expect(yamlScalarOrProblem("'a' # note")).toEqual({ value: 'a', problem: null })
     expect(yamlScalarOrProblem('"a \\"quoted\\" b"')).toEqual({ value: 'a \\"quoted\\" b', problem: null })
+    // 单引号成对转义（YAML `''`）不应把值提前截断。
+    expect(yamlScalarOrProblem("'It''s a'")).toEqual({ value: "It''s a", problem: null })
+    // 合法反斜杠转义（Windows 路径）不应被判成未闭合。
+    expect(yamlScalarOrProblem('"C:\\\\Tools\\\\"')).toEqual({ value: 'C:\\\\Tools\\\\', problem: null })
   })
 })

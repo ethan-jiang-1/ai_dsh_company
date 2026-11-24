@@ -83,6 +83,8 @@ export function parseMotionLedger(text: string): MotionLedgerParse {
     }
     // 分隔行必须带 `-`（BUG-339）：`| | | | | | | |` 过去因 `*` 被当分隔行整行吞掉。
     if (cells.every(cell => cell.includes('-') && /^[-: ]*$/.test(cell))) continue
+    // 重复表头不是数据行（BUG-362 复审）：否则会在 slug 集合里冒出字面量 `slug`。
+    if (HEADERS.some(header => header.length === cells.length && header.every((name, i) => cells[i] === name))) continue
     if (cells.every(cell => cell === '')) {
       badRows.push({ line: index + 1, cells: cells.length, reason: 'empty-row' })
       continue

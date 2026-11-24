@@ -50,12 +50,13 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
   const [problem, setProblem] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const panel = useRef<HTMLDivElement>(null)
-  const { sessions, sessionsCapped } = useMemo(() => {
+  const { sessions, sessionsCapped, sessionsProblem } = useMemo(() => {
     const result = props.sources.listSessions(props.currentSessionId, props.targetRole)
     // BUG-340：边界字段 capped 必须跟着结果一起消费（会话路径不产 skipped）。
+    // BUG-366：未知 cwd 的 ok:false 原因必须露出来，不能折成「没有候选」。
     return result.ok
-      ? { sessions: result.value, sessionsCapped: result.capped ?? 0 }
-      : { sessions: [], sessionsCapped: 0 }
+      ? { sessions: result.value, sessionsCapped: result.capped ?? 0, sessionsProblem: null as string | null }
+      : { sessions: [], sessionsCapped: 0, sessionsProblem: result.problem }
   }, [props.sources, props.currentSessionId, props.targetRole])
 
   useEffect(() => {
@@ -116,6 +117,7 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
       </div>
       <div className="wk-meta wk-cultivation-context-privacy">{CULTIVATION_COPY.contextPrivacy}</div>
       {loading && <div className="wk-meta">{CULTIVATION_COPY.contextLoading}</div>}
+      {sessionsProblem !== null && <div className="wk-meta wk-cultivation-problem">{sessionsProblem}</div>}
       {sessionsCapped > 0 && <div className="wk-meta">{CULTIVATION_COPY.contextSessionsCapped(sessionsCapped, CONTEXT_CANDIDATE_CAP)}</div>}
       {deliverablesCapped > 0 && <div className="wk-meta">{CULTIVATION_COPY.contextDeliverablesCapped(deliverablesCapped, CONTEXT_CANDIDATE_CAP)}</div>}
       {deliverablesSkipped > 0 && <div className="wk-meta">{CULTIVATION_COPY.contextCatalogSkipped(deliverablesSkipped)}</div>}
@@ -157,7 +159,7 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
           </>
         )}
       </div>
-      {empty && <div className="wk-meta">{CULTIVATION_COPY.contextEmpty}</div>}
+      {empty && sessionsProblem === null && <div className="wk-meta">{CULTIVATION_COPY.contextEmpty}</div>}
       <div className="wk-cultivation-actions">
         <Button onClick={props.onCancel}>{CULTIVATION_COPY.cancel}</Button>
       </div>

@@ -303,6 +303,7 @@ export function makeCultivationContextSources(options: {
   return {
     listSessions: (currentSessionId, targetRole) => {
       const projected = projectContextSessions(options.getSessions(), currentSessionId, targetRole)
+      if (projected.problem !== undefined) return { ok: false, problem: projected.problem }
       return { ok: true, value: projected.items, ...(projected.capped > 0 ? { capped: projected.capped } : {}) }
     },
     listDeliverables: async (sessionId, signal) => {

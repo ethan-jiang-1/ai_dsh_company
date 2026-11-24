@@ -22,6 +22,36 @@ function mount(language: ReturnType<typeof createCompanyLanguageState>): { def: 
   return { def: def as ToolDef, reasons }
 }
 
+describe('request_signoff 语言切换重注册（BUG-367）', () => {
+  it('language.set 触发重新注册，新定义按新语言出回执', async () => {
+    const language = createCompanyLanguageState('zh')
+    const defs: ToolDef[] = []
+    const cleanups: Array<() => void> = []
+    const ctx = {
+      tools: { register: (d: ToolDef) => { defs.push(d); return () => {} } },
+      approval: { request: async () => 'allowed-once' },
+      effect: (cb: () => () => void) => { cleanups.push(cb()) },
+    }
+    registerSignoffTool(ctx as unknown as Context, { language })
+    expect(defs).toHaveLength(1)
+    language.set('en')
+    expect(defs).toHaveLength(2)
+    const result = await defs[1]!.execute({ line: 'Margin', summary: '22%' }, { agent: {}, signal: new AbortController().signal })
+    expect(result.note).not.toMatch(/[\u3400-\u9fff]/u)
+    for (const cleanup of cleanups) cleanup()
+  })
+})
+
+describe('request_signoff 无语言状态（BUG-367）', () => {
+  it('不传 language 时只注册一次，行为沿用 zh 缺省', async () => {
+    let def: ToolDef | undefined
+    const ctx = { tools: { register: (d: ToolDef) => { def = d; return () => {} } }, approval: { request: async () => 'allowed-once' } }
+    registerSignoffTool(ctx as unknown as Context)
+    const result = await (def as ToolDef).execute({ line: '毛利线', summary: '折扣 22%' }, { agent: {}, signal: new AbortController().signal })
+    expect(result.note).toContain('可按结论落稿')
+  })
+})
+
 describe('request_signoff 语言注入（BUG-367）', () => {
   it('en：note 与 reason 零中文/全角标点', async () => {
     const { def, reasons } = mount(createCompanyLanguageState('en'))

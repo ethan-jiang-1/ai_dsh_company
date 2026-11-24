@@ -36,6 +36,7 @@ import {
   parseMeta,
   slugFromDirName,
 } from '../../../packages/company-pack/src/lib/deliverables/deliverables-catalog.ts'
+import { parseMotionLedger } from '../../../packages/company-pack/src/lib/accounting/ledger.ts'
 import { parseCatalog } from '../../../packages/company-pack/src/client/data/deliverables-index.ts'
 import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 import { makeTempDir } from '../../support/temp-env.ts'
@@ -69,7 +70,8 @@ describe('meta/catalog 纯逻辑', () => {
   })
 
   it('台账解析只认表行首列', () => {
-    const slugs = ledgerSlugsFromText('| slug | 日期 |\n|---|---|\n| alpha | 2026-10-25 |\n| beta | 2026-10-26 |\n')
+    const header = '| slug | date | type | participants | wallClock | deliverable | summary |\n|---|---|---|---|---|---|---|\n'
+    const slugs = ledgerSlugsFromText(`${header}| alpha | 2026-10-25 | decision | ceo | 1m | ✅ | s |\n| beta | 2026-10-26 | decision | ceo | 1m | ✅ | s |\n`)
     expect([...slugs]).toEqual(['alpha', 'beta'])
   })
 })
@@ -204,7 +206,7 @@ describe('host catalog', () => {
   it('台账命中与未命中都写进目录', () => {
     const root = workspace()
     deliverable(root)
-    writeFileSync(join(root, RUN_BUNDLE_PATHS.ledger), '| slug | 日期 |\n|---|---|\n| alpha | 2026-10-25 |\n')
+    writeFileSync(join(root, RUN_BUNDLE_PATHS.ledger), '| slug | date | type | participants | wallClock | deliverable | summary |\n|---|---|---|---|---|---|---|\n| alpha | 2026-10-25 | decision | ceo | 1m | ✅ | s |\n')
     const catalog = regenerateCatalog(root).catalog
     expect(catalog?.entries[0]?.ledgered).toBe(true)
     expect(catalog?.counts.unledgered).toBe(0)
@@ -558,5 +560,20 @@ describe('presented 身份与归档延续（BUG-357）', () => {
     // 故意只给 slug（不给精确 path），逼 presentedOf 走 dirSlugs 回退（BUG-357 复审 finding 2）。
     const legacy = mergePresented(emptyPresentedLedger(), { paths: [], slugs: ['dir-name'] })
     expect(regenerateCatalog(root, legacy).catalog?.entries[0]?.presented).toBe(true)
+  })
+})
+
+// 负例留证 2026-11-24：让 slug 集合继续接受非权威表头/重复表头 ⇒ 本组红（与台账面板结论相反）。BUG-362
+describe('台账 slug 集合与权威解析同判据（BUG-362 复审）', () => {
+  it('非权威表头 ⇒ 空集合（与权威解析一致）', () => {
+    const text = '| slug | 日期 |\n|---|---|\n| alpha | 2026-10-25 |\n'
+    expect([...ledgerSlugsFromText(text)]).toEqual([])
+    expect(parseMotionLedger(text).rows).toEqual([])
+  })
+
+  it('重复表头不产出字面量 slug', () => {
+    const header = '| slug | date | type | participants | wallClock | deliverable | summary |'
+    const text = [header, '|---|---|---|---|---|---|---|', '| a | 2026-10-25 | decision | ceo | 1m | ✅ | s |', header].join('\n')
+    expect([...ledgerSlugsFromText(text)]).toEqual(['a'])
   })
 })

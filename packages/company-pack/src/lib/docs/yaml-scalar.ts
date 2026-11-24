@@ -17,7 +17,8 @@ export interface YamlScalarRead {
 function closingQuoteIndex(value: string, quote: '"' | "'"): number {
   for (let index = 1; index < value.length; index += 1) {
     const char = value[index]
-    if (quote === '"' && char === '\\' && value[index + 1] === '"') { index += 1; continue }
+    // 双引号里反斜杠转义任意下一个字符（`\"` / `\\`），避免把合法反斜杠值判成未闭合（BUG-368 复审）。
+    if (quote === '"' && char === '\\') { index += 1; continue }
     if (quote === "'" && char === "'" && value[index + 1] === "'") { index += 1; continue }
     if (char === quote) return index
   }

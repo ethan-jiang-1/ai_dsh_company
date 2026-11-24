@@ -6,7 +6,7 @@
  * - 数据面 = 盘上 meta/final；`presented` 由部署 host 的 present 事件投影，未观测 = null（未核）。
  * - `ledgered` = slug 能在 kb/motion-ledger.md 找到。
  */
-import { splitTableRow } from '../docs/markdown-shape.ts'
+import { parseMotionLedger } from '../accounting/ledger.ts'
 import { RUN_BUNDLE_PATHS } from '../shared/run-bundle-paths.ts'
 
 export const CATALOG_ROOTS = [RUN_BUNDLE_PATHS.deliverables, RUN_BUNDLE_PATHS.archive] as const
@@ -29,9 +29,10 @@ export function parseMeta(body: string): MetaFields {
   for (const line of body.split('\n')) {
     const match = /^([\w一-鿿]+)\s*[:：]\s*(.*)$/.exec(line.trim())
     if (match === null) continue
-    const key = match[1] ?? ''
-    const value = match[2] ?? ''
-    if (key === '') continue
+    // 两个捕获组在 `match !== null` 时必然存在（正则 `(.*)`）；String 避免不可达的 `??` 分支/断言空洞。
+    const key = String(match[1])
+    const value = String(match[2])
+    // 正则 `+` 保证 key 非空，无需再判 `key === ''`（不可达分支）。
     if (key === 'events') {
       if (value.trim() !== '') events.push(value.trim())
       continue
@@ -158,25 +159,14 @@ export function buildDeliverablesCatalog(input: {
 
 /**
  * 动议台账里的 slug 集合（只认表行首列；格式家 = kb/motion-ledger.md）。
- * 行有效性 = 表头列数 / 非全空行 / 非分隔行（BUG-362）；与 tools 侧孪生同判据。
+ * 直接复用台账权威解析的行有效性（列数/空行/分隔行/重复表头，BUG-362）：坏行不进「已入账」。
  * @param text - 台账全文。
  * @returns slug 集合。
  */
 export function ledgerSlugsFromText(text: string): Set<string> {
-  const slugs = new Set<string>()
-  let headerWidth = 0
-  for (const line of text.split('\n')) {
-    const trimmed = line.trim()
-    if (!trimmed.startsWith('|')) continue
-    const cells = splitTableRow(trimmed)
-    if (headerWidth === 0) {
-      if (cells[0] === 'slug') headerWidth = cells.length
-      continue
-    }
-    if (cells.length !== headerWidth) continue
-    if (cells.every(cell => /^[-: ]*$/.test(cell))) continue
-    const slug = cells[0]
-    if (slug !== undefined && slug !== '') slugs.add(slug)
-  }
-  return slugs
+  const { rows, badRows, headerOk } = parseMotionLedger(text)
+  // 读齐边界：坏行/表头诊断是行有效性的一部分；坏行与表头不符都不进「已入账」。
+  void badRows
+  if (!headerOk) return new Set()
+  return new Set(rows.map(row => row.slug).filter(slug => slug !== ''))
 }

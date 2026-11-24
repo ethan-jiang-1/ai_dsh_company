@@ -1,6 +1,7 @@
 // 负例留证 2026-11-24：把未设置 preset 折回 '(未选 preset)' 展示串 ⇒ BUG-369 用例红。BUG-369
 /** 工作区门投影读模型（BUG-002：同 cwd × preset 双开检测，keyless 完成定义）。 */
 import { describe, expect, it } from 'vitest'
+import { compareDoorPreset } from '../../../packages/company-pack/src/lib/presence/doors.ts'
 
 /**
  * 只测 doorsFromSessions 纯函数投影（host 面 = src/index.ts 的事件监听接线 + workspace_doors
@@ -46,5 +47,37 @@ describe('工作区门投影——双 CEO 检测面（BUG-002 修复轮，2026-1
     expect(model.rows).toEqual([
       { preset: null, sessionCount: 2, sessionIds: ['s1', 's2'], running: false, duplicateWarning: true },
     ])
+  })
+})
+
+// 覆盖 null 与非 null 的排序分支（BUG-369 复审覆盖率）。
+describe('doorsFromSessions 排序（BUG-369）', () => {
+  it('preset 行按字典序，null（未设置）排最后', () => {
+    const { doorsFromSessions } = require('../../../packages/company-pack/src/lib/presence/doors.ts') as typeof import('../../../packages/company-pack/src/lib/presence/doors.ts')
+    const model = doorsFromSessions([
+      { sessionId: 's1', cwd: '/ws', running: false, agentPreset: undefined },
+      { sessionId: 's2', cwd: '/ws', running: false, agentPreset: 'ceo' },
+      { sessionId: 's3', cwd: '/ws', running: false, agentPreset: '' },
+    ])
+    expect(model.rows.map(row => row.preset)).toEqual(['ceo', null])
+    expect(model.rows.find(row => row.preset === null)?.sessionCount).toBe(2)
+    // 多行乱序 + null：覆盖比较器的双向与相等分支。
+    const sorted = doorsFromSessions([
+      { sessionId: 'a', cwd: '/ws', running: false, agentPreset: 'vp-eng' },
+      { sessionId: 'b', cwd: '/ws', running: false, agentPreset: 'ceo' },
+      { sessionId: 'c', cwd: '/ws', running: false, agentPreset: 'cfo' },
+      { sessionId: 'd', cwd: '/ws', running: false, agentPreset: undefined },
+    ])
+    expect(sorted.rows.map(row => row.preset)).toEqual(['ceo', 'cfo', 'vp-eng', null])
+  })
+})
+
+describe('compareDoorPreset（BUG-369 复审覆盖率）', () => {
+  it('四种组合与字典序', () => {
+    expect(compareDoorPreset('ceo', 'cfo')).toBeLessThan(0)
+    expect(compareDoorPreset('cfo', 'ceo')).toBeGreaterThan(0)
+    expect(compareDoorPreset(null, 'ceo')).toBeGreaterThan(0)
+    expect(compareDoorPreset('ceo', null)).toBeLessThan(0)
+    expect(compareDoorPreset(null, null)).toBe(0)
   })
 })

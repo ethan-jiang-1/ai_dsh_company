@@ -109,9 +109,11 @@ describe('makeContextWiring / openContext', () => {
 })
 
 describe('makeContextWiring / contextSources', () => {
-  it('listSessions 从当前会话列表投影（空列表也是 ok）', () => {
+  it('listSessions：当前会话不在快照里 ⇒ ok:false + 原因（fail-closed，BUG-366）', () => {
     const scoped = makeScoped({ sessions: { list: { getSnapshot: () => ({ byId: {} }) }, subagentAddress: vi.fn() } })
     const wiring = wiringFor(scoped)
-    expect(wiring.contextSources('session-1').listSessions('session-1')).toEqual({ ok: true, value: [] })
+    const result = wiring.contextSources('session-1').listSessions('session-1')
+    expect(result.ok).toBe(false)
+    expect((result as { readonly problem?: string }).problem).toBeTruthy()
   })
 })

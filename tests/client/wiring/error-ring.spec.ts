@@ -193,6 +193,7 @@ describe('console.error 安装幂等（BUG-363）', () => {
     expect(ring1.list()).toHaveLength(1)
 
     off1()
+    off1() // 幂等：重复卸载不能再改函数
     expect(face.error).toBe(original)
     face.error('after off1')
     expect(ring1.list()).toHaveLength(1)

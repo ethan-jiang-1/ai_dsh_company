@@ -58,23 +58,29 @@ export function deliverableSlug(fields, dir) {
 
 
 /**
- * 动议台账里的 slug 集合（与 host `ledgerSlugsFromText` 同判据：表头列数/空行/坏行都排除；BUG-362）。
+ * 动议台账里的 slug 集合（与 host `ledgerSlugsFromText` 同判据；BUG-362 复审）。
+ * 只认两种权威表头（7 列），行有效性 = 列数/非空行/非分隔行/非重复表头。
  * @param {string} text kb/motion-ledger.md 全文
  * @returns {Set<string>}
  */
 export function ledgerSlugsFromText(text) {
+  const HEADERS = [
+    ['slug', 'date', 'type', 'participants', 'wallClock', 'deliverable', 'summary'],
+    ['slug', '日期', '类型', '参与', '墙钟', '成品', '一句话结论'],
+  ]
   const slugs = new Set()
-  let headerWidth = 0
+  let header = null
   for (const line of text.split('\n')) {
     const trimmed = line.trim()
     if (!trimmed.startsWith('|')) continue
     const cells = splitTableRow(trimmed)
-    if (headerWidth === 0) {
-      if (cells[0] === 'slug') headerWidth = cells.length
+    if (header === null) {
+      header = HEADERS.find(candidate => candidate.length === cells.length && candidate.every((name, i) => cells[i] === name)) ?? null
       continue
     }
-    if (cells.length !== headerWidth) continue
+    if (cells.length !== header.length) continue
     if (cells.every(cell => /^[-: ]*$/.test(cell))) continue
+    if (header.every((name, i) => cells[i] === name)) continue
     if (cells[0] !== undefined && cells[0] !== '') slugs.add(cells[0])
   }
   return slugs

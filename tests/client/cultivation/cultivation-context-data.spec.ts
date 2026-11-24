@@ -156,6 +156,18 @@ describe('预览读：只取第一帧即 return', () => {
 })
 
 describe('makeCultivationContextSources', () => {
+  it('当前 cwd 未知：listSessions 返回 ok:false + 原因（BUG-366）', () => {
+    const follow: FollowLike = async function* () { yield { type: 'snapshot', records: [] } }
+    const sources = makeCultivationContextSources({
+      getSessions: () => [row({ sessionId: 'current', cwd: undefined as never })],
+      follow,
+      readCatalog: async () => ({ ok: true, eof: true, text: '{}' }),
+    })
+    const result = sources.listSessions('current')
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.problem).toBeTruthy()
+  })
+
   it('三面接线：列表 / 成品 / 预览', async () => {
     const follow: FollowLike = async function* () { yield { type: 'snapshot', records: [] } }
     const sources = makeCultivationContextSources({

@@ -136,6 +136,16 @@ describe('台账 slug 集合：TS/JS 同方言（BUG-356）', () => {
     expect([...ledgerSlugsFromText(edge)]).toEqual(['a'])
   })
 
+  it('非权威表头 / 重复表头：两侧一致，重复表头不产出 slug', () => {
+    const wrong = '| slug | 日期 |\n|---|---|\n| alpha | 2026-10-25 |\n'
+    expect([...ledgerSlugsFromText(wrong)]).toEqual([])
+    expect([...ledgerSlugsFromTextTs(wrong)]).toEqual([])
+    const header = '| slug | date | type | participants | wallClock | deliverable | summary |'
+    const repeated = [header, '|---|---|---|---|---|---|---|', '| a | 2026-10-25 | decision | ceo | 1m | ✅ | s |', header].join('\n')
+    expect([...ledgerSlugsFromText(repeated)]).toEqual(['a'])
+    expect([...ledgerSlugsFromTextTs(repeated)]).toEqual(['a'])
+  })
+
   it('两侧解析同一份含 \\| 的台账得到相同 slug 集合', () => {
     const js = ledgerSlugsFromText(TEXT)
     const ts = ledgerSlugsFromTextTs(TEXT)
