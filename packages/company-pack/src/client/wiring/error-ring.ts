@@ -131,6 +131,18 @@ export interface ErrorCaptureTarget {
 }
 
 /**
+ * `console.error` 包装的单例状态（BUG-363）：同一 target 只允许一层包装，
+ * 安装/卸载用栈维护「当前环」，卸载到零才恢复原始函数。
+ */
+interface ConsoleCaptureState {
+  readonly consoleFace: { error: (...args: unknown[]) => void }
+  readonly original: (...args: unknown[]) => void
+  readonly stack: ErrorRing[]
+  readonly wrapper: (...args: unknown[]) => void
+}
+const consoleCaptures = new WeakMap<object, ConsoleCaptureState>()
+
+/**
  * 安装捕获；返回卸载函数（幂等：同一 target 重复安装只保留最后一份全局引用）。
  * @param target - 通常是 `window`。
  * @param ring - 环（由调用方持有，探针从 `target[ERROR_RING_KEY]` 读同一份）。
@@ -183,20 +195,39 @@ export function installErrorCapture(target: ErrorCaptureTarget, ring?: ErrorRing
   target.addEventListener('error', onError as never)
   target.addEventListener('unhandledrejection', onRejection as never)
 
-  // console.error：原始输出照旧（不吞），只镜像一份进环。
+  // console.error：原始输出照旧（不吞），只镜像一份进环。同一 target 只装一层包装（BUG-363）：
+  // 栈顶环收条目，卸载只退自己那一层，退到零才恢复原始函数。
   const consoleFace = target.console
-  const originalConsoleError = consoleFace?.error
-  if (consoleFace !== undefined && typeof originalConsoleError === 'function') {
-    consoleFace.error = (...args: unknown[]) => {
-      capture.push({ kind: 'console', message: redactTokenUrls(args.map(item => textOf(item)).join(' ').slice(0, 500)), at: Date.now() })
-      originalConsoleError.apply(consoleFace, args)
+  const captureKey = target as object
+  if (consoleFace !== undefined && typeof consoleFace.error === 'function') {
+    let state = consoleCaptures.get(captureKey)
+    if (state === undefined) {
+      const original = consoleFace.error
+      const stack: ErrorRing[] = []
+      const wrapper = (...args: unknown[]): void => {
+        const top = stack[stack.length - 1]
+        top?.push({ kind: 'console', message: redactTokenUrls(args.map(item => textOf(item)).join(' ').slice(0, 500)), at: Date.now() })
+        original.apply(consoleFace, args)
+      }
+      state = { consoleFace, original, stack, wrapper }
+      consoleCaptures.set(captureKey, state)
+      consoleFace.error = wrapper
     }
+    state.stack.push(capture)
   }
 
   return () => {
     target.removeEventListener('error', onError as never)
     target.removeEventListener('unhandledrejection', onRejection as never)
-    if (consoleFace !== undefined && originalConsoleError !== undefined) consoleFace.error = originalConsoleError
+    const state = consoleCaptures.get(captureKey)
+    if (state !== undefined) {
+      const index = state.stack.lastIndexOf(capture)
+      if (index >= 0) state.stack.splice(index, 1)
+      if (state.stack.length === 0) {
+        state.consoleFace.error = state.original
+        consoleCaptures.delete(captureKey)
+      }
+    }
     global[ERROR_RING_KEY] = previous
   }
 }

@@ -171,3 +171,31 @@ describe('客户端错误环（R3-03）', () => {
     expect((target.console as { error: unknown }).error).toBe(consoleError)
   })
 })
+
+// 负例留证 2026-11-24：console.error 包装改回每次安装叠加 ⇒ 本组红（一条错误进两个环、卸载后旧环仍增长）。BUG-363
+describe('console.error 安装幂等（BUG-363）', () => {
+  it('重复安装只有栈顶环收条目；逐层卸载后恢复原始函数', () => {
+    const { target, consoleError } = fakeTarget()
+    const face = target.console as { error: (...args: unknown[]) => void }
+    const original = face.error
+    const ring1 = createErrorRing()
+    const ring2 = createErrorRing()
+    const off1 = installErrorCapture(target, ring1)
+    const off2 = installErrorCapture(target, ring2)
+
+    face.error('boom')
+    expect(ring1.list()).toHaveLength(0)
+    expect(ring2.list()).toHaveLength(1)
+    expect(consoleError).toHaveBeenCalledWith('boom')
+
+    off2()
+    face.error('after off2')
+    expect(ring1.list()).toHaveLength(1)
+
+    off1()
+    expect(face.error).toBe(original)
+    face.error('after off1')
+    expect(ring1.list()).toHaveLength(1)
+    expect(ring2.list()).toHaveLength(1)
+  })
+})
