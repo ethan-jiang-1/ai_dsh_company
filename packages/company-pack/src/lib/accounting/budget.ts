@@ -48,7 +48,12 @@ export interface BudgetSummary {
 /** 千分位缩写：`1.2k` / `3.4M`；< 1000 原样。 */
 export function formatTokens(value: number): string {
   if (value >= 1_000_000) return `${trim(value / 1_000_000)}M`
-  if (value >= 1_000) return `${trim(value / 1_000)}k`
+  if (value >= 1_000) {
+    const thousands = value / 1_000
+    // 档位看**舍入后**的值（BUG-360）：999 950 舍入成 1000k 时进 M 档，不能出现 `1000k`。
+    if (Math.round(thousands * 10) / 10 >= 1_000) return `${trim(value / 1_000_000)}M`
+    return `${trim(thousands)}k`
+  }
   return String(value)
 }
 

@@ -17,7 +17,8 @@ export function firstText(content: readonly TextBlock[] | undefined | null): str
   if (!Array.isArray(content)) return ''
   for (const block of content) {
     if (block.type === 'text' && typeof block.text === 'string' && block.text.trim() !== '') {
-      return block.text.trim().split('\n')[0]!
+      // CRLF/孤立 CR 先归一（BUG-361）：`a\r\nb` 的首行不能带 `\r`。
+      return block.text.replace(/\r\n?/g, '\n').trim().split('\n')[0]!.trim()
     }
   }
   return ''

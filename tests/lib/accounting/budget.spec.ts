@@ -11,6 +11,14 @@ describe('formatTokens', () => {
     expect(formatTokens(1_000_000)).toBe('1M')
     expect(formatTokens(1_250_000)).toBe('1.3M')
   })
+
+  // 负例留证 2026-11-24：档位只看原始值 ⇒ 999 950 输出 1000k，本用例红。BUG-360
+  it('进位边界：999 950–999 999 进 M 档，不出现 1000k', () => {
+    expect(formatTokens(999_949)).toBe('999.9k')
+    expect(formatTokens(999_950)).toBe('1M')
+    expect(formatTokens(999_999)).toBe('1M')
+    expect(formatTokens(1_000_000)).toBe('1M')
+  })
 })
 
 describe('budgetSummary', () => {

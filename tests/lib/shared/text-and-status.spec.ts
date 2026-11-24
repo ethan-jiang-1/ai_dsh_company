@@ -20,3 +20,12 @@ describe('firstText / memberDot（共享词汇层）', () => {
     expect(memberDot('unknown')).toBe('idle')
   })
 })
+
+// 负例留证 2026-11-24：firstText 不归一换行 ⇒ CRLF/孤立 CR 首行带 \r，本用例红。BUG-361
+describe('firstText 换行归一（BUG-361）', () => {
+  it('CRLF 与孤立 CR 都只留首行文本', () => {
+    expect(firstText([{ type: 'text', text: 'a\r\nb' }])).toBe('a')
+    expect(firstText([{ type: 'text', text: 'a\rb' }])).toBe('a')
+    expect(firstText([{ type: 'text', text: '  a\r\n  b  ' }])).toBe('a')
+  })
+})
