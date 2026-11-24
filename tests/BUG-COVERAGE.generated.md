@@ -382,8 +382,8 @@
 | 369 | 2026-11-24 | tests/host/workspace/workspace-doors.spec.ts:86；tests/host/workspace/workspace-doors.spec.ts:106；tests/lib/presence/doors.spec.ts:41；tests/lib/presence/doors.spec.ts:54；tests/lib/presence/doors.spec.ts:75 |
 | 370 | 2026-11-24 | tests/lib/docs/requirements-check.spec.ts:390 |
 | 371 | 2026-11-24 | tests/tools/meta-shape-parity.spec.ts:20 |
-| 372 | 2026-11-24 | tests/lib/presence/presence-board.spec.ts:466 |
+| 372 | 2026-11-24 | tests/lib/presence/presence-board.spec.ts:467 |
 | 373 | 2026-11-24 | tests/host/commands/delivery-command.spec.ts:301 |
 | 374 | 2026-11-24 | tests/host/commands/req-command.spec.ts:459 |
 | 375 | 2026-11-24 | tests/host/commands/delivery-command.spec.ts:288 |
-| 376 | 2026-11-24 | tests/lib/presence/presence-board.spec.ts:477 |
+| 376 | 2026-11-24 | tests/lib/presence/presence-board.spec.ts:478 |

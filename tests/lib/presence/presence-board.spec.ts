@@ -462,7 +462,8 @@ describe('第六角色 CMO 的显示名映射（防漂移）', () => {
   })
 })
 
-// 负例留证 2026-11-24：diffActivity 任务 owner 硬编码 'teammate'、回放 lead 行手拼 inactive/null ⇒ 本组红。BUG-372/376
+// 负例留证 2026-11-24：diffActivity 任务 owner 硬编码 'teammate' ⇒ CEO 显示成裸 lead，本组红。BUG-372
+// 负例留证 2026-11-24：回放 lead 行手拼 inactive/null ⇒ 与 live 投影不一致，本组红。BUG-376
 describe('live/replay 的 CEO 身份与任务（BUG-372/376）', () => {
   const member = (id: string, name: string, role: 'lead' | 'teammate', phase: string): TeamViewLike['members'][number] => ({ id, name, role, phase })
 
