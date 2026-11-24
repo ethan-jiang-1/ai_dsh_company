@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-355**（2026-11-24，351..359 批顺位 6 / P2）：培养数据 hook 切会话清赞踩、中止先于 state 写、并发 `load()` 用单调代次丢弃过期结果——
+  [355](BUG-355-cultivation-data-stale-feedback-abort-problem-and-load-race.md)。证据提交 `ebe92e7c`。
+
 - **BUG-359**（2026-11-24，351..359 批顺位 5 / P2）：注意力条目带 `eventKey`（会话事件 `seq`），`attentionItemKey` 优先 eventKey，`mergeAttention` 只做跨源去重——
   [359](BUG-359-attention-same-millisecond-stream-items-collapse.md)。证据提交 `0ab2f43d`。
 
