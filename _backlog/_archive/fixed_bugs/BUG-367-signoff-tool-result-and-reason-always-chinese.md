@@ -1,25 +1,25 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-367：`request_signoff` 的模型侧回执与人侧审批理由恒为中文，`en` 公司不随语言
 
-> 严重级别：P2（语言口径：签核工具的结果提示语走 [`signoffDecisionNote`](../../packages/company-pack/src/lib/accounting/signoff.ts#L30-L36) 的四个中文字面量，审批请求 `reason` 也由 [`signoffReason`](../../packages/company-pack/src/lib/accounting/signoff.ts#L23-L27) 拼成全角 `：`/`（）`——英文公司的模型会拿到中文工具结果、审批面板里也会显示中文标点的理由。`BUG-338` 扫的是**命令面**，工具面漏在清单外）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（语言口径：签核工具的结果提示语走 [`signoffDecisionNote`](../../../packages/company-pack/src/lib/accounting/signoff.ts#L30-L36) 的四个中文字面量，审批请求 `reason` 也由 [`signoffReason`](../../../packages/company-pack/src/lib/accounting/signoff.ts#L23-L27) 拼成全角 `：`/`（）`——英文公司的模型会拿到中文工具结果、审批面板里也会显示中文标点的理由。`BUG-338` 扫的是**命令面**，工具面漏在清单外）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（en 工具回执/理由/诊断命令零中文；zh 不变）
 >
-> **留痕**：（待修复时裁决）
+> **留痕**：Note [2026-11-24-boundary-window-and-bad-shape-batch](../../../notes/implemented/2026-11-24-boundary-window-and-bad-shape-batch.md)（批次 360..369：工具面语言注入）
 
 ## 症状
 
 1. **模型侧**：`request_signoff` 的 `output.render` 把 `{ decision, note }` 原样 JSON 化；`note` 四分支全是中文，与同一工具的英文 `description`（`Request human sign-off for a company sign-line…`）不一致。
 2. **人侧**：官方 `ui-approval` 面板显示的 `reason` 是 `毛利线双签：本月折扣 7.8 折（考虑过 8 折…）` 形态——分隔符 `：` 与括号 `（）` 是中文全角，英文语境下同样出现。
 3. 无 `agent` 时的兜底 `审批请求需要发起会话（agent）上下文。` 也是中文常量。
-4. **同族第二个落点**：`/company-diagnostics`（[`client-diagnostics.ts`](../../packages/company-pack/src/host/commands/client-diagnostics.ts#L37-L40)）的 `description`、用法错误、载荷错误、写入失败与成功回执全是中文字面量，且直接用 `ctx.commands.register`（没有走 `registerLocalizedCommand`）——`BUG-338` 收口五个命令时把这条诊断命令漏在清单外。
+4. **同族第二个落点**：`/company-diagnostics`（[`client-diagnostics.ts`](../../../packages/company-pack/src/host/commands/client-diagnostics.ts#L37-L40)）的 `description`、用法错误、载荷错误、写入失败与成功回执全是中文字面量，且直接用 `ctx.commands.register`（没有走 `registerLocalizedCommand`）——`BUG-338` 收口五个命令时把这条诊断命令漏在清单外。
 
 ## 运行面
 
-- **面 = lib + host**：[`packages/company-pack/src/lib/accounting/signoff.ts`](../../packages/company-pack/src/lib/accounting/signoff.ts#L23-L36)、[`packages/company-pack/src/host/commands/signoff-tool.ts`](../../packages/company-pack/src/host/commands/signoff-tool.ts#L22-L61)。
+- **面 = lib + host**：[`packages/company-pack/src/lib/accounting/signoff.ts`](../../../packages/company-pack/src/lib/accounting/signoff.ts#L23-L36)、[`packages/company-pack/src/host/commands/signoff-tool.ts`](../../../packages/company-pack/src/host/commands/signoff-tool.ts#L22-L61)。
 
 ## 复现
 
@@ -51,3 +51,11 @@ console.log(signoffReason({ line: 'Margin line', summary: 'discount 22%', detail
 
 - `en` 语言下 `request_signoff` 的 `note` 四个分支均为英文、`reason` 用 ASCII 分隔符（`: ` 与括号）；`zh` 行为不变；用例对两种语言各断言一次，旧实现红、新实现绿；
 - `en` 语言下 `/company-diagnostics` 的 `description`、用法/载荷/写入失败/成功回执全为英文（中文零残留），且它在语言切换时会重注册。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/accounting/signoff.ts`、`packages/company-pack/src/host/commands/signoff-tool.ts`、`packages/company-pack/src/host/commands/client-diagnostics.ts`、`packages/company-pack/src/index.ts`、`tests/lib/accounting/signoff.spec.ts`、`tests/host/commands/signoff-language.spec.ts`、`tests/host/commands/command-language.spec.ts`
+- 红：`pnpm test tests/lib/accounting/signoff.spec.ts tests/host/commands/signoff-language.spec.ts tests/host/commands/command-language.spec.ts` —— 还原语言注入前 4 failed（en 回执/理由/诊断命令仍中文）
+- 绿：同命令 —— 10/10 passed（en 四结局与 reason 全 ASCII；诊断描述/用法英文；zh 行为不变）
+- 提交：commit 
+- 提交：commit fe4ffe2e

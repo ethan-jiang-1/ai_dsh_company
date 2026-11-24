@@ -14,6 +14,9 @@
 3. **作用域过滤 fail-closed（[BUG-366](../../_backlog/_archive/fixed_bugs/BUG-366-context-candidates-fail-open-on-unknown-cwd.md)）**：
    `projectContextSessions` 在当前会话 cwd 未知时返回零候选 + `contextCwdUnknown` 原因（`listSessions` 变 `ok:false`）；
    行 cwd 缺失排除、子会话经 parent 继承；比较前统一分隔符/尾斜杠。
+4. **工具面/诊断命令语言注入（[BUG-367](../../_backlog/_archive/fixed_bugs/BUG-367-signoff-tool-result-and-reason-always-chinese.md)）**：
+   `signoffReason`/`signoffDecisionNote` 增加可选 `text(zh,en)`（缺省 zh 兼容旧调用）；`registerSignoffTool` 接
+   `{ language }` 并订阅切换重注册；`/company-diagnostics` 改走 `registerLocalizedCommand`，描述与全部错误/成功回执成对。
 
 ## 输掉的方案
 
@@ -34,6 +37,7 @@
 - **BUG-363**：`pnpm test tests/client/wiring/error-ring.spec.ts` —— 还原前 1 failed（一条错误进两个环、卸载后旧环增长）；修复后 9/9 passed。
 - **BUG-365**：`pnpm test tests/client/data/company-stream.spec.ts` —— 无界实现下「追加封顶」红；窗口化后 2/2 passed。
 - **BUG-366**：`pnpm test tests/client/cultivation/cultivation-context-data.spec.ts` —— fail-open 过滤还原后 3 failed；修复后 12/12 passed。
+- **BUG-367**：`pnpm test tests/lib/accounting/signoff.spec.ts tests/host/commands/signoff-language.spec.ts tests/host/commands/command-language.spec.ts` —— 还原语言注入前 4 failed；修复后 10/10 passed。
 - `pnpm verify` ALL PASS。
 
 ## 未覆盖轴
@@ -42,4 +46,5 @@
 - [policy] 同一 target 上 vendor 侧的 `console.error` 包装不计入本包保证 → 去向：[error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts)
 - [covered] 事件窗口的封顶/丢弃计数与 history 裁剪 → 去向：[company-stream.spec.ts](../../tests/client/data/company-stream.spec.ts)
 - [covered] 未知 cwd / 子会话继承 / 尾斜杠归一 → 去向：[cultivation-context-data.spec.ts](../../tests/client/cultivation/cultivation-context-data.spec.ts)
+- [covered] 签核工具 en/zh 回执与 ASCII 分隔符、诊断命令 en 描述/用法 → 去向：[signoff-language.spec.ts](../../tests/host/commands/signoff-language.spec.ts) 与 [command-language.spec.ts](../../tests/host/commands/command-language.spec.ts)
 - [policy] 浏览器侧没有 realpath，`/var` 与 `/private/var` 这类 symlink 别名仍可能漏配（host 侧 canonical 化不适用于 client）→ 去向：[cultivation-context-data.ts](../../packages/company-pack/src/client/cultivation/cultivation-context-data.ts)

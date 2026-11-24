@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-367**（2026-11-24，360..369 批顺位 3 / P2）：`request_signoff` 回执/理由与 `/company-diagnostics` 命令面接语言状态，en 零中文、zh 不变——
+  [367](BUG-367-signoff-tool-result-and-reason-always-chinese.md)。证据提交 `fe4ffe2e`。
+
 - **BUG-365**（2026-11-24，360..369 批顺位 2 / P2）：follow 事件窗口在数据层有界（`EVENT_WINDOW`），history 裁剪并记丢弃数——
   [365](BUG-365-company-data-unbounded-event-accumulation.md)。证据提交 `64fc1a5f`。
 - **BUG-366**（2026-11-24，360..369 批顺位 2 / P2）：培养背景候选 cwd 未知零候选 + reason，行 cwd 缺失排除、子会话继承 parent、路径归一——
