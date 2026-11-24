@@ -40,7 +40,23 @@
 
 **已结**：BUG-288（原主张被反证——`ask` 策略下的真实挂起审批，后开的页面**能看到**，历史重建本来就生效；lane 长期红是环境 `never`。残留的跨会话缺口已另立 BUG-292）。
 
-**本轮批次**：下方「## 2026-11-23 修复交接（质量防线与探查批次：BUG-333..350）」
+**本轮批次**：下方「## 2026-11-24 修复交接（新发现批次：BUG-351..359）
+
+**用户指令（2026-11-24）**：修 `_backlog/bugs` 最新发现的问题；先按根因聚类立批次计划，再建 goal 按 REPO 流程推进。
+
+| 顺位 | 组 / 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
+|---|---|---|---|---|
+| **1 P1 v3 双根** | [353](BUG-353-converge-and-journal-audit-broken-on-v3-dot-dsh-company.md) | `converge.mjs` / `journal-audit.mjs` 绕过 `resolveRunRoots` 仍拼扁平根 | 复用 `workspaceRoot`/`companyRoot` 双根；`DELIVERABLES_WS_REL` 传外层根、文件操作走 companyRoot；临时 v3 盘 e2e（计划/索引/审计） | 1 |
+| **2 P1 采用回路** | [351](BUG-351-method-skill-text-unescaped-yaml-description.md) | 自拼 YAML frontmatter 未编码任意用户输入；adopt 不校验产物 | `methodSkillText` 用 JSON/YAML 双引号标量编码 `description`；写入前用共享 frontmatter 解析器自检，失败则拒绝 adopted；host spec 红→绿 | 2 |
+| **3 表达层** | [354](BUG-354-presence-activity-unassigned-owner-leaks-chinese-in-en.md) + [358](BUG-358-board-unassigned-label-chinese-in-en-and-missing-role-label.md) | `lib` 把「未分配」折进 token/label；`BoardTab` 漏接 `roleLabel` | token 改无 owner 专用键 / `ownerLabel: null` 由 client 渲染；`BoardTab` 补 `roleLabel`；`UNASSIGNED_LABEL` 退役；en 满态零 CJK | 3 |
+| **4 台账/成品身份** | [356](BUG-356-motion-ledger-escaped-pipe-row-dropped.md) + [357](BUG-357-presented-slug-carryover-broken-by-custom-meta-slug.md) | 表格方言两套解析；成品身份写入用目录名 slug、读取用 `deliverableSlug` | 4 处裸 `split('|')` 统一到 `splitTableRow`；presented 写入读 `meta.md` 取 `deliverableSlug` + 旧账本回退；归档后仍 `presented: true` | 4 |
+| **5 注意力身份** | [359](BUG-359-attention-same-millisecond-stream-items-collapse.md) | 无 id 条目用毫秒时间当身份；`mergeAttention` 流内误去重 | `AttentionEventLike.seq` → `eventKey`；`attentionItemKey` 优先 eventKey；merge 只跨源去重；AttentionTab key 同步 | 5 |
+| **6 客户端异步** | [355](BUG-355-cultivation-data-stale-feedback-abort-problem-and-load-race.md) | 切换会话缺态复位；中止后写 problem；并发 `load()` 无代次 | `setFeedback(null)`；中止判定先于 state 写入；单调 `loadSeq` 丢弃过期结果；happy-dom 三场景 | 6 |
+| **7 诊断 schema** | [352](BUG-352-session-diagnose-reads-flat-team-member-shape.md) | 诊断器读想象扁平形状，夹具同款（BUG-030 同族） | 解包 `data.member.{phase,name,id,error}`，扁平仅退化兼容；夹具换真实 v2；`tests/session` 红→绿 | 7 |
+
+**终点**：9 张全部带红/绿证据迁入 `fixed_bugs/`；1 篇批次伞形 Note（含 356/357/359 独立只读盲审）；`verify` / `test` / `typecheck` / `lint` / `dup` / `coverage-ratchet` 与 client 真加载冒烟全绿并 `push`。批次外新卡（若并发出现）不动。
+
+## 2026-11-23 修复交接（质量防线与探查批次：BUG-333..350）」
 
 ## 2026-11-23 修复交接（质量防线与探查批次：BUG-333..350）
 
