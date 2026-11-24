@@ -73,3 +73,4 @@ rmSync(ws, { recursive: true, force: true });
 - 绿：`pnpm test tests/host/ledger/catalog.spec.ts` —— 43/43 passed（true→false→归档 false；同 slug 新件仍 null）
 - 提交：commit b5a3ea4b
 - 复审说明：卡里建议的 `slugs[slug]=false` 会破坏「同 slug 新件不继承旧 false」的既有契约，改用 `dirVeto`（目录名在 live→archive 稳定）
+- 复审修正：commit cf522827（结构行边界 / 账本字段保留）

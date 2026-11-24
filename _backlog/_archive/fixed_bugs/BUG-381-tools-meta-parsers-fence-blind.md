@@ -65,3 +65,4 @@ console.log('converge result =', JSON.stringify(converge('result')), '| lib =', 
 - 红：`pnpm test tests/tools/deliverables.spec.ts tests/tools/markdown-lines-parity.spec.ts` —— 还原逐行首现前 1 failed（围栏样例覆盖真值）
 - 绿：`pnpm test tests/tools/deliverables.spec.ts tests/tools/markdown-lines-parity.spec.ts` —— 全绿（结构行与 core 对拍一致）
 - 提交：commit 6dd7676c
+- 复审修正：commit cf522827（结构行边界 / 账本字段保留）
