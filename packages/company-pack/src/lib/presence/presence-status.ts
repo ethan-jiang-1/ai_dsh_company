@@ -81,6 +81,17 @@ export function displayNameFor(name: string, role: 'lead' | 'teammate'): string 
   return isPresetRole(name) ? PRESET_DISPLAY_NAMES[name] : name
 }
 
+/**
+ * 任务 owner → 显示名（BUG-372）：vendor 对 lead 拥有的任务给字面量 `'lead'`，
+ * 所有消费面必须同一条映射（看板、在场动态、回放），不能各自硬编码角色。
+ * @param name - 任务 owner 名（可能是 `'lead'`、preset id、成员名、undefined）。
+ * @returns 显示名；无 owner 返回 null。
+ */
+export function taskOwnerDisplayName(name: string | undefined): string | null {
+  if (name === undefined || name === '') return null
+  return displayNameFor(name, name === 'lead' ? 'lead' : 'teammate')
+}
+
 /** 角色 → 短标签（培养面板/记录署名用；与 PRESET_DISPLAY_NAMES 分层——短标签不含公司名前缀；
  *  2026-10-21 自 lib/cultivation.ts 的 ROLE_LABELS 收进词汇层，单一事实家）。 */
 export const PRESET_SHORT_LABELS: Record<PresetRoleId, string> = Object.fromEntries(

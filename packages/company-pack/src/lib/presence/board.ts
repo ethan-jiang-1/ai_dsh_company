@@ -5,7 +5,7 @@
  * 数据源 = 官方 Agent Teams 任务板（0.1.7 起 = Lead 会话的 `agentTeam` **投影**；旧 `agentTeams.view` RPC 已移除）；**不自建任务存储**（D13）。
  * 看板答"活到哪一步"；依赖结构（谁卡着谁）由 `dag.ts` 答——分列会丢链，故两者并存（研究 §4）。
  */
-import { displayNameFor, type TeamViewLike } from './presence.ts'
+import { taskOwnerDisplayName, type TeamViewLike } from './presence.ts'
 
 /** 官方 `TeamTaskStatus` 的本地窄化（`vendor/dsh/packages/experimental/agent-team/src/types.ts:71`）。 */
 export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'deleted'
@@ -212,9 +212,7 @@ export function tasksFromTeamView(view: TeamViewLike): TaskRow[] {
       description: task.description ?? '',
       status,
       // ownerName 是**成员名**（`TeamTaskView` 不带 ownerId）；'lead' 按 CEO 映射，其余按 preset id 映射。
-      ownerName: owner === undefined || owner === ''
-        ? null
-        : displayNameFor(owner, owner === 'lead' ? 'lead' : 'teammate'),
+      ownerName: taskOwnerDisplayName(owner),
       revision: task.revision ?? 0,
       blockedBy,
       // ⚠ 右侧必须带 `status === 'pending'`：`readyOf` 只查依赖，官方 `ready` 还要求自己是 pending。

@@ -13,6 +13,7 @@ import {
   displayNameFor,
   presenceStatusFromPhase,
   statusLabelFor,
+  taskOwnerDisplayName,
   type PresenceStatus,
 } from './presence-status.ts'
 import { clip, firstText } from '../shared/text.ts'
@@ -24,6 +25,7 @@ export {
   displayNameFor,
   presenceStatusFromPhase,
   statusLabelFor,
+  taskOwnerDisplayName,
 }
 export type { PresenceStatus }
 
@@ -288,7 +290,8 @@ export function diffActivity(prev: TeamViewLike | undefined, next: TeamViewLike,
       continue
     }
     if (before.status === task.status) continue
-    const owner = task.ownerName === undefined ? null : displayNameFor(task.ownerName, 'teammate')
+    // BUG-372：`ownerName === 'lead'` 是 vendor 的 CEO 字面量，与看板共用同一条映射。
+    const owner = taskOwnerDisplayName(task.ownerName)
     // 状态机有 4 个值：显式分派，别让「pending/未知」落进删除兜底（BUG-098）。
     if (task.status === 'in_progress') {
       // BUG-354：无负责人时不给 owner 参数（中文展示串不能进 token）；client 字典出「未分配/Unassigned」。
@@ -396,6 +399,14 @@ export function presenceFromEvents(
     // 其他事件类型（team/message/delivered 等）忽略——投递回执不进动态流。
   }
 
+  /** 某 owner 名下进行中的任务（lead 与成员共用，BUG-376）。 */
+  const currentTasksOf = (ownerId: string): readonly string[] | null => {
+    const subjects = [...tasks.values()]
+      .filter(task => task.status === 'in_progress' && task.ownerId === ownerId)
+      .map(task => task.subject)
+    return subjects.length === 0 ? null : subjects
+  }
+
   const rows: PresenceRow[] = []
   if (teamId !== null) {
     rows.push({
@@ -403,9 +414,11 @@ export function presenceFromEvents(
       name: 'lead',
       displayName: PRESET_DISPLAY_NAMES.ceo,
       role: 'lead',
-      status: 'inactive',
-      statusLabel: STATUS_LABEL.inactive,
-      currentTasks: null,
+      // 与 live 投影同口径：lead 的 phase 恒 active → idle（回放板里 active 成员记 inactive 是历史语义，
+      // 但 lead 行没有 member 事件，用 inactive 会让「CEO 在做什么」在刷新后凭空消失，BUG-376）。
+      status: 'idle',
+      statusLabel: STATUS_LABEL.idle,
+      currentTasks: currentTasksOf(teamId),
     })
   }
   for (const [id, member] of members) {
@@ -420,12 +433,7 @@ export function presenceFromEvents(
       role: 'teammate',
       status,
       statusLabel: STATUS_LABEL[status],
-      currentTasks: (() => {
-        const subjects = [...tasks.values()]
-          .filter(task => task.status === 'in_progress' && task.ownerId === id)
-          .map(task => task.subject)
-        return subjects.length === 0 ? null : subjects
-      })(),
+      currentTasks: currentTasksOf(id),
     })
   }
 

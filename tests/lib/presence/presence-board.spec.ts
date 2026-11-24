@@ -461,3 +461,31 @@ describe('第六角色 CMO 的显示名映射（防漂移）', () => {
     expect(teamWithEventTasks({ members: [] } as never, [])?.tasks).toEqual([])
   })
 })
+
+// 负例留证 2026-11-24：diffActivity 任务 owner 硬编码 'teammate'、回放 lead 行手拼 inactive/null ⇒ 本组红。BUG-372/376
+describe('live/replay 的 CEO 身份与任务（BUG-372/376）', () => {
+  const member = (id: string, name: string, role: 'lead' | 'teammate', phase: string): TeamViewLike['members'][number] => ({ id, name, role, phase })
+
+  it('diffActivity：lead 拥有的任务显示 CEO（token owner 也是 CEO）', () => {
+    const before: TeamViewLike = { members: [member('team-1', 'lead', 'lead', 'active')], tasks: [{ id: 'task-1', revision: 1, subject: 's', status: 'pending' }] }
+    const after: TeamViewLike = { members: [member('team-1', 'lead', 'lead', 'active')], tasks: [{ id: 'task-1', revision: 2, subject: 's', status: 'in_progress', ownerName: 'lead' }] }
+    const [entry] = diffActivity(before, after, 1)
+    expect(entry?.text).toBe('CEO 认领 task-1')
+    expect(entry?.token).toEqual({ key: 'presence.activity.taskClaimed', params: { owner: 'CEO', id: 'task-1' } })
+  })
+
+  it('presenceFromEvents：lead 行的 status/currentTasks 与 live 投影一致', () => {
+    const events = [
+      { type: 'team/member', time: 1, seq: 1, data: { teamId: 'team-1', member: { id: 'm-vp', name: 'vp-eng', phase: 'active' } } },
+      { type: 'team/task', time: 2, seq: 2, data: { teamId: 'team-1', task: { id: 'task-1', revision: 1, subject: 'CEO work', status: 'in_progress', ownerId: 'team-1' } } },
+    ]
+    const replay = presenceFromEvents(events).rows.find(row => row.role === 'lead')
+    const live = rowsFromTeamView({
+      members: [member('team-1', 'lead', 'lead', 'active')],
+      tasks: [{ id: 'task-1', revision: 1, subject: 'CEO work', status: 'in_progress', ownerName: 'lead' }],
+    }).find(row => row.role === 'lead')
+    expect(replay?.currentTasks).toEqual(['CEO work'])
+    expect(live?.currentTasks).toEqual(['CEO work'])
+    expect(replay?.status).toBe(live?.status)
+  })
+})
