@@ -206,3 +206,34 @@ describe('makeCultivationContextSources：索引截断', () => {
     if (!result.ok) expect(result.problem).toContain('上限')
   })
 })
+
+// 负例留证 2026-11-24：把过滤式改回「cwd 未知即放行」⇒ 本组红（跨 workspace/无 cwd 候选混入）。BUG-366
+describe('projectContextSessions 作用域 fail-closed（BUG-366）', () => {
+  const withoutCwd = (r: ContextSessionRowLike): ContextSessionRowLike => {
+    const { cwd: _cwd, ...rest } = r
+    return rest
+  }
+
+  it('当前会话 cwd 未知 ⇒ 零候选 + 可读原因', () => {
+    const result = projectContextSessions([withoutCwd(row({ sessionId: 'current' })), row({ sessionId: 'other', cwd: '/ws-b' })], 'current')
+    expect(result.items).toEqual([])
+    expect(result.problem).toBeTruthy()
+  })
+
+  it('候选行 cwd 缺失 ⇒ 排除；子会话经 parent 继承 cwd 才进候选', () => {
+    const parent = row({ sessionId: 'current', cwd: '/company' })
+    const orphan = withoutCwd(row({ sessionId: 'orphan' }))
+    const child = { ...withoutCwd(row({ sessionId: 'child' })), origin: 'subagent' as const, parentId: 'current' }
+    const otherChild = { ...withoutCwd(row({ sessionId: 'other-child' })), origin: 'subagent' as const, parentId: 'missing-parent' }
+    const ids = projectContextSessions([parent, orphan, child, otherChild], 'current').items.map(item => item.sessionId)
+    expect(ids).toEqual(['current', 'child'])
+  })
+
+  it('尾斜杠/分隔符差异不算跨工作区', () => {
+    const ids = projectContextSessions([
+      row({ sessionId: 'current', cwd: '/company/' }),
+      row({ sessionId: 'same', cwd: '/company' }),
+    ], 'current').items.map(item => item.sessionId)
+    expect(ids).toEqual(['current', 'same'])
+  })
+})

@@ -150,15 +150,44 @@ export function contextRowsFromStore(
  * @param targetRole - 建议的目标角色（匹配的根会话排前；仅排序）。
  * @returns 同 cwd、非空白、最多 {@link CONTEXT_CANDIDATE_CAP} 行，连同 `capped` 上报。
  */
+/** 路径比较用的归一（BUG-366）：仅做跨平台分隔符/尾斜杠归一；真实 symlink 别名归 host 侧 canonical 化。 */
+function normalizeCwd(value: string): string {
+  return value.replace(/\\/g, '/').replace(/\/+$/, '')
+}
+
+/**
+ * 行的作用域 cwd：自身 cwd 优先，子会话经 parent 继承；取不到 = undefined（调用方 fail-closed）。
+ * @param row - 候选行。
+ * @param byId - 同批行（用于 parent 查找）。
+ * @returns 归一后的 cwd 或 undefined。
+ */
+function rowCwdOf(row: ContextSessionRowLike, byId: ReadonlyMap<string, ContextSessionRowLike>): string | undefined {
+  const direct = row.cwd !== undefined && row.cwd !== '' ? row.cwd : undefined
+  if (direct !== undefined) return normalizeCwd(direct)
+  const parent = row.parentId !== undefined ? byId.get(row.parentId) : undefined
+  return parent?.cwd !== undefined && parent.cwd !== '' ? normalizeCwd(parent.cwd) : undefined
+}
+
+/**
+ * 会话候选投影（纯函数；不读正文）。
+ * @param rows - 客户端 sessions store 的行。
+ * @param currentSessionId - 当前会话（固定第一行、默认带背景）。
+ * @param targetRole - 建议的目标角色（匹配的根会话排前；仅排序）。
+ * @returns 同 cwd、非空白、最多 {@link CONTEXT_CANDIDATE_CAP} 行；cwd 未知时 `problem` 非空且零候选（fail-closed，BUG-366）。
+ */
 export function projectContextSessions(
   rows: readonly ContextSessionRowLike[],
   currentSessionId: string,
   targetRole?: string,
-): Bounded<ContextSessionRow> {
+): Bounded<ContextSessionRow> & { readonly problem?: string } {
   const byId = new Map(rows.map(row => [row.sessionId, row]))
   const current = byId.get(currentSessionId)
-  const cwd = current?.cwd
-  const scope = rows.filter(row => row.blank !== true && (cwd === undefined || row.cwd === undefined || row.cwd === cwd))
+  const currentCwd = current === undefined ? undefined : rowCwdOf(current, byId)
+  if (currentCwd === undefined) {
+    // 未知 ≠ 匹配（BUG-323 同口径）：这一轮不产候选，由面板说「还不知道这个会话属于哪个工作区」。
+    return { items: [], total: 0, capped: 0, truncated: false, problem: CULTIVATION_COPY.contextCwdUnknown }
+  }
+  const scope = rows.filter(row => row.blank !== true && rowCwdOf(row, byId) === currentCwd)
   const projected: ContextSessionRow[] = []
   for (const row of scope) {
     const isChild = row.origin === 'subagent' || row.parentId !== undefined
