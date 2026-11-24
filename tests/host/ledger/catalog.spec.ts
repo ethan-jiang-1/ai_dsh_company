@@ -505,3 +505,35 @@ describe('坏形状：存在 ≠ 可读普通文件', () => {
     expect(result.warning).toBeTruthy()
   })
 })
+
+// 负例留证 2026-11-24：present 写入退回 slugFromDirName、或 presentedOf 去掉目录名回退 ⇒ 本组红。BUG-357
+describe('presented 身份与归档延续（BUG-357）', () => {
+  it('meta 自定义 slug：present 写 custom slug，归档后仍 presented: true', () => {
+    const root = workspace()
+    const dir = `${RUN_BUNDLE_PATHS.deliverables}/2026-11-20-dir-name`
+    mkdirSync(join(root, dir), { recursive: true })
+    writeFileSync(join(root, dir, 'final.md'), '# final\n')
+    writeFileSync(join(root, dir, 'meta.md'), 'slug: custom-name\nkickoff: 2026-11-20\ntype: decision\nresult: completed\nsummary: done\n')
+    const rel = `${dir}/final.md`
+
+    const event = { data: { files: [{ path: join(root, rel) }] } }
+    const observed = presentedFromEvent(event, root)
+    expect([...observed.slugs]).toEqual(['custom-name'])
+    const ledger = mergePresented(emptyPresentedLedger(), observed)
+    expect(regenerateCatalog(root, ledger).catalog?.entries[0]?.presented).toBe(true)
+
+    mkdirSync(join(root, RUN_BUNDLE_PATHS.archive), { recursive: true })
+    renameSync(join(root, dir), join(root, RUN_BUNDLE_PATHS.archive, '2026-11-20-dir-name'))
+    expect(regenerateCatalog(root, ledger).catalog?.entries[0]?.presented).toBe(true)
+  })
+
+  it('升级前账本只有目录名 slug：presentedOf 回退比对，不丢背书', () => {
+    const root = workspace()
+    const dir = `${RUN_BUNDLE_PATHS.deliverables}/2026-11-20-dir-name`
+    mkdirSync(join(root, dir), { recursive: true })
+    writeFileSync(join(root, dir, 'final.md'), '# final\n')
+    writeFileSync(join(root, dir, 'meta.md'), 'slug: custom-name\nkickoff: 2026-11-20\ntype: decision\nresult: completed\n')
+    const legacy = mergePresented(emptyPresentedLedger(), { paths: [`${dir}/final.md`], slugs: ['dir-name'] })
+    expect(regenerateCatalog(root, legacy).catalog?.entries[0]?.presented).toBe(true)
+  })
+})

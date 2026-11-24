@@ -5,7 +5,7 @@
  * catalog.ts 保留目录扫描/生成；账本 I/O、迁移、观测抽取归本文件。
  */
 import { isAbsolute, join, relative, resolve } from 'node:path'
-import { normalizeRel, slugFromDirName, type DeliverablesCatalog } from '../../lib/deliverables/deliverables-catalog.ts'
+import { deliverableSlug, normalizeRel, parseMeta, slugFromDirName, type DeliverablesCatalog } from '../../lib/deliverables/deliverables-catalog.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 import { isRecord } from '../../lib/shared/guards.ts'
 import { readCompanyFile, companyFileProblem, writeCompanyAtomic } from '../run-bundle/company-root.ts'
@@ -149,7 +149,28 @@ export function ensurePresentedLedger(companyHome: string, now: Date = new Date(
 export function presentedOf(ledger: PresentedLedger, path: string, slug: string): boolean | null {
   const byPath = ledger.paths[normalizeRel(path)]
   if (byPath === true || byPath === false) return byPath
-  return ledger.slugs[slug] === true ? true : null
+  if (ledger.slugs[slug] === true) return true
+  // 兼容升级前账本（只写目录名 slug）：从路径回推目录名 slug 再比一次（BUG-357）。
+  const dirMatch = /\.dsh-company\/deliverables(?:-archive)?\/([^/]+)\/final\.md$/.exec(normalizeRel(path))
+  const dirSlug = dirMatch === null ? '' : slugFromDirName(dirMatch[1] ?? '')
+  return dirSlug !== '' && ledger.slugs[dirSlug] === true ? true : null
+}
+
+/**
+ * 成品身份 slug：读 `meta.md` 的 `slug:`（空/空白回落目录名），与 catalog 读侧同一判据（BUG-357）。
+ * 读不到 meta（历史/权限）时退回目录名，不阻断 present。
+ * @param companyHome - 外层 workspace 根。
+ * @param rootRel - `.dsh-company/deliverables` 或归档根。
+ * @param dirName - 成品目录名。
+ * @returns 生效 slug。
+ */
+function presentedSlugOf(companyHome: string, rootRel: string, dirName: string): string {
+  const read = readCompanyFile(companyHome, `${rootRel}/${dirName}/meta.md`)
+  if (read.kind === 'text') {
+    const slug = deliverableSlug(parseMeta(read.text).fields, dirName)
+    if (slug !== '') return slug
+  }
+  return slugFromDirName(dirName)
 }
 
 /** 记录一次 live present；损坏/未来账本不覆盖，返回 warning 给 host。 */
@@ -236,9 +257,9 @@ export function setPresentedAudit(
   let next: PresentedLedger = { schema: 1, updatedAt: now.toISOString(), paths, slugs: base.slugs }
   // true 同时写 slug 便于归档后延续；false 只认精确 path，不写 slug。
   if (presented) {
-    // v3 路径是 `.dsh-company/deliverables/<dir>/final.md`：slug 取 final.md 的父目录，
-    // 不能按旧 v2 `deliverables/<dir>/final.md` 的 split[1]（那会取到字面 `deliverables`）。
-    const slug = slugFromDirName(rel.split('/').slice(-2)[0] ?? '')
+    // v3 路径是 `.dsh-company/deliverables/<dir>/final.md`：身份 = meta 的 slug（与 catalog 读侧同判据）。
+    const rootRel = rel.startsWith(`${RUN_BUNDLE_PATHS.archive}/`) ? RUN_BUNDLE_PATHS.archive : RUN_BUNDLE_PATHS.deliverables
+    const slug = presentedSlugOf(companyHome, rootRel, rel.split('/').slice(-2)[0] ?? '')
     if (slug !== '') next = { ...next, slugs: { ...next.slugs, [slug]: true } }
   }
   try {
@@ -337,7 +358,7 @@ export function presentedFromEvent(event: unknown, companyHome: string): { paths
     const dirName = match[2] ?? ''
     if (dirName === '') continue
     paths.add(rel)
-    slugs.add(slugFromDirName(dirName))
+    slugs.add(presentedSlugOf(companyHome, match[1] ?? RUN_BUNDLE_PATHS.deliverables, dirName))
   }
   return { paths, slugs }
 }
