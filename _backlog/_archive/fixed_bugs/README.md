@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-383**（2026-11-24，377..383 批顺位 3 / P2）：人工 false 写 `dirVeto`（目录名稳定），归档后不再被 slug 旧 true 覆盖——
+  [383](BUG-383-presented-false-overridden-by-slug-after-archive.md)。证据提交 `b5a3ea4b`。
+
 - **BUG-380**（2026-11-24，377..383 批顺位 2 / P2）：`sectionRange` 加 level 透传，`#`/`##`/`###` 必填小节都按结构命中——
   [380](BUG-380-required-sections-heading-level-mismatch.md)。证据提交 `6dd7676c`。
 - **BUG-381**（2026-11-24，377..383 批顺位 2 / P2）：tools 侧 `parseMeta`/`converge.metaField` 改结构行扫描（孪生 + 对拍）——

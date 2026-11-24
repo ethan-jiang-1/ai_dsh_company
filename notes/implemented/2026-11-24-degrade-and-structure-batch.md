@@ -14,6 +14,9 @@
    `sectionRange`/`sectionStructuralText` 增加 level（默认 2），delivery 按 needle 的 `#` 数量透传；
    tools 新增 `markdown-lines.mjs`（结构行孪生）+ `meta-fields.mjs`，`parseMeta`/`converge.metaField` 只读结构行，与 core 对拍；
    `checkRequirements` 的退役词/区间断言只扫结构行并剥行内代码，正文仍判红。
+4. **人工 false 是一等结论（[BUG-383](../../_backlog/_archive/fixed_bugs/BUG-383-presented-false-overridden-by-slug-after-archive.md)）**：
+   不写 `slugs[slug]=false`（会污染同 slug 的新成品，与既有契约冲突），改在账本加 `dirVeto[目录名]=false`；
+   `presentedOf` 的顺序 = 精确 path → 目录否决 → slug 背书 → 旧目录名回退。目录名在 live→archive 迁移中稳定。
 
 ## 输掉的方案
 
@@ -28,12 +31,14 @@
 | 记录时间戳 | [`recordStampOf`](../../packages/company-pack/src/lib/cultivation/cultivation-record.ts) | purge/archive 消费；表驱动用例 |
 | 记录目录读取 | [`loadRecords`](../../packages/company-pack/src/host/cultivation/cultivation-storage.ts) | `/cultivation check|archive` 消费；EACCES 用例 |
 | 标题层级定位 | [`sectionStructuralText`](../../packages/company-pack/src/lib/docs/markdown-shape.ts) | delivery 按 needle 层级透传 |
+| 审计否决延续 | [`dirVeto`](../../packages/company-pack/src/host/ledger/presented-ledger.ts) | `setPresentedAudit` 写入、`presentedOf` 读取 |
 | tools 结构行 | [`structuralLines`](../../tools/lib/company/markdown-lines.mjs) | `parseMeta`/`metaFieldFromText` 消费；与 core 对拍 |
 
 ## 验证（真跑过）
 
 - **U1**：`pnpm test tests/host/ledger/governance-export.spec.ts tests/lib/cultivation/cultivation.spec.ts tests/host/cultivation/cultivation-maintenance.spec.ts` —— 还原前 4 failed（旧快照丢失 / 坏日期删除 / EACCES 抛）；修复后 40/40 passed。
 - **U2**：`pnpm test tests/host/commands/delivery-command.spec.ts tests/lib/docs/markdown-shape.property.spec.ts tests/tools/deliverables.spec.ts tests/tools/markdown-lines-parity.spec.ts tests/lib/docs/requirements-check.spec.ts` —— 还原层级透传/逐行首现/裸全文扫描时分别红；修复后 84/84、联动 tools+host+lib 617/617。
+- **U3**：`pnpm test tests/host/ledger/catalog.spec.ts` —— 还原前 1 failed（归档后旧 true 翻案）；修复后 43/43 passed。
 - `pnpm verify` ALL PASS。
 
 ## 未覆盖轴

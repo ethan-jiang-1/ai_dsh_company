@@ -16,6 +16,7 @@
 - [BUG-365-company-data-unbounded-event-accumulation.md](fixed_bugs/BUG-365-company-data-unbounded-event-accumulation.md) — follow 事件数据层有界。
 - [BUG-366-context-candidates-fail-open-on-unknown-cwd.md](fixed_bugs/BUG-366-context-candidates-fail-open-on-unknown-cwd.md) — 背景候选未知 cwd fail-closed。
 - [BUG-371-meta-shape-validators-three-way-split.md](fixed_bugs/BUG-371-meta-shape-validators-three-way-split.md) — meta 形状单一判据（result 可空）。
+- [BUG-383-presented-false-overridden-by-slug-after-archive.md](fixed_bugs/BUG-383-presented-false-overridden-by-slug-after-archive.md) — 审计 false 随目录延续。
 - [BUG-380-required-sections-heading-level-mismatch.md](fixed_bugs/BUG-380-required-sections-heading-level-mismatch.md) — 标题层级透传。
 - [BUG-381-tools-meta-parsers-fence-blind.md](fixed_bugs/BUG-381-tools-meta-parsers-fence-blind.md) — tools meta 结构解析。
 - [BUG-382-retired-word-scan-fence-blind.md](fixed_bugs/BUG-382-retired-word-scan-fence-blind.md) — 退役词结构扫描。

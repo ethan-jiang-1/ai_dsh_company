@@ -8,11 +8,10 @@
 
 ## 活跃清单
 
-**活跃 1 张（2026-11-24 第八轮构造场景探查新立，只报不修）**：
+**活跃 0 张（2026-11-24 第八轮构造场景探查新立，只报不修）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
-| [BUG-383](BUG-383-presented-false-overridden-by-slug-after-archive.md) | P2 | host | 先 present 后审计 false，归档后又被 slug 延续成 true——「未交付」结论被旧背书覆盖 | 调查中 |
 
 **本轮查过但不入卡**：第七轮 7 张修复已逐条复核（`numbering` 引号/注释/占位符/空格变体、`layers` 方括号、围栏内 `productType`、meta 三分家、CEO 身份与回放、`/delivery` 结构行判据）**全部绿**；`delivery-rules` 的模板路径按模式目录解析且 `content-contract` 已校验存在（初查误报，已核）；`/company-settings` 的并发读改写实测无丢失（Node 单线程 + 同步读写，已核）；`requiredFields` 仍属「未声明要校验」不入卡。
 
@@ -26,7 +25,7 @@
 |---|---|---|---|---|
 | **1 降级而非毁掉/崩溃** | [377](../_archive/fixed_bugs/BUG-377-gov-export-drops-ledger-snapshot-on-missing.md)（已修 `db1fbb11`） + [378](../_archive/fixed_bugs/BUG-378-record-stamp-rollover-deletes-corrupt-archive.md)（已修 `db1fbb11`） + [379](../_archive/fixed_bugs/BUG-379-load-records-throws-on-unreadable-file.md)（已修 `db1fbb11`） | 整目录替换把「源缺失」当「目标应为空」；坏日期被 Date 进位成合法时间；单文件读失败穿透整盘 | 377：`missing` 与 `corrupt` 同处理（沿用旧快照 + warning，无旧快照才静默）；378：`recordStampOf` 加日期往返校验，坏 timestamp 返回 null（purge/archive 跳过）；379：`loadRecords` 包 try、读失败计 `broken`（或 `unreadable`）不抛；三卡各自红→绿 + 真入口用例 | 1 |
 | **2 结构敏感一致** | [380](../_archive/fixed_bugs/BUG-380-required-sections-heading-level-mismatch.md)（已修 `6dd7676c`） + [381](../_archive/fixed_bugs/BUG-381-tools-meta-parsers-fence-blind.md)（已修 `6dd7676c`） + [382](../_archive/fixed_bugs/BUG-382-retired-word-scan-fence-blind.md)（已修 `6dd7676c`） | 声明支持 1–6 级标题但 `sectionRange` 只认 `##`；tools 两份 meta 解析不看围栏；退役词/区间扫描是裸全文 | 380：`sectionRange` 加 level 参数（`#{1,6}`），`sectionStructuralText` 透传，`hasStructuralSection` 用层级；381：tools 的 `converge.metaField`/`deliverables.parseMeta` 用 `scanDocumentDetailed` 结构行（复用 `markdown-shape-core.js`）；382：退役词/区间改用结构行（围栏+行内代码豁免，正文仍禁）；三卡表驱动用例 | 2 |
-| **3 账本结论反转** | [383](BUG-383-presented-false-overridden-by-slug-after-archive.md) | `setPresentedAudit(false)` 只写 path，不撤 `slugs[slug]`；归档后 slug 旧 true 胜出 | false 时写 `slugs[slug]=false`（显式否决），`presentedOf` 的 slug 分支返回 false；`presentedFromLegacyCatalog` 同步；补「true → false → 归档」序列用例 + 既有 true 延续回归 | 3 |
+| **3 账本结论反转** | [383](../_archive/fixed_bugs/BUG-383-presented-false-overridden-by-slug-after-archive.md)（已修 `b5a3ea4b`） | `setPresentedAudit(false)` 只写 path，不撤 `slugs[slug]`；归档后 slug 旧 true 胜出 | false 时写 `slugs[slug]=false`（显式否决），`presentedOf` 的 slug 分支返回 false；`presentedFromLegacyCatalog` 同步；补「true → false → 归档」序列用例 + 既有 true 延续回归 | 3 |
 
 **横向原则**：单源缺失/单文件失败只能降级为「保留旧值 + 可读信号」，不许静默毁数据或整盘抛；结构判据（标题层级/围栏/行内代码）只有一套；账本 false 是一等结论，必须能随路径迁移延续。
 **终点**：7 张全部带红/绿证据迁入 `fixed_bugs/`；1 篇批次伞形 Note；378/381/383 的删除/解析/账本判据过独立只读盲审；`verify`/`test`/`typecheck`/`lint`/`dup`/`coverage-ratchet` 与 client 真加载冒烟全绿并 `push`。批次外新卡不动。

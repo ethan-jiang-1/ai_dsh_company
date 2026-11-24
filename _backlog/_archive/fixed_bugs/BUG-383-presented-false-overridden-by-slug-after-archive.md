@@ -1,25 +1,25 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-383：先 present 后审计为 false，归档后又被 slug 延续成 true——操作员的「未交付」结论被旧背书覆盖
 
-> 严重级别：P2（审计结论被反转为假：`setPresentedAudit(true)` 会写 `paths[rel]=true` 与 `slugs[slug]=true`；随后同一条 `setPresentedAudit(false)` 只写 `paths[rel]=false`，**不清理** `slugs[slug]`。同一路径上 false 优先（正确），但成品归档是高动议生命周期的正常动作——路径一变，查询落到 `slugs[slug]===true`，于是操作员刚做的「未 present」判定被归档前的旧 true 覆盖，面板显示「已交付」）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（审计结论被反转为假：`setPresentedAudit(true)` 会写 `paths[rel]=true` 与 `slugs[slug]=true`；随后同一条 `setPresentedAudit(false)` 只写 `paths[rel]=false`，**不清理** `slugs[slug]`。同一路径上 false 优先（正确），但成品归档是高动议生命周期的正常动作——路径一变，查询落到 `slugs[slug]===true`，于是操作员刚做的「未 present」判定被归档前的旧 true 覆盖，面板显示「已交付」）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（true→false→归档仍 false，同 slug 新件不继承）
 >
-> **留痕**：（待修复时裁决）
+> **留痕**：Note [2026-11-24-degrade-and-structure-batch](../../../notes/implemented/2026-11-24-degrade-and-structure-batch.md)（批次 377..383：false 随目录延续）
 
 ## 症状
 
 1. `present` 或 `/deliverables audit … true` → 账本 `paths[rel]=true`、`slugs[slug]=true`；
 2. 操作员复核后执行 `/deliverables audit … false` → `paths[rel]=false`，`slugs[slug]` **仍是 true**；
-3. 收敛/手工把交付物移进 `deliverables-archive/`（路径变化）→ [`presentedOf`](../../packages/company-pack/src/host/ledger/presented-ledger.ts#L149-L153) 先查新 path（无记录）再查 slug → 返回 `true`；
+3. 收敛/手工把交付物移进 `deliverables-archive/`（路径变化）→ [`presentedOf`](../../../packages/company-pack/src/host/ledger/presented-ledger.ts#L149-L153) 先查新 path（无记录）再查 slug → 返回 `true`；
 4. 成品面板对这条已明确判定「未交付」的成品显示「已交付」，且「未 present」筛选器再也列不出它。
 
 ## 运行面
 
-- **面 = host**：[`presented-ledger.ts`](../../packages/company-pack/src/host/ledger/presented-ledger.ts#L210-L248)（`setPresentedAudit`）、[第 148-153 行](../../packages/company-pack/src/host/ledger/presented-ledger.ts#L148-L153)（`presentedOf`）。
+- **面 = host**：[`presented-ledger.ts`](../../../packages/company-pack/src/host/ledger/presented-ledger.ts#L210-L248)（`setPresentedAudit`）、[第 148-153 行](../../../packages/company-pack/src/host/ledger/presented-ledger.ts#L148-L153)（`presentedOf`）。
 
 ## 复现
 
@@ -65,3 +65,11 @@ rmSync(ws, { recursive: true, force: true });
 - 上述复现里 `archived` 为 `false`（或 `null` 并按口径说明）；
 - 新的「false 后归档」用例与既有「true 延续」用例同时绿（两种语义各自成立）；
 - `tests/host/ledger/` 补一条「true → false → 归档」序列的用例（旧实现红、新实现绿）。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/host/ledger/presented-ledger.ts`、`tests/host/ledger/catalog.spec.ts`
+- 红：`pnpm test tests/host/ledger/catalog.spec.ts` —— 还原 dirVeto 前 1 failed（归档后被旧 true 覆盖）
+- 绿：`pnpm test tests/host/ledger/catalog.spec.ts` —— 43/43 passed（true→false→归档 false；同 slug 新件仍 null）
+- 提交：commit b5a3ea4b
+- 复审说明：卡里建议的 `slugs[slug]=false` 会破坏「同 slug 新件不继承旧 false」的既有契约，改用 `dirVeto`（目录名在 live→archive 稳定）
