@@ -4,6 +4,13 @@
 
 ## 修复流水（倒序）
 
+- **BUG-370**（2026-11-24，370..376 批顺位 1 / P2）：`numbering:` 与 meta 其它字段共用 `metaScalarField`（引号/注释/冒号空格/占位符）——
+  [370](BUG-370-numbering-parser-differs-from-yaml-scalar.md)。证据提交 `d700c76a`。
+- **BUG-374**（2026-11-24，370..376 批顺位 1 / P2）：`parseDeclaredLayers` 改用 `metaListField`/`parseList`，`[…]` 与引号都认——
+  [374](BUG-374-req-declared-layers-splitter-diverges.md)。证据提交 `d700c76a`。
+- **BUG-375**（2026-11-24，370..376 批顺位 1 / P2）：`productType`/`deliveryMode` 改结构行解析，围栏示例不盖真值——
+  [375](BUG-375-meta-field-parsers-fence-blind.md)。证据提交 `d700c76a`。
+
 - **BUG-360**（2026-11-24，360..369 批顺位 6 / P2）：`formatTokens` 按舍入后档位判定，999 950+ 进 M 档——
   [360](BUG-360-format-tokens-1000k-instead-of-1m.md)。证据提交 `c585eb9a`。
 - **BUG-361**（2026-11-24，360..369 批顺位 6 / P2）：`firstText` 先归一 CRLF/孤立 CR 再取首行并 trim——

@@ -15,6 +15,9 @@
 - [BUG-367-signoff-tool-result-and-reason-always-chinese.md](fixed_bugs/BUG-367-signoff-tool-result-and-reason-always-chinese.md) — 签核工具与诊断命令随语言。
 - [BUG-365-company-data-unbounded-event-accumulation.md](fixed_bugs/BUG-365-company-data-unbounded-event-accumulation.md) — follow 事件数据层有界。
 - [BUG-366-context-candidates-fail-open-on-unknown-cwd.md](fixed_bugs/BUG-366-context-candidates-fail-open-on-unknown-cwd.md) — 背景候选未知 cwd fail-closed。
+- [BUG-370-numbering-parser-differs-from-yaml-scalar.md](fixed_bugs/BUG-370-numbering-parser-differs-from-yaml-scalar.md) — meta 标量字段共用解析。
+- [BUG-374-req-declared-layers-splitter-diverges.md](fixed_bugs/BUG-374-req-declared-layers-splitter-diverges.md) — layers 列表同口径。
+- [BUG-375-meta-field-parsers-fence-blind.md](fixed_bugs/BUG-375-meta-field-parsers-fence-blind.md) — meta 字段结构感知。
 - [BUG-363-error-capture-install-not-idempotent.md](fixed_bugs/BUG-363-error-capture-install-not-idempotent.md) — 错误捕获单层安装、逐层卸载可逆。
 - [BUG-352-session-diagnose-reads-flat-team-member-shape.md](fixed_bugs/BUG-352-session-diagnose-reads-flat-team-member-shape.md) — 诊断解包真实 team/member v2。
 - [BUG-355-cultivation-data-stale-feedback-abort-problem-and-load-race.md](fixed_bugs/BUG-355-cultivation-data-stale-feedback-abort-problem-and-load-race.md) — 培养数据 hook 切换复位 + 中止守卫 + 代次。

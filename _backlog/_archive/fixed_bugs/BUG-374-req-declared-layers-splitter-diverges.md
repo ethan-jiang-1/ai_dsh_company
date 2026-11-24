@@ -1,35 +1,35 @@
 ---
-status: 调查中
+status: 已修
 severity: P2
 opened: 2026-11-24
 ---
 
 # BUG-374：`req-command.parseDeclaredLayers` 不认 `[…]` 与引号，`layers: [MRD, SyRS]` 会让「产品类型不支持该层」的提醒静默失效
 
-> 严重级别：P2（提醒静默失效：`/req check` 有一处专门比对「动议声明的层」与「产品类型支持的层」，但声明是用一条**独立**的正则拆分器读的——写成 YAML 序列 `[MRD, SyRS]` 或加引号时，拆分结果里带 `[`/`"`，`isLayer` 全部过滤掉，于是「不支持层」既不提醒也不报错；而同一份 `meta.md` 的层范围在 `checkRequirements` 里用的是 `parseList`（认方括号），两处对同一个 `layers:` 行得出不同集合）｜发现：2026-11-24｜状态：调查中
+> 严重级别：P2（提醒静默失效：`/req check` 有一处专门比对「动议声明的层」与「产品类型支持的层」，但声明是用一条**独立**的正则拆分器读的——写成 YAML 序列 `[MRD, SyRS]` 或加引号时，拆分结果里带 `[`/`"`，`isLayer` 全部过滤掉，于是「不支持层」既不提醒也不报错；而同一份 `meta.md` 的层范围在 `checkRequirements` 里用的是 `parseList`（认方括号），两处对同一个 `layers:` 行得出不同集合）｜发现：2026-11-24｜状态：已修｜审查：agent — 逐条核对已修判定（与 parseList 同集合）
 >
-> **留痕**：（待修复时裁决；可走机械修复）
+> **留痕**：Note [2026-11-24-meta-single-source-and-presence-parity](../../../notes/implemented/2026-11-24-meta-single-source-and-presence-parity.md)（批次 370..376：layers 列表同口径）
 
 ## 症状
 
-[`parseDeclaredLayers`](../../packages/company-pack/src/host/commands/req-command.ts#L92-L98)：
+[`parseDeclaredLayers`](../../../packages/company-pack/src/host/commands/req-command.ts#L92-L98)：
 
 ```ts
 const match = /^layers:\s*(.*)$/m.exec(text)
 return (match[1] ?? '').split(/[,，、;；\s]+/).map(item => item.trim()).filter(item => item !== '')
 ```
 
-方括号与引号没有剥离，随后 [`req-command.ts:287`](../../packages/company-pack/src/host/commands/req-command.ts#L285-L292) 用 `.filter(isLayer)` 过滤：
+方括号与引号没有剥离，随后 [`req-command.ts:287`](../../../packages/company-pack/src/host/commands/req-command.ts#L285-L292) 用 `.filter(isLayer)` 过滤：
 
 ```ts
 const unsupported = parseDeclaredLayers(metaText).filter(isLayer).filter(layer => !allowed.has(layer))
 ```
 
-`[MRD` / `SyRS]` / `"MRD` 都不是层名 → `unsupported` 为空 → 「产品类型不支持该层」的提醒整段消失。`checkRequirements` 内部用 [`metaLayers`→`parseList`](../../packages/company-pack/src/lib/docs/requirements-check.ts#L436-L455)（认方括号），所以同一行在两处得到不同集合。
+`[MRD` / `SyRS]` / `"MRD` 都不是层名 → `unsupported` 为空 → 「产品类型不支持该层」的提醒整段消失。`checkRequirements` 内部用 [`metaLayers`→`parseList`](../../../packages/company-pack/src/lib/docs/requirements-check.ts#L436-L455)（认方括号），所以同一行在两处得到不同集合。
 
 ## 运行面
 
-- **面 = host**：[`req-command.ts`](../../packages/company-pack/src/host/commands/req-command.ts#L92-L98) 与 [第 285-292 行](../../packages/company-pack/src/host/commands/req-command.ts#L285-L292)；对照 [`requirements-check.ts`](../../packages/company-pack/src/lib/docs/requirements-check.ts#L436-L455)。
+- **面 = host**：[`req-command.ts`](../../../packages/company-pack/src/host/commands/req-command.ts#L92-L98) 与 [第 285-292 行](../../../packages/company-pack/src/host/commands/req-command.ts#L285-L292)；对照 [`requirements-check.ts`](../../../packages/company-pack/src/lib/docs/requirements-check.ts#L436-L455)。
 
 ## 复现
 
@@ -63,3 +63,10 @@ for (const v of ['MRD, SyRS', '[MRD, SyRS]', '\"MRD, SyRS\"']) {
 
 - `layers: [MRD, SyRS]` 与 `layers: "MRD, SyRS"` 在 `/req check` 里都触发「产品类型不支持 SyRS」的同一条提醒；
 - 三种写法下 `parseDeclaredLayers` 与 `metaLayers` 的集合相等（新增表驱动用例，旧实现红、新实现绿）。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/lib/docs/requirements-check.ts`、`packages/company-pack/src/host/commands/req-command.ts`、`tests/host/commands/req-command.spec.ts`
+- 红：`pnpm test tests/host/commands/req-command.spec.ts` —— 还原裸拆分前 1 failed（`[MRD, SyRS]` 不触发不支持层提醒）
+- 绿：`pnpm test tests/host/commands/req-command.spec.ts` —— 全绿（方括号/引号两种写法都报 SyRS 不支持）
+- 提交：commit d700c76a
