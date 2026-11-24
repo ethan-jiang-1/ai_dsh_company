@@ -25,6 +25,7 @@ import { pickArchivedJournal } from '../../tools/lib/company/converge-rules.mjs'
 import { pickSessionLog } from '../../tools/lib/session/session-log-generation.mjs'
 import { requireDevHome } from '../../tools/lib/core/runtime-home.mjs'
 import { COMPANY_ROLE_IDS } from '../../tools/lib/company/company-roles.mjs'
+import { COMPANY_BUNDLE_DIRNAME, resolveCompanyRoots } from '../../tools/lib/company/workspace-roots.mjs'
 import { zstdText } from '../../tools/drivers/zstd.mjs'
 
 const args = process.argv.slice(2)
@@ -47,6 +48,8 @@ if (!existsSync(SESSIONS)) {
   process.exit(2)
 }
 const TARGET = argOf('--cwd') === undefined ? undefined : resolve(argOf('--cwd'))
+/** BUG-353：v3 盘把 kb/ 放进了 `.dsh-company/`；在场判据必须跟着双根走。 */
+const companyRootOf = workspace => resolveCompanyRoots(workspace, existsSync(join(workspace, COMPANY_BUNDLE_DIRNAME))).companyRoot
 const LIMIT = Number(argOf('--limit') ?? '400')
 // 「收工留痕」硬闸门语气 2026-09-25 才进 skill；早于此的场次按**历史**单列（不判违规——
 // 拿今天的规矩去判规则生效前的行为是假阳性，会淹掉真信号）。
@@ -186,7 +189,7 @@ function readdirSyncSafe(dir) {
 
 /** 三级匹配：确认 / 存疑 / 违规。 */
 function presence(workspace, role, motion) {
-  const dir = join(workspace, 'kb', role, 'journal')
+  const dir = join(companyRootOf(workspace), 'kb', role, 'journal')
   const inArchive = archived(workspace, role, motion.slug)
   if (inArchive !== null) return { level: 'archived', hit: inArchive }
   if (!existsSync(dir)) return { level: 'missing', hit: null }
@@ -215,7 +218,7 @@ function presence(workspace, role, motion) {
 function formatViolations(workspace, motion) {
   const bad = []
   for (const role of ROLES) {
-    const dir = join(workspace, 'kb', role, 'journal')
+    const dir = join(companyRootOf(workspace), 'kb', role, 'journal')
     if (!existsSync(dir)) continue
     for (const name of readdirSync(dir)) {
       const path = join(dir, name)

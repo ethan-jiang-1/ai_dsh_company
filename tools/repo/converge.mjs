@@ -26,6 +26,7 @@ import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 import { assess, canonicalParticipation, catalogIndexInvocation, charterHasEntry, convergenceResume, journalSlug, parseFlags, steps } from '../lib/company/converge-rules.mjs'
 import { parseAuditVerdict } from '../lib/repo/audit-verdict.mjs'
 import { COMPANY_ROLE_IDS } from '../lib/company/company-roles.mjs'
+import { COMPANY_BUNDLE_DIRNAME, resolveCompanyRoots } from '../lib/company/workspace-roots.mjs'
 import { spawnSync } from 'node:child_process'
 
 const args = process.argv.slice(2)
@@ -45,9 +46,17 @@ if (WS === ROOT_REAL || !WS.startsWith(ROOT_REAL + sep)) {
   process.exit(1)
 }
 const WS_REL = relative(ROOT, WS).split(sep).join('/')
-const ACTIVE = join(WS, 'deliverables')
-const ARCHIVE = join(WS, 'deliverables-archive')
-const LEDGER = join(WS, 'kb', 'motion-ledger.md')
+// BUG-353：v3 run-bundle 把数据搬进 <ws>/.dsh-company；文件操作走 companyRoot，仓库相对路径走外层。
+const roots = resolveCompanyRoots(WS, existsSync(join(WS, COMPANY_BUNDLE_DIRNAME, 'kb'))
+  || existsSync(join(WS, COMPANY_BUNDLE_DIRNAME, 'deliverables'))
+  || existsSync(join(WS, COMPANY_BUNDLE_DIRNAME, 'deliverables-archive')))
+const COMPANY = roots.companyRoot
+const COMPANY_REL = relative(ROOT, COMPANY).split(sep).join('/')
+/** 公司根内的仓库相对片段（v3 加 `.dsh-company/` 前缀，扁平不加）。 */
+const companyRel = (...parts) => parts.filter(part => part !== '').join('/')
+const ACTIVE = join(COMPANY, 'deliverables')
+const ARCHIVE = join(COMPANY, 'deliverables-archive')
+const LEDGER = join(COMPANY, 'kb', 'motion-ledger.md')
 const ROLES = COMPANY_ROLE_IDS
 const today = new Date().toISOString().slice(0, 10)
 
@@ -69,7 +78,7 @@ const metaField = (dir, field) => {
  * @returns `{ ok, detail, violations }`
  */
 const checkSlugFindings = slug => {
-  const r = spawnSync(process.execPath, [join(ROOT, 'checks', 'audit', 'deliverables-check.mjs'), '--only', slug, '--json'], { encoding: 'utf8' })
+  const r = spawnSync(process.execPath, [join(ROOT, 'checks', 'audit', 'deliverables-check.mjs'), '--only', slug, '--workspace', WS_REL, '--json'], { encoding: 'utf8' })
   // 判词结构化后只读机器行：exit 2 / 无判词 / assessed:false = 无法判定，一律 fail-closed。
   const verdict = parseAuditVerdict(r.stdout ?? '')
   if (r.status === 2 || verdict === null || verdict.assessed === false) {
@@ -126,11 +135,11 @@ const harvestJournal = (slug) => {
   const moved = []
   const known = allSlugs().filter(s => s !== slug)
   for (const role of ROLES) {
-    const dir = join(WS, 'kb', role, 'journal')
+    const dir = join(COMPANY, 'kb', role, 'journal')
     if (!existsSync(dir)) continue
     for (const f of readdirSync(dir)) {
       if (!f.endsWith('.md')) continue
-      if (journalSlug(f, slug, known)) moved.push({ role, file: f, path: join('kb', role, 'journal', f) })
+      if (journalSlug(f, slug, known)) moved.push({ role, file: f, path: companyRel(roots.bundleRel, 'kb', role, 'journal', f) })
     }
   }
   return moved
@@ -153,7 +162,7 @@ const clearLiveJournal = journal => {
     if (tracked) git(['rm', '-q', p])
     else rmSync(join(ROOT, p), { force: true })
     removed.push(p)
-    const roleDir = join(WS, 'kb', j.role, 'journal')
+    const roleDir = join(COMPANY, 'kb', j.role, 'journal')
     const keep = join(roleDir, '.gitkeep')
     if (readdirSync(roleDir).length === 0 && !existsSync(keep)) writeFileSync(keep, '')
   }
@@ -245,7 +254,7 @@ const resume = (dirName) => {
 const rewriteRefs = ({ dirName, journal }) => {
   const refRewrites = []
   for (const role of ROLES) {
-    const charter = join(WS, 'kb', role, 'CHARTER.md')
+    const charter = join(COMPANY, 'kb', role, 'CHARTER.md')
     if (!existsSync(charter)) continue
     let ct = readFileSync(charter, 'utf8')
     let touched = false
@@ -268,17 +277,17 @@ const rewriteRefs = ({ dirName, journal }) => {
     let nt = readFileSync(nf, 'utf8')
     let touched = false
     for (const j of journal) {
-      const ref = `${WS_REL}/kb/${j.role}/journal/${j.file}`
+      const ref = `${COMPANY_REL}/kb/${j.role}/journal/${j.file}`
       if (nt.includes(ref)) {
-        const noteTo = `${WS_REL}/deliverables-archive/${dirName}/journal/${j.role}/${j.file}`
+        const noteTo = `${COMPANY_REL}/deliverables-archive/${dirName}/journal/${j.role}/${j.file}`
         nt = nt.split(ref).join(noteTo)
         touched = true
         refRewrites.push(`notes/implemented/${n}：journal 路径 → ${noteTo}`)
       }
     }
-    for (const dref of [`${WS_REL}/deliverables/${dirName}/`]) {
+    for (const dref of [`${COMPANY_REL}/deliverables/${dirName}/`]) {
       if (nt.includes(dref)) {
-        nt = nt.split(dref).join(`${WS_REL}/deliverables-archive/${dirName}/`)
+        nt = nt.split(dref).join(`${COMPANY_REL}/deliverables-archive/${dirName}/`)
         touched = true
         refRewrites.push(`notes/implemented/${n}：交付物路径 → 归档家`)
       }
@@ -342,7 +351,8 @@ const converge = (dirName) => {
   }
   // 零 journal / 未结审计发现两道前置已并入 assess（本函数 prologue），此处不再重复判。
   // 计划清单与执行动作同源（converge-rules.steps）：dry-run 打印的就是执行器要逐条消费的序列。
-  const plan = steps({ dirName, conclusion: fields.summary, journal, wsRel: WS_REL })
+  // archve-move 的 from/to 必须是公司根相对路径（v3 = <ws>/.dsh-company/...；扁平 = <ws>/...）。
+  const plan = steps({ dirName, conclusion: fields.summary, journal, wsRel: COMPANY_REL })
   console.log(`收敛计划 · ${dirName}${DRY ? '（dry-run）' : ''}`)
   for (const step of plan) if (step.label) console.log('  · ' + step.label)
   if (DRY) { console.log('dry-run 结束，未动盘'); return }
@@ -377,8 +387,8 @@ const charterBackfill = (dirName) => {
     : '历史收敛未留 journal 副本'
   if (DRY) { console.log(`backfill 计划：${slug} → ${roles.join(', ')} 的 CHARTER 历史纪要（${journalHint}）`); return }
   for (const role of roles) {
-    const charter = join(WS, 'kb', role, 'CHARTER.md')
-    mkdirSync(join(WS, 'kb', role), { recursive: true })
+    const charter = join(COMPANY, 'kb', role, 'CHARTER.md')
+    mkdirSync(join(COMPANY, 'kb', role), { recursive: true })
     let ct = existsSync(charter) ? readFileSync(charter, 'utf8') : ''
     if (charterHasEntry(ct, slug)) { console.log(`  · ${role}: CHARTER 历史纪要已有 ${slug} 条目——跳过`); continue }
     const entry = `- ${kickoff} · ${slug}（${kind}）—— ${concl}\n  （${journalNote(role)}；交付物：\`deliverables-archive/${dirName}/\`）`
