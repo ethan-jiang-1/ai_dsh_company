@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-351**（2026-11-24，351..359 批顺位 2 / P1）：方法 `SKILL.md` 的 `description` 用 JSON/YAML 双引号标量编码，采纳前用 `methodSkillProblem` 自检 frontmatter，坏产物拒绝 adopted——
+  [351](BUG-351-method-skill-text-unescaped-yaml-description.md)。证据提交 `b781937f`。
+
 - **BUG-353**（2026-11-24，351..359 批顺位 1 / P1）：converge 与 journal-audit 改用共享 `resolveCompanyRoots` 双根解析，v3 `.dsh-company/` 计划/索引/审计三路恢复；顺带修回 `deliverables-index.mjs` 缺失的 `deliverableSlug` 导入——
   [353](BUG-353-converge-and-journal-audit-broken-on-v3-dot-dsh-company.md)。证据提交 `7010fa85`。
 
