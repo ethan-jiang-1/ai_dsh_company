@@ -6,7 +6,7 @@
 
 本 repo 的形态与机制结论借鉴八处 repo 外材料（前三处在维护者本机的 vendor 研究树内、
 已被其 git 跟踪；其余为独立外部仓；均不在本 repo 版本控制范围，引用时注明是外部研究材料）：
-`_faq_on_digested/`、`_digested/`、`_dsh_plugin_agent_ready_development/`、外部仓 ai_deerflow_deep_research_v2（`_backlog` 借鉴源，D31）、外部仓 ai_dsh_loop_advisor/_backlog（D31 制度演进宿主，D33 回借源）、外部仓 ai_dsh_assitant/notes（notes/ 分类 owner 精神借源，D35）、外部仓 ai_dsh_assitant/_backlog（`_backlog` 现行制度整体借源，2026-10-09 重立——路由见 D31 行）、外部仓 ai_dsh_deep_research/_backlog（研究题/题名页模型借源，2026-10-30 当日态——D50）。各材料的版本核对与其"想法落在哪儿"见下表；研究树 HEAD 持续演进，引用以注册行为准、不追新提交。**思想吸收进本 repo 文档后，日常不再依赖原文**；下表是"哪个想法落在了哪儿"的地图：
+`_faq_on_digested/`、`_digested/`、`_dsh_plugin_agent_ready_development/`、外部仓 ai_deerflow_deep_research_v2（`_backlog` 借鉴源，D31）、外部仓 ai_dsh_loop_advisor/_backlog（D31 制度演进宿主，D33 回借源）、外部仓 ai_dsh_assitant/notes（notes/ 分类 owner 精神借源，D35）、外部仓 ai_dsh_assitant/_backlog（`_backlog` 现行制度整体借源，2026-10-09 重立——路由见 D31 行）、外部仓 ai_dsh_deep_research/_backlog（研究题/题名页模型借源，2026-10-30 当日态——D50）。各材料的版本核对与其"想法落在哪儿"见下表；研究树 HEAD 持续演进，引用以注册行为准、不追新提交。**思想吸收进本 repo 文档后，日常不再依赖原文**；引用外部材料只写代码跨度或 URL，**不得写仓库相对链接**（repo-closed 门禁 = md-links 的 `outside` 判据，2026-11-25）。下表是"哪个想法落在了哪儿"的地图：
 
 | 材料 | 内容 | 吸收落点 |
 |---|---|---|

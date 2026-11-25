@@ -30,6 +30,7 @@ pnpm typecheck
 - `pnpm setup` 无参数；`--check/--types` 用 `node tools/dev/setup.mjs ...`。
 - `lib/`、`_dist/*.tgz`、`runtime/` 都是 gitignored：clean clone 没有它们，`npm pack` 会被
   `prepack-check` 拒绝空包。
+- 链接/裸路径门禁是 **repo-closed**：只认仓库内可追踪目标，不依赖本机相邻目录（外部研究材料写成代码跨度或 URL）。
 - 验收：`setup --check` 全产物、`verify` ALL PASS、`test` 全绿；这就是「源码 handoff 可跑」的证据。
 
 ## 2 第一次真挂载 / 首屏
