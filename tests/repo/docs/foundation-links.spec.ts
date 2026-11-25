@@ -113,6 +113,21 @@ describe('GFM local paths and references', () => {
     ])
   })
 
+  it('ignored 目标由调用方注入：命中即红，不命中不判（git 查询不在 tools/lib）', () => {
+    put('docs/target.md')
+    put('README.md', '[ok](docs/target.md)\n')
+    const target = join(root, 'docs/target.md')
+    expect(validateMarkdownLinks(root, { isIgnored: () => new Set([target]) }).violations
+      .map(v => v.reason)).toEqual(['ignored'])
+    expect(validateMarkdownLinks(root, { isIgnored: () => new Set() }).violations).toEqual([])
+  })
+
+  it('证据目录名（无尾斜杠）按证据面跳过：company-workspace 本身不是死链', () => {
+    put('docs/evidence.md', '[证据](../company-workspace)\n')
+    put('docs/ok.md')
+    expect(validateMarkdownLinks(root).violations).toEqual([])
+  })
+
   it('percent-decodes paths and fragments after separating URL delimiters', () => {
     put('docs/中文 #?.md', '# 中文 标题\n')
     const report = check('[encoded](docs/%E4%B8%AD%E6%96%87%20%23%3F.md?raw=1#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98)\n')
