@@ -1,6 +1,6 @@
 /** Bounded, read-only GFM reference checks for current repository source documents. */
 import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs'
-import { dirname, extname, join, relative, resolve } from 'node:path'
+import { dirname, extname, join, relative, resolve, sep } from 'node:path'
 import { createRequire } from 'node:module'
 import { pathToFileURL } from 'node:url'
 import { repositoryRoot } from './repository-layout.mjs'
@@ -130,12 +130,25 @@ export function markdownLinkTargets(file, source = readFileSync(file, 'utf8')) {
   return targets
 }
 
+// 本地证据树（与「缺失目标跳过」同一口径）：里面的字节不随 repo handoff 走，链接只作本地观察。
+// 与 bare-path 的 RUNTIME_PREFIXES 同边界；新增证据树时两处一起改。
+const EVIDENCE_PREFIXES = ['runtime/', 'company-workspace/', 'snapshots/']
+// 目录本身（`company-workspace`，无尾斜杠）与树下文件同属证据面。
+const isEvidencePath = (rel) => EVIDENCE_PREFIXES.some(prefix => rel === prefix.slice(0, -1) || rel.startsWith(prefix))
+
 /**
  * Check Markdown links/images/definitions with cached target headings and source line diagnostics.
  * Root-absolute URLs and schemes are renderer-owned; non-Markdown fragments are not interpreted.
  * Raw HTML hrefs and undefined reference-looking prose are outside this Markdown-only gate.
+ *
+ * 两遍：先收集链接，再批量判 gitignored（一次 git 调用），最后产出违例。判据三类：
+ * `outside`（相对链接逃出仓库根）、`ignored`（目标 gitignored：本机有、干净 clone 无）、
+ * `target`/`anchor`/`encoding`（原有）。
+ *
+ * `options.isIgnored(targets) -> Set<absPath>` 由 judge 层注入（git 查询不得住 tools/lib；
+ * 见 tests/repo/structure/layering.spec.ts 的分层守卫）。不注入 = 不判 ignored。
  */
-export function validateMarkdownLinks(root) {
+export function validateMarkdownLinks(root, options = {}) {
   const files = sourceMarkdownFiles(root)
   const trees = new Map()
   const anchorSets = new Map()
@@ -147,15 +160,12 @@ export function validateMarkdownLinks(root) {
     if (!anchorSets.has(file)) anchorSets.set(file, documentAnchors(treeOf(file)))
     return anchorSets.get(file)
   }
-  const violations = []
-  let linkCount = 0
+  const entries = []
   for (const file of files) {
     visit(treeOf(file), (node) => {
       if (!['link', 'image', 'definition'].includes(node.type)) return
       const url = node.url
       if (url.startsWith('/') || /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(url)) return
-      linkCount++
-      const report = (reason) => violations.push({ file: relative(root, file), line: node.position.start.line, url, reason })
       const hash = url.indexOf('#')
       let path, fragment
       try {
@@ -163,23 +173,37 @@ export function validateMarkdownLinks(root) {
         fragment = hash < 0 ? '' : decodeURIComponent(url.slice(hash + 1))
       } catch {
         // A malformed URL escape is a diagnostic, not an uncaught decoder error.
-        report('encoding')
+        entries.push({ file, line: node.position.start.line, url, reason: 'encoding' })
         return
       }
-      const target = path === '' ? file : resolve(dirname(file), path)
-      if (!existsSync(target)) {
-        // runtime/ 与 company-workspace/ 不是产品仓的保证：runtime 证据按政策可清（runtime/README §五），
-        // company-workspace 是 run bundle 的 workspace（整树 gitignored），snapshots 的真实证据已移产品仓外。三类按“本地证据引用”观察，
-        // 不判死链；产品源码/文档的硬链接不受影响。bare-path 的 RUNTIME_PREFIXES 同口径。
-        const targetRel = relative(root, target).split('\\').join('/')
-        const sourceRel = relative(root, file).split('\\').join('/')
-        const fromRuntimeDoc = sourceRel.startsWith('runtime/') || sourceRel.startsWith('company-workspace/')
-        if (!fromRuntimeDoc && (targetRel.startsWith('runtime/') || targetRel.startsWith('company-workspace/') || targetRel.startsWith('snapshots/'))) return
-        report('target'); return
-      }
-      if (fragment !== '' && extname(target).toLowerCase() === '.md' && statSync(target).isFile()
-        && !anchorsOf(target).has(fragment)) report('anchor')
+      entries.push({ file, line: node.position.start.line, url, path, fragment, target: path === '' ? file : resolve(dirname(file), path) })
     })
+  }
+  // 忽略判定由调用方注入（judge 层可 spawn git；本模块保持 keyless 纯逻辑，见 tests/repo/structure/layering.spec）。
+  const existing = entries.filter(entry => entry.target !== undefined && existsSync(entry.target)).map(entry => entry.target)
+  const ignored = options.isIgnored === undefined ? new Set() : options.isIgnored(existing)
+  const violations = []
+  let linkCount = 0
+  for (const entry of entries) {
+    linkCount++
+    const report = (reason) => violations.push({ file: relative(root, entry.file), line: entry.line, url: entry.url, reason })
+    if (entry.reason !== undefined) { report(entry.reason); continue }
+    const targetRel = relative(root, entry.target).split(sep).join('/')
+    // 相对链接必须留在仓库内：逃出根的目标只在作者机器上与相邻研究树重合，clone 必断。
+    if (targetRel === '..' || targetRel.startsWith('../')) { report('outside'); continue }
+    if (!existsSync(entry.target)) {
+      // runtime/ 与 company-workspace/ 不是产品仓的保证：runtime 证据按政策可清（runtime/README §五），
+      // company-workspace 是 run bundle 的 workspace（整树 gitignored），snapshots 的真实证据已移产品仓外。三类按“本地证据引用”观察，
+      // 不判死链；产品源码/文档的硬链接不受影响。bare-path 的 RUNTIME_PREFIXES 同口径。
+      const sourceRel = relative(root, entry.file).split(sep).join('/')
+      const fromRuntimeDoc = sourceRel.startsWith('runtime/') || sourceRel.startsWith('company-workspace/')
+      if (!fromRuntimeDoc && isEvidencePath(targetRel)) continue
+      report('target'); continue
+    }
+    // 目标在场但被 git 忽略 ⇒ 干净 clone 里不存在，不能算绿（证据树例外，见上）。
+    if (!isEvidencePath(targetRel) && ignored.has(entry.target)) { report('ignored'); continue }
+    if (entry.fragment !== '' && extname(entry.target).toLowerCase() === '.md' && statSync(entry.target).isFile()
+      && !anchorsOf(entry.target).has(entry.fragment)) report('anchor')
   }
   return { files, linkCount, violations }
 }

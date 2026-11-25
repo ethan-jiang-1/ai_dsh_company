@@ -17,7 +17,7 @@ intent: 对照两组 FAQ 与本仓现有资产，解释补洞循环的结构性�
 
 - 日期：2026-11-20，Asia/Shanghai；本仓基线 `936123a6fbff828fde99e99886dacaa2956d959e`；分支 `schemastery`，开始时工作树干净。
 - DSH 权威：只读的钉 SHA `b830ec950faba0a46dda564be3e2d854afed94f1`；本轮核对其 HEAD 与零改动。外部 FAQ 是研究线索，不以其链接的 master 充当本仓版本事实。
-- 输入：[FAQ30 总览](../../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/answer.md)、[配置设计纪律](../../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/05-practical-design-disciplines.md)、[FAQ31 总览](../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/answer.md)、[行为评估](../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/03-behavior-evaluation.md)、[长期开发](../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/04-long-term-development.md)、[本仓案例审读](../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/research-company.md)。原生机制的版本核对见同题材料表。
+- 输入：FAQ30 总览（`_faq_on_digested/30_schemastery-basics/answer.md`）、配置设计纪律（`_faq_on_digested/30_schemastery-basics/05-practical-design-disciplines.md`）、FAQ31 总览（`_faq_on_digested/31_preset-quality/answer.md`）、行为评估（`_faq_on_digested/31_preset-quality/03-behavior-evaluation.md`）、长期开发（`_faq_on_digested/31_preset-quality/04-long-term-development.md`）、本仓案例审读（`_faq_on_digested/31_preset-quality/research-company.md`）。原生机制的版本核对见同题材料表。
 - 证据分层：读源码确认的判据、本轮两个隔离对照实验、历史 Note 自报的运行记录、未来建议，分别叙述。历史红绿和 FAQ 的实跑记录没有冒充本轮执行。
 - 不开展无边界 bug hunt；不跑真模型、浏览器、发布、全局安装或部署。研究验证只检查文档变更与既有 keyless 回归，不评价当前模型的业务能力。
 
@@ -42,7 +42,7 @@ intent: 对照两组 FAQ 与本仓现有资产，解释补洞循环的结构性�
 1. **输入集合靠人枚举。** 新路径、新目录、新消费者必须再补一行，否则旧检查仍绿。最近的[守卫残余面决定：7](../../../../notes/implemented/2026-11-19-guard-residuals-closure.md)已经把多项输入改为目录派生和单一实现，这正是减少未来维护义务的办法；不能每轮再把同一思想写成新制度。
 2. **形状或单步矩阵不足以证明跨操作序列。** [startup 形状矩阵](../../../../tests/host/contract/startup-state-agreement.spec.ts#L30)和[ledger 非破坏矩阵](../../../../tests/host/contract/ledger-state-agreement.spec.ts#L66)已保护有价值性质，但没有因此证明所有“写入→失败→重试→重启”序列。跨时间错误需要在相关 owner 处补操作序列和失败点验证，而非无限加静态形状。
 3. **测试保留实现假设。** 实验 B 的二键“成功”样本与实现一致；实验 A 对“同名键存在”的理解过宽。测试可以全部命中仍接受错误。要从承诺独立构造反例，针对关键条件做变异，而不只检查行被执行过。[SQLite 的 mutation 说明](https://sqlite.org/testing.html#mutation_testing)也区分“走过分支”和“该分支影响结果”。
-4. **把观察代理量当成最终目标。** 能加载、工具有调用、任务板有边、文件有标题、verifier 说 pass，分别是有限事实。它们替代自主决策或领域成果时，就形成不受测试保护的承诺。[FAQ31 的分层建议：35](../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/03-behavior-evaluation.md)明确分开机制、决策和领域质量。
+4. **把观察代理量当成最终目标。** 能加载、工具有调用、任务板有边、文件有标题、verifier 说 pass，分别是有限事实。它们替代自主决策或领域成果时，就形成不受测试保护的承诺。FAQ31 的分层建议：35（`_faq_on_digested/31_preset-quality/03-behavior-evaluation.md`）明确分开机制、决策和领域质量。
 
 这里的因果关系是有源码支持的工程推断，不是长期缺陷率的统计结论。“探索仍发现 bug”本身也不能证明策略失败：新功能、不同输入范围及更强探索都会改变发现数。
 
@@ -60,7 +60,7 @@ intent: 对照两组 FAQ 与本仓现有资产，解释补洞循环的结构性�
 | 模型决策与业务成果 | 给目标即可选合理方法；资料缺失时停止，补齐时完成；结果可核验 | 真模型正反题、独立资料/计算/产物验收；保留未用于调优的题，逐例保留首次失败和成本 | 题目泄漏工具路线、一律拒绝拿高分、没有终态或合格产物却判成功 |
 | 交付证据与测试自身 | 必要检查全部存在且 pass，证据与所测版本对应 | 复用现有 lane 注册/manifest；消费者验证必要集合，缺失/跳过/超时保持不同状态；变异验证拒绝分支 | 删掉一项必要证据、空选择、runner 不再调用、变异后仍全绿 |
 
-配置校验只能保证声明覆盖的输入条件；工具不暴露、执行器限制和沙箱也各有范围。把可机械禁止的动作交给实际执行边界，可以减少依赖提示词服从；模型的事实判断与业务取舍仍需任务评估。[FAQ30 的质量边界：7](../../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/04-assessing-quality-claims.md)反对由约束推出任意任务都正确。
+配置校验只能保证声明覆盖的输入条件；工具不暴露、执行器限制和沙箱也各有范围。把可机械禁止的动作交给实际执行边界，可以减少依赖提示词服从；模型的事实判断与业务取舍仍需任务评估。FAQ30 的质量边界：7（`_faq_on_digested/30_schemastery-basics/04-assessing-quality-claims.md`）反对由约束推出任意任务都正确。
 
 ### 4.1 测试资产应该积累什么
 

@@ -15,6 +15,7 @@
 //   content-manifest      inventory 里塞重复项                                → inventory 重复
 //   base-clean            charter 加“公司财务 agent 案（date-pending）”           → 含部署个案语言
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import * as baseClean from '../../checks/gates/base-clean.mjs'
@@ -23,6 +24,7 @@ import * as contentSingleHome from '../../checks/gates/content-single-home.mjs'
 import * as methodContract from '../../checks/gates/method-contract.mjs'
 import * as packContentPaths from '../../checks/gates/pack-content-paths.mjs'
 import * as navCountClaims from '../../checks/gates/nav-count-claims.mjs'
+import * as mdLinks from '../../checks/gates/md-links.mjs'
 import { mutateFile } from '../support/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
@@ -148,6 +150,9 @@ const mutateOrFail = (label, path, transform) => {
     // 盲审 S1：分支②（库存目录相邻裸篇数）独立红夹具——只坏分支②而①仍在时也必须红。
     writeFileSync(path, '# x\n\nnotes/ 现有 335 篇，持续增长。\n')
     report('nav-count-claims：库存目录相邻裸篇数（分支②）→ 红', run(navCountClaims, root), '文档篇数计数声明')
+    // 2026-11-25：preset 计数类（第 12 个 preset 进仓当天即过期）。
+    writeFileSync(path, '# x\n\n## 名册\n\n公司有 6 个 preset，六公司角色各一行。\n')
+    report('nav-count-claims：preset 计数（6 个 preset）→ 红', run(navCountClaims, root), 'preset 计数声明')
     // 盲审 S2：豁免夹具补齐注释清单（长篇/八篇/两篇），与真盘 13 行绿双兜。
     writeFileSync(path, '# x\n\n本篇管环境。各追加一篇。四篇理由 Note。八篇制度。两篇 PDF。长篇失控。（46 篇 journal 已于昔日迁移）。\n')
     const msgs = run(navCountClaims, root)
@@ -158,5 +163,31 @@ const mutateOrFail = (label, path, transform) => {
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 
+{
+  // md-links repo-closed 判据（2026-11-25 立）：clean-clone 等价。三类夹具，三个方向都跑。
+  const root = mkdtempSync(join(tmpdir(), 'gates-mdlinks-'))
+  try {
+    mkdirSync(join(root, 'docs'), { recursive: true })
+    mkdirSync(join(root, 'lib'), { recursive: true })
+    writeFileSync(join(root, '.gitignore'), 'lib/\n')
+    writeFileSync(join(root, 'lib/out.js'), 'x\n')
+    spawnSync('git', ['init', '-q'], { cwd: root })
+    writeFileSync(join(root, 'docs/ok.md'), '# ok\n\n[内链](./also.md)\n')
+    writeFileSync(join(root, 'docs/also.md'), '# also\n')
+    writeFileSync(join(root, 'docs/outside.md'), '# x\n\n[外链](../../outside.md)\n')
+    writeFileSync(join(root, 'docs/ignored.md'), '# x\n\n[产物](../lib/out.js)\n')
+    report('md-links：相对链接逃出仓库根 → 红', run(mdLinks, root), 'repo 外目标')
+    report('md-links：gitignored 产物目标 → 红', run(mdLinks, root), 'gitignored 目标')
+    rmSync(join(root, 'docs/outside.md'))
+    rmSync(join(root, 'docs/ignored.md'))
+    const green = run(mdLinks, root)
+    const clean = !green.some(m => m.startsWith('FAIL'))
+    if (!clean) failures += 1
+    console.log(`${clean ? 'PASS' : 'FAIL'} md-links：仓库内链接 → 绿`)
+    for (const m of green.slice(0, 2)) console.log(`  ${m}`)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
 console.log(failures === 0 ? 'gates-negative-smoke: ALL PASS' : `gates-negative-smoke: ${failures} FAILURE(S)`)
+
 process.exitCode = failures === 0 ? 0 : 1

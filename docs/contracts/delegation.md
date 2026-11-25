@@ -17,18 +17,18 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 
 ## 1. 命名委托工具（通道 A）
 
-| 工具 | 汇报对象 | 关键 config |
+| 工具 | 汇报对象 | 关键 config（**深度值见 preset 行，本表不复制**） |
 |---|---|---|
-| `vp_eng` | VP-Eng（研发） | `provider: spawn` · `maxDepth: 1` · `agentPreset: vp-eng` |
-| `vp_sales` | VP-Sales（销售） | `provider: spawn` · `maxDepth: 1` · `agentPreset: vp-sales` |
+| `vp_eng` | VP-Eng（研发） | `provider: spawn` · `agentPreset: vp-eng` |
+| `vp_sales` | VP-Sales（销售） | `provider: spawn` · `agentPreset: vp-sales` |
 | `subagent_research` | 只读调研执行手（一次性调研） | `provider: spawn` · `agentPreset: worker-researcher`（只读工具面） |
-| `vp_cmo` | CMO（市场与产品定义；CEO 版 `maxDepth: 1` / VP-Eng 版 `maxDepth: 2`） | `provider: spawn` · `agentPreset: cmo` |
-| `coo` | COO（运营与交付） | `provider: spawn` · `maxDepth: 1` · `agentPreset: coo` |
-| `cfo` | CFO（财务与合规） | `provider: spawn` · `maxDepth: 1` · `agentPreset: cfo` |
-| `quality_loop_produce` | 产出者（质量环"做"的一侧；**只在 vp-eng preset**） | `provider: spawn` · `maxDepth: 2` · `agentPreset: quality-loop-producer` |
-| `quality_loop_verify` | 验证者（质量环"验"的一侧，只读手；**只在 vp-eng preset**） | `provider: spawn` · `maxDepth: 2` · `agentPreset: quality-loop-verifier` |
+| `vp_cmo` | CMO（市场与产品定义；CEO 版 / VP-Eng 版各一行，深度见行） | `provider: spawn` · `agentPreset: cmo` |
+| `coo` | COO（运营与交付） | `provider: spawn` · `agentPreset: coo` |
+| `cfo` | CFO（财务与合规） | `provider: spawn` · `agentPreset: cfo` |
+| `quality_loop_produce` | 产出者（质量环"做"的一侧；**只在 vp-eng preset**） | `provider: spawn` · `agentPreset: quality-loop-producer` |
+| `quality_loop_verify` | 验证者（质量环"验"的一侧，只读手；**只在 vp-eng preset**） | `provider: spawn` · `agentPreset: quality-loop-verifier` |
 
-- **CEO 五个直接汇报各有命名行**（`vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo`，均 `maxDepth: 1`）；child 拿自己的 preset/skills，但一次性、无任务板；多职能仍走 team，team 成员是软角色，要角色方法用命名行或任务书角色包。
+- **CEO 五个直接汇报各有命名行**（`vp_eng` / `vp_sales` / `vp_cmo` / `coo` / `cfo`；深度见各自 preset 行）；child 拿自己的 preset/skills，但一次性、无任务板；多职能仍走 team，team 成员是软角色，要角色方法用命名行或任务书角色包。
 - **质量环两条行**：`quality_loop_produce` → 收工 → `quality_loop_verify`，两个独立 activation、严格串行；流程住 `_shared/skills/quality-loop`，方法住 `<DSH_HOME>/company/methods/<preset id>/`（任务书名 `<pack>@<version>`，缺了 fail-closed）；行只管独立上下文与工具面（[presets.md](./presets.md)「质量环能力档」）。
 
 - **activation 语义**：调用立刻返回回执 `{ kind: 'activation', subagentId }`（线上文本形如
@@ -38,7 +38,7 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
   `backgroundMode` / `enableRunInBackground`（Config 硬拒）。每个工具行钉一个角色 preset，
   于是 child 拿到的是**该角色的 skills 与工具面**，而不是 CEO 的继承面。
 - **深度**：`maxDepth` 是 **child 的绝对 depth 上限**（`0` 禁止、`1` 只允许直接子代）；`parent+1 > maxDepth` 即抛 `SubagentDepthError`。真值：`0/1→1 ALLOW`、`1/1→2 THROW`、`1/2→2 ALLOW`、`2/3→3 ALLOW`、`2/2→3 THROW`。
-  `vp_eng`/`vp_sales` 行=1：只能从 depth 0（根/Lead）调用；depth 1 的成员调用会抛。`vp_cmo` 行=2：depth 1 的 VP-Eng 可调、child 落 2。CEO 行=1 只钉**直接 child**；child 再派看它自己 preset 的行（vp-eng 的通用 `subagent` 行=3）。`spawn_teammate` 仅 Lead 可调。
+  各命名委托行与通用 `subagent` 行的 maxDepth **值见 `presets/<role>/agent.cordis.yml`**（行清单唯一源；本节不复制数字）。语义：`vp_eng`/`vp_sales` 只允许 depth 0（根/Lead）调用，depth 1 的成员调用会抛；`vp_cmo` 允许 depth 1 的 VP-Eng 调用、child 落 2；CEO 行只钉**直接 child**——child 再派看它自己 preset 的通用 `subagent` 行。`spawn_teammate` 仅 Lead 可调。
 - **改稿方式**：优先 `send_to_subagent` 续同一个 named child（root/命名 child 都可用；带上一稿原文）；
   不可续或需要新上下文才再委派一次。CEO 团队的反复追加/互审仍归 team（`send_message` 按名）。
 - **工具行归属**：写在 `presets/ceo/agent.cordis.yml` 的 `delegation` 组内（preset 自包含，
@@ -72,7 +72,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 `spawn_teammate` 带研发小队（成员继承 VP-Eng 组合，是"VP-Eng 带的工程师"）；support preset 不是 team 座位——header 不列 team，九件套 team 工具由 host seat guard 拒并注入 `company:delegation-seat` 纠正段（BUG-072/076）；team 在 header 分 `team collaboration`（Lead+成员）与 `team spawn (Lead only)`（BUG-077）。
 三种门的能力不同，别用一个门承诺另一个：① VP-Eng 根门 = Lead，能组 team、能命名请 CMO；
 ② CEO 命名 `vp_eng` child = 不是 member，不能 spawn，但能请专家（depth 2）；③ CEO teammate `vp-eng`
-= 继承 CEO 组合，受 CEO 的 `vp_cmo maxDepth 1` 限制。root=Lead 的探针证据 =
+= 继承 CEO 组合，受 CEO 侧 `vp_cmo` 行的深度上限限制。root=Lead 的探针证据 =
 `probes/team/vp-eng-workflow-probe.mjs`。
 
 ## 3. 团队（通道 B，主通道 D4）
@@ -99,8 +99,7 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
    `active teammate not found`；机制 = §2）。根门改用 `list_subagents`（父会话 durable catalog，重启后可查）
    与 `send_to_subagent`（官方 `ctx.subagents`，续驶/催稿），名字不被 shadow。`list_subagents` 的每行还带
    **引擎身份**：`agentPreset` / `delegationDepth`（十进制字符串，例 `"3"`）读 child durable header，
-   读不到显式 `unavailable`（不默认 worker/0）——父代理据此核对 preset/深度是否真生效（BUG-046）。`subagent`/`subagent_fork` 行
-   `maxDepth: 3`：CEO→VP（1）→workflow 分支（2）→worker（3）放行；VP 根门→分支→worker 仍有余量（2026-11-09 源码：分支/成员都是 activation 子代，深度 parent+1）。重试敏感的小活可用 `subagent_retry`（host 原语，仅五个有 generic subagent 的 full role；同步、最多 2 attempts、attempts/exhausted 可见；长/批量走 workflow）；**它的子代深度不另立预算**——上限 = 该 preset 通用 `subagent` 行的 `maxDepth`，到预算底部返回 `stopReason: depth-exceeded` 且不起 child（BUG-045）；generic child 需要子层时 `agent_preset` 选 `worker-orchestrator`（它只带 leaf；件数与 fan-out 预算由父代理 brief 决定，不承诺硬数字——BUG-051）。`list_subagents`/`send_to_subagent` 是 **per-agent 安装**：support 与没有 child 预算的座位（CEO teammate：childDepth 1 = depth 1）不装；root/命名 child/childDepth > depth 的 teammate（vp-eng teammate：3 > 1）保留（BUG-052/078/079）。
+   读不到显式 `unavailable`（不默认 worker/0）——父代理据此核对 preset/深度是否真生效（BUG-046）。`subagent`/`subagent_fork` 行的 maxDepth（值见 preset 行）：CEO→VP（1）→workflow 分支（2）→worker（3）放行；VP 根门→分支→worker 仍有余量（2026-11-09 源码：分支/成员都是 activation 子代，深度 parent+1）。重试敏感的小活可用 `subagent_retry`（host 原语，仅五个有 generic subagent 的 full role；同步、最多 2 attempts、attempts/exhausted 可见；长/批量走 workflow）；**它的子代深度不另立预算**——上限 = 该 preset 通用 `subagent` 行的 `maxDepth`，到预算底部返回 `stopReason: depth-exceeded` 且不起 child（BUG-045）；generic child 需要子层时 `agent_preset` 选 `worker-orchestrator`（它只带 leaf；件数与 fan-out 预算由父代理 brief 决定，不承诺硬数字——BUG-051）。`list_subagents`/`send_to_subagent` 是 **per-agent 安装**：support 与没有 child 预算的座位（CEO teammate：childDepth 1 = depth 1）不装；root/命名 child/childDepth > depth 的 teammate（vp-eng teammate：3 > 1）保留（BUG-052/078/079）。
 
 ## 5. UI：委派工具卡
 

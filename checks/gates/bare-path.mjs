@@ -98,6 +98,11 @@ export const RUNTIME_PREFIXES = ['runtime/harness-home', 'runtime/harness-home-b
 // `notes/implemented/2026-09-22-org-presence-board.md` = 2026-10-09 存量清扫迁 archived/ 的退役位置；
 // 二轮审计研究笔记逐字引用该断链现场（自带现迁说明）——按本机制放行（2026-10-21）。
 export const RETIRED_PATHS = new Set(['docs/plans/roadmap.md', 'notes/implemented/2026-09-22-org-presence-board.md'])
+// 构建产物不是活指针（2026-11-25 立，动机 = CI run 45421906380 的 bare-path 两条红）：
+// `packages/company-pack/lib/**` 是 `.gitignore` 覆盖的构建目录——作者树存在、干净 clone 不存在。
+// 存在性检查会把「本机有」当绿，于是 CI 红而本地绿。此类路径**一律判红**（存在也红）：
+// 要引就引生成它的脚本/源文件，不引产物本身。
+export const BUILD_OUTPUT_PREFIXES = ['packages/company-pack/lib/']
 // 负例自重（2026-10-09 N5 立）：**故意写出来给人复现的假路径**，与「腐化指针」形状完全相同，静态扫描
 // 分不开（实测：N5 生效后头两条命中就是我自己 Note 里描述负例用的 `docs/zz-tmp-unregistered.md`）。
 // 约定 = 假路径里带 `zz-`/`zzz-`（本仓从未有过以 zz 开头的真实路径；见命名自带"这是测试值"的语义）。
@@ -121,6 +126,11 @@ const scanBarePaths = (files, hit) => {
         if (RUNTIME_PREFIXES.some(p => raw.startsWith(p))) continue
         if (FIXTURE_PATH.test(raw)) continue                             // 负例假路径（见上）
         barePathCount++
+        // 构建产物：存在也红（干净 clone 不存在；存在性检查 = 作者机绿、CI 红，见 BUILD_OUTPUT_PREFIXES 注释）。
+        if (BUILD_OUTPUT_PREFIXES.some(p => raw.startsWith(p))) {
+          hit(`${rel}:${i + 1}`, raw, 'build-output')
+          continue
+        }
         // 双树查的**例外**（2026-10-10 补盲区，entry-probe 语义审实测）：raw 已带 `vendor/` 前缀时
         // **不再**往 `vendor/dsh/` 下重挂——否则 `vendor/README.md` 会命中 `vendor/dsh/vendor/README.md`
         // （Cordis 自己的 vendoring manifest，语义完全不同的另一个文件）而判绿。实测本仓纪律表正是
@@ -128,7 +138,7 @@ const scanBarePaths = (files, hit) => {
         // 双树查仍保留：纪律表"权威（vendor 树）"列合法地写 vendor 相对写法（如 `packages/todo`）。
         const inSubmodule = raw.startsWith('vendor/') ? false : existsSync(join(root, 'vendor/dsh', raw))
         if (!existsSync(join(root, raw)) && !inSubmodule && !RETIRED_PATHS.has(raw)) {
-          hit(`${rel}:${i + 1}`, raw)
+          hit(`${rel}:${i + 1}`, raw, 'missing')
         }
       }
     })
@@ -162,9 +172,11 @@ const scanPlainNotes = (files, fail) => {
 }
 
 export function run({ root, ok, fail }) {
-scanBarePaths(NOW_FILES, (where, raw) => {
+scanBarePaths(NOW_FILES, (where, raw, kind) => {
   barePathBad = true
-  fail('bare-path', `${where} → \`${raw}\` 不存在（双树均无——活指针腐化：改指针到现行家）`)
+  fail('bare-path', kind === 'build-output'
+    ? `${where} → \`${raw}\` 是构建产物（gitignored：本机有、干净 clone 无——引生成脚本/源，不引产物路径）`
+    : `${where} → \`${raw}\` 不存在（双树均无——活指针腐化：改指针到现行家）`)
 })
 scanPlainNotes(NOW_FILES, (where, raw) => {
   barePathBad = true

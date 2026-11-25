@@ -34,7 +34,7 @@
     （固定页签目录 → 类型/body/title/guide 四处贡献）、`tab-copy`（页签三处文案的 key 表与纯取用）、四个页签体 + `TasksPanel`。
   - `cultivation/` —— 培养域：`CultivationView` / `CultivationTab` 壳、看板/收件箱/创作/背景选择器、`cultivation-actions|data|context-data`、
     `use-cultivation-board`。
-  - `startup/` —— 启动策略面：右栏「策略」页签、`startup.json` 读模型与选项数据。
+  - `startup/` —— 启动策略面：右栏「策略」页签、`startup.json` 读模型、选项数据与 **preset 挂载健康面**（`preset-health.ts`：启动时点名 broken preset）。
   Cordis 各槽仍各自等待声明并负责卸载/重装；构建走 tsdown client 半（产物 `lib/client.js`）。
 
 **UI 文案纪律（Phase 0 起）**：任何 company Web UI 文案从第一个 commit 就必须 zh+en；改 UI 前加载 `company-ui-change-definition` skill；文案只住 typed `company` 字典，纯 view model 返回 token 而不是中文。A4 未落地，勿引用；当前由 skill + review 守。

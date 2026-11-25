@@ -106,8 +106,9 @@ describe('GFM local paths and references', () => {
     put('docs/target.md')
     const report = check('[bare](docs/missing.md)\n[dot](./missing.md)\n[parent](../missing.md)\n'
       + '[full][anchor]\n![img][asset]\n\n[anchor]: docs/target.md#missing\n[asset]: missing.png\n')
+    // 2026-11-25 repo-closed：逃出 root 的相对链接归 `outside`（干净 clone 里它必然是断的）。
     expect(report.violations.map(v => [v.line, v.url, v.reason])).toEqual([
-      [1, 'docs/missing.md', 'target'], [2, './missing.md', 'target'], [3, '../missing.md', 'target'],
+      [1, 'docs/missing.md', 'target'], [2, './missing.md', 'target'], [3, '../missing.md', 'outside'],
       [7, 'docs/target.md#missing', 'anchor'], [8, 'missing.png', 'target'],
     ])
   })

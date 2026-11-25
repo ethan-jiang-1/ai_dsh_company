@@ -33,6 +33,7 @@ import { registerReqCommand } from './host/commands/req-command.ts'
 import { registerDeliveryCommand } from './host/commands/delivery-command.ts'
 import { registerSettingsCommand } from './host/commands/settings-command.ts'
 import { registerStartupSettings } from './host/startup/startup-prompt.ts'
+import { createPresetHealth } from './host/startup/preset-health.ts'
 import { StartupOptionsWatch } from './host/startup/startup-watch.ts'
 import { registerCultivation, type CultivationHostConfig } from './host/cultivation/cultivation.ts'
 import { roleLabelFor } from './lib/shared/role-copy.ts'
@@ -84,6 +85,9 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
 
   const runtime = prepareCompanyRuntime(ctx)
   const language = createCompanyLanguage(ctx)
+  // preset 挂载健康面（dim10）：软件 registry 就绪后点名 broken，UI 吞错时仍可诊断。
+  const presetHealth = createPresetHealth(ctx)
+  presetHealth.start()
   // 工具描述/回执随公司语言（BUG-367）：必须在 language 之后注册。
   registerSignoffTool(ctx, { language })
   const workspace = runtime.workspace

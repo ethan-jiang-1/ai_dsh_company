@@ -57,7 +57,7 @@ EOF
 ## 根因与证据
 
 - 根因：[tsdown.config.ts](../../../packages/company-pack/tsdown.config.ts) 的 client 半 `external` 用了 `/^@deepseek-ai\/dsh-client-/`，把 primitives external 成 `require`；但 `package.json` 的 `peerDependencies` 与 `dsh.client.inject` 是手写清单，没有同步（它只在 devDependencies）。
-- 证据：上脚本；[lib/client.js](../../../packages/company-pack/lib/client.js) 的 require；`package.json` 三处清单。
+- 证据：上脚本；构建产物 `lib/client.js` 的 require；`package.json` 三处清单。
 - 影响：安装到不 hoist primitives、或宿主基线未注册该模块的 profile，client 加载会 `module not found`；`client-load` 只证明当前 dev 宿主有它。
 
 ## 失败类与同类排查

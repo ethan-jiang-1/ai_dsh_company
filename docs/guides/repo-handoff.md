@@ -43,7 +43,7 @@ node checks/lanes/client-load.entry.mjs
 ```
 
 - `pnpm company` 的默认 home = `runtime/harness-home`，workspace = `company-workspace`；不要用日用 `~/.dsh`。
-- 真挂载看 11/11 零 broken + 逐个 `session/create`；首屏看无 `Failed to load plugins` + 品牌槽在场。
+- 真挂载看全部 preset 零 broken + 逐个 `session/create`；首屏看无 `Failed to load plugins` + 品牌槽在场。
 - 卸载检查：`dsh plugin --profile company remove dsh-company-pack`；`.dsh-company/` 默认留下。
 
 ## 3 发布点态

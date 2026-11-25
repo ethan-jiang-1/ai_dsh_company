@@ -99,7 +99,7 @@ node checks/lanes/delegation.entry.mjs      # 汇报线边界守卫：控制名�
   链接快速通道。profile `.npmrc` 把 store/cache 钉在 repo 内，`~/Library` 不被碰。
   历史：file: 拷贝时代首次装会拦 koffi 构建审批 → profile 的 `pnpm-workspace.yaml` 改
   `koffi: true` 再装；link: 下 profile 不再装 koffi，koffi 由源码域解析）。观察窗默认端口由 wrapper 交系统分配（`--port 0`）；日用 GUI **永不动**（其端口是环境状态，判据见 [multi-human-runbook](./multi-human-runbook.md)），要固定端口用
-  `-- --port <n>`（端口是环境状态，从启动横幅读）。preset roster 出现在 UI 的 Built-in 组（6 公司角色 + 5 support preset；trust 分组见上文 R1 坑注）。
+  `-- --port <n>`（端口是环境状态，从启动横幅读）。preset roster 出现在 UI 的 Built-in 组（公司角色 + support preset；清单 = `presets/`；trust 分组见上文 R1 坑注）。
 - **bundle 叠加的重复行 id**（R1 实证）：web-app 已 insert `agent-presets`，pack 再 insert 同 id
   → `duplicate loader entry id` 硬拒。修法：对已存在的行用**替换**语法（`- id:`），只有真正
   新增的行才 insert。
@@ -129,7 +129,7 @@ node checks/lanes/delegation.entry.mjs      # 汇报线边界守卫：控制名�
   1. **防线一（快，`pnpm test`）**：已知必填 config 字段必须随工具行给出（如
      `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`）。
   2. **防线二（真，`node checks/lanes/preset.entry.mjs`）**：boot 真 company profile（`pnpm company` 默认安装目标）→ `agentPresets/list`
-     断言 11 个 preset（6 公司角色 + 5 support）零 broken → **逐个 `session/create` 真挂一次**。
+     断言全部 preset（公司角色 + support）零 broken → **逐个 `session/create` 真挂一次**。
   **只有防线二能抓"preset 挂载失败"**：行 config 校验发生在挂载时，roster 扫描与 `--dump-config`
   都看不到，UI 还会吞掉错误（症状就是"新建会话点了没反应"）。已反证：去掉一个必填 config 即变红
   （精确指向 preset 与缺失字段），恢复后 ALL PASS。

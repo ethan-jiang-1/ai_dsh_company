@@ -15,7 +15,7 @@ delegation / Agent Teams / workflow，不自造调度器。
 | 层 | 载体 | 回答什么 | 本仓对应 |
 |---|---|---|---|
 | 代码包 | npm 包，导出 Cordis 插件 | 有没有**新代码** | 只在角色需要专属工具时出现 |
-| bundle | `dsh.bundle.patch` 数组（`cordis.patch.yml` + 11 个 preset 文件） | 装进来默认加哪些**行** | company pack 的 host 共享行 + 每个 preset 行 |
+| bundle | `dsh.bundle.patch` 数组（`cordis.patch.yml` + 每个 preset 一份 `agent.cordis.yml`；清单 = presets/ 目录） | 装进来默认加哪些**行** | company pack 的 host 共享行 + 每个 preset 行 |
 | profile / patch | `$DSH_HOME/profiles/<p>` | 部署级组合选择 | `company` profile；GUI 安装落当前 profile |
 | **agent preset** | 一个目录一个 `agent.cordis.yml` | **一个会话**挂什么（工具 / prompt sections / skills / persona） | 每个角色一个 preset |
 

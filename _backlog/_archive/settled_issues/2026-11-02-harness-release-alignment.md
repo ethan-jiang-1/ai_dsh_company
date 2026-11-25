@@ -12,12 +12,12 @@ opened: 2026-11-02
 > （`_dist` 同一 tarball + `sourceFingerprint`）。去向 = [distribution-alignment Note](../../../notes/implemented/2026-11-02-distribution-alignment.md)。
 >
 > **用户原话（2026-11-02）**：「历史上整理过一下围绕 插件发布 的内容……现在有个更加规整的说法
-> `/Users/bowhead/deepseek-harness/_faq_on_digested/26_harness-release`……1) 对齐规整的说法，尤其术语和做法
+> `_faq_on_digested/26_harness-release`……1) 对齐规整的说法，尤其术语和做法
 > 2) 背后的思路/技术尽量一致用 DSH 推荐的 3) 历史上和这个没有对齐的要清理掉，让整个 REPO 维持高的信噪比……
 > 先挖掘挖掘，看看 GAP 在哪里，回头 GAP 找到后再拟订 PLAN」；「好的，开工 setup goal 记得所有发现的都要
 > 落地啊，记得要有证据证明你的落地啊」；「你记得你干的事情需要显性化到 issue 里面去」。
 >
-> **外部规范（只读）**：`/Users/bowhead/deepseek-harness/_faq_on_digested/26_harness-release`（实际目录；
+> **外部规范（只读）**：`_faq_on_digested/26_harness-release`（实际目录；
 > `26_plugin-data-model` / `26_plugin-as-product` 已不存在）。FAQ 是研究材料，不是 DSH 合同；DSH 合同
 > 仍以 `vendor/dsh` 钉住 tag 为准。
 

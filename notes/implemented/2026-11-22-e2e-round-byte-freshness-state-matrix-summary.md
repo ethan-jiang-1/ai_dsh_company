@@ -10,8 +10,7 @@
    - `tools/lib/core/client-bundle.mjs`：按「client + 它 import 的 lib + 构建配置 + package.json」的
      **目录级**输入集算 sha256（新增文件自动纳入，不手写清单）；产物缺失 / 无指纹 / 指纹不一致
      三种 problem 各自点名，message 带先构建的命令。
-   - `tools/dev/build-client.mjs`：`tsc -b + tsdown` 后写 `packages/company-pack/lib/.build-fingerprint`
-     （gitignored）；构建失败不写指纹 ⇒ 旧产物继续被判过期，不假装成功。
+   - `tools/dev/build-client.mjs`：`tsc -b + tsdown` 后写构建指纹文件（`lib/` 下，gitignored）；构建失败不写指纹 ⇒ 旧产物继续被判过期，不假装成功。
    - 三条真页面车道（`ui-scene` / `client-load` / `client-error-chain`）启动前比对，不一致 `exit 2`。
 2. **B 状态矩阵（294）**：「需要我处理」的空态从「两态」扩成**四格**——
    `records === null` 加载 ／ `recordsProblem != null` 不可达 ／ `records.length === 0` 目录空 ／
@@ -32,7 +31,7 @@
 
 | 事实 | 唯一入口 | 读载体 | 写载体 |
 |---|---|---|---|
-| client 产物新鲜度 | `tools/lib/core/client-bundle.mjs` | 三条真页面车道启动处 | `packages/company-pack/lib/.build-fingerprint`（构建脚本写） |
+| client 产物新鲜度 | `tools/lib/core/client-bundle.mjs` | 三条真页面车道启动处 | 构建指纹文件（`lib/` 下，gitignored；构建脚本写） |
 | 构建 + 写指纹 | `tools/dev/build-client.mjs` | 车道报错时点名它 | tsc/tsdown 产物 |
 | 培养页空态四格 | `packages/company-pack/src/client/cultivation/CultivationInbox.tsx` + `cultivation-actions.ts` | 培养面板 | `records` / `recordsProblem` / `needsDecision` |
 | 待办摘要钳制 | `packages/company-pack/src/lib/presence/attention.ts`（`attentionSummary`） | 活体登记 + 历史重建 + 列表行 | 外部 `reason`/question/消息文本 |

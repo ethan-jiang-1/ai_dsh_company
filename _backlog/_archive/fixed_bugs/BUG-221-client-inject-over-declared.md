@@ -29,7 +29,7 @@ opened: 2026-11-17
 ] } }
 ```
 
-但 [lib/client.js](../../../packages/company-pack/lib/client.js) 的 factory 实际只 `require`：
+但 构建产物 `lib/client.js` 的 factory 实际只 `require`：
 
 ```text
 @deepseek-ai/dsh-client-ui-primitives

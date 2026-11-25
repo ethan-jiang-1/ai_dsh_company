@@ -11,7 +11,7 @@ intent: 将 FAQ30/31 的实践追溯到本仓钉版本，给出独立判据、�
 
 **观察**：2026-11-20 在 company 工作区只读查询，`git submodule status vendor/dsh` 返回 `b830ec950faba0a46dda564be3e2d854afed94f1`。根[版本簿记：83](../../../../AGENTS.md)登记同一 SHA。下面的原生结论仅针对这份 pin；FAQ 是研究线索，外部工作树当前代码和移动的 GitHub master 都不替代它。
 
-已阅读 FAQ30 的[质量实践：7](<../../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/03-repo-quality-practices.md>)、[设计纪律：28](<../../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/05-practical-design-disciplines.md>)、[消费链：9](<../../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/02-dsh-consumers-and-lifecycle.md>)，以及 FAQ31 的[开发走查：9](<../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/02-development-walkthrough.md>)、[行为验收：35](<../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/03-behavior-evaluation.md>)、[长期开发：45](<../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/04-long-term-development.md>)、[原生验证：54](<../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/05-native-verification-reference.md>)、[生命周期：23](<../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/06-lifecycle-reference.md>)及[运行时出处：121](<../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/research-runtime.md>)。FAQ 的实跑记录属于其原研究，本轮不继承通过计数。
+已阅读 FAQ30 的质量实践：7（`_faq_on_digested/30_schemastery-basics/03-repo-quality-practices.md`）、设计纪律：28（`_faq_on_digested/30_schemastery-basics/05-practical-design-disciplines.md`）、消费链：9（`_faq_on_digested/30_schemastery-basics/02-dsh-consumers-and-lifecycle.md`），以及 FAQ31 的开发走查：9（`_faq_on_digested/31_preset-quality/02-development-walkthrough.md`）、行为验收：35（`_faq_on_digested/31_preset-quality/03-behavior-evaluation.md`）、长期开发：45（`_faq_on_digested/31_preset-quality/04-long-term-development.md`）、原生验证：54（`_faq_on_digested/31_preset-quality/05-native-verification-reference.md`）、生命周期：23（`_faq_on_digested/31_preset-quality/06-lifecycle-reference.md`）及运行时出处：121（`_faq_on_digested/31_preset-quality/research-runtime.md`）。FAQ 的实跑记录属于其原研究，本轮不继承通过计数。
 
 本文“观察”指已读的政策、实现和断言；“推论”是从它们导出的解释；“建议”尚未实施。未执行测试、record/refresh、真模型、浏览器或服务器；没有证明公司缺陷发生率已经下降。
 
@@ -35,7 +35,7 @@ intent: 将 FAQ30/31 的实践追溯到本仓钉版本，给出独立判据、�
 
 **推论**：最有杠杆的预防不是再建一个同步器，而是删掉第二个业务来源；不是提醒每个 UI、CLI、监听器记得补通知，而是由拥有状态的公共操作完成校验、提交和生命周期。配置之外，交付状态、授权和派生 UI 也可用同一问题审视，但本文没有逐个审计它们。
 
-**建议**：设计时先写出默认值、读取者、写入位置、重启恢复来源；再写候选校验、提交点、通知点及失败保留对象。重复事实应合并，独立领域状态则保留自己的拥有者。不能为“只有一个真相”把配置、业务记录和执行中参数强塞成同一对象；FAQ 明确区分[三份状态：9](<../../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/02-dsh-consumers-and-lifecycle.md>)。
+**建议**：设计时先写出默认值、读取者、写入位置、重启恢复来源；再写候选校验、提交点、通知点及失败保留对象。重复事实应合并，独立领域状态则保留自己的拥有者。不能为“只有一个真相”把配置、业务记录和执行中参数强塞成同一对象；FAQ 明确区分三份状态：9（`_faq_on_digested/30_schemastery-basics/02-dsh-consumers-and-lifecycle.md`）。
 
 ## 四类证据各自回答什么
 
@@ -48,11 +48,11 @@ intent: 将 FAQ30/31 的实践追溯到本仓钉版本，给出独立判据、�
 
 **观察**：真实组合政策要求只替换外部或非确定边界；源码映射不覆盖 built exports，见[原生政策：39](../../../../vendor/dsh/docs/testing.md)与[产物入口：41](../../../../vendor/dsh/docs/testing.md)。原生 preset 测试逐项比较工具全集，避免“挂载成功但贡献为空”，见[精确目录断言](../../../../vendor/dsh/apps/cli/tests/web-agent-presets.e2e.ts#L299)。
 
-**观察**：prompt/schema sidecar 固定完整输入序列，并有专属拥有者，见[pin 规则：87](../../../../vendor/dsh/packages/test-support/session-snapshot/README.md)；比较实际 system 与 schemas 的代码在[输入断言](../../../../vendor/dsh/packages/test-support/session-snapshot/src/suite.ts#L1583)。只改 skill 正文而摘要不变，目录可能不重发；需要另看加载结果，见 FAQ 的[正文更新证据线索：52](<../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/02-development-walkthrough.md>)，本文未继续读取该用例源码。
+**观察**：prompt/schema sidecar 固定完整输入序列，并有专属拥有者，见[pin 规则：87](../../../../vendor/dsh/packages/test-support/session-snapshot/README.md)；比较实际 system 与 schemas 的代码在[输入断言](../../../../vendor/dsh/packages/test-support/session-snapshot/src/suite.ts#L1583)。只改 skill 正文而摘要不变，目录可能不重发；需要另看加载结果，见 FAQ 的正文更新证据线索：52（`_faq_on_digested/31_preset-quality/02-development-walkthrough.md`），本文未继续读取该用例源码。
 
 **观察**：replay 明确用固定模型 transcript 驱动真实 Agent，见[包定义：28](../../../../vendor/dsh/packages/test-support/llm-replay/README.md)；其不向 provider 模型发请求，见[限制：136](../../../../vendor/dsh/packages/test-support/llm-replay/README.md)。所以刷新了 prompt 的同时，旧轨迹仍可能通过。原生将真实 API 行为证据与无 Key plumbing 区分，见[政策：25](../../../../vendor/dsh/docs/testing.md)。
 
-**建议**：测自主方法或协作选择时，只给业务目标和约束；明确指定成员、工具、步骤的任务作为机制连通测试。保留“缺依据时不下结论”和“依据完整时正常完成”的配对样例，避免全部拒绝也得高分。此为验收设计，依据 FAQ 的[指定路径边界：37](<../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/03-behavior-evaluation.md>)与[正反例：25](<../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/03-behavior-evaluation.md>)，本轮没有运行这些任务。
+**建议**：测自主方法或协作选择时，只给业务目标和约束；明确指定成员、工具、步骤的任务作为机制连通测试。保留“缺依据时不下结论”和“依据完整时正常完成”的配对样例，避免全部拒绝也得高分。此为验收设计，依据 FAQ 的指定路径边界：37（`_faq_on_digested/31_preset-quality/03-behavior-evaluation.md`）与正反例：25（`_faq_on_digested/31_preset-quality/03-behavior-evaluation.md`），本轮没有运行这些任务。
 
 ## 预期与实测不能共源：独立到哪一层
 
@@ -78,9 +78,9 @@ intent: 将 FAQ30/31 的实践追溯到本仓钉版本，给出独立判据、�
 | 旧/新 Agent 与 child 的版本不同 | 旧 Agent/child 保留 retired revision，最后引用释放后才收集，见[测试](../../../../vendor/dsh/packages/preset/agent-preset-registry/tests/registry.spec.ts#L38) | 同 ID 定义 A→B：旧父仍 A，新 Agent 为 B；child 省略 preset 跟 A，显式同 ID 取 B，比较实际请求工具，见[对照用例](../../../../vendor/dsh/packages/subagent/subagent/tests/activation-presets.spec.ts#L144) |
 | 取消请求、操作终结、资源释放是不同事件 | 原生要求 registry dispose 后观察移除，见[政策：9](../../../../vendor/dsh/docs/testing.md)；并发资源必须拥有到 teardown，见[执行模型：21](../../../../vendor/dsh/docs/testing.md) | 可控 Promise 暂停旧操作，触发取消/卸载，验证最后一次日志/文件写入的依赖仍有效；释放后等真正 settled，再证明无晚到通知/残留资源 |
 
-**建议**：对操作 A 更新中、B 更新后的时间语义，测试应先让 A 进入已知暂停点，再更新、启动 B、读取真实采用参数，最后释放 A 并等待清理；这比 sleep 后读末值更能覆盖竞态。该安排来自 FAQ 的[可控并发建议：68](<../../../../../deepseek-harness/_faq_on_digested/30_schemastery-basics/03-repo-quality-practices.md>)，不是上表 Loader 测试已经验证每一种业务操作的声明。
+**建议**：对操作 A 更新中、B 更新后的时间语义，测试应先让 A 进入已知暂停点，再更新、启动 B、读取真实采用参数，最后释放 A 并等待清理；这比 sleep 后读末值更能覆盖竞态。该安排来自 FAQ 的可控并发建议：68（`_faq_on_digested/30_schemastery-basics/03-repo-quality-practices.md`），不是上表 Loader 测试已经验证每一种业务操作的声明。
 
-**限制**：本轮只核对了进程内 revision 与 child 对照；普通会话重启、继承 child 冷恢复和新空白草稿复用不能混成一条规则。FAQ 的[精确分支：49](<../../../../../deepseek-harness/_faq_on_digested/31_preset-quality/research-runtime.md>)可供后续按产品承诺选测试，本轮未读取这些冷恢复用例，不能宣布 company 已覆盖。
+**限制**：本轮只核对了进程内 revision 与 child 对照；普通会话重启、继承 child 冷恢复和新空白草稿复用不能混成一条规则。FAQ 的精确分支：49（`_faq_on_digested/31_preset-quality/research-runtime.md`）可供后续按产品承诺选测试，本轮未读取这些冷恢复用例，不能宣布 company 已覆盖。
 
 ## 给 company 的七个预防插入点与反例
 

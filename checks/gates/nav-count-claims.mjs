@@ -14,6 +14,9 @@ import { join } from 'node:path'
 // 负例留证 2026-10-12（实跑原话）：docs/orient.md 词表临时插「右栏五个平台页签」→
 //   `FAIL nav-count-claims: docs/orient.md:N → 页签计数声明「五个平台页签」（计数随切片增长必过期；写法 = 全部公司页签 / 清单 = 注册面）`；
 //   还原即绿。豁免方向：cdp-probe.md「开一个页签后…」→ 绿（「一」豁免）。
+// 负例留证 2026-11-25（preset 计数类）：docs/guides/zz-doc-count.md 写「公司有 6 个 preset，六公司角色各一行」→
+//   `FAIL nav-count-claims: … preset 计数声明「六公司角色」`；真盘 9 处（AGENTS/architecture/presets/repo-handoff/
+//   bootstrap×2/project-map×2/profile）删数改「清单 = presets/ 目录」后 `OK ×121`。
 // 负例留证 2026-10-27（R3-15，扫描面扩到包 README 后）：packages/company-pack/README.md 临时追加
 //   「公司视图与五个页签。」→ `FAIL nav-count-claims packages/company-pack/README.md:117 → 页签计数声明
 //   「五个页签」`；还原 → 绿 ×47 文件。
@@ -29,6 +32,11 @@ export function run({ root, ok, fail }) {
     return entry.name.endsWith('.md') ? [p.slice(root.length + 1)] : []
   })
   const COUNT_PHRASE = /[两二三四五六七八九十0-9]+ *个? *(?:公司|平台)?页签/
+  // 2026-11-25 扩「preset 计数」类：名册/编制写进散文必过期（新增第 12 个 preset 当天即失真，
+  // 二轮审计实测 9 处并存：AGENTS×2 / architecture / presets / repo-handoff / bootstrap×2 / project-map×2）。
+  // 家 = presets/ 目录 + package.json patch 数组；写法 = 「清单 = presets/ 目录」。
+  // 「一」豁免同页签（「开一个 preset」是操作叙述）；`每个 preset` 无数字不命中。
+  const PRESET_COUNT_PHRASE = /[两二三四五六七八九十0-9]+ *个? *(?:公司角色|公司 preset|support preset|preset 文件)/
   // 2026-11-16：扩「文档篇数库存计数」类——repo-handoff §4 曾写死 notes/（332 篇）_backlog/（597 篇），
   // 实测 335/506 当天即过期（D28 同款：计数是清单最易腐的投影；页签计数门只查「N个页签」漏了篇数类）。
   // 签名锚在结构上而非弱计数：① 括号裸篇数注解「（N 篇）」（篇紧邻闭括号）；② 库存目录 notes//_backlog/
@@ -62,6 +70,11 @@ const navCountFiles = [...new Set([
         navCountBad = true
         fail('nav-count-claims', `${rel}:${i + 1} → 页签计数声明「${m[0]}」（计数随切片增长必过期；写法 = 全部公司页签 / 清单 = 注册面）`)
       }
+      const p = line.match(PRESET_COUNT_PHRASE)
+      if (p) {
+        navCountBad = true
+        fail('nav-count-claims', `${rel}:${i + 1} → preset 计数声明「${p[0]}」（清单 = presets/ 目录；数量随增员必过期）`)
+      }
       const d = line.match(DOC_COUNT_PHRASE)
       if (d) {
         navCountBad = true
@@ -69,5 +82,5 @@ const navCountFiles = [...new Set([
       }
     })
   }
-  if (!navCountBad) ok(`nav-count-claims ×${navCountFiles.length}（导航面零页签/文档篇数计数声明；数量随切片增长必过期）`)
+  if (!navCountBad) ok(`nav-count-claims ×${navCountFiles.length}（导航面零页签/文档篇数/preset 计数声明；数量随切片增长必过期）`)
 }
