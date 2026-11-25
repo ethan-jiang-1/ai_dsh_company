@@ -53,7 +53,8 @@
 | 静态门（计数） | 12 | `node tests/checks/gates-negative.test.mjs` → `PASS nav-count-claims：preset 计数（6 个 preset）→ 红`（`preset 计数声明「六公司角色」`）；真盘改完 → `OK nav-count-claims ×121` |
 | 全量 | 3 导出/入口 + 12 | `npm_config_verify_deps_before_run=false pnpm verify` → `verify: ALL PASS；2 门无对象`（134 PASS）；`validateMarkdownLinks(process.cwd()).violations` = `0`（8150 链接 / 951 文件） |
 | 真挂载 | 10 配置/组合 | `source run/env.sh && node checks/lanes/preset.entry.mjs` → `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）`，25s；含 11 次 `session/create`、session-search 隔离组、skills 隔离 |
-| CI（真干净 checkout） | 3/12 | run `45525084419` **红**：`link-debt: archived 5 > 基线 4`（`company-workspace` 目录本身没被当证据面；两处前缀表分叉）→ 同源后 run `45525775125` 绿（`Run pnpm verify` 通过）；doc-sync 提交复跑 `45526285813` 仍绿 |
+| CI（真干净 checkout） | 3/12 | run `45525084419` **红**：`link-debt: archived 5 > 基线 4`（`company-workspace` 目录本身没被当证据面；两处前缀表分叉）→ 同源后 run `45525775125` 绿（`Run pnpm verify` 通过）；doc-sync 复跑 `45526285813`、最终树 `45527186543` 三连绿 |
+| 干净 clone（CI fresh-clone） | 4/7 | run `45527467681`（HEAD `2234f632`）四 job 全绿：`install-verify` ubuntu+macos（干净 checkout → install → bundle:init → verify）、`setup-macos`（全量 `pnpm setup` 构建 + verify + test + keyless lane + coverage）、`install-channel`（真实 npm 发布版 DSH 通道） |
 | 干净路径 | 12 | `/tmp/dsh-diag`（rsync 副本、`git add -A` 后；父目录无 `../deepseek-harness`）`pnpm verify` → `ALL PASS`；修复前同一路径 `26 FAILURE(S)`（25 link + 1 link-debt） |
 | 发布字节 | 3 导出 / 13 数据 | `pnpm release --verify` → 7 项 pass（154s）：`release-smoke` ALL PASS（真 tarball→干净 profile→boot→`plugin remove` 后 bundles 摘净、`.dsh-company` 数据不变→重装恢复）；`preset-smoke` 11/11；`client-load` 真页面。`pnpm release --check --allow-pre-publish-index` → `READY 0.11.10 @ 378113aa`（tgz 137 条目） |
 | 单元（健康面） | 2 服务/注册表 | `npx vitest run tests/host/startup/preset-health.spec.ts` → 4 passed（broken 清单、ready:false、启动告警文案） |
@@ -74,5 +75,5 @@
 
 - [covered] tools/lib 不得出现运行时调用（`node:child_process` 等）→ `tests/repo/structure/layering.spec.ts`
 - [covered] preset 真挂载失败会红（R1 反证：去掉必填 config 即红） → `checks/lanes/preset.entry.mjs`
-- [environment-gap] 干净 clone 全量 `pnpm setup` 未在本机重放（需 submodule 网络与分钟级构建）→ `docs/guides/bootstrap.md`
+- [covered] 干净 clone 全量 `pnpm setup` = fresh-clone CI 的 `setup-macos` job（见上表 run `45527467681`）→ `.github/workflows/fresh-clone.yml`
 - [policy] CI verify 转绿需 push 后观察（run 列表 = 外部状态，仓内不可断言）→ `.github/workflows/ci.yml`
