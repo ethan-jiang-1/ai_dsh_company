@@ -2,7 +2,7 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { join, relative, sep } from 'node:path'
-import { markdownLinkTargets } from '../../tools/lib/core/markdown-links.mjs'
+import { isEvidencePath, markdownLinkTargets } from '../../tools/lib/core/markdown-links.mjs'
 
 // ── 链接欠账棘轮门（link-debt，2026-11-03 第六轮立）──────────────────────────────
 // 为什么：`md-links` 对三类"缺失目标"直接 return（`tools/lib/core/markdown-links.mjs` 的本地证据引用豁免）：
@@ -24,7 +24,7 @@ import { markdownLinkTargets } from '../../tools/lib/core/markdown-links.mjs'
 // 负例留证 2026-11-11（clean clone）：无 runtime/company-workspace 证据树时 archived 23 > 20；
 //   冻结层证据树目标改为跳过 → archived 4 ≤ 20 绿；普通 archived 目标仍计数（不放过普通断链）。
 const CLASSES = ['archived', 'moved', 'live']
-const MOVED_TARGET_PREFIXES = ['snapshots/', 'runtime/', 'company-workspace/']
+// 证据面口径唯一家 = markdown-links 的 isEvidencePath（目录本身与树下文件同判）；本门不另写一份前缀表。
 
 /** git ls-files 取 tracked markdown（-z 避免中文文件名被转义）；不读 node_modules/vendor。 */
 function trackedMarkdown(root) {
@@ -37,7 +37,7 @@ function classify(root, sourceRel, targetAbs) {
   if (frozen) return 'archived'
   const targetRel = relative(root, targetAbs).split(sep).join('/')
   if (targetRel.startsWith('..')) return 'live'
-  if (MOVED_TARGET_PREFIXES.some(prefix => targetRel.startsWith(prefix))) return 'moved'
+  if (isEvidencePath(targetRel)) return 'moved'
   return 'live'
 }
 
@@ -80,7 +80,7 @@ export function run({ root, ok, fail }) {
       // 2026-11-11 clean clone 实测：冻结层引用 runtime/... 证据，warm 盘存在、clone 不存在。
       // 冻结层不回写，且这类目标 gitignored（证据树不在 repo handoff 内）⇒ 不计 archived；
       // 非冻结源引用证据树仍归 moved（baseline 0），不放过活层。
-      if (frozen && MOVED_TARGET_PREFIXES.some(prefix => targetRel.startsWith(prefix))) continue
+      if (frozen && isEvidencePath(targetRel)) continue
       const kind = classify(root, sourceRel, target)
       counts[kind]++
       if (samples[kind].length < 5) samples[kind].push(`${sourceRel} → ${relative(root, target).split(sep).join('/')}`)

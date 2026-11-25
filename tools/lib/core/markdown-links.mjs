@@ -132,9 +132,9 @@ export function markdownLinkTargets(file, source = readFileSync(file, 'utf8')) {
 
 // 本地证据树（与「缺失目标跳过」同一口径）：里面的字节不随 repo handoff 走，链接只作本地观察。
 // 与 bare-path 的 RUNTIME_PREFIXES 同边界；新增证据树时两处一起改。
-const EVIDENCE_PREFIXES = ['runtime/', 'company-workspace/', 'snapshots/']
+export const EVIDENCE_PREFIXES = ['runtime/', 'company-workspace/', 'snapshots/']
 // 目录本身（`company-workspace`，无尾斜杠）与树下文件同属证据面。
-const isEvidencePath = (rel) => EVIDENCE_PREFIXES.some(prefix => rel === prefix.slice(0, -1) || rel.startsWith(prefix))
+export const isEvidencePath = (rel) => EVIDENCE_PREFIXES.some(prefix => rel === prefix.slice(0, -1) || rel.startsWith(prefix))
 
 /**
  * Check Markdown links/images/definitions with cached target headings and source line diagnostics.
