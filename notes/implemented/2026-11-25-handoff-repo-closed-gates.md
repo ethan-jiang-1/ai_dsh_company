@@ -50,6 +50,8 @@
 | 静态门（计数） | 12 | `node tests/checks/gates-negative.test.mjs` → `PASS nav-count-claims：preset 计数（6 个 preset）→ 红`（`preset 计数声明「六公司角色」`）；真盘改完 → `OK nav-count-claims ×121` |
 | 全量 | 3 导出/入口 + 12 | `npm_config_verify_deps_before_run=false pnpm verify` → `verify: ALL PASS；2 门无对象`（134 PASS）；`validateMarkdownLinks(process.cwd()).violations` = `0`（8150 链接 / 951 文件） |
 | 真挂载 | 10 配置/组合 | `source run/env.sh && node checks/lanes/preset.entry.mjs` → `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）`，25s；含 11 次 `session/create`、session-search 隔离组、skills 隔离 |
+| 干净路径 | 12 | `/tmp/dsh-diag`（rsync 副本、`git add -A` 后；父目录无 `../deepseek-harness`）`pnpm verify` → `ALL PASS`；修复前同一路径 `26 FAILURE(S)`（25 link + 1 link-debt） |
+| 发布字节 | 3 导出 / 13 数据 | `pnpm release --verify` → 7 项 pass（154s）：`release-smoke` ALL PASS（真 tarball→干净 profile→boot→`plugin remove` 后 bundles 摘净、`.dsh-company` 数据不变→重装恢复）；`preset-smoke` 11/11；`client-load` 真页面。`pnpm release --check --allow-pre-publish-index` → `READY 0.11.10 @ 378113aa`（tgz 137 条目） |
 | 单元（健康面） | 2 服务/注册表 | `npx vitest run tests/host/startup/preset-health.spec.ts` → 4 passed（broken 清单、ready:false、启动告警文案） |
 
 ## 状态事实与载体
@@ -62,7 +64,7 @@
 | preset 挂载健康 | `packages/company-pack/src/host/startup/preset-health.ts`（启动日志点名 broken） |
 | 负例 | `tests/checks/gates-negative.test.mjs`、`tests/host/startup/preset-health.spec.ts` |
 
-发布字节（0.11.10 重打）与 CI 连绿证据 = 本变更的后续提交；在补齐前不写“发布就绪”。
+发布字节已重打并点态 READY（暖树口径，`--check` 自述）；CI 证据 = push 后的 run，未绿前不写“发布就绪”。
 
 ## 未覆盖轴
 
