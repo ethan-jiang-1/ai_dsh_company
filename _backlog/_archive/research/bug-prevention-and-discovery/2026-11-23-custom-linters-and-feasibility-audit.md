@@ -15,7 +15,7 @@ intent: 记录首轮研究后的实盘可行性核验（4 项修正）并系统�
 
 ### 修正 1：已有 8 份 `tests/client/i18n/` 为何拦不住 7 张双语卡？——「只测空态」陷阱
 
-实读 `tests/client/i18n/` 下全部 8 份 spec（如 [panels.spec.ts](../../../tests/client/i18n/panels.spec.ts)、[attention-tab.spec.ts](../../../tests/client/i18n/attention-tab.spec.ts)）发现：
+实读 `tests/client/i18n/` 下全部 8 份 spec（如 [panels.spec.ts](None../../../../tests/client/i18n/panels.spec.tsNone、[attention-tab.spec.ts](None../../../../tests/client/i18n/attention-tab.spec.tsNone）发现：
 - 本仓**已经**有双语渲染测试，而且 `AttentionTab` 早就写了 `expect(html).not.toMatch(/[\u4e00-\u9fff]/u)`。
 - 它们漏掉 `BUG-300/302/308/316/326/329` 以及现行残留（`attention.ts:291`、`company-panels.tsx:159`、`CultivationBoardSections.tsx:286`、`cultivation-data.ts:90`、`cultivation-context-data.ts:197-250`）的**真正原因**是：
   1. 现有 i18n spec **只喂了空态夹具**（`cards: []`、`getPending: () => []`、`layout: { nodes: [] }`），满态卡片、drift 分支、错误态、多问题问询、边界提示从未被执行；
@@ -26,7 +26,7 @@ intent: 记录首轮研究后的实盘可行性核验（4 项修正）并系统�
 
 首轮材料曾把 `tests/client/` 概括为“主要用 `renderToStaticMarkup`，缺少无头 DOM”。实查代码发现：
 - `happy-dom` + `react-dom/client`（`createRoot`）**早已在 10+ 份 `tests/client/` spec 里使用**；
-- [company-client-composition.spec.ts](../../../tests/client/company-client-composition.spec.ts) 甚至已经跑通了真实的 `bootClient` + web profile roster。
+- [company-client-composition.spec.ts](None../../../../tests/client/company-client-composition.spec.tsNone 甚至已经跑通了真实的 `bootClient` + web profile roster。
 - **真正缺失的精确接缝**：`company-client-composition.spec.ts` 只检查了 `slots.entries(...)` 和 `tabs.entries()` **已注册**，**从未调用每个 slot 的 `inject()` 并渲染其组件**——这就是为什么 `CommandScopeHint` 的 `list: undefined as never`（`BUG-293`）能在一整套 composition spec 绿灯下于真页面崩溃。
 - **落地修正**：零新依赖，直接在 composition / slot 挂载 spec 里把已注册的全部 tab 与 slot 真正执行 `inject()` + `happy-dom` 首帧挂载。
 
@@ -39,14 +39,14 @@ intent: 记录首轮研究后的实盘可行性核验（4 项修正）并系统�
 | `no-empty` | **0** | 可直接开启（注：因仓内静默 `catch` 多带注释或 `return null`，此规则单独拦不住静默降级，仍需定制规则） |
 | `typescript/no-explicit-any` | **0** | 可直接开启，零存量成本 |
 | `react-hooks/rules-of-hooks` | **0** | 可直接开启，零存量成本 |
-| `react-hooks/exhaustive-deps` | **11** | **高信噪比，应开启！** 当场抓出 1 条现行真 bug：[DeliverablesTab.tsx](../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx) 第 154 行 `useMemo` 使用了 `t('deliverables.dateMissing')` 却漏写 `t` 依赖（打开页签时切中英文，缺失日期分组头不刷新）；另含 `use-company-data.ts:147,151` 依赖异味及 8 处 `props`/外层对象解构清理 |
+| `react-hooks/exhaustive-deps` | **11** | **高信噪比，应开启！** 当场抓出 1 条现行真 bug：[DeliverablesTab.tsx](None../../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsxNone 第 154 行 `useMemo` 使用了 `t('deliverables.dateMissing')` 却漏写 `t` 依赖（打开页签时切中英文，缺失日期分组头不刷新）；另含 `use-company-data.ts:147,151` 依赖异味及 8 处 `props`/外层对象解构清理 |
 | React Compiler 规则（`react/set-state-in-effect`、`react/purity`、`react/refs`、`react/immutability`） | **12** | 含少量真实异味（如 `use-company-data.ts:151` 渲染期读 `eventsRef.current`、`CultivationBoardSections.tsx:60,155` 渲染期调 `Date.now()`），但 `set-state-in-effect` 对 React 18 切会话重置状态存在模式冲突——**首批暂不启用**，避免强行重写无缺陷代码 |
 
 ### 修正 4：全历史分布、现行 10 处 `as never` 与活跃 E2E 卡的边界对齐
 
-1. **全历史 331 张卡对照**：11-20 前的 281 张卡分布为工具/车道 110、会话/委派/其他 82、`client/lib` 37、`host` 26、`preset/content` 26；11-20 后的 50 张集中于 `client/lib`（40 张）是因为当时活跃的 [2026-11-21 公司页 E2E 设计卡](../../_archive/settled_issues/2026-11-21-company-e2e-test-design.md) 连续 6 轮定向打 UI 面。因此首批 issue 明确标注聚焦「通用静态防线 + client/lib 高发面」，与 E2E 设计卡分工互补、不替代它。
+1. **全历史 331 张卡对照**：11-20 前的 281 张卡分布为工具/车道 110、会话/委派/其他 82、`client/lib` 37、`host` 26、`preset/content` 26；11-20 后的 50 张集中于 `client/lib`（40 张）是因为当时活跃的 [2026-11-21 公司页 E2E 设计卡](None../../../_archive/settled_issues/2026-11-21-company-e2e-test-design.mdNone 连续 6 轮定向打 UI 面。因此首批 issue 明确标注聚焦「通用静态防线 + client/lib 高发面」，与 E2E 设计卡分工互补、不替代它。
 2. **现行 10 处 `as never` 逐条核查**：已核实无一处是 `undefined as never`（`BUG-293` 已修），多位于 vendor RPC / DOM 事件 / 未增强 Cordis 事件窄边界（`company-data-plane.ts:60`、`client/index.ts:229,339`、`context-wiring.ts:51`、`error-ring.ts:183-198`、`company-language.ts:87-89`）。因此规则设计为：**无条件禁止 `undefined/null as never`**，其余 `as never` 收拢为窄白名单或逐步清零，不搞一刀切破坏构建。
-3. **额外顺手发现 1 处现行中文残留**：[cultivation-data.ts](../../../packages/company-pack/src/client/cultivation/cultivation-data.ts) 第 90 行 `return { ok: false, reason: \`读取被拒（${path}）\` }`——`BUG-302` 修了 `dir-denied` 但漏了紧邻的文件读失败分支。
+3. **额外顺手发现 1 处现行中文残留**：[cultivation-data.ts](None../../../../packages/company-pack/src/client/cultivation/cultivation-data.tsNone 第 90 行 `return { ok: false, reason: \`读取被拒（${path}）\` }`——`BUG-302` 修了 `dir-denied` 但漏了紧邻的文件读失败分支。
 
 ---
 
@@ -81,8 +81,8 @@ intent: 记录首轮研究后的实盘可行性核验（4 项修正）并系统�
 - 利用 `ts.createProgram` + `checker.getTypeAtLocation(callExpr)`，对声明为“带边界/带诊断结果类型”的返回值（如 `WorkspaceTextRead` 的 `.eof`、`DeliverablesCatalog` 的 `.skipped`、`MotionLedger` 的 `.badRows`/`.headerOk`、`PendingApprovals` 的 `.capped`、`AttentionBoundaries`、`WorkspaceFilesFace.read` 返回的 `.eof`）：
   - 若调用方拿到该结果对象，消费了数据字段（如 `.text` / `.entries` / `.items` / `.rows`），但在同一作用域内既**没有读取对应的边界/诊断字段**，也没有把整个对象原样传给下游函数 → **直接报错**！
 - **立刻能抓出什么**：
-  - 当场抓出今日现行代码 [cultivation-context-data.ts](../../../packages/company-pack/src/client/cultivation/cultivation-context-data.ts) 第 198 行（调 `parseCatalog(catalogText)` 读了 `catalog.entries`，却完全丢弃 `catalog.skipped`）！
-  - 当场抓出今日现行代码 [client/index.ts](../../../packages/company-pack/src/client/index.ts) 第 339 行（调 `identityFiles.read(..., { limit: 200 })` 读了 `result.value.text`，却从未检查 `result.value.eof`）！
+  - 当场抓出今日现行代码 [cultivation-context-data.ts](None../../../../packages/company-pack/src/client/cultivation/cultivation-context-data.tsNone 第 198 行（调 `parseCatalog(catalogText)` 读了 `catalog.entries`，却完全丢弃 `catalog.skipped`）！
+  - 当场抓出今日现行代码 [client/index.ts](None../../../../packages/company-pack/src/client/index.tsNone 第 339 行（调 `identityFiles.read(..., { limit: 200 })` 读了 `result.value.text`，却从未检查 `result.value.eof`）！
   - 未来任何人调用 `pendingAsks()` 却只拿 `.items` 丢掉 `.capped`（`BUG-327` 复发），写完代码 1 秒内红灯！
 - **实现成本**：约 120–160 行 TypeScript（零外部依赖）。
 

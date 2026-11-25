@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-23）；批准：用户 2026-11-23「那种事最合理的, 长期是正确的, 我就选择哪个, 如何? 推进吧」。
 
-上游 = [已结实施卡](../../_backlog/_archive/settled_issues/2026-11-23-fuzz-bounded-differential-guards.md)；依据 = [研究总纲](../../_backlog/research/bug-prevention-and-discovery/README.md) 与 [落地路线图](../../_backlog/research/bug-prevention-and-discovery/2026-11-23-adoption-roadmap-and-stop-rules.md)（T1-1 / T1-2）。
+上游 = [已结实施卡](../../_backlog/_archive/settled_issues/2026-11-23-fuzz-bounded-differential-guards.md)；依据 = [研究总纲](../../_backlog/_archive/research/bug-prevention-and-discovery/README.md) 与 [落地路线图](../../_backlog/_archive/research/bug-prevention-and-discovery/2026-11-23-adoption-roadmap-and-stop-rules.md)（T1-1 / T1-2）。
 
 ## 决定
 
@@ -49,5 +49,5 @@
 ## 未覆盖轴
 
 - [covered] `Bounded<T>` 静态防丢弃（含 `.capped` 与 `.truncated`）、6 大解析器 seeded 畸形 Fuzz、TS/JS `metaProblemsOf` 差分、`attention` 有界/身份/`Live↔History` 双源一致性及双语渲染 → [`parsers-fuzz.property.spec.ts`](../../tests/lib/shared/parsers-fuzz.property.spec.ts) 与 [`attention-parity.property.spec.ts`](../../tests/client/presence/attention-parity.property.spec.ts)
-- [policy] `tools/` 子进程 RAII 包装（T1-4）、`vendor/` `*Face` 编译期漂移检查、Tier 2 品牌类型与 `fast-check`/StrykerJS（按实际复发触发另卡推进） → [落地路线图](../../_backlog/research/bug-prevention-and-discovery/2026-11-23-adoption-roadmap-and-stop-rules.md)
+- [policy] `tools/` 子进程 RAII 包装（T1-4）、`vendor/` `*Face` 编译期漂移检查、Tier 2 品牌类型与 `fast-check`/StrykerJS（按实际复发触发另卡推进） → [落地路线图](../../_backlog/_archive/research/bug-prevention-and-discovery/2026-11-23-adoption-roadmap-and-stop-rules.md)
 - [environment-gap] 真进程多会话实时并发 `approval/request` / `user-questions/request` waterfall 交互（keyless 冒烟为空公司盘） → [`attention-observers.spec.ts`](../../tests/client/wiring/attention-observers.spec.ts)

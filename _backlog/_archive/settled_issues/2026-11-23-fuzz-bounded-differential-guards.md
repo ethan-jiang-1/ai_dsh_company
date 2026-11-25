@@ -9,7 +9,7 @@ opened: 2026-11-23
 >
 > **结论/去向**：`note` — [实施Note](../../../notes/implemented/2026-11-23-fuzz-bounded-differential-guards.md)
 >
-> 来源：[缺陷预防与非 E2E 发现手段研究](../../research/bug-prevention-and-discovery/README.md)（[落地路线图](../../research/bug-prevention-and-discovery/2026-11-23-adoption-roadmap-and-stop-rules.md) T1-1 / T1-2 与 [定制工具方案](../../research/bug-prevention-and-discovery/2026-11-23-custom-linters-and-feasibility-audit.md)）。
+> 来源：[缺陷预防与非 E2E 发现手段研究](../research/bug-prevention-and-discovery/README.md)（[落地路线图](../research/bug-prevention-and-discovery/2026-11-23-adoption-roadmap-and-stop-rules.md) T1-1 / T1-2 与 [定制工具方案](../research/bug-prevention-and-discovery/2026-11-23-custom-linters-and-feasibility-audit.md)）。
 
 **问题与期望结果：** 首批质量预防卡已建立静态猎手（R1/R2/R3/R4）、hooks 门禁、双语满态扫面与全 Slot 真挂载；但实证解剖指出占比 **55%** 的高发家族（F1 有界截断 13 张 + F2 解析器宽松吞错 7 张 + F4 活体↔历史多源分裂 7 张）仍缺少「生成式畸形 Fuzz + 统一有界原语 + 双源同源差分」自动防线。代码核查同时直接暴露出多处现行隐患：`startup-settings.ts` 缺 `productTypes`/`deliveryModes` 数组元素与 `wikiCheck` 对象形状校验；`deliverables-index.ts` 未对空白 `slug`/`path` 与可选串字段错型过滤；`metaProblemsOf` 对空必填值漏报；`attention-observers.ts` 直接对 `request.questions.map` 解引用且未与 `questionListOf` 共享提取；`use-company-data.ts` 与 `cultivation-context-data.ts` 存在静默 `.slice` 未报截断计数。本卡零新依赖推进 Tier 1 核心防线，把解析、有界读取与活体↔历史一致性收成自动化性质/差分契约。
 

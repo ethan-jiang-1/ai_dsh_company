@@ -2,7 +2,7 @@
 
 状态：implemented（2026-11-23）；批准：用户 2026-11-23「同意按这个落地，记着需要高质量的落地」「……那我们就 set up goal 推动落地吧」（R1/R2/R3 直接设为阻断防线、R4 保留只读基线）。
 
-上游 = [已结实施卡](../../_backlog/_archive/settled_issues/2026-11-23-client-static-guards-and-contract-sweep.md)；依据 = [研究总纲](../../_backlog/research/bug-prevention-and-discovery/README.md) 与 [实盘可行性核验与定制工具方案](../../_backlog/research/bug-prevention-and-discovery/2026-11-23-custom-linters-and-feasibility-audit.md)。
+上游 = [已结实施卡](../../_backlog/_archive/settled_issues/2026-11-23-client-static-guards-and-contract-sweep.md)；依据 = [研究总纲](../../_backlog/_archive/research/bug-prevention-and-discovery/README.md) 与 [实盘可行性核验与定制工具方案](../../_backlog/_archive/research/bug-prevention-and-discovery/2026-11-23-custom-linters-and-feasibility-audit.md)。
 
 ## 决定
 
@@ -56,5 +56,5 @@
 ## 未覆盖轴
 
 - [covered] client + shared lib 静态防线、满态双语组件渲染、全 slot real `inject()` happy-dom 挂载、孤立真实浏览器 10 页签中英文冒烟 → [company-static-audit.spec.ts](../../tests/tools/company-static-audit.spec.ts) 与 [company-client-composition.spec.ts](../../tests/client/company-client-composition.spec.ts)
-- [policy] 历史 6 大解析器随机畸形输入 Fuzz 矩阵、统一 `Bounded<T>` 类型与 Live↔History 同源状态差分（归研究第二批另行立卡） → [缺陷预防研究](../../_backlog/research/bug-prevention-and-discovery/README.md)
+- [policy] 历史 6 大解析器随机畸形输入 Fuzz 矩阵、统一 `Bounded<T>` 类型与 Live↔History 同源状态差分（归研究第二批另行立卡） → [缺陷预防研究](../../_backlog/_archive/research/bug-prevention-and-discovery/README.md)
 - [environment-gap] 真模型会话下触发跨会话实时 `user-questions/request` 与 `approval/request` 弹窗（keyless 冒烟为空公司盘） → [注意力观察者 spec](../../tests/client/wiring/attention-observers.spec.ts)

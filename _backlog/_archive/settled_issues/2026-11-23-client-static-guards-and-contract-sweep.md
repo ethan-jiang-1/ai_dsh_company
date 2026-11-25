@@ -9,7 +9,7 @@ opened: 2026-11-23
 >
 > **结论/去向**：`note` — [实施Note](../../../notes/implemented/2026-11-23-client-static-guards-and-contract-sweep.md)
 >
-> 来源：[缺陷预防与非 E2E 发现手段研究](../../research/bug-prevention-and-discovery/README.md)（特别是 [实盘可行性核验与自研定制工具方案](../../research/bug-prevention-and-discovery/2026-11-23-custom-linters-and-feasibility-audit.md)）。
+> 来源：[缺陷预防与非 E2E 发现手段研究](../research/bug-prevention-and-discovery/README.md)（特别是 [实盘可行性核验与自研定制工具方案](../research/bug-prevention-and-discovery/2026-11-23-custom-linters-and-feasibility-audit.md)）。
 
 **问题与期望结果：** 2026-11-20 试点后 3 天内通过 6 轮 E2E 又挖出 49 张有效缺陷卡（`BUG-283`–`BUG-332`，另 1 撤回），其中 81.6% 在 `src/client/` 与 `src/lib/`、87.8% 只需秒级 keyless `vitest` 即可打红；甚至第 6 轮刚收口，一次只读静态/lint 扫描就在 1 秒内再次命中现行残留（`DeliverablesTab.tsx:154` `useMemo` 漏 `t` 依赖、`attention.ts` 6 处硬编码中文含 `BUG-331` 新引入文案、`company-panels.tsx:159` 与 `CultivationBoardSections.tsx:286` 裸 `join('；')`、`cultivation-data.ts:90` 与 `cultivation-context-data.ts` 中文错误、`cultivation-context-data.ts:198` 丢弃 `catalog.skipped`、`client/index.ts:339` 读 200 行忽略 `eof`）。期望通过**零新第三方依赖**的首批机械防线，把“hooks 依赖洞、领域边界/诊断字段静默丢弃、双语满态/标点泄漏、Slot 接线崩溃”前移到秒级自动捕获，并同步清掉上述已曝光的现行残留。
 

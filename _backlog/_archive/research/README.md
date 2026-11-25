@@ -18,6 +18,7 @@
 
 | 名头 | 材料 | 历史消费者 | 产出的卡 | 归档 |
 |---|---|---|---|---|
+| [bug-prevention-and-discovery/](bug-prevention-and-discovery/README.md) · 缺陷预防与非 E2E 发现手段：为什么试点后仍靠 E2E 找 Bug | 5 份 | 用户 2026-11-23 点名委托；[首卡](../settled_issues/2026-11-23-client-static-guards-and-contract-sweep.md)、[二期卡](../settled_issues/2026-11-23-fuzz-bounded-differential-guards.md) | 同两张卡（Tier 0 / Tier 1 核心已结；Tier 1-4 RAII 与 Tier 2 按触发再议） | 2026-11-25 |
 | [quality-prevention/](quality-prevention/README.md) · 质量预防：跨轮补洞如何收敛为可维护保障 | 6 份 | 用户 2026-11-20 点名；[content 合同族预防试点卡](../settled_issues/2026-11-20-quality-prevention-contract-pilot.md) | 同卡（[Note](../../../notes/implemented/2026-11-20-quality-prevention-contract-pilot.md)） | 2026-11-20 |
 | [maintenance-surface-taxonomy/](maintenance-surface-taxonomy/README.md) · 维护面顶层分类法：judge / show / operate 三面与根布局方向 | 12 份（含 csv） | 用户 2026-11-16 点名（跨三仓比较；无卡） | —（交接 = 三份 reorg handoff，2026-11-16 已落地） | 2026-11-20 |
 | [source-prevention-design/](source-prevention-design/README.md) · 生产源头预防候选：事实同步、重复解释与失败信息保留 | 1 份 | 用户2026-11-20直接委托 | [workspace状态读取卡](../settled_issues/2026-11-20-company-file-read-state.md)（[Note](../../../notes/implemented/2026-11-20-company-file-read-state.md)） | 2026-11-20 |

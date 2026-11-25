@@ -5,7 +5,7 @@ intent: 系统回答“在代码实践和编程范式上还能做什么以更早
 
 # 问题一：根本上在代码实践里还能做什么，才能更早预防 Bug？
 
-> **定位**：基于 [实证解剖](2026-11-23-post-pilot-bug-anatomy.md) 的 7 大缺陷族，结合本仓已钉住的 [DSH 防御模式库](../../../vendor/dsh/docs/defensive-patterns/README.zh.md) 与现代 TypeScript/React 工程实践，给出一套**可直接落地到代码写法**的七大预防范式。本文为设计研究，未修改产品源码。
+> **定位**：基于 [实证解剖](2026-11-23-post-pilot-bug-anatomy.md) 的 7 大缺陷族，结合本仓已钉住的 [DSH 防御模式库](None../../../../vendor/dsh/docs/defensive-patterns/README.zh.mdNone 与现代 TypeScript/React 工程实践，给出一套**可直接落地到代码写法**的七大预防范式。本文为设计研究，未修改产品源码。
 
 ---
 
@@ -148,7 +148,7 @@ type PanelState<T, B> =
      2. 包装上下文后**重新抛出**；
      3. 确属装饰性降级（如 `loadIdentity` 读品牌名）时，**必须写明固定前缀注释**（如 `// intentional-fallback: <理由>`），其余裸 `catch` 一律视为缺陷。
 4. **后置不变量（Postcondition）与双边契约**：
-   - 对应 [DSH general.zh.md「公共约定两侧都要遵守」](../../../vendor/dsh/docs/defensive-patterns/general.zh.md)：例如布局函数 `splitLayout(available, desired)` 自身保证后置不变量 `stacked || (board >= BOARD_MIN && chat >= CHAT_MIN)`（`BUG-315`）；分箱函数 `recordInbox()` 自身保证同一 UI 区块内的两个子箱互斥（`BUG-309`）。
+   - 对应 [DSH general.zh.md「公共约定两侧都要遵守」](None../../../../vendor/dsh/docs/defensive-patterns/general.zh.mdNone：例如布局函数 `splitLayout(available, desired)` 自身保证后置不变量 `stacked || (board >= BOARD_MIN && chat >= CHAT_MIN)`（`BUG-315`）；分箱函数 `recordInbox()` 自身保证同一 UI 区块内的两个子箱互斥（`BUG-309`）。
 
 ---
 
@@ -183,7 +183,7 @@ type PanelState<T, B> =
 
 ## 实践七：子进程与资源生命周期的 RAII 封装（`tools/` 与 `host/`）
 
-针对 `BUG-283`、`BUG-284`（以及 [DSH general.zh.md「dispose 必须达到完全停稳」](../../../vendor/dsh/docs/defensive-patterns/general.zh.md)）：
+针对 `BUG-283`、`BUG-284`（以及 [DSH general.zh.md「dispose 必须达到完全停稳」](None../../../../vendor/dsh/docs/defensive-patterns/general.zh.mdNone）：
 
 - 在 `tools/lib/core/` 提供统一的 `spawnManaged()` / `runCheckedSync()`：
   - `runCheckedSync` 自动校验 `cwd` 存在性，并优先检查 `result.error`（给出 `ENOENT`/`EACCES` 诊断而非 `exit null`）；
