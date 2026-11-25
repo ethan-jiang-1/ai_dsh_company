@@ -12,7 +12,9 @@
    `tests/repo/structure/layering.spec.ts` 不许 `node:child_process` 进 tools/lib（实测第一次实现就被它拦下）。
    同轮 `checks/gates/bare-path.mjs` 对 `packages/company-pack/lib/**` **存在也判红**（构建产物不是活指针），
    `BUILD_OUTPUT_PREFIXES` 是唯一判据。修掉 4 个归档/Note 文件的 18 条仓库外链接、2 条 `lib/client.js`
-   链接与 1 条 Note 里的构建指纹路径。
+   链接与 1 条 Note 里的构建指纹路径。证据面口径（runtime/company-workspace/snapshots 的目录本身与树下
+   文件同判）唯一家 = `markdown-links.mjs` 导出的 `isEvidencePath`；`link-debt` 直接消费它，不再抄一份前缀表
+   （首版两处各写一份，CI 抓到 `archived 5 > 基线 4`——见验证表）。
 
 2. **计数/深度字面量去重**。9 处 preset 计数（`AGENTS.md`×2 / architecture / presets / repo-handoff /
    bootstrap×2 / project-map×2 / profile）改成「清单 = `presets/` 目录」；`docs/contracts/delegation.md`
@@ -33,6 +35,7 @@
 - **用测试钉住散文计数**（docs == 目录数）：把第二事实源合法化，增员时仍要两处改。
 - **在 `tools/lib` 里直接 `spawnSync('git')`**：破坏 keyless 纯逻辑分层，`layering.spec` 立即红（实跑）。
 - **只保留 `preset-smoke` 的诊断**：用户在浏览器里仍无第二条路，运维必须开终端跑 lane。
+- **在 `link-debt` 里再写一份 `MOVED_TARGET_PREFIXES`**：两处前缀表在「目录本身（无尾斜杠）」上分叉，CI 首跑即红（archived 5 > 4）。
 - **把新文案塞进 `/company-diagnostics` 子命令**：host 命令的 CJK 棘轮（该文件 10）只降不升，为一条诊断文案涨额度 = 把结构预算当橡皮。诊断走启动日志，命令面保持原样。
 
 ## 后果
@@ -50,6 +53,7 @@
 | 静态门（计数） | 12 | `node tests/checks/gates-negative.test.mjs` → `PASS nav-count-claims：preset 计数（6 个 preset）→ 红`（`preset 计数声明「六公司角色」`）；真盘改完 → `OK nav-count-claims ×121` |
 | 全量 | 3 导出/入口 + 12 | `npm_config_verify_deps_before_run=false pnpm verify` → `verify: ALL PASS；2 门无对象`（134 PASS）；`validateMarkdownLinks(process.cwd()).violations` = `0`（8150 链接 / 951 文件） |
 | 真挂载 | 10 配置/组合 | `source run/env.sh && node checks/lanes/preset.entry.mjs` → `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）`，25s；含 11 次 `session/create`、session-search 隔离组、skills 隔离 |
+| CI（真干净 checkout） | 3/12 | run `45525084419` **红**：`link-debt: archived 5 > 基线 4`（`company-workspace` 目录本身没被当证据面；两处前缀表分叉）→ 同源后 run `45525775125` 绿（`Run pnpm verify` 通过） |
 | 干净路径 | 12 | `/tmp/dsh-diag`（rsync 副本、`git add -A` 后；父目录无 `../deepseek-harness`）`pnpm verify` → `ALL PASS`；修复前同一路径 `26 FAILURE(S)`（25 link + 1 link-debt） |
 | 发布字节 | 3 导出 / 13 数据 | `pnpm release --verify` → 7 项 pass（154s）：`release-smoke` ALL PASS（真 tarball→干净 profile→boot→`plugin remove` 后 bundles 摘净、`.dsh-company` 数据不变→重装恢复）；`preset-smoke` 11/11；`client-load` 真页面。`pnpm release --check --allow-pre-publish-index` → `READY 0.11.10 @ 378113aa`（tgz 137 条目） |
 | 单元（健康面） | 2 服务/注册表 | `npx vitest run tests/host/startup/preset-health.spec.ts` → 4 passed（broken 清单、ready:false、启动告警文案） |
