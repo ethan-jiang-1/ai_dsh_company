@@ -276,7 +276,7 @@ export const zh = {
   'deliverables.openAria': '打开 {slug} 的 final.md',
   'deliverables.open': '打开',
   'deliverables.dateMissing': '日期未记',
-  'deliverables.footer': '成品 = 目录里有 final.md；present 背书来自本部署 host 的审计账本（domain； 由 present 事件 + 操作员审计写入）。本索引是 host 生成的**派生显示**，不作为审计权威； 未记录的条目显示「未核」，面板只读。',
+  'deliverables.footer': '成品 = 目录里有 final.md；present 背书来自本部署 host 的审计账本（domain； 由 present 事件 + 操作员审计写入）。本索引是 host 生成的派生显示，不作为审计权威； 未记录的条目显示「未核」，面板只读。',
   'delegation.running': '等职能出稿…',
   'delegation.ok': '已交稿',
   'delegation.error': '委派失败',

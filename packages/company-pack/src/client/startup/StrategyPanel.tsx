@@ -27,7 +27,7 @@ export interface StrategyPanelInjected {
   readonly load: (sessionId: SessionId, signal: AbortSignal) => Promise<void>
   readonly save: (sessionId: SessionId, field: StartupField, value: string | null) => Promise<SaveResult>
   readonly reset: (sessionId: SessionId) => Promise<SaveResult>
-  readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
+  readonly floatTab?: ((tabId: TabId, rect?: FloatRectLike) => void) | undefined
   readonly unfloatTab?: ((paneId: string) => void) | undefined
   readonly t: CompanyT
 }

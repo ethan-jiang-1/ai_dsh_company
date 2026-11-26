@@ -165,7 +165,6 @@ type WorkshopState =
   | { readonly status: 'error'; readonly message: string }
   | { readonly status: 'ready'; readonly reference: SessionReference }
 
-const noopFloat = (): void => {}
 const hqTabInfo: UseSidebarRightTabInfo = () => ({
   tab: { id: 'company-hq-tab', contentId: COMPANY_HQ_PANEL_ID },
 }) as unknown as ReturnType<UseSidebarRightTabInfo>
@@ -518,8 +517,6 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
                     sessionId: primarySession.id,
                     useSessions,
                     useTabInfo: hqTabInfo,
-                    floatTab: noopFloat,
-                    unfloatTab: noopFloat,
                     readLedger,
                     t,
                   } as unknown as LedgerTabProps)}
@@ -531,8 +528,6 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
                     sessionId: primarySession.id,
                     useSessions,
                     useTabInfo: hqTabInfo,
-                    floatTab: noopFloat,
-                    unfloatTab: noopFloat,
                     readCatalog,
                     openFinal,
                     t,
@@ -557,8 +552,6 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
                   load: loadStartup,
                   save: saveStartup,
                   reset: resetStartup,
-                  floatTab: noopFloat,
-                  unfloatTab: noopFloat,
                   t,
                 } as unknown as StrategyPanelProps)}
               />

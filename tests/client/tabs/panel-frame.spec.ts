@@ -3,6 +3,7 @@
  * PanelFrame 浮出接线判据（真实 `SidebarRightTabInfo` 契约，不伪造 `.floating` 字段）。
  * 浮窗收回/拖拽/几何由 DSH `<DockLayout>` 原生标题栏持有；`PanelFrame` 负责「浮出」动作与保存几何钳制。
  */
+// 负例留证 2026-11-27：PanelFrame 对缺省 floatTab 仍渲染「浮出」按钮 ⇒ BUG-391 用例红；条件隐藏后绿。BUG-391
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -80,5 +81,16 @@ describe('PanelFrame 浮出接线（真实 SidebarRightTabInfo 契约）', () =>
     expect(root.textContent).toContain('投影更新')
     await act(async () => { buttonByText(root, '浮出').click() })
     expect(tabProps.floatTab).toHaveBeenCalledWith('tab-fallback', undefined)
+  })
+
+  it('未传 floatTab（如 HQ 内嵌容器）时不渲染死「浮出」按钮（BUG-391）', async () => {
+    const root = await mount(createElement(PanelFrame, {
+      title: '台账',
+      tone: 'ledger',
+      tabProps: { useTabInfo: () => realTabInfo('hq-tab', 'dsh-company-pack/hq') },
+      children: createElement('div', null, 'embedded body'),
+    }))
+    const floatBtn = [...root.querySelectorAll('button')].find(node => node.textContent?.includes('浮出'))
+    expect(floatBtn).toBeUndefined()
   })
 })

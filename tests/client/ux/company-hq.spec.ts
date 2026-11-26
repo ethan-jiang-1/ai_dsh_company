@@ -4,6 +4,7 @@
 // 负例留证 2026-11-26：去掉 company-hq.tsx catch 后 `if (cancelled) return` 守卫 ⇒ BUG-348 用例红（卸载后清 storage key 并建孤儿会话）；还原后绿。BUG-348
 // 负例留证 2026-11-27：把 CompanyHqPage 改回 `primarySession = sessionList[0]` 且不追踪 knownCultivationIds ⇒ BUG-384 用例红（create 被调用 6 次陷入循环）；还原后绿。BUG-384
 // 负例留证 2026-11-27：去掉 HqCultivationWorkshop / CultivationBoard 的 `language` 同步 ⇒ BUG-385 用例红（en 界面仍渲染「我的分身」）；还原后绿。BUG-385
+// 负例留证 2026-11-27：HQ 台账与策略恢复传 `floatTab: noopFloat` 且 PanelFrame 忽略 floatTab 可选性 ⇒ BUG-391 用例红（HQ 内嵌卡片仍出现「浮出」死按钮）；还原后绿。BUG-391
 import { act, createElement, type ComponentProps, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -169,8 +170,12 @@ describe('Wave S3 CompanyHqPage & HqCultivationConversationSlot', () => {
     hqStore.select('overview')
     hqStore.select('ledger')
     await renderPage()
+    const ledgerFloatBtns = [...host.querySelectorAll('button')].filter(b => b.textContent?.trim() === zh['panel.float'])
+    expect(ledgerFloatBtns).toHaveLength(0)
     hqStore.select('strategy')
     await renderPage()
+    const strategyFloatBtns = [...host.querySelectorAll('button')].filter(b => b.textContent?.trim() === zh['panel.float'])
+    expect(strategyFloatBtns).toHaveLength(0)
     await renderPage({ byId: {} })
     hqStore.select('ledger')
     await renderPage({ byId: {} })

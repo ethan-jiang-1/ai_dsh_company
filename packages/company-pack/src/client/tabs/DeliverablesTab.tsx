@@ -36,7 +36,7 @@ import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 
 /** 页签体注入面。 */
 export interface DeliverablesTabInjected {
-  readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
+  readonly floatTab?: ((tabId: TabId, rect?: FloatRectLike) => void) | undefined
   readonly unfloatTab?: ((paneId: string) => void) | undefined
   /** 读生成索引全文；不可达给 null（面板显示读取失败，不静默）。 */
   readonly readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<WorkspaceTextRead>

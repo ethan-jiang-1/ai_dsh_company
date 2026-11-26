@@ -22,7 +22,7 @@ import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 
 /** 页签体注入面：台账文件读取闭包 + 浮出。 */
 export interface LedgerTabInjected {
-  readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
+  readonly floatTab?: ((tabId: TabId, rect?: FloatRectLike) => void) | undefined
   readonly unfloatTab?: ((paneId: string) => void) | undefined
   /** 读 `kb/motion-ledger.md` 全文；不可达给 null（面板显示读取失败，不静默）。 */
   readonly readLedger: (sessionId: SessionId, signal: AbortSignal) => Promise<WorkspaceTextRead>

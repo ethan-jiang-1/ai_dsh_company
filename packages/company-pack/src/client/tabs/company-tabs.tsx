@@ -47,7 +47,7 @@ export type PresenceTabProps = CompanyTabProps & {
  */
 export interface PanelFrameProps {
   readonly useTabInfo: CompanyTabProps['useTabInfo']
-  readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
+  readonly floatTab?: ((tabId: TabId, rect?: FloatRectLike) => void) | undefined
   readonly unfloatTab?: ((paneId: string) => void) | undefined
   readonly t?: CompanyT
 }
@@ -69,6 +69,7 @@ export function PanelFrame({ title, tone, tabProps, action, children, refreshLab
 }) {
   const t = tabProps.t ?? defaultPanelT
   const info = tabProps.useTabInfo()
+  const floatTab = tabProps.floatTab
   return (
     <div className="wk-pane">
       <div className={`wk-pane-strip wk-tone-${tone}`} aria-hidden="true" />
@@ -77,18 +78,20 @@ export function PanelFrame({ title, tone, tabProps, action, children, refreshLab
         <span className="wk-meta">{refreshLabel ?? t('panel.projected')}</span>
         <span style={{ flex: 1 }} />
         {action}
-        <Button
-          size="sm"
-          variant="ghost"
-          title={t('panel.floatTitle')}
-          onClick={() => {
-            const tabKey = info.tab.contentId !== '' ? info.tab.contentId : info.tab.id
-            const saved = loadFloatRect(window.localStorage, tabKey)
-            tabProps.floatTab(info.tab.id, saved === null ? undefined : clampRect(saved, window.innerWidth, window.innerHeight))
-          }}
-        >
-          {t('panel.float')}
-        </Button>
+        {floatTab === undefined ? null : (
+          <Button
+            size="sm"
+            variant="ghost"
+            title={t('panel.floatTitle')}
+            onClick={() => {
+              const tabKey = info.tab.contentId !== '' ? info.tab.contentId : info.tab.id
+              const saved = loadFloatRect(window.localStorage, tabKey)
+              floatTab(info.tab.id, saved === null ? undefined : clampRect(saved, window.innerWidth, window.innerHeight))
+            }}
+          >
+            {t('panel.float')}
+          </Button>
+        )}
       </div>
       {/* data-company-tab-title = 面板标题，给真实页面探针一个「面板体在场」的稳定锚；
           标题文本会出现在 tab strip，不能拿 body 里的标题词判断面板是否渲染。

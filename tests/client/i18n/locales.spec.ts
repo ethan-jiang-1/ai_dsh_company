@@ -4,6 +4,7 @@
  * 为什么：typed 注册只能保证「编译期 key 完整」；placeholder 拼错、en 里混中文、
  * 空值这类漂移仍会漏到页面。这里用 keyless 断言把两语言成对与占位符一致钉住。
  */
+// 负例留证 2026-11-27：deliverables.footer 恢复裸 `**派生显示**` ⇒ BUG-391 用例红；清除后绿。BUG-391
 import { describe, expect, it } from 'vitest'
 import { COMPANY_NS, en, zh, type CompanyKey } from '../../../packages/company-pack/src/client/locales.ts'
 
@@ -37,5 +38,10 @@ describe('company locale 字典', () => {
 
   it('命名空间是稳定的 company', () => {
     expect(COMPANY_NS).toBe('company')
+  })
+
+  it('成品页脚不含裸 Markdown ** 星号（BUG-391）', () => {
+    expect(zh['deliverables.footer']).not.toContain('**')
+    expect(en['deliverables.footer']).not.toContain('**')
   })
 })
