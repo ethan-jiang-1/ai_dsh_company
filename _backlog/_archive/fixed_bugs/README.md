@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-389**（2026-11-27，384..391 批顺位 4 / P2）：`SignoffComposerCard` 接入 `ctx.locale.resolveText` 解析 `displayReason` 并将补充上下文折叠进 `<details>`；`signoff-tool` `line` 描述去双语斜杠混排示例——
+  [389](BUG-389-signoff-composer-card-ignores-display-reason-and-duplicates-toolview.md)。证据提交 `fd4efc02`。
+
 - **BUG-388**（2026-11-27，384..391 批顺位 3 / P1）：透传 `callId` 并在 `mergeAttention` 按 `(jumpTo, callId)` 与无 `id`/`callId` 内容配额 1:1 跨源去重；`AttentionTab` 在 `hasBoundary` 且零待办时渲染 `[data-attention-empty-bounded]` 占位说明——
   [388](BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md)。证据提交 `0a04d1e2`。
 

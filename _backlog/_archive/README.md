@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-389](fixed_bugs/BUG-389-signoff-composer-card-ignores-display-reason-and-duplicates-toolview.md) — 已修（`fd4efc02`）：`SignoffComposerCard` 优先消费 `displayReason`、默认折叠补充上下文且清理 `line` schema 双语混排示例；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
 - [BUG-388](fixed_bugs/BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md) — 已修（`0a04d1e2`）：跨源 `approval/request` 按 `callId` / 内容配额 1:1 去重并补全有边界零待办占位说明；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
 - [BUG-386](fixed_bugs/BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md) — 已修（`abec0ad5`）：内嵌控件不换行护栏与 `PresenceTab` 列对齐；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
 - [BUG-387](fixed_bugs/BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md) — 已修（`abec0ad5`）：390px HQ 培养单列折叠、网格 `min(100%, 300px)` 与全屏右栏收起出口；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
