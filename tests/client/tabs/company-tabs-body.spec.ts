@@ -121,6 +121,12 @@ describe('公司页签体静态渲染（R5-06/D5）', () => {
       await act(async () => { asideBtn?.click() })
       expect(asideTarget).toEqual(['session-test', 'm-eng'])
 
+      const htmlNoAside = renderToStaticMarkup(createElement(PresenceTab as never, props({
+        useSessions: (selector: (state: unknown) => unknown) => selector(populatedState),
+        openMember: async () => {},
+      })))
+      expect(htmlNoAside).not.toContain('wk-row-aside-cell')
+
       const failingFollow = (msg: string) => () => ({
         [Symbol.asyncIterator]: () => ({
           next: async () => { throw new Error(msg) },

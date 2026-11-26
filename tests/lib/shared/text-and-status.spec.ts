@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { firstText } from '../../../packages/company-pack/src/lib/shared/text.ts'
+import { firstText, shortSessionId } from '../../../packages/company-pack/src/lib/shared/text.ts'
 import { memberDot } from '../../../packages/company-pack/src/lib/presence/presence-status.ts'
 
 // 2026-10-20 审计：presence.ts / attention.ts 各有一份 firstText；tabs/panels 各有一份 memberDot。
@@ -27,5 +27,12 @@ describe('firstText 换行归一（BUG-361）', () => {
     expect(firstText([{ type: 'text', text: 'a\r\nb' }])).toBe('a')
     expect(firstText([{ type: 'text', text: 'a\rb' }])).toBe('a')
     expect(firstText([{ type: 'text', text: '  a\r\n  b  ' }])).toBe('a')
+  })
+
+  // 负例留证 2026-11-27：shortSessionId 改回裸 slice(0,8) 不去 session- 前缀 ⇒ 本用例红（返回 'session-'）。BUG-390
+  it('shortSessionId 剥离 session- 前缀并在剥空时兜底原串（BUG-390）', () => {
+    expect(shortSessionId('session-abcdef1234')).toBe('abcdef12')
+    expect(shortSessionId('session-')).toBe('session-')
+    expect(shortSessionId('plain123456')).toBe('plain123')
   })
 })

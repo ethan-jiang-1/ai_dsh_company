@@ -8,6 +8,7 @@ import { SlotCore } from '../../../vendor/dsh/packages/client/ui-slots/src/index
 import { en, zh, type CompanyKey } from '../../../packages/company-pack/src/client/locales.ts'
 import {
   isSignoffPendingInteraction,
+  resolveSignoffReason,
   SignoffComposerCard,
   SignoffToolView,
   SIGNOFF_TOOL_KEY,
@@ -153,6 +154,12 @@ describe('SignoffComposerCard · 链式双签决策卡', () => {
     expect(container.textContent).toContain('特批 75 折审批')
     expect(container.textContent).not.toContain('stale-raw-reason')
     expect(container.querySelector('details[data-signoff-detail-toggle]')?.querySelector('summary')?.textContent).toContain(zh['signoff.detailToggle'])
+
+    // 3. resolveSignoffReason 各兜底分支：空回调穿透 / 字符串字面量 / 缺当前语言 key 回 fallback / 全空
+    expect(resolveSignoffReason(pendingWithDisplay, makeT(en), () => '')).toBe('Discount sign line: 25% discount override (Option A / Option B)')
+    expect(resolveSignoffReason({ displayReason: 'literal string reason', reason: 'ignored' }, makeT(zh))).toBe('literal string reason')
+    expect(resolveSignoffReason({ displayReason: { en: 'Only EN line' } }, makeT(zh))).toBe('Only EN line')
+    expect(resolveSignoffReason({}, makeT(zh))).toBe('')
   })
 })
 

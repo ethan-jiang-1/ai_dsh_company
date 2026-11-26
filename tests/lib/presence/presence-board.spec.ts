@@ -147,13 +147,18 @@ describe('presenceFromEvents（回放 / 离线路径，验收判据 4：非空�
   it('lead 成员上线事件映射为 CEO 而非裸 lead（BUG-390）', () => {
     const board = presenceFromEvents([
       memberEvent(LEAD, 'lead', 'active', 1_500),
-    ])
+      memberEvent('team-lead-id', 'custom-lead', 'active', 1_600),
+      taskEvent('t-lead-1', 1, 'Lead owns this', 'pending', 'm-lead', 1_700),
+      taskEvent('t-lead-1', 2, 'Lead owns this', 'in_progress', 'm-lead', 1_800),
+    ], new Map([['m-lead', 'lead']]))
     expect(board.activity[0]?.text).toContain(`${PRESET_DISPLAY_NAMES.ceo} 上线`)
     expect(board.activity[0]?.text).not.toContain('lead')
     expect(board.activity[0]?.token).toEqual({
       key: 'presence.activity.memberOnline',
       params: { name: PRESET_DISPLAY_NAMES.ceo },
     })
+    expect(board.activity[1]?.text).toContain('custom-lead 上线')
+    expect(board.activity.at(-1)?.text).toContain(`${PRESET_DISPLAY_NAMES.ceo} 认领 t-lead-1`)
   })
 })
 

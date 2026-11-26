@@ -5,6 +5,7 @@ import {
   PRESENT_TOOL_NAME,
   STREAM_ITEM_CAP,
   ATTENTION_SUMMARY_MAX,
+  approvalFromPayload,
   attentionItemKey,
   attentionSummary,
   attentionTone,
@@ -574,5 +575,26 @@ describe('跨源无 id 审批消重（BUG-388）', () => {
     ], 's1').items
     expect(mergeAttention(live, [history[0]!])).toHaveLength(1)
     expect(mergeAttention(live, history)).toHaveLength(2)
+
+    const liveWithId = [{
+      kind: 'approval' as const,
+      sessionId: 's1',
+      id: 'uuid-live-only',
+      what: attentionSummary('request_signoff: 同摘要'),
+      since: 2000,
+    }]
+    expect(mergeAttention(liveWithId, [history[0]!])).toHaveLength(2)
+
+    const liveCallOnly = [{
+      kind: 'approval' as const,
+      sessionId: 's1',
+      callId: 'call-live',
+      what: attentionSummary('request_signoff: 仅活体有 callId'),
+      since: 2000,
+    }]
+    expect(mergeAttention(liveCallOnly, history)).toHaveLength(3)
+    expect(attentionItemKey({ kind: 'approval', who: 's1', what: 'w', callId: 'c1', time: 1, jumpTo: 's1' })).toContain('call:c1')
+    expect(approvalFromPayload({ callId: 'c1', toolName: 'bash', reason: 'r' })?.callId).toBe('c1')
+    expect(approvalFromPayload({ callId: '', toolName: 'bash', reason: 'r' })?.callId).toBeUndefined()
   })
 })

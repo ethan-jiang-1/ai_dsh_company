@@ -102,6 +102,11 @@ describe('Wave S2 triggers, deep links, split presets, and shortcuts', () => {
     openSplitPreset({ openTab }, store, 'ops', 390)
     expect(openTab).toHaveBeenCalledTimes(1)
     expect(openTab).toHaveBeenCalledWith('company-ops')
+
+    openTab.mockClear()
+    openSplitPreset({ openTab }, store, 'review', 390)
+    expect(openTab).toHaveBeenCalledTimes(1)
+    expect(openTab).toHaveBeenCalledWith('company-archive')
   })
 
   it('registerCompanyShortcuts registers fixed commands and handles non-composing Alt+Shift+1/2/3 only', () => {

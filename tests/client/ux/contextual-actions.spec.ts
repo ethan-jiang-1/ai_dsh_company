@@ -94,18 +94,22 @@ describe('DeliverableFinalDocActions & AssistantCultivateAction', () => {
     const hubStore = createHubSubViewStore()
     let registeredCultivate: ((ctx?: { messageId?: string; filePath?: string }) => void) | undefined
     let registeredDraftCmd: ((cmd: string) => void) | undefined
+    let composerDef: { select?: (ctx: { pendingInteraction: unknown }) => unknown; inject?: () => Record<string, unknown> } | undefined
     const fakeCtx = {
       locale: { bind: () => makeT(zh) },
       inject: (_deps: readonly string[], fn: (scoped: unknown) => void) => {
         fn({
           slots: {
             inject: (_n: string, reg: () => void) => { reg() },
-            register: (def: { name: string; inject?: (sid: string) => Record<string, unknown> }) => {
+            register: (def: { name: string; select?: (ctx: { pendingInteraction: unknown }) => unknown; inject?: (sid: string) => Record<string, unknown> }) => {
               if (def.name === 'conversation.chat.assistant-actions') {
                 registeredCultivate = def.inject?.('s1').openCultivation as typeof registeredCultivate
               }
               if (def.name === 'conversation.input.dock') {
                 registeredDraftCmd = def.inject?.('s1').onDraftCommand as typeof registeredDraftCmd
+              }
+              if (def.name === 'conversation.composer') {
+                composerDef = def as unknown as typeof composerDef
               }
               return () => {}
             },
@@ -116,6 +120,32 @@ describe('DeliverableFinalDocActions & AssistantCultivateAction', () => {
       },
     }
     registerWaveS1Ux(fakeCtx as never, { attention: createAttentionRegistry(), hubStore })
+    expect(composerDef?.select?.({ pendingInteraction: { kind: 'approval', toolName: 'request_signoff', answer: vi.fn() } })).not.toBeNull()
+    expect(composerDef?.select?.({ pendingInteraction: { kind: 'approval', toolName: 'bash', answer: vi.fn() } })).toBeNull()
+    expect(composerDef?.inject?.().resolveReason).toBeUndefined()
+
+    let composerInjectWithLocale: Record<string, unknown> | undefined
+    const resolveText = vi.fn((text: string | { readonly en: string }) => (typeof text === 'string' ? text : text.en))
+    registerWaveS1Ux({
+      locale: { bind: () => makeT(zh), resolveText },
+      inject: (_deps: readonly string[], fn: (scoped: unknown) => void) => {
+        fn({
+          slots: {
+            inject: (_n: string, reg: () => void) => { reg() },
+            register: (def: { name: string; inject?: () => Record<string, unknown> }) => {
+              if (def.name === 'conversation.composer') composerInjectWithLocale = def.inject?.()
+              return () => {}
+            },
+          },
+          sidebarRight: { openTab },
+          sessions: { binding: () => undefined },
+        })
+      },
+    } as never, { attention: createAttentionRegistry(), hubStore })
+    const resolved = (composerInjectWithLocale?.resolveReason as ((t: unknown) => string))?.({ en: 'Margin', zh: '毛利' })
+    expect(resolved).toBe('Margin')
+    expect(resolveText).toHaveBeenCalledOnce()
+
     registeredCultivate?.({ filePath: '/ws/.dsh-company/deliverables/m1/final.md' })
     expect(hubStore.store.getSnapshot().archive).toBe('cultivation')
     expect(openTab).toHaveBeenCalledWith('company-archive')

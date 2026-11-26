@@ -297,7 +297,7 @@ export function mergeAttention(
     if (item.kind === 'question') {
       const qKey = questionContentKey(item)
       liveQuestionBudget.set(qKey, (liveQuestionBudget.get(qKey) ?? 0) + 1)
-    } else if (item.kind === 'approval') {
+    } else {
       if (item.callId !== undefined) {
         liveApprovalCallIds.add(approvalCallDedupKey(item.jumpTo, item.callId))
       } else if (item.id === undefined) {

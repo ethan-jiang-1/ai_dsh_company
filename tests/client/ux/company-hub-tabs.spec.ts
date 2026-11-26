@@ -267,6 +267,8 @@ describe('Wave S2 cohesive hub tabs', () => {
       } as unknown as ComponentProps<typeof TeamHubTab>))
     })
     expect(host.querySelector('[data-company-narrow-close]')).not.toBeNull()
+    await act(async () => { (host.querySelector('[data-company-narrow-close]') as HTMLButtonElement).click() })
+    expect(openSplit).toHaveBeenCalledTimes(2)
 
     await act(async () => {
       root.render(createElement(ArchiveHubTab, {
@@ -295,6 +297,61 @@ describe('Wave S2 cohesive hub tabs', () => {
         openContext: vi.fn(async () => ({ ok: true as const })),
         openFinal: vi.fn(),
       } as unknown as ComponentProps<typeof ArchiveHubTab>))
+    })
+    expect(host.querySelector('[data-company-narrow-close]')).toBeNull()
+
+    await act(async () => {
+      root.render(createElement(ArchiveHubTab, {
+        sessionId: 's-arch-narrow',
+        useTabInfo: fullscreenTabInfo,
+        useSessions: rt.useSessions,
+        useProjection: rt.useProjection,
+        useHubState: rt.useHubState,
+        selectSection,
+        openSplit,
+        floatTab: rt.floatTab,
+        unfloatTab: rt.unfloatTab,
+        t,
+        follow: async function* () {},
+        cultivationFiles: {
+          listJournal: vi.fn(async () => []),
+          readHead: vi.fn(async () => null),
+          listRecords: vi.fn(async () => ({ ok: true as const, names: [] })),
+          readRecord: vi.fn(async () => null),
+        },
+        cultivationActions: vi.fn(() => ({})) as unknown as ComponentProps<typeof ArchiveHubTab>['cultivationActions'],
+        roleSource: { getSnapshot: () => ({ projectionsBySession: {} }), subscribe: () => () => {} },
+        readLedger: vi.fn(async () => ({ ok: true as const, text: '' })),
+        readCatalog: vi.fn(async () => ({ ok: true as const, text: '' })),
+        contextSources: vi.fn(() => ({ entries: [] })) as unknown as ComponentProps<typeof ArchiveHubTab>['contextSources'],
+        openContext: vi.fn(async () => ({ ok: true as const })),
+        openFinal: vi.fn(),
+      } as unknown as ComponentProps<typeof ArchiveHubTab>))
+    })
+    const archCloseBtn = host.querySelector('[data-company-narrow-close]') as HTMLButtonElement | null
+    expect(archCloseBtn).not.toBeNull()
+    await act(async () => { archCloseBtn!.click() })
+    expect(openSplit).toHaveBeenCalledTimes(3)
+
+    await act(async () => {
+      root.render(createElement(OpsHubTab, {
+        sessionId: 's-ops-undef',
+        useTabInfo: () => ({ tab: { id: 'tab-x', contentId: '' } }),
+        useSessions: rt.useSessions,
+        useProjection: rt.useProjection,
+        useHubState: rt.useHubState,
+        selectSection,
+        openSplit,
+        floatTab: rt.floatTab,
+        unfloatTab: rt.unfloatTab,
+        t,
+        leadOf: (id: string) => id,
+        follow: async function* () {},
+        startupStore: createStartupStore(),
+        loadStartup: async () => {},
+        saveStartup: async () => ({ ok: true as const }),
+        resetStartup: async () => ({ ok: true as const }),
+      } as unknown as ComponentProps<typeof OpsHubTab>))
     })
     expect(host.querySelector('[data-company-narrow-close]')).toBeNull()
 
