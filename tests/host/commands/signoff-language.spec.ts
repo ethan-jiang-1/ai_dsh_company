@@ -52,6 +52,7 @@ describe('request_signoff 无语言状态（BUG-367）', () => {
   })
 })
 
+// 负例留证 2026-11-27：registerSignoffTool line 参数 description 恢复中英斜杠混排示例 ⇒ BUG-389 用例红；还原后绿。BUG-389
 describe('request_signoff 语言注入（BUG-367）', () => {
   it('en：note 与 reason 零中文/全角标点', async () => {
     const { def, reasons } = mount(createCompanyLanguageState('en'))
@@ -72,5 +73,14 @@ describe('request_signoff 语言注入（BUG-367）', () => {
     const result = await def.execute({ line: 'x', summary: 'y' }, { signal: new AbortController().signal })
     expect(result.decision).toBe('unavailable')
     expect(result.note).not.toMatch(/[\u3400-\u9fff]/u)
+  })
+
+  it('line 参数 schema 不携带中英斜杠混排示例以免模型复读双语拼串（BUG-389）', () => {
+    const { def } = mount(createCompanyLanguageState('zh'))
+    const props = (def.parameters as { readonly properties?: Record<string, { readonly description?: string }> }).properties
+    const lineDesc = props?.line?.description ?? ''
+    expect(lineDesc.length).toBeGreaterThan(0)
+    expect(lineDesc).not.toMatch(/[\u3400-\u9fff]/u)
+    expect(lineDesc).not.toContain(' / ')
   })
 })

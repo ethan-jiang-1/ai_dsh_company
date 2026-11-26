@@ -892,6 +892,17 @@ const CSS = `
   font-weight: 500;
   color: var(--dsw-alias-label-tertiary);
 }
+.wk-signoff-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wk-signoff-details-toggle {
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--dsw-alias-label-tertiary);
+  user-select: none;
+}
 .wk-signoff-detail, .wk-signoff-note, .wk-signoff-hint {
   margin: 0;
   font-size: 11.5px;

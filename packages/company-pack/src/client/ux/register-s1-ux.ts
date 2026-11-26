@@ -24,7 +24,13 @@ import {
 import { COMPANY_COMMAND_VIEW_KEYS, CompanyCommandView } from './command-views.tsx'
 import { createCompanyToastSource, CompanyToastOverlay } from './company-toast.tsx'
 import { AssistantCultivateAction, DeliverableFinalDocActions } from './contextual-actions.tsx'
-import { isSignoffPendingInteraction, SIGNOFF_TOOL_KEY, SignoffComposerCard, SignoffToolView } from './signoff-card.tsx'
+import {
+  isSignoffPendingInteraction,
+  SIGNOFF_TOOL_KEY,
+  SignoffComposerCard,
+  SignoffToolView,
+  type SignoffDisplayReason,
+} from './signoff-card.tsx'
 
 import type { HqSection } from './company-hq.tsx'
 
@@ -95,6 +101,11 @@ export function registerWaveS1Ux(ctx: ClientContext, deps: WaveS1Deps): void {
         select: ({ pendingInteraction }) => (
           isSignoffPendingInteraction(pendingInteraction) ? pendingInteraction : null
         ),
+        inject: () => ({
+          resolveReason: typeof ctx.locale?.resolveText === 'function'
+            ? (reason: SignoffDisplayReason) => ctx.locale.resolveText(reason)
+            : undefined,
+        }),
       }, SignoffComposerCard),
     )
   })

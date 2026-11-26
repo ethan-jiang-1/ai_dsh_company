@@ -17,12 +17,14 @@ import type { COMPANY_NS, CompanyKey, CompanyT } from '../locales.ts'
 
 export const SIGNOFF_TOOL_KEY = 'request_signoff' as const
 
+export type SignoffDisplayReason = string | { readonly en: string; readonly zh?: string }
+
 export interface SignoffPendingInteraction {
   readonly kind: 'approval'
   readonly key?: string
   readonly toolName: 'request_signoff'
   readonly reason?: string
-  readonly displayReason?: { readonly zh: string; readonly en: string }
+  readonly displayReason?: SignoffDisplayReason
   readonly answerable?: boolean
   readonly answer: (outcome: 'allowed-once' | 'rejected') => Promise<void>
 }
@@ -123,14 +125,36 @@ export function SignoffToolView({ block, t }: ToolCallViewProps & { readonly t: 
 
 export type SignoffComposerProps =
   PropsRuntime<'conversation.composer'>
-  & { readonly matched: SignoffPendingInteraction }
+  & {
+    readonly matched: SignoffPendingInteraction
+    readonly resolveReason?: ((text: SignoffDisplayReason) => string) | undefined
+  }
   & PropsLocale<typeof COMPANY_NS>
 
+/** 按契约优先解析本地化 `displayReason`，未接 `resolveReason` 时按当前公司语言取用，最后回退 `reason`（BUG-389）。 */
+export function resolveSignoffReason(
+  matched: Pick<SignoffPendingInteraction, 'reason' | 'displayReason'>,
+  t: CompanyT,
+  resolveReason?: (text: SignoffDisplayReason) => string,
+): string {
+  const { displayReason, reason } = matched
+  if (displayReason !== undefined) {
+    if (resolveReason !== undefined) {
+      const resolved = resolveReason(displayReason)
+      if (resolved !== '') return resolved
+    }
+    if (typeof displayReason === 'string') return displayReason
+    const lang = t('meta.language') === 'en' ? 'en' : 'zh'
+    return displayReason[lang] ?? displayReason.en ?? reason ?? ''
+  }
+  return reason ?? ''
+}
+
 /** 输入区 Chain 替换卡：仅当 `pendingInteraction` 为 `request_signoff` 时接管（L1 priority 0）。 */
-export function SignoffComposerCard({ matched, t }: SignoffComposerProps): ReactNode {
+export function SignoffComposerCard({ matched, resolveReason, t }: SignoffComposerProps): ReactNode {
   const [submitting, setSubmitting] = useState<'allowed-once' | 'rejected' | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const parsed = parseSignoffReason(matched.reason)
+  const parsed = parseSignoffReason(resolveSignoffReason(matched, t, resolveReason))
   const busy = submitting !== null
 
   useEffect(() => {
@@ -189,10 +213,13 @@ export function SignoffComposerCard({ matched, t }: SignoffComposerProps): React
         </div>
       ) : null}
       {parsed.detail !== '' ? (
-        <div className="wk-signoff-row">
-          <span className="wk-signoff-label">{t('signoff.detailLabel')}</span>
-          <span className="wk-signoff-value">{parsed.detail}</span>
-        </div>
+        <details className="wk-signoff-details" data-signoff-detail-toggle="">
+          <summary className="wk-signoff-details-toggle">{t('signoff.detailToggle')}</summary>
+          <div className="wk-signoff-row">
+            <span className="wk-signoff-label">{t('signoff.detailLabel')}</span>
+            <span className="wk-signoff-value">{parsed.detail}</span>
+          </div>
+        </details>
       ) : null}
       <p className="wk-signoff-hint">{t('signoff.hint')}</p>
       {errorMessage !== null ? (

@@ -22,7 +22,7 @@ export function registerSignoffTool(ctx: Context, options: { readonly language?:
       line: {
         type: 'string',
         required: true,
-        description: 'Which sign line this hits, e.g. "margin sign line" / "毛利线双签" or "discount sign line" / "折扣线双签" (values live in the deployment policy).',
+        description: 'Which sign line this hits, written in the conversation language (e.g. margin sign line or discount sign line; values live in the deployment policy).',
       },
       summary: {
         type: 'string',

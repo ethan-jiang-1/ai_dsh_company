@@ -56,6 +56,7 @@ describe('isSignoffPendingInteraction · 鸭子类型精确识别', () => {
   })
 })
 
+// 负例留证 2026-11-27：去掉 SignoffComposerCard 的 displayReason 解析优先级或将 parsed.detail 改为默认展开 ⇒ BUG-389 用例红；还原后绿。BUG-389
 describe('SignoffComposerCard · 链式双签决策卡', () => {
   it('解析签字线与备选上下文，点击批准 / 拒绝及 Enter / Esc 正常结算，失败后可恢复重试', async () => {
     const answer = vi.fn().mockRejectedValueOnce(new Error('network blip')).mockResolvedValueOnce(undefined)
@@ -109,6 +110,49 @@ describe('SignoffComposerCard · 链式双签决策卡', () => {
       await Promise.resolve()
     })
     expect(answerEn).toHaveBeenCalledWith('allowed-once')
+  })
+
+  it('优先消费 displayReason（resolveReason 注入 + 无注入时按公司语言回退）并默认折叠补充上下文（BUG-389）', () => {
+    const pendingWithDisplay = {
+      kind: 'approval' as const,
+      key: 'approval:display',
+      toolName: 'request_signoff' as const,
+      reason: 'stale-raw-reason',
+      displayReason: {
+        zh: '折扣线双签：特批 75 折审批（备选 A / 备选 B）',
+        en: 'Discount sign line: 25% discount override (Option A / Option B)',
+      },
+      answerable: true,
+      answer: vi.fn().mockResolvedValue(undefined),
+    }
+
+    // 1. 注入 resolveReason 时优先使用它，不回退陈旧 reason，且 detail 默认折叠
+    const { container, rerender } = mountDom(createElement(SignoffComposerCard, {
+      matched: pendingWithDisplay,
+      sessionId: 's-1' as SessionId,
+      t: makeT(en),
+      resolveReason: (text: { readonly en: string; readonly zh?: string }) => text.en,
+    } as unknown as ComponentProps<typeof SignoffComposerCard>))
+
+    expect(container.textContent).toContain('Discount sign line')
+    expect(container.textContent).toContain('25% discount override')
+    expect(container.textContent).not.toContain('stale-raw-reason')
+    const details = container.querySelector('details[data-signoff-detail-toggle]') as HTMLDetailsElement | null
+    expect(details).not.toBeNull()
+    expect(details?.open).toBe(false)
+    expect(details?.querySelector('summary')?.textContent).toContain(en['signoff.detailToggle'])
+
+    // 2. 未注入 resolveReason 时按 t('meta.language') 消费 displayReason
+    rerender(createElement(SignoffComposerCard, {
+      matched: pendingWithDisplay,
+      sessionId: 's-1' as SessionId,
+      t: makeT(zh),
+    } as unknown as ComponentProps<typeof SignoffComposerCard>))
+
+    expect(container.textContent).toContain('折扣线双签')
+    expect(container.textContent).toContain('特批 75 折审批')
+    expect(container.textContent).not.toContain('stale-raw-reason')
+    expect(container.querySelector('details[data-signoff-detail-toggle]')?.querySelector('summary')?.textContent).toContain(zh['signoff.detailToggle'])
   })
 })
 
