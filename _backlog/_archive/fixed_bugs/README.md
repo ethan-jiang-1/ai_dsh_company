@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-388**（2026-11-27，384..391 批顺位 3 / P1）：透传 `callId` 并在 `mergeAttention` 按 `(jumpTo, callId)` 与无 `id`/`callId` 内容配额 1:1 跨源去重；`AttentionTab` 在 `hasBoundary` 且零待办时渲染 `[data-attention-empty-bounded]` 占位说明——
+  [388](BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md)。证据提交 `0a04d1e2`。
+
 - **BUG-386**（2026-11-27，384..391 批顺位 2 / P1）：内嵌操作条与旁路按钮固定 `white-space: nowrap; flex-shrink: 0`，`.wk-row-button` 补 `min-width: 0`，`PresenceTab` 补齐 `.wk-row-aside-cell`——
   [386](BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md)。证据提交 `abec0ad5`。
 - **BUG-387**（2026-11-27，384..391 批顺位 2 / P1）：HQ 培养工坊补 `<= 820px` 单列折叠与 `min(100%, 300px)`，三聚合 Hub 全屏右栏提供收起按钮并禁窄屏双分屏——
