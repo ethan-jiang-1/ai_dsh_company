@@ -192,3 +192,35 @@ describe('客户端 CSS 与源码脆债反回归守卫（Wave S4）', () => {
     }
   })
 })
+
+// 负例留证 2026-11-27：撤掉 .wk-ux-header-badge 等内嵌包装与 [data-presence-aside] 的 white-space: nowrap / flex-shrink: 0 或恢复 .wk-row-button 的 width: 100% ⇒ 本守卫红；还原后绿。BUG-386
+// 负例留证 2026-11-27：删掉 @media (max-width: 820px) 的 .wk-hq-cultivation-split 单列规则或把 .wk-hq-grid 改回 minmax(300px, 1fr) ⇒ 本守卫红；还原后绿。BUG-387
+describe('客户端 CSS：窄栏不换行护栏与响应式折叠（BUG-386 / BUG-387）', () => {
+  it('BUG-386：五处内嵌 slot 包装类与旁路按钮禁止单字竖折，.wk-row-button 使用 min-width: 0 而非 width: 100%', () => {
+    const parsed = rules(STYLES)
+    const inlineWrap = parsed.find(r => r.full.includes('.wk-ux-header-badge') && r.full.includes('.wk-doc-actions'))
+    expect(inlineWrap, '找不到五处内嵌 slot 包装规则').toBeDefined()
+    expect(inlineWrap!.body).toContain('white-space: nowrap')
+    expect(inlineWrap!.body).toContain('flex-shrink: 0')
+
+    const rowBtn = parsed.find(r => r.selector === '.wk-row-button')
+    expect(rowBtn, '找不到 .wk-row-button').toBeDefined()
+    expect(rowBtn!.body).toContain('min-width: 0')
+    expect(rowBtn!.body).not.toMatch(/\bwidth:\s*100%/)
+
+    const asideBtn = parsed.find(r => r.full.includes('[data-presence-aside]'))
+    expect(asideBtn, '找不到 [data-presence-aside] 规则').toBeDefined()
+    expect(asideBtn!.body).toContain('white-space: nowrap')
+    expect(asideBtn!.body).toMatch(/flex(?:-shrink)?:\s*(?:0\s+0\s+auto|0)/)
+  })
+
+  it('BUG-387：390px 窄视口下 HQ 网格不强制 300px 溢出且培养工坊在 <= 820px 折叠单列', () => {
+    const hqGrid = rules(STYLES).find(r => r.selector === '.wk-hq-grid')
+    expect(hqGrid, '找不到 .wk-hq-grid').toBeDefined()
+    expect(hqGrid!.body).toContain('min(100%, 300px)')
+
+    const mediaBlock = /@media\s*\(\s*max-width:\s*820px\s*\)\s*\{([\s\S]*?\})\s*\}/.exec(STYLES)?.[1] ?? ''
+    expect(mediaBlock).toContain('.wk-hq-cultivation-split')
+    expect(mediaBlock).toContain('minmax(0, 1fr)')
+  })
+})

@@ -85,6 +85,12 @@ describe('Wave S2 triggers, deep links, split presets, and shortcuts', () => {
     toggleExpanded.mockClear()
     openSplitPreset({ openTab, isExpanded: () => false, toggleExpanded }, store, 'quiet')
     expect(toggleExpanded).not.toHaveBeenCalled()
+
+    // BUG-387：窄屏 (<768px) 下不强拆双分屏
+    openTab.mockClear()
+    openSplitPreset({ openTab }, store, 'ops', 390)
+    expect(openTab).toHaveBeenCalledTimes(1)
+    expect(openTab).toHaveBeenCalledWith('company-ops')
   })
 
   it('registerCompanyShortcuts registers fixed commands and handles non-composing Alt+Shift+1/2/3 only', () => {

@@ -81,10 +81,16 @@ export type OpsHubTabProps = PropsRuntime<'sidebar.right.pane.tab'> & InjectFace
 export type TeamHubTabProps = PropsRuntime<'sidebar.right.pane.tab'> & InjectFace<TeamHubInjected>
 export type ArchiveHubTabProps = PropsRuntime<'sidebar.right.pane.tab'> & InjectFace<ArchiveHubInjected>
 
+function useSidebarFullscreen(useTabInfo: OpsHubTabProps['useTabInfo']): boolean {
+  const info = useTabInfo() as { readonly sidebar?: { readonly fullscreen?: boolean } } | undefined
+  return info?.sidebar?.fullscreen === true
+}
+
 /** 作战板：看板 · 依赖图 · 任务板 · 项目策略。 */
 export function OpsHubTab(props: OpsHubTabProps): ReactNode {
   const section = props.useHubState((state: HubSubViewState) => state.ops)
   const { t, selectSection, openSplit, startupStore, loadStartup, saveStartup, resetStartup, ...tabRest } = props
+  const isFullscreen = useSidebarFullscreen(props.useTabInfo)
 
   return (
     <div className="wk-hub-pane" data-company-hub="ops" data-company-tab-title={t('tabs.ops.label')}>
@@ -101,7 +107,11 @@ export function OpsHubTab(props: OpsHubTabProps): ReactNode {
             { value: 'strategy', label: t('tabs.strategy.label') },
           ]}
         />
-        {openSplit === undefined ? null : (
+        {openSplit === undefined ? null : isFullscreen ? (
+          <Button size="sm" variant="outline" data-company-narrow-close="" onClick={() => { openSplit('quiet') }}>
+            {t('layout.closeRightbar')}
+          </Button>
+        ) : (
           <Button size="sm" variant="ghost" onClick={() => { openSplit('ops') }}>
             {t('layout.splitOps')}
           </Button>
@@ -129,7 +139,8 @@ export function OpsHubTab(props: OpsHubTabProps): ReactNode {
 /** 团队：待办审批 · 团队在场 · 令牌用量。 */
 export function TeamHubTab(props: TeamHubTabProps): ReactNode {
   const section = props.useHubState((state: HubSubViewState) => state.team)
-  const { t, selectSection, attention, openSession, openMember, openMemberAside, pageHistory, ...tabRest } = props
+  const { t, selectSection, openSplit, attention, openSession, openMember, openMemberAside, pageHistory, ...tabRest } = props
+  const isFullscreen = useSidebarFullscreen(props.useTabInfo)
 
   return (
     <div className="wk-hub-pane" data-company-hub="team" data-company-tab-title={t('tabs.team.label')}>
@@ -145,6 +156,11 @@ export function TeamHubTab(props: TeamHubTabProps): ReactNode {
             { value: 'budget', label: t('tabs.budget.label') },
           ]}
         />
+        {isFullscreen && openSplit !== undefined ? (
+          <Button size="sm" variant="outline" data-company-narrow-close="" onClick={() => { openSplit('quiet') }}>
+            {t('layout.closeRightbar')}
+          </Button>
+        ) : null}
       </div>
       <div className="wk-hub-body">
         {section === 'attention' && (
@@ -188,6 +204,7 @@ export function ArchiveHubTab(props: ArchiveHubTabProps): ReactNode {
     openFinal,
     ...tabRest
   } = props
+  const isFullscreen = useSidebarFullscreen(props.useTabInfo)
 
   return (
     <div className="wk-hub-pane" data-company-hub="archive" data-company-tab-title={t('tabs.archive.label')}>
@@ -203,7 +220,11 @@ export function ArchiveHubTab(props: ArchiveHubTabProps): ReactNode {
             { value: 'cultivation', label: t('tabs.cultivation.label') },
           ]}
         />
-        {openSplit === undefined ? null : (
+        {openSplit === undefined ? null : isFullscreen ? (
+          <Button size="sm" variant="outline" data-company-narrow-close="" onClick={() => { openSplit('quiet') }}>
+            {t('layout.closeRightbar')}
+          </Button>
+        ) : (
           <Button size="sm" variant="ghost" onClick={() => { openSplit('review') }}>
             {t('layout.splitReview')}
           </Button>

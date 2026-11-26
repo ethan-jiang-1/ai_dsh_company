@@ -184,6 +184,7 @@ export function PresenceTab(props: PresenceTabProps) {
               <span className="wk-row-name">{t('presence.member')}</span>
               <span className="wk-row-status">{t('presence.statusColumn')}</span>
               <span className="wk-row-task">{t('presence.taskColumn')}</span>
+              {openMemberAside !== undefined ? <span className="wk-row-aside-cell" /> : null}
             </div>
             <div role="list" aria-label={t('presence.boardAria')} className="wk-list">
               {rows.map(row => (
@@ -203,15 +204,19 @@ export function PresenceTab(props: PresenceTabProps) {
                     <span className="wk-row-status"><Tag tone={memberTone(row.status)}>{t(`presence.status.${row.status}` as CompanyKey)}</Tag></span>
                     <span className="wk-row-task" title={row.currentTasks === null ? '' : joinList(row.currentTasks, listSeparator(t))}>{row.currentTasks === null ? '—' : joinList(row.currentTasks, listSeparator(t))}</span>
                   </button>
-                  {openMemberAside !== undefined && row.role === 'teammate' ? (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      data-presence-aside={row.id}
-                      onClick={() => { openMemberAside(props.sessionId, row.id) }}
-                    >
-                      {t('presence.openAside')}
-                    </Button>
+                  {openMemberAside !== undefined ? (
+                    <span className="wk-row-aside-cell">
+                      {row.role === 'teammate' ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          data-presence-aside={row.id}
+                          onClick={() => { openMemberAside(props.sessionId, row.id) }}
+                        >
+                          {t('presence.openAside')}
+                        </Button>
+                      ) : null}
+                    </span>
                   ) : null}
                 </div>
               ))}

@@ -7,6 +7,7 @@
  * 的页签可以全绿。本档用 react-dom/server 喂空投影，断言五个页签都渲染出标题与空态。
  * **不主张**真浏览器浮窗/滚动（归 ui-scene-smoke / cdp-probe）。
  */
+// 负例留证 2026-11-27：去掉 PresenceTab 表头与 Lead 行末的 .wk-row-aside-cell 占位列 ⇒ BUG-386 列对齐用例红；还原后绿。BUG-386
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
@@ -109,6 +110,12 @@ describe('公司页签体静态渲染（R5-06/D5）', () => {
       await act(async () => { btn?.click() })
       expect(clickedMember).not.toBeNull()
       expect(host.querySelector('[data-presence-aside="m-lead"]')).toBeNull()
+      expect(host.querySelector('.wk-row-head .wk-row-aside-cell')).not.toBeNull()
+      const rowWraps = [...host.querySelectorAll('.wk-row-wrap')]
+      expect(rowWraps.length).toBeGreaterThan(1)
+      for (const wrap of rowWraps) {
+        expect(wrap.querySelector('.wk-row-aside-cell')).not.toBeNull()
+      }
       const asideBtn = host.querySelector('[data-presence-aside="m-eng"]') as HTMLButtonElement | null
       await act(async () => { asideBtn?.click() })
       expect(asideTarget).toEqual(['session-test', 'm-eng'])

@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 /** Wave S2 三合一集成页签（OpsHubTab / TeamHubTab / ArchiveHubTab）单测。 */
+// 负例留证 2026-11-27：去掉 Hub 页签在 sidebar.fullscreen=true 时渲染的 [data-company-narrow-close] 收起按钮 ⇒ BUG-387 用例红；还原后绿。BUG-387
 import { act, createElement, type ComponentProps } from 'react'
 import { createRoot } from 'react-dom/client'
 import { describe, expect, it, vi } from 'vitest'
@@ -200,6 +201,102 @@ describe('Wave S2 cohesive hub tabs', () => {
     const splitReviewBtn = Array.from(host.querySelectorAll('button'))
       .find(el => el.textContent?.trim() === zh['layout.splitReview'])
     await act(async () => { splitReviewBtn!.click() })
+
+    act(() => { root.unmount() })
+    host.remove()
+  })
+
+  it('BUG-387：右栏处于窄视口全屏态（fullscreen=true）时提供收起侧栏出口并隐藏双分屏按钮', async () => {
+    const rt = baseRuntime()
+    const fullscreenTabInfo = () => ({
+      sidebar: { expanded: true, fullscreen: true },
+      tab: { id: 'tab-hub', contentId: 'dsh-company-pack/ops' },
+    })
+    const openSplit = vi.fn()
+    const selectSection = vi.fn((hub, section) => { rt.store.select(hub, section) })
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+
+    await act(async () => {
+      root.render(createElement(OpsHubTab, {
+        sessionId: 's-ops-narrow',
+        useTabInfo: fullscreenTabInfo,
+        useSessions: rt.useSessions,
+        useProjection: rt.useProjection,
+        useHubState: rt.useHubState,
+        selectSection,
+        openSplit,
+        floatTab: rt.floatTab,
+        unfloatTab: rt.unfloatTab,
+        t,
+        leadOf: (id: string) => id,
+        follow: async function* () {},
+        startupStore: createStartupStore(),
+        loadStartup: async () => {},
+        saveStartup: async () => ({ ok: true as const }),
+        resetStartup: async () => ({ ok: true as const }),
+      } as unknown as ComponentProps<typeof OpsHubTab>))
+    })
+
+    const closeBtn = host.querySelector('[data-company-narrow-close]') as HTMLButtonElement | null
+    expect(closeBtn).not.toBeNull()
+    expect(Array.from(host.querySelectorAll('button')).some(el => el.textContent?.trim() === zh['layout.splitOps'])).toBe(false)
+    await act(async () => { closeBtn!.click() })
+    expect(openSplit).toHaveBeenCalledWith('quiet')
+
+    await act(async () => {
+      root.render(createElement(TeamHubTab, {
+        sessionId: 's-team-narrow',
+        useTabInfo: fullscreenTabInfo,
+        useSessions: rt.useSessions,
+        useProjection: rt.useProjection,
+        useHubState: rt.useHubState,
+        selectSection,
+        openSplit,
+        floatTab: rt.floatTab,
+        unfloatTab: rt.unfloatTab,
+        t,
+        attention: createAttentionRegistry(),
+        openSession: vi.fn(),
+        openMember: vi.fn(async () => {}),
+        openMemberAside: vi.fn(),
+        pageHistory: vi.fn(async () => undefined),
+        leadOf: (id: string) => id,
+        follow: async function* () {},
+      } as unknown as ComponentProps<typeof TeamHubTab>))
+    })
+    expect(host.querySelector('[data-company-narrow-close]')).not.toBeNull()
+
+    await act(async () => {
+      root.render(createElement(ArchiveHubTab, {
+        sessionId: 's-arch-narrow',
+        useTabInfo: rt.useTabInfo,
+        useSessions: rt.useSessions,
+        useProjection: rt.useProjection,
+        useHubState: rt.useHubState,
+        selectSection,
+        openSplit,
+        floatTab: rt.floatTab,
+        unfloatTab: rt.unfloatTab,
+        t,
+        follow: async function* () {},
+        cultivationFiles: {
+          listJournal: vi.fn(async () => []),
+          readHead: vi.fn(async () => null),
+          listRecords: vi.fn(async () => ({ ok: true as const, names: [] })),
+          readRecord: vi.fn(async () => null),
+        },
+        cultivationActions: vi.fn(() => ({})) as unknown as ComponentProps<typeof ArchiveHubTab>['cultivationActions'],
+        roleSource: { getSnapshot: () => ({ projectionsBySession: {} }), subscribe: () => () => {} },
+        readLedger: vi.fn(async () => ({ ok: true as const, text: '' })),
+        readCatalog: vi.fn(async () => ({ ok: true as const, text: '' })),
+        contextSources: vi.fn(() => ({ entries: [] })) as unknown as ComponentProps<typeof ArchiveHubTab>['contextSources'],
+        openContext: vi.fn(async () => ({ ok: true as const })),
+        openFinal: vi.fn(),
+      } as unknown as ComponentProps<typeof ArchiveHubTab>))
+    })
+    expect(host.querySelector('[data-company-narrow-close]')).toBeNull()
 
     act(() => { root.unmount() })
     host.remove()

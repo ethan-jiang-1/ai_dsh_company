@@ -62,6 +62,7 @@ export function openSplitPreset(
   sidebarRight: Pick<ISidebarRight, 'openTab'> & Partial<Pick<ISidebarRight, 'isExpanded' | 'toggleExpanded'>>,
   hubStore: HubSubViewStore,
   preset: SplitPresetId,
+  viewportWidth: number | undefined = typeof window === 'undefined' ? undefined : window.innerWidth,
 ): void {
   if (preset === 'quiet') {
     if (sidebarRight.isExpanded?.() === true) {
@@ -69,15 +70,18 @@ export function openSplitPreset(
     }
     return
   }
+  const isNarrow = viewportWidth !== undefined && viewportWidth < 768
   if (preset === 'ops') {
     hubStore.select('ops', 'board')
     sidebarRight.openTab('company-ops')
+    if (isNarrow) return
     hubStore.select('team', 'presence')
     sidebarRight.openTab('company-team', { preferNewPane: true })
     return
   }
   hubStore.select('archive', 'deliverables')
   sidebarRight.openTab('company-archive')
+  if (isNarrow) return
   try {
     sidebarRight.openTab('files', { preferNewPane: true })
   } catch {
