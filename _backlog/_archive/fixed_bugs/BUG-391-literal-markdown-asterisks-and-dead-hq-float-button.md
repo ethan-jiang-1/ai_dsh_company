@@ -6,7 +6,7 @@ opened: 2026-11-27
 
 # BUG-391：React 文案裸印 Markdown `**` 星号，且 HQ 内嵌子面板保留无响应的「浮出」死按钮
 
-> 严重级别：P2（成品页脚与培养 journal 说明直接在界面上印出原始 `**派生显示**` / `**这里不用你操作**` / `**No action needed here.**` 星号字面量；同时 HQ「台账与成品」与「启动策略」复用 `PanelFrame` 并绑定 `noopFloat`，留下点击毫无反应的「浮出」死按钮）｜发现：2026-11-27｜状态：已修｜审查：agent — 待批次独立只读盲审收口
+> 严重级别：P2（成品页脚与培养 journal 说明直接在界面上印出原始 `**派生显示**` / `**这里不用你操作**` / `**No action needed here.**` 星号字面量；同时 HQ「台账与成品」与「启动策略」复用 `PanelFrame` 并绑定 `noopFloat`，留下点击毫无反应的「浮出」死按钮）｜发现：2026-11-27｜状态：已修｜审查：agent（`7ad5c423` 独立只读盲审通过，0 阻断）
 >
 > **留痕**：Note [2026-11-27-ux-ui-audit-batch-fixes](../../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)（批次 384..391：清除纯文本 `**` 星号与隐藏 HQ 死浮出按钮）
 

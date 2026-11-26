@@ -6,7 +6,7 @@ opened: 2026-11-27
 
 # BUG-385：英文界面下直开 HQ「培养工坊」整块 CultivationBoard 仍显示简体中文
 
-> 严重级别：P1（双语契约破口：`locale.preference = en` 下从左侧「Dream Team HQ」直接进入「Cultivation Workshop」，HQ 顶栏与右侧启动卡全部为英文，而左侧整块 `CultivationBoard` 仍显示中文——因为 HQ 容器未调用 `setCultivationLanguage()`）｜发现：2026-11-27｜状态：已修｜审查：agent — 待批次独立只读盲审收口
+> 严重级别：P1（双语契约破口：`locale.preference = en` 下从左侧「Dream Team HQ」直接进入「Cultivation Workshop」，HQ 顶栏与右侧启动卡全部为英文，而左侧整块 `CultivationBoard` 仍显示中文——因为 HQ 容器未调用 `setCultivationLanguage()`）｜发现：2026-11-27｜状态：已修｜审查：agent（`7ad5c423` 独立只读盲审通过，0 阻断）
 >
 > **留痕**：Note [2026-11-27-ux-ui-audit-batch-fixes](../../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)（批次 384..391：培养板语言 prop 显式同步）
 

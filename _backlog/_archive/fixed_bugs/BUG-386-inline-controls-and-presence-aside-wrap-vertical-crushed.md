@@ -6,7 +6,7 @@ opened: 2026-11-27
 
 # BUG-386：内嵌操作条与在场「旁路查看」按钮缺少不换行约束，在分栏/中窄屏被压成单字竖条
 
-> 严重级别：P1（多处高频控制面视觉与可用性受损：`ComposerStatusPill`、`AssistantCultivateAction`、`DeliverableFinalDocActions` 与 `PresenceTab`「旁路查看」按钮在分栏或 1024px 视口被挤压折成单字竖排甚至裁切，同时 `Presence` 表头与分身行列表列不对齐）｜发现：2026-11-27｜状态：已修｜审查：agent — 待批次独立只读盲审收口
+> 严重级别：P1（多处高频控制面视觉与可用性受损：`ComposerStatusPill`、`AssistantCultivateAction`、`DeliverableFinalDocActions` 与 `PresenceTab`「旁路查看」按钮在分栏或 1024px 视口被挤压折成单字竖排甚至裁切，同时 `Presence` 表头与分身行列表列不对齐）｜发现：2026-11-27｜状态：已修｜审查：agent（`7ad5c423` 独立只读盲审通过，0 阻断）
 >
 > **留痕**：Note [2026-11-27-ux-ui-audit-batch-fixes](../../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)（批次 384..391：内嵌不换行护栏与在场列对齐）
 

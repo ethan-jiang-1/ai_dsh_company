@@ -6,7 +6,7 @@ opened: 2026-11-27
 
 # BUG-389：SignoffComposerCard 未消费结构化 displayReason 且与流内 SignoffToolView 视觉重复
 
-> 严重级别：P2（Wave S1 双签决策卡 `register-s1-ux.ts` 与 `SignoffComposerCard` 只解析 `matched.reason`，未注入/消费多语 `matched.displayReason` 契约，在跨语言或动态切语下与上游 `ApprovalPanel` 行为分叉；且流尾 `SignoffToolView` 与底部 `SignoffComposerCard` 同屏双份完整平铺造成高度与信息冗余；同时 `args.line` 本身在模型复读 `signoff-tool` 提示示例时会出现 `"discount sign line / 折扣线双签"` 混排）｜发现：2026-11-27｜状态：已修｜审查：agent — 待批次独立只读盲审收口
+> 严重级别：P2（Wave S1 双签决策卡 `register-s1-ux.ts` 与 `SignoffComposerCard` 只解析 `matched.reason`，未注入/消费多语 `matched.displayReason` 契约，在跨语言或动态切语下与上游 `ApprovalPanel` 行为分叉；且流尾 `SignoffToolView` 与底部 `SignoffComposerCard` 同屏双份完整平铺造成高度与信息冗余；同时 `args.line` 本身在模型复读 `signoff-tool` 提示示例时会出现 `"discount sign line / 折扣线双签"` 混排）｜发现：2026-11-27｜状态：已修｜审查：agent（`7ad5c423` 独立只读盲审通过，0 阻断）
 >
 > **留痕**：Note [2026-11-27-ux-ui-audit-batch-fixes](../../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)（批次 384..391：双签 `displayReason` 接入、上下文折叠与工具 schema 去混排）
 
