@@ -4,7 +4,7 @@
 
 ## 活跃清单
 
-**活跃 0 张**（当前全部活跃问题已收敛归档；新问题按 [backlog 入口](../README.md) 立卡，不从归档里自行开工）。
+**活跃 0 张**（按 [backlog 入口](../README.md) 推敲与确认后再推进；不从归档里自行开工）。
 
 （2026-11-26 UX/UI 升级卡「利用 DSH 原生扩展能力升级梦之队 UX/UI 并清退脆弱 CSS/DOM 债（S1–S4）」已结归档：去向 = [实施Note](../../notes/implemented/2026-11-26-dsh-native-ux-upgrade.md)，卡片见[归档](../_archive/settled_issues/2026-11-26-dsh-native-ux-upgrade.md)。）
 
@@ -44,6 +44,8 @@
 v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajectory/New terminal 收回卡均已结归档。已结卡见[归档索引](../_archive/README.md)。新问题按 [backlog 入口](../README.md) 立卡，不从归档里自行开工。
 
 ## 近期归档
+
+- UX/UI 全表面深度走查与端到端实测卡 2026-11-27 已结：Phase 0 全绿（`verify`/`typecheck`/`lint`/`test`/keyless 车道）+ Phase 1 14 探针（7 PASS / 6 过期 / 1 实证缺陷）+ Phase 2（zh/en × light/dark × 1440/1024/390 全 41 单元台账，`console=0`）+ Phase 3 真模型 E2E（`presence-e2e` 104s、`human-loop`、`request_signoff`→`批准双签`、`/req check`、子代理旁路查看）+ 独立 `research` 子代理盲审清零；共立 `BUG-384..BUG-391`（只报不修，0 产品源码改动）；去向 = none（只产实测台账与 BUG 卡）；卡在[归档](../_archive/settled_issues/2026-11-27-ux-ui-full-verification-and-e2e.md)。
 
 - 决策台账跨仓对齐卡 2026-11-14 已结：`docs/reference/decisions.md` 拆出 `## 现行决定`（54 行）+ `## 已退役`（5 行）与 D1–D61 `<a id="dN"></a>` 行锚点 + `docs/decisions.md` 8 行顶层门牌 + `ledger-routing` 接管表外控长（禁代码块/H3+/漏尾竖线）+ 10 项单测与 5 分支变异 + 独立 `research` 子代理两轮盲审清零；去向 = [Note](../../notes/implemented/2026-11-14-decision-ledger-unification.md)；卡在[归档](../_archive/settled_issues/2026-11-14-decision-ledger-unification.md)。
 

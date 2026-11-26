@@ -2,20 +2,48 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 384；已分配 BUG-001..383。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 392；已分配 BUG-001..391。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张（2026-11-24 第八轮构造场景探查新立，只报不修）**：
+**活跃 8 张（2026-11-27 UX/UI 全表面深度走查新立，按用户指示「只报不修」）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
+| [BUG-384](BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md) | P0 | client | 总部「启动培养对话」触发 `primarySession` 反跳无限新建会话循环且卡死准备中 | 调查中 |
+| [BUG-385](BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md) | P1 | client | 英文下直开 HQ 培养工坊未调 `setCultivationLanguage()`，整块面板仍显中文 | 调查中 |
+| [BUG-386](BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md) | P1 | client | 内嵌操作条（状态胶囊/纠偏/终稿动作）与「旁路查看」缺不换行约束，在分栏/中屏折成单字竖条且列头错位 | 调查中 |
+| [BUG-387](BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md) | P1 | client | `390×844` 下 HQ 培养双栏网格硬编码导致横向溢出裁切，展开右栏遮挡主区与左侧栏入口 | 调查中 |
+| [BUG-388](BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md) | P1 | client + lib | 活体 `approval/request` 缺 `id` 导致待办重复渲染两条；零待办但有扫描边界时标题下留白 | 调查中 |
+| [BUG-389](BUG-389-signoff-composer-card-ignores-display-reason-and-duplicates-toolview.md) | P2 | client + host | `SignoffComposerCard` 忽略 `displayReason` 泄露斜杠混排并与流内工具卡同屏双份重复 | 调查中 |
+| [BUG-390](BUG-390-unlocalized-raw-identifiers-and-clock-locale-leaks.md) | P2 | client + lib | 4 处漏出原始代码标识与英文钟制（`company-roles` / `lead` / `request_signoff:` / `session-` / `AM·PM`） | 调查中 |
+| [BUG-391](BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md) | P2 | client | React 文本裸印 `**...**` 星号字面量，且 HQ 嵌入式子卡片保留绑定 `noopFloat` 的死「浮出」按钮 | 调查中 |
+
+**按根因聚类摘要（供后续排修批次）**：
+- **组 1 · 总部工坊状态与语言接线**（[384](BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md)、[385](BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md)、[391](BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md) 死浮出部分）：`HqCultivationWorkshop` 对外部易变 `primarySession` 缺锁定且漏接语言/PanelFrame 语境；
+- **组 2 · 响应式窄框与 CSS 换行护栏**（[386](BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md)、[387](BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md)）：`styles.ts` 内嵌控件缺少 `white-space: nowrap; flex-shrink: 0`、`.wk-row-wrap` 与 `.wk-hq-cultivation-split` 缺窄屏/单列断点；
+- **组 3 · 跨源去重与表达层/契约收口**（[388](BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md)、[389](BUG-389-signoff-composer-card-ignores-display-reason-and-duplicates-toolview.md)、[390](BUG-390-unlocalized-raw-identifiers-and-clock-locale-leaks.md)、[391](BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md) 裸星号部分）：跨源无 id 审批去重、S1 双签 `displayReason` 未接与表达层字典/格式化细节遗漏。
+
+**本轮排除（探针自身过时 / 测试脚本环境问题，不立产品 Bug 卡）**：`probes/browser-visual/` 中 6 支过时探针（`sidebar-role-mark`、`cultivation-ux-walkthrough`、`cultivation-ux-scenarios`、`presence-panel`、`deliverables-catalog`、`dag-midflight`）以及 `checks/lanes/attention-e2e.entry.mjs`（找旧 `待办` 与 `Allow once`）/`human-loop-e2e.entry.mjs`（缺冷 profile 两段跳转与中文公告关闭）均属 S1–S4 改版或启动序列变化导致的测试脚本陈旧，已记录于本次走查问题卡；另 `attention-panel-probe.mjs` 触发的 `BUG-328` 边界留白问题已并入 [BUG-388](BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md)。
 
 **本轮查过但不入卡**：第七轮 7 张修复已逐条复核（`numbering` 引号/注释/占位符/空格变体、`layers` 方括号、围栏内 `productType`、meta 三分家、CEO 身份与回放、`/delivery` 结构行判据）**全部绿**；`delivery-rules` 的模板路径按模式目录解析且 `content-contract` 已校验存在（初查误报，已核）；`/company-settings` 的并发读改写实测无丢失（Node 单线程 + 同步读写，已核）；`requiredFields` 仍属「未声明要校验」不入卡。
 
 **本轮查过但不入卡**（避免下轮重复排查）：`delivery-rules` 的 `requiredFields` 没有任何检查器消费，但 `content/delivery-modes/*/document-map.md` 只声明 `documents.file` 与 `requiredSections` 会被 `/delivery check` 校验——属「未声明要校验」，不是缺陷；`catalog` 的 2000 行读上限在 ~153 条成品处触发但已有专档文案（第六轮已记）；`TEAM_TOOL_KEYS`（9 个）与 vendor `tool-agent-team` 的工具名逐字一致（已核）；`DELEGATION_TOOL_KEYS` 与 preset `toolName:` 声明一致（已核）；`formatTokens`/`firstText`/`yamlScalar`/`instance-guard` 四处上一轮修复经本轮复核未见回归。
+
+## 2026-11-27 修复交接（UX/UI 深度走查批次：BUG-384..391）
+
+**用户指令（2026-11-27）**：系统性聚类修复 `_backlog/bugs` 下全部 8 张 UX/UI 走查缺陷（`BUG-384..391`），按根因与依赖序静默自主推进至全绿收口。
+
+| 顺位 | 组 / 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
+|---|---|---|---|---|
+| **1 HQ 工坊状态与语言接线** | [384](BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md) + [385](BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md) | `CompanyHqPage` 把按 `updatedAt` 倒序的 `sessionList[0]` 当 `mainSessionId` 喂给工坊，新建培养会话反推改写主会话触发死循环；`HqCultivationWorkshop` 漏接培养板语言同步 | 384：排除已知培养会话并锚定 `pinnedSessionId`，新建培养会话先登记再打开；385：`<CultivationBoard>` 增加 `language` prop 并在 HQ/Tab/View 统一透传同步 | 1 |
+| **2 窄屏响应式与不换行护栏** | [386](BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md) + [387](BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md) | 内嵌 slot 包装类与旁路按钮缺 `white-space: nowrap; flex-shrink: 0`，在场列头与行尾不对齐；HQ 培养双栏网格缺 `@media (max-width: 820px)` 折叠，`<768px` 右栏全屏缺显式收起入口 | 386：CSS 护栏固定不换行与 `min-width: 0`，`PresenceTab` 补齐 `.wk-row-aside-cell`；387：HQ 加窄屏单列断点与 `min(100%, 300px)`，Hub 在 `fullscreen` 下提供「收起侧栏」并禁用窄屏双分屏 | 2 |
+| **3 跨源审批去重与边界空态** | [388](BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md) | 上游 `approval/request` 只带 `callId` 无 `id`，丢弃 `callId` 导致 live↔history 无法消重；零待办且有边界时小节标题下返回 `null` 留白 | 透传 `callId` 并在 `mergeAttention` 按 `callId` / 内容配额 1:1 消重；`AttentionTab` 在 `hasBoundary` 时渲染带边界限定的诚实空态 | 3 |
+| **4 契约与表达层收口** | [389](BUG-389-signoff-composer-card-ignores-display-reason-and-duplicates-toolview.md) / [390](BUG-390-unlocalized-raw-identifiers-and-clock-locale-leaks.md) / [391](BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md) | 决策卡漏接 `displayReason` 且全展开重复；4 处暴露内部标识与宿主时钟 locale；3 处字典字面量含 `**`；HQ 传 `noopFloat` 留死浮出按钮 | 389：注入 `resolveReason` 并默认折叠补充上下文；390：补 `section`、映射 `lead`/工具名/HQ 类型标签、剥离 `session-`、统一 24h/locale 时钟；391：去 `**`、隐藏无 `floatTab` 时的浮出按钮并刷 UI 金样 | 4 |
+
+**终点**：8 张全部带红/绿证据迁入 `fixed_bugs/`；1 篇批次伞形 Note；全套门禁 + 真浏览器 `client-load`/`ui-scene`/`phase2-audit` 复验全绿 + 独立只读 `research` 子代理盲审 0 阻断并 `push`。
 
 ## 2026-11-24 修复交接（第八轮构造场景批次：BUG-377..383）
 
