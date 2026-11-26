@@ -23,6 +23,7 @@ import {
 } from '../../lib/cultivation/cultivation.ts'
 import {
   CULTIVATION_COPY,
+  setCultivationLanguage,
   type CultivationActions,
 } from './cultivation-actions.ts'
 import { CultivationCompose } from './CultivationCompose.tsx'
@@ -72,6 +73,8 @@ export interface CultivationBoardProps {
   readonly openContext?: ((context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false, readonly problem: string }>) | undefined
   /** 角色名表达层取用；缺席 = canonical 英文（测试/旧容器）。 */
   readonly roleLabel?: (role: string) => string
+  /** 显式界面语言（HQ / 侧栏 / 主视图统一透传，避免遗漏模块语言同步）。 */
+  readonly language?: 'zh' | 'en' | undefined
 }
 
 /** 一条记录的操作行文案（待办给命令、已处理给回执）——**只在没有动作面时**当降级文案用。 */
@@ -81,6 +84,9 @@ export interface CultivationBoardProps {
  * @returns 面板内容（容器自己套壳：公司页直接放、侧栏套 PanelFrame）。
  */
 export function CultivationBoard(props: CultivationBoardProps) {
+  if (props.language !== undefined) {
+    setCultivationLanguage(props.language)
+  }
   const roleLabel = props.roleLabel ?? defaultRoleLabel
   const board = useCultivationBoard(props)
   const {

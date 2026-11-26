@@ -100,7 +100,8 @@ export function createCultivationView(injected: CultivationViewInjected) {
   const { contextSources: makeContextSources, cultivationActions } = injected
   return function CultivationView(props: CultivationViewProps) {
     const { sessionId, t } = props
-    setCultivationLanguage(t('meta.language') === 'en' ? 'en' : 'zh')
+    const lang = t('meta.language') === 'en' ? 'en' : 'zh'
+    setCultivationLanguage(lang)
     const viewerRole = props.useSessions(state => (
       readPresetFromSnapshot(state as unknown as RoleBadgeSourceFace, sessionId)
     ))
@@ -194,6 +195,7 @@ export function createCultivationView(injected: CultivationViewInjected) {
         >
           <div className="wk-cult-view-board">
             <CultivationBoard
+              language={lang}
               viewerRole={viewerRole}
               viewerLabel={viewerRole === null ? null : roleText(viewerRole, 'label', t, roleLabel(viewerRole))}
               workspaceLabel={workspaceLabelOf(sessionCwd)}

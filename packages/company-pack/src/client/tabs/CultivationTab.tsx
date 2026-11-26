@@ -54,7 +54,8 @@ export type CultivationTabProps = PropsRuntime<'sidebar.right.pane.tab'> & Culti
  */
 export function CultivationTab(props: CultivationTabProps) {
   const { roleSource, contextSources: makeContextSources, cultivationActions, sessionId } = props
-  setCultivationLanguage(props.t('meta.language') === 'en' ? 'en' : 'zh')
+  const lang = props.t('meta.language') === 'en' ? 'en' : 'zh'
+  setCultivationLanguage(lang)
   // viewer 角色（上游 agentPreset 投影；订阅制，无轮询——照 RoleBadge 的手法）。
   const subscribe = useMemo(() => roleSource.subscribe.bind(roleSource), [roleSource])
   const getPreset = useCallback(() => readPresetOf(roleSource, sessionId), [roleSource, sessionId])
@@ -78,6 +79,7 @@ export function CultivationTab(props: CultivationTabProps) {
       refreshLabel={props.t('cultivation.refresh', { seconds: CULTIVATION_REFRESH_MS / 1000 })}
     >
       <CultivationBoard
+        language={lang}
         viewerRole={viewerRole}
         viewerLabel={viewerRole === null ? null : roleText(viewerRole, 'label', props.t, roleLabel(viewerRole))}
         workspaceLabel={workspaceLabelOf(workspaceCwd)}

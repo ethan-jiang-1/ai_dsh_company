@@ -2,6 +2,8 @@
 /** Wave S3 全局总部 (`main` 面板 + `sidebar.panellist` + 内嵌培养会话) 单测。 */
 // 负例留证 2026-11-26：en 字典混入 CJK ⇒ company-hq.spec.ts BUG-308 用例红；清除后绿。BUG-308
 // 负例留证 2026-11-26：去掉 company-hq.tsx catch 后 `if (cancelled) return` 守卫 ⇒ BUG-348 用例红（卸载后清 storage key 并建孤儿会话）；还原后绿。BUG-348
+// 负例留证 2026-11-27：把 CompanyHqPage 改回 `primarySession = sessionList[0]` 且不追踪 knownCultivationIds ⇒ BUG-384 用例红（create 被调用 6 次陷入循环）；还原后绿。BUG-384
+// 负例留证 2026-11-27：去掉 HqCultivationWorkshop / CultivationBoard 的 `language` 同步 ⇒ BUG-385 用例红（en 界面仍渲染「我的分身」）；还原后绿。BUG-385
 import { act, createElement, type ComponentProps, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -19,6 +21,7 @@ import {
 } from '../../../packages/company-pack/src/client/ux/company-hq.tsx'
 import { registerWaveS3Ux } from '../../../packages/company-pack/src/client/ux/register-s3-ux.ts'
 import { createAttentionRegistry } from '../../../packages/company-pack/src/client/wiring/attention-registry.ts'
+import { setCultivationLanguage } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -330,5 +333,180 @@ describe('Wave S3 CompanyHqPage & HqCultivationConversationSlot', () => {
     expect(selectPanel).toHaveBeenCalledTimes(2)
     const navDef = registered.find(d => d.name === 'sidebar.panellist')
     expect(navDef?.label?.()).toBe(zh['hq.panel'])
+  })
+
+  it('BUG-384：creating a cultivation session updates store updatedAt without bouncing primarySession or looping create', async () => {
+    const hqStore = createHqSectionStore()
+    hqStore.select('cultivation')
+    const startupStore = createStartupStore()
+    let storeState: {
+      byId: Record<string, { id: SessionId; origin: string; cwd: string; updatedAt: number; displayTitle?: string }>
+      projectionsBySession: Record<string, { values: { agentPreset: string } }>
+    } = {
+      byId: {
+        'lead-1': { id: 'lead-1' as SessionId, origin: 'human', cwd: '/tmp/ws', updatedAt: 100, displayTitle: 'CEO Main' },
+      },
+      projectionsBySession: {
+        'lead-1': { values: { agentPreset: 'ceo' } },
+      },
+    }
+    const listeners = new Set<() => void>()
+    const useSessionsMock = (sel: (v: typeof storeState) => unknown) => sel(storeState)
+
+    let seq = 0
+    const release = vi.fn()
+    const retain = vi.fn((id: SessionId) => ({
+      id,
+      ready: Promise.resolve({}),
+      release,
+    }))
+    const create = vi.fn(async () => {
+      seq += 1
+      const newId = `cult-new-${String(seq)}` as SessionId
+      // 模拟真实 DSH sessions store：刚创建的顶层会话拥有最新 updatedAt，排到 sessionList[0]
+      // 上限保护：防止回归时在 React act() 内无限微任务挂死测试进程
+      if (seq <= 5) {
+        storeState = {
+          byId: {
+            ...storeState.byId,
+            [newId]: { id: newId, origin: 'human', cwd: '/tmp/ws', updatedAt: 200 + seq, displayTitle: 'Cultivation' },
+          },
+          projectionsBySession: {
+            ...storeState.projectionsBySession,
+            [newId]: { values: { agentPreset: 'ceo' } },
+          },
+        }
+        for (const fn of listeners) fn()
+      }
+      return newId
+    })
+    const renderSlot = vi.fn((name: string) => createElement('div', { 'data-rendered-slot': name }, 'Embedded Chat'))
+
+    const sessionsStub = { retain, create }
+    const startupFiles = { listJournal: async () => [], readHead: async () => null, listRecords: async () => ({ ok: true as const, names: [] }), readRecord: async () => ({ ok: false as const, reason: 'unavailable' as const }) }
+    const actionsStub = () => ({ run: async () => ({ ok: true as const, text: 'ok' }) })
+    const followStub = async function* () {}
+    const readEmpty = async () => ({ ok: true as const, text: '' })
+    const contextStub = () => ({ entries: [] })
+    const openContextStub = async () => ({ ok: true as const })
+    const openFinalStub = vi.fn()
+    const loadStub = async () => {}
+    const saveStub = async () => ({ ok: true as const })
+    const resetStub = async () => ({ ok: true as const })
+    const returnStub = vi.fn()
+    const openSessionStub = vi.fn()
+    const selectSectionStub = (next: HqSection) => { hqStore.select(next) }
+    const SessionProviderStub = ({ children }: { children?: ReactNode }) => createElement('div', { 'data-session-provider': '1' }, children)
+
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    const renderCurrent = () => createElement(CompanyHqPage, {
+      t: makeT(zh),
+      useHqSection: (sel: (v: HqSection) => unknown) => sel(hqStore.store.getSnapshot()),
+      useAttentionItems: (sel: (v: readonly unknown[]) => unknown) => sel([]),
+      selectSection: selectSectionStub,
+      returnToChat: returnStub,
+      openSession: openSessionStub,
+      useSessions: useSessionsMock,
+      useProjection: () => undefined,
+      sessions: sessionsStub,
+      cultivationFiles: startupFiles,
+      cultivationActions: actionsStub,
+      followEvents: followStub,
+      readLedger: readEmpty,
+      readCatalog: readEmpty,
+      contextSources: contextStub,
+      openContext: openContextStub,
+      openFinal: openFinalStub,
+      startupStore,
+      loadStartup: loadStub,
+      saveStartup: saveStub,
+      resetStartup: resetStub,
+      SessionProvider: SessionProviderStub,
+      renderSlot,
+    } as unknown as ComponentProps<typeof CompanyHqPage>)
+
+    listeners.add(() => {
+      root.render(renderCurrent())
+    })
+
+    await act(async () => {
+      root.render(renderCurrent())
+    })
+
+    const startBtn = Array.from(host.querySelectorAll('button')).find(b => b.textContent?.trim() === zh['hq.cultivationStart'])!
+    await act(async () => {
+      startBtn.click()
+      for (let i = 0; i < 10; i++) await Promise.resolve()
+    })
+
+    expect(create).toHaveBeenCalledTimes(1)
+    expect(retain).toHaveBeenCalledWith('cult-new-1', { source: 'companyCultivation' })
+    expect(host.querySelector('[data-rendered-slot="company.hq.cultivation.conversation"]')).not.toBeNull()
+    expect(host.textContent).not.toContain(zh['hq.cultivationCreating'])
+    expect(localStorage.getItem('dsh-company-hq-cultivation:lead-1')).toBe('cult-new-1')
+
+    act(() => { root.unmount() })
+    host.remove()
+  })
+
+  it('BUG-385：opening HQ cultivation workshop directly in en locale renders English CultivationBoard without Chinese copy', async () => {
+    setCultivationLanguage('zh')
+    const hqStore = createHqSectionStore()
+    hqStore.select('cultivation')
+    const startupStore = createStartupStore()
+    const sessionState = {
+      byId: { 'lead-1': { id: 'lead-1' as SessionId, origin: 'human', cwd: '/tmp/ws', updatedAt: 100 } },
+      projectionsBySession: { 'lead-1': { values: { agentPreset: 'ceo' } } },
+    }
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+
+    const renderWithLang = async (dict: Record<CompanyKey, string>) => {
+      await act(async () => {
+        root.render(createElement(CompanyHqPage, {
+          t: makeT(dict),
+          useHqSection: (sel: (v: HqSection) => unknown) => sel(hqStore.store.getSnapshot()),
+          useAttentionItems: (sel: (v: readonly unknown[]) => unknown) => sel([]),
+          selectSection: (next: HqSection) => { hqStore.select(next) },
+          returnToChat: vi.fn(),
+          openSession: vi.fn(),
+          useSessions: (sel: (v: typeof sessionState) => unknown) => sel(sessionState),
+          useProjection: () => undefined,
+          sessions: { retain: vi.fn(), create: vi.fn() },
+          cultivationFiles: { listJournal: async () => [], readHead: async () => null, listRecords: async () => ({ ok: true as const, names: [] }), readRecord: async () => ({ ok: false as const, reason: 'unavailable' as const }) },
+          cultivationActions: () => ({ run: async () => ({ ok: true as const, text: 'ok' }) }),
+          followEvents: async function* () {},
+          readLedger: async () => ({ ok: true as const, text: '' }),
+          readCatalog: async () => ({ ok: true as const, text: '' }),
+          contextSources: () => ({ entries: [] }),
+          openContext: async () => ({ ok: true as const }),
+          openFinal: vi.fn(),
+          startupStore,
+          loadStartup: async () => {},
+          saveStartup: async () => ({ ok: true as const }),
+          resetStartup: async () => ({ ok: true as const }),
+          SessionProvider: ({ children }: { children?: ReactNode }) => createElement('div', null, children),
+          renderSlot: () => null,
+        } as unknown as ComponentProps<typeof CompanyHqPage>))
+      })
+    }
+
+    await renderWithLang(en)
+    const boardText = host.querySelector('.wk-hq-cultivation-board')?.textContent ?? ''
+    expect(boardText).toContain('My double')
+    expect(boardText).toContain('Needs me')
+    expect(boardText).not.toMatch(/[\u3400-\u9fff]/u)
+
+    await renderWithLang(zh)
+    const boardTextZh = host.querySelector('.wk-hq-cultivation-board')?.textContent ?? ''
+    expect(boardTextZh).toContain('我的分身')
+    expect(boardTextZh).toContain('需要我处理')
+
+    act(() => { root.unmount() })
+    setCultivationLanguage('zh')
+    host.remove()
   })
 })

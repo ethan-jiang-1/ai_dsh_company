@@ -5,7 +5,7 @@
  *    彻底淘汰手写聊天气泡、`<textarea>` 与全局输入框 CSS 隐藏 hack。
  */
 import '../data/session-source.ts'
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createSnapshotStore, type ObservableSnapshot, type SnapshotStore } from '@deepseek-ai/dsh-client-store'
 import { Button, SegmentedControl, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type {
@@ -27,7 +27,7 @@ import { roleLabel } from '../../lib/cultivation/cultivation.ts'
 import type { LivePending } from '../../lib/presence/attention.ts'
 import type { StartupField } from '../../lib/startup/startup-settings.ts'
 import { CultivationBoard } from '../cultivation/CultivationBoard.tsx'
-import type { CultivationActionsFactory } from '../cultivation/cultivation-actions.ts'
+import { setCultivationLanguage, type CultivationActionsFactory } from '../cultivation/cultivation-actions.ts'
 import type { CultivationContextSources } from '../cultivation/cultivation-context-data.ts'
 import {
   useCultivationFeedback,
@@ -168,6 +168,25 @@ const hqTabInfo: UseSidebarRightTabInfo = () => ({
   tab: { id: 'company-hq-tab', contentId: COMPANY_HQ_PANEL_ID },
 }) as unknown as ReturnType<UseSidebarRightTabInfo>
 
+const CULTIVATION_STORAGE_PREFIX = 'dsh-company-hq-cultivation:'
+
+function readKnownCultivationIds(inMemory: ReadonlySet<string>): Set<string> {
+  const ids = new Set<string>(inMemory)
+  if (typeof localStorage === 'undefined') return ids
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const storageKey = localStorage.key(i)
+      if (storageKey !== null && storageKey.startsWith(CULTIVATION_STORAGE_PREFIX)) {
+        const value = localStorage.getItem(storageKey)
+        if (value !== null && value !== '') ids.add(value)
+      }
+    }
+  } catch {
+    // intentional-fallback: localStorage 不可读时仅使用内存已知培养会话集合。
+  }
+  return ids
+}
+
 function sessionSummaryList(state: {
   readonly byId: Readonly<Record<string, {
     readonly id: SessionId
@@ -178,11 +197,28 @@ function sessionSummaryList(state: {
     readonly cwd?: string
     readonly title?: string
     readonly displayTitle?: string
+    readonly retainedBy?: { readonly mainView?: number }
   } | undefined>>
 }) {
   return Object.values(state.byId)
     .filter((entry): entry is NonNullable<typeof entry> => entry !== undefined && entry.origin !== 'subagent')
     .toSorted((left, right) => (right.updatedAt ?? 0) - (left.updatedAt ?? 0))
+}
+
+function pickPrimarySession<T extends { readonly id: SessionId; readonly retainedBy?: { readonly mainView?: number } }>(
+  sessions: readonly T[],
+  knownCultivationIds: ReadonlySet<string>,
+  pinnedId: SessionId | undefined,
+): T | undefined {
+  const nonCultivation = sessions.filter(s => !knownCultivationIds.has(String(s.id)))
+  const pool = nonCultivation.length > 0 ? nonCultivation : sessions
+  const activeMain = pool.find(s => (s.retainedBy?.mainView ?? 0) > 0)
+  if (activeMain !== undefined) return activeMain
+  if (pinnedId !== undefined) {
+    const pinned = pool.find(s => s.id === pinnedId)
+    if (pinned !== undefined) return pinned
+  }
+  return pool[0]
 }
 
 function HqCultivationWorkshop({
@@ -197,6 +233,8 @@ function HqCultivationWorkshop({
   openContext,
   renderSlot,
   SessionProvider,
+  isKnownCultivationSession,
+  onCultivationSessionCreated,
   t,
 }: {
   readonly mainSessionId: SessionId | undefined
@@ -210,8 +248,12 @@ function HqCultivationWorkshop({
   readonly openContext: (sessionId: SessionId, context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false; readonly problem: string }>
   readonly renderSlot: CompanyHqPageProps['renderSlot']
   readonly SessionProvider: SessionProviderComponent
+  readonly isKnownCultivationSession: (id: SessionId) => boolean
+  readonly onCultivationSessionCreated: (id: SessionId) => void
   readonly t: CompanyT
 }): ReactNode {
+  const lang = t('meta.language') === 'en' ? 'en' : 'zh'
+  setCultivationLanguage(lang)
   const effectiveSessionId = (mainSessionId ?? 'hq-none') as SessionId
   const panelData = useCultivationPanelData(cultivationFiles, effectiveSessionId)
   const feedback = useCultivationFeedback(followEvents, effectiveSessionId)
@@ -221,7 +263,7 @@ function HqCultivationWorkshop({
   const [started, setStarted] = useState(false)
   const [workshop, setWorkshop] = useState<WorkshopState>({ status: 'waiting' })
 
-  const key = mainSessionId === undefined ? null : `dsh-company-hq-cultivation:${String(mainSessionId)}`
+  const key = mainSessionId === undefined ? null : `${CULTIVATION_STORAGE_PREFIX}${String(mainSessionId)}`
   const existingStoredId = key === null || typeof localStorage === 'undefined' ? null : localStorage.getItem(key)
   const shouldConnect = started || (existingStoredId !== null && existingStoredId !== '')
 
@@ -232,7 +274,7 @@ function HqCultivationWorkshop({
     }
     let cancelled = false
     let reference: SessionReference | undefined
-    const storageKey = `dsh-company-hq-cultivation:${String(mainSessionId)}`
+    const storageKey = `${CULTIVATION_STORAGE_PREFIX}${String(mainSessionId)}`
     setWorkshop({ status: 'creating' })
 
     const open = async (targetId: SessionId): Promise<void> => {
@@ -246,6 +288,10 @@ function HqCultivationWorkshop({
     }
 
     const run = async (): Promise<void> => {
+      if (isKnownCultivationSession(mainSessionId)) {
+        await open(mainSessionId)
+        return
+      }
       const stored = typeof localStorage === 'undefined' ? null : localStorage.getItem(storageKey)
       if (stored !== null && stored !== '') {
         try {
@@ -263,8 +309,9 @@ function HqCultivationWorkshop({
         cwd,
         ...(viewerRole === null ? {} : { agentPreset: viewerRole }),
       })
-      if (cancelled) return
+      onCultivationSessionCreated(created)
       if (typeof localStorage !== 'undefined') localStorage.setItem(storageKey, String(created))
+      if (cancelled) return
       await open(created)
     }
 
@@ -277,7 +324,7 @@ function HqCultivationWorkshop({
       cancelled = true
       try { reference?.release() } catch { /* already released */ }
     }
-  }, [sessions, mainSessionId, cwd, viewerRole, shouldConnect])
+  }, [sessions, mainSessionId, cwd, viewerRole, shouldConnect, isKnownCultivationSession, onCultivationSessionCreated])
 
   return (
     <div className="wk-hq-cultivation-split">
@@ -286,6 +333,7 @@ function HqCultivationWorkshop({
           <div className="wk-hq-empty">{t('hq.cultivationWaiting')}</div>
         ) : (
           <CultivationBoard
+            language={lang}
             viewerRole={viewerRole}
             viewerLabel={viewerRole === null ? null : roleText(viewerRole, 'label', t, roleLabel(viewerRole))}
             workspaceLabel={workspaceLabelOf(cwd)}
@@ -365,7 +413,21 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
   const section = useHqSection(value => value)
   const pendingItems = useAttentionItems(value => value)
   const sessionList = useSessions(sessionSummaryList)
-  const primarySession = sessionList[0]
+  const createdCultivationIdsRef = useRef<Set<string>>(new Set())
+  const pinnedSessionIdRef = useRef<SessionId | undefined>(undefined)
+  const knownCultivationIds = readKnownCultivationIds(createdCultivationIdsRef.current)
+  const primarySession = pickPrimarySession(sessionList, knownCultivationIds, pinnedSessionIdRef.current)
+  if (primarySession !== undefined && !knownCultivationIds.has(String(primarySession.id))) {
+    pinnedSessionIdRef.current = primarySession.id
+  }
+  const onCultivationSessionCreated = useCallback(
+    (createdId: SessionId) => { createdCultivationIdsRef.current.add(String(createdId)) },
+    [],
+  )
+  const isKnownCultivationSession = useCallback(
+    (id: SessionId) => readKnownCultivationIds(createdCultivationIdsRef.current).has(String(id)),
+    [],
+  )
   const viewerRole = useSessions(state => (
     primarySession === undefined
       ? null
@@ -515,6 +577,8 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
             openContext={openContext}
             renderSlot={renderSlot}
             SessionProvider={SessionProvider}
+            isKnownCultivationSession={isKnownCultivationSession}
+            onCultivationSessionCreated={onCultivationSessionCreated}
             t={t}
           />
         )}
