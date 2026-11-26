@@ -6,7 +6,7 @@
  * 与浮窗头（FloatLayer 的 FloatHeader 同一 renderer）都渲染这里的输出。
  *
  * 设计口诀：**琥珀喊你（要人/烧量），蓝在干活（总览/工作台），紫管机制（结构/账），绿是人心（在场/成长）。**
- * 色 = 方向（四色族 × 主/次两档），icon = 面板身份（九个独特 glyph）；只给 icon 上色
+ * 色 = 方向（四色族 × 主/次两档），icon = 面板身份（独特 glyph）；只给 icon 上色
  * （tone 类挂 span、glyph 吃 currentColor），标题文字保持平台默认前景。
  * 颜色一律平台静态色相族令牌（--dsw-static-*，跨浅/深主题稳定的识别色；alias 墨色层在
  * 暗色下退化为墨/白，不可作识别色——RFC §色令牌）。
@@ -219,6 +219,9 @@ interface TabFace {
 }
 
 const FACES = {
+  ops: { tone: 'overview', glyph: GridGlyph },
+  team: { tone: 'attention', glyph: PeopleGlyph },
+  archive: { tone: 'archive', glyph: CatalogGlyph },
   attention: { tone: 'attention', glyph: BellGlyph },
   board: { tone: 'overview', glyph: GridGlyph },
   dag: { tone: 'structure', glyph: DagGlyph },
@@ -258,6 +261,9 @@ export const TAB_IDENTITY = Object.fromEntries(
   }),
 ) as Record<FaceKey, TabFaceComponents>
 
+export const OpsTabTitle = TAB_IDENTITY.ops.Title
+export const TeamTabTitle = TAB_IDENTITY.team.Title
+export const ArchiveTabTitle = TAB_IDENTITY.archive.Title
 export const AttentionTabTitle = TAB_IDENTITY.attention.Title
 export const BudgetTabTitle = TAB_IDENTITY.budget.Title
 export const BoardTabTitle = TAB_IDENTITY.board.Title
@@ -269,6 +275,9 @@ export const PresenceTabTitle = TAB_IDENTITY.presence.Title
 export const CultivationTabTitle = TAB_IDENTITY.cultivation.Title
 export const StrategyTabTitle = TAB_IDENTITY.strategy.Title
 
+export const OpsGuideEntry = TAB_IDENTITY.ops.Entry
+export const TeamGuideEntry = TAB_IDENTITY.team.Entry
+export const ArchiveGuideEntry = TAB_IDENTITY.archive.Entry
 export const AttentionGuideEntry = TAB_IDENTITY.attention.Entry
 export const BoardGuideEntry = TAB_IDENTITY.board.Entry
 export const DagGuideEntry = TAB_IDENTITY.dag.Entry
@@ -280,6 +289,9 @@ export const LedgerGuideEntry = TAB_IDENTITY.ledger.Entry
 export const CatalogGuideEntry = TAB_IDENTITY.catalog.Entry
 export const StrategyGuideEntry = TAB_IDENTITY.strategy.Entry
 
+export const OpsGuideIcon = TAB_IDENTITY.ops.Icon
+export const TeamGuideIcon = TAB_IDENTITY.team.Icon
+export const ArchiveGuideIcon = TAB_IDENTITY.archive.Icon
 export const AttentionGuideIcon = TAB_IDENTITY.attention.Icon
 export const BoardGuideIcon = TAB_IDENTITY.board.Icon
 export const DagGuideIcon = TAB_IDENTITY.dag.Icon

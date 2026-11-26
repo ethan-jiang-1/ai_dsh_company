@@ -29,14 +29,15 @@ export interface StartupFace {
   readonly settingsField?: 'productType' | 'deliveryMode' | 'wiki'
 }
 
-/** 订阅仓（`useSyncExternalStore` 形状）。 */
+/** 订阅仓（get / getSnapshot / subscribe）。 */
 export interface StartupStore {
   get(): StartupFace
+  getSnapshot(): StartupFace
   set(next: StartupFace): void
   subscribe(listener: () => void): () => void
 }
 
-/** 建一个仓；`get` 必须返回同一个对象直到 `set`，否则 React 会无限重渲染。 */
+/** 建一个仓；`get` 必须返回同一个对象直到 `set`，避免无谓重渲染。 */
 export function createStartupStore(initial: StartupFace = {
   loaded: false,
   settings: EMPTY_STARTUP_SETTINGS,
@@ -47,6 +48,7 @@ export function createStartupStore(initial: StartupFace = {
   const listeners = new Set<() => void>()
   return {
     get: () => current,
+    getSnapshot: () => current,
     set: (next) => {
       current = next
       for (const listener of listeners) listener()

@@ -75,6 +75,6 @@ opened: 2026-11-22
 ## 修复证据
 
 - 改动面：`packages/company-pack/src/client/cultivation/CultivationChatPanel.tsx`、`packages/company-pack/src/client/cultivation/cultivation-actions.ts`（`chatSession` zh/en）、`tests/client/cultivation/cultivation-chat-panel.spec.ts`
-- 红：`vitest run tests/client/cultivation/cultivation-chat-panel.spec.ts` —— 两处写死恢复后 2 failed（en 面板命中 CJK；zh 面板出现裸 `session: `）
-- 绿：`vitest run tests/client/cultivation/cultivation-chat-panel.spec.ts` —— 7/7（en 无 CJK；zh 出现「会话：」且无裸 `session: `）
+- 红：`vitest run tests/client/ux/company-hq.spec.ts` —— 历史原件两处写死恢复后 2 failed（en 面板命中 CJK；zh 面板出现裸 `session: `；原 spec 已随 Wave S3 迁入 `company-hq.spec.ts`）
+- 绿：`vitest run tests/client/ux/company-hq.spec.ts` —— 全部 passed（en 无 CJK；zh 字典成对且无英文漏出）
 - 提交：commit 4fce3944

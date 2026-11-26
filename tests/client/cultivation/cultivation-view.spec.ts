@@ -1,7 +1,9 @@
 // @vitest-environment happy-dom
 /**
- * 培养主视图（2026-10-28）：第三个 conversation.view 的左右结构、
- * 公司总览入口、shell composer 隐藏属性的挂载/清理。
+ * 培养主视图（Wave S3 去 DOM/CSS hack 化）：
+ * 1) 渲染左培养板 + 右原生总部工坊入口；
+ * 2) 不再写入 `document.documentElement.dataset.dshCultivationView`；
+ * 3) 分界拖曳与宽度持久化继续成立。
  */
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
@@ -19,7 +21,6 @@ afterEach(() => {
   act(() => { mounted?.unmount() })
   mounted = null
   document.body.innerHTML = ''
-  delete document.documentElement.dataset.dshCultivationView
 })
 
 const files: CultivationFiles = {
@@ -31,15 +32,11 @@ const files: CultivationFiles = {
   readRecord: async () => ({ ok: false, reason: 'unavailable' }),
 }
 
-function roleSource() {
-  return {
-    subscribe: () => () => {},
-    getSnapshot: () => ({ projectionsBySession: { 'session-lead': { values: { agentPreset: 'ceo' } } } }),
-  }
-}
-
 function props() {
-  const state = { byId: { 'session-lead': { origin: 'human', cwd: '/tmp/company' } }, projectionsBySession: {} }
+  const state = {
+    byId: { 'session-lead': { origin: 'human', cwd: '/tmp/company' } },
+    projectionsBySession: { 'session-lead': { values: { agentPreset: 'ceo' } } },
+  }
   return {
     sessionId: 'session-lead',
     t: ((key: keyof typeof zh) => zh[key]) as CompanyT,
@@ -48,36 +45,44 @@ function props() {
   } as never
 }
 
-async function mount(over: Record<string, unknown> = {}): Promise<HTMLElement> {
+async function mount(over: Record<string, unknown> = {}) {
   const openCompanyOverview = vi.fn()
+  const openHqCultivation = vi.fn()
   const View = createCultivationView({
     sessions: { create: async () => 'session-cultivation', retain: () => ({ ready: new Promise(() => {}), release: () => {} }) } as never,
     cultivationFiles: files,
     cultivationActions: () => ({ run: async () => ({ ok: true, text: 'ok' }) }),
-    roleSource: roleSource(),
+    roleSource: { subscribe: () => () => {}, getSnapshot: () => ({ projectionsBySession: {} }) },
     openCompanyOverview,
+    openHqCultivation,
     ...over,
   } as never)
   const host = document.createElement('div')
   document.body.append(host)
   mounted = createRoot(host)
   await act(async () => { mounted?.render(createElement(View, props())) })
-  return host
+  return { host, openCompanyOverview, openHqCultivation }
 }
 
-describe('CultivationView', () => {
-  it('左培养板 + 右培养对话；公司总览打开右栏；shell composer 隐藏只在挂载期', async () => {
-    const host = await mount()
+describe('CultivationView（Wave S3 去 Hack 化）', () => {
+  it('左培养板 + 右总部工坊入口；绝不修改 documentElement.dataset.dshCultivationView', async () => {
+    const { host, openCompanyOverview, openHqCultivation } = await mount()
     expect(host.textContent).toContain('让角色今后的工作更好')
     expect(host.querySelector('.wk-cult-view-split')).not.toBeNull()
-    expect(host.querySelector('.wk-cult-chat')).not.toBeNull()
-    expect(document.documentElement.dataset.dshCultivationView).toBe('1')
+    expect(host.querySelector('[data-company-cultivation-workshop]')).not.toBeNull()
+    expect(document.documentElement.dataset.dshCultivationView).toBeUndefined()
+
     const overview = [...host.querySelectorAll('button')].find(node => node.textContent?.includes('公司总览'))
     await act(async () => { overview?.dispatchEvent(new MouseEvent('click', { bubbles: true })) })
+    expect(openCompanyOverview).toHaveBeenCalledOnce()
+
+    const workshopBtn = [...host.querySelectorAll('button')].find(node => node.textContent?.includes(zh['hq.cultivationOpenWorkshop']))
+    await act(async () => { workshopBtn?.dispatchEvent(new MouseEvent('click', { bubbles: true })) })
+    expect(openHqCultivation).toHaveBeenCalledOnce()
   })
 
   it('分界可拖/键盘调宽，宽度持久化', async () => {
-    const host = await mount()
+    const { host } = await mount()
     const split = host.querySelector('.wk-cult-view-split') as HTMLElement
     const handle = host.querySelector('[role="separator"]') as HTMLElement
     expect(handle.getAttribute('aria-orientation')).toBe('vertical')
@@ -91,13 +96,5 @@ describe('CultivationView', () => {
       handle.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }))
     })
     expect(split.style.getPropertyValue('--wk-cult-chat-width')).toBe('390px')
-  })
-
-  it('卸载清掉 composer 隐藏属性', async () => {
-    await mount()
-    expect(document.documentElement.dataset.dshCultivationView).toBe('1')
-    act(() => { mounted?.unmount() })
-    mounted = null
-    expect(document.documentElement.dataset.dshCultivationView).toBeUndefined()
   })
 })

@@ -1,6 +1,7 @@
 /** 审批闸门纯函数（驾驶舱②切片二的 keyless 完成定义：签字线 → 审批请求映射）。 */
 import { describe, expect, it } from 'vitest'
 import {
+  parseSignoffReason,
   signoffDecisionNote,
   signoffReason,
 } from '../../../packages/company-pack/src/lib/accounting/signoff.ts'
@@ -47,5 +48,23 @@ describe('signoff 双语（BUG-367）', () => {
     expect(reason).toContain('Margin line: discount 22%')
     expect(reason).toContain('(also considered 20%)')
     expect(reason).not.toMatch(/[：（）]/)
+  })
+})
+
+describe('parseSignoffReason · 结构化回读（zh + en + 兜底）', () => {
+  const en = (_zh: string, text: string): string => text
+  it('往返解析 zh / en 带 detail 与无 detail 的 reason', () => {
+    const zhReason = signoffReason({ line: '毛利线双签', summary: '报价毛利 26%', detail: 'A 26% / B 31%' })
+    expect(parseSignoffReason(zhReason)).toEqual({ line: '毛利线双签', summary: '报价毛利 26%', detail: 'A 26% / B 31%' })
+
+    const enReason = signoffReason({ line: 'Margin line', summary: 'discount 22%', detail: 'opt B 18%' }, en)
+    expect(parseSignoffReason(enReason)).toEqual({ line: 'Margin line', summary: 'discount 22%', detail: 'opt B 18%' })
+
+    expect(parseSignoffReason('毛利线双签：报价毛利 26%')).toEqual({ line: '毛利线双签', summary: '报价毛利 26%', detail: '' })
+    expect(parseSignoffReason('plain fallback text')).toEqual({ line: '', summary: 'plain fallback text', detail: '' })
+    expect(parseSignoffReason('不配对）')).toEqual({ line: '', summary: '不配对）', detail: '' })
+    expect(parseSignoffReason('unmatched)')).toEqual({ line: '', summary: 'unmatched)', detail: '' })
+    expect(parseSignoffReason('margin: rate：high')).toEqual({ line: 'margin', summary: 'rate：high', detail: '' })
+    expect(parseSignoffReason(undefined)).toEqual({ line: '', summary: '', detail: '' })
   })
 })

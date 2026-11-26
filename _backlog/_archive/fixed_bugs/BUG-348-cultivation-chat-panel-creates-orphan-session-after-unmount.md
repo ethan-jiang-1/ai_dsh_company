@@ -12,24 +12,24 @@ opened: 2026-11-23
 
 ## 症状
 
-在 [`CultivationChatPanel.tsx`](../../../packages/company-pack/src/client/cultivation/CultivationChatPanel.tsx#L121-L167) 中，当 `localStorage` 里已有历史会话 ID，组件触发 `await open(stored)`；如果用户在 `reference.ready` 返回失败（reject）**之前**切换 `mainSessionId` / `cwd` / `agentPreset` 或卸载面板（cleanup 已将 `cancelled = true`）：
+在原 `CultivationChatPanel.tsx`（Wave S3 已迁入 [`company-hq.tsx`](../../../packages/company-pack/src/client/ux/company-hq.tsx)）中，当 `localStorage` 里已有历史会话 ID，组件触发 `await open(stored)`；如果用户在 `reference.ready` 返回失败（reject）**之前**切换 `mainSessionId` / `cwd` / `agentPreset` 或卸载面板（cleanup 已将 `cancelled = true`）：
 
-1. `open(stored)` 的失败分支（[第 147-155 行](../../../packages/company-pack/src/client/cultivation/CultivationChatPanel.tsx#L147-L155)）没有检查 `if (cancelled) return`；
-2. 协程继续执行 `localStorage.removeItem(key)`，接着调用 `await sessions.create({ cwd, agentPreset })` 创建一个没人持有的新会话，再写入 `localStorage.setItem(key, String(created))`，最后又调用一轮 `open(created)`（此时仅能靠第 134 行 `if (cancelled) { reference.release(); return }` 放行，但刚建出来的 session 已被永久遗弃在服务端的 `sessions` 列表里）。
+1. `open(stored)` 的失败分支没有检查 `if (cancelled) return`；
+2. 协程继续执行 `localStorage.removeItem(key)`，接着调用 `await sessions.create({ cwd, agentPreset })` 创建一个没人持有的新会话，再写入 `localStorage.setItem(key, String(created))`，最后又调用一轮 `open(created)`（此时仅能靠 `if (cancelled) { reference.release(); return }` 放行，但刚建出来的 session 已被永久遗弃在服务端的 `sessions` 列表里）。
 
 ## 运行面
 
-- **面 = client UI**：[`packages/company-pack/src/client/cultivation/CultivationChatPanel.tsx`](../../../packages/company-pack/src/client/cultivation/CultivationChatPanel.tsx#L141-L156)。
+- **面 = client UI**：原 `packages/company-pack/src/client/cultivation/CultivationChatPanel.tsx`（现已迁入 [`company-hq.tsx`](../../../packages/company-pack/src/client/ux/company-hq.tsx)）。
 
 ## 复现
 
-通过真实渲染 `CultivationChatPanel`（预置 `localStorage['dsh-company-cultivation-session:main-1'] = 'stale-sess'`，让 `retain('stale-sess').ready` 先挂起；随后 `root.unmount()` 卸载组件，再让该 `ready` promise reject）：
+通过真实渲染培养会话面板（预置 `localStorage['dsh-company-cultivation-session:main-1'] = 'stale-sess'`，让 `retain('stale-sess').ready` 先挂起；随后 `root.unmount()` 卸载组件，再让该 `ready` promise reject）：
 
 - 卸载之后实测观察到：`sessions.create` 被调用 1 次（创建 `'orphan-sess'`），且 `localStorage.getItem('dsh-company-cultivation-session:main-1')` 被篡改为 `'orphan-sess'`。
 
 ## 根因与证据
 
-1. [`CultivationChatPanel.tsx`](../../../packages/company-pack/src/client/cultivation/CultivationChatPanel.tsx#L134-L156) 仅在 `open()` 成功路径与外层 `.catch()`（第 159 行）检查了 `cancelled`，但在 `run()` 内部 `try { await open(stored) } catch { ... }` 结束之后（第 151-155 行）漏掉了 `if (cancelled) return` 守卫（以及 `sessions.create(...)` `await` 返回后也缺少 `if (cancelled) return`）。
+1. 原 `CultivationChatPanel.tsx` 仅在 `open()` 成功路径与外层 `.catch()` 检查了 `cancelled`，但在 `run()` 内部 `try { await open(stored) } catch { ... }` 结束之后漏掉了 `if (cancelled) return` 守卫（以及 `sessions.create(...)` `await` 返回后也缺少 `if (cancelled) return`）。
 
 ## 失败类与同类排查
 

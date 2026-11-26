@@ -4,17 +4,16 @@ import { describe, expect, it } from 'vitest'
 import { repositoryRoot } from '../../tools/lib/core/repository-layout.mjs'
 import { parseCompanyTabCatalog } from '../../tools/lib/probe/company-tab-catalog.mjs'
 
-// 2026-10-20 审计：cdp-probe 的 8 个页签 vs 注册面 9 个（成品缺）；2026-11-12 加「策略」→ 10。本 spec 钉注册源形状，
-// live 面由 cdp-probe 从同一份 catalog 驱动；解析失败 = 探针不该静默跑 8/8。
+// 2026-10-20 审计：cdp-probe 的 8 个页签 vs 注册面 9 个（成品缺）；2026-11-12 加「策略」→ 10；Wave S2 收敛为 3 个集成页签（作战板/团队/档案）。
+// 本 spec 钉注册源形状，live 面由 cdp-probe 从同一份 catalog 驱动；解析失败 = 探针不该静默通过。
 describe('company-tab-catalog', () => {
-  it('从真实注册源解析出 10 个页签，含成品与策略', () => {
+  it('从真实注册源解析出 3 个集成页签（作战板/团队/档案）', () => {
     const source = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/tabs/company-tab-registration.ts'), 'utf8')
     const identity = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/ui/tab-icons.tsx'), 'utf8')
     const copy = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/locales.ts'), 'utf8')
     const tabs = parseCompanyTabCatalog(source, identity, copy)
-    expect(tabs).toHaveLength(10)
-    expect(tabs.map(tab => tab.title)).toContain('成品')
-    expect(tabs.map(tab => tab.title)).toContain('策略')
+    expect(tabs).toHaveLength(3)
+    expect(tabs.map(tab => tab.title)).toEqual(['作战板', '团队', '档案'])
     expect(tabs.every(tab => tab.id.startsWith('dsh-company-pack/'))).toBe(true)
   })
 
@@ -23,13 +22,13 @@ describe('company-tab-catalog', () => {
     expect(parseCompanyTabCatalog("id: 'dsh-company-pack/x', kind: 'k', face: 'missing'", 'const FACES = {}', '')).toEqual([])
   })
 
-  it('en 标题从同一份字典派生：10/10 成对，含 Strategy（不再手维护映射）', () => {
+  it('en 标题从同一份字典派生：3/3 成对，含 Ops Hub / Team / Archive', () => {
     const source = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/tabs/company-tab-registration.ts'), 'utf8')
     const identity = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/ui/tab-icons.tsx'), 'utf8')
     const copy = readFileSync(join(repositoryRoot, 'packages/company-pack/src/client/locales.ts'), 'utf8')
     const tabs = parseCompanyTabCatalog(source, identity, copy)
-    expect(tabs).toHaveLength(10)
-    expect(tabs.map(tab => tab.enTitle)).toContain('Strategy')
+    expect(tabs).toHaveLength(3)
+    expect(tabs.map(tab => tab.enTitle)).toEqual(['Ops Hub', 'Team', 'Archive'])
     expect(tabs.every(tab => tab.enTitle.length > 0)).toBe(true)
   })
 

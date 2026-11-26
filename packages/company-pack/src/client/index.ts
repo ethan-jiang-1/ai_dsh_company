@@ -1,6 +1,4 @@
 /** 浏览器半：部署品牌（侧栏）+ 团队任务板（会话头部）+ 公司驾驶舱页签（右栏，R5b）。 */
-import { workspaceFileExists } from './cultivation/cultivation-data.ts'
-import { startupFaceFromReads } from './startup/startup-load.ts'
 import { CATALOG_READ_LIMIT, LEDGER_READ_LIMIT } from './data/read-limits.ts'
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
@@ -35,19 +33,20 @@ import { registerCompanyTabs } from './tabs/company-tab-registration.ts'
 import { DELEGATION_TOOL_KEYS } from './wiring/delegation-keys.ts'
 import { DelegationCard } from './ui/DelegationCard.tsx'
 import { installStyles } from './ui/styles.ts'
-import { createStartupStore } from './startup/startup-store.ts'
+import { createStartupStore, type StartupStore } from './startup/startup-store.ts'
+import { createStartupHandlers } from './startup/startup-handlers.ts'
 import { StrategyButton } from './startup/StrategyButton.tsx'
 import { registerCommandScopeHint } from './startup/CommandScopeHint.tsx'
-import {
-  STARTUP_OPTIONS_READ_LIMIT,
-  STARTUP_SETTINGS_READ_LIMIT,
-  type StartupField,
-} from '../lib/startup/startup-settings.ts'
-import type { SaveResult } from './startup/StrategyPanel.tsx'
 import { createErrorRelay, installErrorCapture, type ClientErrorEntry, type ErrorCaptureTarget } from './wiring/error-ring.ts'
 import { ROLE_SHORT, RoleBadge, readPresetOf, sessionTitleOf } from './ui/RoleBadge.tsx'
 import { TasksAction } from './tabs/TasksPanel.tsx'
 import { TEAM_TOOL_KEYS, TeamToolCard } from './ui/TeamToolCard.tsx'
+import { createHubSubViewStore, type HubSubViewStore } from './tabs/hub-subview-store.ts'
+import { openSplitPreset, openSubagentAside } from './ux/company-triggers-shortcuts.ts'
+import { registerWaveS1Ux } from './ux/register-s1-ux.ts'
+import { registerWaveS2Ux } from './ux/register-s2-ux.ts'
+import { registerWaveS3Ux } from './ux/register-s3-ux.ts'
+import { registerWaveS4Ux } from './ux/register-s4-ux.ts'
 
 /** Required services: the slot registry plus the remote namespace we read. */
 export const inject = ['slots', 'remote', 'sessions', 'locale']
@@ -117,6 +116,8 @@ export async function apply(ctx: ClientContext): Promise<void> {
   // 驾驶舱①·「待办」：挂起项登记处（apply 闭包内创建——client 纪律禁模块级单例）。
   // 观察者写入 / 页签读取共享同一实例。
   const attention = createAttentionRegistry()
+  const hubStore = createHubSubViewStore()
+  const startupStore = createStartupStore()
 
   // 驾驶舱①·远端事件观察者（跨会话、实时）：user-questions/request（待答问询）与
   // approval/request（待批审批；切片二落地前不会触发，管线先行）。⚠ 只登记、**永远委托**
@@ -126,15 +127,28 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
   registerToolCards(ctx)
 
-  registerSidebarIdentity(ctx)
+  registerSidebarIdentity(ctx, hubStore)
 
-  registerCompanyTabsWiring(ctx, attention)
+  const s3 = registerWaveS3Ux(ctx, { attention, startupStore })
 
-  registerCultivationViewWiring(ctx)
+  registerCompanyTabsWiring(ctx, attention, hubStore, startupStore)
+
+  registerCultivationViewWiring(ctx, hubStore, () => { s3.openHq('cultivation') })
+
+  registerWaveS1Ux(ctx, { attention, hubStore, openHq: (section) => { s3.openHq(section) } })
+
+  registerWaveS2Ux(ctx, { hubStore })
+
+  registerWaveS4Ux(ctx, { hubStore })
 
 }
 
-function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typeof createAttentionRegistry>): void {
+function registerCompanyTabsWiring(
+  ctx: ClientContext,
+  attention: ReturnType<typeof createAttentionRegistry>,
+  hubStore: HubSubViewStore,
+  startupStore: StartupStore,
+): void {
   // Company workspace files are read through this injected session Remote; the
   // tab-registration module keeps the four matching contribution surfaces local.
   // ⚠ `remote.commands` = 人侧动作面（2026-10-17 培养 GUI 卡）：面板按钮/创作表单经它发
@@ -146,6 +160,18 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
     const floatTab = (tabId: TabId, rect?: FloatRectLike): void => { scoped.sidebarRight.float(tabId, rect) }
     const unfloatTab = (paneId: string): void => { scoped.sidebarRight.dock(paneId as PaneId) }
     const openMember = makeOpenMember({ sessions, uiWorkspace: scoped.uiWorkspace, leadOf })
+    let returnToMain: (() => void) | undefined
+    ctx.inject(['layout'], (layoutScoped) => {
+      returnToMain = () => { (layoutScoped as unknown as { layout: { selectPanel: (panel: null) => void } }).layout.selectPanel(null) }
+    })
+    const openMemberAside = (sessionId: SessionId, memberId: string): void => {
+      openSubagentAside(
+        scoped.sidebarRight,
+        leadOf(sessionId),
+        memberId as SessionId,
+        { selectPanel: () => { returnToMain?.() } },
+      )
+    }
     // 动作面按会话取（命令作用在面板所在会话；跨角色会被 host 角色闸拒，错误原话回到面板行内）。
     // 读取闭包唯一实现 = data plane 的 readWorkspaceText（Lead 寻址 + 失败 null 都在工厂里）。
     const readLedger = readWorkspaceText(WORKSPACE_TEXT_PATHS.ledger, LEDGER_READ_LIMIT)
@@ -153,36 +179,13 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
     const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
 
     // 启动策略：读走 workspaceFiles（无日志噪声），写走 /company-settings 命令；
-    // 面板与 composer 按钮共享一个仓，保存后按钮当帧跟着变。
-    const startupStore = createStartupStore()
-    const readStartupText = readWorkspaceText(WORKSPACE_TEXT_PATHS.startup, STARTUP_SETTINGS_READ_LIMIT)
-    const readStartupOptionsText = readWorkspaceText(WORKSPACE_TEXT_PATHS.startupOptions, STARTUP_OPTIONS_READ_LIMIT)
-    const loadStartup = async (sessionId: SessionId, signal: AbortSignal): Promise<void> => {
-      const [settingsRead, optionsRead] = await Promise.all([
-        readStartupText(sessionId, signal),
-        readStartupOptionsText(sessionId, signal),
-      ])
-      // 折算 + 「缺失/不可读」之分都在 `startup/startup-load.ts`（composition 闭包单测不执行）。
-      startupStore.set(await startupFaceFromReads(
-        { settings: settingsRead, options: optionsRead },
-        () => workspaceFileExists(scoped.remote, leadOf, sessionId, WORKSPACE_TEXT_PATHS.startup, signal),
-      ))
-    }
-    const runSettingsCommand = async (sessionId: SessionId, line: string): Promise<SaveResult> => {
-      try {
-        const settled = await scoped.remote.commands.execute(sessionId, line, [])
-        if (!settled.ok) return { ok: false, message: settled.error.message }
-        const result = settled.value?.result
-        if (result === undefined) return { ok: false, message: 'command unavailable' }
-        return result.kind === 'success' ? { ok: true } : { ok: false, message: result.text }
-      } catch (cause) {
-        return { ok: false, message: (cause as Error).message }
-      }
-    }
-    const saveStartup = (sessionId: SessionId, field: StartupField, value: string | null): Promise<SaveResult> =>
-      runSettingsCommand(sessionId, `/company-settings set ${field} ${value ?? 'auto'}`)
-    const resetStartup = (sessionId: SessionId): Promise<SaveResult> =>
-      runSettingsCommand(sessionId, '/company-settings reset')
+    // 面板、composer 按钮与 HQ 共用一个仓，保存后即时同步。
+    const { loadStartup, saveStartup, resetStartup } = createStartupHandlers({
+      remote: scoped.remote,
+      leadOf,
+      readWorkspaceText,
+      startupStore,
+    })
 
     // 跨会话挂起项重建：只有 remote.session.page 对**未打开**的会话可读（retain 的 source 是封闭联合、
     // follow 对未打开会话零帧——见 presence/attention-history.ts 头注）。
@@ -194,6 +197,7 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
       floatTab,
       unfloatTab,
       openMember,
+      openMemberAside,
       cultivationFiles,
       cultivationActions,
       roleSource: sessions.list,
@@ -206,6 +210,8 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
       loadStartup,
       saveStartup,
       resetStartup,
+      hubStore,
+      openSplit: (preset: 'ops' | 'review' | 'quiet') => { openSplitPreset(scoped.sidebarRight, hubStore, preset) },
     })
 
     // composer 入口：排在 auto-continue（未设 order = 0）之后；只显示状态，不承担表单。
@@ -217,7 +223,10 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
         sessionId,
         store: startupStore,
         load: loadStartup,
-        open: () => { scoped.sidebarRight.openTab('company-strategy') },
+        open: () => {
+          hubStore.select('ops', 'strategy')
+          scoped.sidebarRight.openTab('company-ops')
+        },
         t: ctx.locale.bind(COMPANY_NS),
       }),
     }, StrategyButton))
@@ -232,16 +241,23 @@ function registerCompanyTabsWiring(ctx: ClientContext, attention: ReturnType<typ
   })
 }
 
-function registerCultivationViewWiring(ctx: ClientContext): void {
+function registerCultivationViewWiring(
+  ctx: ClientContext,
+  hubStore: HubSubViewStore,
+  openHqCultivation: () => void,
+): void {
   // 培养主视图（2026-10-28；2026-11-02 起主区就剩 Chat + 培养——Trajectory 已从 company profile 禁用）。
   // 公司总览不再占第三个 tab：它的看板/依赖/在场/交付已经住在右栏页签，按钮直接打开。
-  // 该槽没有 inject 面 ⇒ 数据面用注册处闭包注入；右侧培养面板自有 composer（命令面）。
+  // Wave S3 起右侧原手写对话替换为导向全局 HQ 培养工坊（原生 embedded 会话）的入口卡片。
   ctx.inject(['sessions', 'uiWorkspace', 'remote.session', 'remote.workspaceFiles', 'remote.commands', 'sidebarRight', 'slots'], (scoped) => {
     const sessions = scoped.sessions
     const { leadOf, follow, cultivationFiles, cultivationActions, rawFollow, readWorkspaceText } = createCompanyDataPlane(scoped)
     const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, CATALOG_READ_LIMIT)
     const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
-    const openCompanyOverview = (): void => { scoped.sidebarRight.openTab('company-board') }
+    const openCompanyOverview = (): void => {
+      hubStore.select('ops', 'board')
+      scoped.sidebarRight.openTab('company-ops')
+    }
     const CultivationView = createCultivationView({
       sessions,
       cultivationFiles,
@@ -251,6 +267,7 @@ function registerCultivationViewWiring(ctx: ClientContext): void {
       contextSources: contextWiring.contextSources,
       openContext: contextWiring.openContext,
       openCompanyOverview,
+      openHqCultivation,
     })
     scoped.slots.inject('conversation.view', () => scoped.slots.register({
       name: 'conversation.view',
@@ -311,7 +328,7 @@ function registerToolCards(ctx: ClientContext): void {
   })
 }
 
-function registerSidebarIdentity(ctx: ClientContext): void {
+function registerSidebarIdentity(ctx: ClientContext, hubStore: HubSubViewStore): void {
   ctx.inject(['sessions', 'remote.workspaceFiles', 'sidebarRight', 'slots'], (scoped) => {
     scoped.slots.inject('sidebar.brand.name', () =>
       scoped.slots.register({ name: 'sidebar.brand.name', locale: COMPANY_NS }, DreamTeamBrandName))
@@ -395,7 +412,10 @@ function registerSidebarIdentity(ctx: ClientContext): void {
         locale: COMPANY_NS,
         inject: () => ({
           leadOf: leadSessionId,
-          openTasks: () => { scoped.sidebarRight.openTab('company-tasks') },
+          openTasks: () => {
+            hubStore.select('ops', 'tasks')
+            scoped.sidebarRight.openTab('company-ops')
+          },
         }),
       }, TasksAction))
   })

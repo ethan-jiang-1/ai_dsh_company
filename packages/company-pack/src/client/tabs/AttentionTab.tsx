@@ -38,7 +38,7 @@ import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 export interface AttentionTabInjected {
   readonly follow: CompanyDataInjected['follow']
   readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
-  readonly unfloatTab: (paneId: string) => void
+  readonly unfloatTab?: ((paneId: string) => void) | undefined
   /** apply 世界登记处的快照读（远端事件观察者写入）。 */
   readonly getPending: () => readonly LivePending[]
   /** 一键跳会话（`sessions.open`）。 */

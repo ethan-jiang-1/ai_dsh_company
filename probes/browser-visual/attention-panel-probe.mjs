@@ -61,7 +61,7 @@ try {
   await page.locator('[data-composer-input][contenteditable="true"]').waitFor({ timeout: 30_000 })
   await dismissNotices(page, ms => page.waitForTimeout(ms))
   await openSessionBySearch(page, titleArg, ms => page.waitForTimeout(ms))
-  await openCompanyTab(page, '待办', ms => page.waitForTimeout(ms))
+  await openCompanyTab(page, '团队', ms => page.waitForTimeout(ms))
 
   // A1：两段标题。
   const pane = page.locator('.wk-pane-head strong', { hasText: '待办' }).first()

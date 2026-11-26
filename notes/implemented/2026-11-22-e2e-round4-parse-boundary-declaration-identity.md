@@ -57,7 +57,7 @@
   红证：`skipped` 恒 0 / `headerOk` 恒 true → 面板不提示。
 - **313/314**：`vitest run tests/lib/startup/startup-settings.spec.ts`（28/28）、`tests/client/startup/startup-load.spec.ts`（10/10）。
   红证：去掉字段检查 → 字段名丢失、折成空/auto。
-- **308**：`vitest run tests/client/cultivation/cultivation-chat-panel.spec.ts` —— 7/7。红证：恢复写死 → en 命中 CJK、zh 出裸 `session: `。
+- **308**：`vitest run tests/client/ux/company-hq.spec.ts` —— Wave S3 将原 `cultivation-chat-panel.spec.ts`（7/7）守卫迁入 HQ 专题测试。红证：en 字典混入 CJK → 用例红；清除后绿。
 - **312**：`vitest run tests/client/wiring/attention.spec.ts tests/client/wiring/attention-observers.spec.ts` —— 79/79。
   红证：去掉合成 id → 同文两条问询 id 都是 undefined。
 - **315**：`vitest run tests/client/cultivation/cultivation-view-layout.spec.ts` —— 5/5（393 堆叠 / 1100 两栏 / 边界 / 期望过宽 / 首帧）。

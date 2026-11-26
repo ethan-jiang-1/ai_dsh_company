@@ -7,8 +7,9 @@
  * 没有「保存」按钮：每次选完立即发一条 `/company-settings set …`（client → host 的写通道），
  * 成功即重读盘；注入段是活读的，所以最快下一轮生效。
  */
-import { useCallback, useEffect, useSyncExternalStore, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
+import { Button, Input } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import { startupRows, type StartupField, type StartupRow, type WikiCheck } from '../../lib/startup/startup-settings.ts'
@@ -27,7 +28,7 @@ export interface StrategyPanelInjected {
   readonly save: (sessionId: SessionId, field: StartupField, value: string | null) => Promise<SaveResult>
   readonly reset: (sessionId: SessionId) => Promise<SaveResult>
   readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
-  readonly unfloatTab: (paneId: string) => void
+  readonly unfloatTab?: ((paneId: string) => void) | undefined
   readonly t: CompanyT
 }
 
@@ -108,7 +109,7 @@ function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck, checkCurrent, te
       {row.field === 'wiki'
         ? (
           <div className="wk-strategy-row-control">
-            <input
+            <Input
               className="wk-strategy-input"
               value={draft}
               placeholder={t('strategy.placeholder.wiki')}
@@ -123,9 +124,9 @@ function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck, checkCurrent, te
               onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur() }}
             />
             {row.value === null ? null : (
-              <button type="button" className="wk-strategy-clear" disabled={busy} onClick={() => { onWiki(null) }}>
+              <Button size="sm" variant="ghost" className="wk-strategy-clear" disabled={busy} onClick={() => { onWiki(null) }}>
                 {t('strategy.auto')}
-              </button>
+              </Button>
             )}
             {wikiNote === null ? null : <span className="wk-strategy-auto-tag">{wikiNote}</span>}
             {checkedAt === null ? null : <span className="wk-strategy-auto-tag">{checkedAt}</span>}
@@ -156,10 +157,15 @@ function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck, checkCurrent, te
 }
 
 export function StrategyPanel(props: StrategyPanelProps): ReactNode {
-  const face = useSyncExternalStore(props.store.subscribe, props.store.get, props.store.get)
+  const [face, setFace] = useState(() => props.store.get())
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { sessionId, load, save, reset, t } = props
+
+  useEffect(() => {
+    setFace(props.store.get())
+    return props.store.subscribe(() => { setFace(props.store.get()) })
+  }, [props.store])
 
   const reload = useCallback(async (signal: AbortSignal): Promise<void> => {
     await load(sessionId, signal)
@@ -224,14 +230,15 @@ export function StrategyPanel(props: StrategyPanelProps): ReactNode {
         ))}
         <p className="wk-strategy-hint">{t('strategy.hint.noSave')}</p>
         <p className="wk-strategy-hint">{t('strategy.hint.close')}</p>
-        <button
-          type="button"
+        <Button
+          size="sm"
+          variant="ghost"
           className="wk-strategy-reset"
           disabled={busy}
           onClick={() => { void commit(() => reset(sessionId)) }}
         >
           {t('strategy.reset')}
-        </button>
+        </Button>
       </div>
     </PanelFrame>
   )

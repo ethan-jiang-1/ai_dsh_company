@@ -55,6 +55,10 @@ export function registerSignoffTool(ctx: Context, options: { readonly language?:
         toolName: 'request_signoff',
         ...(exec.callId !== undefined ? { callId: exec.callId } : {}),
         reason: signoffReason(args, text),
+        displayReason: {
+          en: signoffReason(args, (_zh, en) => en),
+          zh: signoffReason(args, zh => zh),
+        },
         signal: exec.signal,
       })
       return { decision, note: signoffDecisionNote(decision, text) }

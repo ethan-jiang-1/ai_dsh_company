@@ -1,17 +1,12 @@
 /**
- * 公司页签体（条目 ② S1b）：五个**平台页签**——看板 / 依赖图 / 在场 / 用量 / 任务板。
+ * 公司页签外框与各领域面板体（看板 / 依赖图 / 在场 / 用量 / 任务板）。
  *
- * 为什么这五个是平台页签而不是自造子页签（条目 ② 的首要决定 A1）：只有平台级 tab 才能被
- * `ctx.sidebarRight.float(tabId)` 拖出成浮窗（可移动 / 可缩放 / 最小 220×140 钳制 / 点击置顶），
- * 也才能被 split 并看。数据面走 `useCompanyData`（与公司视图共用同一实现，零重复）。
- *
- * 「在场」页签 = 原 R5b 驾驶舱内容（在场板 + 动态流）**升级**：行仍可点进成员空间，
- * 动态流由 5s 差分改成 `session/follow` 流式（打开即见全程）。
+ * 只有平台级 tab 才能被 `ctx.sidebarRight.float(tabId)` 拖出成浮窗或 split 并看；
+ * 数据面统一走 `useCompanyData`（与全局 HQ 视图共用，零重复）。
+ * 「在场」页签通过 `session/follow` 流式展示成员在线态、当前任务与实时协作动态。
  */
 import type { ReactNode } from 'react'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-// 静态渲染（react-dom/server）没有布局，useLayoutEffect 会打 SSR 警告；浏览器里仍用 layout 版。
-const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
+import { useState } from 'react'
 import { Button, StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
@@ -20,7 +15,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { PresenceRow } from '../../lib/presence/presence.ts'
 import { joinList, listSeparator } from '../ui/list-separator.ts'
 import { memberDot } from '../../lib/presence/presence-status.ts'
-import { clampRect, loadFloatRect, saveFloatRect, type FloatRectLike } from '../ui/float-geometry.ts'
+import { clampRect, loadFloatRect, type FloatRectLike } from '../ui/float-geometry.ts'
 import { BoardPanel, BudgetPanel, DagPanel, StateNote, StreamErrorNotice, activityText } from './company-panels.tsx'
 import { DelegationFlowPanel } from './DelegationFlowPanel.tsx'
 import { buildDelegationTree, type DelegationSessionSummaryLike } from '../../lib/delegation/delegation-tree.ts'
@@ -31,42 +26,35 @@ import { presenceRoleText, roleText, roleTextForCanonical } from '../roles.ts'
 
 /** 页签体注入面：数据面 + 平台浮出操作。 */
 export interface CompanyTabInjected extends CompanyDataInjected {
-  /** `ctx.sidebarRight.float`：把本页签拽出成浮窗（可移动/缩放/置顶）；rect = 记忆摆位（浮窗几何记忆 RFC）。 */
+  /** `ctx.sidebarRight.float`：把本页签拽出成浮窗（rect = 记忆摆位）。 */
   readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
-  /** `ctx.sidebarRight.unfloat`：把浮窗收回右栏（用户走查 2026-09-27：浮出态里「浮出」按钮无意义，换「收回」）。 */
-  readonly unfloatTab: (paneId: string) => void
+  /** `ctx.sidebarRight.dock`：保留给旧调用签名兼容（浮出收回由 DSH 原生浮窗栏接管）。 */
+  readonly unfloatTab?: ((paneId: string) => void) | undefined
 }
 
 /** 页签体 props：槽标准 props（含 `sessionId` / `useProjection` / `useTabInfo`）+ 注入面。 */
 export type CompanyTabProps = PropsRuntime<'sidebar.right.pane.tab'> & CompanyTabInjected & { readonly t: CompanyT }
 
-/** 在场页签额外需要成员空间入口（行可点）。 */
+/** 在场页签额外需要成员空间入口与旁路对话深链（行可点）。 */
 export type PresenceTabProps = CompanyTabProps & {
   readonly openMember: (sessionId: SessionId, member: { readonly id: string; readonly role: 'lead' | 'teammate' }) => Promise<void>
+  readonly openMemberAside?: ((sessionId: SessionId, memberId: string) => void) | undefined
 }
 
 /**
- * 页签体共用外框需要的最小 props（`useTabInfo` + 浮出/收回操作）——「待办」页签（AttentionTab）
+ * 页签体共用外框需要的最小 props（`useTabInfo` + 浮出操作）——「待办」页签（AttentionTab）
  * 复用同一外框，故收窄成独立接口导出（结构上 CompanyTabProps 天然满足）。
  */
 export interface PanelFrameProps {
   readonly useTabInfo: CompanyTabProps['useTabInfo']
   readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
-  readonly unfloatTab: (paneId: string) => void
+  readonly unfloatTab?: ((paneId: string) => void) | undefined
   readonly t?: CompanyT
 }
 
 /**
- * 页签体共用外框：tone 色条 + 标题 + 刷新说明 + **页签自备动作（可选）** + 「浮出 / 收回」（状态感知）+ 内容。
- *
- * - 色条（用户走查 2026-09-27：浮窗背景全一样认不出哪个是哪个）：面板顶 3px tone 色
- *   （`background: currentColor` 吃 tone 类；浮窗头标题另有 tinted 色丸，见 styles.ts）。
- * - 页签自备动作（2026-09-28，用户令）：`action` 槽渲染在页签头右侧（与「浮出」同簇）——
- *   面板私有的小操作（如依赖图的「重画」）不为此另开机制。
- * - 浮出/收回：dock 态显示「浮出」（`float(tabId)`）；浮出态显示「收回」（`unfloat(paneId)`）。
- *   浮出态感知 = 每次渲染查 DOM 祖先 `[data-dockkit-float]`（其属性值 = paneId）——
- *   `useTabInfo()` 的 layout 是 observable，浮出/收回都会触发本组件重渲染，检查自然保持新鲜。
- *   浮窗的移动（grip）、缩放、置顶仍是平台能力，我们不自造窗口管理（D13）。
+ * 页签体共用外框：tone 色条 + 标题 + 刷新说明 + 页签自备动作（可选） + 浮出 + 内容。
+ * 浮出后的收回/拖拽/缩放全部交给 DSH 原生 DockLayout 浮窗标题栏，不伪造 `useTabInfo()` 字段。
  */
 const defaultPanelT = ((key: CompanyKey) => zh[key]) as CompanyT
 
@@ -76,71 +64,31 @@ export function PanelFrame({ title, tone, tabProps, action, children, refreshLab
   readonly tabProps: PanelFrameProps
   readonly action?: ReactNode
   readonly children: ReactNode
-  /** 页签头的新鲜度文案；**必须说真话**（推送面板用默认 projected；轮询面板各自传真实间隔——2026-10-18 走查抓到培养页签写 5 秒实际 30 秒）。 */
+  /** 页签头的新鲜度文案；**必须说真话**。 */
   readonly refreshLabel?: string
 }) {
   const t = tabProps.t ?? defaultPanelT
   const info = tabProps.useTabInfo()
-  const rootRef = useRef<HTMLDivElement | null>(null)
-  const [floatPaneId, setFloatPaneId] = useState<string | null>(null)
-  useIsoLayoutEffect(() => {
-    const paneId = rootRef.current?.closest('[data-dockkit-float]')?.getAttribute('data-dockkit-float') ?? null
-    setFloatPaneId(previous => previous === paneId ? previous : paneId)
-  })
-  /** 采集当前浮窗矩形并按稳定身份存档（浮窗几何记忆 RFC；浮出态外调用 = no-op）。
-   *  key 用 `contentId`（= keyed 槽 key，如 `dsh-company-pack/dag`——`openContent` 的去重身份，
-   *  页签关掉重开不变）而不是运行时 `tab.id`（`tab3` 这类生成 id，重开会换 ⇒ 存档孤儿化）。 */
-  const captureFloatRect = (): void => {
-    const pane = rootRef.current?.closest('[data-dockkit-float]') ?? null
-    if (pane === null) return
-    const rect = pane.getBoundingClientRect()
-    if (rect.width === 0 && rect.height === 0) return // 未挂载/不可见：不采
-    const tabKey = info.tab.contentId !== '' ? info.tab.contentId : info.tab.id
-    saveFloatRect(window.localStorage, tabKey, { x: rect.x, y: rect.y, width: rect.width, height: rect.height })
-  }
-  // 浮出期间监听手势结束（拖拽/缩放都以 pointerup 落定）：每次落定即采一次；浮出瞬间先采一次
-  // （默认位也进记忆 ⇒ 没拖过就收回、下次浮出仍在同一默认位）。收回时 pointerup 先于 click，
-  // 最后一拖已入库；onClick 里再补采一次兜底（防无拖拽直接收回丢初始位）。
-  useEffect(() => {
-    if (floatPaneId === null) return
-    captureFloatRect()
-    document.addEventListener('pointerup', captureFloatRect)
-    return () => { document.removeEventListener('pointerup', captureFloatRect) }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- info.tab.id 在页签生命周期内不变
-  }, [floatPaneId])
   return (
-    <div className="wk-pane" ref={rootRef}>
+    <div className="wk-pane">
       <div className={`wk-pane-strip wk-tone-${tone}`} aria-hidden="true" />
       <div className="wk-pane-head">
         <strong>{title}</strong>
         <span className="wk-meta">{refreshLabel ?? t('panel.projected')}</span>
         <span style={{ flex: 1 }} />
         {action}
-        {floatPaneId === null
-          ? (
-            <Button
-              size="sm"
-              variant="ghost"
-              title={t('panel.floatTitle')}
-              onClick={() => {
-                const tabKey = info.tab.contentId !== '' ? info.tab.contentId : info.tab.id
-                const saved = loadFloatRect(window.localStorage, tabKey)
-                tabProps.floatTab(info.tab.id, saved === null ? undefined : clampRect(saved, window.innerWidth, window.innerHeight))
-              }}
-            >
-              {t('panel.float')}
-            </Button>
-          )
-          : (
-            <Button
-              size="sm"
-              variant="ghost"
-              title={t('panel.dockTitle')}
-              onClick={() => { captureFloatRect(); tabProps.unfloatTab(floatPaneId) }}
-            >
-              {t('panel.dock')}
-            </Button>
-          )}
+        <Button
+          size="sm"
+          variant="ghost"
+          title={t('panel.floatTitle')}
+          onClick={() => {
+            const tabKey = info.tab.contentId !== '' ? info.tab.contentId : info.tab.id
+            const saved = loadFloatRect(window.localStorage, tabKey)
+            tabProps.floatTab(info.tab.id, saved === null ? undefined : clampRect(saved, window.innerWidth, window.innerHeight))
+          }}
+        >
+          {t('panel.float')}
+        </Button>
       </div>
       {/* data-company-tab-title = 面板标题，给真实页面探针一个「面板体在场」的稳定锚；
           标题文本会出现在 tab strip，不能拿 body 里的标题词判断面板是否渲染。
@@ -221,7 +169,7 @@ export function DagTab(props: CompanyTabProps) {
  * @returns 在场面板。
  */
 export function PresenceTab(props: PresenceTabProps) {
-  const { openMember, t, ...dataFace } = props
+  const { openMember, openMemberAside, t, ...dataFace } = props
   const data = useCompanyData(dataFace, props.sessionId, props.useProjection, props.useSessions, { stream: true })
   const rows = data.rows.map(row => ({ ...row, displayName: presenceRoleText(row, t) }))
   return (
@@ -239,23 +187,33 @@ export function PresenceTab(props: PresenceTabProps) {
             </div>
             <div role="list" aria-label={t('presence.boardAria')} className="wk-list">
               {rows.map(row => (
-                <button
-                  key={row.id}
-                  type="button"
-                  role="listitem"
-                  className="wk-row wk-row-button"
-                  aria-label={t('presence.rowAria', { name: row.displayName, status: t(`presence.status.${row.status}` as CompanyKey), task: row.currentTasks === null ? t('presence.noTask') : t('presence.task', { task: joinList(row.currentTasks, listSeparator(t)) }) })}
-                  title={row.role === 'lead' ? t('presence.openLead') : t('presence.openMember')}
-                  onClick={() => { void openMember(props.sessionId, { id: row.id, role: row.role }) }}
-                >
-                  <span className="wk-row-name">
-                    <StateDot state={memberDot(row.status)} />
-                    {row.displayName}
-                    {row.role === 'lead' ? <Tag tone="neutral">Lead</Tag> : null}
-                  </span>
-                  <span className="wk-row-status"><Tag tone={memberTone(row.status)}>{t(`presence.status.${row.status}` as CompanyKey)}</Tag></span>
-                  <span className="wk-row-task" title={row.currentTasks === null ? '' : joinList(row.currentTasks, listSeparator(t))}>{row.currentTasks === null ? '—' : joinList(row.currentTasks, listSeparator(t))}</span>
-                </button>
+                <div key={row.id} role="listitem" className="wk-row-wrap">
+                  <button
+                    type="button"
+                    className="wk-row wk-row-button"
+                    aria-label={t('presence.rowAria', { name: row.displayName, status: t(`presence.status.${row.status}` as CompanyKey), task: row.currentTasks === null ? t('presence.noTask') : t('presence.task', { task: joinList(row.currentTasks, listSeparator(t)) }) })}
+                    title={row.role === 'lead' ? t('presence.openLead') : t('presence.openMember')}
+                    onClick={() => { void openMember(props.sessionId, { id: row.id, role: row.role }) }}
+                  >
+                    <span className="wk-row-name">
+                      <StateDot state={memberDot(row.status)} />
+                      {row.displayName}
+                      {row.role === 'lead' ? <Tag tone="neutral">Lead</Tag> : null}
+                    </span>
+                    <span className="wk-row-status"><Tag tone={memberTone(row.status)}>{t(`presence.status.${row.status}` as CompanyKey)}</Tag></span>
+                    <span className="wk-row-task" title={row.currentTasks === null ? '' : joinList(row.currentTasks, listSeparator(t))}>{row.currentTasks === null ? '—' : joinList(row.currentTasks, listSeparator(t))}</span>
+                  </button>
+                  {openMemberAside !== undefined && row.role === 'teammate' ? (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      data-presence-aside={row.id}
+                      onClick={() => { openMemberAside(props.sessionId, row.id) }}
+                    >
+                      {t('presence.openAside')}
+                    </Button>
+                  ) : null}
+                </div>
               ))}
             </div>
             <div className="wk-meta wk-lead-note">{t('presence.statusNote')}</div>

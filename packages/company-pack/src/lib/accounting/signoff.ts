@@ -20,12 +20,59 @@ export interface SignoffRequest {
 /** 语言选择（与 `CompanyLanguageState.text` 同签名；缺省 zh 保持旧调用方行为）。 */
 type SignoffText = (zh: string, en: string) => string
 
+/** 解析后的签字请求结构（供 client 双签卡结构化展示红线/决策要点/备选对比）。 */
+export interface ParsedSignoffReason {
+  readonly line: string
+  readonly summary: string
+  readonly detail: string
+}
+
 /** 审批请求的 reason（给应答人看的）：`<签字线>：<摘要>（<补充>）`；空补充忽略。 */
 export function signoffReason(request: SignoffRequest, text: SignoffText = zh => zh): string {
   const base = text(`${request.line}：${request.summary}`, `${request.line}: ${request.summary}`)
   return request.detail === undefined || request.detail.trim() === ''
     ? base
     : text(`${base}（${request.detail.trim()}）`, `${base} (${request.detail.trim()})`)
+}
+
+/**
+ * 反解析 `signoffReason` 生成的审批理由（兼容 zh `：/（）` 与 en `:/()` 两种格式）。
+ * 格式不匹配时将原文落入 `summary`，保证不丢信息。
+ */
+export function parseSignoffReason(reason: string | undefined): ParsedSignoffReason {
+  const raw = reason?.trim() ?? ''
+  if (raw === '') return { line: '', summary: '', detail: '' }
+
+  let body = raw
+  let detail = ''
+  // Full-width CJK punctuation produced by zh signoffReason (kept via code points for static-audit ratchet)
+  const ZH_CLOSE = String.fromCharCode(0xff09)
+  const ZH_OPEN = String.fromCharCode(0xff08)
+  const ZH_COLON = String.fromCharCode(0xff1a)
+  if (raw.endsWith(ZH_CLOSE)) {
+    const open = raw.lastIndexOf(ZH_OPEN)
+    if (open > 0) {
+      detail = raw.slice(open + 1, -1).trim()
+      body = raw.slice(0, open).trim()
+    }
+  } else if (raw.endsWith(')')) {
+    const open = raw.lastIndexOf(' (')
+    if (open > 0) {
+      detail = raw.slice(open + 2, -1).trim()
+      body = raw.slice(0, open).trim()
+    }
+  }
+
+  const zhSep = body.indexOf(ZH_COLON)
+  const enSep = body.indexOf(': ')
+  const sepIndex = zhSep >= 0 && (enSep < 0 || zhSep < enSep) ? zhSep : enSep
+  if (sepIndex <= 0) return { line: '', summary: body, detail }
+  const sepLen = body[sepIndex] === ZH_COLON ? 1 : 2
+  return {
+    line: body.slice(0, sepIndex).trim(),
+    summary: body.slice(sepIndex + sepLen).trim(),
+    detail,
+  }
 }
 
 /** 审批结果 → 模型侧提示语（工具结果带一句人话，模型据此决定落稿 / 调整 / veto）。 */

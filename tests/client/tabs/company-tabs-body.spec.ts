@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * 五个公司页签体的 keyless 静态渲染判据（R5-06/D5，2026-11-03 A- 批次）。
  *
@@ -47,11 +48,103 @@ describe('公司页签体静态渲染（R5-06/D5）', () => {
     expect(render(TasksTab as never)).toContain('读取团队状态…')
   })
 
-  it('在场页签：没有团队动议时给空态，不是空白面板', () => {
+  it('在场页签：没有团队动议时给空态，不是空白面板；有成员时覆盖状态与点击', async () => {
     const html = render(PresenceTab as never)
     expect(html).toContain('在场')
     expect(html).toContain('当前没有团队动议')
     expect(html).toContain('协作动态')
+
+    const { act } = await import('react')
+    const { createRoot } = await import('react-dom/client')
+    ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+    let clickedMember: unknown = null
+    let asideTarget: unknown = null
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    try {
+      const populatedState = {
+        byId: {
+          'session-test': { id: 'session-test', origin: 'human', running: true },
+        },
+        projectionsBySession: {
+          'session-test': {
+            values: {
+              agentTeam: {
+                members: [
+                  { id: 'm-lead', name: 'lead', role: 'lead', phase: 'idle' },
+                  { id: 'm-eng', name: 'vp_eng', role: 'teammate', phase: 'running' },
+                  { id: 'm-cfo', name: 'cfo', role: 'teammate', phase: 'failed' },
+                  { id: 'm-coo', name: 'coo', role: 'teammate', phase: 'stopped' },
+                  { id: 'm-cmo', name: 'cmo', role: 'teammate', phase: 'spawning' },
+                ],
+                tasks: [
+                  { id: 't1', subject: 'Build API', status: 'in_progress', ownerId: 'm-eng', revision: 1 },
+                ],
+              },
+            },
+          },
+        },
+      }
+      await act(async () => {
+        root.render(createElement(PresenceTab as never, props({
+          useSessions: (selector: (state: unknown) => unknown) => selector(populatedState),
+          openMember: async (_sid: string, m: unknown) => { clickedMember = m },
+          openMemberAside: (sid: string, memberId: string) => { asideTarget = [sid, memberId] },
+          follow: async function* () {
+            yield {
+              event: {
+                type: 'team/message/queued',
+                time: 1000,
+                seq: 1,
+                data: { message: { senderName: 'vp_eng', content: [{ type: 'text', text: 'Shipped PR' }] } },
+              },
+            }
+            throw new Error('follow disconnected')
+          },
+        })))
+        await new Promise(resolve => { setTimeout(resolve, 10) })
+      })
+      const btn = host.querySelector('.wk-row-button') as HTMLButtonElement | null
+      await act(async () => { btn?.click() })
+      expect(clickedMember).not.toBeNull()
+      expect(host.querySelector('[data-presence-aside="m-lead"]')).toBeNull()
+      const asideBtn = host.querySelector('[data-presence-aside="m-eng"]') as HTMLButtonElement | null
+      await act(async () => { asideBtn?.click() })
+      expect(asideTarget).toEqual(['session-test', 'm-eng'])
+
+      const failingFollow = (msg: string) => () => ({
+        [Symbol.asyncIterator]: () => ({
+          next: async () => { throw new Error(msg) },
+        }),
+      })
+      await act(async () => {
+        root.render(createElement(BoardTab as never, props({
+          useSessions: (selector: (state: unknown) => unknown) => selector(populatedState),
+          follow: failingFollow('board stream down'),
+        })))
+        await new Promise(resolve => { setTimeout(resolve, 10) })
+      })
+      await act(async () => {
+        root.render(createElement(TasksTab as never, props({
+          useSessions: (selector: (state: unknown) => unknown) => selector(populatedState),
+          follow: failingFollow('tasks stream down'),
+        })))
+        await new Promise(resolve => { setTimeout(resolve, 10) })
+      })
+      await act(async () => {
+        root.render(createElement(DagTab as never, props({
+          useSessions: (selector: (state: unknown) => unknown) => selector(populatedState),
+          follow: failingFollow('dag stream down'),
+        })))
+        await new Promise(resolve => { setTimeout(resolve, 10) })
+      })
+      const redrawBtn = host.querySelector('button[title]') as HTMLButtonElement | null
+      await act(async () => { redrawBtn?.click() })
+    } finally {
+      act(() => { root.unmount() })
+      host.remove()
+    }
   })
 
 })

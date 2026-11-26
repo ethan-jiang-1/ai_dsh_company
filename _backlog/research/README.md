@@ -58,7 +58,7 @@ opened: YYYY-MM-DD
 
 ## 索引
 
-（当前无活跃研究题；全部已迁[研究归档](../_archive/research/README.md)。）
+（2026-11-26 dsh-native-ux-feasibility 随 UX/UI 升级卡结项迁入[研究归档](../_archive/research/README.md)。）
 
 （2026-11-25 bug-prevention-and-discovery 随首卡与二期卡结项迁入[研究归档](../_archive/research/README.md)。）
 

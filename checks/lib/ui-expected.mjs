@@ -5,12 +5,16 @@
 // 由人决定"这是有意的 UI 变化（--refresh-expected）还是回归"。
 //
 // 边界：金样只覆盖**隔离空壳**（无会话数据面）；会话内数据渲染仍由 keyless 渲染 spec 与
-// 真模型档覆盖。文本归一化 = 去零宽字符、折叠空白、去首尾——时间/计数不做掩码，
-// 场景本身保证这些值确定（隔离盘、无会话、零调用）。
+// 真模型档覆盖。文本归一化 = 去零宽字符、折叠空白、去首尾，并把隔离盘首次建档产生的
+// `YYYY-MM-DD HH:MM UTC` 实时索引时间折叠为 `<UTC>`（否则跨分钟跑必漂）；其余文本严格原样比对。
 
-/** 归一化可见文本：去零宽、折叠空白、trim。 */
+/** 归一化可见文本：去零宽、折叠 `YYYY-MM-DD HH:MM UTC` 生成时间戳、折叠空白、trim。 */
 export function normalizeText(text) {
-  return String(text ?? '').replace(/\u200b/g, '').replace(/\s+/g, ' ').trim()
+  return String(text ?? '')
+    .replace(/\u200b/g, '')
+    .replace(/\d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC/g, '<UTC>')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 /** 从 {标题: 原始文本} 造一份可提交的金样（不含时间戳，保证 diff 干净）。 */

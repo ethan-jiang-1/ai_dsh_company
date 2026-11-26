@@ -95,6 +95,11 @@ describe('request_signoff · execute 行为（真 defineTool 包装 + stub 审�
     expect(requests).toHaveLength(1)
     expect(requests[0]!.toolName).toBe('request_signoff')
     expect(requests[0]!.reason).toBe(signoffReason(ARGS))
+    expect(requests[0]!.displayReason).toEqual({
+      zh: signoffReason(ARGS, zh => zh),
+      en: signoffReason(ARGS, (_zh, en) => en),
+    })
+    expect((requests[0]!.displayReason as { en: string }).en).not.toMatch(/[：（）]/)
     expect(requests[0]!.agent).toEqual({})
     expect(requests[0]!.callId).toBe('call-1')
     expect(requests[0]!.signal).toBe(signal)

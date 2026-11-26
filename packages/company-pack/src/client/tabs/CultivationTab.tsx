@@ -30,7 +30,7 @@ import { readPresetOf, type RoleBadgeInjected } from '../ui/RoleBadge.tsx'
 /** 页签体注入面：文件读取闭包 + 事件流闭包 + viewer 角色源 + 浮出。 */
 export interface CultivationTabInjected {
   readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
-  readonly unfloatTab: (paneId: string) => void
+  readonly unfloatTab?: ((paneId: string) => void) | undefined
   /** 培养数据闭包（journal + 记录；工厂见 `cultivation-data.ts`）。 */
   readonly cultivationFiles: CultivationFiles
   /** 人侧动作面工厂（GUI 版 /cultivation；缺席不会发生——注册处必给）。 */

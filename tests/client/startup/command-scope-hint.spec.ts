@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * composer 提示「斜杠命令要等会话开始后才回话」的 keyless 判据（BUG-290）。
  *
@@ -39,6 +40,33 @@ describe('composer 命令作用域提示（BUG-290）', () => {
 
   it('会话行还没加载（undefined）⇒ 不渲染，不猜', () => {
     expect(render(undefined)).toBe('')
+  })
+
+  it('list.subscribe 通知 blank 状态切换时触发状态同步回调', async () => {
+    const { act } = await import('react')
+    const { createRoot } = await import('react-dom/client')
+    ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+    let blank = true
+    let listener: (() => void) | undefined
+    const reactiveList = {
+      subscribe: (fn: () => void) => { listener = fn; return () => { listener = undefined } },
+      getSnapshot: () => ({ byId: { 'session-1': { blank } } }),
+    }
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    try {
+      await act(async () => {
+        root.render(createElement(CommandScopeHint, { sessionId: 'session-1' as never, list: reactiveList, t }))
+      })
+      expect(host.textContent).toContain('斜杠命令要等会话开始后才回话')
+      blank = false
+      await act(async () => { listener?.() })
+      expect(host.textContent).toBe('')
+    } finally {
+      act(() => { root.unmount() })
+      host.remove()
+    }
   })
 })
 

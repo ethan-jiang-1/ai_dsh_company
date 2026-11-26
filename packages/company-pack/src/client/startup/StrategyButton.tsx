@@ -4,7 +4,7 @@
  * 为什么不是齿轮图标：齿轮暗示「系统设置、别乱动」；这里显示的是**当前状态**
  * （「策略：自动」/「策略：业务软件 · 按项目做」），让人随时知道这次按什么跑，跑歪了再点。
  */
-import { useEffect, useSyncExternalStore, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { InjectFace } from '@deepseek-ai/dsh-client-ui-slots'
 import { overriddenEntries, startupRows } from '../../lib/startup/startup-settings.ts'
@@ -36,8 +36,13 @@ export function strategySummary(values: readonly string[]): string {
 }
 
 export function StrategyButton(props: StrategyButtonProps): ReactNode {
-  const face = useSyncExternalStore(props.store.subscribe, props.store.get, props.store.get)
+  const [face, setFace] = useState(() => props.store.get())
   const { sessionId, load } = props
+
+  useEffect(() => {
+    setFace(props.store.get())
+    return props.store.subscribe(() => { setFace(props.store.get()) })
+  }, [props.store])
 
   useEffect(() => {
     const controller = new AbortController()

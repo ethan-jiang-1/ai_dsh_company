@@ -2,7 +2,7 @@
  * 公司页签壳的中英文回归（Phase A2 第一片）。
  *
  * 这不是端到端：它断言**真实 UI 用的那份 copy 函数和 Title 组件**在 zh/en 下
- * 返回不同语言的文案，且 10 个页签全覆盖。浏览器全页签归 ui-scene-smoke。
+ * 返回不同语言的文案，且全部页签/分段身份全覆盖。浏览器全页签归 ui-scene-smoke。
  */
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -21,8 +21,8 @@ const enT = translate(en)
 const faces = Object.keys(TAB_COPY_KEYS) as FaceKey[]
 
 describe('company 页签壳 zh/en', () => {
-  it('10 个页签都有 zh/en 的 label/tooltip/description；en 无中文且与 zh 不同', () => {
-    expect(faces).toHaveLength(10)
+  it('全部页签（3 集成 + 10 分段）都有 zh/en 的 label/tooltip/description；en 无中文且与 zh 不同', () => {
+    expect(faces).toHaveLength(13)
     for (const face of faces) {
       const zhCopy = tabCopyFor(face, zhT)
       const enCopy = tabCopyFor(face, enT)
@@ -50,6 +50,12 @@ describe('company 页签壳 zh/en', () => {
   })
 
   it('关键页签的 language 映射没有错位', () => {
+    expect(tabCopyFor('ops', zhT).label).toBe('作战板')
+    expect(tabCopyFor('ops', enT).label).toBe('Ops Hub')
+    expect(tabCopyFor('team', zhT).label).toBe('团队')
+    expect(tabCopyFor('team', enT).label).toBe('Team')
+    expect(tabCopyFor('archive', zhT).label).toBe('档案')
+    expect(tabCopyFor('archive', enT).label).toBe('Archive')
     expect(tabCopyFor('attention', zhT).label).toBe('待办')
     expect(tabCopyFor('attention', enT).label).toBe('Inbox')
     expect(tabCopyFor('catalog', zhT).label).toBe('成品')

@@ -507,4 +507,19 @@ describe('attention 事件身份（BUG-359）', () => {
     const approval = { kind: 'approval' as const, who: 's1', what: '预算', id: 'a1', time: 1, jumpTo: 's1' }
     expect(mergeAttention([], [approval, approval])).toHaveLength(1)
   })
+
+  it('createAttentionRegistry 支持 snapshot/subscribe 广播且重复销账幂等', () => {
+    const reg = createAttentionRegistry()
+    let calls = 0
+    const unsub = reg.subscribe(() => { calls += 1 })
+    expect(reg.snapshot()).toEqual([])
+    const release = reg.begin({ kind: 'approval', sessionId: 's1', id: 'a1', what: '预算', since: 1 })
+    expect(calls).toBe(1)
+    expect(reg.snapshot()).toHaveLength(1)
+    release()
+    release()
+    expect(calls).toBe(2)
+    expect(reg.snapshot()).toHaveLength(0)
+    unsub()
+  })
 })

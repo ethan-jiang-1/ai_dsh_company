@@ -6,42 +6,28 @@ import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { CultivationFiles } from '../../../packages/company-pack/src/client/cultivation/cultivation-data.ts'
 import { createAttentionRegistry } from '../../../packages/company-pack/src/client/wiring/attention-registry.ts'
 import type { CompanyTabRegistrationData } from '../../../packages/company-pack/src/client/tabs/company-tab-registration.ts'
-import { AttentionTab } from '../../../packages/company-pack/src/client/tabs/AttentionTab.tsx'
-import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from '../../../packages/company-pack/src/client/tabs/company-tabs.tsx'
-import { CultivationTab } from '../../../packages/company-pack/src/client/tabs/CultivationTab.tsx'
-import { DeliverablesTab } from '../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx'
-import { LedgerTab } from '../../../packages/company-pack/src/client/tabs/LedgerTab.tsx'
-import { StrategyPanel } from '../../../packages/company-pack/src/client/startup/StrategyPanel.tsx'
+import { ArchiveHubTab, OpsHubTab, TeamHubTab } from '../../../packages/company-pack/src/client/tabs/company-hub-tabs.tsx'
+import { createHubSubViewStore, type HubSubViewState } from '../../../packages/company-pack/src/client/tabs/hub-subview-store.ts'
 import { createStartupStore } from '../../../packages/company-pack/src/client/startup/startup-store.ts'
 import {
-  AttentionTabTitle, BoardTabTitle, BudgetTabTitle, CatalogTabTitle, CultivationTabTitle,
-  DagTabTitle, LedgerTabTitle, PresenceTabTitle, TasksTabTitle, StrategyTabTitle,
-  AttentionGuideEntry, BoardGuideEntry, BudgetGuideEntry, CatalogGuideEntry, CultivationGuideEntry,
-  DagGuideEntry, LedgerGuideEntry, PresenceGuideEntry, TasksGuideEntry, StrategyGuideEntry,
-  AttentionGuideIcon, BoardGuideIcon, DagGuideIcon, PresenceGuideIcon,
-  BudgetGuideIcon, TasksGuideIcon, CultivationGuideIcon, LedgerGuideIcon, CatalogGuideIcon, StrategyGuideIcon,
+  ArchiveTabTitle, OpsTabTitle, TeamTabTitle,
+  ArchiveGuideEntry, OpsGuideEntry, TeamGuideEntry,
+  ArchiveGuideIcon, OpsGuideIcon, TeamGuideIcon,
 } from '../../../packages/company-pack/src/client/ui/tab-icons.tsx'
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import { registerCompanyTabs } from '../../../packages/company-pack/src/client/tabs/company-tab-registration.ts'
 import { en, zh } from '../../../packages/company-pack/src/client/locales.ts'
 
 const EXPECTED_TYPES = [
-  { id: 'dsh-company-pack/attention', kind: 'company-attention', title: '待办', order: 50, description: '人的待办收件箱：待批审批 / 待答问询 / 升级 + 完成通知' },
-  { id: 'dsh-company-pack/board', kind: 'company-board', title: '看板', order: 51, description: '任务看板：活到哪一步（owner / 依赖 / 修订号）' },
-  { id: 'dsh-company-pack/dag', kind: 'company-dag', title: '依赖图', order: 52, description: '任务依赖图：谁依赖谁、关键路径' },
-  { id: 'dsh-company-pack/presence', kind: 'company-presence', title: '在场', order: 53, description: '组织在场板：谁在忙、忙什么；点行进成员空间' },
-  { id: 'dsh-company-pack/budget', kind: 'company-budget', title: '用量', order: 54, description: '令牌用量与占比（只做令牌，不做美元）' },
-  { id: 'dsh-company-pack/tasks', kind: 'company-tasks', title: '任务板', order: 55, description: '共享任务表：状态 / owner / 依赖 / 修订号' },
-  { id: 'dsh-company-pack/cultivation', kind: 'company-cultivation', title: '培养', order: 56, description: '养自己的角色分身：待处理建议 / 已采纳方法 / journal 待审 / 赞踩' },
-  { id: 'dsh-company-pack/ledger', kind: 'company-ledger', title: '台账', order: 57, description: '动议台账：公司累计干了什么（日期/类型/参与/成品/结论）' },
-  { id: 'dsh-company-pack/deliverables', kind: 'company-deliverables', title: '成品', order: 58, description: '公司成品目录：按 final.md 列成品（日期/类型/结果/结论）' },
-  { id: 'dsh-company-pack/strategy', kind: 'company-strategy', title: '策略', order: 20, description: '项目策略：三行、自动优先、选项来自公司内容' },
+  { id: 'dsh-company-pack/ops', kind: 'company-ops', title: '作战板', order: 20, description: '项目作战总台：合并看板、依赖图、任务板与项目策略' },
+  { id: 'dsh-company-pack/team', kind: 'company-team', title: '团队', order: 30, description: '团队协同中心：汇总待办、高管在场动态与令牌预算' },
+  { id: 'dsh-company-pack/archive', kind: 'company-archive', title: '档案', order: 40, description: '公司资产档案：集中审阅成品终稿、动议台账与培养规则' },
 ] as const
 
-const BODY_COMPONENTS = [AttentionTab, BoardTab, DagTab, PresenceTab, BudgetTab, TasksTab, CultivationTab, LedgerTab, DeliverablesTab, StrategyPanel]
-const TITLE_COMPONENTS = [AttentionTabTitle, BoardTabTitle, DagTabTitle, PresenceTabTitle, BudgetTabTitle, TasksTabTitle, CultivationTabTitle, LedgerTabTitle, CatalogTabTitle, StrategyTabTitle]
-const GUIDE_COMPONENTS = [AttentionGuideEntry, BoardGuideEntry, DagGuideEntry, PresenceGuideEntry, BudgetGuideEntry, TasksGuideEntry, CultivationGuideEntry, LedgerGuideEntry, CatalogGuideEntry, StrategyGuideEntry]
-const GUIDE_ICONS = [AttentionGuideIcon, BoardGuideIcon, DagGuideIcon, PresenceGuideIcon, BudgetGuideIcon, TasksGuideIcon, CultivationGuideIcon, LedgerGuideIcon, CatalogGuideIcon, StrategyGuideIcon]
+const BODY_COMPONENTS = [OpsHubTab, TeamHubTab, ArchiveHubTab]
+const TITLE_COMPONENTS = [OpsTabTitle, TeamTabTitle, ArchiveTabTitle]
+const GUIDE_COMPONENTS = [OpsGuideEntry, TeamGuideEntry, ArchiveGuideEntry]
+const GUIDE_ICONS = [OpsGuideIcon, TeamGuideIcon, ArchiveGuideIcon]
 const BODY_SLOT = 'sidebar.right.pane.tab'
 const TITLE_SLOT = 'sidebar.right.pane.tab.title'
 const GUIDE_SLOT = 'sidebar.right.tab.guide.entry'
@@ -178,38 +164,37 @@ describe('company tab registration', () => {
     expect(harness.slots.entries(GUIDE_SLOT)).toEqual([])
 
     const bodyProps = bodyEntries.map(entry => entry.inject?.() ?? {})
-    const attentionProps = bodyProps[0]!
-    expect(Object.keys(attentionProps).sort()).toEqual(['floatTab', 'follow', 'getPending', 'leadOf', 'openSession', 'pageHistory', 't', 'unfloatTab'])
-    expect(attentionProps.floatTab).toBe(harness.data.floatTab)
-    expect(attentionProps.unfloatTab).toBe(harness.data.unfloatTab)
-    expect(attentionProps.leadOf).toBe(harness.data.leadOf)
-    expect(attentionProps.follow).toBe(harness.data.follow)
-    expect((attentionProps.getPending as () => unknown)()).toEqual([harness.pending])
-    ;(attentionProps.openSession as (sessionId: SessionId) => void)('test-session' as SessionId)
-    expect(harness.openSession).toHaveBeenCalledWith('test-session')
+    const hubStore = createHubSubViewStore()
+    const opsProps = bodyProps[0]!
+    expect(opsProps.floatTab).toBe(harness.data.floatTab)
+    expect(opsProps.unfloatTab).toBe(harness.data.unfloatTab)
+    expect(opsProps.leadOf).toBe(harness.data.leadOf)
+    expect(opsProps.follow).toBe(harness.data.follow)
+    expect((opsProps.hooks as { hubState: { getSnapshot(): HubSubViewState } }).hubState.getSnapshot().ops).toBe('board')
+    ;(opsProps.selectSection as typeof hubStore.select)('ops', 'tasks')
+    expect((opsProps.hooks as { hubState: { getSnapshot(): HubSubViewState } }).hubState.getSnapshot().ops).toBe('tasks')
 
-    const sharedData = { leadOf: harness.data.leadOf, follow: harness.data.follow, floatTab: harness.data.floatTab, unfloatTab: harness.data.unfloatTab, t: harness.data.t }
-    for (const index of [1, 2, 4, 5]) expect(bodyProps[index]).toEqual(sharedData)
-    const presenceProps = bodyProps[3]!
-    expect(presenceProps).toEqual({ ...sharedData, openMember: harness.data.openMember })
+    const teamProps = bodyProps[1]!
+    expect(teamProps.floatTab).toBe(harness.data.floatTab)
+    expect(teamProps.unfloatTab).toBe(harness.data.unfloatTab)
+    expect(teamProps.attention).toBe(harness.data.attention)
+    expect((teamProps.attention as typeof harness.data.attention).list()).toEqual([harness.pending])
+    ;(teamProps.openSession as (sessionId: SessionId) => void)('test-session' as SessionId)
+    expect(harness.openSession).toHaveBeenCalledWith('test-session')
     const member = { id: 'member-1', role: 'teammate' } as const
-    await (presenceProps.openMember as CompanyTabRegistrationData['openMember'])('child-session' as SessionId, member)
+    await (teamProps.openMember as CompanyTabRegistrationData['openMember'])('child-session' as SessionId, member)
     expect(harness.data.openMember).toHaveBeenCalledWith('child-session', member)
 
-    expect(bodyProps[6]).toEqual({
-      floatTab: harness.data.floatTab,
-      unfloatTab: harness.data.unfloatTab,
-      cultivationFiles: harness.data.cultivationFiles,
-      followEvents: harness.data.follow,
-      roleSource: harness.data.roleSource,
-      t: harness.data.t,
-    })
+    const archiveProps = bodyProps[2]!
+    expect(archiveProps.floatTab).toBe(harness.data.floatTab)
+    expect(archiveProps.unfloatTab).toBe(harness.data.unfloatTab)
+    expect(archiveProps.cultivationFiles).toBe(harness.data.cultivationFiles)
+    expect(archiveProps.roleSource).toBe(harness.data.roleSource)
     const signal = new AbortController().signal
-    expect(bodyProps[7]).toEqual({ floatTab: harness.data.floatTab, unfloatTab: harness.data.unfloatTab, readLedger: harness.data.readLedger, t: harness.data.t })
-    await expect((bodyProps[7]!.readLedger as CompanyTabRegistrationData['readLedger'])('lead-session' as SessionId, signal)).resolves.toBe('ledger text')
+    await expect((archiveProps.readLedger as CompanyTabRegistrationData['readLedger'])('lead-session' as SessionId, signal)).resolves.toBe('ledger text')
     expect(harness.data.readLedger).toHaveBeenCalledWith('lead-session', signal)
-    expect(bodyProps[8]!.readCatalog).toBe(harness.data.readCatalog)
-    await expect((bodyProps[8]!.readCatalog as CompanyTabRegistrationData['readCatalog'])('lead-session' as SessionId, signal)).resolves.toBe('catalog text')
+    expect(archiveProps.readCatalog).toBe(harness.data.readCatalog)
+    await expect((archiveProps.readCatalog as CompanyTabRegistrationData['readCatalog'])('lead-session' as SessionId, signal)).resolves.toBe('catalog text')
     expect(harness.data.readCatalog).toHaveBeenCalledWith('lead-session', signal)
 
     const titleFiber = await declareSlot(harness, TITLE_OWNER, TITLE_SLOT)
@@ -239,15 +224,15 @@ describe('company tab registration', () => {
     let dict: Record<string, string> = zh
     const t = ((key: string) => dict[key] ?? key) as CompanyTabRegistrationData['t']
     const harness = await mountHarness(t)
-    const attention = harness.sidebarRightTabs.entries().find(definition => definition.id === 'dsh-company-pack/attention')
-    expect(attention, 'attention tab type').toBeDefined()
-    expect(attention!.title()).toBe('待办')
-    expect(attention!.guide?.[0]?.description?.()).toContain('待办收件箱')
+    const team = harness.sidebarRightTabs.entries().find(definition => definition.id === 'dsh-company-pack/team')
+    expect(team, 'team tab type').toBeDefined()
+    expect(team!.title('')).toBe('团队')
+    expect(team!.guide?.[0]?.description?.()).toContain('团队协同中心')
     dict = en
-    expect(attention!.title()).toBe('Inbox')
-    expect(attention!.guide?.[0]?.description?.()).toContain('pending inbox')
+    expect(team!.title('')).toBe('Team')
+    expect(team!.guide?.[0]?.description?.()).toContain('Team hub')
     dict = zh
-    expect(attention!.title()).toBe('待办')
+    expect(team!.title('')).toBe('团队')
   })
 
   it('collapses one declaration at a time; reinstallation and final unload stay scoped', async () => {

@@ -66,14 +66,38 @@ export async function openSessionBySearch(page, title, sleep) {
   await sleep(800)
 }
 
+const SUBVIEW_TO_HUB = {
+  待办: '团队',
+  在场: '团队',
+  用量: '团队',
+  看板: '作战板',
+  依赖图: '作战板',
+  任务板: '作战板',
+  策略: '作战板',
+  成品: '档案',
+  台账: '档案',
+  培养: '档案',
+}
+
 /**
- * 打开右栏的公司页签（按左侧指南条目的标签点）。
+ * 打开右栏的公司页签（先进入聚合页签，若传子视图名再点对应 SegmentedControl 分段）。
  * @param page - Playwright 页面。
- * @param label - 页签标签，如 `台账`。
+ * @param label - 页签或子视图标签，如 `团队` / `台账`。
  * @param sleep - 探针自己的 sleep。
  * @returns 无。
  */
 export async function openCompanyTab(page, label, sleep) {
-  await page.locator('.wk-guide-entry-label').filter({ hasText: label }).click()
+  const hubLabel = SUBVIEW_TO_HUB[label] ?? label
+  const guideEntry = page.locator('.wk-guide-entry-label').filter({ hasText: hubLabel })
+  if (await guideEntry.count() > 0) {
+    await guideEntry.first().click()
+    await sleep(600)
+  }
+  if (SUBVIEW_TO_HUB[label] !== undefined) {
+    const seg = page.getByRole('tab', { name: label, exact: true })
+    if (await seg.count() > 0) {
+      await seg.first().click()
+    }
+  }
   await sleep(1000)
 }

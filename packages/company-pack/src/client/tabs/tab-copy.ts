@@ -1,14 +1,27 @@
 /**
  * 页签身份文案的 key 表与纯取用函数（Phase A2 第一片）。
  *
- * 九行身份（label / tooltip / description）仍只在这里定义一次；具体 zh/en 值住
+ * 身份键（label / tooltip / description）在这里定义；具体 zh/en 值住
  * `../locales.ts` 的 `company` 字典。`tabCopyFor(face, t)` 是组件/注册处共用的纯函数，
  * keyless spec 直接断言 zh/en 两态，不需要浏览器。
  */
 import type { CompanyKey, CompanyT } from '../locales.ts'
 
-/** 九行页签身份键。 */
-export type FaceKey = 'attention' | 'board' | 'dag' | 'presence' | 'budget' | 'tasks' | 'cultivation' | 'ledger' | 'catalog' | 'strategy'
+/** 页签身份键（含 3 个聚合页签 + 原有细粒度面板分段键）。 */
+export type FaceKey =
+  | 'ops'
+  | 'team'
+  | 'archive'
+  | 'attention'
+  | 'board'
+  | 'dag'
+  | 'presence'
+  | 'budget'
+  | 'tasks'
+  | 'cultivation'
+  | 'ledger'
+  | 'catalog'
+  | 'strategy'
 
 /** 一行的三处文案 key。 */
 export interface TabCopyKeys {
@@ -19,6 +32,9 @@ export interface TabCopyKeys {
 
 /** face → 三处 key；新增页签 = 加一行 + 在 locales.ts 加三对 key。 */
 export const TAB_COPY_KEYS: Readonly<Record<FaceKey, TabCopyKeys>> = {
+  ops: { label: 'tabs.ops.label', tooltip: 'tabs.ops.tooltip', description: 'tabs.ops.description' },
+  team: { label: 'tabs.team.label', tooltip: 'tabs.team.tooltip', description: 'tabs.team.description' },
+  archive: { label: 'tabs.archive.label', tooltip: 'tabs.archive.tooltip', description: 'tabs.archive.description' },
   attention: { label: 'tabs.attention.label', tooltip: 'tabs.attention.tooltip', description: 'tabs.attention.description' },
   board: { label: 'tabs.board.label', tooltip: 'tabs.board.tooltip', description: 'tabs.board.description' },
   dag: { label: 'tabs.dag.label', tooltip: 'tabs.dag.tooltip', description: 'tabs.dag.description' },

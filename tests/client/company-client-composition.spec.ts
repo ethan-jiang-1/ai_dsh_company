@@ -4,7 +4,7 @@
  * Boots the production `bootClient` over the real web-profile bundle roster
  * (dsh-base + dsh-web-app + dsh-company-pack, composed by bundleRoster the way
  * the profile launcher composes patch layers) with the pack's dependency cone,
- * then asserts the actual `apply` surface: the nine company tab types, the
+ * then asserts the actual `apply` surface: the three cohesive company tabs, the
  * three keyed slot groups, and the instance guard's fiber-owned heartbeat —
  * including their removal on unload and return on reload. Remote endpoints are
  * answered by the tier's RemoteMock (network boundary only; real composition
@@ -24,6 +24,11 @@ import { HEARTBEAT_KEY } from '../../packages/company-pack/src/client/wiring/ins
 import { en as companyEn, zh as companyZh } from '../../packages/company-pack/src/client/locales.ts'
 import { DELEGATION_TOOL_KEYS } from '../../packages/company-pack/src/client/wiring/delegation-keys.ts'
 import { TEAM_TOOL_KEYS } from '../../packages/company-pack/src/client/ui/TeamToolCard.tsx'
+import { S1_CLIENT_SURFACE_IDS, S1_TOOL_KEYS } from '../../packages/company-pack/src/client/ux/register-s1-ux.ts'
+import { CompanyGuideHub } from '../../packages/company-pack/src/client/ux/company-guide.tsx'
+import { COMPANY_SHORTCUT_IDS } from '../../packages/company-pack/src/client/ux/company-triggers-shortcuts.ts'
+import { COMPANY_HQ_PANEL_ID } from '../../packages/company-pack/src/client/ux/company-hq.tsx'
+import { COMPANY_TURN_TAIL_ID } from '../../packages/company-pack/src/client/ux/company-turn-tail.tsx'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -35,16 +40,9 @@ const roster = bundleRoster(
 ).closure(['dsh-company-pack'])
 
 const COMPANY_TAB_IDS = [
-  'dsh-company-pack/attention',
-  'dsh-company-pack/board',
-  'dsh-company-pack/dag',
-  'dsh-company-pack/presence',
-  'dsh-company-pack/budget',
-  'dsh-company-pack/tasks',
-  'dsh-company-pack/cultivation',
-  'dsh-company-pack/ledger',
-  'dsh-company-pack/deliverables',
-  'dsh-company-pack/strategy',
+  'dsh-company-pack/ops',
+  'dsh-company-pack/team',
+  'dsh-company-pack/archive',
 ] as const
 
 const COMPANY_SLOTS = [
@@ -60,6 +58,7 @@ interface StoredSlotEntry {
   component: ComponentType<Record<string, unknown>>
   options: { key?: string; id?: string }
   inject?: ((...args: unknown[]) => Record<string, unknown>) | undefined
+  select?: ((...args: unknown[]) => unknown) | undefined
   locale?: string | undefined
 }
 interface SlotsRegistry { entries(key: string): ReadonlyArray<StoredSlotEntry> }
@@ -74,7 +73,7 @@ function declareWorkspaceFilesNamespace(mock: { load(rules: unknown): unknown })
 const test = createClientTest({ roster, provide: { 'dsh-company-pack': companyClient } })
 
 describe('company client apply through the whole-client tier', () => {
-  test('boots the pack row and registers the ten company tabs with keyed slots', async ({ mock, start }) => {
+  test('boots the pack row and registers the three company hubs with keyed slots', async ({ mock, start }) => {
     declareWorkspaceFilesNamespace(mock)
     // A1：setLocale 会写 settings/mutate；给 mock 一个最小 namespace view，避免 unmatched。
     mock.load({
@@ -118,6 +117,37 @@ describe('company client apply through the whole-client tier', () => {
       expect(keys).toEqual([...COMPANY_TAB_IDS])
     }
 
+    // S1 原生扩展槽均成功注册
+    expect((slots as SlotsRegistry).entries('shell.overlay').map(s => s.options.id)).toContain(S1_CLIENT_SURFACE_IDS.toastOverlay)
+    expect((slots as SlotsRegistry).entries('conversation.session.header.utilities').map(s => s.options.id)).toContain(S1_CLIENT_SURFACE_IDS.headerAttention)
+    expect((slots as SlotsRegistry).entries('sidebar.footer.action').map(s => s.options.id)).toContain(S1_CLIENT_SURFACE_IDS.footerStatus)
+    expect((slots as SlotsRegistry).entries('conversation.hero.options').map(s => s.options.id)).toContain(S1_CLIENT_SURFACE_IDS.heroMotions)
+    expect((slots as SlotsRegistry).entries('conversation.input.dock').map(s => s.options.id)).toContain(S1_CLIENT_SURFACE_IDS.motionDock)
+    expect((slots as SlotsRegistry).entries('conversation.composer.dock').map(s => s.options.id)).toContain(S1_CLIENT_SURFACE_IDS.composerDock)
+    expect((slots as SlotsRegistry).entries('conversation.chat.assistant-actions').map(s => s.options.id)).toContain(S1_CLIENT_SURFACE_IDS.assistantCultivate)
+    expect((slots as SlotsRegistry).entries('sidebar.right.tab.document.actions').map(s => s.options.id)).toContain(S1_CLIENT_SURFACE_IDS.docFinalActions)
+    expect((slots as SlotsRegistry).entries('tool.call.toolview').map(s => s.options.key)).toContain(S1_TOOL_KEYS.signoff)
+    for (const cmd of S1_TOOL_KEYS.commands) {
+      expect((slots as SlotsRegistry).entries('conversation.chat.commandview').map(s => s.options.key)).toContain(cmd)
+    }
+
+    // S2 原生 Guide Hub、@ trigger 与固定快捷键均成功注册
+    expect((slots as SlotsRegistry).entries('sidebar.right.tab.guide').map(s => s.component)).toContain(CompanyGuideHub)
+    // S3 全局 HQ 面板与左侧导航项注册
+    expect((slots as SlotsRegistry).entries('sidebar.panellist').map(s => s.options.id)).toContain(COMPANY_HQ_PANEL_ID)
+    expect((slots as SlotsRegistry).entries('main').map(s => s.options.key)).toContain(COMPANY_HQ_PANEL_ID)
+    // S4 turnTail 注册
+    expect((slots as SlotsRegistry).entries('conversation.chat.turnTail').map(s => s.options.id)).toContain(COMPANY_TURN_TAIL_ID)
+    const shortcuts = client.ctx.get('shortcuts') as {
+      fixedCatalog?: { getSnapshot(): ReadonlyArray<{ id: string }> }
+    } | undefined
+    if (shortcuts?.fixedCatalog !== undefined) {
+      const fixedIds = shortcuts.fixedCatalog.getSnapshot().map(item => item.id)
+      expect(fixedIds).toContain(COMPANY_SHORTCUT_IDS.ops)
+      expect(fixedIds).toContain(COMPANY_SHORTCUT_IDS.team)
+      expect(fixedIds).toContain(COMPANY_SHORTCUT_IDS.archive)
+    }
+
     // The instance guard ran inside the real apply and owns one heartbeat.
     const beats = JSON.parse(localStorage.getItem(HEARTBEATS) ?? '{}') as Record<string, number>
     expect(Object.keys(beats).filter(id => id.startsWith('tab-'))).toHaveLength(1)
@@ -136,6 +166,13 @@ describe('company client apply through the whole-client tier', () => {
     for (const slot of COMPANY_SLOTS) {
       expect(slots.entries(slot).map(stored => stored.options.key).filter(key => key.startsWith('dsh-company-pack/'))).toEqual([])
     }
+    expect(slots.entries('shell.overlay').map(s => s.options.id)).not.toContain(S1_CLIENT_SURFACE_IDS.toastOverlay)
+    expect(slots.entries('conversation.chat.assistant-actions').map(s => s.options.id)).not.toContain(S1_CLIENT_SURFACE_IDS.assistantCultivate)
+    expect(slots.entries('tool.call.toolview').map(s => s.options.key)).not.toContain(S1_TOOL_KEYS.signoff)
+    expect(slots.entries('sidebar.right.tab.guide').map(s => s.component)).not.toContain(CompanyGuideHub)
+    expect(slots.entries('sidebar.panellist').map(s => s.options.id)).not.toContain(COMPANY_HQ_PANEL_ID)
+    expect(slots.entries('main').map(s => s.options.key)).not.toContain(COMPANY_HQ_PANEL_ID)
+    expect(slots.entries('conversation.chat.turnTail').map(s => s.options.id)).not.toContain(COMPANY_TURN_TAIL_ID)
     // The guard's disposer is fiber-owned (ctx.effect): unload removes its heartbeat.
     const beats = JSON.parse(localStorage.getItem(HEARTBEATS) ?? '{}') as Record<string, number>
     expect(Object.keys(beats).filter(id => id.startsWith('tab-'))).toEqual([])
@@ -240,7 +277,7 @@ describe('company client apply through the whole-client tier', () => {
       expect(title, `missing tab title ${key}`).toBeDefined()
       expect(guide, `missing guide entry ${key}`).toBeDefined()
       targets.push(
-        { slot: `tab.body:${key}`, entry: body!, owner: { sessionId, useSessions, useProjection, useTabInfo: () => ({ tab: { id: 'tab-1', contentId: key }, floating: false }) } },
+        { slot: `tab.body:${key}`, entry: body!, owner: { sessionId, useSessions, useProjection, useTabInfo: () => ({ sidebar: { expanded: true, fullscreen: false }, panel: { id: 'pane-1' }, tab: { id: 'tab-1', contentId: key } }) } },
         { slot: `tab.title:${key}`, entry: title!, owner: { sessionId, active: true, tab: { id: 'tab-1', contentId: key } } },
         { slot: `tab.guide:${key}`, entry: guide!, owner: { id: key, title: key, description: key } },
       )
@@ -285,18 +322,125 @@ describe('company client apply through the whole-client tier', () => {
       })
     }
 
-    for (const key of [...DELEGATION_TOOL_KEYS, ...TEAM_TOOL_KEYS]) {
+    for (const key of [...DELEGATION_TOOL_KEYS, ...TEAM_TOOL_KEYS, S1_TOOL_KEYS.signoff]) {
       const tool = slots.entries('tool.call.toolview').find(e => e.options.key === key && e.locale === 'company')
       expect(tool, `missing tool.call.toolview ${key}`).toBeDefined()
       targets.push({ slot: `tool.call.toolview:${key}`, entry: tool!, owner: { sessionId, toolName: key, block: { name: key, argsRaw: '{}' } } })
     }
 
+    // S1–S4 新增槽位真 inject() + 挂载守卫（含 chain selector & injected callbacks）
+    const s1Toast = slots.entries('shell.overlay').find(e => e.options.id === S1_CLIENT_SURFACE_IDS.toastOverlay)
+    const s1Header = slots.entries('conversation.session.header.utilities').find(e => e.options.id === S1_CLIENT_SURFACE_IDS.headerAttention)
+    const s1Footer = slots.entries('sidebar.footer.action').find(e => e.options.id === S1_CLIENT_SURFACE_IDS.footerStatus)
+    const s1Hero = slots.entries('conversation.hero.options').find(e => e.options.id === S1_CLIENT_SURFACE_IDS.heroMotions)
+    const s1Dock = slots.entries('conversation.input.dock').find(e => e.options.id === S1_CLIENT_SURFACE_IDS.motionDock)
+    const s1CompDock = slots.entries('conversation.composer.dock').find(e => e.options.id === S1_CLIENT_SURFACE_IDS.composerDock)
+    const s1Assist = slots.entries('conversation.chat.assistant-actions').find(e => e.options.id === S1_CLIENT_SURFACE_IDS.assistantCultivate)
+    const s1DocAct = slots.entries('sidebar.right.tab.document.actions').find(e => e.options.id === S1_CLIENT_SURFACE_IDS.docFinalActions)
+    const s1Composer = slots.entries('conversation.composer').find(e => e.locale === 'company')
+    const s2Guide = slots.entries('sidebar.right.tab.guide').find(e => e.component === CompanyGuideHub)
+    const s3Icon = slots.entries('sidebar.panellist').find(e => e.options.id === COMPANY_HQ_PANEL_ID)
+    const s3Main = slots.entries('main').find(e => e.options.key === COMPANY_HQ_PANEL_ID)
+    const s4TurnTail = slots.entries('conversation.chat.turnTail').find(e => e.options.id === COMPANY_TURN_TAIL_ID)
+
+    expect(s1Toast && s1Header && s1Footer && s1Hero && s1Dock && s1CompDock && s1Assist && s1DocAct).toBeDefined()
+    expect(s1Composer && s2Guide && s3Icon && s3Main && s4TurnTail).toBeDefined()
+
+    for (const cmd of S1_TOOL_KEYS.commands) {
+      const cmdEntry = slots.entries('conversation.chat.commandview').find(e => e.options.key === cmd)
+      expect(cmdEntry, `missing commandview ${cmd}`).toBeDefined()
+      targets.push({ slot: `commandview:${cmd}`, entry: cmdEntry!, owner: { sessionId, name: cmd, node: { name: cmd, outcome: { kind: 'success', text: 'OK' } } } })
+    }
+    targets.push(
+      { slot: 'shell.overlay:toast', entry: s1Toast!, owner: {} },
+      { slot: 'header.utilities:attention', entry: s1Header!, owner: { sessionId } },
+      { slot: 'sidebar.footer.action', entry: s1Footer!, owner: { wide: true } },
+      { slot: 'conversation.hero.options', entry: s1Hero!, owner: { sessionId, inputActions: { setDraft: () => {} } } },
+      { slot: 'conversation.input.dock', entry: s1Dock!, owner: { sessionId, session: { id: sessionId }, input: {}, inputActions: { setDraft: () => {} }, useSessions } },
+      { slot: 'conversation.composer.dock', entry: s1CompDock!, owner: { sessionId, useSessions } },
+      { slot: 'assistant-actions', entry: s1Assist!, owner: { sessionId, message: { id: 'm1', content: [] } } },
+      { slot: 'document.actions', entry: s1DocAct!, owner: { absolutePath: '.dsh-company/deliverables/m1/final.md' } },
+      {
+        slot: 'conversation.composer:signoff',
+        entry: s1Composer!,
+        owner: { pendingInteraction: { kind: 'approval', toolName: 'request_signoff', reason: 'Margin: test', answer: () => {} } },
+      },
+      {
+        slot: 'sidebar.right.tab.guide:company',
+        entry: s2Guide!,
+        owner: { useTabInfo: () => ({ tab: { id: 'g', contentId: 'guide', actions: { openTab: () => {} } } }) },
+      },
+      { slot: 'sidebar.panellist:hq', entry: s3Icon!, owner: { size: 18, active: false } },
+      {
+        slot: 'main:hq',
+        entry: s3Main!,
+        owner: {
+          renderSlot: () => null,
+          SessionProvider: ({ children }: { children?: unknown }) => children,
+          useSessions,
+          useProjection,
+        },
+      },
+      { slot: 'conversation.chat.turnTail', entry: s4TurnTail!, owner: { turn: { data: new Map() } } },
+    )
+
     try {
       for (const target of targets) {
+        const selected = target.entry.select !== undefined ? target.entry.select(target.owner) : undefined
+        if (target.slot === 'conversation.composer:signoff') {
+          expect(selected).not.toBeNull()
+          expect(target.entry.select?.({ pendingInteraction: { kind: 'approval', toolName: 'bash', answer: () => {} } })).toBeNull()
+        }
+        if (target.slot === 'sidebar.right.tab.guide:company') {
+          expect(selected).toEqual({ active: true })
+        }
         const injected = target.entry.inject !== undefined ? target.entry.inject(sessionId) : {}
+        // Exercise safe navigation / callback wires injected by S1–S4 & company-tab-registration
+        if (target.slot === 'tab.body:dsh-company-pack/archive') {
+          try { (injected as { openFinal?: (sid: string, p: string) => void }).openFinal?.(sessionId, '.dsh-company/deliverables/m1/final.md') } catch { /* ok when no surface */ }
+        } else if (target.slot === 'tab.body:dsh-company-pack/team') {
+          try { (injected as { openMemberAside?: (sid: string, m: string) => void }).openMemberAside?.(sessionId, 'child-1') } catch { /* ok when no surface */ }
+        } else if (target.slot === 'header.utilities:attention') {
+          const openTabFn = injected.openTab as ((id: string) => void) | undefined
+          openTabFn?.('company-attention')
+          openTabFn?.('company-board')
+        } else if (target.slot === 'conversation.hero.options') {
+          ;(injected.notifyDraft as ((label: string) => void) | undefined)?.('PRD')
+        } else if (target.slot === 'conversation.input.dock') {
+          ;(injected.onDraftCommand as ((cmd: string) => void) | undefined)?.('/req check ')
+        } else if (target.slot === 'assistant-actions') {
+          const openCult = injected.openCultivation as ((ctx?: { messageId?: string; filePath?: string }) => void) | undefined
+          openCult?.({ messageId: 'm1' })
+          openCult?.({ filePath: '.dsh-company/deliverables/m1/final.md' })
+          openCult?.()
+        } else if (target.slot === 'document.actions') {
+          ;(injected.openDeliverables as (() => void) | undefined)?.()
+        } else if (target.slot === 'sidebar.right.tab.guide:company') {
+          try { (injected.openSplit as ((p: string) => void) | undefined)?.('ops') } catch { /* ok */ }
+          try { (injected.openSplit as ((p: string) => void) | undefined)?.('quiet') } catch { /* ok */ }
+        } else if (target.slot === 'main:hq') {
+          ;(injected.selectSection as ((s: string) => void) | undefined)?.('overview')
+          ;(injected.returnToChat as (() => void) | undefined)?.()
+          try { (injected.openSession as ((id: string) => void) | undefined)?.(sessionId) } catch { /* ok */ }
+          try { (injected.openFinal as ((sid: string, p: string) => void) | undefined)?.(sessionId, 'final.md') } catch { /* ok */ }
+        } else if (target.slot === 'conversation.chat.turnTail') {
+          try { (injected.openOps as (() => void) | undefined)?.() } catch { /* ok when no surface */ }
+          try { (injected.openArchive as (() => void) | undefined)?.() } catch { /* ok when no surface */ }
+        }
+        const hooks = (injected as { readonly hooks?: Record<string, { getSnapshot(): unknown }> }).hooks
+        const hookProps = hooks === undefined
+          ? {}
+          : Object.fromEntries(
+              Object.entries(hooks).map(([name, src]) => [
+                `use${name.charAt(0).toUpperCase()}${name.slice(1)}`,
+                (selector: (value: unknown) => unknown) => selector(src.getSnapshot()),
+              ]),
+            )
         const props = {
           ...target.owner,
+          ...(selected !== undefined ? { matched: selected } : {}),
           ...injected,
+          ...hookProps,
           ...(target.entry.locale ? { t: tCompany } : {}),
         }
         const host = document.createElement('div')
@@ -307,6 +451,8 @@ describe('company client apply through the whole-client tier', () => {
         act(() => { root.unmount() })
         host.remove()
       }
+      const toastInjected = s1Toast!.inject?.(sessionId) as { dismiss?: () => void } | undefined
+      toastInjected?.dismiss?.()
     } finally {
       errorSpy.mockRestore()
     }

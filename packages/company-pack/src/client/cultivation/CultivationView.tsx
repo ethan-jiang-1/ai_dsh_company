@@ -2,13 +2,14 @@
  * 培养主视图（2026-10-28 培养 tab；2026-11-02 起主区 = Chat + 培养）：与 Chat 并列的 `conversation.view`。
  *
  * 左：培养领域板（纠正 / 方法 / journal / 赞踩 / 怎么养），复用 `CultivationBoard`；
- * 右：培养专属面板（自有 composer；当前阶段命令面，独立培养会话下一阶段接入）。
+ * 右：会话内动作摘要（完整内嵌培养对话住全局「梦之队总部」`company-hq.tsx` 面板）。
  * 公司总览（看板 / 依赖 / 在场 / 交付）不在这里：通过 `openCompanyOverview` 打开无对话入口。
  *
  * 为什么不是公司子页：只有培养需要“记录 → 判断 → 方法”的专属对话；其他面板不需要。
  */
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
+import { Button } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
@@ -18,7 +19,6 @@ import type { CompanyT } from '../locales.ts'
 import { setCultivationLanguage } from './cultivation-actions.ts'
 import { roleText } from '../roles.ts'
 import { CultivationBoard } from './CultivationBoard.tsx'
-import { CultivationChatPanel } from './CultivationChatPanel.tsx'
 import type { CultivationActionsFactory } from './cultivation-actions.ts'
 import type { CultivationContextSources } from './cultivation-context-data.ts'
 import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
@@ -29,7 +29,7 @@ import {
   type CultivationFiles,
   type CultivationFollowEvents,
 } from './cultivation-data.ts'
-import { readPresetOf, type RoleBadgeInjected } from '../ui/RoleBadge.tsx'
+import { readPresetFromSnapshot, type RoleBadgeInjected, type RoleBadgeSourceFace } from '../ui/RoleBadge.tsx'
 
 /** 培养主视图注入面：与侧栏 CultivationTab 共用同一数据平面/动作面。 */
 export interface CultivationViewInjected {
@@ -42,6 +42,8 @@ export interface CultivationViewInjected {
   readonly openContext?: ((sessionId: SessionId, context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false, readonly problem: string }>) | undefined
   /** 打开无对话的公司总览（右栏看板/依赖/在场/交付）。 */
   readonly openCompanyOverview: () => void
+  /** 打开全局总部里的培养工坊（原生内嵌对话）。 */
+  readonly openHqCultivation?: (() => void) | undefined
 }
 
 export type CultivationViewProps = PropsRuntime<'conversation.view'> & { readonly t: CompanyT }
@@ -95,13 +97,13 @@ function initialChatWidth(): number {
  * @returns 可注册到 `conversation.view` 的组件。
  */
 export function createCultivationView(injected: CultivationViewInjected) {
-  const { roleSource, contextSources: makeContextSources, cultivationActions } = injected
+  const { contextSources: makeContextSources, cultivationActions } = injected
   return function CultivationView(props: CultivationViewProps) {
     const { sessionId, t } = props
     setCultivationLanguage(t('meta.language') === 'en' ? 'en' : 'zh')
-    const subscribe = useMemo(() => roleSource.subscribe.bind(roleSource), [])
-    const getPreset = useCallback(() => readPresetOf(roleSource, sessionId), [sessionId])
-    const viewerRole = useSyncExternalStore(subscribe, getPreset, getPreset)
+    const viewerRole = props.useSessions(state => (
+      readPresetFromSnapshot(state as unknown as RoleBadgeSourceFace, sessionId)
+    ))
     const { journalRows, records, recordsProblem, brokenRecords, unexpandedRecords, refresh } = useCultivationPanelData(injected.cultivationFiles, sessionId)
     const feedback = useCultivationFeedback(injected.followEvents, sessionId)
     const teammate = props.useSessions(state => state.byId[sessionId]?.origin === 'subagent')
@@ -171,13 +173,6 @@ export function createCultivationView(injected: CultivationViewInjected) {
       }
     }
 
-    // 培养视图自有右栏 composer；隐藏 shell 的全局 composer（per-document，切走即恢复）。
-    useEffect(() => {
-      if (typeof document === 'undefined') return
-      document.documentElement.dataset.dshCultivationView = '1'
-      return () => { delete document.documentElement.dataset.dshCultivationView }
-    }, [])
-
     return (
       <div className="wk-cult-view">
         <header className="wk-cult-view-head">
@@ -232,13 +227,17 @@ export function createCultivationView(injected: CultivationViewInjected) {
             onKeyDown={onResizeKeyDown}
             onDoubleClick={() => setChatWidth(CHAT_DEFAULT)}
           />
-          <CultivationChatPanel
-            sessions={injected.sessions}
-            mainSessionId={sessionId}
-            cwd={sessionCwd}
-            agentPreset={viewerRole}
-            attachments={records ?? []}
-          />
+          <aside className="wk-cult-workshop-card" data-company-cultivation-workshop="">
+            <div className="wk-cult-workshop-title">{t('hq.tab.cultivation')}</div>
+            <p className="wk-cult-workshop-hint">{t('hq.cultivationWorkshopHint')}</p>
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => { (injected.openHqCultivation ?? injected.openCompanyOverview)() }}
+            >
+              {t('hq.cultivationOpenWorkshop')}
+            </Button>
+          </aside>
         </div>
       </div>
     )

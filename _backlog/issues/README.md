@@ -4,7 +4,9 @@
 
 ## 活跃清单
 
-**活跃 0 张**。
+**活跃 0 张**（当前全部活跃问题已收敛归档；新问题按 [backlog 入口](../README.md) 立卡，不从归档里自行开工）。
+
+（2026-11-26 UX/UI 升级卡「利用 DSH 原生扩展能力升级梦之队 UX/UI 并清退脆弱 CSS/DOM 债（S1–S4）」已结归档：去向 = [实施Note](../../notes/implemented/2026-11-26-dsh-native-ux-upgrade.md)，卡片见[归档](../_archive/settled_issues/2026-11-26-dsh-native-ux-upgrade.md)。）
 
 （2026-11-23 公司页 E2E 设计卡已消化归档：`BUG-293`–`BUG-332` 已全部清零迁入 [fixed_bugs](../_archive/fixed_bugs/README.md)，防线诉求已分别由两篇 2026-11-23 质量预防 Note 承接；卡片见[归档](../_archive/settled_issues/2026-11-21-company-e2e-test-design.md)。）
 

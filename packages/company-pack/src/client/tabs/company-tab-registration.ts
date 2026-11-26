@@ -1,24 +1,21 @@
 /** Company tab type and keyed renderer registrations. */
-import type { WorkspaceTextRead } from '../cultivation/cultivation-data.ts'
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
-import { AttentionTab } from './AttentionTab.tsx'
+import type { WorkspaceTextRead } from '../cultivation/cultivation-data.ts'
 import type { AttentionRegistry } from '../wiring/attention-registry.ts'
 import type { SessionPageFace } from '../presence/attention-history.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
-import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-tabs.tsx'
 import type { CultivationActionsFactory } from '../cultivation/cultivation-actions.ts'
 import type { CultivationFiles } from '../cultivation/cultivation-data.ts'
 import type { CultivationContextSources } from '../cultivation/cultivation-context-data.ts'
 import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
-import { CultivationTab } from './CultivationTab.tsx'
-import { DeliverablesTab } from './DeliverablesTab.tsx'
-import { StrategyPanel, type SaveResult } from '../startup/StrategyPanel.tsx'
+import type { SaveResult } from '../startup/StrategyPanel.tsx'
 import type { StartupStore } from '../startup/startup-store.ts'
 import type { StartupField } from '../../lib/startup/startup-settings.ts'
-import { LedgerTab } from './LedgerTab.tsx'
 import { sessionFileAddress } from '../../lib/deliverables/deliverables-address.ts'
+import { ArchiveHubTab, OpsHubTab, TeamHubTab } from './company-hub-tabs.tsx'
+import { createHubSubViewStore, type HubId, type HubSubViewState, type HubSubViewStore } from './hub-subview-store.ts'
 import { TAB_IDENTITY, type FaceKey } from '../ui/tab-icons.tsx'
 import { tabCopyFor } from './tab-copy.ts'
 import { COMPANY_NS, type CompanyT } from '../locales.ts'
@@ -38,10 +35,12 @@ export interface CompanyTabRegistrationData {
   readonly follow: (sessionId: SessionId, signal: AbortSignal) => AsyncIterable<TeamStreamFrame>
   /** Float one platform tab. */
   readonly floatTab: (tabId: TabId, rect?: FloatRectLike) => void
-  /** Dock one floating pane. */
-  readonly unfloatTab: (paneId: string) => void
+  /** Compatibility docking callback. */
+  readonly unfloatTab?: (paneId: string) => void
   /** Open the selected member's session. */
   readonly openMember: (sessionId: SessionId, member: { readonly id: string; readonly role: 'lead' | 'teammate' }) => Promise<void>
+  /** Open teammate subagent chat in a split right-sidebar pane. */
+  readonly openMemberAside?: (sessionId: SessionId, memberId: string) => void
   /** Company workspace files read by cultivation views. */
   readonly cultivationFiles: CultivationFiles
   /** 人侧动作面（GUI 版 /cultivation；工厂见 `cultivation-actions.ts`）。 */
@@ -68,6 +67,10 @@ export interface CompanyTabRegistrationData {
   readonly resetStartup: (sessionId: SessionId) => Promise<SaveResult>
   /** 读一个会话的历史事件（跨会话重建挂起项的唯一通道；见 presence/attention-history.ts）。 */
   readonly pageHistory: SessionPageFace
+  /** 三合一右栏集成页签共享子视图状态仓。 */
+  readonly hubStore?: HubSubViewStore
+  /** 双分栏/清净布局快捷预设。 */
+  readonly openSplit?: (preset: 'ops' | 'review' | 'quiet') => void
 }
 
 interface TabRegistration {
@@ -76,120 +79,79 @@ interface TabRegistration {
   /** 身份行的键（tone/glyph/组件唯一家 = tab-icons 的 TAB_IDENTITY；label/tooltip/description 的 key 与值住 tab-copy.ts / locales.ts）。 */
   readonly face: FaceKey
   readonly order: number
-  readonly registerBody: (scoped: CompanyTabContext, id: string, data: CompanyTabRegistrationData) => Dispose
+  readonly registerBody: (
+    scoped: CompanyTabContext,
+    id: string,
+    data: CompanyTabRegistrationData,
+    hubStore: HubSubViewStore,
+  ) => Dispose
 }
 
-/** Each tab's identity, type metadata, and three keyed renderers live in one catalog. */
+/** Shared hub props injected across all three cohesive Company tabs. */
+function baseHubInject(data: CompanyTabRegistrationData, hubStore: HubSubViewStore) {
+  return {
+    hooks: { hubState: hubStore.store },
+    selectSection: <K extends HubId>(hub: K, section: HubSubViewState[K]) => { hubStore.select(hub, section) },
+    ...(data.openSplit === undefined ? {} : { openSplit: data.openSplit }),
+    t: data.t,
+    follow: data.follow,
+    floatTab: data.floatTab,
+    unfloatTab: data.unfloatTab,
+  }
+}
+
+/** 3 个聚合页签声明：保留单行 `id / kind / face` 结构供 tab-catalog 门禁解析。 */
 const TAB_REGISTRATIONS = [
   {
-    id: 'dsh-company-pack/attention', kind: 'company-attention', face: 'attention',
-    order: 50,
-    registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS, inject: () => ({ t: data.t,
-        follow: data.follow,
-        floatTab: data.floatTab,
-        unfloatTab: data.unfloatTab,
-        getPending: () => data.attention.list(),
-        openSession: (sessionId: SessionId) => { scoped.uiWorkspace.openSession(sessionId) },
+    id: 'dsh-company-pack/ops', kind: 'company-ops', face: 'ops',
+    order: 20,
+    registerBody: (scoped, id, data, hubStore) => scoped.slots.register({
+      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
+      inject: () => ({
+        ...baseHubInject(data, hubStore),
         leadOf: data.leadOf,
-        pageHistory: data.pageHistory,
+        startupStore: data.startupStore,
+        loadStartup: data.loadStartup,
+        saveStartup: data.saveStartup,
+        resetStartup: data.resetStartup,
       }),
-    }, AttentionTab),
+    }, OpsHubTab),
   },
   {
-    id: 'dsh-company-pack/board', kind: 'company-board', face: 'board',
-    order: 51,
-    registerBody: (scoped, id, data) => scoped.slots.register({
+    id: 'dsh-company-pack/team', kind: 'company-team', face: 'team',
+    order: 30,
+    registerBody: (scoped, id, data, hubStore) => scoped.slots.register({
       name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
-      inject: () => ({ t: data.t, leadOf: data.leadOf, follow: data.follow, floatTab: data.floatTab, unfloatTab: data.unfloatTab }),
-    }, BoardTab),
+      inject: () => ({
+        ...baseHubInject(data, hubStore),
+        attention: data.attention,
+        pageHistory: data.pageHistory,
+        leadOf: data.leadOf,
+        openSession: (sessionId: SessionId) => { scoped.uiWorkspace.openSession(sessionId) },
+        openMember: data.openMember,
+        openMemberAside: data.openMemberAside,
+      }),
+    }, TeamHubTab),
   },
   {
-    id: 'dsh-company-pack/dag', kind: 'company-dag', face: 'dag',
-    order: 52,
-    registerBody: (scoped, id, data) => scoped.slots.register({
+    id: 'dsh-company-pack/archive', kind: 'company-archive', face: 'archive',
+    order: 40,
+    registerBody: (scoped, id, data, hubStore) => scoped.slots.register({
       name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
-      inject: () => ({ t: data.t, leadOf: data.leadOf, follow: data.follow, floatTab: data.floatTab, unfloatTab: data.unfloatTab }),
-    }, DagTab),
-  },
-  {
-    id: 'dsh-company-pack/presence', kind: 'company-presence', face: 'presence',
-    order: 53,
-    registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
-      inject: () => ({ t: data.t, leadOf: data.leadOf, follow: data.follow, openMember: data.openMember, floatTab: data.floatTab, unfloatTab: data.unfloatTab }),
-    }, PresenceTab),
-  },
-  {
-    id: 'dsh-company-pack/budget', kind: 'company-budget', face: 'budget',
-    order: 54,
-    registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
-      inject: () => ({ t: data.t, leadOf: data.leadOf, follow: data.follow, floatTab: data.floatTab, unfloatTab: data.unfloatTab }),
-    }, BudgetTab),
-  },
-  {
-    id: 'dsh-company-pack/tasks', kind: 'company-tasks', face: 'tasks',
-    order: 55,
-    registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
-      inject: () => ({ t: data.t, leadOf: data.leadOf, follow: data.follow, floatTab: data.floatTab, unfloatTab: data.unfloatTab }),
-    }, TasksTab),
-  },
-  {
-    id: 'dsh-company-pack/cultivation', kind: 'company-cultivation', face: 'cultivation',
-    order: 56,
-    registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
-      inject: () => ({ t: data.t,
-        floatTab: data.floatTab,
-        unfloatTab: data.unfloatTab,
+      inject: () => ({
+        ...baseHubInject(data, hubStore),
         cultivationFiles: data.cultivationFiles,
         cultivationActions: data.cultivationActions,
-        followEvents: data.follow,
         roleSource: data.roleSource,
+        readLedger: data.readLedger,
+        readCatalog: data.readCatalog,
         contextSources: data.contextSources,
         openContext: data.openContext,
-      }),
-    }, CultivationTab),
-  },
-  {
-    id: 'dsh-company-pack/ledger', kind: 'company-ledger', face: 'ledger',
-    order: 57,
-    registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
-      inject: () => ({ t: data.t, floatTab: data.floatTab, unfloatTab: data.unfloatTab, readLedger: data.readLedger }),
-    }, LedgerTab),
-  },
-  {
-    id: 'dsh-company-pack/deliverables', kind: 'company-deliverables', face: 'catalog',
-    order: 58,
-    registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
-      inject: () => ({ t: data.t,
-        floatTab: data.floatTab,
-        unfloatTab: data.unfloatTab,
-        readCatalog: data.readCatalog,
         openFinal: (sessionId: SessionId, path: string) => {
           scoped.sidebarRight.openResource(sessionFileAddress(sessionId, path))
         },
       }),
-    }, DeliverablesTab),
-  },
-  {
-    id: 'dsh-company-pack/strategy', kind: 'company-strategy', face: 'strategy',
-    order: 20,
-    registerBody: (scoped, id, data) => scoped.slots.register({
-      name: 'sidebar.right.pane.tab', key: id, locale: COMPANY_NS,
-      inject: () => ({ t: data.t,
-        store: data.startupStore,
-        load: data.loadStartup,
-        save: data.saveStartup,
-        reset: data.resetStartup,
-        floatTab: data.floatTab,
-        unfloatTab: data.unfloatTab,
-      }),
-    }, StrategyPanel),
+    }, ArchiveHubTab),
   },
 ] satisfies readonly TabRegistration[]
 
@@ -203,6 +165,7 @@ const TAB_REGISTRATIONS = [
  */
 export function registerCompanyTabs(scoped: CompanyTabContext, data: CompanyTabRegistrationData): void {
   const t = data.t
+  const hubStore = data.hubStore ?? createHubSubViewStore()
   // ⚠ 文案必须在 thunk 里按当前语言取：注册时捕获字符串会让切换语言后页签条/guide 停在旧语言
   // （标题组件自己拿 t，会跟着变；registry 的 title/guide 是 thunk，必须每次重取）。
   const copyOf = (face: FaceKey) => tabCopyFor(face, t)
@@ -218,7 +181,7 @@ export function registerCompanyTabs(scoped: CompanyTabContext, data: CompanyTabR
   }
 
   scoped.slots.inject('sidebar.right.pane.tab', () =>
-    TAB_REGISTRATIONS.map(tab => tab.registerBody(scoped, tab.id, data)))
+    TAB_REGISTRATIONS.map(tab => tab.registerBody(scoped, tab.id, data, hubStore)))
 
   scoped.slots.inject('sidebar.right.pane.tab.title', () =>
     TAB_REGISTRATIONS.map(tab => scoped.slots.register({ name: 'sidebar.right.pane.tab.title', key: tab.id, locale: COMPANY_NS }, TAB_IDENTITY[tab.face].Title)))

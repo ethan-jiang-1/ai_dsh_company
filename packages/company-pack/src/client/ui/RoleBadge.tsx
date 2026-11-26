@@ -86,13 +86,18 @@ export const ROLE_MARK: Readonly<Record<string, string>> = {
  * @param props - 行 sessionId + 注入的会话列表快照。
  * @returns 标记；无角色痕迹时 null。
  */
+/** 从已取出的会话列表快照中读取当前角色（无/空/非字符串 ⇒ null）。 */
+export function readPresetFromSnapshot(snapshot: RoleBadgeSourceFace, sessionId: SessionId): string | null {
+  const value = snapshot.projectionsBySession[sessionId]?.values.agentPreset
+  return typeof value === 'string' && value !== '' ? value : null
+}
+
 /**
  * 读一个会话的当前角色（上游 agentPreset 投影；无/空/非字符串 ⇒ null）。
  * 标记与 C 段窗口标题共用。
  */
 export function readPresetOf(source: SnapshotLike<RoleBadgeSourceFace>, sessionId: SessionId): string | null {
-  const value = source.getSnapshot().projectionsBySession[sessionId]?.values.agentPreset
-  return typeof value === 'string' && value !== '' ? value : null
+  return readPresetFromSnapshot(source.getSnapshot(), sessionId)
 }
 
 /** 会话行的显示标题（客户端列表行带 title/displayTitle；防御性双读）。 */

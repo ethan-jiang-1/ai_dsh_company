@@ -49,7 +49,7 @@ async function mountWith(store: StartupStore, save: (field: string, value: strin
 }
 
 const wikiInput = (host: HTMLElement): HTMLInputElement => {
-  const input = host.querySelector('input.wk-strategy-input')
+  const input = host.querySelector('.wk-strategy-input input, input.wk-strategy-input')
   if (input === null) throw new Error('wiki input not found')
   return input as HTMLInputElement
 }

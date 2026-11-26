@@ -162,3 +162,33 @@ describe('客户端 CSS：角色色调（字母之外的第二个通道，2026-1
     expect(backgrounds).not.toContain('var(--dsw-alias-brand-primary)')
   })
 })
+
+describe('客户端 CSS 与源码脆债反回归守卫（Wave S4）', () => {
+  it('styles.ts 不含裸十六进制色值、>500 字重、1px 中性边框及旧黑客选择器', () => {
+    expect(STYLES).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+    expect(STYLES).not.toMatch(/data-composer-seat|data-dsh-cultivation-view|dockkit-float/)
+    expect(STYLES).not.toMatch(/border[^;]*\b1px\s+(?:solid|dashed)\s+var\(--dsw-alias-border-/)
+
+    const heavyWeights = [...STYLES.matchAll(/font-weight:\s*([0-9]+|bold)\b/g)]
+      .map(match => match[1]!)
+      .filter(weight => weight === 'bold' || Number(weight) > 500)
+    expect(heavyWeights).toEqual([])
+  })
+
+  it('client/src 不含 L2/L3 禁区占坑与 cultivation/startup 违规 useSyncExternalStore', () => {
+    const clientFiles = collect(CLIENT_SRC, '.ts').concat(collect(CLIENT_SRC, '.tsx'))
+    for (const file of clientFiles) {
+      const text = readFileSync(file, 'utf8')
+      expect(text, file).not.toMatch(/data-composer-seat|data-dsh-cultivation-view|dockkit-float|#16111f/)
+      expect(text, file).not.toMatch(/conversation\.approval\.detail|sidebar\.toggle\.badge|uiConversation\.groups/)
+    }
+
+    const restricted = collect(join(CLIENT_SRC, 'cultivation'), '.ts')
+      .concat(collect(join(CLIENT_SRC, 'cultivation'), '.tsx'))
+      .concat(collect(join(CLIENT_SRC, 'startup'), '.ts'))
+      .concat(collect(join(CLIENT_SRC, 'startup'), '.tsx'))
+    for (const file of restricted) {
+      expect(readFileSync(file, 'utf8'), file).not.toContain('useSyncExternalStore')
+    }
+  })
+})

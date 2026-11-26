@@ -53,7 +53,7 @@ function upsertBanner(doc: Document, message: string): void {
   if (el === null) {
     el = doc.createElement('div')
     el.id = BANNER_ID
-    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#b45309;color:#fff;padding:6px 12px;font-size:13px;text-align:center;'
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--dsw-alias-state-warn-tertiary);color:var(--dsw-alias-state-warn-label);border-bottom:0.5px solid var(--dsw-alias-state-warn-primary);padding:6px 12px;font-size:13px;text-align:center;'
     doc.body.appendChild(el)
   }
   el.textContent = message

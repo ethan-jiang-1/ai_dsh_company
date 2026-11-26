@@ -300,10 +300,10 @@
 | 286 | 2026-11-20 | tests/tools/deliverables-audit.spec.ts:597 |
 | 287 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:51 |
 | 289 | 2026-11-20 | tests/repo/structure/dev-entry-guards.spec.ts:63 |
-| 290 | 2026-11-20 | tests/client/startup/command-scope-hint.spec.ts:29 |
+| 290 | 2026-11-20 | tests/client/startup/command-scope-hint.spec.ts:30 |
 | 291 | 2026-11-21 | tests/client/cultivation/cultivation-board.spec.ts:240；tests/client/cultivation/cultivation-board.spec.ts:272；tests/client/cultivation/cultivation-board.spec.ts:310 |
 | 292 | 2026-11-21 | tests/client/presence/attention-history.spec.ts:40；tests/client/tabs/attention-tab.spec.ts:67；tests/client/tabs/attention-tab.spec.ts:122 |
-| 293 | 2026-11-21 | tests/client/startup/command-scope-hint.spec.ts:69 |
+| 293 | 2026-11-21 | tests/client/startup/command-scope-hint.spec.ts:97 |
 | 294 | 2026-11-21 | tests/client/cultivation/cultivation-board.spec.ts:300 |
 | 295 | 2026-11-21 | tests/client/wiring/attention.spec.ts:233 |
 | 296 | 2026-11-21 | tests/tools/client-bundle.spec.ts:36 |
@@ -318,7 +318,7 @@
 | 305 | 2026-11-22 | tests/client/tabs/attention-tab.spec.ts:159 |
 | 306 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:353；tests/client/cultivation/list-caps-consumed.spec.ts:19 |
 | 307 | 2026-11-22 | tests/client/cultivation/cultivation-board.spec.ts:372 |
-| 308 | 2026-11-22 | tests/client/cultivation/cultivation-chat-panel.spec.ts:188 |
+| 308 | 2026-11-22 | tests/client/ux/company-hq.spec.ts:33 |
 | 309 | 2026-11-22 | tests/lib/cultivation/cultivation.spec.ts:337 |
 | 310 | 2026-11-22 | tests/client/tabs/deliverables-catalog.spec.ts:221 |
 | 311 | 2026-11-22 | tests/client/tabs/ledger-tab.spec.ts:100；tests/lib/accounting/ledger.spec.ts:121 |
@@ -351,14 +351,14 @@
 | 338 | 2026-11-23 | tests/host/commands/command-language.spec.ts:31；tests/host/commands/prd-command.spec.ts:222；tests/host/commands/settings-command.spec.ts:261；tests/lib/docs/prd-check.spec.ts:429；tests/lib/docs/requirements-check.spec.ts:359；tests/lib/docs/requirements-check.spec.ts:373 |
 | 339 | 2026-11-23 | tests/lib/shared/parsers-fuzz.property.spec.ts:416 |
 | 340 | 2026-11-23 | tests/client/cultivation/cultivation-copy.spec.ts:82；tests/client/cultivation/cultivation-copy.spec.ts:101；tests/tools/company-static-audit.spec.ts:203 |
-| 341 | 2026-11-23 | tests/client/company-client-composition.spec.ts:144；tests/client/ui/brand.spec.ts:59 |
+| 341 | 2026-11-23 | tests/client/company-client-composition.spec.ts:181；tests/client/ui/brand.spec.ts:59 |
 | 342 | 2026-11-23 | tests/host/prompt/handbook.spec.ts:45；tests/host/prompt/handbook.spec.ts:153 |
 | 343 | 2026-11-23 | tests/host/commands/req-command.spec.ts:226 |
 | 344 | 2026-11-23 | tests/host/delegation/subagent-retry.spec.ts:249 |
 | 345 | 2026-11-23 | tests/host/run-bundle/lease.spec.ts:134 |
 | 346 | 2026-11-23 | tests/host/ledger/presented-domain.spec.ts:137 |
 | 347 | 2026-11-23 | tests/tools/deliverables-catalog-tools.spec.ts:75 |
-| 348 | 2026-11-23 | tests/client/cultivation/cultivation-chat-panel.spec.ts:214 |
+| 348 | 2026-11-23 | tests/client/ux/company-hq.spec.ts:192 |
 | 349 | 2026-11-23 | tests/host/cultivation/cultivation-command.spec.ts:221 |
 | 350 | 2026-11-23 | tests/client/cultivation/cultivation-compose-context.spec.ts:209 |
 | 351 | 2026-11-24 | tests/host/cultivation/cultivation-command.spec.ts:244 |
@@ -377,7 +377,7 @@
 | 364 | 2026-11-24 | tests/client/wiring/instance-guard.spec.ts:84 |
 | 365 | 2026-11-24 | tests/client/data/company-stream.spec.ts:9 |
 | 366 | 2026-11-24 | tests/client/cultivation/cultivation-context-data.spec.ts:159；tests/client/cultivation/cultivation-context-data.spec.ts:223；tests/client/cultivation/cultivation-context-picker.spec.ts:72；tests/client/wiring/company-context-wiring.spec.ts:114 |
-| 367 | 2026-11-24 | tests/host/commands/signoff-language.spec.ts:25；tests/host/commands/signoff-language.spec.ts:45；tests/host/commands/signoff-language.spec.ts:55；tests/lib/accounting/signoff.spec.ts:38 |
+| 367 | 2026-11-24 | tests/host/commands/signoff-language.spec.ts:25；tests/host/commands/signoff-language.spec.ts:45；tests/host/commands/signoff-language.spec.ts:55；tests/lib/accounting/signoff.spec.ts:39 |
 | 368 | 2026-11-24 | tests/client/ui/brand.spec.ts:40；tests/lib/docs/yaml-scalar.spec.ts:27 |
 | 369 | 2026-11-24 | tests/host/workspace/workspace-doors.spec.ts:86；tests/host/workspace/workspace-doors.spec.ts:106；tests/lib/presence/doors.spec.ts:41；tests/lib/presence/doors.spec.ts:54；tests/lib/presence/doors.spec.ts:75 |
 | 370 | 2026-11-24 | tests/lib/docs/requirements-check.spec.ts:396 |

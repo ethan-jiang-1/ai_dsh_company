@@ -254,7 +254,7 @@
 
 ## P0 UI 第十六批（ChatPanel）
 
-- CultivationChatPanel 迁 chat* copy：标题/副标题/提示/等待/创建/错误/空态/说话人/回复中/附加记录/输入/发送/工具行。
+- CultivationChatPanel（Wave S3 已退役并由 `packages/company-pack/src/client/ux/company-hq.tsx` 原生内嵌会话替代）当时迁 chat* copy：标题/副标题/提示/等待/创建/错误/空态/说话人/回复中/附加记录/输入/发送/工具行。
 - cultivation-copy.spec 覆盖 en chatTitle/chatSend；client 381 tests；金样 ALL PASS。
 
 ## P0 UI 第十七批（Compose）

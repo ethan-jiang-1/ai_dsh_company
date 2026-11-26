@@ -9,7 +9,7 @@
  * 判据（keyless）：`blank === true` 时渲染该提示；会话已有轮次（`blank === false`）时不渲染；
  * 会话行缺席（未加载）时也不渲染——**不猜**，宁可不出现，也不在正常会话里插一句废话。
  */
-import { useCallback, useMemo, useSyncExternalStore, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { InjectFace } from '@deepseek-ai/dsh-client-ui-slots'
 import type { CompanyT } from '../locales.ts'
@@ -37,9 +37,13 @@ export type CommandScopeHintProps = InjectFace<CommandScopeHintFace>
  */
 export function CommandScopeHint(props: CommandScopeHintProps): ReactNode {
   const { sessionId, list } = props
-  const subscribe = useMemo(() => list.subscribe.bind(list), [list])
-  const readBlank = useCallback(() => list.getSnapshot().byId[sessionId]?.blank === true, [list, sessionId])
-  const blank = useSyncExternalStore(subscribe, readBlank, readBlank)
+  const [blank, setBlank] = useState(() => list.getSnapshot().byId[sessionId]?.blank === true)
+  useEffect(() => {
+    setBlank(list.getSnapshot().byId[sessionId]?.blank === true)
+    return list.subscribe(() => {
+      setBlank(list.getSnapshot().byId[sessionId]?.blank === true)
+    })
+  }, [list, sessionId])
   if (!blank) return null
   return (
     <span className="wk-command-scope-hint" title={props.t('command.scopeHint.tooltip')}>

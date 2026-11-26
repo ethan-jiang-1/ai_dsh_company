@@ -30,11 +30,15 @@
     `workspace-text`、`session-source`。
   - `ui/` —— 共用视觉件：`styles`（CSS 唯一源）、`Brand`、`RoleBadge`、`tab-icons`、`float-geometry`（浮窗几何）、
     `DelegationCard` / `TeamToolCard`（工具卡）。
-  - `tabs/` —— 页签面：`company-tabs`（框架/浮出）、`company-panels`（看板/依赖图/在场/用量）、`company-tab-registration`
-    （固定页签目录 → 类型/body/title/guide 四处贡献）、`tab-copy`（页签三处文案的 key 表与纯取用）、四个页签体 + `TasksPanel`。
+  - `tabs/` —— 页签面：`company-tabs`（容器外框 `PanelFrame` 与浮出几何）、`company-panels`（看板/依赖图/在场/用量）、`company-hub-tabs`
+    （右栏三合一聚合页签 `OpsHubTab` / `TeamHubTab` / `ArchiveHubTab`）、`hub-subview-store`、`company-tab-registration`
+    （三页签目录 → 类型/body/title/guide 四处贡献）、`tab-copy`（页签三处文案 key 表）、原单页签体 + `TasksPanel`。
+  - `ux/` —— Wave S1–S4 DSH 原生 L0/L1 扩展：`register-s1-ux`..`register-s4-ux`、`ambient-chrome`、`command-views`、
+    `company-guide`（`sidebar.right.tab.guide` L1 透传）、`company-hq`（`main` 全局总部 + 内嵌培养会话）、
+    `company-toast`、`company-triggers-shortcuts`（`@` 角色触发与固定快捷键）、`company-turn-tail`、`contextual-actions`、`signoff-card`。
   - `cultivation/` —— 培养域：`CultivationView` / `CultivationTab` 壳、看板/收件箱/创作/背景选择器、`cultivation-actions|data|context-data`、
-    `use-cultivation-board`。
-  - `startup/` —— 启动策略面：右栏「策略」页签、`startup.json` 读模型、选项数据与 **preset 挂载健康面**（`preset-health.ts`：启动时点名 broken preset）。
+    `use-cultivation-board`（对话 UI 已于 Wave S3 迁入 `ux/company-hq` 原生内嵌会话）。
+  - `startup/` —— 启动策略面：`StrategyPanel`（`ui-primitives` 控件）、`startup-handlers`、`startup-store`、选项数据与 **preset 挂载健康面**（`preset-health.ts`：启动时点名 broken preset）。
   Cordis 各槽仍各自等待声明并负责卸载/重装；构建走 tsdown client 半（产物 `lib/client.js`）。
 
 **UI 文案纪律（Phase 0 起）**：任何 company Web UI 文案从第一个 commit 就必须 zh+en；改 UI 前加载 `company-ui-change-definition` skill；文案只住 typed `company` 字典，纯 view model 返回 token 而不是中文。A4 未落地，勿引用；当前由 skill + review 守。
