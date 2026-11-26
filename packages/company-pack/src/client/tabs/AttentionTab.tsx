@@ -227,10 +227,10 @@ export function AttentionTab(props: AttentionTabProps) {
       <div className="wk-activity-block">
         <strong>{t('attention.waiting')}</strong>
         {waiting.length === 0
-          // 只要**任一**边界存在就不能说「没有等你的事」（BUG-305/317/318/320/323/328）：
-          // 判据只有一处 = hasBoundary；过去这里是手写的三个条件，组合就漏。
+          // 只要**任一**边界存在就不能说「没有等你的事」（BUG-305/317/318/320/323/328）；
+          // 但也不留空让用户误以为区域坏了——渲染带边界限定的占位说明（BUG-388）。
           ? (hasBoundary(boundaries)
-            ? null
+            ? <div className="wk-meta" data-attention-empty-bounded="">{t('attention.emptyWaitingBounded')}</div>
             : <div className="wk-meta">{t('attention.emptyWaiting')}</div>)
           : (
             <ul className="wk-activity" aria-label={t('attention.waitingList')}>

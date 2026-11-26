@@ -523,3 +523,56 @@ describe('attention 事件身份（BUG-359）', () => {
     unsub()
   })
 })
+
+// 负例留证 2026-11-27：去掉 approvalFromPayload/pendingApprovals 的 callId 透传或 mergeAttention 跨源 callId/预算消重 ⇒ BUG-388 用例红（live+history 叠成 2 条）；还原后绿。BUG-388
+describe('跨源无 id 审批消重（BUG-388）', () => {
+  it('live approval/request 缺 id 但带 callId 时，与历史 approval/asked 1:1 消重只留 1 条', () => {
+    const live = [{
+      kind: 'approval' as const,
+      sessionId: 's1',
+      callId: 'call-1',
+      what: attentionSummary('request_signoff: 折扣线双签'),
+      since: 2000,
+    }]
+    const history = pendingApprovals([{
+      type: 'approval/asked',
+      time: 1990,
+      data: { id: 'uuid-1', callId: 'call-1', toolName: 'request_signoff', reason: '折扣线双签' },
+    }], 's1').items
+    const merged = mergeAttention(live, history)
+    expect(merged).toHaveLength(1)
+    expect(merged[0]?.time).toBe(2000)
+  })
+
+  it('同摘要不同 callId 的两条审批绝不塌缩（1 live + 2 history → 2 条且 key 互异）', () => {
+    const live = [{
+      kind: 'approval' as const,
+      sessionId: 's1',
+      callId: 'call-1',
+      what: attentionSummary('request_signoff: 同摘要'),
+      since: 2000,
+    }]
+    const history = pendingApprovals([
+      { type: 'approval/asked', time: 1990, data: { id: 'uuid-1', callId: 'call-1', toolName: 'request_signoff', reason: '同摘要' } },
+      { type: 'approval/asked', time: 1995, data: { id: 'uuid-2', callId: 'call-2', toolName: 'request_signoff', reason: '同摘要' } },
+    ], 's1').items
+    const merged = mergeAttention(live, history)
+    expect(merged).toHaveLength(2)
+    expect(new Set(merged.map(attentionItemKey)).size).toBe(2)
+  })
+
+  it('live 缺 id 且缺 callId 时按内容 1:1 预算抵消，多出同摘要历史仍保留', () => {
+    const live = [{
+      kind: 'approval' as const,
+      sessionId: 's1',
+      what: attentionSummary('request_signoff: 同摘要'),
+      since: 2000,
+    }]
+    const history = pendingApprovals([
+      { type: 'approval/asked', time: 1990, data: { id: 'uuid-1', toolName: 'request_signoff', reason: '同摘要' } },
+      { type: 'approval/asked', time: 1995, data: { id: 'uuid-2', toolName: 'request_signoff', reason: '同摘要' } },
+    ], 's1').items
+    expect(mergeAttention(live, [history[0]!])).toHaveLength(1)
+    expect(mergeAttention(live, history)).toHaveLength(2)
+  })
+})

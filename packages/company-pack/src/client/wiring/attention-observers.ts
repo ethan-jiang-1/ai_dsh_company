@@ -56,11 +56,13 @@ export function registerAttentionObservers({ remote, sessions, attention }: Atte
     if (sessionId === undefined) return next()
     const approval = approvalFromPayload(request)
     const approvalId = approval?.id
+    const approvalCallId = approval?.callId
     const copy = buildApprovalCopy(approval?.toolName, approval?.reason)
     const done = attention.begin({
       kind: 'approval',
       sessionId,
       ...(approvalId === undefined ? {} : { id: approvalId }),
+      ...(approvalCallId === undefined ? {} : { callId: approvalCallId }),
       what: copy.what,
       whatToken: copy.whatToken,
       ...(copy.detail === undefined ? {} : { detail: copy.detail }),

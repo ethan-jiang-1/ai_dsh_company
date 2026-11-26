@@ -1,4 +1,5 @@
 // 负例留证 2026-11-23：在 `attention-history.ts` 把 `windowTruncated` 改回 `full.value.hasMore === true || records.length >= HISTORY_PAGE_MESSAGES` ⇒ `180 组随机工作区与历史响应` 当场红（expected 'some' to be 'none'），连同 `BUG-304/BUG-305/BUG-318/BUG-320/BUG-323/BUG-327/BUG-328/BUG-332` 边界/fail-open 守卫一起验红；还原即 4/4 全绿。
+// 负例留证 2026-11-27：去掉 attention-observers 的 callId 透传 ⇒ BUG-388 真实 DSH approval/request 形状双源同源消重用例红（merged=2）；还原后绿。BUG-388
 /**
  * `attention` 读模型性质与 Live ↔ History 同源差分测试（Tier 1-2，零新 npm 依赖）。
  *
@@ -246,6 +247,29 @@ describe('identity · mergeAttention 与 Live ↔ History 同源差分', () => {
       ],
     )
     expect(merged).toHaveLength(2)
+  })
+
+  it('真实 DSH approval/request（仅带 callId、无 id）经观察者登记后与 approval/asked 同源 1:1 消重（BUG-388）', async () => {
+    const handlers = new Map<string, (this: unknown, request: never, next: () => unknown) => unknown>()
+    const registry = createAttentionRegistry()
+    registerAttentionObservers({
+      remote: { $on: (e, h) => { handlers.set(e, h); return () => {} } },
+      sessions: { scopeOf: () => 'lead-1' },
+      attention: registry,
+    })
+    let release!: () => void
+    const pending = (handlers.get('approval/request')!).call(
+      {},
+      { toolName: 'request_signoff', callId: 'call-sign-1', reason: '折扣线双签' } as never,
+      () => new Promise<void>(resolve => { release = resolve }),
+    )
+    await Promise.resolve()
+    const history = pendingAsks([
+      { type: 'approval/asked', time: 1000, data: { id: 'uuid-sign-1', callId: 'call-sign-1', toolName: 'request_signoff', reason: '折扣线双签' } },
+    ], 'lead-1')
+    expect(mergeAttention(registry.list(), history.items)).toHaveLength(1)
+    release()
+    await pending
   })
 
   it('registerAttentionObservers 收到畸形 user-questions/request 与 approval/request 均不崩溃并正常委托 next()', async () => {

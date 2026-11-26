@@ -45,6 +45,10 @@ export interface AttentionItem {
    */
   readonly id?: string
   /**
+   * 工具调用身份（实时 `approval/request` 缺 `id` 但带 `callId` 时与历史 `approval/asked` 对齐；BUG-388）。
+   */
+  readonly callId?: string
+  /**
    * 事件流身份（vendor 会话事件的 `seq`）。无 id 的消息类条目用它去重——毫秒时间不是身份
    * （BUG-359：同毫秒两条不同升级会互相吞掉）。
    */
@@ -66,6 +70,10 @@ export interface LivePending {
   readonly detail?: string
   /** 稳定身份（审批 id / 问询 id）；去重用，见 {@link attentionItemKey}。 */
   readonly id?: string
+  /**
+   * 工具调用身份（实时 `approval/request` 缺 `id` 但带 `callId` 时与历史 `approval/asked` 对齐；BUG-388）。
+   */
+  readonly callId?: string
   readonly since: number
 }
 
@@ -196,11 +204,13 @@ export function streamAttention(
  */
 export function approvalFromPayload(
   payload: unknown,
-): { readonly id?: string; readonly toolName: unknown; readonly reason: unknown } | null {
+): { readonly id?: string; readonly callId?: string; readonly toolName: unknown; readonly reason: unknown } | null {
   if (!isRecord(payload)) return null
   const id = typeof payload.id === 'string' && payload.id !== '' ? payload.id : undefined
+  const callId = typeof payload.callId === 'string' && payload.callId !== '' ? payload.callId : undefined
   return {
     ...(id === undefined ? {} : { id }),
+    ...(callId === undefined ? {} : { callId }),
     toolName: payload.toolName,
     reason: payload.reason,
   }
@@ -229,6 +239,7 @@ export function pendingApprovals(events: readonly AttentionEventLike[], sessionI
         kind: 'approval',
         who: sessionId,
         id: data.id,
+        ...(data.callId === undefined ? {} : { callId: data.callId }),
         what: copy.what,
         whatToken: copy.whatToken,
         ...(copy.detail === undefined ? {} : { detail: copy.detail }),
@@ -268,20 +279,32 @@ export function mergeAttention(
     ...(entry.whatToken === undefined ? {} : { whatToken: entry.whatToken }),
     ...(entry.detail === undefined ? {} : { detail: entry.detail }),
     ...(entry.id === undefined ? {} : { id: entry.id }),
+    ...(entry.callId === undefined ? {} : { callId: entry.callId }),
     time: entry.since,
     jumpTo: entry.sessionId,
   }))
   // 活体登记与「历史重建」可能指向同一条挂起（本页看着它发起、刷新后又能重建）——按**身份**去重，
   // 优先活体（它带真实 since）。按摘要去重会让两条同摘要的不同审批互相吞掉（BUG-299）。
   const seen = new Set(waiting.map(attentionItemKey))
-  // 跨源身份（BUG-325）：问询的活体 id 是合成的（312）、历史 id 是 `callId`（319）——两套 id 各自都对，
-  // 拼起来会让同一条问询显示两行。这里对 **live ↔ history** 之间的问询按多重集配额去重（1:1 抵消），
-  // 既防止同一条被重复渲染，也不吞掉仅有历史或同文多条的问询；源内仍按 id（保 312）。
+  // 跨源身份（BUG-325 / BUG-388）：问询活体 id 合成而历史为 callId；实时审批 `approval/request` 常不带
+  // `id` 而只带 `callId`，历史 `approval/asked` 同时带 `id` 与 `callId`。
+  // 对 live ↔ history 之间：问询按内容 1:1 预算抵消；审批先按 `callId` 精确消重，既无 `id` 又无 `callId`
+  // 的兜底活体审批再按内容 1:1 预算抵消，避免同一审批叠出两条又绝不塌缩不同 `callId`。
   const liveQuestionBudget = new Map<string, number>()
+  const liveApprovalCallIds = new Set<string>()
+  const liveApprovalContentBudget = new Map<string, number>()
   for (const item of waiting) {
-    if (item.kind !== 'question') continue
-    const qKey = questionContentKey(item)
-    liveQuestionBudget.set(qKey, (liveQuestionBudget.get(qKey) ?? 0) + 1)
+    if (item.kind === 'question') {
+      const qKey = questionContentKey(item)
+      liveQuestionBudget.set(qKey, (liveQuestionBudget.get(qKey) ?? 0) + 1)
+    } else if (item.kind === 'approval') {
+      if (item.callId !== undefined) {
+        liveApprovalCallIds.add(approvalCallDedupKey(item.jumpTo, item.callId))
+      } else if (item.id === undefined) {
+        const aKey = questionContentKey(item)
+        liveApprovalContentBudget.set(aKey, (liveApprovalContentBudget.get(aKey) ?? 0) + 1)
+      }
+    }
   }
   // BUG-359：只在 **live ↔ history** 之间去重；历史流内部两条不同事件（同毫秒、同 kind）都保留。
   const rebuilt = streamItems.filter(item => {
@@ -292,6 +315,16 @@ export function mergeAttention(
       const budget = liveQuestionBudget.get(qKey) ?? 0
       if (budget > 0) {
         liveQuestionBudget.set(qKey, budget - 1)
+        return false
+      }
+    } else if (item.kind === 'approval') {
+      if (item.callId !== undefined && liveApprovalCallIds.has(approvalCallDedupKey(item.jumpTo, item.callId))) {
+        return false
+      }
+      const aKey = questionContentKey(item)
+      const budget = liveApprovalContentBudget.get(aKey) ?? 0
+      if (budget > 0) {
+        liveApprovalContentBudget.set(aKey, budget - 1)
         return false
       }
     }
@@ -315,11 +348,17 @@ export function mergeAttention(
  * @returns 去重键。
  */
 export function attentionItemKey(item: AttentionItem): string {
-  // 无 id 的消息类：优先事件 seq（真实身份，BUG-359）；没有 seq 的旧流才退回毫秒时间。
+  // 无 id 的消息类：优先 callId，其次事件 seq（真实身份，BUG-359）；没有的旧流才退回毫秒时间。
   // **绝不回落到 `what`**——同文两条会撞 key（BUG-312 就是这么冒出来的）。
   if (item.id !== undefined) return `${item.kind}\u0000${item.jumpTo}\u0000#${item.id}`
+  if (item.callId !== undefined) return `${item.kind}\u0000${item.jumpTo}\u0000call:${item.callId}`
   if (item.eventKey !== undefined) return `${item.kind}\u0000${item.jumpTo}\u0000@${String(item.eventKey)}`
   return `${item.kind}\u0000${item.jumpTo}\u0000${String(item.time)}`
+}
+
+/** 审批跨源 `callId` 键（live 缺 `id` 但带 `callId` ↔ history `approval/asked` 的 `callId`）。 */
+function approvalCallDedupKey(jumpTo: string, callId: string): string {
+  return `${jumpTo}\u0000${callId}`
 }
 
 /** 问询的**跨源**内容键（只在 live↔history 之间用；源内仍按 id）。 */

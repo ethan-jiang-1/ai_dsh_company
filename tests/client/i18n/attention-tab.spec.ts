@@ -69,6 +69,12 @@ describe('AttentionTab i18n', () => {
     expect(html).toContain('Nothing is waiting for you')
     expect(html).toContain('Just completed')
     assertEnglishUiClean(html, 'AttentionTab empty en')
+
+    const unresolved = (selector: (state: { byId: Record<string, unknown> }) => unknown) => selector({ byId: {} })
+    const boundedHtml = render(tEn, { useSessions: unresolved })
+    expect(boundedHtml).toContain('data-attention-empty-bounded')
+    expect(boundedHtml).toContain('within the covered boundary')
+    assertEnglishUiClean(boundedHtml, 'AttentionTab bounded empty en')
   })
 
   it('en 填充态与边界态（多问题/缺工具名审批/带理由审批/未解析工作区）：zh/en 均干净', async () => {

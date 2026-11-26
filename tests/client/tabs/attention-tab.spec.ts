@@ -263,6 +263,7 @@ describe('AttentionTab · 问询从历史重建（BUG-319）', () => {
 })
 
 // 负例留证 2026-11-23：去掉 ownAsks.capped 后「本会话审批被截」用例 failure；把空态改回手写三条件后矩阵五档 failure。BUG-327 / BUG-328
+// 负例留证 2026-11-27：把 AttentionTab 的 hasBoundary(boundaries) 分支改回返回 null ⇒ BUG-388 边界占位用例红；还原后绿。BUG-388
 // 边界组合矩阵：六个边界 × {空 / 有项}，每种组合下
 // 「提示行出现」且「空态被压住」。这是上一轮漏掉的形状——单个边界对、组合起来漏。
 describe('AttentionTab · 本会话 capped（BUG-327）', () => {
@@ -315,5 +316,15 @@ describe('AttentionTab · 边界组合矩阵（BUG-328）', () => {
     const frames = Array.from({ length: 1001 }, (_, i) => ({ kind: 'history' as const, events: [{ type: 'turn/start', time: i, data: {} }] }))
     const follow = async function* () { for (const frame of frames) yield frame as never }
     await expectBoundary(createElement(AttentionTab, props({ follow, useSessions: stub(readyById) })), '只保留最近')
+  })
+
+  it('⑦ 有边界且 waiting=0 时「等你处理」下不留白，渲染带边界限定的占位提示（BUG-388）', async () => {
+    const many = Object.fromEntries(Array.from({ length: 25 }, (_, i) => [`s${String(i)}`, { id: `s${String(i)}`, cwd: '/ws', updatedAt: i }]))
+    const host = await mount(createElement(AttentionTab, props({ useSessions: stub({ ...readyById, ...many }), pageHistory: page([]) })))
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 40)) })
+    const boundedEmpty = host.querySelector('[data-attention-empty-bounded]')
+    expect(boundedEmpty).not.toBeNull()
+    expect(boundedEmpty?.textContent).toContain('边界')
+    expect(host.textContent).not.toContain('没有等你的事——')
   })
 })
