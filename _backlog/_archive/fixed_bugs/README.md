@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-391**（2026-11-27，384..391 批顺位 4 / P2）：清除 `cultivation-copy` 与 `locales.ts` 文本裸 `**` 并同步刷新 `ui.expected.json`；`PanelFrameProps.floatTab` 改为可选并移除 HQ 的 `noopFloat` 隐藏死浮出按钮——
+  [391](BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md)。证据提交 `cc3878ed`。
+
 - **BUG-390**（2026-11-27，384..391 批顺位 4 / P2）：`@` 角色组补充本地化 `section`、`TasksTab`/`presenceFromEvents` 将 `lead` 映为 CEO、新增 `shortSessionId` 剥离 `session-`、HQ 总览与待办映射 `request_signoff` 并统一 `zh-CN` 24h/`en-US` 时钟——
   [390](BUG-390-unlocalized-raw-identifiers-and-clock-locale-leaks.md)。证据提交 `11764dd1`。
 

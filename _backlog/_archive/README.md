@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-391](fixed_bugs/BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md) — 已修（`cc3878ed`）：清除纯文本裸 `**` 星号并隐藏 HQ 不可浮出卡片的死「浮出」按钮；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
 - [BUG-390](fixed_bugs/BUG-390-unlocalized-raw-identifiers-and-clock-locale-leaks.md) — 已修（`11764dd1`）：本地化 `@` 分组、`lead` 成员映射、`request_signoff` 工具名、`shortSessionId` 去前缀与 24h/locale 时钟；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
 - [BUG-389](fixed_bugs/BUG-389-signoff-composer-card-ignores-display-reason-and-duplicates-toolview.md) — 已修（`fd4efc02`）：`SignoffComposerCard` 优先消费 `displayReason`、默认折叠补充上下文且清理 `line` schema 双语混排示例；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
 - [BUG-388](fixed_bugs/BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md) — 已修（`0a04d1e2`）：跨源 `approval/request` 按 `callId` / 内容配额 1:1 去重并补全有边界零待办占位说明；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。

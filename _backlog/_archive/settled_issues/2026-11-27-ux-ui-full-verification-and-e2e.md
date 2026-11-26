@@ -224,4 +224,4 @@ Keyless 夹具无法替代真实 LLM 工具调用与流式渲染，本阶段覆�
 - P1：[BUG-388](../fixed_bugs/BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md)（活体待办审批重复条目 + BUG-328 边界留白）
 - P2：[BUG-389](../fixed_bugs/BUG-389-signoff-composer-card-ignores-display-reason-and-duplicates-toolview.md)（`SignoffComposerCard` 忽略 `displayReason` 且与流内工具卡同屏重复）
 - P2：[BUG-390](../fixed_bugs/BUG-390-unlocalized-raw-identifiers-and-clock-locale-leaks.md)（`company-roles` / `lead` / `request_signoff:` / `session-` / `AM·PM` 裸标识与时制泄漏）
-- P2：[BUG-391](../../bugs/BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md)（React 裸印 `**...**` 星号 + HQ 死「浮出」按钮）
+- P2：[BUG-391](../fixed_bugs/BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md)（React 裸印 `**...**` 星号 + HQ 死「浮出」按钮）
