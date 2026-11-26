@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-386](fixed_bugs/BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md) — 已修（`abec0ad5`）：内嵌控件不换行护栏与 `PresenceTab` 列对齐；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
+- [BUG-387](fixed_bugs/BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md) — 已修（`abec0ad5`）：390px HQ 培养单列折叠、网格 `min(100%, 300px)` 与全屏右栏收起出口；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
 - [BUG-384](fixed_bugs/BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md) — 已修（`4711f9d3`）：HQ 培养工坊锁定主会话并排除已知培养会话，消除无限新建会话死循环；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
 - [BUG-385](fixed_bugs/BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md) — 已修（`4711f9d3`）：`<CultivationBoard>` 新增 `language` prop 并在 HQ/Tab/View 统一透传同步；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
 - [2026-11-27-ux-ui-full-verification-and-e2e.md](settled_issues/2026-11-27-ux-ui-full-verification-and-e2e.md) — 梦之队 UX/UI 全表面深度走查与真模型 E2E（Phase 0–4 全盘完成，独立盲审校准，产 `BUG-384..BUG-391` 只报不修，0 产品代码改动）；去向 = none。

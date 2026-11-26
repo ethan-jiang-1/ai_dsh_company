@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-386**（2026-11-27，384..391 批顺位 2 / P1）：内嵌操作条与旁路按钮固定 `white-space: nowrap; flex-shrink: 0`，`.wk-row-button` 补 `min-width: 0`，`PresenceTab` 补齐 `.wk-row-aside-cell`——
+  [386](BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md)。证据提交 `abec0ad5`。
+- **BUG-387**（2026-11-27，384..391 批顺位 2 / P1）：HQ 培养工坊补 `<= 820px` 单列折叠与 `min(100%, 300px)`，三聚合 Hub 全屏右栏提供收起按钮并禁窄屏双分屏——
+  [387](BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md)。证据提交 `abec0ad5`。
+
 - **BUG-384**（2026-11-27，384..391 批顺位 1 / P0）：`CompanyHqPage` 排除已知培养会话并锚定 `pinnedSessionIdRef`，新建培养会话先登记再打开，消除死循环——
   [384](BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md)。证据提交 `4711f9d3`。
 - **BUG-385**（2026-11-27，384..391 批顺位 1 / P1）：`<CultivationBoard>` 增加 `language` prop 并在 HQ/Tab/View 统一透传同步，en 直开零中文——

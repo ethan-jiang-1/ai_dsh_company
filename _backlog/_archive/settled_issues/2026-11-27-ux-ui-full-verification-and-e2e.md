@@ -219,8 +219,8 @@ Keyless 夹具无法替代真实 LLM 工具调用与流式渲染，本阶段覆�
 ### Phase 4 · 缺陷账本立卡汇总（`BUG-384..BUG-391`，原立于 `bugs/` 调查中，按批次修复迁入 `fixed_bugs/`）
 - P0：[BUG-384](../fixed_bugs/BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md)（总部启动培养对话无限创建会话循环并永久卡死）
 - P1：[BUG-385](../fixed_bugs/BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md)（英文直开 HQ 培养面板全中文）
-- P1：[BUG-386](../../bugs/BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md)（内嵌控件与旁路查看被压成单字竖条及在场列头错位）
-- P1：[BUG-387](../../bugs/BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md)（390px 窄屏 HQ 培养双栏溢出裁切与右栏全屏遮挡）
+- P1：[BUG-386](../fixed_bugs/BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md)（内嵌控件与旁路查看被压成单字竖条及在场列头错位）
+- P1：[BUG-387](../fixed_bugs/BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md)（390px 窄屏 HQ 培养双栏溢出裁切与右栏全屏遮挡）
 - P1：[BUG-388](../../bugs/BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md)（活体待办审批重复条目 + BUG-328 边界留白）
 - P2：[BUG-389](../../bugs/BUG-389-signoff-composer-card-ignores-display-reason-and-duplicates-toolview.md)（`SignoffComposerCard` 忽略 `displayReason` 且与流内工具卡同屏重复）
 - P2：[BUG-390](../../bugs/BUG-390-unlocalized-raw-identifiers-and-clock-locale-leaks.md)（`company-roles` / `lead` / `request_signoff:` / `session-` / `AM·PM` 裸标识与时制泄漏）
