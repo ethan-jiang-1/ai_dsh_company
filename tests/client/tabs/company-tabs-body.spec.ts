@@ -8,6 +8,7 @@
  * **不主张**真浏览器浮窗/滚动（归 ui-scene-smoke / cdp-probe）。
  */
 // 负例留证 2026-11-27：去掉 PresenceTab 表头与 Lead 行末的 .wk-row-aside-cell 占位列 ⇒ BUG-386 列对齐用例红；还原后绿。BUG-386
+// 负例留证 2026-11-27：TasksTab 改回直接调 roleText(name) 不映射 'lead' ⇒ 成员列露出裸 'lead('（BUG-390）；还原后绿。BUG-390
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
@@ -154,4 +155,30 @@ describe('公司页签体静态渲染（R5-06/D5）', () => {
     }
   })
 
+  it('TasksTab 将 lead 成员映射为本地化 CEO 角色名而不漏裸 lead（BUG-390）', () => {
+    const state = {
+      projectionsBySession: {
+        'session-test': {
+          values: {
+            agentTeam: {
+              members: [
+                { id: 'm-lead', name: 'lead', role: 'lead', phase: 'idle' },
+              ],
+              tasks: [
+                { id: 't-lead', subject: 'Kickoff gate', status: 'in_progress', ownerId: 'm-lead', revision: 1 },
+              ],
+            },
+          },
+        },
+      },
+    }
+    const useSessions = (selector: (s: typeof state) => unknown) => selector(state)
+    const tInterp = ((key: keyof typeof zh, params?: Record<string, string | number>) => {
+      const tpl = zh[key]
+      return params === undefined ? tpl : tpl.replace(/\{(\w+)\}/g, (_m, n: string) => String(params[n] ?? ''))
+    }) as CompanyT
+    const html = renderToStaticMarkup(createElement(TasksTab, props({ useSessions, t: tInterp })))
+    expect(html).toContain(zh['roles.ceo.label'])
+    expect(html).not.toContain('lead(')
+  })
 })

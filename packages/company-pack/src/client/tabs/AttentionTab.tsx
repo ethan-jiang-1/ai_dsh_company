@@ -28,6 +28,7 @@ import {
   type AttentionItem,
   type LivePending,
 } from '../../lib/presence/attention.ts'
+import { shortSessionId } from '../../lib/shared/text.ts'
 import { PanelFrame, type PanelFrameProps } from './company-tabs.tsx'
 import { HISTORY_PAGE_MESSAGES, historyCandidates, readPendingAcrossSessions, type CandidateSession, type PendingAcrossSessions, type SessionPageFace } from '../presence/attention-history.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
@@ -60,19 +61,23 @@ const HISTORY_SCAN_CAP = 20
 /** 跨会话重读周期（别与会话内 2s 的活体轮询同频：那是内存读，这是 N 次远程读）。 */
 const HISTORY_REFRESH_MS = 15_000
 
-const ATTENTION_KEYS: Readonly<Record<AttentionItem['kind'], CompanyKey>> = {
+export const ATTENTION_KEYS: Readonly<Record<AttentionItem['kind'], CompanyKey>> = {
   question: 'attention.kind.question',
   approval: 'attention.kind.approval',
   escalation: 'attention.kind.escalation',
   completion: 'attention.kind.completion',
 }
 
-/** 相对时间（刚刚 / N 分钟前 / HH:MM）。 */
+/** 相对时间（刚刚 / N 分钟前 / 按公司语言 zh-CN 24h 或 en-US 渲染 HH:MM）。 */
 function formatWhen(time: number, t: CompanyT): string {
   const delta = Date.now() - time
   if (delta < 60_000) return t('attention.justNow')
   if (delta < 3_600_000) return t('attention.minutesAgo', { minutes: Math.floor(delta / 60_000) })
-  return new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const isEn = t('meta.language') === 'en'
+  return new Date(time).toLocaleTimeString(
+    isEn ? 'en-US' : 'zh-CN',
+    isEn ? { hour: '2-digit', minute: '2-digit' } : { hour: '2-digit', minute: '2-digit', hour12: false },
+  )
 }
 
 /** 条目稳定 key（时间 + 类别 + 归属 + 摘要）。 */
@@ -100,9 +105,12 @@ export function formatAttentionWhat(item: Pick<AttentionItem, 'what' | 'whatToke
       label: tok.label ?? t('attention.deliverableFallback'),
     })
     case 'approval-missing-tool': return t('attention.toolMissing')
-    case 'approval': return tok.reason === undefined
-      ? tok.toolName
-      : t('attention.approvalWithReason', { tool: tok.toolName, reason: tok.reason })
+    case 'approval': {
+      const toolLabel = tok.toolName === 'request_signoff' ? t('attention.tool.requestSignoff') : tok.toolName
+      return tok.reason === undefined
+        ? toolLabel
+        : t('attention.approvalWithReason', { tool: toolLabel, reason: tok.reason })
+    }
     case 'question-missing': return t('attention.questionMissing')
     case 'question-multi': return t('attention.questionMulti', { first: tok.first, count: tok.count })
   }
@@ -201,7 +209,7 @@ export function AttentionTab(props: AttentionTabProps) {
   const whoOf = (item: AttentionItem): string => {
     if (item.kind === 'completion' || item.kind === 'escalation') return item.who
     const summary = byId[item.jumpTo as SessionId]
-    return summary?.displayTitle ?? t('attention.session', { id: item.jumpTo.slice(0, 8) })
+    return summary?.displayTitle ?? t('attention.session', { id: shortSessionId(item.jumpTo) })
   }
 
   return (

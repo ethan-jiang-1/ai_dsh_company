@@ -331,14 +331,17 @@ export function presenceFromEvents(
   const displayOf = (id: string, fallbackName?: string): string => {
     if (teamId !== null && id === teamId) return PRESET_DISPLAY_NAMES.ceo
     const name = members.get(id)?.name ?? fallbackName ?? nameById?.get(id) ?? id
-    return displayNameFor(name, 'teammate')
+    return displayNameFor(name, name === 'lead' ? 'lead' : 'teammate')
   }
 
   for (const event of events) {
     if (isMemberEvent(event)) {
       const { member } = event.data
       teamId ??= event.data.teamId
-      const display = displayNameFor(member.name, 'teammate')
+      const display = displayNameFor(
+        member.name,
+        member.name === 'lead' || member.id === teamId ? 'lead' : 'teammate',
+      )
       if (member.phase === 'provisioning') {
         activity.push({ time: event.time, kind: 'member', text: `${display} 启动中`, token: memberToken(display, 'provisioning') })
       } else if (member.phase === 'active') {

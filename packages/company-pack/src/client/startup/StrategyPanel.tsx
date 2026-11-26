@@ -59,11 +59,16 @@ const WIKI_PROBLEM_KEY = {
   'no-index': 'strategy.wiki.noIndex',
 } as const
 
-/** 检查时间 → 人话（只到分钟；无法解析时原样）。 */
-export function formatCheckedAt(iso: string): string {
+/** 检查时间 → 人话（只到分钟；按公司语言切 zh-CN 24h / en-US；无法解析时原样）。 */
+export function formatCheckedAt(iso: string, lang: 'zh' | 'en' = 'zh'): string {
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return iso
-  return date.toLocaleString(undefined, { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+  return date.toLocaleString(
+    lang === 'en' ? 'en-US' : 'zh-CN',
+    lang === 'en'
+      ? { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }
+      : { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false },
+  )
 }
 
 function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck, checkCurrent, templatePath }: {
@@ -101,7 +106,7 @@ function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck, checkCurrent, te
     : null
   const wikiUnchecked = row.field === 'wiki' && row.value !== null && !checkCurrent ? t('strategy.wiki.unchecked') : null
   const checkedAt = row.field === 'wiki' && checkCurrent && wikiCheck.checkedAt !== null
-    ? t('strategy.wiki.checkedAt', { time: formatCheckedAt(wikiCheck.checkedAt) })
+    ? t('strategy.wiki.checkedAt', { time: formatCheckedAt(wikiCheck.checkedAt, t('meta.language') === 'en' ? 'en' : 'zh') })
     : null
   return (
     <div className="wk-strategy-row" data-field={row.field}>

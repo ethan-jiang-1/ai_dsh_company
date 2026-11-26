@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { ShortcutFixedCommand, ShortcutFixedInput } from '../../../vendor/dsh/packages/client/shortcuts/src/client/types.ts'
 import type { CompanyKey, CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
-import { zh } from '../../../packages/company-pack/src/client/locales.ts'
+import { en, zh } from '../../../packages/company-pack/src/client/locales.ts'
 import { createHubSubViewStore } from '../../../packages/company-pack/src/client/tabs/hub-subview-store.ts'
 import {
   buildSubagentChatAddress,
@@ -16,6 +16,7 @@ import {
 
 const t = ((key: CompanyKey) => zh[key]) as CompanyT
 
+// 负例留证 2026-11-27：去掉 createCompanyRoleTriggerSource 返回项的 localized section ⇒ @ 菜单分组头暴露裸 'company-roles'（BUG-390）；还原后绿。BUG-390
 describe('Wave S2 triggers, deep links, split presets, and shortcuts', () => {
   it('@ role trigger filters company roles cleanly and picks plain reference text', async () => {
     const source = createCompanyRoleTriggerSource(t)
@@ -31,6 +32,16 @@ describe('Wave S2 triggers, deep links, split presets, and shortcuts', () => {
     })
     expect(all.some(item => item.name === 'ceo')).toBe(true)
     expect(all.some(item => item.name === 'vp-eng')).toBe(true)
+    expect(all.every(item => typeof item.section === 'string' && item.section.length > 0 && item.section === zh['trigger.companyRoles'])).toBe(true)
+
+    const sourceEn = createCompanyRoleTriggerSource(((key: CompanyKey) => en[key]) as CompanyT)
+    const allEn = await sourceEn.candidates({ sessionId: 's1' as SessionId }, {
+      query: '',
+      position: 'inline',
+      drilled: false,
+      signal: controller.signal,
+    })
+    expect(allEn.every(item => typeof item.section === 'string' && item.section.length > 0 && item.section === en['trigger.companyRoles'])).toBe(true)
 
     const filtered = await source.candidates({ sessionId: 's1' as SessionId }, {
       query: 'eng',

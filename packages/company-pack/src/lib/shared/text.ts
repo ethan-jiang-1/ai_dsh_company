@@ -24,6 +24,12 @@ export function firstText(content: readonly TextBlock[] | undefined | null): str
   return ''
 }
 
+/** 剥离 DSH 会话 ID 固定 `session-` 前缀后再取短串（BUG-390：避免列表统一显示 `session-`）。 */
+export function shortSessionId(id: string): string {
+  const stripped = id.replace(/^session-/, '')
+  return (stripped !== '' ? stripped : id).slice(0, 8)
+}
+
 /** 截断长文本到 `max` 个字符；超出补省略号（动态流/标题共用）。 */
 export function clip(text: string, max: number): string {
   return text.length <= max ? text : `${text.slice(0, max)}…`

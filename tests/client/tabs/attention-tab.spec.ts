@@ -7,10 +7,12 @@
  * 本档用 happy-dom + createRoot 真挂载：挂起项从登记处读、断流显式落错误行、空态说真话、
  * 「去处理」真的跳到发起会话。**不主张**真浏览器渲染（那层归 client-load-smoke / cdp-probe）。
  */
+// 负例留证 2026-11-27：AttentionTab 去掉 shortSessionId / request_signoff 本地化 / zh-CN 24h formatWhen ⇒ 露出 session-、request_signoff: 与 AM/PM（BUG-390）；还原后绿。BUG-390
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { AttentionTab } from '../../../packages/company-pack/src/client/tabs/AttentionTab.tsx'
+import { AttentionTab, formatAttentionWhat } from '../../../packages/company-pack/src/client/tabs/AttentionTab.tsx'
+import { en, zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 import { createAttentionRegistry } from '../../../packages/company-pack/src/client/wiring/attention-registry.ts'
 import type { LivePending } from '../../../packages/company-pack/src/lib/presence/attention.ts'
 
@@ -78,8 +80,48 @@ describe('待办页签：挂起项、空态与断流（R3-10）', () => {
     expect(host.textContent).toContain('签发技术方案')
     expect(host.textContent).toContain('待答问询')
     expect(host.textContent).toContain('定价要不要让一步')
-    // 会话名解析不到 durable title 时用短 id 降级链（不是空白）
-    expect(host.textContent).toContain('会话 session-')
+    // 会话名解析不到 durable title 时剥离 session- 前缀用短 id 降级链（BUG-390：不露裸 session-）
+    expect(host.textContent).toContain('会话 vp-eng')
+    expect(host.textContent).not.toContain('会话 session-')
+  })
+
+  it('本地化 request_signoff 摘要、剥离 session- 前缀并按 zh-CN 24 小时制格式时间（BUG-390）', async () => {
+    const tZh = ((k: keyof typeof zh, p?: Record<string, string | number>) => {
+      const tpl = zh[k]
+      return p === undefined ? tpl : tpl.replace(/\{(\w+)\}/g, (_m, n: string) => String(p[n] ?? ''))
+    }) as CompanyT
+    const tEn = ((k: keyof typeof en, p?: Record<string, string | number>) => {
+      const tpl = en[k]
+      return p === undefined ? tpl : tpl.replace(/\{(\w+)\}/g, (_m, n: string) => String(p[n] ?? ''))
+    }) as CompanyT
+
+    expect(formatAttentionWhat({
+      what: 'request_signoff: margin check',
+      whatToken: { kind: 'approval', toolName: 'request_signoff', reason: 'margin check' },
+    }, tZh)).toBe(`${zh['attention.tool.requestSignoff']}：margin check`)
+    expect(formatAttentionWhat({
+      what: 'request_signoff: margin check',
+      whatToken: { kind: 'approval', toolName: 'request_signoff', reason: 'margin check' },
+    }, tEn)).toBe(`${en['attention.tool.requestSignoff']}: margin check`)
+
+    const registry = createAttentionRegistry()
+    // 超过 1 小时以走到 HH:MM 分支（23:46 本地时间测试 24 小时制且无 AM/PM）
+    const d = new Date()
+    d.setHours(23, 46, 0, 0)
+    const oldMs = d.getTime() > Date.now() - 3_600_000 ? d.getTime() - 86_400_000 : d.getTime()
+    registry.begin({
+      kind: 'approval',
+      sessionId: 'session-abcdef1234',
+      what: 'request_signoff: 折扣线',
+      whatToken: { kind: 'approval', toolName: 'request_signoff', reason: '折扣线' },
+      since: oldMs,
+    })
+    const host = await mount(createElement(AttentionTab, props({ t: tZh, getPending: () => registry.list() })))
+    expect(host.textContent).toContain('会话 abcdef12')
+    expect(host.textContent).toContain(`${zh['attention.tool.requestSignoff']}：折扣线`)
+    expect(host.textContent).not.toContain('request_signoff:')
+    expect(host.textContent).toContain('23:46')
+    expect(host.textContent).not.toMatch(/\b(AM|PM)\b/i)
   })
 
   it('「去处理」把跳转落在发起这件事的会话上', async () => {

@@ -26,6 +26,7 @@ import type { CultivationContext } from '../../lib/cultivation/cultivation-conte
 import { roleLabel } from '../../lib/cultivation/cultivation.ts'
 import type { LivePending } from '../../lib/presence/attention.ts'
 import type { StartupField } from '../../lib/startup/startup-settings.ts'
+import { shortSessionId } from '../../lib/shared/text.ts'
 import { CultivationBoard } from '../cultivation/CultivationBoard.tsx'
 import { setCultivationLanguage, type CultivationActionsFactory } from '../cultivation/cultivation-actions.ts'
 import type { CultivationContextSources } from '../cultivation/cultivation-context-data.ts'
@@ -44,6 +45,7 @@ import { StrategyPanel, type SaveResult } from '../startup/StrategyPanel.tsx'
 import type { StartupStore } from '../startup/startup-store.ts'
 import { DeliverablesTab, type DeliverablesTabProps } from '../tabs/DeliverablesTab.tsx'
 import { LedgerTab, type LedgerTabProps } from '../tabs/LedgerTab.tsx'
+import { ATTENTION_KEYS, formatAttentionWhat } from '../tabs/AttentionTab.tsx'
 import { readPresetFromSnapshot, sessionTitleOf } from '../ui/RoleBadge.tsx'
 
 export const COMPANY_HQ_PANEL_ID = 'dsh-company-pack/hq' as MainPanelId
@@ -472,7 +474,7 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
                   {sessionList.map(item => (
                     <div key={item.id} className="wk-hq-row">
                       <span className="wk-hq-row-label">{sessionTitleOf(item) ?? item.id}</span>
-                      <Tag tone={item.running ? 'warning' : 'neutral'}>{item.id.slice(0, 8)}</Tag>
+                      <Tag tone={item.running ? 'warning' : 'neutral'}>{shortSessionId(item.id)}</Tag>
                       <Button size="sm" variant="ghost" onClick={() => { openSession(item.id) }}>
                         {t('hq.openSession')}
                       </Button>
@@ -491,9 +493,9 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
                   {pendingItems.map(item => (
                     <div key={`${item.kind}:${item.sessionId}:${String(item.since)}`} className="wk-hq-row">
                       <Tag tone={item.kind === 'approval' ? 'danger' : 'warning'}>
-                        {item.kind}
+                        {t(ATTENTION_KEYS[item.kind])}
                       </Tag>
-                      <span className="wk-hq-row-label">{item.what}</span>
+                      <span className="wk-hq-row-label">{formatAttentionWhat(item, t)}</span>
                       <Button size="sm" variant="ghost" onClick={() => { openSession(item.sessionId as SessionId) }}>
                         {t('hq.openSession')}
                       </Button>

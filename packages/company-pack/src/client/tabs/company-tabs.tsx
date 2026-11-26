@@ -22,7 +22,7 @@ import { buildDelegationTree, type DelegationSessionSummaryLike } from '../../li
 import { TasksTableView } from './TasksPanel.tsx'
 import { MAX_ACTIVITY, useCompanyData, type CompanyDataInjected } from '../data/use-company-data.ts'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
-import { presenceRoleText, roleText, roleTextForCanonical } from '../roles.ts'
+import { memberRoleText, presenceRoleText, roleTextForCanonical } from '../roles.ts'
 
 /** 页签体注入面：数据面 + 平台浮出操作。 */
 export interface CompanyTabInjected extends CompanyDataInjected {
@@ -268,7 +268,7 @@ export function TasksTab(props: CompanyTabProps) {
     <PanelFrame title={props.t('tabs.tasks.label')} tone="work" tabProps={props}>
       {data.error !== null && <div className="wk-error">{data.error}</div>}
       {data.streamError === null ? null : <StreamErrorNotice message={data.streamError} t={props.t} />}
-      <TasksTableView view={data.team} roleLabel={(name: string) => roleText(name, 'label', props.t, name)} t={props.t} />
+      <TasksTableView view={data.team} roleLabel={(name: string) => memberRoleText(name, props.t)} t={props.t} />
     </PanelFrame>
   )
 }

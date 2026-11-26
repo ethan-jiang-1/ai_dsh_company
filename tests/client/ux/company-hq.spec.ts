@@ -26,7 +26,10 @@ import { setCultivationLanguage } from '../../../packages/company-pack/src/clien
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
 const makeT = (dict: Record<CompanyKey, string>) =>
-  ((key: CompanyKey) => dict[key]) as unknown as CompanyT
+  ((key: CompanyKey, params?: Record<string, string | number>) => {
+    const template = dict[key]
+    return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, n: string) => String(params[n] ?? ''))
+  }) as unknown as CompanyT
 
 beforeEach(() => {
   localStorage.clear()
@@ -507,6 +510,67 @@ describe('Wave S3 CompanyHqPage & HqCultivationConversationSlot', () => {
 
     act(() => { root.unmount() })
     setCultivationLanguage('zh')
+    host.remove()
+  })
+
+  // 负例留证 2026-11-27：HQ 总览会话标签与待办行恢复裸 item.id.slice(0,8) / item.kind / item.what ⇒ 露出 session- / approval / request_signoff:（BUG-390）；还原后绿。BUG-390
+  it('BUG-390：HQ 总览剥离 session- 前缀并本地化待办类别与 request_signoff', async () => {
+    const hqStore = createHqSectionStore()
+    hqStore.select('overview')
+    const startupStore = createStartupStore()
+    const sessionState = {
+      byId: { 'session-abc12345def': { id: 'session-abc12345def' as SessionId, title: 'Main CEO Session', origin: 'human', cwd: '/tmp/ws', updatedAt: 100 } },
+      projectionsBySession: { 'session-abc12345def': { values: { agentPreset: 'ceo' } } },
+    }
+    const pendingItems = [{
+      kind: 'approval' as const,
+      sessionId: 'session-abc12345def',
+      what: 'request_signoff: margin check',
+      whatToken: { kind: 'approval' as const, toolName: 'request_signoff', reason: 'margin check' },
+      since: 10,
+    }]
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    await act(async () => {
+      root.render(createElement(CompanyHqPage, {
+        t: makeT(zh),
+        useHqSection: (sel: (v: HqSection) => unknown) => sel(hqStore.store.getSnapshot()),
+        useAttentionItems: (sel: (v: readonly unknown[]) => unknown) => sel(pendingItems),
+        selectSection: (next: HqSection) => { hqStore.select(next) },
+        returnToChat: vi.fn(),
+        openSession: vi.fn(),
+        useSessions: (sel: (v: typeof sessionState) => unknown) => sel(sessionState),
+        useProjection: () => undefined,
+        sessions: { retain: vi.fn(), create: vi.fn() },
+        cultivationFiles: { listJournal: async () => [], readHead: async () => null, listRecords: async () => ({ ok: true as const, names: [] }), readRecord: async () => ({ ok: false as const, reason: 'unavailable' as const }) },
+        cultivationActions: () => ({ run: async () => ({ ok: true as const, text: 'ok' }) }),
+        followEvents: async function* () {},
+        readLedger: async () => ({ ok: true as const, text: '' }),
+        readCatalog: async () => ({ ok: true as const, text: '' }),
+        contextSources: () => ({ entries: [] }),
+        openContext: async () => ({ ok: true as const }),
+        openFinal: vi.fn(),
+        startupStore,
+        loadStartup: async () => {},
+        saveStartup: async () => ({ ok: true as const }),
+        resetStartup: async () => ({ ok: true as const }),
+        SessionProvider: ({ children }: { children?: ReactNode }) => createElement('div', null, children),
+        renderSlot: () => null,
+      } as unknown as ComponentProps<typeof CompanyHqPage>))
+    })
+
+    const overviewText = host.textContent ?? ''
+    expect(overviewText).toContain('abc12345')
+    expect(overviewText).not.toContain('session- ')
+    const tags = [...host.querySelectorAll('.wk-hq-row')].map(row => row.textContent ?? '')
+    expect(tags.some(text => text.includes('abc12345') && !text.includes('session-abc'))).toBe(true)
+    expect(overviewText).toContain(zh['attention.kind.approval'])
+    expect(overviewText).toContain(zh['attention.tool.requestSignoff'])
+    expect(overviewText).not.toContain('approvalrequest_signoff:')
+    expect(overviewText).not.toContain('request_signoff:')
+
+    act(() => { root.unmount() })
     host.remove()
   })
 })

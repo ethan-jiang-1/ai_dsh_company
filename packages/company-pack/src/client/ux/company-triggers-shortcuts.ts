@@ -111,6 +111,7 @@ export function createCompanyRoleTriggerSource(t: CompanyT): InputTriggerSource 
         name: roleId,
         label: roleText(roleId, 'label', t),
         description: roleText(roleId, 'full', t),
+        section: t('trigger.companyRoles'),
         value: roleId,
         icon: 'session',
       }))

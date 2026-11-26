@@ -45,6 +45,11 @@ export function roleTextForCanonical(name: string, t: CompanyT): string {
   return id === undefined ? name : roleText(id, 'label', t)
 }
 
+/** 团队成员名 → 表达层 label；团队里的 `lead` 与 `ceo` 同义，不漏裸 `'lead'`（BUG-390）。 */
+export function memberRoleText(name: string, t: CompanyT): string {
+  return name === 'lead' ? roleText('ceo', 'label', t) : roleText(name, 'label', t, name)
+}
+
 /** canonical 名（数据/测试用；不随语言变）。 */
 export function canonicalRoleName(role: string): string {
   return isRoleId(role) ? ROLE_CANONICAL[role] : role

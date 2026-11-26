@@ -106,6 +106,7 @@ const R2_LIKE_EVENTS: readonly TeamEventLike[] = [
   messageEvent(VP_SALES, 'vp-sales', LEAD, '回执 · task-1：结论一句话——有条件做，市场侧放行。', 2_250),
 ]
 
+// 负例留证 2026-11-27：presenceFromEvents 对 member.name=lead 仍传 'teammate' 给 displayNameFor ⇒ 动态流露出 'lead 上线'（BUG-390）；还原后绿。BUG-390
 describe('presenceFromEvents（回放 / 离线路径，验收判据 4：非空在场板）', () => {
   const board = presenceFromEvents(R2_LIKE_EVENTS)
 
@@ -141,6 +142,18 @@ describe('presenceFromEvents（回放 / 离线路径，验收判据 4：非空�
     const message = texts.find(text => text.includes('→'))
     expect(message).toContain('VP-Sales → CEO')
     expect(message).toContain('回执 · task-1')
+  })
+
+  it('lead 成员上线事件映射为 CEO 而非裸 lead（BUG-390）', () => {
+    const board = presenceFromEvents([
+      memberEvent(LEAD, 'lead', 'active', 1_500),
+    ])
+    expect(board.activity[0]?.text).toContain(`${PRESET_DISPLAY_NAMES.ceo} 上线`)
+    expect(board.activity[0]?.text).not.toContain('lead')
+    expect(board.activity[0]?.token).toEqual({
+      key: 'presence.activity.memberOnline',
+      params: { name: PRESET_DISPLAY_NAMES.ceo },
+    })
   })
 })
 
