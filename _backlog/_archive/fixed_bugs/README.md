@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-390**（2026-11-27，384..391 批顺位 4 / P2）：`@` 角色组补充本地化 `section`、`TasksTab`/`presenceFromEvents` 将 `lead` 映为 CEO、新增 `shortSessionId` 剥离 `session-`、HQ 总览与待办映射 `request_signoff` 并统一 `zh-CN` 24h/`en-US` 时钟——
+  [390](BUG-390-unlocalized-raw-identifiers-and-clock-locale-leaks.md)。证据提交 `11764dd1`。
+
 - **BUG-389**（2026-11-27，384..391 批顺位 4 / P2）：`SignoffComposerCard` 接入 `ctx.locale.resolveText` 解析 `displayReason` 并将补充上下文折叠进 `<details>`；`signoff-tool` `line` 描述去双语斜杠混排示例——
   [389](BUG-389-signoff-composer-card-ignores-display-reason-and-duplicates-toolview.md)。证据提交 `fd4efc02`。
 
