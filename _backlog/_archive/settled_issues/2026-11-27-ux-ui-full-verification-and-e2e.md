@@ -216,9 +216,9 @@ Keyless 夹具无法替代真实 LLM 工具调用与流式渲染，本阶段覆�
   - 真实会话执行 `/req check` 渲染 `CompanyCommandView`，且在 `presence-e2e` 真子代理会话验证「旁路查看」成功加载子代理对话。
 - **未在本轮真模型直跑的覆盖边界**：`bash` 非公司审批在 `workspace-write` 沙箱策略下需要显式越权请求才能触发（未单独在真模型跑一轮，按源码检查 `ui-approval` `priority: 1` 透传）；真模型 `/prd check` 与 `/delivery check` 未另起长动议流式跑（已用 `/req check` 真跑 + 合成夹具覆盖结构卡样式与折叠）。
 
-### Phase 4 · 缺陷账本立卡汇总（`BUG-384..BUG-391`，均 `status: 调查中`）
-- P0：[BUG-384](../../bugs/BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md)（总部启动培养对话无限创建会话循环并永久卡死）
-- P1：[BUG-385](../../bugs/BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md)（英文直开 HQ 培养面板全中文）
+### Phase 4 · 缺陷账本立卡汇总（`BUG-384..BUG-391`，原立于 `bugs/` 调查中，按批次修复迁入 `fixed_bugs/`）
+- P0：[BUG-384](../fixed_bugs/BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md)（总部启动培养对话无限创建会话循环并永久卡死）
+- P1：[BUG-385](../fixed_bugs/BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md)（英文直开 HQ 培养面板全中文）
 - P1：[BUG-386](../../bugs/BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md)（内嵌控件与旁路查看被压成单字竖条及在场列头错位）
 - P1：[BUG-387](../../bugs/BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md)（390px 窄屏 HQ 培养双栏溢出裁切与右栏全屏遮挡）
 - P1：[BUG-388](../../bugs/BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md)（活体待办审批重复条目 + BUG-328 边界留白）

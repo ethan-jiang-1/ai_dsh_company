@@ -8,12 +8,10 @@
 
 ## 活跃清单
 
-**活跃 8 张（2026-11-27 UX/UI 全表面深度走查新立，按用户指示「只报不修」）**：
+**活跃 6 张（UX/UI 深度走查批次进行中；384–385 已修归档）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
-| [BUG-384](BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md) | P0 | client | 总部「启动培养对话」触发 `primarySession` 反跳无限新建会话循环且卡死准备中 | 调查中 |
-| [BUG-385](BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md) | P1 | client | 英文下直开 HQ 培养工坊未调 `setCultivationLanguage()`，整块面板仍显中文 | 调查中 |
 | [BUG-386](BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md) | P1 | client | 内嵌操作条（状态胶囊/纠偏/终稿动作）与「旁路查看」缺不换行约束，在分栏/中屏折成单字竖条且列头错位 | 调查中 |
 | [BUG-387](BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md) | P1 | client | `390×844` 下 HQ 培养双栏网格硬编码导致横向溢出裁切，展开右栏遮挡主区与左侧栏入口 | 调查中 |
 | [BUG-388](BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md) | P1 | client + lib | 活体 `approval/request` 缺 `id` 导致待办重复渲染两条；零待办但有扫描边界时标题下留白 | 调查中 |
@@ -22,7 +20,7 @@
 | [BUG-391](BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md) | P2 | client | React 文本裸印 `**...**` 星号字面量，且 HQ 嵌入式子卡片保留绑定 `noopFloat` 的死「浮出」按钮 | 调查中 |
 
 **按根因聚类摘要（供后续排修批次）**：
-- **组 1 · 总部工坊状态与语言接线**（[384](BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md)、[385](BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md)、[391](BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md) 死浮出部分）：`HqCultivationWorkshop` 对外部易变 `primarySession` 缺锁定且漏接语言/PanelFrame 语境；
+- **组 1 · 总部工坊状态与语言接线**（[384](../_archive/fixed_bugs/BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md)、[385](../_archive/fixed_bugs/BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md)、[391](BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md) 死浮出部分）：`HqCultivationWorkshop` 对外部易变 `primarySession` 缺锁定且漏接语言/PanelFrame 语境；
 - **组 2 · 响应式窄框与 CSS 换行护栏**（[386](BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md)、[387](BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md)）：`styles.ts` 内嵌控件缺少 `white-space: nowrap; flex-shrink: 0`、`.wk-row-wrap` 与 `.wk-hq-cultivation-split` 缺窄屏/单列断点；
 - **组 3 · 跨源去重与表达层/契约收口**（[388](BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md)、[389](BUG-389-signoff-composer-card-ignores-display-reason-and-duplicates-toolview.md)、[390](BUG-390-unlocalized-raw-identifiers-and-clock-locale-leaks.md)、[391](BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md) 裸星号部分）：跨源无 id 审批去重、S1 双签 `displayReason` 未接与表达层字典/格式化细节遗漏。
 
@@ -38,7 +36,7 @@
 
 | 顺位 | 组 / 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
 |---|---|---|---|---|
-| **1 HQ 工坊状态与语言接线** | [384](BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md) + [385](BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md) | `CompanyHqPage` 把按 `updatedAt` 倒序的 `sessionList[0]` 当 `mainSessionId` 喂给工坊，新建培养会话反推改写主会话触发死循环；`HqCultivationWorkshop` 漏接培养板语言同步 | 384：排除已知培养会话并锚定 `pinnedSessionId`，新建培养会话先登记再打开；385：`<CultivationBoard>` 增加 `language` prop 并在 HQ/Tab/View 统一透传同步 | 1 |
+| **1 HQ 工坊状态与语言接线** | [384](../_archive/fixed_bugs/BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md)（已修 `4711f9d3`） + [385](../_archive/fixed_bugs/BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md)（已修 `4711f9d3`） | `CompanyHqPage` 把按 `updatedAt` 倒序的 `sessionList[0]` 当 `mainSessionId` 喂给工坊，新建培养会话反推改写主会话触发死循环；`HqCultivationWorkshop` 漏接培养板语言同步 | 384：排除已知培养会话并锚定 `pinnedSessionId`，新建培养会话先登记再打开；385：`<CultivationBoard>` 增加 `language` prop 并在 HQ/Tab/View 统一透传同步 | 1 |
 | **2 窄屏响应式与不换行护栏** | [386](BUG-386-inline-controls-and-presence-aside-wrap-vertical-crushed.md) + [387](BUG-387-mobile-390-hq-cultivation-overflow-and-rightbar-occlusion.md) | 内嵌 slot 包装类与旁路按钮缺 `white-space: nowrap; flex-shrink: 0`，在场列头与行尾不对齐；HQ 培养双栏网格缺 `@media (max-width: 820px)` 折叠，`<768px` 右栏全屏缺显式收起入口 | 386：CSS 护栏固定不换行与 `min-width: 0`，`PresenceTab` 补齐 `.wk-row-aside-cell`；387：HQ 加窄屏单列断点与 `min(100%, 300px)`，Hub 在 `fullscreen` 下提供「收起侧栏」并禁用窄屏双分屏 | 2 |
 | **3 跨源审批去重与边界空态** | [388](BUG-388-attention-live-approval-duplicate-and-boundary-blank-void.md) | 上游 `approval/request` 只带 `callId` 无 `id`，丢弃 `callId` 导致 live↔history 无法消重；零待办且有边界时小节标题下返回 `null` 留白 | 透传 `callId` 并在 `mergeAttention` 按 `callId` / 内容配额 1:1 消重；`AttentionTab` 在 `hasBoundary` 时渲染带边界限定的诚实空态 | 3 |
 | **4 契约与表达层收口** | [389](BUG-389-signoff-composer-card-ignores-display-reason-and-duplicates-toolview.md) / [390](BUG-390-unlocalized-raw-identifiers-and-clock-locale-leaks.md) / [391](BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md) | 决策卡漏接 `displayReason` 且全展开重复；4 处暴露内部标识与宿主时钟 locale；3 处字典字面量含 `**`；HQ 传 `noopFloat` 留死浮出按钮 | 389：注入 `resolveReason` 并默认折叠补充上下文；390：补 `section`、映射 `lead`/工具名/HQ 类型标签、剥离 `session-`、统一 24h/locale 时钟；391：去 `**`、隐藏无 `floatTab` 时的浮出按钮并刷 UI 金样 | 4 |

@@ -4,6 +4,11 @@
 
 ## 修复流水（倒序）
 
+- **BUG-384**（2026-11-27，384..391 批顺位 1 / P0）：`CompanyHqPage` 排除已知培养会话并锚定 `pinnedSessionIdRef`，新建培养会话先登记再打开，消除死循环——
+  [384](BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md)。证据提交 `4711f9d3`。
+- **BUG-385**（2026-11-27，384..391 批顺位 1 / P1）：`<CultivationBoard>` 增加 `language` prop 并在 HQ/Tab/View 统一透传同步，en 直开零中文——
+  [385](BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md)。证据提交 `4711f9d3`。
+
 - **BUG-383**（2026-11-24，377..383 批顺位 3 / P2）：人工 false 写 `dirVeto`（目录名稳定），归档后不再被 slug 旧 true 覆盖——
   [383](BUG-383-presented-false-overridden-by-slug-after-archive.md)。证据提交 `b5a3ea4b`。
 

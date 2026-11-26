@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-384](fixed_bugs/BUG-384-hq-cultivation-workshop-infinite-session-create-loop.md) — 已修（`4711f9d3`）：HQ 培养工坊锁定主会话并排除已知培养会话，消除无限新建会话死循环；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
+- [BUG-385](fixed_bugs/BUG-385-hq-cultivation-board-ignores-locale-stays-chinese-in-en.md) — 已修（`4711f9d3`）：`<CultivationBoard>` 新增 `language` prop 并在 HQ/Tab/View 统一透传同步；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
 - [2026-11-27-ux-ui-full-verification-and-e2e.md](settled_issues/2026-11-27-ux-ui-full-verification-and-e2e.md) — 梦之队 UX/UI 全表面深度走查与真模型 E2E（Phase 0–4 全盘完成，独立盲审校准，产 `BUG-384..BUG-391` 只报不修，0 产品代码改动）；去向 = none。
 - [2026-11-26-dsh-native-ux-upgrade.md](settled_issues/2026-11-26-dsh-native-ux-upgrade.md) — S1–S4 利用 DSH 原生扩展升级 UX/UI（12 项原生槽位、右栏 10→3 聚合 + Guide L1 透传、全局总部与原生内嵌培养、清退 `[data-composer-seat]` / `dockkit-float` / `#16111f` / 组件 `useSyncExternalStore`）；独立两轮盲审 0 阻断；去向 = [实施Note](../../notes/implemented/2026-11-26-dsh-native-ux-upgrade.md)。
 - [2026-11-21-company-e2e-test-design.md](settled_issues/2026-11-21-company-e2e-test-design.md) — 消化收口：6 轮 E2E（`BUG-293`–`BUG-332`）全部修复归档、`BUG-296` 构建指纹已入真实页面车道，系统防线由 11-23 两篇质量预防 Note 承接。
