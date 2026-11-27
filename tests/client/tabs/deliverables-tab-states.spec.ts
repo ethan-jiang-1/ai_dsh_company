@@ -10,9 +10,9 @@
  */
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
-import { afterEach, describe, expect, it } from 'vitest'
-import { DeliverablesTab, DeliverablesView } from '../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx'
-import { deliverablesFocusStore } from '../../../packages/company-pack/src/client/tabs/deliverables-focus-store.ts'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { DeliverablesTab, DeliverablesView, formatGeneratedAt } from '../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx'
+import { createDeliverablesFocusStore, deliverablesFocusStore, extractDeliverableTarget } from '../../../packages/company-pack/src/client/tabs/deliverables-focus-store.ts'
 import { zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 
@@ -137,15 +137,87 @@ describe('DeliverablesTab：截断 ≠ 形状不符', () => {
         metaProblem: null,
       }],
     }
+    const openFinal = vi.fn()
     const host = await mount(createElement(DeliverablesView, {
       catalog,
       sessionId: 'session-1' as never,
-      openFinal: () => {},
+      openFinal,
       t,
     }))
     const row = host.querySelector('.wk-deliverable-row[data-highlighted="true"]')
     expect(row).not.toBeNull()
     expect(row?.textContent).toContain('item-1')
     expect(deliverablesFocusStore.get()).toBeNull()
+
+    const openBtn = host.querySelector('.wk-deliverable-open') as HTMLButtonElement
+    await act(async () => { openBtn.click() })
+    expect(openFinal).toHaveBeenCalledWith('session-1', `${RUN_BUNDLE_PATHS.deliverables}/2026-11-27-item-1/final.md`)
+
+    expect(extractDeliverableTarget(undefined)).toBeNull()
+    expect(extractDeliverableTarget('   ')).toBeNull()
+    expect(extractDeliverableTarget('custom-slug')).toBe('custom-slug')
+    const focusStore = createDeliverablesFocusStore()
+    expect(focusStore.publish('')).toBeNull()
+    const published = focusStore.publish('custom-slug')!
+    focusStore.consume(published.id + 99)
+    expect(focusStore.get()?.id).toBe(published.id)
+    focusStore.consume(published.id)
+    expect(focusStore.get()).toBeNull()
+
+    // formatGeneratedAt defaultT fallback (L121), emptyFilter/emptyAll (L215), unpresented drop-to-zero (L164), slug highlight (L223)
+    expect(formatGeneratedAt('2026-11-27T01:00:00Z')).toContain('01:00')
+    act(() => { mounted?.unmount(); mounted = null })
+
+    const makeUnpresented = (presented: boolean) => ({
+      schema: 1 as const,
+      generatedAt: '2026-11-27T01:00:00Z',
+      skipped: 0,
+      entries: [{
+        slug: 'slug-match',
+        kickoff: '2026-11-27',
+        type: 'production',
+        result: 'completed',
+        summary: 'done',
+        root: RUN_BUNDLE_PATHS.deliverables,
+        dir: '2026-11-27-other',
+        path: `${RUN_BUNDLE_PATHS.deliverables}/2026-11-27-other/final.md`,
+        ledgered: true,
+        presented,
+        metaProblem: null,
+      }],
+    })
+    deliverablesFocusStore.publish('slug-match')
+    const h2 = await mount(createElement(DeliverablesView, {
+      catalog: makeUnpresented(false),
+      sessionId: 'session-1' as never,
+      openFinal,
+      t,
+    }))
+    expect(h2.querySelector('.wk-deliverable-row[data-highlighted="true"]')).not.toBeNull()
+    const unpresentedBtn = [...h2.querySelectorAll('button')].find(b => b.textContent?.includes(zh['deliverables.filter.unpresented']))!
+    await act(async () => { unpresentedBtn.click() })
+    await act(async () => {
+      mounted?.render(createElement(DeliverablesView, {
+        catalog: makeUnpresented(true),
+        sessionId: 'session-1' as never,
+        openFinal,
+        t,
+      }))
+    })
+    expect(h2.textContent).toContain('slug-match')
+    const archiveBtn = [...h2.querySelectorAll('button')].find(b => b.textContent?.includes(zh['deliverables.filter.archive']))!
+    await act(async () => { archiveBtn.click() })
+    expect(h2.textContent).toContain(zh['deliverables.emptyFilter'])
+    const allBtn = [...h2.querySelectorAll('button')].find(b => b.textContent?.includes(zh['deliverables.filter.all']))!
+    await act(async () => { allBtn.click() })
+    await act(async () => {
+      mounted?.render(createElement(DeliverablesView, {
+        catalog: { schema: 1, generatedAt: '', skipped: 0, entries: [] },
+        sessionId: 'session-1' as never,
+        openFinal,
+        t,
+      }))
+    })
+    expect(h2.textContent).toContain(zh['deliverables.emptyAll'])
   })
 })

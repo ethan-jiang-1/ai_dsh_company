@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * 在场 / 用量两个面板的静态渲染判据（R3-10，2026-10-27）。
  *
@@ -5,9 +6,12 @@
  * 一个渲染即空白的回归可以全绿。本档只断言"用户能看到的事实"（行、状态、任务、金额口径、
  * 空态文案），不主张 CSS/布局（那层归视觉探针与 client-load）。
  */
-import { createElement } from 'react'
+import { act, createElement } from 'react'
+import { createRoot } from 'react-dom/client'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 import { BudgetPanel, PresencePanel, StreamErrorNotice } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
 import type { BudgetSummary } from '../../../packages/company-pack/src/lib/accounting/budget.ts'
 import type { ActivityEntry, PresenceRow } from '../../../packages/company-pack/src/lib/presence/presence.ts'
@@ -86,5 +90,46 @@ describe('流错误提示', () => {
     const html = renderToStaticMarkup(createElement(StreamErrorNotice, { message: 'follow failed' }))
     expect(html).toContain('实时流断开')
     expect(html).toContain('follow failed')
+  })
+
+  it('useCountUp 支持 prefers-reduced-motion 与动态步进插值', () => {
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    const baseSummary: BudgetSummary = { totalTokens: 100, turns: 1, steps: 2, toolShare: 0.1, rows: [] }
+    const origMatchMedia = window.matchMedia
+    try {
+      let reduced = false
+      window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+        matches: reduced && query.includes('prefers-reduced-motion'),
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      })) as unknown as typeof window.matchMedia
+
+      const rafQueue: FrameRequestCallback[] = []
+      const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb: FrameRequestCallback) => {
+        rafQueue.push(cb)
+        return rafQueue.length
+      })
+      const cancelSpy = vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {})
+
+      act(() => { root.render(createElement(BudgetPanel, { summary: baseSummary })) })
+      act(() => { root.render(createElement(BudgetPanel, { summary: { ...baseSummary, totalTokens: 2000 } })) })
+      expect(rafQueue.length).toBeGreaterThan(0)
+      act(() => { rafQueue.shift()?.(performance.now() + 1000) })
+      expect(host.textContent).toContain('2k')
+
+      reduced = true
+      act(() => { root.render(createElement(BudgetPanel, { summary: { ...baseSummary, totalTokens: 5000 } })) })
+      expect(host.textContent).toContain('5k')
+
+      rafSpy.mockRestore()
+      cancelSpy.mockRestore()
+    } finally {
+      window.matchMedia = origMatchMedia
+      act(() => { root.unmount() })
+      host.remove()
+    }
   })
 })

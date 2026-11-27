@@ -11,7 +11,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
 import { CultivationCompose } from '../../../packages/company-pack/src/client/cultivation/CultivationCompose.tsx'
 import { CultivationBoard } from '../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx'
-import { CULTIVATION_COPY, type ActionOutcome, type CultivationActions } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
+import { CULTIVATION_COPY, setCultivationLanguage, type ActionOutcome, type CultivationActions } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
 import { decodeContextToken } from '../../../packages/company-pack/src/lib/cultivation/cultivation-context.ts'
 import type {
   ContextSessionRow,
@@ -22,6 +22,7 @@ import type {
 
 const mounted: { root: Root, container: HTMLElement }[] = []
 afterEach(() => {
+  setCultivationLanguage('zh')
   for (const entry of mounted.splice(0)) {
     act(() => { entry.root.unmount() })
     entry.container.remove()
@@ -318,5 +319,56 @@ describe('跨会话/视角切换的表单隔离（BUG-350）', () => {
     act(() => { root.render(createElement(CultivationBoard, { ...base, language: 'en' as const })) })
     expect(container.textContent).toContain('Write one sentence: what should it do.')
     expect(container.textContent).not.toContain('先写一句「期望它怎么做」。')
+  })
+
+  it('覆盖背景展开/收起切换、预览失败后重试打开选择器及超大 token 提交拦截', async () => {
+    const oversizedRow = {
+      slug: '超大交付物',
+      result: 'accepted',
+      kickoff: '2026-10-22',
+      path: `deliverables/${'x'.repeat(2100)}/final.md`,
+      summary: '超大摘要',
+    }
+    const sources = stubSources({
+      readPreview: async () => ({ ok: false, problem: '首轮失败' }),
+      listDeliverables: async () => ({ ok: true as const, value: [oversizedRow] }),
+    })
+    // First trigger problem card via failing pick
+    let callIdx = 0
+    const flakeySources = {
+      ...sources,
+      readPreview: async () => {
+        callIdx += 1
+        return callIdx === 1
+          ? { ok: true as const, turn: { turn: 1, text: 'a\nb\nc\nd' } }
+          : { ok: false as const, problem: '重试预览失败' }
+      },
+    }
+    const container = mount({ sources: flakeySources, currentSessionId: 'session-1' })
+    await openCorrection(container)
+    await flush()
+
+    // Expand & collapse long excerpt (line 384)
+    const expandBtn = button(container, CULTIVATION_COPY.contextExpand) as HTMLButtonElement
+    await click(expandBtn)
+    expect(expandBtn.getAttribute('aria-expanded')).toBe('true')
+    await click(expandBtn)
+    expect(expandBtn.getAttribute('aria-expanded')).toBe('false')
+
+    // Trigger manual session pick error -> renders contextProblem retry button (lines 351-360)
+    await click(button(container, CULTIVATION_COPY.contextChange))
+    await flush()
+    await click(buttonContaining(container, '收口检查'))
+    await flush()
+    expect(container.textContent).toContain('重试预览失败')
+    await click(button(container, CULTIVATION_COPY.contextAdd))
+    await flush()
+
+    // Pick oversized deliverable -> encodeContextToken fails on submit (lines 253-254)
+    await click(buttonContaining(container, '超大交付物'))
+    await type(container.querySelector('input') as HTMLInputElement, '测试提交期望')
+    await click(button(container, CULTIVATION_COPY.submit))
+    await flush()
+    expect(container.textContent).toContain('安全的工作区相对路径')
   })
 })

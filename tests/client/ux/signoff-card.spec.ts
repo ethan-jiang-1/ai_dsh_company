@@ -294,4 +294,60 @@ describe('SignoffToolView & SlotCore chain 透传整合', () => {
     expect(pick(pSignoff)).toBe(SignoffComposerCard)
     expect(pick(pBash)).toBe(Upstream)
   })
+
+  it('SignoffToolView 对非 JSON/缺字段回执安全退化；SignoffComposerCard 在 answer 拒收时展示重试错误并覆盖组合输入与拒绝按钮', async () => {
+    const tZh = makeT(zh)
+    const { container, rerender } = mountDom(createElement(SignoffToolView, {
+      toolName: SIGNOFF_TOOL_KEY,
+      callId: 'c-2',
+      block: {
+        kind: 'settled',
+        call: { callId: 'c-2', toolName: SIGNOFF_TOOL_KEY, argsRaw: JSON.stringify({ line: '线A' }) },
+        content: [{ type: 'text', text: 'plain non-json text' }],
+        isError: false,
+      },
+      t: tZh,
+    } as unknown as ComponentProps<typeof SignoffToolView>))
+    expect(container.textContent).toContain('plain non-json text')
+
+    rerender(createElement(SignoffToolView, {
+      toolName: SIGNOFF_TOOL_KEY,
+      callId: 'c-2',
+      block: {
+        kind: 'settled',
+        call: { callId: 'c-2', toolName: SIGNOFF_TOOL_KEY, argsRaw: JSON.stringify({ line: '线A' }) },
+        content: [{ type: 'text', text: JSON.stringify({ noteOnly: true }) }],
+        isError: true,
+      },
+      t: tZh,
+    } as unknown as ComponentProps<typeof SignoffToolView>))
+    expect(container.textContent).toContain('noteOnly')
+
+    const failingAnswer = vi.fn().mockRejectedValueOnce(new Error('network fail'))
+    const { container: cCard } = mountDom(createElement(SignoffComposerCard, {
+      sessionId: 's1' as SessionId,
+      matched: {
+        kind: 'approval',
+        key: 'approval:fail',
+        toolName: 'request_signoff',
+        answerable: true,
+        reason: 'Line: test',
+        answer: failingAnswer,
+      },
+      t: tZh,
+    } as unknown as ComponentProps<typeof SignoffComposerCard>))
+
+    const group = cCard.querySelector('[data-company-signoff-composer]') as HTMLElement
+    act(() => {
+      group.dispatchEvent(new window.CompositionEvent('compositionstart', { bubbles: true }))
+      group.dispatchEvent(new window.CompositionEvent('compositionend', { bubbles: true }))
+      group.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', bubbles: true }))
+    })
+    const rejectBtn = [...cCard.querySelectorAll('button')].find(b => b.textContent?.includes(zh['signoff.reject']))!
+    await act(async () => {
+      rejectBtn.click()
+      await Promise.resolve()
+    })
+    expect(cCard.querySelector('[role="alert"]')?.textContent).toContain('network fail')
+  })
 })

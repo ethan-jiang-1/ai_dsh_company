@@ -75,4 +75,50 @@ describe('createStartupHandlers', () => {
     expect(store.getSnapshot().optionsProblem).toBeNull()
     expect(store.getSnapshot().settings.productType).toBe('business-software')
   })
+
+  it('缺失文件时走 workspaceFiles.list 探测存在性，commands.execute 抛错时安全折为 SaveResult 失败', async () => {
+    const store = createStartupStore()
+    const list = vi.fn(async () => ({ ok: true as const, value: { entries: [] } }))
+    const execute = vi.fn(async () => { throw new Error('ipc disconnected') })
+    const readWorkspaceText = vi.fn(() => async () => ({ ok: false as const, reason: 'ENOENT' }))
+    const handlers = createStartupHandlers({
+      remote: {
+        commands: { execute },
+        workspaceFiles: { list },
+      } as never,
+      leadOf: id => id,
+      readWorkspaceText,
+      startupStore: store,
+    })
+
+    await handlers.loadStartup('s-missing' as SessionId, new AbortController().signal)
+    expect(list).toHaveBeenCalledTimes(1)
+    expect(store.getSnapshot().loaded).toBe(true)
+
+    await expect(handlers.saveStartup('s-missing' as SessionId, 'productType', 'b2b')).resolves.toEqual({
+      ok: false,
+      message: 'ipc disconnected',
+    })
+
+    // 预中止 signal 与 commands.execute 多种返回形态（error / missing result / result.text 缺省）
+    const aborted = new AbortController()
+    aborted.abort()
+    list.mockClear()
+    await handlers.loadStartup('s-aborted' as SessionId, aborted.signal)
+    expect(list).not.toHaveBeenCalled()
+
+    const execVariants = vi.fn()
+      .mockResolvedValueOnce({ ok: false as const, error: { message: 'rpc err' } })
+      .mockResolvedValueOnce({ ok: true as const, value: {} })
+      .mockResolvedValueOnce({ ok: true as const, value: { result: { kind: 'denied' } } })
+    const h2 = createStartupHandlers({
+      remote: { commands: { execute: execVariants }, workspaceFiles: { list } } as never,
+      leadOf: id => id,
+      readWorkspaceText,
+      startupStore: store,
+    })
+    await expect(h2.saveStartup('s-1' as SessionId, 'productType', 'b2b')).resolves.toEqual({ ok: false, message: 'rpc err' })
+    await expect(h2.saveStartup('s-1' as SessionId, 'productType', 'b2b')).resolves.toEqual({ ok: false, message: 'command unavailable' })
+    await expect(h2.resetStartup('s-1' as SessionId)).resolves.toEqual({ ok: false, message: 'denied' })
+  })
 })

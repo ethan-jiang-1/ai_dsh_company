@@ -24,7 +24,10 @@ import { HEARTBEAT_KEY } from '../../packages/company-pack/src/client/wiring/ins
 import { en as companyEn, zh as companyZh } from '../../packages/company-pack/src/client/locales.ts'
 import { DELEGATION_TOOL_KEYS } from '../../packages/company-pack/src/client/wiring/delegation-keys.ts'
 import { TEAM_TOOL_KEYS } from '../../packages/company-pack/src/client/ui/TeamToolCard.tsx'
-import { S1_CLIENT_SURFACE_IDS, S1_TOOL_KEYS } from '../../packages/company-pack/src/client/ux/register-s1-ux.ts'
+import { registerWaveS1Ux, S1_CLIENT_SURFACE_IDS, S1_TOOL_KEYS } from '../../packages/company-pack/src/client/ux/register-s1-ux.ts'
+import { registerWaveS3Ux } from '../../packages/company-pack/src/client/ux/register-s3-ux.ts'
+import { createStartupStore } from '../../packages/company-pack/src/client/startup/startup-store.ts'
+import { createAttentionRegistry } from '../../packages/company-pack/src/client/wiring/attention-registry.ts'
 import { CompanyGuideHub } from '../../packages/company-pack/src/client/ux/company-guide.tsx'
 import { COMPANY_SHORTCUT_IDS } from '../../packages/company-pack/src/client/ux/company-triggers-shortcuts.ts'
 import { COMPANY_HQ_PANEL_ID } from '../../packages/company-pack/src/client/ux/company-hq.tsx'
@@ -202,10 +205,13 @@ describe('company client apply through the whole-client tier', () => {
       handleSessionAdded(summary: {
         sessionId: string
         cwd?: string
+        origin?: 'subagent'
+        parentId?: string
         running: boolean
         blank: boolean
         updatedAt: number
       }): void
+      handleSessionRemoved(sessionId: string): void
     }
     sessions.handleSessionAdded({
       sessionId: 's-cold-boot-1',
@@ -224,6 +230,48 @@ describe('company client apply through the whole-client tier', () => {
       })
     })
     expect(readSessionIds).toEqual(['s-cold-boot-1'])
+    try { (client.ctx.get('uiWorkspace') as { openSession(id: string): void }).openSession('s-cold-boot-1') } catch { /* ok */ }
+
+    // Removing the only session triggers target === undefined -> resetCompanyIdentity() (index.ts L378-385)
+    sessions.handleSessionRemoved('s-cold-boot-1')
+    await vi.waitFor(() => {
+      expect(companyIdentity().productName).toBe('')
+    })
+
+    // Subagent-only session without cwd falls back to rows[0] & empty cwd key (index.ts L371-372, L387)
+    sessions.handleSessionAdded({
+      sessionId: 's-sub-only',
+      origin: 'subagent',
+      parentId: 's-parent',
+      running: false,
+      blank: false,
+      updatedAt: 1500,
+    })
+    await vi.waitFor(() => {
+      expect(readSessionIds).toContain('s-sub-only')
+    })
+
+    // Subsequent session whose workspaceFiles/read rejects falls back cleanly (index.ts L399-403)
+    let secondReadAttempted = false
+    mock.load({
+      unary: {
+        'workspaceFiles/read': () => {
+          secondReadAttempted = true
+          throw new Error('read failed')
+        },
+      },
+    })
+    sessions.handleSessionAdded({
+      sessionId: 's-cold-boot-2',
+      cwd: '/tmp/ws-cold-2',
+      running: false,
+      blank: false,
+      updatedAt: 2000,
+    })
+    await vi.waitFor(() => {
+      expect(secondReadAttempted).toBe(true)
+      expect(companyIdentity().productName).toBe('')
+    })
   })
 
   test('reloading the pack row re-registers the same surface', async ({ mock, start }) => {
@@ -384,6 +432,21 @@ describe('company client apply through the whole-client tier', () => {
       { slot: 'conversation.chat.turnTail', entry: s4TurnTail!, owner: { turn: { data: new Map() } } },
     )
 
+    const sidebarRight = client.ctx.get('sidebarRight') as {
+      mounted?: { getSnapshot(): string | undefined }
+      openTab(id: string): void
+      openResource(ref: unknown): void
+      float(id: string, rect?: unknown): void
+      dock(id: string): void
+    }
+    const mountedSpy = sidebarRight.mounted !== undefined
+      ? vi.spyOn(sidebarRight.mounted, 'getSnapshot').mockReturnValue('surface-test')
+      : undefined
+    const openTabSpy = vi.spyOn(sidebarRight, 'openTab').mockImplementation(() => {})
+    const openResourceSpy = vi.spyOn(sidebarRight, 'openResource').mockImplementation(() => {})
+    const floatSpy = vi.spyOn(sidebarRight, 'float').mockImplementation(() => {})
+    const dockSpy = vi.spyOn(sidebarRight, 'dock').mockImplementation(() => {})
+
     try {
       for (const target of targets) {
         const selected = target.entry.select !== undefined ? target.entry.select(target.owner) : undefined
@@ -397,24 +460,42 @@ describe('company client apply through the whole-client tier', () => {
         const injected = target.entry.inject !== undefined ? target.entry.inject(sessionId) : {}
         // Exercise safe navigation / callback wires injected by S1–S4 & company-tab-registration
         if (target.slot === 'tab.body:dsh-company-pack/archive') {
-          try { (injected as { openFinal?: (sid: string, p: string) => void }).openFinal?.(sessionId, '.dsh-company/deliverables/m1/final.md') } catch { /* ok when no surface */ }
+          try {
+            const tabActs = injected as { openFinal?: (sid: string, p: string) => void; floatTab?: (id: string) => void; unfloatTab?: (id: string) => void; openSplit?: (preset: string) => void }
+            tabActs.openFinal?.(sessionId, '.dsh-company/deliverables/m1/final.md')
+            tabActs.floatTab?.('tab-1')
+            tabActs.unfloatTab?.('pane-1')
+            tabActs.openSplit?.('ops')
+          } catch { /* ok when no surface */ }
+        } else if (target.slot === 'conversation.input.left:company-strategy') {
+          try { (injected as { open?: () => void }).open?.() } catch { /* ok */ }
+        } else if (target.slot === 'conversation.view:cultivation') {
+          try { (injected as { openCompanyOverview?: () => void }).openCompanyOverview?.() } catch { /* ok */ }
         } else if (target.slot === 'tab.body:dsh-company-pack/team') {
           try { (injected as { openMemberAside?: (sid: string, m: string) => void }).openMemberAside?.(sessionId, 'child-1') } catch { /* ok when no surface */ }
-        } else if (target.slot === 'header.utilities:attention') {
+        } else if (target.slot === 'conversation.session.header.actions') {
+          try { (injected as { openTasks?: () => void }).openTasks?.() } catch { /* ok when no surface */ }
+        } else if (target.slot === 'header.utilities:attention' || target.slot === 'conversation.input.dock' || target.slot === 'conversation.composer.dock') {
           const openTabFn = injected.openTab as ((id: string) => void) | undefined
           openTabFn?.('company-attention')
           openTabFn?.('company-board')
+          if (target.slot === 'header.utilities:attention') {
+            openTabSpy.mockImplementationOnce(() => { throw new Error('surface unavailable') })
+            openTabFn?.('company-board')
+          }
+          if (target.slot === 'conversation.input.dock') {
+            ;(injected.onDraftCommand as ((cmd: string) => void) | undefined)?.('/req check ')
+          }
         } else if (target.slot === 'conversation.hero.options') {
           ;(injected.notifyDraft as ((label: string) => void) | undefined)?.('PRD')
-        } else if (target.slot === 'conversation.input.dock') {
-          ;(injected.onDraftCommand as ((cmd: string) => void) | undefined)?.('/req check ')
         } else if (target.slot === 'assistant-actions') {
           const openCult = injected.openCultivation as ((ctx?: { messageId?: string; filePath?: string }) => void) | undefined
           openCult?.({ messageId: 'm1' })
           openCult?.({ filePath: '.dsh-company/deliverables/m1/final.md' })
+          openCult?.({ messageId: '  ', filePath: '   ' })
           openCult?.()
         } else if (target.slot === 'document.actions') {
-          ;(injected.openDeliverables as (() => void) | undefined)?.()
+          ;(injected.openDeliverables as ((p?: string) => void) | undefined)?.('.dsh-company/deliverables/m1/final.md')
         } else if (target.slot === 'sidebar.right.tab.guide:company') {
           try { (injected.openSplit as ((p: string) => void) | undefined)?.('ops') } catch { /* ok */ }
           try { (injected.openSplit as ((p: string) => void) | undefined)?.('quiet') } catch { /* ok */ }
@@ -423,6 +504,7 @@ describe('company client apply through the whole-client tier', () => {
           ;(injected.returnToChat as (() => void) | undefined)?.()
           try { (injected.openSession as ((id: string) => void) | undefined)?.(sessionId) } catch { /* ok */ }
           try { (injected.openFinal as ((sid: string, p: string) => void) | undefined)?.(sessionId, 'final.md') } catch { /* ok */ }
+          expect(openResourceSpy).toHaveBeenCalled()
         } else if (target.slot === 'conversation.chat.turnTail') {
           try { (injected.openOps as (() => void) | undefined)?.() } catch { /* ok when no surface */ }
           try { (injected.openArchive as (() => void) | undefined)?.() } catch { /* ok when no surface */ }
@@ -453,7 +535,62 @@ describe('company client apply through the whole-client tier', () => {
       }
       const toastInjected = s1Toast!.inject?.(sessionId) as { dismiss?: () => void } | undefined
       toastInjected?.dismiss?.()
+
+      // Exercise registerWaveS1Ux without openHq/hubStore fallback (safeOpenTab('company-cultivation') & string error)
+      const registeredActions: Array<{ slot: string; inject?: (sid: string) => Record<string, unknown> }> = []
+      const fakeCtx = {
+        locale: { bind: () => (k: string) => k },
+        inject: (_deps: readonly string[], fn: (sc: unknown) => void) => {
+          fn({
+            slots: {
+              inject: (slot: string, factory: () => unknown) => {
+                const entry = factory() as { inject?: (sid: string) => Record<string, unknown> }
+                registeredActions.push({ slot, inject: entry.inject })
+              },
+              register: (opts: unknown) => opts,
+            },
+            sidebarRight: {
+              mounted: { getSnapshot: () => 's1', subscribe: () => () => {} },
+              openTab: () => { throw 'tab open failed' },
+            },
+            sessions: { binding: () => undefined },
+          })
+        },
+      }
+      registerWaveS1Ux(fakeCtx as never, { attention: createAttentionRegistry() })
+      const assist = registeredActions.find(a => a.slot === 'conversation.chat.assistant-actions')
+      ;(assist?.inject?.(sessionId) as { openCultivation?: () => void } | undefined)?.openCultivation?.()
+
+      // Exercise registerWaveS3Ux with missing remote.session.page (register-s3-ux.ts L113 : undefined branch)
+      const s3Injected: Array<{ inject?: () => Record<string, unknown> }> = []
+      const fakeS3Ctx = {
+        locale: { bind: () => (k: string) => k },
+        inject: (_deps: readonly string[], fn: (sc: unknown) => void) => {
+          fn({
+            slots: {
+              inject: (_slot: string, factory: () => unknown) => {
+                s3Injected.push(factory() as { inject?: () => Record<string, unknown> })
+              },
+              register: (opts: unknown) => opts,
+            },
+            layout: { selectPanel: () => {} },
+            sessions: { list: { getSnapshot: () => ({ byId: {} }), subscribe: () => () => {} }, binding: () => undefined },
+            uiWorkspace: { openSession: () => {} },
+            remote: { session: {}, workspaceFiles: {}, commands: {} },
+            sidebarRight: { mounted: { getSnapshot: () => 's1', subscribe: () => () => {} }, openResource: () => {} },
+          })
+        },
+      }
+      const s3Handle = registerWaveS3Ux(fakeS3Ctx as never, { attention: createAttentionRegistry(), startupStore: createStartupStore() })
+      s3Handle.openHq()
+      const mainProps = s3Injected[1]?.inject?.()
+      expect(mainProps?.pageHistory).toBeUndefined()
     } finally {
+      mountedSpy?.mockRestore()
+      openTabSpy.mockRestore()
+      openResourceSpy.mockRestore()
+      floatSpy.mockRestore()
+      dockSpy.mockRestore()
       errorSpy.mockRestore()
     }
     expect(errors).toEqual([])

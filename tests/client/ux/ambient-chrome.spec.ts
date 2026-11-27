@@ -12,7 +12,7 @@ import {
   createCompanyToastSource,
   CompanyToastOverlay,
 } from '../../../packages/company-pack/src/client/ux/company-toast.tsx'
-import { registerEmbeddedWorkshopSession } from '../../../packages/company-pack/src/client/ux/workshop-sessions.ts'
+import { isEmbeddedWorkshopSession, registerEmbeddedWorkshopSession } from '../../../packages/company-pack/src/client/ux/workshop-sessions.ts'
 import {
   ComposerStatusPill,
   HeaderAttentionUtility,
@@ -263,5 +263,13 @@ describe('Header / Footer / Hero / MotionDock / ComposerDock', () => {
 
     act(() => { buttons.find(b => b.textContent === zh['dock.action.prd'])!.click() })
     expect(setDraft).toHaveBeenLastCalledWith('/prd check MY UNSENT USER DRAFT')
+  })
+
+  it('BUG-393：workshop-sessions 对 undefined 安全返回 false 并支持登记注销', () => {
+    expect(isEmbeddedWorkshopSession(undefined)).toBe(false)
+    const release = registerEmbeddedWorkshopSession('s-ws-toggle' as never)
+    expect(isEmbeddedWorkshopSession('s-ws-toggle' as never)).toBe(true)
+    release()
+    expect(isEmbeddedWorkshopSession('s-ws-toggle' as never)).toBe(false)
   })
 })

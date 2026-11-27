@@ -21,6 +21,7 @@ import {
   verifyLine,
   type CommandsRemoteFace,
 } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
+import { WORK_TEXT_LIMIT } from '../../../packages/company-pack/src/lib/cultivation/cultivation.ts'
 
 const SESSION = 'session-1' as SessionId
 
@@ -209,6 +210,10 @@ describe('可选背景的命令线（D1=A：只带 ref token）', () => {
     // work 显式给了但空 = 校验问题（不是没填）。
     expect(correctLine('期望句', '', undefined, '  ')).toEqual({
       ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemWorkEmpty, code: 'workEmpty' },
+    })
+    // work 超过 WORK_TEXT_LIMIT = 校验拦截。
+    expect(correctLine('期望句', '', undefined, '字'.repeat(WORK_TEXT_LIMIT + 1))).toEqual({
+      ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemWorkTooLong, code: 'workTooLong' },
     })
   })
 
