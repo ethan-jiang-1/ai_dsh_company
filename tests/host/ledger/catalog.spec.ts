@@ -334,8 +334,8 @@ describe('host catalog', () => {
     }
     const result = await presentedFromSessions(query, root)
     expect(result.scanned).toBe(2)
-    expect([...result.paths]).toEqual([expected])
-    expect([...result.slugs]).toEqual(['alpha'])
+    expect([...(result.paths ?? [])]).toEqual([expected])
+    expect([...(result.slugs ?? [])]).toEqual(['alpha'])
     expect(disposed.sort()).toEqual(['s-in', 's-sub'])
   })
 

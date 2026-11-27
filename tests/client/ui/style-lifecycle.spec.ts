@@ -1,4 +1,4 @@
-import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
+import { Context } from '@deepseek-ai/cordis'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { installStyles } from '../../../packages/company-pack/src/client/ui/styles.ts'
 

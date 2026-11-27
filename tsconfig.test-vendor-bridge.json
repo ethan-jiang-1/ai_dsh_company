@@ -1,0 +1,54 @@
+{
+  "extends": "./vendor/dsh/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "composite": false,
+    "incremental": true,
+    "tsBuildInfoFile": "./runtime/tsc-cache/test-vendor-bridge.tsbuildinfo",
+    "rewriteRelativeImportExtensions": false,
+    "allowJs": true,
+    "checkJs": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "tests/host/cultivation/fs-record-sandbox.spec.ts",
+    "tests/host/cultivation/fs-record-write.spec.ts",
+    "tests/host/ledger/presented-domain-real.spec.ts",
+    "tests/contract/**/*.spec.ts",
+    "tests/support/temp-env.ts"
+  ],
+  "references": [
+    {
+      "path": "./vendor/dsh/vendor/cordis"
+    },
+    {
+      "path": "./vendor/dsh/vendor/cosmokit"
+    },
+    {
+      "path": "./vendor/dsh/vendor/schemastery"
+    },
+    {
+      "path": "./vendor/dsh/vendor/loader"
+    },
+    {
+      "path": "./vendor/dsh/vendor/include"
+    },
+    {
+      "path": "./vendor/dsh/vendor/group"
+    },
+    {
+      "path": "./vendor/dsh/vendor/timer"
+    },
+    {
+      "path": "./vendor/dsh/vendor/hmr"
+    },
+    {
+      "path": "./vendor/dsh/vendor/logger-console"
+    }
+  ]
+}

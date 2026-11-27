@@ -12,9 +12,9 @@
 import { act, createElement, type ComponentType } from 'react'
 import { createRoot } from 'react-dom/client'
 import { describe, expect, vi } from 'vitest'
-import { frames, ok } from '../../vendor/dsh/packages/test-support/remote-mock/src/index.ts'
-import { bundleRoster, WEB_PROFILE_BUNDLES } from '../../vendor/dsh/packages/test-support/client-runtime/src/assembly/bundle-roster.ts'
-import { createClientTest } from '../../vendor/dsh/packages/test-support/client-runtime/src/assembly/index.ts'
+import { frames, ok } from '@deepseek-ai/dsh-remote-mock'
+import { bundleRoster, WEB_PROFILE_BUNDLES } from '@deepseek-ai/dsh-client-test-runtime/assembly/bundle-roster'
+import { createClientTest } from '@deepseek-ai/dsh-client-test-runtime/assembly'
 // 源码面供本包 client 行（tier 的 provide 机制）：动态 import 走 exports 落到 tsdown 的 CJS
 // 构建产物会炸；provide 与根仓「vitest 一律走 src 源码面」纪律一致，模块本体仍是生产实现。
 // 负例留证 2026-11-23：把 registerSidebarIdentity 的 sessions.list 订阅去掉改回一次性 void loadIdentity() ⇒ BUG-341 冷启动用例红；还原 ⇒ 绿。BUG-341
@@ -116,7 +116,7 @@ describe('company client apply through the whole-client tier', () => {
       const keys = (slots as SlotsRegistry)
         .entries(slot)
         .map(stored => stored.options.key)
-        .filter(key => key.startsWith('dsh-company-pack/'))
+        .filter((key): key is string => typeof key === 'string' && key.startsWith('dsh-company-pack/'))
       expect(keys).toEqual([...COMPANY_TAB_IDS])
     }
 
@@ -167,7 +167,7 @@ describe('company client apply through the whole-client tier', () => {
 
     expect(tabs.entries().map(definition => definition.id).filter(id => id.startsWith('dsh-company-pack/'))).toEqual([])
     for (const slot of COMPANY_SLOTS) {
-      expect(slots.entries(slot).map(stored => stored.options.key).filter(key => key.startsWith('dsh-company-pack/'))).toEqual([])
+      expect(slots.entries(slot).map(stored => stored.options.key).filter((key): key is string => typeof key === 'string' && key.startsWith('dsh-company-pack/'))).toEqual([])
     }
     expect(slots.entries('shell.overlay').map(s => s.options.id)).not.toContain(S1_CLIENT_SURFACE_IDS.toastOverlay)
     expect(slots.entries('conversation.chat.assistant-actions').map(s => s.options.id)).not.toContain(S1_CLIENT_SURFACE_IDS.assistantCultivate)
@@ -201,7 +201,7 @@ describe('company client apply through the whole-client tier', () => {
     expect(readCount).toBe(0)
     expect(companyIdentity().company).toBe('')
 
-    const sessions = client.ctx.get('sessions') as {
+    const sessions = client.ctx.get('sessions') as unknown as {
       handleSessionAdded(summary: {
         sessionId: string
         cwd?: string
@@ -304,8 +304,8 @@ describe('company client apply through the whole-client tier', () => {
     const client = await start()
     const slots = client.ctx.get('slots') as SlotsRegistry
     const locale = client.ctx.get('locale') as { bind(ns: string): (key: string) => unknown }
-    const sessions = client.ctx.get('sessions') as {
-      list: { getSnapshot(): Record<string, unknown>; subscribe(fn: () => void): () => void }
+    const sessions = client.ctx.get('sessions') as unknown as {
+      list: { getSnapshot(): unknown; subscribe(fn: () => void): () => void }
     }
 
     const sessionId = 's-mount-1'
@@ -361,7 +361,7 @@ describe('company client apply through the whole-client tier', () => {
         inject: ['slots'],
         apply: (scoped) => {
           scoped.slots.inject('shell.overlay', () =>
-            scoped.slots.register({
+            (scoped.slots as unknown as { register(opts: unknown, comp: unknown): () => void }).register({
               name: 'shell.overlay',
               id: 'test-toolview-host',
               children: { 'tool.call.toolview': { kind: 'keyed', scope: 'session' } },
@@ -547,7 +547,10 @@ describe('company client apply through the whole-client tier', () => {
             slots: {
               inject: (slot: string, factory: () => unknown) => {
                 const entry = factory() as { inject?: (sid: string) => Record<string, unknown> }
-                registeredActions.push({ slot, inject: entry.inject })
+                registeredActions.push({
+                  slot,
+                  ...(entry.inject === undefined ? {} : { inject: entry.inject }),
+                })
               },
               register: (opts: unknown) => opts,
             },

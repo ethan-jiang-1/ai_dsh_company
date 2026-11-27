@@ -11,7 +11,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync 
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
+import { Context } from '@deepseek-ai/cordis'
 import { apply } from '../../../packages/company-pack/src/index.ts'
 
 const ORIGINAL_ENV = new Map<string, string | undefined>()

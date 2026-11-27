@@ -5,8 +5,8 @@
  * LocaleRuntime 在英文浏览器 provisional=en 的情况下，Host preference=zh 到达后会
  * 切到 zh。两段合起来才是「缺省中文」的快速回归（真浏览器首屏归 ui-scene-smoke）。
  */
-import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
-import { LocaleRuntime } from '../../../vendor/dsh/packages/client/locale/src/client/index.ts'
+import { Context } from '@deepseek-ai/cordis'
+import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
 import { describe, expect, it, onTestFinished } from 'vitest'
 
 interface Snapshot {

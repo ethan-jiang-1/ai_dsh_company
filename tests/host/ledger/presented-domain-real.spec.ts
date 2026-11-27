@@ -3,7 +3,7 @@
  * 证明 `company_run_bundle_ledger` 能 open/put/read，并按 workspace key 分区。
  */
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
+import { Context } from '@deepseek-ai/cordis'
 import Storage from '../../../vendor/dsh/packages/storage/storage/src/index.ts'
 import { DomainFacility } from '../../../vendor/dsh/packages/storage/storage-domain/src/index.ts'
 import { MemoryStorageBackend } from '../../../vendor/dsh/packages/storage/storage-domain/tests/helpers/memory-backend.ts'

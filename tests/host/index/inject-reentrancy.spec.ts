@@ -15,7 +15,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
+import { Context } from '@deepseek-ai/cordis'
+import { emitAgentCreated } from '../../support/cordis-agent-harness.ts'
 import { registerDelegationContracts, DELEGATION_HEADER_SECTION } from '../../../packages/company-pack/src/host/prompt/delegation-contracts.ts'
 import { registerWorkflowContract, WORKFLOW_CONTRACT_SECTION } from '../../../packages/company-pack/src/host/prompt/contracts.ts'
 import { registerWorkflowRuns } from '../../../packages/company-pack/src/host/delegation/workflow-runs.ts'
@@ -145,7 +146,7 @@ describe('per-agent inject 生命周期：re-provide ≠ ctx.set（BUG-074）', 
     const h = await harness()
     try {
       registerDelegationContracts(h.ctx, dir)
-      h.ctx.emit('agent/created', { agent: h.agent })
+      emitAgentCreated(h.ctx, h.agent)
       await wait()
       expect(h.prompts.sections.map(section => section.name)).toContain(DELEGATION_HEADER_SECTION)
 
@@ -168,7 +169,7 @@ describe('per-agent inject 生命周期：re-provide ≠ ctx.set（BUG-074）', 
     const h = await harness()
     try {
       registerWorkflowContract(h.ctx, dir)
-      h.ctx.emit('agent/created', { agent: h.agent })
+      emitAgentCreated(h.ctx, h.agent)
       await wait()
       expect(h.prompts.sections.map(section => section.name)).toContain(WORKFLOW_CONTRACT_SECTION)
 
@@ -188,7 +189,7 @@ describe('per-agent inject 生命周期：re-provide ≠ ctx.set（BUG-074）', 
     const h = await harness()
     try {
       registerWorkflowRuns(h.ctx)
-      h.ctx.emit('agent/created', { agent: h.agent })
+      emitAgentCreated(h.ctx, h.agent)
       await wait()
       expect(h.tools.registered.has('workflow_runs')).toBe(true)
 
@@ -207,7 +208,7 @@ describe('per-agent inject 生命周期：re-provide ≠ ctx.set（BUG-074）', 
     const h = await harness()
     try {
       registerDelegationControl(h.ctx)
-      h.ctx.emit('agent/created', { agent: h.agent })
+      emitAgentCreated(h.ctx, h.agent)
       await wait()
       expect(h.tools.registered.has('list_subagents')).toBe(true)
 
@@ -229,7 +230,7 @@ describe('per-agent inject 生命周期：re-provide ≠ ctx.set（BUG-074）', 
     try {
       registerWorkflowRuns(h.ctx)
       registerDelegationContracts(h.ctx, dir)
-      h.ctx.emit('agent/created', { agent: h.agent })
+      emitAgentCreated(h.ctx, h.agent)
       await wait()
       expect(h.tools.registered.has('workflow_runs')).toBe(true)
 
@@ -250,8 +251,8 @@ describe('per-agent inject 生命周期：re-provide ≠ ctx.set（BUG-074）', 
     const h = await harness()
     try {
       registerDelegationContracts(h.ctx, dir)
-      h.ctx.emit('agent/created', { agent: h.agent })
-      h.ctx.emit('agent/created', { agent: h.agent })
+      emitAgentCreated(h.ctx, h.agent)
+      emitAgentCreated(h.ctx, h.agent)
       await wait()
       const names = h.prompts.sections.map(section => section.name)
       expect(names.filter(name => name === DELEGATION_HEADER_SECTION)).toHaveLength(1)

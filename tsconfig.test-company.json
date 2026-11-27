@@ -35,16 +35,12 @@
     "tests/content/**/*.ts",
     "tests/presets/**/*.ts",
     "tests/support/temp-env.ts",
-    "tests/support/cultivation-harness.ts"
+    "tests/support/cultivation-harness.ts",
+    "tests/support/cordis-agent-harness.ts"
   ],
   "exclude": [
-    "tests/host/index/apply-lifecycle.spec.ts",
-    "tests/host/index/inject-reentrancy.spec.ts",
     "tests/host/cultivation/fs-record-sandbox.spec.ts",
-    "tests/host/index/cultivation-propose-guards.spec.ts",
     "tests/host/cultivation/fs-record-write.spec.ts",
-    "tests/host/ledger/presented-domain-real.spec.ts",
-    "tests/host/index/host-composition.spec.ts",
-    "tests/host/ledger/catalog.spec.ts"
+    "tests/host/ledger/presented-domain-real.spec.ts"
   ]
 }

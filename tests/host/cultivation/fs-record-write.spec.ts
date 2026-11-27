@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync }
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
+import { Context } from '@deepseek-ai/cordis'
 import LocalFileSystem from '../../../vendor/dsh/packages/fs/fs-local/src/index.ts'
 import { writeRecordViaFs } from '../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts'
 

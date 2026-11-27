@@ -20,7 +20,8 @@
 // 负例留证 2026-11-16：把 docs/testing.md 的公式改回 `227/245 spec` → 「导航面没有 x/y spec 字面量（BUG-191）」红；还原 → 绿。
 // 负例留证 2026-11-16（二轮）：向 checks/README.md 追加 `227/245 spec`，修复前本 spec 绿（BUG-196）；补导航面清单后红。
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, relative, resolve } from 'node:path'
+import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 
@@ -71,5 +72,39 @@ describe('live 文档不写死类型面覆盖分数', () => {
 
   it('扫描面非空（判据被搬空 = 通过是假的）', () => {
     expect(docsUnder('docs').length).toBeGreaterThan(0)
+  })
+
+  it('package.json#scripts.typecheck 串联的 tsconfig.test-*.json 并集 100% 覆盖盘上全部 spec（零 exclude 死角）', () => {
+    const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { scripts?: Record<string, string> }
+    const typecheckCmd = pkg.scripts?.typecheck ?? ''
+    const configs = [...typecheckCmd.matchAll(/-p\s+(tsconfig\.test-[A-Za-z0-9._-]+\.json)/g)].map(m => m[1]!)
+    expect(configs.length).toBeGreaterThanOrEqual(4)
+
+    const covered = new Set<string>()
+    for (const cfgName of configs) {
+      const cfgPath = join(ROOT, cfgName)
+      const readRes = ts.readConfigFile(cfgPath, ts.sys.readFile)
+      expect(readRes.error, `读取 ${cfgName} 失败`).toBeUndefined()
+      const parsed = ts.parseJsonConfigFileContent(readRes.config, ts.sys, ROOT, undefined, cfgPath)
+      for (const file of parsed.fileNames) {
+        covered.add(relative(ROOT, resolve(file)).replace(/\\/g, '/'))
+      }
+    }
+
+    const walkSpecs = (rel: string): string[] => {
+      const dir = join(ROOT, rel)
+      const out: string[] = []
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        if (entry.name === 'node_modules') continue
+        const child = `${rel}/${entry.name}`
+        if (entry.isDirectory()) out.push(...walkSpecs(child))
+        else if (/\.spec\.tsx?$/.test(entry.name)) out.push(child)
+      }
+      return out
+    }
+    const allSpecs = walkSpecs('tests').sort()
+    expect(allSpecs.length).toBeGreaterThan(300)
+    const uncovered = allSpecs.filter(spec => !covered.has(spec))
+    expect(uncovered, '禁止把 spec 留在 tsconfig exclude 死角而不由桥接配置承接').toEqual([])
   })
 })

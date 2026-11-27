@@ -13,7 +13,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join, relative, sep } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
+import { Context } from '@deepseek-ai/cordis'
 import { apply } from '../../../packages/company-pack/src/index.ts'
 import { createTempEnv, type TempEnv } from '../../support/temp-env.ts'
 

@@ -52,7 +52,7 @@ pnpm bundle:init                       # fresh clone：建 dev 的 .dsh-company/
 source run/env.sh && pnpm company --no-open  # repo dev-only：pack + plugin add file: + exec dsh --profile company（--link 快速通道）
 pnpm verify                            # 结构门禁（清单唯一源 = checks/gates/ 目录）
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）
-pnpm typecheck                         # pack 两面 + tests/{client,host,lib,content,repo,tools,session,evidence,ui,presets}（三个 tsconfig.test-*；覆盖 = include 减 exclude，清单以配置为准）
+pnpm typecheck                         # pack 两面 + tests/{client,host,lib,content,repo,contract,tools,session,evidence,ui,presets}（四套 tsconfig.test-* 并集全覆盖，清单以配置为准）
 pnpm release --check                   # 发布就绪（dist 与源码指纹；verify 绿 ≠ 可发布）
 source run/env.sh && pnpm orient       # 运行态全景（先 source 才看 dev home；keyless 只读）
 pnpm diagnose --session <slug>/<id>    # 会话失败摘要（只读；child 也可点名）

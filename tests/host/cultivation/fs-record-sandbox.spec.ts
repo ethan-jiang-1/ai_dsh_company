@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:f
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
+import { Context } from '@deepseek-ai/cordis'
 import SandboxPolicyService from '../../../vendor/dsh/packages/sandbox/sandbox-policy/src/index.ts'
 import SandboxedFileSystem from '../../../vendor/dsh/packages/fs/fs-sandbox/src/index.ts'
 import { writeRecordViaFs } from '../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts'

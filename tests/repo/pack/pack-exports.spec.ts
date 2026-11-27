@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest'
 // vendor loader 经相对路径直引 src（源码平面）——本仓 vitest 的 paths 不解析 extends 链的
 // 包名映射（实测 `@deepseek-ai/cordis-plugin-loader` Cannot find package），
 // 既有先例 = tests/client/ui/style-lifecycle.spec.ts 同样相对路径引 cordis src。
-import Loader from '../../../vendor/dsh/vendor/loader/src/index.ts'
+import Loader from '@deepseek-ai/cordis-plugin-loader'
 import * as clientEntry from '../../../packages/company-pack/src/client/index.ts'
 import * as hostEntry from '../../../packages/company-pack/src/index.ts'
 

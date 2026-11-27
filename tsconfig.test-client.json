@@ -35,6 +35,27 @@
       "@deepseek-ai/dsh-session/types": [
         "./packages/company-pack/node_modules/@deepseek-ai/dsh-session/lib/types/types.d.ts"
       ],
+      "@deepseek-ai/dsh-client-locale/client": [
+        "./vendor/dsh/packages/client/locale/lib/types/client/index.d.ts"
+      ],
+      "@deepseek-ai/dsh-client-ui-renderer/client": [
+        "./vendor/dsh/packages/client/ui-renderer/lib/types/client/index.d.ts"
+      ],
+      "@deepseek-ai/dsh-client-ui-sidebar-right/client": [
+        "./vendor/dsh/packages/client/ui-sidebar-right/lib/types/client/index.d.ts"
+      ],
+      "@deepseek-ai/dsh-client-ui-sidebar-right/tab-registry": [
+        "./vendor/dsh/packages/client/ui-sidebar-right/lib/types/client/tab-registry.d.ts"
+      ],
+      "@deepseek-ai/dsh-remote-mock": [
+        "./vendor/dsh/packages/test-support/remote-mock/lib/types/index.d.ts"
+      ],
+      "@deepseek-ai/dsh-client-test-runtime/assembly/bundle-roster": [
+        "./vendor/dsh/packages/test-support/client-runtime/lib/types/assembly/bundle-roster.d.ts"
+      ],
+      "@deepseek-ai/dsh-client-test-runtime/assembly": [
+        "./vendor/dsh/packages/test-support/client-runtime/lib/types/assembly/index.d.ts"
+      ],
       "react": [
         "./vendor/dsh/node_modules/@types/react"
       ],
@@ -51,13 +72,5 @@
     "tests/client/**/*.tsx",
     "tests/support/temp-env.ts",
     "tests/support/i18n-assertions.ts"
-  ],
-  // 这些 spec 直接引 vendor 源码（Cordis/SlotRegistry/LocaleRuntime），单面项目无法同时满足两半类型；
-  // 运行由 vitest 的 Vite transform 负责，类型面不在这里重复编译 vendor。
-  "exclude": [
-    "tests/client/tabs/company-tab-registration.spec.ts",
-    "tests/client/company-client-composition.spec.ts",
-    "tests/client/ui/style-lifecycle.spec.ts",
-    "tests/client/i18n/default-locale-runtime.spec.ts"
   ]
 }

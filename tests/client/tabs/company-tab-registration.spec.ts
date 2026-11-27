@@ -1,7 +1,7 @@
-import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
+import { Context } from '@deepseek-ai/cordis'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
-import { SlotRegistry } from '../../../vendor/dsh/packages/client/ui-renderer/src/client/registry.ts'
-import { SidebarRightTabRegistry } from '../../../vendor/dsh/packages/client/ui-sidebar-right/src/client/tab-registry.ts'
+import { SlotRegistry } from '@deepseek-ai/dsh-client-ui-renderer/client'
+import { SidebarRightTabRegistry } from '@deepseek-ai/dsh-client-ui-sidebar-right/tab-registry'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type { CultivationFiles } from '../../../packages/company-pack/src/client/cultivation/cultivation-data.ts'
 import { createAttentionRegistry } from '../../../packages/company-pack/src/client/wiring/attention-registry.ts'
@@ -41,8 +41,10 @@ function tabData(t: CompanyTabRegistrationData['t'] = ((key: keyof typeof zh) =>
   const cultivationFiles: CultivationFiles = {
     listJournal: vi.fn(async () => []),
     readHead: vi.fn(async () => null),
-    listRecords: vi.fn(async () => ({ ok: true, names: [] })),
-    readRecord: vi.fn(async () => null),
+    readJournalMore: vi.fn(async () => null),
+    listRecords: vi.fn(async () => ({ ok: true as const, names: [] })),
+    readRecordHead: vi.fn(async () => null),
+    readRecord: vi.fn(async () => ({ ok: false as const, reason: 'missing' as const })),
   }
   const roleSource = { getSnapshot: vi.fn(() => ({ projectionsBySession: {} })), subscribe: vi.fn(() => () => {}) }
   const attention = createAttentionRegistry()
@@ -54,12 +56,19 @@ function tabData(t: CompanyTabRegistrationData['t'] = ((key: keyof typeof zh) =>
     follow: vi.fn(async function* () {}),
     floatTab: vi.fn(),
     unfloatTab: vi.fn(),
-    pageHistory: vi.fn(async () => undefined),
+    pageHistory: vi.fn(async () => ({ ok: false as const })),
     openMember: vi.fn(async () => {}),
     cultivationFiles,
+    cultivationActions: vi.fn(() => ({ run: vi.fn(async () => ({ ok: true, text: 'ok' })) })),
     roleSource,
-    readLedger: vi.fn(async () => 'ledger text'),
-    readCatalog: vi.fn(async () => 'catalog text'),
+    readLedger: vi.fn(async () => ({ ok: true as const, text: 'ledger text', eof: true })),
+    readCatalog: vi.fn(async () => ({ ok: true as const, text: 'catalog text', eof: true })),
+    contextSources: vi.fn(() => ({
+      listSessions: () => ({ ok: true as const, value: [] }),
+      listDeliverables: async () => ({ ok: true as const, value: [] }),
+      readPreview: async () => ({ ok: false, problem: 'missing' }),
+    })),
+    openContext: vi.fn(async () => ({ ok: true as const })),
     startupStore: createStartupStore(),
     loadStartup: vi.fn(async () => {}),
     saveStartup: vi.fn(async () => ({ ok: true as const })),
@@ -191,10 +200,10 @@ describe('company tab registration', () => {
     expect(archiveProps.cultivationFiles).toBe(harness.data.cultivationFiles)
     expect(archiveProps.roleSource).toBe(harness.data.roleSource)
     const signal = new AbortController().signal
-    await expect((archiveProps.readLedger as CompanyTabRegistrationData['readLedger'])('lead-session' as SessionId, signal)).resolves.toBe('ledger text')
+    await expect((archiveProps.readLedger as CompanyTabRegistrationData['readLedger'])('lead-session' as SessionId, signal)).resolves.toEqual({ ok: true, text: 'ledger text', eof: true })
     expect(harness.data.readLedger).toHaveBeenCalledWith('lead-session', signal)
     expect(archiveProps.readCatalog).toBe(harness.data.readCatalog)
-    await expect((archiveProps.readCatalog as CompanyTabRegistrationData['readCatalog'])('lead-session' as SessionId, signal)).resolves.toBe('catalog text')
+    await expect((archiveProps.readCatalog as CompanyTabRegistrationData['readCatalog'])('lead-session' as SessionId, signal)).resolves.toEqual({ ok: true, text: 'catalog text', eof: true })
     expect(harness.data.readCatalog).toHaveBeenCalledWith('lead-session', signal)
 
     const titleFiber = await declareSlot(harness, TITLE_OWNER, TITLE_SLOT)

@@ -153,7 +153,7 @@
 | 059 | 2026-11-10 | tests/tools/quality-loop.spec.ts:198 |
 | 060 | 2026-11-10 | tests/host/commands/prd-command.spec.ts:116；tests/host/commands/req-command.spec.ts:130 |
 | 072 | 2026-11-11 | tests/host/prompt/delegation-contracts.spec.ts:243 |
-| 074 | 2026-11-11 | tests/host/index/inject-reentrancy.spec.ts:142 |
+| 074 | 2026-11-11 | tests/host/index/inject-reentrancy.spec.ts:143 |
 | 077 | 2026-11-11 | tests/host/prompt/delegation-contracts.spec.ts:175 |
 | 078 | 2026-11-11 | tests/host/delegation/delegation-control.spec.ts:130 |
 | 079 | 2026-11-11 | tests/host/delegation/seat.spec.ts:77；tests/host/delegation/seat.spec.ts:84；tests/host/prompt/delegation-contracts.spec.ts:204 |
@@ -203,12 +203,12 @@
 | 188 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:101 |
 | 189 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:108 |
 | 190 | 2026-11-15 | tests/repo/docs/live-pointer-paths.spec.ts:115 |
-| 191 | 2026-11-15 | tests/repo/docs/typecheck-coverage-claim.spec.ts:60 |
+| 191 | 2026-11-15 | tests/repo/docs/typecheck-coverage-claim.spec.ts:61 |
 | 192 | 2026-11-16 | tests/repo/budget/asset-lanes.spec.ts:141 |
 | 193 | 2026-11-16 | tests/repo/budget/vitest-coverage-thresholds.spec.ts:75 |
 | 194 | 2026-11-16 | tests/repo/docs/live-pointer-paths.spec.ts:119 |
 | 195 | 2026-11-16 | tests/repo/docs/live-pointer-paths.spec.ts:123 |
-| 196 | 2026-11-16 | tests/repo/docs/typecheck-coverage-claim.spec.ts:64 |
+| 196 | 2026-11-16 | tests/repo/docs/typecheck-coverage-claim.spec.ts:65 |
 | 197 | 2026-11-16 | tests/repo/structure/built-path-literals.spec.ts:96 |
 | 198 | 2026-11-16 | tests/repo/structure/built-path-literals.spec.ts:102 |
 | 199 | 2026-11-16 | tests/checks/pre-push-surfaces.test.mjs:121；tests/checks/pre-push-surfaces.test.mjs:144 |

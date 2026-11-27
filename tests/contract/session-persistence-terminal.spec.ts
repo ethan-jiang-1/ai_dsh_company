@@ -16,9 +16,9 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { Context } from '../../vendor/dsh/vendor/cordis/src/index.ts'
+import { Context } from '@deepseek-ai/cordis'
 import * as JsonlSessionPersistence from '../../vendor/dsh/packages/session/session-persistence-jsonl/src/index.ts'
-import { SESSION_FORMAT_VERSION, SessionId } from '../../vendor/dsh/packages/core/session/src/types.ts'
+import { SESSION_FORMAT_VERSION, SessionId, type SessionEvent } from '../../vendor/dsh/packages/core/session/src/types.ts'
 import { readChildTurnState } from '../../packages/company-pack/src/host/delegation/delegation-control.ts'
 
 /** Mount the real JSONL persistence on a temp root. */
@@ -30,10 +30,10 @@ async function mount(root: string): Promise<Context> {
 
 /** Persist a child log through the real write handle: create → append → close. */
 async function writeChildLog(
-  persistence: { create(header: unknown): Promise<{ append(events: unknown[]): Promise<void>; close(): Promise<void> }> },
+  persistence: Context['sessionPersistence'],
   root: string,
   id: string,
-  events: unknown[],
+  events: readonly SessionEvent[],
 ): Promise<void> {
   const handle = await persistence.create({
     version: SESSION_FORMAT_VERSION,
@@ -51,8 +51,9 @@ async function writeChildLog(
   }
 }
 
-const turnStart = { type: 'turn/start', seq: 0, time: 1, data: { turn: 1 } }
-const turnEnd = (kind: string) => ({ type: 'turn/end', seq: 1, time: 2, data: { turn: 1, reason: { kind } } })
+const turnStart = { type: 'turn/start', seq: 0, time: 1, data: { turn: 1 } } as unknown as SessionEvent
+const turnEnd = (kind: string): SessionEvent =>
+  ({ type: 'turn/end', seq: 1, time: 2, data: { turn: 1, reason: { kind } } }) as unknown as SessionEvent
 
 describe('child terminal via the real session persistence', () => {
   it('reads the last turn/end reason from a stored child log', async () => {

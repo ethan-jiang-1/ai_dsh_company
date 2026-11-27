@@ -21,6 +21,13 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
     alias: {
       '@deepseek-ai/cordis': fileURLToPath(new URL('./vendor/dsh/vendor/cordis/src/index.ts', import.meta.url)),
+      '@deepseek-ai/cordis-plugin-loader': fileURLToPath(new URL('./vendor/dsh/vendor/loader/src/index.ts', import.meta.url)),
+      '@deepseek-ai/dsh-client-locale/client': fileURLToPath(new URL('./vendor/dsh/packages/client/locale/src/client/index.ts', import.meta.url)),
+      '@deepseek-ai/dsh-client-ui-renderer/client': fileURLToPath(new URL('./vendor/dsh/packages/client/ui-renderer/src/client/index.ts', import.meta.url)),
+      '@deepseek-ai/dsh-client-ui-sidebar-right/tab-registry': fileURLToPath(new URL('./vendor/dsh/packages/client/ui-sidebar-right/src/client/tab-registry.ts', import.meta.url)),
+      '@deepseek-ai/dsh-remote-mock': fileURLToPath(new URL('./vendor/dsh/packages/test-support/remote-mock/src/index.ts', import.meta.url)),
+      '@deepseek-ai/dsh-client-test-runtime/assembly/bundle-roster': fileURLToPath(new URL('./vendor/dsh/packages/test-support/client-runtime/src/assembly/bundle-roster.ts', import.meta.url)),
+      '@deepseek-ai/dsh-client-test-runtime/assembly': fileURLToPath(new URL('./vendor/dsh/packages/test-support/client-runtime/src/assembly/index.ts', import.meta.url)),
     },
   },
   plugins: [tsconfigPaths({

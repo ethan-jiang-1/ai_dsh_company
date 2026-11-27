@@ -12,6 +12,7 @@
 | `pnpm bundle:init` | 初始化 dev 盘 `company-workspace/.dsh-company/`（不覆盖已有盘） | `tools/dev/bundle-init.mjs` |
 | `pnpm methods:init` | 初始化或同步公司方法层目录 | `tools/dev/methods-init.mjs` |
 | `pnpm company` | repo dev-only：打包 + `plugin add file:` + 启动 Web 观察窗（支持 `--no-open` / `--link`） | `tools/dev/company.mjs` |
+| `pnpm dev:pack` | 监听 `packages/company-pack/src` 增量重编类型与 runtime 双半产物 | `tsc -b --watch` / `tsdown --watch` |
 | `pnpm dsh` | 从钉 SHA 的 `vendor/dsh` 源码直接运行 DSH CLI（需先 `source run/env.sh`） | `vendor/dsh/apps/cli/src/bin.ts` |
 
 ## 2. 门禁、静态检查与测试回归
@@ -29,7 +30,7 @@
 | `pnpm smoke:surface` | 按改动面一键运行真入口车道（`client-load`/`preset`/`replay`；支持 `--all`/`--paths`） | `checks/pre-push-surfaces.mjs` |
 | `pnpm smoke:all` | 运行全量 keyless 周检车道 | `checks/lanes/keyless-lane.mjs` |
 | `pnpm coverage:ratchet` | 执行覆盖率棘轮检查（只升不降 + 新文件下限） | `checks/audit/coverage-ratchet.mjs` |
-| `pnpm typecheck` | 检查 `packages/company-pack` 双面与三套 `tsconfig.test-*.json` | `tsc -b` / `tsc -p` |
+| `pnpm typecheck` | 检查 `packages/company-pack` 双面与四套 `tsconfig.test-*.json` | `tsc -b` / `tsc -p` |
 | `pnpm lint` | 运行 oxlint 与 `company-static-audit --strict` | `checks/audit/company-static-audit.mjs` |
 | `pnpm dup` | 运行 jscpd 重复代码扫描（0 克隆门禁） | `.jscpd.json` |
 

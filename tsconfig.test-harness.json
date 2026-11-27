@@ -3,6 +3,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "noEmit": true,
+    "rewriteRelativeImportExtensions": false,
     "composite": false,
     "incremental": true,
     "tsBuildInfoFile": "./runtime/tsc-cache/test-harness.tsbuildinfo",
@@ -16,24 +17,20 @@
       "@deepseek-ai/*": ["./packages/company-pack/node_modules/@deepseek-ai/*"],
       "@deepseek-ai/dsh-api-session-controller/client": ["./packages/company-pack/node_modules/@deepseek-ai/dsh-api-session-controller/lib/types/client/index.d.ts"],
       "@deepseek-ai/dsh-api-session-controller/types": ["./packages/company-pack/node_modules/@deepseek-ai/dsh-api-session-controller/lib/types/types.d.ts"],
-      "@deepseek-ai/dsh-session/types": ["./packages/company-pack/node_modules/@deepseek-ai/dsh-session/lib/types/types.d.ts"]
+      "@deepseek-ai/dsh-session/types": ["./packages/company-pack/node_modules/@deepseek-ai/dsh-session/lib/types/types.d.ts"],
+      "@deepseek-ai/cordis-plugin-loader": ["./vendor/dsh/vendor/loader/lib/types/index.d.ts"]
     }
   },
   "include": [
     "tests/repo/**/*.spec.ts",
-    "tests/contract/**/*.spec.ts",
     "tests/tools/**/*.spec.ts",
     "tests/session/**/*.spec.ts",
     "tests/evidence/**/*.spec.ts",
     "tests/ui/**/*.spec.ts",
     "tests/support/temp-env.ts"
   ],
-  "exclude": [
-    "tests/repo/pack/pack-exports.spec.ts",
-    // 直引 vendor 源码的合同钉子（2026-11-08 修复轮起）：vendor 源内部的裸包导入
-    // （@deepseek-ai/dsh-util-values 等）在本 project 的 paths 下解析不到；与 tsconfig.test-client.json、
-    // tsconfig.test-company.json 对直引 vendor 源 spec 的处置同形。运行面走 vitest 的 paths（vendor 源），
-    // 不受这里影响；证明边界见 docs/testing.md §5「已知未覆盖面」。
-    "tests/contract/**"
+  "references": [
+    { "path": "./packages/company-pack/tsconfig.host.json" },
+    { "path": "./packages/company-pack/tsconfig.client.json" }
   ]
 }
