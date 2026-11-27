@@ -215,4 +215,77 @@ describe('workflow run durable view', () => {
     ] as never)
     expect(rows.map(row => [row.runId, row.jobId])).toEqual([['r1', 'jobA'], ['r2', 'jobB']])
   })
+
+  it('hasWorkflowTool fallback/throw、jobs.list 异常降级与 output.render 序列化完整覆盖', async () => {
+    const events = [
+      call(0, 'c1', 'audit', true),
+      runStart(1, 'r1', 'audit'),
+      result(2, 'c1', backgroundText('audit', 'workflow-live')),
+    ]
+    const okHarness = harness(events, { list: () => [{ id: 'workflow-live' }] })
+    const tool = okHarness.tools.get('workflow_runs') as unknown as {
+      execute: (args: never, exec: unknown) => Promise<unknown>
+      output: { render: (args: unknown, value: unknown) => Array<{ type: string; text: string }> }
+    }
+    const liveOut = await tool.execute({} as never, { agent: okHarness.agent, signal: new AbortController().signal })
+    expect(liveOut).toEqual({ runs: [expect.objectContaining({ runId: 'r1', status: 'running' })] })
+    expect(tool.output.render({}, liveOut)[0]?.text).toContain('"status": "running"')
+
+    // jobs.list throws => degrades to lost instead of crashing
+    const throwingJobs = harness(events, { list: () => { throw new Error('jobs unavailable') } })
+    const degraded = await throwingJobs.tools.get('workflow_runs')?.execute(
+      {} as never,
+      { agent: throwingJobs.agent, signal: new AbortController().signal } as never,
+    )
+    expect(degraded).toEqual({ runs: [expect.objectContaining({ runId: 'r1', status: 'lost' })] })
+    await expect(
+      throwingJobs.tools.get('workflow_runs')?.execute({} as never, { signal: new AbortController().signal } as never),
+    ).rejects.toThrow(/calling agent/)
+
+    // hasWorkflowTool fallback when scopeOf(scope) throws on non-Cordis stub scope
+    const registered: string[] = []
+    const listeners = new Map<string, ((payload: unknown) => void)[]>()
+    registerWorkflowRuns({
+      get: () => undefined,
+      on: (name: string, fn: (payload: unknown) => void) => {
+        listeners.set(name, [...(listeners.get(name) ?? []), fn])
+      },
+    } as never)
+    for (const fn of listeners.get('agent/created') ?? []) {
+      fn({
+        agent: {
+          ctx: {
+            inject: (_deps: readonly string[], cb: (s: unknown) => void) => {
+              let calls = 0
+              const tools = {
+                get: () => {
+                  calls += 1
+                  if (calls === 1) throw new Error('scoped lookup unsupported')
+                  return { name: 'workflow' }
+                },
+                register: (def: { name: string }) => { registered.push(def.name); return () => {} },
+              }
+              cb({ get: (n: string) => n === 'tools' ? tools : undefined, effect: (f: () => () => void) => f() })
+              return { dispose: async () => {} }
+            },
+          },
+        },
+      })
+      fn({
+        agent: {
+          ctx: {
+            inject: (_deps: readonly string[], cb: (s: unknown) => void) => {
+              const tools = {
+                get: () => { throw new Error('both lookups fail') },
+                register: (def: { name: string }) => { registered.push(def.name); return () => {} },
+              }
+              cb({ get: (n: string) => n === 'tools' ? tools : undefined, effect: (f: () => () => void) => f() })
+              return { dispose: async () => {} }
+            },
+          },
+        },
+      })
+    }
+    expect(registered).toEqual(['workflow_runs'])
+  })
 })

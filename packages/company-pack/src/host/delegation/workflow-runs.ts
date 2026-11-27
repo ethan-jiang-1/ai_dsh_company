@@ -14,6 +14,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { scopeOf } from '@deepseek-ai/dsh-scope'
 import { defineTool } from '@deepseek-ai/dsh-tools'
+import { injectEachAgent } from '../run-bundle/for-each-agent.ts'
 
 type SessionEventLike = { type: string; data: unknown; seq?: number }
 
@@ -233,19 +234,13 @@ export function createWorkflowRunsTool(ctx: Context): unknown {
  */
 export function registerWorkflowRuns(ctx: Context): void {
   // 只去重 `agent/created` 的重复投递；tools re-provide 时 callback 由 fiber 重跑（BUG-074）。
-  const installed = new WeakSet<object>()
-  const install = (agent: AgentLike): void => {
-    if (installed.has(agent)) return
-    installed.add(agent)
-    agent.ctx.inject(['tools'], (scope) => {
-      const scoped = scope as unknown as ToolScopeLike
-      const tools = scope.get('tools') as ToolScopeLike['tools'] | undefined
-      if (!hasWorkflowTool(scope) || tools === undefined) return
-      scoped.effect(() => {
-        const unregister = tools.register(createWorkflowRunsTool(ctx))
-        return () => { unregister?.() }
-      })
+  injectEachAgent<AgentLike>(ctx, ['tools'], (scope) => {
+    const scoped = scope as unknown as ToolScopeLike
+    const tools = scope.get('tools') as ToolScopeLike['tools'] | undefined
+    if (!hasWorkflowTool(scope) || tools === undefined) return
+    scoped.effect(() => {
+      const unregister = tools.register(createWorkflowRunsTool(ctx))
+      return () => { unregister?.() }
     })
-  }
-  ctx.on('agent/created', ({ agent }: { agent: AgentLike }) => { install(agent) })
+  })
 }

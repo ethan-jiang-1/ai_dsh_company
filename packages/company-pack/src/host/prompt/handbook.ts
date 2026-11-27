@@ -16,6 +16,7 @@ import { join } from 'node:path'
 import { NON_ROLE_PRESETS } from '../../lib/delegation/delegation-surface.ts'
 import { RUN_BUNDLE_PATHS } from '../../lib/shared/run-bundle-paths.ts'
 import { readCompanyFile } from '../run-bundle/company-root.ts'
+import { injectEachAgent } from '../run-bundle/for-each-agent.ts'
 
 export const HANDBOOK_SECTION = 'company:handbook'
 /** 注入预算：build gate 核 `content/AGENTS.md` 字节数；运行时超限只告警，不静默截断。 */
@@ -90,27 +91,19 @@ export function registerHandbook(
       + 'handbook-budget 门禁会红；运行时仍注入全文，不静默截断')
   }
   const skip = new Set(options.skipPresets ?? NON_ROLE_PRESETS)
-  const fibers = new Map<AgentLike, ReturnType<Context['inject']>>()
-  const install = (agent: AgentLike): void => {
-    if (fibers.has(agent)) return
-    if (skip.has(composedPresetOf(agent.ctx) ?? '')) return
-    const fiber = agent.ctx.inject(['systemPrompt'], (scope) => {
+  injectEachAgent<AgentLike>(
+    ctx,
+    ['systemPrompt'],
+    (scope) => {
       scope.systemPrompt.section({
         name: HANDBOOK_SECTION,
         order: 500,
         text: () => handbook.text,
         interpolate: false,
       })
-    })
-    fibers.set(agent, fiber)
-  }
-  ctx.on('agent/created', ({ agent }: { agent: AgentLike }) => { install(agent) })
-  ctx.on('agent/disposed', ({ agent }: { agent: AgentLike }) => {
-    const fiber = fibers.get(agent)
-    if (fiber === undefined) return
-    fibers.delete(agent)
-    void fiber.dispose().catch(() => {})
-  })
+    },
+    { filter: agent => !skip.has(composedPresetOf(agent.ctx) ?? '') },
+  )
 }
 
 interface PresetReader {

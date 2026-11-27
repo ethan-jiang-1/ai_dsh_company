@@ -18,6 +18,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { composedPresetOf } from '../prompt/handbook.ts'
+import { injectEachAgent } from '../run-bundle/for-each-agent.ts'
 import { abortable } from '../../lib/shared/abortable.ts'
 import { SUBAGENT_RETRY, subagentRetryDecision, type SubagentRetrySurface } from '../../lib/delegation/retry-policy.ts'
 
@@ -108,19 +109,20 @@ export function registerSubagentRetry(ctx: Context, options: SubagentRetryOption
   const { surface } = options
   const provider = options.provider ?? DEFAULT_PROVIDER
   const maxAttempts = Math.min(SUBAGENT_RETRY.maxAttempts, Math.max(1, options.maxAttempts ?? SUBAGENT_RETRY.maxAttempts))
-  const fibers = new Map<AgentLike, ReturnType<Context['inject']>>()
 
-  const install = (agent: AgentLike, subagents: SubagentsLike): void => {
-    if (fibers.has(agent)) return
-    const preset = composedPresetOf(agent.ctx)
-    if (preset === undefined) return
-    const maxDepth = surface.presets[preset]
-    if (maxDepth === undefined) return
-    const fiber = agent.ctx.inject(['tools'], (scope) => {
-      const tools = (scope as unknown as { tools?: ToolsLike }).tools
-      if (tools === undefined) return
-      scope.effect(() => {
-        const tool = defineTool({
+  const mountOnOwner = (ownerCtx: Context, subagents: SubagentsLike): void => {
+    injectEachAgent<AgentLike>(
+      ownerCtx,
+      ['tools'],
+      (scope, agent) => {
+        const preset = composedPresetOf(agent.ctx)
+        if (preset === undefined) return
+        const maxDepth = surface.presets[preset]
+        if (maxDepth === undefined) return
+        const tools = (scope as unknown as { tools?: ToolsLike }).tools
+        if (tools === undefined) return
+        scope.effect(() => {
+          const tool = defineTool({
           name: 'subagent_retry',
           description: 'Retry-sensitive subagent: start a fresh worker, wait for its terminal result, and retry at most once '
             + 'when the failure is retryable (error/interrupted/lost) and the task is idempotent. '
@@ -263,25 +265,23 @@ export function registerSubagentRetry(ctx: Context, options: SubagentRetryOption
             }
           },
         })
-        const unregister = tools.register(tool)
-        return () => { unregister() }
-      })
-    })
-    fibers.set(agent, fiber)
+          const unregister = tools.register(tool)
+          return () => { unregister() }
+        })
+      },
+      {
+        filter: agent => {
+          const preset = composedPresetOf(agent.ctx)
+          return preset !== undefined && surface.presets[preset] !== undefined
+        },
+      },
+    )
   }
 
   ctx.inject(['subagents'], (scope) => {
     const subagents = (scope as unknown as { subagents?: SubagentsLike }).subagents
     if (subagents === undefined) return
-    // vendor 的 Agent 类型不带 subagentDepth 的本地增广（augmentation 在 subagent 包里）；
-    // 这里只在边界做窄化，内部只用 session.header + options.subagentDepth 两个字段。
-    ctx.on('agent/created', payload => { install(payload.agent as unknown as AgentLike, subagents) })
-    ctx.on('agent/disposed', payload => {
-      const agent = payload.agent as unknown as AgentLike
-      const fiber = fibers.get(agent)
-      if (fiber === undefined) return
-      fibers.delete(agent)
-      void fiber.dispose().catch(() => {})
-    })
+    const ownerCtx = typeof (scope as unknown as { on?: unknown }).on === 'function' ? scope : ctx
+    mountOnOwner(ownerCtx, subagents)
   })
 }

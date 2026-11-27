@@ -10,6 +10,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { NON_ROLE_PRESETS } from '../../lib/delegation/delegation-surface.ts'
 import { PRESET_KEYS } from '../../lib/presence/presence-status.ts'
+import { injectEachAgent } from '../run-bundle/for-each-agent.ts'
 import { composedPresetOf } from './handbook.ts'
 import type { CompanyLanguage, CompanyLanguageState } from '../language/company-language.ts'
 
@@ -49,19 +50,14 @@ interface AgentLike {
  * @param language - 语言状态。
  */
 export function registerLanguagePolicy(ctx: Context, language: CompanyLanguageState): void {
-  const installed = new WeakSet<object>()
-  ctx.on('agent/created', ({ agent }: { agent: AgentLike }) => {
-    if (installed.has(agent)) return
-    installed.add(agent)
-    agent.ctx.inject(['systemPrompt'], (scope) => {
-      const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
-      if (preset === undefined || !COMPANY_POLICY_PRESETS.has(preset)) return
-      scope.systemPrompt.section({
-        name: LANGUAGE_POLICY_SECTION,
-        order: 1,
-        text: () => languagePolicyText(language.current()),
-        interpolate: false,
-      })
+  injectEachAgent<AgentLike>(ctx, ['systemPrompt'], (scope, agent) => {
+    const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
+    if (preset === undefined || !COMPANY_POLICY_PRESETS.has(preset)) return
+    scope.systemPrompt.section({
+      name: LANGUAGE_POLICY_SECTION,
+      order: 1,
+      text: () => languagePolicyText(language.current()),
+      interpolate: false,
     })
   })
 }

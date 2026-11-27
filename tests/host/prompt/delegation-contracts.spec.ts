@@ -4,7 +4,11 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
-  DELEGATION_HEADER_SECTION, DELEGATION_SEAT_SECTION, DELEGATION_SECTION_PREFIX, registerDelegationContracts,
+  DELEGATION_HEADER_SECTION,
+  DELEGATION_SEAT_SECTION,
+  DELEGATION_SECTION_PREFIX,
+  registerDelegationContracts,
+  supportSeatNote,
 } from '../../../packages/company-pack/src/host/prompt/delegation-contracts.ts'
 
 // 负例留证 2026-11-11：把 team 判据从 `seat.teamCollaborate` 改回 `seat.teamLead` ⇒「teammate: collaboration」
@@ -269,6 +273,62 @@ describe('registerDelegationContracts', () => {
       h.fire()
       expect(h.sections).toHaveLength(0)
       expect(h.warnings.join('\n')).toContain('delegation 政策段缺失')
+    } finally { rmSync(dir, { recursive: true, force: true }) }
+  })
+
+  it('tools.get 抛错或缺失时安全视为不可用，不中断其余通道注入', () => {
+    const dir = content()
+    try {
+      const sections: Array<{ name: string; text: string }> = []
+      const listeners = new Map<string, ((payload: unknown) => void)[]>()
+      const ctx = {
+        logger: { warn: () => {} },
+        on: (name: string, fn: (payload: unknown) => void) => {
+          listeners.set(name, [...(listeners.get(name) ?? []), fn])
+        },
+      }
+      const agent = {
+        ctx: {
+          get: (name: string) => name === 'agentPresets' ? { composedPreset: () => 'vp-eng' } : undefined,
+          inject: (_deps: readonly string[], cb: (scope: unknown) => void) => {
+            cb({
+              get: (name: string) => {
+                if (name === 'agentPresets') return { composedPreset: () => 'vp-eng' }
+                if (name === 'tools') return { get: () => { throw new Error('scope mismatch') } }
+                return undefined
+              },
+              systemPrompt: {
+                getSectionOrder: () => 2800,
+                section: (s: { name: string; text: string }) => { sections.push(s) },
+              },
+            })
+            return { dispose: async () => {} }
+          },
+        },
+      }
+      registerDelegationContracts(ctx as never, dir)
+      for (const fn of listeners.get('agent/created') ?? []) {
+        fn({ agent })
+        fn({
+          agent: {
+            ctx: {
+              get: (name: string) => name === 'agentPresets' ? { composedPreset: () => 'ceo' } : undefined,
+              inject: (_deps: readonly string[], cb: (scope: unknown) => void) => {
+                cb({
+                  get: () => undefined,
+                  systemPrompt: {
+                    getSectionOrder: () => 2800,
+                    section: (s: { name: string; text: string }) => { sections.push(s) },
+                  },
+                })
+                return { dispose: async () => {} }
+              },
+            },
+          },
+        })
+      }
+      expect(sections.map(s => s.name)).toContain(DELEGATION_HEADER_SECTION)
+      expect(supportSeatNote(undefined)).toContain('support capability seat, not a company role')
     } finally { rmSync(dir, { recursive: true, force: true }) }
   })
 })

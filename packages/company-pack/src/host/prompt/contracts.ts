@@ -16,6 +16,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { scopeOf } from '@deepseek-ai/dsh-scope'
+import { injectEachAgent } from '../run-bundle/for-each-agent.ts'
 import { composedPresetOf } from './handbook.ts'
 
 export const WORKFLOW_CONTRACT_SECTION = 'company:workflow-contract'
@@ -69,19 +70,14 @@ export function registerWorkflowContract(
   }
   const fallback = new Set(options.workflowPresets ?? [])
   // 只去重 `agent/created` 的重复投递；inject callback 的 re-provide 重跑由 fiber 负责（BUG-074）。
-  const installed = new WeakSet<object>()
-  ctx.on('agent/created', ({ agent }: { agent: AgentLike }) => {
-    if (installed.has(agent)) return
-    installed.add(agent)
-    agent.ctx.inject(['systemPrompt', 'tools'], (scope) => {
-      const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
-      if (!hasWorkflowTool(scope) && (preset === undefined || !fallback.has(preset))) return
-      scope.systemPrompt.section({
-        name: WORKFLOW_CONTRACT_SECTION,
-        order: scope.systemPrompt.getSectionOrder('TOOL_WORKFLOW') + 1,
-        text,
-        interpolate: false,
-      })
+  injectEachAgent<AgentLike>(ctx, ['systemPrompt', 'tools'], (scope, agent) => {
+    const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
+    if (!hasWorkflowTool(scope) && (preset === undefined || !fallback.has(preset))) return
+    scope.systemPrompt.section({
+      name: WORKFLOW_CONTRACT_SECTION,
+      order: scope.systemPrompt.getSectionOrder('TOOL_WORKFLOW') + 1,
+      text,
+      interpolate: false,
     })
   })
 }

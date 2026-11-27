@@ -19,6 +19,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { isSupportPreset } from '../../lib/delegation/delegation-surface.ts'
 import { composedPresetOf } from '../prompt/handbook.ts'
+import { injectEachAgent } from '../run-bundle/for-each-agent.ts'
 import { TEAM_SURFACE_TOOLS } from './seat.ts'
 
 /** 只取本模块用到的 tools.guard 面（不扩大 peer 依赖）。 */
@@ -43,17 +44,11 @@ export function supportTeamDenial(preset: string | undefined, tool: string): str
  * @param ctx - Host 上下文。
  */
 export function registerTeamSeatGuard(ctx: Context): void {
-  const installed = new WeakSet<object>()
-  ctx.on('agent/created', (payload: { agent: AgentLike }) => {
-    const { agent } = payload
-    if (installed.has(agent)) return
-    installed.add(agent)
-    agent.ctx.inject(['tools'], (scope) => {
-      const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
-      if (!isSupportPreset(preset)) return
-      const tools = scope.get('tools') as GuardTools | undefined
-      if (tools?.guard === undefined) return
-      scope.effect(() => tools.guard(exec => supportTeamDenial(preset, exec.name)))
-    })
+  injectEachAgent<AgentLike>(ctx, ['tools'], (scope, agent) => {
+    const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
+    if (!isSupportPreset(preset)) return
+    const tools = scope.get('tools') as GuardTools | undefined
+    if (tools?.guard === undefined) return
+    scope.effect(() => tools.guard(exec => supportTeamDenial(preset, exec.name)))
   })
 }

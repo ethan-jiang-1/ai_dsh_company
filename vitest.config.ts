@@ -1,4 +1,5 @@
 import { cpus } from 'node:os'
+import { fileURLToPath } from 'node:url'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 
@@ -16,7 +17,12 @@ export default defineConfig({
   // 单一 React：干净 clone 的 vendor 安装会落下第二份 react（vendor/dsh/node_modules），
   // 与根 react-dom 的 dispatcher 不同源 → 源码面组件在 react-dom/server 下 hooks 报 null
   // （2026-11-13 clean clone 实测 tab-copy.spec）。dedupe 让测试面只保留根副本。
-  resolve: { dedupe: ['react', 'react-dom'] },
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+    alias: {
+      '@deepseek-ai/cordis': fileURLToPath(new URL('./vendor/dsh/vendor/cordis/src/index.ts', import.meta.url)),
+    },
+  },
   plugins: [tsconfigPaths({
     // vendor/dsh/tsconfig.base.json 同时列为原生项目：extends 链继承的 paths 在本仓根解析时
     // 基址错位（实测 @deepseek-ai/dsh-client-modules/client 解析出 packages/packages 翻倍路径、

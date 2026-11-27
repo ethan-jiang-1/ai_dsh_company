@@ -23,6 +23,7 @@ import {
 } from '../../lib/startup/startup-settings.ts'
 import { resolveStartupWorkspace } from './startup-workspace.ts'
 import { composedPresetOf } from '../prompt/handbook.ts'
+import { injectEachAgent } from '../run-bundle/for-each-agent.ts'
 import { checkWikiPointer, readStartupSettingsState } from './startup-store.ts'
 
 /** section 名（测试与诊断用）。 */
@@ -119,36 +120,33 @@ export function registerStartupSettings(
   bootWorkspace: string,
   options: StartupSettingsRegistration = {},
 ): void {
-  const installed = new WeakSet<object>()
-  ctx.on('agent/created', ({ agent }: { agent: AgentLike }) => {
-    if (installed.has(agent)) return
-    installed.add(agent)
-    agent.ctx.inject(['systemPrompt'], (scope) => {
-      const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
-      if (preset !== undefined && (NON_ROLE_PRESETS as readonly string[]).includes(preset)) return
-      const workspace = resolveStartupWorkspace(bootWorkspace, agent)
-      if (workspace === '') return
-      // 首次安装时补一次派生：boot 无 workspace、会话 cwd 才有项目的场景也要有 options 文件。
-      if (options.writable !== false) {
-        try {
-          options.watch?.sync(workspace)
-        } catch { /* 派生失败不挡注入；面板会显示「还没检查」 */ }
+  injectEachAgent<AgentLike>(ctx, ['systemPrompt'], (scope, agent) => {
+    const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
+    if (preset !== undefined && (NON_ROLE_PRESETS as readonly string[]).includes(preset)) return
+    const workspace = resolveStartupWorkspace(bootWorkspace, agent)
+    if (workspace === '') return
+    // 首次安装时补一次派生：boot 无 workspace、会话 cwd 才有项目的场景也要有 options 文件。
+    if (options.writable !== false) {
+      try {
+        options.watch?.sync(workspace)
+      } catch {
+        // intentional-fallback: 派生失败不挡注入；面板会显示「还没检查」
       }
-      scope.systemPrompt.section({
-        name: STARTUP_SETTINGS_SECTION,
-        order: STARTUP_SETTINGS_ORDER,
-        // 每次 assembly 重读盘 + 重查指针：改完下一轮生效（与 company:language 同款活读）。
-        text: () => {
-          const current = resolveStartupWorkspace(bootWorkspace, agent)
-          if (current === '') return ''
-          const state = readStartupSettingsState(current)
-          if (state.problem !== null) {
-            return `⚠ 项目启动策略文件不可用（${state.problem}）：本次按全自动处理，不采用其中的值；修好 .dsh-company/startup.json 或重新设置后下一轮恢复。`
-          }
-          return startupSettingsText(state.settings, checkWikiPointer(current, state.settings.wiki))
-        },
-        interpolate: false,
-      })
+    }
+    scope.systemPrompt.section({
+      name: STARTUP_SETTINGS_SECTION,
+      order: STARTUP_SETTINGS_ORDER,
+      // 每次 assembly 重读盘 + 重查指针：改完下一轮生效（与 company:language 同款活读）。
+      text: () => {
+        const current = resolveStartupWorkspace(bootWorkspace, agent)
+        if (current === '') return ''
+        const state = readStartupSettingsState(current)
+        if (state.problem !== null) {
+          return `⚠ 项目启动策略文件不可用（${state.problem}）：本次按全自动处理，不采用其中的值；修好 .dsh-company/startup.json 或重新设置后下一轮恢复。`
+        }
+        return startupSettingsText(state.settings, checkWikiPointer(current, state.settings.wiki))
+      },
+      interpolate: false,
     })
   })
 }

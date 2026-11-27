@@ -25,6 +25,7 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
+import { injectEachAgent } from '../run-bundle/for-each-agent.ts'
 import { delegationSeatOf } from './seat.ts'
 
 /** 父会话 durable catalog 里的 `subagent/catalog` 事件（只取本模块用到的字段）。 */
@@ -273,15 +274,10 @@ export function registerDelegationControl(ctx: Context): void {
     return agents?.get(id)?.status === 'running' ? 'running' : 'inactive'
   }
 
-  const fibers = new Map<AgentLike, ReturnType<Context['inject']>>()
-
-  const install = (agent: AgentLike): void => {
-    if (fibers.has(agent)) return
-    // 座位优先：support 与没有 child 预算的座位（CEO teammate）不装。
-    // vp-eng teammate childDepth 3 > depth 1 ⇒ controlsChildren true，保留。
-    const seat = delegationSeatOf(agent)
-    if (!seat.controlsChildren) return
-    const fiber = agent.ctx.inject(['tools'], scope => {
+  injectEachAgent<AgentLike>(
+    ctx,
+    ['tools'],
+    (scope) => {
       const scoped = scope as unknown as ToolScopeLike
       const tools = scoped.tools
       if (tools === undefined) return
@@ -447,16 +443,10 @@ export function registerDelegationControl(ctx: Context): void {
 
         return () => { unregisterList(); unregisterSend() }
       })
-    })
-    fibers.set(agent, fiber)
-  }
-
-  ctx.on('agent/created', payload => { install(payload.agent as unknown as AgentLike) })
-  ctx.on('agent/disposed', payload => {
-    const agent = payload.agent as unknown as AgentLike
-    const fiber = fibers.get(agent)
-    if (fiber === undefined) return
-    fibers.delete(agent)
-    void fiber.dispose().catch(() => {})
-  })
+    },
+    {
+      // 座位优先：support 与没有 child 预算的座位（CEO teammate）不装；vp-eng teammate 保留。
+      filter: agent => delegationSeatOf(agent).controlsChildren,
+    },
+  )
 }

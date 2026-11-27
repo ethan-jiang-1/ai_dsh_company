@@ -152,11 +152,11 @@
 | 058 | 2026-11-10 | tests/host/commands/deliverables-command.spec.ts:50；tests/host/commands/prd-command.spec.ts:85；tests/host/commands/req-command.spec.ts:120 |
 | 059 | 2026-11-10 | tests/tools/quality-loop.spec.ts:198 |
 | 060 | 2026-11-10 | tests/host/commands/prd-command.spec.ts:116；tests/host/commands/req-command.spec.ts:130 |
-| 072 | 2026-11-11 | tests/host/prompt/delegation-contracts.spec.ts:239 |
+| 072 | 2026-11-11 | tests/host/prompt/delegation-contracts.spec.ts:243 |
 | 074 | 2026-11-11 | tests/host/index/inject-reentrancy.spec.ts:142 |
-| 077 | 2026-11-11 | tests/host/prompt/delegation-contracts.spec.ts:171 |
+| 077 | 2026-11-11 | tests/host/prompt/delegation-contracts.spec.ts:175 |
 | 078 | 2026-11-11 | tests/host/delegation/delegation-control.spec.ts:130 |
-| 079 | 2026-11-11 | tests/host/delegation/seat.spec.ts:77；tests/host/delegation/seat.spec.ts:84；tests/host/prompt/delegation-contracts.spec.ts:200 |
+| 079 | 2026-11-11 | tests/host/delegation/seat.spec.ts:77；tests/host/delegation/seat.spec.ts:84；tests/host/prompt/delegation-contracts.spec.ts:204 |
 | 103 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:436 |
 | 114 | 2026-11-13 | tests/host/ledger/governance-export.spec.ts:89 |
 | 117 | 2026-11-13 | tests/host/cultivation/cultivation-command.spec.ts:421 |

@@ -6,7 +6,7 @@
 
 | 组 | 管什么 | 文件 |
 |---|---|---|
-| `run-bundle/` | 首启播种（`bootstrap`）、bundle 身份（`bundle-manifest`）、布局（`run-bundle`）、租约（`lease`）、运行前提（`runtime-guard`）、启动配置校验与路径/profile 体检 | bootstrap, bundle-manifest, run-bundle, lease, runtime-guard, config, paths, profiles |
+| `run-bundle/` | 首启播种（`bootstrap`）、bundle 身份（`bundle-manifest`）、布局（`run-bundle`）、租约（`lease`）、运行前提（`runtime-guard`）、per-agent 双 owner 注入生命周期（`for-each-agent`）、启动配置校验与路径/profile 体检 | bootstrap, bundle-manifest, run-bundle, lease, runtime-guard, for-each-agent, config, paths, profiles |
 | `workspace/` | workspace 解析、登记体检、工作区门投影 | workspace-resolution, workspace-registry, workspace-doors |
 | `cultivation/` | 培养提案/命令、记录与方法层存储、背景读取、撤销恢复日志 | cultivation, cultivation-storage, cultivation-context-read, revoke-journal |
 | `ledger/` | presented 审计账本与状态通道、成品目录生成/读取、治理导出 | presented-ledger, presented-domain, catalog, catalog-state, governance-export |

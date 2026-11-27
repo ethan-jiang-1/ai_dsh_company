@@ -20,6 +20,7 @@ import { join } from 'node:path'
 import { scopeOf } from '@deepseek-ai/dsh-scope'
 import { delegationCapabilitiesOf } from '../../lib/delegation/delegation-capabilities.ts'
 import { delegationSeatOf } from '../delegation/seat.ts'
+import { injectEachAgent } from '../run-bundle/for-each-agent.ts'
 import { composedPresetOf } from './handbook.ts'
 
 export const DELEGATION_HEADER_SECTION = 'company:delegation-capabilities'
@@ -136,58 +137,52 @@ export function registerDelegationContracts(ctx: Context, contentDir: string): v
   }
   // 只去重 `agent/created` 的重复投递：同一 Agent 建第二个 inject fiber 会重复 section。
   // 它**不挡** inject callback 的 re-run——required service re-provide 时 Cordis 复用同一 fiber
-  // 重跑 callback（BUG-074 实测：WeakSet 在位、systemPrompt/tools 重挂仍会重装；`ctx.set` 换值
-  // 不触发重跑，那不是 re-provide）。真正的重跑保护是 fiber 生命周期，不是这个 Agent 键。
-  const installed = new WeakSet<object>()
-  ctx.on('agent/created', ({ agent }: { agent: AgentLike }) => {
-    if (installed.has(agent)) return
-    installed.add(agent)
-    agent.ctx.inject(['systemPrompt', 'tools'], (scope) => {
-      const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
-      const seat = delegationSeatOf(agent, preset)
-      const caps = delegationCapabilitiesOf(preset)
-      // team 的两个能力分开：`team` = 名册成员的协作面；`team-spawn` = Lead 的 spawn 权。
-      // 工具在场是必要条件（vendor 按成员安装九件套），座位是充分判据（BUG-077）。
-      const available: Record<Channel, boolean> = {
-        // spawn 用能力表（CEO 的命名行不是 `subagent`，无法靠单名探测）；表由 parity spec 钉 YAML。
-        // BUG-079：能力表是 preset 级，还要叠座位 depth——CEO teammate depth 1 的命名行 maxDepth 1 不可用。
-        spawn: caps?.spawn === true && seat.canStartChild,
-        fork: caps?.fork === true && seat.canStartChild && hasTool(scope, 'subagent_fork'),
-        workflow: caps?.workflow === true && hasTool(scope, 'workflow'),
-        team: seat.teamCollaborate && hasTool(scope, 'team_task_list'),
-        'team-spawn': seat.teamLead && hasTool(scope, 'spawn_teammate'),
-        // retry 是 host per-agent 安装的，agent/created 监听顺序可能晚于本注入；能力表已由 parity spec 钉住。
-        // retry 的 child 也受同一个 depth 预算；depth 用尽时 header 不再承诺。
-        retry: caps?.retry === true && seat.canStartChild,
-      }
-      // BUG-076：support root 的 vendor team:policy/identity 仍在；先纠正，再按 header 决定是否注入段。
-      if (seat.support && seat.teamRole === 'lead') {
-        scope.systemPrompt.section({
-          name: DELEGATION_SEAT_SECTION,
-          order: scope.systemPrompt.getSectionOrder('TEAM_POLICY') + 1,
-          text: supportSeatNote(preset),
-          interpolate: false,
-        })
-      }
-      const header = buildCapabilityHeader(available)
-      if (header === undefined) return
-      const base = scope.systemPrompt.getSectionOrder('TOOL_SUBAGENT') - 10
+  // 重跑 callback（BUG-074 实测）。双 owner 释放与在场挂载由 injectEachAgent 统一维护。
+  injectEachAgent<AgentLike>(ctx, ['systemPrompt', 'tools'], (scope, agent) => {
+    const preset = composedPresetOf(scope) ?? composedPresetOf(agent.ctx)
+    const seat = delegationSeatOf(agent, preset)
+    const caps = delegationCapabilitiesOf(preset)
+    // team 的两个能力分开：`team` = 名册成员的协作面；`team-spawn` = Lead 的 spawn 权。
+    // 工具在场是必要条件（vendor 按成员安装九件套），座位是充分判据（BUG-077）。
+    const available: Record<Channel, boolean> = {
+      // spawn 用能力表（CEO 的命名行不是 `subagent`，无法靠单名探测）；表由 parity spec 钉 YAML。
+      // BUG-079：能力表是 preset 级，还要叠座位 depth——CEO teammate depth 1 的命名行 maxDepth 1 不可用。
+      spawn: caps?.spawn === true && seat.canStartChild,
+      fork: caps?.fork === true && seat.canStartChild && hasTool(scope, 'subagent_fork'),
+      workflow: caps?.workflow === true && hasTool(scope, 'workflow'),
+      team: seat.teamCollaborate && hasTool(scope, 'team_task_list'),
+      'team-spawn': seat.teamLead && hasTool(scope, 'spawn_teammate'),
+      // retry 是 host per-agent 安装的，agent/created 监听顺序可能晚于本注入；能力表已由 parity spec 钉住。
+      // retry 的 child 也受同一个 depth 预算；depth 用尽时 header 不再承诺。
+      retry: caps?.retry === true && seat.canStartChild,
+    }
+    // BUG-076：support root 的 vendor team:policy/identity 仍在；先纠正，再按 header 决定是否注入段。
+    if (seat.support && seat.teamRole === 'lead') {
       scope.systemPrompt.section({
-        name: DELEGATION_HEADER_SECTION,
-        order: base,
-        text: header,
+        name: DELEGATION_SEAT_SECTION,
+        order: scope.systemPrompt.getSectionOrder('TEAM_POLICY') + 1,
+        text: supportSeatNote(preset),
         interpolate: false,
       })
-      CHANNELS.forEach((channel, index) => {
-        if (!available[channel]) return
-        const text = texts.channels[channel]
-        if (text === undefined) return
-        scope.systemPrompt.section({
-          name: `${DELEGATION_SECTION_PREFIX}${channel}`,
-          order: base + index + 1,
-          text,
-          interpolate: false,
-        })
+    }
+    const header = buildCapabilityHeader(available)
+    if (header === undefined) return
+    const base = scope.systemPrompt.getSectionOrder('TOOL_SUBAGENT') - 10
+    scope.systemPrompt.section({
+      name: DELEGATION_HEADER_SECTION,
+      order: base,
+      text: header,
+      interpolate: false,
+    })
+    CHANNELS.forEach((channel, index) => {
+      if (!available[channel]) return
+      const text = texts.channels[channel]
+      if (text === undefined) return
+      scope.systemPrompt.section({
+        name: `${DELEGATION_SECTION_PREFIX}${channel}`,
+        order: base + index + 1,
+        text,
+        interpolate: false,
       })
     })
   })

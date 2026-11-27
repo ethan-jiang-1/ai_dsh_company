@@ -14,8 +14,13 @@
  *   type escapes (`undefined/null as never`, general `as never`, and `JSON.parse(...) as T`).
  * - R4 (`hygiene-smells`, read-only): Counts silent catches without `// intentional-fallback:`, JSX
  *   `defaultValue=`, and `x === undefined || ...` fail-open guards.
+ * - R5 (`dual-owner-agent-inject` & `no-fake-cordis-ctx`, blocking): Forbids raw `<agent>.ctx.inject(...)`
+ *   in `src/host/**` outside `for-each-agent.ts` (must use `injectEachAgent` for dual-owner disposal),
+ *   and forbids hand-rolled `{ inject: fn }` fake Cordis contexts in `tests/host/index/**`.
  */
-import { existsSync, readFileSync } from 'node:fs'
+// 负例留证 2026-11-28：重构前 `packages/company-pack/src/host/delegation/subagent-retry.ts:119` 留裸 `agent.ctx.inject` →
+//   `FAIL [R5:dual-owner-agent-inject] packages/company-pack/src/host/delegation/subagent-retry.ts:119:19`；改用 `injectEachAgent` 后 → violations=0。
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import ts from 'typescript'
 
@@ -748,8 +753,69 @@ function checkTypeEscapesAndSmells(sf, relFile, violations, metrics) {
   ts.forEachChild(sf, visit)
 }
 
+const AGENT_INJECT_OWNER = 'packages/company-pack/src/host/run-bundle/for-each-agent.ts'
+
+function checkCordisLifecycleRules(sf, relFile, violations) {
+  const isHostNonOwner = relFile.startsWith('packages/company-pack/src/host/') && relFile !== AGENT_INJECT_OWNER
+  const isHostIndexSpec = relFile.startsWith('tests/host/index/')
+  if (!isHostNonOwner && !isHostIndexSpec) return
+
+  function visit(node) {
+    if (isHostNonOwner && ts.isCallExpression(node)) {
+      const callee = node.expression
+      if (
+        ts.isPropertyAccessExpression(callee) &&
+        callee.name.text === 'inject' &&
+        ts.isPropertyAccessExpression(callee.expression) &&
+        callee.expression.name.text === 'ctx'
+      ) {
+        const { line, col } = lineOf(sf, node)
+        violations.push({
+          rule: 'R5:dual-owner-agent-inject',
+          file: relFile,
+          line,
+          col,
+          message: 'Raw `<agent>.ctx.inject(...)` leaks on plugin unload — use `injectEachAgent` from host/run-bundle/for-each-agent.ts',
+        })
+      }
+    }
+
+    if (isHostIndexSpec && ts.isObjectLiteralExpression(node)) {
+      for (const prop of node.properties) {
+        if (ts.isMethodDeclaration(prop) && ts.isIdentifier(prop.name) && prop.name.text === 'inject') {
+          const { line, col } = lineOf(sf, prop)
+          violations.push({
+            rule: 'R5:no-fake-cordis-ctx',
+            file: relFile,
+            line,
+            col,
+            message: 'Hand-rolled `{ inject() {} }` fake Context hides fiber disposal leaks — use real Cordis Context / createRealAgentHarness()',
+          })
+        } else if (
+          ts.isPropertyAssignment(prop) &&
+          ts.isIdentifier(prop.name) &&
+          prop.name.text === 'inject' &&
+          (ts.isArrowFunction(prop.initializer) || ts.isFunctionExpression(prop.initializer))
+        ) {
+          const { line, col } = lineOf(sf, prop)
+          violations.push({
+            rule: 'R5:no-fake-cordis-ctx',
+            file: relFile,
+            line,
+            col,
+            message: 'Hand-rolled `{ inject: fn }` fake Context hides fiber disposal leaks — use real Cordis Context / createRealAgentHarness()',
+          })
+        }
+      }
+    }
+
+    ts.forEachChild(node, visit)
+  }
+  ts.forEachChild(sf, visit)
+}
+
 /**
- * Run R1/R2/R3/R4 static audit across one or more TypeScript programs.
+ * Run R1/R2/R3/R4/R5 static audit across one or more TypeScript programs.
  * @param {string} root - Repository root.
  * @param {{ tsconfigs?: readonly string[]; programs?: readonly ts.Program[] }} [options]
  */
@@ -772,30 +838,52 @@ export function runStaticAudit(root, options = {}) {
       if (sf.isDeclarationFile) continue
       const absFile = resolve(sf.fileName)
       const relFile = toPosix(relative(root, absFile))
-      if (!relFile.startsWith('packages/company-pack/src/')) continue
+      const isSrc = relFile.startsWith('packages/company-pack/src/')
+      const isHostIndexSpec = relFile.startsWith('tests/host/index/')
+      if (!isSrc && !isHostIndexSpec) continue
 
-      // R1 runs per-program/call because host and client programs can resolve distinct surfaces
-      function walkR1(node) {
-        if (ts.isCallExpression(node)) {
-          const sigKey = `${relFile}:${node.getStart(sf)}:${node.getEnd()}`
-          if (!seenR1.has(sigKey)) {
-            const retType = checker.getTypeAtLocation(node)
-            const spec = matchBoundarySpec(checker, retType, node)
-            if (spec !== null) {
-              seenR1.add(sigKey)
-              checkCallBoundaryUse(checker, sf, relFile, node, spec, violations)
+      if (isSrc) {
+        // R1 runs per-program/call because host and client programs can resolve distinct surfaces
+        function walkR1(node) {
+          if (ts.isCallExpression(node)) {
+            const sigKey = `${relFile}:${node.getStart(sf)}:${node.getEnd()}`
+            if (!seenR1.has(sigKey)) {
+              const retType = checker.getTypeAtLocation(node)
+              const spec = matchBoundarySpec(checker, retType, node)
+              if (spec !== null) {
+                seenR1.add(sigKey)
+                checkCallBoundaryUse(checker, sf, relFile, node, spec, violations)
+              }
             }
           }
+          ts.forEachChild(node, walkR1)
         }
-        ts.forEachChild(node, walkR1)
+        ts.forEachChild(sf, walkR1)
       }
-      ts.forEachChild(sf, walkR1)
 
       if (seenAstFiles.has(relFile)) continue
       seenAstFiles.add(relFile)
 
-      checkCjkInFile(sf, relFile, violations, libCounts)
-      checkTypeEscapesAndSmells(sf, relFile, violations, metrics)
+      if (isSrc) {
+        checkCjkInFile(sf, relFile, violations, libCounts)
+        checkTypeEscapesAndSmells(sf, relFile, violations, metrics)
+      }
+      checkCordisLifecycleRules(sf, relFile, violations)
+    }
+  }
+
+  if (options.programs === undefined) {
+    const hostIndexDir = join(root, 'tests/host/index')
+    if (existsSync(hostIndexDir)) {
+      for (const name of readdirSync(hostIndexDir).sort()) {
+        if (!name.endsWith('.spec.ts')) continue
+        const relFile = `tests/host/index/${name}`
+        if (seenAstFiles.has(relFile)) continue
+        seenAstFiles.add(relFile)
+        const text = readFileSync(join(hostIndexDir, name), 'utf8')
+        const sf = ts.createSourceFile(join(hostIndexDir, name), text, ts.ScriptTarget.Latest, true)
+        checkCordisLifecycleRules(sf, relFile, violations)
+      }
     }
   }
 

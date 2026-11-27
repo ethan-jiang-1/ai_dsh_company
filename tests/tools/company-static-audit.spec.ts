@@ -293,4 +293,39 @@ describe('BUG-340 · 六条绕过缝隙的负控', () => {
     `)
     expect(dict.violations).toEqual([])
   })
+
+  it('R5 拦截 src/host 非 owner 的裸 agent.ctx.inject 与 tests/host/index 的手写 { inject: fn } 假桩', () => {
+    const rawInject = runVirtual('packages/company-pack/src/host/prompt/bad-agent-inject.ts', `
+      export function bad(agent: { ctx: { inject: (deps: string[], fn: () => void) => void } }) {
+        agent.ctx.inject(['systemPrompt'], () => {})
+      }
+    `)
+    expect(rawInject.violations.map(v => v.rule)).toContain('R5:dual-owner-agent-inject')
+
+    const ownerAllowed = runVirtual('packages/company-pack/src/host/run-bundle/for-each-agent.ts', `
+      export function ok(agent: { ctx: { inject: (deps: string[], fn: () => void) => void } }) {
+        agent.ctx.inject(['systemPrompt'], () => {})
+      }
+    `)
+    expect(ownerAllowed.violations).toEqual([])
+
+    const fakeCtxArrow = runVirtual('tests/host/index/bad-fake-ctx.spec.ts', `
+      export const agent = {
+        ctx: {
+          inject: (_deps: string[], cb: () => void) => { cb() },
+        },
+      }
+      export const pluginCfg = { inject: ['tools', 'commands'] }
+    `)
+    expect(fakeCtxArrow.violations.map(v => v.rule)).toEqual(['R5:no-fake-cordis-ctx'])
+
+    const fakeCtxMethod = runVirtual('tests/host/index/bad-fake-method.spec.ts', `
+      export const agent = {
+        ctx: {
+          inject() { return { dispose: async () => {} } },
+        },
+      }
+    `)
+    expect(fakeCtxMethod.violations.map(v => v.rule)).toEqual(['R5:no-fake-cordis-ctx'])
+  })
 })

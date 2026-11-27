@@ -11,10 +11,15 @@ import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { Context } from '../../../vendor/dsh/vendor/cordis/src/index.ts'
 import { apply } from '../../../packages/company-pack/src/index.ts'
 import { writeStartupSettings } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
 import { EMPTY_STARTUP_SETTINGS } from '../../../packages/company-pack/src/lib/startup/startup-settings.ts'
+import {
+  createRealAgentHarness,
+  createRealHostHarness,
+  emitAgentCreated,
+  type Context,
+} from '../../support/cordis-agent-harness.ts'
 import { createTempEnv, type TempEnv } from '../../support/temp-env.ts'
 
 let env: TempEnv
@@ -35,33 +40,32 @@ afterEach(() => { env.cleanup() })
 
 const wait = (): Promise<void> => new Promise(resolve => { setImmediate(resolve) })
 
-function mount(): { ctx: Context; warns: string[]; toolRegistrations: () => number } {
-  const ctx = new Context()
-  const warns: string[] = []
-  let registrations = 0
-  ctx.provide('tools', { register: () => { registrations += 1; return ctx.effect(() => () => {}) } } as never)
-  ctx.provide('commands', { register: () => ctx.effect(() => () => {}) } as never)
-  ctx.provide('approval', { request: async () => 'rejected' } as never)
-  // Cordis 的 logger 是内置 callable；测试直接挂 warn 收集器（生产由 logger facade 提供）。
-  ;(ctx.logger as unknown as { warn: (...args: unknown[]) => void }).warn = (...args) => { warns.push(args.map(String).join(' ')) }
-  return { ctx, warns, toolRegistrations: () => registrations }
+function mount(initialAgents: readonly ReturnType<typeof createRealAgentHarness>['agent'][] = []) {
+  const host = createRealHostHarness(initialAgents)
+  return {
+    ctx: host.ctx,
+    warns: host.warns,
+    toolRegistrations: () => host.hostTools.size,
+    provideSubagents: () => { host.provideSubagents() },
+  }
 }
 
-async function start(ctx: Context): Promise<Context> {
+async function start(ctx: Context): Promise<{ scoped: Context; pluginFiber: ReturnType<Context['plugin']> }> {
   let scoped: Context | undefined
-  await ctx.plugin({
+  const pluginFiber = ctx.plugin({
     inject: ['tools', 'approval', 'commands'],
-    apply: (child: Context) => { scoped = child; apply(child, {}) },
+    apply: (child: Context) => { scoped = child; return apply(child, {}) },
   })
+  await pluginFiber
   await wait()
   if (scoped === undefined) throw new Error('plugin apply did not run')
-  return scoped
+  return { scoped, pluginFiber }
 }
 
-describe('Host apply 生命周期：迟到 inject 与卸载后事件（R4-05）', () => {
+describe('Host apply 生命周期：迟到 inject、双 owner 卸载与热挂载（R4-05 / 维3）', () => {
   it('apply 后才 provide workspaceRegistry：迟到 inject 回调真跑，并点名失效路径', async () => {
     const { ctx, warns, toolRegistrations } = mount()
-    const scoped = await start(ctx)
+    const { scoped } = await start(ctx)
     expect(toolRegistrations()).toBe(3)
     scoped.provide('workspaceRegistry', { list: () => [{ path: '/definitely-missing-r4-9f3a' }] } as never)
     await wait()
@@ -69,49 +73,31 @@ describe('Host apply 生命周期：迟到 inject 与卸载后事件（R4-05）'
     await ctx.fiber.dispose()
   })
 
-  it('apply 注册的 company:language policy 在 agent/created 时真的注入', async () => {
+  it('apply 注册的 company:language policy 在真 Cordis agent/created 时注入', async () => {
     const { ctx } = mount()
-    const scoped = await start(ctx)
-    const sections: Array<{ name: string; text: () => string }> = []
-    const presets = { composedPreset: () => 'ceo' }
-    const agent = {
-      ctx: {
-        get: (name: string) => name === 'agentPresets' ? presets : undefined,
-        inject: (_deps: readonly string[], callback: (scope: unknown) => void) => {
-          callback({
-            get: (name: string) => name === 'agentPresets' ? presets : undefined,
-            systemPrompt: {
-              getSectionOrder: () => 0,
-              section: (section: { name: string; text: () => string }) => {
-                sections.push(section)
-                return () => {}
-              },
-            },
-          })
-          return { dispose: async () => {} }
-        },
-      },
-    }
-    scoped.emit('agent/created', { agent })
-    expect(sections.some(section => section.name === 'company:language')).toBe(true)
-    expect(sections.find(section => section.name === 'company:language')?.text()).toContain('公司工作语言')
+    const { scoped } = await start(ctx)
+    const ceo = createRealAgentHarness({ preset: 'ceo', cwd: env.company })
+    emitAgentCreated(scoped, ceo.agent)
+    await wait()
+    expect(ceo.sections.has('company:language')).toBe(true)
+    expect(ceo.readSectionText('company:language')).toContain('公司工作语言')
+    await ceo.disposeAgent(scoped)
     await ctx.fiber.dispose()
   })
 
   it('dispose 后 api-session/added 不再触发告警（事件监听已摘）', async () => {
     const { ctx, warns, toolRegistrations } = mount()
-    const scoped = await start(ctx)
+    const { scoped } = await start(ctx)
     expect(toolRegistrations()).toBe(3)
-    scoped.emit('api-session/added', { sessionId: 'session-x', cwd: '/outside-r4', origin: 'human', running: true, projections: { values: {} } })
+    scoped.emit('api-session/added', { sessionId: 'session-x', cwd: '/outside-r4', origin: 'human', running: true, projections: { values: {} } } as never)
     await wait()
     expect(warns.some(message => message.includes('不在 workspace'))).toBe(true)
     const before = warns.length
     await ctx.fiber.dispose()
-    scoped.emit('api-session/added', { sessionId: 'session-y', cwd: '/outside-r4-2', origin: 'human', running: true, projections: { values: {} } })
+    scoped.emit('api-session/added', { sessionId: 'session-y', cwd: '/outside-r4-2', origin: 'human', running: true, projections: { values: {} } } as never)
     await wait()
     expect(warns.length).toBe(before)
   })
-
 
   it('boot 无 workspace 仍注册 startup section，按会话 cwd 读策略', async () => {
     env.set({
@@ -120,42 +106,84 @@ describe('Host apply 生命周期：迟到 inject 与卸载后事件（R4-05）'
       DSH_COMPANY_REBIND: undefined,
     })
     const { ctx } = mount()
-    const scoped = await start(ctx)
+    const { scoped } = await start(ctx)
     const project = mkdtempSync(join(tmpdir(), 'startup-apply-'))
+    const ceo = createRealAgentHarness({ preset: 'ceo', cwd: project })
     try {
       writeStartupSettings(project, {
         ...EMPTY_STARTUP_SETTINGS,
         productType: 'hardware-software',
         updatedAt: '2026-11-12T00:00:00.000Z',
       })
-      const sections: Array<{ name: string; text: () => string }> = []
-      const presets = { composedPreset: () => 'ceo' }
-      const agent = {
-        session: { header: { cwd: project } },
-        ctx: {
-          get: (name: string) => name === 'agentPresets' ? presets : undefined,
-          inject: (_deps: readonly string[], callback: (scope: unknown) => void) => {
-            callback({
-              get: (name: string) => name === 'agentPresets' ? presets : undefined,
-              systemPrompt: {
-                getSectionOrder: () => 0,
-                section: (section: { name: string; text: () => string }) => {
-                  sections.push(section)
-                  return () => {}
-                },
-              },
-            })
-            return { dispose: async () => {} }
-          },
-        },
-      }
-      scoped.emit('agent/created', { agent })
-      const section = sections.find(entry => entry.name === 'company:startup-settings')
-      expect(section).toBeDefined()
-      expect(section?.text()).toContain('产品类型：hardware-software')
+      emitAgentCreated(scoped, ceo.agent)
+      await wait()
+      expect(ceo.sections.has('company:startup-settings')).toBe(true)
+      expect(ceo.readSectionText('company:startup-settings')).toContain('产品类型：hardware-software')
     } finally {
+      await ceo.disposeAgent(scoped)
       await ctx.fiber.dispose()
       rmSync(project, { recursive: true, force: true })
     }
+  })
+
+  it('双 owner 卸载（维3）：plugin fiber dispose 时已打开会话上的全部 section / tool / guard 归零', async () => {
+    const { ctx, provideSubagents } = mount()
+    provideSubagents()
+    const { scoped, pluginFiber } = await start(ctx)
+    const vpEng = createRealAgentHarness({ id: 'session-vpeng', preset: 'vp-eng', cwd: env.company, teamRole: 'lead' })
+    const worker = createRealAgentHarness({ id: 'session-worker', preset: 'worker', cwd: env.company })
+
+    emitAgentCreated(scoped, vpEng.agent)
+    emitAgentCreated(scoped, worker.agent)
+    await wait()
+
+    // 挂载期：9 个 per-agent 模块在对应角色与 support 会话上均真实生效
+    expect([...vpEng.sections.keys()].sort()).toEqual([
+      'company:delegation-capabilities',
+      'company:delegation-fork',
+      'company:delegation-retry',
+      'company:delegation-spawn',
+      'company:delegation-team',
+      'company:delegation-team-spawn',
+      'company:delegation-workflow',
+      'company:handbook',
+      'company:language',
+      'company:startup-settings',
+      'company:workflow-contract',
+    ])
+    expect([...vpEng.tools.keys()].sort()).toEqual(['list_subagents', 'send_to_subagent', 'subagent_retry', 'workflow_runs'])
+    expect(worker.guards.size).toBe(1)
+    expect(worker.sections.has('company:language')).toBe(true)
+
+    // 插件热卸载（会话仍存活，未发 agent/disposed）：全部 per-agent 注入项、工具与守卫必须归零
+    await pluginFiber.dispose()
+    await wait()
+
+    expect([...vpEng.sections.keys()]).toEqual([])
+    expect([...vpEng.tools.keys()]).toEqual([])
+    expect([...worker.sections.keys()]).toEqual([])
+    expect(worker.guards.size).toBe(0)
+
+    await vpEng.disposeAgent()
+    await worker.disposeAgent()
+    await ctx.fiber.dispose()
+  })
+
+  it('live 热启用（维3）：apply 前已在 agents 注册表存活的会话立即挂上，卸载后同样摘净', async () => {
+    const existingCeo = createRealAgentHarness({ id: 'session-live-ceo', preset: 'ceo', cwd: env.company })
+    const { ctx } = mount([existingCeo.agent])
+    const { pluginFiber } = await start(ctx)
+
+    expect(existingCeo.sections.has('company:handbook')).toBe(true)
+    expect(existingCeo.sections.has('company:language')).toBe(true)
+    expect(existingCeo.tools.has('list_subagents')).toBe(true)
+
+    await pluginFiber.dispose()
+    await wait()
+    expect([...existingCeo.sections.keys()]).toEqual([])
+    expect([...existingCeo.tools.keys()]).toEqual([])
+
+    await existingCeo.disposeAgent()
+    await ctx.fiber.dispose()
   })
 })

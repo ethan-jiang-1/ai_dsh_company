@@ -206,4 +206,36 @@ describe('registerStartupSettings', () => {
       expect(sections).toHaveLength(1)
     } finally { rmSync(ws, { recursive: true, force: true }) }
   })
+
+  it('startup.json 损坏时返回可见降级提示；watch.sync 抛错不阻断注册', () => {
+    const ws = mkdtempSync(join(tmpdir(), 'startup-prompt-corrupt-'))
+    try {
+      writeStartupSettings(ws, { ...EMPTY_STARTUP_SETTINGS, productType: 'business-software', updatedAt: '2026-11-12T00:00:00.000Z' })
+      // 写入损坏 JSON 触发 state.problem !== null 分支
+      const fs = process.getBuiltinModule('node:fs')
+      fs.writeFileSync(join(ws, '.dsh-company', 'startup.json'), '{corrupt-json', 'utf8')
+      const sections: Array<{ text: () => string }> = []
+      const listeners = new Map<string, ((payload: unknown) => void)[]>()
+      const ctx = { logger: { warn: () => {} }, on: (name: string, listener: (payload: unknown) => void) => { listeners.set(name, [...(listeners.get(name) ?? []), listener]) } }
+      let dynamicCwd: string | undefined = ws
+      const agent = {
+        get session() { return dynamicCwd === undefined ? undefined : { header: { cwd: dynamicCwd } } },
+        ctx: {
+          get: () => ({ composedPreset: () => 'ceo' }),
+          inject: (_deps: readonly string[], cb: (scope: unknown) => void) => {
+            cb({ systemPrompt: { section: (section: { text: () => string }) => { sections.push(section); return () => {} } } })
+            return { dispose: async () => {} }
+          },
+        },
+      }
+      registerStartupSettings(ctx as never, '', {
+        watch: { sync: () => { throw new Error('sync failed') } },
+      })
+      for (const listener of listeners.get('agent/created') ?? []) listener({ agent })
+      expect(sections).toHaveLength(1)
+      expect(sections[0]?.text()).toContain('项目启动策略文件不可用')
+      dynamicCwd = undefined
+      expect(sections[0]?.text()).toBe('')
+    } finally { rmSync(ws, { recursive: true, force: true }) }
+  })
 })
