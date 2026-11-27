@@ -452,9 +452,15 @@ export function pendingQuestions(events: readonly AttentionEventLike[], sessionI
       })
       continue
     }
-    // 答案的两条落盘口径都认：tool/result（同 callId）与 user-questions/answered（同 id）。
+    // 答案的两条落盘口径都认：tool/result（同 callId）与 user-questions/answered（同 id，或无匹配时按 FIFO 销最早未答问询）。
     if (event.type === 'tool/result' && typeof data.callId === 'string') { open.delete(data.callId); continue }
-    if (event.type === 'user-questions/answered' && typeof data.id === 'string') { open.delete(data.id); continue }
+    if (event.type === 'user-questions/answered' && typeof data.id === 'string') {
+      if (!open.delete(data.id) && open.size > 0) {
+        const oldest = open.keys().next().value
+        if (oldest !== undefined) open.delete(oldest)
+      }
+      continue
+    }
   }
   return [...open.values()].sort((a, b) => b.time - a.time)
 }

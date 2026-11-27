@@ -119,6 +119,7 @@ describe('TasksTableView：依赖列人读优先（owner · subject + id 次要�
  * BUG-277/278：任务表的状态格也要标降级（未知 status / 缺 revision），不只是看板。
  */
 // 负例留证 2026-11-19：TasksPanel 只翻 status 文案、丢掉 statusGap/revisionGap（BUG-277/278）。
+// 负例留证 2026-11-27：TasksTableView 直接调 view.members.map(...) 不检查 Array.isArray ⇒ 缺失 members/tasks 的部分投影直接 TypeError 崩盘（BUG-401）；加防线后绿。BUG-401
 describe('TasksTableView：状态格的降级标记（BUG-277/278）', () => {
   const DEGRADED: TeamViewLike = {
     members: [{ id: 'session-lead', name: 'lead', role: 'lead', phase: 'active' }],
@@ -137,5 +138,12 @@ describe('TasksTableView：状态格的降级标记（BUG-277/278）', () => {
     expect(byId('g2')).toContain('修订缺失')
     expect(byId('g3')).not.toContain('未知状态')
     expect(byId('g3')).not.toContain('修订缺失')
+  })
+
+  it('BUG-401：缺省 members/tasks 部分投影不崩并渲染空态与无成员提示', () => {
+    const partial = { tasks: [] } as unknown as TeamViewLike
+    const html = renderToStaticMarkup(createElement(TasksTableView, { view: partial }))
+    expect(html).toContain('成员：（无）')
+    expect(html).toContain('还没有共享任务。')
   })
 })

@@ -436,6 +436,9 @@ export const zh = {
   'signoff.decision.rejected': '已拒绝',
   'signoff.decision.cancelled': '已撤回',
   'signoff.decision.unavailable': '无人应答',
+  'signoff.state.error': '执行失败',
+  'signoff.state.stopped': '已中断',
+  'signoff.state.settled': '已结束',
 
   'guide.title': '梦之队作战概览',
   'guide.subtitle': '聚焦 3 个公司聚合工作区，并完整透传 DSH 原生工具。',
@@ -907,6 +910,9 @@ export const en: Record<CompanyKey, string> = {
   'signoff.decision.rejected': 'Rejected',
   'signoff.decision.cancelled': 'Withdrawn',
   'signoff.decision.unavailable': 'Unavailable',
+  'signoff.state.error': 'Failed',
+  'signoff.state.stopped': 'Stopped',
+  'signoff.state.settled': 'Settled',
 
   'guide.title': 'Dream Team Ops Overview',
   'guide.subtitle': '3 focused company workspaces with full passthrough of native DSH tools.',

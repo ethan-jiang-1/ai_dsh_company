@@ -173,6 +173,7 @@ describe('客户端错误环（R3-03）', () => {
 })
 
 // 负例留证 2026-11-24：console.error 包装改回每次安装叠加 ⇒ 本组红（一条错误进两个环、卸载后旧环仍增长）。BUG-363
+// 负例留证 2026-11-27：installErrorCapture 返回闭包无条件写 global[ERROR_RING_KEY] = previous ⇒ d1 晚于 d2 安装前却先卸载时清空存活的 d2 句柄（BUG-401）；改按栈恢复后绿。BUG-401
 describe('console.error 安装幂等（BUG-363）', () => {
   it('重复安装只有栈顶环收条目；逐层卸载后恢复原始函数', () => {
     const { target, consoleError } = fakeTarget()
@@ -198,5 +199,21 @@ describe('console.error 安装幂等（BUG-363）', () => {
     face.error('after off1')
     expect(ring1.list()).toHaveLength(1)
     expect(ring2.list()).toHaveLength(1)
+  })
+
+  it('BUG-401：乱序卸载 d1 后仍保留存活 d2 的全局错误环句柄，d2 卸载后恢复原始值', () => {
+    const { target } = fakeTarget()
+    const g = target as unknown as Record<string, unknown>
+    expect(g[ERROR_RING_KEY]).toBeUndefined()
+    const r1 = createErrorRing()
+    const r2 = createErrorRing()
+    const d1 = installErrorCapture(target, r1)
+    const d2 = installErrorCapture(target, r2)
+    expect(g[ERROR_RING_KEY]).toBe(r2)
+
+    d1()
+    expect(g[ERROR_RING_KEY]).toBe(r2)
+    d2()
+    expect(g[ERROR_RING_KEY]).toBeUndefined()
   })
 })

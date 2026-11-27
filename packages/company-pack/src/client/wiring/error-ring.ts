@@ -141,9 +141,10 @@ interface ConsoleCaptureState {
   readonly wrapper: (...args: unknown[]) => void
 }
 const consoleCaptures = new WeakMap<object, ConsoleCaptureState>()
+const ringCaptureStacks = new WeakMap<object, Array<{ readonly capture: ErrorRing; readonly baseline: unknown }>>()
 
 /**
- * 安装捕获；返回卸载函数（幂等：同一 target 重复安装只保留最后一份全局引用）。
+ * 安装捕获；返回卸载函数（幂等：同一 target 重复安装只保留最后一份全局引用，按栈还原）。
  * @param target - 通常是 `window`。
  * @param ring - 环（由调用方持有，探针从 `target[ERROR_RING_KEY]` 读同一份）。
  */
@@ -167,7 +168,14 @@ export function installErrorCapture(target: ErrorCaptureTarget, ring?: ErrorRing
     } catch { /* 坏存档：按空处理 */ }
   }
   const global = target as unknown as Record<string, unknown>
-  const previous = global[ERROR_RING_KEY] as ErrorRing | undefined
+  const captureKey = target as object
+  let ringStack = ringCaptureStacks.get(captureKey)
+  if (ringStack === undefined) {
+    ringStack = []
+    ringCaptureStacks.set(captureKey, ringStack)
+  }
+  const baseline = ringStack.length === 0 ? global[ERROR_RING_KEY] : ringStack[0]!.baseline
+  ringStack.push({ capture, baseline })
   global[ERROR_RING_KEY] = capture
 
   const onError = (event: unknown): void => {
@@ -198,7 +206,6 @@ export function installErrorCapture(target: ErrorCaptureTarget, ring?: ErrorRing
   // console.error：原始输出照旧（不吞），只镜像一份进环。同一 target 只装一层包装（BUG-363）：
   // 栈顶环收条目，卸载只退自己那一层，退到零才恢复原始函数。
   const consoleFace = target.console
-  const captureKey = target as object
   if (consoleFace !== undefined && typeof consoleFace.error === 'function') {
     let state = consoleCaptures.get(captureKey)
     if (state === undefined) {
@@ -216,7 +223,10 @@ export function installErrorCapture(target: ErrorCaptureTarget, ring?: ErrorRing
     state.stack.push(capture)
   }
 
+  let uninstalled = false
   return () => {
+    if (uninstalled) return
+    uninstalled = true
     target.removeEventListener('error', onError as never)
     target.removeEventListener('unhandledrejection', onRejection as never)
     const state = consoleCaptures.get(captureKey)
@@ -228,7 +238,19 @@ export function installErrorCapture(target: ErrorCaptureTarget, ring?: ErrorRing
         consoleCaptures.delete(captureKey)
       }
     }
-    global[ERROR_RING_KEY] = previous
+    const stack = ringCaptureStacks.get(captureKey)
+    if (stack !== undefined) {
+      const index = stack.findLastIndex(item => item.capture === capture)
+      if (index >= 0) {
+        const [removed] = stack.splice(index, 1)
+        if (stack.length === 0) {
+          ringCaptureStacks.delete(captureKey)
+          global[ERROR_RING_KEY] = removed?.baseline
+        } else {
+          global[ERROR_RING_KEY] = stack[stack.length - 1]!.capture
+        }
+      }
+    }
   }
 }
 
@@ -271,7 +293,7 @@ export function createErrorRelay<Id = string>(options: ErrorRelayOptions<Id>): E
   const now = options.now ?? (() => Date.now())
   const schedule = options.schedule ?? ((fn, ms) => setTimeout(fn, ms))
   const cancel = options.cancel ?? (handle => clearTimeout(handle as ReturnType<typeof setTimeout>))
-  const queue: ClientErrorEntry[] = []
+  const queue: Array<{ readonly entry: ClientErrorEntry; retried: boolean }> = []
   let lastSent = 0
   let timer: unknown
   let disposed = false
@@ -293,15 +315,28 @@ export function createErrorRelay<Id = string>(options: ErrorRelayOptions<Id>): E
       timer = schedule(() => { timer = undefined; flush() }, wait)
       return
     }
-    const entry = queue.shift()
-    if (entry === undefined) return
+    const item = queue[0]
+    if (item === undefined) return
     lastSent = now()
     try {
-      const result = options.send(sessionId, entry)
+      const result = options.send(sessionId, item.entry)
+      queue.shift()
       if (result !== undefined && typeof (result as Promise<unknown>).catch === 'function') {
-        void (result as Promise<unknown>).catch(error => options.onSendError?.(error))
+        void (result as Promise<unknown>).catch((error) => {
+          options.onSendError?.(error)
+          if (!disposed && !item.retried) {
+            item.retried = true
+            queue.unshift(item)
+            while (queue.length > maxPending) queue.pop()
+          }
+        })
       }
     } catch (error) {
+      if (!item.retried) {
+        item.retried = true
+      } else {
+        queue.shift()
+      }
       options.onSendError?.(error)
     }
     if (queue.length > 0) timer = schedule(() => { timer = undefined; flush() }, interval)
@@ -310,7 +345,7 @@ export function createErrorRelay<Id = string>(options: ErrorRelayOptions<Id>): E
   return {
     push(entry) {
       if (disposed) return
-      queue.push(entry)
+      queue.push({ entry, retried: false })
       while (queue.length > maxPending) queue.shift()
       flush()
     },

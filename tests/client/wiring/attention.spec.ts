@@ -447,6 +447,7 @@ describe('mergeAttention · 跨源问询去重（BUG-325）', () => {
 
 // 多问题（BUG-331）：一次 ask_user_question 带 N 个问题 ⇒ 一条条目 + 「共 N 个问题」，detail 放全部。
 // 负例留证 2026-11-23：只读第一个问题后 `vitest run tests/client/wiring/attention.spec.ts` 1 failed（缺「共 N 个问题」）。BUG-331
+// 负例留证 2026-11-27：pendingQuestions 遇到 data.id !== callId 的 user-questions/answered 时不销最早未答问询 ⇒ 已答问询永挂待办（BUG-401）；按 FIFO 兜底消除后绿。BUG-401
 describe('pendingQuestions · 多问题请求（BUG-331）', () => {
   const call = (argumentsText: string) => ({ type: 'tool/call' as const, time: 1000, data: { callId: 'c1', name: 'ask_user_question', arguments: argumentsText } })
 
@@ -462,6 +463,14 @@ describe('pendingQuestions · 多问题请求（BUG-331）', () => {
   it('单个问题 ⇒ 不加计数后缀', () => {
     const [item] = pendingQuestions([call(JSON.stringify({ questions: [{ question: '只有一个' }] }))], 's-1')
     expect(item?.what).toBe('只有一个')
+  })
+
+  it('BUG-401：user-questions/answered 仅带问答实例 id 且无 tool/result 时按 FIFO 消除未答问询', () => {
+    const items = pendingQuestions([
+      { type: 'tool/call', time: 1000, data: { callId: 'call-1', name: 'ask_user_question', arguments: JSON.stringify({ questions: [{ question: 'Q1?' }] }) } },
+      { type: 'user-questions/answered', time: 1050, data: { id: 'q-instance-99' } },
+    ], 's-1')
+    expect(items).toEqual([])
   })
 })
 

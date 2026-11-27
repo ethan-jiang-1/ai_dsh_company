@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// 负例留证 2026-11-27：BudgetPanel 未用 Number.isFinite 消毒 totalTokens 且 useCountUp cleanup 用终值覆写 fromRef ⇒ NaN 渲染为 'NaN tokens' 且连续更新插值回跳（BUG-401）；加限与 currentRef 后绿。BUG-401
 /**
  * 在场 / 用量两个面板的静态渲染判据（R3-10，2026-10-27）。
  *
@@ -124,9 +125,66 @@ describe('流错误提示', () => {
       act(() => { root.render(createElement(BudgetPanel, { summary: { ...baseSummary, totalTokens: 5000 } })) })
       expect(host.textContent).toContain('5k')
 
+      // BUG-401: non-finite totalTokens/row fields render 0 instead of NaN
+      const nanSummary: BudgetSummary = {
+        totalTokens: Number.NaN,
+        turns: 1,
+        steps: 2,
+        toolShare: Number.NaN,
+        rows: [{ id: 'output', label: '输出', tokens: Number.NaN, share: Number.NaN }],
+      }
+      act(() => { root.render(createElement(BudgetPanel, { summary: nanSummary })) })
+      expect(host.textContent).not.toContain('NaN')
+      expect(host.textContent).toContain('0 tokens')
+
       rafSpy.mockRestore()
       cancelSpy.mockRestore()
     } finally {
+      window.matchMedia = origMatchMedia
+      act(() => { root.unmount() })
+      host.remove()
+    }
+  })
+
+  it('BUG-401：useCountUp 在未完成的动画中途更新 target 时从当前插值起跳而非终值回跳', () => {
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    const baseSummary: BudgetSummary = { totalTokens: 0, turns: 1, steps: 1, toolShare: null, rows: [] }
+    const origMatchMedia = window.matchMedia
+    let nowMs = 1000
+    const nowSpy = vi.spyOn(performance, 'now').mockImplementation(() => nowMs)
+    try {
+      window.matchMedia = vi.fn().mockImplementation(() => ({
+        matches: false,
+        media: '',
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      })) as unknown as typeof window.matchMedia
+      const callbacks: FrameRequestCallback[] = []
+      const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+        callbacks.push(cb)
+        return callbacks.length
+      })
+      const cancelSpy = vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {})
+
+      act(() => { root.render(createElement(BudgetPanel, { summary: { ...baseSummary, totalTokens: 0 } })) })
+      act(() => { root.render(createElement(BudgetPanel, { summary: { ...baseSummary, totalTokens: 1000 } })) })
+      // Advance halfway (160ms out of COUNT_UP_MS=320ms) -> 500 tokens
+      nowMs = 1160
+      act(() => { callbacks.shift()?.(1160) })
+      expect(host.textContent).toContain('500')
+
+      // Re-target to 600 mid-animation -> should start from 500, NOT jump back from 1000
+      act(() => { root.render(createElement(BudgetPanel, { summary: { ...baseSummary, totalTokens: 600 } })) })
+      nowMs = 1320
+      act(() => { callbacks.shift()?.(1320) })
+      expect(host.textContent).not.toContain('900')
+
+      rafSpy.mockRestore()
+      cancelSpy.mockRestore()
+    } finally {
+      nowSpy.mockRestore()
       window.matchMedia = origMatchMedia
       act(() => { root.unmount() })
       host.remove()

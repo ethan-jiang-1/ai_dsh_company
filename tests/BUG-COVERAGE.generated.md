@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 389 |
-| 有具名守卫 | 287 |
+| 已修卡 | 391 |
+| 有具名守卫 | 289 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 73.8% |
+| 覆盖率 | 73.9% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -288,7 +288,7 @@
 | 274 | 2026-11-19 | tests/tools/content-contract.spec.ts:73 |
 | 275 | 2026-11-19 | tests/host/ledger/catalog.spec.ts:256 |
 | 276 | 2026-11-19 | tests/host/ledger/catalog.spec.ts:166；tests/host/ledger/catalog.spec.ts:178；tests/host/ledger/catalog.spec.ts:195 |
-| 277 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:135；tests/client/tabs/board-panel.spec.ts:155；tests/client/tabs/tasks-table.spec.ts:122；tests/lib/presence/board.spec.ts:247 |
+| 277 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:135；tests/client/tabs/board-panel.spec.ts:155；tests/client/tabs/tasks-table.spec.ts:123；tests/lib/presence/board.spec.ts:247 |
 | 278 | 2026-11-19 | tests/client/tabs/board-panel.spec.ts:148 |
 | 279 | 2026-11-19 | tests/host/run-bundle/bundle-manifest.spec.ts:250 |
 | 280 | 2026-11-19 | tests/repo/release/docs-only.spec.ts:31；tests/repo/release/docs-only.spec.ts:93 |
@@ -335,13 +335,13 @@
 | 322 | 2026-11-22 | tests/client/cultivation/cultivation-data.spec.ts:173 |
 | 323 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:118；tests/client/tabs/attention-tab.spec.ts:231 |
 | 324 | 2026-11-22 | tests/client/data/catalog-contract.spec.ts:72 |
-| 325 | 2026-11-23 | tests/client/wiring/attention.spec.ts:429；tests/client/wiring/attention.spec.ts:499 |
+| 325 | 2026-11-23 | tests/client/wiring/attention.spec.ts:429；tests/client/wiring/attention.spec.ts:508 |
 | 326 | 2026-11-23 | tests/host/commands/blocked-text.spec.ts:11；tests/host/cultivation/cultivation-command.spec.ts:504；tests/host/cultivation/cultivation-command.spec.ts:534 |
 | 327 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:311 |
 | 328 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:326；tests/client/wiring/attention.spec.ts:409 |
 | 329 | 2026-11-23 | tests/client/ui/list-separator.spec.ts:19；tests/client/ui/team-tool-card.spec.ts:118 |
 | 330 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:278 |
-| 331 | 2026-11-23 | tests/client/wiring/attention-observers.spec.ts:189；tests/client/wiring/attention.spec.ts:450 |
+| 331 | 2026-11-23 | tests/client/wiring/attention-observers.spec.ts:189；tests/client/wiring/attention.spec.ts:451 |
 | 332 | 2026-11-23 | tests/client/presence/attention-history.spec.ts:85 |
 | 333 | 2026-11-23 | tests/client/ui/team-tool-card.spec.ts:128 |
 | 334 | 2026-11-23 | tests/client/i18n/cultivation-and-strategy.spec.ts:119 |
@@ -369,11 +369,11 @@
 | 356 | 2026-11-24 | tests/lib/accounting/ledger.spec.ts:140；tests/tools/deliverables-catalog-tools.spec.ts:105；tests/tools/deliverables-catalog-tools.spec.ts:157；tests/tools/deliverables-catalog-tools.spec.ts:172；tests/tools/markdown-table-parity.spec.ts:18 |
 | 357 | 2026-11-24 | tests/host/ledger/catalog.spec.ts:513；tests/host/ledger/catalog.spec.ts:542 |
 | 358 | 2026-11-24 | tests/client/tabs/board-panel.spec.ts:164；tests/client/tabs/board-panel.spec.ts:185 |
-| 359 | 2026-11-24 | tests/client/wiring/attention.spec.ts:483 |
+| 359 | 2026-11-24 | tests/client/wiring/attention.spec.ts:492 |
 | 360 | 2026-11-24 | tests/lib/accounting/budget.spec.ts:16 |
 | 361 | 2026-11-24 | tests/lib/shared/text-and-status.spec.ts:25 |
 | 362 | 2026-11-24 | tests/host/ledger/catalog.spec.ts:567；tests/tools/deliverables-catalog-tools.spec.ts:113 |
-| 363 | 2026-11-24 | tests/client/wiring/error-ring.spec.ts:176 |
+| 363 | 2026-11-24 | tests/client/wiring/error-ring.spec.ts:177 |
 | 364 | 2026-11-24 | tests/client/wiring/instance-guard.spec.ts:85 |
 | 365 | 2026-11-24 | tests/client/data/company-stream.spec.ts:9 |
 | 366 | 2026-11-24 | tests/client/cultivation/cultivation-context-data.spec.ts:159；tests/client/cultivation/cultivation-context-data.spec.ts:223；tests/client/cultivation/cultivation-context-picker.spec.ts:74；tests/client/wiring/company-context-wiring.spec.ts:151 |
@@ -398,11 +398,11 @@
 | 385 | 2026-11-27 | tests/client/ux/company-hq.spec.ts:470 |
 | 386 | 2026-11-27 | tests/client/ui/client-css.spec.ts:199；tests/client/ui/client-css.spec.ts:200 |
 | 387 | 2026-11-27 | tests/client/ui/client-css.spec.ts:199；tests/client/ui/client-css.spec.ts:218；tests/client/ux/company-hub-tabs.spec.ts:209 |
-| 388 | 2026-11-27 | tests/client/presence/attention-parity.property.spec.ts:252；tests/client/tabs/attention-tab.spec.ts:363；tests/client/wiring/attention.spec.ts:529 |
-| 389 | 2026-11-27 | tests/client/ux/signoff-card.spec.ts:117；tests/host/commands/signoff-language.spec.ts:78 |
+| 388 | 2026-11-27 | tests/client/presence/attention-parity.property.spec.ts:252；tests/client/tabs/attention-tab.spec.ts:363；tests/client/wiring/attention.spec.ts:538 |
+| 389 | 2026-11-27 | tests/client/ux/signoff-card.spec.ts:118；tests/host/commands/signoff-language.spec.ts:78 |
 | 390 | 2026-11-27 | tests/client/tabs/attention-tab.spec.ts:88；tests/client/tabs/company-tabs-body.spec.ts:165；tests/client/ux/company-hq.spec.ts:530；tests/lib/presence/presence-board.spec.ts:147；tests/lib/shared/text-and-status.spec.ts:33 |
 | 391 | 2026-11-27 | tests/client/cultivation/cultivation-copy.spec.ts:71；tests/client/i18n/locales.spec.ts:43；tests/client/tabs/panel-frame.spec.ts:88 |
-| 392 | 2026-11-27 | tests/client/ux/signoff-card.spec.ts:166 |
+| 392 | 2026-11-27 | tests/client/ux/signoff-card.spec.ts:167 |
 | 393 | 2026-11-27 | tests/client/startup/command-scope-hint.spec.ts:43；tests/client/ux/ambient-chrome.spec.ts:283；tests/client/ux/company-hq.spec.ts:590；tests/client/ux/contextual-actions.spec.ts:158；tests/client/wiring/company-context-wiring.spec.ts:112；tests/client/wiring/company-context-wiring.spec.ts:137 |
 | 394 | 2026-11-27 | tests/client/data/workspace-text.spec.ts:91；tests/client/startup/startup-handlers.spec.ts:44；tests/client/startup/strategy-panel-input.spec.ts:91；tests/client/ui/brand.spec.ts:52 |
 | 395 | 2026-11-27 | tests/client/tabs/dag-panel.spec.ts:138；tests/client/tabs/dag-panel.spec.ts:154；tests/client/tabs/deliverables-tab-states.spec.ts:78 |
@@ -410,3 +410,5 @@
 | 397 | 2026-11-27 | tests/client/cultivation/cultivation-board-actions.spec.ts:602；tests/client/cultivation/cultivation-compose-context.spec.ts:261；tests/client/tabs/delegation-flow-panel.spec.ts:70；tests/client/wiring/instance-guard.spec.ts:109 |
 | 398 | 2026-11-27 | tests/client/tabs/deliverables-tab-states.spec.ts:120；tests/client/tabs/panel-frame.spec.ts:99；tests/client/ui/client-css.spec.ts:228；tests/client/ux/ambient-chrome.spec.ts:240；tests/client/ux/company-hq.spec.ts:688 |
 | 399 | 2026-11-27 | tests/client/ux/company-hq.spec.ts:799；tests/client/ux/company-triggers-shortcuts.spec.ts:226；tests/client/ux/company-turn-tail.spec.ts:159 |
+| 400 | 2026-11-27 | tests/client/cultivation/cultivation-board-actions.spec.ts:635；tests/client/cultivation/cultivation-context-picker.spec.ts:197；tests/client/cultivation/cultivation-data.spec.ts:200；tests/client/ux/ambient-chrome.spec.ts:291 |
+| 404 | 2026-11-27 | tests/client/cultivation/cultivation-board-actions.spec.ts:700；tests/client/ux/ambient-chrome.spec.ts:291；tests/client/wiring/attention-source.spec.ts:35 |

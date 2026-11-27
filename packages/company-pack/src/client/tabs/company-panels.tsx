@@ -344,37 +344,45 @@ const COUNT_UP_MS = 320
  * @returns 当前显示值。
  */
 function useCountUp(target: number): number {
-  const [value, setValue] = useState(target)
-  const fromRef = useRef(target)
+  const safeTarget = Number.isFinite(target) ? target : 0
+  const [value, setValue] = useState(safeTarget)
+  const fromRef = useRef(safeTarget)
+  const currentRef = useRef(safeTarget)
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      setValue(target)
+      currentRef.current = safeTarget
+      fromRef.current = safeTarget
+      setValue(safeTarget)
       return
     }
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setValue(target)
-      fromRef.current = target
+      currentRef.current = safeTarget
+      fromRef.current = safeTarget
+      setValue(safeTarget)
       return
     }
     const from = fromRef.current
-    if (from === target) {
-      setValue(target)
+    if (from === safeTarget) {
+      currentRef.current = safeTarget
+      setValue(safeTarget)
       return
     }
     let frame = 0
     const started = performance.now()
     const tick = (now: number): void => {
       const progress = Math.min(1, (now - started) / COUNT_UP_MS)
-      setValue(Math.round(from + (target - from) * progress))
+      const next = Math.round(from + (safeTarget - from) * progress)
+      currentRef.current = next
+      setValue(next)
       if (progress < 1) frame = requestAnimationFrame(tick)
-      else fromRef.current = target
+      else fromRef.current = safeTarget
     }
     frame = requestAnimationFrame(tick)
     return () => {
       cancelAnimationFrame(frame)
-      fromRef.current = target
+      fromRef.current = currentRef.current
     }
-  }, [target])
+  }, [safeTarget])
   return value
 }
 
@@ -392,24 +400,31 @@ const BUDGET_ROW_KEYS: Record<string, CompanyKey> = {
 
 export function BudgetPanel({ summary, t = defaultT }: { readonly summary: BudgetSummary; readonly t?: CompanyT }) {
   const total = useCountUp(summary.totalTokens)
+  const toolSharePct = summary.toolShare !== null && Number.isFinite(summary.toolShare)
+    ? Math.round(summary.toolShare * 100)
+    : null
   return (
     <div>
       <div className="wk-usage-total">{formatTokens(total)} <span className="wk-meta">tokens</span></div>
       <div className="wk-meta">
         {t('budget.turns', { turns: summary.turns ?? '—' })} · {t('budget.steps', { steps: summary.steps ?? '—' })}
-        {summary.toolShare === null ? '' : ` · ${t('budget.toolShare', { share: Math.round(summary.toolShare * 100) })}`}
+        {toolSharePct === null ? '' : ` · ${t('budget.toolShare', { share: toolSharePct })}`}
       </div>
-      {summary.rows.map(row => (
-        <div className="wk-usage-row" key={row.label}>
-          <div className="wk-usage-head">
-            <span>{BUDGET_ROW_KEYS[row.id] === undefined ? row.label : t(BUDGET_ROW_KEYS[row.id] as CompanyKey)}</span>
-            <span>{formatTokens(row.tokens)}{t('budget.share', { share: Math.round(row.share * 100) })}</span>
+      {summary.rows.map((row) => {
+        const safeTokens = Number.isFinite(row.tokens) ? row.tokens : 0
+        const safePct = Number.isFinite(row.share) ? Math.round(row.share * 100) : 0
+        return (
+          <div className="wk-usage-row" key={row.label}>
+            <div className="wk-usage-head">
+              <span>{BUDGET_ROW_KEYS[row.id] === undefined ? row.label : t(BUDGET_ROW_KEYS[row.id] as CompanyKey)}</span>
+              <span>{formatTokens(safeTokens)}{t('budget.share', { share: safePct })}</span>
+            </div>
+            <div className="wk-bar">
+              <div className="wk-bar-fill" style={{ width: `${String(safePct)}%` }} />
+            </div>
           </div>
-          <div className="wk-bar">
-            <div className="wk-bar-fill" style={{ width: `${String(Math.round(row.share * 100))}%` }} />
-          </div>
-        </div>
-      ))}
+        )
+      })}
       <StateNote text={t('budget.tokensOnly')} />
     </div>
   )

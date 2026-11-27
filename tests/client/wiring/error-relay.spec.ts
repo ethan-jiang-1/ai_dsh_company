@@ -8,6 +8,7 @@
  * 证明不了：真实浏览器事件捕获（error-ring 自身）、远端命令真的写盘（client-error-chain-smoke）、
  * 会话服务的真实快照（company-client-composition）。
  */
+// 负例留证 2026-11-27：createErrorRelay 在 options.send() 前先 queue.shift() ⇒ 同步抛错时条目立即被弹出丢失（BUG-401）；先发后弹出与单次重试后绿。BUG-401
 import { describe, expect, it } from 'vitest'
 import { createErrorRelay, type ClientErrorEntry } from '../../../packages/company-pack/src/client/wiring/error-ring.ts'
 
@@ -110,6 +111,35 @@ describe('createErrorRelay（客户端错误上报）', () => {
     failing.push(entry('a'))
     expect(h.errors).toHaveLength(1)
     expect(h.errors[0]).toBeInstanceOf(Error)
+  })
+
+  it('BUG-401：send 同步抛错时条目保留用于单次重试，两次均失败后出队避免死循环', () => {
+    let now = 5_000
+    let attempts = 0
+    const timers: Array<{ fn: () => void; at: number }> = []
+    const errs: unknown[] = []
+    const relay = createErrorRelay<string>({
+      currentSessionId: () => 's1',
+      send: () => {
+        attempts += 1
+        throw new Error(`fail-${attempts}`)
+      },
+      now: () => now,
+      schedule: (fn, ms) => { const t = { fn, at: now + ms }; timers.push(t); return t },
+      cancel: h => { const i = timers.indexOf(h as { fn: () => void; at: number }); if (i >= 0) timers.splice(i, 1) },
+      onSendError: err => errs.push(err),
+    })
+
+    relay.push(entry('important-error'))
+    expect(attempts).toBe(1)
+    expect(errs).toHaveLength(1)
+    expect(relay.pending()).toBe(1)
+
+    now += 1_000
+    timers.shift()?.fn()
+    expect(attempts).toBe(2)
+    expect(errs).toHaveLength(2)
+    expect(relay.pending()).toBe(0)
   })
 
   it('dispose 之后不再排定时器、不再发', () => {

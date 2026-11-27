@@ -76,6 +76,13 @@ const STATE_TONE: Record<CardState, 'info' | 'success' | 'danger' | 'neutral'> =
   stopped: 'neutral',
 }
 
+const STATE_FALLBACK_TAG: Record<CardState, { readonly key: CompanyKey; readonly tone: 'warning' | 'danger' | 'neutral' }> = {
+  running: { key: 'signoff.pendingTag', tone: 'warning' },
+  ok: { key: 'signoff.state.settled', tone: 'neutral' },
+  error: { key: 'signoff.state.error', tone: 'danger' },
+  stopped: { key: 'signoff.state.stopped', tone: 'warning' },
+}
+
 /** 对话流内的 `request_signoff` 工具调用卡（L0）。 */
 export function SignoffToolView({ block, t }: ToolCallViewProps & { readonly t: CompanyT }): ReactNode {
   const settled = 'kind' in block
@@ -90,6 +97,7 @@ export function SignoffToolView({ block, t }: ToolCallViewProps & { readonly t: 
   const decisionMeta = parsedResult !== null && parsedResult.decision in DECISION_TAG
     ? DECISION_TAG[parsedResult.decision]
     : undefined
+  const fallbackTag = STATE_FALLBACK_TAG[state] ?? { key: 'signoff.pendingTag' as CompanyKey, tone: STATE_TONE[state] }
 
   return (
     <div className="wk-signoff-tool" data-company-signoff-tool="" data-state={state}>
@@ -98,7 +106,7 @@ export function SignoffToolView({ block, t }: ToolCallViewProps & { readonly t: 
         {decisionMeta !== undefined ? (
           <Tag tone={decisionMeta.tone}>{t(decisionMeta.key)}</Tag>
         ) : (
-          <Tag tone={STATE_TONE[state]}>{t('signoff.pendingTag')}</Tag>
+          <Tag tone={fallbackTag.tone}>{t(fallbackTag.key)}</Tag>
         )}
       </div>
       {line !== '' ? (

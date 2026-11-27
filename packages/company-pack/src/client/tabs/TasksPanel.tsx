@@ -61,12 +61,14 @@ function DependencyLabel({ id, byId, t }: { readonly id: string; readonly byId: 
  */
 export function TasksTableView({ view, roleLabel = name => name, t = defaultT }: { readonly view: TeamViewLike | null; readonly roleLabel?: (name: string) => string; readonly t?: CompanyT }) {
   if (view === null) return <StateNote kind="loading" text={t('tasks.loading')} />
-  const tasks = tasksFromTeamView(view)
+  const safeMembers = Array.isArray(view.members) ? view.members : []
+  const safeTasks = Array.isArray(view.tasks) ? view.tasks : []
+  const tasks = tasksFromTeamView({ ...view, members: safeMembers, tasks: safeTasks })
   const byId = new Map(tasks.map(task => [task.id, task]))
   return (
     <>
       <div className="wk-meta wk-mb-xs">
-        {t('tasks.members', { members: joinList(view.members.map(member => `${roleLabel(member.name)}(${t(`presence.status.${presenceStatusFromPhase(member.phase)}` as CompanyKey)})`), listSeparator(t)) || t('tasks.noMembers') })}
+        {t('tasks.members', { members: joinList(safeMembers.map(member => `${roleLabel(member.name)}(${t(`presence.status.${presenceStatusFromPhase(member.phase)}` as CompanyKey)})`), listSeparator(t)) || t('tasks.noMembers') })}
       </div>
       {tasks.length === 0
         ? <StateNote text={t('tasks.empty')} />

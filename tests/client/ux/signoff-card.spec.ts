@@ -59,6 +59,7 @@ describe('isSignoffPendingInteraction · 鸭子类型精确识别', () => {
 
 // 负例留证 2026-11-27：去掉 SignoffComposerCard 的 displayReason 解析优先级或将 parsed.detail 改为默认展开 ⇒ BUG-389 用例红；还原后绿。BUG-389
 // 负例留证 2026-11-27：去掉 SignoffComposerCard 键盘 `<summary>`/`button`/修饰键/IME 护栏、waitingRef 锁或 `answerable === false` 禁用 ⇒ BUG-392 用例红；还原后绿。BUG-392
+// 负例留证 2026-11-27：SignoffToolView 在 decisionMeta===undefined 时一律渲染 signoff.pendingTag ⇒ state='error'/'stopped' 无 JSON 决策时仍显「待拍板」（BUG-401）；按终态分流后绿。BUG-401
 describe('SignoffComposerCard · 链式双签决策卡', () => {
   it('解析签字线与备选上下文，点击批准 / 拒绝及 Enter / Esc 正常结算，失败后可恢复重试', async () => {
     const answer = vi.fn().mockRejectedValueOnce(new Error('network blip')).mockResolvedValueOnce(undefined)
@@ -349,5 +350,38 @@ describe('SignoffToolView & SlotCore chain 透传整合', () => {
       await Promise.resolve()
     })
     expect(cCard.querySelector('[role="alert"]')?.textContent).toContain('network fail')
+  })
+
+  it('BUG-401：SignoffToolView 对非决策 error/stopped 终态显示对应状态徽标而非「待拍板」', () => {
+    const tZh = makeT(zh)
+    const { container, rerender } = mountDom(createElement(SignoffToolView, {
+      toolName: SIGNOFF_TOOL_KEY,
+      callId: 'c-err',
+      block: {
+        kind: 'settled',
+        call: { callId: 'c-err', toolName: SIGNOFF_TOOL_KEY, argsRaw: JSON.stringify({ line: '线E' }) },
+        content: [{ type: 'text', text: 'Tool execution failed' }],
+        isError: true,
+      },
+      t: tZh,
+    } as unknown as ComponentProps<typeof SignoffToolView>))
+    expect(container.querySelector('[data-company-signoff-tool]')?.getAttribute('data-state')).toBe('error')
+    expect(container.textContent).toContain(zh['signoff.state.error'])
+    expect(container.textContent).not.toContain(zh['signoff.pendingTag'])
+
+    rerender(createElement(SignoffToolView, {
+      toolName: SIGNOFF_TOOL_KEY,
+      callId: 'c-stop',
+      block: {
+        kind: 'settled',
+        call: { callId: 'c-stop', toolName: SIGNOFF_TOOL_KEY, argsRaw: JSON.stringify({ line: '线S' }) },
+        content: [],
+        isError: true,
+        error: { name: 'AbortError', code: 'interrupted' },
+      },
+      t: makeT(en),
+    } as unknown as ComponentProps<typeof SignoffToolView>))
+    expect(container.textContent).toContain(en['signoff.state.stopped'])
+    expect(container.textContent).not.toContain(en['signoff.pendingTag'])
   })
 })
