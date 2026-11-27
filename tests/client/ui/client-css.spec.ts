@@ -196,6 +196,8 @@ describe('客户端 CSS 与源码脆债反回归守卫（Wave S4）', () => {
 // 负例留证 2026-11-27：撤掉 .wk-ux-header-badge 等内嵌包装与 [data-presence-aside] 的 white-space: nowrap / flex-shrink: 0 或恢复 .wk-row-button 的 width: 100% ⇒ 本守卫红；还原后绿。BUG-386
 // 负例留证 2026-11-27：删掉 @media (max-width: 820px) 的 .wk-hq-cultivation-split 单列规则或把 .wk-hq-grid 改回 minmax(300px, 1fr) ⇒ 本守卫红；还原后绿。BUG-387
 // 负例留证 2026-11-27：删掉 .wk-command-scope-hint 规则或恢复重复 .wk-guide-entry 声明 ⇒ BUG-398 用例红；还原后绿。BUG-398
+// 负例留证 2026-11-27：恢复 --dsw-alias-bg-layer-2 高亮/轨道背景或去掉 .wk-cultivation-body-input 的 box-sizing: border-box ⇒ Light 白底隐身且 390px 右溢 +18px（BUG-402）；替换浅色可见令牌与 border-box 后绿。BUG-402
+// 负例留证 2026-11-27：恢复 focus-visible outline: none 或把 :root[data-wk-role] body::before z-index 设回 2147483647 ⇒ 键盘焦点框丢失且角色顶带压过弹窗（BUG-403）；修复后绿。BUG-403
 describe('客户端 CSS：窄栏不换行护栏与响应式折叠（BUG-386 / BUG-387）', () => {
   it('BUG-386：五处内嵌 slot 包装类与旁路按钮禁止单字竖折，.wk-row-button 使用 min-width: 0 而非 width: 100%', () => {
     const parsed = rules(STYLES)
@@ -235,5 +237,28 @@ describe('客户端 CSS：窄栏不换行护栏与响应式折叠（BUG-386 / BU
     expect(guideEntryRules).toHaveLength(1)
     const guideLabelRules = parsed.filter(r => r.selector === '.wk-guide-entry-label')
     expect(guideLabelRules).toHaveLength(1)
+  })
+
+  it('BUG-402：禁用 Light 态纯白层令牌 --dsw-alias-bg-layer-2，并为 .wk-cultivation-body-input 声明 border-box', () => {
+    expect(STYLES).not.toContain('--dsw-alias-bg-layer-2')
+    const parsed = rules(STYLES)
+    const hlRule = parsed.find(r => r.selector === ".wk-deliverable-row[data-highlighted='true']")
+    expect(hlRule?.body).toContain('--dsw-alias-interactive-bg-active')
+    const taRule = parsed.find(r => r.selector === '.wk-cultivation-body-input')
+    expect(taRule?.body).toContain('box-sizing: border-box')
+  })
+
+  it('BUG-403：保留 :focus-visible 焦点框并将角色顶带 z-index 控制在官方 Modal(1000) 以下', () => {
+    const parsed = rules(STYLES)
+    for (const rule of parsed) {
+      if (rule.full.includes(':focus-visible')) {
+        expect(rule.body, rule.full).not.toMatch(/\boutline:\s*none\b/)
+      }
+    }
+    const roleRibbon = parsed.find(r => r.selector === ':root[data-wk-role] body::before')
+    expect(roleRibbon).toBeDefined()
+    const zMatch = /\bz-index:\s*(\d+)/.exec(roleRibbon!.body)
+    expect(zMatch).not.toBeNull()
+    expect(Number(zMatch![1])).toBeLessThan(1000)
   })
 })

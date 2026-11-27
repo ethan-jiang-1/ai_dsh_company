@@ -7,7 +7,7 @@
  * 每个集成页签通过 DSH 原生 `SegmentedControl` 在内部切换子视图，
  * 并在根节点保留 `data-company-tab-title={t('tabs.<hub>.label')}` 供自动化探针识别。
  */
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { ObservableSnapshot } from '@deepseek-ai/dsh-client-store'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
@@ -27,7 +27,7 @@ import type { FloatRectLike } from '../ui/float-geometry.ts'
 import type { RoleBadgeInjected } from '../ui/RoleBadge.tsx'
 import type { AttentionRegistry } from '../wiring/attention-registry.ts'
 import { AttentionTab } from './AttentionTab.tsx'
-import { BoardTab, BudgetTab, DagTab, PresenceTab, TasksTab } from './company-tabs.tsx'
+import { BoardTab, BudgetTab, DagTab, isFloatingPaneInfo, PresenceTab, TasksTab } from './company-tabs.tsx'
 import { CultivationTab } from './CultivationTab.tsx'
 import { DeliverablesTab } from './DeliverablesTab.tsx'
 import {
@@ -81,16 +81,50 @@ export type OpsHubTabProps = PropsRuntime<'sidebar.right.pane.tab'> & InjectFace
 export type TeamHubTabProps = PropsRuntime<'sidebar.right.pane.tab'> & InjectFace<TeamHubInjected>
 export type ArchiveHubTabProps = PropsRuntime<'sidebar.right.pane.tab'> & InjectFace<ArchiveHubInjected>
 
-function useSidebarFullscreen(useTabInfo: OpsHubTabProps['useTabInfo']): boolean {
-  const info = useTabInfo() as { readonly sidebar?: { readonly fullscreen?: boolean } } | undefined
-  return info?.sidebar?.fullscreen === true
+function useHubContainerMode(useTabInfo: OpsHubTabProps['useTabInfo']): { readonly fullscreen: boolean; readonly floating: boolean } {
+  const info = useTabInfo() as { readonly sidebar?: { readonly fullscreen?: boolean }; readonly panel?: { readonly id?: string } } | undefined
+  return {
+    fullscreen: info?.sidebar?.fullscreen === true,
+    floating: isFloatingPaneInfo(info),
+  }
+}
+
+/** 渲染与 `SegmentedControl` 配对的 ARIA `tabpanel` 容器，避免悬空 `aria-controls` 并按需保活表单。 */
+export function SegmentedTabPanels<T extends string>({
+  controlId,
+  active,
+  panels,
+}: {
+  readonly controlId: string
+  readonly active: T
+  readonly panels: ReadonlyArray<{
+    readonly id: T
+    readonly keepMounted?: boolean
+    readonly render: () => ReactNode
+  }>
+}): ReactNode {
+  return panels.map((panel) => {
+    const isActive = active === panel.id
+    const shouldMount = isActive || panel.keepMounted === true
+    return (
+      <div
+        key={panel.id}
+        id={`${controlId}-${panel.id}-panel`}
+        role="tabpanel"
+        aria-labelledby={`${controlId}-${panel.id}`}
+        hidden={!isActive}
+      >
+        {shouldMount ? panel.render() : null}
+      </div>
+    )
+  })
 }
 
 /** 作战板：看板 · 依赖图 · 任务板 · 项目策略。 */
 export function OpsHubTab(props: OpsHubTabProps): ReactNode {
   const section = props.useHubState((state: HubSubViewState) => state.ops)
   const { t, selectSection, openSplit, startupStore, loadStartup, saveStartup, resetStartup, ...tabRest } = props
-  const isFullscreen = useSidebarFullscreen(props.useTabInfo)
+  const { fullscreen, floating } = useHubContainerMode(props.useTabInfo)
 
   return (
     <div className="wk-hub-pane" data-company-hub="ops" data-company-tab-title={t('tabs.ops.label')}>
@@ -107,7 +141,7 @@ export function OpsHubTab(props: OpsHubTabProps): ReactNode {
             { value: 'strategy', label: t('tabs.strategy.label') },
           ]}
         />
-        {openSplit === undefined ? null : isFullscreen ? (
+        {floating || openSplit === undefined ? null : fullscreen ? (
           <Button size="sm" variant="outline" data-company-narrow-close="" onClick={() => { openSplit('quiet') }}>
             {t('layout.closeRightbar')}
           </Button>
@@ -118,19 +152,28 @@ export function OpsHubTab(props: OpsHubTabProps): ReactNode {
         )}
       </div>
       <div className="wk-hub-body">
-        {section === 'board' && <BoardTab {...tabRest} t={t} />}
-        {section === 'dag' && <DagTab {...tabRest} t={t} />}
-        {section === 'tasks' && <TasksTab {...tabRest} t={t} />}
-        {section === 'strategy' && (
-          <StrategyPanel
-            {...tabRest}
-            t={t}
-            store={startupStore}
-            load={loadStartup}
-            save={saveStartup}
-            reset={resetStartup}
-          />
-        )}
+        <SegmentedTabPanels<OpsSection>
+          controlId="company-ops-segments"
+          active={section}
+          panels={[
+            { id: 'board', render: () => <BoardTab {...tabRest} t={t} /> },
+            { id: 'dag', render: () => <DagTab {...tabRest} t={t} /> },
+            { id: 'tasks', render: () => <TasksTab {...tabRest} t={t} /> },
+            {
+              id: 'strategy',
+              render: () => (
+                <StrategyPanel
+                  {...tabRest}
+                  t={t}
+                  store={startupStore}
+                  load={loadStartup}
+                  save={saveStartup}
+                  reset={resetStartup}
+                />
+              ),
+            },
+          ]}
+        />
       </div>
     </div>
   )
@@ -140,7 +183,7 @@ export function OpsHubTab(props: OpsHubTabProps): ReactNode {
 export function TeamHubTab(props: TeamHubTabProps): ReactNode {
   const section = props.useHubState((state: HubSubViewState) => state.team)
   const { t, selectSection, openSplit, attention, openSession, openMember, openMemberAside, pageHistory, ...tabRest } = props
-  const isFullscreen = useSidebarFullscreen(props.useTabInfo)
+  const { fullscreen, floating } = useHubContainerMode(props.useTabInfo)
 
   return (
     <div className="wk-hub-pane" data-company-hub="team" data-company-tab-title={t('tabs.team.label')}>
@@ -156,31 +199,43 @@ export function TeamHubTab(props: TeamHubTabProps): ReactNode {
             { value: 'budget', label: t('tabs.budget.label') },
           ]}
         />
-        {isFullscreen && openSplit !== undefined ? (
+        {!floating && fullscreen && openSplit !== undefined ? (
           <Button size="sm" variant="outline" data-company-narrow-close="" onClick={() => { openSplit('quiet') }}>
             {t('layout.closeRightbar')}
           </Button>
         ) : null}
       </div>
       <div className="wk-hub-body">
-        {section === 'attention' && (
-          <AttentionTab
-            {...tabRest}
-            t={t}
-            getPending={() => attention.list()}
-            openSession={openSession}
-            pageHistory={pageHistory}
-          />
-        )}
-        {section === 'presence' && (
-          <PresenceTab
-            {...tabRest}
-            t={t}
-            openMember={openMember}
-            openMemberAside={openMemberAside}
-          />
-        )}
-        {section === 'budget' && <BudgetTab {...tabRest} t={t} />}
+        <SegmentedTabPanels<TeamSection>
+          controlId="company-team-segments"
+          active={section}
+          panels={[
+            {
+              id: 'attention',
+              render: () => (
+                <AttentionTab
+                  {...tabRest}
+                  t={t}
+                  getPending={() => attention.list()}
+                  openSession={openSession}
+                  pageHistory={pageHistory}
+                />
+              ),
+            },
+            {
+              id: 'presence',
+              render: () => (
+                <PresenceTab
+                  {...tabRest}
+                  t={t}
+                  openMember={openMember}
+                  openMemberAside={openMemberAside}
+                />
+              ),
+            },
+            { id: 'budget', render: () => <BudgetTab {...tabRest} t={t} /> },
+          ]}
+        />
       </div>
     </div>
   )
@@ -189,6 +244,10 @@ export function TeamHubTab(props: TeamHubTabProps): ReactNode {
 /** 档案：成品目录 · 动议台账 · 角色培养。 */
 export function ArchiveHubTab(props: ArchiveHubTabProps): ReactNode {
   const section = props.useHubState((state: HubSubViewState) => state.archive)
+  const [cultivationVisited, setCultivationVisited] = useState(() => section === 'cultivation')
+  useEffect(() => {
+    if (section === 'cultivation') setCultivationVisited(true)
+  }, [section])
   const {
     t,
     selectSection,
@@ -204,7 +263,7 @@ export function ArchiveHubTab(props: ArchiveHubTabProps): ReactNode {
     openFinal,
     ...tabRest
   } = props
-  const isFullscreen = useSidebarFullscreen(props.useTabInfo)
+  const { fullscreen, floating } = useHubContainerMode(props.useTabInfo)
 
   return (
     <div className="wk-hub-pane" data-company-hub="archive" data-company-tab-title={t('tabs.archive.label')}>
@@ -220,7 +279,7 @@ export function ArchiveHubTab(props: ArchiveHubTabProps): ReactNode {
             { value: 'cultivation', label: t('tabs.cultivation.label') },
           ]}
         />
-        {openSplit === undefined ? null : isFullscreen ? (
+        {floating || openSplit === undefined ? null : fullscreen ? (
           <Button size="sm" variant="outline" data-company-narrow-close="" onClick={() => { openSplit('quiet') }}>
             {t('layout.closeRightbar')}
           </Button>
@@ -231,27 +290,40 @@ export function ArchiveHubTab(props: ArchiveHubTabProps): ReactNode {
         )}
       </div>
       <div className="wk-hub-body">
-        {section === 'deliverables' && (
-          <DeliverablesTab
-            {...tabRest}
-            t={t}
-            readCatalog={readCatalog}
-            openFinal={openFinal}
-          />
-        )}
-        {section === 'ledger' && <LedgerTab {...tabRest} t={t} readLedger={readLedger} />}
-        {section === 'cultivation' && (
-          <CultivationTab
-            {...tabRest}
-            t={t}
-            cultivationFiles={cultivationFiles}
-            cultivationActions={cultivationActions}
-            followEvents={follow}
-            roleSource={roleSource}
-            contextSources={contextSources}
-            openContext={openContext}
-          />
-        )}
+        <SegmentedTabPanels<ArchiveSection>
+          controlId="company-archive-segments"
+          active={section}
+          panels={[
+            {
+              id: 'deliverables',
+              render: () => (
+                <DeliverablesTab
+                  {...tabRest}
+                  t={t}
+                  readCatalog={readCatalog}
+                  openFinal={openFinal}
+                />
+              ),
+            },
+            { id: 'ledger', render: () => <LedgerTab {...tabRest} t={t} readLedger={readLedger} /> },
+            {
+              id: 'cultivation',
+              keepMounted: cultivationVisited,
+              render: () => (
+                <CultivationTab
+                  {...tabRest}
+                  t={t}
+                  cultivationFiles={cultivationFiles}
+                  cultivationActions={cultivationActions}
+                  followEvents={follow}
+                  roleSource={roleSource}
+                  contextSources={contextSources}
+                  openContext={openContext}
+                />
+              ),
+            },
+          ]}
+        />
       </div>
     </div>
   )

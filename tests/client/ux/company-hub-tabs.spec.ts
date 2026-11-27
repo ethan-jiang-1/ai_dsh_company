@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 /** Wave S2 三合一集成页签（OpsHubTab / TeamHubTab / ArchiveHubTab）单测。 */
 // 负例留证 2026-11-27：去掉 Hub 页签在 sidebar.fullscreen=true 时渲染的 [data-company-narrow-close] 收起按钮 ⇒ BUG-387 用例红；还原后绿。BUG-387
+// 负例留证 2026-11-27：浮窗仍显示收起侧栏/分屏按钮、SegmentedControl 缺配对 tabpanel 或 Archive 切子页销毁 CultivationTab ⇒ 浮窗关闭死点、悬空 aria-controls 与草稿丢失（BUG-403）；修复后绿。BUG-403
 import { act, createElement, type ComponentProps } from 'react'
 import { createRoot } from 'react-dom/client'
 import { describe, expect, it, vi } from 'vitest'
@@ -354,6 +355,112 @@ describe('Wave S2 cohesive hub tabs', () => {
       } as unknown as ComponentProps<typeof OpsHubTab>))
     })
     expect(host.querySelector('[data-company-narrow-close]')).toBeNull()
+
+    act(() => { root.unmount() })
+    host.remove()
+  })
+
+  it('BUG-403：SegmentedControl 配对全部 tabpanel、浮窗隐藏收起与分屏按钮、Archive 切子页保留培养草稿', async () => {
+    const rt = baseRuntime()
+    const selectSection = vi.fn((hub, section) => { rt.store.select(hub, section) })
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+
+    // 1. Floating pane suppresses narrow-close and split buttons even when fullscreen=true, and resolves all aria-controls
+    await act(async () => {
+      root.render(createElement(OpsHubTab, {
+        sessionId: 's-ops-float',
+        useTabInfo: () => ({
+          sidebar: { expanded: true, fullscreen: true },
+          panel: { id: 'float-ops-1' },
+          tab: { id: 'tab-float', contentId: 'dsh-company-pack/ops' },
+        }),
+        useSessions: rt.useSessions,
+        useProjection: rt.useProjection,
+        useHubState: rt.useHubState,
+        selectSection,
+        openSplit: vi.fn(),
+        floatTab: rt.floatTab,
+        unfloatTab: rt.unfloatTab,
+        t,
+        leadOf: (id: string) => id,
+        follow: async function* () {},
+        startupStore: createStartupStore(),
+        loadStartup: async () => {},
+        saveStartup: async () => ({ ok: true as const }),
+        resetStartup: async () => ({ ok: true as const }),
+      } as unknown as ComponentProps<typeof OpsHubTab>))
+    })
+    expect(host.querySelector('[data-company-narrow-close]')).toBeNull()
+    expect(Array.from(host.querySelectorAll('button')).some(el => el.textContent?.trim() === zh['layout.splitOps'])).toBe(false)
+    for (const tab of host.querySelectorAll('[role="tab"]')) {
+      const targetId = tab.getAttribute('aria-controls')
+      expect(targetId).toBeTruthy()
+      const panel = host.querySelector(`#${targetId}`)
+      expect(panel?.getAttribute('role')).toBe('tabpanel')
+    }
+
+    // 2. ArchiveHubTab preserves CultivationCompose draft across cultivation -> ledger -> cultivation
+    const roleSource = {
+      getSnapshot: () => ({ projectionsBySession: { 's-arch-draft': { values: { agentPreset: 'ceo' } } } }),
+      subscribe: () => () => {},
+    }
+    const renderArchive = async () => {
+      await act(async () => {
+        root.render(createElement(ArchiveHubTab, {
+          sessionId: 's-arch-draft',
+          useTabInfo: rt.useTabInfo,
+          useSessions: rt.useSessions,
+          useProjection: rt.useProjection,
+          useHubState: rt.useHubState,
+          selectSection,
+          openSplit: vi.fn(),
+          floatTab: rt.floatTab,
+          unfloatTab: rt.unfloatTab,
+          t,
+          follow: async function* () {},
+          cultivationFiles: {
+            listJournal: vi.fn(async () => []),
+            readHead: vi.fn(async () => null),
+            listRecords: vi.fn(async () => ({ ok: true as const, names: [] })),
+            readRecord: vi.fn(async () => null),
+          },
+          cultivationActions: () => ({ run: async () => ({ ok: true as const, text: 'ok' }) }),
+          roleSource,
+          readLedger: vi.fn(async () => ({ ok: true as const, text: '' })),
+          readCatalog: vi.fn(async () => ({ ok: true as const, text: '' })),
+          contextSources: vi.fn(() => ({ listSessions: () => ({ ok: true as const, value: [] }), listDeliverables: async () => ({ ok: true as const, value: [] }), readPreview: async () => ({ ok: true as const }) })),
+          openContext: vi.fn(async () => ({ ok: true as const })),
+          openFinal: vi.fn(),
+        } as unknown as ComponentProps<typeof ArchiveHubTab>))
+      })
+    }
+
+    rt.store.select('archive', 'cultivation')
+    await renderArchive()
+    for (const tab of host.querySelectorAll('[role="tab"]')) {
+      const targetId = tab.getAttribute('aria-controls')!
+      expect(host.querySelector(`#${targetId}`)?.getAttribute('role')).toBe('tabpanel')
+    }
+
+    const startBtn = Array.from(host.querySelectorAll('button')).find(b => b.textContent?.includes('开始记录一项工作')) as HTMLButtonElement | undefined
+    expect(startBtn).toBeDefined()
+    await act(async () => { startBtn!.click() })
+    const ta = host.querySelector('.wk-cultivation-body-input') as HTMLTextAreaElement
+    expect(ta).not.toBeNull()
+    const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set
+    await act(async () => {
+      setter?.call(ta, 'UNSAVED_R3_DRAFT')
+      ta.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+
+    rt.store.select('archive', 'ledger')
+    await renderArchive()
+    rt.store.select('archive', 'cultivation')
+    await renderArchive()
+    const afterTa = host.querySelector('.wk-cultivation-body-input') as HTMLTextAreaElement | null
+    expect(afterTa?.value).toBe('UNSAVED_R3_DRAFT')
 
     act(() => { root.unmount() })
     host.remove()

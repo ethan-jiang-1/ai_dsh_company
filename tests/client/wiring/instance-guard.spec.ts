@@ -7,6 +7,7 @@ import { assertEnglishUiClean, translateWith } from '../../support/i18n-assertio
 // 负例留证 2026-10-10：卡② UX 依据 = 现场实测 3 个 web 实例并存 + E2 实证（多实例同文件
 // ×20 = 20/20 静默互踩）——用户拍板「警告横幅」：第二实例照常启动但被明确告知。
 // 负例留证 2026-11-27：startInstanceGuard 未订阅 locale/change ⇒ 实时切换语言后横幅滞留旧语直到下轮 10s 轮询（BUG-397）；接入订阅后绿。BUG-397
+// 负例留证 2026-11-27：instance-guard 横幅保留 z-index:9999 ⇒ 打开上游 Modal(1000) 时横幅压在弹窗之上并拦截点击（BUG-403）；降至 900 后绿。BUG-403
 
 const NOW = 1_000_000
 const KEY = HEARTBEAT_KEY
@@ -130,5 +131,15 @@ describe('心跳新鲜度双边窗口（BUG-364）', () => {
 
     dispose()
     expect(offSpy).toHaveBeenCalledOnce()
+  })
+
+  it('BUG-403：多实例警告横幅 z-index 低于上游 Modal(1000) 避免遮挡弹窗指针', () => {
+    vi.useFakeTimers()
+    localStorage.setItem(KEY, JSON.stringify({ 'tab-other': Date.now() }))
+    const dispose = startInstanceGuard(document, translateWith(zh))
+    const banner = document.getElementById(BANNER_ID) as HTMLElement | null
+    expect(banner).not.toBeNull()
+    expect(Number(banner!.style.zIndex)).toBeLessThan(1000)
+    dispose()
   })
 })

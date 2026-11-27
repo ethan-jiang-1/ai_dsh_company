@@ -58,6 +58,11 @@ export interface PanelFrameProps {
  */
 const defaultPanelT = ((key: CompanyKey) => zh[key]) as CompanyT
 
+/** DockKit 浮出窗的 `pane.id` 统一带 `float` 前缀（上游 `minter.next('float')`），用于收敛仅限侧栏的动作。 */
+export function isFloatingPaneInfo(info: { readonly panel?: { readonly id?: string } } | undefined): boolean {
+  return typeof info?.panel?.id === 'string' && info.panel.id.startsWith('float')
+}
+
 export function PanelFrame({ title, tone, tabProps, action, children, refreshLabel }: {
   readonly title: string
   readonly tone: string
@@ -70,6 +75,7 @@ export function PanelFrame({ title, tone, tabProps, action, children, refreshLab
   const t = tabProps.t ?? defaultPanelT
   const info = tabProps.useTabInfo()
   const floatTab = tabProps.floatTab
+  const isFloating = isFloatingPaneInfo(info)
   return (
     <div className="wk-pane">
       <div className={`wk-pane-strip wk-tone-${tone}`} aria-hidden="true" />
@@ -78,7 +84,7 @@ export function PanelFrame({ title, tone, tabProps, action, children, refreshLab
         <span className="wk-meta">{refreshLabel ?? t('panel.projected')}</span>
         <span style={{ flex: 1 }} />
         {action}
-        {floatTab === undefined ? null : (
+        {floatTab === undefined || isFloating ? null : (
           <Button
             size="sm"
             variant="ghost"

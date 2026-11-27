@@ -5,6 +5,7 @@
  */
 // 负例留证 2026-11-27：PanelFrame 对缺省 floatTab 仍渲染「浮出」按钮 ⇒ BUG-391 用例红；条件隐藏后绿。BUG-391
 // 负例留证 2026-11-27：locales panel.floatTitle 保留未实现的「下次浮出回到上次位置」承诺（BUG-398）；对齐诚实提示后绿。BUG-398
+// 负例留证 2026-11-27：PanelFrame 对 panel.id 以 float 开头的浮窗仍渲染「浮出」按钮 ⇒ 浮窗内留无意义冗余按钮（BUG-403）；按 isFloatingPaneInfo 隐藏后绿。BUG-403
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -99,5 +100,16 @@ describe('PanelFrame 浮出接线（真实 SidebarRightTabInfo 契约）', () =>
   it('BUG-398：panel.floatTitle 移除未实现的位置记忆虚假承诺', () => {
     expect(zh['panel.floatTitle']).not.toContain('回到上次位置')
     expect(en['panel.floatTitle']).not.toContain('returns to its last position')
+  })
+
+  it('BUG-403：浮窗（panel.id=float-*）隐藏冗余「浮出」按钮', async () => {
+    const root = await mount(createElement(PanelFrame, {
+      title: '作战板',
+      tone: 'overview',
+      tabProps: { useTabInfo: () => realTabInfo('tab-float', 'dsh-company-pack/ops', 'float-1'), floatTab: vi.fn() },
+      children: createElement('div', null, 'floating body'),
+    }))
+    const floatBtn = [...root.querySelectorAll('button')].find(node => node.textContent?.includes('浮出'))
+    expect(floatBtn).toBeUndefined()
   })
 })

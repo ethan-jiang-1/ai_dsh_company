@@ -53,7 +53,7 @@ export function CompanyGuideHub({
   const { company, upstream } = partitionGuideEntries(entries)
 
   const openEntry = (kind: string): void => {
-    tab.actions.openTab(kind)
+    tab.actions.openTab(kind, { replaceTab: true })
   }
 
   return (

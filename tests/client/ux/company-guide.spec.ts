@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// 负例留证 2026-11-27：CompanyGuideHub 调用 tab.actions.openTab(kind) 未传 { replaceTab: true } ⇒ 跳转后残留空「开始」页签（BUG-403）；透传 { replaceTab: true } 后绿。BUG-403
 /** Wave S2 Guide Hub (`sidebar.right.tab.guide` chain 替换 + 上游透传) 单测。 */
 import { act, createElement, type ComponentProps } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -71,12 +72,12 @@ describe('Wave S2 CompanyGuideHub', () => {
     const opsEntry = host.querySelector('[data-sidebar-right-guide-entry="company-ops"]') as HTMLButtonElement | null
     expect(opsEntry).not.toBeNull()
     await act(async () => { opsEntry!.click() })
-    expect(openTab).toHaveBeenCalledWith('company-ops')
+    expect(openTab).toHaveBeenCalledWith('company-ops', { replaceTab: true })
 
     const filesTool = host.querySelector('[data-sidebar-right-guide-entry="files"]') as HTMLButtonElement | null
     expect(filesTool).not.toBeNull()
     await act(async () => { filesTool!.click() })
-    expect(openTab).toHaveBeenCalledWith('files')
+    expect(openTab).toHaveBeenCalledWith('files', { replaceTab: true })
 
     const opsSplitBtn = Array.from(host.querySelectorAll('button'))
       .find(btn => btn.textContent?.trim() === zh['layout.splitOps'])

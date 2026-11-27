@@ -8,6 +8,7 @@
 // 负例留证 2026-11-27：HqCultivationConversationSlot 传 `hero: true`、或去掉 HqCultivationWorkshop 的 `retryNonce`/`mainSessionId` 复位及 HQ 总览 `pageHistory` 合并 ⇒ BUG-393 用例红；还原后绿。BUG-393
 // 负例留证 2026-11-27：openCultivation 仅弹 toast 不入 composeIntentStore ⇒ HQ 培养表单不自动展开也无来源背景预填（BUG-398）；接通后绿。BUG-398
 // 负例留证 2026-11-27：CultivationCompose 缺少 intentScope 区分 HQ 与侧栏实例且 deliverables-archive 未归一 ⇒ 侧栏表单先消费并误吞 HQ 意图或归档路径拒收（BUG-399）；还原后绿。BUG-399
+// 负例留证 2026-11-27：CompanyHqPage 的 SegmentedControl 缺配对 id="company-hq-segments-<sec>-panel" role="tabpanel" ⇒ 4 个分段标签全产悬空 aria-controls（BUG-403）；接入 SegmentedTabPanels 后绿。BUG-403
 import { act, createElement, type ComponentProps, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -873,5 +874,49 @@ describe('Wave S3 CompanyHqPage & HqCultivationConversationSlot', () => {
     openDeliv?.()
     const okToast = toastHook?.(v => v) as { text?: string } | undefined
     expect(okToast?.text).toBe(zh['toast.reviewOpened'])
+  })
+
+  it('BUG-403：CompanyHqPage 的全部 SegmentedControl 标签均有匹配 tabpanel', () => {
+    const hqStore = createHqSectionStore()
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    act(() => {
+      root.render(createElement(CompanyHqPage, {
+        t: makeT(zh),
+        useHqSection: <S,>(sel: (v: HqSection) => S) => sel(hqStore.store.getSnapshot()),
+        useAttentionItems: <S,>(sel: (v: readonly unknown[]) => S) => sel([]),
+        selectSection: (s: HqSection) => { hqStore.select(s) },
+        returnToChat: vi.fn(),
+        openSession: vi.fn(),
+        useSessions: <S,>(sel: (v: { byId: Record<string, unknown>; projectionsBySession: Record<string, unknown> }) => S) =>
+          sel({ byId: {}, projectionsBySession: {} }),
+        sessions: { retain: vi.fn(), create: vi.fn() },
+        cultivationFiles: { listJournal: vi.fn(async () => []), readHead: vi.fn(async () => null), listRecords: vi.fn(async () => ({ ok: true as const, names: [] })), readRecord: vi.fn(async () => null) },
+        cultivationActions: () => ({ run: vi.fn(async () => ({ ok: true as const, text: 'ok' })) }),
+        followEvents: async function* () {},
+        readLedger: vi.fn(async () => ({ ok: true as const, text: '' })),
+        readCatalog: vi.fn(async () => ({ ok: true as const, text: '' })),
+        contextSources: vi.fn(() => ({ listSessions: () => ({ ok: true as const, value: [] }), listDeliverables: async () => ({ ok: true as const, value: [] }), readPreview: async () => ({ ok: true as const }) })),
+        openContext: vi.fn(async () => ({ ok: true as const })),
+        openFinal: vi.fn(),
+        startupStore: createStartupStore(),
+        loadStartup: vi.fn(async () => {}),
+        saveStartup: vi.fn(async () => ({ ok: true as const })),
+        resetStartup: vi.fn(async () => ({ ok: true as const })),
+        renderSlot: () => null,
+        SessionProvider: (({ children }: { children?: ReactNode }) => children) as unknown as ComponentProps<typeof CompanyHqPage>['SessionProvider'],
+      } as unknown as ComponentProps<typeof CompanyHqPage>))
+    })
+
+    const tabs = [...host.querySelectorAll('[role="tab"]')]
+    expect(tabs).toHaveLength(4)
+    for (const tab of tabs) {
+      const targetId = tab.getAttribute('aria-controls')!
+      const panel = host.querySelector(`#${targetId}`)
+      expect(panel?.getAttribute('role')).toBe('tabpanel')
+    }
+    act(() => { root.unmount() })
+    host.remove()
   })
 })

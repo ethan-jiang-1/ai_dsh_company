@@ -46,6 +46,7 @@ import type { StrategyPanelProps } from '../startup/StrategyPanel.tsx'
 import { StrategyPanel, type SaveResult } from '../startup/StrategyPanel.tsx'
 import type { StartupStore } from '../startup/startup-store.ts'
 import { DeliverablesTab, type DeliverablesTabProps } from '../tabs/DeliverablesTab.tsx'
+import { SegmentedTabPanels } from '../tabs/company-hub-tabs.tsx'
 import { LedgerTab, type LedgerTabProps } from '../tabs/LedgerTab.tsx'
 import { ATTENTION_KEYS, formatAttentionWhat } from '../tabs/AttentionTab.tsx'
 import { readPresetFromSnapshot, sessionTitleOf } from '../ui/RoleBadge.tsx'
@@ -495,124 +496,139 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
       </header>
 
       <div className="wk-hq-body">
-        {section === 'overview' && (
-          <div className="wk-hq-grid">
-            <section className="wk-hq-card">
-              <div className="wk-hq-card-title">{t('hq.sessionsHeading')}</div>
-              {sessionList.length === 0 ? (
-                <div className="wk-hq-empty">{t('hq.sessionsEmpty')}</div>
-              ) : (
-                <div className="wk-hq-list">
-                  {sessionList.map(item => (
-                    <div key={item.id} className="wk-hq-row">
-                      <span className="wk-hq-row-label">{sessionTitleOf(item) ?? item.id}</span>
-                      <Tag tone={item.running ? 'warning' : 'neutral'}>{shortSessionId(item.id)}</Tag>
-                      <Button size="sm" variant="ghost" onClick={() => { openSession(item.id) }}>
-                        {t('hq.openSession')}
-                      </Button>
-                    </div>
-                  ))}
+        <SegmentedTabPanels<HqSection>
+          controlId="company-hq-segments"
+          active={section}
+          panels={[
+            {
+              id: 'overview',
+              render: () => (
+                <div className="wk-hq-grid">
+                  <section className="wk-hq-card">
+                    <div className="wk-hq-card-title">{t('hq.sessionsHeading')}</div>
+                    {sessionList.length === 0 ? (
+                      <div className="wk-hq-empty">{t('hq.sessionsEmpty')}</div>
+                    ) : (
+                      <div className="wk-hq-list">
+                        {sessionList.map(item => (
+                          <div key={item.id} className="wk-hq-row">
+                            <span className="wk-hq-row-label">{sessionTitleOf(item) ?? item.id}</span>
+                            <Tag tone={item.running ? 'warning' : 'neutral'}>{shortSessionId(item.id)}</Tag>
+                            <Button size="sm" variant="ghost" onClick={() => { openSession(item.id) }}>
+                              {t('hq.openSession')}
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="wk-hq-card">
+                    <div className="wk-hq-card-title">{t('hq.pendingHeading')}</div>
+                    {historyScan.capped > 0 && historyScan.total > 0 && (
+                      <div className="wk-meta">{t('attention.candidatesCapped', { count: historyScan.capped })}</div>
+                    )}
+                    {pendingItems.length === 0 ? (
+                      <div className="wk-hq-empty">{t('hq.pendingEmpty')}</div>
+                    ) : (
+                      <div className="wk-hq-list">
+                        {pendingItems.map(item => (
+                          <div key={attentionItemKey(item)} className="wk-hq-row">
+                            <Tag tone={item.kind === 'approval' ? 'danger' : 'warning'}>
+                              {t(ATTENTION_KEYS[item.kind])}
+                            </Tag>
+                            <span className="wk-hq-row-label">{formatAttentionWhat(item, t)}</span>
+                            <Button size="sm" variant="ghost" onClick={() => { openSession((item.jumpTo || primaryId || '') as SessionId) }}>
+                              {t('hq.openSession')}
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </section>
                 </div>
-              )}
-            </section>
-
-            <section className="wk-hq-card">
-              <div className="wk-hq-card-title">{t('hq.pendingHeading')}</div>
-              {historyScan.capped > 0 && historyScan.total > 0 && (
-                <div className="wk-meta">{t('attention.candidatesCapped', { count: historyScan.capped })}</div>
-              )}
-              {pendingItems.length === 0 ? (
-                <div className="wk-hq-empty">{t('hq.pendingEmpty')}</div>
-              ) : (
-                <div className="wk-hq-list">
-                  {pendingItems.map(item => (
-                    <div key={attentionItemKey(item)} className="wk-hq-row">
-                      <Tag tone={item.kind === 'approval' ? 'danger' : 'warning'}>
-                        {t(ATTENTION_KEYS[item.kind])}
-                      </Tag>
-                      <span className="wk-hq-row-label">{formatAttentionWhat(item, t)}</span>
-                      <Button size="sm" variant="ghost" onClick={() => { openSession((item.jumpTo || primaryId || '') as SessionId) }}>
-                        {t('hq.openSession')}
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-          </div>
-        )}
-
-        {section === 'ledger' && (
-          primarySession === undefined ? (
-            <div className="wk-hq-empty">{t('hq.ledgerEmpty')}</div>
-          ) : (
-            <div className="wk-hq-grid">
-              <section className="wk-hq-card">
-                <LedgerTab
-                  {...({
-                    sessionId: primarySession.id,
-                    useSessions,
-                    useTabInfo: hqTabInfo,
-                    readLedger,
-                    t,
-                  } as unknown as LedgerTabProps)}
+              ),
+            },
+            {
+              id: 'ledger',
+              render: () => (
+                primarySession === undefined ? (
+                  <div className="wk-hq-empty">{t('hq.ledgerEmpty')}</div>
+                ) : (
+                  <div className="wk-hq-grid">
+                    <section className="wk-hq-card">
+                      <LedgerTab
+                        {...({
+                          sessionId: primarySession.id,
+                          useSessions,
+                          useTabInfo: hqTabInfo,
+                          readLedger,
+                          t,
+                        } as unknown as LedgerTabProps)}
+                      />
+                    </section>
+                    <section className="wk-hq-card">
+                      <DeliverablesTab
+                        {...({
+                          sessionId: primarySession.id,
+                          useSessions,
+                          useTabInfo: hqTabInfo,
+                          readCatalog,
+                          openFinal,
+                          t,
+                        } as unknown as DeliverablesTabProps)}
+                      />
+                    </section>
+                  </div>
+                )
+              ),
+            },
+            {
+              id: 'strategy',
+              render: () => (
+                primarySession === undefined ? (
+                  <div className="wk-hq-empty">{t('hq.sessionsEmpty')}</div>
+                ) : (
+                  <section className="wk-hq-card">
+                    <StrategyPanel
+                      {...({
+                        sessionId: primarySession.id,
+                        useSessions,
+                        useTabInfo: hqTabInfo,
+                        store: startupStore,
+                        load: loadStartup,
+                        save: saveStartup,
+                        reset: resetStartup,
+                        t,
+                      } as unknown as StrategyPanelProps)}
+                    />
+                  </section>
+                )
+              ),
+            },
+            {
+              id: 'cultivation',
+              render: () => (
+                <HqCultivationWorkshop
+                  mainSessionId={primarySession?.id}
+                  cwd={primarySession?.cwd}
+                  viewerRole={viewerRole}
+                  sessions={sessions}
+                  cultivationFiles={cultivationFiles}
+                  cultivationActions={cultivationActions}
+                  followEvents={followEvents}
+                  contextSources={contextSources}
+                  openContext={openContext}
+                  renderSlot={renderSlot}
+                  SessionProvider={SessionProvider}
+                  isKnownCultivationSession={isKnownCultivationSession}
+                  onCultivationSessionCreated={onCultivationSessionCreated}
+                  t={t}
                 />
-              </section>
-              <section className="wk-hq-card">
-                <DeliverablesTab
-                  {...({
-                    sessionId: primarySession.id,
-                    useSessions,
-                    useTabInfo: hqTabInfo,
-                    readCatalog,
-                    openFinal,
-                    t,
-                  } as unknown as DeliverablesTabProps)}
-                />
-              </section>
-            </div>
-          )
-        )}
-
-        {section === 'strategy' && (
-          primarySession === undefined ? (
-            <div className="wk-hq-empty">{t('hq.sessionsEmpty')}</div>
-          ) : (
-            <section className="wk-hq-card">
-              <StrategyPanel
-                {...({
-                  sessionId: primarySession.id,
-                  useSessions,
-                  useTabInfo: hqTabInfo,
-                  store: startupStore,
-                  load: loadStartup,
-                  save: saveStartup,
-                  reset: resetStartup,
-                  t,
-                } as unknown as StrategyPanelProps)}
-              />
-            </section>
-          )
-        )}
-
-        {section === 'cultivation' && (
-          <HqCultivationWorkshop
-            mainSessionId={primarySession?.id}
-            cwd={primarySession?.cwd}
-            viewerRole={viewerRole}
-            sessions={sessions}
-            cultivationFiles={cultivationFiles}
-            cultivationActions={cultivationActions}
-            followEvents={followEvents}
-            contextSources={contextSources}
-            openContext={openContext}
-            renderSlot={renderSlot}
-            SessionProvider={SessionProvider}
-            isKnownCultivationSession={isKnownCultivationSession}
-            onCultivationSessionCreated={onCultivationSessionCreated}
-            t={t}
-          />
-        )}
+              ),
+            },
+          ]}
+        />
       </div>
     </div>
   )
