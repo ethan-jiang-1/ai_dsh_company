@@ -4,7 +4,9 @@
 
 ## 活跃清单
 
-**活跃 0 张**（按 [backlog 入口](../README.md) 推敲与确认后再推进；不从归档里自行开工）。
+**活跃 0 张**（按 [backlog 入口](../README.md) 推敲与确认后再推进；不从归档里自行开工）：
+
+（2026-11-27 Round 3 UX/UI 全面深化审计卡「梦之队 UX/UI Round 3 · 修复回归核验、隐藏深层缝隙、可访问性与真实交互闭环全扫计划」已结归档：已完成 28 单元走查与 Phase 0–3 三路实证，排伪 6 项后立案 `BUG-399..BUG-405` 共 7 张活跃 Bug 卡，0 产品代码改动；去向 = none，卡片见[归档](../_archive/settled_issues/2026-11-27-ux-ui-round3-deep-audit-and-e2e.md)。）
 
 （2026-11-26 UX/UI 升级卡「利用 DSH 原生扩展能力升级梦之队 UX/UI 并清退脆弱 CSS/DOM 债（S1–S4）」已结归档：去向 = [实施Note](../../notes/implemented/2026-11-26-dsh-native-ux-upgrade.md)，卡片见[归档](../_archive/settled_issues/2026-11-26-dsh-native-ux-upgrade.md)。）
 

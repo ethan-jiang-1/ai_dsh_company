@@ -2,16 +2,23 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 399；已分配 BUG-001..398。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 406；已分配 BUG-001..405。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张（Round 2 UX/UI 盲区深扫批次 BUG-392..398 已全部修复并迁出；仅留收口验证、批次 Note 与独立盲审）**：
+**活跃 7 张（Round 3 UX/UI 盲区深扫立案 BUG-399..405；按根因五批依次自主修复）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
+| [399](BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md) | P1 | client / lib | `final.md` 发起复盘培养传绝对路径拒收 + 6 处 `openTab` 入口绕过 `openOnSessionSurface` 抛错、Toast 抢跑与双挂载竞争 | 调查中 |
+| [400](BUG-400-embedded-workshop-status-pill-leak-and-cultivation-race-gaps.md) | P1 | client | 工坊泄漏 `ComposerStatusPill`、`HeroMotionOptions` 缺角色守卫、Picker reject 永驻加载及培养看板空白/取消/后台轮询竞态 | 调查中 |
+| [401](BUG-401-panel-nan-null-crashes-signoff-error-tag-and-question-id-mismatch.md) | P1 | client / lib | `TasksPanel` 缺省崩溃、`BudgetPanel` `NaN`、`SignoffToolView` 失败误标「待拍板」、已答问询未消重及错误环乱序/丢条目 | 调查中 |
+| [402](BUG-402-light-mode-layer2-invisible-highlight-and-390-textarea-overflow.md) | P1 | client / CSS | Light 主题 `--dsw-alias-bg-layer-2` 同 `#fff` 致高亮/轨道零对比度，`390px` 培养输入框缺 `border-box` 右溢 `+18px` | 调查中 |
+| [403](BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md) | P1 | client | 浮窗「收起侧栏」死点与冗余「浮出」按钮、切页清草稿、`SegmentedControl` 悬空 `aria-controls` 及 `z-index` 压弹窗 | 调查中 |
+| [404](BUG-404-stale-zero-badges-after-reload-and-mine-revoked-tag.md) | P1 | client | 刷新后顶栏/底部待办角标误报 `0`/就绪（与 `AttentionTab` 脱节）；`CultivationMine` 已撤回方法仍显绿色「已采纳」 | 调查中 |
+| [405](BUG-405-host-cultivation-command-and-errors-unlocalized-and-live-en-lag.md) | P1 | host / lib | `/cultivation` 漏用 `registerLocalizedCommand` 致 `en` 命令菜单仍显中文；Host 上下文读取与底层路径/写闸报错硬编码中文 | 调查中 |
 
 **按根因聚类摘要（供下轮修复排期）**：
 - **组 1 · 交互安全与宿主生命周期**（[392](../_archive/fixed_bugs/BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md)、[393](../_archive/fixed_bugs/BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md)、[396](../_archive/fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md) 快捷键部分）：容器级键盘未豁免可聚焦控件/`modal`/`terminal`，HQ 全局面板呼唤右栏漏切回会话，内嵌工坊未清理会话 Hero/Chrome；
@@ -28,6 +35,20 @@
 **本轮查过但不入卡**：第七轮 7 张修复已逐条复核（`numbering` 引号/注释/占位符/空格变体、`layers` 方括号、围栏内 `productType`、meta 三分家、CEO 身份与回放、`/delivery` 结构行判据）**全部绿**；`delivery-rules` 的模板路径按模式目录解析且 `content-contract` 已校验存在（初查误报，已核）；`/company-settings` 的并发读改写实测无丢失（Node 单线程 + 同步读写，已核）；`requiredFields` 仍属「未声明要校验」不入卡。
 
 **本轮查过但不入卡**（避免下轮重复排查）：`delivery-rules` 的 `requiredFields` 没有任何检查器消费，但 `content/delivery-modes/*/document-map.md` 只声明 `documents.file` 与 `requiredSections` 会被 `/delivery check` 校验——属「未声明要校验」，不是缺陷；`catalog` 的 2000 行读上限在 ~153 条成品处触发但已有专档文案（第六轮已记）；`TEAM_TOOL_KEYS`（9 个）与 vendor `tool-agent-team` 的工具名逐字一致（已核）；`DELEGATION_TOOL_KEYS` 与 preset `toolName:` 声明一致（已核）；`formatTokens`/`firstText`/`yamlScalar`/`instance-guard` 四处上一轮修复经本轮复核未见回归。
+
+## 2026-11-27 修复交接（Round 3 UX/UI 盲区与回归深扫批次：BUG-399..405）
+
+**用户指令（2026-11-27）**：系统性看 `_backlog/bugs` 最近发现的缺陷，按根因聚类与修复次序使用 goal 静默自主全部修复并归档收口。
+
+| 顺位 | 组 / 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
+|---|---|---|---|---|
+| **1 跨表面守卫与意图/路径闭环** | [399](BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md) | 存档路径 `.dsh-company/deliverables-archive/` 未纳入终稿归一；6 处 `openTab`/快捷键绕过 `openOnSessionSurface`；`openDeliverables` 异步前预判 Toast；双挂载 `CultivationCompose` 抢消费 | `deliverables-focus-store.ts` 与 `contextual-actions.tsx` 扩 `deliverables-archive`；`openOnSessionSurface` 增 `onSuccess` 回调，全部 6 处入口改走 `openOnSessionSurface`；`composeIntentStore` 增 `target: 'hq' \| 'sidebar'` 作用域隔离 | 1 |
+| **2 环境状态同源与培养异步竞态** | [400](BUG-400-embedded-workshop-status-pill-leak-and-cultivation-race-gaps.md) + [404](BUG-404-stale-zero-badges-after-reload-and-mine-revoked-tag.md) | `ComposerStatusPill` 漏内嵌工坊守卫、`HeroMotionOptions` 无公司角色守卫、`workshop-sessions` 无订阅；环境角标未合流 `pageHistory` 历史审批；`CultivationMine` 漏判 `revokedAt`、看板 `records===null` 空白、撤回取消未禁用、Picker 缺 `.catch()`、`visibilitychange` 后台乱读 | 抽共享 `createMergedAttentionObservable`（live+history 去重）接回环境角标；工坊/角色守卫收全并可订阅；`CultivationAdopted`/`Feedback`/`Mine`/`Picker`/`cultivation-data` 补齐加载态、互斥锁定、`.catch()` 与 `visible` 过滤 | 2 |
+| **3 运行期边界防崩、终态标签与错误环** | [401](BUG-401-panel-nan-null-crashes-signoff-error-tag-and-question-id-mismatch.md) | `TasksTableView` 与 `BudgetPanel` 假设投影字段完备有限；`SignoffToolView` 忽略非决策 `error`/`stopped` 终态；`pendingQuestions` 错失 `data.id !== callId` 问询已答事件；`error-ring` 乱序卸破坏全局句柄、`relay` 抛错前 `shift` 丢队列 | 展示层加 `Array.isArray`/`Number.isFinite` 及动画插值连续 ref；`SignoffToolView` 区分失败/中断终态徽标；`pendingQuestions` 兼容跨键已答清理；`installErrorCapture` 按栈恢复、`createErrorRelay` 先发送再出队（单次重试保队列） | 3 |
+| **4 视觉对比度、窄屏溢框、浮窗与 ARIA** | [402](BUG-402-light-mode-layer2-invisible-highlight-and-390-textarea-overflow.md) + [403](BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md) | Light 模式 `--dsw-alias-bg-layer-2` 同 `#fff` 致高亮/轨道隐身；`.wk-cultivation-body-input` 缺 `border-box`；浮窗未认 `panel.id` 留死按钮；Hub 子页卸载丢草稿；`SegmentedControl` 悬空 `aria-controls`；横幅/顶带 `z-index` 压 `Modal`；`GuideHub` 缺 `replaceTab` | 替换为 Light 可区分设计系统令牌并补 `border-box`；对齐 `z-index: 900 < Modal(1000)`；按 `panel.id.startsWith('float')` 隐藏浮窗冗余按钮；`ArchiveHubTab` 首次访问后保活隐藏；补全全部 `tabpanel` `id`；`GuideHub` 加 `{ replaceTab: true }` | 4 |
+| **5 Host 命令与底层错误双语闭环** | [405](BUG-405-host-cultivation-command-and-errors-unlocalized-and-live-en-lag.md) | `/cultivation` 漏用 `registerLocalizedCommand` 导致 `en` 命令栏仍显中文；`readContext`/`cultivation-context`/`company-root`/`write-gate`/`runtime-guard` 硬编码中文报错 | `/cultivation` 接入 `registerLocalizedCommand`；按 `language` / `lang` 参数实现 `readContext`、`cultivation-context`、路径与写闸双语错误分流（默认保持 `zh` 向后兼容，`en` 零中文泄漏） | 5 |
+
+**终点**：7 张全部带实跑红/绿证据迁入 `fixed_bugs/`；1 篇批次伞形 Note（收口时同 diff 落盘）；全套门禁（`verify`/`typecheck`/`lint`/`dup`/`test`/`coverage:ratchet`）+ 5 条 keyless 浏览器车道 + Round 3 实证复验全绿 + 独立只读 `research` 子代理盲审 0 阻断并 `push`。
 
 ## 2026-11-27 修复交接（Round 2 UX/UI 盲区深扫批次：BUG-392..398）
 
