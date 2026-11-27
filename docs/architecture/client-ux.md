@@ -11,13 +11,16 @@
 
 ## 2. DSH 原生扩展面（S1–S4 现行架构）
 
-| 区域 | 挂载槽位 / API | 现行职责与实现载体 |
-|---|---|---|
-| **右侧边栏聚合页签** | `sidebarRightTabs.register` + `sidebar.right.pane.tab` / `.title` / `.guide.entry` | `tabs/company-tab-registration.ts` 注册右栏聚合页签：**作战板**（`dsh-company-pack/ops`：看板/依赖图/任务板/策略）、**团队**（`dsh-company-pack/team`：待办审批/团队在场/用量）、**档案**（`dsh-company-pack/archive`：成品目录/台账/培养）；内部用 `ui-primitives` `SegmentedControl` + `hub-subview-store.ts` 切换子视图；浮窗拖放与收回交由 DSH `<DockLayout>` |
-| **Guide 透传与分栏** | `sidebar.right.tab.guide`（`priority: 0`） | `ux/company-guide.tsx` 消费 `sidebarRightTabs.guide()`，对非 `dsh-company-pack/` 上游条目（如 `files`）全量透传并调 `tab.actions.openTab(kind)` 保留 `Start` 入口；提供督战/审稿双分栏与 `quiet` 专注预设；在场行支持经 `openSubagentAside` 旁路打开成员子会话 |
-| **全局「梦之队总部」HQ** | `sidebar.panellist` + `main`（key: `dsh-company-pack/hq`）+ `company.hq.cultivation.conversation` | `ux/register-s3-ux.ts` 与 `ux/company-hq.tsx` 注册左侧全局总部（总览/台账/策略/培养工坊），返回主会话统一 `layout.selectPanel(null)`；培养工坊通过 `sessions.retain` + `<SessionProvider>` + `renderFactorySlot('conversation.content', { variant: 'embedded' })` 复用 DSH 原生会话（`conversation.view` 保留入口卡片导向 HQ 培养工坊） |
-| **会话流、签字与触发** | `tool.call.toolview` · `conversation.composer`（`priority: 0`）· `conversation.chat.turnTail` · `uiConversation.events` | `DelegationCard` / `TeamToolCard` / `SignoffToolView` 渲染工具卡（`priority: -1`）；`SignoffComposerCard` 以鸭子类型精确拦截 `request_signoff` 并消费双语 `displayReason`，非双签审批（如 `bash`）返回 `null` 透传上游 `ApprovalPanel`；`company-turn-tail.tsx` 展示回合收口条 |
-| **周边增强与动作** | `shell.overlay` · `conversation.session.header.*` · `sidebar.footer.action` · `conversation.hero.options` · `conversation.input.dock` · `conversation.composer.dock` · `conversation.chat.commandview` · `conversation.chat.assistant-actions` · `sidebar.right.tab.document.actions` · `inputTriggers` · `shortcuts` | `ux/register-s1-ux.ts` 与 `ux/register-s2-ux.ts` 挂接原生 Toast、页头/底栏状态、命令草稿回填与命令视图（`req`/`prd`/`delivery`）、`@` 角色触发与 `Alt+Shift+1/2/3` 快捷键；`document.actions` 仅匹配 `.dsh-company/deliverables/**/final.md`，不劫持普通 Markdown |
+- **右侧边栏聚合页签**（`sidebarRightTabs.register` + `sidebar.right.pane.tab/.title/.guide.entry`）：`tabs/company-tab-registration.ts` 注册三大聚合页签——**作战板**（`dsh-company-pack/ops`：看板/依赖图/任务板/策略）、**团队**（`dsh-company-pack/team`：待办审批/团队在场/用量）、**档案**（`dsh-company-pack/archive`：成品目录/台账/培养）。
+  - 内部以 `ui-primitives` `SegmentedControl` + `hub-subview-store.ts` 切换子视图；浮窗拖放与收回交由 DSH `<DockLayout>`。
+- **Guide 透传与分栏**（`sidebar.right.tab.guide`，`priority: 0`）：`ux/company-guide.tsx` 消费 `sidebarRightTabs.guide()`，对非 `dsh-company-pack/` 上游条目（如 `files`）全量透传并调用 `tab.actions.openTab(kind)` 保留 `Start` 入口；提供督战/审稿双分栏与 `quiet` 专注预设；在场行支持经 `openSubagentAside` 旁路打开成员子会话。
+- **全局「梦之队总部」HQ**（`sidebar.panellist` + `main` key `dsh-company-pack/hq`）：`ux/register-s3-ux.ts` 与 `ux/company-hq.tsx` 注册左侧全局总部（总览/台账/策略/培养工坊），返回主会话统一调用 `layout.selectPanel(null)`。
+- **内嵌培养工坊会话**（`company.hq.cultivation.conversation`）：经 `sessions.retain` + `<SessionProvider>` + `renderFactorySlot('conversation.content', { variant: 'embedded' })` 复用 DSH 原生会话（`conversation.view` 保留入口卡片导向 HQ 培养工坊）。
+- **会话流与签字拦截**（`tool.call.toolview`、`conversation.composer` `priority: 0`、`conversation.chat.turnTail`、`uiConversation.events`）：`DelegationCard` / `TeamToolCard` / `SignoffToolView` 渲染工具卡（`priority: -1`）；`company-turn-tail.tsx` 展示回合收口条。
+  - `SignoffComposerCard` 精确拦截 `request_signoff` 并消费双语 `displayReason`，非双签审批（如 `bash`）返回 `null` 透传上游 `ApprovalPanel`。
+- **周边增强（S1/S2 壳层与命令）**：`ux/register-s1-ux.ts` 与 `ux/register-s2-ux.ts` 挂接 `shell.overlay`、`conversation.session.header.*`、`sidebar.footer.action`、`conversation.hero.options`、`conversation.input.dock`、`conversation.composer.dock`、`conversation.chat.commandview` 与 `conversation.chat.assistant-actions`。
+  - 统一提供原生 Toast、状态条、命令草稿回填与命令视图（`req`/`prd`/`delivery`）。
+- **触发器、快捷键与成品文档动作**：通过 `inputTriggers` 与 `shortcuts` 提供 `@` 角色触发与 `Alt+Shift+1/2/3` 快捷键；`sidebar.right.tab.document.actions` 仅匹配 `.dsh-company/deliverables/**/final.md`，不劫持普通 Markdown。
 
 ## 3. 安全红线（L2/L3 禁区与脆弱债清零）
 

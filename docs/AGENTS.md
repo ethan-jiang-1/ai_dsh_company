@@ -25,9 +25,9 @@
 **单向依赖规则**：`docs/` 只依赖代码实现与已定型的 `notes/`，**禁止出现指向 `_backlog/` 的 Markdown 链接**（`_backlog/` 是上游探索与缺陷跟踪沙盒，重要结论须先升格进 `notes/` 再由 `docs/` 引用；机械门 = `doc-taxonomy`）。
 **「理由」的边界**：为什么选 A 不选 B、输掉的方案、验证证据 → `notes/implemented/`（Agent Note）；`docs/` 只留当前语义（合同/架构）、操作（指南）、查表（参考），理由正文不留第二份。
 
-## 长度：顶点即信号
+## 长度：UTF-8 字节预算与顶点信号
 
-行数上限唯一源 = [`checks/gates/doc-budget.mjs`](../checks/gates/doc-budget.mjs) 的 `DOC_LINE_BUDGETS`（本文件不复述数字）。
+字节上限唯一源 = [`checks/gates/doc-budget.mjs`](../checks/gates/doc-budget.mjs) 的 `DOC_BYTE_BUDGETS`（本文件不复述数字），并禁止单行超过 350 字符的压缩正文墙（按语义拆段或列表，不做句中硬折行）。
 语义 = **棘轮**：
 
 - 只降不升——瘦身轮后上限随内容下调；上限长期高于内容 20% 由反向棘轮报红。

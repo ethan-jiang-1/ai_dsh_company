@@ -434,7 +434,7 @@ export const SURFACE_RULES = [
     why: '源码侧 shipped shape（README.shipped 链接/pnpm、presets/cordis/content dev 限定、patch 目标）由 checks/gates/shipped-links.mjs 在 verify/run-gates 下检查；真实 tarball 由 release:shape 判',
   },
   {
-    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', '.agents/**', 'run/**', 'snapshots/**'],
+    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', '.agents/**', '.claude/**', 'run/**', 'snapshots/**'],
     coveredBy: ['verify'],
     why: '文档/指针/技能/运行配置/快照 = 结构门禁 verify 的射程',
   },

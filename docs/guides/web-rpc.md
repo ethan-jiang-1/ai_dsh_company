@@ -1,9 +1,7 @@
-# web-rpc：驱动 Web 面会话（RPC；R1 实证）
+# web-rpc：驱动 Web 面会话（HTTP RPC）
 
 > 性质：指南层 runbook——脚本化建会话、发 prompt、列会话与读会话日志的 HTTP RPC 面。
-> 何时读：验证角色行为（preset 只在 Web 面挂载，[debugging](./debugging.md) 的 Web 面层）、自动化建会话/发动议、
-> 或 UI 静默失败要拿真实错误时。2026-10-12 自 dev-loop §8 整节迁出（常驻层瘦身轮；dev-loop §8
-> 留指针、节号防断链）。
+> 何时读：验证角色行为（preset 只在 Web 面挂载，见 [debugging](./debugging.md)）、自动化建会话/发动议、或 UI 静默失败需取真实错误时。
 
 preset 只在 Web 面挂载（[debugging §3.6](./debugging.md) 的层），所以**验证角色行为必须驱动 Web 面**：
 
@@ -21,6 +19,7 @@ curl -s -X POST "http://127.0.0.1:3081/api/session/prompt" -H 'Content-Type: app
 
 规则（都是实证踩出来的）：
 
-- **endpoint = `<namespace>/<method>`**（斜杠不是点；gateway `claimsEndpoint` 两段校验）——namespace 来自服务键：`session-controller` → `session`，`agent-presets` → `agentPresets`。信封固定 `{"type":"client-request","rpcId":…,"method":…,"payload":{"args":{…}}}`；**`args` 是位置参数的具名对象**（名字取自源码参数名：`create(request)` → `args.request`；`list(_request, signal)` → 连下划线也要照写）。常用：`session/create`、`session/prompt`、`session/list`、`agentPresets/list`。
-- **`ask_user_question` 的应答形态**：本包六角色 preset 已钉 `mode: timed`（窗口过后转 `continued`，RPC 与 UI 都能答；vendor 默认 `legacy` 形态前台无界、脚本化驱动会永久挂住）。应答配方与判据 = [BUG-021 Note](../../notes/archived/2026-10-18-bug021-timed-user-question.md)；驱动侧停点守则（见无界问询就停并报，别干等）= [BUG-022 Note](../../notes/archived/2026-10-18-bug022-question-stop-guard.md)。这条通道也是 R5a「web 快照 lane」的雏形。
-- **读会话日志**用 `tools/lib/session/session-log.mjs`（`session/page` 与事件解析的共用实现）。两个坑：`throughSeq` 必须是**有效 seq**（`-1` 实测返回 0 条；游标可从越界报错 `… is past cursor N` 取），完成信号取**持久事件 `turn/end`**（`session/list.running` 是「会话有活 agent」，idle 也 true——用它等会假超时）。
+- **endpoint 命名**：格式为 `<namespace>/<method>`（斜杠不是点；gateway `claimsEndpoint` 两段校验），namespace 来自服务键（`session-controller` → `session`，`agent-presets` → `agentPresets`）。常用：`session/create`、`session/prompt`、`session/list`、`agentPresets/list`。
+- **请求信封**：固定 `{"type":"client-request","rpcId":…,"method":…,"payload":{"args":{…}}}`；`args` 是位置参数的具名对象，字段名与源码参数名一致（`create(request)` → `args.request`；`list(_request, signal)` → 连下划线照写）。
+- **`ask_user_question` 应答形态**：六角色 preset 已钉 `mode: timed`（窗口过后转 `continued`，RPC 与 UI 都能答；vendor 默认 `legacy` 在脚本驱动下会挂住）。应答配方见 [BUG-021 Note](../../notes/archived/2026-10-18-bug021-timed-user-question.md)，驱动停点守则见 [BUG-022 Note](../../notes/archived/2026-10-18-bug022-question-stop-guard.md)。
+- **读会话日志**：用 `tools/lib/session/session-log.mjs`（共用实现）。注意 `throughSeq` 须为有效 seq（`-1` 返回 0 条），完成信号取持久事件 `turn/end`（`session/list.running` 在 idle 时仍为 true，不可用作完成判据）。

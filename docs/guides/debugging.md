@@ -1,33 +1,30 @@
 # 调试阶梯：组合层 → 会话层（不跳层）
 
 > 什么时候读：插件/启动/会话出问题，按组合层→装载层→生效层→会话层排查时。
-> 性质：指南——插件开发排查的**阶梯手册**（2026-10-27 自 [开发环 §2](./dev-loop.md) 迁出；节号保留防断链）。
-> demo **现场**的症状→动作表另见 [budget-and-ops](./budget-and-ops.md) §3；本阶梯用于开发插件本身时排查。
+> 性质：指南——插件开发排查的**阶梯手册**；demo 现场症状→动作表另见 [budget-and-ops](./budget-and-ops.md) §3。
 
 | 层 | 手段 | 核对什么 |
 |---|---|---|
-| 1 组合层 | `pnpm dsh --profile <p> --dump-config` | 打印最终组合树，确认"我以为挂上的行"真的在、config 是我以为的；层级顺序 bundle → profile patch → home patch → `--patch` overlay（`vendor/dsh/apps/cli/src/dump-config.ts`）。⚠ patch 语法两条（`- id:` 替换 / `- insert:` 新增）唯一家 = [bootstrap §插拔速查](./bootstrap.md) |
-| 2 装载层 | preset 装不上时看 roster 报错 | roster **连原因一起列出**（fail-loud），报错即诊断，不静默跳过 |
-| 3 生效层 | 改 patch 行后要不要重启 | 长驻 Web 默认启用 HMR；headless/sdk/acp 由组合里的 `hmr` row 关闭；不要用当前 vendor 已删除的旧 profile 热重载字段（判据 = `vendor/dsh/packages/bundle/base/cordis.patch.yml`） |
-| 3.5 **退出层（R1 实证）** | **症状"任务似已跑完但进程不退 + stdout 零输出"→ 查组合里的 `hmr` row** | **HMR 由 YAML 组合决定**：base 默认启用；headless/sdk/acp 用 `- id: hmr` + `disabled: true` 关闭。一次性自定义 profile 需退出时，在 profile patch 写同样的 `disabled: true`，或直接用 shipped `headless`；旧的 profile 热重载字段已从 vendor 删除，写它不会生效 |
-| 3.6 **表面层（R1 实证）** | **症状"角色没入戏 / persona 不生效"→ 先问跑在哪个面** | **preset 只在 Web 面挂载**：只有 `web-app` 组合 `session-controller`（其 `composeAgent` 负责"未指定 preset 时挂 default"），headless / sdk / acp 的一次性驱动直接经 core agent registry 建 agent、**绕过 preset**。所以在 headless 里验角色内容永远失败，换 Web 会话（选 preset）验证 |
-| 3.7 **工具面层（R1 实证）** | **症状"角色会话只能协调、不能读写文件 / 加载 skill / 写交付物"→ 查 preset 是否声明了工具行** | preset composition 是**自包含**的：工具行不随 profile/bundle 继承（shipped `standard` 自己声明全部工具行）。查证手段：**会话日志 `request/header.tools`** 列出的工具名（`--dump-config` 看不出来——它只打印 profile 树）。⚠ 会话日志是**多 frame zstd**：Node `zstdDecompressSync` 只解第一 frame（读到 200 字节就停），用 `zstd -d -c`（homebrew）读全量 |
-| 3.8 **Web RPC 层（R1 实证）** | **UI 静默失败（"新建会话没反应"）→ 直接打 `session/create` RPC 拿真实错误** | UI 不显示 preset mount 失败；RPC 会返回 `agent-preset/invalid` + 具体行与缺失字段（R1 实证：工具行缺必填 config，如 `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`——**抄 shipped preset 的行要连 config 一起抄**）。驱动方法见 [web-rpc 指南](./web-rpc.md) |
-| 3.9 **客户端模块层（R1 误诊 → R2 更正，postmortem 0003）** | **症状"整窗只剩 HARNESS / Failed to load plugins 错误屏"→ 某个 client 入口 apply 抛错，砖的是全 app** | ① client 入口失败**不静默**：BootPage 错误屏 + 浏览器 console 有 `failed to apply loader entry <id> (<name>)`；先跑 `node checks/lanes/client-load.entry.mjs`（headless 浏览器断言零挂载失败 + 品牌在场）。② `dsh.client.inject` 不排 Cordis 激活/apply 顺序，但它是浏览器模块 factory 的依赖边（vendor `packages/client/modules` 的 `arriveGraphRow`）——"inject 引用了不在 entries 里的包" ≠ 挂不上，**别把它当纯展示元数据**；shell baseline（`platform.ts` 的 `PLATFORM_MODULES`：react/cordis/store/ui-slots/ui-primitives/ui-dockkit）隐式回答这些名字（R1 曾据此误诊"官方 Team UI 挂不上"，实为可用）。③ 真正"挂不上但没报错"的形态是 fiber **PENDING**（声明的服务无人提供，无超时，贡献安静不出现）。④ 复用别人已挂的贡献（如官方 Team remote）：走服务 inject 等它，**别重复 `$mount`**——同一描述符挂两次 = `already mounted` = 全 UI 砖（2026-09-22 实证） |
-| 4 会话层 | 读会话 JSONL，不猜；先跑 `pnpm diagnose` 拿失败摘要 | model-visible ⟺ logged：上下文组装问题从日志（`$DSH_HOME` 下 sessions）重建；读不全 = 欠了 [开发环 §3](./dev-loop.md) 第②问的债。⚠ bash 沙箱对会话文件有**间歇视图抖动**（列出得、打开不得），且 headless 会话收尾会删目录——分析要趁进程活着时做（R1 实证） |
-| 5 回归层 | snapshot 重放（R5a 起） | `snapshots/`；回答"行为为什么变了"的最快路径 |
+| 1 组合层 | `pnpm dsh --profile <p> --dump-config` | 打印最终组合树（层级顺序：bundle → profile patch → home patch → `--patch` overlay，见 `vendor/dsh/apps/cli/src/dump-config.ts`）；patch 语法见 [bootstrap §插拔速查](./bootstrap.md) |
+| 2 装载层 | 查看 preset roster 报错 | roster 连原因一起列出（fail-loud），报错即诊断，不静默跳过 |
+| 3 生效层 | 核对 `hmr` row 与重启边界 | 长驻 Web 默认启用 HMR；headless/sdk/acp 通过 `hmr` row `disabled: true` 关闭（判据 = `vendor/dsh/packages/bundle/base/cordis.patch.yml`） |
+| 3.5 退出层 | 症状「任务似已跑完但进程不退 + stdout 零输出」 | 查组合里的 `hmr` row；一次性自定义 profile 需退出时设 `disabled: true`，或直接用 shipped `headless` |
+| 3.6 表面层 | 症状「角色没入戏 / persona 不生效」 | preset 只在 Web 面挂载（`web-app` 组合 `session-controller`）；headless/sdk/acp 绕过 preset，验证角色内容必须走 Web 会话 |
+| 3.7 工具面层 | 症状「角色不能读写文件 / 加载 skill / 写交付物」 | preset composition 自包含（不随 profile 继承）。核对会话日志 `request/header.tools`；会话日志为多帧 zstd，用 `zstd -d -c` 读全量 |
+| 3.8 Web RPC 层 | 症状「新建会话 UI 静默无反应」 | 直接调 `session/create` RPC（见 [web-rpc 指南](./web-rpc.md)）获取 `agent-preset/invalid` 与缺失必填 config 字段 |
+| 3.9 客户端模块层 | 症状「整窗只剩 HARNESS / Failed to load plugins 错误屏」 | 先跑 `node checks/lanes/client-load.entry.mjs` 定位失败入口，按下方四条客户端排障要点核对 |
+| 4 会话层 | 先跑 `pnpm diagnose`，再读 `$DSH_HOME/sessions/` JSONL | `model-visible ⟺ logged`，上下文组装从日志重建；headless 会话收尾会删目录，分析趁进程存活时进行 |
+| 5 回归层 | `snapshots/` 回放对比 | 回答「行为为什么变了」的最快路径 |
 
-诊断方法论补一条（R1 血泪）：**栈采样先于二分**——`sample <pid> 3` 看主线程：kevent 空转 = "等一个不会来的事件"，
-CPU 满载 = 死循环；比砍配置二分快得多（R1 三刀二分全白切，问题在 profile 形态默认值而非内容）。
+### 客户端模块层（§3.9）四条排障要点
 
-一次性实验不落盘：`pnpm dsh --profile <p> --patch ./run/try-x.patch.yml`——`--patch` 是
-"profile 层之后再叠一层"的可重复旗标（`vendor/dsh/apps/cli/src/args.ts`），风险半径一次
-进程，连 dev home 都不落。指令层的同款临时叠加 = `AGENTS.local.md` / `CLAUDE.local.md`
-（vendor `packages/context/agent-instructions` 支持）——不动 git 的本地叠加，调试/演示现场用；
-长期规则必须给它正式的家，不留 local 叠加里。
+- **不静默失败**：client `apply` 抛错会直接进入 BootPage 错误屏，浏览器 console 输出 `failed to apply loader entry <id> (<name>)`。
+- **`dsh.client.inject` 是模块到达依赖边**：浏览器模块 factory 沿此边在 consumer 前到达（`vendor/dsh` `packages/client/modules` `arriveGraphRow`）；shell baseline（`PLATFORM_MODULES`：`react`/cordis/store/ui-slots/ui-primitives/ui-dockkit）隐式提供基础模块。
+- **静默不出现通常是 fiber PENDING**：声明的 Cordis 服务无人提供时会无限等待，贡献安静不挂载。
+- **禁止重复 `$mount`**：复用已有贡献（如官方 Team remote）必须走服务 `inject` 等待，同一描述符重复 `$mount` 会抛 `already mounted` 导致整窗失败。
 
+### 通用诊断方法与临时实验
 
-**进程内查询（rc.2 收割）**：角色会话里 `cordis_inspect_list` 发现 Inspect Provider 与方法、
-`cordis_inspect_query` 按 schema 精查挂载与 Config（preset 已挂 `tool-cordis` 行）；组合层另有
-`dsh --dump-config-schema` 自描述配置 schema——三者回答"这台进程现在真跑着什么"（升 pin 扫描 = [release.md](../contracts/release.md)）。
-⚠ inspect 是**可见性工具，不是授权边界**（vm 只防意外全局污染，不替代 sandbox/approval）——「查得到」不等于「被授权」（FAQ 07 四边界；2026-09-27 补）。
+- **栈采样先于二分**：`sample <pid> 3` 看主线程——kevent 空转表示等待未到达事件，CPU 满载表示死循环，比盲目砍配置二分快得多。
+- **一次性实验不落盘**：`pnpm dsh --profile <p> --patch ./run/try-x.patch.yml` 在 profile 层之后叠一层，风险半径限单次进程（`vendor/dsh/apps/cli/src/args.ts`）。指令层临时叠加可用 `AGENTS.local.md` / `CLAUDE.local.md`（不进 git，长期规则须归正式文档）。
+- **进程内自省**：角色会话内 `cordis_inspect_list` / `cordis_inspect_query` 与组合层 `dsh --dump-config-schema` 回答「进程当前实际装配了什么」。注意 inspect 仅是可见性工具，不构成授权或沙箱边界。

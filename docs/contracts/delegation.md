@@ -94,12 +94,11 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
 2. **要自定义组合/多角色编排** ⇒ 四个职能角色的 `subagent_fork`（可续跑的自身分叉）+ 命名委托；`workflow` 是
    vp-eng 的**同身份并行扇出**（不能带 `agentPreset`、不能替代独立结论）；CEO 的编排面仍是 team + 命名委托。
 3. **并行快捷派活**：同一轮可并行发起多个调用，每个都是独立 activation；共享任务板/互审仍走 team。
-4. **控制面现状**：根会话是 Lead，`send_message` / `list_agents` / `wait_agent` / `interrupt_agent` 是团队版、
-   只认名册成员，够不到根起的 `subagent` child（`list_agents` 只回 `lead`、`send_message` 报
-   `active teammate not found`；机制 = §2）。根门改用 `list_subagents`（父会话 durable catalog，重启后可查）
-   与 `send_to_subagent`（官方 `ctx.subagents`，续驶/催稿），名字不被 shadow。`list_subagents` 的每行还带
-   **引擎身份**：`agentPreset` / `delegationDepth`（十进制字符串，例 `"3"`）读 child durable header，
-   读不到显式 `unavailable`（不默认 worker/0）——父代理据此核对 preset/深度是否真生效（BUG-046）。`subagent`/`subagent_fork` 行的 maxDepth（值见 preset 行）：CEO→VP（1）→workflow 分支（2）→worker（3）放行；VP 根门→分支→worker 仍有余量（2026-11-09 源码：分支/成员都是 activation 子代，深度 parent+1）。重试敏感的小活可用 `subagent_retry`（host 原语，仅五个有 generic subagent 的 full role；同步、最多 2 attempts、attempts/exhausted 可见；长/批量走 workflow）；**它的子代深度不另立预算**——上限 = 该 preset 通用 `subagent` 行的 `maxDepth`，到预算底部返回 `stopReason: depth-exceeded` 且不起 child（BUG-045）；generic child 需要子层时 `agent_preset` 选 `worker-orchestrator`（它只带 leaf；件数与 fan-out 预算由父代理 brief 决定，不承诺硬数字——BUG-051）。`list_subagents`/`send_to_subagent` 是 **per-agent 安装**：support 与没有 child 预算的座位（CEO teammate：childDepth 1 = depth 1）不装；root/命名 child/childDepth > depth 的 teammate（vp-eng teammate：3 > 1）保留（BUG-052/078/079）。
+4. **控制面现状**：
+   - **根门控制面**：根会话是 Lead，`send_message` / `list_agents` / `wait_agent` / `interrupt_agent` 归团队版，够不到根起的 `subagent` child；根门用不被 shadow 的 `list_subagents`（父会话 durable catalog，重启后可查）与 `send_to_subagent`（官方 `ctx.subagents`，续驶/催稿）。
+   - **引擎身份**：`list_subagents` 每行带 `agentPreset` 与 `delegationDepth`（读 child durable header，读不到显式返回 `unavailable`，不默认 `worker/0`）。
+   - **深度预算与重试**：`subagent` / `subagent_fork` 的 `maxDepth` 以各 preset 声明为准（分支与成员均为 activation 子代，深度 `parent+1`）。重试敏感的小活可用 `subagent_retry`（同步、最多 2 attempts，仅装在含通用 `subagent` 的职能角色），其上限与该 preset 通用 `subagent` 的 `maxDepth` 一致，触底返回 `stopReason: depth-exceeded` 且不起 child。
+   - **多层委派与按座安装**：generic child 需要再派子层时 `agent_preset` 选 `worker-orchestrator`（仅带 leaf，fan-out 预算由父代理 brief 决定）。`list_subagents` / `send_to_subagent` 按座位安装：support 与无 child 预算的座位（如 CEO teammate）不装，root、命名 child 及有 child 预算的 teammate 保留。
 
 ## 5. UI：委派工具卡
 

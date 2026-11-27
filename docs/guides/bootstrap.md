@@ -2,7 +2,7 @@
 
 > 性质：指南层 runbook——[开发环](./dev-loop.md)管「一笔任务怎么走」，本篇管「环境怎么立起来」。
 > 何时读：新 clone、重建 dev home、vendor 换 tag、任何「跑不起来」的第一站。
-> 出生：2026-09-27 自 dev-loop §7 整段迁入（常驻层瘦身轮；dev-loop §7 留指针、编号不动防既有引用断链）；配方与坑均在钉住 vendor 基线实证（R0/R1，2026-09-22），机制结论以 vendor/dsh 工作树为权威；本源 handoff 构建入口，收件人安装 = [_dist/安装手册.md](../../_dist/安装手册.md)。
+> 机制结论以 `vendor/dsh` 钉住基线为权威；本篇面向源码维护者，收件人安装 = [_dist/安装手册.md](../../_dist/安装手册.md)。
 
 ## 先选形状（真插件安装 vs 维护者 dev）
 
@@ -19,13 +19,39 @@
 
 维护者 dev **不是**“复制构建产物分发包”：构建仍按 checkout 产生；换机器按本节重建。启动入口始终是 named profile，不是本仓脚本。
 
+## 一、fresh clone 一条龙（可直接执行）
+
 ```sh
-git submodule update --init             # vendor/dsh 钉 tag
-corepack enable pnpm                    # 一次性：pnpm 读根 packageManager（钉 11.28.5）
-pnpm install                            # 根 workspace（vendor/dsh 全树含 vendored cordis 与 native/system）；经 prepare 接 .githooks/pre-push（core.hooksPath 本地配置不随 clone；唯一家 = tools/dev/hooks-install.mjs）
-(cd vendor/dsh && pnpm install --frozen-lockfile --ignore-scripts)  # vendor 自己的 lock：pi-ai 1.1.0 / vite 8.2.2 等；根 lock 会解析到更新版 → 类型漂移（= `setup` 内部步骤，幂等重跑；单跑仅为排障）
-pnpm bundle:init                        # dev 公司状态 的 workspace（company-workspace/ 整树 gitignored；只建 .dsh-company/——公司事实/章程按 seed.json 补缺，手册/模板不复制）
-# host 面最小 dev type graph（fresh-clone CI 跑这档；源码直跑需要的 typert 产物；= `setup` 内部步骤的展开，幂等吸收，单跑仅为排障）：
+git submodule update --init             # 拉下钉住 tag 的 vendor/dsh
+corepack enable pnpm                    # 一次性：启用根 packageManager 声明的 pnpm
+pnpm install                            # 安装根 workspace 并经 prepare 接好 .githooks/pre-push
+pnpm bundle:init                        # 建 dev 的 company-workspace/.dsh-company/（gitignored，已有盘不动）
+pnpm setup                              # 全量构建：vendor host/client/native/web + company-pack
+node tools/dev/setup.mjs --check        # 核对全部构建产物在场
+pnpm verify && pnpm test && pnpm typecheck
+```
+
+启动隔离观察窗并做最小真挂载验收：
+
+```sh
+source run/env.sh
+pnpm company --no-open                  # dev-only：构建 + npm pack + plugin add file: + exec dsh --profile company
+node checks/lanes/preset.entry.mjs      # preset 真挂载（零 broken + 逐个 session/create）
+node checks/lanes/client-load.entry.mjs # client 真页面加载（需先 pnpm dlx playwright install chromium）
+```
+
+> 改 `presets/**` 后需重启 `pnpm company`（默认 tarball 安装副本）；快速迭代可用 `pnpm company --link`（显式快速通道，不验打包面）。
+> 改 `src/**` 必须重跑 `tsc -b` + `tsdown`（或重跑 `pnpm company`）并刷新浏览器（无 HMR）；仅查 `verify` 不会替你重建 `lib/`。
+
+## 二、内部步骤与单步排障（`pnpm setup` 失败时才手跑）
+
+以下命令均为 `pnpm setup` 的内部展开，正常首跑成功后无需重复执行：
+
+```sh
+# 1. vendor 独立 lock 安装（固定上游依赖版本，防与根 lock 漂移）
+(cd vendor/dsh && pnpm install --frozen-lockfile --ignore-scripts)
+
+# 2. vendor host 最小 dev type graph（CI 单独调用可用 node tools/dev/setup.mjs --types）
 node ./node_modules/typescript/bin/tsc -b \
   vendor/dsh/packages/typert/generator \
   vendor/dsh/packages/llm/llm \
@@ -33,42 +59,26 @@ node ./node_modules/typescript/bin/tsc -b \
   vendor/dsh/packages/feedback/command-feedback \
   vendor/dsh/packages/goal/goal \
   vendor/dsh/packages/subagent/subagent
-# 全量构建（host/client/native/web/pack）唯一入口；首次或 vendor pin 变后跑：
-pnpm setup
-# 只补 vendor 类型：node tools/dev/setup.mjs --types（fresh-clone CI 用）；⚠ 以下命令 = pnpm setup 内部步骤，setup 成功后勿重复，仅失败时单步排障。
-# 原生插件（flock，会话持久化刚需；macOS 用 CommandLineTools 的 cc；Linux 需 musl-tools 的 musl-gcc）：
-(cd vendor/dsh/native/system && ../../node_modules/.bin/tsx scripts/build.ts)
-# web 观察窗（可选；三件事缺一不可）：
-node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json   # client 面（测试面报错可忽略）
-(cd vendor/dsh && DSH_CLIENT_TITLE="DSH 梦之队" ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
-DSH_CLIENT_TITLE="DSH 梦之队" pnpm --filter @deepseek-ai/dsh-web-frontend run build   # 前端 dist
-source run/env.sh && pnpm company --no-open   # dev-only：pack + plugin add file: + exec dsh --profile company（workspace=company-workspace）
-# 真实安装形状归 release-smoke：plugin --profile company add file:<tgz> → dsh --profile company（cwd=workspace）
 
-# pack 代码面构建（改 src/** 任一面都需要——host〔src/index.ts+lib〕与 client〔src/client〕双编译面，
-# 2026-09-25 起 solution root；⚠ 旧命令 `tsc -p tsconfig.json` 在 solution root 上静默不构建，即此坑的由来）：
-# 先补 vendor client 类型（pack 的 client 面依赖 @deepseek-ai/*/client 声明；fresh clone 上没有 web 构建时必跑）：
-(cd vendor/dsh && ../../node_modules/typescript/bin/tsc -b tsconfig.client.json)
+# 3. 原生插件（flock，会话持久化刚需；macOS 用 CLT cc，Linux 需 musl-gcc）
+(cd vendor/dsh/native/system && ../../node_modules/.bin/tsx scripts/build.ts)
+
+# 4. Web 观察窗产物（client 类型 → client bundles → 前端 dist；DSH_CLIENT_TITLE 决定标签页与主标题）
+node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json
+(cd vendor/dsh && DSH_CLIENT_TITLE="DSH 梦之队" ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
+DSH_CLIENT_TITLE="DSH 梦之队" pnpm --filter @deepseek-ai/dsh-web-frontend run build
+
+# 5. company-pack 双面构建（必须先 tsc -b 生成 lib/types，再 tsdown 打包；不可只跑 tsdown）
 node ./node_modules/typescript/bin/tsc -b packages/company-pack
 (cd packages/company-pack && ../../node_modules/.bin/tsdown)
-# ⚠ 两步必须连跑：tsdown 的入口是 lib/types/**（tsc 的产物）——改 src 后只跑 tsdown = 打包上一次的旧产物（2026-09-27 实测：改 styles.ts 只跑 tsdown，页面仍旧色）；也别删 lib/ 再只跑 tsdown（入口没了直接红）
-# ③ client 面生效第三跳 = **用户浏览器刷新**（无 HMR：模块表 rev 会变，不刷新看的是旧 bundle）
-# ⚠ preset 内容与代码面不同步：presets/**（persona/skills）是数据面，按安装形态生效（见下条安装形状）；
-#   但 host/client 代码（src/**）走 lib/ 构建产物——**不重建 = 改动永远不生效**（2026-09-25 实证：
-#   verify 的 client-halves 门禁只查形状不构建，preset-smoke/client-load 全绿也可能验的是旧包）。
-# ⚠ 安装形状（2026-11-02 起）：`pnpm company` **默认** = pack → `plugin add file:<tgz>` → exec，
-#   与用户侧同形（差异表 = guides/dev-product-parity.md）。改 presets/** 后**要重启**（tarball 是副本）；
-#   需要"改即刻生效"时用 `pnpm company --link`（显式快速通道，改 presets 免重建）。
-#   profile 的 `.npmrc` 把 store/cache 钉在 repo 内（`~/Library` 不被碰）。
-#   **日期通道与定时提醒不再需要额外 bundle（0.2.1）**：`time-context` + `tool-schedule` 由六个
-#   公司角色 preset 各自声明（`preset-clock` 组），宿主 schedule 服务随 web-app 组合而来 ⇒ profile 的
-#   bundles 列表里若还留着已退役的 schedule bundle，删掉那一项即可。
-#   历史：file: 拷贝时代，presets/*.yml 用编辑工具改会换 inode、安装副本是真拷贝（link count 1），
-#   不重装则改动不可见——默认 tarball 按内容寻址（内容变 → spec 变 → 重装），启动器吸收该坑。
-node checks/lanes/client-load.entry.mjs     # client 面完成定义：真浏览器加载（postmortem 0003；playwright 从 .pnpm store 自动定位；需 chromium：pnpm dlx playwright install chromium，setup 不装）
-pnpm test tests/host/prompt/handbook.spec.ts    # 手册注入完成定义（keyless：content/override/systemPrompt section）
-node checks/lanes/delegation.entry.mjs      # 汇报线边界守卫：控制名归团队版（1 条 prompt，~30s）
+
+# 6. 常用定向校验
+pnpm test tests/host/prompt/handbook.spec.ts
+node checks/lanes/delegation.entry.mjs
 ```
+
+- **凭据与隔离**：profile 的 `.npmrc` 将 store/cache 钉在仓库内，不碰系统目录；日期通道（`time-context` + `tool-schedule`）已由公司角色 preset 各自声明，无需额外 schedule bundle。
+- **真实安装形状验证**：归 `release-smoke`（干净 profile 执行 `plugin --profile company add file:<tgz>` → `dsh --profile company`）。
 
 > **fresh clone 的可执行证明（范围诚实）**：CI `fresh-clone` 的 job 分工（`install-verify` /
 > `setup-macos` / `install-channel`）与「证明了什么」唯一家 =

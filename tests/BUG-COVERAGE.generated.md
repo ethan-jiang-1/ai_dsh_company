@@ -303,7 +303,7 @@
 | 290 | 2026-11-20 | tests/client/startup/command-scope-hint.spec.ts:32 |
 | 291 | 2026-11-21 | tests/client/cultivation/cultivation-board.spec.ts:240；tests/client/cultivation/cultivation-board.spec.ts:272；tests/client/cultivation/cultivation-board.spec.ts:310 |
 | 292 | 2026-11-21 | tests/client/presence/attention-history.spec.ts:40；tests/client/tabs/attention-tab.spec.ts:69；tests/client/tabs/attention-tab.spec.ts:164 |
-| 293 | 2026-11-21 | tests/client/startup/command-scope-hint.spec.ts:146 |
+| 293 | 2026-11-21 | tests/client/startup/command-scope-hint.spec.ts:147 |
 | 294 | 2026-11-21 | tests/client/cultivation/cultivation-board.spec.ts:300 |
 | 295 | 2026-11-21 | tests/client/wiring/attention.spec.ts:234 |
 | 296 | 2026-11-21 | tests/tools/client-bundle.spec.ts:36 |
@@ -410,7 +410,7 @@
 | 397 | 2026-11-27 | tests/client/cultivation/cultivation-board-actions.spec.ts:602；tests/client/cultivation/cultivation-compose-context.spec.ts:261；tests/client/tabs/delegation-flow-panel.spec.ts:70；tests/client/wiring/instance-guard.spec.ts:110 |
 | 398 | 2026-11-27 | tests/client/tabs/deliverables-tab-states.spec.ts:120；tests/client/tabs/panel-frame.spec.ts:100；tests/client/ui/client-css.spec.ts:230；tests/client/ux/ambient-chrome.spec.ts:240；tests/client/ux/company-hq.spec.ts:689 |
 | 399 | 2026-11-27 | tests/client/ux/company-hq.spec.ts:800；tests/client/ux/company-triggers-shortcuts.spec.ts:226；tests/client/ux/company-turn-tail.spec.ts:159 |
-| 400 | 2026-11-27 | tests/client/cultivation/cultivation-board-actions.spec.ts:635；tests/client/cultivation/cultivation-context-picker.spec.ts:197；tests/client/cultivation/cultivation-data.spec.ts:200；tests/client/startup/command-scope-hint.spec.ts:83；tests/client/ux/ambient-chrome.spec.ts:291 |
+| 400 | 2026-11-27 | tests/client/cultivation/cultivation-board-actions.spec.ts:635；tests/client/cultivation/cultivation-context-picker.spec.ts:197；tests/client/cultivation/cultivation-data.spec.ts:200；tests/client/startup/command-scope-hint.spec.ts:84；tests/client/ux/ambient-chrome.spec.ts:291 |
 | 401 | 2026-11-27 | tests/client/tabs/company-panels.spec.ts:149；tests/client/tabs/tasks-table.spec.ts:143；tests/client/ux/signoff-card.spec.ts:355；tests/client/wiring/attention.spec.ts:468；tests/client/wiring/error-relay.spec.ts:116；tests/client/wiring/error-relay.spec.ts:145；tests/client/wiring/error-ring.spec.ts:204 |
 | 402 | 2026-11-27 | tests/client/ui/client-css.spec.ts:242 |
 | 403 | 2026-11-27 | tests/client/tabs/panel-frame.spec.ts:105；tests/client/ui/client-css.spec.ts:251；tests/client/ux/company-hq.spec.ts:879；tests/client/ux/company-hub-tabs.spec.ts:363；tests/client/wiring/instance-guard.spec.ts:136 |

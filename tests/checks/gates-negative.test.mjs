@@ -26,6 +26,8 @@ import * as packContentPaths from '../../checks/gates/pack-content-paths.mjs'
 import * as navCountClaims from '../../checks/gates/nav-count-claims.mjs'
 import * as mdLinks from '../../checks/gates/md-links.mjs'
 import * as docTaxonomy from '../../checks/gates/doc-taxonomy.mjs'
+import * as docBudget from '../../checks/gates/doc-budget.mjs'
+import * as layoutBlock from '../../checks/gates/layout-block.mjs'
 import { mutateFile } from '../support/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
@@ -212,6 +214,71 @@ const mutateOrFail = (label, path, transform) => {
     mkdirSync(join(root, 'docs/zz-tier'), { recursive: true })
     writeFileSync(join(root, 'docs/zz-tier/zz.md'), '# stray\n')
     report('doc-taxonomy：未知 tier 目录 → 红', run(docTaxonomy, root), '不在 tier 目录')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // doc-budget（2026-11-27）：UTF-8 字节预算 + 反向棘轮 + 反单行正文墙（豁免代码块与表格行）。
+  const root = mkdtempSync(join(tmpdir(), 'gates-docbudget-'))
+  try {
+    mkdirSync(join(root, 'docs'), { recursive: true })
+    writeFileSync(join(root, 'docs/ok.md'), `${'a'.repeat(85)}\n`)
+    const okMsgs = []
+    docBudget.run({ root, budgets: [['docs/ok.md', 100]], ok: m => okMsgs.push(`OK ${m}`), fail: (n, m) => okMsgs.push(`FAIL ${n}: ${m}`) })
+    const okPass = okMsgs.every(m => !m.startsWith('FAIL'))
+    if (!okPass) failures += 1
+    console.log(`${okPass ? 'PASS' : 'FAIL'} doc-budget：合法字节窗口 → 绿`)
+
+    const overMsgs = []
+    docBudget.run({ root, budgets: [['docs/ok.md', 80]], ok: m => overMsgs.push(`OK ${m}`), fail: (n, m) => overMsgs.push(`FAIL ${n}: ${m}`) })
+    report('doc-budget：字节超上限 → 红', overMsgs, '超上限')
+
+    const slackMsgs = []
+    docBudget.run({ root, budgets: [['docs/ok.md', 200]], ok: m => slackMsgs.push(`OK ${m}`), fail: (n, m) => slackMsgs.push(`FAIL ${n}: ${m}`) })
+    report('doc-budget：反向棘轮空置 >20% → 红', slackMsgs, '空置 >20%')
+
+    const missingMsgs = []
+    docBudget.run({ root, budgets: [['docs/zz-missing.md', 100]], ok: m => missingMsgs.push(`OK ${m}`), fail: (n, m) => missingMsgs.push(`FAIL ${n}: ${m}`) })
+    report('doc-budget：缺失文件报缺失不崩 → 红', missingMsgs, '不在盘上')
+
+    writeFileSync(join(root, 'docs/wall.md'), `${'字'.repeat(360)}\n`)
+    const wallMsgs = []
+    docBudget.run({ root, budgets: [['docs/wall.md', 2000]], ok: m => wallMsgs.push(`OK ${m}`), fail: (n, m) => wallMsgs.push(`FAIL ${n}: ${m}`) })
+    report('doc-budget：单行正文 >350 字符压缩墙 → 红', wallMsgs, '单行正文 360 字符超上限')
+
+    writeFileSync(join(root, 'docs/table.md'), `| c |\n|---|\n| ${'字'.repeat(380)} |\n\`\`\`txt\n${'x'.repeat(380)}\n\`\`\`\n`)
+    const tblBytes = Buffer.byteLength(readFileSync(join(root, 'docs/table.md'), 'utf8'), 'utf8')
+    const tblMsgs = []
+    docBudget.run({ root, budgets: [['docs/table.md', Math.ceil(tblBytes / 0.88)]], ok: m => tblMsgs.push(`OK ${m}`), fail: (n, m) => tblMsgs.push(`FAIL ${n}: ${m}`) })
+    const tblOk = tblMsgs.every(m => !m.startsWith('FAIL'))
+    if (!tblOk) failures += 1
+    console.log(`${tblOk ? 'PASS' : 'FAIL'} doc-budget：表格与代码块超宽不误伤 → 绿`)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // layout-block（2026-11-27）：DSH 软链（CLAUDE.md / .claude/skills）与布局路径非零守卫。
+  const root = mkdtempSync(join(tmpdir(), 'gates-layout-'))
+  try {
+    mkdirSync(join(root, 'docs'), { recursive: true })
+    mkdirSync(join(root, '.agents/skills'), { recursive: true })
+    mkdirSync(join(root, '.claude'), { recursive: true })
+    writeFileSync(join(root, 'AGENTS.md'), '# AGENTS\n\n## 布局\n\n| 目录 | 用途 |\n|---|---|\n| [`docs/`](./docs/) | 文档 |\n')
+    symlinkSync('AGENTS.md', join(root, 'CLAUDE.md'))
+    symlinkSync('../.agents/skills', join(root, '.claude/skills'))
+    const okMsgs = run(layoutBlock, root)
+    const okClean = okMsgs.every(m => !m.startsWith('FAIL'))
+    if (!okClean) failures += 1
+    console.log(`${okClean ? 'PASS' : 'FAIL'} layout-block：表格布局 + 双软链 → 绿`)
+
+    rmSync(join(root, 'CLAUDE.md'))
+    writeFileSync(join(root, 'CLAUDE.md'), '# copy\n')
+    report('layout-block：CLAUDE.md 写成普通文件 → 红', run(layoutBlock, root), '不是符号链接')
+
+    rmSync(join(root, 'CLAUDE.md'))
+    symlinkSync('AGENTS.md', join(root, 'CLAUDE.md'))
+    rmSync(join(root, '.claude/skills'))
+    report('layout-block：.claude/skills 缺失 → 红', run(layoutBlock, root), '.claude/skills 缺失')
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 

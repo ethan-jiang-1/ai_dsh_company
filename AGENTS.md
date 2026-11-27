@@ -1,9 +1,18 @@
 # AGENTS.md — 本仓库的入口链
 
 梦之队（Dream Team）虚拟公司 DSH 插件（DSH = DeepSeek Harness，唯一权威 = `vendor/dsh` 钉 SHA 子模块，见下「DSH 源码」节）：一个 company pack 提供公司角色 preset 与 support preset（清单 = `packages/company-pack/presets/` 目录），以及 host/client 面。
-**开工最小路径**（读完这三样就够开工，其余按需；feature 任务先 Plan Mode，规则 = [policy P1](docs/policy.md)）：① 本文件（纪律 + 命令表）；② 你任务那一份 owner——改角色内容 = [presets.md](./docs/contracts/presets.md)、改 host/Web 代码 = [src/README](packages/company-pack/src/README.md)、改文档 = [docs/AGENTS.md](docs/AGENTS.md)、新增/搬内容 = [content-charter](./docs/content-charter.md)、改机制/组合 = [profile.md](./docs/contracts/profile.md)；③ [tests/README.md](tests/README.md) 的「改动面 → 最窄检查」对应行；**接手源码仓 = [源码 handoff](docs/guides/repo-handoff.md)**。**任务源 = 用户点名或已批 RFC；`待落地` 卡不是任务源。** **“落地”= 系统里出现可验证的变更（代码/文档/门禁/模板/技能）+ 实跑证据；写 RFC、搬卡、归档、做计划都不算落地；只产出文档时必须明说“这是立项/交接，不是落地”。缺陷轨同一判据：修 = 改动面 + 红→绿 + 可对账的提交，只翻状态/`git mv` 不算修复（机械门 = `fix-evidence`；细则 = [_backlog 章程](_backlog/README.md)「缺陷的通道」）。**
-**按需**：[项目地图](docs/project-map.md)（空间）、[运行态地图](docs/runtime-map.md)（时序与四轴）、[开发环 §0.5](docs/guides/dev-loop.md#05-任务入口与交接) / [§1](docs/guides/dev-loop.md#1-执行链从授权到有证据交接)（流程细节）、[policy](docs/policy.md)（授权与常设边界）、[测试宪法](docs/testing.md)（证据边界）、[维护面合同](docs/surface-contract.md)（脚本选家）、[脚本索引](checks/README.md)（逐脚本）、[orient 七问](docs/orient.md)（白话速读）。
-**五条命令**：`pnpm setup`（fresh clone / vendor pin 变后：vendor host/client/native/web + pack 一条命令；入口 = [tools/dev/setup.mjs](tools/dev/setup.mjs)）/ `source run/env.sh && pnpm company --no-open`（repo dev-only；默认 pack + `plugin add file:`，默认 `--port 0`（URL 读启动横幅），`--link` 快速通道；启动入口 = `dsh --profile company`）/ `pnpm verify`（结构门禁）/ `pnpm test`（keyless 回归）/ `pnpm typecheck`（类型面）。新 Agent 首跑验收 = [tests/README.md](tests/README.md) 首跑节；fresh clone 顺序唯一家 = [bootstrap](docs/guides/bootstrap.md)（`pnpm install` → `bundle:init` → `setup` → 验收），本节不复述。`pnpm setup` 无参数；`--check/--types` 用 `node tools/dev/setup.mjs ...`。
+### 开工最小路径（读完这三步即可开工；feature 任务先 Plan Mode，见 [policy §P1](docs/policy.md)）
+
+1. **本文件**：纪律与命令表；接手源码仓见 [源码 handoff](docs/guides/repo-handoff.md)。
+2. **你任务那一份 owner**：改角色内容 = [presets.md](./docs/contracts/presets.md)；改 host/Web 代码 = [src/README](packages/company-pack/src/README.md)；改文档 = [docs/AGENTS.md](docs/AGENTS.md)；新增/搬内容 = [content-charter](./docs/content-charter.md)；改机制/组合 = [profile.md](./docs/contracts/profile.md)。
+3. **验证选层**：[tests/README.md](tests/README.md) 的「改动面 → 最窄检查」对应行。
+
+- **任务源**：用户点名或已批 RFC；`待落地` 卡不是任务源。
+- **“落地”判据**：系统里出现可验证的变更（代码/文档/门禁/模板/技能）+ 实跑证据；写 RFC、搬卡、归档、做计划都不算落地，只产出文档时必须明说「这是立项/交接，不是落地」。
+- **缺陷轨同一判据**：修 = 改动面 + 红→绿 + 可对账提交，只翻状态/`git mv` 不算修复（机械门 = `fix-evidence`；细则 = [_backlog 章程](_backlog/README.md)）。
+- **按需扩展**：[项目地图](docs/project-map.md) · [运行态地图](docs/runtime-map.md) · [开发环 §1](docs/guides/dev-loop.md#1-任务入口与交接)/[§2](docs/guides/dev-loop.md#2-执行链从授权到有证据交接) · [policy](docs/policy.md) · [测试宪法](docs/testing.md) · [维护面合同](docs/surface-contract.md) · [脚本索引](checks/README.md) · [orient 七问](docs/orient.md)。
+- **五条常用命令**：`pnpm setup`（[setup.mjs](tools/dev/setup.mjs)；`--check/--types` 用 `node tools/dev/setup.mjs ...`）、`source run/env.sh && pnpm company --no-open`（dev-only，`--link` 快速通道；启动入口 = `dsh --profile company`）、`pnpm verify`、`pnpm test`、`pnpm typecheck`。
+- **首跑与验收**：首跑顺序唯一家 = [bootstrap](docs/guides/bootstrap.md)，新 Agent 首跑验收 = [tests/README.md](tests/README.md)。
 
 **你（读者）= 维护本 repo 的开发 agent**；公司角色与 support preset 是你**维护的产物**（跑在 DSH 会话里，由 `pnpm dsh` / web 观察窗驱动）——别把自己混进公司角色，也别替角色执行公司手册。
 
@@ -29,7 +38,10 @@ snapshots/              回归证据资产；规则与分类 = snapshots/README.
 
 设计全貌 = `docs/index.md`；决策台账 = `docs/reference/decisions.md`。
 
-**一条流水线**（位置唯一家 = 卡 frontmatter `status`；门与守卫 = [_backlog 门牌](_backlog/AGENTS.md)）：卡 `研究 → 定性 → 落地 → 审 → 归档`，毕业 = 门票 + `去向`（`rfc｜note｜implementation｜pending｜none｜rejected`），去向落 `notes/proposed` RFC 或 `notes/implemented` Note，实施见 [dev-loop §1](docs/guides/dev-loop.md)。任务源 = 已批 RFC（proposed 带「批准：」）与用户点名；唯一例外 = 缺陷卡 `修复就绪` 自授权（边界唯一家 = [policy §P1-B](docs/policy.md#p1-b-缺陷材料性与修复自授权边界唯一定义家)）。**notes/ 是决策记忆**：开工按主题检索，非平凡变更同 diff 更新（分类与收尾唯一家 = [notes/README.md](notes/README.md)）。**条目状态不镜像进本文件**。
+**一条流水线**（位置唯一家 = 卡 frontmatter `status`；门与守卫 = [_backlog 门牌](_backlog/AGENTS.md)）：
+- 卡流转：`研究 → 定性 → 落地 → 审 → 归档`；毕业 = 门票 + `去向`（`rfc｜note｜implementation｜pending｜none｜rejected`），去向落 `notes/proposed` RFC 或 `notes/implemented` Note，实施见 [dev-loop §2](docs/guides/dev-loop.md#2-执行链从授权到有证据交接)。
+- 任务源：已批 RFC（`proposed` 带「批准：」）与用户点名；唯一例外 = 缺陷卡 `修复就绪` 自授权（边界唯一家 = [policy §P1-B](docs/policy.md#p1-b-缺陷材料性与修复自授权边界唯一定义家)）。
+- **notes/ 是决策记忆**：开工按主题检索，非平凡变更同 diff 更新（分类与收尾唯一家 = [notes/README.md](notes/README.md)）；条目状态不镜像进本文件。
 
 ## 命令表
 
@@ -66,7 +78,7 @@ source run/env.sh && node checks/lanes/preset.entry.mjs    # preset 改动的真
 | 纪律 | 权威（vendor 树） | 本仓落点 |
 |---|---|---|
 | 任务反馈面；按变更选检查、只报告实跑过的 | `packages/todo` / `packages/plan` / `AGENTS.md` | [dev-loop](docs/guides/dev-loop.md) §0.5/§1/§12 + [policy §P5](docs/policy.md)（语义审） |
-| docs = 当前合同（一处事实一个家，只写 now）；文档卫生 | `docs/AGENTS.md` | docs/ 分层；行预算 = doc-budget 门禁 `DOC_LINE_BUDGETS`；细则 = [docs/AGENTS.md](docs/AGENTS.md) |
+| docs = 当前合同（一处事实一个家，只写 now）；文档卫生 | `docs/AGENTS.md` | docs/ 分层；UTF-8 字节预算 = doc-budget 门禁 `DOC_BYTE_BUDGETS`；细则 = [docs/AGENTS.md](docs/AGENTS.md) |
 | 非平凡变更同 diff 带 Note（决定/输掉的方案/验证什么）；日志税 | `.agents/notes/README.md` / `AGENTS.md` Conventions | notes/proposed/ → notes/implemented/；写什么 = [notes/README.md](notes/README.md) |
 | 完成定义 = 最小真检查；测试分层；**文件名 = 证据类型**（naming-contract）；真实入口与安装形状 | `docs/testing.md` / `docs/postmortem/0003-web-agent-gui-feedback-loop.md` | 本仓 [测试宪法](docs/testing.md) + layering 守卫；preset = preset-smoke；安装 = release-smoke（[release.md](./docs/contracts/release.md)） |
 | 源码/产物面不混；vendor 钉版本，升 pin 时流程合同重校 | `AGENTS.md` Conventions / [release.md §vendor 政策](./docs/contracts/release.md) | 根 tsconfig extends vendor base；簿记见下节 + `tools/repo/sync-dsh.mjs` |
