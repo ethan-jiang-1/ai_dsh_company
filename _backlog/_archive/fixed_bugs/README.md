@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-392 / BUG-393**（2026-11-27，392..398 批顺位 1 / P0×2）：`SignoffComposerCard` 补齐 `<summary>`/`button`/修饰键/IME/`waitingRef`/`answerable` 护栏；新增 `openOnSessionSurface` 统一先切回主区再等 `sidebarRight.mounted` 就绪，内嵌工坊固定 `phase:'active', hero:false` 并按 `mainSessionId`/`retryNonce` 管控生命周期且在总览合并 `pageHistory`——
+  [392](BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md)、[393](BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md)。证据提交 `1d9368a1`。
+
 - **BUG-391**（2026-11-27，384..391 批顺位 4 / P2）：清除 `cultivation-copy` 与 `locales.ts` 文本裸 `**` 并同步刷新 `ui.expected.json`；`PanelFrameProps.floatTab` 改为可选并移除 HQ 的 `noopFloat` 隐藏死浮出按钮——
   [391](BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md)。证据提交 `cc3878ed`。
 

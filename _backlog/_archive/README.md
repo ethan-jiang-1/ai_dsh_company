@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-392](fixed_bugs/BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md) — 已修（`1d9368a1`）：`SignoffComposerCard` 补 `<summary>`/`拒绝` Enter 豁免、修饰键/IME/`waitingRef`/`answerable` 护栏。
+- [BUG-393](fixed_bugs/BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md) — 已修（`1d9368a1`）：统一 `openOnSessionSurface` 切换右栏、修复内嵌培养工坊 Hero 阻断与 `retryNonce`/`started` 生命周期并同步 HQ 待办历史。
 - [2026-11-27-ux-ui-round2-deep-audit-and-e2e.md](settled_issues/2026-11-27-ux-ui-round2-deep-audit-and-e2e.md) — Round 2 UX/UI 盲区与契约边界深扫（Phase 0–4 全盘实证，排伪 5 项后立 `BUG-392..BUG-398` 只报不修，0 产品代码改动）；去向 = none。
 - [BUG-391](fixed_bugs/BUG-391-literal-markdown-asterisks-and-dead-hq-float-button.md) — 已修（`cc3878ed`）：清除纯文本裸 `**` 星号并隐藏 HQ 不可浮出卡片的死「浮出」按钮；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
 - [BUG-390](fixed_bugs/BUG-390-unlocalized-raw-identifiers-and-clock-locale-leaks.md) — 已修（`11764dd1`）：本地化 `@` 分组、`lead` 成员映射、`request_signoff` 工具名、`shortSessionId` 去前缀与 24h/locale 时钟；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md)。
