@@ -13,7 +13,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { InjectFace } from '@deepseek-ai/dsh-client-ui-slots'
 import type { CompanyT } from '../locales.ts'
-import { isEmbeddedWorkshopSession } from '../ux/workshop-sessions.ts'
+import { isEmbeddedWorkshopSession, subscribeEmbeddedWorkshopSessions } from '../ux/workshop-sessions.ts'
 
 /** 会话列表的快照面（与 RoleBadge 同款：`sessions.list` 的 subscribe/getSnapshot）。 */
 export interface SessionListFace {
@@ -39,13 +39,20 @@ export type CommandScopeHintProps = InjectFace<CommandScopeHintFace>
 export function CommandScopeHint(props: CommandScopeHintProps): ReactNode {
   const { sessionId, list } = props
   const [blank, setBlank] = useState(() => list.getSnapshot().byId[sessionId]?.blank === true)
+  const [embedded, setEmbedded] = useState(() => isEmbeddedWorkshopSession(sessionId))
   useEffect(() => {
     setBlank(list.getSnapshot().byId[sessionId]?.blank === true)
     return list.subscribe(() => {
       setBlank(list.getSnapshot().byId[sessionId]?.blank === true)
     })
   }, [list, sessionId])
-  if (isEmbeddedWorkshopSession(sessionId) || !blank) return null
+  useEffect(() => {
+    setEmbedded(isEmbeddedWorkshopSession(sessionId))
+    return subscribeEmbeddedWorkshopSessions(() => {
+      setEmbedded(isEmbeddedWorkshopSession(sessionId))
+    })
+  }, [sessionId])
+  if (embedded || !blank) return null
   return (
     <span className="wk-command-scope-hint" title={props.t('command.scopeHint.tooltip')}>
       {props.t('command.scopeHint')}

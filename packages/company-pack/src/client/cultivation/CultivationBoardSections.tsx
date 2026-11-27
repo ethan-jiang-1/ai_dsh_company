@@ -76,7 +76,11 @@ export function CultivationMine({ inbox, roleLabel = defaultRoleLabel, capList, 
                 <span className="wk-row-name">
                   {record.kind === 'suggestion' ? CULTIVATION_COPY.mineSuggestionFor(roleLabel(record.targetRole)) : CULTIVATION_COPY.mineMyCorrection}
                   {record.status === 'open' && <Tag tone="info">{isSelfRecord(record) ? CULTIVATION_COPY.minePendingMe : CULTIVATION_COPY.minePendingOther}</Tag>}
-                  {record.status === 'adopted' && <Tag tone="success">{CULTIVATION_COPY.mineAdoptedByTarget(record.methodSlug)}</Tag>}
+                  {record.status === 'adopted' && (
+                    record.revokedAt !== undefined
+                      ? <Tag tone="warning">{CULTIVATION_COPY.mineRevokedByTarget(record.methodSlug)}</Tag>
+                      : <Tag tone="success">{CULTIVATION_COPY.mineAdoptedByTarget(record.methodSlug)}</Tag>
+                  )}
                   {record.status === 'rejected' && <Tag tone="warning">{CULTIVATION_COPY.mineRejectedByTarget}</Tag>}
                 </span>
                 <span className="wk-row-task">
@@ -108,6 +112,7 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
   const [verificationProblem, setVerificationProblem] = useState<'required' | null>(null)
   const [expandedEvidence, setExpandedEvidence] = useState<Readonly<Record<string, boolean>>>({})
   const startVerification = (recordId: string, outcome: 'pass' | 'fail'): void => {
+    setRevokingSlug(null)
     setVerifyingId(recordId)
     setVerificationOutcome(outcome)
     setVerificationEvidence('')
@@ -128,9 +133,11 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
   return (
       <div className="wk-activity-block" aria-label={CULTIVATION_COPY.adoptedAria}>
         <strong>{CULTIVATION_COPY.adoptedTitle}</strong>
-        {records !== null && inbox.adoptedForViewer.length === 0
-          ? <div className="wk-meta">{CULTIVATION_COPY.adoptedEmpty}</div>
-          : records !== null && (
+        {records === null
+          ? <div className="wk-meta">{CULTIVATION_COPY.adoptedLoading}</div>
+          : inbox.adoptedForViewer.length === 0
+            ? <div className="wk-meta">{CULTIVATION_COPY.adoptedEmpty}</div>
+            : (
             <div role="list" aria-label={CULTIVATION_COPY.adoptedAria} className="wk-list wk-cultivation-list">
               {capList('adopted', inbox.adoptedForViewer).map(record => {
                 const slug = record.methodSlug ?? record.id
@@ -251,11 +258,23 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
                                 >
                                   {CULTIVATION_COPY.revokeConfirm}
                                 </Button>
-                                <Button onClick={() => { setRevokingSlug(null) }}>{CULTIVATION_COPY.cancel}</Button>
+                                <Button disabled={pendingIds.has(record.id)} onClick={() => { setRevokingSlug(null) }}>{CULTIVATION_COPY.cancel}</Button>
                               </div>
                             </div>
                           )
-                          : <Button onClick={() => { setRevokingSlug(slug) }}>{CULTIVATION_COPY.revoke}</Button>}
+                          : (
+                            <Button
+                              disabled={pendingIds.has(record.id)}
+                              onClick={() => {
+                                setVerifyingId(null)
+                                setVerificationEvidence('')
+                                setVerificationProblem(null)
+                                setRevokingSlug(slug)
+                              }}
+                            >
+                              {CULTIVATION_COPY.revoke}
+                            </Button>
+                          )}
                       </div>
                     )}
                     {outcome !== undefined && (
@@ -314,9 +333,11 @@ export function CultivationFeedback({ feedback, reachable }: { readonly feedback
   return (
       <div className="wk-activity-block" aria-label={CULTIVATION_COPY.feedbackAria}>
         <strong>{CULTIVATION_COPY.feedbackTitle}</strong>
-        {!reachable || feedback === null
+        {!reachable
           ? <div className="wk-meta">{CULTIVATION_COPY.feedbackUnreachable}</div>
-          : feedback.length === 0
+          : feedback === null
+            ? <div className="wk-meta">{CULTIVATION_COPY.feedbackLoading}</div>
+            : feedback.length === 0
             ? <div className="wk-meta">{CULTIVATION_COPY.feedbackEmpty}</div>
             : (
               <div role="list" aria-label={CULTIVATION_COPY.feedbackListAria} className="wk-list">

@@ -75,6 +75,14 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
         setDeliverablesCapped(0)
         setProblem(result.problem)
       }
+    }).catch((error: unknown) => {
+      if (!live || controller.signal.aborted) return
+      setLoading(false)
+      setDeliverables([])
+      setDeliverablesSkipped(0)
+      setDeliverablesCapped(0)
+      const reason = error instanceof Error ? error.message : String(error)
+      setProblem(CULTIVATION_COPY.contextCatalogReadFailed(reason))
     })
     return () => { live = false; controller.abort() }
   }, [props.sources, props.currentSessionId])

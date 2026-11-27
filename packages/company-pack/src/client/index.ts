@@ -19,6 +19,7 @@ import { DreamTeamBrandName } from './ui/Brand.tsx'
 import { COMPANY_NS, en, zh } from './locales.ts'
 import { startInstanceGuard } from './wiring/instance-guard.ts'
 import { createAttentionRegistry } from './wiring/attention-registry.ts'
+import { createMergedAttentionObservable, createSwitchableAttentionObservable } from './wiring/attention-source.ts'
 import { asSessionPageFace } from './presence/attention-history.ts'
 import { installAttentionObservers } from './wiring/attention-observers.ts'
 import { createCultivationView } from './cultivation/CultivationView.tsx'
@@ -136,7 +137,34 @@ export async function apply(ctx: ClientContext): Promise<void> {
 
   registerCultivationViewWiring(ctx, hubStore, () => { s3.openHq('cultivation') })
 
-  registerWaveS1Ux(ctx, { attention, hubStore, openHq: (section) => { s3.openHq(section) } })
+  // BUG-404：顶栏/侧栏角标与输入框状态胶囊共享「活体 + 跨会话历史重建」合并待办源。
+  const switchableAttention = createSwitchableAttentionObservable({
+    getSnapshot: () => attention.snapshot(),
+    subscribe: listener => attention.subscribe(listener),
+  })
+  ctx.inject(['sessions', 'remote.session'], (scoped) => {
+    const page = scoped.remote.session.page
+    if (typeof page !== 'function') return
+    scoped.effect(() => {
+      const merged = createMergedAttentionObservable({
+        attention,
+        sessionsList: scoped.sessions.list,
+        pageHistory: asSessionPageFace(page),
+      })
+      const detach = switchableAttention.attach(merged.observable)
+      return () => {
+        detach()
+        merged.dispose()
+      }
+    })
+  })
+
+  registerWaveS1Ux(ctx, {
+    attention,
+    attentionObservable: switchableAttention,
+    hubStore,
+    openHq: (section) => { s3.openHq(section) },
+  })
 
   registerWaveS2Ux(ctx, { hubStore })
 

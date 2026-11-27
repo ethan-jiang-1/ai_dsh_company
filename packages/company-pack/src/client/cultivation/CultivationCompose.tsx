@@ -110,6 +110,14 @@ export function CultivationCompose(props: CultivationComposeProps) {
   const restoreTriggerFocusRef = useRef(false)
   const seq = useRef(0)
   const inflight = useRef<AbortController | null>(null)
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      inflight.current?.abort()
+    }
+  }, [])
   const togglePicker = (trigger: HTMLElement): void => {
     pickerTriggerRef.current = trigger
     setPickerOpen(open => !open)
@@ -187,7 +195,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
     setContextProblem(null)
     setPickerOpen(false)
     const result = await sources.readPreview(row, controller.signal)
-    if (id !== seq.current) return
+    if (id !== seq.current || !mountedRef.current) return
     setContextStatus('idle')
     inflight.current = null
     if (!result.ok || result.turn === undefined) {
@@ -273,6 +281,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
     setPending(true)
     setProblem(null)
     const result = await props.actions.run(draft.line)
+    if (!mountedRef.current) return
     setPending(false)
     setOutcome(result)
     if (!result.ok) return

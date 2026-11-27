@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// 负例留证 2026-11-27：document.visibilitychange 直接绑 wake() 不判 visibilityState === 'visible' ⇒ 切后台 hidden 时仍发整套 read/list 请求（BUG-400）；仅 visible 时唤醒后绿。BUG-400
 /**
  * 跨实例刷新广播的**订阅侧**判据（2026-10-19）：发布侧（成功即 dispatch）已在交互档钉住；
  * 这里证明「事件到达 ⇒ 面板真的重读」。浏览器里的多实例路径（公司页第四子页）当前**未验成**
@@ -193,5 +194,39 @@ describe('journal 预览补读标题（BUG-322）', () => {
     expect(row?.entries?.[0]?.title).toContain('真正的标题')
     await act(async () => { root.unmount() })
     container.remove()
+  })
+})
+
+describe('visibilitychange 后台过滤（BUG-400）', () => {
+  it('document.visibilityState === hidden 时不触发重载，切回 visible 时触发', async () => {
+    const { calls, files } = stubFiles()
+    function Probe(): null {
+      useCultivationPanelData(files as never, 'session-vis' as never)
+      return null
+    }
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    const desc = Object.getOwnPropertyDescriptor(document, 'visibilityState')
+    try {
+      await act(async () => { root.render(createElement(Probe)) })
+      await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)) })
+      const afterInit = calls.records
+
+      Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true })
+      await act(async () => { document.dispatchEvent(new Event('visibilitychange')) })
+      await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)) })
+      expect(calls.records).toBe(afterInit)
+
+      Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true })
+      await act(async () => { document.dispatchEvent(new Event('visibilitychange')) })
+      await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)) })
+      expect(calls.records).toBe(afterInit + 1)
+    } finally {
+      if (desc !== undefined) Object.defineProperty(document, 'visibilityState', desc)
+      else delete (document as { visibilityState?: string }).visibilityState
+      await act(async () => { root.unmount() })
+      container.remove()
+    }
   })
 })

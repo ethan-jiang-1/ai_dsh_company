@@ -10,7 +10,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
-import type { LivePending } from '../../lib/presence/attention.ts'
+import type { AttentionItem, LivePending } from '../../lib/presence/attention.ts'
 import { COMPANY_NS } from '../locales.ts'
 import type { HubSubViewStore } from '../tabs/hub-subview-store.ts'
 import type { AttentionRegistry } from '../wiring/attention-registry.ts'
@@ -55,6 +55,7 @@ export const S1_TOOL_KEYS = {
 
 export interface WaveS1Deps {
   readonly attention: AttentionRegistry
+  readonly attentionObservable?: ObservableSnapshot<readonly Pick<AttentionItem, 'kind'>[]> | undefined
   readonly hubStore?: HubSubViewStore
   readonly openHq?: (section?: HqSection) => void
 }
@@ -71,7 +72,7 @@ export function asAttentionObservable(attention: AttentionRegistry): ObservableS
 export function registerWaveS1Ux(ctx: ClientContext, deps: WaveS1Deps): void {
   const t = ctx.locale.bind(COMPANY_NS)
   const toastSource = createCompanyToastSource()
-  const attentionObservable = asAttentionObservable(deps.attention)
+  const attentionObservable = deps.attentionObservable ?? asAttentionObservable(deps.attention)
 
   // 1. `shell.overlay` 全局 Toast（无强会话依赖，单独 slots 注入）
   ctx.inject(['slots'], (scoped) => {

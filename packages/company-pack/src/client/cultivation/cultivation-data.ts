@@ -346,15 +346,18 @@ export function useCultivationPanelData(
     // 注意力回来就刷新（2026-10-18 走查抓到：只靠 30s 轮询时，外部刚提的记录最长要等 30s 才出现）。
     // 只读、幂等、跟着 effect 的 abort 走——不是第二个轮询源，是"人看向面板"这个事件的一次触发。
     const wake = (): void => { if (!controller.signal.aborted) void load() }
+    const onVisibilityChange = (): void => {
+      if (document.visibilityState === 'visible') wake()
+    }
     window.addEventListener('focus', wake)
-    document.addEventListener('visibilitychange', wake)
+    document.addEventListener('visibilitychange', onVisibilityChange)
     // 兄弟实例的动作广播（同页多实例：侧栏页签 + 公司页 + 浮窗）⇒ 秒级同步，不等轮询
     window.addEventListener(CULTIVATION_CHANGED_EVENT, wake)
     return () => {
       controller.abort()
       clearInterval(timer)
       window.removeEventListener('focus', wake)
-      document.removeEventListener('visibilitychange', wake)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
       window.removeEventListener(CULTIVATION_CHANGED_EVENT, wake)
     }
   }, [enabled, sessionId, files, nonce])

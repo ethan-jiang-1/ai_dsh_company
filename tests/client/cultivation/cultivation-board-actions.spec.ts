@@ -9,11 +9,14 @@
  * 红证（先红后绿）：本 spec 在按钮与动作面 prop 存在前实跑红（见毕业 Note 验证节）。
  */
 // 负例留证 2026-11-27：use-cultivation-board / CultivationBoardSections 直接将翻译文本写入 reasonProblem / verificationProblem state ⇒ 热切 language='en' 后仍滞留中文报错（BUG-397）；改存结构化状态码并在渲染期解析后绿。BUG-397
+// 负例留证 2026-11-27：CultivationAdopted records=null 空白、撤回取消未随 pendingIds 禁用或 CultivationFeedback 把 null 与 !reachable 合并 ⇒ 首帧加载态空白/误报不可达且取消可破坏进行中的撤回（BUG-400）；拆态与加锁后绿。BUG-400
+// 负例留证 2026-11-27：CultivationMine 对 status==='adopted' && revokedAt!==undefined 仍渲染绿色 mineAdoptedByTarget ⇒ 撤回后同屏上方仍显示已采纳（BUG-404）；改判 warning revoked 标签后绿。BUG-404
 import { act, createElement, type ReactElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { assertEnglishUiClean } from '../../support/i18n-assertions.ts'
 import { CultivationBoard } from '../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx'
+import { CultivationCompose } from '../../../packages/company-pack/src/client/cultivation/CultivationCompose.tsx'
 import {
   CULTIVATION_CHANGED_EVENT,
   CULTIVATION_COPY,
@@ -627,5 +630,91 @@ describe('渲染入口自检', () => {
     expect(enText).toContain('A rejection needs a one-line reason')
     expect(enText).toContain('Name one similar piece of work after adoption')
     assertEnglishUiClean(enText, 'BUG-397 live locale switch')
+  })
+
+  it('BUG-400：records=null 与 reachable=true/feedback=null 显示读取态、撤回等待时禁用取消并互斥验证表单、卸载不误回调', async () => {
+    // 1. records=null & feedback=null & reachable=true -> loading copy, NOT unreachable
+    const { container: loadingBox } = mount({
+      records: null,
+      feedback: null,
+      feedbackReachable: true,
+    })
+    expect(loadingBox.textContent).toContain(CULTIVATION_COPY.adoptedLoading)
+    expect(loadingBox.textContent).toContain(CULTIVATION_COPY.feedbackLoading)
+    expect(loadingBox.textContent).not.toContain(CULTIVATION_COPY.feedbackUnreachable)
+
+    // 2. pending revoke locks both Confirm & Cancel; verify & revoke mutually exclude
+    let resolveRevoke: ((res: ActionOutcome) => void) | undefined
+    const pendingActions: CultivationActions = {
+      run: () => new Promise(resolve => { resolveRevoke = resolve }),
+    }
+    const { container: actionBox } = mount({
+      records: [record({ id: 'r-rev', status: 'adopted', methodSlug: 'method-r-rev' })],
+      actions: pendingActions,
+    })
+    const verifyTrigger = [...actionBox.querySelectorAll('button')].find(b => b.textContent?.trim() === CULTIVATION_COPY.verifyPass)!
+    await click(verifyTrigger)
+    expect(actionBox.querySelector('.wk-cultivation-verification-form')).not.toBeNull()
+
+    await click(button(actionBox, CULTIVATION_COPY.revoke)!)
+    expect(actionBox.querySelector('.wk-cultivation-verification-form')).toBeNull()
+    expect(actionBox.querySelector('.wk-cultivation-confirm')).not.toBeNull()
+
+    await click(button(actionBox, CULTIVATION_COPY.revokeConfirm)!)
+    expect(button(actionBox, CULTIVATION_COPY.revokeConfirm)!.disabled).toBe(true)
+    expect(button(actionBox, CULTIVATION_COPY.cancel)!.disabled).toBe(true)
+
+    resolveRevoke?.({ ok: true, text: 'revoked' })
+    await act(async () => { await new Promise(r => setTimeout(r, 10)) })
+
+    // 3. CultivationCompose unmount mid-submit does not fire onSubmitted/onRefresh
+    let resolveSubmit: ((res: ActionOutcome) => void) | undefined
+    const onSubmitted = vi.fn()
+    const onRefresh = vi.fn()
+    const composeHost = document.createElement('div')
+    document.body.append(composeHost)
+    const composeRoot = createRoot(composeHost)
+    act(() => {
+      composeRoot.render(createElement(CultivationCompose, {
+        viewerRole: 'ceo',
+        actions: { run: () => new Promise<ActionOutcome>(resolve => { resolveSubmit = resolve }) },
+        onSubmitted,
+        onRefresh,
+      }))
+    })
+    await click(button(composeHost, CULTIVATION_COPY.composeOpen)!)
+    const expInput = composeHost.querySelector('input') as HTMLInputElement
+    await type(expInput, '期望做法')
+    const textareas = [...composeHost.querySelectorAll('textarea')]
+    await type(textareas[1]!, '具体做法与出处')
+    await click(button(composeHost, CULTIVATION_COPY.submit)!)
+    act(() => { composeRoot.unmount() })
+    composeHost.remove()
+
+    resolveSubmit?.({ ok: true, text: 'ok id=rec-123' })
+    await act(async () => { await new Promise(r => setTimeout(r, 10)) })
+    expect(onSubmitted).not.toHaveBeenCalled()
+    expect(onRefresh).not.toHaveBeenCalled()
+  })
+
+  it('BUG-404：CultivationMine 对已撤回记录显示撤回标签而非绿色已采纳标签', () => {
+    const { container } = mount({
+      language: 'zh',
+      viewerRole: 'cfo',
+      records: [
+        record({
+          id: 'r-mine-rev',
+          kind: 'suggestion',
+          proposerRole: 'cfo',
+          targetRole: 'ceo',
+          status: 'adopted',
+          methodSlug: 'method-rec-gui-open',
+          revokedAt: '2026-11-27T01:00:00.000Z',
+        }),
+      ],
+    })
+    const mineBlock = container.querySelector('[aria-label="我提交的与我已处理"]')!
+    expect(mineBlock.textContent).toContain('曾采纳并已撤回 → method-rec-gui-open')
+    expect(mineBlock.textContent).not.toContain('目标角色语境下的人已采纳 → method-rec-gui-open')
   })
 })

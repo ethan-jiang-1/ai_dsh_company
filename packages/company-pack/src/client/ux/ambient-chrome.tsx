@@ -6,21 +6,22 @@
  * - `MotionCommandDock` (`conversation.input.dock`, order: 20)
  * - `ComposerStatusPill` (`conversation.composer.dock`, order: 20)
  */
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import type { ObservableSnapshot } from '@deepseek-ai/dsh-client-store'
 import { Button, Pill, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {} from '@deepseek-ai/dsh-api-session-controller/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
-import type { LivePending } from '../../lib/presence/attention.ts'
+import type { AttentionItem } from '../../lib/presence/attention.ts'
 import { ROLE_COPY, type RoleId } from '../../lib/shared/role-copy.ts'
 import type { COMPANY_NS, CompanyKey } from '../locales.ts'
 import { roleText } from '../roles.ts'
-import { isEmbeddedWorkshopSession } from './workshop-sessions.ts'
+import { isEmbeddedWorkshopSession, subscribeEmbeddedWorkshopSessions } from './workshop-sessions.ts'
 
 export interface AttentionObservableInjected {
-  readonly hooks: { readonly attentionItems: ObservableSnapshot<readonly LivePending[]> }
+  readonly hooks: { readonly attentionItems: ObservableSnapshot<readonly Pick<AttentionItem, 'kind'>[]> }
 }
 
 export interface TabOpenerInjected {
@@ -34,7 +35,7 @@ export type HeaderAttentionUtilityProps =
 
 /** 活跃会话顶栏待办角标（order >= 10，避让 upstream open-in-app=-10 与 schedule=0）。 */
 export function HeaderAttentionUtility({ useAttentionItems, openTab, t }: HeaderAttentionUtilityProps): ReactNode {
-  const pendingCount = useAttentionItems((items: readonly LivePending[]) => items.length)
+  const pendingCount = useAttentionItems((items: readonly Pick<AttentionItem, 'kind'>[]) => items.length)
   return (
     <span className="wk-ux-header-badge" data-company-header-attention="">
       <Button
@@ -60,7 +61,7 @@ export type SidebarFooterCompanyActionProps =
 
 /** 左侧栏底部公司快捷状态按钮（宽栏展示文案+徽标，窄栏收为紧凑 Tag）。 */
 export function SidebarFooterCompanyAction({ wide, useAttentionItems, openTab, t }: SidebarFooterCompanyActionProps): ReactNode {
-  const pendingCount = useAttentionItems((items: readonly LivePending[]) => items.length)
+  const pendingCount = useAttentionItems((items: readonly Pick<AttentionItem, 'kind'>[]) => items.length)
   return (
     <span className="wk-ux-footer-action" data-company-footer-action="">
       <Button
@@ -101,11 +102,32 @@ function emptyDraftHook(sel: (s: { readonly draft: string }) => string): string 
   return sel({ draft: '' })
 }
 
+type HeroUseSessions = NonNullable<HeroMotionOptionsProps['useSessions']>
+
+function emptySessionsHook<S>(sel: (state: { readonly projectionsBySession: Record<string, { readonly values: Record<string, unknown> }> }) => S): S {
+  return sel({ projectionsBySession: {} })
+}
+
+function useIsEmbeddedWorkshop(sessionId: SessionId | undefined): boolean {
+  const [embedded, setEmbedded] = useState(() => isEmbeddedWorkshopSession(sessionId))
+  useEffect(() => {
+    setEmbedded(isEmbeddedWorkshopSession(sessionId))
+    return subscribeEmbeddedWorkshopSessions(() => {
+      setEmbedded(isEmbeddedWorkshopSession(sessionId))
+    })
+  }, [sessionId])
+  return embedded
+}
+
 /** 新会话 Hero 态的 3 个高频动议模板速启胶囊。 */
-export function HeroMotionOptions({ sessionId, useInput, inputActions, notifyDraft, t }: HeroMotionOptionsProps): ReactNode {
+export function HeroMotionOptions({ sessionId, useSessions, useInput, inputActions, notifyDraft, t }: HeroMotionOptionsProps): ReactNode {
+  const embedded = useIsEmbeddedWorkshop(sessionId)
+  const useSessionState: HeroUseSessions = typeof useSessions === 'function' ? useSessions : (emptySessionsHook as unknown as HeroUseSessions)
+  const presetRaw = useSessionState(s => s.projectionsBySession[sessionId]?.values.agentPreset)
+  const roleId = readCompanyRole(presetRaw)
   const useDraftInput = typeof useInput === 'function' ? useInput : emptyDraftHook
   const currentDraft = useDraftInput(s => s.draft)
-  if (isEmbeddedWorkshopSession(sessionId)) return null
+  if (embedded || roleId === null) return null
   return (
     <div className="wk-hero-options" data-company-hero-options="">
       <span className="wk-hero-options-label">{t('hero.quickLabel')}</span>
@@ -151,12 +173,13 @@ export function MotionCommandDock({
   onDraftCommand,
   t,
 }: MotionCommandDockProps): ReactNode {
+  const embedded = useIsEmbeddedWorkshop(sessionId)
   const presetRaw = useSessions(s => s.projectionsBySession[sessionId]?.values.agentPreset)
   const useDraftInput = typeof useInput === 'function' ? useInput : emptyDraftHook
   const currentDraft = useDraftInput(s => s.draft)
   const roleId = readCompanyRole(presetRaw)
-  const pendingCount = useAttentionItems((items: readonly LivePending[]) => items.length)
-  if (isEmbeddedWorkshopSession(sessionId) || roleId === null) return null
+  const pendingCount = useAttentionItems((items: readonly Pick<AttentionItem, 'kind'>[]) => items.length)
+  if (embedded || roleId === null) return null
 
   const draftCommand = (cmd: string): void => {
     const trimmed = currentDraft.trimStart()
@@ -202,10 +225,11 @@ export function ComposerStatusPill({
   openTab,
   t,
 }: ComposerStatusPillProps): ReactNode {
+  const embedded = useIsEmbeddedWorkshop(sessionId)
   const presetRaw = useSessions(s => s.projectionsBySession[sessionId]?.values.agentPreset)
   const roleId = readCompanyRole(presetRaw)
-  const pendingCount = useAttentionItems((items: readonly LivePending[]) => items.length)
-  if (roleId === null) return null
+  const pendingCount = useAttentionItems((items: readonly Pick<AttentionItem, 'kind'>[]) => items.length)
+  if (embedded || roleId === null) return null
 
   const roleLabel = roleText(roleId, 'short', t)
   return (

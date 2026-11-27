@@ -1,6 +1,8 @@
 // @vitest-environment happy-dom
 // 负例留证 2026-11-27：MotionCommandDock / HeroMotionOptions 去掉 isEmbeddedWorkshopSession 抑制 ⇒ HQ 内嵌培养工坊渲染顶层动议指挥带与 Hero 胶囊（BUG-393）；还原后绿。BUG-393
 // 负例留证 2026-11-27：HeroMotionOptions / MotionCommandDock 无条件 inputActions.setDraft 覆盖已有草稿 ⇒ 未发用户输入被静默抹掉（BUG-398）；先读 useInput draft 保留非空用户输入后绿。BUG-398
+// 负例留证 2026-11-27：ComposerStatusPill 缺失 embedded 守卫或 HeroMotionOptions 缺失 readCompanyRole 守卫 ⇒ 工坊露出底部胶囊且普通非公司会话曝光公司模板（BUG-400）；补守卫与订阅后绿。BUG-400
+// 负例留证 2026-11-27：HeaderAttentionUtility / ComposerStatusPill 只绑定活体 registry 而非 merged observable ⇒ 刷新后有历史待批时仍报待办 0 / 就绪（BUG-404）；接入合并源后绿。BUG-404
 /** Wave S1：全局 Toast、页头/侧栏角标、Hero 速启、动议指挥带与脚手栏组件测试。 */
 import { act, createElement, Fragment, type ComponentProps, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
@@ -122,6 +124,7 @@ describe('Header / Footer / Hero / MotionDock / ComposerDock', () => {
       } as unknown as ComponentProps<typeof SidebarFooterCompanyAction>),
       createElement(HeroMotionOptions, {
         sessionId: 's1',
+        useSessions: useSessionsCompany,
         inputActions: { setDraft },
         notifyDraft,
         t: tEn,
@@ -191,7 +194,7 @@ describe('Header / Footer / Hero / MotionDock / ComposerDock', () => {
     expect(container.querySelector('[data-company-motion-dock]')).toBeNull()
     expect(container.textContent).toContain(en['composerDock.idle'])
 
-    // BUG-393：内嵌培养工坊会话隐藏顶层 HeroMotionOptions 与 MotionCommandDock
+    // BUG-393 + BUG-400：内嵌培养工坊会话隐藏顶层 HeroMotionOptions、MotionCommandDock 与 ComposerStatusPill
     const releaseWorkshop = registerEmbeddedWorkshopSession('s-workshop' as never)
     try {
       const { container: wsBox } = mountDom(createElement(
@@ -199,6 +202,8 @@ describe('Header / Footer / Hero / MotionDock / ComposerDock', () => {
         null,
         createElement(HeroMotionOptions, {
           sessionId: 's-workshop',
+          useSessions: (sel: (v: { projectionsBySession: Record<string, { values: Record<string, unknown> }> }) => unknown) =>
+            sel({ projectionsBySession: { 's-workshop': { values: { agentPreset: 'ceo' } } } }),
           inputActions: { setDraft },
           notifyDraft,
           t: tEn,
@@ -215,11 +220,20 @@ describe('Header / Footer / Hero / MotionDock / ComposerDock', () => {
           onDraftCommand,
           t: tZh,
         } as unknown as ComponentProps<typeof MotionCommandDock>),
+        createElement(ComposerStatusPill, {
+          sessionId: 's-workshop',
+          useSessions: (sel: (v: { projectionsBySession: Record<string, { values: Record<string, unknown> }> }) => unknown) =>
+            sel({ projectionsBySession: { 's-workshop': { values: { agentPreset: 'ceo' } } } }),
+          useAttentionItems: useHookFrom(obs),
+          openTab,
+          t: tZh,
+        } as unknown as ComponentProps<typeof ComposerStatusPill>),
       ))
       expect(wsBox.querySelector('[data-company-hero-options]')).toBeNull()
       expect(wsBox.querySelector('[data-company-motion-dock]')).toBeNull()
+      expect(wsBox.querySelector('[data-company-composer-dock]')).toBeNull()
     } finally {
-      releaseWorkshop()
+      act(() => { releaseWorkshop() })
     }
   })
 
@@ -238,6 +252,7 @@ describe('Header / Footer / Hero / MotionDock / ComposerDock', () => {
       null,
       createElement(HeroMotionOptions, {
         sessionId: 's1',
+        useSessions: useSessionsCompany,
         useInput: useInputStub,
         inputActions: { setDraft },
         notifyDraft,
@@ -271,5 +286,52 @@ describe('Header / Footer / Hero / MotionDock / ComposerDock', () => {
     expect(isEmbeddedWorkshopSession('s-ws-toggle' as never)).toBe(true)
     release()
     expect(isEmbeddedWorkshopSession('s-ws-toggle' as never)).toBe(false)
+  })
+
+  it('BUG-400 + BUG-404：普通非公司会话隐藏 HeroMotionOptions、动态登记工坊即时卸载胶囊、合并待办源显示历史计数', () => {
+    const useSessionsOther = <S,>(sel: (v: { projectionsBySession: Record<string, undefined> }) => S) =>
+      sel({ projectionsBySession: {} })
+    const useSessionsCompany = <S,>(sel: (v: { projectionsBySession: Record<string, { values: Record<string, unknown> }> }) => S) =>
+      sel({ projectionsBySession: { 's-dyn': { values: { agentPreset: 'ceo' } } } })
+    const mergedObs = { getSnapshot: () => [{ kind: 'approval' as const }] }
+
+    const { container } = mountDom(createElement(
+      Fragment,
+      null,
+      createElement(HeroMotionOptions, {
+        sessionId: 'plain-sess-1',
+        useSessions: useSessionsOther,
+        inputActions: { setDraft: vi.fn() },
+        notifyDraft: vi.fn(),
+        t: makeT(zh),
+      } as unknown as ComponentProps<typeof HeroMotionOptions>),
+      createElement(ComposerStatusPill, {
+        sessionId: 's-dyn',
+        useSessions: useSessionsCompany,
+        useAttentionItems: useHookFrom(mergedObs),
+        openTab: vi.fn(),
+        t: makeT(zh),
+      } as unknown as ComponentProps<typeof ComposerStatusPill>),
+      createElement(HeaderAttentionUtility, {
+        sessionId: 's-dyn',
+        useAttentionItems: useHookFrom(mergedObs),
+        openTab: vi.fn(),
+        t: makeT(zh),
+      } as unknown as ComponentProps<typeof HeaderAttentionUtility>),
+    ))
+
+    expect(container.querySelector('[data-company-hero-options]')).toBeNull()
+    expect(container.querySelector('[data-company-composer-dock]')).not.toBeNull()
+    expect(container.textContent).toContain('待办 1')
+
+    let release: (() => void) | undefined
+    act(() => {
+      release = registerEmbeddedWorkshopSession('s-dyn' as never)
+    })
+    expect(container.querySelector('[data-company-composer-dock]')).toBeNull()
+    act(() => {
+      release?.()
+    })
+    expect(container.querySelector('[data-company-composer-dock]')).not.toBeNull()
   })
 })
