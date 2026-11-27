@@ -103,22 +103,27 @@ const BASE64URL_LOOKUP = new Map([...BASE64URL_ALPHABET].map((char, index) => [c
 const encoder = new TextEncoder()
 const decoder = new TextDecoder('utf-8', { fatal: true })
 
+export type ContextLang = 'zh' | 'en'
+type PickText = (zh: string, en: string) => string
+
+const pickerOf = (lang: ContextLang = 'zh'): PickText => (lang === 'en' ? (_zh, en) => en : zh => zh)
+
 const codePoints = (text: string): number => [...text].length
 
 function onlyKeys(value: Record<string, unknown>, allowed: readonly string[]): boolean {
   return Object.keys(value).every(key => allowed.includes(key))
 }
 
-function textProblem(value: unknown, name: string, min: number, max: number): string | null {
-  if (typeof value !== 'string') return `${name} 必须是字符串`
+function textProblem(value: unknown, name: string, min: number, max: number, t: PickText): string | null {
+  if (typeof value !== 'string') return t(`${name} 必须是字符串`, `${name} must be a string`)
   const length = codePoints(value)
-  if (length < min || length > max) return `${name} 长度须在 ${min}–${max} 码点`
+  if (length < min || length > max) return t(`${name} 长度须在 ${min}–${max} 码点`, `${name} length must be ${min}–${max} code points`)
   return null
 }
 
-function optionalTextProblem(value: unknown, name: string, max: number): string | null {
+function optionalTextProblem(value: unknown, name: string, max: number, t: PickText): string | null {
   if (value === undefined) return null
-  return textProblem(value, name, 0, max)
+  return textProblem(value, name, 0, max, t)
 }
 
 function isSubagentMode(value: unknown): value is SubagentMode {
@@ -140,56 +145,58 @@ export function isSafeContextRef(kind: CultivationContextKind, ref: string): boo
   return false
 }
 
-function refProblem(value: unknown): string | null {
-  if (!isRecord(value)) return '背景引用不是对象'
+function refProblem(value: unknown, t: PickText): string | null {
+  if (!isRecord(value)) return t('背景引用不是对象', 'context reference is not an object')
   const kind = value.kind
-  if (kind !== 'session' && kind !== 'deliverable') return 'kind 必须是 session 或 deliverable'
+  if (kind !== 'session' && kind !== 'deliverable') return t('kind 必须是 session 或 deliverable', 'kind must be session or deliverable')
   if (typeof value.ref !== 'string' || !isSafeContextRef(kind, value.ref)) {
-    return kind === 'session' ? '会话 ref 不合法' : '成品 ref 必须是安全的工作区相对路径'
+    return kind === 'session'
+      ? t('会话 ref 不合法', 'invalid session ref')
+      : t('成品 ref 必须是安全的工作区相对路径', 'deliverable ref must be a safe workspace-relative path')
   }
   if (value.turn !== undefined) {
-    if (kind !== 'session') return '成品背景不接受 turn'
-    if (!Number.isSafeInteger(value.turn) || Number(value.turn) < 0) return 'turn 必须是非负安全整数'
+    if (kind !== 'session') return t('成品背景不接受 turn', 'deliverable context does not accept turn')
+    if (!Number.isSafeInteger(value.turn) || Number(value.turn) < 0) return t('turn 必须是非负安全整数', 'turn must be a non-negative safe integer')
   }
   if (value.label !== undefined) {
-    const problem = optionalTextProblem(value.label, 'label', CONTEXT_LABEL_MAX_CHARS)
+    const problem = optionalTextProblem(value.label, 'label', CONTEXT_LABEL_MAX_CHARS, t)
     if (problem !== null) return problem
-    if (CONTROL_RE.test(String(value.label))) return 'label 不能含控制字符'
+    if (CONTROL_RE.test(String(value.label))) return t('label 不能含控制字符', 'label must not contain control characters')
   }
   if (value.role !== undefined) {
-    const problem = optionalTextProblem(value.role, 'role', CONTEXT_ROLE_MAX_CHARS)
+    const problem = optionalTextProblem(value.role, 'role', CONTEXT_ROLE_MAX_CHARS, t)
     if (problem !== null) return problem
-    if (CONTROL_RE.test(String(value.role))) return 'role 不能含控制字符'
+    if (CONTROL_RE.test(String(value.role))) return t('role 不能含控制字符', 'role must not contain control characters')
   }
   const hasParent = value.parentSessionId !== undefined
   const hasMode = value.mode !== undefined
-  if (hasParent !== hasMode) return 'parentSessionId 与 mode 必须成对出现'
+  if (hasParent !== hasMode) return t('parentSessionId 与 mode 必须成对出现', 'parentSessionId and mode must appear together')
   if (hasParent) {
-    if (kind !== 'session') return '只有会话背景能带 parentSessionId'
+    if (kind !== 'session') return t('只有会话背景能带 parentSessionId', 'only session context may include parentSessionId')
     if (typeof value.parentSessionId !== 'string' || !SESSION_REF_RE.test(value.parentSessionId)
       || codePoints(value.parentSessionId) > CONTEXT_REF_MAX_CHARS) {
-      return 'parentSessionId 不合法'
+      return t('parentSessionId 不合法', 'invalid parentSessionId')
     }
-    if (!isSubagentMode(value.mode)) return 'mode 必须是 one-shot / continuable / unknown'
+    if (!isSubagentMode(value.mode)) return t('mode 必须是 one-shot / continuable / unknown', 'mode must be one-shot / continuable / unknown')
   }
   return null
 }
 
-function commandProblem(value: unknown): string | null {
-  if (!isRecord(value)) return '背景不是对象'
-  if (!onlyKeys(value, COMMAND_KEYS)) return '含未知字段（客户端只能带引用，不能带摘录）'
-  if (value.v !== 1) return '不支持的版本（v1）'
-  if (value.mode !== 'correct' && value.mode !== 'suggest') return 'mode 必须是 correct 或 suggest'
+function commandProblem(value: unknown, t: PickText): string | null {
+  if (!isRecord(value)) return t('背景不是对象', 'context is not an object')
+  if (!onlyKeys(value, COMMAND_KEYS)) return t('含未知字段（客户端只能带引用，不能带摘录）', 'contains unknown fields (client may send references only, not excerpts)')
+  if (value.v !== 1) return t('不支持的版本（v1）', 'unsupported version (v1)')
+  if (value.mode !== 'correct' && value.mode !== 'suggest') return t('mode 必须是 correct 或 suggest', 'mode must be correct or suggest')
   if (value.mode === 'correct') {
-    if (value.targetRole !== undefined) return 'correct 不接受 targetRole'
+    if (value.targetRole !== undefined) return t('correct 不接受 targetRole', 'correct does not accept targetRole')
   } else if (typeof value.targetRole !== 'string' || !(CULTIVATION_ROLES as readonly string[]).includes(value.targetRole)) {
-    return 'suggest 的 targetRole 须在名册'
+    return t('suggest 的 targetRole 须在名册', 'suggest targetRole must be on the roster')
   }
-  if (!Array.isArray(value.items)) return 'items 必须是数组'
-  if (value.items.length !== 1) return '背景只能带一段（v1）'
+  if (!Array.isArray(value.items)) return t('items 必须是数组', 'items must be an array')
+  if (value.items.length !== 1) return t('背景只能带一段（v1）', 'only one context block is supported (v1)')
   const item = value.items[0]
-  if (!isRecord(item) || !onlyKeys(item, REF_KEYS)) return '背景引用含未知字段'
-  return refProblem(item)
+  if (!isRecord(item) || !onlyKeys(item, REF_KEYS)) return t('背景引用含未知字段', 'context reference contains unknown fields')
+  return refProblem(item, t)
 }
 
 function toBase64Url(bytes: Uint8Array): string {
@@ -206,15 +213,15 @@ function toBase64Url(bytes: Uint8Array): string {
   return out
 }
 
-function fromBase64Url(token: string): Uint8Array {
+function fromBase64Url(token: string, t: PickText): Uint8Array {
   if (!/^[A-Za-z0-9_-]+$/u.test(token) || token.length % 4 === 1) {
-    throw new Error('不是合法的 base64url')
+    throw new Error(t('不是合法的 base64url', 'not valid base64url'))
   }
   const bytes: number[] = []
   for (let index = 0; index < token.length; index += 4) {
     const first = BASE64URL_LOOKUP.get(token[index] ?? '')
     const second = BASE64URL_LOOKUP.get(token[index + 1] ?? '')
-    if (first === undefined || second === undefined) throw new Error('不是合法的 base64url')
+    if (first === undefined || second === undefined) throw new Error(t('不是合法的 base64url', 'not valid base64url'))
     const third = token[index + 2] === undefined ? undefined : BASE64URL_LOOKUP.get(token[index + 2] ?? '')
     const fourth = token[index + 3] === undefined ? undefined : BASE64URL_LOOKUP.get(token[index + 3] ?? '')
     bytes.push((first << 2) | (second >> 4))
@@ -225,83 +232,108 @@ function fromBase64Url(token: string): Uint8Array {
 }
 
 /** 命令 → token；超限明确报错，不截断。 */
-export function encodeContextToken(command: unknown): ContextEncodeResult {
-  const problem = commandProblem(command)
+export function encodeContextToken(command: unknown, lang: ContextLang = 'zh'): ContextEncodeResult {
+  const t = pickerOf(lang)
+  const problem = commandProblem(command, t)
   if (problem !== null) return { ok: false, problem }
   const json = JSON.stringify(command)
   const bytes = encoder.encode(json)
   if (bytes.length > CONTEXT_COMMAND_MAX_BYTES) {
-    return { ok: false, problem: `背景太大（超过 ${String(CONTEXT_COMMAND_MAX_BYTES)} 字节），请选短一点的材料。` }
+    return {
+      ok: false,
+      problem: t(
+        `背景太大（超过 ${String(CONTEXT_COMMAND_MAX_BYTES)} 字节），请选短一点的材料。`,
+        `Background context is too large (exceeds ${String(CONTEXT_COMMAND_MAX_BYTES)} bytes); choose a shorter material.`,
+      ),
+    }
   }
   const token = toBase64Url(bytes)
   if (token.length > CONTEXT_TOKEN_MAX_CHARS) {
-    return { ok: false, problem: `背景太大（token 超过 ${String(CONTEXT_TOKEN_MAX_CHARS)} 字符），请选短一点的材料。` }
+    return {
+      ok: false,
+      problem: t(
+        `背景太大（token 超过 ${String(CONTEXT_TOKEN_MAX_CHARS)} 字符），请选短一点的材料。`,
+        `Background context is too large (token exceeds ${String(CONTEXT_TOKEN_MAX_CHARS)} characters); choose a shorter material.`,
+      ),
+    }
   }
   return { ok: true, token }
 }
 
 /** token → 命令；坏输入一律给可读原因，不抛未捕获异常。 */
-export function decodeContextToken(token: string): ContextDecodeResult {
-  if (typeof token !== 'string') return { ok: false, problem: '背景格式坏：不是合法的 base64url。' }
+export function decodeContextToken(token: string, lang: ContextLang = 'zh'): ContextDecodeResult {
+  const t = pickerOf(lang)
+  if (typeof token !== 'string') return { ok: false, problem: t('背景格式坏：不是合法的 base64url。', 'Malformed background context: not valid base64url.') }
   let bytes: Uint8Array
   try {
-    bytes = fromBase64Url(token)
+    bytes = fromBase64Url(token, t)
   } catch {
-    return { ok: false, problem: '背景格式坏：不是合法的 base64url。' }
+    return { ok: false, problem: t('背景格式坏：不是合法的 base64url。', 'Malformed background context: not valid base64url.') }
   }
   if (bytes.length > CONTEXT_COMMAND_MAX_BYTES) {
-    return { ok: false, problem: `背景太大（超过 ${String(CONTEXT_COMMAND_MAX_BYTES)} 字节），请选短一点的材料。` }
+    return {
+      ok: false,
+      problem: t(
+        `背景太大（超过 ${String(CONTEXT_COMMAND_MAX_BYTES)} 字节），请选短一点的材料。`,
+        `Background context is too large (exceeds ${String(CONTEXT_COMMAND_MAX_BYTES)} bytes); choose a shorter material.`,
+      ),
+    }
   }
   let text: string
   try {
     text = decoder.decode(bytes)
   } catch {
-    return { ok: false, problem: '背景格式坏：不是合法的 UTF-8。' }
+    return { ok: false, problem: t('背景格式坏：不是合法的 UTF-8。', 'Malformed background context: not valid UTF-8.') }
   }
   let parsed: unknown
   try {
     parsed = JSON.parse(text)
   } catch (error) {
-    return { ok: false, problem: `背景格式坏：JSON 解析失败（${error instanceof Error ? error.message : String(error)}）。` }
+    const detail = error instanceof Error ? error.message : String(error)
+    return { ok: false, problem: t(`背景格式坏：JSON 解析失败（${detail}）。`, `Malformed background context: JSON parse failed (${detail}).`) }
   }
-  const problem = commandProblem(parsed)
-  if (problem !== null) return { ok: false, problem: `背景格式坏：${problem}。` }
+  const problem = commandProblem(parsed, t)
+  if (problem !== null) return { ok: false, problem: t(`背景格式坏：${problem}。`, `Malformed background context: ${problem}.`) }
   return { ok: true, command: parsed as CultivationContextCommand }
 }
 
-function contextItemProblem(value: unknown): string | null {
-  if (!isRecord(value)) return '背景不是对象'
-  if (!onlyKeys(value, CONTEXT_KEYS)) return '背景含未知字段'
-  const ref = refProblem(value)
+function contextItemProblem(value: unknown, t: PickText): string | null {
+  if (!isRecord(value)) return t('背景不是对象', 'context is not an object')
+  if (!onlyKeys(value, CONTEXT_KEYS)) return t('背景含未知字段', 'context contains unknown fields')
+  const ref = refProblem(value, t)
   if (ref !== null) return ref
-  const title = textProblem(value.title, 'title', 1, CONTEXT_TITLE_MAX_CHARS)
+  const title = textProblem(value.title, 'title', 1, CONTEXT_TITLE_MAX_CHARS, t)
   if (title !== null) return title
-  const subtitle = optionalTextProblem(value.subtitle, 'subtitle', CONTEXT_SUBTITLE_MAX_CHARS)
+  const subtitle = optionalTextProblem(value.subtitle, 'subtitle', CONTEXT_SUBTITLE_MAX_CHARS, t)
   if (subtitle !== null) return subtitle
   if (value.at !== undefined) {
-    if (typeof value.at !== 'string' || codePoints(value.at) > 64 || /[\r\n]/u.test(value.at)) return 'at 不合法'
+    if (typeof value.at !== 'string' || codePoints(value.at) > 64 || /[\r\n]/u.test(value.at)) return t('at 不合法', 'invalid at timestamp')
   }
-  const excerpt = textProblem(value.excerpt, 'excerpt', 1, CONTEXT_EXCERPT_MAX_CHARS)
+  const excerpt = textProblem(value.excerpt, 'excerpt', 1, CONTEXT_EXCERPT_MAX_CHARS, t)
   if (excerpt !== null) return excerpt
-  if (value.truncated !== undefined && typeof value.truncated !== 'boolean') return 'truncated 必须是布尔'
+  if (value.truncated !== undefined && typeof value.truncated !== 'boolean') return t('truncated 必须是布尔', 'truncated must be a boolean')
   return null
 }
 
 /** 记录 `contexts` 字段（单行 JSON）→ 读模型；缺失/坏形状都降级，记录本身不消失。 */
-export function parseContextPayload(text: string | undefined): ContextPayloadRead {
+export function parseContextPayload(text: string | undefined, lang: ContextLang = 'zh'): ContextPayloadRead {
+  const t = pickerOf(lang)
   if (text === undefined || text.trim() === '') return { contexts: [], problem: null }
   let parsed: unknown
   try {
     parsed = JSON.parse(text)
   } catch (error) {
-    return { contexts: [], problem: `背景格式坏：JSON 解析失败（${error instanceof Error ? error.message : String(error)}）。` }
+    const detail = error instanceof Error ? error.message : String(error)
+    return { contexts: [], problem: t(`背景格式坏：JSON 解析失败（${detail}）。`, `Malformed background context: JSON parse failed (${detail}).`) }
   }
-  if (!isRecord(parsed) || !onlyKeys(parsed, ['v', 'items'])) return { contexts: [], problem: '背景格式坏：不是 {v, items} 形状。' }
-  if (parsed.v !== 1) return { contexts: [], problem: '背景格式坏：不支持的版本。' }
-  if (!Array.isArray(parsed.items)) return { contexts: [], problem: '背景格式坏：items 不是数组。' }
+  if (!isRecord(parsed) || !onlyKeys(parsed, ['v', 'items'])) {
+    return { contexts: [], problem: t('背景格式坏：不是 {v, items} 形状。', 'Malformed background context: expected {v, items} shape.') }
+  }
+  if (parsed.v !== 1) return { contexts: [], problem: t('背景格式坏：不支持的版本。', 'Malformed background context: unsupported version.') }
+  if (!Array.isArray(parsed.items)) return { contexts: [], problem: t('背景格式坏：items 不是数组。', 'Malformed background context: items must be an array.') }
   for (const item of parsed.items) {
-    const problem = contextItemProblem(item)
-    if (problem !== null) return { contexts: [], problem: `背景格式坏：${problem}。` }
+    const problem = contextItemProblem(item, t)
+    if (problem !== null) return { contexts: [], problem: t(`背景格式坏：${problem}。`, `Malformed background context: ${problem}.`) }
   }
   return { contexts: parsed.items as readonly CultivationContext[], problem: null }
 }

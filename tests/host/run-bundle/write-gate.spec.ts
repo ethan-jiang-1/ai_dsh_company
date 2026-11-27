@@ -7,9 +7,16 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   ensureCompanyRoot,
+  resolveCompanySegments,
+  UnsafeCompanyPathError,
   writeCompanyAtomic,
 } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
-import { blockCompanyWrites, unblockCompanyWrites, CompanyWriteBlockedError } from '../../../packages/company-pack/src/host/run-bundle/write-gate.ts'
+import {
+  assertCompanyWritesAllowed,
+  blockCompanyWrites,
+  unblockCompanyWrites,
+  CompanyWriteBlockedError,
+} from '../../../packages/company-pack/src/host/run-bundle/write-gate.ts'
 import { nodeCultivationStorage } from '../../../packages/company-pack/src/host/cultivation/cultivation-storage.ts'
 import { exportGovernance } from '../../../packages/company-pack/src/host/ledger/governance-export.ts'
 import { writePendingRevoke } from '../../../packages/company-pack/src/host/cultivation/revoke-journal.ts'
@@ -88,5 +95,49 @@ describe('公司盘根 residency 与写 gate', () => {
       expect(existsSync(join(outside, 'cultivation'))).toBe(false)
       expect(existsSync(join(outside, 'logs'))).toBe(false)
     } finally { rmSync(ws, { recursive: true, force: true }); rmSync(outside, { recursive: true, force: true }) }
+  })
+
+  // 负例留证 2026-11-27：write-gate 与 company-root 无 en 错误输出（BUG-405）；加 reasonEn/lang='en' 即绿。BUG-405
+  it('write-gate 与 company-root 在 lang="en" 下抛出无中文的英文错误与 messageEn（BUG-405）', () => {
+    const cjk = /[\u4e00-\u9fff]/
+    const ws = temp()
+    const outside = temp()
+    symlinkSync(outside, join(ws, '.dsh-company'))
+    try {
+      let captured: unknown
+      try {
+        ensureCompanyRoot(ws, { lang: 'en' })
+      } catch (error) {
+        captured = error
+      }
+      expect(captured).toBeInstanceOf(UnsafeCompanyPathError)
+      expect((captured as UnsafeCompanyPathError).message).not.toMatch(cjk)
+      expect((captured as UnsafeCompanyPathError).messageEn).not.toMatch(cjk)
+
+      let segError: unknown
+      try {
+        resolveCompanySegments('../escape', { allowRoot: false, stripCompanyPrefix: false, lang: 'en' })
+      } catch (error) {
+        segError = error
+      }
+      expect(segError).toBeInstanceOf(UnsafeCompanyPathError)
+      expect((segError as UnsafeCompanyPathError).message).not.toMatch(cjk)
+
+      blockCompanyWrites('中文原因', 'English lease blocked')
+      let gateError: unknown
+      try {
+        assertCompanyWritesAllowed('en')
+      } catch (error) {
+        gateError = error
+      }
+      expect(gateError).toBeInstanceOf(CompanyWriteBlockedError)
+      expect((gateError as CompanyWriteBlockedError).message).toContain('English lease blocked')
+      expect((gateError as CompanyWriteBlockedError).message).not.toMatch(cjk)
+      expect((gateError as CompanyWriteBlockedError).messageEn).not.toMatch(cjk)
+    } finally {
+      unblockCompanyWrites()
+      rmSync(ws, { recursive: true, force: true })
+      rmSync(outside, { recursive: true, force: true })
+    }
   })
 })

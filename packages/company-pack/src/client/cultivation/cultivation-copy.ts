@@ -582,6 +582,11 @@ export function setCultivationLanguage(language: 'zh' | 'en'): void {
   cultivationLanguage = language
 }
 
+/** Current expression language for cultivation helpers/tokens (BUG-405). */
+export function getCultivationLanguage(): 'zh' | 'en' {
+  return cultivationLanguage
+}
+
 /** Language-aware copy table; consumers keep reading CULTIVATION_COPY as before. */
 export const CULTIVATION_COPY: typeof CULTIVATION_COPY_ZH = new Proxy(CULTIVATION_COPY_ZH, {
   get(target, property, receiver) {

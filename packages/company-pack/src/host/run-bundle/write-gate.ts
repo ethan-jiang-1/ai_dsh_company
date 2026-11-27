@@ -6,12 +6,13 @@
  * 读路径不受影响；写入口调用 `assertCompanyWritesAllowed()`，把拒绝变成可读回执。
  */
 let blockedReason: string | null = null
+let blockedReasonEn: string | null = null
 
 /** 公司盘写被拒绝的 typed error。 */
 export class CompanyWriteBlockedError extends Error {
   /**
    * 英文原话：**不翻译 reason 本身**（那是运行前提的原话，可能是中文），
-   * 只保证「停写」这句在 en 下说得对（BUG-326 的边界：不伪造翻译）。
+   * 只保证「停写」这句在 en 下说得对（BUG-326 的边界：不伪造翻译；若给了 reasonEn 则直出英文，BUG-405）。
    */
   readonly messageEn: string
   constructor(reason: string, reasonEn?: string) {
@@ -22,13 +23,17 @@ export class CompanyWriteBlockedError extends Error {
 }
 
 /** 关闭公司盘写（重复调用保留第一条原因）。 */
-export function blockCompanyWrites(reason: string): void {
-  if (blockedReason === null) blockedReason = reason
+export function blockCompanyWrites(reason: string, reasonEn?: string): void {
+  if (blockedReason === null) {
+    blockedReason = reason
+    blockedReasonEn = reasonEn ?? null
+  }
 }
 
 /** 恢复公司盘写（拿到 lease 时）。 */
 export function unblockCompanyWrites(): void {
   blockedReason = null
+  blockedReasonEn = null
 }
 
 /** 当前被 block 的原因；null = 可写。 */
@@ -36,7 +41,12 @@ export function companyWriteBlockReason(): string | null {
   return blockedReason
 }
 
-/** 写前守卫；被 block 时抛 `CompanyWriteBlockedError`。 */
-export function assertCompanyWritesAllowed(): void {
-  if (blockedReason !== null) throw new CompanyWriteBlockedError(`公司数据已停写：${blockedReason}`)
+/** 写前守卫；被 block 时抛 `CompanyWriteBlockedError`（lang='en' 时 error.message 直接给英文）。 */
+export function assertCompanyWritesAllowed(lang: 'zh' | 'en' = 'zh'): void {
+  if (blockedReason === null) return
+  const messageEn = blockedReasonEn === null
+    ? 'Company data writes are paused; resolve the runtime preconditions and retry.'
+    : `Company data writes are paused: ${blockedReasonEn}`
+  const message = lang === 'en' ? messageEn : `公司数据已停写：${blockedReason}`
+  throw new CompanyWriteBlockedError(message, messageEn)
 }

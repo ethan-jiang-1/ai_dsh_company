@@ -13,10 +13,18 @@ import { assertCompanyWritesAllowed } from './write-gate.ts'
 
 /** 公司盘路径不安全（symlink/文件占目录/越界）。 */
 export class UnsafeCompanyPathError extends Error {
-  constructor(message: string) {
+  readonly messageEn: string
+  constructor(message: string, messageEn?: string) {
     super(message)
     this.name = 'UnsafeCompanyPathError'
+    this.messageEn = messageEn ?? message
   }
+}
+
+export type CompanyRootLang = 'zh' | 'en'
+
+function unsafePath(zh: string, en: string, lang: CompanyRootLang = 'zh'): UnsafeCompanyPathError {
+  return new UnsafeCompanyPathError(lang === 'en' ? en : zh, en)
 }
 
 /** 把 `.dsh-company/…` / `kb/…` 统一成相对公司盘根的路径（保留给词法路径辅助函数）。 */
@@ -50,12 +58,15 @@ interface ResolvedCompanyPath {
  */
 export function resolveCompanySegments(
   rawRel: string,
-  options: { readonly allowRoot: boolean; readonly stripCompanyPrefix: boolean },
+  options: { readonly allowRoot: boolean; readonly stripCompanyPrefix: boolean; readonly lang?: CompanyRootLang },
 ): ResolvedCompanyPath {
+  const lang = options.lang ?? 'zh'
   let normalized = rawRel.replaceAll('\\', '/')
-  if (normalized.includes('\0')) throw new UnsafeCompanyPathError(`公司盘路径含空字节：${rawRel}`)
+  if (normalized.includes('\0')) {
+    throw unsafePath(`公司盘路径含空字节：${rawRel}`, `Company disk path contains null byte: ${rawRel}`, lang)
+  }
   if (normalized.startsWith('/') || /^[A-Za-z]:/.test(normalized)) {
-    throw new UnsafeCompanyPathError(`公司盘路径必须是相对路径：${rawRel}`)
+    throw unsafePath(`公司盘路径必须是相对路径：${rawRel}`, `Company disk path must be relative: ${rawRel}`, lang)
   }
   if (options.stripCompanyPrefix) {
     while (normalized.startsWith('./')) normalized = normalized.slice(2)
@@ -67,7 +78,9 @@ export function resolveCompanySegments(
   for (const segment of normalized.split('/')) {
     if (segment === '' || segment === '.') continue
     if (segment === '..') {
-      if (segments.length === 0) throw new UnsafeCompanyPathError(`公司盘路径越出根：${rawRel}`)
+      if (segments.length === 0) {
+        throw unsafePath(`公司盘路径越出根：${rawRel}`, `Company disk path escapes root: ${rawRel}`, lang)
+      }
       traversedPrefixes.push([...segments])
       segments.pop()
       continue
@@ -75,27 +88,31 @@ export function resolveCompanySegments(
     segments.push(segment)
   }
   if (!options.allowRoot && segments.length === 0) {
-    throw new UnsafeCompanyPathError(`公司盘目标不能指向盘根自身：${rawRel}`)
+    throw unsafePath(`公司盘目标不能指向盘根自身：${rawRel}`, `Company disk target cannot point to the disk root itself: ${rawRel}`, lang)
   }
   return { segments, traversedPrefixes }
 }
 
 /** 证明所有被 `..` 跨越过的中间前缀在盘上都不是 symlink 或非目录。 */
-function verifyTraversedPrefixes(root: string, traversedPrefixes: readonly (readonly string[])[]): void {
+function verifyTraversedPrefixes(root: string, traversedPrefixes: readonly (readonly string[])[], lang: CompanyRootLang = 'zh'): void {
   for (const prefix of traversedPrefixes) {
     let current = root
     for (const segment of prefix) {
       current = join(current, segment)
       const info = lstatOrNull(current)
       if (info === null) break
-      if (info.isSymbolicLink()) throw new UnsafeCompanyPathError(`公司盘路径经由 symlink 目录回退：${current}`)
-      if (!info.isDirectory()) throw new UnsafeCompanyPathError(`公司盘路径中间段不是目录：${current}`)
+      if (info.isSymbolicLink()) {
+        throw unsafePath(`公司盘路径经由 symlink 目录回退：${current}`, `Company disk path traverses back through a symlink directory: ${current}`, lang)
+      }
+      if (!info.isDirectory()) {
+        throw unsafePath(`公司盘路径中间段不是目录：${current}`, `Company disk path intermediate segment is not a directory: ${current}`, lang)
+      }
     }
   }
 }
 
 /** 从已证明安全的根逐级走已消解目录段；create 时缺失则创建，symlink/文件占目录 → typed error。 */
-function walkSegmentList(root: string, segments: readonly string[], create: boolean): string {
+function walkSegmentList(root: string, segments: readonly string[], create: boolean, lang: CompanyRootLang = 'zh'): string {
   let current = root
   for (const segment of segments) {
     current = join(current, segment)
@@ -103,13 +120,20 @@ function walkSegmentList(root: string, segments: readonly string[], create: bool
     if (info === null) {
       if (!create) return current
       try { mkdirSync(current) } catch (error) {
-        throw new UnsafeCompanyPathError(`无法创建公司盘子目录：${current}（${(error as Error).message}）`)
+        const msg = (error as Error).message
+        throw unsafePath(`无法创建公司盘子目录：${current}（${msg}）`, `Cannot create company disk subdirectory: ${current} (${msg})`, lang)
       }
       info = lstatOrNull(current)
-      if (info === null) throw new UnsafeCompanyPathError(`公司盘子目录无法创建：${current}`)
+      if (info === null) {
+        throw unsafePath(`公司盘子目录无法创建：${current}`, `Company disk subdirectory could not be created: ${current}`, lang)
+      }
     }
-    if (info.isSymbolicLink()) throw new UnsafeCompanyPathError(`公司盘子目录是 symlink，拒绝：${current}`)
-    if (!info.isDirectory()) throw new UnsafeCompanyPathError(`公司盘子目录不是目录：${current}`)
+    if (info.isSymbolicLink()) {
+      throw unsafePath(`公司盘子目录是 symlink，拒绝：${current}`, `Company disk subdirectory is a symlink, refusing: ${current}`, lang)
+    }
+    if (!info.isDirectory()) {
+      throw unsafePath(`公司盘子目录不是目录：${current}`, `Company disk subdirectory is not a directory: ${current}`, lang)
+    }
   }
   return current
 }
@@ -118,11 +142,12 @@ function walkCompanyDirs(
   root: string,
   rawRel: string,
   create: boolean,
-  options: { readonly allowRoot: boolean; readonly stripCompanyPrefix: boolean },
+  options: { readonly allowRoot: boolean; readonly stripCompanyPrefix: boolean; readonly lang?: CompanyRootLang },
 ): string {
+  const lang = options.lang ?? 'zh'
   const { segments, traversedPrefixes } = resolveCompanySegments(rawRel, options)
-  verifyTraversedPrefixes(root, traversedPrefixes)
-  return walkSegmentList(root, segments, create)
+  verifyTraversedPrefixes(root, traversedPrefixes, lang)
+  return walkSegmentList(root, segments, create, lang)
 }
 
 /** 在已证明安全的根下原子写文件（父目录安全、目标非目录；symlink 由 rename 替换）。 */
@@ -141,24 +166,29 @@ function recheckParent(
   parentSegments: readonly string[],
   parentReal: string,
   realpath: (path: string) => string,
+  lang: CompanyRootLang = 'zh',
 ): void {
   try {
     const info = lstatOrNull(root)
     if (info === null || info.isSymbolicLink() || !info.isDirectory()) {
-      throw new UnsafeCompanyPathError(`公司盘根在写入期间被替换：${root}`)
+      throw unsafePath(`公司盘根在写入期间被替换：${root}`, `Company disk root was replaced during write: ${root}`, lang)
     }
-    verifyTraversedPrefixes(root, traversedPrefixes)
+    verifyTraversedPrefixes(root, traversedPrefixes, lang)
     if (parentSegments.length === 0) {
-      if (realpath(root) !== parentReal) throw new UnsafeCompanyPathError(`公司盘根在写入期间被替换：${root}`)
+      if (realpath(root) !== parentReal) {
+        throw unsafePath(`公司盘根在写入期间被替换：${root}`, `Company disk root was replaced during write: ${root}`, lang)
+      }
       return
     }
-    const current = walkSegmentList(root, parentSegments, false)
+    const current = walkSegmentList(root, parentSegments, false, lang)
     if (realpath(current) !== parentReal) {
-      throw new UnsafeCompanyPathError(`公司盘父目录在写入期间被替换：${current}`)
+      throw unsafePath(`公司盘父目录在写入期间被替换：${current}`, `Company disk parent directory was replaced during write: ${current}`, lang)
     }
   } catch (error) {
     if (error instanceof UnsafeCompanyPathError) throw error
-    throw new UnsafeCompanyPathError(`公司盘父目录在写入期间不可解析：${parentSegments.join('/')}（${(error as Error).message}）`)
+    const msg = (error as Error).message
+    const rel = parentSegments.join('/')
+    throw unsafePath(`公司盘父目录在写入期间不可解析：${rel}（${msg}）`, `Company disk parent directory became unresolvable during write: ${rel} (${msg})`, lang)
   }
 }
 
@@ -168,22 +198,25 @@ function writeAtomicAtRoot(
   text: string,
   stripCompanyPrefix: boolean,
   deps: CompanyAtomicWriteDeps = {},
+  lang: CompanyRootLang = 'zh',
 ): void {
-  const { segments, traversedPrefixes } = resolveCompanySegments(rawRel, { allowRoot: false, stripCompanyPrefix })
-  verifyTraversedPrefixes(root, traversedPrefixes)
+  const { segments, traversedPrefixes } = resolveCompanySegments(rawRel, { allowRoot: false, stripCompanyPrefix, lang })
+  verifyTraversedPrefixes(root, traversedPrefixes, lang)
   const parentSegments = segments.slice(0, -1)
   const leaf = segments[segments.length - 1] ?? ''
-  const parent = parentSegments.length === 0 ? root : walkSegmentList(root, parentSegments, true)
+  const parent = parentSegments.length === 0 ? root : walkSegmentList(root, parentSegments, true, lang)
   const parentReal = (deps.realpath ?? realpathSync)(parent)
   const target = join(parent, leaf)
   const info = lstatOrNull(target)
-  if (info !== null && info.isDirectory()) throw new UnsafeCompanyPathError(`公司盘文件被目录占用：${target}`)
+  if (info !== null && info.isDirectory()) {
+    throw unsafePath(`公司盘文件被目录占用：${target}`, `Company disk file path is occupied by a directory: ${target}`, lang)
+  }
   const temporary = `${target}.${String(process.pid)}.${randomUUID()}.tmp`
   try {
     ;(deps.writeFile ?? writeFileSync)(temporary, text, { flag: 'wx' })
     // 注入缝：测试在这里把父目录换成 symlink；生产路径下窗口极小，但 rename 仍走路径，
     // Node 没有 renameat/openat，无法完全关闭——残余风险见 Note。
-    recheckParent(root, traversedPrefixes, parentSegments, parentReal, deps.realpath ?? realpathSync)
+    recheckParent(root, traversedPrefixes, parentSegments, parentReal, deps.realpath ?? realpathSync, lang)
     ;(deps.rename ?? renameSync)(temporary, target)
   } catch (error) {
     try { (deps.unlink ?? unlinkSync)(temporary) } catch { /* 未创建/已 rename */ }
@@ -195,28 +228,31 @@ function writeAtomicAtRoot(
  * 证明公司盘根是 workspace 内的普通目录；`create` 时缺失则创建。
  * @throws UnsafeCompanyPathError
  */
-export function ensureCompanyRoot(workspace: string, options: { readonly create?: boolean } = {}): string {
-  if (options.create === true) assertCompanyWritesAllowed()
+export function ensureCompanyRoot(workspace: string, options: { readonly create?: boolean; readonly lang?: CompanyRootLang } = {}): string {
+  const lang = options.lang ?? 'zh'
+  if (options.create === true) assertCompanyWritesAllowed(lang)
   const root = companyHomeOf(workspace)
   let info = lstatOrNull(root)
   if (info === null) {
     if (options.create !== true) return root
     try { mkdirSync(root) } catch (error) {
-      throw new UnsafeCompanyPathError(`无法创建公司盘根：${root}（${(error as Error).message}）`)
+      const msg = (error as Error).message
+      throw unsafePath(`无法创建公司盘根：${root}（${msg}）`, `Cannot create company disk root: ${root} (${msg})`, lang)
     }
     info = lstatOrNull(root)
-    if (info === null) throw new UnsafeCompanyPathError(`公司盘根无法创建：${root}`)
+    if (info === null) throw unsafePath(`公司盘根无法创建：${root}`, `Company disk root could not be created: ${root}`, lang)
   }
-  if (info === null) throw new UnsafeCompanyPathError(`公司盘根不存在：${root}`)
-  if (info.isSymbolicLink()) throw new UnsafeCompanyPathError(`公司盘根是 symlink，拒绝：${root}`)
-  if (!info.isDirectory()) throw new UnsafeCompanyPathError(`公司盘根不是目录：${root}`)
+  if (info === null) throw unsafePath(`公司盘根不存在：${root}`, `Company disk root does not exist: ${root}`, lang)
+  if (info.isSymbolicLink()) throw unsafePath(`公司盘根是 symlink，拒绝：${root}`, `Company disk root is a symlink, refusing: ${root}`, lang)
+  if (!info.isDirectory()) throw unsafePath(`公司盘根不是目录：${root}`, `Company disk root is not a directory: ${root}`, lang)
   try {
     if (!isInside(workspace, realpathSync(root))) {
-      throw new UnsafeCompanyPathError(`公司盘根真实路径越出 workspace：${root}`)
+      throw unsafePath(`公司盘根真实路径越出 workspace：${root}`, `Company disk root real path escapes workspace: ${root}`, lang)
     }
   } catch (error) {
     if (error instanceof UnsafeCompanyPathError) throw error
-    throw new UnsafeCompanyPathError(`公司盘根不可解析：${root}（${(error as Error).message}）`)
+    const msg = (error as Error).message
+    throw unsafePath(`公司盘根不可解析：${root}（${msg}）`, `Company disk root is unresolvable: ${root} (${msg})`, lang)
   }
   return root
 }
@@ -225,11 +261,13 @@ export function ensureCompanyRoot(workspace: string, options: { readonly create?
  * 证明 `rel` 的每一级父目录都是公司盘根内的普通目录；`create` 时缺失则创建。
  * @returns 目标绝对路径（目录本身必须按需已存在；不会跟随 symlink）。
  */
-export function ensureCompanyDir(workspace: string, rawRel: string, options: { readonly create?: boolean } = {}): string {
-  if (options.create === true) assertCompanyWritesAllowed()
+export function ensureCompanyDir(workspace: string, rawRel: string, options: { readonly create?: boolean; readonly lang?: CompanyRootLang } = {}): string {
+  const lang = options.lang ?? 'zh'
+  if (options.create === true) assertCompanyWritesAllowed(lang)
   return walkCompanyDirs(ensureCompanyRoot(workspace, options), rawRel, options.create === true, {
     allowRoot: true,
     stripCompanyPrefix: true,
+    lang,
   })
 }
 
@@ -304,28 +342,32 @@ export function createCompanyDir(workspace: string, rawRel: string): void {
 // ── companyHome 版本（catalog/ledger 等已持有 `<workspace>/.dsh-company` 的模块）────────────
 
 /** 证明给定的 companyHome 是普通目录（缺失/`create` 时创建）；不校验 workspace 前缀。 */
-export function ensureCompanyRootAt(companyHome: string, options: { readonly create?: boolean } = {}): string {
-  if (options.create === true) assertCompanyWritesAllowed()
+export function ensureCompanyRootAt(companyHome: string, options: { readonly create?: boolean; readonly lang?: CompanyRootLang } = {}): string {
+  const lang = options.lang ?? 'zh'
+  if (options.create === true) assertCompanyWritesAllowed(lang)
   let info = lstatOrNull(companyHome)
   if (info === null) {
     if (options.create !== true) return companyHome
     try { mkdirSync(companyHome, { recursive: true }) } catch (error) {
-      throw new UnsafeCompanyPathError(`无法创建公司盘根：${companyHome}（${(error as Error).message}）`)
+      const msg = (error as Error).message
+      throw unsafePath(`无法创建公司盘根：${companyHome}（${msg}）`, `Cannot create company disk root: ${companyHome} (${msg})`, lang)
     }
     info = lstatOrNull(companyHome)
-    if (info === null) throw new UnsafeCompanyPathError(`公司盘根无法创建：${companyHome}`)
+    if (info === null) throw unsafePath(`公司盘根无法创建：${companyHome}`, `Company disk root could not be created: ${companyHome}`, lang)
   }
-  if (info.isSymbolicLink()) throw new UnsafeCompanyPathError(`公司盘根是 symlink，拒绝：${companyHome}`)
-  if (!info.isDirectory()) throw new UnsafeCompanyPathError(`公司盘根不是目录：${companyHome}`)
+  if (info.isSymbolicLink()) throw unsafePath(`公司盘根是 symlink，拒绝：${companyHome}`, `Company disk root is a symlink, refusing: ${companyHome}`, lang)
+  if (!info.isDirectory()) throw unsafePath(`公司盘根不是目录：${companyHome}`, `Company disk root is not a directory: ${companyHome}`, lang)
   return companyHome
 }
 
 /** 逐级证明 companyHome 下的目录安全（可选创建）；symlink/文件占目录 → typed error。 */
-export function ensureCompanyDirAt(companyHome: string, rel: string, options: { readonly create?: boolean } = {}): string {
-  if (options.create === true) assertCompanyWritesAllowed()
+export function ensureCompanyDirAt(companyHome: string, rel: string, options: { readonly create?: boolean; readonly lang?: CompanyRootLang } = {}): string {
+  const lang = options.lang ?? 'zh'
+  if (options.create === true) assertCompanyWritesAllowed(lang)
   return walkCompanyDirs(ensureCompanyRootAt(companyHome, options), rel, options.create === true, {
     allowRoot: true,
     stripCompanyPrefix: false,
+    lang,
   })
 }
 
@@ -333,19 +375,21 @@ export function ensureCompanyDirAt(companyHome: string, rel: string, options: { 
  * 校验 companyHome 下的目标子路径（含中间 `..` 跨越段与目标自身）没有经过或落到 symlink。
  * 目标或父目录尚未落盘时放行（兼容合成测试与未落盘预览路径）；一旦盘上存在 symlink/非目录中间段即抛。
  */
-export function verifyCompanySubpathAt(companyHome: string, rawRel: string): readonly string[] {
-  const root = ensureCompanyRootAt(companyHome)
+export function verifyCompanySubpathAt(companyHome: string, rawRel: string, lang: CompanyRootLang = 'zh'): readonly string[] {
+  const root = ensureCompanyRootAt(companyHome, { lang })
   const { segments, traversedPrefixes } = resolveCompanySegments(rawRel, {
     allowRoot: false,
     stripCompanyPrefix: false,
+    lang,
   })
-  verifyTraversedPrefixes(root, traversedPrefixes)
+  verifyTraversedPrefixes(root, traversedPrefixes, lang)
   if (segments.length > 1) {
-    walkSegmentList(root, segments.slice(0, -1), false)
+    walkSegmentList(root, segments.slice(0, -1), false, lang)
   }
-  const leafInfo = lstatOrNull(join(root, ...segments))
+  const target = join(root, ...segments)
+  const leafInfo = lstatOrNull(target)
   if (leafInfo !== null && leafInfo.isSymbolicLink()) {
-    throw new UnsafeCompanyPathError(`公司盘目标是 symlink，拒绝：${join(root, ...segments)}`)
+    throw unsafePath(`公司盘目标是 symlink，拒绝：${target}`, `Company disk target is a symlink, refusing: ${target}`, lang)
   }
   return segments
 }

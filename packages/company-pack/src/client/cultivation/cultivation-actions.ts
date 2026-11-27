@@ -26,6 +26,7 @@ export {
   cultivationListSeparator,
   cultivationTimeLabel,
   formatCultivationReadReason,
+  getCultivationLanguage,
   setCultivationLanguage,
 } from './cultivation-copy.ts'
 

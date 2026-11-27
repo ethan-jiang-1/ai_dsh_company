@@ -21,6 +21,7 @@ import { clipExcerpt, encodeContextToken, secretLikeFindings, type CultivationCo
 import {
   CULTIVATION_COPY,
   correctLine,
+  getCultivationLanguage,
   resolveDraftProblem,
   suggestLine,
   type ActionOutcome,
@@ -262,7 +263,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
         mode: isSuggest ? 'suggest' : 'correct',
         ...(isSuggest ? { targetRole } : {}),
         items: [context.ref],
-      })
+      }, getCultivationLanguage())
       if (!encoded.ok) {
         setProblem(encoded.problem)
         return

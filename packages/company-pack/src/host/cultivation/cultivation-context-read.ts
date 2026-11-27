@@ -42,12 +42,13 @@ interface SessionQueryLike {
 }
 
 type ContextRead = { readonly context: CultivationContext } | { readonly problem: string }
+type ContextText = (zh: string, en: string) => string
 
-function errorMessage(error: unknown): string {
+function errorMessage(error: unknown, t: ContextText): string {
   try {
     return error instanceof Error ? error.message : String(error)
   } catch {
-    return '未知原因'
+    return t('未知原因', 'unknown error')
   }
 }
 
@@ -59,21 +60,30 @@ function sessionQueryOf(ctx: Context): SessionQueryLike | undefined {
 }
 
 /** 会话背景：host 非激活读一轮文字，填自包含 `contexts`。 */
-async function readSessionContext(query: SessionQueryLike, ref: CultivationContextRef, roleLabel: (role: string) => string): Promise<ContextRead> {
+async function readSessionContext(
+  query: SessionQueryLike,
+  ref: CultivationContextRef,
+  roleLabel: (role: string) => string,
+  t: ContextText,
+): Promise<ContextRead> {
   const observation = await query.observeSession(ref.ref, {
     projectionMode: 'none',
     signal: AbortSignal.timeout(5_000),
   })
   if (ref.parentSessionId !== undefined) {
-    if (observation.header.parentSession !== ref.parentSessionId) return { problem: '背景会话不是这个 parent 的子会话。' }
-    if (observation.header.origin !== 'subagent') return { problem: '背景会话不是子会话（origin 不是 subagent）。' }
+    if (observation.header.parentSession !== ref.parentSessionId) {
+      return { problem: t('背景会话不是这个 parent 的子会话。', 'This context session is not a child of the current parent session.') }
+    }
+    if (observation.header.origin !== 'subagent') {
+      return { problem: t('背景会话不是子会话（origin 不是 subagent）。', 'This context session is not a subagent session (origin is not subagent).') }
+    }
   }
   const picked = pickSessionTurn(observation.events, ref.turn)
   if (picked === null) {
     return {
       problem: ref.turn === undefined
-        ? '这段会话没有可用的文字背景（可能只有工具调用）。'
-        : `第 ${String(ref.turn)} 轮没有可用的文字背景。`,
+        ? t('这段会话没有可用的文字背景（可能只有工具调用）。', 'This session has no usable text context (it may contain only tool calls).')
+        : t(`第 ${String(ref.turn)} 轮没有可用的文字背景。`, `Turn ${String(ref.turn)} has no usable text context.`),
     }
   }
   let title = ref.label?.trim() ?? ''
@@ -88,12 +98,13 @@ async function readSessionContext(query: SessionQueryLike, ref: CultivationConte
       // Title is presentation-only; the turn text is the evidence.
     }
   }
-  if (title === '') title = `第 ${String(picked.turn)} 轮`
+  const turnLabel = t(`第 ${String(picked.turn)} 轮`, `Turn ${String(picked.turn)}`)
+  if (title === '') title = turnLabel
   const preset = observation.header.agentPreset
   const role = ref.role?.trim() !== undefined && ref.role?.trim() !== ''
     ? ref.role.trim()
     : preset !== undefined && ROSTER.has(preset) ? preset : undefined
-  const subtitle = [role === undefined ? '' : roleLabel(role), `第 ${String(picked.turn)} 轮`]
+  const subtitle = [role === undefined ? '' : roleLabel(role), turnLabel]
     .filter(part => part !== '').join(' · ')
   const clipped = clipExcerpt(picked.text, 1_200)
   const context: CultivationContext = {
@@ -113,21 +124,35 @@ async function readSessionContext(query: SessionQueryLike, ref: CultivationConte
 }
 
 /** 成品背景：只认 `RUN_BUNDLE_PATHS.catalog` 里的条目（不做任意文件读）。 */
-function readDeliverableContext(companyRoot: string, ref: CultivationContextRef, resultLabel: (result: string) => string): ContextRead {
+function readDeliverableContext(
+  companyRoot: string,
+  ref: CultivationContextRef,
+  resultLabel: (result: string) => string,
+  t: ContextText,
+): ContextRead {
   let raw: unknown
   try {
     raw = JSON.parse(readFileSync(join(companyRoot, RUN_BUNDLE_PATHS.catalog), 'utf8'))
   } catch {
-    return { problem: '读不到成品目录（生成器未跑或索引缺失）——仍可选会话，或直接手写。' }
+    return {
+      problem: t(
+        '读不到成品目录（生成器未跑或索引缺失）——仍可选会话，或直接手写。',
+        'Cannot read the deliverables catalog (generator has not run or the index is missing) — you can still pick a session or write directly.',
+      ),
+    }
   }
-  if (!isRecord(raw) || !Array.isArray(raw.entries)) return { problem: '成品目录形状不符（schema/entries 缺失）。' }
+  if (!isRecord(raw) || !Array.isArray(raw.entries)) {
+    return { problem: t('成品目录形状不符（schema/entries 缺失）。', 'Malformed deliverables catalog (missing schema/entries).') }
+  }
   const entry = raw.entries.find(value => isRecord(value) && value.path === ref.ref)
-  if (entry === undefined || !isRecord(entry)) return { problem: '成品目录里没有这个成品（可能已归档/移动）。' }
-  const slug = typeof entry.slug === 'string' && entry.slug !== '' ? entry.slug : ref.label?.trim() ?? '成品'
+  if (entry === undefined || !isRecord(entry)) {
+    return { problem: t('成品目录里没有这个成品（可能已归档/移动）。', 'This deliverable is not in the deliverables catalog (it may have been archived or moved).') }
+  }
+  const slug = typeof entry.slug === 'string' && entry.slug !== '' ? entry.slug : ref.label?.trim() ?? t('成品', 'Deliverable')
   const result = typeof entry.result === 'string' && entry.result !== '' ? entry.result : undefined
   const summary = typeof entry.summary === 'string' && entry.summary.trim() !== ''
     ? entry.summary.trim()
-    : `成品 ${slug}`
+    : t(`成品 ${slug}`, `Deliverable ${slug}`)
   const clipped = clipExcerpt(summary, 600)
   const role = ref.role?.trim() === undefined || ref.role?.trim() === '' ? undefined : ref.role.trim()
   const context: CultivationContext = {
@@ -143,24 +168,33 @@ function readDeliverableContext(companyRoot: string, ref: CultivationContextRef,
   return { context }
 }
 
-export async function readContext(ctx: Context, companyRoot: string, ref: CultivationContextRef, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result): Promise<ContextRead> {
+export async function readContext(
+  ctx: Context,
+  companyRoot: string,
+  ref: CultivationContextRef,
+  roleLabel: (role: string) => string = defaultRoleLabel,
+  resultLabel: (result: string) => string = result => result,
+  t: ContextText = zh => zh,
+): Promise<ContextRead> {
   if (ref.kind === 'session') {
     const query = sessionQueryOf(ctx)
-    if (query === undefined) return { problem: '这个界面读不了会话历史（sessionQuery 未挂）。' }
+    if (query === undefined) {
+      return { problem: t('这个界面读不了会话历史（sessionQuery 未挂）。', 'This surface cannot read session history (sessionQuery is not mounted).') }
+    }
     try {
-      return await readSessionContext(query, ref, roleLabel)
+      return await readSessionContext(query, ref, roleLabel, t)
     } catch (error) {
-      return { problem: `这段背景读不到：${errorMessage(error)}。` }
+      return { problem: t(`这段背景读不到：${errorMessage(error, t)}。`, `Unable to read this background context: ${errorMessage(error, t)}.`) }
     }
   }
   if (ref.kind === 'deliverable') {
     try {
-      return readDeliverableContext(companyRoot, ref, resultLabel)
+      return readDeliverableContext(companyRoot, ref, resultLabel, t)
     } catch (error) {
-      return { problem: `这段背景读不到：${errorMessage(error)}。` }
+      return { problem: t(`这段背景读不到：${errorMessage(error, t)}。`, `Unable to read this background context: ${errorMessage(error, t)}.`) }
     }
   }
-  return { problem: '背景格式坏：不支持的 kind。' }
+  return { problem: t('背景格式坏：不支持的 kind。', 'Malformed background context: unsupported kind.') }
 }
 
 /** 把 `head :: body` 切开（分隔符两侧留白皆可；无分隔符 = body 空）。 */

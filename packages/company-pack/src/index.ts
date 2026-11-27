@@ -95,6 +95,8 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   const dataBlocked = runtime.dataBlocked || !hasWorkspace
   const blockedReason = runtime.blockedReason
     ?? (hasWorkspace ? undefined : '未指定 workspace（DSH_COMPANY_HOME 为空，cwd 不是可用项目目录，也没有已保存选择）')
+  const blockedReasonEn = runtime.blockedReasonEn
+    ?? (hasWorkspace ? undefined : 'No workspace specified (DSH_COMPANY_HOME is empty, cwd is not a usable project directory, and no saved selection exists)')
   // exactOptionalPropertyTypes：可选属性不能显式传 undefined，只在有原因时展开。
   const blockedFields = blockedReason === undefined ? {} : { blockedReason }
 
@@ -135,7 +137,18 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
     }
   }
 
-  registerCultivation(ctx, config, hasWorkspace ? workspace : undefined, dataBlocked, blockedReason, role => roleLabelFor(role, language.current()), result => resultLabelFor(result, language.current()), language.text)
+  registerCultivation(
+    ctx,
+    config,
+    hasWorkspace ? workspace : undefined,
+    dataBlocked,
+    blockedReason,
+    role => roleLabelFor(role, language.current()),
+    result => resultLabelFor(result, language.current()),
+    language.text,
+    language,
+    blockedReasonEn,
+  )
   const contentDir = resolveContentDir(import.meta.url)
   const startupWatch = new StartupOptionsWatch({ contentDir, logger: ctx.logger })
   // 组合测试的最小 ctx 替身可能没有 effect；真实 Cordis 有。缺失时 watcher 随进程退出回收。

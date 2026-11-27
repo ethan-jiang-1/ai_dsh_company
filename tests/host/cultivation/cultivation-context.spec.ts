@@ -193,4 +193,83 @@ describe('可选参考背景（RFC：命令只带引用，host 读后写 context
       }
     })
   })
+
+  // 负例留证 2026-11-27：host/cultivation-context-read.ts 与 decodeContextToken 硬编码中文 ⇒ en 命令上下文读报错泄漏中文（BUG-405）；加 t/lang 后全英文即绿。BUG-405
+  it('en 模式下坏 token / 无 sessionQuery / 读失败 / 子会话校验 / 缺成品均输出无中文英文错误（BUG-405）', async () => {
+    const cjk = /[\u4e00-\u9fff]/
+    await withCultivationWorkspace(async workspace => {
+      const en = (_zh: string, enText: string) => enText
+
+      const badToken = await invokeCultivation(
+        cultivationRegistrations({}, query(), workspace, undefined, undefined, undefined, en).command,
+        'ceo', workspace, 'correct --context=bad$token Expect ::',
+      )
+      expect(badToken.kind).toBe('error')
+      expect(badToken.text).not.toMatch(cjk)
+
+      const noQuery = await invokeCultivation(
+        cultivationRegistrations({} as never, undefined, workspace, undefined, undefined, undefined, en).command,
+        'ceo', workspace, `correct --context=${tokenOf({ kind: 'session', ref: 'session-1' })} Expect ::`,
+      )
+      expect(noQuery.kind).toBe('error')
+      expect(noQuery.text).not.toMatch(cjk)
+
+      const failed = await invokeCultivation(
+        cultivationRegistrations({}, query({ observeSession: async () => { throw new Error('disk gone') } }), workspace, undefined, undefined, undefined, en).command,
+        'ceo', workspace, `correct --context=${tokenOf({ kind: 'session', ref: 'session-1' })} Expect ::`,
+      )
+      expect(failed.kind).toBe('error')
+      expect(failed.text).toContain('disk gone')
+      expect(failed.text).not.toMatch(cjk)
+
+      const mismatch = await invokeCultivation(
+        cultivationRegistrations({}, query({
+          observeSession: async (sessionId: string) => ({
+            header: { id: sessionId, agentPreset: 'cfo', origin: 'subagent', parentSession: 'other-parent' },
+            events,
+          }),
+        }), workspace, undefined, undefined, undefined, en).command,
+        'ceo', workspace, `correct --context=${tokenOf({ kind: 'session', ref: 'child-1', parentSessionId: 'parent-1', mode: 'continuable' })} Expect ::`,
+      )
+      expect(mismatch.kind).toBe('error')
+      expect(mismatch.text).not.toMatch(cjk)
+
+      const notSubagent = await invokeCultivation(
+        cultivationRegistrations({}, query({
+          observeSession: async (sessionId: string) => ({
+            header: { id: sessionId, agentPreset: 'cfo', origin: 'root', parentSession: 'parent-1' },
+            events,
+          }),
+        }), workspace, undefined, undefined, undefined, en).command,
+        'ceo', workspace, `correct --context=${tokenOf({ kind: 'session', ref: 'child-1', parentSessionId: 'parent-1', mode: 'continuable' })} Expect ::`,
+      )
+      expect(notSubagent.kind).toBe('error')
+      expect(notSubagent.text).not.toMatch(cjk)
+
+      const noTurn = await invokeCultivation(
+        cultivationRegistrations({}, query({
+          observeSession: async (sessionId: string) => ({ header: { id: sessionId, agentPreset: 'cfo' }, events: [] }),
+        }), workspace, undefined, undefined, undefined, en).command,
+        'ceo', workspace, `correct --context=${tokenOf({ kind: 'session', ref: 'session-1', turn: 2 })} Expect ::`,
+      )
+      expect(noTurn.kind).toBe('error')
+      expect(noTurn.text).not.toMatch(cjk)
+
+      const missingCatalog = await invokeCultivation(
+        cultivationRegistrations({}, query(), workspace, undefined, undefined, undefined, en).command,
+        'ceo', workspace, `suggest cfo --context=${tokenOf({ kind: 'deliverable', ref: '.dsh-company/deliverables/nope/final.md' }, 'suggest')} Expect ::`,
+      )
+      expect(missingCatalog.kind).toBe('error')
+      expect(missingCatalog.text).not.toMatch(cjk)
+
+      mkdirSync(join(workspace, '.dsh-company/kb'), { recursive: true })
+      writeFileSync(join(workspace, '.dsh-company/kb', 'deliverables-index.json'), JSON.stringify({ schema: 1, entries: [] }))
+      const missingEntry = await invokeCultivation(
+        cultivationRegistrations({}, query(), workspace, undefined, undefined, undefined, en).command,
+        'ceo', workspace, `suggest cfo --context=${tokenOf({ kind: 'deliverable', ref: '.dsh-company/deliverables/nope/final.md' }, 'suggest')} Expect ::`,
+      )
+      expect(missingEntry.kind).toBe('error')
+      expect(missingEntry.text).not.toMatch(cjk)
+    })
+  })
 })

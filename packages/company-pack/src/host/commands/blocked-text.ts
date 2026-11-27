@@ -22,8 +22,13 @@ export function blockedCompanyTextPair(
   reason: string | undefined,
   actionZh: string,
   actionEn: string,
+  reasonEn?: string,
 ): { readonly zh: string, readonly en: string } {
-  const whyEn = reason === undefined || reason.trim() === '' ? 'runtime preconditions are not met' : reason.trim()
+  const cleanEn = reasonEn?.trim()
+  const cleanZh = reason?.trim()
+  const whyEn = cleanEn !== undefined && cleanEn !== ''
+    ? cleanEn
+    : cleanZh !== undefined && cleanZh !== '' ? cleanZh : 'runtime preconditions are not met'
   return {
     zh: blockedCompanyText(reason, actionZh),
     en: `Company data writes are paused (reason: ${whyEn}); resolve it before ${actionEn}.`

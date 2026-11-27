@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 392 |
-| 有具名守卫 | 290 |
+| 已修卡 | 394 |
+| 有具名守卫 | 292 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 74.0% |
+| 覆盖率 | 74.1% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -172,11 +172,11 @@
 | 138 | 2026-11-13 | tests/host/ledger/catalog.spec.ts:502 |
 | 139 | 2026-11-13 | tests/host/cultivation/cultivation-command.spec.ts:450 |
 | 143 | 2026-11-13 | tests/host/run-bundle/bootstrap.spec.ts:478 |
-| 144 | 2026-11-13 | tests/host/run-bundle/write-gate.spec.ts:55 |
+| 144 | 2026-11-13 | tests/host/run-bundle/write-gate.spec.ts:62 |
 | 145 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:476 |
 | 147 | 2026-11-13 | tests/host/ledger/governance-export.spec.ts:107 |
 | 148 | 2026-11-13 | tests/host/run-bundle/bundle-manifest.spec.ts:183 |
-| 149 | 2026-11-13 | tests/host/run-bundle/write-gate.spec.ts:73 |
+| 149 | 2026-11-13 | tests/host/run-bundle/write-gate.spec.ts:80 |
 | 152 | 2026-11-13 | tests/lib/docs/markdown-shape.property.spec.ts:152；tests/lib/docs/prd-check.spec.ts:241 |
 | 153 | 2026-11-13 | tests/lib/docs/prd-check.spec.ts:253 |
 | 156 | 2026-11-13 | tests/host/contract/file-shape-agreement.spec.ts:331 |
@@ -336,7 +336,7 @@
 | 323 | 2026-11-22 | tests/client/presence/attention-history.spec.ts:118；tests/client/tabs/attention-tab.spec.ts:231 |
 | 324 | 2026-11-22 | tests/client/data/catalog-contract.spec.ts:72 |
 | 325 | 2026-11-23 | tests/client/wiring/attention.spec.ts:429；tests/client/wiring/attention.spec.ts:508 |
-| 326 | 2026-11-23 | tests/host/commands/blocked-text.spec.ts:11；tests/host/cultivation/cultivation-command.spec.ts:504；tests/host/cultivation/cultivation-command.spec.ts:534 |
+| 326 | 2026-11-23 | tests/host/commands/blocked-text.spec.ts:11；tests/host/cultivation/cultivation-command.spec.ts:504；tests/host/cultivation/cultivation-command.spec.ts:535 |
 | 327 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:311 |
 | 328 | 2026-11-23 | tests/client/tabs/attention-tab.spec.ts:326；tests/client/wiring/attention.spec.ts:409 |
 | 329 | 2026-11-23 | tests/client/ui/list-separator.spec.ts:19；tests/client/ui/team-tool-card.spec.ts:118 |
@@ -412,4 +412,6 @@
 | 399 | 2026-11-27 | tests/client/ux/company-hq.spec.ts:800；tests/client/ux/company-triggers-shortcuts.spec.ts:226；tests/client/ux/company-turn-tail.spec.ts:159 |
 | 400 | 2026-11-27 | tests/client/cultivation/cultivation-board-actions.spec.ts:635；tests/client/cultivation/cultivation-context-picker.spec.ts:197；tests/client/cultivation/cultivation-data.spec.ts:200；tests/client/ux/ambient-chrome.spec.ts:291 |
 | 401 | 2026-11-27 | tests/client/tabs/company-panels.spec.ts:149；tests/client/tabs/tasks-table.spec.ts:143；tests/client/ux/signoff-card.spec.ts:355；tests/client/wiring/attention.spec.ts:468；tests/client/wiring/error-relay.spec.ts:116；tests/client/wiring/error-ring.spec.ts:204 |
+| 402 | 2026-11-27 | tests/client/ui/client-css.spec.ts:242 |
+| 403 | 2026-11-27 | tests/client/tabs/panel-frame.spec.ts:105；tests/client/ui/client-css.spec.ts:251；tests/client/ux/company-hq.spec.ts:879；tests/client/ux/company-hub-tabs.spec.ts:363；tests/client/wiring/instance-guard.spec.ts:136 |
 | 404 | 2026-11-27 | tests/client/cultivation/cultivation-board-actions.spec.ts:700；tests/client/ux/ambient-chrome.spec.ts:291；tests/client/wiring/attention-source.spec.ts:35 |

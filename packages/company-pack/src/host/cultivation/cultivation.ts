@@ -24,6 +24,8 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { blockedCompanyText, blockedCompanyTextPair } from '../commands/blocked-text.ts'
+import { registerLocalizedCommand } from '../commands/localized-command.ts'
+import type { CompanyLanguageState } from '../language/company-language.ts'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：ctx.commands 的 Context 增强（服务本体由 base bundle 挂载，vendor patch 钉行）。
 import type {} from '@deepseek-ai/dsh-commands'
@@ -195,14 +197,25 @@ type CultivationText = (zh: string, en: string) => string
 
 
 /** 命令行为只依赖会话输入、配置与培养存储；Cordis 注册留在外层适配器。 */
-function cultivationCommandHandlerInner(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, t: CultivationText, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result) {
+function cultivationCommandHandlerInner(
+  config: CultivationHostConfig,
+  storage: CultivationStorage,
+  ctx: Context,
+  t: CultivationText,
+  companyHome?: string,
+  dataBlocked = false,
+  blockedReason?: string,
+  roleLabel: (role: string) => string = defaultRoleLabel,
+  resultLabel: (result: string) => string = result => result,
+  blockedReasonEn?: string,
+) {
   return async ({ agent, rawInput }: { readonly agent?: AgentLike, readonly rawInput: string }) => {
     const face = sessionFaceOf(agent)
     if (face === null) {
       return { kind: 'error' as const, text: t('培养命令需要公司角色会话（当前会话不是公司角色 preset，或 cwd 缺席）。', 'Cultivation commands need a company-role session (this session is not a company-role preset, or its cwd is missing).') }
     }
     if (dataBlocked) {
-      const paused = blockedCompanyTextPair(blockedReason, '培养', 'cultivating')
+      const paused = blockedCompanyTextPair(blockedReason, '培养', 'cultivating', blockedReasonEn)
       return { kind: 'error' as const, text: t(paused.zh, paused.en) }
     }
     const scope = companyScopeOf(face, companyHome)
@@ -263,8 +276,19 @@ function cultivationCommandHandlerInner(config: CultivationHostConfig, storage: 
 /**
  * 命令边界统一收口存储 typed error（BUG-127/130/141）：坏形状/写 gate 变可读回执，不抛到命令面。
  */
-function cultivationCommandHandler(config: CultivationHostConfig, storage: CultivationStorage, ctx: Context, t: CultivationText, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result) {
-  const inner = cultivationCommandHandlerInner(config, storage, ctx, t, companyHome, dataBlocked, blockedReason, roleLabel, resultLabel)
+function cultivationCommandHandler(
+  config: CultivationHostConfig,
+  storage: CultivationStorage,
+  ctx: Context,
+  t: CultivationText,
+  companyHome?: string,
+  dataBlocked = false,
+  blockedReason?: string,
+  roleLabel: (role: string) => string = defaultRoleLabel,
+  resultLabel: (result: string) => string = result => result,
+  blockedReasonEn?: string,
+) {
+  const inner = cultivationCommandHandlerInner(config, storage, ctx, t, companyHome, dataBlocked, blockedReason, roleLabel, resultLabel, blockedReasonEn)
   return async (input: { readonly agent?: AgentLike, readonly rawInput: string }): Promise<CultivationCommandResult> => {
     try {
       return await inner(input)
@@ -318,11 +342,12 @@ async function commandCorrectOrSuggest(
   }
   let contexts: readonly CultivationContext[] | undefined
   if (contextToken !== undefined) {
-    const decoded = decodeContextToken(contextToken)
+    const lang = t('zh', 'en') === 'en' ? 'en' : 'zh'
+    const decoded = decodeContextToken(contextToken, lang)
     if (!decoded.ok) return { kind: 'error', text: decoded.problem }
     const item = decoded.command.items[0]
     if (item === undefined) return { kind: 'error', text: t('背景只能带一段（v1）。', 'Only one context block is supported (v1).') }
-    const read = await readContext(ctx, root, item, command.roleLabel, command.resultLabel)
+    const read = await readContext(ctx, root, item, command.roleLabel, command.resultLabel, t)
     if ('problem' in read) return { kind: 'error', text: read.problem }
     contexts = [read.context]
   }
@@ -719,7 +744,18 @@ function commandCheck(command: CultivationCommandContext): CultivationCommandRes
 }
 
 /** 「/cultivation」命令族与提案工具的注册面。 */
-export function registerCultivation(ctx: Context, config: CultivationHostConfig, companyHome?: string, dataBlocked = false, blockedReason?: string, roleLabel: (role: string) => string = defaultRoleLabel, resultLabel: (result: string) => string = result => result, t: CultivationText = zh => zh): void {
+export function registerCultivation(
+  ctx: Context,
+  config: CultivationHostConfig,
+  companyHome?: string,
+  dataBlocked = false,
+  blockedReason?: string,
+  roleLabel: (role: string) => string = defaultRoleLabel,
+  resultLabel: (result: string) => string = result => result,
+  t: CultivationText = zh => zh,
+  language?: Pick<CompanyLanguageState, 'subscribe'>,
+  blockedReasonEn?: string,
+): void {
   const storage = nodeCultivationStorage
   if (!dataBlocked && companyHome !== undefined && config.cultivationRoot !== undefined) {
     try {
@@ -845,8 +881,11 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
     },
   }))
 
-  // ── /cultivation 命令族（V4/V8：人专用直控面，不经模型）─────────────────────
-  ctx.commands.register({
+  // ── /cultivation 命令族（V4/V8：人专用直控面，不经模型；语言切换时重注册，BUG-405）────────
+  const handler = cultivationCommandHandler(
+    config, storage, ctx, t, companyHome, dataBlocked, blockedReason, roleLabel, resultLabel, blockedReasonEn,
+  )
+  registerLocalizedCommand(ctx, () => ({
     name: 'cultivation',
     description: t(
       '培养回路：给自己的角色提交纠正、给别的角色提建议、采纳/拒绝/验证/撤回方法（采纳仅目标角色本人）',
@@ -858,6 +897,6 @@ export function registerCultivation(ctx: Context, config: CultivationHostConfig,
         'correct <expected behavior> :: <method and evidence> | suggest <role> <expected behavior> :: <suggestion> | adopt <id> [as <slug>] | reject <id> :: <reason> | verify <id> <pass|fail> :: <evidence from later similar work> | revoke <slug>',
       ),
     },
-    handler: cultivationCommandHandler(config, storage, ctx, t, companyHome, dataBlocked, blockedReason, roleLabel, resultLabel),
-  })
+    handler,
+  }), language)
 }

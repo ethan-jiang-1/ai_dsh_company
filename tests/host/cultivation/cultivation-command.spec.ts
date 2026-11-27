@@ -530,15 +530,61 @@ describe('/cultivation 元数据与内部错误的语言（BUG-326）', () => {
   })
 })
 
-// 停写回执也随语言（BUG-326）：dataBlocked 下 en 只出英文句子（原因原话可能仍是中文）。
-describe('/cultivation 停写回执的语言（BUG-326）', () => {
-  it('dataBlocked + en ⇒ 「writes are paused」，不出现中文模板', async () => {
+// 负例留证 2026-11-27：/cultivation 用 ctx.commands.register 一次性注册，切 en 后 description/hint 仍残留中文（BUG-405）；接 registerLocalizedCommand 即绿。BUG-405
+// 停写回执也随语言（BUG-326）：dataBlocked 下 en 只出英文句子；传 blockedReasonEn 时英文原因也直出（BUG-405）。
+describe('/cultivation 停写回执与实时语言切换（BUG-326 / BUG-405）', () => {
+  const cjk = /[\u4e00-\u9fff]/
+
+  it('dataBlocked + en ⇒ 「writes are paused」，有 blockedReasonEn 时零中文', async () => {
     await withCultivationWorkspace(async (workspace, methods) => {
-      const { command } = cultivationRegistrations({ cultivationRoot: methods }, undefined, workspace, undefined, undefined, undefined, (_zh, en) => en, true)
+      const { command } = cultivationRegistrations(
+        { cultivationRoot: methods },
+        undefined,
+        workspace,
+        undefined,
+        undefined,
+        undefined,
+        (_zh, en) => en,
+        true,
+        undefined,
+        'No workspace selected',
+      )
       const result = await invokeCultivation(command, 'ceo', workspace, 'correct 期望行为 :: 做法')
       expect(result.kind).toBe('error')
       expect(result.text).toContain('writes are paused')
+      expect(result.text).toContain('No workspace selected')
+      expect(result.text).not.toMatch(cjk)
       expect(result.text).not.toContain('公司数据已停写')
+    })
+  })
+
+  it('language.set("en") 实时重注册 /cultivation description/hint 为零中文（BUG-405）', async () => {
+    const { createCompanyLanguageState } = await import('../../../packages/company-pack/src/host/language/company-language.ts')
+    await withCultivationWorkspace(async (workspace, methods) => {
+      const language = createCompanyLanguageState('zh')
+      const regs = cultivationRegistrations(
+        { cultivationRoot: methods },
+        undefined,
+        workspace,
+        undefined,
+        undefined,
+        undefined,
+        (zhText, enText) => language.text(zhText, enText),
+        false,
+        language,
+      )
+      expect(String(regs.latestDefinition()?.description ?? '')).toMatch(cjk)
+      expect(String(regs.latestDefinition()?.input?.hint ?? '')).toMatch(cjk)
+
+      language.set('en')
+      const after = regs.latestDefinition()
+      expect(String(after?.description ?? '')).not.toBe('')
+      expect(String(after?.description ?? '')).not.toMatch(cjk)
+      expect(String(after?.input?.hint ?? '')).not.toBe('')
+      expect(String(after?.input?.hint ?? '')).not.toMatch(cjk)
+
+      language.set('zh')
+      expect(String(regs.latestDefinition()?.description ?? '')).toMatch(cjk)
     })
   })
 })

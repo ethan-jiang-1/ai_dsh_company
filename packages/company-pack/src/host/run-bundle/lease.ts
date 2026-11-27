@@ -24,7 +24,7 @@ export interface LeaseHolder {
 
 export type LeaseResult =
   | { readonly acquired: true; readonly path: string; readonly release: () => void; readonly warning?: string }
-  | { readonly acquired: false; readonly path: string; readonly reason: string; readonly holder?: LeaseHolder }
+  | { readonly acquired: false; readonly path: string; readonly reason: string; readonly reasonEn: string; readonly holder?: LeaseHolder }
 
 interface HeldLease {
   readonly holder: LeaseHolder
@@ -133,7 +133,12 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
       writeFileSync(path, text, { flag: 'wx' })
       unblockCompanyWrites()
       const timer = setInterval(() => {
-        if (!touchLease(path, holder.token)) blockCompanyWrites('writer lease 已被接管（盘上 token 已变化），本 host 停止写公司数据')
+        if (!touchLease(path, holder.token)) {
+          blockCompanyWrites(
+            'writer lease 已被接管（盘上 token 已变化），本 host 停止写公司数据',
+            'Writer lease was taken over (on-disk token changed); this host paused company data writes.',
+          )
+        }
       }, LEASE_HEARTBEAT_MS)
       ;(timer as unknown as { unref?: () => void }).unref?.()
       held.set(path, { holder, refs: 1, timer })
@@ -145,7 +150,8 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
       }
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {
-        return { acquired: false, path, reason: `无法写 writer lease：${(error as Error).message}` }
+        const message = (error as Error).message
+        return { acquired: false, path, reason: `无法写 writer lease：${message}`, reasonEn: `Cannot write writer lease: ${message}` }
       }
     }
     // 锁路径可能是目录/symlink（BUG-124）：形状先 fail loud，不把「读不了」当竞争。
@@ -153,10 +159,20 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
     try { lockInfo = lstatSync(path) } catch { lockInfo = null }
     if (lockInfo !== null) {
       if (lockInfo.isSymbolicLink()) {
-        return { acquired: false, path, reason: `writer lease 路径是 symlink，拒绝：${path}（请手工删除该链接后重试）` }
+        return {
+          acquired: false,
+          path,
+          reason: `writer lease 路径是 symlink，拒绝：${path}（请手工删除该链接后重试）`,
+          reasonEn: `Writer lease path is a symlink, refusing: ${path} (remove the symlink manually and retry)`,
+        }
       }
       if (!lockInfo.isFile()) {
-        return { acquired: false, path, reason: `writer lease 路径不是普通文件（目录？）：${path}（删除后重试）` }
+        return {
+          acquired: false,
+          path,
+          reason: `writer lease 路径不是普通文件（目录？）：${path}（删除后重试）`,
+          reasonEn: `Writer lease path is not a regular file (directory?): ${path} (remove it and retry)`,
+        }
       }
     }
     let current: LeaseHolder | null = null
@@ -165,18 +181,35 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
     } catch (error) {
       // 不可读 ≠ stale：EACCES/EPERM 的活锁不能删除后抢占（BUG-254）；ENOENT 可重试。
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') continue
-      return { acquired: false, path, reason: `writer lease 不可读，拒绝接管：${(error as Error).message}` }
+      const message = (error as Error).message
+      return {
+        acquired: false,
+        path,
+        reason: `writer lease 不可读，拒绝接管：${message}`,
+        reasonEn: `Writer lease is unreadable, refusing takeover: ${message}`,
+      }
     }
     if (current !== null && current.pid !== pid) {
       const age = leaseAgeMs(path, now)
       // PID 存活 + 心跳新鲜 = 真 writer；PID 存活但锁已过期 = 很可能是 PID 复用（BUG-106）。
       if (isAlive(current.pid) && age <= LEASE_STALE_MS) {
-        return { acquired: false, path, reason: `另一个 writer 正在使用这个 home（pid ${String(current.pid)}）`, holder: current }
+        return {
+          acquired: false,
+          path,
+          reason: `另一个 writer 正在使用这个 home（pid ${String(current.pid)}）`,
+          reasonEn: `Another writer is using this home (pid ${String(current.pid)})`,
+          holder: current,
+        }
       }
       if (isAlive(current.pid)) takeover = current
     }
     // 同 pid 但没有进程内登记 = 上次异常残留；stale/坏文件都清掉后重试一次。
     try { unlinkSync(path) } catch { /* 被别的进程抢先清掉 */ }
   }
-  return { acquired: false, path, reason: 'writer lease 竞争失败（另一个进程抢先）' }
+  return {
+    acquired: false,
+    path,
+    reason: 'writer lease 竞争失败（另一个进程抢先）',
+    reasonEn: 'Writer lease contention failed (another process acquired it first)',
+  }
 }

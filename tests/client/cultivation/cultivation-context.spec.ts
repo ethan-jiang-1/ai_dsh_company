@@ -319,7 +319,39 @@ describe('会话轮次投影（host 读与客户端预览共用）', () => {
 })
 
 
-describe('背景密钥样式扫描（2026-10-27 F9）', () => {
+// 负例留证 2026-11-27：cultivation-context 校验硬编码中文 ⇒ en 下编码/解码/payload 报错全带中文（BUG-405）；加 lang 参数后全英文即绿。BUG-405
+describe('背景编解码与扫描（en 语言错误信息，BUG-405）', () => {
+  const cjk = /[\u4e00-\u9fff]/
+
+  it('encodeContextToken / decodeContextToken / parseContextPayload 在 lang="en" 下输出无中文英文错误', () => {
+    const encBad = encodeContextToken({ v: 1, mode: 'correct', items: [{ kind: 'deliverable', ref: '../escape.md' }] }, 'en')
+    expect(encBad.ok).toBe(false)
+    if (!encBad.ok) {
+      expect(encBad.problem).not.toMatch(cjk)
+      expect(encBad.problem).toContain('deliverable ref')
+    }
+
+    const decBad = decodeContextToken('abc$', 'en')
+    expect(decBad.ok).toBe(false)
+    if (!decBad.ok) expect(decBad.problem).not.toMatch(cjk)
+
+    const decJson = decodeContextToken(tokenOf('{bad'), 'en')
+    expect(decJson.ok).toBe(false)
+    if (!decJson.ok) expect(decJson.problem).not.toMatch(cjk)
+
+    const decEmpty = decodeContextToken(tokenOf(JSON.stringify({ v: 1, mode: 'correct', items: [] })), 'en')
+    expect(decEmpty.ok).toBe(false)
+    if (!decEmpty.ok) expect(decEmpty.problem).not.toMatch(cjk)
+
+    const parsedJson = parseContextPayload('{bad', 'en')
+    expect(parsedJson.problem).not.toBeNull()
+    expect(parsedJson.problem).not.toMatch(cjk)
+
+    const parsedBadItem = parseContextPayload(JSON.stringify({ v: 1, items: [{}] }), 'en')
+    expect(parsedBadItem.problem).not.toBeNull()
+    expect(parsedBadItem.problem).not.toMatch(cjk)
+  })
+
   it('只报类别不回显值；干净文本空', () => {
     expect(secretLikeFindings('普通讨论：先列假设')).toEqual([])
     const findings = secretLikeFindings('api_key = sk-abcdefghijklmnop1234\nAuthorization: Bearer abcdefghijklmnopqrstuvwxyz')
