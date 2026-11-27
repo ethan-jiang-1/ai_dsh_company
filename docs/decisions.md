@@ -71,6 +71,7 @@
 | <a id="d69"></a>D69 | DSH 原生 UX/UI 扩展（S1–S4）：零 vendor 改动与 L2/L3 禁区，聚合页签+全局总部 | [ux-upgrade Note](../notes/implemented/2026-11-26-dsh-native-ux-upgrade.md) · [client-ui](./contracts/client-ui.md) |
 | <a id="d70"></a>D70 | `docs/` 架构主干与单向依赖：禁链 `_backlog/`；材料性与自授权收回政策层；子架构合入 `contracts/` | [docs-alignment Note](../notes/implemented/2026-11-27-docs-architecture-and-dependency-alignment.md) |
 | <a id="d71"></a>D71 | `root → docs/` 16 文件骨架（顶层 6 + 三分区）、UTF-8 字节预算、自动包目录与双向命令表 | [16-file alignment Note](../notes/implemented/2026-11-27-docs-16-file-standard-alignment.md) |
+| <a id="d72"></a>D72 | 13 维接手全绿护栏：双 owner 注入原语、全量 spec 进 tsc、137 单源包+三向依赖、总常驻预算与诊断自检 | [13d-readiness Note](../notes/implemented/2026-11-28-all-green-13d-readiness-closure.md) |
 
 ## 已退役
 
