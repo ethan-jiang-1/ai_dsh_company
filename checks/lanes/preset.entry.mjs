@@ -163,16 +163,28 @@ try {
     })
   }
 
-  // ② 真入口：逐个 preset 建会话——**这一步才会触发行 config 校验**
+  // ② 真入口：并发为全部 preset 建会话（BUG-407：6 角色 + 5 support 并发 3× 提速，按稳定顺序打印）——**这一步才会触发行 config 校验**
   const sessionIds = new Map()
-  for (const role of [...ROLES, ...SUPPORT_PRESETS]) {
-    await check(`session/create 挂上 ${role}`, async () => {
+  const allPresets = [...ROLES, ...SUPPORT_PRESETS]
+  const createResults = await Promise.all(allPresets.map(async (role) => {
+    try {
       const created = await rpc(base, cookie, 'session/create', { request: { cwd: CWD, agentPreset: role } })
       if (created?.agentPreset !== role) throw new Error(`返回的 preset 不是 ${role}：${JSON.stringify(created)}`)
       const id = created?.id ?? created?.sessionId
       if (typeof id !== 'string') throw new Error(`session/create 没返回会话 id：${JSON.stringify(created).slice(0, 200)}`)
-      sessionIds.set(role, id)
-    })
+      return { role, ok: true, id }
+    } catch (error) {
+      return { role, ok: false, error }
+    }
+  }))
+  for (const res of createResults) {
+    if (res.ok) {
+      sessionIds.set(res.role, res.id)
+      console.log(`  PASS session/create 挂上 ${res.role}`)
+    } else {
+      failures.push(`session/create 挂上 ${res.role}: ${res.error.message}`)
+      console.log(`  FAIL session/create 挂上 ${res.role}: ${res.error.message}`)
+    }
   }
 
   // ②b 并发两会话：同一 profile/同一工作区同时创建，返回的 preset/id 不串。
@@ -215,8 +227,8 @@ try {
   //    角色会话会额外看见项目根/用户级技能集（`~/.agents/skills` 等），本条仍抓这个泄漏。
   // support preset 目前没有 skills 目录；worker-researcher 只读由 spec 守，smoke 只证明能挂载。
   const skillBearing = [...ROLES, ...SUPPORT_PRESETS.filter(preset => existsSync(join(ROOT, 'packages/company-pack/presets', preset, 'skills')))]
-  for (const role of skillBearing) {
-    await check(`${role} 只看见自己的 skills`, async () => {
+  const skillResults = await Promise.all(skillBearing.map(async (role) => {
+    try {
       const sessionId = sessionIds.get(role)
       if (sessionId === undefined) throw new Error('没有会话 id（上一步未通过）')
       const value = await rpc(base, cookie, 'skills/list', { request: { sessionId } })
@@ -226,7 +238,17 @@ try {
       const missing = expected.filter(name => !actual.includes(name))
       if (extra.length > 0) throw new Error(`看见了非本角色的 skill：${extra.join(', ')}`)
       if (missing.length > 0) throw new Error(`本角色 skill 缺席：${missing.join(', ')}`)
-    })
+      return { role, ok: true }
+    } catch (error) {
+      return { role, ok: false, error }
+    }
+  }))
+  for (const res of skillResults) {
+    if (res.ok) console.log(`  PASS ${res.role} 只看见自己的 skills`)
+    else {
+      failures.push(`${res.role} 只看见自己的 skills: ${res.error.message}`)
+      console.log(`  FAIL ${res.role} 只看见自己的 skills: ${res.error.message}`)
+    }
   }
 
   // ④ 浏览器模块闭包（lint 级）：每个 client 模块 `dsh.client.inject` 里的包名，应当是

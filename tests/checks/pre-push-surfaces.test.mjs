@@ -166,10 +166,13 @@ test('--exec-plan --dry-run：docs-only 走快速路径，代码/探针改动按
   assert.equal(client.status, 0, client.stdout + client.stderr)
   assert.match(client.stdout, /steps=\[typecheck, lint, dup, smoke:fast, test:spec\]/, client.stdout)
   assert.match(client.stdout, /assets=\[client-load\]/, client.stdout)
+  assert.match(client.stdout, /移出 push 阻塞链，收口用 pnpm smoke:surface/, client.stdout)
+  assert.match(client.stdout, /vitest = related/, client.stdout)
 
   const probe = runPlan('probes/analyze/orient-probe.mjs')
   assert.equal(probe.status, 0, probe.stdout + probe.stderr)
   assert.match(probe.stdout, /entry-import-graph\.spec\.ts/, probe.stdout)
+  assert.match(probe.stdout, /vitest = targeted/, probe.stdout)
 
   // 盲审 S-2：未分类路径退出非零且不得误印 docs-only 快速路径；已删除源码路径须带出兜底 targetedSpecs。
   const unseen = runPlan('zz-unseen/file.txt')
@@ -181,4 +184,48 @@ test('--exec-plan --dry-run：docs-only 走快速路径，代码/探针改动按
   assert.match(deletedSrc.stdout, /deletedFallback = packages\/company-pack\/src\/client\/zz-deleted-nonexistent\.ts/, deletedSrc.stdout)
   assert.match(deletedSrc.stdout, /entry-import-graph\.spec\.ts/, deletedSrc.stdout)
   assert.match(deletedSrc.stdout, /pack-exports\.spec\.ts/, deletedSrc.stdout)
+
+  // 合并去重与超阈值回退单次全测：小改动合并 related+targeted 为单次 merged，大目录展开回退 full。
+  const merged = runPlan('tools/lib/core/markdown-links.mjs')
+  assert.equal(merged.status, 0, merged.stdout + merged.stderr)
+  assert.match(merged.stdout, /vitest = merged/, merged.stdout)
+
+  const fullFallback = runPlan('vitest.config.ts')
+  assert.equal(fullFallback.status, 0, fullFallback.stdout + fullFallback.stderr)
+  assert.match(fullFallback.stdout, /vitest = full/, fullFallback.stdout)
+})
+
+test('--lanes-only --dry-run：收口命令精准列出命中面、--all 全量、自动嗅探未推送/单提交仓，且 unseen 仍 fail-closed', () => {
+  const all = spawnSync(process.execPath, [SCRIPT, '--lanes-only', '--all', '--dry-run'], { encoding: 'utf8' })
+  assert.equal(all.status, 0, all.stdout + all.stderr)
+  assert.match(all.stdout, /应跑 client-load、preset、replay/, all.stdout)
+
+  const one = spawnSync(process.execPath, [SCRIPT, '--lanes-only', '--dry-run', '--paths', 'packages/company-pack/src/client/wiring/error-ring.ts'], { encoding: 'utf8' })
+  assert.equal(one.status, 0, one.stdout + one.stderr)
+  assert.match(one.stdout, /应跑 client-load/, one.stdout)
+
+  const unseen = spawnSync(process.execPath, [SCRIPT, '--lanes-only', '--dry-run', '--paths', 'zz-unseen/file.txt'], { encoding: 'utf8' })
+  assert.notEqual(unseen.status, 0, unseen.stdout + unseen.stderr)
+  assert.match(unseen.stdout, /未分类改动面/, unseen.stdout)
+
+  // 单 commit 干净树（无 HEAD~1、无 upstream）：不崩且能识别根提交命中面。
+  const single = repo()
+  try {
+    single.commit(CLIENT_FILE, 'export const rootOnly = 1\n', 'feat: initial client')
+    const res = spawnSync(process.execPath, [SCRIPT, '--root', single.dir, '--lanes-only', '--dry-run'], { encoding: 'utf8' })
+    const out = `${res.stdout}${res.stderr}`
+    assert.equal(res.status, 0, `单 commit 仓不许崩：${out}`)
+    assert.match(out, /应跑 client-load/, `单 commit 根提交 client 改动必须命中 client-load：${out}`)
+  } finally { single.cleanup() }
+
+  // 无 upstream 的多提交本地分支（父提交改 client、tip 只改 docs，工作树干净）：须聚合所有未推送提交不漏面。
+  const multi = repo()
+  try {
+    multi.commit(CLIENT_FILE, 'export const parentClient = 1\n', 'feat: client')
+    multi.commit(DOC_FILE, '# docs\n', 'docs: follow-up')
+    const res = spawnSync(process.execPath, [SCRIPT, '--root', multi.dir, '--lanes-only', '--dry-run'], { encoding: 'utf8' })
+    const out = `${res.stdout}${res.stderr}`
+    assert.equal(res.status, 0, out)
+    assert.match(out, /应跑 client-load/, `无 upstream 多提交分支不能静默漏掉父提交 client-load：${out}`)
+  } finally { multi.cleanup() }
 })

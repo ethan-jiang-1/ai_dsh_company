@@ -62,10 +62,19 @@ export function run({ root, ok, fail }) {
 
   const counts = Object.fromEntries(CLASSES.map(key => [key, 0]))
   const samples = Object.fromEntries(CLASSES.map(key => [key, []]))
+  const existsCache = new Map()
+  const pathExists = (p) => {
+    let hit = existsCache.get(p)
+    if (hit === undefined) {
+      hit = existsSync(p)
+      existsCache.set(p, hit)
+    }
+    return hit
+  }
   for (const sourceRel of trackedMarkdown(root)) {
     if (sourceRel.startsWith('packages/company-pack/content/')) continue
     const absolute = join(root, sourceRel)
-    if (!existsSync(absolute)) continue
+    if (!pathExists(absolute)) continue
     let targets
     try {
       targets = markdownLinkTargets(absolute)
@@ -74,7 +83,7 @@ export function run({ root, ok, fail }) {
       return
     }
     for (const target of targets) {
-      if (existsSync(target)) continue
+      if (pathExists(target)) continue
       const frozen = sourceRel.startsWith('notes/archived/') || sourceRel.startsWith('_backlog/_archive/')
       const targetRel = relative(root, target).split(sep).join('/')
       // 2026-11-11 clean clone 实测：冻结层引用 runtime/... 证据，warm 盘存在、clone 不存在。

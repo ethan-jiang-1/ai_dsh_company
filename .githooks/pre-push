@@ -1,12 +1,13 @@
 #!/bin/sh
-# pre-push：push 前无条件结构门禁 + 按出站改动面精准分派窄检查与真入口（enforcement 通道，2026-09-27 立；2026-11-27 BUG-406 收敛热路径）。
+# pre-push：push 前无条件结构门禁 + 按出站改动面精准分派免环境窄检查（enforcement 通道，2026-09-27 立；2026-11-27 BUG-406/407 职责归位）。
 # 为什么：DSH 立场——"Agents follow enforced gates far more reliably than prose conventions"。
-#       同时守「hook 只装便宜高置信缺陷、热路径不拖慢日常迭代」的边界（BUG-406）：
+#       同时守「push = 免浏览器/免 DSH_HOME 的秒级确定性安全网」的边界（BUG-406/407）：
 #       - 无条件必跑：全量结构门禁 `node checks/run-gates.mjs`（verify）；
 #       - 按出站改动面精准执行（`checks/pre-push-surfaces.mjs --exec-plan`，规则唯一家 = `tools/lib/core/asset-lanes.mjs`）：
-#         docs-only 快速路径只跑 verify；代码/测试/工具/探针只跑受影响面的增量 typecheck / lint / dup / smoke:fast / test:checks / vitest related（与定向 spec）+ 按面真入口；
-#         未分类改动面 fail-closed 阻断（BUG-199）。
-#       - 全量覆盖率棘轮（`pnpm coverage:ratchet`，带 maxWorkers 上限与同 HEAD 缓存复用）下沉至 `pnpm release --verify`、每周 CI（`fresh-clone.yml`）与阶段收口手动执行，不再在每次 push 重扫全量 305 份 spec。
+#         docs-only 快速路径只跑 verify；代码/测试/工具/门禁/探针跑受影响的增量 typecheck / lint / dup / smoke:fast / test:checks，
+#         再跑最多一次合并去重 Vitest（超阈值自动回退单次全测）；未分类改动面 fail-closed 阻断（BUG-199）。
+#       - 需要真 DSH 服务器/真 Chromium 的真入口车道（`client-load` / `preset` / `replay`）不阻塞 `git push`：
+#         改由开发收口 `source run/env.sh && pnpm smoke:surface` 与发版前 `pnpm release --verify` 强制兜底（每周 CI 另覆盖 `replay`、`coverage:ratchet` 与 `channel-matrix`）。
 # 负例留证（2026-09-27）：AGENTS.md 临时加死链 → push 被 verify 拦下（未触网络层）；还原 → 放行到网络层。
 #        （2026-11-13）：改 client 文件不跑 client-load-smoke 直接 push → surface lane 拦下并点名；还原后按面检查 PASS → 绿。
 #        （2026-11-27 BUG-406）：docs-only `--exec-plan --dry-run` 仅跑 verify（跳过 tsc/vitest）；改 probes 精准带出 entry-import-graph.spec.ts；改 src/client 精准带出 typecheck/lint/dup/vitest related/client-load。

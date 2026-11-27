@@ -212,7 +212,7 @@
 | 197 | 2026-11-16 | tests/repo/structure/built-path-literals.spec.ts:96 |
 | 198 | 2026-11-16 | tests/repo/structure/built-path-literals.spec.ts:102 |
 | 199 | 2026-11-16 | tests/checks/pre-push-surfaces.test.mjs:121；tests/checks/pre-push-surfaces.test.mjs:144 |
-| 200 | 2026-11-16 | tests/repo/budget/asset-lanes.spec.ts:206 |
+| 200 | 2026-11-16 | tests/repo/budget/asset-lanes.spec.ts:212 |
 | 201 | 2026-11-16 | tests/checks/pre-push-surfaces.test.mjs:129 |
 | 202 | 2026-11-17 | tests/tools/refactor-drift.spec.ts:48 |
 | 203 | 2026-11-17 | tests/tools/coverage-baseline.spec.ts:77 |

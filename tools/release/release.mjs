@@ -305,6 +305,7 @@ function verify() {
     ['company-entry-smoke', [process.execPath, ['checks/lanes/company-entry.entry.mjs'], true]],
     ['client-load-smoke', [process.execPath, ['checks/lanes/client-load.entry.mjs'], true]],
     ['preset-smoke', [process.execPath, ['checks/lanes/preset.entry.mjs'], true]],
+    ['replay-smoke', [process.execPath, ['checks/lanes/replay.e2e.mjs'], true]],
     // 源码面 smoke：import src/**.ts，plain node 的 strip-only 不支持参数属性等 TS-only 语法；
     // 用仓库源码面 loader（tsx）跑，别让一条静默红冒充发布验收。
     ['present-catalog-smoke', [process.execPath, ['--import', 'tsx/esm', 'checks/lanes/present-catalog.e2e.mjs'], false]],

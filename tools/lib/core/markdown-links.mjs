@@ -79,9 +79,9 @@ export function sourceMarkdownFiles(root) {
   return [...files.values()].sort()
 }
 
-// 进程内有界 AST 缓存（BUG-406）：返回只读 mdast 树，调用方不得就地修改节点；
-// run-gates 下 75 道门与多份 spec 对同一批 Markdown 文本反复调用 parseMarkdownAst，缓存消除 4–6 倍重复 GFM 解析开销。
-const MAX_AST_CACHE_ENTRIES = 2048
+// 进程内有界 AST 缓存（BUG-406/407）：返回只读 mdast 树，调用方不得就地修改节点；
+// 4096 上限覆盖全仓 1330+ 份源/归档文档及剥离 frontmatter 后的正文变体，消除 run-gates 下 md-links/backlog-liveness/link-debt 间缓存清零抖动。
+const MAX_AST_CACHE_ENTRIES = 4096
 const astCache = new Map()
 export const parseMarkdownAst = (source, maxEntries = MAX_AST_CACHE_ENTRIES) => {
   if (maxEntries <= 0) return fromMarkdown(source, { extensions: [gfm()], mdastExtensions: [gfmFromMarkdown()] })

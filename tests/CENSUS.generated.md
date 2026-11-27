@@ -45,9 +45,9 @@
 | present-catalog | classic | fast + surface + weekly | 会话持久化 | example | 4 |
 | company-root-process | classic | fast + surface + weekly | 子进程并发 | example | 3 |
 | snapshot-motion | classic | fast + weekly | 会话持久化 | example | 3 |
-| client-load | browser | surface + weekly | client UI | example | 7 |
-| preset | classic | surface + weekly | 配置组合 | example | 8 |
-| replay | classic | surface + weekly | 会话持久化 | example | 11 |
+| client-load | browser | surface + weekly | client UI | example | 8 |
+| preset | classic | surface + weekly | 配置组合 | example | 9 |
+| replay | classic | surface + weekly | 会话持久化 | example | 13 |
 | company-entry | classic | weekly | 配置组合 | example | 2 |
 | concurrent-home | classic | weekly | 子进程并发 | example | 1 |
 | external-workspace | classic | weekly | 子进程并发 | example | 1 |
@@ -62,7 +62,7 @@
 | multi-window-banner | browser | weekly | client UI | example | 1 |
 | ui-scene | browser | weekly | client UI | example | 6 |
 | channel-matrix | browser | 手动（要真实全局 dsh + 网络 + 已导出 _dist；发布前手动跑 --channel all） | 配置组合 | example | 1 |
-| release | classic | 手动（分钟级构建 + pack；由 release --verify 调度，不进每周 sweep） | 导出形态 | example | 7 |
+| release | classic | 手动（分钟级构建 + pack；由 release --verify 调度，不进每周 sweep） | 导出形态 | example | 8 |
 | probe | model | 手动（真模型档（连通 ~6s / 内容 --full 5–10min），按内容改动触发） | 模型可见文本 | example | 4 |
 | delegation | model | 手动（真模型 1 条 prompt（升 pin 或委托边界改动时）） | 工具定义 | example | 3 |
 | presence-e2e | model | 手动（真模型 ~$1，按在场/协作面验收触发） | 模型可见文本 | example | 0 |

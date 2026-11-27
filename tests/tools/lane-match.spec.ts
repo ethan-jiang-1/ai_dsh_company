@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { globToRegExp, matchesAny, planPrePush, selectSurfaces } from '../../tools/lib/core/asset-lanes.mjs'
+import {
+  SURFACE_LANE_ASSETS,
+  VITEST_FULL_FALLBACK_RELATED,
+  VITEST_FULL_FALLBACK_TARGETED,
+  globToRegExp,
+  matchesAny,
+  planPrePush,
+  planVitestRun,
+  selectSurfaces,
+} from '../../tools/lib/core/asset-lanes.mjs'
 
 /**
  * lane 匹配是 pre-push 按面触发的唯一判据（数据 = tools/lib/core/asset-lanes.mjs 的 SURFACE_RULES）。
@@ -169,5 +178,37 @@ describe('planPrePush 按改动面精准选步', () => {
     const rootCfg = planPrePush(['vitest.config.ts'])
     expect(rootCfg.steps).toEqual(['typecheck', 'test:spec'])
     expect(rootCfg.targetedSpecs).toEqual(['tests/repo'])
+  })
+
+  it('planVitestRun 最多生成一次 Vitest 调用，小改动去重合并，超阈值回退单次全测', () => {
+    expect(SURFACE_LANE_ASSETS).toEqual(['client-load', 'preset', 'replay'])
+    expect(planVitestRun()).toEqual({ mode: 'none', args: [] })
+    expect(planVitestRun({ existingRelated: [], expandedTargeted: [] })).toEqual({ mode: 'none', args: [] })
+
+    expect(planVitestRun({ expandedTargeted: ['tests/a.spec.ts', 'tests/a.spec.ts'] })).toEqual({
+      mode: 'targeted',
+      args: ['run', 'tests/a.spec.ts'],
+    })
+    const manyTargets = Array.from({ length: VITEST_FULL_FALLBACK_TARGETED }, (_, i) => `tests/t${String(i)}.spec.ts`)
+    expect(planVitestRun({ expandedTargeted: manyTargets })).toEqual({ mode: 'full', args: ['run'] })
+
+    expect(planVitestRun({ existingRelated: ['tools/lib/a.mjs', 'tools/lib/a.mjs'] })).toEqual({
+      mode: 'related',
+      args: ['related', '--run', '--passWithNoTests', 'tools/lib/a.mjs'],
+    })
+    const manyRelated = Array.from({ length: VITEST_FULL_FALLBACK_RELATED }, (_, i) => `tools/lib/r${String(i)}.mjs`)
+    expect(planVitestRun({ existingRelated: manyRelated })).toEqual({ mode: 'full', args: ['run'] })
+
+    expect(planVitestRun({
+      existingRelated: ['tools/lib/a.mjs'],
+      expandedTargeted: ['tests/a.spec.ts', 'tools/lib/a.mjs'],
+    })).toEqual({
+      mode: 'merged',
+      args: ['related', '--run', '--passWithNoTests', 'tools/lib/a.mjs', 'tests/a.spec.ts'],
+    })
+    expect(planVitestRun({
+      existingRelated: ['tools/lib/a.mjs'],
+      expandedTargeted: manyTargets,
+    })).toEqual({ mode: 'full', args: ['run'] })
   })
 })

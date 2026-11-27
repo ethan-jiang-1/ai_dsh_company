@@ -192,7 +192,7 @@ function defineProbe(name, domain) {
 }
 
 export const ASSETS = [
-  // ── fast lane（pre-push 每次跑；只收 ≤10s、稳定、keyless）────────────────────
+  // ── fast lane（按改动面在 pre-push 触发；只收 ≤10s、稳定、keyless）───────────
   define('workflow-contract', 'classic', ['fast', 'surface', 'weekly'], {
     nodeArgs: TSX,
     why: 'workflow/subagent 引擎的 schema 分支与重试语义',
@@ -207,7 +207,7 @@ export const ASSETS = [
   define('snapshot-motion', 'classic', ['fast', 'weekly'], {
     why: 'snapshot-motion CLI 与 workspace capture 接线',
   }),
-  // ── surface lane（改到对应面时 pre-push 必跑；见 SURFACE_RULES）──────────────
+  // ── surface lane（改到对应面时由 pnpm smoke:surface 收口验证 + release:verify 强制兜底；见 SURFACE_RULES）──
   define('client-load', 'browser', ['surface', 'weekly'], {
     why: '真页面零挂载失败（client 装配/入口改动的完成定义一部分）',
   }),
@@ -216,7 +216,7 @@ export const ASSETS = [
     // ciSafe:false（2026-11-17 weekly --ci 实证 11 红）：需要已装 pack 的 dev home company profile，
     // 干净 CI 无安装态。按 fresh-clone.yml 头注「按实际结果标 ciSafe:false + 理由，不删资产」。
     ciSafe: false,
-    manualReason: '需要已装 pack 的 dev home profile（干净 CI 无安装态）；本地 pre-push/smoke:all 不受影响',
+    manualReason: '需要已装 pack 的 dev home profile（干净 CI 无安装态）；本地 smoke:surface / release:verify / smoke:all 不受影响',
   }),
   define('replay', 'classic', ['surface', 'weekly'], {
     why: '合成回放场景的会话日志 + workspace 判据',
@@ -345,8 +345,8 @@ export const UNCONDITIONAL_STEPS = ['verify']
 export const SCOPED_STEPS = ['typecheck', 'lint', 'dup', 'smoke:fast', 'test:checks', 'test:spec']
 
 /**
- * 按面触发规则：改到 globs 命中的路径时，pre-push 跑 assets；没有额外 lane 的面必须写
- * `coveredBy`（取自 UNCONDITIONAL_STEPS ∪ SCOPED_STEPS）+ `why`，不许留空。
+ * 按面触发规则：改到 globs 命中的路径时，记为命中 `assets`（真入口面由开发收口 `pnpm smoke:surface` 与发版门 `pnpm release --verify` 执行，`pre-push` 仅打印非阻塞提醒）；
+ * 没有额外 lane 的面必须写 `coveredBy`（取自 UNCONDITIONAL_STEPS ∪ SCOPED_STEPS）+ `why`，不许留空。
  *
  * 为什么有两种证据而不是只有 assets：选择器对未命中**静默返回空**，于是「这个面不需要额外
  * 真入口」与「这个面忘了登记」同形（BUG-186：src/lib 搬移没有触发 replay）。`coveredBy`
@@ -713,6 +713,43 @@ export function planPrePush(paths) {
     targetedSpecs: [...targetedSpecs],
   }
 }
+
+/** `planVitestRun` 从窄测回退到单次全量 `vitest run` 的阈值（BUG-407：避免窄测冷启/展开耗时倒挂单次全量 ~29s）。 */
+export const VITEST_FULL_FALLBACK_RELATED = 10
+export const VITEST_FULL_FALLBACK_TARGETED = 20
+
+/**
+ * 将 `relatedFiles` 与展开后的 `expandedTargeted`（具体 `.spec.ts` 文件）规划为**最多一次** Vitest 调用（BUG-407）。
+ *
+ * 为什么：此前 `pre-push-surfaces` 分别冷启 `vitest related` 与 `vitest run`，导致多面改动时大量重叠 spec 跑两遍（实测 84.8s，
+ * 反超单次全量 `pnpm test` 29.6s 近 3 倍）。这里保证：
+ * - 单侧非空 → 单次 `vitest run`（targeted）或单次 `vitest related`（related，超阈值直接回退 `vitest run`）；
+ * - 两侧均非空 → 小改动合进单次 `vitest related --run --passWithNoTests ...merged`（Vitest 4 实证同时跑关联 spec 与显式 spec 且天然去重）；
+ *   超阈值直接回退单次全量 `vitest run`（100% 超集、零重复、耗时封顶 ~29s）。
+ *
+ * @param {{ existingRelated?: readonly string[], expandedTargeted?: readonly string[] }} input
+ * @returns {{ mode: 'none'|'targeted'|'related'|'merged'|'full', args: string[] }}
+ */
+export function planVitestRun({ existingRelated = [], expandedTargeted = [] } = {}) {
+  const related = [...new Set(existingRelated)]
+  const targeted = [...new Set(expandedTargeted)]
+  if (related.length === 0 && targeted.length === 0) return { mode: 'none', args: [] }
+  if (related.length === 0) {
+    if (targeted.length >= VITEST_FULL_FALLBACK_TARGETED) return { mode: 'full', args: ['run'] }
+    return { mode: 'targeted', args: ['run', ...targeted] }
+  }
+  if (related.length >= VITEST_FULL_FALLBACK_RELATED || targeted.length >= VITEST_FULL_FALLBACK_TARGETED) {
+    return { mode: 'full', args: ['run'] }
+  }
+  if (targeted.length === 0) {
+    return { mode: 'related', args: ['related', '--run', '--passWithNoTests', ...related] }
+  }
+  const merged = [...new Set([...related, ...targeted])]
+  return { mode: 'merged', args: ['related', '--run', '--passWithNoTests', ...merged] }
+}
+
+/** 所有在 SURFACE_RULES 里登记过的真入口面资产（去重保序；`smoke:surface --all` 与 `release --verify` 对齐源）。 */
+export const SURFACE_LANE_ASSETS = [...new Set(SURFACE_RULES.flatMap(rule => rule.assets ?? []))]
 
 /** 按名字取注册项；未登记返回 undefined（调用方据此报错，不猜）。 */
 export function assetByName(name) {

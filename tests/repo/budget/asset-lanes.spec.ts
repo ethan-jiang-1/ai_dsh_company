@@ -7,7 +7,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import {
-  ASSETS, FAST, KINDS, LANES, SCOPED_STEPS, SURFACE_RULES, UNCONDITIONAL_STEPS,
+  ASSETS, FAST, KINDS, LANES, SCOPED_STEPS, SURFACE_LANE_ASSETS, SURFACE_RULES, UNCONDITIONAL_STEPS,
   assetByName, planPrePush, selectSurfaces, selectWeeklyAssets, suffixOf,
 } from '../../../tools/lib/core/asset-lanes.mjs'
 
@@ -183,6 +183,12 @@ describe('资产 lane 注册表（空间完备）', () => {
     }
     expect(executed, '.githooks/pre-push 必须调用 pre-push-surfaces --exec-plan 执行按面计划').toContain('node checks/pre-push-surfaces.mjs --stdin "$refs_file" --exec-plan')
     expect(executed, 'pre-push 热路径不再无条件全量跑 coverage-ratchet（BUG-406）').not.toContain('checks/audit/coverage-ratchet.mjs')
+    // 真入口面（SURFACE_LANE_ASSETS 动态派生）从 push 热路径解耦后，必须全部由 release --verify 强制兜底。
+    const releaseScript = readFileSync(join(ROOT, 'tools/release/release.mjs'), 'utf8')
+    for (const name of SURFACE_LANE_ASSETS) {
+      const file = `checks/lanes/${name}.${suffixOf(name)}.mjs`
+      expect(releaseScript, `tools/release/release.mjs --verify 必须覆盖 ${file}`).toContain(file)
+    }
 
     const validSteps = [...UNCONDITIONAL_STEPS, ...SCOPED_STEPS]
     for (const rule of SURFACE_RULES) {

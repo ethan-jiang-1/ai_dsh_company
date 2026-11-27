@@ -1,35 +1,31 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：pre-push 自动（`.githooks/pre-push` 传 `--stdin <file>`）；也可手动
-//   `node checks/pre-push-surfaces.mjs --dry-run`，或给单点改动面试跑：
-//   `node checks/pre-push-surfaces.mjs --dry-run --paths packages/company-pack/src/lib/presence/presence.ts`。
+// 何时跑：
+//   - pre-push 自动：`.githooks/pre-push` 传 `--stdin <file> --exec-plan`（100% 免浏览器/免 DSH_HOME，
+//     遇红即停跑受影响的快门禁 + 单次去重 Vitest；命中真入口面时只打印非阻塞提醒，不拖慢 push）；
+//   - 收口验收手动：`source run/env.sh && pnpm smoke:surface`（即 `--lanes-only`，支持 `--all` 或 `--paths`），
+//     只跑命中改动面的真入口车道（client-load / preset / replay）；发版前由 `pnpm release --verify` 强制执行。
+//   - 预检试跑：`node checks/pre-push-surfaces.mjs --dry-run --paths <p1,p2>`。
 //
-// 为什么：真入口证据（client 装配 / preset 挂载 / 回放 / 进程级写面）不在任何 required lane 里，
-// 只能靠人记得跑（2026-11-13 研究：33 个冒烟只有 6 条在 push 时自动跑；发布验收曾静默红）。
-// 本脚本把「改到哪个面就必须跑哪条真入口检查」变成 push 前的机械动作：规则住
-// `tools/lib/core/asset-lanes.mjs` 的 SURFACE_RULES（一处事实一个家），这里只做取范围 + 匹配 + 跑。
-//
-// 没有匹配到 asset ≠ 无话可说（BUG-186）：规则里没有额外 lane 的面用 `coveredBy` 申报「由哪条
-// 无条件步骤覆盖」，本脚本逐条打印；两者都没有的路径打印「未分类」并**退出非零**（BUG-199）：
-// 未登记面不许静默 push；覆盖面完备另由 `checks/gates/surface-coverage.mjs`（全 tracked 全集）
-// 与 `asset-lanes.spec`（样本）机械判红。
-//
-// `--paths` 是手工预检入口，路径先归一（反斜杠 → `/`、`./` 与 `a//b` 消解；BUG-201），
-// 否则从 shell 复制来的合法路径会假阴性。
-//
-// 取范围不猜 base：pre-push hook 自带 `<local ref> <local sha> <remote ref> <remote sha>` 四元组。
-// 三种形状各有一条明确语义（2026-11-14，BUG-158）：
-// - remote sha 非零  → `git diff <remote sha> <local sha>`（这次 push 新增的提交）
-// - remote sha 全零  → 新分支/远端没有这个 sha：`git rev-list <local sha> --not --remotes` 取**整条出站
-//   提交集**再逐个 diff-tree——只 diff tip 会漏掉分支里更早的提交（假绿）；
-// - local sha 全零   → ref 被删除：跳过，不调 diff（对 `000…` 做 diff 会 `bad object` 崩，假红）。
-// 没有 stdin（手动直跑）才退化为 HEAD~1，并明确打印"退化"，不静默。
+// 为什么（BUG-186/199/406/407）：
+// - 规则唯一家 = `tools/lib/core/asset-lanes.mjs`（SURFACE_RULES / planPrePush / planVitestRun）；
+// - 未登记改动面（既无 asset 也无 coveredBy）在所有模式下均 fail-closed 退出非零（BUG-199）；
+// - 2026-11-27（BUG-407）：将需要起真 DSH 服务器/真 Chromium 的 surface lane（client-load/preset/replay）
+//   从 `git push` 阻塞热路径解耦至开发收口 `pnpm smoke:surface` 与发版门 `pnpm release --verify`（每周 CI 另覆盖 replay 与 coverage:ratchet），
+//   并将 `--exec-plan` 重构为「快门禁遇红即停 + 单次去重 Vitest（超阈值回退单次全测）」。
 // `--root <dir>` 只用于自测（`tests/checks/pre-push-surfaces.test.mjs` 在临时仓库里跑真脚本）。
 import { spawnSync } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { dirname, join, posix, resolve } from 'node:path'
-import { assetByName, planPrePush, selectSurfaces, suffixOf } from '../tools/lib/core/asset-lanes.mjs'
+import { dirname, join, posix, relative, resolve, sep } from 'node:path'
+import {
+  SURFACE_LANE_ASSETS,
+  assetByName,
+  planPrePush,
+  planVitestRun,
+  selectSurfaces,
+  suffixOf,
+} from '../tools/lib/core/asset-lanes.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const argv = process.argv.slice(2)
@@ -42,6 +38,8 @@ const rootFlag = valueOf('--root')
 const root = rootFlag === undefined ? resolve(here, '..') : resolve(process.cwd(), rootFlag)
 const dryRun = has('--dry-run')
 const execPlan = has('--exec-plan')
+const lanesOnly = has('--lanes-only')
+const allLanes = has('--all')
 
 const git = args => {
   const result = spawnSync('git', args, { cwd: root, encoding: 'utf8' })
@@ -124,10 +122,41 @@ function changedPaths() {
   return [...paths]
 }
 
-const targetPaths = valueOf('--paths') === undefined
-  ? changedPaths()
-  : (valueOf('--paths') ?? '').split(',').map(normalizePath).filter(Boolean)
-const { assets, matches, covered, unseen } = selectSurfaces(targetPaths)
+/** `--lanes-only` 未给 `--stdin`/`--paths` 时取本机待验收改动（工作树 + 未推送提交；空则退化为 HEAD 自身提交，兼容单 commit / shallow 仓）。 */
+function localSurfacePaths() {
+  const collected = new Set()
+  for (const args of [
+    ['diff', '-z', '--name-only', 'HEAD'],
+    ['ls-files', '-z', '--others', '--exclude-standard'],
+  ]) {
+    const res = spawnSync('git', args, { cwd: root, encoding: 'utf8' })
+    if (res.status === 0) for (const p of splitZ(res.stdout)) collected.add(p)
+  }
+  const upstream = spawnSync('git', ['rev-parse', '--verify', '@{u}'], { cwd: root, encoding: 'utf8' })
+  if (upstream.status === 0) {
+    const out = spawnSync('git', ['diff', '-z', '--name-only', '@{u}..HEAD'], { cwd: root, encoding: 'utf8' })
+    if (out.status === 0) for (const p of splitZ(out.stdout)) collected.add(p)
+  } else {
+    // 无 upstream（如本地新建未 push -u 的分支或 detached HEAD）：收集全部尚未推送到远端的本地提交，避免漏掉父提交面。
+    const unpushed = spawnSync('git', ['rev-list', 'HEAD', '--not', '--remotes'], { cwd: root, encoding: 'utf8' })
+    if (unpushed.status === 0) {
+      for (const sha of unpushed.stdout.split('\n').filter(Boolean)) {
+        for (const p of commitPaths(sha)) collected.add(p)
+      }
+    }
+  }
+  if (collected.size > 0) return [...collected]
+  console.log('smoke:surface: 工作树干净且无未推送提交——退化为 HEAD 自身提交')
+  return commitPaths('HEAD')
+}
+
+const targetPaths = allLanes
+  ? []
+  : valueOf('--paths') !== undefined
+    ? (valueOf('--paths') ?? '').split(',').map(normalizePath).filter(Boolean)
+    : (lanesOnly && valueOf('--stdin') === undefined ? localSurfacePaths() : changedPaths())
+const { assets: matchedAssets, matches, covered, unseen } = selectSurfaces(targetPaths)
+const assets = allLanes ? [...SURFACE_LANE_ASSETS] : matchedAssets
 const plan = execPlan ? planPrePush(targetPaths) : null
 
 const coveredByRule = new Map()
@@ -180,6 +209,27 @@ if (!execPlan && assets.length === 0) {
   process.exit(unseen.length > 0 ? 1 : 0)
 }
 
+/** 将目录型 targetedSpecs（如 `tests/presets`、`tests/repo`）递归展开为具体 `.spec.ts` 相对路径。 */
+function expandSpecTargets(targets) {
+  const files = []
+  const walk = (absDir) => {
+    for (const entry of readdirSync(absDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const full = join(absDir, entry.name)
+      if (entry.isDirectory()) walk(full)
+      else if (entry.isFile() && entry.name.endsWith('.spec.ts')) {
+        files.push(relative(root, full).split(sep).join('/'))
+      }
+    }
+  }
+  for (const rel of targets) {
+    const abs = join(root, rel)
+    if (!existsSync(abs)) continue
+    if (statSync(abs).isDirectory()) walk(abs)
+    else files.push(rel)
+  }
+  return [...new Set(files)]
+}
+
 function resolveVitestTargets(plan) {
   const existingRelated = plan.relatedFiles.filter(rel => existsSync(join(root, rel)))
   const deletedRelated = plan.relatedFiles.filter(rel => !existsSync(join(root, rel)))
@@ -191,19 +241,29 @@ function resolveVitestTargets(plan) {
       existingTargeted.add('tests/repo/pack/pack-exports.spec.ts')
     }
   }
-  if (plan.steps.includes('test:spec') && existingRelated.length === 0 && existingTargeted.size === 0) {
-    existingTargeted.add('tests/repo/structure/entry-import-graph.spec.ts')
+  const existingTargetedList = [...existingTargeted]
+  const expandedTargeted = expandSpecTargets(existingTargetedList)
+  if (plan.steps.includes('test:spec') && existingRelated.length === 0 && expandedTargeted.length === 0) {
+    const fallback = 'tests/repo/structure/entry-import-graph.spec.ts'
+    if (existsSync(join(root, fallback))) expandedTargeted.push(fallback)
+    if (!existingTargeted.has(fallback)) existingTargetedList.push(fallback)
   }
-  return { existingRelated, deletedRelated, existingTargeted: [...existingTargeted] }
+  const vitestPlan = planVitestRun({ existingRelated, expandedTargeted })
+  return { existingRelated, deletedRelated, existingTargeted: existingTargetedList, expandedTargeted, vitestPlan }
 }
 
 if (dryRun) {
-  if (assets.length > 0) console.log(`pre-push surfaces: --dry-run，应跑 ${assets.join('、')}`)
+  if (assets.length > 0) {
+    console.log(execPlan
+      ? `pre-push surfaces: --dry-run，命中真入口面（移出 push 阻塞链，收口用 pnpm smoke:surface）：${assets.join('、')}`
+      : `pre-push surfaces: --dry-run，应跑 ${assets.join('、')}`)
+  }
   if (plan !== null) {
     const resolved = resolveVitestTargets(plan)
     if (resolved.existingTargeted.length > 0) console.log(`pre-push plan: --dry-run targetedSpecs = ${resolved.existingTargeted.join('、')}`)
     if (resolved.existingRelated.length > 0) console.log(`pre-push plan: --dry-run relatedFiles = ${resolved.existingRelated.join('、')}`)
     if (resolved.deletedRelated.length > 0) console.log(`pre-push plan: --dry-run deletedFallback = ${resolved.deletedRelated.join('、')}`)
+    if (resolved.vitestPlan.mode !== 'none') console.log(`pre-push plan: --dry-run vitest = ${resolved.vitestPlan.mode} (${String(resolved.vitestPlan.args.length)} args)`)
   }
   process.exit(unseen.length > 0 ? 1 : 0)
 }
@@ -211,7 +271,7 @@ if (dryRun) {
 const failures = []
 const started = Date.now()
 
-function runStep(label, command, cmdArgs, timeout = 300_000) {
+function runStepSync(label, command, cmdArgs, timeout = 300_000) {
   const t0 = Date.now()
   const result = spawnSync(command, cmdArgs, { cwd: root, stdio: 'inherit', timeout })
   const elapsed = ((Date.now() - t0) / 1000).toFixed(2)
@@ -222,31 +282,41 @@ function runStep(label, command, cmdArgs, timeout = 300_000) {
 }
 
 if (plan !== null) {
+  // Wave 1：轻量检查各自内部已多线程（oxlint 10 线程 / test:checks 3 并发 / tsc 增量），实测串行 ~15s、并发反而 CPU/IO 争抢膨胀至 36s，故保持干净串行 + 遇红即停。
+  const wave1Commands = {
+    typecheck: { label: 'typecheck', command: 'pnpm', args: ['-s', 'typecheck'] },
+    lint: { label: 'lint', command: 'pnpm', args: ['-s', 'lint'] },
+    dup: { label: 'dup', command: 'pnpm', args: ['-s', 'dup'] },
+    'smoke:fast': { label: 'smoke:fast', command: 'pnpm', args: ['-s', 'smoke:fast'] },
+    'test:checks': { label: 'test:checks', command: 'pnpm', args: ['-s', 'test:checks'] },
+  }
   for (const step of plan.steps) {
-    if (step === 'typecheck') {
-      runStep('typecheck', 'pnpm', ['-s', 'typecheck'])
-    } else if (step === 'lint') {
-      runStep('lint', 'pnpm', ['-s', 'lint'])
-    } else if (step === 'dup') {
-      runStep('dup', 'pnpm', ['-s', 'dup'])
-    } else if (step === 'smoke:fast') {
-      runStep('smoke:fast', 'pnpm', ['-s', 'smoke:fast'])
-    } else if (step === 'test:checks') {
-      runStep('test:checks', 'pnpm', ['-s', 'test:checks'])
-    } else if (step === 'test:spec') {
-      const { existingRelated, existingTargeted } = resolveVitestTargets(plan)
-      if (existingRelated.length > 0) {
-        runStep(`vitest related (${String(existingRelated.length)} files)`, 'pnpm', ['-s', 'exec', 'vitest', 'related', '--run', '--passWithNoTests', ...existingRelated])
-      }
-      if (existingTargeted.length > 0 && failures.length === 0) {
-        runStep(`vitest targeted (${String(existingTargeted.length)} targets)`, 'pnpm', ['-s', 'exec', 'vitest', 'run', ...existingTargeted])
-      }
+    if (step === 'test:spec') continue
+    const spec = wave1Commands[step]
+    if (!spec) continue
+    if (!runStepSync(spec.label, spec.command, spec.args)) break
+  }
+
+  // Wave 2（BUG-407）：最多一次 Vitest 调用（合并去重或超阈值回退单次全测，彻底消灭双次冷启倒挂）。
+  if (failures.length === 0 && plan.steps.includes('test:spec')) {
+    const { vitestPlan } = resolveVitestTargets(plan)
+    if (vitestPlan.mode !== 'none') {
+      const label = vitestPlan.mode === 'full'
+        ? 'vitest full (fallback)'
+        : `vitest ${vitestPlan.mode} (${String(vitestPlan.args.filter(a => !a.startsWith('-') && a !== 'run' && a !== 'related').length)} targets)`
+      runStepSync(label, 'pnpm', ['-s', 'exec', 'vitest', ...vitestPlan.args])
     }
-    if (failures.length > 0) break
+  }
+
+  // BUG-407（方案 1）：真浏览器/真服务器 surface lane（client-load / preset / replay）移出 push 热路径；
+  // 改由开发收口 `source run/env.sh && pnpm smoke:surface` 与发版门 `pnpm release --verify` 强制兜底（每周 CI 另覆盖 replay 与 coverage:ratchet）。
+  if (assets.length > 0) {
+    console.log(`pre-push surfaces: 提示——本次改动命中真入口面（${assets.join('、')}），已移出 push 阻塞热路径；收口请跑 \`source run/env.sh && pnpm smoke:surface\`（发版前由 \`pnpm release --verify\` 强制执行）`)
   }
 }
 
-if (failures.length === 0) {
+const shouldRunLanes = !execPlan && (lanesOnly || assets.length > 0)
+if (shouldRunLanes && failures.length === 0) {
   for (const name of assets) {
     const asset = assetByName(name)
     if (!asset) {
@@ -272,11 +342,11 @@ const total = ((Date.now() - started) / 1000).toFixed(2)
 if (failures.length > 0 || unseen.length > 0) {
   const reasons = [...failures, ...(unseen.length > 0 ? [`未分类改动面 ${String(unseen.length)} 条（登记 SURFACE_RULES 或 coveredBy）`] : [])]
   console.error(`pre-push surfaces: ${String(reasons.length)} FAILURE(S)（${reasons.join('、')}，${total}s）`)
-  console.error('  这些检查是改动面的完成定义，不是可选建议；`git push --no-verify` 逃生后要在收尾 Note 写原因。')
+  console.error('  这些检查是改动面的完成定义，不是可选建议；`git push --no-verify` 逃生后要在收尾 Note 说明原因。')
   process.exitCode = 1
 } else {
   const countText = plan !== null
-    ? `${String(plan.steps.length)} scoped + ${String(assets.length)} surface`
+    ? `${String(plan.steps.length)} scoped${assets.length > 0 ? `（${String(assets.length)} surface 提醒）` : ''}`
     : `${String(assets.length)} 条`
   console.log(`pre-push surfaces: ALL PASS（${countText}，${total}s）`)
 }

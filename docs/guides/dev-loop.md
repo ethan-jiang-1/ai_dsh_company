@@ -83,7 +83,7 @@
 - **人审反馈与清扫**：反馈成立就修并补证，不成立用技术事实反驳；条目收尾后可派独立只读子代理清扫，扫与修分家。文档卫生按指导价值取舍，不以净减行数为目标（D26）。
 - **授权链与时间轴（D34）**：授权线索记在对应 Note 状态行；时间轴 = `notes/implemented/` 文件名日期 + `git log`。
 - **push 落点与 pre-push 门禁**：`origin` 走 `ssh.github.com:443`，`git push origin master` 直接用；命令链须 `set -o pipefail`。
-- **pre-push 强制校验**（`source run/env.sh` 接线 `.githooks`，口径与 [testing.md §5](../testing.md) 一致）：无条件 `verify` + 按出站改动面精准分派（docs-only 只跑 `verify`；代码/测试/探针按面跑增量 `typecheck` / `lint` / `dup` / `smoke:fast` / `test:checks` / 窄 `vitest` + 按面真入口；未分类 fail-closed）。
-  全量 `coverage:ratchet` 下沉至 `release:verify`、每周 CI 与阶段收口执行；规则唯一家 = `tools/lib/core/asset-lanes.mjs`。用 `--no-verify` 绕过后须在收尾 Note 说明原因。
+- **pre-push 强制校验**（`source run/env.sh` 接线 `.githooks`，口径与 [testing.md §5](../testing.md) 一致）：免浏览器/免 `DSH_HOME` 安全网——无条件 `verify` + 按出站改动面精准分派（docs-only 只跑 `verify`；代码/测试/探针按面跑增量 `typecheck`/`lint`/`dup`/`smoke:fast`/`test:checks` + 最多一次合并去重 `vitest`；未分类 fail-closed）。
+  真入口面（`client-load`/`preset`/`replay`）不阻塞 `git push`，改由开发收口 `source run/env.sh && pnpm smoke:surface` 与发版前 `release:verify` 强制兜底（每周 CI 另覆盖 `replay` 与 `coverage:ratchet`，`client-load`/`preset` 在 `--ci` 显式跳过）；规则唯一家 = `tools/lib/core/asset-lanes.mjs`。用 `--no-verify` 绕过后须在收尾 Note 说明原因。
 - **工作区收敛**：收尾跑 `node tools/repo/converge.mjs`（无参 = 计划模式），有可收敛 slug 逐个 `--slug` 收敛并 `--charter-backfill`；证据家 = `deliverables-archive/<目录>/journal/`（依据 = [converge-evidence-home](../../notes/implemented/2026-10-30-converge-evidence-home.md)）。
 - **复盘未成文规则**：若发现 agent 遵守了未写明的隐性规则，三选一收口：升格 verify 门禁 / 写进 owner Note / 显式作废。

@@ -10,7 +10,7 @@
 | 当前目标 | 入口 |
 |---|---|
 | 检查结构、引用与簿记 | `pnpm verify` → [run-gates](run-gates.mjs) |
-| pre-push 按面分派 | [pre-push-surfaces](pre-push-surfaces.mjs)：从 git ref 算 outgoing 范围 → 选 surface lane；未分类 fail-closed |
+| pre-push 按面分派与收口真入口 | [pre-push-surfaces](pre-push-surfaces.mjs)：push `--exec-plan` 跑免环境窄检查 + 单次 vitest（未分类 fail-closed）；收口 `pnpm smoke:surface`（`--lanes-only`）跑命中真入口 |
 | 看运行态全景 / 场景 / 会话历史 | `pnpm orient` → [orient](../probes/analyze/orient-probe.mjs) |
 | 看最近会话的失败摘要（中断轮、非零 bash、待审批也算） | `pnpm diagnose [--strict]` → [diagnose](../probes/analyze/diagnose-probe.mjs) |
 | 检查密钥与凭据暴露面 | [security-scan](gates/security-scan.mjs) · [tracked-token](gates/tracked-token.mjs) · [tracked-secrets](gates/tracked-secrets.mjs) |
