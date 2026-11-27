@@ -7,7 +7,7 @@
 横向对账三仓（本仓、`ai_dsh_bsimulation`、`ai_dsh_deep_research`）的决策治理载体后，维持本仓 **三层职责切分**——① `docs/contracts/` 管现在时语义（What）、② [docs/decisions.md](../../docs/decisions.md) 管 `≤100` 字纯路由（Where）、③ `notes/implemented/` 与 `notes/archived/` 管理由、备选与验证证据（Why）——同时一次性消除本仓三处结构摩擦（现行与废止混排无行锚点、顶层缺同路径入口、`doc-budget` 逐行死卡逼出 6 次 `+1` 与跳号）：
 
 1. **双表分离 + `#dN` 行级锚点**（[docs/decisions.md](../../docs/decisions.md)）：拆为 `## 现行决定`（54 行）与 `## 已退役`（5 行：`D11`、`D19+D21`、`D45`、`D48`、`D59`）两张同构三列表（`| # | 一句话 | 决定的家 |`）。每行首格统一带 `<a id="dN"></a>DN` 锚点（合并行保留双锚点如 `<a id="d19"></a><a id="d21"></a>D19+D21`）；完整废止项迁入 `## 已退役` 并附原 Note 与接替 `#dM` 链接，部分演进仍现行有效的项（如 `D23+D24` 的新上下文/Plan Mode、`D34` 的禁集中索引与日期命名、`D51` 的 `company` profile 与 host 账本边界）留主表且只写当前有效口径。
-2. **三仓同路径导航门牌**（[docs/decisions.md](../../docs/decisions.md)）：在 `docs/` 顶层新增 8 行纯导航门牌（`doc-budget` 上限 9 行，零事实复述），一跳直链 `./reference/decisions.md#现行决定`、`#已退役` 与 `../notes/README.md`，并在 [docs/README.md](../../docs/README.md) 顶层书架及 [docs/AGENTS.md](../../docs/AGENTS.md) 登记；真身原地不动，使 `notes/archived/` 与 `_backlog/_archive/` 冻结历史相对链接零改动。
+2. **三仓同路径导航门牌**（现已于 D71 升格合并为 [docs/decisions.md](../../docs/decisions.md)）：当时在 `docs/` 顶层新增 8 行纯导航门牌（`doc-budget` 上限 9 行，零事实复述），一跳直链原 reference/decisions.md 的「现行决定」「已退役」与 `../notes/README.md`，并在原 docs/index.md（现 [docs/README.md](../../docs/README.md)）顶层书架及 [docs/AGENTS.md](../../docs/AGENTS.md) 登记；当时保留真身原地不动以维持冻结历史相对链接零改动。
 3. **表外散文控长接管逐行死卡**（`checks/gates/doc-budget.mjs` + `checks/gates/ledger-routing.mjs`）：从 `DOC_LINE_BUDGETS` 移出 `docs/decisions.md`，改由 `ledger-routing` 锁死单 H1 + 双 H2、禁代码块/块级 HTML/frontmatter/H3+、表外散文 `≤ 10` 行 + 单格 `≤ 100` 字（即使涨到 D200 全文仍 `<18KB`，正当新增 D 号零门禁摩擦）。
 4. **`ledger-routing` 升级双表与连续性守卫**（复用 `tools/lib/core/repo-markdown.mjs` 单原语 `headingSections` / `structuralLines`，门禁总数维持 75 不增）：硬查双节顺序、闭合三列表（含行尾竖线校验）、`<a id="dN"></a>DN` 匹配锚点（禁前导零）、现行表禁残留 `~~` / `已退役` / `**历史**`、各表递增、跨两表 `D1..Dmax` 全局唯一无断档、以及文件链接与 `#dN` 内部锚点全可解析。
 
@@ -23,8 +23,8 @@
 | 项 | 内容 |
 |---|---|
 | 事实 | 决策台账双表结构（`## 现行决定` / `## 已退役`）、`<a id="dN"></a>DN` 行锚点、`docs/decisions.md` 顶层门牌与表外散文控长规则 |
-| 唯一入口 | 路由事实 = [docs/decisions.md](../../docs/decisions.md)；顶层门牌 = [docs/decisions.md](../../docs/decisions.md)；形状门禁 = `checks/gates/ledger-routing.mjs` |
-| 读载体 | 人与跨会话 agent（`docs/decisions.md` → `docs/decisions.md` 的 `#dN` 锚点）；机械门 `pnpm verify`（`ledger-routing` / `doc-taxonomy` / `doc-budget` / `md-links`）与 `pnpm notes:audit` |
+| 唯一入口 | 路由事实 = [docs/decisions.md](../../docs/decisions.md)（D71 已将原 reference 台账真身升格合并，原 8 行顶层门牌退役）；形状门禁 = `checks/gates/ledger-routing.mjs` |
+| 读载体 | 人与跨会话 agent（[docs/decisions.md](../../docs/decisions.md) 的 `#dN` 锚点）；机械门 `pnpm verify`（`ledger-routing` / `doc-taxonomy` / `doc-budget` / `md-links`）与 `pnpm notes:audit` |
 | 写载体 | 新增或退役 D 号的会话（直接编辑 `docs/decisions.md` 对应表，无需手改 `doc-budget.mjs`） |
 
 ## 未覆盖轴

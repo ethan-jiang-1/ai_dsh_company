@@ -16,7 +16,7 @@
 
 ## 输掉的方案
 
-- **大挪 `docs/` 顶层与 `guides/` 目录结构**：全仓相对链接中 `docs/contracts/` 被引用 601 次、`docs/guides/` 540 次（多在冻结归档层，`notes-archived-links` 强制查断链），物理搬迁会造成大面积归档链接失效；改用「稳定物理路径 + 新增 `docs/contracts/` + 重做 `index.md` 分层导览」零断链达成清晰心智模型。
+- **大挪 `docs/` 顶层与 `guides/` 目录结构**：全仓相对链接中 `docs/contracts/` 被引用 601 次、`docs/guides/` 540 次（多在冻结归档层，`notes-archived-links` 强制查断链），当时判断物理搬迁会造成大面积归档链接失效；改用「稳定物理路径 + 新增原 docs/architecture/ 层 + 重做原 index.md 分层导览」零断链达成清晰心智模型（后由 D71 统一并入 `docs/contracts/` 与 `docs/README.md`）。
 - **把 `_backlog/methods/` 迁进 `docs/guides/` 或 `.agents/skills/`**：违背用户选定的轻改方案（选项 B），且这些作业手册强耦合 `_backlog/` 问题卡与缺陷卡流程；留在原地并切断 `docs/` 对其反向依赖边界最干净。
 - **新建独立 `docs-no-backlog-links.mjs` 门禁文件**：违反 `policy §P2` 门禁总数只降不升棘轮；直接并入既有 `doc-taxonomy.mjs`（同样守护 `docs/` 分层规范）。
 
@@ -33,14 +33,14 @@
 
 | 层 | 失败类 | 负控（见过红）与实跑结果 |
 |---|---|---|
-| 结构门禁 `pnpm verify` | 分层/依赖边界/预算/台账 | **真红→还原→绿（2026-11-27）**：`docs/README.md` 临时追加 `[probe](../_backlog/README.md)` → `FAIL doc-taxonomy: docs/README.md:40 → 禁止 docs/ 链接 _backlog/（../_backlog/README.md；_backlog 为上游探索区，重要结论请先升格 notes/ 再引用）`；还原并清零本 Note `bare-path` 假路径后，本变更所涉全部门禁（`bare-path`、`doc-taxonomy` 11 顶层 + 29 tier + 零 `_backlog` 链接、`doc-budget` 全部 80%–95% 窗口、`ledger-routing` D1–D70、`nav-count-claims` ×123、`md-links` ×8608 / 979 files、`notes-liveness`/`notes-axes`/`notes-supersession`）**均 PASS**（工作区另存在并行 BUG-396 未提交改动导致的 `guard-red-record` 失败，非本次改动面） |
+| 结构门禁 `pnpm verify` | 分层/依赖边界/预算/台账 | **真红→还原→绿（2026-11-27）**：原 docs/index.md（现迁为 `docs/README.md`）临时追加 `[probe](../_backlog/README.md)` → FAIL doc-taxonomy: 原 docs/index.md:40 → 禁止 docs/ 链接 `_backlog/`（`../_backlog/README.md`；`_backlog` 为上游探索区，重要结论请先升格 notes/ 再引用）；还原并清零本 Note `bare-path` 假路径后，本变更所涉全部门禁（`bare-path`、`doc-taxonomy` 11 顶层 + 29 tier + 零 `_backlog` 链接、`doc-budget` 全部 80%–95% 窗口、`ledger-routing` D1–D70、`nav-count-claims` ×123、`md-links` ×8608 / 979 files、`notes-liveness`/`notes-axes`/`notes-supersession`）**均 PASS**（工作区另存在并行 BUG-396 未提交改动导致的 `guard-red-record` 失败，非本次改动面） |
 | 门禁单测 `pnpm test:checks` | 门禁回归与双向边界 | 初跑因测试夹具相对层级少一层（将路径错误解析到 `docs/` 下不存在的子目录）红 1 项；修正夹具为 `../../_backlog/README.md` 后 **11/11 PASS**（`gates-negative.test.mjs` 验证 `architecture/`+反引号 `_backlog/` 绿、`_backlog` Markdown 链接红、未知 tier 红） |
 | Notes 审计 `pnpm notes:audit --strict` | 取代回链与路径时效 | **PASS**（`implemented 133 / archived 197 / receipts 32`，硬项 0） |
 | 结构/文档/工具回归 `npx vitest run tests/repo/structure/ tests/tools/lane-match.spec.ts tests/tools/repo-markdown.spec.ts tests/session/entry-probe.spec.ts` | 分层与入站入口 | **16 files / 104 tests passed**（注：全量 `pnpm test` 实跑 298/303 passed，剩余 5 项失败均属同工作区并行中的 BUG-394..396 事务：`company-static-audit` 报 `company-hq.tsx:428`、3 个 `BUG-396` client 用例、`BUG-COVERAGE.generated.md` 随 BUG-394/395 归档漂移，与本次 `docs/`+门禁改动面无关） |
 
 ## 语义审阅
 
-- **首轮独立盲审（`1c1e44d9-fb64-454f-b0f6-d526170afbee`，`policy.md §P5` 四项判据）**：指出 1 项 Blocker（Note 第 37 行反引号写出不存在路径触发 `bare-path` 红，且不能在 `guard-red-record` 并行失败下泛称 `pnpm verify` 全绿）及 3 项建议（`docs/README.md` 与 `docs/architecture.md` 残留「公司视图」旧称、`docs/contracts/host-and-lib.md` 补写 `src/host/` 编译输入、`doc-taxonomy.mjs` 纳入 `image` 节点）；已全部清零并复验通过。
+- **首轮独立盲审（`1c1e44d9-fb64-454f-b0f6-d526170afbee`，`policy.md §P5` 四项判据）**：指出 1 项 Blocker（Note 第 37 行反引号写出不存在路径触发 `bare-path` 红，且不能在 `guard-red-record` 并行失败下泛称 `pnpm verify` 全绿）及 3 项建议（原 docs/project-map.md 与原 docs/runtime-map.md 残留「公司视图」旧称、`docs/contracts/host-and-lib.md` 补写 `src/host/` 编译输入、`doc-taxonomy.mjs` 纳入 `image` 节点）；已全部清零并复验通过。
 - **复核结论（`1c1e44d9-fb64-454f-b0f6-d526170afbee`）**：**PASS（0 Blocker）**。
 
 ## 未覆盖轴

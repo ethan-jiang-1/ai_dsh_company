@@ -17,7 +17,7 @@ const read = (rel: string) => readFileSync(join(ROOT, rel), 'utf8')
 
 describe('setup 调用形', () => {
   it('带参数的 setup 不走 pnpm setup --...', () => {
-    for (const rel of ['tools/dev/setup.mjs', 'docs/guides/bootstrap.md', '.github/workflows/fresh-clone.yml', 'README.md', 'CHANGELOG.md']) {
+    for (const rel of ['tools/dev/setup.mjs', 'docs/guides/bootstrap.md', 'docs/reference/commands.md', '.github/workflows/fresh-clone.yml', 'README.md', 'CHANGELOG.md']) {
       expect(read(rel), `${rel} 不应出现 pnpm setup --...`).not.toMatch(/pnpm setup\s+--/)
     }
     expect(read('.github/workflows/fresh-clone.yml')).toContain('node tools/dev/setup.mjs --check')

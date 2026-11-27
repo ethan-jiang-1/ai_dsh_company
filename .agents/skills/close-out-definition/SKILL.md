@@ -6,7 +6,7 @@ description: Use when finishing any non-trivial change before reporting it done,
 # 收尾的完成定义
 
 适用：任何非平凡变更在**宣布完成之前**。**收尾次序与六行回执形状的唯一家 = 本 skill**；
-去向规则住 [dev-loop §12](../../../docs/guides/dev-loop.md)（整片 revert / `_backlog` 离场 / Note 归属），
+去向规则住 [dev-loop §5](../../../docs/guides/dev-loop.md#5-记录与收尾)（整片 revert / `_backlog` 离场 / Note 归属），
 语义审四输入住 [policy.md §P5](../../../docs/policy.md)——两边都只链接，不复述本 skill 的步骤。
 
 ## 陷阱
@@ -71,8 +71,8 @@ description: Use when finishing any non-trivial change before reporting it done,
 
 ## 指针（别复述）
 
-去向规则（整片 revert / `_backlog` 离场 / Note 归属）= [dev-loop §12](../../../docs/guides/dev-loop.md)；语义审四输入与拉人四件套 = [policy.md §P5](../../../docs/policy.md)；
-**本 skill 是收尾次序与六行回执形状的唯一家**（§12 与 orient 只链接，不复述）；
+去向规则（整片 revert / `_backlog` 离场 / Note 归属）= [dev-loop §5](../../../docs/guides/dev-loop.md#5-记录与收尾)；语义审四输入与拉人四件套 = [policy.md §P5](../../../docs/policy.md)；
+**本 skill 是收尾次序与六行回执形状的唯一家**（§5 与 orient 只链接，不复述）；
 Note 侧的完成定义 = [agent-note-definition](../agent-note-definition/SKILL.md)；
 门禁侧 = [gate-change-definition](../gate-change-definition/SKILL.md)；
 证据分层 = [testing.md](../../../docs/testing.md)。

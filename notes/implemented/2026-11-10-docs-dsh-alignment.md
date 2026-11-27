@@ -11,7 +11,7 @@
 ## 决定
 
 1. **值/死路径/矛盾**：14+ 处修正，删数不改数（D28）；含 architecture 的 tool-face 自相矛盾、roles-isolation 的 `continuation-activation.ts` 死引用、product-definition 的死路径。
-2. **index → tier 书架**：`docs/README.md` 只列 5 层（顶层门/宪法、contracts、guides、reference）+ “先读（按目的）”；33 行逐文档登记删除。`doc-taxonomy` 改为：顶层文档必须逐项链接；tier 文档只要求 tier 目录被链接；stray 目录/顶层未登记即红。`docs/AGENTS.md` 新文档规则同步（树即 inventory）。
+2. **index → tier 书架**：原 docs/index.md（D71 迁为 [docs/README.md](../../docs/README.md)）当时只列 5 层（顶层门/宪法、contracts、guides、reference）+ “先读（按目的）”；33 行逐文档登记删除。`doc-taxonomy` 改为：顶层文档必须逐项链接；tier 文档只要求 tier 目录被链接；stray 目录/顶层未登记即红。`docs/AGENTS.md` 新文档规则同步（树即 inventory）。
 3. **design/ → notes/**：4 篇设计文档写成 `notes/implemented/2026-11-10-{architecture,roles-isolation,ui-demo,role-content}-rationale.md`，收口为决定记录（现行语义用 canonical 链接；完整原稿留 git `ab0fd622^`）。`design/` tier 从树、层表、`doc-taxonomy`、预算中移除；顶层新增有序地图 `docs/architecture.md`。
 4. **genre 拆分**：`demo` 的前置/分镜/场景 B–F → `guides/demo-scenes.md`；`multi-human` 的开门/交接/前提/迁移 → `guides/multi-human-runbook.md`；`presets` 的培养回路 → `contracts/cultivation.md`；工具行枚举改为指针（owner = preset 实现）。三份合同只留当前语义。
 5. **5% headroom**：`doc-budget` 加“内容 ≤ 95% 上限”（`docs/` 适用；`docs/reference/` 豁免——查表/台账，DSH 允许 reference 穷尽）。9 篇 prose 文档瘦身/去重，**未提额**；`doc-taxonomy` 红证 3 条（顶层 stray / stray tier / tier 未链接）。

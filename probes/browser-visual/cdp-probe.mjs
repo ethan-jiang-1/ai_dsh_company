@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻
 // cdp-probe——观察窗的「呈现即验证」机器腿（borrowed from ai_dsh_loop_advisor，驱动层逐字拷贝）。
-// 何时跑：①「启动给我看」类请求的自检（呈现即验证，dev-loop §1 + demo.md §前置的机器实现：
+// 何时跑：①「启动给我看」类请求的自检（呈现即验证，dev-loop §2 + demo-scenes.md §前置的机器实现：
 //   先对已起实例断言真实渲染，全绿才把 URL 交给人）；②插件 client 面改动后；
 //   ③升 pin / 收割后 UI 回归。成本：默认档零模型（真实渲染断言面）；`--ask` 加一次真实模型调用。
 // 前置：GUI URL（demo.md §前置：source run/env.sh → pnpm dsh web -- --port 0 --no-open → 横幅 URL）；

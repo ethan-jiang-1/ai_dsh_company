@@ -78,7 +78,7 @@ tag（升 pin 走 sync-dsh，冒烟过了才加列）；`sync-dsh` 检查模式�
 首启、二次 boot、卸载与重装。程序、成本、超时和锁 = 脚本头注；判据 = 安装副本的 presets/client/`content/`、roster
 零 broken、`session/create`、`application: applied`（或 `restart-required` 后重启）、stderr 无
 `did not activate`/`skipping profile bundle`、`_dist` sha 与 manifest 一致、`plugin remove` 后
-bundles 摘净且 `.dsh-company/` 字节不变（重装可恢复）。`release --verify` 同时跑
+bundles 摘净且 `.dsh-company/` 字节不变（重装可恢复）。`release --verify` 同时跑 `coverage:ratchet`、
 `company-entry-smoke`（真 tarball + 第二 workspace）与 `sourceFingerprint` 核对；`release --check`
 拒绝“源已变但 `_dist` 未重打”。重建 `_dist` 时同批核对 shipped 注释里的路径指针（2026-11-17 移动轮已同步清零）。
 

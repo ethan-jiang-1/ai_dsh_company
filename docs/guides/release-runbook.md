@@ -21,7 +21,7 @@ $EDITOR CHANGELOG.md
 # ③ 构建 + 导出 + 写 manifest
 pnpm release --prepare
 
-# ④ 全套验收（verify/test + 真实安装/生命周期/独立启动/client/preset）
+# ④ 全套验收（verify + coverage:ratchet + 真实安装/生命周期/独立启动/client/preset）
 pnpm release --verify
 #   需要手册注入的真模型验收时：
 pnpm release --verify --with-key

@@ -8,7 +8,7 @@ export const ENTRY_QUESTIONS = [
   { id: 'Q4', ask: 'vendor/dsh 当前钉住哪个 tag？受控源码如何处理？', expect: [/dsh-v\d+\.\d+/, /只读|零改动|不改/] },
   { id: 'Q5', ask: '改 preset 组合后用哪个脚本验真入口？为什么 dump-config 不够？', expect: [/preset-smoke/, /挂载|行校验/] },
   { id: 'Q6', ask: '任务源与「未成熟思考不算任务」的规矩在哪定义？哪些决定记录说明它？', expect: [/RFC|磨活|_backlog|推敲/, /D23|D24|D31|D32|Note/] },
-  { id: 'Q7', ask: '回归与认证档在哪定义？真模型是否进 pnpm test？', expect: [/dev-loop|9\.1/, /不进|不含|排除/] },
+  { id: 'Q7', ask: '回归与认证档在哪定义？真模型是否进 pnpm test？', expect: [/testing\.md|tests\/README|dev-loop|9\.1/, /不进|不含|排除/] },
   { id: 'Q8', ask: 'notes 在开工、实现、收尾各起什么作用？若 Note 与当前实现冲突如何核对？', expect: [/检索|读取|读/, /决定|取舍|方案/, /验证|证据/, /核对|源码|实现/] },
   // ── 执行链四跳（2026-09-26 扩面：原 8 问只覆盖探查链，收尾动作与授权条件无人认证）──
   { id: 'Q9', ask: 'feature 类任务开工前要不要先呈批？什么情况下可以直接做、不必求批？', expect: [/Plan Mode|呈批|exit_plan_mode/, /机械单步|已批准|明确批准/] },
@@ -23,8 +23,8 @@ export const ENTRY_QUESTIONS = [
   { id: 'Q12', ask: '长程自主执行的 goal 有哪两种写法？停止条件有哪几类？', expect: [/交付型/, /打磨型/, /预算|枯竭|卡住/] },
   // ── 完成判断链（2026-10-07 plugin-corpus-realignment 接线：四不等式与语义审形状从此进认证面）──
   // 措辞要点：不问「怎么算完成」那种宽问题（D15 已被 Q5/Q7 侧覆盖）——问四条链 + 语义审清单位置，
-  // 答案锚在 dev-loop §1 完成判断链与 §13 最小清单，唯一。
-  { id: 'Q13', ask: '完成判断链的四条（挂载/行为/安装/批准）各对应什么检查？语义审按哪个清单走、结果记在哪？', expect: [/preset-smoke/, /release-smoke|场景|判据/, /语义审/, /§13|清单/, /Note|收尾/] },
+  // 答案锚在 dev-loop §2 完成判断链与 policy.md §P5 语义审清单，唯一。
+  { id: 'Q13', ask: '完成判断链的四条（挂载/行为/安装/批准）各对应什么检查？语义审按哪个清单走、结果记在哪？', expect: [/preset-smoke/, /release-smoke|场景|判据/, /语义审/, /policy|P5|§13|清单/, /Note|收尾/] },
 ]
 
 /**

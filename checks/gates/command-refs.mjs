@@ -1,6 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { splitGfmTableCells } from '../../tools/lib/core/repo-markdown.mjs'
 
 // ── 文档命令引用门（command-refs，2026-11-03 第六轮 D4）────────────────────────────
 // 为什么：文档里的 `pnpm <script>` 与 `node <仓内路径>` 此前与实现**零机械联系**。实测：
@@ -34,7 +35,9 @@ const UPSTREAM_SCRIPTS = new Set(['gen-client-catalog', 'build'])
 
 function activeDocs(root) {
   const files = ['AGENTS.md', 'README.md', 'tests/README.md', 'checks/README.md', 'checks/AGENTS.md',
-    'run/README.md', 'runtime/README.md', 'packages/company-pack/README.md', 'packages/company-pack/AGENTS.md']
+    'probes/README.md', 'tools/README.md',
+    'run/README.md', 'runtime/README.md', 'packages/company-pack/README.md', 'packages/company-pack/AGENTS.md',
+    'packages/company-pack/src/README.md']
   const walk = (rel) => {
     const dir = join(root, rel)
     if (!existsSync(dir)) return
@@ -99,7 +102,24 @@ export function run({ root, ok, fail }) {
   if (!existsSync(commandsDocPath)) {
     problems.push('docs/reference/commands.md 缺失——根 package.json 脚本须在命令参考表双向登记')
   } else {
-    const missing = [...scripts].filter(name => !commandsDocScripts.has(name)).sort()
+    // 对 commands.md 表格首列做严格双向相等校验（不走 PNPM_BUILTIN / UPSTREAM_SCRIPTS 豁免，
+    // 防止误把 pnpm build / pnpm pack 或已删除的 pnpm setup 留在“根 package.json 脚本全集”表里）。
+    const tableScripts = new Set()
+    const commandsText = readFileSync(commandsDocPath, 'utf8')
+    const lines = commandsText.split('\n')
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i]
+      if (!line.trim().startsWith('|')) continue
+      const firstCell = splitGfmTableCells(line)[0] ?? ''
+      const m = /`pnpm\s+(?:run\s+)?([a-z][\w:-]*)`/.exec(firstCell)
+      if (!m) continue
+      tableScripts.add(m[1])
+      if (!scripts.has(m[1])) {
+        problems.push(`docs/reference/commands.md:${String(i + 1)} → 表格登记了非本仓 package.json 脚本：pnpm ${m[1]}`)
+      }
+    }
+    const registered = tableScripts.size > 0 ? tableScripts : commandsDocScripts
+    const missing = [...scripts].filter(name => !registered.has(name)).sort()
     if (missing.length > 0) {
       problems.push(`package.json 脚本未登记在 docs/reference/commands.md：${missing.join('、')}`)
     }

@@ -217,7 +217,7 @@ export function renderOrient(state) {
   lines.push(`profiles   ${state.profiles.length > 0 ? state.profiles.join(', ') : '（无——home 未初始化或未生效）'}`)
   lines.push(state.credentials.present
     ? `凭据       ${state.credentials.keys.includes(DEEPSEEK_CREDENTIAL) ? `${DEEPSEEK_CREDENTIAL} ✓` : `${DEEPSEEK_CREDENTIAL} ✗`}（共 ${String(state.credentials.keys.length)} 个键；住 .credentials.yaml，不是环境变量）`
-    : '凭据       （无 .credentials.yaml——真模型跑不了；配法见 dev-loop §6）')
+    : '凭据       （无 .credentials.yaml——真模型跑不了；配法见 docs/guides/run-ops.md §1）')
   lines.push('', '== 会话（按工作区 slug 汇总）==')
   if (state.sessions.total === 0) {
     lines.push('（无会话记录——home 未生效或尚未起过会话）')

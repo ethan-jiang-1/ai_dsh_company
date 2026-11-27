@@ -61,7 +61,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 层 | 时间 | 跑什么（代表脚本；**它自己的触发条件在头注**） |
 |---|---|---|
 | **四层命令** | spec/checks 秒级；e2e/entry 按面或每周 | test:spec / test:e2e / test:entry / test:checks（后缀 = lane；e2e/entry 由 keyless-lane 分派） |
-| 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接、物理行预算、裸路径、分层方向与 pin 一致性门禁） |
+| 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接、UTF-8 字节预算、裸路径、分层方向与 pin 一致性门禁） |
 | **类型面 keyless** | 秒级（增量） | `pnpm typecheck`（三个 tsconfig.test-*；覆盖 = include 减 exclude（未接 = `tests/contract` / `pack-exports` / client / host 四类，清单 = 各 exclude；改导出/导入签名或测试类型时跑——verify 与 test 都不做类型检查） |
 | **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器）；便宜 smoke lane = `pnpm smoke:fast`（4 条，~2.2s；pre-push；只证明资产还活着） |
 | 装配 keyless | ~25s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |

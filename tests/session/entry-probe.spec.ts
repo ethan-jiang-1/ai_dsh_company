@@ -21,7 +21,7 @@ const ANSWERS: Record<string, string> = {
   Q4: `${bookkeepingTag ?? 'dsh-v?'} 只读`,
   Q5: 'preset-smoke 验证挂载',
   Q6: '任务源与推敲卡规矩 D31 D32',
-  Q7: 'dev-loop 真模型不进回归',
+  Q7: 'docs/testing.md 与 tests/README.md 定义；真模型不进 pnpm test',
   Q8: '开工检索决定和取舍，核对实现，留下验证证据',
   Q9: 'Plan Mode 呈批；已批准或机械单步可直接做',
   Q10: 'dag-visual 视觉夹具；human-loop-e2e 人机回路；date-rule 日期口径',

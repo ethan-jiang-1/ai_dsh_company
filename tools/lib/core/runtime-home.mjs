@@ -48,7 +48,7 @@ export function devHomeStatus(home, { dailyHome } = {}) {
   }
   const target = physicalPath(resolve(home))
   if (contains(daily, target) || contains(target, daily)) {
-    return { kind: 'daily', home: target, dailyHome: daily, warning: '⚠ DSH_HOME 与日用 home 重叠——先 source run/env.sh（双 home 纪律 = guides/dev-loop §6）' }
+    return { kind: 'daily', home: target, dailyHome: daily, warning: '⚠ DSH_HOME 与日用 home 重叠——先 source run/env.sh（双 home 纪律 = docs/guides/run-ops.md §1）' }
   }
   return { kind: 'ok', home: target, dailyHome: daily }
 }

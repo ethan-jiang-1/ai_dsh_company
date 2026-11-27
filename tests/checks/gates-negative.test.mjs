@@ -336,17 +336,20 @@ const mutateOrFail = (label, path, transform) => {
   try {
     mkdirSync(join(root, 'docs/reference'), { recursive: true })
     writeFileSync(join(root, 'package.json'), JSON.stringify({ scripts: { verify: 'echo ok', test: 'echo ok' } }))
-    writeFileSync(join(root, 'docs/reference/commands.md'), '# 命令\n\n- `pnpm verify`\n- `pnpm test`\n')
+    writeFileSync(join(root, 'docs/reference/commands.md'), '# 命令\n\n| 命令 | 用途 |\n|---|---|\n| `pnpm verify` | 门禁 |\n| `pnpm test` | 测试 |\n')
     const okMsgs = run(commandRefs, root)
     const okClean = okMsgs.every(m => !m.startsWith('FAIL'))
     if (!okClean) failures += 1
     console.log(`${okClean ? 'PASS' : 'FAIL'} command-refs：双向对齐 → 绿`)
 
-    writeFileSync(join(root, 'docs/reference/commands.md'), '# 命令\n\n- `pnpm verify`\n')
+    writeFileSync(join(root, 'docs/reference/commands.md'), '# 命令\n\n| 命令 | 用途 |\n|---|---|\n| `pnpm verify` | 门禁 |\n')
     report('command-refs：commands.md 漏记 package.json 脚本 → 红', run(commandRefs, root), '未登记在 docs/reference/commands.md：test')
 
-    writeFileSync(join(root, 'docs/reference/commands.md'), '# 命令\n\n- `pnpm verify`\n- `pnpm test`\n- `pnpm ghost-cmd`\n')
+    writeFileSync(join(root, 'docs/reference/commands.md'), '# 命令\n\n| 命令 | 用途 |\n|---|---|\n| `pnpm verify` | 门禁 |\n| `pnpm test` | 测试 |\n| `pnpm ghost-cmd` | 幽灵 |\n')
     report('command-refs：commands.md 引用不存在的脚本 → 红', run(commandRefs, root), 'pnpm ghost-cmd 不是本仓脚本')
+
+    writeFileSync(join(root, 'docs/reference/commands.md'), '# 命令\n\n| 命令 | 用途 |\n|---|---|\n| `pnpm verify` | 门禁 |\n| `pnpm test` | 测试 |\n| `pnpm build` | 非本仓上游脚本 |\n| `pnpm pack` | pnpm 内建 |\n')
+    report('command-refs：commands.md 表格误登内建/上游脚本（绕过反向白名单）→ 红', run(commandRefs, root), '表格登记了非本仓 package.json 脚本：pnpm build')
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 

@@ -7,7 +7,7 @@
 
 | 命令 | 用途 | 实现入口 |
 |---|---|---|
-| `pnpm setup` | fresh clone 一键配置与构建验证（支持 `--check` / `--types`） | `tools/dev/setup.mjs` |
+| `pnpm setup` | fresh clone 一键配置与构建验证（无参；`--check`/`--types` 用 `node tools/dev/setup.mjs`） | `tools/dev/setup.mjs` |
 | `pnpm prepare` | 安装仓库 git hooks（pre-push 接线） | `tools/dev/hooks-install.mjs` |
 | `pnpm bundle:init` | 初始化 dev 盘 `company-workspace/.dsh-company/`（不覆盖已有盘） | `tools/dev/bundle-init.mjs` |
 | `pnpm methods:init` | 初始化或同步公司方法层目录 | `tools/dev/methods-init.mjs` |
@@ -26,6 +26,7 @@
 | `pnpm test:e2e` | 运行 keyless `*.e2e.mjs` 端到端车道 | `checks/lanes/keyless-lane.mjs` |
 | `pnpm test:entry` | 运行 keyless `*.entry.mjs` 真实入口车道 | `checks/lanes/keyless-lane.mjs` |
 | `pnpm smoke:fast` | 运行 pre-push 快速无头车道（4 项核心烟测） | `checks/lanes/fast-lane.mjs` |
+| `pnpm smoke:surface` | 按改动面一键运行真入口车道（`client-load`/`preset`/`replay`；支持 `--all`/`--paths`） | `checks/pre-push-surfaces.mjs` |
 | `pnpm smoke:all` | 运行全量 keyless 周检车道 | `checks/lanes/keyless-lane.mjs` |
 | `pnpm coverage:ratchet` | 执行覆盖率棘轮检查（只升不降 + 新文件下限） | `checks/audit/coverage-ratchet.mjs` |
 | `pnpm typecheck` | 检查 `packages/company-pack` 双面与三套 `tsconfig.test-*.json` | `tsc -b` / `tsc -p` |
@@ -48,7 +49,7 @@
 | `pnpm release` | 发布主入口（按子参数执行 check/prepare/verify/stamp/all） | `tools/release/release.mjs` |
 | `pnpm release:check` | 检查 `_dist/` 与源码指纹的发布就绪状态 | `tools/release/release.mjs` |
 | `pnpm release:prepare` | 生成 `_dist/` tarball 与安装手册两件套 | `tools/release/release.mjs` |
-| `pnpm release:verify` | 在干净 profile 中验证真实 tarball 安装形状 | `tools/release/release.mjs` |
+| `pnpm release:verify` | 全套发布验收（`verify`、`coverage:ratchet`、真实 tarball 安装与入口冒烟） | `tools/release/release.mjs` |
 | `pnpm release:stamp` | 为当前发布版本打指纹戳与清单记录 | `tools/release/release.mjs` |
 | `pnpm release:shape` | 校验已导出 tarball 的 shipped 文件形状与链接 | `tools/release/shipped-shape.mjs` |
 | `pnpm release:all` | 串行执行准备、校验与落戳完整发布流 | `tools/release/release.mjs` |

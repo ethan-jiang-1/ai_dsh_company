@@ -105,7 +105,6 @@ export function run({ root, ok, fail, budgets = DOC_BYTE_BUDGETS }) {
     if (walls.length > 0) {
       const first = walls[0]
       fail('doc-budget', `${rel}:${String(first.line)} 单行正文 ${String(first.length)} 字符超上限 ${String(MAX_PROSE_LINE_CHARS)}（禁止单行压缩正文墙，请按语义拆段或列表）`)
-      continue
     }
     if (bytes > cap) {
       fail('doc-budget', `${rel} ${String(bytes)}B 超上限 ${String(cap)}B（先搬内容到该去的家，再压；不直接提额）`)
@@ -113,7 +112,7 @@ export function run({ root, ok, fail, budgets = DOC_BYTE_BUDGETS }) {
       fail('doc-budget', `${rel} ${String(bytes)}/${String(cap)}B，headroom <5%（DSH 目标内留白；先搬/压，不提额）`)
     } else if (bytes < Math.ceil(cap * (1 - SLACK_FLOOR))) {
       fail('doc-budget', `${rel} ${String(bytes)}B 只占上限 ${String(cap)}B 的 ${String(Math.round((bytes / cap) * 100))}%（空置 >${String(Math.round(SLACK_FLOOR * 100))}%：按现行内容下调上限，或 Note 论证保留）`)
-    } else {
+    } else if (walls.length === 0) {
       ok(`doc-budget ${rel} (${String(bytes)}/${String(cap)}B)`)
     }
   }

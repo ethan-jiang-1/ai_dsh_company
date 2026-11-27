@@ -66,7 +66,7 @@ pnpm release --check --allow-pre-publish-index
   [bootstrap](./bootstrap.md) → [tests/README](../../tests/README.md)。
 - `notes/` 与 `_backlog/` 是决策记忆/推敲层，不是任务源；清单=目录本身（体量现算 `find notes -name '*.md' | wc -l` / `find _backlog -name '*.md' | wc -l`，别写死篇数），任务源 = 用户点名或已批 RFC。
 - `_dist/安装手册.md` 是生成物；`market-index.staged.json` 是发布哨兵；
-  `checks/INDEX.generated.md`、`tests/CENSUS.generated.md` 是生成库存，不要手改。
+  `checks/INDEX.generated.md`、`tests/CENSUS.generated.md`、`tests/BUG-COVERAGE.generated.md` 与 `docs/reference/package-catalog.generated.md` 是生成库存，不要手改。
 - `vendor/` 只读；`lib/` 是构建产物；不要用 `npm pack` 代替 `pnpm release --prepare`。
 
 ## 5 卡点
