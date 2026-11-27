@@ -37,7 +37,7 @@ opened: 2026-11-27
 | ID | 范围 | 实测结论 | 关键证据与归宿 |
 |---|---|---|---|
 | **P1** | `final.md` → 发起复盘培养提交链 | **FAIL** | `targeted-r3.spec.tsx` 与 Chromium（`r3-01-p1-final-md-cultivate-rejected.png`）实证：携带绝对路径提交被 `'成品 ref 必须是安全的工作区相对路径'` 拒收 → [BUG-399](../fixed_bugs/BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md)。 |
-| **P2** | Light 模式白底白字 Token 碰撞 | **FAIL** | Chromium 切浅色主题实测 `--dsw-alias-bg-layer-2` 与 `--dsw-alias-bg-base` 同为 `#ffffff`（`r3-02-light-mode-contrast.png`）→ [BUG-402](../../bugs/BUG-402-light-mode-layer2-invisible-highlight-and-390-textarea-overflow.md)。 |
+| **P2** | Light 模式白底白字 Token 碰撞 | **FAIL** | Chromium 切浅色主题实测 `--dsw-alias-bg-layer-2` 与 `--dsw-alias-bg-base` 同为 `#ffffff`（`r3-02-light-mode-contrast.png`）→ [BUG-402](../fixed_bugs/BUG-402-light-mode-layer2-invisible-highlight-and-390-textarea-overflow.md)。 |
 | **P3** | 未迁移 `openTab` 入口、S4 TurnTail 与假 Toast | **FAIL** | `targeted-r3.spec.tsx` 复现 HQ 内 `register-s4-ux` / `StrategyButton` / `openDeliverables` 绕过 `openOnSessionSurface` 与假成功 Toast → [BUG-399](../fixed_bugs/BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md)。 |
 | **P4** | 环境角标刷新谎报、HQ 内嵌 `ComposerStatusPill` 与 `HeroMotionOptions` | **FAIL（部分 PASS）** | Chromium 实测 HQ 内嵌保留 `ComposerStatusPill`（`pillInHq=1`），刷新后角标显 `待办 0`/`梦之队就绪` 而 `AttentionTab` 有挂起 `'红线测试待办'` → [BUG-400](../fixed_bugs/BUG-400-embedded-workshop-status-pill-leak-and-cultivation-race-gaps.md)、[BUG-404](../fixed_bugs/BUG-404-stale-zero-badges-after-reload-and-mine-revoked-tag.md)；空白非公司会话 `plainId` 下 `HeroMotionOptions` `count=0`（PASS）。 |
 | **P5** | `BUG-392..397` 其余细节基线复核 | **PASS** | Phase 0 全量基线规格（303 文件 / 2868 用例含 `signoff`/`strategy`/`dag`/`context-picker`）与 `targeted-r3.spec.tsx` 通过。 |
@@ -52,7 +52,7 @@ opened: 2026-11-27
 | **Q4** | `error-ring` 与 `instance-guard` 故障链边界 | **FAIL（部分排伪）** | `targeted-r3.spec.tsx` 复现 `error-ring` 乱序释放清空与 `flush` 丢包 → [BUG-401](../fixed_bugs/BUG-401-panel-nan-null-crashes-signoff-error-tag-and-question-id-mismatch.md)；`localStorage` 写入 `'123'` 时 `instance-guard` 未抛错（排伪 PASS）。 |
 | **Q5** | `attention.ts` 与 `presence.ts` `callId/id` 错位及中英混语 | **FAIL** | `targeted-r3.spec.tsx` 复现仅有 `id`（无 `callId`）的已答问询滞留待办 → [BUG-401](../fixed_bugs/BUG-401-panel-nan-null-crashes-signoff-error-tag-and-question-id-mismatch.md)；`presence.ts` 仅见静态读码回退标签，未单独单列为运行时故障。 |
 | **Q6** | `SignoffToolView` 异常终态仍显「等待签字」与卡片溢出 | **FAIL** | `targeted-r3.spec.tsx` 复现 `state='error'` / `'stopped'` 且无 JSON decision 时仍显等待签字 → [BUG-401](../fixed_bugs/BUG-401-panel-nan-null-crashes-signoff-error-tag-and-question-id-mismatch.md)。 |
-| **Q7** | 浮窗 `unfloatTab` 空置与冗余「浮出」按钮 | **FAIL** | Chromium 实测浮出窗内保留无响应的「浮出」按钮（`count=1`）→ [BUG-403](../../bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
+| **Q7** | 浮窗 `unfloatTab` 空置与冗余「浮出」按钮 | **FAIL** | Chromium 实测浮出窗内保留无响应的「浮出」按钮（`count=1`）→ [BUG-403](../fixed_bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
 | **Q8** | 冷启首屏报错跨 Reload → 会话落盘与脱敏 | **PASS** | Phase 3 `phase3-live-r3.mjs` 实测错误写入 `runtime/harness-home/logs/company-client-errors.log` 且含 `?token=<redacted>`。 |
 | **Q9** | 新增/拆分模块组合与边界回归 | **PASS** | `targeted-r3.spec.tsx`（14 用例）与 Phase 0 303 个 spec 文件通过。 |
 
@@ -60,12 +60,12 @@ opened: 2026-11-27
 
 | ID | 范围 | 实测结论 | 关键证据与归宿 |
 |---|---|---|---|
-| **S1** | ARIA `aria-controls` 与 `:focus-visible` 可见性 | **FAIL** | Chromium 实测 4/4 `SegmentedControl` 产生悬空 `aria-controls`；`styles.ts` 局部将 `:focus-visible` 设为 `outline: none` → [BUG-403](../../bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
-| **S2** | `z-index` 弹窗叠压拦截 | **FAIL** | Chromium 实测打开弹窗时 `#dsh-instance-guard-banner`（`zIndex: 9999`）截获指针点击（`topHitId: dsh-instance-guard-banner`，`r3-04-zindex-modal-banner.png`）→ [BUG-403](../../bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
-| **S3** | `390×844` 窄窗控件/卡片溢横 | **FAIL（部分排伪）** | `.wk-cultivation-body-input` 因 `content-box` 溢出 `+18px`（`r3-05-390-overflow.png`）→ [BUG-402](../../bugs/BUG-402-light-mode-layer2-invisible-highlight-and-390-textarea-overflow.md)；`.wk-delegation` 长 URL 卡片实测正常换行（`sw=254, cw=254`，`r3-08-390-long-toolcards.png`，排伪 PASS）。 |
-| **S4** | Tab 切换销毁培养表单草稿 | **FAIL** | Chromium 实测 `档案 -> 培养` 填表后切往它页再切回表单销毁（`formGone=true`）→ [BUG-403](../../bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
-| **S5** | `CompanyGuideHub` 缺失 `replaceTab: true` | **FAIL** | `phase2b-extra.mjs` 实测点击 Guide 后标签由 `["档案"]` 增至 `["档案","开始","作战板"]` → [BUG-403](../../bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
-| **S6** | 浮窗窄视口关闭死点 | **FAIL** | Chromium 实测 `<768px` 浮窗点关闭按钮后浮窗仍可见（`stillVisibleAfterClick=true`，`r3-06-floating-narrow-dead-close.png`）→ [BUG-403](../../bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
+| **S1** | ARIA `aria-controls` 与 `:focus-visible` 可见性 | **FAIL** | Chromium 实测 4/4 `SegmentedControl` 产生悬空 `aria-controls`；`styles.ts` 局部将 `:focus-visible` 设为 `outline: none` → [BUG-403](../fixed_bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
+| **S2** | `z-index` 弹窗叠压拦截 | **FAIL** | Chromium 实测打开弹窗时 `#dsh-instance-guard-banner`（`zIndex: 9999`）截获指针点击（`topHitId: dsh-instance-guard-banner`，`r3-04-zindex-modal-banner.png`）→ [BUG-403](../fixed_bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
+| **S3** | `390×844` 窄窗控件/卡片溢横 | **FAIL（部分排伪）** | `.wk-cultivation-body-input` 因 `content-box` 溢出 `+18px`（`r3-05-390-overflow.png`）→ [BUG-402](../fixed_bugs/BUG-402-light-mode-layer2-invisible-highlight-and-390-textarea-overflow.md)；`.wk-delegation` 长 URL 卡片实测正常换行（`sw=254, cw=254`，`r3-08-390-long-toolcards.png`，排伪 PASS）。 |
+| **S4** | Tab 切换销毁培养表单草稿 | **FAIL** | Chromium 实测 `档案 -> 培养` 填表后切往它页再切回表单销毁（`formGone=true`）→ [BUG-403](../fixed_bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
+| **S5** | `CompanyGuideHub` 缺失 `replaceTab: true` | **FAIL** | `phase2b-extra.mjs` 实测点击 Guide 后标签由 `["档案"]` 增至 `["档案","开始","作战板"]` → [BUG-403](../fixed_bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
+| **S6** | 浮窗窄视口关闭死点 | **FAIL** | Chromium 实测 `<768px` 浮窗点关闭按钮后浮窗仍可见（`stillVisibleAfterClick=true`，`r3-06-floating-narrow-dead-close.png`）→ [BUG-403](../fixed_bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)。 |
 | **S7** | 纯键盘端到端通测边界记录 | **PARTIAL（未另作全程自动化）** | 经 `S1`/`P5` 证实 `aria-controls` 悬空与 `outline: none` 阻断纯键盘可达性；全界面无鼠标串联巡检未单独成脚本。 |
 
 ### 组 T · 双语切语、Host 错误面与 R1/R2 未闭环真模型长尾（7 单元）
