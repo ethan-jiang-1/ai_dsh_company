@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// 负例留证 2026-11-27：去掉 StrategyPanel 按 sessionId 重置 error 与 StrategyRow key ⇒ 切会话保留上一会话保存报错与未提交 wiki 草稿（BUG-394）；还原后绿。BUG-394
 /**
  * 策略面板 wiki 输入的受控语义。
  *
@@ -85,5 +86,48 @@ describe('策略 wiki 输入：受控（BUG-301）', () => {
     })
     await act(async () => { input.dispatchEvent(new Event('focusout', { bubbles: true })) })
     expect(save).toHaveBeenCalledWith('session-1', 'wiki', 'wiki')
+  })
+
+  it('BUG-394：切换 sessionId 时清除上一会话的保存失败 error 与未提交 wiki 草稿', async () => {
+    const store = createStartupStore({
+      loaded: true,
+      settings: { ...EMPTY_STARTUP_SETTINGS, wiki: null },
+      options: EMPTY_STARTUP_OPTIONS,
+    })
+    const save = vi.fn(async () => ({ ok: false as const, message: 'save failed err' }))
+    const host = document.createElement('div')
+    document.body.append(host)
+    mounted = createRoot(host)
+    const renderFor = (sessionId: string) => createElement(StrategyPanel, {
+      sessionId,
+      store,
+      load: async () => {},
+      save,
+      reset: async () => ({ ok: true }),
+      floatTab: () => {},
+      unfloatTab: () => {},
+      useTabInfo: () => ({ tab: { id: 'tab1', contentId: 'dsh-company-pack/strategy' }, layout: 'dock' }),
+      t,
+    } as never)
+
+    await act(async () => { mounted?.render(renderFor('sess-1')) })
+    const select = host.querySelector('.wk-strategy-select') as HTMLSelectElement
+    await act(async () => {
+      select.value = ''
+      select.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    expect(host.textContent).toContain('save failed err')
+
+    const input = wikiInput(host)
+    await act(async () => {
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
+      setter?.call(input, 'unsaved-draft-s1')
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+    expect(wikiInput(host).value).toBe('unsaved-draft-s1')
+
+    await act(async () => { mounted?.render(renderFor('sess-2')) })
+    expect(host.textContent).not.toContain('save failed err')
+    expect(wikiInput(host).value).toBe('')
   })
 })

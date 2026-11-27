@@ -164,8 +164,9 @@ function StrategyRow({ row, t, onPick, onWiki, busy, wikiCheck, checkCurrent, te
 export function StrategyPanel(props: StrategyPanelProps): ReactNode {
   const [face, setFace] = useState(() => props.store.get())
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [errorState, setErrorState] = useState<{ readonly sessionId: SessionId; readonly message: string } | null>(null)
   const { sessionId, load, save, reset, t } = props
+  const error = errorState?.sessionId === sessionId ? errorState.message : null
 
   useEffect(() => {
     setFace(props.store.get())
@@ -184,20 +185,20 @@ export function StrategyPanel(props: StrategyPanelProps): ReactNode {
 
   const commit = useCallback(async (action: () => Promise<SaveResult>): Promise<void> => {
     setBusy(true)
-    setError(null)
+    setErrorState(null)
     try {
       const result = await action()
       if (!result.ok) {
-        setError(t('strategy.saveFailed', { message: result.message }))
+        setErrorState({ sessionId, message: t('strategy.saveFailed', { message: result.message }) })
         return
       }
       await reload(new AbortController().signal)
     } catch (cause) {
-      setError(t('strategy.saveFailed', { message: (cause as Error).message }))
+      setErrorState({ sessionId, message: t('strategy.saveFailed', { message: (cause as Error).message }) })
     } finally {
       setBusy(false)
     }
-  }, [reload, t])
+  }, [reload, sessionId, t])
 
   const rows = startupRows(face.settings, face.options)
   const optionsUnreadable = face.optionsProblem === 'unreadable'
@@ -222,7 +223,7 @@ export function StrategyPanel(props: StrategyPanelProps): ReactNode {
         {nothingToPick ? <p className="wk-strategy-empty">{t('strategy.noOptions')}</p> : null}
         {rows.map(row => (
           <StrategyRow
-            key={row.field}
+            key={`${String(sessionId)}:${row.field}`}
             row={row}
             t={t}
             busy={busy}

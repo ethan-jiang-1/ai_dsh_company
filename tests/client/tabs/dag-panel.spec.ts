@@ -1,3 +1,5 @@
+// @vitest-environment happy-dom
+// 负例留证 2026-11-27：把 DagPanel ResizeObserver useEffect 依赖改回 [] 或改回写死 id="wk-arrow-wait" ⇒ 空态先挂后再加节点 observer 不触发且双面板 SVG marker ID 冲突（BUG-395）；还原后绿。BUG-395
 /**
  * DagPanel 渲染结构 keyless 回归（2026-09-25 实验现场红证立的钉）：
  * CSS 动画的 transform 会覆盖 SVG <g> 的 transform 定位属性 ⇒ 定位与动画必须**分层**——
@@ -5,7 +7,8 @@
  * 所有节点堆到 (0,0)（依赖图"只剩左上角一个"的事故形态）。client-load 看不见这类错
  * （不开会话不渲染面板），静态渲染是这层唯一 keyless 防线。
  */
-import { createElement } from 'react'
+import { act, createElement, Fragment } from 'react'
+import { createRoot } from 'react-dom/client'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { DagPanel, fitScale, wrapTitle } from '../../../packages/company-pack/src/client/tabs/company-panels.tsx'
@@ -132,15 +135,50 @@ describe('DagPanel 状态徽章与箭头（2026-09-26 code-review 补的钉子�
     expect(pending).not.toContain('wk-dag-progress')
   })
 
-  it('箭头 = 双 marker 显式上色（不依赖 SVG2 context-stroke）', () => {
+  it('箭头 = 双 marker 显式上色（不依赖 SVG2 context-stroke）且双实例 marker ID 互不冲突（BUG-395）', () => {
     const layout = layoutDag([task('a', [], 'completed'), task('b', ['a']), task('c', ['b'])])
-    const html = renderToString(createElement(DagPanel, { layout }))
-    expect(html).toContain('id="wk-arrow-wait"')
-    expect(html).toContain('id="wk-arrow-done"')
-    expect(html).toContain('wk-arrow-tip-wait')
-    expect(html).toContain('wk-arrow-tip-done')
-    expect(html, 'context-stroke 在 Safari 无信号，不支持时箭头会变黑').not.toContain('context-stroke')
-    expect(html).toContain('url(#wk-arrow-done)')
-    expect(html).toContain('url(#wk-arrow-wait)')
+    const htmlBoth = renderToString(createElement(Fragment, null, createElement(DagPanel, { layout }), createElement(DagPanel, { layout })))
+    const waitIds = [...htmlBoth.matchAll(/id="([^"]*wk-arrow-wait)"/g)].map(m => m[1]!)
+    const doneIds = [...htmlBoth.matchAll(/id="([^"]*wk-arrow-done)"/g)].map(m => m[1]!)
+    expect(waitIds).toHaveLength(2)
+    expect(doneIds).toHaveLength(2)
+    expect(waitIds[0]).not.toBe(waitIds[1])
+    expect(doneIds[0]).not.toBe(doneIds[1])
+    expect(htmlBoth).toContain('wk-arrow-tip-wait')
+    expect(htmlBoth).toContain('wk-arrow-tip-done')
+    expect(htmlBoth, 'context-stroke 在 Safari 无信号，不支持时箭头会变黑').not.toContain('context-stroke')
+    for (const id of doneIds) expect(htmlBoth).toContain(`url(#${id})`)
+    for (const id of waitIds) expect(htmlBoth).toContain(`url(#${id})`)
+  })
+
+  it('BUG-395：空图先挂载后动态来节点时，ResizeObserver 正常附着并按容器宽缩放', () => {
+    ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+    let observed = 0
+    const OrigRO = globalThis.ResizeObserver
+    globalThis.ResizeObserver = class {
+      observe() { observed += 1 }
+      disconnect() {}
+      unobserve() {}
+    } as unknown as typeof ResizeObserver
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    try {
+      act(() => {
+        root.render(createElement(DagPanel, { layout: { width: 0, height: 0, nodes: [], edges: [] } }))
+      })
+      expect(observed).toBe(0)
+
+      act(() => {
+        root.render(createElement(DagPanel, {
+          layout: layoutDag([task('a'), task('b'), task('c'), task('d')]),
+        }))
+      })
+      expect(observed).toBe(1)
+    } finally {
+      act(() => { root.unmount() })
+      host.remove()
+      globalThis.ResizeObserver = OrigRO
+    }
   })
 })

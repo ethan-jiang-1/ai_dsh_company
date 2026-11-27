@@ -13,7 +13,7 @@
  */
 import { CATALOG_READ_LIMIT } from '../data/read-limits.ts'
 import type { WorkspaceTextRead } from '../cultivation/cultivation-data.ts'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type { TabId } from '@deepseek-ai/dsh-client-ui-dockkit'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
@@ -144,7 +144,14 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
     notPresented: entries.filter(entry => entry.presented === false).length,
     presentUnknown: entries.filter(entry => entry.presented === null).length,
   }), [entries])
-  const filtered = filterCatalog(entries, filter)
+  const activeFilter: Filter = (filter === 'unledgered' && counts.unledgered === 0)
+    || (filter === 'unpresented' && counts.notPresented === 0)
+    ? 'all'
+    : filter
+  useEffect(() => {
+    if (activeFilter !== filter) setFilter('all')
+  }, [activeFilter, filter])
+  const filtered = filterCatalog(entries, activeFilter)
   const groups = useMemo(() => {
     const byMonth = new Map<string, DeliverablesCatalogEntry[]>()
     for (const entry of filtered) {
@@ -179,8 +186,8 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
             <Button
               key={item}
               size="sm"
-              variant={filter === item ? 'primary' : 'ghost'}
-              aria-pressed={filter === item}
+              variant={activeFilter === item ? 'primary' : 'ghost'}
+              aria-pressed={activeFilter === item}
               onClick={() => { setFilter(item) }}
             >
               {filterLabel(item, t)} {filterCount(item)}
@@ -189,7 +196,7 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
         ))}
       </div>
       {filtered.length === 0
-        ? <StateNote text={filter === 'all' ? t('deliverables.emptyAll') : t('deliverables.emptyFilter')} />
+        ? <StateNote text={activeFilter === 'all' ? t('deliverables.emptyAll') : t('deliverables.emptyFilter')} />
         : (
             <div role="list" aria-label={t('deliverables.listAria')} className="wk-deliverable-list">
               {groups.map(([month, rows]) => (

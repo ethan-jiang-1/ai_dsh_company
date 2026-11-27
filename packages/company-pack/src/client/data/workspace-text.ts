@@ -37,8 +37,14 @@ export function useWorkspaceText(
   options: WorkspaceTextOptions = {},
 ): { readonly state: WorkspaceTextState; readonly reload: () => void } {
   const [state, setState] = useState<WorkspaceTextState>({ status: 'loading' })
+  const [syncedSessionId, setSyncedSessionId] = useState<SessionId>(sessionId)
   const [tick, setTick] = useState(0)
   const { refreshMs } = options
+  if (syncedSessionId !== sessionId) {
+    // BUG-394：会话/工作区切换立刻清回 loading，防止新盘加载窗口内残留展示上一盘正文。
+    setSyncedSessionId(sessionId)
+    setState({ status: 'loading' })
+  }
   useEffect(() => {
     const controller = new AbortController()
     const run = async (): Promise<void> => {
@@ -58,5 +64,5 @@ export function useWorkspaceText(
     return () => { controller.abort(); if (timer !== undefined) clearInterval(timer) }
   }, [load, sessionId, refreshMs, tick])
   const reload = useCallback(() => { setTick(value => value + 1) }, [])
-  return { state, reload }
+  return { state: syncedSessionId !== sessionId ? { status: 'loading' } : state, reload }
 }

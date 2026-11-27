@@ -76,14 +76,20 @@ export function parseCompanyIdentity(text: string | null): CompanyIdentity | nul
 
 /**
  * 消费一次 workspaceFiles.read 结果（拒绝半文件 `eof === false` 与失败结果）。
- * 解析有效时更新全局品牌缓存并返 true，否则保留既有值并返 false。
+ * 解析有效时更新全局品牌缓存并返 true，否则回落出厂身份并返 false（BUG-394：跨盘切换不残留旧名）。
  */
 export function applyCompanyIdentityRead(
   result: { readonly ok: true; readonly value: { readonly text: string; readonly eof?: boolean } } | { readonly ok: false },
 ): boolean {
-  if (!result.ok || result.value.eof === false) return false
+  if (!result.ok || result.value.eof === false) {
+    resetCompanyIdentity()
+    return false
+  }
   const parsed = parseCompanyIdentity(result.value.text)
-  if (parsed === null) return false
+  if (parsed === null) {
+    resetCompanyIdentity()
+    return false
+  }
   setCompanyIdentity(parsed)
   return true
 }

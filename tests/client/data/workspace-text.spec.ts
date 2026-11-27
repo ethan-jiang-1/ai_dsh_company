@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// 负例留证 2026-11-27：去掉 useWorkspaceText 按 sessionId 切换立即重置 state 为 loading 的逻辑 ⇒ 切会话未完前仍显示上一盘文本（BUG-394）；还原后绿。BUG-394
 /**
  * `useWorkspaceText` 的加载状态机（R4-05，2026-10-28 第四轮六维审计）。
  *
@@ -19,8 +20,8 @@ afterEach(() => {
   document.body.innerHTML = ''
 })
 
-function Probe({ load, refreshMs }: { readonly load: WorkspaceTextLoader; readonly refreshMs?: number }) {
-  const { state, reload } = useWorkspaceText(load, 'session-lead' as never, refreshMs === undefined ? {} : { refreshMs })
+function Probe({ load, refreshMs, sessionId = 'session-lead' }: { readonly load: WorkspaceTextLoader; readonly refreshMs?: number; readonly sessionId?: string }) {
+  const { state, reload } = useWorkspaceText(load, sessionId as never, refreshMs === undefined ? {} : { refreshMs })
   return createElement('div', null,
     createElement('span', { 'data-status': state.status }, state.status),
     createElement('span', { 'data-text': '' }, state.status === 'ready' ? state.text : ''),
@@ -85,5 +86,28 @@ describe('useWorkspaceText：loading → ready / null → unreadable / 卸载中
     await act(async () => { button?.click() })
     expect(load).toHaveBeenCalledTimes(2)
     expect(host.textContent).toContain('第二版')
+  })
+
+  it('切换 sessionId 时在新会话异步加载完成前立刻回到 loading 并清空前盘正文（BUG-394）', async () => {
+    let resolveB!: (v: { readonly ok: true; readonly eof: true; readonly text: string }) => void
+    const load: WorkspaceTextLoader = (sessionId) => (
+      sessionId === ('sA' as never)
+        ? Promise.resolve({ ok: true as const, eof: true, text: 'WORKSPACE_A_TEXT' })
+        : new Promise(resolve => { resolveB = resolve })
+    )
+    const host = document.createElement('div')
+    document.body.append(host)
+    mounted = createRoot(host)
+    await act(async () => { mounted?.render(createElement(Probe, { load, sessionId: 'sA' })) })
+    expect(status(host)).toBe('ready')
+    expect(host.textContent).toContain('WORKSPACE_A_TEXT')
+
+    await act(async () => { mounted?.render(createElement(Probe, { load, sessionId: 'sB' })) })
+    expect(status(host)).toBe('loading')
+    expect(host.querySelector('[data-text]')?.textContent).toBe('')
+
+    await act(async () => { resolveB({ ok: true, eof: true, text: 'WORKSPACE_B_TEXT' }) })
+    expect(status(host)).toBe('ready')
+    expect(host.textContent).toContain('WORKSPACE_B_TEXT')
   })
 })

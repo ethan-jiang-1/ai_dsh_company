@@ -6,7 +6,7 @@
  */
 import { clauseSeparator, joinList, listSeparator } from '../ui/list-separator.ts'
 import { MAX_ACTIVITY } from '../data/use-company-data.ts'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { BoardCard, BoardColumn, TaskRow } from '../../lib/presence/board.ts'
 import type { BudgetSummary } from '../../lib/accounting/budget.ts'
@@ -185,7 +185,12 @@ export function fitScale(availableWidth: number, graphWidth: number): number {
 export function DagPanel({ layout, roleLabel = label => label, t = defaultT }: { readonly layout: DagLayout; readonly roleLabel?: (ownerLabel: string) => string; readonly t?: CompanyT }) {
   const fitRef = useRef<HTMLDivElement | null>(null)
   const [availableWidth, setAvailableWidth] = useState(0)
+  const markerPrefix = useId().replace(/:/g, '')
+  const waitMarkerId = `${markerPrefix}-wk-arrow-wait`
+  const doneMarkerId = `${markerPrefix}-wk-arrow-done`
+  const hasNodes = layout.nodes.length > 0
   useEffect(() => {
+    if (!hasNodes) return
     const element = fitRef.current
     if (element === null) return
     const measure = (): void => {
@@ -195,8 +200,8 @@ export function DagPanel({ layout, roleLabel = label => label, t = defaultT }: {
     const observer = new ResizeObserver(measure)
     observer.observe(element)
     return () => { observer.disconnect() }
-  }, [])
-  if (layout.nodes.length === 0) return <StateNote text={t('dag.empty')} />
+  }, [hasNodes])
+  if (!hasNodes) return <StateNote text={t('dag.empty')} />
   const scale = availableWidth === 0 ? 1 : fitScale(availableWidth, layout.width)
   return (
     <div className="wk-dag-fit" ref={fitRef}>
@@ -214,10 +219,10 @@ export function DagPanel({ layout, roleLabel = label => label, t = defaultT }: {
         {/* 箭头 = **双 marker 显式上色**（CSS 里 .wk-arrow-tip-*）。不用 SVG2 `context-stroke`：
             Chrome 124+/Firefox 支持，Safari 无信号——不支持时 marker 会 fallback 成黑，
             深色主题下箭头直接看不见。 */}
-        <marker id="wk-arrow-wait" viewBox="0 0 8 8" refX={7} refY={4} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
+        <marker id={waitMarkerId} viewBox="0 0 8 8" refX={7} refY={4} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
           <path className="wk-arrow-tip-wait" d="M 0 0 L 8 4 L 0 8 z" />
         </marker>
-        <marker id="wk-arrow-done" viewBox="0 0 8 8" refX={7} refY={4} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
+        <marker id={doneMarkerId} viewBox="0 0 8 8" refX={7} refY={4} markerWidth={7} markerHeight={7} orient="auto-start-reverse">
           <path className="wk-arrow-tip-done" d="M 0 0 L 8 4 L 0 8 z" />
         </marker>
       </defs>
@@ -227,7 +232,7 @@ export function DagPanel({ layout, roleLabel = label => label, t = defaultT }: {
           className="wk-edge"
           data-done={edge.done}
           d={edge.path}
-          markerEnd={`url(#wk-arrow-${edge.done ? 'done' : 'wait'})`}
+          markerEnd={`url(#${edge.done ? doneMarkerId : waitMarkerId})`}
           /* pathLength=1：把 dash 单位归一化 ⇒ dashoffset 1→0 的"画线"与真实长度无关。
              颜色/线宽/dash 全在 CSS（.wk-edge[data-done]）——含浅色对比度修正。 */
           pathLength={1}

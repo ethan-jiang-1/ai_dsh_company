@@ -49,14 +49,18 @@ export function createStartupHandlers(deps: {
   const readStartupOptionsText = readWorkspaceText(WORKSPACE_TEXT_PATHS.startupOptions, STARTUP_OPTIONS_READ_LIMIT)
 
   const loadStartup = async (sessionId: SessionId, signal: AbortSignal): Promise<void> => {
+    if (signal.aborted) return
     const [settingsRead, optionsRead] = await Promise.all([
       readStartupText(sessionId, signal),
       readStartupOptionsText(sessionId, signal),
     ])
-    startupStore.set(await startupFaceFromReads(
+    if (signal.aborted) return
+    const nextFace = await startupFaceFromReads(
       { settings: settingsRead, options: optionsRead },
       () => workspaceFileExists(remote, leadOf, sessionId, WORKSPACE_TEXT_PATHS.startup, signal),
-    ))
+    )
+    if (signal.aborted) return
+    startupStore.set(nextFace)
   }
 
   const runSettingsCommand = async (sessionId: SessionId, line: string): Promise<SaveResult> => {

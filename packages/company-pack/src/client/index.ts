@@ -375,7 +375,15 @@ function registerSidebarIdentity(ctx: ClientContext, hubStore: HubSubViewStore):
       const syncIdentity = (): void => {
         if (disposed) return
         const target = pickTarget()
-        if (target === undefined) return
+        if (target === undefined) {
+          if (lastTargetKey !== null) {
+            lastTargetKey = null
+            activeController?.abort()
+            activeController = null
+            resetCompanyIdentity()
+          }
+          return
+        }
         const targetKey = `${target.id}:${target.cwd ?? ''}`
         if (targetKey === lastTargetKey) return
         lastTargetKey = targetKey
@@ -390,6 +398,9 @@ function registerSidebarIdentity(ctx: ClientContext, hubStore: HubSubViewStore):
             }
           } catch {
             // intentional-fallback: 品牌读不到就用出厂词标；不把装饰面错误升级成页面错误。
+            if (!disposed && !controller.signal.aborted) {
+              resetCompanyIdentity()
+            }
           }
         })()
       }

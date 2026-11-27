@@ -1,4 +1,5 @@
 // 负例留证 2026-11-24：让 parseCompanyIdentity 不检查 yamlScalarOrProblem ⇒ BUG-368 用例红（品牌带引号）。BUG-368
+// 负例留证 2026-11-27：applyCompanyIdentityRead 在 !ok / eof=false / 解析失败时不调 resetCompanyIdentity() ⇒ BUG-394 跨工作区切换仍保留旧品牌名称；还原后绿。BUG-394
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { createElement } from 'react'
@@ -48,10 +49,19 @@ describe('Brand', () => {
     expect(parseCompanyIdentity('---\nproductName: Acme\n---\n')).toBeNull()
   })
 
-  it('applyCompanyIdentityRead：失败或截断（eof=false）不覆盖；完整且有效才写入', () => {
+  it('applyCompanyIdentityRead：失败/截断（eof=false）/坏文件回落出厂身份；完整且有效才写入（BUG-394）', () => {
+    setCompanyIdentity({ company: 'OldCorp', productName: 'NovaCorp', productType: '', timeZone: '' })
     expect(applyCompanyIdentityRead({ ok: false })).toBe(false)
+    expect(companyIdentity()).toEqual(FALLBACK_IDENTITY)
+
+    setCompanyIdentity({ company: 'OldCorp', productName: 'NovaCorp', productType: '', timeZone: '' })
     expect(applyCompanyIdentityRead({ ok: true, value: { text: '---\ncompany: X\nproductName: Y\n---\n', eof: false } })).toBe(false)
     expect(companyIdentity()).toEqual(FALLBACK_IDENTITY)
+
+    setCompanyIdentity({ company: 'OldCorp', productName: 'NovaCorp', productType: '', timeZone: '' })
+    expect(applyCompanyIdentityRead({ ok: true, value: { text: '# no frontmatter', eof: true } })).toBe(false)
+    expect(companyIdentity()).toEqual(FALLBACK_IDENTITY)
+
     expect(applyCompanyIdentityRead({ ok: true, value: { text: '---\ncompany: X\nproductName: Y\n---\n', eof: true } })).toBe(true)
     expect(companyIdentity().productName).toBe('Y')
   })

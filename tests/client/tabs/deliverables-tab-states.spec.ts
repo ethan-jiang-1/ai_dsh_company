@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// 负例留证 2026-11-27：DeliverablesView 直接使用未回正的 filter state ⇒ 台账外/未 present 归零隐藏按钮后画面卡死在空态（BUG-395）；还原后绿。BUG-395
 /**
  * 成品页签的**错误态渲染判据**：真挂 `DeliverablesTab`，喂三种读取结果，
  * 断言面板说的那句话对得上状态——尤其「截断」不能报成「形状不符」。
@@ -9,8 +10,9 @@
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
-import { DeliverablesTab } from '../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx'
+import { DeliverablesTab, DeliverablesView } from '../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx'
 import { zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
+import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -69,5 +71,47 @@ describe('DeliverablesTab：截断 ≠ 形状不符', () => {
       readCatalog: async () => ({ ok: false as const, reason: 'EACCES' }),
     })))
     expect(host.textContent).toContain('不可读')
+  })
+
+  it('BUG-395：选中「台账外/未 present」筛选且计数归零后自动退回「全部」，不卡死空态', async () => {
+    const makeCatalog = (unledgered: boolean) => ({
+      schema: 1 as const,
+      generatedAt: '2026-11-27T01:00:00Z',
+      skipped: 0,
+      entries: [{
+        slug: 'item-1',
+        kickoff: '2026-11-27',
+        type: 'production',
+        result: 'completed',
+        summary: 'done summary',
+        root: RUN_BUNDLE_PATHS.deliverables,
+        dir: '2026-11-27-item-1',
+        path: `${RUN_BUNDLE_PATHS.deliverables}/2026-11-27-item-1/final.md`,
+        ledgered: !unledgered,
+        presented: true,
+        metaProblem: null,
+      }],
+    })
+    const host = await mount(createElement(DeliverablesView, {
+      catalog: makeCatalog(true),
+      sessionId: 'session-1' as never,
+      openFinal: () => {},
+      t,
+    }))
+    const unledgeredBtn = [...host.querySelectorAll('button')].find(b => b.textContent?.includes(zh['deliverables.filter.unledgered']))!
+    await act(async () => { unledgeredBtn.click() })
+    expect(unledgeredBtn.getAttribute('aria-pressed')).toBe('true')
+
+    await act(async () => {
+      mounted?.render(createElement(DeliverablesView, {
+        catalog: makeCatalog(false),
+        sessionId: 'session-1' as never,
+        openFinal: () => {},
+        t,
+      }))
+    })
+    expect([...host.querySelectorAll('button')].find(b => b.textContent?.includes(zh['deliverables.filter.unledgered']))).toBeUndefined()
+    expect(host.textContent).toContain('item-1')
+    expect(host.textContent).not.toContain(zh['deliverables.emptyFilter'])
   })
 })
