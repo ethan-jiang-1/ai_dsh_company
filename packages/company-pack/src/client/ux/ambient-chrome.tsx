@@ -17,6 +17,7 @@ import type { LivePending } from '../../lib/presence/attention.ts'
 import { ROLE_COPY, type RoleId } from '../../lib/shared/role-copy.ts'
 import type { COMPANY_NS, CompanyKey } from '../locales.ts'
 import { roleText } from '../roles.ts'
+import { isEmbeddedWorkshopSession } from './workshop-sessions.ts'
 
 export interface AttentionObservableInjected {
   readonly hooks: { readonly attentionItems: ObservableSnapshot<readonly LivePending[]> }
@@ -97,7 +98,8 @@ export type HeroMotionOptionsProps =
   & InjectFace<DraftNotifyInjected>
 
 /** 新会话 Hero 态的 3 个高频动议模板速启胶囊。 */
-export function HeroMotionOptions({ inputActions, notifyDraft, t }: HeroMotionOptionsProps): ReactNode {
+export function HeroMotionOptions({ sessionId, inputActions, notifyDraft, t }: HeroMotionOptionsProps): ReactNode {
+  if (isEmbeddedWorkshopSession(sessionId)) return null
   return (
     <div className="wk-hero-options" data-company-hero-options="">
       <span className="wk-hero-options-label">{t('hero.quickLabel')}</span>
@@ -143,7 +145,7 @@ export function MotionCommandDock({
   const presetRaw = useSessions(s => s.projectionsBySession[sessionId]?.values.agentPreset)
   const roleId = readCompanyRole(presetRaw)
   const pendingCount = useAttentionItems((items: readonly LivePending[]) => items.length)
-  if (roleId === null) return null
+  if (isEmbeddedWorkshopSession(sessionId) || roleId === null) return null
 
   const draftCommand = (cmd: string): void => {
     inputActions.setDraft(cmd)

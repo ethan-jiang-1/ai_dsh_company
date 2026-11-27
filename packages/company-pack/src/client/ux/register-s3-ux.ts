@@ -17,8 +17,10 @@ import { COMPANY_NS } from '../locales.ts'
 import { createStartupHandlers } from '../startup/startup-handlers.ts'
 import type { StartupStore } from '../startup/startup-store.ts'
 import { sessionFileAddress } from '../../lib/deliverables/deliverables-address.ts'
+import { asSessionPageFace } from '../presence/attention-history.ts'
 import type { AttentionRegistry } from '../wiring/attention-registry.ts'
 import { makeContextWiring, type ContextWiringScoped } from '../wiring/context-wiring.ts'
+import { openOnSessionSurface } from '../wiring/sidebar-right-guard.ts'
 import { asAttentionObservable } from './register-s1-ux.ts'
 import {
   COMPANY_HQ_CULTIVATION_SLOT,
@@ -52,7 +54,8 @@ export function registerWaveS3Ux(ctx: ClientContext, deps: WaveS3Deps): WaveS3Ha
       const { leadOf, follow, cultivationFiles, cultivationActions, rawFollow, readWorkspaceText } = createCompanyDataPlane(scoped)
       const readLedger = readWorkspaceText(WORKSPACE_TEXT_PATHS.ledger, LEDGER_READ_LIMIT)
       const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, CATALOG_READ_LIMIT)
-      const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
+      const returnToChat = (): void => { scoped.layout.selectPanel(null) }
+      const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog, returnToChat)
       const { loadStartup, saveStartup, resetStartup } = createStartupHandlers({
         remote: scoped.remote,
         leadOf,
@@ -89,7 +92,7 @@ export function registerWaveS3Ux(ctx: ClientContext, deps: WaveS3Deps): WaveS3Ha
               attentionItems: attentionObservable,
             },
             selectSection: (next: HqSection) => { hqSectionStore.select(next) },
-            returnToChat: () => { scoped.layout.selectPanel(null) },
+            returnToChat,
             openSession: (sessionId: SessionId) => {
               scoped.uiWorkspace.openSession(sessionId)
               scoped.layout.selectPanel(null)
@@ -103,9 +106,13 @@ export function registerWaveS3Ux(ctx: ClientContext, deps: WaveS3Deps): WaveS3Ha
             contextSources: contextWiring.contextSources,
             openContext: contextWiring.openContext,
             openFinal: (sessionId: SessionId, path: string) => {
-              scoped.layout.selectPanel(null)
-              scoped.sidebarRight.openResource(sessionFileAddress(sessionId, path))
+              openOnSessionSurface(scoped.sidebarRight, returnToChat, () => {
+                scoped.sidebarRight.openResource(sessionFileAddress(sessionId, path))
+              })
             },
+            pageHistory: typeof scoped.remote.session.page === 'function'
+              ? asSessionPageFace(scoped.remote.session.page)
+              : undefined,
             startupStore: deps.startupStore,
             loadStartup,
             saveStartup,

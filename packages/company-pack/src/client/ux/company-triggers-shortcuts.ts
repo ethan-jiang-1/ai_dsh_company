@@ -21,6 +21,7 @@ import { ROLE_CANONICAL, ROLE_IDS } from '../../lib/shared/role-copy.ts'
 import type { CompanyT } from '../locales.ts'
 import { roleText } from '../roles.ts'
 import type { HubSubViewStore } from '../tabs/hub-subview-store.ts'
+import { openOnSessionSurface, type SidebarRightSurfaceLike } from '../wiring/sidebar-right-guard.ts'
 
 export type SplitPresetId = 'ops' | 'review' | 'quiet'
 
@@ -45,21 +46,26 @@ export function buildSubagentChatAddress(
 
 /** 在右栏新窗格打开成员/子代理对话而不切走主列当前对话；若在全局 HQ 面板则先切回主会话。 */
 export function openSubagentAside(
-  sidebarRight: Pick<ISidebarRight, 'openResource'>,
+  sidebarRight: Pick<ISidebarRight, 'openResource'> & SidebarRightSurfaceLike,
   parentSessionId: SessionId,
   childSessionId: SessionId,
   layout?: { readonly selectPanel: (panel: null) => void },
 ): void {
-  layout?.selectPanel(null)
-  sidebarRight.openResource(
-    buildSubagentChatAddress(parentSessionId, childSessionId),
-    { preferNewPane: true },
+  openOnSessionSurface(
+    sidebarRight,
+    layout === undefined ? undefined : () => { layout.selectPanel(null) },
+    () => {
+      sidebarRight.openResource(
+        buildSubagentChatAddress(parentSessionId, childSessionId),
+        { preferNewPane: true },
+      )
+    },
   )
 }
 
 /** 一键打开双分栏工作区预设或收起右栏进入清净专注。 */
 export function openSplitPreset(
-  sidebarRight: Pick<ISidebarRight, 'openTab'> & Partial<Pick<ISidebarRight, 'isExpanded' | 'toggleExpanded'>>,
+  sidebarRight: Pick<ISidebarRight, 'openTab'> & Partial<Pick<ISidebarRight, 'isExpanded' | 'toggleExpanded'>> & SidebarRightSurfaceLike,
   hubStore: HubSubViewStore,
   preset: SplitPresetId,
   viewportWidth: number | undefined = typeof window === 'undefined' ? undefined : window.innerWidth,
@@ -71,22 +77,25 @@ export function openSplitPreset(
     return
   }
   const isNarrow = viewportWidth !== undefined && viewportWidth < 768
+  const safeTry = (fn: () => void): void => {
+    try { fn() } catch { /* 右栏未挂会话面或窗格不足时安全退避，不抛裸异常（BUG-393）。 */ }
+  }
   if (preset === 'ops') {
     hubStore.select('ops', 'board')
-    sidebarRight.openTab('company-ops')
+    safeTry(() => { sidebarRight.openTab('company-ops') })
     if (isNarrow) return
     hubStore.select('team', 'presence')
-    sidebarRight.openTab('company-team', { preferNewPane: true })
+    safeTry(() => { sidebarRight.openTab('company-team', { preferNewPane: true }) })
     return
   }
   hubStore.select('archive', 'deliverables')
-  sidebarRight.openTab('company-archive')
+  safeTry(() => { sidebarRight.openTab('company-archive') })
   if (isNarrow) return
   try {
     sidebarRight.openTab('files', { preferNewPane: true })
   } catch {
     hubStore.select('ops', 'board')
-    sidebarRight.openTab('company-ops', { preferNewPane: true })
+    safeTry(() => { sidebarRight.openTab('company-ops', { preferNewPane: true }) })
   }
 }
 

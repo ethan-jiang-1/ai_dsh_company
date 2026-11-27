@@ -164,19 +164,20 @@ function registerCompanyTabsWiring(
     ctx.inject(['layout'], (layoutScoped) => {
       returnToMain = () => { (layoutScoped as unknown as { layout: { selectPanel: (panel: null) => void } }).layout.selectPanel(null) }
     })
+    const returnToMainFn = (): void => { returnToMain?.() }
     const openMemberAside = (sessionId: SessionId, memberId: string): void => {
       openSubagentAside(
         scoped.sidebarRight,
         leadOf(sessionId),
         memberId as SessionId,
-        { selectPanel: () => { returnToMain?.() } },
+        { selectPanel: returnToMainFn },
       )
     }
     // 动作面按会话取（命令作用在面板所在会话；跨角色会被 host 角色闸拒，错误原话回到面板行内）。
     // 读取闭包唯一实现 = data plane 的 readWorkspaceText（Lead 寻址 + 失败 null 都在工厂里）。
     const readLedger = readWorkspaceText(WORKSPACE_TEXT_PATHS.ledger, LEDGER_READ_LIMIT)
     const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, CATALOG_READ_LIMIT)
-    const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
+    const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog, returnToMainFn)
 
     // 启动策略：读走 workspaceFiles（无日志噪声），写走 /company-settings 命令；
     // 面板、composer 按钮与 HQ 共用一个仓，保存后即时同步。

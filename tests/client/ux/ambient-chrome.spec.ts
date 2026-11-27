@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// 负例留证 2026-11-27：MotionCommandDock / HeroMotionOptions 去掉 isEmbeddedWorkshopSession 抑制 ⇒ HQ 内嵌培养工坊渲染顶层动议指挥带与 Hero 胶囊（BUG-393）；还原后绿。BUG-393
 /** Wave S1：全局 Toast、页头/侧栏角标、Hero 速启、动议指挥带与脚手栏组件测试。 */
 import { act, createElement, Fragment, type ComponentProps, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
@@ -10,6 +11,7 @@ import {
   createCompanyToastSource,
   CompanyToastOverlay,
 } from '../../../packages/company-pack/src/client/ux/company-toast.tsx'
+import { registerEmbeddedWorkshopSession } from '../../../packages/company-pack/src/client/ux/workshop-sessions.ts'
 import {
   ComposerStatusPill,
   HeaderAttentionUtility,
@@ -187,5 +189,36 @@ describe('Header / Footer / Hero / MotionDock / ComposerDock', () => {
     ))
     expect(container.querySelector('[data-company-motion-dock]')).toBeNull()
     expect(container.textContent).toContain(en['composerDock.idle'])
+
+    // BUG-393：内嵌培养工坊会话隐藏顶层 HeroMotionOptions 与 MotionCommandDock
+    const releaseWorkshop = registerEmbeddedWorkshopSession('s-workshop' as never)
+    try {
+      const { container: wsBox } = mountDom(createElement(
+        Fragment,
+        null,
+        createElement(HeroMotionOptions, {
+          sessionId: 's-workshop',
+          inputActions: { setDraft },
+          notifyDraft,
+          t: tEn,
+        } as unknown as ComponentProps<typeof HeroMotionOptions>),
+        createElement(MotionCommandDock, {
+          sessionId: 's-workshop',
+          session: { id: 's-workshop' },
+          input: {},
+          inputActions: { setDraft },
+          useSessions: (sel: (v: { projectionsBySession: Record<string, { values: Record<string, unknown> }> }) => unknown) =>
+            sel({ projectionsBySession: { 's-workshop': { values: { agentPreset: 'ceo' } } } }),
+          useAttentionItems: useHookFrom(obs),
+          openTab,
+          onDraftCommand,
+          t: tZh,
+        } as unknown as ComponentProps<typeof MotionCommandDock>),
+      ))
+      expect(wsBox.querySelector('[data-company-hero-options]')).toBeNull()
+      expect(wsBox.querySelector('[data-company-motion-dock]')).toBeNull()
+    } finally {
+      releaseWorkshop()
+    }
   })
 })

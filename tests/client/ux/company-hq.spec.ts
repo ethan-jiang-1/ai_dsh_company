@@ -5,6 +5,7 @@
 // 负例留证 2026-11-27：把 CompanyHqPage 改回 `primarySession = sessionList[0]` 且不追踪 knownCultivationIds ⇒ BUG-384 用例红（create 被调用 6 次陷入循环）；还原后绿。BUG-384
 // 负例留证 2026-11-27：去掉 HqCultivationWorkshop / CultivationBoard 的 `language` 同步 ⇒ BUG-385 用例红（en 界面仍渲染「我的分身」）；还原后绿。BUG-385
 // 负例留证 2026-11-27：HQ 台账与策略恢复传 `floatTab: noopFloat` 且 PanelFrame 忽略 floatTab 可选性 ⇒ BUG-391 用例红（HQ 内嵌卡片仍出现「浮出」死按钮）；还原后绿。BUG-391
+// 负例留证 2026-11-27：HqCultivationConversationSlot 传 `hero: true`、或去掉 HqCultivationWorkshop 的 `retryNonce`/`mainSessionId` 复位及 HQ 总览 `pageHistory` 合并 ⇒ BUG-393 用例红；还原后绿。BUG-393
 import { act, createElement, type ComponentProps, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -282,7 +283,7 @@ describe('Wave S3 CompanyHqPage & HqCultivationConversationSlot', () => {
     })
     expect(renderFactorySlot).toHaveBeenCalledWith(
       'conversation.content',
-      { variant: 'embedded', phase: 'hero', hero: true },
+      { variant: 'embedded', phase: 'active', hero: false },
       expect.objectContaining({ slots: expect.any(Object) }),
     )
     expect(host.querySelector('[data-inner-view*="conversation.session"]')).not.toBeNull()
@@ -574,6 +575,104 @@ describe('Wave S3 CompanyHqPage & HqCultivationConversationSlot', () => {
     expect(overviewText).toContain(zh['attention.tool.requestSignoff'])
     expect(overviewText).not.toContain('approvalrequest_signoff:')
     expect(overviewText).not.toContain('request_signoff:')
+
+    act(() => { root.unmount() })
+    host.remove()
+  })
+
+  it('BUG-393：失败重试用 retryNonce 真正重试；切 mainSessionId 后 started 复位且不静默建会话；总览待办合并历史重建', async () => {
+    const hqStore = createHqSectionStore()
+    hqStore.select('cultivation')
+    const startupStore = createStartupStore()
+    const createFn = vi.fn()
+      .mockRejectedValueOnce(new Error('boom-create-failed'))
+      .mockResolvedValueOnce('cult-new-2' as SessionId)
+    const retain = vi.fn((id: SessionId) => ({ id, ready: Promise.resolve({}), release: vi.fn() }))
+    let storeState = {
+      byId: {
+        s1: { id: 's1' as SessionId, cwd: '/tmp/ws', updatedAt: 100, retainedBy: { mainView: 1 } as Record<string, number>, displayTitle: 'S1' },
+        s2: { id: 's2' as SessionId, cwd: '/tmp/ws', updatedAt: 50, retainedBy: {} as Record<string, number>, displayTitle: 'S2' },
+      },
+      projectionsBySession: {
+        s1: { values: { agentPreset: 'ceo' } },
+        s2: { values: { agentPreset: 'ceo' } },
+      },
+    }
+    const pageHistory = vi.fn(async ({ throughSeq }: { throughSeq: number }) => {
+      if (throughSeq === Number.MAX_SAFE_INTEGER) {
+        return { ok: true as const, value: { records: [{ event: { seq: 1 } }], hasMore: false } }
+      }
+      return {
+        ok: true as const,
+        value: {
+          records: [
+            { event: { seq: 1, type: 'approval/asked', time: 50, data: { id: 'app-hist-1', callId: 'call-hist-1', toolName: 'bash', reason: 'History check' } } },
+          ],
+          hasMore: false,
+        },
+      }
+    })
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    const renderNode = () => createElement(CompanyHqPage, {
+      t: makeT(zh),
+      useHqSection: (sel: (v: HqSection) => unknown) => sel(hqStore.store.getSnapshot()),
+      useAttentionItems: (sel: (v: readonly unknown[]) => unknown) => sel([]),
+      selectSection: (next: HqSection) => { hqStore.select(next) },
+      returnToChat: vi.fn(),
+      openSession: vi.fn(),
+      useSessions: (sel: (v: typeof storeState) => unknown) => sel(storeState),
+      useProjection: () => undefined,
+      sessions: { retain, create: createFn },
+      cultivationFiles: { listJournal: async () => [], readHead: async () => null, listRecords: async () => ({ ok: true as const, names: [] }), readRecord: async () => ({ ok: false as const, reason: 'unavailable' as const }) },
+      cultivationActions: () => ({ run: async () => ({ ok: true as const, text: 'ok' }) }),
+      followEvents: async function* () {},
+      readLedger: async () => ({ ok: true as const, text: '' }),
+      readCatalog: async () => ({ ok: true as const, text: '' }),
+      contextSources: () => ({ entries: [] }),
+      openContext: async () => ({ ok: true as const }),
+      openFinal: vi.fn(),
+      pageHistory,
+      startupStore,
+      loadStartup: async () => {},
+      saveStartup: async () => ({ ok: true as const }),
+      resetStartup: async () => ({ ok: true as const }),
+      SessionProvider: ({ children }: { children?: ReactNode }) => createElement('div', { 'data-session-provider': '1' }, children),
+      renderSlot: (name: string) => createElement('div', { 'data-rendered-slot': name }, 'Embedded Chat'),
+    } as unknown as ComponentProps<typeof CompanyHqPage>)
+
+    await act(async () => { root.render(renderNode()) })
+    const startBtn = [...host.querySelectorAll('button')].find(b => b.textContent?.trim() === zh['hq.cultivationStart'])!
+    await act(async () => { startBtn.click(); await Promise.resolve(); await Promise.resolve() })
+    expect(createFn).toHaveBeenCalledTimes(1)
+    expect(host.textContent).toContain('boom-create-failed')
+
+    // 重试按钮必须真正再次触发 create
+    const retryBtn = [...host.querySelectorAll('button')].find(b => b.textContent?.trim() === zh['hq.cultivationStart'])!
+    await act(async () => { retryBtn.click(); await Promise.resolve(); await Promise.resolve() })
+    expect(createFn).toHaveBeenCalledTimes(2)
+    expect(retain).toHaveBeenCalledWith('cult-new-2', { source: 'companyCultivation' })
+
+    // 切换到新主会话 s2：started 自动复位，不静默新建培养会话
+    storeState = {
+      ...storeState,
+      byId: {
+        s1: { ...storeState.byId.s1, retainedBy: {} },
+        s2: { ...storeState.byId.s2, retainedBy: { mainView: 1 } },
+      },
+    }
+    await act(async () => { root.render(renderNode()); await Promise.resolve(); await Promise.resolve() })
+    expect(createFn).toHaveBeenCalledTimes(2)
+    expect([...host.querySelectorAll('button')].some(b => b.textContent?.trim() === zh['hq.cultivationStart'])).toBe(true)
+
+    // 总览页待办合并 pageHistory 历史重建项
+    hqStore.select('overview')
+    await act(async () => {
+      root.render(renderNode())
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
+    expect(host.textContent).toContain('History check')
 
     act(() => { root.unmount() })
     host.remove()

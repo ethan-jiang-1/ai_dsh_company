@@ -17,6 +17,7 @@ import {
 const t = ((key: CompanyKey) => zh[key]) as CompanyT
 
 // 负例留证 2026-11-27：去掉 createCompanyRoleTriggerSource 返回项的 localized section ⇒ @ 菜单分组头暴露裸 'company-roles'（BUG-390）；还原后绿。BUG-390
+// 负例留证 2026-11-27：去掉 openSplitPreset review 分支 catch 块的 try 保护 ⇒ 两栏都无法挂载时直接抛未捕获异常（BUG-393）；还原后绿。BUG-393
 describe('Wave S2 triggers, deep links, split presets, and shortcuts', () => {
   it('@ role trigger filters company roles cleanly and picks plain reference text', async () => {
     const source = createCompanyRoleTriggerSource(t)
@@ -107,6 +108,12 @@ describe('Wave S2 triggers, deep links, split presets, and shortcuts', () => {
     openSplitPreset({ openTab }, store, 'review', 390)
     expect(openTab).toHaveBeenCalledTimes(1)
     expect(openTab).toHaveBeenCalledWith('company-archive')
+
+    // BUG-393：openSplitPreset review 当 files 与 company-ops fallback 均抛错时不向外抛未捕获异常
+    expect(() => openSplitPreset({
+      mounted: { getSnapshot: () => 's1' as SessionId, subscribe: () => () => {} },
+      openTab: () => { throw new Error('sidebarRight: no session surface is mounted') },
+    }, store, 'review', 1440)).not.toThrow()
   })
 
   it('registerCompanyShortcuts registers fixed commands and handles non-composing Alt+Shift+1/2/3 only', () => {

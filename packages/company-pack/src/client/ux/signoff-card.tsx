@@ -5,7 +5,7 @@
  *    审批条，提供一键「批准双签 / 拒绝」与 Enter/Esc 快捷键；非双签审批（如 `bash`）返回 `null`
  *    100% 透传给上游 `ui-approval`（priority: 1）（E2 已实证通过）。
  */
-import { useEffect, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
@@ -154,35 +154,58 @@ export function resolveSignoffReason(
 export function SignoffComposerCard({ matched, resolveReason, t }: SignoffComposerProps): ReactNode {
   const [submitting, setSubmitting] = useState<'allowed-once' | 'rejected' | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const waitingRef = useRef(false)
+  const activeRef = useRef(true)
+  const composingRef = useRef(false)
+  const compositionEndedRef = useRef(false)
   const parsed = parseSignoffReason(resolveSignoffReason(matched, t, resolveReason))
+  const answerable = matched.answerable !== false
   const busy = submitting !== null
 
   useEffect(() => {
+    activeRef.current = true
+    return () => { activeRef.current = false }
+  }, [])
+
+  useEffect(() => {
+    waitingRef.current = false
     setSubmitting(null)
     setErrorMessage(null)
   }, [matched.key, matched.answer])
 
   const submitDecision = async (outcome: 'allowed-once' | 'rejected'): Promise<void> => {
-    if (busy || matched.answerable === false) return
+    if (waitingRef.current || busy || !answerable) return
+    waitingRef.current = true
     setSubmitting(outcome)
     setErrorMessage(null)
     try {
       await matched.answer(outcome)
     } catch (error) {
+      if (!activeRef.current) return
+      waitingRef.current = false
       setErrorMessage(error instanceof Error ? error.message : String(error))
       setSubmitting(null)
     }
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
-    if (busy) return
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      void submitDecision('allowed-once')
-    } else if (event.key === 'Escape') {
-      event.preventDefault()
-      void submitDecision('rejected')
-    }
+    if (waitingRef.current || busy || !answerable || event.defaultPrevented) return
+    const active = typeof document === 'undefined' ? null : document.activeElement
+    if (active !== null && active !== document.body && !event.currentTarget.contains(active)) return
+    const targetElement = event.target instanceof Element ? event.target : null
+    const activeWithin = active instanceof Element && event.currentTarget.contains(active) ? active : null
+    const matchesAny = (selector: string): boolean =>
+      targetElement?.closest(selector) !== null && targetElement?.closest(selector) !== undefined
+      || activeWithin?.closest(selector) !== null && activeWithin?.closest(selector) !== undefined
+    if (matchesAny('input, textarea, select, [contenteditable="true"], [contenteditable=""]')) return
+    if (event.key !== 'Enter' && event.key !== 'Escape') return
+    if (event.key === 'Enter' && matchesAny('button, a[href], [role="button"], summary')) return
+    if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return
+    event.preventDefault()
+    event.stopPropagation()
+    // oxlint-disable-next-line typescript/no-deprecated -- IME 229 covers engines without isComposing.
+    if (event.repeat || composingRef.current || compositionEndedRef.current || event.nativeEvent.isComposing || event.keyCode === 229) return
+    void submitDecision(event.key === 'Enter' ? 'allowed-once' : 'rejected')
   }
 
   return (
@@ -192,6 +215,9 @@ export function SignoffComposerCard({ matched, resolveReason, t }: SignoffCompos
       aria-label={t('signoff.title')}
       tabIndex={0}
       onKeyDown={handleKeyDown}
+      onKeyUpCapture={() => { compositionEndedRef.current = false }}
+      onCompositionStartCapture={() => { composingRef.current = true; compositionEndedRef.current = false }}
+      onCompositionEndCapture={() => { composingRef.current = false; compositionEndedRef.current = true }}
       data-company-signoff-composer=""
       data-approval-key={matched.key ?? ''}
       aria-busy={busy ? 'true' : 'false'}
@@ -226,10 +252,10 @@ export function SignoffComposerCard({ matched, resolveReason, t }: SignoffCompos
         <p className="wk-signoff-error" role="alert">{t('signoff.errorRetry', { message: errorMessage })}</p>
       ) : null}
       <div className="wk-signoff-actions">
-        <Button size="sm" variant="outline" disabled={busy} onClick={() => { void submitDecision('rejected') }}>
+        <Button size="sm" variant="outline" disabled={busy || !answerable} onClick={() => { void submitDecision('rejected') }}>
           {submitting === 'rejected' ? t('signoff.submitting') : t('signoff.reject')}
         </Button>
-        <Button size="sm" variant="primary" disabled={busy} onClick={() => { void submitDecision('allowed-once') }}>
+        <Button size="sm" variant="primary" disabled={busy || !answerable} onClick={() => { void submitDecision('allowed-once') }}>
           {submitting === 'allowed-once' ? t('signoff.submitting') : t('signoff.approve')}
         </Button>
       </div>

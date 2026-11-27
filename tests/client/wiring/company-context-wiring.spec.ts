@@ -1,4 +1,5 @@
 // 负例留证 2026-11-24：让 listSessions 对未知 cwd 返回 ok:true 空列表 ⇒ 本用例红。BUG-366
+// 负例留证 2026-11-27：去掉 openContext 文件分支的 returnToMain / mounted 等待守卫 ⇒ HQ 态点击打开背景文件直弹 sidebarRight: no session surface is mounted（BUG-393）；还原后绿。BUG-393
 /**
  * 培养背景接线的直测（2026-11-03 D2/D5 抽出后）：会话/成品引用 → 背景源 + 「打开原文」。
  *
@@ -85,7 +86,7 @@ describe('makeContextWiring / openContext', () => {
   it('成品/文件 stat ok → openResource(sessionFileAddress(lead, ref))', async () => {
     const scoped = makeScoped()
     const wiring = wiringFor(scoped)
-    await expect(wiring.openContext('session-1', fileContext())).resolves.toEqual({ ok: true })
+    await expect(wiring.openContext('session-1' as never, fileContext() as never)).resolves.toEqual({ ok: true })
     expect(scoped.sidebarRight.openResource).toHaveBeenCalledWith(sessionFileAddress('lead-session', 'kb/x.md'))
   })
 
@@ -106,6 +107,31 @@ describe('makeContextWiring / openContext', () => {
     const wiring = wiringFor(scoped)
     await expect(wiring.openContext('session-1', fileContext()))
       .resolves.toEqual({ ok: false, problem: '打不开原文：boom' })
+  })
+
+  it('HQ 面板占位时 openContext 文件分支先切回会话并在 mounted 就绪后开右栏（BUG-393）', async () => {
+    let mountedSession: string | undefined = undefined
+    const listeners = new Set<() => void>()
+    const openResource = vi.fn(() => {
+      if (mountedSession === undefined) throw new Error('sidebarRight: no session surface is mounted')
+    })
+    const returnToMain = vi.fn(() => {
+      mountedSession = 'session-1'
+      for (const l of listeners) l()
+    })
+    const scoped = makeScoped({
+      sidebarRight: {
+        mounted: {
+          getSnapshot: () => mountedSession,
+          subscribe: (fn: () => void) => { listeners.add(fn); return () => { listeners.delete(fn) } },
+        },
+        openResource,
+      },
+    })
+    const wiring = makeContextWiring(scoped as never, leadOf as never, rawFollow as never, readCatalog as never, returnToMain)
+    await expect(wiring.openContext('session-1' as never, fileContext() as never)).resolves.toEqual({ ok: true })
+    expect(returnToMain).toHaveBeenCalledOnce()
+    expect(openResource).toHaveBeenCalledWith(sessionFileAddress('lead-session', 'kb/x.md'))
   })
 })
 

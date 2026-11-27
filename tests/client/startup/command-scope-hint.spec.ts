@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// 负例留证 2026-11-27：CommandScopeHint 去掉 isEmbeddedWorkshopSession 抑制 ⇒ HQ 内嵌培养工坊窄框下显示命令提示条（BUG-393）；还原后绿。BUG-393
 /**
  * composer 提示「斜杠命令要等会话开始后才回话」的 keyless 判据（BUG-290）。
  *
@@ -10,6 +11,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { CommandScopeHint, registerCommandScopeHint } from '../../../packages/company-pack/src/client/startup/CommandScopeHint.tsx'
+import { registerEmbeddedWorkshopSession } from '../../../packages/company-pack/src/client/ux/workshop-sessions.ts'
 import { zh } from '../../../packages/company-pack/src/client/locales.ts'
 
 /** 假会话列表快照面：`blank` 由用例指定。 */
@@ -36,6 +38,15 @@ describe('composer 命令作用域提示（BUG-290）', () => {
 
   it('会话已有轮次（blank=false）⇒ 不渲染（不在正常会话里挂废话）', () => {
     expect(render(false)).toBe('')
+  })
+
+  it('BUG-393：内嵌培养工坊会话（blank=true）⇒ 不渲染命令作用域提示', () => {
+    const release = registerEmbeddedWorkshopSession('session-1' as never)
+    try {
+      expect(render(true)).toBe('')
+    } finally {
+      release()
+    }
   })
 
   it('会话行还没加载（undefined）⇒ 不渲染，不猜', () => {

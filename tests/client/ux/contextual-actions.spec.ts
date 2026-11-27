@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// 负例留证 2026-11-27：去掉 safeOpenTab 的 layout.selectPanel(null) + mounted 等待守卫 ⇒ HQ 态点页脚待办直接抛 sidebarRight: no session surface is mounted（BUG-393）；还原后绿。BUG-393
 /** Wave S1：deliverables final.md 上下文动作与消息级纠偏按钮。 */
 import { act, createElement, type ComponentProps, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
@@ -150,5 +151,57 @@ describe('DeliverableFinalDocActions & AssistantCultivateAction', () => {
     expect(hubStore.store.getSnapshot().archive).toBe('cultivation')
     expect(openTab).toHaveBeenCalledWith('company-archive')
     registeredDraftCmd?.('/req check ')
+  })
+
+  it('BUG-393：HQ 占屏 sidebarRight.mounted 为 undefined 时，safeOpenTab 先 selectPanel(null) 并等 mounted 就绪后开右栏', () => {
+    const hubStore = createHubSubViewStore()
+    let mountedSession: string | undefined = undefined
+    const mountedListeners = new Set<() => void>()
+    const openTab = vi.fn(() => {
+      if (mountedSession === undefined) throw new Error('sidebarRight: no session surface is mounted')
+    })
+    const selectPanel = vi.fn((panel: null) => {
+      expect(panel).toBeNull()
+    })
+    let clickFooter!: (tab: 'company-attention' | 'company-board') => void
+    registerWaveS1Ux({
+      locale: { bind: () => makeT(zh) },
+      inject: (deps: readonly string[], fn: (scoped: unknown) => void) => {
+        if (deps.includes('layout')) {
+          fn({ layout: { selectPanel } })
+          return
+        }
+        fn({
+          slots: {
+            inject: (_n: string, reg: () => void) => { reg() },
+            register: (def: { name: string; inject?: (sid: string) => Record<string, unknown> }) => {
+              if (def.name === 'sidebar.footer.action') {
+                clickFooter = def.inject?.('s1').openTab as typeof clickFooter
+              }
+              return () => {}
+            },
+          },
+          sidebarRight: {
+            mounted: {
+              getSnapshot: () => mountedSession,
+              subscribe: (listener: () => void) => {
+                mountedListeners.add(listener)
+                return () => { mountedListeners.delete(listener) }
+              },
+            },
+            openTab,
+          },
+          sessions: { binding: () => undefined },
+        })
+      },
+    } as never, { attention: createAttentionRegistry(), hubStore })
+
+    clickFooter('company-attention')
+    expect(selectPanel).toHaveBeenCalledWith(null)
+    expect(openTab).not.toHaveBeenCalled()
+
+    mountedSession = 's1'
+    for (const listener of mountedListeners) listener()
+    expect(openTab).toHaveBeenCalledWith('company-team')
   })
 })

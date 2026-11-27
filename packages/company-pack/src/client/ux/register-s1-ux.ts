@@ -14,6 +14,7 @@ import type { LivePending } from '../../lib/presence/attention.ts'
 import { COMPANY_NS } from '../locales.ts'
 import type { HubSubViewStore } from '../tabs/hub-subview-store.ts'
 import type { AttentionRegistry } from '../wiring/attention-registry.ts'
+import { openOnSessionSurface } from '../wiring/sidebar-right-guard.ts'
 import {
   ComposerStatusPill,
   HeaderAttentionUtility,
@@ -111,26 +112,39 @@ export function registerWaveS1Ux(ctx: ClientContext, deps: WaveS1Deps): void {
   })
 
   // 3. 需要 rightSidebar / sessions 的会话与上下文增强槽
+  let returnToMain: (() => void) | undefined
+  ctx.inject(['layout'], (layoutScoped) => {
+    const layout = (layoutScoped as unknown as { readonly layout?: { readonly selectPanel?: (panel: null) => void } }).layout
+    if (typeof layout?.selectPanel === 'function') {
+      returnToMain = () => { layout.selectPanel!(null) }
+    }
+  })
+
   ctx.inject(['slots', 'sidebarRight', 'sessions'], (scoped) => {
     const safeOpenTab = (tabId: 'company-attention' | 'company-board' | 'company-cultivation' | 'company-deliverables'): void => {
-      try {
-        if (tabId === 'company-attention') {
-          deps.hubStore?.select('team', 'attention')
-          scoped.sidebarRight.openTab('company-team')
-        } else if (tabId === 'company-board') {
-          deps.hubStore?.select('ops', 'board')
-          scoped.sidebarRight.openTab('company-ops')
-        } else if (tabId === 'company-cultivation') {
-          deps.hubStore?.select('archive', 'cultivation')
-          scoped.sidebarRight.openTab('company-archive')
-        } else {
-          deps.hubStore?.select('archive', 'deliverables')
-          scoped.sidebarRight.openTab('company-archive')
-        }
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error)
-        toastSource.notify(message)
-      }
+      openOnSessionSurface(
+        scoped.sidebarRight,
+        returnToMain,
+        () => {
+          if (tabId === 'company-attention') {
+            deps.hubStore?.select('team', 'attention')
+            scoped.sidebarRight.openTab('company-team')
+          } else if (tabId === 'company-board') {
+            deps.hubStore?.select('ops', 'board')
+            scoped.sidebarRight.openTab('company-ops')
+          } else if (tabId === 'company-cultivation') {
+            deps.hubStore?.select('archive', 'cultivation')
+            scoped.sidebarRight.openTab('company-archive')
+          } else {
+            deps.hubStore?.select('archive', 'deliverables')
+            scoped.sidebarRight.openTab('company-archive')
+          }
+        },
+        (error) => {
+          const message = error instanceof Error ? error.message : String(error)
+          toastSource.notify(message)
+        },
+      )
     }
 
     const formatContextRef = (context?: { readonly messageId?: string; readonly filePath?: string }): string | null => {

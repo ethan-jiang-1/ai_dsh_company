@@ -24,9 +24,11 @@ import type { UseSidebarRightTabInfo } from '@deepseek-ai/dsh-client-ui-sidebar-
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
 import { roleLabel } from '../../lib/cultivation/cultivation.ts'
-import type { LivePending } from '../../lib/presence/attention.ts'
+import { attentionItemKey, mergeAttention, type AttentionItem, type LivePending } from '../../lib/presence/attention.ts'
 import type { StartupField } from '../../lib/startup/startup-settings.ts'
 import { shortSessionId } from '../../lib/shared/text.ts'
+import { historyCandidates, readPendingAcrossSessions, type CandidateSession, type SessionPageFace } from '../presence/attention-history.ts'
+import { registerEmbeddedWorkshopSession } from './workshop-sessions.ts'
 import { CultivationBoard } from '../cultivation/CultivationBoard.tsx'
 import { setCultivationLanguage, type CultivationActionsFactory } from '../cultivation/cultivation-actions.ts'
 import type { CultivationContextSources } from '../cultivation/cultivation-context-data.ts'
@@ -105,26 +107,10 @@ export type HqCultivationConversationSlotProps =
 
 /** 在总部培养工坊内挂载官方 DSH 内嵌会话视图 (`conversation.content` embedded)。 */
 export function HqCultivationConversationSlot({
-  sessionId,
-  useSession,
-  useConversation,
-  useSessions,
   renderFactorySlot,
 }: HqCultivationConversationSlotProps): ReactNode {
-  const session = useSession(value => value)
-  const conversation = useConversation(value => value)
-  const active = conversation.activeTargets.size > 0
-    || (!session.blank && !session.awaitingFirstTurn)
-    || session.running
-  const shellPhase = active ? 'active' : session.promptAttempted ? 'engaging' : 'blank'
-  const summaryBlank = useSessions(state => state.byId[sessionId]?.blank)
-  const parentAvailabilityPending = session.subagent?.address.mode === 'continuable'
-    && session.subagent.parentAvailable === undefined
-  const settling = (shellPhase === 'blank' && session.openState === 'loading' && summaryBlank !== true)
-    || parentAvailabilityPending
-  const hero = shellPhase === 'blank' && (session.openState === 'open' || summaryBlank === true)
-  const phase = settling ? 'settling' : hero ? 'hero' : 'active'
-  return renderFactorySlot('conversation.content', { variant: 'embedded', phase, hero }, {
+  // BUG-393：内嵌培养工坊永远以 `active` + `hero:false` 渲染，不复用顶层「选择工作区」Hero 阻断与动议模板行。
+  return renderFactorySlot('conversation.content', { variant: 'embedded', phase: 'active', hero: false }, {
     slots: { views: FixedChatConversationView },
   })
 }
@@ -146,6 +132,7 @@ export interface CompanyHqInjected {
   readonly contextSources: (sessionId: SessionId) => CultivationContextSources
   readonly openContext: (sessionId: SessionId, context: CultivationContext) => Promise<{ readonly ok: true } | { readonly ok: false; readonly problem: string }>
   readonly openFinal: (sessionId: SessionId, path: string) => void
+  readonly pageHistory?: SessionPageFace | undefined
   readonly startupStore: StartupStore
   readonly loadStartup: (sessionId: SessionId, signal: AbortSignal) => Promise<void>
   readonly saveStartup: (sessionId: SessionId, field: StartupField, value: string | null) => Promise<SaveResult>
@@ -163,7 +150,7 @@ type WorkshopState =
   | { readonly status: 'waiting' }
   | { readonly status: 'creating' }
   | { readonly status: 'error'; readonly message: string }
-  | { readonly status: 'ready'; readonly reference: SessionReference }
+  | { readonly status: 'ready'; readonly sessionId: SessionId; readonly reference: SessionReference }
 
 const hqTabInfo: UseSidebarRightTabInfo = () => ({
   tab: { id: 'company-hq-tab', contentId: COMPANY_HQ_PANEL_ID },
@@ -261,12 +248,23 @@ function HqCultivationWorkshop({
   const actions = useMemo(() => cultivationActions(effectiveSessionId), [cultivationActions, effectiveSessionId])
   const scopedSources = useMemo(() => contextSources(effectiveSessionId), [contextSources, effectiveSessionId])
 
-  const [started, setStarted] = useState(false)
+  const [startedSession, setStartedSession] = useState<SessionId | undefined>(undefined)
+  const [retryNonce, setRetryNonce] = useState(0)
   const [workshop, setWorkshop] = useState<WorkshopState>({ status: 'waiting' })
 
+  const started = mainSessionId !== undefined && startedSession === mainSessionId
   const key = mainSessionId === undefined ? null : `${CULTIVATION_STORAGE_PREFIX}${String(mainSessionId)}`
   const existingStoredId = key === null || typeof localStorage === 'undefined' ? null : localStorage.getItem(key)
   const shouldConnect = started || (existingStoredId !== null && existingStoredId !== '')
+
+  useEffect(() => {
+    setRetryNonce(0)
+  }, [mainSessionId])
+
+  useEffect(() => {
+    if (workshop.status !== 'ready') return
+    return registerEmbeddedWorkshopSession(workshop.sessionId)
+  }, [workshop])
 
   useEffect(() => {
     if (mainSessionId === undefined || cwd === undefined || !shouldConnect) {
@@ -285,7 +283,7 @@ function HqCultivationWorkshop({
         reference.release()
         return
       }
-      setWorkshop({ status: 'ready', reference })
+      setWorkshop({ status: 'ready', sessionId: reference.sessionId ?? targetId, reference })
     }
 
     const run = async (): Promise<void> => {
@@ -325,7 +323,7 @@ function HqCultivationWorkshop({
       cancelled = true
       try { reference?.release() } catch { /* already released */ }
     }
-  }, [sessions, mainSessionId, cwd, viewerRole, shouldConnect, isKnownCultivationSession, onCultivationSessionCreated])
+  }, [sessions, mainSessionId, cwd, viewerRole, shouldConnect, retryNonce, isKnownCultivationSession, onCultivationSessionCreated])
 
   return (
     <div className="wk-hq-cultivation-split">
@@ -367,14 +365,14 @@ function HqCultivationWorkshop({
         ) : workshop.status === 'error' ? (
           <div className="wk-hq-empty">
             <p className="wk-error">{workshop.message}</p>
-            <Button size="sm" variant="outline" onClick={() => { setStarted(true) }}>
+            <Button size="sm" variant="outline" onClick={() => { setRetryNonce(n => n + 1) }}>
               {t('hq.cultivationStart')}
             </Button>
           </div>
         ) : (
           <div className="wk-hq-empty">
             <p className="wk-hq-subtitle">{t('hq.cultivationWorkshopHint')}</p>
-            <Button size="sm" variant="primary" onClick={() => { setStarted(true) }}>
+            <Button size="sm" variant="primary" onClick={() => { setStartedSession(mainSessionId) }}>
               {t('hq.cultivationStart')}
             </Button>
           </div>
@@ -403,6 +401,7 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
     contextSources,
     openContext,
     openFinal,
+    pageHistory,
     startupStore,
     loadStartup,
     saveStartup,
@@ -412,8 +411,9 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
   } = props
 
   const section = useHqSection(value => value)
-  const pendingItems = useAttentionItems(value => value)
-  const sessionList = useSessions(sessionSummaryList)
+  const livePendingItems = useAttentionItems(value => value)
+  const byId = useSessions(state => state.byId)
+  const sessionList = useMemo(() => sessionSummaryList({ byId }), [byId])
   const createdCultivationIdsRef = useRef<Set<string>>(new Set())
   const pinnedSessionIdRef = useRef<SessionId | undefined>(undefined)
   const knownCultivationIds = readKnownCultivationIds(createdCultivationIdsRef.current)
@@ -421,6 +421,34 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
   if (primarySession !== undefined && !knownCultivationIds.has(String(primarySession.id))) {
     pinnedSessionIdRef.current = primarySession.id
   }
+  const [historyItems, setHistoryItems] = useState<readonly AttentionItem[]>([])
+  const primaryId = primarySession?.id
+  const historyScanIds = useMemo(() => {
+    if (primaryId === undefined) return ''
+    const candidates = historyCandidates(byId as unknown as Readonly<Record<string, CandidateSession>>, String(primaryId), 20)
+    const ids = candidates.ok ? [String(primaryId), ...candidates.ids] : [String(primaryId)]
+    return [...new Set(ids)].join('\n')
+  }, [byId, primaryId])
+
+  useEffect(() => {
+    const ids = historyScanIds === '' ? [] : historyScanIds.split('\n')
+    if (ids.length === 0 || pageHistory === undefined) {
+      setHistoryItems([])
+      return
+    }
+    const controller = new AbortController()
+    void readPendingAcrossSessions(pageHistory, ids, controller.signal)
+      .then((rebuilt) => {
+        if (!controller.signal.aborted) setHistoryItems(rebuilt.items)
+      })
+      .catch(() => { /* fallback to live pending items */ })
+    return () => { controller.abort() }
+  }, [historyScanIds, pageHistory])
+
+  const pendingItems = useMemo(
+    () => mergeAttention(livePendingItems, historyItems).filter(item => item.kind !== 'completion'),
+    [livePendingItems, historyItems],
+  )
   const onCultivationSessionCreated = useCallback(
     (createdId: SessionId) => { createdCultivationIdsRef.current.add(String(createdId)) },
     [],
@@ -490,12 +518,12 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
               ) : (
                 <div className="wk-hq-list">
                   {pendingItems.map(item => (
-                    <div key={`${item.kind}:${item.sessionId}:${String(item.since)}`} className="wk-hq-row">
+                    <div key={attentionItemKey(item)} className="wk-hq-row">
                       <Tag tone={item.kind === 'approval' ? 'danger' : 'warning'}>
                         {t(ATTENTION_KEYS[item.kind])}
                       </Tag>
                       <span className="wk-hq-row-label">{formatAttentionWhat(item, t)}</span>
-                      <Button size="sm" variant="ghost" onClick={() => { openSession(item.sessionId as SessionId) }}>
+                      <Button size="sm" variant="ghost" onClick={() => { openSession((item.jumpTo || primaryId || '') as SessionId) }}>
                         {t('hq.openSession')}
                       </Button>
                     </div>

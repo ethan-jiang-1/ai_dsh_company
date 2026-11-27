@@ -58,6 +58,7 @@ describe('isSignoffPendingInteraction · 鸭子类型精确识别', () => {
 })
 
 // 负例留证 2026-11-27：去掉 SignoffComposerCard 的 displayReason 解析优先级或将 parsed.detail 改为默认展开 ⇒ BUG-389 用例红；还原后绿。BUG-389
+// 负例留证 2026-11-27：去掉 SignoffComposerCard 键盘 `<summary>`/`button`/修饰键/IME 护栏、waitingRef 锁或 `answerable === false` 禁用 ⇒ BUG-392 用例红；还原后绿。BUG-392
 describe('SignoffComposerCard · 链式双签决策卡', () => {
   it('解析签字线与备选上下文，点击批准 / 拒绝及 Enter / Esc 正常结算，失败后可恢复重试', async () => {
     const answer = vi.fn().mockRejectedValueOnce(new Error('network blip')).mockResolvedValueOnce(undefined)
@@ -160,6 +161,74 @@ describe('SignoffComposerCard · 链式双签决策卡', () => {
     expect(resolveSignoffReason({ displayReason: 'literal string reason', reason: 'ignored' }, makeT(zh))).toBe('literal string reason')
     expect(resolveSignoffReason({ displayReason: { en: 'Only EN line' } }, makeT(zh))).toBe('Only EN line')
     expect(resolveSignoffReason({}, makeT(zh))).toBe('')
+  })
+
+  it('焦点在 <summary> / 拒绝按钮 / 修饰键 / IME 时 Enter 不误批；answerable=false 禁按且防重入（BUG-392）', async () => {
+    const answer = vi.fn(() => new Promise<void>(() => {}))
+    const pending = {
+      kind: 'approval' as const,
+      key: 'approval:guards',
+      toolName: 'request_signoff' as const,
+      displayReason: { zh: '毛利红线：示例报价（补充详情正文）', en: 'Margin line: quote (detail body)' },
+      answerable: true,
+      answer,
+    }
+    const baseProps = {
+      matched: pending,
+      sessionId: 's-1' as SessionId,
+      t: makeT(zh),
+    } as unknown as ComponentProps<typeof SignoffComposerCard>
+    const { container, rerender } = mountDom(createElement(SignoffComposerCard, baseProps))
+    const group = container.querySelector('[role="group"]') as HTMLElement
+    const summary = container.querySelector('summary') as HTMLElement
+    const rejectBtn = [...container.querySelectorAll('button')].find(b => b.textContent?.includes(zh['signoff.reject']))!
+    const approveBtn = [...container.querySelectorAll('button')].find(b => b.textContent?.includes(zh['signoff.approve']))!
+
+    // 1. 焦点在 <summary> 按 Enter 不触发 allowed-once
+    summary.focus()
+    act(() => { summary.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })) })
+    expect(answer).not.toHaveBeenCalled()
+
+    // 2. 焦点在 拒绝按钮 按 Enter 不触发 allowed-once
+    rejectBtn.focus()
+    act(() => { rejectBtn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })) })
+    expect(answer).not.toHaveBeenCalled()
+
+    // 3. Ctrl+Enter / Shift+Enter / Alt+Enter / Meta+Enter / repeat / IME 不触发
+    group.focus()
+    for (const init of [
+      { key: 'Enter', ctrlKey: true },
+      { key: 'Enter', shiftKey: true },
+      { key: 'Enter', altKey: true },
+      { key: 'Enter', metaKey: true },
+      { key: 'Enter', repeat: true },
+      { key: 'Enter', isComposing: true },
+      { key: 'Enter', keyCode: 229 },
+    ] as KeyboardEventInit[]) {
+      act(() => { group.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init })) })
+    }
+    expect(answer).not.toHaveBeenCalled()
+
+    // 4. answerable === false 时双按钮禁用且快捷键不触发
+    rerender(createElement(SignoffComposerCard, {
+      ...baseProps,
+      matched: { ...pending, answerable: false },
+    }))
+    expect(rejectBtn.disabled).toBe(true)
+    expect(approveBtn.disabled).toBe(true)
+    group.focus()
+    act(() => { group.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })) })
+    expect(answer).not.toHaveBeenCalled()
+
+    // 5. 同 tick 双击/连按只发一次 answer
+    const pendingSyncLock = { ...pending, key: 'approval:lock', answerable: true, answer }
+    rerender(createElement(SignoffComposerCard, { ...baseProps, matched: pendingSyncLock }))
+    act(() => {
+      approveBtn.click()
+      approveBtn.click()
+      group.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+    })
+    expect(answer).toHaveBeenCalledTimes(1)
   })
 })
 

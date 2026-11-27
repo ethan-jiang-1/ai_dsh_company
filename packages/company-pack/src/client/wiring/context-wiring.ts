@@ -16,6 +16,7 @@ import {
 import { CULTIVATION_COPY } from '../cultivation/cultivation-actions.ts'
 import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
 import { sessionFileAddress } from '../../lib/deliverables/deliverables-address.ts'
+import { openOnSessionSurface, type MountedSurfaceSnapshot } from './sidebar-right-guard.ts'
 
 /** 背景读/开的最小结构面（两个注入块共用；预检与导航都在容器，领域视图不碰 RPC）。 */
 export interface ContextWiringScoped {
@@ -28,7 +29,10 @@ export interface ContextWiringScoped {
     subagentAddress(id: SessionId): unknown
   }
   readonly uiWorkspace: { openSession(target: unknown): void }
-  readonly sidebarRight: { openResource(address: string): void }
+  readonly sidebarRight: {
+    readonly mounted?: MountedSurfaceSnapshot | undefined
+    openResource(address: string): void
+  }
   readonly remote: {
     readonly workspaceFiles: {
       stat(agentId: SessionId, path: string, signal: AbortSignal): Promise<{ readonly ok: boolean }>
@@ -36,12 +40,13 @@ export interface ContextWiringScoped {
   }
 }
 
-/** 造背景源与「打开原文」（会话查 list/subagentAddress；文件先 stat 再开 file resource）。 */
+/** 造背景源与「打开原文」（会话查 list/subagentAddress；文件先 stat 再切回会话并开 file resource）。 */
 export function makeContextWiring(
   scoped: ContextWiringScoped,
   leadOf: (sessionId: SessionId) => SessionId,
   rawFollow: FollowLike,
   readCatalog: (sessionId: SessionId, signal: AbortSignal) => Promise<WorkspaceTextRead>,
+  returnToMain?: () => void,
 ): {
   readonly contextSources: (sessionId: SessionId) => CultivationContextSources
   readonly openContext: (sessionId: SessionId, context: CultivationContext) => Promise<
@@ -73,7 +78,14 @@ export function makeContextWiring(
         const lead = leadOf(sessionId)
         const stat = await scoped.remote.workspaceFiles.stat(lead, context.ref, new AbortController().signal)
         if (!stat.ok) return { ok: false, problem: CULTIVATION_COPY.contextOpenFileMissing }
-        scoped.sidebarRight.openResource(sessionFileAddress(lead, context.ref))
+        let openError: unknown = null
+        openOnSessionSurface(
+          scoped.sidebarRight,
+          returnToMain,
+          () => { scoped.sidebarRight.openResource(sessionFileAddress(lead, context.ref)) },
+          (error) => { openError = error },
+        )
+        if (openError !== null) throw openError
         return { ok: true }
       } catch (error) {
         return { ok: false, problem: CULTIVATION_COPY.contextOpenFileFailed(error instanceof Error ? error.message : String(error)) }
