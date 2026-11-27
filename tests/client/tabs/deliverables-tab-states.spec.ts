@@ -12,7 +12,7 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { DeliverablesTab, DeliverablesView, formatGeneratedAt } from '../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx'
-import { createDeliverablesFocusStore, deliverablesFocusStore, extractDeliverableTarget } from '../../../packages/company-pack/src/client/tabs/deliverables-focus-store.ts'
+import { createDeliverablesFocusStore, deliverablesFocusStore, extractDeliverableRelativePath, extractDeliverableTarget } from '../../../packages/company-pack/src/client/tabs/deliverables-focus-store.ts'
 import { zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 
@@ -166,6 +166,11 @@ describe('DeliverablesTab：截断 ≠ 形状不符', () => {
 
     // formatGeneratedAt defaultT fallback (L121), emptyFilter/emptyAll (L215), unpresented drop-to-zero (L164), slug highlight (L223)
     expect(formatGeneratedAt('2026-11-27T01:00:00Z')).toContain('01:00')
+    expect(extractDeliverableRelativePath(undefined)).toBeNull()
+    expect(extractDeliverableRelativePath('   ')).toBeNull()
+    expect(extractDeliverableRelativePath('C:\\ws\\.dsh-company\\deliverables\\2026-11-27-demo\\final.md')).toBe('.dsh-company/deliverables/2026-11-27-demo/final.md')
+    expect(extractDeliverableRelativePath('./deliverables/demo/final.md')).toBe('deliverables/demo/final.md')
+    expect(extractDeliverableRelativePath('/tmp/outside.md')).toBeNull()
     act(() => { mounted?.unmount(); mounted = null })
 
     const makeUnpresented = (presented: boolean) => ({

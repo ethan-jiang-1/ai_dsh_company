@@ -28,7 +28,7 @@ import {
   type DraftProblem,
 } from './cultivation-actions.ts'
 import { composeIntentStore } from './compose-intent-store.ts'
-import { extractDeliverableTarget } from '../tabs/deliverables-focus-store.ts'
+import { extractDeliverableRelativePath, extractDeliverableTarget } from '../tabs/deliverables-focus-store.ts'
 import { CultivationContextPicker, type ContextPickerPick } from './CultivationContextPicker.tsx'
 import type { ContextDeliverableRow, ContextSessionRow, CultivationContextSources } from './cultivation-context-data.ts'
 
@@ -134,14 +134,17 @@ export function CultivationCompose(props: CultivationComposeProps) {
       setExpanded(false)
       setTargetRole(props.viewerRole)
       if (intent.filePath !== undefined) {
+        const relPath = extractDeliverableRelativePath(intent.filePath)
         const slug = extractDeliverableTarget(intent.filePath) ?? intent.filePath
         setContextStatus('idle')
         setContextProblem(null)
-        setContext({
-          ref: { kind: 'deliverable', ref: intent.filePath, label: slug },
-          title: slug,
-          excerpt: intent.filePath,
-        })
+        setContext(relPath === null
+          ? null
+          : {
+              ref: { kind: 'deliverable', ref: relPath, label: slug },
+              title: slug,
+              excerpt: relPath,
+            })
         return
       }
       setContext(null)

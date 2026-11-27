@@ -262,17 +262,13 @@ function HqCultivationWorkshop({
   }, [mainSessionId])
 
   useEffect(() => {
-    if (workshop.status !== 'ready') return
-    return registerEmbeddedWorkshopSession(workshop.sessionId)
-  }, [workshop])
-
-  useEffect(() => {
     if (mainSessionId === undefined || cwd === undefined || !shouldConnect) {
       setWorkshop({ status: 'waiting' })
       return
     }
     let cancelled = false
     let reference: SessionReference | undefined
+    let releaseEmbedded: (() => void) | undefined
     const storageKey = `${CULTIVATION_STORAGE_PREFIX}${String(mainSessionId)}`
     setWorkshop({ status: 'creating' })
 
@@ -283,7 +279,10 @@ function HqCultivationWorkshop({
         reference.release()
         return
       }
-      setWorkshop({ status: 'ready', sessionId: reference.sessionId ?? targetId, reference })
+      const readySessionId = reference.sessionId ?? targetId
+      // 在写入 ready 前同步登记内嵌会话，避免子组件首帧短暂露出顶层指挥带。
+      releaseEmbedded = registerEmbeddedWorkshopSession(readySessionId)
+      setWorkshop({ status: 'ready', sessionId: readySessionId, reference })
     }
 
     const run = async (): Promise<void> => {
@@ -321,6 +320,7 @@ function HqCultivationWorkshop({
 
     return () => {
       cancelled = true
+      releaseEmbedded?.()
       try { reference?.release() } catch { /* already released */ }
     }
   }, [sessions, mainSessionId, cwd, viewerRole, shouldConnect, retryNonce, isKnownCultivationSession, onCultivationSessionCreated])

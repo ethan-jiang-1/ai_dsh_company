@@ -26,7 +26,8 @@ import { registerWaveS3Ux } from '../../../packages/company-pack/src/client/ux/r
 import { registerWaveS1Ux } from '../../../packages/company-pack/src/client/ux/register-s1-ux.ts'
 import { createHubSubViewStore } from '../../../packages/company-pack/src/client/tabs/hub-subview-store.ts'
 import { createAttentionRegistry } from '../../../packages/company-pack/src/client/wiring/attention-registry.ts'
-import { setCultivationLanguage } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
+import { CULTIVATION_COPY, setCultivationLanguage } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
+import { decodeContextToken } from '../../../packages/company-pack/src/lib/cultivation/cultivation-context.ts'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -717,6 +718,7 @@ describe('Wave S3 CompanyHqPage & HqCultivationConversationSlot', () => {
       byId: { s1: { id: 's1' as SessionId, origin: 'human', cwd: '/ws', updatedAt: 100, displayTitle: 'Main', retainedBy: { mainView: 1 } } },
       projectionsBySession: { s1: { values: { agentPreset: 'ceo' } } },
     }
+    const submittedLines: string[] = []
     const host = document.createElement('div')
     document.body.append(host)
     const root = createRoot(host)
@@ -732,7 +734,7 @@ describe('Wave S3 CompanyHqPage & HqCultivationConversationSlot', () => {
         useProjection: () => undefined,
         sessions: { retain: vi.fn(), create: vi.fn() },
         cultivationFiles: { listJournal: async () => [], readHead: async () => null, listRecords: async () => ({ ok: true as const, names: [] }), readRecord: async () => ({ ok: false as const, reason: 'unavailable' as const }) },
-        cultivationActions: () => ({ run: async () => ({ ok: true as const, text: 'ok' }) }),
+        cultivationActions: () => ({ run: async (line: string) => { submittedLines.push(line); return { ok: true as const, text: '已提交培养记录 r-398' } } }),
         followEvents: async function* () {},
         readLedger: async () => ({ ok: true as const, text: '' }),
         readCatalog: async () => ({ ok: true as const, text: '' }),
@@ -751,6 +753,34 @@ describe('Wave S3 CompanyHqPage & HqCultivationConversationSlot', () => {
 
     expect(host.querySelector('textarea')).not.toBeNull()
     expect(host.textContent).toContain('2026-11-27-demo')
+    expect(host.textContent).toContain('.dsh-company/deliverables/2026-11-27-demo/final.md')
+
+    // BUG-398 盲审阻断补测：绝对路径归一成安全工作区相对路径，填期望后点提交可通过 encodeContextToken 并落盘命令行
+    const expectationInput = host.querySelector('input') as HTMLInputElement
+    const nativeInputSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')!.set!
+    await act(async () => {
+      nativeInputSetter.call(expectationInput, '交付前补充验收成本清单')
+      expectationInput.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+    const submitBtn = [...host.querySelectorAll('button')].find(b => b.textContent?.trim() === CULTIVATION_COPY.submit)!
+    await act(async () => {
+      submitBtn.click()
+      await Promise.resolve()
+    })
+    expect(submittedLines).toHaveLength(1)
+    expect(submittedLines[0]).toContain('--context=')
+    const ctxToken = /--context=(\S+)/.exec(submittedLines[0] ?? '')?.[1]
+    expect(decodeContextToken(ctxToken!)).toMatchObject({
+      ok: true,
+      command: { items: [{ kind: 'deliverable', ref: '.dsh-company/deliverables/2026-11-27-demo/final.md', label: '2026-11-27-demo' }] },
+    })
+
+    // 非工作区相对交付路径不注入无效 ref（避免提交被 encodeContextToken 拒收）
+    await act(async () => {
+      registeredCultivate?.({ filePath: '/tmp/outside.md' })
+      await Promise.resolve()
+    })
+    expect(host.querySelector('.wk-cultivation-context-card')).toBeNull()
 
     act(() => { root.unmount() })
     host.remove()
