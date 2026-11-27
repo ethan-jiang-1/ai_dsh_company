@@ -2,6 +2,18 @@
 
 本文件只记用户/收件人可见的变化；维护者过程证据在 `notes/implemented/` 与 `_dist/release-manifest.json`。
 
+## 0.11.11 — 2026-11-28
+
+### Fixed
+
+- Host per-agent 生命周期双 owner 释放：全部 9 个会话级注入模块（手册、启动策略、工作语言、委托/工作流合同、委托控制、重试、工作流视图、团队座位守卫）在插件热卸载/重配或 agent 销毁任一侧触发时均完整释放 Cordis fiber，并支持向已在场活跃 agent 补挂。
+- 英文工作语言（`en`）一致性：`company:startup-settings`（含产品类型、交付模式与三档 wiki 指针提示）随工作语言输出纯英文，`ceo` 计划模式声明跟随工作语言；公司视图（S1–S4 原生扩展面、总部面板、跨会话待办、签字卡双语理由）已完成多轮响应式与实时切换收口。
+
+### Changed
+
+- `/company-diagnostics` 新增无参 / `status` 只读自检分支（中英双语），在会话内直接返回 `workspace`、公司数据闸门状态、`presetHealth` 挂载诊断、`<DSH_HOME>/cache/company` 索引体积与最近客户端错误摘要。
+- 兼容窗口与发布契约收紧：`engines.dsh` 收窄至已验证 minor 窗口 `>=0.2.1-rc.2 <0.2.2`；源包 `files` 收窄至精确 137 条目面并补裸 `npm publish` 拦截锁；公司手册外部取证条款对齐会话权限与审批策略；卸载说明补齐 `rm -rf <DSH_HOME>/cache/company`（覆盖 `.db-wal`/`.db-shm`）与浏览器 `localStorage` 键前缀。
+
 ## 0.11.10 — 2026-11-25
 
 ### Changed
