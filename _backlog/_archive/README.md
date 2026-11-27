@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-401](fixed_bugs/BUG-401-panel-nan-null-crashes-signoff-error-tag-and-question-id-mismatch.md) — 已修（`dfbaed24`）：加固 `TasksTableView`/`BudgetPanel` 的 `Array.isArray`/`Number.isFinite` 与 `useCountUp` 中途插值连续 ref，补全 `SignoffToolView` 非决策 `error`/`stopped`/`settled` 终态徽标、`pendingQuestions` 跨 `id` FIFO 消重、`installErrorCapture` 按栈还原与 `createErrorRelay` 单次重试队列保留。
 - [BUG-400](fixed_bugs/BUG-400-embedded-workshop-status-pill-leak-and-cultivation-race-gaps.md) — 已修（`cc9da514`）：补齐 `ComposerStatusPill`/`HeroMotionOptions` 工坊与角色守卫并使 `workshop-sessions` 可订阅；补齐培养看板 `records=null`/`feedback=null` 加载态、撤回取消禁用与互斥、选择器 `.catch()`、`visibilityState==='visible'` 过滤及创作卸载防误回调。
 - [BUG-404](fixed_bugs/BUG-404-stale-zero-badges-after-reload-and-mine-revoked-tag.md) — 已修（`cc9da514`）：新增 `createMergedAttentionObservable` 接通环境待办角标与跨会话历史重建；`CultivationMine` 判 `revokedAt` 渲染撤回 warning 标签。
 - [BUG-399](fixed_bugs/BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md) — 已修（`dd20d299`）：扩展 `deliverables-archive` 路径归一与终稿识别、统一剩余 6 处 `openTab`/快捷键走 `openOnSessionSurface`、延后 `reviewOpened` 到 `onSuccess` 并隔离 `composeIntentStore` 的 `hq`/`sidebar` 作用域。
