@@ -15,7 +15,7 @@
 | **跑开发环、环境隔离、调试阶梯、demo 或发布** | [guides/](./guides/)（[dev-loop](./guides/dev-loop.md) · [run-ops](./guides/run-ops.md)） | [demo-scenes.md](./guides/demo-scenes.md) · [release-runbook.md](./guides/release-runbook.md) |
 | **判授权、红线、维护面与测试证据门槛** | [policy.md](./policy.md) · [testing.md](./testing.md) | [checks/README.md](../checks/README.md) · [snapshots/README.md](../snapshots/README.md) |
 | **查架构决策（D 号）与为什么选 A 不选 B** | [decisions.md](./decisions.md) | 对应 [notes/implemented/](../notes/implemented/README.md) |
-| **查术语映射、外部材料或面例外** | [reference/](./reference/) | [glossary.md](./reference/glossary.md) · [external.md](./reference/external.md) |
+| **查术语映射、包自动目录、命令表或面例外** | [reference/](./reference/) | [package-catalog.generated.md](./reference/package-catalog.generated.md) · [commands.md](./reference/commands.md) · [glossary.md](./reference/glossary.md) |
 
 ## 推荐阅读顺序
 
@@ -30,7 +30,7 @@
 | **顶层核心（6 文件）** | `docs/*.md` | 导航入口、文档层规范、架构与运行态总纲、D 号决策路由、治理与维护面政策、测试宪法 | [AGENTS.md](./AGENTS.md) · [architecture.md](./architecture.md) · [decisions.md](./decisions.md) · [policy.md](./policy.md) · [testing.md](./testing.md) |
 | **合同层** | [contracts/](./contracts/) | **子系统现在时语义与代码边界**：host-and-lib、client-ui、presets、delegation、profile、cultivation、data-model、demo、multi-human、release、repo-hygiene、[content-charter.md](./contracts/content-charter.md) | 进目录按主题文件名选 |
 | **指南层** | [guides/](./guides/) | **操作手册（How-to）**：① 环境与开发（[bootstrap](./guides/bootstrap.md) · [dev-loop](./guides/dev-loop.md) · [run-ops](./guides/run-ops.md) · [orient](./guides/orient.md) · [repo-handoff](./guides/repo-handoff.md) 等）；② 演示与运转（[demo-scenes](./guides/demo-scenes.md) · [multi-human-runbook](./guides/multi-human-runbook.md) 等）；③ 发布（[release-runbook](./guides/release-runbook.md) · [publish-handoff](./guides/publish-handoff.md)） | 进目录按任务选 |
-| **参考层** | [reference/](./reference/) | **纯查表与登记**：术语映射（[glossary.md](./reference/glossary.md)）、外部材料（[external.md](./reference/external.md)）、维护面例外（[surface-exceptions.md](./reference/surface-exceptions.md)） | 进目录按查表名选 |
+| **参考层** | [reference/](./reference/) | **纯查表与自动生成目录**：包目录（[package-catalog.generated.md](./reference/package-catalog.generated.md)）、全量命令表（[commands.md](./reference/commands.md)）、术语映射（[glossary.md](./reference/glossary.md)）、外部材料（[external.md](./reference/external.md)）、维护面例外（[surface-exceptions.md](./reference/surface-exceptions.md)） | 进目录按查表名选 |
 
 ## 故障快查（现象 → 落点）
 

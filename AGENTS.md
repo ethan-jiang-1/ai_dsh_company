@@ -23,13 +23,13 @@
 | 目录 | 定位与职责 | 入口 |
 |---|---|---|
 | [`.agents/skills/`](.agents/skills/) | 完成定义 skill 与 `web-window-ops` 宿主（目录即清单，DSH 会话自动发现；`.claude/skills` 软链指向此处） | 目录即清单 |
-| [`packages/company-pack/`](packages/company-pack/) | 唯一自写包：`presets/<role>/`、`cordis.patch.yml`、`src/`（host + client）、`content/`（只读手册/模板/章程）；无 bin/启动器 | [pack README](packages/company-pack/README.md) · [src/README](packages/company-pack/src/README.md) |
+| [`packages/company-pack/`](packages/company-pack/) | 唯一自写包：`presets/<role>/`、`cordis.patch.yml`、`src/`（host + client）、`content/`（只读手册/模板/章程）；无 bin/启动器 | [pack AGENTS](packages/company-pack/AGENTS.md) · [pack README](packages/company-pack/README.md) · [src/README](packages/company-pack/src/README.md) |
 | `company-workspace/` | dev 公司状态 workspace（会话 cwd；整树 gitignored）：仅 `.dsh-company/`，由 `pnpm bundle:init` 建，不复制插件内容 | [bootstrap](docs/guides/bootstrap.md) |
 | `vendor/dsh/` | DSH 源码 submodule（钉 SHA，受版本控制内容只读零改动） | 见下「vendor 铁律」 |
 | [`docs/`](docs/) | 唯一长期维护的核心架构、现在时合同、操作指南与参考查表（只写 now，随代码同 diff 更新） | [docs/README.md](docs/README.md) · [docs/AGENTS.md](docs/AGENTS.md) |
 | [`notes/`](notes/) | 开发记忆：`proposed/`（RFC）→ `implemented/`（活跃决策记忆）；分类与收尾见其 README | [notes/README.md](notes/README.md) |
 | [`_backlog/`](_backlog/) | 上游推敲层：`issues/`、`bugs/`、`research/`、`methods/`、`_archive/` + `triggers.md`（卡流转与五道门） | [_backlog/README.md](_backlog/README.md) · [_backlog/AGENTS.md](_backlog/AGENTS.md) |
-| [`checks/`](checks/) | judge：会拦人的判断（`gates/`、`lanes/`、`audit/`；`lib/` = 判据支撑） | [checks/README.md](checks/README.md) |
+| [`checks/`](checks/) | judge：会拦人的判断（`gates/`、`lanes/`、`audit/`；`lib/` = 判据支撑） | [checks/AGENTS.md](checks/AGENTS.md) · [checks/README.md](checks/README.md) |
 | [`tests/`](tests/) | keyless 回归（按面分区 spec；真模型/浏览器不进本树） | [tests/README.md](tests/README.md) |
 | [`probes/`](probes/) | show：给人看的证据（`team/`、`fs-taskboard/`、`browser-visual/`、`session-context/`、`analyze/`） | [checks/README.md](checks/README.md) |
 | [`tools/`](tools/) | operate：改世界的操作（`dev/`、`repo/`、`release/`、`lib/`、`drivers/`） | [checks/README.md](checks/README.md) |

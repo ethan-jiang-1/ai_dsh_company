@@ -119,7 +119,7 @@
 [worker-orchestrator-probe](../probes/team/worker-orchestrator-probe.mjs)
 [worker-researcher-probe](../probes/team/worker-researcher-probe.mjs)
 
-## 维护工具（tools/，21 = 19 tools + 1 runner + 1 query）
+## 维护工具（tools/，22 = 20 tools + 1 runner + 1 query）
 
 ### dev/（7）
 
@@ -133,13 +133,14 @@
 [export-dist](../tools/release/export-dist.mjs) · [market-index](../tools/release/market-index.mjs)
 [release](../tools/release/release.mjs) · [shipped-shape](../tools/release/shipped-shape.mjs)
 
-### repo/（10）
+### repo/（11）
 
 [bug-coverage](../tools/repo/bug-coverage.mjs) · [checks-index](../tools/repo/checks-index.mjs)
 [converge](../tools/repo/converge.mjs) · [deliverables-index](../tools/repo/deliverables-index.mjs)
-[prune-runtime](../tools/repo/prune-runtime.mjs) · [run-check-tests](../tools/repo/run-check-tests.mjs)
-[snapshot-motion](../tools/repo/snapshot-motion.mjs) · [snapshot-path](../tools/repo/snapshot-path.mjs)
-[sync-dsh](../tools/repo/sync-dsh.mjs) · [test-census](../tools/repo/test-census.mjs)
+[gen-catalog](../tools/repo/gen-catalog.mjs) · [prune-runtime](../tools/repo/prune-runtime.mjs)
+[run-check-tests](../tools/repo/run-check-tests.mjs) · [snapshot-motion](../tools/repo/snapshot-motion.mjs)
+[snapshot-path](../tools/repo/snapshot-path.mjs) · [sync-dsh](../tools/repo/sync-dsh.mjs)
+[test-census](../tools/repo/test-census.mjs)
 
 ## 结构门禁（checks/gates/，75 个模块）
 

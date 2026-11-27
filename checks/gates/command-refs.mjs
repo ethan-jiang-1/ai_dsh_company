@@ -16,10 +16,15 @@ import { join } from 'node:path'
 //   与负例（"改坏成 `pnpm bundle-init` → 红"）——实测扩扫得 27 命中，全部是历史/负例/`pnpm vitest`
 //   这类合法二进制快捷，无一真 stale（唯一像的两条是被否方案与被禁形状的原文）。可执行事实的家 =
 //   docs/ + README + .agents/（本门覆盖）；notes 的路径类引用由 bare-path 门守。
+// 2026-11-27（16 文件标准骨架）：升级为双向校验——不仅检验活跃文档里的 `pnpm <script>` 在
+//   package.json 存在，还要求根 package.json 的每条 script 均在 `docs/reference/commands.md`
+//   有记录（新加脚本漏记命令表即红），并纳入 `packages/company-pack/AGENTS.md` 与 `checks/AGENTS.md`。
 // 负例留证 2026-11-03（实地造红→还原→绿）：① 在 `docs/orient.md` 加围栏 `pnpm nonexistent-script`
 //   → `FAIL command-refs: docs/orient.md:N → pnpm nonexistent-script 不是本仓脚本…`；② 加
 //   `` `node tools/nonexistent-tool.mjs` `` → `… node tools/nonexistent-tool.mjs 指向不存在的文件`。
 //   两例还原即绿；把 package.json 的 orient 改名后本门在「pnpm orient」处红（同轮已验）。
+// 负例留证 2026-11-27：在 `docs/reference/commands.md` 删掉 `pnpm gen:catalog` 行 →
+//   `FAIL command-refs: package.json 脚本未登记在 docs/reference/commands.md：gen:catalog`；还原即绿。
 const PNPM_BUILTIN = new Set(['install', 'i', 'add', 'remove', 'rm', 'uninstall', 'update', 'up', 'upgrade', 'link',
   'unlink', 'import', 'rebuild', 'prune', 'exec', 'dlx', 'create', 'init', 'publish', 'pack', 'deploy', 'list', 'ls',
   'll', 'la', 'outdated', 'why', 'licenses', 'audit', 'bin', 'root', 'store', 'config', 'setup', 'help', 'env', 'node',
@@ -28,8 +33,8 @@ const PNPM_BUILTIN = new Set(['install', 'i', 'add', 'remove', 'rm', 'uninstall'
 const UPSTREAM_SCRIPTS = new Set(['gen-client-catalog', 'build'])
 
 function activeDocs(root) {
-  const files = ['AGENTS.md', 'README.md', 'tests/README.md', 'checks/README.md', 'run/README.md', 'runtime/README.md',
-    'packages/company-pack/README.md']
+  const files = ['AGENTS.md', 'README.md', 'tests/README.md', 'checks/README.md', 'checks/AGENTS.md',
+    'run/README.md', 'runtime/README.md', 'packages/company-pack/README.md', 'packages/company-pack/AGENTS.md']
   const walk = (rel) => {
     const dir = join(root, rel)
     if (!existsSync(dir)) return
@@ -62,6 +67,7 @@ export function run({ root, ok, fail }) {
   const scripts = new Set(Object.keys(JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).scripts ?? {}))
   const problems = []
   let checked = 0
+  const commandsDocScripts = new Set()
   for (const rel of activeDocs(root)) {
     for (const span of commandSpans(readFileSync(join(root, rel), 'utf8'))) {
       for (const match of span.text.matchAll(/(?:^|[\s$;&|(])pnpm\s+([a-z][\w:-]*)/g)) {
@@ -71,9 +77,12 @@ export function run({ root, ok, fail }) {
           const inner = /pnpm\s+run\s+([\w:-]+)/.exec(span.text)?.[1]
           if (inner !== undefined && !scripts.has(inner) && !UPSTREAM_SCRIPTS.has(inner)) {
             problems.push(`${rel}:${String(span.line)} → pnpm run ${inner} 不是本仓脚本（scripts: ${[...scripts].join(', ')}）`)
+          } else if (rel === 'docs/reference/commands.md' && inner !== undefined) {
+            commandsDocScripts.add(inner)
           }
           continue
         }
+        if (rel === 'docs/reference/commands.md') commandsDocScripts.add(token)
         if (PNPM_BUILTIN.has(token) || scripts.has(token) || UPSTREAM_SCRIPTS.has(token)) continue
         problems.push(`${rel}:${String(span.line)} → pnpm ${token} 不是本仓脚本（改脚本名/删除命令，或加到 package.json scripts）`)
       }
@@ -86,7 +95,16 @@ export function run({ root, ok, fail }) {
       }
     }
   }
+  const commandsDocPath = join(root, 'docs/reference/commands.md')
+  if (!existsSync(commandsDocPath)) {
+    problems.push('docs/reference/commands.md 缺失——根 package.json 脚本须在命令参考表双向登记')
+  } else {
+    const missing = [...scripts].filter(name => !commandsDocScripts.has(name)).sort()
+    if (missing.length > 0) {
+      problems.push(`package.json 脚本未登记在 docs/reference/commands.md：${missing.join('、')}`)
+    }
+  }
   problems.length === 0
-    ? ok(`command-refs ×${String(checked)}（文档里的 pnpm 脚本与 node 仓内路径都存在）`)
+    ? ok(`command-refs ×${String(checked)}（文档命令存在 + docs/reference/commands.md 与 package.json ${String(scripts.size)} 条脚本双向对齐）`)
     : fail('command-refs', problems.join('；'))
 }

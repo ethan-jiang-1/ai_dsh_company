@@ -28,6 +28,8 @@ import * as mdLinks from '../../checks/gates/md-links.mjs'
 import * as docTaxonomy from '../../checks/gates/doc-taxonomy.mjs'
 import * as docBudget from '../../checks/gates/doc-budget.mjs'
 import * as layoutBlock from '../../checks/gates/layout-block.mjs'
+import * as commandRefs from '../../checks/gates/command-refs.mjs'
+import * as scriptIndex from '../../checks/gates/script-index.mjs'
 import { mutateFile } from '../support/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
@@ -288,6 +290,42 @@ const mutateOrFail = (label, path, transform) => {
     symlinkSync('AGENTS.md', join(root, 'CLAUDE.md'))
     rmSync(join(root, '.claude/skills'))
     report('layout-block：.claude/skills 缺失 → 红', run(layoutBlock, root), '.claude/skills 缺失')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // command-refs（2026-11-27）：package.json scripts ↔ docs/reference/commands.md 双向对齐。
+  const root = mkdtempSync(join(tmpdir(), 'gates-cmdrefs-'))
+  try {
+    mkdirSync(join(root, 'docs/reference'), { recursive: true })
+    writeFileSync(join(root, 'package.json'), JSON.stringify({ scripts: { verify: 'echo ok', test: 'echo ok' } }))
+    writeFileSync(join(root, 'docs/reference/commands.md'), '# 命令\n\n- `pnpm verify`\n- `pnpm test`\n')
+    const okMsgs = run(commandRefs, root)
+    const okClean = okMsgs.every(m => !m.startsWith('FAIL'))
+    if (!okClean) failures += 1
+    console.log(`${okClean ? 'PASS' : 'FAIL'} command-refs：双向对齐 → 绿`)
+
+    writeFileSync(join(root, 'docs/reference/commands.md'), '# 命令\n\n- `pnpm verify`\n')
+    report('command-refs：commands.md 漏记 package.json 脚本 → 红', run(commandRefs, root), '未登记在 docs/reference/commands.md：test')
+
+    writeFileSync(join(root, 'docs/reference/commands.md'), '# 命令\n\n- `pnpm verify`\n- `pnpm test`\n- `pnpm ghost-cmd`\n')
+    report('command-refs：commands.md 引用不存在的脚本 → 红', run(commandRefs, root), 'pnpm ghost-cmd 不是本仓脚本')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // script-index（2026-11-27）：docs/reference/package-catalog.generated.md 过期/缺失报红。
+  const root = mkdtempSync(join(tmpdir(), 'gates-catalog-'))
+  try {
+    cpSync(join(ROOT, 'checks'), join(root, 'checks'), { recursive: true })
+    cpSync(join(ROOT, 'probes'), join(root, 'probes'), { recursive: true })
+    cpSync(join(ROOT, 'tools'), join(root, 'tools'), { recursive: true })
+    cpSync(join(ROOT, 'packages/company-pack/package.json'), join(root, 'packages/company-pack/package.json'))
+    cpSync(join(ROOT, 'packages/company-pack/cordis.patch.yml'), join(root, 'packages/company-pack/cordis.patch.yml'))
+    cpSync(join(ROOT, 'packages/company-pack/presets'), join(root, 'packages/company-pack/presets'), { recursive: true })
+    mkdirSync(join(root, 'docs/reference'), { recursive: true })
+    writeFileSync(join(root, 'docs/reference/package-catalog.generated.md'), '# stale\n')
+    report('script-index：package-catalog.generated.md 过期 → 红', run(scriptIndex, root), 'package-catalog.generated.md 与 packages/company-pack 源码不一致')
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 

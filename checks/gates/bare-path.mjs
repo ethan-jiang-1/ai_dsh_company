@@ -24,6 +24,7 @@ const NOTES_CURRENCY_EFFECTIVE_DATE = '2026-10-09'
 // 同时收窄匹配器，避免扩面后自带假阳性：跳过 `{a,b}` 花括号展开，剥掉 `path:12-34` 的引文行号后缀。
 export const NOW_FILES = (() => {
   const out = ['AGENTS.md', 'README.md', 'ROADMAP.md', 'packages/company-pack/content/AGENTS.md',
+    'packages/company-pack/AGENTS.md', 'checks/AGENTS.md',
     'snapshots/README.md', 'runtime/README.md', 'runtime/harness-home/README.md', 'packages/company-pack/README.md',
     'packages/company-pack/src/README.md'].filter(f => existsSync(join(root, f)))
   const walkMd = (dir) => !existsSync(dir) || !lstatSync(dir).isDirectory() ? [] : readdirSync(dir, { withFileTypes: true }).flatMap(entry => {

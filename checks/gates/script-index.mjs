@@ -4,13 +4,19 @@
 // 2026-11-03（A- D1）：覆盖门禁反过来强制 README 手工枚举（违反 D28「枚举的家 = 实现自己」）。
 // 现在改成「扫描目录 → 渲染生成物 → 校验新鲜度」：README 只链接 checks/INDEX.generated.md，
 // 目录一变生成物就红，提示跑 `node tools/repo/checks-index.mjs --write`。
+// 2026-11-27（16 文件标准骨架）：受 policy §P2 门禁封顶约束，将 `docs/reference/package-catalog.generated.md`
+// 新鲜度校验并入本「生成索引新鲜度」门禁（不新增独立 gate 文件）。
 // 负例留证 2026-11-03：临时建 checks/lanes/zz-index-probe.mjs → 生成物未更新 ⇒
 //   `FAIL script-index: checks/INDEX.generated.md 与目录不一致……`；跑 --write 后绿；
 //   删除探针后生成物多一条 → 再红；--write 还原 → 绿。
+// 负例留证 2026-11-27：临时篡改 docs/reference/package-catalog.generated.md →
+//   `FAIL script-index: docs/reference/package-catalog.generated.md 与 packages/company-pack 源码不一致……`；
+//   运行 `pnpm gen:catalog -- --write` 后绿。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { ASSETS, PROBES } from '../../tools/lib/core/asset-lanes.mjs'
 import { renderScriptInventory, scanPublicScripts, strayToolEntries } from '../../tools/lib/core/checks-index.mjs'
+import { renderPackageCatalog, scanPackageCatalog } from '../../tools/lib/repo/package-catalog.mjs'
 
 export function run({ root, ok, fail }) {
   const readmePath = join(root, 'checks', 'README.md')
@@ -46,5 +52,22 @@ export function run({ root, ok, fail }) {
     fail('script-index', `tools/ 顶层有散件（入口必须进三个用途组之一）：${stray.join('、')}`)
     return
   }
-  ok(`script-index ×${String(scripts.length)}（生成库存与目录一致；README 已链接；tools 顶层无散件）`)
+  // 包与能力自动目录新鲜度（仅在 packages/company-pack 存在时校验，兼容只含 checks/tools 的最小夹具）
+  const packPkg = join(root, 'packages/company-pack/package.json')
+  let catalogNote = ''
+  if (existsSync(packPkg)) {
+    const catalogPath = join(root, 'docs/reference/package-catalog.generated.md')
+    if (!existsSync(catalogPath)) {
+      fail('script-index', 'docs/reference/package-catalog.generated.md 不在盘上——先跑 pnpm gen:catalog -- --write')
+      return
+    }
+    const expectedCatalog = renderPackageCatalog(scanPackageCatalog(root))
+    const actualCatalog = readFileSync(catalogPath, 'utf8')
+    if (actualCatalog !== expectedCatalog) {
+      fail('script-index', 'docs/reference/package-catalog.generated.md 与 packages/company-pack 源码不一致——运行 pnpm gen:catalog -- --write（生成物勿手改）')
+      return
+    }
+    catalogNote = '；package-catalog 新鲜'
+  }
+  ok(`script-index ×${String(scripts.length)}（生成库存与目录一致；README 已链接；tools 顶层无散件${catalogNote}）`)
 }

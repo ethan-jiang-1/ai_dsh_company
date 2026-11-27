@@ -15,6 +15,7 @@
     "methods:init": "node tools/dev/methods-init.mjs",
     "orient": "node probes/analyze/orient-probe.mjs",
     "notes:audit": "node probes/analyze/notes-audit-probe.mjs",
+    "gen:catalog": "node tools/repo/gen-catalog.mjs",
     "diagnose": "node probes/analyze/diagnose-probe.mjs",
     "verify": "node checks/run-gates.mjs",
     "test": "vitest run",
