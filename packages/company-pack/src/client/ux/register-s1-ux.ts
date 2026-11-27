@@ -14,7 +14,7 @@ import type { LivePending } from '../../lib/presence/attention.ts'
 import { COMPANY_NS } from '../locales.ts'
 import type { HubSubViewStore } from '../tabs/hub-subview-store.ts'
 import type { AttentionRegistry } from '../wiring/attention-registry.ts'
-import { openOnSessionSurface } from '../wiring/sidebar-right-guard.ts'
+import { openOnSessionSurface, trackReturnToMain } from '../wiring/sidebar-right-guard.ts'
 import { composeIntentStore } from '../cultivation/compose-intent-store.ts'
 import { deliverablesFocusStore } from '../tabs/deliverables-focus-store.ts'
 import {
@@ -114,16 +114,13 @@ export function registerWaveS1Ux(ctx: ClientContext, deps: WaveS1Deps): void {
   })
 
   // 3. 需要 rightSidebar / sessions 的会话与上下文增强槽
-  let returnToMain: (() => void) | undefined
-  ctx.inject(['layout'], (layoutScoped) => {
-    const layout = (layoutScoped as unknown as { readonly layout?: { readonly selectPanel?: (panel: null) => void } }).layout
-    if (typeof layout?.selectPanel === 'function') {
-      returnToMain = () => { layout.selectPanel!(null) }
-    }
-  })
+  const returnToMain = trackReturnToMain(ctx)
 
   ctx.inject(['slots', 'sidebarRight', 'sessions'], (scoped) => {
-    const safeOpenTab = (tabId: 'company-attention' | 'company-board' | 'company-cultivation' | 'company-deliverables'): void => {
+    const safeOpenTab = (
+      tabId: 'company-attention' | 'company-board' | 'company-cultivation' | 'company-deliverables',
+      onSuccess?: () => void,
+    ): void => {
       openOnSessionSurface(
         scoped.sidebarRight,
         returnToMain,
@@ -146,6 +143,7 @@ export function registerWaveS1Ux(ctx: ClientContext, deps: WaveS1Deps): void {
           const message = error instanceof Error ? error.message : String(error)
           toastSource.notify(message)
         },
+        onSuccess,
       )
     }
 
@@ -161,7 +159,10 @@ export function registerWaveS1Ux(ctx: ClientContext, deps: WaveS1Deps): void {
     }
 
     const openCultivation = (context?: { readonly messageId?: string; readonly filePath?: string }): void => {
-      composeIntentStore.publish(context)
+      composeIntentStore.publish({
+        ...context,
+        target: deps.openHq !== undefined ? 'hq' : 'sidebar',
+      })
       if (deps.openHq !== undefined) {
         deps.openHq('cultivation')
       } else {
@@ -176,8 +177,9 @@ export function registerWaveS1Ux(ctx: ClientContext, deps: WaveS1Deps): void {
 
     const openDeliverables = (filePath?: string): void => {
       if (filePath !== undefined) deliverablesFocusStore.publish(filePath)
-      safeOpenTab('company-deliverables')
-      toastSource.notify(t('toast.reviewOpened'), 'success')
+      safeOpenTab('company-deliverables', () => {
+        toastSource.notify(t('toast.reviewOpened'), 'success')
+      })
     }
 
     scoped.slots.inject('conversation.session.header.utilities', () =>

@@ -171,6 +171,8 @@ describe('DeliverablesTab：截断 ≠ 形状不符', () => {
     expect(extractDeliverableRelativePath('C:\\ws\\.dsh-company\\deliverables\\2026-11-27-demo\\final.md')).toBe('.dsh-company/deliverables/2026-11-27-demo/final.md')
     expect(extractDeliverableRelativePath('./deliverables/demo/final.md')).toBe('deliverables/demo/final.md')
     expect(extractDeliverableRelativePath('/tmp/outside.md')).toBeNull()
+    expect(extractDeliverableRelativePath('/ws/.dsh-company/deliverables-archive/2026-11-27-old/final.md')).toBe('.dsh-company/deliverables-archive/2026-11-27-old/final.md')
+    expect(extractDeliverableTarget('/ws/.dsh-company/deliverables-archive/2026-11-27-old/final.md')).toBe('2026-11-27-old')
     act(() => { mounted?.unmount(); mounted = null })
 
     const makeUnpresented = (presented: boolean) => ({

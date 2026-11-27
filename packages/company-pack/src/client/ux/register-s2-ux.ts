@@ -11,6 +11,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-input-trigger/client'
 import type {} from '@deepseek-ai/dsh-client-shortcuts/client'
 import { COMPANY_NS } from '../locales.ts'
 import type { HubSubViewStore } from '../tabs/hub-subview-store.ts'
+import { trackReturnToMain } from '../wiring/sidebar-right-guard.ts'
 import { CompanyGuideHub } from './company-guide.tsx'
 import {
   createCompanyRoleTriggerSource,
@@ -29,6 +30,7 @@ export const S2_GUIDE_SLOT_ID = 'company-guide-hub'
 /** 挂载 Wave S2 全套导航聚焦、角色提及触发器与固定快捷键。 */
 export function registerWaveS2Ux(ctx: ClientContext, deps: WaveS2Deps): void {
   const t = ctx.locale.bind(COMPANY_NS)
+  const returnToMain = trackReturnToMain(ctx)
 
   ctx.inject(['slots', 'sidebarRight', 'sidebarRightTabs'], (scoped) => {
     const guideEntries: ObservableSnapshot<readonly SidebarRightGuideBox[]> = {
@@ -66,6 +68,7 @@ export function registerWaveS2Ux(ctx: ClientContext, deps: WaveS2Deps): void {
         sidebarRight: scoped.sidebarRight,
         hubStore: deps.hubStore,
         t,
+        returnToMain,
       }),
       'company-pack: fixed shortcuts',
     )

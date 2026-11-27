@@ -11,6 +11,8 @@ import {
   isCompanyTurnTool,
   selectCompanyTurnSummary,
 } from '../../../packages/company-pack/src/client/ux/company-turn-tail.tsx'
+import { registerWaveS4Ux } from '../../../packages/company-pack/src/client/ux/register-s4-ux.ts'
+import { createHubSubViewStore } from '../../../packages/company-pack/src/client/tabs/hub-subview-store.ts'
 
 type StartInput = Parameters<typeof companyTurnSummaryDefinition.start>[1]
 type UpdateInput = Parameters<typeof companyTurnSummaryDefinition.update>[1]
@@ -151,5 +153,43 @@ describe('Wave S4 companyTurnSummaryDefinition & CompanyTurnTailCard', () => {
 
     act(() => { root.unmount() })
     host.remove()
+  })
+
+  it('BUG-399：registerWaveS4Ux 在 HQ/无会话表面态通过 openOnSessionSurface 切回主会话后打开右栏页签，零抛错', () => {
+    let mounted: string | undefined = undefined
+    const listeners = new Set<() => void>()
+    const openTab = vi.fn(() => {
+      if (mounted === undefined) throw new Error('sidebarRight: no session surface is mounted')
+    })
+    const selectPanel = vi.fn(() => {
+      mounted = 's-restored'
+      for (const fn of listeners) fn()
+    })
+    let injected: { openOps?: () => void; openArchive?: () => void } | undefined
+    registerWaveS4Ux({
+      inject: (deps: readonly string[], fn: (scoped: unknown) => void) => {
+        if (deps.includes('layout')) { fn({ layout: { selectPanel } }); return }
+        fn({
+          effect: () => {},
+          uiConversation: { events: { register: () => () => {} } },
+          slots: {
+            inject: (_slot: string, reg: () => void) => { reg() },
+            register: (def: { inject?: () => unknown }) => { injected = def.inject?.() as typeof injected; return () => {} },
+          },
+          sidebarRight: {
+            mounted: { getSnapshot: () => mounted, subscribe: (cb: () => void) => { listeners.add(cb); return () => { listeners.delete(cb) } } },
+            openTab,
+          },
+        })
+      },
+    } as never, { hubStore: createHubSubViewStore() })
+
+    expect(() => injected?.openOps?.()).not.toThrow()
+    expect(selectPanel).toHaveBeenCalledWith(null)
+    expect(openTab).toHaveBeenCalledWith('company-ops')
+
+    mounted = undefined
+    expect(() => injected?.openArchive?.()).not.toThrow()
+    expect(openTab).toHaveBeenLastCalledWith('company-archive')
   })
 })

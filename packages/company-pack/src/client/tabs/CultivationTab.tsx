@@ -80,6 +80,7 @@ export function CultivationTab(props: CultivationTabProps) {
     >
       <CultivationBoard
         language={lang}
+        intentScope="sidebar"
         viewerRole={viewerRole}
         viewerLabel={viewerRole === null ? null : roleText(viewerRole, 'label', props.t, roleLabel(viewerRole))}
         workspaceLabel={workspaceLabelOf(workspaceCwd)}

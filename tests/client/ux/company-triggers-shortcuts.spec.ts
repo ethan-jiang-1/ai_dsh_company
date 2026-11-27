@@ -19,6 +19,7 @@ const t = ((key: CompanyKey) => zh[key]) as CompanyT
 // 负例留证 2026-11-27：去掉 createCompanyRoleTriggerSource 返回项的 localized section ⇒ @ 菜单分组头暴露裸 'company-roles'（BUG-390）；还原后绿。BUG-390
 // 负例留证 2026-11-27：去掉 openSplitPreset review 分支 catch 块的 try 保护 ⇒ 两栏都无法挂载时直接抛未捕获异常（BUG-393）；还原后绿。BUG-393
 // 负例留证 2026-11-27：去掉 observeFixedInput 对 context.modal 与 context.region === 'terminal' 的守卫 ⇒ 弹窗开启或终端聚焦时 Alt+Shift+1/2/3 仍切走右栏（BUG-396）；还原后绿。BUG-396
+// 负例留证 2026-11-27：safeOpenHubFromShortcut 保留 `mounted === undefined` 早退而不走 openOnSessionSurface ⇒ HQ 内按 Alt+Shift+1/2/3 静默失效（BUG-399）；还原后绿。BUG-399
 describe('Wave S2 triggers, deep links, split presets, and shortcuts', () => {
   it('@ role trigger filters company roles cleanly and picks plain reference text', async () => {
     const source = createCompanyRoleTriggerSource(t)
@@ -219,6 +220,49 @@ describe('Wave S2 triggers, deep links, split presets, and shortcuts', () => {
     })
     expect(blockedConsume).not.toHaveBeenCalled()
     expect(openTab).toHaveBeenCalledTimes(1)
+    dispose()
+  })
+
+  it('BUG-399：右栏未挂载时 Alt+Shift+1/2/3 经 openOnSessionSurface 切回主会话并等待 mounted 就绪后打开页签', () => {
+    let listener: ((input: ShortcutFixedInput) => void) | null = null
+    let mountedSession: SessionId | undefined = undefined
+    const listeners = new Set<() => void>()
+    const openTab = vi.fn()
+    const returnToMain = vi.fn(() => {
+      mountedSession = 's-restored' as SessionId
+      for (const fn of listeners) fn()
+    })
+    const hubStore = createHubSubViewStore()
+    const dispose = registerCompanyShortcuts(
+      {
+        registerFixed: () => () => {},
+        observeFixedInput: (fn) => { listener = fn; return () => { listener = null } },
+      },
+      {
+        sidebarRight: {
+          mounted: {
+            getSnapshot: () => mountedSession,
+            subscribe: (fn) => { listeners.add(fn); return () => { listeners.delete(fn) } },
+          },
+          openTab,
+        },
+        hubStore,
+        t,
+        returnToMain,
+      },
+    )
+
+    const consume = vi.fn()
+    listener!({
+      type: 'keydown',
+      gesture: { code: 'Digit3', control: false, alt: true, shift: true, meta: false, repeat: false, composing: false, defaultPrevented: false },
+      context: { region: 'page', modal: null, target: null },
+      consume,
+    })
+    expect(consume).toHaveBeenCalledOnce()
+    expect(returnToMain).toHaveBeenCalledOnce()
+    expect(openTab).toHaveBeenCalledWith('company-archive')
+    expect(hubStore.store.getSnapshot().archive).toBe('deliverables')
     dispose()
   })
 })

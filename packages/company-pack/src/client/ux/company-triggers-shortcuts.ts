@@ -133,28 +133,27 @@ export function createCompanyRoleTriggerSource(t: CompanyT): InputTriggerSource 
 }
 
 function safeOpenHubFromShortcut(
-  sidebarRight: Pick<ISidebarRight, 'mounted' | 'openTab'>,
+  sidebarRight: Pick<ISidebarRight, 'openTab'> & SidebarRightSurfaceLike,
   hubStore: HubSubViewStore,
   kind: 'company-ops' | 'company-team' | 'company-archive',
+  returnToMain?: () => void,
 ): void {
-  if (sidebarRight.mounted.getSnapshot() === undefined) return
-  if (kind === 'company-ops') hubStore.select('ops', 'board')
-  if (kind === 'company-team') hubStore.select('team', 'attention')
-  if (kind === 'company-archive') hubStore.select('archive', 'deliverables')
-  try {
+  openOnSessionSurface(sidebarRight, returnToMain, () => {
+    if (kind === 'company-ops') hubStore.select('ops', 'board')
+    if (kind === 'company-team') hubStore.select('team', 'attention')
+    if (kind === 'company-archive') hubStore.select('archive', 'deliverables')
     sidebarRight.openTab(kind)
-  } catch {
-    // 会话尚未挂载完右栏时静默忽略，避免键盘全局报错。
-  }
+  })
 }
 
 /** 注册三组只读全局快捷键（Alt+Shift+1 / 2 / 3）。 */
 export function registerCompanyShortcuts(
   shortcuts: Pick<Shortcuts, 'registerFixed' | 'observeFixedInput'>,
   deps: {
-    readonly sidebarRight: Pick<ISidebarRight, 'mounted' | 'openTab'>
+    readonly sidebarRight: Pick<ISidebarRight, 'openTab'> & SidebarRightSurfaceLike
     readonly hubStore: HubSubViewStore
     readonly t: CompanyT
+    readonly returnToMain?: () => void
   },
 ): () => void {
   const disposers: Array<() => void> = [
@@ -187,13 +186,13 @@ export function registerCompanyShortcuts(
       if (!gesture.alt || !gesture.shift || gesture.control || gesture.meta) return
       if (gesture.code === 'Digit1') {
         input.consume()
-        safeOpenHubFromShortcut(deps.sidebarRight, deps.hubStore, 'company-ops')
+        safeOpenHubFromShortcut(deps.sidebarRight, deps.hubStore, 'company-ops', deps.returnToMain)
       } else if (gesture.code === 'Digit2') {
         input.consume()
-        safeOpenHubFromShortcut(deps.sidebarRight, deps.hubStore, 'company-team')
+        safeOpenHubFromShortcut(deps.sidebarRight, deps.hubStore, 'company-team', deps.returnToMain)
       } else if (gesture.code === 'Digit3') {
         input.consume()
-        safeOpenHubFromShortcut(deps.sidebarRight, deps.hubStore, 'company-archive')
+        safeOpenHubFromShortcut(deps.sidebarRight, deps.hubStore, 'company-archive', deps.returnToMain)
       }
     }),
   ]

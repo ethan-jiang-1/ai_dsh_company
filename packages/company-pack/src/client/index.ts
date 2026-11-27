@@ -31,6 +31,7 @@ import { titleUpdateFor } from './wiring/title-state.ts'
 import { createLeadLookup } from './wiring/company-session-adapters.ts'
 import { registerCompanyTabs } from './tabs/company-tab-registration.ts'
 import { DELEGATION_TOOL_KEYS } from './wiring/delegation-keys.ts'
+import { openOnSessionSurface, trackReturnToMain } from './wiring/sidebar-right-guard.ts'
 import { DelegationCard } from './ui/DelegationCard.tsx'
 import { installStyles } from './ui/styles.ts'
 import { createStartupStore, type StartupStore } from './startup/startup-store.ts'
@@ -160,11 +161,7 @@ function registerCompanyTabsWiring(
     const floatTab = (tabId: TabId, rect?: FloatRectLike): void => { scoped.sidebarRight.float(tabId, rect) }
     const unfloatTab = (paneId: string): void => { scoped.sidebarRight.dock(paneId as PaneId) }
     const openMember = makeOpenMember({ sessions, uiWorkspace: scoped.uiWorkspace, leadOf })
-    let returnToMain: (() => void) | undefined
-    ctx.inject(['layout'], (layoutScoped) => {
-      returnToMain = () => { (layoutScoped as unknown as { layout: { selectPanel: (panel: null) => void } }).layout.selectPanel(null) }
-    })
-    const returnToMainFn = (): void => { returnToMain?.() }
+    const returnToMainFn = trackReturnToMain(ctx)
     const openMemberAside = (sessionId: SessionId, memberId: string): void => {
       openSubagentAside(
         scoped.sidebarRight,
@@ -225,8 +222,10 @@ function registerCompanyTabsWiring(
         store: startupStore,
         load: loadStartup,
         open: () => {
-          hubStore.select('ops', 'strategy')
-          scoped.sidebarRight.openTab('company-ops')
+          openOnSessionSurface(scoped.sidebarRight, returnToMainFn, () => {
+            hubStore.select('ops', 'strategy')
+            scoped.sidebarRight.openTab('company-ops')
+          })
         },
         t: ctx.locale.bind(COMPANY_NS),
       }),
@@ -247,6 +246,7 @@ function registerCultivationViewWiring(
   hubStore: HubSubViewStore,
   openHqCultivation: () => void,
 ): void {
+  const returnToMain = trackReturnToMain(ctx)
   // 培养主视图（2026-10-28；2026-11-02 起主区就剩 Chat + 培养——Trajectory 已从 company profile 禁用）。
   // 公司总览不再占第三个 tab：它的看板/依赖/在场/交付已经住在右栏页签，按钮直接打开。
   // Wave S3 起右侧原手写对话替换为导向全局 HQ 培养工坊（原生 embedded 会话）的入口卡片。
@@ -254,10 +254,12 @@ function registerCultivationViewWiring(
     const sessions = scoped.sessions
     const { leadOf, follow, cultivationFiles, cultivationActions, rawFollow, readWorkspaceText } = createCompanyDataPlane(scoped)
     const readCatalog = readWorkspaceText(WORKSPACE_TEXT_PATHS.catalog, CATALOG_READ_LIMIT)
-    const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog)
+    const contextWiring = makeContextWiring(scoped as unknown as ContextWiringScoped, leadOf, rawFollow, readCatalog, returnToMain)
     const openCompanyOverview = (): void => {
-      hubStore.select('ops', 'board')
-      scoped.sidebarRight.openTab('company-ops')
+      openOnSessionSurface(scoped.sidebarRight, returnToMain, () => {
+        hubStore.select('ops', 'board')
+        scoped.sidebarRight.openTab('company-ops')
+      })
     }
     const CultivationView = createCultivationView({
       sessions,
@@ -330,6 +332,7 @@ function registerToolCards(ctx: ClientContext): void {
 }
 
 function registerSidebarIdentity(ctx: ClientContext, hubStore: HubSubViewStore): void {
+  const returnToMain = trackReturnToMain(ctx)
   ctx.inject(['sessions', 'remote.workspaceFiles', 'sidebarRight', 'slots'], (scoped) => {
     scoped.slots.inject('sidebar.brand.name', () =>
       scoped.slots.register({ name: 'sidebar.brand.name', locale: COMPANY_NS }, DreamTeamBrandName))
@@ -425,8 +428,10 @@ function registerSidebarIdentity(ctx: ClientContext, hubStore: HubSubViewStore):
         inject: () => ({
           leadOf: leadSessionId,
           openTasks: () => {
-            hubStore.select('ops', 'tasks')
-            scoped.sidebarRight.openTab('company-ops')
+            openOnSessionSurface(scoped.sidebarRight, returnToMain, () => {
+              hubStore.select('ops', 'tasks')
+              scoped.sidebarRight.openTab('company-ops')
+            })
           },
         }),
       }, TasksAction))

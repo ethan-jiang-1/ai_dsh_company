@@ -27,7 +27,7 @@ import {
   type CultivationActions,
   type DraftProblem,
 } from './cultivation-actions.ts'
-import { composeIntentStore } from './compose-intent-store.ts'
+import { composeIntentStore, type ComposeIntentTarget } from './compose-intent-store.ts'
 import { extractDeliverableRelativePath, extractDeliverableTarget } from '../tabs/deliverables-focus-store.ts'
 import { CultivationContextPicker, type ContextPickerPick } from './CultivationContextPicker.tsx'
 import type { ContextDeliverableRow, ContextSessionRow, CultivationContextSources } from './cultivation-context-data.ts'
@@ -61,6 +61,8 @@ export interface CultivationComposeProps {
   readonly teammate?: boolean | undefined
   /** 角色名表达层取用；缺席 = canonical 英文。 */
   readonly roleLabel?: (role: string) => string
+  /** 意图消费作用域（区分总部工坊与侧栏页签，避免双挂载互抢；缺席 = 全消费）。 */
+  readonly intentScope?: ComposeIntentTarget | undefined
 }
 
 type ContextStatus = 'idle' | 'loading'
@@ -123,6 +125,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
     const applyIntent = (): void => {
       const intent = composeIntentStore.get()
       if (intent === null) return
+      if (intent.target !== undefined && props.intentScope !== undefined && intent.target !== props.intentScope) return
       composeIntentStore.consume(intent.id)
       seq.current += 1
       inflight.current?.abort()
@@ -156,7 +159,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
     }
     applyIntent()
     return composeIntentStore.subscribe(applyIntent)
-  }, [props.viewerRole])
+  }, [props.viewerRole, props.intentScope])
   // 纠正/建议由目标角色推导：人先说工作，类型不是选择题。
   const isSuggest = targetRole !== props.viewerRole
   const sources = props.sources

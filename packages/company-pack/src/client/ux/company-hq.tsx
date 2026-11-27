@@ -333,6 +333,7 @@ function HqCultivationWorkshop({
         ) : (
           <CultivationBoard
             language={lang}
+            intentScope="hq"
             viewerRole={viewerRole}
             viewerLabel={viewerRole === null ? null : roleText(viewerRole, 'label', t, roleLabel(viewerRole))}
             workspaceLabel={workspaceLabelOf(cwd)}

@@ -8,6 +8,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-chat/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-right/client'
 import { COMPANY_NS } from '../locales.ts'
 import type { HubSubViewStore } from '../tabs/hub-subview-store.ts'
+import { openOnSessionSurface, trackReturnToMain } from '../wiring/sidebar-right-guard.ts'
 import {
   COMPANY_TURN_TAIL_ID,
   CompanyTurnTailCard,
@@ -20,6 +21,7 @@ export interface WaveS4Deps {
 
 /** 挂载 Wave S4 回合级公司收口摘要。 */
 export function registerWaveS4Ux(ctx: ClientContext, deps: WaveS4Deps): void {
+  const returnToMain = trackReturnToMain(ctx)
   ctx.inject(['uiConversation', 'slots', 'sidebarRight'], (scoped) => {
     scoped.effect(
       () => scoped.uiConversation.events.register(companyTurnSummaryDefinition),
@@ -34,12 +36,16 @@ export function registerWaveS4Ux(ctx: ClientContext, deps: WaveS4Deps): void {
         locale: COMPANY_NS,
         inject: () => ({
           openOps: () => {
-            deps.hubStore.select('ops', 'board')
-            scoped.sidebarRight.openTab('company-ops')
+            openOnSessionSurface(scoped.sidebarRight, returnToMain, () => {
+              deps.hubStore.select('ops', 'board')
+              scoped.sidebarRight.openTab('company-ops')
+            })
           },
           openArchive: () => {
-            deps.hubStore.select('archive', 'deliverables')
-            scoped.sidebarRight.openTab('company-archive')
+            openOnSessionSurface(scoped.sidebarRight, returnToMain, () => {
+              deps.hubStore.select('archive', 'deliverables')
+              scoped.sidebarRight.openTab('company-archive')
+            })
           },
         }),
       }, CompanyTurnTailCard),

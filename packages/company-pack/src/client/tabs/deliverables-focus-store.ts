@@ -18,8 +18,8 @@ export interface DeliverablesFocusStore {
   subscribe(listener: () => void): () => void
 }
 
-const DELIVERABLE_TARGET_RE = /(?:^|[\\/])(?:\.dsh-company[\\/])?(?:deliverables|archive)[\\/]([^\\/]+)(?:[\\/]|$)/i
-const DELIVERABLE_REL_RE = /(?:^|\/)((?:\.dsh-company\/)?(?:deliverables|archive)\/.+)$/i
+const DELIVERABLE_TARGET_RE = /(?:^|[\\/])(?:\.dsh-company[\\/])?(?:deliverables-archive|deliverables|archive)[\\/]([^\\/]+)(?:[\\/]|$)/i
+const DELIVERABLE_REL_RE = /(?:^|\/)((?:\.dsh-company\/)?(?:deliverables-archive|deliverables|archive)\/.+)$/i
 
 /** 从交付终稿或目录路径提取动议目录/slug；非交付路径回落去首尾空白原串。 */
 export function extractDeliverableTarget(filePath?: string): string | null {

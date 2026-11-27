@@ -11,7 +11,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-chat/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar-documentpreview/client'
 import type { COMPANY_NS } from '../locales.ts'
 
-const DELIVERABLE_FINAL_RE = /(?:^|[\\/])\.dsh-company[\\/]deliverables[\\/][^\\/]+[\\/]final\.md$/i
+const DELIVERABLE_FINAL_RE = /(?:^|[\\/])\.dsh-company[\\/](?:deliverables|deliverables-archive)[\\/][^\\/]+[\\/]final\.md$/i
 
 /** 严格匹配公司正式交付终稿路径；普通工作区 Markdown 与草稿目录一律返回 false。 */
 export function isDeliverableFinalMarkdown(absolutePath: string | undefined): boolean {

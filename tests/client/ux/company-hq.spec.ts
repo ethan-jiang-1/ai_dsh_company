@@ -7,6 +7,7 @@
 // 负例留证 2026-11-27：HQ 台账与策略恢复传 `floatTab: noopFloat` 且 PanelFrame 忽略 floatTab 可选性 ⇒ BUG-391 用例红（HQ 内嵌卡片仍出现「浮出」死按钮）；还原后绿。BUG-391
 // 负例留证 2026-11-27：HqCultivationConversationSlot 传 `hero: true`、或去掉 HqCultivationWorkshop 的 `retryNonce`/`mainSessionId` 复位及 HQ 总览 `pageHistory` 合并 ⇒ BUG-393 用例红；还原后绿。BUG-393
 // 负例留证 2026-11-27：openCultivation 仅弹 toast 不入 composeIntentStore ⇒ HQ 培养表单不自动展开也无来源背景预填（BUG-398）；接通后绿。BUG-398
+// 负例留证 2026-11-27：CultivationCompose 缺少 intentScope 区分 HQ 与侧栏实例且 deliverables-archive 未归一 ⇒ 侧栏表单先消费并误吞 HQ 意图或归档路径拒收（BUG-399）；还原后绿。BUG-399
 import { act, createElement, type ComponentProps, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -27,6 +28,8 @@ import { registerWaveS1Ux } from '../../../packages/company-pack/src/client/ux/r
 import { createHubSubViewStore } from '../../../packages/company-pack/src/client/tabs/hub-subview-store.ts'
 import { createAttentionRegistry } from '../../../packages/company-pack/src/client/wiring/attention-registry.ts'
 import { CULTIVATION_COPY, setCultivationLanguage } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
+import { CultivationCompose } from '../../../packages/company-pack/src/client/cultivation/CultivationCompose.tsx'
+import { composeIntentStore } from '../../../packages/company-pack/src/client/cultivation/compose-intent-store.ts'
 import { decodeContextToken } from '../../../packages/company-pack/src/lib/cultivation/cultivation-context.ts'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
@@ -782,7 +785,93 @@ describe('Wave S3 CompanyHqPage & HqCultivationConversationSlot', () => {
     })
     expect(host.querySelector('.wk-cultivation-context-card')).toBeNull()
 
+    // BUG-399：deliverables-archive 终稿也可归一并提交
+    await act(async () => {
+      registeredCultivate?.({ filePath: '/ws/.dsh-company/deliverables-archive/2026-11-27-archived/final.md' })
+      await Promise.resolve()
+    })
+    expect(host.textContent).toContain('.dsh-company/deliverables-archive/2026-11-27-archived/final.md')
+
     act(() => { root.unmount() })
     host.remove()
+  })
+
+  it('BUG-399：双挂载 CultivationCompose 时 target=hq 只被 HQ 实例消费，不被侧栏抢占；openDeliverables 成功回调在异步切换后触发', async () => {
+    const sidebarHost = document.createElement('div')
+    const hqHost = document.createElement('div')
+    document.body.append(sidebarHost, hqHost)
+    const rSide = createRoot(sidebarHost)
+    const rHq = createRoot(hqHost)
+    const actions = { run: async () => ({ ok: true as const, text: 'ok' }) }
+
+    const stubSources = {
+      listSessions: () => ({ ok: true as const, value: [] }),
+      listDeliverables: async () => ({ ok: true as const, value: [] }),
+      readPreview: async () => ({ ok: true as const }),
+    }
+    await act(async () => {
+      rSide.render(createElement(CultivationCompose, { viewerRole: 'ceo', actions, intentScope: 'sidebar', sources: stubSources, currentSessionId: 's1' }))
+      rHq.render(createElement(CultivationCompose, { viewerRole: 'ceo', actions, intentScope: 'hq', sources: stubSources, currentSessionId: 's1' }))
+    })
+    await act(async () => {
+      composeIntentStore.publish({ filePath: '/ws/.dsh-company/deliverables-archive/2026-11-27-old/final.md', target: 'hq' })
+      await Promise.resolve()
+    })
+    expect(sidebarHost.querySelector('textarea')).toBeNull()
+    expect(hqHost.querySelector('textarea')).not.toBeNull()
+    expect(hqHost.textContent).toContain('.dsh-company/deliverables-archive/2026-11-27-old/final.md')
+
+    act(() => { rSide.unmount(); rHq.unmount() })
+    sidebarHost.remove()
+    hqHost.remove()
+
+    // openDeliverables 异步切换前不预判 toast.reviewOpened；mounted 就绪后才弹
+    let mounted: string | undefined = undefined
+    const listeners = new Set<() => void>()
+    const openTab = vi.fn()
+    const selectPanel = vi.fn(() => {
+      mounted = 's-ready'
+      for (const fn of listeners) fn()
+    })
+    let toastHook: ((sel: (v: unknown) => unknown) => unknown) | undefined
+    let openDeliv: ((p?: string) => void) | undefined
+    registerWaveS1Ux({
+      locale: { bind: () => makeT(zh) },
+      inject: (deps: readonly string[], fn: (scoped: unknown) => void) => {
+        if (deps.includes('layout')) { fn({ layout: { selectPanel } }); return }
+        fn({
+          slots: {
+            inject: (_n: string, reg: () => void) => { reg() },
+            register: (def: { name: string; inject?: () => Record<string, unknown> }) => {
+              if (def.name === 'shell.overlay') {
+                const inj = def.inject?.() as { hooks?: { toastState?: { getSnapshot(): unknown } } }
+                toastHook = sel => sel(inj.hooks?.toastState?.getSnapshot())
+              }
+              if (def.name === 'sidebar.right.tab.document.actions') {
+                openDeliv = def.inject?.().openDeliverables as typeof openDeliv
+              }
+              return () => {}
+            },
+          },
+          sidebarRight: {
+            mounted: { getSnapshot: () => mounted, subscribe: (cb: () => void) => { listeners.add(cb); return () => { listeners.delete(cb) } } },
+            openTab,
+          },
+          sessions: { binding: () => undefined },
+        })
+      },
+    } as never, { attention: createAttentionRegistry(), hubStore: createHubSubViewStore() })
+
+    // 1. 先测 openTab 抛错 ⇒ 不弹 reviewOpened 成功提示
+    openTab.mockImplementationOnce(() => { throw new Error('surface failed') })
+    openDeliv?.()
+    const errToast = toastHook?.(v => v) as { text?: string } | undefined
+    expect(errToast?.text).toBe('surface failed')
+
+    // 2. 再测成功切换 ⇒ 才弹 reviewOpened
+    mounted = undefined
+    openDeliv?.()
+    const okToast = toastHook?.(v => v) as { text?: string } | undefined
+    expect(okToast?.text).toBe(zh['toast.reviewOpened'])
   })
 })

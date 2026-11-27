@@ -34,6 +34,7 @@ import { roleLabel as defaultRoleLabel } from '../../lib/cultivation/cultivation
 import { CultivationAdopted, CultivationFeedback, CultivationJournal, CultivationMine } from './CultivationBoardSections.tsx'
 import type { CultivationContextSources } from './cultivation-context-data.ts'
 import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
+import type { ComposeIntentTarget } from './compose-intent-store.ts'
 
 /** 页签体注入面。 */
 
@@ -75,6 +76,8 @@ export interface CultivationBoardProps {
   readonly roleLabel?: (role: string) => string
   /** 显式界面语言（HQ / 侧栏 / 主视图统一透传，避免遗漏模块语言同步）。 */
   readonly language?: 'zh' | 'en' | undefined
+  /** 意图消费作用域（HQ 与侧栏页签隔离，BUG-399）。 */
+  readonly intentScope?: ComposeIntentTarget | undefined
 }
 
 /** 一条记录的操作行文案（待办给命令、已处理给回执）——**只在没有动作面时**当降级文案用。 */
@@ -127,6 +130,7 @@ export function CultivationBoard(props: CultivationBoardProps) {
           currentSessionId={props.currentSessionId}
           teammate={props.teammate}
           roleLabel={roleLabel}
+          intentScope={props.intentScope}
         />
       )}
 

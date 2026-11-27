@@ -4,14 +4,17 @@
  * `AssistantCultivateAction` / `DeliverableFinalDocActions` 跳转至 HQ 或培养板时写入上下文
  * （`messageId` / `filePath`），由 `CultivationCompose` 消费后自动展开表单并预填参考背景。
  */
+export type ComposeIntentTarget = 'hq' | 'sidebar'
+
 export interface ComposeIntent {
   readonly id: number
   readonly messageId?: string
   readonly filePath?: string
+  readonly target?: ComposeIntentTarget
 }
 
 export interface ComposeIntentStore {
-  publish(context?: { readonly messageId?: string; readonly filePath?: string }): ComposeIntent
+  publish(context?: { readonly messageId?: string; readonly filePath?: string; readonly target?: ComposeIntentTarget }): ComposeIntent
   get(): ComposeIntent | null
   consume(id: number): void
   subscribe(listener: () => void): () => void
@@ -32,6 +35,7 @@ export function createComposeIntentStore(): ComposeIntentStore {
         id: ++seq,
         ...(messageId === undefined || messageId === '' ? {} : { messageId }),
         ...(filePath === undefined || filePath === '' ? {} : { filePath }),
+        ...(context?.target === undefined ? {} : { target: context.target }),
       }
       current = next
       emit()

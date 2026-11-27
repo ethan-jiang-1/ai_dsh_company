@@ -16,19 +16,22 @@ export interface SidebarRightSurfaceLike {
 
 const SURFACE_WAIT_TIMEOUT_MS = 1_500
 
-/** 先切回会话主区并在 `sidebarRight.mounted` 就绪后执行动作；异常走 `onError` 而不抛未捕获报错。 */
+/** 先切回会话主区并在 `sidebarRight.mounted` 就绪后执行动作；异常走 `onError`，成功后才触发 `onSuccess`。 */
 export function openOnSessionSurface(
   sidebarRight: SidebarRightSurfaceLike,
   returnToMain: (() => void) | undefined,
   action: () => void,
   onError?: (error: unknown) => void,
+  onSuccess?: () => void,
 ): void {
   const run = (): void => {
     try {
       action()
     } catch (error) {
       onError?.(error)
+      return
     }
+    onSuccess?.()
   }
   const mounted = sidebarRight.mounted
   if (mounted === undefined || mounted.getSnapshot() !== undefined) {
@@ -61,4 +64,18 @@ export function openOnSessionSurface(
     return
   }
   timer = setTimeout(cleanup, SURFACE_WAIT_TIMEOUT_MS)
+}
+
+/** 可选挂载 `layout.selectPanel(null)` 回调，供跨表面导航切回会话主区；缺失 `layout` 时安全降级。 */
+export function trackReturnToMain(ctx: {
+  inject?(deps: readonly string[], callback: (scoped: unknown) => void): unknown
+}): () => void {
+  let selectNull: (() => void) | undefined
+  ctx.inject?.(['layout'], (scoped) => {
+    const layout = (scoped as { readonly layout?: { readonly selectPanel?: (panel: null) => void } } | undefined)?.layout
+    if (typeof layout?.selectPanel === 'function') {
+      selectNull = () => { layout.selectPanel!(null) }
+    }
+  })
+  return () => { selectNull?.() }
 }
