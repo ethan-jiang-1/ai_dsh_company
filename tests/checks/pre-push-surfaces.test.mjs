@@ -195,7 +195,9 @@ test('--exec-plan --dry-run：docs-only 走快速路径，代码/探针改动按
   assert.match(fullFallback.stdout, /vitest = full/, fullFallback.stdout)
 })
 
-test('--lanes-only --dry-run：收口命令精准列出命中面、--all 全量、自动嗅探未推送/单提交仓，且 unseen 仍 fail-closed', () => {
+// 负例留证 2026-11-27（BUG-407）：把 localSurfacePaths 改回退化 HEAD~1..HEAD → 单 commit 仓报 bad object 崩红、
+//   无 upstream 多提交分支漏掉父提交 client-load 红；把 --exec-plan 的 planVitestRun 拆回两次调用 → merged/full 断言红。
+test('--lanes-only --dry-run：收口命令精准列出命中面、--all 全量、自动嗅探未推送/单提交仓，且 unseen 仍 fail-closed（BUG-407）', () => {
   const all = spawnSync(process.execPath, [SCRIPT, '--lanes-only', '--all', '--dry-run'], { encoding: 'utf8' })
   assert.equal(all.status, 0, all.stdout + all.stderr)
   assert.match(all.stdout, /应跑 client-load、preset、replay/, all.stdout)

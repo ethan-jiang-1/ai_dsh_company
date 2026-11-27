@@ -4,7 +4,7 @@
 
 > **部分取代**：[2026-11-13-test-asset-loop](./2026-11-13-test-asset-loop.md) 与 [2026-11-27-prepush-fast-path-and-test-budget](./2026-11-27-prepush-fast-path-and-test-budget.md) 第 3 项中「`git push` 热路径阻塞执行 `client-load`/`preset`/`replay` 真入口面，且 `vitest related` 与 `targeted` 拆成两次独立冷启」由本决定取代。
 
-上游 = 用户 2026-11-27 针对真实 push 仍耗时 3m21s 要求换位反思并立案 [BUG-407](../../_backlog/bugs/BUG-407-prepush-serial-pipeline-duplicate-vitest-and-double-web-boot.md)，随后显式批准推荐的方案 1。
+上游 = 用户 2026-11-27 针对真实 push 仍耗时 3m21s 要求换位反思并立案 [BUG-407](../../_backlog/_archive/fixed_bugs/BUG-407-prepush-serial-pipeline-duplicate-vitest-and-double-web-boot.md)，随后显式批准推荐的方案 1。
 
 ## 决定
 

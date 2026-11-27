@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-407**（2026-11-27，P1 / infra & lanes）：`.githooks/pre-push` 职责归位为免浏览器/免 `DSH_HOME` 秒级安全网，将 `client-load`/`preset`/`replay` 解耦至开发收口 `pnpm smoke:surface`（`--lanes-only`）与发版门 `pnpm release --verify`（补齐 `replay-smoke`）；新增 `planVitestRun` 将 `vitest related` 与 `targeted` 收敛为最多一次调用（小改动合并去重、大改动单次全测封顶，消灭 84.8s 倒挂）；`security-scan` 改原生 blob SHA-1 + 6 路并发、`markdown-links` 扩缓存至 4096、`preset.entry.mjs` 并发建会话（10.8s→5.45s）——
+  [407](BUG-407-prepush-serial-pipeline-duplicate-vitest-and-double-web-boot.md)。证据提交 `a01238c1`。
+
 - **BUG-406**（2026-11-27，P1 / infra & tests）：Vitest 切换 `pool: 'threads'` 并设 `maxWorkers=clamp(floor(cpus/2),2,4)` 并发上限；`coverage-ratchet` 强制并发上限与同 `HEAD` 干净缓存复用并下沉至 `release:verify`/周跑 CI/手动；`.githooks/pre-push` 改为 `verify` 无条件 + `planPrePush` 按改动面精准路由，并在 `surface-coverage` 门禁补全集防漂移；系统根治 Top 6 慢 spec、慢门禁（`fix-evidence` 单次 `git log` 索引、消除双 `mdast` 解析）、增量 `tsc`、3 并发 `test:checks` 及 4 条浏览器车道/探针固定长 `sleep`——
   [406](BUG-406-regression-coverage-prepush-cpu-saturation-and-timeouts.md)。证据提交 `b76e9d37`。
 

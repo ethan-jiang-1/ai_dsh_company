@@ -8,11 +8,10 @@
 
 ## 活跃清单
 
-**活跃 1 张**：
+**活跃 0 张（BUG-407 已修 `a01238c1` 并迁入 `fixed_bugs/`）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
-| [407](BUG-407-prepush-serial-pipeline-duplicate-vitest-and-double-web-boot.md) | P1 | infra / checks / lanes | 多面 `git push` 仍耗时 3m21s：`vitest related` 与 `targeted` 双次冷启重跑（84.8s 倒挂全测 29.6s）、`client-load`/`preset` 双次冷启 Web（70s）、11 步全串行 | 修复已落地 |
 
 **按根因聚类摘要（供下轮修复排期）**：
 - **组 1 · 交互安全与宿主生命周期**（[392](../_archive/fixed_bugs/BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md)、[393](../_archive/fixed_bugs/BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md)、[396](../_archive/fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md) 快捷键部分）：容器级键盘未豁免可聚焦控件/`modal`/`terminal`，HQ 全局面板呼唤右栏漏切回会话，内嵌工坊未清理会话 Hero/Chrome；

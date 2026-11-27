@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 396 |
-| 有具名守卫 | 294 |
+| 已修卡 | 397 |
+| 有具名守卫 | 295 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 74.2% |
+| 覆盖率 | 74.3% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -417,3 +417,4 @@
 | 404 | 2026-11-27 | tests/client/cultivation/cultivation-board-actions.spec.ts:700；tests/client/ux/ambient-chrome.spec.ts:291；tests/client/wiring/attention-source.spec.ts:35 |
 | 405 | 2026-11-27 | tests/client/cultivation/cultivation-context.spec.ts:323；tests/client/cultivation/cultivation-copy.spec.ts:120；tests/host/cultivation/cultivation-command.spec.ts:535；tests/host/cultivation/cultivation-command.spec.ts:561；tests/host/cultivation/cultivation-context.spec.ts:198；tests/host/run-bundle/write-gate.spec.ts:105 |
 | 406 | 2026-11-27 | tests/checks/pre-push-surfaces.test.mjs:155 |
+| 407 | 2026-11-27 | tests/checks/pre-push-surfaces.test.mjs:200 |
