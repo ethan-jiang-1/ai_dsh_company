@@ -6,9 +6,9 @@ opened: 2026-11-27
 
 # BUG-396：键盘与无障碍穿透——`ContextPicker` 搜索框劫持方向键、全局快捷键穿透 Modal/终端、`CultivationView` 堆叠拖拽键失效
 
-> 严重级别：P1（键盘交互与无障碍失效：背景选择器搜索框按 `↓` 劫持光标且 `Esc` 不归还焦点；`Alt+Shift+1/2/3` 在原生弹窗或终端焦点下穿透切页；`CultivationView` 窄屏垂直堆叠态分割线无法用 `↑/↓` 与纵向拖拽调节）｜发现：2026-11-27｜状态：已修｜审查：待本批收口独立盲审
+> 严重级别：P1（键盘交互与无障碍失效：背景选择器搜索框按 `↓` 劫持光标且 `Esc` 不归还焦点；`Alt+Shift+1/2/3` 在原生弹窗或终端焦点下穿透切页；`CultivationView` 窄屏垂直堆叠态分割线无法用 `↑/↓` 与纵向拖拽调节）｜发现：2026-11-27｜状态：已修｜审查：2026-11-27 独立只读盲审复审通过（0 阻断；初审 3 项阻断已于 79a562d7 与批次 Note 修复）
 >
-> **留痕**：commit `28e0398d`（批次 392..398 顺位 3：Modal/终端快捷键守卫、`ContextPicker` 输入框键盘界限与焦点归还、`CultivationView` 堆叠纵拖与失焦清理）
+> **留痕**：commit `28e0398d`（批次 392..398 顺位 3：Modal/终端快捷键守卫、`ContextPicker` 输入框键盘界限与焦点归还、`CultivationView` 堆叠纵拖与失焦清理）；Note [2026-11-27-ux-ui-round2-batch-fixes.md](../../../notes/implemented/2026-11-27-ux-ui-round2-batch-fixes.md)
 
 ## 症状
 

@@ -6,9 +6,9 @@ opened: 2026-11-27
 
 # BUG-395：`DagPanel` 空图初挂后 `ResizeObserver` 失灵与全局 SVG marker 冲突，及 `DeliverablesView` 隐藏筛选器卡死空态
 
-> 严重级别：P1（功能与排版退化：`DagPanel` 在空态先挂载后再动态出现任务节点时，`ResizeObserver` 永不附着导致 SVG 缩放永远冻结在 `scale(1)` 无法自适应栏宽，多窗格同挂时箭头 `<marker>` ID 冲突；`DeliverablesView` 当前选中「台账外/未 present」筛选后数量归零时，筛选按钮消失却未回退至「全部」，画面永久卡死空态）｜发现：2026-11-27｜状态：已修｜审查：待本批收口独立盲审
+> 严重级别：P1（功能与排版退化：`DagPanel` 在空态先挂载后再动态出现任务节点时，`ResizeObserver` 永不附着导致 SVG 缩放永远冻结在 `scale(1)` 无法自适应栏宽，多窗格同挂时箭头 `<marker>` ID 冲突；`DeliverablesView` 当前选中「台账外/未 present」筛选后数量归零时，筛选按钮消失却未回退至「全部」，画面永久卡死空态）｜发现：2026-11-27｜状态：已修｜审查：2026-11-27 独立只读盲审复审通过（0 阻断；初审 3 项阻断已于 79a562d7 与批次 Note 修复）
 >
-> **留痕**：commit `e2337ab8`（批次 392..398 顺位 2：`DagPanel` 按 `hasNodes` 重挂 `ResizeObserver` + `useId()` 隔离 `<marker>`；`DeliverablesView` 归零筛选回正 `'all'`）
+> **留痕**：commit `e2337ab8`（批次 392..398 顺位 2：`DagPanel` 按 `hasNodes` 重挂 `ResizeObserver` + `useId()` 隔离 `<marker>`；`DeliverablesView` 归零筛选回正 `'all'`）；Note [2026-11-27-ux-ui-round2-batch-fixes.md](../../../notes/implemented/2026-11-27-ux-ui-round2-batch-fixes.md)
 
 ## 症状
 

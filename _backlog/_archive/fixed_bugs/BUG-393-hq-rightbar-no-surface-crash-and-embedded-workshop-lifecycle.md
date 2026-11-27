@@ -6,9 +6,9 @@ opened: 2026-11-27
 
 # BUG-393：全局总部打开态呼唤右栏直弹裸英文报错且内嵌培养工坊存在工作区阻断、死重试按钮与 `started` 跨会话粘连
 
-> 严重级别：P0（功能阻塞：在全局总部 HQ 内点击页脚「待办·看板」或培养背景「打开文件」直接在屏幕顶部弹出英文异常 `sidebarRight: no session surface is mounted`；启动内嵌培养工坊出现「选择工作区 / 选择一个工作区开始」阻断且失败重试按钮无效）｜发现：2026-11-27｜状态：已修｜审查：待本批收口独立盲审
+> 严重级别：P0（功能阻塞：在全局总部 HQ 内点击页脚「待办·看板」或培养背景「打开文件」直接在屏幕顶部弹出英文异常 `sidebarRight: no session surface is mounted`；启动内嵌培养工坊出现「选择工作区 / 选择一个工作区开始」阻断且失败重试按钮无效）｜发现：2026-11-27｜状态：已修｜审查：2026-11-27 独立只读盲审复审通过（0 阻断；初审 3 项阻断已于 79a562d7 与批次 Note 修复）
 >
-> **留痕**：commit `1d9368a1`（批次 392..398 顺位 1：统一 `openOnSessionSurface` 切回守卫、工坊 `retryNonce`/`mainSessionId` 复位与内嵌 Chrome 抑制、HQ 待办合并历史）
+> **留痕**：commit `1d9368a1`（批次 392..398 顺位 1：统一 `openOnSessionSurface` 切回守卫、工坊 `retryNonce`/`mainSessionId` 复位与内嵌 Chrome 抑制、HQ 待办合并历史）；Note [2026-11-27-ux-ui-round2-batch-fixes.md](../../../notes/implemented/2026-11-27-ux-ui-round2-batch-fixes.md)
 
 ## 症状
 

@@ -6,9 +6,9 @@ opened: 2026-11-27
 
 # BUG-392：`SignoffComposerCard` 焦点在拒绝按钮或详情折叠上按 Enter 误批双签且未守 `answerable` / 修饰键 / 输入法
 
-> 严重级别：P0（误批准红线审批的数据安全缺陷：用户在「拒绝 (Esc)」按钮或 `<details>` 详情折叠标题 `<summary>` 上聚焦后按 `Enter`，外层容器无条件拦截 `Enter` 并触发 `allowed-once` 批准放行）｜发现：2026-11-27｜状态：已修｜审查：待本批收口独立盲审
+> 严重级别：P0（误批准红线审批的数据安全缺陷：用户在「拒绝 (Esc)」按钮或 `<details>` 详情折叠标题 `<summary>` 上聚焦后按 `Enter`，外层容器无条件拦截 `Enter` 并触发 `allowed-once` 批准放行）｜发现：2026-11-27｜状态：已修｜审查：2026-11-27 独立只读盲审复审通过（0 阻断；初审 3 项阻断已于 79a562d7 与批次 Note 修复）
 >
-> **留痕**：commit `1d9368a1`（批次 392..398 顺位 1：`SignoffComposerCard` 键盘/IME/防重入/`answerable` 五道护栏）
+> **留痕**：commit `1d9368a1`（批次 392..398 顺位 1：`SignoffComposerCard` 键盘/IME/防重入/`answerable` 五道护栏）；Note [2026-11-27-ux-ui-round2-batch-fixes.md](../../../notes/implemented/2026-11-27-ux-ui-round2-batch-fixes.md)
 
 ## 症状
 

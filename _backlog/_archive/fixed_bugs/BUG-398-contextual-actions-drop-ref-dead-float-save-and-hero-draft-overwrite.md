@@ -6,9 +6,9 @@ opened: 2026-11-27
 
 # BUG-398：上下文动作丢参、浮窗位置写入空置、Hero 模板无保护覆盖草稿及提示条缺样式/样式重定义
 
-> 严重级别：P2（UX 完整性打折：右栏与消息快捷动作承诺「带入上下文 / 核对草稿 / 记住浮窗位置」，实际只做浅跳转或从未落盘；已有草稿误点模板无保护覆盖；`.wk-command-scope-hint` 在 `styles.ts` 无对应样式）｜发现：2026-11-27｜状态：已修｜审查：待本批收口独立盲审
+> 严重级别：P2（UX 完整性打折：右栏与消息快捷动作承诺「带入上下文 / 核对草稿 / 记住浮窗位置」，实际只做浅跳转或从未落盘；已有草稿误点模板无保护覆盖；`.wk-command-scope-hint` 在 `styles.ts` 无对应样式）｜发现：2026-11-27｜状态：已修｜审查：2026-11-27 独立只读盲审复审通过（0 阻断；初审 3 项阻断已于 79a562d7 与批次 Note 修复）
 >
-> **留痕**：commit `bec52daf`（批次 392..398 顺位 4：`composeIntentStore` 与 `deliverablesFocusStore` 贯通、移除 `panel.floatTitle` 虚假位置记忆承诺、Hero/Dock 保留非空草稿、补 `.wk-command-scope-hint` 并去重 `.wk-guide-entry`）
+> **留痕**：commit `bec52daf`（批次 392..398 顺位 4：`composeIntentStore` 与 `deliverablesFocusStore` 贯通、移除 `panel.floatTitle` 虚假位置记忆承诺、Hero/Dock 保留非空草稿、补 `.wk-command-scope-hint` 并去重 `.wk-guide-entry`）；Note [2026-11-27-ux-ui-round2-batch-fixes.md](../../../notes/implemented/2026-11-27-ux-ui-round2-batch-fixes.md)
 
 ## 症状
 

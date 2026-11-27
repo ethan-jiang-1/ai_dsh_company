@@ -6,9 +6,9 @@ opened: 2026-11-27
 
 # BUG-394：切工作区/切会话四重状态滞留——品牌词标、`useWorkspaceText`、策略加载 `AbortError` 吞并及局部错误残留
 
-> 严重级别：P1（跨工作区与会话串味：切到无 `company.md` 的工作区时品牌仍残留前盘名称；切换会话瞬间 `DeliverablesTab`/`LedgerTab` 保留前盘路径导致错误寻址；策略读中止被折算为损坏告警覆盖全局 store 并跨会话留存错误提示）｜发现：2026-11-27｜状态：已修｜审查：待本批收口独立盲审
+> 严重级别：P1（跨工作区与会话串味：切到无 `company.md` 的工作区时品牌仍残留前盘名称；切换会话瞬间 `DeliverablesTab`/`LedgerTab` 保留前盘路径导致错误寻址；策略读中止被折算为损坏告警覆盖全局 store 并跨会话留存错误提示）｜发现：2026-11-27｜状态：已修｜审查：2026-11-27 独立只读盲审复审通过（0 阻断；初审 3 项阻断已于 79a562d7 与批次 Note 修复）
 >
-> **留痕**：commit `e2337ab8`（批次 392..398 顺位 2：品牌回落、`useWorkspaceText` 切盘复位、`loadStartup` abort 守卫与 `StrategyPanel` 会话隔离）
+> **留痕**：commit `e2337ab8`（批次 392..398 顺位 2：品牌回落、`useWorkspaceText` 切盘复位、`loadStartup` abort 守卫与 `StrategyPanel` 会话隔离）；Note [2026-11-27-ux-ui-round2-batch-fixes.md](../../../notes/implemented/2026-11-27-ux-ui-round2-batch-fixes.md)
 
 ## 症状
 
