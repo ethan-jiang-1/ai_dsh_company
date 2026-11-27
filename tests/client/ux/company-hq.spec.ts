@@ -6,6 +6,7 @@
 // 负例留证 2026-11-27：去掉 HqCultivationWorkshop / CultivationBoard 的 `language` 同步 ⇒ BUG-385 用例红（en 界面仍渲染「我的分身」）；还原后绿。BUG-385
 // 负例留证 2026-11-27：HQ 台账与策略恢复传 `floatTab: noopFloat` 且 PanelFrame 忽略 floatTab 可选性 ⇒ BUG-391 用例红（HQ 内嵌卡片仍出现「浮出」死按钮）；还原后绿。BUG-391
 // 负例留证 2026-11-27：HqCultivationConversationSlot 传 `hero: true`、或去掉 HqCultivationWorkshop 的 `retryNonce`/`mainSessionId` 复位及 HQ 总览 `pageHistory` 合并 ⇒ BUG-393 用例红；还原后绿。BUG-393
+// 负例留证 2026-11-27：openCultivation 仅弹 toast 不入 composeIntentStore ⇒ HQ 培养表单不自动展开也无来源背景预填（BUG-398）；接通后绿。BUG-398
 import { act, createElement, type ComponentProps, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -22,6 +23,8 @@ import {
   type HqSection,
 } from '../../../packages/company-pack/src/client/ux/company-hq.tsx'
 import { registerWaveS3Ux } from '../../../packages/company-pack/src/client/ux/register-s3-ux.ts'
+import { registerWaveS1Ux } from '../../../packages/company-pack/src/client/ux/register-s1-ux.ts'
+import { createHubSubViewStore } from '../../../packages/company-pack/src/client/tabs/hub-subview-store.ts'
 import { createAttentionRegistry } from '../../../packages/company-pack/src/client/wiring/attention-registry.ts'
 import { setCultivationLanguage } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
 
@@ -673,6 +676,81 @@ describe('Wave S3 CompanyHqPage & HqCultivationConversationSlot', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
     })
     expect(host.textContent).toContain('History check')
+
+    act(() => { root.unmount() })
+    host.remove()
+  })
+
+  it('BUG-398：从 final.md 发起复盘培养后跳转 HQ 时自动展开 CultivationCompose 并预填交付背景', async () => {
+    const hqStore = createHqSectionStore()
+    const hubStore = createHubSubViewStore()
+    let registeredCultivate: ((ctx?: { messageId?: string; filePath?: string }) => void) | undefined
+    registerWaveS1Ux({
+      locale: { bind: () => makeT(zh) },
+      inject: (deps: readonly string[], fn: (scoped: unknown) => void) => {
+        if (deps.includes('layout')) { fn({ layout: { selectPanel: vi.fn() } }); return }
+        fn({
+          slots: {
+            inject: (_n: string, reg: () => void) => { reg() },
+            register: (def: { name: string; inject?: () => Record<string, unknown> }) => {
+              if (def.name === 'sidebar.right.tab.document.actions') {
+                registeredCultivate = def.inject?.().openCultivation as typeof registeredCultivate
+              }
+              return () => {}
+            },
+          },
+          sidebarRight: { mounted: { getSnapshot: () => 's1', subscribe: () => () => {} }, openTab: vi.fn() },
+          sessions: { binding: () => undefined },
+        })
+      },
+    } as never, {
+      attention: createAttentionRegistry(),
+      hubStore,
+      openHq: (section) => { if (section !== undefined) hqStore.select(section) },
+    })
+
+    registeredCultivate?.({ filePath: '/ws/.dsh-company/deliverables/2026-11-27-demo/final.md' })
+    expect(hqStore.store.getSnapshot()).toBe('cultivation')
+
+    const startupStore = createStartupStore()
+    const storeState = {
+      byId: { s1: { id: 's1' as SessionId, origin: 'human', cwd: '/ws', updatedAt: 100, displayTitle: 'Main', retainedBy: { mainView: 1 } } },
+      projectionsBySession: { s1: { values: { agentPreset: 'ceo' } } },
+    }
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    await act(async () => {
+      root.render(createElement(CompanyHqPage, {
+        t: makeT(zh),
+        useHqSection: (sel: (v: HqSection) => unknown) => sel(hqStore.store.getSnapshot()),
+        useAttentionItems: (sel: (v: readonly unknown[]) => unknown) => sel([]),
+        selectSection: (next: HqSection) => { hqStore.select(next) },
+        returnToChat: vi.fn(),
+        openSession: vi.fn(),
+        useSessions: (sel: (v: typeof storeState) => unknown) => sel(storeState),
+        useProjection: () => undefined,
+        sessions: { retain: vi.fn(), create: vi.fn() },
+        cultivationFiles: { listJournal: async () => [], readHead: async () => null, listRecords: async () => ({ ok: true as const, names: [] }), readRecord: async () => ({ ok: false as const, reason: 'unavailable' as const }) },
+        cultivationActions: () => ({ run: async () => ({ ok: true as const, text: 'ok' }) }),
+        followEvents: async function* () {},
+        readLedger: async () => ({ ok: true as const, text: '' }),
+        readCatalog: async () => ({ ok: true as const, text: '' }),
+        contextSources: () => ({ listSessions: () => ({ ok: true as const, value: [] }), listDeliverables: async () => ({ ok: true as const, value: [] }), readPreview: async () => ({ ok: true as const }) }),
+        openContext: async () => ({ ok: true as const }),
+        openFinal: vi.fn(),
+        startupStore,
+        loadStartup: async () => {},
+        saveStartup: async () => ({ ok: true as const }),
+        resetStartup: async () => ({ ok: true as const }),
+        SessionProvider: ({ children }: { children?: ReactNode }) => createElement('div', { 'data-session-provider': '1' }, children),
+        renderSlot: () => createElement('div', null),
+      } as unknown as ComponentProps<typeof CompanyHqPage>))
+      await Promise.resolve()
+    })
+
+    expect(host.querySelector('textarea')).not.toBeNull()
+    expect(host.textContent).toContain('2026-11-27-demo')
 
     act(() => { root.unmount() })
     host.remove()

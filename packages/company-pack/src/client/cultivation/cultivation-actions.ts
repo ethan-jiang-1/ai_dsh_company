@@ -29,9 +29,38 @@ export {
   setCultivationLanguage,
 } from './cultivation-copy.ts'
 
+export type DraftProblemCode =
+  | 'expectationEmpty'
+  | 'expectationSeparator'
+  | 'workEmpty'
+  | 'workTooLong'
+  | 'bodyEmpty'
+  | 'roleUnknown'
+  | 'roleSelf'
+  | 'reason'
+
 export interface DraftProblem {
   readonly field: 'expectation' | 'body' | 'reason' | 'role'
   readonly message: string
+  readonly code?: DraftProblemCode
+}
+
+const DRAFT_PROBLEM_KEYS: Readonly<Record<DraftProblemCode, keyof typeof CULTIVATION_COPY>> = {
+  expectationEmpty: 'problemExpectationEmpty',
+  expectationSeparator: 'problemExpectationSeparator',
+  workEmpty: 'problemWorkEmpty',
+  workTooLong: 'problemWorkTooLong',
+  bodyEmpty: 'problemBodyEmpty',
+  roleUnknown: 'problemRoleUnknown',
+  roleSelf: 'problemRoleSelf',
+  reason: 'problemReason',
+}
+
+/** 渲染期按当前培养语言解析校验错误，避免热切语言后滞留旧语文案（BUG-397）。 */
+export function resolveDraftProblem(problem: DraftProblem): string {
+  if (problem.code === undefined) return problem.message
+  const key = DRAFT_PROBLEM_KEYS[problem.code]
+  return String(CULTIVATION_COPY[key])
 }
 
 /** 线构造结果：可发或不可发（不可发必须带一句可读的原因）。 */
@@ -89,8 +118,8 @@ export type CultivationActionsFactory = (sessionId: SessionId) => CultivationAct
 /** 校验期望行为一句话（非空、不含 `::`）。 */
 function expectationProblem(expectation: string): DraftProblem | null {
   const one = expectation.trim()
-  if (one === '') return { field: 'expectation', message: CULTIVATION_COPY.problemExpectationEmpty }
-  if (one.includes('::')) return { field: 'expectation', message: CULTIVATION_COPY.problemExpectationSeparator }
+  if (one === '') return { field: 'expectation', message: CULTIVATION_COPY.problemExpectationEmpty, code: 'expectationEmpty' }
+  if (one.includes('::')) return { field: 'expectation', message: CULTIVATION_COPY.problemExpectationSeparator, code: 'expectationSeparator' }
   return null
 }
 
@@ -107,7 +136,7 @@ export function adoptLine(id: string): string {
 /** `reject <记录id> :: <理由>`：理由非空且压成一行。 */
 export function rejectLine(id: string, reason: string): DraftResult {
   const one = flattenReason(reason)
-  if (one === '') return { ok: false, problem: { field: 'reason', message: CULTIVATION_COPY.problemReason } }
+  if (one === '') return { ok: false, problem: { field: 'reason', message: CULTIVATION_COPY.problemReason, code: 'reason' } }
   return { ok: true, line: `/cultivation reject ${id} :: ${one}` }
 }
 
@@ -130,13 +159,13 @@ export function correctLine(expectation: string, body: string, contextToken?: st
   if (problem !== null) return { ok: false, problem }
   const workText = work?.trim() ?? ''
   if (work !== undefined && workText === '') {
-    return { ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemWorkEmpty } }
+    return { ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemWorkEmpty, code: 'workEmpty' } }
   }
   if (workText.length > WORK_TEXT_LIMIT) {
-    return { ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemWorkTooLong } }
+    return { ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemWorkTooLong, code: 'workTooLong' } }
   }
   if (body.trim() === '' && contextToken === undefined && workText === '') {
-    return { ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemBodyEmpty } }
+    return { ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemBodyEmpty, code: 'bodyEmpty' } }
   }
   const flags = [
     contextToken === undefined ? '' : `--context=${contextToken}`,
@@ -155,10 +184,10 @@ export function correctLine(expectation: string, body: string, contextToken?: st
  */
 export function suggestLine(targetRole: string, expectation: string, body: string, ownRole?: string, contextToken?: string, work?: string): DraftResult {
   if (!(CULTIVATION_ROLES as readonly string[]).includes(targetRole)) {
-    return { ok: false, problem: { field: 'role', message: CULTIVATION_COPY.problemRoleUnknown } }
+    return { ok: false, problem: { field: 'role', message: CULTIVATION_COPY.problemRoleUnknown, code: 'roleUnknown' } }
   }
   if (ownRole !== undefined && ownRole === targetRole) {
-    return { ok: false, problem: { field: 'role', message: CULTIVATION_COPY.problemRoleSelf } }
+    return { ok: false, problem: { field: 'role', message: CULTIVATION_COPY.problemRoleSelf, code: 'roleSelf' } }
   }
   const draft = correctLine(expectation, body, contextToken, work)
   if (!draft.ok) return draft

@@ -45,7 +45,7 @@ export function AssistantCultivateAction({ messageId, t, openCultivation }: Assi
 }
 
 export interface DeliverableDocActionsInjected {
-  readonly openDeliverables: () => void
+  readonly openDeliverables: (filePath?: string) => void
   readonly openCultivation: (context?: { readonly filePath?: string }) => void
 }
 
@@ -68,7 +68,7 @@ export function DeliverableFinalDocActions({
         size="sm"
         variant="outline"
         title={t('docAction.compareDraftsTooltip')}
-        onClick={openDeliverables}
+        onClick={() => openDeliverables(absolutePath)}
       >
         {t('docAction.compareDrafts')}
       </Button>

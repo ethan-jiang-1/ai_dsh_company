@@ -1,3 +1,4 @@
+// 负例留证 2026-11-27：formatGeneratedAt 无视中文语言硬编码 'UTC' ⇒ 中文界面头部仍印 'UTC'（BUG-397）；按 locale 格式化后绿。BUG-397
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
@@ -14,7 +15,7 @@ import {
 import { sessionFileAddress } from '../../../packages/company-pack/src/lib/deliverables/deliverables-address.ts'
 import { buildDeliverablesCatalog } from '../../../tools/lib/company/deliverables-catalog.mjs'
 import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
-import { en, type CompanyKey, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
+import { en, zh, type CompanyKey, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 
 /**
  * 成品目录的 keyless 层（2026-10-19 成品台账卡）：
@@ -72,9 +73,18 @@ describe('filterCatalog / formatGeneratedAt', () => {
     expect(filterCatalog(CATALOG.entries, 'all')).toHaveLength(3)
   })
 
-  it('生成时间显示为 UTC 分钟（不依赖浏览器时区）', () => {
-    expect(formatGeneratedAt('2026-10-19T15:14:50.242Z')).toBe('2026-10-19 15:14 UTC')
-    expect(formatGeneratedAt('not-a-date')).toBe('not-a-date')
+  it('生成时间按语言格式化为世界时/UTC 分钟（不依赖浏览器时区）', () => {
+    const tEn = ((key: CompanyKey, params?: Record<string, string | number>) => {
+      const tpl = en[key]
+      return params === undefined ? tpl : tpl.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+    }) as CompanyT
+    const tZh = ((key: CompanyKey, params?: Record<string, string | number>) => {
+      const tpl = zh[key]
+      return params === undefined ? tpl : tpl.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
+    }) as CompanyT
+    expect(formatGeneratedAt('2026-10-19T15:14:50.242Z', tZh)).toBe('2026-10-19 15:14（世界时）')
+    expect(formatGeneratedAt('2026-10-19T15:14:50.242Z', tEn)).toBe('2026-10-19 15:14 UTC')
+    expect(formatGeneratedAt('not-a-date', tZh)).toBe('not-a-date')
   })
 })
 

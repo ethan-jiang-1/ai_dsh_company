@@ -25,6 +25,7 @@ import { useWorkspaceText } from '../data/workspace-text.ts'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 import { joinList, listSeparator } from '../ui/list-separator.ts'
 import type { FloatRectLike } from '../ui/float-geometry.ts'
+import { deliverablesFocusStore } from './deliverables-focus-store.ts'
 import {
   filterCatalog,
   parseCatalog,
@@ -120,10 +121,10 @@ const defaultT = ((key: CompanyKey, params?: Record<string, string | number>) =>
   return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
 }) as CompanyT
 
-/** 生成时间 → 稳定、可读的 UTC 文案（不依赖浏览器时区，跨机器一致）。 */
-export function formatGeneratedAt(value: string): string {
+/** 生成时间 → 按当前语言格式化为稳定、可读的 UTC/世界时文案（不依赖浏览器时区）。 */
+export function formatGeneratedAt(value: string, t: CompanyT = defaultT): string {
   const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/.exec(value)
-  return match === null ? value : `${match[1]} ${match[2]} UTC`
+  return match === null ? value : t('deliverables.timeUtc', { date: match[1]!, time: match[2]! })
 }
 
 /** 目录视图（纯展示 + 本地筛选；数据读取在页签体内，便于 keyless 静态渲染）。 */
@@ -134,6 +135,21 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
   readonly t?: CompanyT
 }) {
   const [filter, setFilter] = useState<Filter>('all')
+  const [highlightedTarget, setHighlightedTarget] = useState<string | null>(() => {
+    const focus = deliverablesFocusStore.get()
+    return focus === null ? null : focus.target
+  })
+  useEffect(() => {
+    const applyFocus = (): void => {
+      const focus = deliverablesFocusStore.get()
+      if (focus === null) return
+      setHighlightedTarget(focus.target)
+      setFilter('all')
+      deliverablesFocusStore.consume(focus.id)
+    }
+    applyFocus()
+    return deliverablesFocusStore.subscribe(applyFocus)
+  }, [])
   const entries = catalog.entries
   const counts = useMemo(() => ({
     total: entries.length,
@@ -202,11 +218,15 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
               {groups.map(([month, rows]) => (
                 <div key={month} role="group" aria-label={t('deliverables.monthAria', { month })}>
                   <div className="wk-section-title">{t('deliverables.monthCount', { month, count: rows.length })}</div>
-                  {rows.map(entry => (
+                  {rows.map(entry => {
+                    const isHighlighted = highlightedTarget !== null
+                      && (entry.dir === highlightedTarget || entry.slug === highlightedTarget || entry.path === highlightedTarget)
+                    return (
                     <div
                       key={entry.path}
                       role="listitem"
                       className="wk-row wk-deliverable-row"
+                      data-highlighted={isHighlighted ? 'true' : undefined}
                       aria-label={rowAria(entry, t)}
                     >
                       <span className="wk-row-name">
@@ -231,7 +251,8 @@ export function DeliverablesView({ catalog, sessionId, openFinal, t = defaultT }
                         {t('deliverables.open')}
                       </Button>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
               ))}
             </div>
@@ -284,7 +305,7 @@ export function DeliverablesTab(props: DeliverablesTabProps) {
       title={props.t('deliverables.title')}
       tone="archive"
       tabProps={props satisfies PanelFrameProps}
-      refreshLabel={catalog === null ? props.t('deliverables.staticIndex') : props.t('deliverables.staticIndexGenerated', { time: formatGeneratedAt(catalog.generatedAt) })}
+      refreshLabel={catalog === null ? props.t('deliverables.staticIndex') : props.t('deliverables.staticIndexGenerated', { time: formatGeneratedAt(catalog.generatedAt, props.t) })}
       action={(
         <Button
           size="sm"

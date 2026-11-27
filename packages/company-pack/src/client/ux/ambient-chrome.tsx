@@ -98,7 +98,8 @@ export type HeroMotionOptionsProps =
   & InjectFace<DraftNotifyInjected>
 
 /** 新会话 Hero 态的 3 个高频动议模板速启胶囊。 */
-export function HeroMotionOptions({ sessionId, inputActions, notifyDraft, t }: HeroMotionOptionsProps): ReactNode {
+export function HeroMotionOptions({ sessionId, useInput, inputActions, notifyDraft, t }: HeroMotionOptionsProps): ReactNode {
+  const currentDraft = typeof useInput === 'function' ? useInput(s => s.draft) : ''
   if (isEmbeddedWorkshopSession(sessionId)) return null
   return (
     <div className="wk-hero-options" data-company-hero-options="">
@@ -108,7 +109,9 @@ export function HeroMotionOptions({ sessionId, inputActions, notifyDraft, t }: H
           key={item.id}
           onClick={() => {
             const label = t(item.labelKey)
-            inputActions.setDraft(t(item.promptKey))
+            const prompt = t(item.promptKey)
+            const next = currentDraft.trim() === '' ? prompt : `${currentDraft.trimEnd()}\n\n${prompt}`
+            inputActions.setDraft(next)
             notifyDraft(label)
           }}
         >
@@ -135,6 +138,7 @@ function readCompanyRole(raw: unknown): RoleId | null {
 /** 输入框上方「动议指挥带」：仅对公司角色会话显示快速命令与看板入口。 */
 export function MotionCommandDock({
   sessionId,
+  useInput,
   inputActions,
   useSessions,
   useAttentionItems,
@@ -143,12 +147,15 @@ export function MotionCommandDock({
   t,
 }: MotionCommandDockProps): ReactNode {
   const presetRaw = useSessions(s => s.projectionsBySession[sessionId]?.values.agentPreset)
+  const currentDraft = typeof useInput === 'function' ? useInput(s => s.draft) : ''
   const roleId = readCompanyRole(presetRaw)
   const pendingCount = useAttentionItems((items: readonly LivePending[]) => items.length)
   if (isEmbeddedWorkshopSession(sessionId) || roleId === null) return null
 
   const draftCommand = (cmd: string): void => {
-    inputActions.setDraft(cmd)
+    const trimmed = currentDraft.trimStart()
+    const next = trimmed === '' || trimmed.startsWith(cmd.trim()) ? cmd : `${cmd}${trimmed}`
+    inputActions.setDraft(next)
     onDraftCommand(cmd)
   }
 

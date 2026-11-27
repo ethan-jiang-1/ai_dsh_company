@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 // 负例留证 2026-11-27：DeliverablesView 直接使用未回正的 filter state ⇒ 台账外/未 present 归零隐藏按钮后画面卡死在空态（BUG-395）；还原后绿。BUG-395
+// 负例留证 2026-11-27：DeliverablesView 未订阅 deliverablesFocusStore ⇒ 从 final.md 点核对草稿跳转成品面板时无对应动议高亮且隐藏筛选不复位（BUG-398）；还原后绿。BUG-398
 /**
  * 成品页签的**错误态渲染判据**：真挂 `DeliverablesTab`，喂三种读取结果，
  * 断言面板说的那句话对得上状态——尤其「截断」不能报成「形状不符」。
@@ -11,6 +12,7 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
 import { DeliverablesTab, DeliverablesView } from '../../../packages/company-pack/src/client/tabs/DeliverablesTab.tsx'
+import { deliverablesFocusStore } from '../../../packages/company-pack/src/client/tabs/deliverables-focus-store.ts'
 import { zh, type CompanyT } from '../../../packages/company-pack/src/client/locales.ts'
 import { RUN_BUNDLE_PATHS } from '../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts'
 
@@ -113,5 +115,37 @@ describe('DeliverablesTab：截断 ≠ 形状不符', () => {
     expect([...host.querySelectorAll('button')].find(b => b.textContent?.includes(zh['deliverables.filter.unledgered']))).toBeUndefined()
     expect(host.textContent).toContain('item-1')
     expect(host.textContent).not.toContain(zh['deliverables.emptyFilter'])
+  })
+
+  it('BUG-398：deliverablesFocusStore 发布路径后重置筛选并高亮匹配成品行', async () => {
+    deliverablesFocusStore.publish('/ws/.dsh-company/deliverables/2026-11-27-item-1/final.md')
+    const catalog = {
+      schema: 1 as const,
+      generatedAt: '2026-11-27T00:00:00Z',
+      skipped: 0,
+      entries: [{
+        slug: 'item-1',
+        kickoff: '2026-11-27',
+        type: 'production',
+        result: 'completed',
+        summary: 'done summary',
+        root: RUN_BUNDLE_PATHS.deliverables,
+        dir: '2026-11-27-item-1',
+        path: `${RUN_BUNDLE_PATHS.deliverables}/2026-11-27-item-1/final.md`,
+        ledgered: true,
+        presented: true,
+        metaProblem: null,
+      }],
+    }
+    const host = await mount(createElement(DeliverablesView, {
+      catalog,
+      sessionId: 'session-1' as never,
+      openFinal: () => {},
+      t,
+    }))
+    const row = host.querySelector('.wk-deliverable-row[data-highlighted="true"]')
+    expect(row).not.toBeNull()
+    expect(row?.textContent).toContain('item-1')
+    expect(deliverablesFocusStore.get()).toBeNull()
   })
 })

@@ -20,6 +20,7 @@ import {
   renderThrown,
   type ActionOutcome,
   type CultivationActions,
+  type DraftProblem,
 } from './cultivation-actions.ts'
 import type { CultivationContext } from '../../lib/cultivation/cultivation-context.ts'
 
@@ -75,7 +76,7 @@ export function useCultivationBoard(props: CultivationBoardStateProps) {
     if (!result.ok) setContextOutcomes(previous => ({ ...previous, [recordId]: result.problem }))
   }
   const [reason, setReason] = useState('')
-  const [reasonProblem, setReasonProblem] = useState<string | null>(null)
+  const [reasonProblem, setReasonProblem] = useState<DraftProblem | null>(null)
   /** 正在确认撤回的方法 slug（两步：先讲后果再确认）。 */
   const [revokingSlug, setRevokingSlug] = useState<string | null>(null)
   /** 刚创作提交、待高亮的记录 id。 */
@@ -146,7 +147,7 @@ export function useCultivationBoard(props: CultivationBoardStateProps) {
   const confirmReject = async (id: string): Promise<void> => {
     const draft = rejectLine(id, reason)
     if (!draft.ok) {
-      setReasonProblem(draft.problem.message)
+      setReasonProblem(draft.problem)
       return
     }
     await run(id, draft.line, () => { setRejectingId(null); setReason('') })

@@ -4,9 +4,11 @@
  * 浮窗收回/拖拽/几何由 DSH `<DockLayout>` 原生标题栏持有；`PanelFrame` 负责「浮出」动作与保存几何钳制。
  */
 // 负例留证 2026-11-27：PanelFrame 对缺省 floatTab 仍渲染「浮出」按钮 ⇒ BUG-391 用例红；条件隐藏后绿。BUG-391
+// 负例留证 2026-11-27：locales panel.floatTitle 保留未实现的「下次浮出回到上次位置」承诺（BUG-398）；对齐诚实提示后绿。BUG-398
 import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { en, zh } from '../../../packages/company-pack/src/client/locales.ts'
 import { PanelFrame, type PanelFrameProps } from '../../../packages/company-pack/src/client/tabs/company-tabs.tsx'
 import { storageKey } from '../../../packages/company-pack/src/client/ui/float-geometry.ts'
 
@@ -92,5 +94,10 @@ describe('PanelFrame 浮出接线（真实 SidebarRightTabInfo 契约）', () =>
     }))
     const floatBtn = [...root.querySelectorAll('button')].find(node => node.textContent?.includes('浮出'))
     expect(floatBtn).toBeUndefined()
+  })
+
+  it('BUG-398：panel.floatTitle 移除未实现的位置记忆虚假承诺', () => {
+    expect(zh['panel.floatTitle']).not.toContain('回到上次位置')
+    expect(en['panel.floatTitle']).not.toContain('returns to its last position')
   })
 })

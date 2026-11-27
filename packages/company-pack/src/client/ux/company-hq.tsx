@@ -423,15 +423,19 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
   }
   const [historyItems, setHistoryItems] = useState<readonly AttentionItem[]>([])
   const primaryId = primarySession?.id
-  const historyScanIds = useMemo(() => {
-    if (primaryId === undefined) return ''
+  const historyScan = useMemo(() => {
+    if (primaryId === undefined) return { key: '', total: 0, capped: 0 }
     const candidates = historyCandidates(byId as unknown as Readonly<Record<string, CandidateSession>>, String(primaryId), 20)
     const ids = candidates.ok ? [String(primaryId), ...candidates.ids] : [String(primaryId)]
-    return [...new Set(ids)].join('\n')
+    return {
+      key: [...new Set(ids)].join('\n'),
+      total: candidates.ok ? candidates.total : 0,
+      capped: candidates.ok ? candidates.capped : 0,
+    }
   }, [byId, primaryId])
 
   useEffect(() => {
-    const ids = historyScanIds === '' ? [] : historyScanIds.split('\n')
+    const ids = historyScan.key === '' ? [] : historyScan.key.split('\n')
     if (ids.length === 0 || pageHistory === undefined) {
       setHistoryItems([])
       return
@@ -443,7 +447,7 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
       })
       .catch(() => { /* fallback to live pending items */ })
     return () => { controller.abort() }
-  }, [historyScanIds, pageHistory])
+  }, [historyScan.key, pageHistory])
 
   const pendingItems = useMemo(
     () => mergeAttention(livePendingItems, historyItems).filter(item => item.kind !== 'completion'),
@@ -513,6 +517,9 @@ export function CompanyHqPage(props: CompanyHqPageProps): ReactNode {
 
             <section className="wk-hq-card">
               <div className="wk-hq-card-title">{t('hq.pendingHeading')}</div>
+              {historyScan.capped > 0 && historyScan.total > 0 && (
+                <div className="wk-meta">{t('attention.candidatesCapped', { count: historyScan.capped })}</div>
+              )}
               {pendingItems.length === 0 ? (
                 <div className="wk-hq-empty">{t('hq.pendingEmpty')}</div>
               ) : (

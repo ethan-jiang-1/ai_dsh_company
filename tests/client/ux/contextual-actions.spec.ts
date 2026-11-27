@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 // 负例留证 2026-11-27：去掉 safeOpenTab 的 layout.selectPanel(null) + mounted 等待守卫 ⇒ HQ 态点页脚待办直接抛 sidebarRight: no session surface is mounted（BUG-393）；还原后绿。BUG-393
+// 负例留证 2026-11-27：DeliverableFinalDocActions 核对草稿按钮未向 openDeliverables 传 filePath ⇒ 成品面板无法定位动议（BUG-398）；还原后绿。BUG-398
 /** Wave S1：deliverables final.md 上下文动作与消息级纠偏按钮。 */
 import { act, createElement, type ComponentProps, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
@@ -75,6 +76,7 @@ describe('DeliverableFinalDocActions & AssistantCultivateAction', () => {
     const buttons = [...container.querySelectorAll('button')]
     act(() => { buttons.find(b => b.textContent === en['docAction.compareDrafts'])!.click() })
     expect(openDeliverables).toHaveBeenCalledOnce()
+    expect(openDeliverables).toHaveBeenCalledWith('/ws/.dsh-company/deliverables/demo/final.md')
     act(() => { buttons.find(b => b.textContent === en['docAction.startCultivation'])!.click() })
     expect(openCultivation).toHaveBeenCalledWith({ filePath: '/ws/.dsh-company/deliverables/demo/final.md' })
   })

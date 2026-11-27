@@ -5,7 +5,7 @@
 import { joinList } from '../ui/list-separator.ts'
 import { Button, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import { isInSessionSource, roleLabel as defaultRoleLabel, type CultivationRecord } from '../../lib/cultivation/cultivation.ts'
-import { CULTIVATION_COPY, cultivationListSeparator, formatCultivationReadReason, adoptLine } from './cultivation-actions.ts'
+import { CULTIVATION_COPY, cultivationListSeparator, formatCultivationReadReason, adoptLine, resolveDraftProblem } from './cultivation-actions.ts'
 import { BODY_PREVIEW_LINES, type CultivationBoardState } from './use-cultivation-board.tsx'
 
 function recordKindLabel(record: CultivationRecord, roleLabel: (role: string) => string): string {
@@ -115,7 +115,7 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
                               <strong>{background.title}</strong>
                               <span className="wk-meta">
                                 {[
-                                  background.role === undefined ? '' : background.role,
+                                  background.role === undefined ? '' : roleLabel(background.role),
                                   background.subtitle === undefined ? '' : background.subtitle,
                                   background.turn === undefined ? '' : CULTIVATION_COPY.inboxTurn(background.turn),
                                 ].filter(part => part !== '').join(' · ')}
@@ -221,7 +221,9 @@ export function CultivationInbox({ board, roleLabel = defaultRoleLabel }: { read
                             {CULTIVATION_COPY.rejectConfirm}
                           </Button>
                           <Button onClick={() => { setRejectingId(null); setReasonProblem(null) }}>{CULTIVATION_COPY.cancel}</Button>
-                          {reasonProblem !== null && <div className="wk-meta wk-cultivation-problem">{reasonProblem}</div>}
+                          {reasonProblem !== null && (
+                            <div className="wk-meta wk-cultivation-problem">{resolveDraftProblem(reasonProblem)}</div>
+                          )}
                         </div>
                       )}
                       {outcome !== undefined && (

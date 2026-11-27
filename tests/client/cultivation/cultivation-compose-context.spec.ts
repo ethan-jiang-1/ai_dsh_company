@@ -1,4 +1,5 @@
 // 负例留证 2026-11-27：去掉 CultivationCompose 触发 ref 恢复焦点 ⇒ 背景选择器按 Escape 取消后焦点跌回 document.body（BUG-396）；还原后绿。BUG-396
+// 负例留证 2026-11-27：CultivationCompose / CultivationInbox 直接存翻译字符串与裸 role ⇒ 热切 en 滞留中文且背景卡露裸 vp_eng（BUG-397）；还原后绿。BUG-397
 // @vitest-environment happy-dom
 /**
  * 创作面可选背景的 keyless 交互判据（D1=A / D2=A）：
@@ -254,5 +255,68 @@ describe('跨会话/视角切换的表单隔离（BUG-350）', () => {
     await flush()
     const restoredBtn = button(container, CULTIVATION_COPY.contextChange)
     expect(document.activeElement).toBe(restoredBtn)
+  })
+
+  it('BUG-397：创作校验报错在热切 en 后即时重译且背景角色经过 roleLabel 映射', async () => {
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    const sourcesWithEng = stubSources({
+      listSessions: () => ({
+        ok: true,
+        value: [{
+          ...currentRow,
+          ref: { kind: 'session', ref: 'session-1', label: '工程复盘', role: 'vp_eng' },
+          title: '工程复盘',
+          role: 'vp_eng',
+        }],
+      }),
+    })
+    const base = {
+      language: 'zh' as const,
+      viewerRole: 'ceo',
+      viewerLabel: 'CEO',
+      roleLabel: (r: string) => (r === 'vp_eng' ? 'VP-Eng' : r.toUpperCase()),
+      journalRows: [],
+      records: [{
+        id: 'r-eng',
+        kind: 'suggestion' as const,
+        targetRole: 'ceo',
+        proposerRole: 'vp_eng',
+        proposerKind: 'agent' as const,
+        source: 'session-1',
+        expectation: 'Check interfaces',
+        status: 'open' as const,
+        title: 'Title',
+        body: 'Body',
+        contexts: [{
+          kind: 'session' as const,
+          ref: 'session-1',
+          title: '工程复盘',
+          role: 'vp_eng',
+          excerpt: 'excerpt text',
+        }],
+      }],
+      feedback: null,
+      feedbackReachable: false,
+      actions: stubActions().actions,
+      contextSources: sourcesWithEng,
+      currentSessionId: 'session-1',
+    }
+    act(() => { root.render(createElement(CultivationBoard, base)) })
+    mounted.push({ root, container })
+
+    const contextCard = container.querySelector('.wk-cultivation-context-card')
+    expect(contextCard?.textContent).toContain('VP-Eng')
+    expect(contextCard?.textContent).not.toContain('vp_eng')
+
+    await openCorrection(container)
+    await flush()
+    await click(button(container, CULTIVATION_COPY.submit))
+    expect(container.textContent).toContain('先写一句「期望它怎么做」。')
+
+    act(() => { root.render(createElement(CultivationBoard, { ...base, language: 'en' as const })) })
+    expect(container.textContent).toContain('Write one sentence: what should it do.')
+    expect(container.textContent).not.toContain('先写一句「期望它怎么做」。')
   })
 })

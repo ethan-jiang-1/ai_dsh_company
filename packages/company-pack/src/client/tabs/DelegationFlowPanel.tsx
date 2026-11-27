@@ -10,6 +10,7 @@
  */
 import { StateDot, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { DelegationNode, DelegationTree } from '../../lib/delegation/delegation-tree.ts'
+import { roleText } from '../roles.ts'
 import { StateNote } from './company-panels.tsx'
 import { zh, type CompanyKey, type CompanyT } from '../locales.ts'
 
@@ -17,6 +18,17 @@ const defaultT = ((key: CompanyKey, params?: Record<string, string | number>) =>
   const template = zh[key]
   return params === undefined ? template : template.replace(/\{(\w+)\}/g, (_m, name: string) => String(params[name] ?? ''))
 }) as CompanyT
+
+function presetLabel(preset: string, t: CompanyT): string {
+  return preset === 'subagent' ? t('delegation.preset.subagent') : roleText(preset, 'label', t, preset)
+}
+
+function modeLabel(mode: string, t: CompanyT): string {
+  if (mode === 'subagent') return t('delegation.preset.subagent')
+  if (mode === 'continuable') return t('delegation.mode.continuable')
+  if (mode === 'one-shot') return t('delegation.mode.oneShot')
+  return mode
+}
 
 function stateOf(node: DelegationNode): 'ongoing' | 'idle' | 'warning' {
   if (node.missing || node.status === 'unknown') return 'warning'
@@ -56,8 +68,8 @@ export function DelegationFlowPanel({ tree, t = defaultT }: { readonly tree: Del
             ))}
             <StateDot state={stateOf(node)} />
             <span className="wk-delegation-flow-label">{node.label}</span>
-            {node.preset !== null && <Tag tone="info">{node.preset}</Tag>}
-            {node.mode !== null && <Tag tone="outline">{node.mode}</Tag>}
+            {node.preset !== null && <Tag tone="info">{presetLabel(node.preset, t)}</Tag>}
+            {node.mode !== null && <Tag tone="outline">{modeLabel(node.mode, t)}</Tag>}
             <span className="wk-delegation-flow-depth">d{node.depth}</span>
             {node.terminal === 'completed' && <Tag tone="success">{t('delegationFlow.terminal.completed')}</Tag>}
             {node.terminal === 'failed' && <Tag tone="warning">{t('delegationFlow.terminal.failed')}</Tag>}

@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 // 负例留证 2026-11-27：MotionCommandDock / HeroMotionOptions 去掉 isEmbeddedWorkshopSession 抑制 ⇒ HQ 内嵌培养工坊渲染顶层动议指挥带与 Hero 胶囊（BUG-393）；还原后绿。BUG-393
+// 负例留证 2026-11-27：HeroMotionOptions / MotionCommandDock 无条件 inputActions.setDraft 覆盖已有草稿 ⇒ 未发用户输入被静默抹掉（BUG-398）；先读 useInput draft 保留非空用户输入后绿。BUG-398
 /** Wave S1：全局 Toast、页头/侧栏角标、Hero 速启、动议指挥带与脚手栏组件测试。 */
 import { act, createElement, Fragment, type ComponentProps, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
@@ -220,5 +221,47 @@ describe('Header / Footer / Hero / MotionDock / ComposerDock', () => {
     } finally {
       releaseWorkshop()
     }
+  })
+
+  it('BUG-398：输入框已有未发送草稿时，点 Hero 模板或动议指挥带指令保留原草稿不静默覆盖', () => {
+    const setDraft = vi.fn()
+    const notifyDraft = vi.fn()
+    const onDraftCommand = vi.fn()
+    const openTab = vi.fn()
+    const obs = asAttentionObservable(createAttentionRegistry())
+    const useInputStub = <S,>(sel: (s: { draft: string }) => S): S => sel({ draft: 'MY UNSENT USER DRAFT' })
+    const useSessionsCompany = <S,>(sel: (v: { projectionsBySession: Record<string, { values: Record<string, unknown> }> }) => S) =>
+      sel({ projectionsBySession: { s1: { values: { agentPreset: 'ceo' } } } })
+
+    const { container } = mountDom(createElement(
+      Fragment,
+      null,
+      createElement(HeroMotionOptions, {
+        sessionId: 's1',
+        useInput: useInputStub,
+        inputActions: { setDraft },
+        notifyDraft,
+        t: makeT(en),
+      } as unknown as ComponentProps<typeof HeroMotionOptions>),
+      createElement(MotionCommandDock, {
+        sessionId: 's1',
+        session: { id: 's1' },
+        input: {},
+        useInput: useInputStub,
+        inputActions: { setDraft },
+        useSessions: useSessionsCompany,
+        useAttentionItems: useHookFrom(obs),
+        openTab,
+        onDraftCommand,
+        t: makeT(zh),
+      } as unknown as ComponentProps<typeof MotionCommandDock>),
+    ))
+
+    const buttons = [...container.querySelectorAll('button')]
+    act(() => { buttons.find(b => b.textContent === en['hero.template.prd'])!.click() })
+    expect(setDraft).toHaveBeenLastCalledWith(`MY UNSENT USER DRAFT\n\n${en['hero.template.prdPrompt']}`)
+
+    act(() => { buttons.find(b => b.textContent === zh['dock.action.prd'])!.click() })
+    expect(setDraft).toHaveBeenLastCalledWith('/prd check MY UNSENT USER DRAFT')
   })
 })

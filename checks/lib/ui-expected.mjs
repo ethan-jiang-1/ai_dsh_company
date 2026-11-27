@@ -12,7 +12,7 @@
 export function normalizeText(text) {
   return String(text ?? '')
     .replace(/\u200b/g, '')
-    .replace(/\d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC/g, '<UTC>')
+    .replace(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}(?: UTC|（世界时）)/g, '<UTC>')
     .replace(/\s+/g, ' ')
     .trim()
 }

@@ -11,6 +11,8 @@
  * - 纯函数，不读盘、不依赖 React；unit test 直接喂快照。
  */
 
+import { shortSessionId } from '../shared/text.ts'
+
 /** `byId` 里本模块用到的 session 摘要（结构型，只依赖 wire 形状）。 */
 export interface DelegationSessionSummaryLike {
   readonly parentId?: string
@@ -63,7 +65,7 @@ const labelOf = (id: string, summary: DelegationSessionSummaryLike | undefined, 
   if (display !== undefined && display !== '') return display
   const catalog = entry?.label?.trim()
   if (catalog !== undefined && catalog !== '') return catalog
-  return id.slice(0, 8)
+  return shortSessionId(id)
 }
 
 /**

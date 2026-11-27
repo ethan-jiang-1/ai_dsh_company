@@ -105,7 +105,7 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
   const [verifyingId, setVerifyingId] = useState<string | null>(null)
   const [verificationOutcome, setVerificationOutcome] = useState<'pass' | 'fail'>('pass')
   const [verificationEvidence, setVerificationEvidence] = useState('')
-  const [verificationProblem, setVerificationProblem] = useState<string | null>(null)
+  const [verificationProblem, setVerificationProblem] = useState<'required' | null>(null)
   const [expandedEvidence, setExpandedEvidence] = useState<Readonly<Record<string, boolean>>>({})
   const startVerification = (recordId: string, outcome: 'pass' | 'fail'): void => {
     setVerifyingId(recordId)
@@ -116,7 +116,7 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
   const confirmVerification = (recordId: string): void => {
     const evidence = verificationEvidence.trim()
     if (evidence === '') {
-      setVerificationProblem(CULTIVATION_COPY.verificationEvidenceRequired)
+      setVerificationProblem('required')
       return
     }
     void run(recordId, verifyLine(recordId, verificationOutcome, evidence), () => {
@@ -222,7 +222,9 @@ export function CultivationAdopted({ board, records, roleLabel = defaultRoleLabe
                                 />
                               </label>
                               <span className="wk-meta">{CULTIVATION_COPY.verificationEvidenceHint}</span>
-                              {verificationProblem !== null && <span className="wk-meta wk-cultivation-problem">{verificationProblem}</span>}
+                              {verificationProblem !== null && (
+                                <span className="wk-meta wk-cultivation-problem">{CULTIVATION_COPY.verificationEvidenceRequired}</span>
+                              )}
                               <div className="wk-cultivation-actions">
                                 <Button variant="primary" disabled={pendingIds.has(record.id)} onClick={() => { confirmVerification(record.id) }}>
                                   {verificationOutcome === 'pass' ? CULTIVATION_COPY.verifyPassConfirm : CULTIVATION_COPY.verifyFailConfirm}

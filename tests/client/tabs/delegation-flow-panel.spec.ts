@@ -1,3 +1,4 @@
+// 负例留证 2026-11-27：DelegationFlowPanel 直接渲染裸 preset/mode 且 delegation-tree labelOf 未剥离 session- 前缀 ⇒ 中文列表印出 ceo/subagent/continuable 与 session-xxx（BUG-397）；还原后绿。BUG-397
 /** DelegationFlowPanel 静态渲染：只读树 → 流程列表；缺数据不伪造终态。 */
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -28,7 +29,7 @@ describe('DelegationFlowPanel', () => {
     expect(html).toContain('worker-1')
     expect(html).toContain('worker-2')
     expect(html).toContain('>worker<')
-    expect(html).toContain('>subagent<')
+    expect(html).toContain('>子代理<')
     expect(html).toContain('d1')
     expect(html).toContain('data-company-delegation="flow"')
     expect(html.match(/wk-delegation-flow-branch/g)?.length).toBe(2)
@@ -62,6 +63,42 @@ describe('DelegationFlowPanel 的缺失标签（BUG-337）', () => {
     expect(zhHtml).toContain('缺失')
     const enHtml = renderToStaticMarkup(createElement(DelegationFlowPanel, { tree: missingTree, t: tEn }))
     expect(enHtml).toContain('>missing<')
+    expect(enHtml).toContain('>One-shot<')
+    assertEnglishUiClean(enHtml)
+  })
+
+  it('BUG-397：DelegationFlowPanel 本地化 ceo/subagent 与 continuable/one-shot，labelOf 剥离 session- 前缀', () => {
+    const richTree = buildDelegationTree({
+      byId: {
+        'session-root01': {
+          running: true,
+          projectionValues: {
+            agentPreset: 'ceo',
+            subagentCatalog: [{ id: 'session-ff123456', mode: 'continuable' }],
+          },
+        },
+        'session-ff123456': {
+          parentId: 'session-root01',
+          origin: 'subagent',
+          running: false,
+          projectionValues: { agentPreset: 'subagent' },
+        },
+      },
+    }, 'session-root01')
+    expect(richTree.root?.label).toBe('root01')
+    expect(richTree.nodes[1]?.label).toBe('ff123456')
+
+    const zhHtml = renderToStaticMarkup(createElement(DelegationFlowPanel, { tree: richTree }))
+    expect(zhHtml).toContain('>CEO · 首席执行官<')
+    expect(zhHtml).toContain('>子代理<')
+    expect(zhHtml).toContain('>持续对话<')
+    expect(zhHtml).not.toContain('>ceo<')
+    expect(zhHtml).not.toContain('>subagent<')
+    expect(zhHtml).not.toContain('>continuable<')
+
+    const enHtml = renderToStaticMarkup(createElement(DelegationFlowPanel, { tree: richTree, t: tEn }))
+    expect(enHtml).toContain('>Subagent<')
+    expect(enHtml).toContain('>Continuable<')
     assertEnglishUiClean(enHtml)
   })
 })

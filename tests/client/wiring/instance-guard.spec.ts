@@ -1,11 +1,12 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { HEARTBEAT_KEY, shouldWarn, startInstanceGuard } from '../../../packages/company-pack/src/client/wiring/instance-guard.ts'
-import { en } from '../../../packages/company-pack/src/client/locales.ts'
+import { en, zh } from '../../../packages/company-pack/src/client/locales.ts'
 import { assertEnglishUiClean, translateWith } from '../../support/i18n-assertions.ts'
 
 // 负例留证 2026-10-10：卡② UX 依据 = 现场实测 3 个 web 实例并存 + E2 实证（多实例同文件
 // ×20 = 20/20 静默互踩）——用户拍板「警告横幅」：第二实例照常启动但被明确告知。
+// 负例留证 2026-11-27：startInstanceGuard 未订阅 locale/change ⇒ 实时切换语言后横幅滞留旧语直到下轮 10s 轮询（BUG-397）；接入订阅后绿。BUG-397
 
 const NOW = 1_000_000
 const KEY = HEARTBEAT_KEY
@@ -103,5 +104,31 @@ describe('心跳新鲜度双边窗口（BUG-364）', () => {
     expect(beats).not.toHaveProperty('future')
     expect(beats).toHaveProperty('fresh')
     expect(Object.keys(beats).some(key => key.startsWith('tab-'))).toBe(true)
+  })
+
+  it('BUG-397：locale/change 回调触发时多实例横幅即时重译，不滞留旧语言', () => {
+    vi.useFakeTimers()
+    localStorage.setItem(KEY, JSON.stringify({ 'tab-other': Date.now() }))
+    let dict: typeof zh | typeof en = zh
+    let onLocaleChange: (() => void) | undefined
+    const offSpy = vi.fn()
+    const dynamicT = ((key: keyof typeof zh, params?: Record<string, string | number>) => {
+      const tpl = dict[key]
+      return params === undefined ? tpl : tpl.replace(/\{(\w+)\}/g, (_m, n: string) => String(params[n] ?? ''))
+    }) as ReturnType<typeof translateWith>
+    const dispose = startInstanceGuard(document, dynamicT, (cb) => {
+      onLocaleChange = cb
+      return offSpy
+    })
+    expect(document.getElementById(BANNER_ID)?.textContent).toContain('静默互踩')
+
+    dict = en
+    onLocaleChange?.()
+    const enBanner = document.getElementById(BANNER_ID)?.textContent ?? ''
+    expect(enBanner).toContain('Detected 1 other observation window')
+    assertEnglishUiClean(enBanner, 'BUG-397 instance-guard live locale switch')
+
+    dispose()
+    expect(offSpy).toHaveBeenCalledOnce()
   })
 })

@@ -63,8 +63,12 @@ function removeBanner(doc: Document): void {
   doc.getElementById(BANNER_ID)?.remove()
 }
 
-/** 启动探活：心跳每 5s 一跳、判据每 10s 一查；返回清理函数（卸载/单实例时移除横幅）。 */
-export function startInstanceGuard(doc: Document = document, t?: CompanyT): () => void {
+/** 启动探活：心跳每 5s 一跳、判据每 10s 一查；支持语言热切换即时重译（BUG-397）。 */
+export function startInstanceGuard(
+  doc: Document = document,
+  t?: CompanyT,
+  subscribeLocale?: (onChange: () => void) => () => void,
+): () => void {
   const selfId = `tab-${Math.random().toString(36).slice(2, 10)}`
   writeBeat(selfId)
   const beatTimer = window.setInterval(() => writeBeat(selfId), 5_000)
@@ -78,6 +82,7 @@ export function startInstanceGuard(doc: Document = document, t?: CompanyT): () =
   }
   check()
   const checkTimer = window.setInterval(check, 10_000)
+  const offLocale = subscribeLocale?.(check)
   const onUnload = () => {
     try {
       const win = window
@@ -90,6 +95,7 @@ export function startInstanceGuard(doc: Document = document, t?: CompanyT): () =
   return () => {
     window.clearInterval(beatTimer)
     window.clearInterval(checkTimer)
+    offLocale?.()
     win()?.removeEventListener('beforeunload', onUnload)
     onUnload()
     removeBanner(doc)

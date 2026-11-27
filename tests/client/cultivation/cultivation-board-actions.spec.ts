@@ -8,9 +8,11 @@
  * 断言到动作面的入参；**不主张**真浏览器渲染（那层归 `client-load-smoke` 与 browser-visual 探针）。
  * 红证（先红后绿）：本 spec 在按钮与动作面 prop 存在前实跑红（见毕业 Note 验证节）。
  */
+// 负例留证 2026-11-27：use-cultivation-board / CultivationBoardSections 直接将翻译文本写入 reasonProblem / verificationProblem state ⇒ 热切 language='en' 后仍滞留中文报错（BUG-397）；改存结构化状态码并在渲染期解析后绿。BUG-397
 import { act, createElement, type ReactElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it } from 'vitest'
+import { assertEnglishUiClean } from '../../support/i18n-assertions.ts'
 import { CultivationBoard } from '../../../packages/company-pack/src/client/cultivation/CultivationBoard.tsx'
 import {
   CULTIVATION_CHANGED_EVENT,
@@ -592,5 +594,38 @@ describe('渲染入口自检', () => {
     const tree: ReactElement = createElement('div')
     expect(tree).toBeDefined()
     expect(container.textContent).toContain('不算 0 条')
+  })
+
+  it('BUG-397：拒绝空理由与已采纳空验证证据报错在热切 language=en 后即时重译且零中文残留', async () => {
+    const { actions } = stubActions()
+    const records = [
+      record({ id: 'r-open', status: 'open', expectation: 'List open checks', source: 'session-1', title: 'List open checks' }),
+      record({ id: 'r-adopted', status: 'adopted', expectation: 'Verify outputs', source: 'session-1', title: 'Verify outputs', methodSlug: 'method-r-adopted', decidedAt: '2026-11-27T00:00:00.000Z' }),
+    ]
+    const { container, rerender } = mount({
+      language: 'zh',
+      actions,
+      records,
+    })
+    await click(button(container, CULTIVATION_COPY.reject)!)
+    await click(button(container, CULTIVATION_COPY.rejectConfirm)!)
+    expect(container.textContent).toContain('拒绝要留一句理由')
+
+    const verifyTrigger = [...container.querySelectorAll('button')].find(b => b.textContent?.trim() === CULTIVATION_COPY.verifyPass)!
+    await click(verifyTrigger)
+    await click(button(container, CULTIVATION_COPY.verifyPassConfirm)!)
+    expect(container.textContent).toContain('请写明一项采纳后的相似工作')
+
+    rerender({
+      language: 'en',
+      viewerLabel: 'CEO',
+      roleLabel: (r: string) => r.toUpperCase(),
+      actions,
+      records,
+    })
+    const enText = container.textContent ?? ''
+    expect(enText).toContain('A rejection needs a one-line reason')
+    expect(enText).toContain('Name one similar piece of work after adoption')
+    assertEnglishUiClean(enText, 'BUG-397 live locale switch')
   })
 })

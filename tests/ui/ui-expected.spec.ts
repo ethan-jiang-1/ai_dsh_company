@@ -6,6 +6,7 @@ describe('UI 金样：归一化、构造与比较', () => {
   it('归一化折叠空白、去零宽与首尾，并折叠目录生成时间戳', () => {
     expect(normalizeText('  等\u200b你\n\n处理  ')).toBe('等你 处理')
     expect(normalizeText('静态索引 · 生成于 2026-11-26 12:16 UTC')).toBe('静态索引 · 生成于 <UTC>')
+    expect(normalizeText('静态索引 · 生成于 2026-11-26 12:16（世界时）')).toBe('静态索引 · 生成于 <UTC>')
     expect(normalizeText(undefined)).toBe('')
   })
 

@@ -195,6 +195,7 @@ describe('客户端 CSS 与源码脆债反回归守卫（Wave S4）', () => {
 
 // 负例留证 2026-11-27：撤掉 .wk-ux-header-badge 等内嵌包装与 [data-presence-aside] 的 white-space: nowrap / flex-shrink: 0 或恢复 .wk-row-button 的 width: 100% ⇒ 本守卫红；还原后绿。BUG-386
 // 负例留证 2026-11-27：删掉 @media (max-width: 820px) 的 .wk-hq-cultivation-split 单列规则或把 .wk-hq-grid 改回 minmax(300px, 1fr) ⇒ 本守卫红；还原后绿。BUG-387
+// 负例留证 2026-11-27：删掉 .wk-command-scope-hint 规则或恢复重复 .wk-guide-entry 声明 ⇒ BUG-398 用例红；还原后绿。BUG-398
 describe('客户端 CSS：窄栏不换行护栏与响应式折叠（BUG-386 / BUG-387）', () => {
   it('BUG-386：五处内嵌 slot 包装类与旁路按钮禁止单字竖折，.wk-row-button 使用 min-width: 0 而非 width: 100%', () => {
     const parsed = rules(STYLES)
@@ -222,5 +223,17 @@ describe('客户端 CSS：窄栏不换行护栏与响应式折叠（BUG-386 / BU
     const mediaBlock = /@media\s*\(\s*max-width:\s*820px\s*\)\s*\{([\s\S]*?\})\s*\}/.exec(STYLES)?.[1] ?? ''
     expect(mediaBlock).toContain('.wk-hq-cultivation-split')
     expect(mediaBlock).toContain('minmax(0, 1fr)')
+  })
+
+  it('BUG-398：补齐 .wk-command-scope-hint 样式且消除重复的 .wk-guide-entry 定义', () => {
+    const parsed = rules(STYLES)
+    const hintRule = parsed.find(r => r.selector === '.wk-command-scope-hint')
+    expect(hintRule, '找不到 .wk-command-scope-hint').toBeDefined()
+    expect(hintRule!.body).toContain('white-space: nowrap')
+
+    const guideEntryRules = parsed.filter(r => r.selector === '.wk-guide-entry')
+    expect(guideEntryRules).toHaveLength(1)
+    const guideLabelRules = parsed.filter(r => r.selector === '.wk-guide-entry-label')
+    expect(guideLabelRules).toHaveLength(1)
   })
 })

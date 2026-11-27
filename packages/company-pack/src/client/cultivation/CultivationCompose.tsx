@@ -21,10 +21,14 @@ import { clipExcerpt, encodeContextToken, secretLikeFindings, type CultivationCo
 import {
   CULTIVATION_COPY,
   correctLine,
+  resolveDraftProblem,
   suggestLine,
   type ActionOutcome,
   type CultivationActions,
+  type DraftProblem,
 } from './cultivation-actions.ts'
+import { composeIntentStore } from './compose-intent-store.ts'
+import { extractDeliverableTarget } from '../tabs/deliverables-focus-store.ts'
 import { CultivationContextPicker, type ContextPickerPick } from './CultivationContextPicker.tsx'
 import type { ContextDeliverableRow, ContextSessionRow, CultivationContextSources } from './cultivation-context-data.ts'
 
@@ -92,7 +96,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
   const [work, setWork] = useState('')
   const [expectation, setExpectation] = useState('')
   const [body, setBody] = useState('')
-  const [problem, setProblem] = useState<string | null>(null)
+  const [problem, setProblem] = useState<DraftProblem | string | null>(null)
   const [outcome, setOutcome] = useState<ActionOutcome | null>(null)
   const [pending, setPending] = useState(false)
   const [context, setContext] = useState<ComposeContextCard | null>(null)
@@ -114,6 +118,42 @@ export function CultivationCompose(props: CultivationComposeProps) {
       pickerTriggerRef.current?.focus()
     }
   }, [pickerOpen])
+
+  useEffect(() => {
+    const applyIntent = (): void => {
+      const intent = composeIntentStore.get()
+      if (intent === null) return
+      composeIntentStore.consume(intent.id)
+      seq.current += 1
+      inflight.current?.abort()
+      inflight.current = null
+      setOpen(true)
+      setProblem(null)
+      setOutcome(null)
+      setPickerOpen(false)
+      setExpanded(false)
+      setTargetRole(props.viewerRole)
+      if (intent.filePath !== undefined) {
+        const slug = extractDeliverableTarget(intent.filePath) ?? intent.filePath
+        setContextStatus('idle')
+        setContextProblem(null)
+        setContext({
+          ref: { kind: 'deliverable', ref: intent.filePath, label: slug },
+          title: slug,
+          excerpt: intent.filePath,
+        })
+        return
+      }
+      setContext(null)
+      setContextStatus('idle')
+      setContextProblem(null)
+      if (intent.messageId !== undefined) {
+        setWork(prev => (prev.trim() === '' ? intent.messageId! : prev))
+      }
+    }
+    applyIntent()
+    return composeIntentStore.subscribe(applyIntent)
+  }, [props.viewerRole])
   // 纠正/建议由目标角色推导：人先说工作，类型不是选择题。
   const isSuggest = targetRole !== props.viewerRole
   const sources = props.sources
@@ -221,7 +261,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
       ? suggestLine(targetRole, expectation, body, props.viewerRole, token, workText)
       : correctLine(expectation, body, token, workText)
     if (!draft.ok) {
-      setProblem(draft.problem.message)
+      setProblem(draft.problem)
       return
     }
     setPending(true)
@@ -326,7 +366,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
                       <strong>{context.title}</strong>
                       <span className="wk-meta">
                         {[
-                          context.role === undefined ? '' : context.role,
+                          context.role === undefined ? '' : roleLabel(context.role),
                           context.subtitle === undefined ? '' : context.subtitle,
                           context.turn === undefined ? '' : CULTIVATION_COPY.composeTurn(context.turn),
                         ].filter(part => part !== '').join(' · ')}
@@ -391,7 +431,11 @@ export function CultivationCompose(props: CultivationComposeProps) {
             </div>
           </div>
         )}
-      {problem !== null && <div className="wk-meta wk-cultivation-problem">{problem}</div>}
+      {problem !== null && (
+        <div className="wk-meta wk-cultivation-problem">
+          {typeof problem === 'string' ? problem : resolveDraftProblem(problem)}
+        </div>
+      )}
       {outcome !== null && (
         <div className={outcome.ok ? 'wk-meta wk-cultivation-outcome' : 'wk-meta wk-cultivation-problem'}>
           {outcome.text}

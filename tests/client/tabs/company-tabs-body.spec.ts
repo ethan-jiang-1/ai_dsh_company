@@ -9,6 +9,7 @@
  */
 // 负例留证 2026-11-27：去掉 PresenceTab 表头与 Lead 行末的 .wk-row-aside-cell 占位列 ⇒ BUG-386 列对齐用例红；还原后绿。BUG-386
 // 负例留证 2026-11-27：TasksTab 改回直接调 roleText(name) 不映射 'lead' ⇒ 成员列露出裸 'lead('（BUG-390）；还原后绿。BUG-390
+// 负例留证 2026-11-27：zh['tasks.col.owner'] 保留小写 'owner' ⇒ 中文任务板第 4 列表头混出英文（BUG-397）；改为「负责人」后绿。BUG-397
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
@@ -186,5 +187,7 @@ describe('公司页签体静态渲染（R5-06/D5）', () => {
     const html = renderToStaticMarkup(createElement(TasksTab, props({ useSessions, t: tInterp })))
     expect(html).toContain(zh['roles.ceo.label'])
     expect(html).not.toContain('lead(')
+    expect(html).toContain('<th>负责人</th>')
+    expect(html).not.toContain('<th>owner</th>')
   })
 })

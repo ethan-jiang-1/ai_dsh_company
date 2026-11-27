@@ -599,27 +599,21 @@ const CSS = `
    口诀更新：琥珀喊你和记账（三档橙），三蓝干活分深浅，绿色是人。
    ⚠ 深底注意：blue-800 rgb(30,64,175) 饱和蓝暗底可见；deepseek-800 以下禁用（暗底隐身）。 */
 
-/* guide 条目胶囊（Start 页；接管自 vendor EntryBox——槽 sidebar.right.tab.guide.entry）：
-   视觉对齐出厂胶囊（圆角、hover 底色全令牌），外加 Tooltip（组件层）与原生 title（chip 侧）。 */
-.wk-guide-entry {
-  display: flex;
+/* guide 条目旧声明已整合到 L960+ 卡片规则；此处补充命令范围提示样式（BUG-398）。 */
+.wk-command-scope-hint {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 0.55rem 0.7rem;
-  border: none;
-  border-radius: var(--dsw-radius-xs);
-  background: transparent;
-  color: var(--dsw-alias-label-primary);
-  font: inherit;
-  cursor: pointer;
-  text-align: left;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--dsw-alias-bg-layer-2);
+  color: var(--dsw-alias-label-secondary);
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-.wk-guide-entry:hover {
-  background: var(--dsw-alias-interactive-bg-hover);
-}
-.wk-guide-entry-label {
-  font-weight: 500;
+.wk-deliverable-row[data-highlighted='true'] {
+  background: var(--dsw-alias-bg-layer-2);
 }
 
 /* ── 面板顶色条 ── */

@@ -15,6 +15,8 @@ import { COMPANY_NS } from '../locales.ts'
 import type { HubSubViewStore } from '../tabs/hub-subview-store.ts'
 import type { AttentionRegistry } from '../wiring/attention-registry.ts'
 import { openOnSessionSurface } from '../wiring/sidebar-right-guard.ts'
+import { composeIntentStore } from '../cultivation/compose-intent-store.ts'
+import { deliverablesFocusStore } from '../tabs/deliverables-focus-store.ts'
 import {
   ComposerStatusPill,
   HeaderAttentionUtility,
@@ -159,6 +161,7 @@ export function registerWaveS1Ux(ctx: ClientContext, deps: WaveS1Deps): void {
     }
 
     const openCultivation = (context?: { readonly messageId?: string; readonly filePath?: string }): void => {
+      composeIntentStore.publish(context)
       if (deps.openHq !== undefined) {
         deps.openHq('cultivation')
       } else {
@@ -171,7 +174,8 @@ export function registerWaveS1Ux(ctx: ClientContext, deps: WaveS1Deps): void {
       )
     }
 
-    const openDeliverables = (): void => {
+    const openDeliverables = (filePath?: string): void => {
+      if (filePath !== undefined) deliverablesFocusStore.publish(filePath)
       safeOpenTab('company-deliverables')
       toastSource.notify(t('toast.reviewOpened'), 'success')
     }
@@ -254,7 +258,7 @@ export function registerWaveS1Ux(ctx: ClientContext, deps: WaveS1Deps): void {
           name: 'conversation.chat.commandview',
           key: cmdKey,
           locale: COMPANY_NS,
-          inject: () => ({ openDeliverables }),
+          inject: () => ({ openDeliverables: () => { openDeliverables() } }),
         }, CompanyCommandView),
       )
     }
