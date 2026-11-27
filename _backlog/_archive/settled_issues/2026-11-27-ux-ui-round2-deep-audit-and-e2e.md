@@ -184,7 +184,7 @@ opened: 2026-11-27
   - `R1` / `J5`（[BUG-393](../fixed_bugs/BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md)）：HQ 培养 `error` 态重试按钮死掉且 `started` 跨会话粘连；`openSplitPreset('review')` 降级抛未捕获异常；
   - `G1` / `G6` / `H4-A` / `H4-B`（[BUG-394](../fixed_bugs/BUG-394-cross-session-brand-text-and-startup-abort-state-leaks.md)）：身份读取失败不回落、`useWorkspaceText` 切会话滞留前盘文本、`loadStartup` 吞并 `AbortError` 覆写全局 store、`StrategyPanel` 切会话残留 `error`；
   - `H2` / `H8`（[BUG-395](../fixed_bugs/BUG-395-dag-empty-mount-never-scales-and-deliverables-hidden-filter-trap.md)）：`DagPanel` 空图先挂后 `ResizeObserver` 永不生效；`DeliverablesView` 隐藏筛选按钮卡死空态；
-  - `I5` / `I6` / `K6`（[BUG-396](../../bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md)）：`ContextPicker` 搜索框劫持 `ArrowDown` 且 `Esc` 失焦；`CultivationView` 堆叠忽略垂直键；`observeFixedInput` 穿透 Modal/终端；
+  - `I5` / `I6` / `K6`（[BUG-396](../fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md)）：`ContextPicker` 搜索框劫持 `ArrowDown` 且 `Esc` 失焦；`CultivationView` 堆叠忽略垂直键；`observeFixedInput` 穿透 Modal/终端；
   - `R2`（[BUG-397](../../bugs/BUG-397-live-locale-lag-in-cultivation-errors-and-remaining-raw-labels.md)）：热切语言后培养表单报错停在中文。
 
 ### Phase 2 · Chromium 多盘多视口深扫（`round2-deep-audit.mjs` + `round2-part2-audit.mjs`）
@@ -199,5 +199,5 @@ opened: 2026-11-27
 
 ### Phase 4 · Bug 账本收口（`BUG-392..BUG-398`，均 `status: 调查中`）
 - P0：[BUG-392](../fixed_bugs/BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md)、[BUG-393](../fixed_bugs/BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md)
-- P1：[BUG-394](../fixed_bugs/BUG-394-cross-session-brand-text-and-startup-abort-state-leaks.md)、[BUG-395](../fixed_bugs/BUG-395-dag-empty-mount-never-scales-and-deliverables-hidden-filter-trap.md)、[BUG-396](../../bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md)
+- P1：[BUG-394](../fixed_bugs/BUG-394-cross-session-brand-text-and-startup-abort-state-leaks.md)、[BUG-395](../fixed_bugs/BUG-395-dag-empty-mount-never-scales-and-deliverables-hidden-filter-trap.md)、[BUG-396](../fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md)
 - P2：[BUG-397](../../bugs/BUG-397-live-locale-lag-in-cultivation-errors-and-remaining-raw-labels.md)、[BUG-398](../../bugs/BUG-398-contextual-actions-drop-ref-dead-float-save-and-hero-draft-overwrite.md)

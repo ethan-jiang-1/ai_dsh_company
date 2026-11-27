@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-396**（2026-11-27，392..398 批顺位 3 / P1）：`registerCompanyShortcuts` 增加 `modal`/`terminal` 守卫；`CultivationContextPicker` 输入框 `ArrowUp` 不劫持并支持与首选项往返，关闭后由 `CultivationCompose` 归还触发焦点；`CultivationView` 堆叠模式分隔条切换 `horizontal`、支持 `ArrowUp`/`ArrowDown`/`Home` 与 `clientY` 拖高并挂 `pointercancel`/`blur`/卸载清理——
+  [396](BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md)。证据提交 `28e0398d`。
+
 - **BUG-394 / BUG-395**（2026-11-27，392..398 批顺位 2 / P1×2）：`applyCompanyIdentityRead` 失败或无目标回落出厂品牌、`useWorkspaceText` 切 `sessionId` 同步归 `loading`、`loadStartup` 守卫 `signal.aborted`、`StrategyPanel` 随 `sessionId` 清错并重建行；`DagPanel` `ResizeObserver` 按 `hasNodes` 重挂并用 `useId()` 隔离 `<marker>`，`DeliverablesView` 归零筛选回正 `'all'`——
   [394](BUG-394-cross-session-brand-text-and-startup-abort-state-leaks.md)、[395](BUG-395-dag-empty-mount-never-scales-and-deliverables-hidden-filter-trap.md)。证据提交 `e2337ab8`。
 

@@ -1,4 +1,5 @@
 # _archive/ · 离开活跃区
+- [BUG-396](fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md) — 已修（`28e0398d`）：`observeFixedInput` 增加 `modal`/`terminal` 守卫、`ContextPicker` 输入框与选项双向键盘衔接及 `Escape` 焦点归还、`CultivationView` 堆叠纵拖与 `blur`/`pointercancel` 清理。
 - [BUG-394](fixed_bugs/BUG-394-cross-session-brand-text-and-startup-abort-state-leaks.md) — 已修（`e2337ab8`）：跨工作区品牌读取失败回落出厂身份、`useWorkspaceText` 切会话清回 `loading`、`loadStartup` 检查 `signal.aborted` 及 `StrategyPanel` 随 `sessionId` 清除残留报错与草稿。
 - [BUG-395](fixed_bugs/BUG-395-dag-empty-mount-never-scales-and-deliverables-hidden-filter-trap.md) — 已修（`e2337ab8`）：`DagPanel` 依 `hasNodes` 重挂 `ResizeObserver` 并用 `useId()` 隔离 `<marker>`，`DeliverablesView` 条件筛选归零时自动退回 `'all'`。
 - [BUG-392](fixed_bugs/BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md) — 已修（`1d9368a1`）：`SignoffComposerCard` 补 `<summary>`/`拒绝` Enter 豁免、修饰键/IME/`waitingRef`/`answerable` 护栏。
