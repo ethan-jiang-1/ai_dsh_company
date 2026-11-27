@@ -8,17 +8,15 @@
 
 ## 活跃清单
 
-**活跃 2 张（Round 2 UX/UI 盲区深扫新立卡：BUG-397..398，392..396 已修迁出）**：
+**活跃 0 张（Round 2 UX/UI 盲区深扫批次 BUG-392..398 已全部修复并迁出；仅留收口验证、批次 Note 与独立盲审）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
-| [BUG-397](BUG-397-live-locale-lag-in-cultivation-errors-and-remaining-raw-labels.md) | P2 | client+lib | 热切语言培养报错滞留旧语、`DelegationFlowPanel` 裸 `ceo`/`subagent`、`DeliverablesTab` `UTC`、在场 `session-`、`tasks.col.owner` | 调查中 |
-| [BUG-398](BUG-398-contextual-actions-drop-ref-dead-float-save-and-hero-draft-overwrite.md) | P2 | client | 上下文快捷动作丢参未带入表单/草稿对比、`saveFloatRect` 写入空置、Hero 模板覆盖未发草稿及 `.wk-command-scope-hint` 缺样式 | 调查中 |
 
 **按根因聚类摘要（供下轮修复排期）**：
 - **组 1 · 交互安全与宿主生命周期**（[392](../_archive/fixed_bugs/BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md)、[393](../_archive/fixed_bugs/BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md)、[396](../_archive/fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md) 快捷键部分）：容器级键盘未豁免可聚焦控件/`modal`/`terminal`，HQ 全局面板呼唤右栏漏切回会话，内嵌工坊未清理会话 Hero/Chrome；
 - **组 2 · 跨会话/跨盘状态重置与异步竞态**（[394](../_archive/fixed_bugs/BUG-394-cross-session-brand-text-and-startup-abort-state-leaks.md)、[395](../_archive/fixed_bugs/BUG-395-dag-empty-mount-never-scales-and-deliverables-hidden-filter-trap.md)）：`sessionId`/`cwd` 切换缺状态清理、`AbortError` 误折失败、`DagPanel` 早退跳过 observer、`DeliverablesView` 隐藏激活态；
-- **组 3 · 文案热切换、契约承诺与无障碍打磨**（[396](../_archive/fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md) Picker/拖拽部分、[397](BUG-397-live-locale-lag-in-cultivation-errors-and-remaining-raw-labels.md)、[398](BUG-398-contextual-actions-drop-ref-dead-float-save-and-hero-draft-overwrite.md)）：`CULTIVATION_COPY` 单例与残留英文标签、上下文动作/浮窗存储只写半截。
+- **组 3 · 文案热切换、契约承诺与无障碍打磨**（[396](../_archive/fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md) Picker/拖拽部分、[397](../_archive/fixed_bugs/BUG-397-live-locale-lag-in-cultivation-errors-and-remaining-raw-labels.md)、[398](../_archive/fixed_bugs/BUG-398-contextual-actions-drop-ref-dead-float-save-and-hero-draft-overwrite.md)）：`CULTIVATION_COPY` 单例与残留英文标签、上下文动作/浮窗存储只写半截。
 
 **Round 2 实证排查但不立 BUG 卡项（防误判/不重复）**：
 - `390px` 窄屏非 Hub 右栏页签（如 `final.md`）未挂 `[data-company-narrow-close]`：实测上游右栏顶条原生提供 `退出全屏` 与 `收起右侧边栏` 按钮，无困死（`R3_390_non_hub_final_md_close`）；
@@ -40,7 +38,7 @@
 | **1 P0 交互安全与 HQ/右栏生命周期** | [392](../_archive/fixed_bugs/BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md)（已修 `1d9368a1`） + [393](../_archive/fixed_bugs/BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md)（已修 `1d9368a1`） | 签字确认卡键盘处理器未对齐上游 5 道护栏（`summary`/拒绝按钮 Enter 劫持、IME/`repeat`/修饰键/同步防重入/`answerable`）；HQ 全局面板与会话右栏切换未过 `selectPanel(null)` + `mounted` 守卫，内嵌培养工坊挂 Hero Chrome 且 `started`/重试失效 | 392：`SignoffComposerCard` 补 `waitingRef`/`activeRef`/IME/修饰键/子控件豁免/`answerable` 禁用；393：抽出 `openOnSessionSurface` 统一收口 4 处右栏入口，`HqCultivationWorkshop` 解耦 `retryNonce`、按 `mainSessionId` 复位、内嵌槽改 `phase:'active', hero:false` 并隐藏顶层动议带，HQ 总览接入 `pageHistory` | 1 |
 | **2 P1 跨盘/切会话状态复位与面板寿命** | [394](../_archive/fixed_bugs/BUG-394-cross-session-brand-text-and-startup-abort-state-leaks.md)（已修 `e2337ab8`） + [395](../_archive/fixed_bugs/BUG-395-dag-empty-mount-never-scales-and-deliverables-hidden-filter-trap.md)（已修 `e2337ab8`） | 失败/取消/切换窗口未清旧态（品牌读取失败保留旧部署名、`useWorkspaceText` 切会话滞留旧盘、`loadStartup` 吞并 abort 写坏全局仓、`StrategyPanel` 留错）；空图/空筛退化未绑定重挂载与隐藏激活态回正 | 394：身份读取失败或缺失回落 `FALLBACK_IDENTITY`、`useWorkspaceText` 切 `sessionId` 即刻归 `loading`、`loadStartup` 双检 `signal.aborted`、`StrategyPanel` 随 `sessionId` 清错与重建行；395：`DagPanel` `ResizeObserver` 依 `hasNodes` 重挂并 `useId()` 隔离 marker，`DeliverablesView` 归零筛选回正 `'all'` | 2 |
 | **3 P1 键盘与无障碍交互** | [396](../_archive/fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md)（已修 `28e0398d`） | 快捷键与弹窗/输入控件抢键：全局快捷键未挡 `modal`/`terminal`；背景选择器输入区拦截上下键且关闭丢焦点；培养主视图堆叠模式缺垂直拖拽与指针异常清理 | `registerCompanyShortcuts` 增加 `modal`/`terminal` 守卫；`CultivationContextPicker` 区分输入框与选项列表方向键、关闭还焦点给触发按钮；`CultivationView` 堆叠模式支持 `ArrowUp`/`ArrowDown` + `clientY` 拖拽并挂 `pointercancel`/`blur` 清理 | 3 |
-| **4 P2 热切语、残留标识、动作贯通与样式** | [397](BUG-397-live-locale-lag-in-cultivation-errors-and-remaining-raw-labels.md)（P2） + [398](BUG-398-contextual-actions-drop-ref-dead-float-save-and-hero-draft-overwrite.md)（P2） | 翻译冻结在组件 state + 二级展示面漏翻；上下文快捷动作仅 toast 未入表单、浮窗悬停与 `saveFloatRect` 脱节、模板覆盖草稿、CSS 缺项/重定义 | 397：培养错误改存结构化码渲染期解析、`DelegationFlowPanel` 翻 role/mode、`CultivationInbox` 翻 `roleLabel`、`tasks.col.owner` 中译、`DeliverablesTab` 时间缀与金样对齐、`shortSessionId` 去 `session-`、`instance-guard` 监听切语；398：上下文 `{messageId,filePath}` 直通并展开 `CultivationCompose`、对齐 `compareDrafts` 与 `floatTitle` 诚实表述、Hero/Dock 保留非空草稿、补 `.wk-command-scope-hint` 并去重 `.wk-guide-entry` | 4 |
+| **4 P2 热切语、残留标识、动作贯通与样式** | [397](../_archive/fixed_bugs/BUG-397-live-locale-lag-in-cultivation-errors-and-remaining-raw-labels.md)（已修 `bec52daf`） + [398](../_archive/fixed_bugs/BUG-398-contextual-actions-drop-ref-dead-float-save-and-hero-draft-overwrite.md)（已修 `bec52daf`） | 翻译冻结在组件 state + 二级展示面漏翻；上下文快捷动作仅 toast 未入表单、浮窗悬停与 `saveFloatRect` 脱节、模板覆盖草稿、CSS 缺项/重定义 | 397：培养错误改存结构化码渲染期解析、`DelegationFlowPanel` 翻 role/mode、`CultivationInbox` 翻 `roleLabel`、`tasks.col.owner` 中译、`DeliverablesTab` 世界时与金样对齐、`shortSessionId` 去 `session-`、`instance-guard` 监听切语；398：`composeIntentStore` 与 `deliverablesFocusStore` 贯通、移除 `panel.floatTitle` 虚假位置记忆承诺、Hero/Dock 保留非空草稿、补 `.wk-command-scope-hint` 并去重 `.wk-guide-entry` | 4 |
 
 **终点**：7 张全部带实跑红/绿证据迁入 `fixed_bugs/`；1 篇批次伞形 Note（收口时同 diff 落盘）；全套门禁（`verify`/`typecheck`/`lint`/`dup`/`test`/`coverage:ratchet`）+ 5 条 keyless 浏览器车道 + Round 2 深扫脚本复验全绿 + 独立只读 `research` 子代理盲审 0 阻断并 `push`。
 

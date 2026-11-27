@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-397](fixed_bugs/BUG-397-live-locale-lag-in-cultivation-errors-and-remaining-raw-labels.md) — 已修（`bec52daf`）：培养错误改存结构化码渲染期重译、本地化 `DelegationFlowPanel`/`CultivationInbox`/`tasks.col.owner`/`formatGeneratedAt`/`shortSessionId` 并让 `instance-guard` 响应 `locale/change`。
+- [BUG-398](fixed_bugs/BUG-398-contextual-actions-drop-ref-dead-float-save-and-hero-draft-overwrite.md) — 已修（`bec52daf`）：打通 `composeIntentStore` 与 `deliverablesFocusStore`、移除 `panel.floatTitle` 虚假位置记忆承诺、Hero/Dock 保留已有草稿并补 `.wk-command-scope-hint` 且去重 `.wk-guide-entry`。
 - [BUG-396](fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md) — 已修（`28e0398d`）：`observeFixedInput` 增加 `modal`/`terminal` 守卫、`ContextPicker` 输入框与选项双向键盘衔接及 `Escape` 焦点归还、`CultivationView` 堆叠纵拖与 `blur`/`pointercancel` 清理。
 - [BUG-394](fixed_bugs/BUG-394-cross-session-brand-text-and-startup-abort-state-leaks.md) — 已修（`e2337ab8`）：跨工作区品牌读取失败回落出厂身份、`useWorkspaceText` 切会话清回 `loading`、`loadStartup` 检查 `signal.aborted` 及 `StrategyPanel` 随 `sessionId` 清除残留报错与草稿。
 - [BUG-395](fixed_bugs/BUG-395-dag-empty-mount-never-scales-and-deliverables-hidden-filter-trap.md) — 已修（`e2337ab8`）：`DagPanel` 依 `hasNodes` 重挂 `ResizeObserver` 并用 `useId()` 隔离 `<marker>`，`DeliverablesView` 条件筛选归零时自动退回 `'all'`。

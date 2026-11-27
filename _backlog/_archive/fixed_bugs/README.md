@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-397 / BUG-398**（2026-11-27，392..398 批顺位 4 / P2×2）：培养错误改存 `DraftProblemCode`/`'required'` 在渲染期按最新语言解析、`DelegationFlowPanel`/`CultivationInbox`/`tasks.col.owner`/`formatGeneratedAt`/`delegation-tree`/`instance-guard` 本地化与 `locale/change` 联动；打通 `composeIntentStore` 与 `deliverablesFocusStore`、对齐 `panel.floatTitle` 诚实提示、Hero/Dock 保留已有草稿并补 `.wk-command-scope-hint` 且去重 `.wk-guide-entry`——
+  [397](BUG-397-live-locale-lag-in-cultivation-errors-and-remaining-raw-labels.md)、[398](BUG-398-contextual-actions-drop-ref-dead-float-save-and-hero-draft-overwrite.md)。证据提交 `bec52daf`。
+
 - **BUG-396**（2026-11-27，392..398 批顺位 3 / P1）：`registerCompanyShortcuts` 增加 `modal`/`terminal` 守卫；`CultivationContextPicker` 输入框 `ArrowUp` 不劫持并支持与首选项往返，关闭后由 `CultivationCompose` 归还触发焦点；`CultivationView` 堆叠模式分隔条切换 `horizontal`、支持 `ArrowUp`/`ArrowDown`/`Home` 与 `clientY` 拖高并挂 `pointercancel`/`blur`/卸载清理——
   [396](BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md)。证据提交 `28e0398d`。
 
