@@ -72,8 +72,8 @@ opened: 2026-11-27
 
 | ID | 范围 | 实测结论 | 关键证据与归宿 |
 |---|---|---|---|
-| **T1** | 真 Settings 弹窗热切 `zh ↔ en` 与亮/暗主题 | **FAIL（2 项排伪）** | `phase2c-settings.mjs` 实点击设置弹窗切 `English` 后，`StrategyButton`（`"Strategy: auto"`）与 `CommandScopeHint` **即时更新**（排伪 PASS，`r3-10-settings-real-en-lag.png`）；但 `/cultivation` 斜杠弹窗仍滞留中文描述（`slashCultHasChinese: true`）→ [BUG-405](../../bugs/BUG-405-host-cultivation-command-and-errors-unlocalized-and-live-en-lag.md)。 |
-| **T2** | Host `/cultivation` 及路径/写闸硬编码中文报错 | **FAIL** | `host-commands-en.spec.ts` 实证 `en` 环境下 `/cultivation`、上下文读取及写闸/根路径校验返回中文报错 → [BUG-405](../../bugs/BUG-405-host-cultivation-command-and-errors-unlocalized-and-live-en-lag.md)。 |
+| **T1** | 真 Settings 弹窗热切 `zh ↔ en` 与亮/暗主题 | **FAIL（2 项排伪）** | `phase2c-settings.mjs` 实点击设置弹窗切 `English` 后，`StrategyButton`（`"Strategy: auto"`）与 `CommandScopeHint` **即时更新**（排伪 PASS，`r3-10-settings-real-en-lag.png`）；但 `/cultivation` 斜杠弹窗仍滞留中文描述（`slashCultHasChinese: true`）→ [BUG-405](../fixed_bugs/BUG-405-host-cultivation-command-and-errors-unlocalized-and-live-en-lag.md)。 |
+| **T2** | Host `/cultivation` 及路径/写闸硬编码中文报错 | **FAIL** | `host-commands-en.spec.ts` 实证 `en` 环境下 `/cultivation`、上下文读取及写闸/根路径校验返回中文报错 → [BUG-405](../fixed_bugs/BUG-405-host-cultivation-command-and-errors-unlocalized-and-live-en-lag.md)。 |
 | **T3** | 真模型 `bash` 越权审批原生 `ApprovalPanel` 透传 | **PASS** | `phase3b-bash-escalate.mjs` 实测 `sandbox_permissions: "require_escalated"` 触发上游 `ApprovalPanel`（`signoffCnt=0 allowVis=true`，`p3r3-01-bash-approval-panel.png`）。 |
 | **T4** | 真模型多题 + 自由文本 `ask_user_question` | **PASS** | `phase3-live-r3.mjs` 实测两题向导与自由文本输入框（`ask=true radios=2`，`p3r3-02-multi-question-card.png`）。 |
 | **T5** | `/cultivation` 附带引用 → 创建 → 采纳 → 验证 → 撤回 GUI 闭环 | **PASS（连带检出 BUG-404）** | Chromium 全链路 `verified=true revoked=true`（`r3-07-cultivation-full-gui.png`），同时发现撤回后 `Mine` 绿标残余并立 [BUG-404](../fixed_bugs/BUG-404-stale-zero-badges-after-reload-and-mine-revoked-tag.md)。 |

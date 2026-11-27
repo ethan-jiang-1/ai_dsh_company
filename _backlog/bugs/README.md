@@ -8,11 +8,10 @@
 
 ## 活跃清单
 
-**活跃 1 张（Round 3 UX/UI 盲区深扫立案 BUG-399..405；按根因五批依次自主修复）**：
+**活跃 0 张（Round 3 UX/UI 盲区深扫立案 BUG-399..405 已全部按五批自主修完并迁入 `fixed_bugs/`）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
-| [405](BUG-405-host-cultivation-command-and-errors-unlocalized-and-live-en-lag.md) | P1 | host / lib | `/cultivation` 漏用 `registerLocalizedCommand` 致 `en` 命令菜单仍显中文；Host 上下文读取与底层路径/写闸报错硬编码中文 | 调查中 |
 
 **按根因聚类摘要（供下轮修复排期）**：
 - **组 1 · 交互安全与宿主生命周期**（[392](../_archive/fixed_bugs/BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md)、[393](../_archive/fixed_bugs/BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md)、[396](../_archive/fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md) 快捷键部分）：容器级键盘未豁免可聚焦控件/`modal`/`terminal`，HQ 全局面板呼唤右栏漏切回会话，内嵌工坊未清理会话 Hero/Chrome；
@@ -40,7 +39,7 @@
 | **2 环境状态同源与培养异步竞态** | [400](../_archive/fixed_bugs/BUG-400-embedded-workshop-status-pill-leak-and-cultivation-race-gaps.md)（已修 `cc9da514`） + [404](../_archive/fixed_bugs/BUG-404-stale-zero-badges-after-reload-and-mine-revoked-tag.md)（已修 `cc9da514`） | `ComposerStatusPill` 漏内嵌工坊守卫、`HeroMotionOptions` 无公司角色守卫、`workshop-sessions` 无订阅；环境角标未合流 `pageHistory` 历史审批；`CultivationMine` 漏判 `revokedAt`、看板 `records===null` 空白、撤回取消未禁用、Picker 缺 `.catch()`、`visibilitychange` 后台乱读 | 抽共享 `createMergedAttentionObservable`（live+history 去重）接回环境角标；工坊/角色守卫收全并可订阅；`CultivationAdopted`/`Feedback`/`Mine`/`Picker`/`cultivation-data` 补齐加载态、互斥锁定、`.catch()` 与 `visible` 过滤 | 2 |
 | **3 运行期边界防崩、终态标签与错误环** | [401](../_archive/fixed_bugs/BUG-401-panel-nan-null-crashes-signoff-error-tag-and-question-id-mismatch.md)（已修 `dfbaed24`） | `TasksTableView` 与 `BudgetPanel` 假设投影字段完备有限；`SignoffToolView` 忽略非决策 `error`/`stopped` 终态；`pendingQuestions` 错失 `data.id !== callId` 问询已答事件；`error-ring` 乱序卸破坏全局句柄、`relay` 抛错前 `shift` 丢队列 | 展示层加 `Array.isArray`/`Number.isFinite` 及动画插值连续 ref；`SignoffToolView` 区分失败/中断终态徽标；`pendingQuestions` 兼容跨键已答清理；`installErrorCapture` 按栈恢复、`createErrorRelay` 先发送再出队（单次重试保队列） | 3 |
 | **4 视觉对比度、窄屏溢框、浮窗与 ARIA** | [402](../_archive/fixed_bugs/BUG-402-light-mode-layer2-invisible-highlight-and-390-textarea-overflow.md)（已修 `aa8d8cc3`） + [403](../_archive/fixed_bugs/BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md)（已修 `aa8d8cc3`） | Light 模式 `--dsw-alias-bg-layer-2` 同 `#fff` 致高亮/轨道隐身；`.wk-cultivation-body-input` 缺 `border-box`；浮窗未认 `panel.id` 留死按钮；Hub 子页卸载丢草稿；`SegmentedControl` 悬空 `aria-controls`；横幅/顶带 `z-index` 压 `Modal`；`GuideHub` 缺 `replaceTab` | 替换为 Light 可区分设计系统令牌并补 `border-box`；对齐 `z-index: 900 < Modal(1000)`；按 `panel.id.startsWith('float')` 隐藏浮窗冗余按钮；`ArchiveHubTab` 首次访问后保活隐藏；补全全部 `tabpanel` `id`；`GuideHub` 加 `{ replaceTab: true }` | 4 |
-| **5 Host 命令与底层错误双语闭环** | [405](BUG-405-host-cultivation-command-and-errors-unlocalized-and-live-en-lag.md) | `/cultivation` 漏用 `registerLocalizedCommand` 导致 `en` 命令栏仍显中文；`readContext`/`cultivation-context`/`company-root`/`write-gate`/`runtime-guard` 硬编码中文报错 | `/cultivation` 接入 `registerLocalizedCommand`；按 `language` / `lang` 参数实现 `readContext`、`cultivation-context`、路径与写闸双语错误分流（默认保持 `zh` 向后兼容，`en` 零中文泄漏） | 5 |
+| **5 Host 命令与底层错误双语闭环** | [405](../_archive/fixed_bugs/BUG-405-host-cultivation-command-and-errors-unlocalized-and-live-en-lag.md)（已修 `1db6d6e7`） | `/cultivation` 漏用 `registerLocalizedCommand` 导致 `en` 命令栏仍显中文；`readContext`/`cultivation-context`/`company-root`/`write-gate`/`runtime-guard` 硬编码中文报错 | `/cultivation` 接入 `registerLocalizedCommand`；按 `language` / `lang` 参数实现 `readContext`、`cultivation-context`、路径与写闸双语错误分流（默认保持 `zh` 向后兼容，`en` 零中文泄漏） | 5 |
 
 **终点**：7 张全部带实跑红/绿证据迁入 `fixed_bugs/`；1 篇批次伞形 Note（收口时同 diff 落盘）；全套门禁（`verify`/`typecheck`/`lint`/`dup`/`test`/`coverage:ratchet`）+ 5 条 keyless 浏览器车道 + Round 3 实证复验全绿 + 独立只读 `research` 子代理盲审 0 阻断并 `push`。
 
