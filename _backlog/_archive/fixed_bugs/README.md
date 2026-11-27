@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-394 / BUG-395**（2026-11-27，392..398 批顺位 2 / P1×2）：`applyCompanyIdentityRead` 失败或无目标回落出厂品牌、`useWorkspaceText` 切 `sessionId` 同步归 `loading`、`loadStartup` 守卫 `signal.aborted`、`StrategyPanel` 随 `sessionId` 清错并重建行；`DagPanel` `ResizeObserver` 按 `hasNodes` 重挂并用 `useId()` 隔离 `<marker>`，`DeliverablesView` 归零筛选回正 `'all'`——
+  [394](BUG-394-cross-session-brand-text-and-startup-abort-state-leaks.md)、[395](BUG-395-dag-empty-mount-never-scales-and-deliverables-hidden-filter-trap.md)。证据提交 `e2337ab8`。
+
 - **BUG-392 / BUG-393**（2026-11-27，392..398 批顺位 1 / P0×2）：`SignoffComposerCard` 补齐 `<summary>`/`button`/修饰键/IME/`waitingRef`/`answerable` 护栏；新增 `openOnSessionSurface` 统一先切回主区再等 `sidebarRight.mounted` 就绪，内嵌工坊固定 `phase:'active', hero:false` 并按 `mainSessionId`/`retryNonce` 管控生命周期且在总览合并 `pageHistory`——
   [392](BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md)、[393](BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md)。证据提交 `1d9368a1`。
 

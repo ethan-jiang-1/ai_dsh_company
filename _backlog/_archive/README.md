@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-394](fixed_bugs/BUG-394-cross-session-brand-text-and-startup-abort-state-leaks.md) — 已修（`e2337ab8`）：跨工作区品牌读取失败回落出厂身份、`useWorkspaceText` 切会话清回 `loading`、`loadStartup` 检查 `signal.aborted` 及 `StrategyPanel` 随 `sessionId` 清除残留报错与草稿。
+- [BUG-395](fixed_bugs/BUG-395-dag-empty-mount-never-scales-and-deliverables-hidden-filter-trap.md) — 已修（`e2337ab8`）：`DagPanel` 依 `hasNodes` 重挂 `ResizeObserver` 并用 `useId()` 隔离 `<marker>`，`DeliverablesView` 条件筛选归零时自动退回 `'all'`。
 - [BUG-392](fixed_bugs/BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md) — 已修（`1d9368a1`）：`SignoffComposerCard` 补 `<summary>`/`拒绝` Enter 豁免、修饰键/IME/`waitingRef`/`answerable` 护栏。
 - [BUG-393](fixed_bugs/BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md) — 已修（`1d9368a1`）：统一 `openOnSessionSurface` 切换右栏、修复内嵌培养工坊 Hero 阻断与 `retryNonce`/`started` 生命周期并同步 HQ 待办历史。
 - [2026-11-27-ux-ui-round2-deep-audit-and-e2e.md](settled_issues/2026-11-27-ux-ui-round2-deep-audit-and-e2e.md) — Round 2 UX/UI 盲区与契约边界深扫（Phase 0–4 全盘实证，排伪 5 项后立 `BUG-392..BUG-398` 只报不修，0 产品代码改动）；去向 = none。
