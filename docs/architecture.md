@@ -2,7 +2,7 @@
 
 > 什么时候读：想掌握公司插件的整体技术架构、代码分层与扩展边界时。这是**架构总纲（有序地图）**——
 > 内部代码架构看 [architecture/](./architecture/)，运行态时序看 [runtime-map.md](./runtime-map.md)，当前语义看 [contracts/](./contracts/)，
-> 为什么选 A 不选 B 住 `notes/implemented/`。总入口 = [index.md](./index.md)；决策台账 = [reference/decisions.md](./reference/decisions.md)。
+> 为什么选 A 不选 B 住 `notes/implemented/`。总入口 = [docs/README.md](./README.md)；决策台账 = [reference/decisions.md](./reference/decisions.md)。
 
 ## 一句话
 
@@ -71,7 +71,7 @@ host 行 = [contracts/profile.md](./contracts/profile.md)；工具面 owner = `p
 - host 组合 / 安装：[contracts/profile.md](./contracts/profile.md) + [contracts/release.md](./contracts/release.md)。
 - 委派 / 团队：[contracts/delegation.md](./contracts/delegation.md)。
 - 运行态 / 时序：[runtime-map.md](./runtime-map.md)；空间位置：[project-map.md](./project-map.md)。
-- 验证：[testing.md](./testing.md) + [tests/README](../tests/README.md)；文档规矩：[docs/AGENTS.md](./AGENTS.md) · [index.md](./index.md)。
+- 验证：[testing.md](./testing.md) + [tests/README](../tests/README.md)；文档规矩：[docs/AGENTS.md](./AGENTS.md) · [docs/README.md](./README.md)。
 - 早期设计理由（为什么这样）：[architecture](../notes/implemented/2026-11-10-architecture-rationale.md) · [roles-isolation](../notes/implemented/2026-11-10-roles-isolation-rationale.md) · [ui-demo](../notes/implemented/2026-11-10-ui-demo-rationale.md) · [role-content](../notes/implemented/2026-11-10-role-content-rationale.md)。
 
 ## 升级触发

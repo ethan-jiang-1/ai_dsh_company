@@ -1,6 +1,6 @@
 # 2026-11-10 · docs/ DSH 对齐五步
 
-状态：implemented（2026-11-10 交付；五步 commit `69706354` / `177f887f` / `ab0fd622` / `3beabcca` / `abb02d1e`；部分被 [2026-11-27-docs-architecture-and-dependency-alignment.md](./2026-11-27-docs-architecture-and-dependency-alignment.md) 演进：新增 `docs/architecture/` 层、补全 `docs/index.md` 五层导航并禁止 `docs/` 链接 `_backlog/`）
+状态：implemented（2026-11-10 交付；五步 commit `69706354` / `177f887f` / `ab0fd622` / `3beabcca` / `abb02d1e`；部分被 [2026-11-27-docs-architecture-and-dependency-alignment.md](./2026-11-27-docs-architecture-and-dependency-alignment.md) 演进：新增 `docs/architecture/` 层、补全 `docs/README.md` 五层导航并禁止 `docs/` 链接 `_backlog/`）
 
 上游 = [docs-dsh-alignment](../../_backlog/_archive/settled_issues/2026-11-10-docs-dsh-alignment.md)
 
@@ -11,7 +11,7 @@
 ## 决定
 
 1. **值/死路径/矛盾**：14+ 处修正，删数不改数（D28）；含 architecture 的 tool-face 自相矛盾、roles-isolation 的 `continuation-activation.ts` 死引用、product-definition 的死路径。
-2. **index → tier 书架**：`docs/index.md` 只列 5 层（顶层门/宪法、contracts、guides、reference）+ “先读（按目的）”；33 行逐文档登记删除。`doc-taxonomy` 改为：顶层文档必须逐项链接；tier 文档只要求 tier 目录被链接；stray 目录/顶层未登记即红。`docs/AGENTS.md` 新文档规则同步（树即 inventory）。
+2. **index → tier 书架**：`docs/README.md` 只列 5 层（顶层门/宪法、contracts、guides、reference）+ “先读（按目的）”；33 行逐文档登记删除。`doc-taxonomy` 改为：顶层文档必须逐项链接；tier 文档只要求 tier 目录被链接；stray 目录/顶层未登记即红。`docs/AGENTS.md` 新文档规则同步（树即 inventory）。
 3. **design/ → notes/**：4 篇设计文档写成 `notes/implemented/2026-11-10-{architecture,roles-isolation,ui-demo,role-content}-rationale.md`，收口为决定记录（现行语义用 canonical 链接；完整原稿留 git `ab0fd622^`）。`design/` tier 从树、层表、`doc-taxonomy`、预算中移除；顶层新增有序地图 `docs/architecture.md`。
 4. **genre 拆分**：`demo` 的前置/分镜/场景 B–F → `guides/demo-scenes.md`；`multi-human` 的开门/交接/前提/迁移 → `guides/multi-human-runbook.md`；`presets` 的培养回路 → `contracts/cultivation.md`；工具行枚举改为指针（owner = preset 实现）。三份合同只留当前语义。
 5. **5% headroom**：`doc-budget` 加“内容 ≤ 95% 上限”（`docs/` 适用；`docs/reference/` 豁免——查表/台账，DSH 允许 reference 穷尽）。9 篇 prose 文档瘦身/去重，**未提额**；`doc-taxonomy` 红证 3 条（顶层 stray / stray tier / tier 未链接）。
@@ -45,5 +45,5 @@
 
 - 卡：[docs-dsh-alignment](../../_backlog/_archive/settled_issues/2026-11-10-docs-dsh-alignment.md)。
 - 前序结构收敛：[docs-layer-restructure](./2026-11-10-docs-layer-restructure.md)。
-- 地图：[docs/index.md](../../docs/index.md)；层表：[docs/AGENTS.md](../../docs/AGENTS.md)；架构：[docs/architecture.md](../../docs/architecture.md)。
+- 地图：[docs/README.md](../../docs/README.md)；层表：[docs/AGENTS.md](../../docs/AGENTS.md)；架构：[docs/architecture.md](../../docs/architecture.md)。
 - 四篇理由 Note：[architecture](./2026-11-10-architecture-rationale.md) · [roles-isolation](./2026-11-10-roles-isolation-rationale.md) · [ui-demo](./2026-11-10-ui-demo-rationale.md) · [role-content](./2026-11-10-role-content-rationale.md)。

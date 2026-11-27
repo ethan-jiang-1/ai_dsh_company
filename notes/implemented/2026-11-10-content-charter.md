@@ -14,7 +14,7 @@
    看骨架垮不垮）→ 点名第二消费者 → 按搬家成本定抽象度。
 4. **宪法只写判据**：目录清单住 `packages/company-pack/content/README.md` 与 `manifest.json`，门禁清单住
    `checks/gates/` 目录，步骤住 skill——宪章不复述这三者（D28：枚举型事实的家 = 实现自己）。
-5. **入口四条**：`AGENTS.md` 开工最小路径、`docs/index.md` 书架、`docs/AGENTS.md` 层表、
+5. **入口四条**：`AGENTS.md` 开工最小路径、`docs/README.md` 书架、`docs/AGENTS.md` 层表、
    `capability-addition-definition` skill 链回；`charter-entry` 门禁钉这四条在场。
 
 ## 输掉的方案
@@ -46,7 +46,7 @@
 - 多一道门禁 `charter-entry`（每次 `pnpm verify` 跑一次，纯读盘，零成本）。
 - 未做：`## 抽象度` 的机械强制仍是 v1「模板 + 语义审」——两个真实案例都没填才升格为门；产品类型层的
   第二消费者目前只有两家 fixture。决策台账未加 D 号（同类前一轮 DSH 对齐轮同款；[台账](../../docs/reference/decisions.md)
-  已在 65/65 顶格，加行须先搬/压——路由已由 `docs/index.md` 书架给出）。
+  已在 65/65 顶格，加行须先搬/压——路由已由 `docs/README.md` 书架给出）。
 
 ## 验证
 
@@ -60,7 +60,7 @@
   - 删 `AGENTS.md` 的宪章链接 → `FAIL charter-entry: AGENTS.md 未以 Markdown 链接指向 content-charter.md（开工最小路径；纯文本提及不算入口）`
   - 删归位 skill 的链回 → `FAIL charter-entry: .agents/skills/capability-addition-definition/SKILL.md 未以 Markdown 链接指向 content-charter.md（归位 skill；纯文本提及不算入口）`
   - `mv` 走宪章本体 → `FAIL charter-entry: docs/content-charter.md 不在盘上——内容宪章是归位规则的唯一家（文件不许消失：内容该搬就搬，壳留着）`
-  - 删 `docs/index.md` 书架链接 → `FAIL charter-entry: docs/index.md 未以 Markdown 链接指向 content-charter.md（书架；纯文本提及不算入口）`
+  - 删 `docs/README.md` 书架链接 → `FAIL charter-entry: docs/README.md 未以 Markdown 链接指向 content-charter.md（书架；纯文本提及不算入口）`
   - `mv` 走 `docs/AGENTS.md` → `FAIL charter-entry: docs/AGENTS.md 缺失（层表：入口面不许消失）`
 
   五条逐条还原后重跑 = PASS（同一行输出见上）。
@@ -69,7 +69,7 @@
 
 - **样本**：fresh subagent（会话 `c94b6027-8e2e-47a9-9bc6-58cb79f05ac2`，独立上下文，无本变更背景）。
   题 = 「给公司加一个新能力：CFO 在每轮动议收工时自动产出现金流预警简报，阈值和升级线由公司政策决定」。
-- **撞到入口链（自报阅读顺序，原文节选）**：`AGENTS.md` → `docs/index.md` → `docs/policy.md` →
+- **撞到入口链（自报阅读顺序，原文节选）**：`AGENTS.md` → `docs/README.md` → `docs/policy.md` →
   `docs/contracts/presets.md` → **`docs/content-charter.md`** → `packages/company-pack/content/README.md` … →
   **`.agents/skills/capability-addition-definition/SKILL.md`**。
   后一条同时证明 skill catalog 在新会话里已收录该 skill（catalog 于会话首个 pre-step 装载）。

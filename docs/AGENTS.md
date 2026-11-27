@@ -3,7 +3,7 @@
 > 什么时候读：写/改/搬 `docs/` 下的文档、判断某事实该住哪层时。
 
 本文件是 `docs/` 的**分层规矩唯一家**：哪层放什么、**哪层不放什么**、写多长、写完了怎么更新。
-文档地图 = [index.md](./index.md)；决策台账 = [decisions.md](./decisions.md) → [reference/decisions.md](./reference/decisions.md)；写作风格（一次一句、不复述代码）= 根 [AGENTS.md](../AGENTS.md) 纪律表。
+文档地图 = [docs/README.md](./README.md)；决策台账 = [decisions.md](./decisions.md) → [reference/decisions.md](./reference/decisions.md)；写作风格（一次一句、不复述代码）= 根 [AGENTS.md](../AGENTS.md) 纪律表。
 **本文件管形状，不管事实**——各主题的现在时语义住各合同文件，本文件不复述。
 
 ## 一处事实一个家
@@ -13,7 +13,7 @@
 
 | 层 | 目录 | Job（这层管什么） | **不属于这层** |
 |---|---|---|---|
-| 导航 | [index.md](./index.md) | 文档地图（决策台账 = [decisions.md](./decisions.md) → [reference/decisions.md](./reference/decisions.md)） | 决定正文、理由、输掉的方案（→ Note）；主题事实（→ 该主题的合同） |
+| 导航 | [docs/README.md](./README.md) | 文档地图（决策台账 = [decisions.md](./decisions.md) → [reference/decisions.md](./reference/decisions.md)） | 决定正文、理由、输掉的方案（→ Note）；主题事实（→ 该主题的合同） |
 | 架构 | [architecture.md](./architecture.md) · [architecture/](./architecture/) | **怎么组装与分层**：组合链、模块边界、扩展契约与源码入口 | 逐行工具/文件枚举（→ 实现自己）；历史备选与理由（→ Note） |
 | 参考 | [reference/](./reference/) | 查表与登记：D 号、术语、外部材料、面例外 | 决定正文（→ Note）；主题事实（→ 合同） |
 | 政策 | [policy.md](./policy.md) | **常设规则**：授权边界、材料性、门禁升格、自动化上限、越界写入、自主协议 | 操作步骤与命令（→ 指南）；机制依据（→ notes/implemented）；决定史（→ Note） |
@@ -46,13 +46,13 @@
 
 ## 新文档
 
-先定位层次 → 定该层详略上限 → 定教程/参考 → 写 → 放进对应 tier；**顶层门/宪法**才在 [index.md](./index.md) 书架登记，tier 内文档由目录承载（树就是 inventory）。**别建集中清单**（第二清单必漂，D28/D34 同款教义）：枚举型事实的家 = 实现自己。
+先定位层次 → 定该层详略上限 → 定教程/参考 → 写 → 放进对应 tier；**顶层门/宪法**才在 [docs/README.md](./README.md) 书架登记，tier 内文档由目录承载（树就是 inventory）。**别建集中清单**（第二清单必漂，D28/D34 同款教义）：枚举型事实的家 = 实现自己。
 
 ## 负知识（本仓明确不借的）
 
 | 不借 | 为什么 |
 |---|---|
-| 按时间分目录（"初始化"一类） | 必然长出"烂尾层"：要么始终为真（那是合同，按主题归位），要么已失真（那是历史，归 `notes/` 或 git）。见 [index.md §书架](./index.md) |
+| 按时间分目录（"初始化"一类） | 必然长出"烂尾层"：要么始终为真（那是合同，按主题归位），要么已失真（那是历史，归 `notes/` 或 git）。见 [docs/README.md §书架](./README.md) |
 | 集中 `INDEX.md` | 违反 DSH no-index 教义（"the lifecycle/class tree **is** the working inventory"）；D34 已据此退役一份。台账只做**路由** |
 | 在文档里复述枚举型清单 | 实测六份清单同一种病（D28）：家 = 实现自己，文档留分层原则 + 指针 |
 | 用行数当完成门槛 | D26：文件/行数**仅观察**；完成门槛是"该面最小真检查通过"（D15） |

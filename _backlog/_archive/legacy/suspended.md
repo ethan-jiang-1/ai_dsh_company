@@ -21,7 +21,7 @@
 | remote-mock 测试支撑 | 同上 #12 | 现有 keyless 链够用 | client 测试需要 mock remote |
 | 新工具族（ssh/browser-use/voice/PTC/auto-review/skill-office） | 同上 #14 | demo 储备不预挂（D13） | demo 卖点需求逐项点名 |
 | OTLP 产品遥测 | 同上 #15 | 默认不挂载 | 运营侧使用数据需求 |
-| **M2 自定义 provider** | [index](../../../docs/index.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
+| **M2 自定义 provider** | [index](../../../docs/README.md) 待定 Q1（已闭合） | 只在需要**组合隔离**时才有价值；"跟 VP 连续对话"已由 team 持久成员满足 | 出现必须隔离组合的具体需求 |
 | **界面外推送 / 收件箱** | [org-presence-board（已毕业）](../../../notes/archived/2026-09-22-org-presence-board.md) §背景 | 需求已出现（实时卡人离台即丢）但**用户裁定 demo 期不做**——"人在台面前"成立即可；生态有现成做法（[web-push](https://github.com/blauerberg/dsh-web-push-notification) / [pager](https://github.com/wg5759/dsh-pager) / [ui-mobile](https://github.com/jasondu/dsh-ui-mobile) / [dispatch](https://github.com/alextangson/dsh-dispatch)），借设计不装 | 到 MVP 阶段按依赖门槛评估，或明确要求"人不在台面前也要收到" |
 | **多人门的折中视图**（L1-E 激活：默认只见自己的门 + 一键切全局；实验 D 用户裁决「A、B 都不对，要折中」） | [multi-human-ux 毕业稿 §结论](../../../notes/archived/2026-09-26-multi-human-ux.md) | **client 红线未解除**（demo 期不做 client 增强，2026-09-25 裁）；实验 D 两配置均已由用户本人否决（A 红线触发 / B 隔离过度） | 用户点名开工 client 增强时（届时先过 client 红线裁决） |
 | **会话库共享文件系统后端**（S3 类；用户部署路径裁决：先本地调通，将来迁共享 FS，"只要是一个共享文件系统就行"） | [multi-human-ux 毕业稿 §结论](../../../notes/archived/2026-09-26-multi-human-ux.md)（配置 B 人判腿 2026-09-26） | MVP 未到；DSH 会话库后端属上游能力（`dshHomePath`），本仓不自建（D13） | MVP 多人部署阶段；届时向上游提 seam 或评估部署架构 |

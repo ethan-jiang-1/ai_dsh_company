@@ -49,7 +49,7 @@
 | 层 | 失败类 | 负控（见过红） |
 |---|---|---|
 | 静态门（链接） | 12 文档/指针 | `node tests/checks/gates-negative.test.mjs` → `PASS md-links：相对链接逃出仓库根 → 红`（`FAIL link: docs/outside.md:3 → ../../outside.md (repo 外目标…)`）、`PASS md-links：gitignored 产物目标 → 红`（`(gitignored 目标…)`）、`PASS md-links：仓库内链接 → 绿`；三向全跑 |
-| 静态门（裸路径） | 12 | 在构建输出目录真造一个探针文件（存在）+ `docs/index.md` 加一行 → `FAIL bare-path docs/index.md:46 → … 是构建产物（gitignored：本机有、干净 clone 无…）`；还原 → `OK` |
+| 静态门（裸路径） | 12 | 在构建输出目录真造一个探针文件（存在）+ `docs/README.md` 加一行 → `FAIL bare-path docs/README.md:46 → … 是构建产物（gitignored：本机有、干净 clone 无…）`；还原 → `OK` |
 | 静态门（计数） | 12 | `node tests/checks/gates-negative.test.mjs` → `PASS nav-count-claims：preset 计数（6 个 preset）→ 红`（`preset 计数声明「六公司角色」`）；真盘改完 → `OK nav-count-claims ×121` |
 | 全量 | 3 导出/入口 + 12 | `npm_config_verify_deps_before_run=false pnpm verify` → `verify: ALL PASS；2 门无对象`（134 PASS）；`validateMarkdownLinks(process.cwd()).violations` = `0`（8150 链接 / 951 文件） |
 | 真挂载 | 10 配置/组合 | `source run/env.sh && node checks/lanes/preset.entry.mjs` → `preset-smoke: ALL PASS（6 个角色 + 5 个非角色 preset 全部可挂载）`，25s；含 11 次 `session/create`、session-search 隔离组、skills 隔离 |

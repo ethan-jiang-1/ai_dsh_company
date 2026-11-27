@@ -70,7 +70,7 @@ opened: 2026-11-08
 | 使用者（边界情况） | 安装手册（随 tarball 分发） | 前置、完整路径、第一次经营、升级、备份、卸载、排障 |
 | 开发者 | [bootstrap](../../../docs/guides/bootstrap.md) | 环境怎么立、维护者 dev 与真插件安装的差别 |
 | Agent | [AGENTS.md](../../../AGENTS.md) | 入口链、纪律、命令表 |
-| 想懂机制的人 | [docs/index](../../../docs/index.md) | 设计、合同、决策台账 |
+| 想懂机制的人 | [docs/index](../../../docs/README.md) | 设计、合同、决策台账 |
 
 ### 根 README 目标结构（≤90 行，骨架不是定稿文案）
 

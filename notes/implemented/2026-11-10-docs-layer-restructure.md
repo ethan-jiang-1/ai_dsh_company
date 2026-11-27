@@ -24,7 +24,7 @@ index 首屏按目的路由。
    （3：decisions / terminology / external-research）；`design/`（4）与 `guides/`（11）不变。
 2. **`docs/AGENTS.md` 层表**：新增“参考”行；合同行改为“顶层跨面宪法 + `contracts/`”；合同定义从
    “某子系统”改为“某主题/子系统”（contracts 含 demo/multi-human/release，不是纯子系统）。
-3. **`docs/index.md`**：首屏改为“先读（按目的）”5 行；33 行登记表路径全部指向新家；
+3. **`docs/README.md`**：首屏改为“先读（按目的）”5 行；33 行登记表路径全部指向新家；
    `doc-taxonomy` 绿。
 4. **站内链接**：227+ 条、104 个源文件跟随；其中 **122 个冻结层文件**（`notes/archived` /
    `_backlog/_archive`）逐文件核为 **HEAD 内容只做 10 条 old→new 路径替换**，0 内容/日期/论断变化。

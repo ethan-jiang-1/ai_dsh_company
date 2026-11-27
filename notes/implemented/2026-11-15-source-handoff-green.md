@@ -7,7 +7,7 @@
 1. **源码 handoff 有单一入口。** 新增 [repo-handoff](../../docs/guides/repo-handoff.md)：先选路径
    （源码 / tarball / 只有手册）、clean clone 五步、真挂载与首屏、发布点态、start set 与「不要读什么」。
    根 [README](../../README.md) 首屏加一句话边界（本仓库是源码 handoff，不是收件人安装包），
-   [AGENTS](../../AGENTS.md) 开工路径与命令表、[docs/index](../../docs/index.md) 第一次接管行都指向它。
+   [AGENTS](../../AGENTS.md) 开工路径与命令表、[docs/index](../../docs/README.md) 第一次接管行都指向它。
    此前边界只在 README 尾部，fresh agent 会先走「5 分钟装好」的收件人路径。
 2. **命令表补前置。** `pnpm company --no-open` 在 AGENTS 命令表与「五条命令」里都改为
    `source run/env.sh && pnpm company --no-open`；`run/env.sh` 的双 home/裸 dsh 拦截不再靠读者自己想起。

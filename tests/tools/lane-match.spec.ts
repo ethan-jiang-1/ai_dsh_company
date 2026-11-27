@@ -54,10 +54,10 @@ describe('lane 匹配纯逻辑（按面触发的判据）', () => {
 
   it('coveredBy 规则产出显式豁免，且不重复产出 asset', () => {
     const rules = [{ globs: ['docs/**'], coveredBy: ['verify'], why: 'docs' }]
-    const { assets, matches, covered, unseen } = selectSurfaces(['docs/index.md'], rules)
+    const { assets, matches, covered, unseen } = selectSurfaces(['docs/README.md'], rules)
     expect(assets).toEqual([])
     expect(matches).toEqual([])
-    expect(covered).toEqual([{ glob: 'docs/**', path: 'docs/index.md', coveredBy: ['verify'], why: 'docs' }])
+    expect(covered).toEqual([{ glob: 'docs/**', path: 'docs/README.md', coveredBy: ['verify'], why: 'docs' }])
     expect(unseen).toEqual([])
   })
 

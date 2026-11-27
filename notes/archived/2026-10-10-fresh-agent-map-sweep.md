@@ -11,7 +11,7 @@
 5. **`.pi/`（外部工具任务态）不在 .gitignore**：只靠机器级全局 gitignore 隐身，换机器/新 clone 即露 untracked。
 6. **entry-probe 语义审实测抓出的矛盾**（同日三轮，机器面 13/13 绿、语义面报 3+5 条）：
    - **C1/C4 = 冻结历史类误立**：审读把 `snapshots/probes/entry-probe/` 历史档案引用的旧文本（磨活曾为任务源、`_backlog/_archive/` 迁档前的旧池前缀）当现行矛盾——那些面是录制/归档时点的原文，按政策**不追改**，属判据没划清面。
-   - **C2 = 我自己刚造的新标签**：布局行写「→ rejected/archived/postmortem（离场面三桶）」，与 [index §notes 行](../../docs/index.md) 的「离场两桶（D30）+ postmortem 单列」成第三套计数口径。**同轮暴露第四个盲区**：`checks|probes|tools` 的**脚本头注**运载指针，却不在任何 .md 扫描面——retired-path 扩面后实测红出两处（`cross-process-fs-probe` 引用已迁的 plans 研究卡、`time-context-probe` 引用已迁的 `_done/_closed_plans` 推敲卡），三门禁此前全绿放过。
+   - **C2 = 我自己刚造的新标签**：布局行写「→ rejected/archived/postmortem（离场面三桶）」，与 [index §notes 行](../../docs/README.md) 的「离场两桶（D30）+ postmortem 单列」成第三套计数口径。**同轮暴露第四个盲区**：`checks|probes|tools` 的**脚本头注**运载指针，却不在任何 .md 扫描面——retired-path 扩面后实测红出两处（`cross-process-fs-probe` 引用已迁的 plans 研究卡、`time-context-probe` 引用已迁的 `_done/_closed_plans` 推敲卡），三门禁此前全绿放过。
    - **C3 = index 路由未随迁家改新**：现有文档表仍把「改动面→最小证据」记在 testing.md 名下（该表 2026-10-10 已迁 `tests/README.md`）。
    - **C5 = 成品口径两套措辞无单点映射**：公司手册写角色措辞「只有 CEO」，D20/判据写会话形状「Lead 的 present」；单公司与多人模式下二者重合，但「Lead ≡ CEO 根门」这一映射此前不在任何文件。
 7. **幽灵指针 vendor/README.md（长期存活，靠门禁重挂藏身）**：纪律表把它当「vendor 钉版本 / 升 pin 流程合同」的权威，而**本仓从来没有这个文件**（`vendor/` 是子模块，只有 `dsh/`；`git log --all` 对该路径零记录——自 08ceba4 引入起就是幽灵）。它逃过所有审计的原因 = bare-path 的**双树重挂**：该 raw 被判成 `vendor/dsh` 下的同名文件命中（Cordis 自己的 vendoring manifest，语义完全不同的另一个文件）。

@@ -19,7 +19,7 @@
 | 修改 host 或 Web | [源码地图](../packages/company-pack/src/README.md) | 找到注册入口、读模型与渲染实现 |
 | 选择验证 | [测试宪法](testing.md)、[tests/README](../tests/README.md)、[脚本索引](../checks/README.md) | 选择证明当前性质的最窄检查 |
 | 查证据与归档 | [快照规则](../snapshots/README.md) | 区分录制、副本、独立 oracle、视觉夹具和归档 |
-| 查设计理由或旧决定 | [主题导航](index.md)、[决策台账](./reference/decisions.md) | 从主题进入合同和关联 Note |
+| 查设计理由或旧决定 | [主题导航](./README.md)、[决策台账](./reference/decisions.md) | 从主题进入合同和关联 Note |
 
 ## 运行、开发、排练与证据各在哪里
 
@@ -33,7 +33,7 @@
 | keyless 回归 | [tests](../tests/)、[Vitest 配置](../vitest.config.ts) | 模块逻辑、静态渲染、隔离文件夹具；分层守卫见 [layering.spec.ts](../tests/repo/structure/layering.spec.ts) |
 | 维护工具 | [检查与工具索引](../checks/README.md) | 门禁、真实入口、窄探针、审计、回放与导出；工具面按用途分三组，目录规则 = [tools/README](../tools/README.md)；共享地基 = [tools/lib](../tools/lib/)（core/ probe/ session/ company/ repo/ release/），judge-wide = [checks/lib](../checks/lib/)；gate-local = [checks/gates/lib](../checks/gates/lib/)；lane-local = [checks/lanes/lib](../checks/lanes/lib/)；show = [probes/lib](../probes/lib/)；test-only = [tests/support](../tests/support/) |
 | 固化证据 | [snapshots](../snapshots/README.md) | 按场景保留日志、sidecar、工作区与判据；按日期保存归档证据 |
-| 当前合同 | [docs](index.md) | 当前语义与操作方式；本地图负责路由 |
+| 当前合同 | [docs](./README.md) | 当前语义与操作方式；本地图负责路由 |
 | 决策记忆 | [notes](../notes/) | 按主题检索决定、被否决方案与复验依据 |
 | 推敲空间 | `_backlog/`（上游沙盒，非 `docs/` 权威源） | 探索、未成熟判断与缺陷跟踪材料；定型结论升格 `notes/` 后才被 `docs/` 引用 |
 

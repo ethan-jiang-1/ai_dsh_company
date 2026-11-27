@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻
 // Coding entry probe: explicit standard preset + repo cwd + logged coding baseline.
-// 何时跑：入口链/执行链文档（AGENTS.md / docs/index.md / dev-loop / _backlog）改动后；真模型认证档
+// 何时跑：入口链/执行链文档（AGENTS.md / docs/README.md / dev-loop / _backlog）改动后；真模型认证档
 // Machine checks validate per-question routing/evidence, not semantic correctness.
 // No keyless regression claim: true-model certification, 不进 pnpm test.
 // Usage: source run/env.sh && node checks/lanes/entry-probe.entry.mjs [--port 0] [--timeout 240000]
@@ -32,7 +32,7 @@ if (!Number.isInteger(PORT) || PORT < 0 || PORT > 65535 || !Number.isFinite(TURN
 // Overriding cwd can silently change the injected instruction chain. Keep this probe repo-specific.
 if (process.argv.includes('--cwd')) { console.error('entry-probe: cwd 固定为开发仓库根，不接受 --cwd'); process.exit(2) }
 const PROMPT = [
-  '你是本仓库的只读审读代理。先读 AGENTS.md、docs/index.md、docs/guides/dev-loop.md；',
+  '你是本仓库的只读审读代理。先读 AGENTS.md、docs/README.md、docs/guides/dev-loop.md；',
   '再按入口指针读取相关 docs/、notes/ 与 _backlog/（无需通读全树）。不要联网、执行命令、修改文件或启动子代理。',
   '这是审读任务，不执行任务，不进入实施；来源矛盾或答不了时明确列出，不编造。',
   '最后只输出一个 JSON 对象，不要输出前后说明，结构如下：',
@@ -48,7 +48,7 @@ const sourceHashes = new Map()
 // 允许面（2026-09-26 两次扩）：根入口 + docs/ + notes/ + **公司手册** + **checks|probes|tools/ + tests/**。
 // 为什么加 `company-workspace/AGENTS.md`：Q3 问"交付物三态的事实家在哪个文件"，正确答案就是它
 // （D20 点名的合同家、随每个成员会话首帧注入）。旧允许面读不到它 ⇒ **正确答案反而被判"来源不可读"**，
-// 而只有引 `docs/index.md` 的代理句才能过——那是在奖励绕路、惩罚直答。首跑实测踩到（基线 8/12 的 Q3）。
+// 而只有引 `docs/README.md` 的代理句才能过——那是在奖励绕路、惩罚直答。首跑实测踩到（基线 8/12 的 Q3）。
 // 为什么加 `checks|probes|tools/` 与 `tests/`：③ 把"何时跑"的家搬进了**脚本自己的头注**，于是"该跑哪个脚本"这类
 // 问题的最权威证据就是脚本本身；旧允许面只收 .md ⇒ 引脚本一律"来源不可读"（实测 Q4/Q5/Q7/Q10 同挂）。
 // **允许面必须跟着事实的家走。** 2026-10-07 再实证同病：Q7/Q10 的正确答案家 = `tests/README.md`
@@ -75,7 +75,7 @@ function readSource(path) {
   sourceHashes.set(path, createHash('sha256').update(text).digest('hex'))
   return text
 }
-for (const path of ['AGENTS.md', 'docs/index.md', 'docs/guides/dev-loop.md']) readSource(path)
+for (const path of ['AGENTS.md', 'docs/README.md', 'docs/guides/dev-loop.md']) readSource(path)
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 async function stop(child) {

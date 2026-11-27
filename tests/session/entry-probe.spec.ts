@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
 // 通配证据路径：单测桩对它返回 quote 自身（自洽），与下方真夹具（AGENTS.md）不撞车
-const evidence = { path: 'docs/index.md', quote: '逐字可核的证据原文至少八字符' }
+const evidence = { path: 'docs/README.md', quote: '逐字可核的证据原文至少八字符' }
 // Q4 的标准答案 = 现行 pin，从 AGENTS.md §vendor 簿记现读（2026-10-27 R3-15：原先写死 0.1.7，
 // pin 升到 0.2.1 后这份"入口链新鲜度"答卷仍在教旧值）。测试自己拉事实，不再抄第二份。
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..')

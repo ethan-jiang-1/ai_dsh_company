@@ -25,7 +25,7 @@ import assert from 'node:assert/strict'
 const SCRIPT = new URL('../../checks/pre-push-surfaces.mjs', import.meta.url).pathname
 const ZERO = '0000000000000000000000000000000000000000'
 const CLIENT_FILE = 'packages/company-pack/src/client/wiring/error-ring.ts'
-const DOC_FILE = 'docs/index.md'
+const DOC_FILE = 'docs/README.md'
 
 /** 在临时目录造一个带提交的 git 仓库；返回 { dir, commit, cleanup }。 */
 function repo() {

@@ -8,7 +8,7 @@ fresh-agent 审计（本日）发现三类结构性问题：
 
 1. **双写**：[docs/testing.md](../../docs/testing.md) §2 与 [tests/README.md](../../tests/README.md) 各持一张「改动面 → 检查」表——六行重叠、粒度略异，是「一处事实一个家」的现行违例面；run-gates 的 doc-budget 注释已自我点名（testing.md 顶格 75/75，「§1 分层表与 tests/README 有重叠面可搬」）。
 2. **内容相左**：[docs/guides/dev-loop.md](../../docs/guides/dev-loop.md) §1 第 5 步与 §12「完成条目」写「`_backlog` 表行/卡验收通过后离场」——与 2026-10-09 章制（[_backlog/README.md](../../_backlog/README.md)：结论 + 交接去向已记录即可关闭，**不等**实施验收）相反，且「表行」是 D32 已退役的队列概念。
-3. **登记漂移**：[docs/index.md](../../docs/index.md) 外部材料登记缺第七处（`ai_dsh_assitant/_backlog`——现行 `_backlog` 制度 2026-10-09 整体重立的借源），D31 行仍只指向 D31/D33 前朝；D30 行「research 目录退役」未说清退役的是 notes 侧旧 research 层，现行调研家 `_backlog/research/` 反而像被退役了。
+3. **登记漂移**：[docs/index.md](../../docs/README.md) 外部材料登记缺第七处（`ai_dsh_assitant/_backlog`——现行 `_backlog` 制度 2026-10-09 整体重立的借源），D31 行仍只指向 D31/D33 前朝；D30 行「research 目录退役」未说清退役的是 notes 侧旧 research 层，现行调研家 `_backlog/research/` 反而像被退役了。
 
 取代检查：活跃树无同决定 owner——最近邻 D36（台账纯路由）、D38（Note 事实落点时效）不与本 Note 冲突，无取代。
 

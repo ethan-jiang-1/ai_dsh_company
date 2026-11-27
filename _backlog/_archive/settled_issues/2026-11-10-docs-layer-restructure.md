@@ -14,7 +14,7 @@ opened: 2026-11-10
 
 ## 问题与期望结果
 
-`docs/` 顶层 18 个文件平铺：合同、地图、台账、规范、政策混在一个平面。人扫目录“无所适从”，agent 用 `glob docs/**/*.md` 也看不出路径的 scope。期望：按 DSH 的“树位置即 scope”分层——顶层只留门与宪法，按主题的当前语义进 `contracts/`，查表/台账进 `reference/`；[index.md](../../../docs/index.md) 首屏按目的路由，登记表留作查询。
+`docs/` 顶层 18 个文件平铺：合同、地图、台账、规范、政策混在一个平面。人扫目录“无所适从”，agent 用 `glob docs/**/*.md` 也看不出路径的 scope。期望：按 DSH 的“树位置即 scope”分层——顶层只留门与宪法，按主题的当前语义进 `contracts/`，查表/台账进 `reference/`；[index.md](../../../docs/README.md) 首屏按目的路由，登记表留作查询。
 
 ## 背景：为什么 docs/ 也要按寿命分层
 
@@ -55,12 +55,12 @@ opened: 2026-11-10
 
 ## 范围与排除项
 
-- 范围：`docs/` 的目录形状；[docs/AGENTS.md](../../../docs/AGENTS.md) 层表；[docs/index.md](../../../docs/index.md) 首屏与登记路径；`DOC_LINE_BUDGETS` 键；站内链接（含冻结层路径）；代码/配置里的 docs 路径引用；对应窄测。
+- 范围：`docs/` 的目录形状；[docs/AGENTS.md](../../../docs/AGENTS.md) 层表；[docs/index.md](../../../docs/README.md) 首屏与登记路径；`DOC_LINE_BUDGETS` 键；站内链接（含冻结层路径）；代码/配置里的 docs 路径引用；对应窄测。
 - 排除：docs 内容值修正（14 处，另卡）；两张触发卡的内容；`packages/company-pack/content/` 的三层内容；`vendor/`；不改 `docs/` 以外的文档结构。
 
 ## 已知与未决
 
-- [index.md](../../../docs/index.md) 69/72、[AGENTS.md](../../../docs/AGENTS.md) 60/62——贴着上限，下一步加内容先搬/压。
+- [index.md](../../../docs/README.md) 69/72、[AGENTS.md](../../../docs/AGENTS.md) 60/62——贴着上限，下一步加内容先搬/压。
 - `link-debt` 未升（archived 20 / moved 0 / live 0）；没有 redirect stub。
 - `_backlog/issues/2026-11-10-content-charter.md` 等未跟踪材料里的 docs 路径被顺带修正（路径 only），内容未动。
 - 14 处过期值仍在：release 的 patch 计数、runtime-map 的 preset 计数、presets 的 browser 角色数、dev-loop 的角色数、architecture 的 255 行 / 4 preset、ui-demo 的 patch 数组、bootstrap 的角色数、environments 的“四条”、product-definition 的死路径、budget-and-ops 的 maxDepth 等。
@@ -80,7 +80,7 @@ opened: 2026-11-10
 ## 验收标准
 
 1. 树形状：顶层 8 md + `contracts/` 7 + `reference/` 3 + `design/` 4 + `guides/` 11；[docs/AGENTS.md](../../../docs/AGENTS.md) 层表含“参考”行与“合同 = 顶层跨面宪法 + contracts/”。
-2. [docs/index.md](../../../docs/index.md) 首屏“先读（按目的）”5 行；33 行登记表路径全部指向新家；`doc-taxonomy` 绿。
+2. [docs/index.md](../../../docs/README.md) 首屏“先读（按目的）”5 行；33 行登记表路径全部指向新家；`doc-taxonomy` 绿。
 3. 站内链接：`pnpm verify` ALL PASS；`notes-archived-links` 绿；`link-debt` 不升（archived 20 / moved 0 / live 0）。
 4. 冻结层：122 个文件（126 链接 + 散文路径）只改路径；逐文件核 = HEAD 内容只做 old→new 替换；diff 不含内容/日期/论断变化；在 Note 记明规则与文件数。
 5. 预算：10 个 `DOC_LINE_BUDGETS` 键更新；未提额；index 69/72、AGENTS 60/62。

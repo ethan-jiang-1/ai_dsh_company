@@ -12,7 +12,7 @@ spec / 页签这类**持续增长的清单**从导航文档退役——件名与
   （漏 foundation-safety、orient、runtime-layout、session-log-generation、backlog-liveness 等）——
   [snapshots/README](../../snapshots/README.md) 引用的 foundation-safety 在导航里查无此件。改为
   区级职责描述 + 一句「spec 清单 = 各区目录本身；导航到区，不到件」。
-- [docs/index](../../docs/index.md) 术语映射「公司页签」行：曾写「五个平台页签（看板/依赖图/在场/
+- [docs/index](../../docs/README.md) 术语映射「公司页签」行：曾写「五个平台页签（看板/依赖图/在场/
   用量/任务板）」，客户端注册面同期已有待办/培养/台账切片——[cdp-probe](../../docs/guides/cdp-probe.md)
   断言面写 8，两文相左。改为「页签清单 = 客户端注册面，随切片增长、不在此枚举」。
 - [docs/orient](../../docs/orient.md) 词表：「并入右栏五页签」同病，去计数。

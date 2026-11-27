@@ -75,7 +75,7 @@
 
 ## 指针
 
-- 读者面：`README.md`、`AGENTS.md`、`docs/index.md`、`docs/contracts/profile.md`、`docs/contracts/release.md`、
+- 读者面：`README.md`、`AGENTS.md`、`docs/README.md`、`docs/contracts/profile.md`、`docs/contracts/release.md`、
   `docs/runtime-map.md`、`docs/contracts/data-model.md`、`docs/project-map.md`、`docs/orient.md`、
   `docs/reference/external-research.md`、`docs/reference/terminology.md`、`run/README.md`、`packages/company-pack/README.md`。
 - 发布链：`tools/release/release.mjs`、`checks/lanes/release.entry.mjs`、`docs/guides/release-runbook.md`、

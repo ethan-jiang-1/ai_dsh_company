@@ -199,7 +199,7 @@ const mutateOrFail = (label, path, transform) => {
     mkdirSync(join(root, '_backlog'), { recursive: true })
     writeFileSync(join(root, '_backlog/README.md'), '# backlog\n')
     writeFileSync(join(root, 'docs/AGENTS.md'), '# AGENTS\n\n| 层 | 目录 | Job | **不属于这层** |\n|---|---|---|---|')
-    writeFileSync(join(root, 'docs/index.md'), '# index\n\n[AGENTS](./AGENTS.md)\n[architecture/](./architecture/)\n\n纯说明可用 `_backlog/` 反引号。\n')
+    writeFileSync(join(root, 'docs/README.md'), '# docs\n\n[AGENTS](./AGENTS.md)\n[architecture/](./architecture/)\n\n纯说明可用 `_backlog/` 反引号。\n')
     writeFileSync(join(root, 'docs/architecture/host-and-lib.md'), '# host\n')
     const green = run(docTaxonomy, root)
     const okClean = !green.some(m => m.startsWith('FAIL'))

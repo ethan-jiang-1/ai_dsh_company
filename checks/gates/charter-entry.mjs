@@ -18,13 +18,13 @@ import { join } from 'node:path'
 //      Markdown 链接指向 …（归位 skill …）`；还原 → 绿。
 //   ③ `git mv` 走宪章本体 → `FAIL … docs/content-charter.md 不在盘上——…（文件不许消失：内容该搬就搬，壳留着）`；
 //      还原 → 绿。
-//   ④ 删 docs/index.md 书架链接 → `FAIL … docs/index.md 未以 Markdown 链接指向 content-charter.md（书架；…）`；还原 → 绿。
+//   ④ 删 docs/README.md 书架链接 → `FAIL … docs/README.md 未以 Markdown 链接指向 content-charter.md（书架；…）`；还原 → 绿。
 //   ⑤ `mv` 走 docs/AGENTS.md（指针面文件缺失这一支）→ `FAIL … docs/AGENTS.md 缺失（层表：入口面不许消失）`；还原 → 绿。
 const CHARTER = 'docs/content-charter.md'
 /** 四处入口：三条文档链 + 一条执行链（拆除任一条 = 一半 agent 撞不到）。 */
 const POINTERS = [
   { file: 'AGENTS.md', what: '开工最小路径' },
-  { file: 'docs/index.md', what: '书架' },
+  { file: 'docs/README.md', what: '书架' },
   { file: 'docs/AGENTS.md', what: '层表' },
   { file: '.agents/skills/capability-addition-definition/SKILL.md', what: '归位 skill' },
 ]
