@@ -6,7 +6,7 @@ opened: 2026-11-27
 
 # BUG-399：`final.md` 发起复盘培养传入绝对路径导致提交必被拒，且多处 `openTab` 入口绕过 HQ 切回守卫并错抢意图队列
 
-> 严重级别：P1（功能闭环断链：`BUG-398` 打通的「`final.md` → 发起复盘培养」表单一提交即报错拒收；`CompanyTurnTailCard` / `StrategyButton` / `openCompanyOverview` / `TasksAction` 未接 `openOnSessionSurface` 并在无会话表面时直抛错、全局快捷键静默丢单，且 `openDeliverables` 预判成功 Toast、双挂载表单抢消费）｜发现：2026-11-27｜状态：已修｜审查：待本批收口独立盲审
+> 严重级别：P1（功能闭环断链：`BUG-398` 打通的「`final.md` → 发起复盘培养」表单一提交即报错拒收；`CompanyTurnTailCard` / `StrategyButton` / `openCompanyOverview` / `TasksAction` 未接 `openOnSessionSurface` 并在无会话表面时直抛错、全局快捷键静默丢单，且 `openDeliverables` 预判成功 Toast、双挂载表单抢消费）｜发现：2026-11-27｜状态：已修｜审查：独立只读盲审通过（0 阻断）；去向 = [批次Note](../../../notes/implemented/2026-11-27-ux-ui-round3-batch-fixes.md)
 >
 > **留痕**：commit `dd20d299`（批次 399..405 顺位 1：扩展 `deliverables-archive` 归一与触发、统一全部 `openTab`/快捷键至 `openOnSessionSurface`、延后 `reviewOpened` 到 `onSuccess`、`composeIntentStore` 增加 `target` 作用域）
 

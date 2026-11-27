@@ -6,7 +6,7 @@ opened: 2026-11-27
 
 # BUG-400：HQ 内嵌工坊仍泄漏 `ComposerStatusPill`、`HeroMotionOptions` 无角色守卫，且培养看板加载空窗/撤回取消/选择器 Reject/后台监听存在竞态与卡死
 
-> 严重级别：P1（多处 UX 破坏与异步死锁：`ComposerStatusPill` 在工坊内显示一点即踢出 HQ；`HeroMotionOptions` 在普通非公司会话曝光；`CultivationContextPicker` `listDeliverables` reject 时永久卡死「正在读取」；`CultivationAdopted` 读中空白与撤回取消未禁用、`CultivationFeedback` 首连误报不可达、`visibilitychange` 后台发读风暴）｜发现：2026-11-27｜状态：已修（`cc9da514`）｜审查：待盲审确认
+> 严重级别：P1（多处 UX 破坏与异步死锁：`ComposerStatusPill` 在工坊内显示一点即踢出 HQ；`HeroMotionOptions` 在普通非公司会话曝光；`CultivationContextPicker` `listDeliverables` reject 时永久卡死「正在读取」；`CultivationAdopted` 读中空白与撤回取消未禁用、`CultivationFeedback` 首连误报不可达、`visibilitychange` 后台发读风暴）｜发现：2026-11-27｜状态：已修（`cc9da514`）｜审查：独立只读盲审通过（0 阻断）；去向 = [批次Note](../../../notes/implemented/2026-11-27-ux-ui-round3-batch-fixes.md)
 
 ## 症状
 

@@ -6,7 +6,7 @@ opened: 2026-11-27
 
 # BUG-401：异常投影/指标下客户端崩溃或渲染 `NaN`、双签工具失败卡误标「待拍板」及问询/错误环状态丢失
 
-> 严重级别：P1（渲染期崩溃与状态错乱：`TasksTableView` 遇到缺失 `members` 投影直接抛 TypeError 崩盘；`BudgetPanel` 遇到 `NaN` 渲染 `'NaN tokens'`；`SignoffToolView` 把工具执行失败错标为「待拍板」；`pendingQuestions` 因 `data.id !== callId` 漏消重；`error-ring` 乱序卸载与同步送信异常丢条目）｜发现：2026-11-27｜状态：已修（`dfbaed24`）｜审查：待盲审确认
+> 严重级别：P1（渲染期崩溃与状态错乱：`TasksTableView` 遇到缺失 `members` 投影直接抛 TypeError 崩盘；`BudgetPanel` 遇到 `NaN` 渲染 `'NaN tokens'`；`SignoffToolView` 把工具执行失败错标为「待拍板」；`pendingQuestions` 因 `data.id !== callId` 漏消重；`error-ring` 乱序卸载与同步送信异常丢条目）｜发现：2026-11-27｜状态：已修（`dfbaed24`）｜审查：独立只读盲审通过（0 阻断）；去向 = [批次Note](../../../notes/implemented/2026-11-27-ux-ui-round3-batch-fixes.md)
 
 ## 症状
 

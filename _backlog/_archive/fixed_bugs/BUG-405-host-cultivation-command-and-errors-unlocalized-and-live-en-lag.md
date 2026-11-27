@@ -6,7 +6,7 @@ opened: 2026-11-27
 
 # BUG-405：`/cultivation` 漏接 `registerLocalizedCommand` 致 `en` 命令菜单仍显中文，且 Host 上下文读取与公司盘底层报错硬编码中文
 
-> 严重级别：P1（`en` 双语体验断层：其余 6 条宿主命令已接动态重注册，唯有 `/cultivation` 漏网导致界面切到 English 后 `/` 命令栏仍弹出整行中文说明；`readContext`、`company-root`、`write-gate`、`runtime-guard` 与 `cultivation-context` 校验报错硬编码中文直透给 `en` 用户）｜发现：2026-11-27｜状态：已修（`1db6d6e7`）｜审查：待盲审确认
+> 严重级别：P1（`en` 双语体验断层：其余 6 条宿主命令已接动态重注册，唯有 `/cultivation` 漏网导致界面切到 English 后 `/` 命令栏仍弹出整行中文说明；`readContext`、`company-root`、`write-gate`、`runtime-guard` 与 `cultivation-context` 校验报错硬编码中文直透给 `en` 用户）｜发现：2026-11-27｜状态：已修（`1db6d6e7`）｜审查：独立只读盲审通过（0 阻断）；去向 = [批次Note](../../../notes/implemented/2026-11-27-ux-ui-round3-batch-fixes.md)
 
 ## 症状
 
