@@ -80,6 +80,7 @@ describe('composer 命令作用域提示（BUG-290）', () => {
     }
   })
 
+  // 负例留证 2026-11-27：将 workshop-sessions.ts 的 notifyWorkshopListeners 改为空操作后 `vitest run tests/client/startup/command-scope-hint.spec.ts` 红（BUG-400 用例期望 host.textContent 为 '' 实为提示文案）；还原后 7/7 绿。BUG-400
   it('BUG-400：内嵌工坊会话登记/重复/幂等注销与 subscribeEmbeddedWorkshopSessions 实时更新 CommandScopeHint', async () => {
     const { act } = await import('react')
     const { createRoot } = await import('react-dom/client')
