@@ -1,4 +1,6 @@
 # _archive/ · 离开活跃区
+- [BUG-400](fixed_bugs/BUG-400-embedded-workshop-status-pill-leak-and-cultivation-race-gaps.md) — 已修（`cc9da514`）：补齐 `ComposerStatusPill`/`HeroMotionOptions` 工坊与角色守卫并使 `workshop-sessions` 可订阅；补齐培养看板 `records=null`/`feedback=null` 加载态、撤回取消禁用与互斥、选择器 `.catch()`、`visibilityState==='visible'` 过滤及创作卸载防误回调。
+- [BUG-404](fixed_bugs/BUG-404-stale-zero-badges-after-reload-and-mine-revoked-tag.md) — 已修（`cc9da514`）：新增 `createMergedAttentionObservable` 接通环境待办角标与跨会话历史重建；`CultivationMine` 判 `revokedAt` 渲染撤回 warning 标签。
 - [BUG-399](fixed_bugs/BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md) — 已修（`dd20d299`）：扩展 `deliverables-archive` 路径归一与终稿识别、统一剩余 6 处 `openTab`/快捷键走 `openOnSessionSurface`、延后 `reviewOpened` 到 `onSuccess` 并隔离 `composeIntentStore` 的 `hq`/`sidebar` 作用域。
 - [2026-11-27-ux-ui-round3-deep-audit-and-e2e.md](settled_issues/2026-11-27-ux-ui-round3-deep-audit-and-e2e.md) — Round 3 UX/UI 深水区与修复回归盲区走查（Phase 0–3 覆盖 28 单元，排伪后实证立案 `BUG-399..BUG-405` 只报不修，0 产品代码改动）；去向 = none。
 - [BUG-397](fixed_bugs/BUG-397-live-locale-lag-in-cultivation-errors-and-remaining-raw-labels.md) — 已修（`bec52daf`）：培养错误改存结构化码渲染期重译、本地化 `DelegationFlowPanel`/`CultivationInbox`/`tasks.col.owner`/`formatGeneratedAt`/`shortSessionId` 并让 `instance-guard` 响应 `locale/change`；去向 = [批次Note](../../notes/implemented/2026-11-27-ux-ui-round2-batch-fixes.md)。

@@ -1,12 +1,12 @@
 ---
-status: 调查中
+status: 已修
 severity: P1
 opened: 2026-11-27
 ---
 
 # BUG-404：页面刷新后环境待办角标误报 `0` /「就绪」，且培养「我提交的」列表把已撤回方法仍标为「已采纳」
 
-> 严重级别：P1（状态撒谎：`cfo` 会话明确挂起 `request_signoff` 审批且右栏 `团队 -> 待办` 已显示「红线测试待办」，但页面刷新后顶栏显示「待办 0」、底部胶囊显示「梦之队就绪」；在 GUI 撤回方法后，上方「我提交的 · 我已处理」仍显示绿色「目标角色语境下的人已采纳」标签）｜发现：2026-11-27｜状态：调查中｜审查：待修前确认
+> 严重级别：P1（状态撒谎：`cfo` 会话明确挂起 `request_signoff` 审批且右栏 `团队 -> 待办` 已显示「红线测试待办」，但页面刷新后顶栏显示「待办 0」、底部胶囊显示「梦之队就绪」；在 GUI 撤回方法后，上方「我提交的 · 我已处理」仍显示绿色「目标角色语境下的人已采纳」标签）｜发现：2026-11-27｜状态：已修（`cc9da514`）｜审查：待盲审确认
 
 ## 症状
 
@@ -20,8 +20,8 @@ opened: 2026-11-27
 ## 运行面
 
 - **面 = client**：
-  - [ambient-chrome.tsx](../../packages/company-pack/src/client/ux/ambient-chrome.tsx#L36-L82,L144-L220) 与 [register-s1-ux.ts](../../packages/company-pack/src/client/ux/register-s1-ux.ts#L63-L75)（仅包装了实时 `deps.attention`，未接入历史重建待办源）；
-  - [CultivationBoardSections.tsx](../../packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx#L78-L80)。
+  - [ambient-chrome.tsx](../../../packages/company-pack/src/client/ux/ambient-chrome.tsx#L36-L82,L144-L220) 与 [register-s1-ux.ts](../../../packages/company-pack/src/client/ux/register-s1-ux.ts#L63-L75)（仅包装了实时 `deps.attention`，未接入历史重建待办源）；
+  - [CultivationBoardSections.tsx](../../../packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx#L78-L80)。
 
 ## 复现
 
@@ -35,8 +35,15 @@ source run/env.sh && node runtime/tmp/ux-audit-r3/round3-chromium-audit.mjs
 ## 根因与证据
 
 1. `HeaderAttentionUtility`、`SidebarFooterCompanyAction`、`MotionCommandDock` 与 `ComposerStatusPill` 均通过 `attentionObservable` 仅订阅了运行期 `attentionRegistry` 内存事件，刷新页面后历史事件仅由 `AttentionTab` 和 `CompanyHqPage` 的 `pageHistory` 合并，环境角标漏接同一合并读模型；
-2. [CultivationMine](../../packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx#L79) 仅判断 `record.status === 'adopted'`，未判断 `record.revokedAt !== undefined`（`revokedAt` 存在时方法已被撤回）。
+2. [CultivationMine](../../../packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx#L79) 仅判断 `record.status === 'adopted'`，未判断 `record.revokedAt !== undefined`（`revokedAt` 存在时方法已被撤回）。
 
 ## 失败类与同类排查
 
 - **失败类**：同源状态（历史待办、培养撤回生命周期）在同一页面的不同展示块采用不完整的消费判据，造成同屏互相打脸。
+
+## 修复证据
+
+- 改动面：`packages/company-pack/src/client/wiring/attention-source.ts`、`packages/company-pack/src/client/ux/register-s1-ux.ts`、`packages/company-pack/src/client/index.ts`、`packages/company-pack/src/client/ux/ambient-chrome.tsx`、`packages/company-pack/src/client/cultivation/cultivation-copy.ts`、`packages/company-pack/src/client/cultivation/CultivationBoardSections.tsx`。
+- 红：仅有 `attentionRegistry` 而未合并 `pageHistory` 时，`pnpm test tests/client/wiring/attention-source.spec.ts` 与 `pnpm test tests/client/ux/ambient-chrome.spec.ts` 刷新后待办计数为 `0`；`CultivationMine` 仅判 `record.status === 'adopted'` 时 `pnpm test tests/client/cultivation/cultivation-board-actions.spec.ts` 仍渲染绿色已采纳标签。
+- 绿：`pnpm test tests/client/wiring/attention-source.spec.ts`、`pnpm test tests/client/ux/ambient-chrome.spec.ts`、`pnpm test tests/client/cultivation/cultivation-board-actions.spec.ts` 及全部 9 份关联 spec（96/96 用例绿），`pnpm typecheck`、`pnpm lint`、`pnpm dup` 零错误零违例。
+- 提交：commit cc9da514
