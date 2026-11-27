@@ -142,6 +142,40 @@ describe('createErrorRelay（客户端错误上报）', () => {
     expect(relay.pending()).toBe(0)
   })
 
+  it('BUG-401：send 返回 Promise reject 时保留条目单次重试并在超出 maxPending 时裁尾', async () => {
+    let now = 5_000
+    let attempts = 0
+    const timers: Array<{ fn: () => void; at: number }> = []
+    const errs: unknown[] = []
+    const relay = createErrorRelay<string>({
+      currentSessionId: () => 's1',
+      maxPending: 1,
+      send: () => {
+        attempts += 1
+        return Promise.reject(new Error(`async-fail-${attempts}`))
+      },
+      now: () => now,
+      schedule: (fn, ms) => { const t = { fn, at: now + ms }; timers.push(t); return t },
+      cancel: h => { const i = timers.indexOf(h as { fn: () => void; at: number }); if (i >= 0) timers.splice(i, 1) },
+      onSendError: err => errs.push(err),
+    })
+
+    relay.push(entry('first-async-error'))
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(attempts).toBe(1)
+    expect(errs).toHaveLength(1)
+    expect(relay.pending()).toBe(1)
+
+    now += 1_000
+    timers.shift()?.fn()
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(attempts).toBe(2)
+    expect(errs).toHaveLength(2)
+    expect(relay.pending()).toBe(0)
+  })
+
   it('dispose 之后不再排定时器、不再发', () => {
     const h = harness()
     h.setSession('s1')

@@ -89,6 +89,37 @@ function useHubContainerMode(useTabInfo: OpsHubTabProps['useTabInfo']): { readon
   }
 }
 
+function HubToolbarTrailing({
+  floating,
+  fullscreen,
+  openSplit,
+  splitTarget,
+  splitLabel,
+  closeLabel,
+}: {
+  readonly floating: boolean
+  readonly fullscreen: boolean
+  readonly openSplit: ((mode: 'quiet' | 'review' | 'ops') => void) | undefined
+  readonly splitTarget?: 'review' | 'ops'
+  readonly splitLabel?: string
+  readonly closeLabel: string
+}): ReactNode {
+  if (floating || openSplit === undefined) return null
+  if (fullscreen) {
+    return (
+      <Button size="sm" variant="outline" data-company-narrow-close="" onClick={() => { openSplit('quiet') }}>
+        {closeLabel}
+      </Button>
+    )
+  }
+  if (splitTarget === undefined || splitLabel === undefined) return null
+  return (
+    <Button size="sm" variant="ghost" onClick={() => { openSplit(splitTarget) }}>
+      {splitLabel}
+    </Button>
+  )
+}
+
 /** 渲染与 `SegmentedControl` 配对的 ARIA `tabpanel` 容器，避免悬空 `aria-controls` 并按需保活表单。 */
 export function SegmentedTabPanels<T extends string>({
   controlId,
@@ -141,15 +172,14 @@ export function OpsHubTab(props: OpsHubTabProps): ReactNode {
             { value: 'strategy', label: t('tabs.strategy.label') },
           ]}
         />
-        {floating || openSplit === undefined ? null : fullscreen ? (
-          <Button size="sm" variant="outline" data-company-narrow-close="" onClick={() => { openSplit('quiet') }}>
-            {t('layout.closeRightbar')}
-          </Button>
-        ) : (
-          <Button size="sm" variant="ghost" onClick={() => { openSplit('ops') }}>
-            {t('layout.splitOps')}
-          </Button>
-        )}
+        <HubToolbarTrailing
+          floating={floating}
+          fullscreen={fullscreen}
+          openSplit={openSplit}
+          splitTarget="ops"
+          splitLabel={t('layout.splitOps')}
+          closeLabel={t('layout.closeRightbar')}
+        />
       </div>
       <div className="wk-hub-body">
         <SegmentedTabPanels<OpsSection>
@@ -199,11 +229,12 @@ export function TeamHubTab(props: TeamHubTabProps): ReactNode {
             { value: 'budget', label: t('tabs.budget.label') },
           ]}
         />
-        {!floating && fullscreen && openSplit !== undefined ? (
-          <Button size="sm" variant="outline" data-company-narrow-close="" onClick={() => { openSplit('quiet') }}>
-            {t('layout.closeRightbar')}
-          </Button>
-        ) : null}
+        <HubToolbarTrailing
+          floating={floating}
+          fullscreen={fullscreen}
+          openSplit={openSplit}
+          closeLabel={t('layout.closeRightbar')}
+        />
       </div>
       <div className="wk-hub-body">
         <SegmentedTabPanels<TeamSection>
@@ -279,15 +310,14 @@ export function ArchiveHubTab(props: ArchiveHubTabProps): ReactNode {
             { value: 'cultivation', label: t('tabs.cultivation.label') },
           ]}
         />
-        {floating || openSplit === undefined ? null : fullscreen ? (
-          <Button size="sm" variant="outline" data-company-narrow-close="" onClick={() => { openSplit('quiet') }}>
-            {t('layout.closeRightbar')}
-          </Button>
-        ) : (
-          <Button size="sm" variant="ghost" onClick={() => { openSplit('review') }}>
-            {t('layout.splitReview')}
-          </Button>
-        )}
+        <HubToolbarTrailing
+          floating={floating}
+          fullscreen={fullscreen}
+          openSplit={openSplit}
+          splitTarget="review"
+          splitLabel={t('layout.splitReview')}
+          closeLabel={t('layout.closeRightbar')}
+        />
       </div>
       <div className="wk-hub-body">
         <SegmentedTabPanels<ArchiveSection>

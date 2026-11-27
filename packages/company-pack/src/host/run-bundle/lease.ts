@@ -133,12 +133,7 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
       writeFileSync(path, text, { flag: 'wx' })
       unblockCompanyWrites()
       const timer = setInterval(() => {
-        if (!touchLease(path, holder.token)) {
-          blockCompanyWrites(
-            'writer lease 已被接管（盘上 token 已变化），本 host 停止写公司数据',
-            'Writer lease was taken over (on-disk token changed); this host paused company data writes.',
-          )
-        }
+        if (!touchLease(path, holder.token)) blockCompanyWrites('writer lease 已被接管（盘上 token 已变化），本 host 停止写公司数据', 'Writer lease was taken over (on-disk token changed); this host paused company data writes.')
       }, LEASE_HEARTBEAT_MS)
       ;(timer as unknown as { unref?: () => void }).unref?.()
       held.set(path, { holder, refs: 1, timer })
@@ -150,8 +145,7 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
       }
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {
-        const message = (error as Error).message
-        return { acquired: false, path, reason: `无法写 writer lease：${message}`, reasonEn: `Cannot write writer lease: ${message}` }
+        return { acquired: false, path, reason: `无法写 writer lease：${(error as Error).message}`, reasonEn: `Cannot write writer lease: ${(error as Error).message}` }
       }
     }
     // 锁路径可能是目录/symlink（BUG-124）：形状先 fail loud，不把「读不了」当竞争。
@@ -181,12 +175,11 @@ export function acquireCompanyLease(dshHome: string, now: Date = new Date(), pid
     } catch (error) {
       // 不可读 ≠ stale：EACCES/EPERM 的活锁不能删除后抢占（BUG-254）；ENOENT 可重试。
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') continue
-      const message = (error as Error).message
       return {
         acquired: false,
         path,
-        reason: `writer lease 不可读，拒绝接管：${message}`,
-        reasonEn: `Writer lease is unreadable, refusing takeover: ${message}`,
+        reason: `writer lease 不可读，拒绝接管：${(error as Error).message}`,
+        reasonEn: `Writer lease is unreadable, refusing takeover: ${(error as Error).message}`,
       }
     }
     if (current !== null && current.pid !== pid) {

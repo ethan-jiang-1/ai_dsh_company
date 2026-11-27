@@ -114,7 +114,10 @@ describe('同 home writer lease（2026-10-27 R2）', () => {
       symlinkSync(join(home, 'missing-target'), leasePath(home))
       const link = acquireCompanyLease(home)
       expect(link.acquired).toBe(false)
-      if (!link.acquired) expect(link.reason).toContain('symlink')
+      if (!link.acquired) {
+        expect(link.reason).toContain('symlink')
+        expect(link.reasonEn).not.toMatch(/[\u4e00-\u9fff]/)
+      }
     } finally { rmSync(home, { recursive: true, force: true }) }
   })
 

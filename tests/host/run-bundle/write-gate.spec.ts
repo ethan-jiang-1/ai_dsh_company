@@ -1,14 +1,18 @@
 // 负例留证 2026-11-13：删 ensureRecordsDirectory 的 residency ⇒ root symlink 下先 mkdir 外部 cultivation（BUG-149）；前置 assert 即绿。
 // 负例留证 2026-11-13：cultivation/export 直写不接 gate ⇒ block 后仍写成功（BUG-144）；接 assert 即绿。
 /** 公司盘写 gate 与根/子目录 residency（BUG-119/121/129/131）。 */
-import { existsSync, mkdtempSync, mkdirSync, rmSync, symlinkSync } from 'node:fs'
+import { existsSync, mkdtempSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
+  ensureCompanyDir,
+  ensureCompanyDirAt,
   ensureCompanyRoot,
+  ensureCompanyRootAt,
   resolveCompanySegments,
   UnsafeCompanyPathError,
+  verifyCompanySubpathAt,
   writeCompanyAtomic,
 } from '../../../packages/company-pack/src/host/run-bundle/company-root.ts'
 import {
@@ -122,6 +126,21 @@ describe('公司盘根 residency 与写 gate', () => {
       }
       expect(segError).toBeInstanceOf(UnsafeCompanyPathError)
       expect((segError as UnsafeCompanyPathError).message).not.toMatch(cjk)
+
+      const safeHome = join(outside, 'safe-home')
+      mkdirSync(join(safeHome, 'kb'), { recursive: true })
+      symlinkSync(outside, join(safeHome, 'kb/link'))
+      expect(() => ensureCompanyRootAt(join(ws, '.dsh-company'), { lang: 'en' })).toThrow(UnsafeCompanyPathError)
+      expect(() => verifyCompanySubpathAt(safeHome, 'kb/link', 'en')).toThrow(UnsafeCompanyPathError)
+      expect(() => ensureCompanyDirAt(safeHome, 'kb/link', { lang: 'en' })).toThrow(UnsafeCompanyPathError)
+      expect(() => ensureCompanyDir(ws, 'kb', { lang: 'en' })).toThrow(UnsafeCompanyPathError)
+      expect(() => resolveCompanySegments('/abs/path', { allowRoot: false, stripCompanyPrefix: false, lang: 'en' })).toThrow(UnsafeCompanyPathError)
+      expect(() => resolveCompanySegments('a\0b', { allowRoot: false, stripCompanyPrefix: false, lang: 'en' })).toThrow(UnsafeCompanyPathError)
+      expect(() => resolveCompanySegments('.dsh-company', { allowRoot: false, stripCompanyPrefix: true, lang: 'en' })).toThrow(UnsafeCompanyPathError)
+      const fileWs = join(outside, 'file-ws')
+      mkdirSync(fileWs, { recursive: true })
+      writeFileSync(join(fileWs, '.dsh-company'), 'not-dir')
+      expect(() => ensureCompanyRoot(fileWs, { lang: 'en' })).toThrow(/not a directory/)
 
       blockCompanyWrites('中文原因', 'English lease blocked')
       let gateError: unknown

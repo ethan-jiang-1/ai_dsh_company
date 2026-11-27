@@ -328,6 +328,7 @@ export function createErrorRelay<Id = string>(options: ErrorRelayOptions<Id>): E
             item.retried = true
             queue.unshift(item)
             while (queue.length > maxPending) queue.pop()
+            if (timer === undefined) flush()
           }
         })
       }

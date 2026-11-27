@@ -11,7 +11,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { CommandScopeHint, registerCommandScopeHint } from '../../../packages/company-pack/src/client/startup/CommandScopeHint.tsx'
-import { registerEmbeddedWorkshopSession } from '../../../packages/company-pack/src/client/ux/workshop-sessions.ts'
+import { isEmbeddedWorkshopSession, registerEmbeddedWorkshopSession, subscribeEmbeddedWorkshopSessions } from '../../../packages/company-pack/src/client/ux/workshop-sessions.ts'
 import { zh } from '../../../packages/company-pack/src/client/locales.ts'
 
 /** 假会话列表快照面：`blank` 由用例指定。 */
@@ -75,6 +75,44 @@ describe('composer 命令作用域提示（BUG-290）', () => {
       await act(async () => { listener?.() })
       expect(host.textContent).toBe('')
     } finally {
+      act(() => { root.unmount() })
+      host.remove()
+    }
+  })
+
+  it('BUG-400：内嵌工坊会话登记/重复/幂等注销与 subscribeEmbeddedWorkshopSessions 实时更新 CommandScopeHint', async () => {
+    const { act } = await import('react')
+    const { createRoot } = await import('react-dom/client')
+    ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+    expect(isEmbeddedWorkshopSession(undefined)).toBe(false)
+    let notifications = 0
+    const unsub = subscribeEmbeddedWorkshopSessions(() => { notifications += 1 })
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    try {
+      await act(async () => {
+        root.render(createElement(CommandScopeHint, { sessionId: 'session-1' as never, list: listFace(true), t }))
+      })
+      expect(host.textContent).toContain('斜杠命令要等会话开始后才回话')
+
+      let release1!: () => void
+      let release2!: () => void
+      await act(async () => {
+        release1 = registerEmbeddedWorkshopSession('session-1' as never)
+        release2 = registerEmbeddedWorkshopSession('session-1' as never)
+      })
+      expect(host.textContent).toBe('')
+      expect(notifications).toBe(1)
+
+      await act(async () => {
+        release1()
+        release2()
+      })
+      expect(host.textContent).toContain('斜杠命令要等会话开始后才回话')
+      expect(notifications).toBe(2)
+    } finally {
+      unsub()
       act(() => { root.unmount() })
       host.remove()
     }

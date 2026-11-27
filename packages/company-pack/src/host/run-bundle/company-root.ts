@@ -120,8 +120,7 @@ function walkSegmentList(root: string, segments: readonly string[], create: bool
     if (info === null) {
       if (!create) return current
       try { mkdirSync(current) } catch (error) {
-        const msg = (error as Error).message
-        throw unsafePath(`无法创建公司盘子目录：${current}（${msg}）`, `Cannot create company disk subdirectory: ${current} (${msg})`, lang)
+        throw unsafePath(`无法创建公司盘子目录：${current}（${(error as Error).message}）`, `Cannot create company disk subdirectory: ${current} (${(error as Error).message})`, lang)
       }
       info = lstatOrNull(current)
       if (info === null) {
@@ -186,9 +185,7 @@ function recheckParent(
     }
   } catch (error) {
     if (error instanceof UnsafeCompanyPathError) throw error
-    const msg = (error as Error).message
-    const rel = parentSegments.join('/')
-    throw unsafePath(`公司盘父目录在写入期间不可解析：${rel}（${msg}）`, `Company disk parent directory became unresolvable during write: ${rel} (${msg})`, lang)
+    throw unsafePath(`公司盘父目录在写入期间不可解析：${parentSegments.join('/')}（${(error as Error).message}）`, `Company disk parent directory became unresolvable during write: ${parentSegments.join('/')} (${(error as Error).message})`, lang)
   }
 }
 
@@ -236,8 +233,7 @@ export function ensureCompanyRoot(workspace: string, options: { readonly create?
   if (info === null) {
     if (options.create !== true) return root
     try { mkdirSync(root) } catch (error) {
-      const msg = (error as Error).message
-      throw unsafePath(`无法创建公司盘根：${root}（${msg}）`, `Cannot create company disk root: ${root} (${msg})`, lang)
+      throw unsafePath(`无法创建公司盘根：${root}（${(error as Error).message}）`, `Cannot create company disk root: ${root} (${(error as Error).message})`, lang)
     }
     info = lstatOrNull(root)
     if (info === null) throw unsafePath(`公司盘根无法创建：${root}`, `Company disk root could not be created: ${root}`, lang)
@@ -251,8 +247,7 @@ export function ensureCompanyRoot(workspace: string, options: { readonly create?
     }
   } catch (error) {
     if (error instanceof UnsafeCompanyPathError) throw error
-    const msg = (error as Error).message
-    throw unsafePath(`公司盘根不可解析：${root}（${msg}）`, `Company disk root is unresolvable: ${root} (${msg})`, lang)
+    throw unsafePath(`公司盘根不可解析：${root}（${(error as Error).message}）`, `Company disk root is unresolvable: ${root} (${(error as Error).message})`, lang)
   }
   return root
 }
@@ -349,8 +344,7 @@ export function ensureCompanyRootAt(companyHome: string, options: { readonly cre
   if (info === null) {
     if (options.create !== true) return companyHome
     try { mkdirSync(companyHome, { recursive: true }) } catch (error) {
-      const msg = (error as Error).message
-      throw unsafePath(`无法创建公司盘根：${companyHome}（${msg}）`, `Cannot create company disk root: ${companyHome} (${msg})`, lang)
+      throw unsafePath(`无法创建公司盘根：${companyHome}（${(error as Error).message}）`, `Cannot create company disk root: ${companyHome} (${(error as Error).message})`, lang)
     }
     info = lstatOrNull(companyHome)
     if (info === null) throw unsafePath(`公司盘根无法创建：${companyHome}`, `Company disk root could not be created: ${companyHome}`, lang)

@@ -465,8 +465,9 @@ describe('pendingQuestions · 多问题请求（BUG-331）', () => {
     expect(item?.what).toBe('只有一个')
   })
 
-  it('BUG-401：user-questions/answered 仅带问答实例 id 且无 tool/result 时按 FIFO 消除未答问询', () => {
+  it('BUG-401：user-questions/answered 仅带问答实例 id 且无 tool/result 时按 FIFO 消除未答问询（空池安全忽略）', () => {
     const items = pendingQuestions([
+      { type: 'user-questions/answered', time: 900, data: { id: 'orphan-answer' } },
       { type: 'tool/call', time: 1000, data: { callId: 'call-1', name: 'ask_user_question', arguments: JSON.stringify({ questions: [{ question: 'Q1?' }] }) } },
       { type: 'user-questions/answered', time: 1050, data: { id: 'q-instance-99' } },
     ], 's-1')

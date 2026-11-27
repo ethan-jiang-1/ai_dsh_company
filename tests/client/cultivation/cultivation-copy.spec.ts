@@ -6,6 +6,7 @@ import {
   CULTIVATION_COPY,
   cultivationClauseSeparator,
   formatCultivationReadReason,
+  getCultivationLanguage,
   renderThrown,
   setCultivationLanguage,
 } from '../../../packages/company-pack/src/client/cultivation/cultivation-actions.ts'
@@ -41,6 +42,16 @@ describe('CULTIVATION_COPY 语言代理', () => {
     expect(CULTIVATION_COPY.feedbackPositive).toContain('👍')
     expect(CULTIVATION_COPY.mineTitle).toContain('Mine')
     expect(CULTIVATION_COPY.mineSuggestionFor('CFO')).toContain('CFO')
+    expect(CULTIVATION_COPY.mineRevokedByTarget(undefined)).not.toContain('→')
+    expect(CULTIVATION_COPY.mineRevokedByTarget('s1')).toContain('→ s1')
+    expect(CULTIVATION_COPY.adoptedLoading).toContain('Reading')
+    expect(CULTIVATION_COPY.feedbackLoading).toContain('Reading')
+    expect(getCultivationLanguage()).toBe('en')
+    setCultivationLanguage('zh')
+    expect(CULTIVATION_COPY.mineRevokedByTarget(undefined)).not.toContain('→')
+    expect(CULTIVATION_COPY.mineRevokedByTarget('s1')).toContain('→ s1')
+    expect(getCultivationLanguage()).toBe('zh')
+    setCultivationLanguage('en')
     expect(CULTIVATION_COPY.adoptedTitle).toBe('Adopted methods')
     expect(CULTIVATION_COPY.adoptedShowAll(3)).toContain('3')
     expect(CULTIVATION_COPY.boardHow).toBe('How to cultivate')
@@ -106,18 +117,24 @@ describe('cultivation-copy 独立字典面（BUG-340）', () => {
 })
 
 // 字典条目全部可执行：函数项用占位参数调一次，保证没有死文案/抛错分支（也是文件覆盖率下限的来源）。
-describe('cultivation-copy 条目可执行（BUG-340）', () => {
-  it('每个函数项都能被调用并返回非空字符串', () => {
-    for (const [key, value] of Object.entries(CULTIVATION_COPY_ZH_FOR_TEST)) {
-      if (typeof value !== 'function') continue
-      let result: unknown
-      try {
-        result = (value as (...args: unknown[]) => unknown)(...Array.from({ length: Math.max(0, value.length) }, () => '占位'))
-      } catch (error) {
-        throw new Error(`copy.${key} 调用抛错：${String(error)}`)
+describe('cultivation-copy 条目可执行（BUG-340 / BUG-405）', () => {
+  it('每个函数项都能被调用并返回非空字符串（zh 与 en 均扫）', () => {
+    for (const lang of ['zh', 'en'] as const) {
+      setCultivationLanguage(lang)
+      for (const [key, zhValue] of Object.entries(CULTIVATION_COPY_ZH_FOR_TEST)) {
+        if (typeof zhValue !== 'function') continue
+        const value = CULTIVATION_COPY[key as keyof typeof CULTIVATION_COPY] as (...args: unknown[]) => unknown
+        let result: unknown
+        try {
+          result = value(...Array.from({ length: Math.max(0, zhValue.length) }, () => '占位'))
+        } catch (error) {
+          throw new Error(`copy.${key} (${lang}) 调用抛错：${String(error)}`)
+        }
+        expect(typeof result, `copy.${key} (${lang})`).toBe('string')
+        expect((result as string).length, `copy.${key} (${lang})`).toBeGreaterThan(0)
       }
-      expect(typeof result, `copy.${key}`).toBe('string')
-      expect((result as string).length, `copy.${key}`).toBeGreaterThan(0)
+      expect(CULTIVATION_COPY.mineAdoptedByTarget(undefined)).not.toContain('→')
+      expect(CULTIVATION_COPY.mineRevokedByTarget(undefined)).not.toContain('→')
     }
   })
 })
