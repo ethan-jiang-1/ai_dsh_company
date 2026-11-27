@@ -47,6 +47,6 @@ packages/company-pack/src/index.ts      ← 唯一 host 入口（只导出 apply
 
 ## 4. 关键不变量
 
-- **不写死用户盘事实**：`content/` 为随包只读源，`.dsh-company/` 只补缺不覆盖；方法层与 `presented` 账本保留在 `$DSH_HOME/company/`（[data-model.md](./data-model.md)）。
+- **不写死用户盘事实**：`content/` 为随包只读源，`.dsh-company/` 只补缺不覆盖（载荷合同见 [bootstrap-payload](../../notes/implemented/2026-11-20-bootstrap-plan-payload-contract.md)）；方法层与 `presented` 账本保留在 `$DSH_HOME/company/`（[data-model.md](./data-model.md)）。
 - **无 workspace 零写入**：boot 未解析到合法 workspace 时，`dataBlocked` 成立，应用可启动但公司数据写面全部阻断。
 - **双编译面产物**：`src/index.ts`、`src/host/` 与 `src/lib/` 经 `tsc -b` + `tsdown` 输出至 `lib/index.js`（gitignored；构建顺序见 [guides/bootstrap.md](../guides/bootstrap.md)）。

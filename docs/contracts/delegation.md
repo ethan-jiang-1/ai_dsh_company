@@ -95,9 +95,10 @@ subagent child 不在团队名册上 ⇒ 在 CEO 会话里**既发不了消息�
    vp-eng 的**同身份并行扇出**（不能带 `agentPreset`、不能替代独立结论）；CEO 的编排面仍是 team + 命名委托。
 3. **并行快捷派活**：同一轮可并行发起多个调用，每个都是独立 activation；共享任务板/互审仍走 team。
 4. **控制面现状**：
-   - **根门控制面**：根会话是 Lead，`send_message` / `list_agents` / `wait_agent` / `interrupt_agent` 归团队版，够不到根起的 `subagent` child；根门用不被 shadow 的 `list_subagents`（父会话 durable catalog，重启后可查）与 `send_to_subagent`（官方 `ctx.subagents`，续驶/催稿）。
-   - **引擎身份**：`list_subagents` 每行带 `agentPreset` 与 `delegationDepth`（读 child durable header，读不到显式返回 `unavailable`，不默认 `worker/0`）。
-   - **深度预算与重试**：`subagent` / `subagent_fork` 的 `maxDepth` 以各 preset 声明为准（分支与成员均为 activation 子代，深度 `parent+1`）。重试敏感的小活可用 `subagent_retry`（同步、最多 2 attempts，仅装在含通用 `subagent` 的职能角色），其上限与该 preset 通用 `subagent` 的 `maxDepth` 一致，触底返回 `stopReason: depth-exceeded` 且不起 child。
+   - **根门控制面**：根会话是 Lead，`send_message` / `list_agents` / `wait_agent` / `interrupt_agent` 归团队版，够不到根起的 `subagent` child；根门用不被 shadow 的 `list_subagents`（父会话 durable catalog，重启后可查）与 `send_to_subagent`（官方 `ctx.subagents`，续驶/催稿；五条直接汇报命名行与团队角色包见 [coo-cfo-delegation](../../notes/implemented/2026-11-10-coo-cfo-delegation.md)）。
+   - **引擎身份**：`list_subagents` 每行带 `agentPreset` 与 `delegationDepth`（读 child durable header，读不到显式返回 `unavailable`，不默认 `worker/0`；见 [subagent-identity](../../notes/implemented/2026-11-09-subagent-identity-observable.md)）。
+   - **深度预算**：`subagent` / `subagent_fork` 的 `maxDepth` 以各 preset 声明为准（分支与成员均为 activation 子代，深度 `parent+1`）。
+   - **同步重试**：重试敏感的小活可用 `subagent_retry`（同步、最多 2 attempts，响应父轮取消见 [blocking-cancellation](../../notes/implemented/2026-11-10-blocking-tool-cancellation.md)，仅装在含通用 `subagent` 的职能角色），上限与通用 `subagent` 的 `maxDepth` 一致，触底返回 `stopReason: depth-exceeded` 且不起 child。
    - **多层委派与按座安装**：generic child 需要再派子层时 `agent_preset` 选 `worker-orchestrator`（仅带 leaf，fan-out 预算由父代理 brief 决定）。`list_subagents` / `send_to_subagent` 按座位安装：support 与无 child 预算的座位（如 CEO teammate）不装，root、命名 child 及有 child 预算的 teammate 保留。
 
 ## 5. UI：委派工具卡

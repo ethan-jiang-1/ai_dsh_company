@@ -55,6 +55,9 @@ describe('host 命令面语言合同（BUG-338）', () => {
     const result = await definition!.handler({ rawInput: ' client-error' })
     expect(result.kind).toBe('error')
     assertEnglishUiClean(result.text, 'diagnostics en usage')
+    const statusResult = await definition!.handler({ rawInput: 'status' })
+    expect(statusResult.kind).toBe('success')
+    assertEnglishUiClean(statusResult.text, 'diagnostics en status')
   })
 
   it('en：/company-settings 的停写回执与缺 workspace 回执零中文', async () => {

@@ -48,7 +48,9 @@ Restart the profile you installed into, then start with the same entry point.
 - Upgrade by installing a newer version over the old one, then restart the profile and hard-refresh
   the browser. There is no separate Update button for external plugins.
 - Remove the plugin from the same profile. Company state under `<workspace>/.dsh-company/` is user
-  data and is not removed by the package.
+  data and is not removed by the package; derived search caches live under `<DSH_HOME>/cache/company/`
+  (including `.db-wal`/`.db-shm`) and browser UI state uses `localStorage` keys
+  `dsh-company-pack/*`, `dsh-company-hq-cultivation:*`, and `dsh-company-cultivation-chat-width`.
 - Roll back by installing the previous tarball version.
 
 ## Links

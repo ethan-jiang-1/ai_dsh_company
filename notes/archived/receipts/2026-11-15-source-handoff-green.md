@@ -4,15 +4,15 @@
 
 ## 决定
 
-1. **源码 handoff 有单一入口。** 新增 [repo-handoff](../../docs/guides/repo-handoff.md)：先选路径
+1. **源码 handoff 有单一入口。** 新增 [repo-handoff](../../../docs/guides/repo-handoff.md)：先选路径
    （源码 / tarball / 只有手册）、clean clone 五步、真挂载与首屏、发布点态、start set 与「不要读什么」。
-   根 [README](../../README.md) 首屏加一句话边界（本仓库是源码 handoff，不是收件人安装包），
-   [AGENTS](../../AGENTS.md) 开工路径与命令表、[docs/index](../../docs/README.md) 第一次接管行都指向它。
+   根 [README](../../../README.md) 首屏加一句话边界（本仓库是源码 handoff，不是收件人安装包），
+   [AGENTS](../../../AGENTS.md) 开工路径与命令表、[docs/index](../../../docs/README.md) 第一次接管行都指向它。
    此前边界只在 README 尾部，fresh agent 会先走「5 分钟装好」的收件人路径。
 2. **命令表补前置。** `pnpm company --no-open` 在 AGENTS 命令表与「五条命令」里都改为
    `source run/env.sh && pnpm company --no-open`；`run/env.sh` 的双 home/裸 dsh 拦截不再靠读者自己想起。
-3. **浏览器前置显式化。** `pnpm setup` 不下载 Playwright chromium；[bootstrap](../../docs/guides/bootstrap.md)
-   的 client-load 行与 [tests/README](../../tests/README.md) 首跑节都写明
+3. **浏览器前置显式化。** `pnpm setup` 不下载 Playwright chromium；[bootstrap](../../../docs/guides/bootstrap.md)
+   的 client-load 行与 [tests/README](../../../tests/README.md) 首跑节都写明
    `pnpm dlx playwright install chromium`，避免 clean machine 上首屏检查报 `Executable doesn't exist`。
 4. **发布点态不靠删哨兵变绿。** 文档-only 交接 commit 上重跑 `pnpm release --stamp` 把 manifest 的
    `gitSha` 钉到 HEAD；`release --check --allow-pre-publish-index` 的绿是 pre-publish 口径，
@@ -37,7 +37,7 @@
 | 项 | 内容 |
 |---|---|
 | 事实 | repo = 维护者源码 handoff；收件人两件套 = tarball + 安装手册；源码首跑含 vendor 构建 |
-| 唯一入口 | [repo-handoff](../../docs/guides/repo-handoff.md)（人）；[AGENTS](../../AGENTS.md) 命令表（agent）；[bootstrap](../../docs/guides/bootstrap.md)（构建配方） |
+| 唯一入口 | [repo-handoff](../../../docs/guides/repo-handoff.md)（人）；[AGENTS](../../../AGENTS.md) 命令表（agent）；[bootstrap](../../../docs/guides/bootstrap.md)（构建配方） |
 | 读载体 | fresh maintainer agent、发布者、误把 repo 当安装包的收件人 |
 | 写载体 | 本 Note 同 diff 的 README / AGENTS / docs/index / bootstrap / tests README；`pnpm verify` 的 doc-budget / md-links / command-refs 守 |
 | 发布点态 | `_dist/release-manifest.json`（gitignored）是机器回执；`market-index.staged.json` 是未发布哨兵 |

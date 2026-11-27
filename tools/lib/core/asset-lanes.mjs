@@ -18,7 +18,6 @@
  * - why           一句话：它守住什么（给人看，不参与判据）
  * - manualReason  lanes 为空时必填：为什么不进自动 lane
  * - shape         example | generator | model | meta
- * - lastRed       最近一次真红日期（— = 未接运行日志，不伪造）
  * - replaceBy     被哪个资产替代（— = 无）
  * - retireWhen    退役条件（— = 未排期）
  */
@@ -162,7 +161,7 @@ export function failureClassOf(name) {
   return FAILURE_CLASS_BY_NAME[name] ?? '未分类'
 }
 
-/** @returns {{name:string,kind:string,lanes:string[],nodeArgs:string[],ciSafe:boolean,shape:string,lastRed:string,replaceBy:string,retireWhen:string,why?:string,manualReason?:string}} */
+/** @returns {{name:string,kind:string,lanes:string[],nodeArgs:string[],ciSafe:boolean,shape:string,replaceBy:string,retireWhen:string,why?:string,manualReason?:string}} */
 function define(name, kind, lanes, extra = {}) {
   return {
     name,
@@ -171,7 +170,6 @@ function define(name, kind, lanes, extra = {}) {
     nodeArgs: extra.nodeArgs ?? [],
     ciSafe: extra.ciSafe ?? kind === 'classic',
     shape: extra.shape ?? 'example',
-    lastRed: extra.lastRed ?? '—',
     replaceBy: extra.replaceBy ?? '—',
     retireWhen: extra.retireWhen ?? '—',
     ...(extra.why ? { why: extra.why } : {}),

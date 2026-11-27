@@ -45,11 +45,12 @@ elif [ "$(uname -s)" != "Darwin" ]; then
   echo "沙箱：非 macOS，交给上游链自动选后端（Linux 走 bwrap/landlock）。"
 elif /usr/bin/sandbox-exec -p '(version 1)(allow default)' /usr/bin/true 2>/dev/null; then
   echo "沙箱：sandbox-exec 可用 ⇒ 保持 workspace-write（真围栏）。"
-else
+elif [ "${DSH_ALLOW_UNCONFINED_DEV:-}" = "1" ]; then
   export DSH_PERMISSION_MODE=danger-full-access
-  echo "沙箱：⚠ 本机 sandbox-exec 不可用（Seatbelt 被禁）⇒ 已导出 DSH_PERMISSION_MODE=danger-full-access，bash 不再逐条请求批准。" >&2
-  echo "      取舍：不再有围栏（审批策略随之变 never）。这是上游对该错误的指定处方；本机围栏本就不存在，" >&2
-  echo "      此前每次 allowed-once 事实上已在给全权。要恢复围栏：修好 Seatbelt 或改用 Linux/WSL，然后重开本文件。" >&2
+  echo "沙箱：⚠ 本机 sandbox-exec 不可用且已显式指定 DSH_ALLOW_UNCONFINED_DEV=1 ⇒ 已导出 DSH_PERMISSION_MODE=danger-full-access（无围栏）。" >&2
+else
+  echo "沙箱：⚠ 本机 sandbox-exec 不可用（Seatbelt 被禁）⇒ 默认保持 fail-closed（workspace-write，不静默升权）。" >&2
+  echo "      若确认当前开发环境需无围栏运行，请显式执行：DSH_ALLOW_UNCONFINED_DEV=1 source run/env.sh" >&2
 fi
 
 # pre-push 门禁接线（enforcement 通道，2026-09-27）：push 前强制跑全量结构门禁（.githooks/pre-push）。

@@ -31,7 +31,7 @@ describe('卸载清单 parity（pack README ↔ 安装手册 §八）', () => {
     const manual = rmPaths(read(manualPath))
     expect(readme).toEqual(manual)
     expect(readme).toHaveLength(6)
-    for (const suffix of ['company-pack.lock', 'company-client-errors.log', 'session-search-*.db']) {
+    for (const suffix of ['company-pack.lock', 'company-client-errors.log', 'cache/company']) {
       expect(readme.some(path => path.includes(suffix)), suffix).toBe(true)
     }
   })

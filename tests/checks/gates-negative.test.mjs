@@ -33,6 +33,7 @@ import * as scriptIndex from '../../checks/gates/script-index.mjs'
 import * as devProductParity from '../../checks/gates/dev-product-parity.mjs'
 import * as packShape from '../../checks/gates/pack-shape.mjs'
 import * as presetRowDeps from '../../checks/gates/preset-row-deps.mjs'
+import * as handbookBudget from '../../checks/gates/handbook-budget.mjs'
 import { mutateFile } from '../support/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
@@ -414,17 +415,56 @@ const mutateOrFail = (label, path, transform) => {
   if (!blockedOk) failures += 1
   console.log(`${blockedOk ? 'PASS' : 'FAIL'} prepack-check：裸 publish 硬拒 → 红`)
 
-  const expectedHome = `${ROOT.replace(/\/$/, '')}/runtime/harness-home`
-  for (const shell of ['bash', 'zsh']) {
-    const res = spawnSync(shell, ['-c', 'source run/env.sh >/dev/null 2>&1 && printf "%s" "$DSH_HOME"'], {
+    const expectedHome = `${ROOT.replace(/\/$/, '')}/runtime/harness-home`
+    for (const shell of ['bash', 'zsh']) {
+      const res = spawnSync(shell, ['-c', 'source run/env.sh >/dev/null 2>&1 && printf "%s" "$DSH_HOME"'], {
+        cwd: ROOT,
+        env: { ...process.env, DSH_HOME: '', DSH_SKIP_SANDBOX_PROBE: '1' },
+        encoding: 'utf8',
+      })
+      const shellOk = res.status === 0 && res.stdout === expectedHome
+      if (!shellOk) failures += 1
+      console.log(`${shellOk ? 'PASS' : 'FAIL'} run/env.sh（${shell}）→ DSH_HOME=${res.stdout}`)
+    }
+  }
+
+{
+  // Wave 5：handbook-budget 角色合成总常驻字节棘轮 + 合同缺失报错；run/env.sh Seatbelt 失败时默认不导出 danger-full-access。
+  const root = mkdtempSync(join(tmpdir(), 'gates-handbook-resident-'))
+  try {
+    mkdirSync(join(root, 'packages/company-pack'), { recursive: true })
+    cpSync(join(ROOT, 'packages/company-pack/content'), join(root, 'packages/company-pack/content'), { recursive: true })
+    cpSync(join(ROOT, 'packages/company-pack/presets'), join(root, 'packages/company-pack/presets'), { recursive: true })
+
+    const wfPath = join(root, 'packages/company-pack/content/contracts/workflow.md')
+    const origWf = readFileSync(wfPath, 'utf8')
+    writeFileSync(wfPath, `${origWf}\n${'x'.repeat(3000)}\n`)
+    report('handbook-budget：角色合成总常驻超 23296B → 红', run(handbookBudget, root), 'vp-eng')
+    rmSync(wfPath, { force: true })
+    report('handbook-budget：host 常驻合同缺失 → 红', run(handbookBudget, root), 'host 常驻合同文件缺失')
+    writeFileSync(wfPath, origWf)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+
+  const fakeEnv = readFileSync(join(ROOT, 'run/env.sh'), 'utf8')
+    .replace('/usr/bin/sandbox-exec -p \'(version 1)(allow default)\' /usr/bin/true', 'false')
+  const tmpEnvDir = mkdtempSync(join(tmpdir(), 'env-sandbox-fail-'))
+  try {
+    const patchedEnv = join(tmpEnvDir, 'env.sh')
+    writeFileSync(patchedEnv, fakeEnv)
+    const defaultClosed = spawnSync('bash', ['-c', `source "${patchedEnv}" >/dev/null 2>&1 && printf "%s" "\${DSH_PERMISSION_MODE:-unset}"`], {
       cwd: ROOT,
-      env: { ...process.env, DSH_HOME: '', DSH_SKIP_SANDBOX_PROBE: '1' },
+      env: { ...process.env, DSH_PERMISSION_MODE: '', DSH_SKIP_SANDBOX_PROBE: '', DSH_ALLOW_UNCONFINED_DEV: '' },
       encoding: 'utf8',
     })
-    const shellOk = res.status === 0 && res.stdout === expectedHome
-    if (!shellOk) failures += 1
-    console.log(`${shellOk ? 'PASS' : 'FAIL'} run/env.sh（${shell}）→ DSH_HOME=${res.stdout}`)
-  }
+    const optInOpen = spawnSync('bash', ['-c', `source "${patchedEnv}" >/dev/null 2>&1 && printf "%s" "\${DSH_PERMISSION_MODE:-unset}"`], {
+      cwd: ROOT,
+      env: { ...process.env, DSH_PERMISSION_MODE: '', DSH_SKIP_SANDBOX_PROBE: '', DSH_ALLOW_UNCONFINED_DEV: '1' },
+      encoding: 'utf8',
+    })
+    const sandboxOk = defaultClosed.stdout === 'unset' && optInOpen.stdout === 'danger-full-access'
+    if (!sandboxOk) failures += 1
+    console.log(`${sandboxOk ? 'PASS' : 'FAIL'} run/env.sh Seatbelt 失败默认保持 fail-closed（opt-in 才切 danger-full-access）`)
+  } finally { rmSync(tmpEnvDir, { recursive: true, force: true }) }
 }
 
 console.log(failures === 0 ? 'gates-negative-smoke: ALL PASS' : `gates-negative-smoke: ${failures} FAILURE(S)`)

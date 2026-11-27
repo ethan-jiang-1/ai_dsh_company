@@ -159,7 +159,7 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
     // 部署配置只作覆盖旋钮（BUG-047）。
     config.handbookSkipPresets === undefined ? {} : { skipPresets: config.handbookSkipPresets })
   // 不按 hasWorkspace 门控：boot 无 workspace 时之后在会话 cwd 里设的策略也要生效（BUG-089）。
-  registerStartupSettings(ctx, workspace, { contentDir, watch: startupWatch, writable: !dataBlocked })
+  registerStartupSettings(ctx, workspace, { contentDir, watch: startupWatch, writable: !dataBlocked, language })
   registerLanguagePolicy(ctx, language)
   registerWorkflowContract(ctx, contentDir, { workflowPresets: ['vp-eng'] })
   registerDelegationContracts(ctx, contentDir)
@@ -169,7 +169,14 @@ export async function apply(ctx: Context, config: HostConfig = {}): Promise<void
   // 模型 retrySurface() 同源，parity spec 钉着）；这里不再写第二份 preset 列表（BUG-045/049）。
   registerSubagentRetry(ctx, { surface: SUBAGENT_RETRY_SURFACE })
   registerDelegationTerminal(ctx)
-  registerClientDiagnostics(ctx, runtime.dshHome, { language })
+  registerClientDiagnostics(ctx, runtime.dshHome, {
+    language,
+    presetHealth,
+    workspace,
+    dataBlocked,
+    ...blockedFields,
+    ...(blockedReasonEn === undefined ? {} : { blockedReasonEn }),
+  })
 
   registerDeliverablesCommand(ctx, { dataBlocked, ...blockedFields, workspace, ledgerStorePromise, exportNow, language })
   registerPrdCommand(ctx, { dataBlocked, ...blockedFields, workspace, language })

@@ -116,7 +116,8 @@ const BOUNDARY_SPECS = [
 export const HOST_CJK_RATCHET = new Map([
   ['packages/company-pack/src/index.ts', 88], // host 入口（盲审 finding 7：此前完全跳过扫描；88 = 模板片段计数）
   ['packages/company-pack/src/host/commands/blocked-text.ts', 5],
-  ['packages/company-pack/src/host/commands/client-diagnostics.ts', 10],
+  // 31（2026-11-28）：dim10 新增 `/company-diagnostics [status]` 双语运行态自检摘要（zh+en 成对）。
+  ['packages/company-pack/src/host/commands/client-diagnostics.ts', 31],
   ['packages/company-pack/src/host/commands/deliverable-path.ts', 7],
   ['packages/company-pack/src/host/commands/deliverables-command.ts', 12],
   ['packages/company-pack/src/host/commands/delivery-command.ts', 33],

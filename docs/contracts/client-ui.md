@@ -31,5 +31,6 @@
 
 - **数据读写分离**：读盘经 `remote.workspaceFiles`（带字节上限与显式错误状态，禁止静默空态回退）；人侧动作经 `remote.commands.execute` 发 `/cultivation`、`/company-settings` 等命令，由 host 实施角色闸与持久化。
 - **跨会话待办重建**：仅靠事件流对未打开会话零帧；`presence/attention-history.ts` 结合 `installAttentionObservers` 与 `remote.session.page` 投影重建跨会话挂起审批/问询（[D67](../decisions.md#d67)）。
-- **双语表达层**：所有公司 Web UI 文案必须 `zh`/`en` 对称（默认 `zh`），集中住 `src/client/locales.ts` typed `company` 字典，角色表达走 `src/client/roles.ts`，禁止组件内硬编码中文/英文标签（修改流程 = `company-ui-change-definition` skill）。
-- **错误环回传**：客户端异常捕获进 `window.__DSH_COMPANY_ERRORS__`，由 `error-ring.ts` 节流经 `/company-diagnostics` 追加到 `$DSH_HOME/logs/company-client-errors.log`。
+- **双语表达层**：所有公司 Web UI 文案必须 `zh`/`en` 对称（默认 `zh`），集中住 `src/client/locales.ts`，角色表达走 `src/client/roles.ts`（[i18n-pilot](../../notes/implemented/2026-11-12-i18n-expression-role-pilot.md)），禁硬编码标签（流程 = `company-ui-change-definition` skill）。
+  - 响应式与本地化收口见 [r1](../../notes/implemented/2026-11-27-ux-ui-audit-batch-fixes.md) · [r2](../../notes/implemented/2026-11-27-ux-ui-round2-batch-fixes.md) · [r3](../../notes/implemented/2026-11-27-ux-ui-round3-batch-fixes.md)。
+- **错误环回传**：客户端异常捕获进 `window.__DSH_COMPANY_ERRORS__`（过滤良性通知见 [benign-notices](../../notes/implemented/2026-11-13-client-error-ring-benign-notices.md)），由 `error-ring.ts` 节流经 `/company-diagnostics` 追加到 `$DSH_HOME/logs/company-client-errors.log`。

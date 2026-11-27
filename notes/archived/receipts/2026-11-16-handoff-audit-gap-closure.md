@@ -7,32 +7,32 @@
 
 ## 决定
 
-1. **G8-1 并入既有 owner 门，不新建门**：[preset-row-deps](../../checks/gates/preset-row-deps.mjs) 从「presets 行」扩到
-   「bundle [cordis.patch.yml](../../packages/company-pack/cordis.patch.yml) 的 **insert 行**（含 group 嵌套）」。
+1. **G8-1 并入既有 owner 门，不新建门**：[preset-row-deps](../../../checks/gates/preset-row-deps.mjs) 从「presets 行」扩到
+   「bundle [cordis.patch.yml](../../../packages/company-pack/cordis.patch.yml) 的 **insert 行**（含 group 嵌套）」。
    判据 = 行内 `@deepseek-ai/*` 包名 ⊆ pack `dependencies ∪ peerDependencies`；**replace 行豁免**（它替换 base/web-app
    已有行，包由上游提供——如按产品决定 disabled 的 `ui-trajectory`/`ui-sidebar-terminal` 不在本包 peers，是有意）；
    `disabled` 行豁免。为什么：insert 行装不上时 host 共享面静默 broken（影响全会话），此前只有 release-smoke 兜底。
-2. **`!!js` 加载器住 YAML 原语，不住门禁**：[repo-markdown](../../tools/lib/core/repo-markdown.mjs) 增 `loadCordisYaml`
+2. **`!!js` 加载器住 YAML 原语，不住门禁**：[repo-markdown](../../../tools/lib/core/repo-markdown.mjs) 增 `loadCordisYaml`
    （CORE_SCHEMA + `tag:yaml.org,2002:js` scalar）与 `flattenCordisRows`（insert/group config/preset plugins 三处展平）。
    两门禁共用同一加载器；门禁内不再手写 schema 扩展（`!!js` 是 DSH 组合方言，两处手写必漂）。
    js-yaml 只解析一次（原两个加载器各带一份 fallback 循环）；**不保留永不可达的「友好错误」throw**——
    覆盖率棘轮当场拦下过一次（见验证表），死语句只会永久压低覆盖。
-3. **dim6 常驻上下文补字节账本，并入注入面预算 owner**：[handbook-budget](../../checks/gates/handbook-budget.mjs) 增两轴
+3. **dim6 常驻上下文补字节账本，并入注入面预算 owner**：[handbook-budget](../../../checks/gates/handbook-budget.mjs) 增两轴
    `persona-budget`（每 preset `config.prefix` 字节 ≤ 5120，实测最大 ceo 4612B）与 `skill-catalog-budget`
    （每 preset 可达 skills 根的 SKILL.md frontmatter `name`+`description` 字节 ≤ 2304，实测最大 vp-eng 2082B）。
-   判据值 = 实测最大 +10% 取整（棘轮只降不升）；SKILL.md frontmatter 走 [parseFrontmatter](../../tools/lib/core/repo-markdown.mjs)，
+   判据值 = 实测最大 +10% 取整（棘轮只降不升）；SKILL.md frontmatter 走 [parseFrontmatter](../../../tools/lib/core/repo-markdown.mjs)，
    不手搓 `---` 正则。
-4. **dim5 端口字面量退役**：`3080 是本 GUI` 在 5 处活跃面（[bootstrap](../../docs/guides/bootstrap.md)、
-   [budget-and-ops](../../docs/guides/run-ops.md)、[dev-product-parity](../../docs/guides/dev-product-parity.md)、
-   [demo-scenes](../../docs/guides/demo-scenes.md)、[web-window-ops](../../.agents/skills/web-window-ops/SKILL.md)）改为
-   「日用 GUI 永不动 / 端口是环境状态」，判据单家 = [multi-human-runbook §2](../../docs/guides/multi-human-runbook.md)（实测 3080/3081/3082 都可能是别人的）。
-   决定本身（`--port 0` 安全默认）已在 [handoff-hygiene Note](2026-11-11-handoff-hygiene.md)，本笔只删复述。
-5. **dead evidence lane 复活**：[permissions-recovery lane](../../checks/lanes/permissions-recovery.entry.mjs) 两处修真身——
+4. **dim5 端口字面量退役**：`3080 是本 GUI` 在 5 处活跃面（[bootstrap](../../../docs/guides/bootstrap.md)、
+   [budget-and-ops](../../../docs/guides/run-ops.md)、[dev-product-parity](../../../docs/guides/dev-product-parity.md)、
+   [demo-scenes](../../../docs/guides/demo-scenes.md)、[web-window-ops](../../../.agents/skills/web-window-ops/SKILL.md)）改为
+   「日用 GUI 永不动 / 端口是环境状态」，判据单家 = [multi-human-runbook §2](../../../docs/guides/multi-human-runbook.md)（实测 3080/3081/3082 都可能是别人的）。
+   决定本身（`--port 0` 安全默认）已在 [handoff-hygiene Note](../../implemented/2026-11-11-handoff-hygiene.md)，本笔只删复述。
+5. **dead evidence lane 复活**：[permissions-recovery lane](../../../checks/lanes/permissions-recovery.entry.mjs) 两处修真身——
    ① `DSH_COMPANY_HOME` 目录不存在时 host 按设计停写（无 workspace 零写，2026-11-03），lane 必须先 `mkdirSync(WS)`；
    ② 公司状态家迁 `.dsh-company/` 后本 lane 仍写旧布局 `WS/kb`，改消费
-   [RUN_BUNDLE_PATHS](../../packages/company-pack/src/lib/shared/run-bundle-paths.ts)。此前这条「发布前手动」lane 恒红无人跑。
-6. **文档对不齐机械修**：[snapshots/README](../../snapshots/README.md) 死 flag（`--golden`/`--refresh-golden` →
-   脚本实认 `--expected`/`--refresh-expected`）+ 页签死计数改指门禁输出；[tests/README](../../tests/README.md) layering
+   [RUN_BUNDLE_PATHS](../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts)。此前这条「发布前手动」lane 恒红无人跑。
+6. **文档对不齐机械修**：[snapshots/README](../../../snapshots/README.md) 死 flag（`--golden`/`--refresh-golden` →
+   脚本实认 `--expected`/`--refresh-expected`）+ 页签死计数改指门禁输出；[tests/README](../../../tests/README.md) layering
    守卫措辞对齐真实判据（`spawn(`/`fetch(` 调用点**不**机械扫，防夹具误伤）；`fixture-provenance` 措辞改「spec 守卫」。
 
 ## 输掉的方案
@@ -40,7 +40,7 @@
 - **command-refs 扩扫 notes/（G8-2 的原始动议）**：实测扩扫 1343 处命令得 27 命中，**全部**为历史叙述（`pnpm standalone`）、
   负例原文（改坏成 `pnpm bundle-init` → 红的证据）或 `pnpm vitest` 这类合法二进制快捷，真 stale 为零。
   扩扫只会逼出「历史/负例」豁免仪式（低频低爆），违反「可机械判断的才进 gate」；改为在
-  [command-refs](../../checks/gates/command-refs.mjs) 头注写明边界（notes 的路径类引用由 bare-path 守）。否。
+  [command-refs](../../../checks/gates/command-refs.mjs) 头注写明边界（notes 的路径类引用由 bare-path 守）。否。
 - **新建独立 persona-budget gate 文件**：gates/ 总量只降不升 + 注入面预算是 handbook-budget 的既有 owner。否。
 - **把 5120/2304 写成一次性快照不设棘轮**：无预算的常驻文本只加不减（dim6 的 GAP 本体）。否。
 - **给 isolation-matrix 的 3→5 个 FAIL 立缺陷卡**：solo 复跑（暖 corepack 缓存）ALL PASS，失败形态每次不同且伴随
@@ -51,8 +51,8 @@
 
 - **事实**：① bundle insert 行的插件必须在 pack 依赖声明里；② 会话常驻面（手册/persona/skills 目录）各有字节预算；
   ③ 端口是环境状态、判据单家；④ 失效证据 lane 必须能跑（不是「一直红」）。
-- **唯一入口**：patch 行依赖 = [preset-row-deps.mjs](../../checks/gates/preset-row-deps.mjs)；字节账本 =
-  [handbook-budget.mjs](../../checks/gates/handbook-budget.mjs)；lane 路径 = [RUN_BUNDLE_PATHS](../../packages/company-pack/src/lib/shared/run-bundle-paths.ts)。
+- **唯一入口**：patch 行依赖 = [preset-row-deps.mjs](../../../checks/gates/preset-row-deps.mjs)；字节账本 =
+  [handbook-budget.mjs](../../../checks/gates/handbook-budget.mjs)；lane 路径 = [RUN_BUNDLE_PATHS](../../../packages/company-pack/src/lib/shared/run-bundle-paths.ts)。
 - **读载体**：`pnpm verify`（三门前述 + gate-wiring ×75）；`pnpm test:checks`（gates-negative conformance）；
   `node checks/lanes/permissions-recovery.entry.mjs`（~1.5min）。
 - **写载体**：门内常量 `PERSONA_MAX_BYTES`/`CATALOG_MAX_BYTES`；`loadCordisYaml`/`flattenCordisRows`（原语）。
@@ -70,7 +70,7 @@
 
 ## 验证
 
-| 层 | 失败类（[词表](../../tests/failure-classes.md)） | 负控（见过红） |
+| 层 | 失败类（[词表](../../../tests/failure-classes.md)） | 负控（见过红） |
 |---|---|---|
 | 静态门 preset-row-deps/patch-dep | #10 配置/profile/组合 | 追加 insert 行 `@deepseek-ai/dsh-nonexistent-probe` → `FAIL patch-dep: cordis.patch.yml insert 行 probe-undeclared-row 引用 … 没有 @deepseek-ai/dsh-nonexistent-probe（安装后 host 共享面解析不到 → broken）`；还原 → `PASS preset-row-deps ×29 + patch-insert ×6` |
 | 静态门 persona-budget | #12 文档/生成物/指针 | ceo prefix 追加 600B → `FAIL persona-budget: 常驻 persona 超预算…：ceo 5212B > 5120B`；还原 → `PASS persona-budget 常驻 persona 最大 4612B（ceo）≤ 5120B` |
@@ -86,4 +86,4 @@
 
 运行态观察（非材料，不立卡）：`preset-smoke` 一条 WARN「非本包模块 inject 引用未知包名：`@deepseek-ai/dsh-client-ui-attachment`
 → `@deepseek-ai/dsh-client-ui-trajectory`」——上游 ui-attachment 的 inject 指向本包按产品决定 disabled 的 ui-trajectory 行；
-非本包配置、非失败，留作升 pin 核对（同 [nav-count 轮](2026-11-16-nav-count-doc-class.md)观察）。
+非本包配置、非失败，留作升 pin 核对（同 [nav-count 轮](../../implemented/2026-11-16-nav-count-doc-class.md)观察）。

@@ -31,7 +31,7 @@ This handbook keeps only what every member must know at the start; read operatin
 ## Work discipline
 
 - The writable area is the shared company disk; read a shared file before changing it. **Rehearsal sessions do not write this disk** (rehearse in a separate directory/session).
-- **Evidence capability boundary**: `web_fetch` is DNS-check-blocked for all domains; **shell egress is unrestricted** (`bash` + `curl` + browser UA) ⇒ prefer direct bash retrieval for external evidence; playbook = CEO skill `fact-finding-playbook`; only after exhausting the channel may you use HITL.
+- **Evidence capability boundary**: `web_fetch` may be blocked by domain/DNS checks; when external retrieval is permitted by the session's active sandbox and approval policy, use `web_search` or approved `bash`/`browser` channels per CEO skill `fact-finding-playbook`; never bypass sandbox or permission denials — escalate via HITL only after permitted channels are exhausted.
 - Before saying "done", run a check that proves it; if you cannot, say "unverified".
 - **Two factory human interfaces**: the per-round **file-change review card** (self-check changes before close-out); after `present`, click **"Open in sidebar"** to preview (Open in app then launches the local app — two consecutive but different actions).
 - **Files end with a single newline**: no blank line, no missing line (the shared-disk artifact's uniform shape).

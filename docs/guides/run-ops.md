@@ -11,7 +11,7 @@
 4. **coding 会话继承陷阱**：coding 会话常继承日用 `DSH_HOME=~/.dsh`，“未设即报错”不会触发。因此判据/审计脚本统一接入 `tools/lib/core/runtime-home.mjs`（拒绝日用 home、重叠路径与符号链接；接入清单由 `rg -l runtime-home checks tools -g '*.mjs'` 现算）。
 5. **端口与交付形态**：headless 形态无端口，日志落 `$DSH_HOME/sessions/`；Web 形态起本地 HTTP 端口（以启动横幅为准），与日用实例完全独立。一个安装可顺序服务多个 workspace，公司状态落 `<workspace>/.dsh-company/`；dev 用 `pnpm company --no-open`。
 6. **排练场 ≠ 运行场**：排练/探针默认 cwd = `runtime/rehearsal-workspace/`（`node tools/dev/rehearsal-init.mjs` 幂等成型，刷新 `kb/` 事实与章程、不镜像 journal）；真盘 `company-workspace/` 只收真实动议产物。
-7. **沙箱后端探测**：`env.sh` 启动时探测 `sandbox-exec`，不可用时自动导出 `DSH_PERMISSION_MODE=danger-full-access` 并向 stderr 明示；逃生阀 = `DSH_SKIP_SANDBOX_PROBE=1` 或显式设 `DSH_PERMISSION_MODE`（依据见 [sandbox-backend-probe](../../notes/archived/2026-10-10-sandbox-backend-probe.md)）。
+7. **沙箱后端探测**：`env.sh` 启动时探测 `sandbox-exec`，不可用时默认保持 fail-closed（`workspace-write`，向 stderr 打明示告警），仅在显式指定 `DSH_ALLOW_UNCONFINED_DEV=1` 时导出 `DSH_PERMISSION_MODE=danger-full-access`；逃生阀 = `DSH_SKIP_SANDBOX_PROBE=1` 或显式设 `DSH_PERMISSION_MODE`（依据见 [sandbox-backend-probe](../../notes/archived/2026-10-10-sandbox-backend-probe.md)）。
 
 ## 2. 调试阶梯（组合层 → 会话层，不跳层）
 
@@ -60,7 +60,7 @@
 | 症状 | 判断 | 动作 |
 |---|---|---|
 | **面板空白 / 页签点不开 / 按钮无反应** | 区分环境未就绪与渲染失败 | 跑 `node checks/lanes/ui-scene.entry.mjs`（exit 2 = 未登录，exit 1 = 真断言失败）；加 `--steps <file>` 复现交互；证据落 `runtime/harness-home/diagnosis/` |
-| **用户报「页面报错了」** | 浏览器错误进错误环并追加到 `$DSH_HOME/logs/company-client-errors.log` | 跑 `ui-scene.entry.mjs` 或 `cdp-probe <url> --evidence` 看 `clientErrors`；整链回归 = `node checks/lanes/client-error-chain.entry.mjs`；也可直读脱敏日志（256 KiB 轮转 `.1`） |
+| **用户报「页面报错了」或查预设/数据闸门状态** | 浏览器错误进错误环并追加到 `$DSH_HOME/logs/company-client-errors.log`；预设挂载由 `presetHealth` 跟踪 | 会话内敲 `/company-diagnostics`（或 `/company-diagnostics status`）看 `workspace`、数据闸门、broken preset、检索缓存体积与最近错误；整链回归 = `node checks/lanes/client-error-chain.entry.mjs` |
 | **会话卡住 / 以为崩了** | 多在等人回答或审批，非进程死 | 跑 `pnpm diagnose --session <slug>/<id>`：`NONZERO` 列非零 bash；中断轮标明等回答/等审批/真崩溃；child 目录也可点名 |
 | **重启时仍有 subagent 在跑** | 宿主退出把 in-flight child 记为 `interrupted`，父侧无补发通知 | 重启前先等 child 终态或 cancel；重启后父会话用 `list_subagents` 查，要结果则 `send_to_subagent` 冷恢复 |
 | **改了手册/CHARTER，进行中会话看不到** | 指令注入是触达驱动（无 watcher） | 让成员碰一次工作区文件（read/edit）或重开会话 |

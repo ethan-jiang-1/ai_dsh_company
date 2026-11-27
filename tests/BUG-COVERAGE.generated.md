@@ -161,7 +161,7 @@
 | 114 | 2026-11-13 | tests/host/ledger/governance-export.spec.ts:89 |
 | 117 | 2026-11-13 | tests/host/cultivation/cultivation-command.spec.ts:421 |
 | 118 | 2026-11-13 | tests/lib/presence/presence-board.spec.ts:469 |
-| 119 | 2026-11-13 | tests/host/startup/startup-prompt.spec.ts:186 |
+| 119 | 2026-11-13 | tests/host/startup/startup-prompt.spec.ts:212 |
 | 121 | 2026-11-13 | tests/host/commands/settings-command.spec.ts:233 |
 | 123 | 2026-11-13 | tests/host/startup/startup-store.spec.ts:178 |
 | 124 | 2026-11-13 | tests/host/run-bundle/lease.spec.ts:106 |

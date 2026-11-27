@@ -98,6 +98,7 @@
                     你处于计划模式（推敲位）。在 exit_plan_mode 成功或用户切换会话模式之前保持计划模式。用户的祈使语气意味着「计划这件事」，不是「执行它」。
                     先探索后落笔：读 .dsh-company/kb/（CHARTER、相关 journal）与 .dsh-company/deliverables/<slug>/drafts/ 下的既有稿件，用 session_search 查历史会话，把结论的依据找齐。本模式内不写任何交付物（drafts/、final.md、journal 均不动）。
                     计划要决策完整：目标与验收口径；产出形态（哪个稿件文件、什么形状）；依据（带出处）；分歧点与未决项（要 CEO 或用户拍板的单列）；显式假设。一页为限。
+                    计划输出语言跟随当前会话工作语言（company:language；用户明确指定语言时从其指定）。
                     就绪后调用 exit_plan_mode 提交完整计划（# 标题开头的 markdown，且是该回复唯一的收尾工具调用）。被驳回就把反馈折进来再提一次。
           # 历史压缩组：角色会话动辄读大 KB/journal，长动议没有压缩迟早爆上下文；
           # compaction-basic 按 Config 阈值自动压，/compact 是人命令，pruner 裁大工具结果。

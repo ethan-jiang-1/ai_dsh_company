@@ -17,9 +17,12 @@ import {
   STARTUP_SETTINGS_ORDER,
   STARTUP_SETTINGS_SECTION,
   startupSettingsText,
+  wikiRule,
 } from '../../../packages/company-pack/src/host/startup/startup-prompt.ts'
+import { createCompanyLanguageState } from '../../../packages/company-pack/src/host/language/company-language.ts'
 import { writeStartupSettings } from '../../../packages/company-pack/src/host/startup/startup-store.ts'
 import { EMPTY_STARTUP_SETTINGS, EMPTY_WIKI_CHECK } from '../../../packages/company-pack/src/lib/startup/startup-settings.ts'
+import { assertEnglishUiClean } from '../../support/i18n-assertions.ts'
 
 describe('startupSettingsText', () => {
   it('全自动 → 空串', () => {
@@ -76,6 +79,29 @@ describe('startupSettingsText', () => {
   it('section 名与顺序和手册错开（手册 500 → 本段 501）', () => {
     expect(STARTUP_SETTINGS_SECTION).toBe('company:startup-settings')
     expect(STARTUP_SETTINGS_ORDER).toBe(501)
+  })
+
+  it('en 模式：三字段与 wiki 三档及三类失效原因全部纯英文（零中文泄漏）', () => {
+    const full = startupSettingsText({
+      ...EMPTY_STARTUP_SETTINGS,
+      productType: 'business-software',
+      deliveryMode: 'managed-service',
+      wiki: '../team-wiki',
+    }, { value: '../team-wiki', ok: true, problem: null, location: 'inside', checkedAt: '2026-11-28T00:00:00.000Z' }, 'en')
+    assertEnglishUiClean(full, 'startupSettingsText en full')
+    expect(full).toContain('Product type: business-software')
+    expect(full).toContain('Delivery mode: managed-service')
+    expect(full).toContain('Reference wiki: ../team-wiki')
+
+    const outsideEn = wikiRule({ value: '/w', ok: true, problem: null, location: 'outside', checkedAt: '2026-11-28T00:00:00.000Z' }, 'en')
+    assertEnglishUiClean(outsideEn, 'wikiRule en outside')
+    expect(outsideEn).toContain('read-only')
+
+    for (const problem of ['missing', 'not-directory', 'no-index'] as const) {
+      const brokenEn = wikiRule({ value: '/w', ok: false, problem, location: 'outside', checkedAt: '2026-11-28T00:00:00.000Z' }, 'en')
+      assertEnglishUiClean(brokenEn, `wikiRule en ${problem}`)
+      expect(brokenEn).toContain('broken')
+    }
   })
 })
 
@@ -236,6 +262,41 @@ describe('registerStartupSettings', () => {
       expect(sections[0]?.text()).toContain('项目启动策略文件不可用')
       dynamicCwd = undefined
       expect(sections[0]?.text()).toBe('')
+    } finally { rmSync(ws, { recursive: true, force: true }) }
+  })
+
+  it('registerStartupSettings 跟随 CompanyLanguage 动态切换 zh/en（含损坏提示）', () => {
+    const ws = workspaceWithSettings()
+    try {
+      const language = createCompanyLanguageState('en')
+      const sections: Array<{ text: () => string }> = []
+      const listeners = new Map<string, ((payload: unknown) => void)[]>()
+      const ctx = { logger: { warn: () => {} }, on: (name: string, listener: (payload: unknown) => void) => { listeners.set(name, [...(listeners.get(name) ?? []), listener]) } }
+      const agent = {
+        session: { header: { cwd: ws } },
+        ctx: {
+          get: () => ({ composedPreset: () => 'ceo' }),
+          inject: (_deps: readonly string[], cb: (scope: unknown) => void) => {
+            cb({ systemPrompt: { section: (section: { text: () => string }) => { sections.push(section); return () => {} } } })
+            return { dispose: async () => {} }
+          },
+        },
+      }
+      registerStartupSettings(ctx as never, '', { language })
+      for (const listener of listeners.get('agent/created') ?? []) listener({ agent })
+      const enText = sections[0]?.text() ?? ''
+      assertEnglishUiClean(enText, 'registerStartupSettings live en')
+      expect(enText).toContain('Product type: hardware-software')
+
+      language.set('zh')
+      expect(sections[0]?.text()).toContain('产品类型：hardware-software')
+
+      language.set('en')
+      const fs = process.getBuiltinModule('node:fs')
+      fs.writeFileSync(join(ws, '.dsh-company', 'startup.json'), '{bad', 'utf8')
+      const corruptEn = sections[0]?.text() ?? ''
+      assertEnglishUiClean(corruptEn, 'registerStartupSettings corrupt en')
+      expect(corruptEn).toContain('startup settings file is unusable')
     } finally { rmSync(ws, { recursive: true, force: true }) }
   })
 })

@@ -17,7 +17,7 @@ VP-Eng 有两条命名行：`quality_loop_produce`（`quality-loop-producer`，�
 
 ## 1. 装方法包（starter 或人做）
 
-pack 自带 starter `system-architecture@1.0.0` / `vv-plan@1.0.0`：`pnpm methods:init` 复制到方法层（已存在跳过、不覆盖人的版本；先 `source run/env.sh` 给 `DSH_HOME`）。
+pack 自带 starter `system-architecture@1.0.0` / `vv-plan@1.0.0`（依据见 [sa-sqa-method-packs](../../notes/implemented/2026-11-10-sa-sqa-method-packs.md)）：`pnpm methods:init` 复制到方法层（已存在跳过、不覆盖人的版本；先 `source run/env.sh` 给 `DSH_HOME`）。
 
 自定义包：两侧各一份 `SKILL.md`（同 `method`/`version`，`side` 不同；正文有 check-id 表）：
 

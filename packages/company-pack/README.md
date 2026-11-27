@@ -124,18 +124,18 @@ rm -rf <workspace>/.dsh-company                       # 公司状态（kb/delive
 rm -rf <DSH_HOME>/company                             # identity / methods / ledger
 rm -f  <DSH_HOME>/company-pack.lock                    # 并发写者锁（home 根）
 rm -f  <DSH_HOME>/logs/company-client-errors.log       # 已脱敏的客户端错误日志
-rm -f  <DSH_HOME>/storages/company_run_bundle_ledger.json
-rm -f  <DSH_HOME>/cache/company/session-search-*.db    # 派生索引，可删可重建
+rm -rf <DSH_HOME>/storages/company_run_bundle_ledger.json
+rm -rf <DSH_HOME>/cache/company                        # 派生检索索引（含 .db / .db-wal / .db-shm），可删可重建
 # 会话、凭据、其他 profile 依赖 HOME 里的共享状态，不要整删 DSH_HOME
 ```
 
-`<DSH_HOME>/cache/company/session-search-*.db` 是派生索引，可删可重建；不要为了清插件删整个
+`<DSH_HOME>/cache/company/`（含 SQLite `.db`/`.db-wal`/`.db-shm`）是派生索引，可删可重建；浏览器侧按 origin 隔离的本地状态键（`dsh-company-pack/*`、`dsh-company-hq-cultivation:*`、`dsh-company-cultivation-chat-width`）可在浏览器站点数据中按需清理。不要为了清插件删整个
 `DSH_HOME`（会话/凭据/workspace 登记都在那里）。完整清单以《安装手册》§八为准；本块与手册由
 `tests/repo/release/uninstall-parity.spec.ts` 对账。
 
 ## 已知限制（随行为变更同 diff 更新）
 
-- **状态文件读取**：startup settings/options、bundle manifest、catalog和presented账本各消费一次文件结果；缺失/unsafe仍沿用既有保守分桶，取得的文本决定本次解析，下次调用重读。至多一次payload读取不提供文件系统原子快照，见[读取决定](../../notes/implemented/2026-11-20-company-file-read-state.md)。
+- **状态文件读取**：startup settings/options、bundle manifest、catalog和presented账本各消费一次文件结果；缺失/unsafe仍沿用既有保守分桶，取得的文本决定本次解析，下次调用重读。至多一次payload读取不提供文件系统原子快照，见[读取决定](../../notes/implemented/2026-11-20-company-file-read-state.md)；解析器有界窗口、身份/meta 单一派生与降级结构边界见[质量防线](../../notes/implemented/2026-11-23-quality-defenses-bugfix-batch.md)、[身份派生](../../notes/implemented/2026-11-24-identity-single-source-batch.md)、[边界窗口](../../notes/implemented/2026-11-24-boundary-window-and-bad-shape-batch.md)、[meta 同源](../../notes/implemented/2026-11-24-meta-single-source-and-presence-parity.md)与[降级结构](../../notes/implemented/2026-11-24-degrade-and-structure-batch.md)。
 - **编号校验（`/req check`）的 v1 边界**：跨动议引用 `<动议键>:<ID>` 未实现（遇到只标未支持）；并发取号不加锁（靠 Lead 串行分配 + 撞号红兜底）；旧动议无 `编号体系:` 标记即 `skipped`（只读豁免，不回溯判红）。
 - **只支持 web 组合**：`company-client` 的 `inject` 声明 `workspaceRegistry`（由 web-app 组合提供）；base-only / headless profile 不加载本包。这不是缺陷，是本包的 app surface = Web（[release.md](../../docs/contracts/release.md) 六轴）。
 - **`dsh.client.inject` 的依赖边**（条数以 `package.json` 为准）= 本包 client 模块 factory 的依赖边：Cordis 激活顺序仍由服务 inject 决定；但浏览器模块 factory 会沿这些边在 consumer 前到达（vendor `packages/client/modules/src/client/system.ts` 的 `arriveGraphRow`）。删除需上游合同/证据，故保留。

@@ -10,7 +10,7 @@
 | 冒烟 | 30 |
 | 探针 | 66 |
 | 结构门禁 | 75 |
-| keyless spec 文件 | 306 |
+| keyless spec 文件 | 307 |
 | 门禁自测（tests/checks） | 11 |
 | fast lane | 4 |
 | surface lane | 6 |
@@ -35,7 +35,7 @@
 
 ## 字段（v2）
 
-`shape` = example | generator | model | meta（当前默认 example）；`lastRed` = 最近一次真红日期（— = 未接运行日志，不伪造）；`replaceBy` / `retireWhen` = 替代资产 / 退役条件（— = 未排期）。`消费者` = 自动调度 lane 数 + tests/checks/tools/probes/run 里引用该资产名的文件数。
+`shape` = example | generator | model | meta（当前默认 example）；`replaceBy` / `retireWhen` = 替代资产 / 退役条件（— = 未排期）。`消费者` = 自动调度 lane 数 + tests/checks/tools/probes/run 里引用该资产名的文件数。
 
 ## 冒烟
 

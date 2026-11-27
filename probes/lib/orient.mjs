@@ -150,6 +150,32 @@ export function fourPieceState({ home, profiles, workspaceRoot, root = repositor
 export const CREDENTIALS_FILE = '.credentials.yaml'
 /** 真模型要的那把钥匙的键名（渲染 ✓/✗ 用；同样是字面量的单一事实）。 */
 export const DEEPSEEK_CREDENTIAL = 'DEEPSEEK_API_KEY'
+/** 派生检索缓存超阈值提醒线（100 MiB；含 .db/.db-wal/.db-shm）。 */
+export const CACHE_WARN_BYTES = 100 * 1024 * 1024
+
+/**
+ * 统计 `<home>/cache/company` 派生检索缓存体积（只读；缺失时 present:false）。
+ * @param {string|null|undefined} home 生效的 DSH home。
+ */
+export function cacheState(home) {
+  if (home === null || home === undefined) return { present: false, files: 0, bytes: 0, overThreshold: false }
+  const dir = join(home, 'cache', 'company')
+  if (!existsSync(dir)) return { present: false, files: 0, bytes: 0, overThreshold: false }
+  let files = 0
+  let bytes = 0
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (!entry.isFile()) continue
+    files += 1
+    bytes += statSync(join(dir, entry.name)).size
+  }
+  return { present: true, files, bytes, overThreshold: bytes > CACHE_WARN_BYTES }
+}
+
+function formatCacheSize(bytes) {
+  if (bytes < 1024) return `${String(bytes)} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KiB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`
+}
 
 /**
  * 解析凭据库文本里的键名（纯函数；值一律不取）。键**嵌在顶层 `refs:` 块里**。
@@ -199,6 +225,7 @@ export function orientState({ env = process.env, dailyHome, workspaceRoot, gitSt
     home,
     profiles,
     credentials: credentialsState(effective),
+    cache: cacheState(effective),
     sessions: effective ? listSessions(effective, sessionLimit) : { total: 0, recent: [] },
     workspace: { root: workspaceRoot, ...workspaceOverview(workspaceRoot), gitStatus, gitIgnored },
     scan: scanDeliverables(workspaceRoot),
@@ -218,6 +245,12 @@ export function renderOrient(state) {
   lines.push(state.credentials.present
     ? `凭据       ${state.credentials.keys.includes(DEEPSEEK_CREDENTIAL) ? `${DEEPSEEK_CREDENTIAL} ✓` : `${DEEPSEEK_CREDENTIAL} ✗`}（共 ${String(state.credentials.keys.length)} 个键；住 .credentials.yaml，不是环境变量）`
     : '凭据       （无 .credentials.yaml——真模型跑不了；配法见 docs/guides/run-ops.md §1）')
+  if (state.cache?.present) {
+    const warn = state.cache.overThreshold
+      ? ' ⚠ 超过 100 MiB 告警线（派生索引可安全重建：rm -rf "$DSH_HOME/cache/company"）'
+      : '（派生索引，可删可重建）'
+    lines.push(`派生缓存   ${formatCacheSize(state.cache.bytes)} · ${String(state.cache.files)} 个文件${warn}`)
+  }
   lines.push('', '== 会话（按工作区 slug 汇总）==')
   if (state.sessions.total === 0) {
     lines.push('（无会话记录——home 未生效或尚未起过会话）')

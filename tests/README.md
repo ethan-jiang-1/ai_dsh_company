@@ -60,13 +60,13 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 
 | 层 | 时间 | 跑什么（代表脚本；**它自己的触发条件在头注**） |
 |---|---|---|
-| **四层命令** | spec/checks 秒级；e2e/entry 按面或每周 | test:spec / test:e2e / test:entry / test:checks（后缀 = lane；e2e/entry 由 keyless-lane 分派） |
+| **四层命令** | spec/checks 秒级；e2e/entry 按面或每周 | test:spec / test:e2e / test:entry / test:checks（后缀 = lane 见 [suffix-lane](../notes/implemented/2026-11-13-suffix-lane-alignment.md)；快档围栏见 [asset-fence](../notes/implemented/2026-11-13-test-asset-fence.md)） |
 | 文档/结构 keyless | 秒级 | `pnpm verify`（含当前 Markdown 链接、UTF-8 字节预算、裸路径、分层方向与 pin 一致性门禁） |
 | **类型面 keyless** | 秒级（增量） | `pnpm typecheck`（四套 `tsconfig.test-*` 并集全覆盖，清单以配置为准；改导出/导入签名或测试类型时跑——verify 与 test 都不做类型检查） |
 | **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器）；便宜 smoke lane = `pnpm smoke:fast`（4 条，~2.2s；pre-push；只证明资产还活着） |
 | 装配 keyless | ~25s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
-| **重放 lane（第三档，无 key）** | 现行场景 ~8s | `replay-smoke`（默认跑全部 runnable 合成场景：`foundation-workspace` + 加载 `company-pack` 的 `company-handbook-smoke`；会话日志 + sidecar）——要起进程，不进 `pnpm test`。真页面车道 = `ui-scene-smoke`（自起实例，~40s） |
+| **重放 lane（第三档，无 key）** | 现行场景 ~8s | `replay-smoke`（默认跑全部 runnable 合成场景：`foundation-workspace` + 加载 `company-pack` 的 `company-handbook-smoke`；三态活性门见 [replay-liveness](../notes/implemented/2026-10-09-replay-scene-liveness.md)）——要起进程，不进 `pnpm test`。真页面车道 = `ui-scene-smoke`（自起实例，~40s） |
 | CLI 集成（keyless，需子进程） | 秒级 | `node checks/lanes/snapshot-motion.e2e.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） |
 | 发布与分发（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../docs/contracts/release.md)） |
 | 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件与成本见其头注「何时跑」**；`script-triggers` 门禁强制） |
@@ -93,7 +93,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 
 ## 新 spec 落点
 
-keyless 单测唯一后缀 `*.spec.ts`（[testing.md §1.1](../docs/testing.md)）；按**区**归位，区内再看轴：**有源码组的区**跟组名同名（`tests/host/`、`tests/client/`、`tests/lib/` 下的同名目录，镜像由 [tests/repo/structure](./repo/structure/) 的断言守），**没有源码对象的区**按 owner 或消费者归（`tests/repo/` 的六个 owner 子目录、`tests/session/`、`tests/evidence/`、`tests/ui/`）。需要真进程 / 浏览器 / 模型的检查写 `checks/lanes/` 或 `probes/` 下的 `.mjs` 并在头注自述「何时跑 / 成本 / 状态」——不塞进 tests/（layering 守卫拦截）。
+keyless 单测唯一后缀 `*.spec.ts`（[testing.md §1.1](../docs/testing.md)）；按**区**归位，区内再看轴：**有源码组的区**跟组名同名（`tests/host/`、`tests/client/`、`tests/lib/` 下的同名目录，镜像对齐见 [dir-alignment](../notes/implemented/2026-11-15-src-tests-dir-alignment.md)，对抗性边界矩阵见 [adversarial-matrix](../notes/implemented/2026-11-13-adversarial-shape-matrix.md)），**没有源码对象的区**按 owner 或消费者归（`tests/repo/` 的六个 owner 子目录、`tests/session/`、`tests/evidence/`、`tests/ui/`）。需要真进程 / 浏览器 / 模型的检查写 `checks/lanes/` 或 `probes/` 下的 `.mjs` 并在头注自述「何时跑 / 成本 / 状态」——不塞进 tests/（layering 守卫拦截）。
 本文件骨架由 [repo/navigation-assets.spec](./repo/docs/navigation-assets.spec.ts) 钉进回归（2026-10-05 红→绿落地）。
 
 > ⚠ 类型面 = `tsconfig.test-client.json`（tests/client）+ `tsconfig.test-company.json`（tests/host、tests/lib、tests/content、tests/presets）+ `tsconfig.test-harness.json`（tests/repo、tests/tools、tests/session、tests/evidence、tests/ui）+ `tsconfig.test-vendor-bridge.json`（tests/contract 及直引 vendor host 源的 spec），并集零遗漏（`typecheck-coverage-claim.spec` 机械守卫）。

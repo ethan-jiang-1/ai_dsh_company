@@ -21,6 +21,7 @@ import {
   type StartupSettings,
   type WikiCheck,
 } from '../../lib/startup/startup-settings.ts'
+import type { CompanyLanguage, CompanyLanguageState } from '../language/company-language.ts'
 import { resolveStartupWorkspace } from './startup-workspace.ts'
 import { composedPresetOf } from '../prompt/handbook.ts'
 import { injectEachAgent } from '../run-bundle/for-each-agent.ts'
@@ -39,10 +40,21 @@ const FIELD_LABEL = {
   wiki: '参考资料 wiki',
 } as const
 
+const FIELD_LABEL_EN = {
+  productType: 'Product type',
+  deliveryMode: 'Delivery mode',
+  wiki: 'Reference wiki',
+} as const
+
 /** 字段 → 该字段被给定后要压住的「问/猜」行为（wiki 另有分档规则，见 `wikiRule`）。 */
 const FIELD_RULE = {
   productType: '本次一律按这份产品类型包执行；动议 meta.md 没写就以它为准——不要再问用户，也不要按习惯猜。',
   deliveryMode: '本次一律按这个交付模式交付；不要再按 SOW/SLA/驻场特征去猜。',
+} as const
+
+const FIELD_RULE_EN = {
+  productType: 'Use this product-type pack for the entire session; if meta.md omits it, treat this value as authoritative — do not ask the user again or guess from habit.',
+  deliveryMode: 'Deliver under this delivery mode for the entire session; do not guess from SOW/SLA/on-site cues.',
 } as const
 
 /**
@@ -52,9 +64,24 @@ const FIELD_RULE = {
  * 「按 wiki 指引查」会让模型在只读目录上反复尝试写入（失败且浪费轮次），或者在外置盘上
  * 以为自己在维护 wiki。
  * @param check - host 刚算出来的指针检查。
+ * @param language - 当前公司工作语言（默认 zh）。
  * @returns 该档的规则句。
  */
-export function wikiRule(check: WikiCheck): string {
+export function wikiRule(check: WikiCheck, language: CompanyLanguage = 'zh'): string {
+  if (language === 'en') {
+    if (!check.ok) {
+      const whyEn = check.problem === 'missing'
+        ? 'directory does not exist'
+        : check.problem === 'not-directory'
+          ? 'path is not a directory'
+          : 'directory has no index.md'
+      return `Warning: this wiki pointer is broken (${whyEn}) — **do not** treat it as a knowledge source or fabricate facts from memory; tell the user the pointer is invalid and ask whether to reset it first.`
+    }
+    if (check.location === 'inside') {
+      return 'Read its index.md before drilling into pages, and grep when unsure. Because the directory is inside the workspace, you may add or update pages under the wiki maintenance protocol (write the page first, then update index.md and log.md); never touch the raw source layer.'
+    }
+    return 'Read its index.md before drilling into pages, and grep when unsure. Because the directory is outside the workspace, it is **read-only** knowledge (readable, not writable): do not attempt writes or invent facts outside the wiki; propose page additions to the user instead of editing it yourself.'
+  }
   if (!check.ok) {
     const why = check.problem === 'missing'
       ? '目录不存在'
@@ -75,16 +102,32 @@ export function wikiRule(check: WikiCheck): string {
  * 生成注入正文；全自动（一项未设）返回空串——不占上下文、也不给模型任何约束暗示。
  * @param settings - 当前项目策略。
  * @param wikiCheck - 当前 wiki 指针的检查结果（决定 wiki 段落在哪一档）。
+ * @param language - 当前公司工作语言（默认 zh）。
  * @returns 注入文本（可能为空）。
  */
-export function startupSettingsText(settings: StartupSettings, wikiCheck: WikiCheck): string {
+export function startupSettingsText(
+  settings: StartupSettings,
+  wikiCheck: WikiCheck,
+  language: CompanyLanguage = 'zh',
+): string {
   const entries = overriddenEntries(settings)
   if (entries.length === 0) return ''
+  if (language === 'en') {
+    const linesEn = [
+      'Project startup settings (configured by the operator for this session; do not ask again or guess from habit):',
+    ]
+    for (const [field, value] of entries) {
+      const ruleEn = field === 'wiki' ? wikiRule(wikiCheck, 'en') : FIELD_RULE_EN[field]
+      linesEn.push(`- ${FIELD_LABEL_EN[field]}: ${value}. ${ruleEn}`)
+    }
+    linesEn.push('These startup bindings apply unless the user explicitly overrides them.')
+    return linesEn.join('\n')
+  }
   const lines = [
     '本项目的启动策略（已由人指定，整场沿用；不要重新问、不要按习惯猜）：',
   ]
   for (const [field, value] of entries) {
-    const rule = field === 'wiki' ? wikiRule(wikiCheck) : FIELD_RULE[field]
+    const rule = field === 'wiki' ? wikiRule(wikiCheck, 'zh') : FIELD_RULE[field]
     lines.push(`- ${FIELD_LABEL[field]}：${value}。${rule}`)
   }
   lines.push('以上是启动绑定；只有用户明确改口，才按新说法。')
@@ -103,6 +146,8 @@ export interface StartupSettingsRegistration {
   readonly watch?: { sync(workspace: string): unknown }
   /** 公司盘可写（lease 到手）；false 时只装只读 section，不写派生/布 watcher（BUG-119）。 */
   readonly writable?: boolean
+  /** 公司语言状态（可选；传入时 en 会话输出纯英文策略提示，避免中英夹杂）。 */
+  readonly language?: Pick<CompanyLanguageState, 'current'>
 }
 
 /**
@@ -140,11 +185,15 @@ export function registerStartupSettings(
       text: () => {
         const current = resolveStartupWorkspace(bootWorkspace, agent)
         if (current === '') return ''
+        const lang = options.language?.current() ?? 'zh'
         const state = readStartupSettingsState(current)
         if (state.problem !== null) {
+          if (lang === 'en') {
+            return `Warning: startup settings file is unusable (${state.problem}) — falling back to full auto for this turn and ignoring its values; fix .dsh-company/startup.json or reconfigure to restore on the next turn.`
+          }
           return `⚠ 项目启动策略文件不可用（${state.problem}）：本次按全自动处理，不采用其中的值；修好 .dsh-company/startup.json 或重新设置后下一轮恢复。`
         }
-        return startupSettingsText(state.settings, checkWikiPointer(current, state.settings.wiki))
+        return startupSettingsText(state.settings, checkWikiPointer(current, state.settings.wiki), lang)
       },
       interpolate: false,
     })

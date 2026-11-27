@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
-import { CHECKS, CREDENTIALS_FILE, DEEPSEEK_CREDENTIAL, LIVE_SURFACES, credentialsState, homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseCredentialKeys, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, scanDeliverables, scenarioVerification, workspaceOverview } from '../../probes/lib/orient.mjs'
+import { CACHE_WARN_BYTES, CHECKS, CREDENTIALS_FILE, DEEPSEEK_CREDENTIAL, LIVE_SURFACES, cacheState, credentialsState, homeStatus, listProfiles, listSessions, listSlugSessions, orientState, parseCredentialKeys, parseSessionHead, parseSessionPreset, renderOrient, renderSessionView, runBundleView, scanDeliverables, scenarioVerification, workspaceOverview } from '../../probes/lib/orient.mjs'
 
 // 条目 B 判据（RFC driver-surface-package）：pnpm orient 的 keyless 只读核心——
 // home 判定（requireDevHome 同款但只警告不抛）/ profiles / 会话清单 / 公司盘概览 /
@@ -164,6 +164,29 @@ describe('orientState + renderOrient', () => {
     expect(text).not.toContain(daily)
     expect(state.home.kind).toBe('unset')
     expect(state.profiles).toEqual([])
+  })
+
+  it('cache/company 派生缓存统计：缺席不渲染、常规体积显示字节与文件数、超过 100 MiB 打告警与清理提示', () => {
+    expect(cacheState(null)).toEqual({ present: false, files: 0, bytes: 0, overThreshold: false })
+    expect(cacheState(home)).toEqual({ present: false, files: 0, bytes: 0, overThreshold: false })
+    mkdirSync(join(home, 'cache/company/sub-ignored'), { recursive: true })
+    writeFileSync(join(home, 'cache/company/tiny.db'), Buffer.alloc(512))
+    const tinyRendered = renderOrient(orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace }))
+    expect(tinyRendered).toContain('派生缓存   512 B · 1 个文件')
+    writeFileSync(join(home, 'cache/company/session-search-company.db'), Buffer.alloc(4096))
+    const normal = orientState({ env: { DSH_HOME: home }, dailyHome: daily, workspaceRoot: workspace })
+    expect(normal.cache).toEqual({ present: true, files: 2, bytes: 4608, overThreshold: false })
+    const normalRendered = renderOrient(normal)
+    expect(normalRendered).toContain('派生缓存   4.5 KiB · 2 个文件')
+    expect(normalRendered).not.toContain('超过 100 MiB 告警线')
+
+    const overState = {
+      ...normal,
+      cache: { present: true, files: 3, bytes: CACHE_WARN_BYTES + 1024, overThreshold: true },
+    }
+    const overRendered = renderOrient(overState)
+    expect(overRendered).toContain('超过 100 MiB 告警线')
+    expect(overRendered).toContain('rm -rf "$DSH_HOME/cache/company"')
   })
 })
 

@@ -49,8 +49,9 @@ CEO 收口：final.md（产品决策/合并摘要，引用两份 draft）→ pre
 
 ## 产品类型 playbook
 
-先判断这次是哪种产品（决定 MRD/PRD 多出哪些字段）；**类型与 playbook 的唯一表** = 共享 skill 的「产品类型 → playbook」，可选值 = pack `content/product-types/<id>/` 的目录。
-**第二轴 = 交付模式**（`meta.md` 的 `交付模式`）：`productized`（默认）/ `project-services`（SOW/UAT/驻场）/ `managed-service`（持续 SLA/值班/月报/续费）；它不是产品类型，规则与模板 = `content/delivery-modes/<id>/`，组合示例 `business-software × project-services`。新类型按同结构新增并随包发布，不改公共字段。**类型看动议**：`meta.md` 的 `产品类型` 优先，缺省回落 `company.md` 的 `productType`（回执会点名来源）；用户口头声明优先于默认，并写进 meta。
+先判断这次是哪种产品（决定 MRD/PRD 多出哪些字段；`business-software` 默认链见 [business-software Note](../../notes/implemented/2026-11-10-business-software-product-type.md)）；**类型与 playbook 的唯一表** = 共享 skill 的「产品类型 → playbook」，可选值 = pack `content/product-types/<id>/` 的目录。
+**第二轴 = 交付模式**（`meta.md` 的 `交付模式`）：`productized`（默认）/ `project-services`（SOW/UAT/驻场）/ `managed-service`（持续 SLA/值班/月报/续费）；它不是产品类型，规则与模板 = `content/delivery-modes/<id>/`，组合示例 `business-software × project-services`。新类型按同结构新增并随包发布，不改公共字段。
+**类型看动议**：`meta.md` 的 `产品类型` 优先，缺省回落 `company.md` 的 `productType`（回执会点名来源，见 [motion-product-type Note](../../notes/implemented/2026-11-10-motion-product-type.md)）；用户口头声明优先于默认，并写进 meta。
 ## 最小场景（3 人，不叫全员）
 
 CEO 收到"要不要做对账产品" → 只叫 CMO + VP-Eng：
