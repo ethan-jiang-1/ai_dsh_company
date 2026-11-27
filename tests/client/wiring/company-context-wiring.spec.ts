@@ -133,6 +133,17 @@ describe('makeContextWiring / openContext', () => {
     expect(returnToMain).toHaveBeenCalledOnce()
     expect(openResource).toHaveBeenCalledWith(sessionFileAddress('lead-session', 'kb/x.md'))
   })
+
+  it('openResource 抛错时经 onError 转回 { ok: false, problem }（BUG-393）', async () => {
+    const scoped = makeScoped({
+      sidebarRight: {
+        openResource: () => { throw new Error('openResource failed') },
+      },
+    })
+    const wiring = makeContextWiring(scoped as never, leadOf as never, rawFollow as never, readCatalog as never)
+    await expect(wiring.openContext('session-1' as never, fileContext() as never))
+      .resolves.toEqual({ ok: false, problem: '打不开原文：openResource failed' })
+  })
 })
 
 // 负例留证 2026-11-24：删掉 `makeCultivationContextSources.listSessions` 的 `projected.problem` 早退后 `vitest run tests/client/wiring/company-context-wiring.spec.ts` 1 failed（当前会话不在快照时返回 ok:true 而不是 fail-closed）；还原后 8/8 绿。BUG-366

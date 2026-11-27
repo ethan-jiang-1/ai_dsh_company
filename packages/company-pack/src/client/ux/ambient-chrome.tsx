@@ -97,9 +97,14 @@ export type HeroMotionOptionsProps =
   & PropsLocale<typeof COMPANY_NS>
   & InjectFace<DraftNotifyInjected>
 
+function emptyDraftHook(sel: (s: { readonly draft: string }) => string): string {
+  return sel({ draft: '' })
+}
+
 /** 新会话 Hero 态的 3 个高频动议模板速启胶囊。 */
 export function HeroMotionOptions({ sessionId, useInput, inputActions, notifyDraft, t }: HeroMotionOptionsProps): ReactNode {
-  const currentDraft = typeof useInput === 'function' ? useInput(s => s.draft) : ''
+  const useDraftInput = typeof useInput === 'function' ? useInput : emptyDraftHook
+  const currentDraft = useDraftInput(s => s.draft)
   if (isEmbeddedWorkshopSession(sessionId)) return null
   return (
     <div className="wk-hero-options" data-company-hero-options="">
@@ -147,7 +152,8 @@ export function MotionCommandDock({
   t,
 }: MotionCommandDockProps): ReactNode {
   const presetRaw = useSessions(s => s.projectionsBySession[sessionId]?.values.agentPreset)
-  const currentDraft = typeof useInput === 'function' ? useInput(s => s.draft) : ''
+  const useDraftInput = typeof useInput === 'function' ? useInput : emptyDraftHook
+  const currentDraft = useDraftInput(s => s.draft)
   const roleId = readCompanyRole(presetRaw)
   const pendingCount = useAttentionItems((items: readonly LivePending[]) => items.length)
   if (isEmbeddedWorkshopSession(sessionId) || roleId === null) return null

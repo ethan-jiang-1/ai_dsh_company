@@ -56,7 +56,7 @@ describe('命令线构造：host 发下来的 id/slug 直接用，自由文本�
     expect(line).toEqual({ ok: true, line: '/cultivation reject r-1 :: 口径不符 （KB 已有：vp-sales/CHARTER）' })
     expect(rejectLine('r-1', '   \n  ')).toEqual({
       ok: false,
-      problem: { field: 'reason', message: CULTIVATION_COPY.problemReason },
+      problem: { field: 'reason', message: CULTIVATION_COPY.problemReason, code: 'reason' },
     })
   })
 
@@ -68,15 +68,15 @@ describe('命令线构造：host 发下来的 id/slug 直接用，自由文本�
     })
     expect(correctLine('含 :: 的期望句', '正文')).toEqual({
       ok: false,
-      problem: { field: 'expectation', message: CULTIVATION_COPY.problemExpectationSeparator },
+      problem: { field: 'expectation', message: CULTIVATION_COPY.problemExpectationSeparator, code: 'expectationSeparator' },
     })
     expect(correctLine('   ', '正文')).toEqual({
       ok: false,
-      problem: { field: 'expectation', message: CULTIVATION_COPY.problemExpectationEmpty },
+      problem: { field: 'expectation', message: CULTIVATION_COPY.problemExpectationEmpty, code: 'expectationEmpty' },
     })
     expect(correctLine('期望句', '  \n ')).toEqual({
       ok: false,
-      problem: { field: 'body', message: CULTIVATION_COPY.problemBodyEmpty },
+      problem: { field: 'body', message: CULTIVATION_COPY.problemBodyEmpty, code: 'bodyEmpty' },
     })
   })
 
@@ -88,11 +88,11 @@ describe('命令线构造：host 发下来的 id/slug 直接用，自由文本�
     })
     expect(suggestLine('cto', '期望句', '正文', 'ceo')).toEqual({
       ok: false,
-      problem: { field: 'role', message: CULTIVATION_COPY.problemRoleUnknown },
+      problem: { field: 'role', message: CULTIVATION_COPY.problemRoleUnknown, code: 'roleUnknown' },
     })
     expect(suggestLine('ceo', '期望句', '正文', 'ceo')).toEqual({
       ok: false,
-      problem: { field: 'role', message: CULTIVATION_COPY.problemRoleSelf },
+      problem: { field: 'role', message: CULTIVATION_COPY.problemRoleSelf, code: 'roleSelf' },
     })
   })
 })
@@ -201,14 +201,14 @@ describe('可选背景的命令线（D1=A：只带 ref token）', () => {
 
   it('无 context 且正文空 → 提示可带背景或写工作；有 context / work 则允许空正文', () => {
     expect(correctLine('期望句', '  \n ')).toEqual({
-      ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemBodyEmpty },
+      ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemBodyEmpty, code: 'bodyEmpty' },
     })
     expect(CULTIVATION_COPY.problemBodyEmpty).toContain('或写清这次工作')
     expect(correctLine('期望句', '', 'tok').ok).toBe(true)
     expect(correctLine('期望句', '', undefined, '这次工作').ok).toBe(true)
     // work 显式给了但空 = 校验问题（不是没填）。
     expect(correctLine('期望句', '', undefined, '  ')).toEqual({
-      ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemWorkEmpty },
+      ok: false, problem: { field: 'body', message: CULTIVATION_COPY.problemWorkEmpty, code: 'workEmpty' },
     })
   })
 
