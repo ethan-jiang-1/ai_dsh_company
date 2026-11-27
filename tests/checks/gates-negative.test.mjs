@@ -30,6 +30,7 @@ import * as docBudget from '../../checks/gates/doc-budget.mjs'
 import * as layoutBlock from '../../checks/gates/layout-block.mjs'
 import * as commandRefs from '../../checks/gates/command-refs.mjs'
 import * as scriptIndex from '../../checks/gates/script-index.mjs'
+import * as devProductParity from '../../checks/gates/dev-product-parity.mjs'
 import { mutateFile } from '../support/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
@@ -290,6 +291,42 @@ const mutateOrFail = (label, path, transform) => {
     symlinkSync('AGENTS.md', join(root, 'CLAUDE.md'))
     rmSync(join(root, '.claude/skills'))
     report('layout-block：.claude/skills 缺失 → 红', run(layoutBlock, root), '.claude/skills 缺失')
+
+    symlinkSync('../wrong-target', join(root, '.claude/skills'))
+    report('layout-block：软链目标不符 → 红', run(layoutBlock, root), '软链目标为 ../wrong-target')
+    rmSync(join(root, '.claude/skills'))
+    symlinkSync('../.agents/skills', join(root, '.claude/skills'))
+
+    writeFileSync(join(root, 'AGENTS.md'), '# AGENTS\n\n## 布局\n\n| 目录 | 用途 |\n|---|---|\n| [`docs/no-such-file.md`](./docs/no-such-file.md) | 死路径 |\n')
+    report('layout-block：布局表死路径 → 红', run(layoutBlock, root), '不存在')
+
+    writeFileSync(join(root, 'AGENTS.md'), '# AGENTS\n\n## 命令表\n\n```sh\ntools/dev/setup.mjs\n```\n')
+    report('layout-block：无 ## 布局节（×0 防空转）→ 红', run(layoutBlock, root), '未解析到任何布局路径')
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // dev-product-parity（2026-11-27）：退役词扫描目标缺失必须 fail-closed 报红，禁止 existsSync 静默跳过。
+  const root = mkdtempSync(join(tmpdir(), 'gates-parity-'))
+  try {
+    mkdirSync(join(root, 'docs/guides'), { recursive: true })
+    mkdirSync(join(root, 'docs/reference'), { recursive: true })
+    mkdirSync(join(root, 'tools/dev'), { recursive: true })
+    mkdirSync(join(root, 'tools/lib/core'), { recursive: true })
+    mkdirSync(join(root, 'packages/company-pack'), { recursive: true })
+    mkdirSync(join(root, '_dist'), { recursive: true })
+    mkdirSync(join(root, 'run'), { recursive: true })
+    cpSync(join(ROOT, 'tools/dev/company.mjs'), join(root, 'tools/dev/company.mjs'))
+    cpSync(join(ROOT, 'tools/lib/core/dev-install.mjs'), join(root, 'tools/lib/core/dev-install.mjs'))
+    cpSync(join(ROOT, 'docs/guides/dev-product-parity.md'), join(root, 'docs/guides/dev-product-parity.md'))
+    cpSync(join(ROOT, 'docs/guides/bootstrap.md'), join(root, 'docs/guides/bootstrap.md'))
+    cpSync(join(ROOT, 'README.md'), join(root, 'README.md'))
+    cpSync(join(ROOT, 'packages/company-pack/README.md'), join(root, 'packages/company-pack/README.md'))
+    cpSync(join(ROOT, '_dist/安装手册.md'), join(root, '_dist/安装手册.md'))
+    cpSync(join(ROOT, 'run/README.md'), join(root, 'run/README.md'))
+    cpSync(join(ROOT, 'docs/reference/external.md'), join(root, 'docs/reference/external.md'))
+    // 故意缺失 docs/guides/orient.md
+    report('dev-product-parity：退役词目标 docs/guides/orient.md 缺失 → fail-closed 红', run(devProductParity, root), '退役词校验目标缺失：docs/guides/orient.md')
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 

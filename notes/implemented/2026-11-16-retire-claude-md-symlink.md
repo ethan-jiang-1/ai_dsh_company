@@ -1,6 +1,6 @@
 # 2026-11-16 · 退役 `CLAUDE.md` symlink 与其专属门禁
 
-状态：implemented（2026-11-16 落地；任务源 = 用户点名「有必要吗」→「没必要就把它删了」）
+状态：implemented（2026-11-16 落地；任务源 = 用户点名「有必要吗」→「没必要就把它删了」；已被 [2026-11-27-docs-16-file-standard-alignment.md](./2026-11-27-docs-16-file-standard-alignment.md) 取代：恢复 DSH 原生 `CLAUDE.md` 与 `.claude/skills` 软链并并入 `layout-block.mjs`）
 
 > 上游 = 用户 2026-11-16：`CLAUDE.md -> AGENTS.md` 这个 symlink 还有没有必要留。用户同时指出「CC 号称已经可以使用 AGENTS.md」——读者确认了前提。
 

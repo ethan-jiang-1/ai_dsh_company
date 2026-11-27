@@ -1,10 +1,10 @@
 # 2026-11-27 · `docs/` 架构主干补齐、全量对齐与单向依赖收口
 
-状态：implemented（2026-11-27；批准：用户「整理整理，同步同步，对齐对齐……docs/ 尽量别依赖 _backlog/ 可以依赖 notes/……选项 B / 选项 A / doc-taxonomy 门禁」；部分取代 [2026-11-10-docs-dsh-alignment.md](./2026-11-10-docs-dsh-alignment.md) 的 tier 集合与导航结构，并部分演进 [2026-11-10-materiality-and-trace-decision.md](./2026-11-10-materiality-and-trace-decision.md) 将材料性唯一定义迁入 `docs/policy.md §P1-B`）
+状态：implemented（2026-11-27；批准：用户「整理整理，同步同步，对齐对齐……docs/ 尽量别依赖 _backlog/ 可以依赖 notes/……选项 B / 选项 A / doc-taxonomy 门禁」；部分取代 [2026-11-10-docs-dsh-alignment.md](./2026-11-10-docs-dsh-alignment.md) 的 tier 集合与导航结构，并部分演进 [2026-11-10-materiality-and-trace-decision.md](./2026-11-10-materiality-and-trace-decision.md) 将材料性唯一定义迁入 `docs/policy.md §P1-B`；部分被 [2026-11-27-docs-16-file-standard-alignment.md](./2026-11-27-docs-16-file-standard-alignment.md) 取代：合入顶层 6 文件 + 三分区 16 文件骨架）
 
 ## 决定
 
-1. **确立 `docs/contracts/` 内部技术架构主干层**：新增 [`docs/contracts/host-and-lib.md`](../../docs/contracts/host-and-lib.md) 与 [`docs/contracts/client-ui.md`](../../docs/contracts/client-ui.md)，保持原有 [`docs/architecture.md`](../../docs/architecture.md)（升级为架构总纲）、[`docs/README.md`](../../docs/README.md)、[`docs/architecture.md`](../../docs/architecture.md) 及全部 `contracts/`、`guides/` 路径不变（零历史归档断链），并在 [`docs/README.md`](../../docs/README.md) 统一呈现五层书架与 Agent/人类双起点导航。
+1. **确立内部技术架构主干层**：新增 [`docs/contracts/host-and-lib.md`](../../docs/contracts/host-and-lib.md) 与 [`docs/contracts/client-ui.md`](../../docs/contracts/client-ui.md)，保持原有 [`docs/architecture.md`](../../docs/architecture.md)（升级为架构总纲）、[`docs/README.md`](../../docs/README.md) 及全部 `contracts/`、`guides/` 路径不变（零历史归档断链），并在 [`docs/README.md`](../../docs/README.md) 统一呈现分层书架与 Agent/人类双起点导航。
 2. **确立 `docs/` 单向依赖边界并收回跨仓政策**：
    - `docs/` 只能依赖代码实现与已定型 `notes/`，禁止出现指向 `_backlog/` 的 Markdown 链接（纯拓扑说明用反引号代码跨度）；
    - 将「材料性（materiality）」唯一定义与「缺陷修复自授权边界」收回 [`docs/policy.md`](../../docs/policy.md) `§P1-B`，[`_backlog/README.md`](../../_backlog/README.md) 与 [`close-out-definition`](../../.agents/skills/close-out-definition/SKILL.md) 改为单向引用 `docs/policy.md`；

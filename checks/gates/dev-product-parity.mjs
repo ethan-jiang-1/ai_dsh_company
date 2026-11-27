@@ -59,9 +59,11 @@ export function run({ root, ok, fail }) {
     if (!/^\|.+\|$/m.test(parity)) problems.push('parity 指南没有差异表')
   }
 
-  // ③ bootstrap 不再把 link 写成 dev 默认（观察窗 profile / 插拔速查 / 升级配方三处漂移）
+  // ③ bootstrap 不再把 link 写成 dev 默认（观察窗 profile / 插拔速查 / 升级配方三处漂移；缺文件 fail-closed 不静默跳过）
   const bootstrapPath = join(root, 'docs/guides/bootstrap.md')
-  if (existsSync(bootstrapPath)) {
+  if (!existsSync(bootstrapPath)) {
+    problems.push('缺 docs/guides/bootstrap.md（dev-product-parity 校验目标不在盘上，禁止静默跳过）')
+  } else {
     const bootstrap = readFileSync(bootstrapPath, 'utf8')
     for (const [pattern, message] of [
       [/装进 \*\*web profile\*\*/, 'bootstrap 仍写「装进 web profile」（观察窗 profile 是 company；与 docs/contracts/profile.md 矛盾）'],
@@ -96,8 +98,8 @@ export function run({ root, ok, fail }) {
     }
   }
 
-  // ⑤ 分发/安装/初始化 current docs 退役词：防旧说法回潮（2026-11-02）。
-  // 负例留证：在 run/README.md 写回「一 home 一 workspace」→ 本门禁红；还原即绿。
+  // ⑤ 分发/安装/初始化 current docs 退役词：防旧说法回潮（2026-11-02；2026-11-27 改为缺失即 fail-closed 禁静默跳过）。
+  // 负例留证：在 run/README.md 写回「一 home 一 workspace」→ 本门禁红；删 docs/guides/orient.md → 报缺失不静默跳过；还原即绿。
   const retired = [
     ['README.md', /插件即产品|产品形状|产品安装|产品入口|产品 home|产品文件|产品承诺/],
     ['packages/company-pack/README.md', /产品形状|产品安装|产品入口|产品 home|产品文件|产品承诺|run bundle/],
@@ -108,7 +110,11 @@ export function run({ root, ok, fail }) {
   ]
   for (const [rel, pattern] of retired) {
     const file = join(root, rel)
-    if (existsSync(file) && pattern.test(readFileSync(file, 'utf8'))) {
+    if (!existsSync(file)) {
+      problems.push(`dev-product-parity 退役词校验目标缺失：${rel}（文件若已改名须同步本门禁，禁止 existsSync 静默跳过）`)
+      continue
+    }
+    if (pattern.test(readFileSync(file, 'utf8'))) {
       problems.push(`current docs 仍有退役说法（${rel} / ${pattern.source}）`)
     }
   }

@@ -1,6 +1,7 @@
 # src/ —— 本包源码面（host 半 + client 半）
 
 > 什么时候读：改 host/client 源码、找注册入口 / 读模型 / 渲染实现时。
+> 编码与 UI 红线 = [pack AGENTS](../AGENTS.md) · [host-and-lib.md](../../../docs/contracts/host-and-lib.md) · [client-ui.md](../../../docs/contracts/client-ui.md) · [company-ui-change-definition](../../../.agents/skills/company-ui-change-definition/SKILL.md)。
 **布局**（2026-11-11 按盘重校；host 组路径以 [host/README](./host/README.md) 为准）：
 
 - `index.ts` —— **host 注册入口**（bundle 行 `company-client` 指向它）：`inject = ['tools','approval','commands','workspaceRegistry']`

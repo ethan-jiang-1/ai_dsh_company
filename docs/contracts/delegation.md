@@ -44,7 +44,7 @@ CEO 有两条派活路，**按"要不要协作面"分，不按"熟不熟"分**�
 - **工具行归属**：写在 `presets/ceo/agent.cordis.yml` 的 `delegation` 组内（preset 自包含，
   DSH 无 patch 继承——见 [presets.md](./presets.md) §工具面）。
 
-## 2. 为什么 CEO 不放续驶控制行（R3 实证，0.2.1 仍成立）
+## 2. 为什么 CEO 不放续驶控制行
 
 CEO 会话**从第一个请求起**就是 team-scoped——`tool-agent-team` 按成员作用域 shadow 掉全局控制名，
 而 **Lead（CEO）自己也是 team member**：

@@ -2,7 +2,7 @@
 
 > 性质：合同层——本仓测试政策的**唯一家**。什么时候读 = 挑验证、写验收、判断「这算不算证据」时。规则的目标不是让测试变多，是**让绿有意义**。
 > 本文件管**政策与证明边界**；行级映射与命令预算 = [tests/README](../tests/README.md)，脚本索引 = [checks/README](../checks/README.md)。命令与预算档 = [tests/README §验证分层与预算](../tests/README.md)；每个脚本头注自述「何时跑/成本/状态」（门禁强制）；
-> 快照树规则 = [snapshots/README.md](../snapshots/README.md)；理由与教训 = `notes/`。思想源头 = DSH `docs/testing.md`（55 行宪法）经 `_digested/test-strategy` 消化的本仓投影（登记见 [external-research.md](./reference/external.md)）。
+> 快照树规则 = [snapshots/README.md](../snapshots/README.md)；理由与教训 = `notes/`。思想源头 = DSH `docs/testing.md` 经 `_digested/test-strategy` 消化的本仓投影（登记见 [external.md](./reference/external.md)）。
 
 ## 1. 分层与证明边界（每层只证明自己能观察的性质）
 
@@ -36,8 +36,7 @@
 ## 2. 改动面 → 最小证据（同 diff 交付）
 
 **行级映射**（哪个改动面跑哪个检查、何时升档、回放/视觉夹具的义务）唯一家 =
-[tests/README「改动面 → 最窄检查」](../tests/README.md)——2026-10-10 自本节迁入消双写，取舍 =
-[该轮 Note](../notes/archived/2026-10-10-minimal-evidence-mapping-home.md)。本节只留政策：
+[tests/README「改动面 → 最窄检查」](../tests/README.md)（取舍见 [minimal-evidence-mapping-home](../notes/archived/2026-10-10-minimal-evidence-mapping-home.md)）。本节只留政策：
 
 - **同 diff 交付**：最小证据与被证明的改动同一 diff 出现，不欠账到"以后补"；
 - 单测、smoke、rationale **不替代组装转录**——会话级行为的固化证据只有回放场景（公司行为回放已移部署仓；本仓只保留合成管线场景）。

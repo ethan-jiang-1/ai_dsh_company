@@ -70,6 +70,7 @@
 | <a id="d68"></a>D68 | 源码接手面 repo-closed 判据与 preset 挂载健康面：链接禁出仓，启动日志点名 broken | [handoff Note](../notes/implemented/2026-11-25-handoff-repo-closed-gates.md) |
 | <a id="d69"></a>D69 | DSH 原生 UX/UI 扩展（S1–S4）：零 vendor 改动与 L2/L3 禁区，聚合页签+全局总部 | [ux-upgrade Note](../notes/implemented/2026-11-26-dsh-native-ux-upgrade.md) · [client-ui](./contracts/client-ui.md) |
 | <a id="d70"></a>D70 | `docs/` 架构主干与单向依赖：禁链 `_backlog/`；材料性与自授权收回政策层；子架构合入 `contracts/` | [docs-alignment Note](../notes/implemented/2026-11-27-docs-architecture-and-dependency-alignment.md) |
+| <a id="d71"></a>D71 | `root → docs/` 16 文件骨架（顶层 6 + 三分区）、UTF-8 字节预算、自动包目录与双向命令表 | [16-file alignment Note](../notes/implemented/2026-11-27-docs-16-file-standard-alignment.md) |
 
 ## 已退役
 

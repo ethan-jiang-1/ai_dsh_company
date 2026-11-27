@@ -2,7 +2,7 @@
 
 > **读法**：改公司状态落点、身份、账本或备份策略时读（现在时数据模型合同）。
 > 公司状态布局 = `.dsh-company/`（[run-bundle-paths](../../packages/company-pack/src/lib/shared/run-bundle-paths.ts)）；
-> 时序 = [runtime-map](../architecture.md)；发布/安装 = [release](./release.md)、[_dist 手册](../../_dist/安装手册.md)。
+> 时序 = [architecture.md §2](../architecture.md#2-完整-web-运行链时序与四条状态轴)；发布/安装 = [release](./release.md)、[_dist 手册](../../_dist/安装手册.md)。
 
 **用户拥有的业务字节留在 workspace；host 治理留 home；插件只拥有身份/方法/账本/索引。**
 一个事实只有一个权威。workspace 是模型可写区（`workspace-write`）；方法层（D25）与 presented 账本

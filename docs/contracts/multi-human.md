@@ -49,7 +49,7 @@
 
 ## 开门与交接
 
-> 开门配方、交接协议、协作前提、迁移清单已迁 [guides/multi-human-runbook.md](../guides/multi-human-runbook.md)；本文件只留机制、形态、边界与验收。
+> 开门配方、交接协议、协作前提与迁移清单见 [guides/multi-human-runbook.md](../guides/multi-human-runbook.md)；本文件定义机制、形态、边界与验收。
 
 ## 6. 边界（诚实说清，不假装是安全隔离）
 

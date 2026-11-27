@@ -38,9 +38,9 @@
 | teammate（Agent Teams 成员） | **继承 Lead 组合**（composeFrom ⇒ `agentPreset=ceo`）——身份来自成员名、任务书与手册注入，**不是成员角色的 preset**；上下文默认 `fresh`，`fork` 只带 Lead 已完成轮 | 继承 Lead 组合（delegation 行无 `toolFilter` 不裁剪） | 同 Lead 工作区；读自己的 CHARTER | 各自 sessionId 目录（authorship 按 `team/member` 事件建 sessionId→成员名映射） | 动议内升级 CEO（不直问） |
 | 命名 child（activation） | **工具行钉的 `agentPreset`**（`vp_eng`→vp-eng / `vp_sales`→vp-sales / `subagent_research`→worker-researcher；0.2.1 起人格与组合都由 preset 给，不再继承 Lead）——child 日志首帧 `agentPreset` 是唯一取证件，**名册角色名 ≠ 加载 preset** 这条旧坑以此字段核对（旧反例 = 2026-09-26 sea-reconcile，[authorship-audit](../../checks/audit/authorship-audit.mjs) 头注） | 该 preset 自声明的那一套（role skills 随 preset 一起到） | 同 Lead | child 自带 sessionId 日志 | 经 Lead |
 
-改哪一列 → 哪个文件：persona/工具/skills → `presets/<role>/`（owner 表 = [pack README](../../packages/company-pack/README.md)）；手册/模板/默认章程 → `packages/company-pack/content/`（只读；默认章程与状态首启只补缺到 `.dsh-company/`，实例才在 workspace）；生效时点 = 下文「生效边界按面」表。
+改哪一列 → 哪个文件：persona/工具/skills → `presets/<role>/`（owner 表 = [pack README](../../packages/company-pack/README.md)）；手册/模板/默认章程 → `packages/company-pack/content/`（只读；默认章程与状态首启只补缺到 `.dsh-company/`，实例才在 workspace）；生效边界按面见 [cultivation.md](./cultivation.md)。
 
-- **skill/工具实际生效的证据 = 会话日志**（`request/header.tools` 列实际工具名）——多帧 zstd 用 `zstd -d -c` 读（手段唯一家 = [debugging §3.7](../guides/run-ops.md)，不复述）；`--dump-config` 只证组合层，不证会话实际全貌。
+- **skill/工具实际生效的证据 = 会话日志**（`request/header.tools` 列实际工具名）——多帧 zstd 用 `zstd -d -c` 读（手段唯一家 = [run-ops.md §2](../guides/run-ops.md#2-调试阶梯组合层--会话层不跳层)，不复述）；`--dump-config` 只证组合层，不证会话实际全貌。
 - **agent loop 是 vendor 运行机制**：本仓负责四个面——preset 声明（`presets/`）、bundle 装配（`cordis.patch.yml`）、host+client 注册（`src/`）、workspace 约束（手册与模板）；**公司手册是给 DSH 会话里的公司角色的，不是 Coding Agent 指令**（两类主体的分界 = 根 [AGENTS.md](../../AGENTS.md) 入口）。
 
 ## CEO（个体：动议的唯一入口与出口）
@@ -49,7 +49,7 @@
   再拆解；亲自组建会议、亲自分派、亲自收口；**不代笔**（稿子由职能出）；只有 CEO 能说
   "这家公司不做了"。
 - **工作流（1 号）**：`chairing-staff-meeting`——五步节奏：澄清 → 拆解分派（单一 owner + 可验收）→
-  追进度（不抢活）→ 收口（保留分歧、`present` 交付）→ 记账。R2 起在第 3、4 步之间插入互审。
+  追进度（不抢活）→ 互审 → 收口（保留分歧、`present` 交付）→ 记账。
 - **KB**：`company-workspace/.dsh-company/kb/ceo/CHARTER.md`（决策原则：一页纸 / 分歧保留 / 不代笔；公司业务
   与编制指引）+ `journal/`。
 - **验证**：Web 会话选 `ceo` → 身份探针（答出 CEO 视角与 veto 边界）；动议跑通见 [demo.md](./demo.md)。
@@ -66,7 +66,7 @@
   AI 试点 API 硬顶见 `policy-lines.md`「试点预算」）+ `journal/`。
 - **验证**：Web 会话选 `vp-eng` → 身份探针 + 产出探针（PRD 出稿：REQ/AC/slice；评审意见；不得越权替销售/运营下结论）。
 
-## VP of Sales（职能化身：现有客户/销售，R2 定稿；新市场/新产品归 CMO）
+## VP of Sales（职能化身：现有客户/销售；新市场/新产品归 CMO）
 
 - **persona 要点**：视角=现有客户 / 销售 / 定价；新市场与新产品机会归 CMO；对"没人买"有 veto（需求不成立 / 商机不成熟 /
   定价撑不住交付成本）；产出=市场判断 + 定价建议（`templates/decision-memo.md`，结论先行一页纸）；
@@ -79,12 +79,12 @@
 - **验证**：Web 会话选 `vp-sales` → 三探针（身份=视角与 veto 边界；知识=KB 客户数与定价原则；
   产出=对 PRD 出定价/现有客户影响意见（新市场归 CMO），不越权）。
 
-## CMO（职能化身：市场与产品定义，2026-11-05 增设）
+## CMO（职能化身：市场与产品定义）
 - **persona**：视角=市场机会/产品定义/买点；"市场不成立"即 veto；产出 MRD（`MR-###`）+ StRS（`REQ-###`，`traces`→MR，标[fact/assumption]）；不替 VP-Sales 定价、不替 VP-Eng 定技术。
 - **打法**：`mrd-playbook` + 共享 `product-definition`（脊柱 + 硬软一体 / 纯软 playbook；交付模式另轴 = `content/delivery-modes/` 的 `project-services` / `managed-service`，不是产品类型）。
 - **KB/验证**：`kb/cmo/CHARTER.md` + `journal/`；选 `cmo` 跑身份/知识/产出三探针；MRD→PRD 交接见 demo.md。
 
-## COO（职能化身：运营，R2 定稿）
+## COO（职能化身：运营）
 
 - **persona 要点**：视角=落地 / 预算 / 流程合规；对"运营接不住"有 veto（人力撑不住 / 流程没有 /
   合规过不去）；产出=运营方案 + 预算核查（`templates/ops-review-note.md`）；核查语言 =
@@ -97,7 +97,7 @@
 - **验证**：Web 会话选 `coo` → 三探针（身份=视角与 veto 边界；知识=并行项目上限与审批线；
   产出=对一页方案出落地核查，不越权）。
 
-## CFO（职能化身：财务，R2 增设）
+## CFO（职能化身：财务）
 
 - **persona 要点**：视角=现金 / 成本 / 合规；对资金与账务红线有 veto（现金流撑不住 / 毛利低于
   底线 / 账务或税务不合规）；产出=项目经济性测算 + 财务合规意见（`templates/decision-memo.md`）；

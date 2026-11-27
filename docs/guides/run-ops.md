@@ -28,7 +28,7 @@
 | 4 会话层 | 先跑 `pnpm diagnose`，再读 `$DSH_HOME/sessions/` JSONL | `model-visible ⟺ logged`，上下文从日志重建；headless 会话收尾会删目录，分析趁进程存活时进行 |
 | 5 回归层 | `snapshots/` 回放对比 | 回答「行为为什么变了」的最快路径 |
 
-### 客户端模块层（§3.9）排障要点
+### 客户端模块层（阶梯 3.9）排障要点
 
 - **不静默失败**：client `apply` 抛错会直接进入 BootPage 错误屏，浏览器 console 输出 `failed to apply loader entry <id> (<name>)`。
 - **`dsh.client.inject` 是模块到达依赖边**：浏览器模块 factory 沿此边在 consumer 前到达；shell baseline（`PLATFORM_MODULES`：`react`/cordis/store/ui-slots/ui-primitives/ui-dockkit）隐式提供基础模块。

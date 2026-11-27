@@ -27,53 +27,40 @@ export function run({ root, ok, fail }) {
     fail('layout-block', `${layoutRel} 不在盘上——根入口不许消失`)
     return
   }
-  const layoutLines = readFileSync(layoutPath, 'utf8').split('\n')
-  let inFence = false
+  const rawText = readFileSync(layoutPath, 'utf8')
+  const layoutSec = headingSections(rawText, { depth: 2 }).find(
+    sec => sec.title.includes('布局') || sec.rawTitle.includes('布局'),
+  )
   let layoutChecked = 0
   let layoutBad = false
   const KNOWN_TOP = /^(\.agents\/|\.claude\/|CLAUDE\.md|packages\/|company-workspace\/|vendor\/|docs\/|notes\/|_backlog\/|checks\/|tests\/|probes\/|tools\/|_dist\/|run\/|runtime\/|snapshots\/)/
-  for (let i = 0; i < layoutLines.length; i++) {
-    const line = layoutLines[i]
-    if (line.startsWith('```')) { inFence = !inFence; continue }
-    if (!inFence) continue
-    const m = line.match(/^(\S+)/)
-    if (!m) continue
-    const raw = m[1]
-    if (line.includes('->')) continue
-    if (!KNOWN_TOP.test(raw)) continue
-    if (FIXTURE_PATH.test(raw)) continue
-    if (RUNTIME_PREFIXES.some(p => raw.startsWith(p))) continue
-    if (RETIRED_PATHS.has(raw)) continue
-    layoutChecked++
-    if (!existsSync(join(root, raw))) {
-      layoutBad = true
-      fail('layout-block', `${layoutRel}:${i + 1} → \`${raw}\` 不存在（布局块指了盘上没有的路径）`)
-    }
-  }
-  // 兼容：若根 AGENTS.md 改用「## 布局」Markdown 表格呈现目录树，同样校验表格首列链接/路径，防止门禁退化为 ×0 空转。
-  if (layoutChecked === 0) {
-    const rawText = layoutLines.join('\n')
-    const layoutSec = headingSections(rawText, { depth: 2 }).find(
-      sec => sec.title.includes('布局') || sec.rawTitle.includes('布局'),
-    )
-    if (layoutSec !== undefined) {
-      const secLines = layoutSec.structuralBody.split('\n')
-      for (let idx = 0; idx < secLines.length; idx += 1) {
-        const line = secLines[idx]
-        if (!line.trim().startsWith('|')) continue
+  if (layoutSec !== undefined) {
+    // 同时支持「## 布局」内的 fenced 目录树与 Markdown 表格，避免被其他节（如命令表）的围栏误截断。
+    const rawSecLines = layoutSec.rawBody.split('\n')
+    let inFence = false
+    for (let idx = 0; idx < rawSecLines.length; idx += 1) {
+      const line = rawSecLines[idx]
+      const lineNo = layoutSec.startLine + 1 + idx
+      if (/^\s*```/.test(line)) { inFence = !inFence; continue }
+      let raw = ''
+      if (inFence) {
+        const m = line.match(/^(\S+)/)
+        if (!m || line.includes('->')) continue
+        raw = m[1]
+      } else if (line.trim().startsWith('|')) {
         const firstCell = splitGfmTableCells(line)[0] ?? ''
         const linkMatch = /\]\((?:\.\/)?([^)#\s]+)\)/.exec(firstCell)
         const codeMatch = /`([^`\s]+)`/.exec(firstCell)
-        const raw = (linkMatch?.[1] ?? codeMatch?.[1] ?? '').replace(/^\.\//, '')
-        if (!raw || !KNOWN_TOP.test(raw)) continue
-        if (FIXTURE_PATH.test(raw)) continue
-        if (RUNTIME_PREFIXES.some(p => raw.startsWith(p))) continue
-        if (RETIRED_PATHS.has(raw)) continue
-        layoutChecked++
-        if (!existsSync(join(root, raw))) {
-          layoutBad = true
-          fail('layout-block', `${layoutRel}:${layoutSec.startLine + 1 + idx} → \`${raw}\` 不存在（布局表指了盘上没有的路径）`)
-        }
+        raw = (linkMatch?.[1] ?? codeMatch?.[1] ?? '').replace(/^\.\//, '')
+      }
+      if (!raw || !KNOWN_TOP.test(raw)) continue
+      if (FIXTURE_PATH.test(raw)) continue
+      if (RUNTIME_PREFIXES.some(p => raw.startsWith(p))) continue
+      if (RETIRED_PATHS.has(raw)) continue
+      layoutChecked++
+      if (!existsSync(join(root, raw))) {
+        layoutBad = true
+        fail('layout-block', `${layoutRel}:${String(lineNo)} → \`${raw}\` 不存在（布局面指了盘上没有的路径）`)
       }
     }
   }

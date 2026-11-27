@@ -1,6 +1,6 @@
 # 决策台账跨仓对齐：现行/退役双表分离、行锚点、入口显眼化与按格控长
 
-状态：implemented（2026-11-14 交付；批准：用户 2026-11-14 点名按卡落地；上游 = [决策台账跨仓对齐卡](../../_backlog/_archive/settled_issues/2026-11-14-decision-ledger-unification.md)；决定号 = [D36](../../docs/decisions.md#d36)；扩展自冻结决定 [ledger-routing-table](../archived/2026-10-09-ledger-routing-table.md)）
+状态：implemented（2026-11-14 交付；批准：用户 2026-11-14 点名按卡落地；上游 = [决策台账跨仓对齐卡](../../_backlog/_archive/settled_issues/2026-11-14-decision-ledger-unification.md)；决定号 = [D36](../../docs/decisions.md#d36)；扩展自冻结决定 [ledger-routing-table](../archived/2026-10-09-ledger-routing-table.md)；部分被 [2026-11-27-docs-16-file-standard-alignment.md](./2026-11-27-docs-16-file-standard-alignment.md) 取代：台账真身升格至 `docs/decisions.md`、退役 8 行门牌）
 
 ## 决定
 
@@ -13,7 +13,7 @@
 
 ## 输掉的方案
 
-- **物理 `git mv` 将 `docs/decisions.md` 挪回 `docs/decisions.md`**：会击穿 `notes/archived/` 与 `_backlog/_archive/` 十余处冻结相对链接，违背 `notes/archived/AGENTS.md` 冻结铁律；真身留原位 + 8 行顶层门牌同时保住三仓同路径入口与冻结层零回写。
+- **物理 `git mv` 将原 reference 台账挪回顶层 `docs/decisions.md`**：当时会击穿 `notes/archived/` 与 `_backlog/_archive/` 十余处冻结相对链接，违背 `notes/archived/AGENTS.md` 冻结铁律；当时采用真身留原位 + 8 行顶层门牌（该决策已由 2026-11-27 16 文件标准骨架重构取代）。
 - **符号链接 `docs/decisions.md -> reference/decisions.md`**：跨目录深度会导致表内 `../../notes/...` 从 `docs/` 解析时越出仓根触发 `md-links` 红灯（根 `CLAUDE.md -> AGENTS.md` 成立是因为同处仓根）。
 - **效仿兄弟仓把单格放宽到 `≤800` 字写胖台账**：兄弟仓实测在 ~60 条时即逼近 `29.4KB / 32KB` 读取截断线并引发三处同步税；`≤100` 字路由表 + Note 正文才是抗百条增长的收敛态。
 - **保留 `doc-budget` 对 `docs/decisions.md` 的固定总行预算并预留大余量**：预留 >20% 会触发 `SLACK_FLOOR` 反向棘轮报红，贴着写又重演每增 1 条 D 号必改门禁常量的反向激励；按「表外散文上限 + 单格字数上限 + 禁非结构块」控形状更贴合追加型路由表。

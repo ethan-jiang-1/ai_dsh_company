@@ -6,7 +6,7 @@
 ## 1. 总体装配与隔离边界
 
 - **入口与模块组**：`src/client/index.ts`（导出 `apply` 与 `inject = ['slots', 'remote', 'sessions', 'locale']`）在 `apply` 闭包内初始化 `attention`、`hubStore`、`startupStore`（**严禁模块级可变单例**），再按服务可用性独立 `ctx.inject([...], ...)` 装配 `wiring/`、`data/`、`ui/`、`tabs/`、`ux/`、`cultivation/`、`startup/`、`presence/`（组清单 = `src/client/` 目录本身）。
-- **自打包与平台白名单**：client 半经 `tsdown` 打包为 `lib/client.js`，`react` 与 `dsh-client-*`/`dsh-api-*` 走浏览器 `PLATFORM_MODULES` 与 `package.json` 的 `dsh.client.inject` 到达边（依赖语义见 [guides/debugging.md §3.9](../guides/run-ops.md)）。
+- **自打包与平台白名单**：client 半经 `tsdown` 打包为 `lib/client.js`，`react` 与 `dsh-client-*`/`dsh-api-*` 走浏览器 `PLATFORM_MODULES` 与 `package.json` 的 `dsh.client.inject` 到达边（依赖语义见 [run-ops.md §2](../guides/run-ops.md#2-调试阶梯组合层--会话层不跳层)）。
 - **零 `vendor/dsh/` 修改**：全部交互与界面收敛在 DSH 官方 L0/L1 扩展契约面；禁止重复 `$mount` 官方 `ui-agent-team` 产生的 Team Remote。
 
 ## 2. DSH 原生扩展面（S1–S4 现行架构）

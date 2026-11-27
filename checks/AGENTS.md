@@ -10,7 +10,7 @@
   - `checks/lanes/`：真入口与端到端车道（`*.entry.mjs` / `*.e2e.mjs`），由 `tools/lib/core/asset-lanes.mjs` 统一登记。
   - `checks/audit/`：盘面审计与棘轮脚本（`*-audit.mjs` / `*-check.mjs` / `*-ratchet.mjs`）。
   - `checks/lib/` 与 `checks/gates/lib/`：judge 支撑库；严禁反向 import `probes/` 或 `tests/`。
-- **门禁总数封顶（硬棘轮）**：`tests/repo/budget/test-census.spec.ts` 强制 `MAX_GATES` 上限。新增结构规则**优先并入既有 owner 门禁**，不随意新建独立 `.mjs` 文件撞顶。
+- **门禁总数封顶（硬棘轮）**：[test-census.spec.ts](../tests/repo/budget/test-census.spec.ts) 强制 `MAX_GATES` 上限。新增结构规则**优先并入既有 owner 门禁**，不随意新建独立 `.mjs` 文件撞顶。
 - **只看证据不阻塞变更的脚本去 `probes/`**；改世界/写盘工具去 `tools/<dev|repo|release>/`。
 
 ## 2. 写门禁与脚本的五条机械铁律

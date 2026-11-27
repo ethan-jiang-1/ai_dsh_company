@@ -102,49 +102,44 @@ node checks/lanes/delegation.entry.mjs
 - **根 devDeps**（tsx/tsdown/typescript/@types/node/@types/js-yaml/lightningcss/vitest）
   版本逐字镜像 vendor 根声明；vendor 换 tag 时随升级环 diff 对齐。
 - **凭据**：`cp ~/.dsh/.credentials.yaml runtime/harness-home/ && chmod 600`（gitignored）。
-- **web 观察窗三件事**（R1 实证）：① client bundles（`tsdown --env.DSH_BUILD_FACE client`）——
+- **web 观察窗三件事**：① client bundles（`tsdown --env.DSH_BUILD_FACE client`）——
   缺了报 `client bundles not found; run pnpm run build before launch`；② 前端 dist
   （`pnpm --filter @deepseek-ai/dsh-web-frontend run build`）——缺了首页 404 空页；
   ③ pack 装进 **company profile**（`pnpm company` 默认 pack + `plugin add file:`；`--link` 走符号
-  链接快速通道。profile `.npmrc` 把 store/cache 钉在 repo 内，`~/Library` 不被碰。
-  历史：file: 拷贝时代首次装会拦 koffi 构建审批 → profile 的 `pnpm-workspace.yaml` 改
-  `koffi: true` 再装；link: 下 profile 不再装 koffi，koffi 由源码域解析）。观察窗默认端口由 wrapper 交系统分配（`--port 0`）；日用 GUI **永不动**（其端口是环境状态，判据见 [multi-human-runbook](./multi-human-runbook.md)），要固定端口用
-  `-- --port <n>`（端口是环境状态，从启动横幅读）。preset roster 出现在 UI 的 Built-in 组（公司角色 + support preset；清单 = `presets/`；trust 分组见上文 R1 坑注）。
-- **bundle 叠加的重复行 id**（R1 实证）：web-app 已 insert `agent-presets`，pack 再 insert 同 id
+  链接快速通道。profile `.npmrc` 把 store/cache 钉在 repo 内，`~/Library` 不被碰）。观察窗默认端口由 wrapper 交系统分配（`--port 0`）；日用 GUI **永不动**（其端口是环境状态，判据见 [multi-human-runbook](./multi-human-runbook.md)），要固定端口用
+  `-- --port <n>`（端口是环境状态，从启动横幅读）。preset roster 出现在 UI 的 Built-in 组（公司角色 + support preset；清单 = `presets/`；trust 分组见下文说明）。
+- **bundle 叠加的重复行 id**：web-app 已 insert `agent-presets`，pack 再 insert 同 id
   → `duplicate loader entry id` 硬拒。修法：对已存在的行用**替换**语法（`- id:`），只有真正
   新增的行才 insert。
-- **根 devDeps 的 workspace 链接**（R1 实证）：insert 的四个行其包名必须同时是根
+- **根 devDeps 的 workspace 链接**：insert 的行其包名必须同时是根
   `devDependencies`（`workspace:*`）——源码 CLI 下 TS 导入走 tsconfig paths 进 src，但插件清单的
   `require.resolve` 走 **Node 原生解析**，root 无链接就报
   `REQUEST_EXTENSION: DeepSeek request extension preparation failed`。
-- **`!!js` 里的 `baseUrl` = profile 目录，不是你的包目录**（R1 实证，`app-boot/src/index.ts:799`
+- **`!!js` 里的 `baseUrl` = profile 目录，不是包目录**（`app-boot/src/index.ts:799`
   设 `ctx.baseUrl = pathToFileURL(dirname(configPath)) + '/'`）。所以 bundle 里给 agent-presets 的
   roots 必须写 profile 相对路径（`node_modules/<你的包>/presets/`）；写成 `presets/` 会指向
-  `<profile>/presets/`——不存在 → `scanRoot` 遇 ENOENT **静默返回空** → UI 里一个角色都不出现
-  （无报错、无警告，最难查的一类）。另：**preset 在 UI 按 trust 分组**——`system` → **Built-in**、
+  `<profile>/presets/`——不存在 → `scanRoot` 遇 ENOENT **静默返回空** → UI 里一个角色都不出现。另：**preset 在 UI 按 trust 分组**——`system` → **Built-in**、
   `user` → **Custom**（`AgentPresetSection.tsx`）。
-- **preset 行的插件必须在 pack dependencies 里**（R1 实证，`pnpm verify` 已加门禁）：
+- **preset 行的插件必须在 pack dependencies 里**（由 `checks/gates/preset-row-deps.mjs` 强守）：
   preset 的 `agent.cordis.yml` 里 `name:` 写的裸插件（如 `@deepseek-ai/dsh-persona`、
   `dsh-skill-filesystem`）会**按安装域解析**——不在 pack dependencies（profile 安装）或根
   devDeps workspace 链接（源码域）里，行就解析不到 → **preset 被标记 broken → UI 给不出可用角色**
-  （扫描得到、名字也对，就是不能用；`discoverPresets` 的 `broken` 字段是唯一线索）。
-  对应 DSH 的 `verify-cordis-config` 门禁；我们同构到 `checks/gates/preset-row-deps.mjs`（原 run-gates 检查 7）。
+  （`discoverPresets` 的 `broken` 字段是唯一线索）。
 - **一次性 profile 退出**：headless 用途优先用 shipped `headless`；自定义 profile 在 profile patch 把
-  `hmr` row 设为 `disabled: true`（见 [调试指南 §3.5](./run-ops.md)）。旧的 profile 热重载字段已从当前 vendor 删除，不要再写。
-- **品牌（皮肤第一笔，零代码）**：`DSH_CLIENT_TITLE` 是构建期环境变量，同时决定**浏览器标签页标题**
+  `hmr` row 设为 `disabled: true`（见 [run-ops.md §2](./run-ops.md#2-调试阶梯组合层--会话层不跳层)）。
+- **品牌（皮肤入口）**：`DSH_CLIENT_TITLE` 是构建期环境变量，同时决定**浏览器标签页标题**
   （`apps/web/vite.config.ts`）与**应用内主标题**（`ui-layout/src/client/AppFrame.tsx:192`）——所以
-  **上面两条构建命令都要带它**（web dist 与 client 面各注入一次）。侧栏品牌名是插槽
-  `sidebar.brand.name`（官方品牌包占着），改它需要 pack 自己的 client 面（R5 皮肤 v1）。
-- **上线前必跑 preset 冒烟**（R1 起，两道防线）：
+  **上面两条构建命令都要带它**（web dist 与 client 面各注入一次）。侧栏品牌名走插槽
+  `sidebar.brand.name`，由 pack 自己的 client 面接管。
+- **上线前必跑 preset 冒烟**（两道防线）：
   1. **防线一（快，`pnpm test`）**：已知必填 config 字段必须随工具行给出（如
      `tool-fs-search.sampleOverCapGlobResults`、`tool-todo.allowParallelInProgress`）。
   2. **防线二（真，`node checks/lanes/preset.entry.mjs`）**：boot 真 company profile（`pnpm company` 默认安装目标）→ `agentPresets/list`
      断言全部 preset（公司角色 + support）零 broken → **逐个 `session/create` 真挂一次**。
   **只有防线二能抓"preset 挂载失败"**：行 config 校验发生在挂载时，roster 扫描与 `--dump-config`
-  都看不到，UI 还会吞掉错误（症状就是"新建会话点了没反应"）。已反证：去掉一个必填 config 即变红
-  （精确指向 preset 与缺失字段），恢复后 ALL PASS。
+  都看不到，UI 还会吞掉错误（症状就是"新建会话点了没反应"）。
 
-## 插拔速查（装法，2026-10-27 自开发环 §4 迁出）
+## 插拔速查
 
 装法（按离源码远近）：
 
@@ -152,13 +147,13 @@ node checks/lanes/delegation.entry.mjs
 |---|---|---|
 | workspace 直跑 | `source run/env.sh && pnpm dsh --profile headless "…"` | 源码组合调试，改配置即刻生效（不验打包面） |
 | patch overlay | `pnpm dsh --profile <p> --patch ./run/try-x.patch.yml` | 一次性实验某插件行，不落盘 |
-| **公司 overlay（headless 动议）** | `pnpm dsh --profile headless --patch ./run/company.overlay.yml "…"` | 无 web-app 行的组合里补公司行（insert 语法）；R1 用它验过全组合 |
+| **公司 overlay（headless 动议）** | `pnpm dsh --profile headless --patch ./run/company.overlay.yml "…"` | 无 web-app 行的组合里补公司行（insert 语法） |
 | profile 内持久（dev 默认，tarball） | `pnpm company`（包装器：构建 + `npm pack` + `plugin add file:<tgz>`） | **日常开发**：与用户侧同形；store/cache 由 profile `.npmrc` 钉在 repo 内 |
 | profile 内持久（link 快速通道） | `pnpm company --link`（或 `pnpm dsh plugin --profile company add link:./packages/company-pack`） | 改 `presets/**` 即刻生效；**不验打包面**，只做快速迭代 |
-| profile 内持久（真实形状） | `pnpm dsh plugin --profile <p> add file:./packages/company-pack` | 仅验证真实安装形状——归 R5a release-smoke（干净 profile；`plugin` 子命令把参数转发给 profile 目录里的 pnpm） |
+| profile 内持久（真实形状） | `pnpm dsh plugin --profile <p> add file:./packages/company-pack` | 仅验证真实安装形状——归 `release-smoke`（干净 profile；`plugin` 子命令把参数转发给 profile 目录里的 pnpm） |
 | 正式分发 | `pnpm dsh plugin --profile <p> add <npm-name>` | 用户视角；CI 测兼容矩阵 |
 
-⚠ overlay 语法（R1 实证）：`- id:` **只替换已有行**（not found 会警告丢弃）；**新增行必须
+⚠ overlay 语法：`- id:` **只替换已有行**（not found 会警告丢弃）；**新增行必须
 `- insert:` 子列表**（教义源自 shipped dsh-headless/dsh-web-app 的 cordis.patch.yml）。
 
 拔法（从轻到重）：会话不挂 preset → patch 行 `disabled: true`（行还在，Loader 每次 mount

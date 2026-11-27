@@ -37,11 +37,11 @@
 | `tool-present`（insert） | 交付物声明（deliverables 卡片） | ✅ |
 | `agent-team` + `tool-agent-team`（insert） | 团队协作主通道（M4/D4） | ✅ |
 | `ui-agent-team`（insert） | 团队 Web 可视面 | ✅ |
-| `company-client`（insert，`name: dsh-company-pack`） | 本包 host/client 入口：签字工具与 composer 拦截、工作区门、培养、公司状态初始化、workspace 登记、handbook/语言/策略 `systemPrompt.section`、`/req` `/prd` `/delivery` `/deliverables` `/company-settings` `/company-diagnostics`、目录/账本、工作语言桥（`host/language`）、右栏聚合页签与左侧全局「梦之队总部」（HQ） | ✅ bundle 自带；应用内装即生效（架构 = [host-and-lib](host-and-lib.md) · [client-ux](client-ui.md)） |
+| `company-client`（insert，`name: dsh-company-pack`） | 本包 host/client 入口：签字工具与 composer 拦截、工作区门、培养、公司状态初始化、workspace 登记、handbook/语言/策略 `systemPrompt.section`、`/req` `/prd` `/delivery` `/deliverables` `/company-settings` `/company-diagnostics`、目录/账本、工作语言桥（`host/language`）、右栏聚合页签与左侧全局「梦之队总部」（HQ） | ✅ bundle 自带；应用内装即生效（架构 = [host-and-lib](host-and-lib.md) · [client-ui](client-ui.md)） |
 | `company-session-search`（insert + isolate 组） | 会话全文检索（provider + `session_search` 工具同组；per profile 落 home cache） | ✅ 组内 provider/tool active；不替换 host 行 |
 | `time-context`（preset 内声明） | 日期通道（Asia/Shanghai） | ✅ |
 
-工具行走 preset 的自包含组合，不随 host bundle 增补（R1 实证；机制见
+工具行走 preset 的自包含组合，不随 host bundle 增补（机制见
 [architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §6 要点 1）。**例外 = `company-session-search` 隔离组**：
 检索工具必须与 isolated `sessionQuery` provider 同组，所以它由 bundle 全局提供、不再逐 preset 声明；
 host 的 `session/search`（侧栏内容搜索）保持出厂 `openAt: never`（有会话时会报禁用），不是本包承诺。

@@ -12,7 +12,7 @@ import { parseMarkdownAst } from '../../tools/lib/core/markdown-links.mjs'
 // 2026-11-10（DSH 步 2）：文档入口从“逐文档登记”改成“书架 + 入口”（树就是 inventory）。
 // 2026-11-27（16 文件标准骨架收口）：统一为顶层 6 文件 + 三分区（contracts/、guides/、reference/），
 // 目录深度上限 2 且分区内禁建子 README.md；禁止 `docs/` 出现指向 `_backlog/` 的 Markdown 链接。
-// 本门禁守六件事：
+// 本门禁守五件事：
 // ① docs/AGENTS.md 在场且带「不属于这层」列（分层的**反例半边**不许丢）；
 // ② **顶层门/宪法**（docs/*.md，除 README.md）必须在 docs/README.md 书架逐项列出；
 // ③ **tier 文档**（contracts/guides/reference/）只要求 tier 目录被 docs/README.md 链接，不逐份登记；

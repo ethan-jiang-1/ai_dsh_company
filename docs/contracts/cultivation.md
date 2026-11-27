@@ -3,14 +3,14 @@
 > **读法**：改培养/方法层、journal 收敛或扩 `/cultivation` 时读。
 > 角色语义与名册 = [presets.md](./presets.md)；数据落点 = [data-model.md](./data-model.md)。
 
-## 培养回路与学习载体（分身成长条目出生，2026-09-24；2026-10-13 培养卡扩三面）
+## 培养回路与学习载体
 
 **培养动作分三面**（2026-10-13 培养卡拍板：对象 = 公司盘×角色，人人培养自己的分身）：
 
 | 面 | 动作 | 谁 |
 |---|---|---|
 | **通用方法**（pack skills） | 改 `packages/company-pack/presets/<role>/skills/`——跨公司可复用的方法论 | 维护者（repo 写权限 = 培养权不变） |
-| **角色方法层**（公司级） | 本人采纳培养记录 ⇒ host 写 `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`——公司级、按角色隔离、pack 升级不擦；旧 `<profile>/company-cultivation/` 只读留一版 | 角色驾驭者（人）在总部培养工坊 / 培养面板点「采纳」或敲 `/cultivation adopt`——**同一条人侧命令通道**（面板经 `remote.commands.execute` 发同一行命令，host 照旧记 `source: user`，角色闸不变；原生内嵌培养对话见 [client-ux](client-ui.md)）；分身只能用 `cultivation_propose` 工具提案 |
+| **角色方法层**（公司级） | 本人采纳培养记录 ⇒ host 写 `<DSH_HOME>/company/methods/<role>/<slug>/SKILL.md`——公司级、按角色隔离、pack 升级不擦；旧 `<profile>/company-cultivation/` 只读留一版 | 角色驾驭者（人）在总部培养工坊 / 培养面板点「采纳」或敲 `/cultivation adopt`——**同一条人侧命令通道**（面板经 `remote.commands.execute` 发同一行命令，host 照旧记 `source: user`，角色闸不变；原生内嵌培养对话见 [client-ui.md](client-ui.md)）；分身只能用 `cultivation_propose` 工具提案 |
 | **素材**（journal） | 角色会话收工纪要，人审后按「轮末收敛」压进 CHARTER | 分身写、人收敛 |
 
 **名册外的能力档**（worker family / `quality-loop-*` 两档）不走 `/cultivation`（名册 = 六角色）：方法由**人**直接放进 `<DSH_HOME>/company/methods/<能力档 id>/<pack>/`，v1 没有采纳/撤回流水线（扩名册是另一张卡；质量环见 [presets.md](./presets.md) 名册）。
