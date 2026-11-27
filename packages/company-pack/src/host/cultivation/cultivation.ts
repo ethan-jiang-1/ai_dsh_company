@@ -25,7 +25,6 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { blockedCompanyText, blockedCompanyTextPair } from '../commands/blocked-text.ts'
 import { registerLocalizedCommand } from '../commands/localized-command.ts'
-import type { CompanyLanguageState } from '../language/company-language.ts'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 // 纯类型导入：ctx.commands 的 Context 增强（服务本体由 base bundle 挂载，vendor patch 钉行）。
 import type {} from '@deepseek-ai/dsh-commands'
@@ -753,7 +752,7 @@ export function registerCultivation(
   roleLabel: (role: string) => string = defaultRoleLabel,
   resultLabel: (result: string) => string = result => result,
   t: CultivationText = zh => zh,
-  language?: Pick<CompanyLanguageState, 'subscribe'>,
+  language?: { readonly subscribe: (listener: () => void) => () => void },
   blockedReasonEn?: string,
 ): void {
   const storage = nodeCultivationStorage

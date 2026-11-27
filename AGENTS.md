@@ -49,6 +49,7 @@ git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm && pnpm install   # workspace 解析；全配方（含 vendor 构建）见 docs/guides/bootstrap.md
 source run/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 接线（⚠ 见 docs/guides/run-ops.md）
 pnpm bundle:init                       # fresh clone：建 dev 的 .dsh-company/ 状态（不复制插件内容；已有盘不动）
+pnpm setup                             # 全量构建：vendor host/client/native/web + company-pack（自动扩容堆防 OOM）
 source run/env.sh && pnpm company --no-open  # repo dev-only：pack + plugin add file: + exec dsh --profile company（--link 快速通道）
 pnpm verify                            # 结构门禁（清单唯一源 = checks/gates/ 目录）
 pnpm test                              # keyless 回归（真模型/浏览器不进；layering 守卫）

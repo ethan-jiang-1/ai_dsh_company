@@ -1,16 +1,32 @@
 #!/usr/bin/env node
 // 状态：常驻
-// 何时跑：npm pack / npm publish 前自动（prepack）；也可手动 `node packages/company-pack/scripts/prepack-check.mjs`。
+// 何时跑：npm pack / npm publish 前自动（prepack / prepublishOnly）；也可手动 `node packages/company-pack/scripts/prepack-check.mjs`。
 //
-// 为什么：lib/ 是 gitignored 的构建产物；clean clone 上直接 `npm pack` 会静默跳过 files 里的
-// lib/index.js 与 lib/client.js，产出“能装但 import 不了”的空壳。发布路径（export-dist / release）
-// 会先 build，但手工 pack 没有这道保护——prepack 让缺产物变成 fail-loud。
+// 为什么：
+// ① lib/ 是 gitignored 的构建产物；clean clone 上直接 `npm pack` 会静默跳过 files 里的入口，产出空壳；
+// ② 源目录 `npm publish` 会把 dev 元数据（scripts/devDependencies/workspace:*）直接发往 registry——
+//    正式发布必须对 `pnpm release --prepare` 清洗后的 `_dist/dsh-company-pack-<ver>.tgz` 执行。
 import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+if (
+  (process.argv.includes('--publish') || process.env.npm_command === 'publish')
+  && process.env.DSH_SANITIZED_PUBLISH !== '1'
+) {
+  console.error('pack: 禁止在源码包目录直接 `npm publish`（源 manifest 含 workspace:* devDependencies 与 scripts）。')
+  console.error('      请先跑 `pnpm release --prepare` 生成清洗后的 `_dist/dsh-company-pack-<version>.tgz`，再对 tarball 发布（确需人工放行设 DSH_SANITIZED_PUBLISH=1）。')
+  process.exit(1)
+}
+
 const packDir = dirname(dirname(fileURLToPath(import.meta.url)))
-const required = ['lib/index.js', 'lib/client.js']
+const required = [
+  'lib/index.js',
+  'lib/client.js',
+  'lib/types/index.d.ts',
+  'lib/types/client/index.d.ts',
+  'lib/types/host/cultivation/cultivation.d.ts',
+]
 const missing = required.filter((rel) => !existsSync(join(packDir, rel)))
 
 if (missing.length > 0) {

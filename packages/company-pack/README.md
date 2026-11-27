@@ -5,7 +5,7 @@ kind: "package-reference"
 
 # dsh-company-pack
 
-> **给收件人（先读这个）**：本包是 `dsh-company-pack`（版本见 `package.json` / 手册表头）；DSH 窗口 = `engines.dsh`（`>=0.2.1-rc.2 <0.3.0`）。前置按运行时来源：**Desktop 自带 Node/pnpm**；
+> **给收件人（先读这个）**：本包是 `dsh-company-pack`（版本见 `package.json` / 手册表头）；DSH 窗口 = `engines.dsh`（`>=0.2.1-rc.2 <0.2.2`）。前置按运行时来源：**Desktop 自带 Node/pnpm**；
 > **npm 全局 CLI / `dsh web` 的 Plugins 页**用 DSH 的 Node，pnpm 需在 PATH（或 `corepack enable pnpm`）。
 > 安装、sha256 校验、升级、备份、卸载、回退见同版本生成的《安装手册》：
 > <https://github.com/ethan-jiang-1/ai_dsh_company/blob/master/_dist/安装手册.md>（手动分发时与 tarball 同目录）。
@@ -39,7 +39,7 @@ tarball 的**绝对路径**。按提示重启正在使用的 profile，之后用
 
 ## Compatibility
 
-- `engines.dsh`（`>=0.2.1-rc.2 <0.3.0`）是唯一硬版本门；有它时 peer 范围不参与判定。
+- `engines.dsh`（`>=0.2.1-rc.2 <0.2.2`）是唯一硬版本门；有它时 peer 范围不参与判定。
 - 已验证运行时：`dsh-v0.2.1-rc.5`（`release-smoke` 全链，兼容台账已加列）。历史基线
   `dsh-v0.2.1-rc.2`（曾全链认证，保留对照）；窗口内其他 0.2.x 未执行，不等于承诺。
 - market index 里的 `engines.dsh` 只用于展示/推荐；安装时以包自身 manifest 为准。

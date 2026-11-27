@@ -26,7 +26,7 @@ Restart the profile you installed into, then start with the same entry point.
 
 ## Runtime contract
 
-- DSH window: `engines.dsh` (`>=0.2.1-rc.2 <0.3.0`). A version outside the window is rejected by
+- DSH window: `engines.dsh` (`>=0.2.1-rc.2 <0.2.2`). A version outside the window is rejected by
   the installer.
 - Client surface: **web** only. The client factory requires the web platform baseline modules
   `react`, `react/jsx-runtime` and `@deepseek-ai/dsh-client-ui-primitives`; the host module table

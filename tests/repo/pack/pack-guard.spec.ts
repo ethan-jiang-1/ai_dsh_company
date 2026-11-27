@@ -15,12 +15,17 @@ import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layou
 
 const read = (rel: string) => readFileSync(join(ROOT, rel), 'utf8')
 
-describe('company-pack prepack 守护', () => {
-  it('prepack 指向脚本，脚本检查 lib 两半', () => {
+describe('company-pack prepack 与裸 publish 守护', () => {
+  it('prepack / prepublishOnly 指向脚本，脚本检查 lib 两半 + 3 份可达 .d.ts 并硬锁裸 npm publish', () => {
     const pkg = JSON.parse(read('packages/company-pack/package.json')) as { scripts?: Record<string, string> }
     expect(pkg.scripts?.prepack).toBe('node scripts/prepack-check.mjs')
+    expect(pkg.scripts?.prepublishOnly).toBe('node scripts/prepack-check.mjs --publish')
     const guard = read('packages/company-pack/scripts/prepack-check.mjs')
     expect(guard).toContain("'lib/index.js'")
     expect(guard).toContain("'lib/client.js'")
+    expect(guard).toContain("'lib/types/index.d.ts'")
+    expect(guard).toContain("'lib/types/client/index.d.ts'")
+    expect(guard).toContain("'lib/types/host/cultivation/cultivation.d.ts'")
+    expect(guard).toContain('DSH_SANITIZED_PUBLISH')
   })
 })

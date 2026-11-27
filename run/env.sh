@@ -1,6 +1,8 @@
 # 开发环境兜底：coding agent 不会自己想起双 home / 双 DSH 的区别（docs/guides/dev-loop.md §6）。
-# 用法：source run/env.sh
-_repo_root_dev="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# 用法：source run/env.sh（兼容 bash 与 macOS 默认 zsh）
+_env_file="${BASH_SOURCE[0]:-${(%):-%x}}"
+_repo_root_dev="$(cd "$(dirname "$_env_file")/.." && pwd)"
+unset _env_file
 export DSH_HOME="$_repo_root_dev/runtime/harness-home"
 mkdir -p "$DSH_HOME"
 
@@ -54,7 +56,9 @@ fi
 # core.hooksPath 是本地 git config（不随 clone 走）；唯一实现 = tools/dev/hooks-install.mjs，
 # `pnpm install` 的 prepare 也会调用它（2026-11-11），这里只保留复用，不再各写一份 git config。
 # bypass = git push --no-verify（用后留 Note 说明）。
-_repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+_env_file="${BASH_SOURCE[0]:-${(%):-%x}}"
+_repo_root="$(cd "$(dirname "$_env_file")/.." && pwd)"
+unset _env_file
 node "$_repo_root/tools/dev/hooks-install.mjs" \
   || echo "warn: pre-push hook 接线失败（enforcement 通道未生效）" >&2
 unset _repo_root

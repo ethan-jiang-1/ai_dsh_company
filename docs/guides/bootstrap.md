@@ -45,36 +45,15 @@ node checks/lanes/client-load.entry.mjs # client 真页面加载（需先 pnpm d
 
 ## 二、内部步骤与单步排障（`pnpm setup` 失败时才手跑）
 
-以下命令均为 `pnpm setup` 的内部展开，正常首跑成功后无需重复执行：
+`pnpm setup` 的构建图唯一真源为 [`tools/dev/setup.mjs`](../../tools/dev/setup.mjs)（`vendorTsc` 已内置 `--max-old-space-size=6144` 防默认 2GB 堆 OOM，且 `pack` 步自动写入 `lib/.build-fingerprint`）。某一步失败时按 `--step` 单独重跑定位，不在本文档手抄易漂移的第二份构建参数：
 
 ```sh
-# 1. vendor 独立 lock 安装（固定上游依赖版本，防与根 lock 漂移）
-(cd vendor/dsh && pnpm install --frozen-lockfile --ignore-scripts)
-
-# 2. vendor host 最小 dev type graph（CI 单独调用可用 node tools/dev/setup.mjs --types）
-node ./node_modules/typescript/bin/tsc -b \
-  vendor/dsh/packages/typert/generator \
-  vendor/dsh/packages/llm/llm \
-  vendor/dsh/packages/interaction/commands \
-  vendor/dsh/packages/feedback/command-feedback \
-  vendor/dsh/packages/goal/goal \
-  vendor/dsh/packages/subagent/subagent
-
-# 3. 原生插件（flock，会话持久化刚需；macOS 用 CLT cc，Linux 需 musl-gcc）
-(cd vendor/dsh/native/system && ../../node_modules/.bin/tsx scripts/build.ts)
-
-# 4. Web 观察窗产物（client 类型 → client bundles → 前端 dist；DSH_CLIENT_TITLE 决定标签页与主标题）
-node ./node_modules/typescript/bin/tsc -b vendor/dsh/tsconfig.client.json
-(cd vendor/dsh && DSH_CLIENT_TITLE="DSH 梦之队" ../../node_modules/.bin/tsdown --env.DSH_BUILD_FACE client)
-DSH_CLIENT_TITLE="DSH 梦之队" pnpm --filter @deepseek-ai/dsh-web-frontend run build
-
-# 5. company-pack 双面构建（必须先 tsc -b 生成 lib/types，再 tsdown 打包；不可只跑 tsdown）
-node ./node_modules/typescript/bin/tsc -b packages/company-pack
-(cd packages/company-pack && ../../node_modules/.bin/tsdown)
-
-# 6. 常用定向校验
-pnpm test tests/host/prompt/handbook.spec.ts
-node checks/lanes/delegation.entry.mjs
+node tools/dev/setup.mjs --step install        # 根与 vendor 双 lock 依赖收敛
+node tools/dev/setup.mjs --step types          # vendor host types → typert 生成 → vendor client types
+node tools/dev/setup.mjs --step vendor-runtime # vendor host/client tsdown（含 DSH_CLIENT_TITLE="DSH 梦之队"）
+node tools/dev/setup.mjs --step native         # vendor/dsh/native/system（flock；macOS CLT / Linux musl-gcc）
+node tools/dev/setup.mjs --step web            # @deepseek-ai/dsh-web-frontend 前端 dist
+node tools/dev/setup.mjs --step pack           # company-pack tsc -b + tsdown + client 构建指纹
 ```
 
 - **凭据与隔离**：profile 的 `.npmrc` 将 store/cache 钉在仓库内，不碰系统目录；日期通道（`time-context` + `tool-schedule`）已由公司角色 preset 各自声明，无需额外 schedule bundle。

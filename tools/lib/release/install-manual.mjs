@@ -27,7 +27,7 @@ export function renderInstallManual(input) {
 | 安装包 | ${q(input.tarballName)}（与本手册同目录） |
 | 校验（sha256） | ${q(input.digest)} |
 | 打包日期 | ${input.date} |
-| 适用 DSH | ${q('engines.dsh')} 窗口内（${q('>=0.2.1-rc.2 <0.3.0')}；已验证基线 ${q(input.expectedTag)}） |
+| 适用 DSH | ${q('engines.dsh')} 窗口内（${q('>=0.2.1-rc.2 <0.2.2')}；已验证基线 ${q(input.expectedTag)}） |
 | 许可 | MIT（${q('LICENSE')} 随包） |
 
 这个包把一间**六人虚拟公司**装进 DSH：CEO 接你的动议，按需要叫上工程、销售、运营、财务、市场，
@@ -52,7 +52,7 @@ export function renderInstallManual(input) {
 ## 二、开始之前
 
 - **DSH 已安装**：官方 Desktop，或可用的 ${q('dsh')} CLI。先跑 ${q('dsh --version')}，确认版本在
-  ${q('engines.dsh')} 窗口内（${q('>=0.2.1-rc.2 <0.3.0')}；本版本已认证基线 ${q(input.expectedTag)}）。
+  ${q('engines.dsh')} 窗口内（${q('>=0.2.1-rc.2 <0.2.2')}；本版本已认证基线 ${q(input.expectedTag)}）。
   不在窗口内先升级 DSH——安装器会拒绝不兼容的包，不要用 ${q('allow-version')} 绕过。
 - **一个项目目录**：已存在、可写。不需要专用空盘；本包只在其中写 ${q('.dsh-company/')}。
 - **Node 版本**：本包要求 ${q('^22.19.0 || >=24.0.0')}。DSH Desktop 自带满足条件的 Node；${q('dsh web')}

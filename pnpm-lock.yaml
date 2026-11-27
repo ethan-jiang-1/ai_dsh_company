@@ -15,6 +15,12 @@ importers:
 
   .:
     devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:*
+        version: link:vendor/dsh/vendor/cordis
+      '@deepseek-ai/dsh-agent-instructions':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/context/agent-instructions
       '@deepseek-ai/dsh-agent-preset':
         specifier: workspace:*
         version: link:vendor/dsh/packages/preset/agent-preset
@@ -66,9 +72,18 @@ importers:
       '@deepseek-ai/dsh-skill-filesystem':
         specifier: workspace:*
         version: link:vendor/dsh/packages/skill/skill-filesystem
+      '@deepseek-ai/dsh-time-context':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/context/time-context
       '@deepseek-ai/dsh-tool-ask-user':
         specifier: workspace:*
         version: link:vendor/dsh/packages/interaction/tool-ask-user
+      '@deepseek-ai/dsh-tool-bash':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/shell/tool-bash
+      '@deepseek-ai/dsh-tool-cordis':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/extensions/tool-cordis
       '@deepseek-ai/dsh-tool-fs':
         specifier: workspace:*
         version: link:vendor/dsh/packages/fs/tool-fs
@@ -84,6 +99,9 @@ importers:
       '@deepseek-ai/dsh-tool-present':
         specifier: workspace:*
         version: link:vendor/dsh/packages/deliverables/tool-present
+      '@deepseek-ai/dsh-tool-schedule':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/schedule/tool-schedule
       '@deepseek-ai/dsh-tool-session-query':
         specifier: workspace:*
         version: link:vendor/dsh/packages/experimental/tool-session-query
@@ -93,6 +111,9 @@ importers:
       '@deepseek-ai/dsh-tool-subagent':
         specifier: workspace:*
         version: link:vendor/dsh/packages/subagent/tool-subagent
+      '@deepseek-ai/dsh-tool-subagent-control':
+        specifier: workspace:*
+        version: link:vendor/dsh/packages/subagent/tool-subagent-control
       '@deepseek-ai/dsh-tool-todo':
         specifier: workspace:*
         version: link:vendor/dsh/packages/todo/tool-todo
@@ -165,9 +186,6 @@ importers:
       '@deepseek-ai/dsh-command-goal':
         specifier: ^0.2.1-rc.2
         version: link:../../vendor/dsh/packages/goal/command-goal
-      '@deepseek-ai/dsh-commands':
-        specifier: ^0.2.1-rc.2
-        version: link:../../vendor/dsh/packages/interaction/commands
       '@deepseek-ai/dsh-compaction-basic':
         specifier: ^0.2.1-rc.2
         version: link:../../vendor/dsh/packages/compaction/compaction-basic
@@ -183,18 +201,12 @@ importers:
       '@deepseek-ai/dsh-experimental-tool-agent-team':
         specifier: ^0.2.1-rc.2
         version: link:../../vendor/dsh/packages/experimental/tool-agent-team
-      '@deepseek-ai/dsh-home-paths':
-        specifier: ^0.2.1-rc.2
-        version: link:../../vendor/dsh/packages/util/home-paths
       '@deepseek-ai/dsh-persona':
         specifier: ^0.2.1-rc.2
         version: link:../../vendor/dsh/packages/preset/persona
       '@deepseek-ai/dsh-plan-mode':
         specifier: ^0.2.1-rc.2
         version: link:../../vendor/dsh/packages/plan/plan-mode
-      '@deepseek-ai/dsh-scope':
-        specifier: ^0.2.1-rc.2
-        version: link:../../vendor/dsh/packages/core/scope
       '@deepseek-ai/dsh-session-query-sqlite':
         specifier: ^0.2.1-rc.2
         version: link:../../vendor/dsh/packages/session-query/session-query-sqlite
@@ -328,9 +340,18 @@ importers:
       '@deepseek-ai/dsh-client-ui-workspace':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/client/ui-workspace
+      '@deepseek-ai/dsh-commands':
+        specifier: workspace:*
+        version: link:../../vendor/dsh/packages/interaction/commands
       '@deepseek-ai/dsh-experimental-agent-team':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/experimental/agent-team
+      '@deepseek-ai/dsh-home-paths':
+        specifier: workspace:*
+        version: link:../../vendor/dsh/packages/util/home-paths
+      '@deepseek-ai/dsh-scope':
+        specifier: workspace:*
+        version: link:../../vendor/dsh/packages/core/scope
       '@deepseek-ai/dsh-session':
         specifier: workspace:*
         version: link:../../vendor/dsh/packages/core/session

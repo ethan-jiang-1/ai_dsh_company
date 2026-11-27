@@ -31,6 +31,8 @@ import * as layoutBlock from '../../checks/gates/layout-block.mjs'
 import * as commandRefs from '../../checks/gates/command-refs.mjs'
 import * as scriptIndex from '../../checks/gates/script-index.mjs'
 import * as devProductParity from '../../checks/gates/dev-product-parity.mjs'
+import * as packShape from '../../checks/gates/pack-shape.mjs'
+import * as presetRowDeps from '../../checks/gates/preset-row-deps.mjs'
 import { mutateFile } from '../support/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
@@ -367,6 +369,62 @@ const mutateOrFail = (label, path, transform) => {
     writeFileSync(join(root, 'docs/reference/package-catalog.generated.md'), '# stale\n')
     report('script-index：package-catalog.generated.md 过期 → 红', run(scriptIndex, root), 'package-catalog.generated.md 与 packages/company-pack 源码不一致')
   } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // Wave 4：pack-shape 禁 lib/types/** 整树打包与缺 prepublishOnly；preset-row-deps 三向依赖对账。
+  const root = mkdtempSync(join(tmpdir(), 'gates-packdeps-'))
+  try {
+    mkdirSync(join(root, 'packages/company-pack'), { recursive: true })
+    mkdirSync(join(root, 'tools/lib/core'), { recursive: true })
+    cpSync(join(ROOT, 'package.json'), join(root, 'package.json'))
+    cpSync(join(ROOT, 'packages/company-pack/package.json'), join(root, 'packages/company-pack/package.json'))
+    cpSync(join(ROOT, 'packages/company-pack/LICENSE'), join(root, 'packages/company-pack/LICENSE'))
+    cpSync(join(ROOT, 'packages/company-pack/cordis.patch.yml'), join(root, 'packages/company-pack/cordis.patch.yml'))
+    cpSync(join(ROOT, 'packages/company-pack/presets'), join(root, 'packages/company-pack/presets'), { recursive: true })
+    cpSync(join(ROOT, 'packages/company-pack/src'), join(root, 'packages/company-pack/src'), { recursive: true })
+    cpSync(join(ROOT, 'tools/lib/core/compat-tags.json'), join(root, 'tools/lib/core/compat-tags.json'))
+
+    const packManifestPath = join(root, 'packages/company-pack/package.json')
+    const origPackManifest = readFileSync(packManifestPath, 'utf8')
+    const badPack = JSON.parse(origPackManifest)
+    badPack.files.push('lib/types/**/*.d.ts')
+    writeFileSync(packManifestPath, JSON.stringify(badPack, null, 2))
+    report('pack-shape：files 含 lib/types/**/*.d.ts → 红', run(packShape, root), 'files 仍整树收 lib/types/**')
+    writeFileSync(packManifestPath, origPackManifest)
+
+    const rootManifestPath = join(root, 'package.json')
+    const origRootManifest = readFileSync(rootManifestPath, 'utf8')
+    const badRoot = JSON.parse(origRootManifest)
+    delete badRoot.devDependencies['@deepseek-ai/dsh-tool-bash']
+    writeFileSync(rootManifestPath, JSON.stringify(badRoot, null, 2))
+    report('preset-row-deps：根 devDependencies 缺组合行插件 → 红', run(presetRowDeps, root), '根 package.json devDependencies 缺 workspace 链接')
+    writeFileSync(rootManifestPath, origRootManifest)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // Wave 4：prepack-check --publish 无 DSH_SANITIZED_PUBLISH=1 硬拒；run/env.sh 在 bash 与 zsh 下均落仓内 runtime/harness-home。
+  const pubBlocked = spawnSync(process.execPath, [join(ROOT, 'packages/company-pack/scripts/prepack-check.mjs'), '--publish'], {
+    cwd: ROOT,
+    env: { ...process.env, DSH_SANITIZED_PUBLISH: '' },
+    encoding: 'utf8',
+  })
+  const blockedOk = pubBlocked.status !== 0 && (pubBlocked.stderr ?? '').includes('禁止在源码包目录直接')
+  if (!blockedOk) failures += 1
+  console.log(`${blockedOk ? 'PASS' : 'FAIL'} prepack-check：裸 publish 硬拒 → 红`)
+
+  const expectedHome = `${ROOT.replace(/\/$/, '')}/runtime/harness-home`
+  for (const shell of ['bash', 'zsh']) {
+    const res = spawnSync(shell, ['-c', 'source run/env.sh >/dev/null 2>&1 && printf "%s" "$DSH_HOME"'], {
+      cwd: ROOT,
+      env: { ...process.env, DSH_HOME: '', DSH_SKIP_SANDBOX_PROBE: '1' },
+      encoding: 'utf8',
+    })
+    const shellOk = res.status === 0 && res.stdout === expectedHome
+    if (!shellOk) failures += 1
+    console.log(`${shellOk ? 'PASS' : 'FAIL'} run/env.sh（${shell}）→ DSH_HOME=${res.stdout}`)
+  }
 }
 
 console.log(failures === 0 ? 'gates-negative-smoke: ALL PASS' : `gates-negative-smoke: ${failures} FAILURE(S)`)

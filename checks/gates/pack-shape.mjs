@@ -9,8 +9,16 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
 // ── 6. pack 形状：dsh.bundle.patch 指向的文件存在 + 兼容矩阵覆盖钉住的 tag ──────
 // 负例留证 2026-09-27：patch 指向不存在文件 → pack-bundle 红；矩阵滤掉当前 tag → pack-compat 红。
+// 负例留证 2026-11-28：把 package.json files 改回 `lib/types/**/*.d.ts` → `FAIL pack-files: files 仍整树收 lib/types/**`；还原 → 绿。
 export const pack = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.json'), 'utf8'))
 export function run({ root, ok, fail }) {
+let pack
+try {
+  pack = JSON.parse(readFileSync(join(root, 'packages/company-pack/package.json'), 'utf8'))
+} catch (error) {
+  fail('pack-files', `读不到 packages/company-pack/package.json（${error instanceof Error ? error.message : String(error)}）`)
+  return
+}
 // 0.1.7 起 `dsh.bundle.patch` 可以是字符串或**数组**（registry + 每预设一个 patch 文件）。
 const patchRel = pack?.dsh?.bundle?.patch
 const patchRels = typeof patchRel === 'string' ? [patchRel] : Array.isArray(patchRel) ? patchRel : []
@@ -84,17 +92,31 @@ if (!Array.isArray(pack.files) || !pack.files.includes('locale/*.json')) metaPro
 if (!Array.isArray(pack.files) || !pack.files.includes('icon.svg')) metaProblems.push('files 缺 icon.svg')
 if (pack.exports?.['./locale/*.json'] === undefined) metaProblems.push('exports 缺 ./locale/*.json')
 if (pack.exports?.['./icon'] === undefined) metaProblems.push('exports 缺 ./icon')
+metaProblems.length === 0
+  ? ok('pack-meta（locale + icon 的 files/exports 齐全）')
+  : fail('pack-meta', metaProblems.join('；'))
 
-// 发布文件清单（2026-10-26，P1）：lib/ 是 gitignored 的构建目录，`lib/**` 会把 tsc 的中间
-// .js/.map/.tsbuildinfo 一起打进包（0.3.9 实测 216/272 条是 lib/types）；发布面只留 runtime
-// 两半 + 声明。静态检查 files/exports，不依赖 lib 是否已构建（fresh clone 也能跑）。
+// 发布文件清单（2026-10-26，P1；2026-11-28 维 2 单源收窄）：源 `files` 与 `_dist` 保持同一 137 条目面，
+// 只留 runtime 两半 + exports 可达的 3 份 .d.ts，禁止整树 `lib/types/**/*.d.ts` 与冗余 `lib/*.js`；
+// 且源 manifest 须带 `prepublishOnly` 防裸 `npm publish`。静态检查不依赖 lib 是否已构建。
 const files = Array.isArray(pack.files) ? pack.files : []
 const fileProblems = []
-for (const required of ['lib/index.js', 'lib/client.js', 'lib/types/**/*.d.ts', 'content/**', 'LICENSE']) {
+for (const required of [
+  'lib/index.js',
+  'lib/client.js',
+  'lib/types/index.d.ts',
+  'lib/types/client/index.d.ts',
+  'lib/types/host/cultivation/cultivation.d.ts',
+  'content/**',
+  'LICENSE',
+]) {
   if (!files.includes(required)) fileProblems.push(`files 缺 ${required}`)
 }
-if (files.includes('lib/**')) fileProblems.push('files 用了 lib/**（会把 tsc 中间产物/tsbuildinfo 打进包）')
-if (files.includes('lib/types/**/*.js') || files.includes('lib/types/**')) fileProblems.push('files 把 lib/types 的 .js 打进包')
+if (files.includes('lib/**') || files.includes('lib/*.js')) fileProblems.push('files 用了宽通配 lib/** 或 lib/*.js（只许精确列出 lib/index.js 与 lib/client.js）')
+if (files.some(file => file.includes('lib/types/**'))) fileProblems.push('files 仍整树收 lib/types/**（会把不可达内部 .d.ts/.js 打进源 npm pack）')
+if (typeof pack?.scripts?.prepublishOnly !== 'string' || !pack.scripts.prepublishOnly.includes('prepack-check.mjs')) {
+  fileProblems.push('scripts.prepublishOnly 缺失或未指向 prepack-check.mjs（裸 npm publish 必须硬拒）')
+}
 if (files.includes('workspace/**')) fileProblems.push('files 仍带 workspace/**（只读内容已迁 content/）')
 if (files.some(file => file.startsWith('bin/'))) fileProblems.push('files 仍带 bin/**（发布包不得有启动器）')
 if (pack.bin !== undefined) fileProblems.push('bin 字段仍在（启动入口是 dsh --profile company）')

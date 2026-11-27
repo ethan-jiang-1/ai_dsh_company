@@ -44,7 +44,7 @@ export const DOC_BYTE_BUDGETS = [
   ['docs/contracts/profile.md', 8320],
   ['docs/contracts/release.md', 14848],
   ['docs/contracts/repo-hygiene.md', 6528],
-  ['docs/guides/bootstrap.md', 15488],
+  ['docs/guides/bootstrap.md', 14336],
   ['docs/guides/cdp-probe.md', 7680],
   ['docs/guides/demo-scenes.md', 22912],
   ['docs/guides/dev-loop.md', 11776],

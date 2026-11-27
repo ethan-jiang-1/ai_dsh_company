@@ -11,7 +11,7 @@
 
 | 轴 | 本仓答案 | 读回 |
 |---|---|---|
-| 运行时 | 用户已装 DSH（npm/Desktop）；本包不捆绑运行时；`engines.dsh >=0.2.1-rc.2 <0.3.0` | `dsh --version` / `pack-engines` |
+| 运行时 | 用户已装 DSH（npm/Desktop）；本包不捆绑运行时；`engines.dsh >=0.2.1-rc.2 <0.2.2` | `dsh --version` / `pack-engines` |
 | profile | 自定义具名 `company`；首次 `--from-default-profile web`；用户/DSH 拥有；本包不写 profile patch | `$DSH_HOME/profiles/company/package.json` 的 `dsh.profile.bundles` |
 | patch 层 | `dsh.bundle.patch` 数组；默认值在 bundle patch；profile/home 可覆盖；`config` 整份替换 | `dsh --profile company --dump-config` |
 | app surface | Web（`dsh --profile company`）；client 面随包；Desktop 仅 Plugins 页安装、未真机验证 | 启动横幅 / `client-load-smoke` |
@@ -38,7 +38,7 @@ home/数据策略和生命周期承诺。六轴任一格写“默认应该有”
   `private` 已移除。发布面 = npm + 自托管 market index；真实 `npm publish` 是人工 handoff。
 - **client 面自打包**：`lib/client.js` 由 tsdown 产出，react 与 `dsh-client-*`/`dsh-api-*` 留作浏览器
   模块表 require；其余内联，tarball 的浏览器半零 runtime 依赖。
-- **exports 不说谎**：`./src/*` 已摘；`files` 只发 runtime 两半与 `lib/types/**/*.d.ts`；tsc 中间物不进包。
+- **exports 不说谎**：`./src/*` 已摘；`files` 只发 runtime 两半与 `exports.types` 可达的 3 份 `.d.ts`（源 `npm pack` 与 `_dist` 条目集完全一致）；`prepublishOnly` 硬拒在源码目录直接 `npm publish`。
 
 ## 兼容台账（`tools/lib/core/compat-tags.json`）
 
@@ -113,8 +113,7 @@ cwd 会自动迁移。
 1. **experimental 行重校**：本 pack 直插的 experimental 行逐字段对照 vendor 同 tag 的官方 optional
    bundle patch；差异须是有意识偏离并写明理由。
 2. **货架过账**：对照外部研究树当轮 `_digested/plugin-inventory`；新增/退役能力按判收四档记入收割台账 Note。
-3. **合成回放全绿**：vendor 换 tag 后先跑 `replay-smoke` 再谈语义结论；本仓现行回放网只证管线可跑，
-   公司行为真实录制的语义回归网在部署仓。
+3. **合成回放与窗口同步**：vendor 换 tag 后先跑 `replay-smoke` 再谈语义结论；跨 minor 升 pin（如升 `0.2.2`）时须同步更新 `packages/company-pack/package.json`、`README.shipped.md`、`README.md` 与 `install-manual.mjs` 的 `engines.dsh` 上界（`pack-engines` 强制覆盖当前 pin）。
 
 程序：验证旧簿记及 `verify` → fetch tag 并核对证据 SHA → 暂存新簿记/台账 → checkout 候选 →
 `pnpm install` → vendor 面 staging 构建后拷回（`git archive` 候选 → 独立 install + `pnpm run build` →

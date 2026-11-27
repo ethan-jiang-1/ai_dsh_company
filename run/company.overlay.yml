@@ -3,7 +3,7 @@
 # 语法：新增行用 insert；替换行用 - id:（教义见 guides/dev-loop §2 第 1 层）。
 - insert:
     # 0.1.7 预设模型：registry（default）+ 每预设一行；本 overlay 只补 registry，
-    # 五个预设行由 pack 的 bundle patch 数组并入（见 packages/company-pack/package.json）。
+    # 各角色与 support 预设行由 pack 的 bundle patch 数组并入（见 packages/company-pack/package.json#dsh.bundle.patch）。
     - id: agent-preset-registry
       name: '@deepseek-ai/dsh-agent-preset-registry'
       config:
@@ -15,5 +15,5 @@
     - id: tool-agent-team
       name: '@deepseek-ai/dsh-experimental-tool-agent-team'
     # 日期通道与定时提醒（0.2.1）：`time-context` + `tool-schedule` 归**角色 preset 行所有权**
-    # （五个 preset 各自声明 `preset-clock` 组）——headless overlay 不插，插了就是重复行 id 硬拒。
+    # （六个公司角色 preset 各自声明 `preset-clock` 组）——headless overlay 不插，插了就是重复行 id 硬拒。
     # 它们的宿主 `schedule` 服务随组合而来；web 面另有 ui-schedule 任务页（web-app 组合）。
