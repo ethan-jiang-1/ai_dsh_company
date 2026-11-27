@@ -4,7 +4,7 @@
 
 > **部分取代**：[2026-11-13-test-asset-loop](./2026-11-13-test-asset-loop.md) 第 6 项（`coverage:ratchet` 不再无条件塞进 `.githooks/pre-push` 每次运行；下沉至 `pnpm release --verify`、每周 CI 与手动 `pnpm coverage:ratchet`）；[2026-11-18-release-docs-only-and-pre-push-budget](./2026-11-18-release-docs-only-and-pre-push-budget.md) 第 2 项（原 pre-push 46s 预算挂起与「输掉的方案：pre-push 去掉 coverage」因触发条件兑现由本决定取代）。
 
-上游 = 用户 2026-11-27 指令修复 [BUG-406](../../_backlog/bugs/BUG-406-regression-coverage-prepush-cpu-saturation-and-timeouts.md) 并批准方案 A。
+上游 = 用户 2026-11-27 指令修复 [BUG-406](../../_backlog/_archive/fixed_bugs/BUG-406-regression-coverage-prepush-cpu-saturation-and-timeouts.md) 并批准方案 A。
 
 ## 决定
 

@@ -4,6 +4,9 @@
 
 ## 修复流水（倒序）
 
+- **BUG-406**（2026-11-27，P1 / infra & tests）：Vitest 切换 `pool: 'threads'` 并设 `maxWorkers=clamp(floor(cpus/2),2,4)` 并发上限；`coverage-ratchet` 强制并发上限与同 `HEAD` 干净缓存复用并下沉至 `release:verify`/周跑 CI/手动；`.githooks/pre-push` 改为 `verify` 无条件 + `planPrePush` 按改动面精准路由，并在 `surface-coverage` 门禁补全集防漂移；系统根治 Top 6 慢 spec、慢门禁（`fix-evidence` 单次 `git log` 索引、消除双 `mdast` 解析）、增量 `tsc`、3 并发 `test:checks` 及 4 条浏览器车道/探针固定长 `sleep`——
+  [406](BUG-406-regression-coverage-prepush-cpu-saturation-and-timeouts.md)。证据提交 `b76e9d37`。
+
 - **BUG-397 / BUG-398**（2026-11-27，392..398 批顺位 4 / P2×2）：培养错误改存 `DraftProblemCode`/`'required'` 在渲染期按最新语言解析、`DelegationFlowPanel`/`CultivationInbox`/`tasks.col.owner`/`formatGeneratedAt`/`delegation-tree`/`instance-guard` 本地化与 `locale/change` 联动；打通 `composeIntentStore` 与 `deliverablesFocusStore`、对齐 `panel.floatTitle` 诚实提示、Hero/Dock 保留已有草稿并补 `.wk-command-scope-hint` 且去重 `.wk-guide-entry`——
   [397](BUG-397-live-locale-lag-in-cultivation-errors-and-remaining-raw-labels.md)、[398](BUG-398-contextual-actions-drop-ref-dead-float-save-and-hero-draft-overwrite.md)。证据提交 `bec52daf`。
 

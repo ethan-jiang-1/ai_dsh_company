@@ -8,11 +8,10 @@
 
 ## 活跃清单
 
-**活跃 1 张**：
+**活跃 0 张（BUG-406 已修 `b76e9d37` 并迁入 `fixed_bugs/`）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
-| [406](BUG-406-regression-coverage-prepush-cpu-saturation-and-timeouts.md) | P1 | infra / tests | `pre-push` 与 `coverage-ratchet` 无并发上限重跑全量 Vitest 覆盖率触发 CPU 过载，致多项 1–5s 测试膨胀超时并拖慢本机 | 修复已落地 |
 
 **按根因聚类摘要（供下轮修复排期）**：
 - **组 1 · 交互安全与宿主生命周期**（[392](../_archive/fixed_bugs/BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md)、[393](../_archive/fixed_bugs/BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md)、[396](../_archive/fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md) 快捷键部分）：容器级键盘未豁免可聚焦控件/`modal`/`terminal`，HQ 全局面板呼唤右栏漏切回会话，内嵌工坊未清理会话 Hero/Chrome；

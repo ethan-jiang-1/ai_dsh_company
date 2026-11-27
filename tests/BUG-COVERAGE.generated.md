@@ -7,8 +7,8 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 395 |
-| 有具名守卫 | 293 |
+| 已修卡 | 396 |
+| 有具名守卫 | 294 |
 | 无具名守卫 | 102 |
 | 覆盖率 | 74.2% |
 
@@ -350,7 +350,7 @@
 | 337 | 2026-11-23 | tests/client/tabs/delegation-flow-panel.spec.ts:52 |
 | 338 | 2026-11-23 | tests/host/commands/command-language.spec.ts:31；tests/host/commands/prd-command.spec.ts:222；tests/host/commands/settings-command.spec.ts:261；tests/lib/docs/prd-check.spec.ts:429；tests/lib/docs/requirements-check.spec.ts:359；tests/lib/docs/requirements-check.spec.ts:373 |
 | 339 | 2026-11-23 | tests/lib/shared/parsers-fuzz.property.spec.ts:416 |
-| 340 | 2026-11-23 | tests/client/cultivation/cultivation-copy.spec.ts:101；tests/client/cultivation/cultivation-copy.spec.ts:120；tests/tools/company-static-audit.spec.ts:217 |
+| 340 | 2026-11-23 | tests/client/cultivation/cultivation-copy.spec.ts:101；tests/client/cultivation/cultivation-copy.spec.ts:120；tests/tools/company-static-audit.spec.ts:220 |
 | 341 | 2026-11-23 | tests/client/company-client-composition.spec.ts:184；tests/client/ui/brand.spec.ts:69 |
 | 342 | 2026-11-23 | tests/host/prompt/handbook.spec.ts:45；tests/host/prompt/handbook.spec.ts:153 |
 | 343 | 2026-11-23 | tests/host/commands/req-command.spec.ts:226 |
@@ -416,3 +416,4 @@
 | 403 | 2026-11-27 | tests/client/tabs/panel-frame.spec.ts:105；tests/client/ui/client-css.spec.ts:251；tests/client/ux/company-hq.spec.ts:879；tests/client/ux/company-hub-tabs.spec.ts:363；tests/client/wiring/instance-guard.spec.ts:136 |
 | 404 | 2026-11-27 | tests/client/cultivation/cultivation-board-actions.spec.ts:700；tests/client/ux/ambient-chrome.spec.ts:291；tests/client/wiring/attention-source.spec.ts:35 |
 | 405 | 2026-11-27 | tests/client/cultivation/cultivation-context.spec.ts:323；tests/client/cultivation/cultivation-copy.spec.ts:120；tests/host/cultivation/cultivation-command.spec.ts:535；tests/host/cultivation/cultivation-command.spec.ts:561；tests/host/cultivation/cultivation-context.spec.ts:198；tests/host/run-bundle/write-gate.spec.ts:105 |
+| 406 | 2026-11-27 | tests/checks/pre-push-surfaces.test.mjs:155 |
