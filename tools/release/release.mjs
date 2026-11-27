@@ -297,7 +297,9 @@ function verify() {
   if (!allowStaleManifest && prepared.gitSha !== capture('git', ['rev-parse', 'HEAD']).trim()) fail('manifest 不是当前 HEAD 的 --prepare 产物；先重跑 --prepare（仅 test/docs 改动可显式 --allow-stale-manifest）')
   const commands = [
     ['verify', ['pnpm', ['verify'], false]],
-    ['test', ['pnpm', ['test'], false]],
+    // BUG-406：覆盖率棘轮下沉至发布前验收与每周 CI，不再塞进 pre-push 热路径；
+    // coverage:ratchet 本身执行全量 vitest + 覆盖率基线比对（同 HEAD 干净树自动复用缓存）。
+    ['test', ['pnpm', ['coverage:ratchet'], false]],
     ['release-smoke', [process.execPath, ['checks/lanes/release.entry.mjs', '--tarball',
       join(DIST, artifact.file), '--expect-sha', artifact.sha256], true]],
     ['company-entry-smoke', [process.execPath, ['checks/lanes/company-entry.entry.mjs'], true]],

@@ -21,7 +21,7 @@ const propResult = spawnSync(
   ],
   {
     cwd: root,
-    env: { ...process.env, MARKDOWN_SHAPE_CASES: '1000' },
+    env: { ...process.env, MARKDOWN_SHAPE_CASES: '1000', MARKDOWN_BUNDLE_CASES: '90' },
     stdio: 'inherit',
   },
 )

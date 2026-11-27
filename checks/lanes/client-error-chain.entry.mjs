@@ -38,6 +38,15 @@ if (!existsSync(cli)) {
 }
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+/** 条件等待（BUG-406）：替代固定长 sleep，满足即刻推进。 */
+async function waitUntil(predicate, timeoutMs, intervalMs = 150) {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    if (await predicate()) return true
+    await sleep(intervalMs)
+  }
+  return Boolean(await predicate())
+}
 mkdirSync(join(ROOT, 'runtime/tmp'), { recursive: true })
 const root = mkdtempSync(join(ROOT, 'runtime/tmp/client-error-chain-'))
 const home = join(root, 'home')
@@ -74,15 +83,16 @@ let page
 try {
   page = await browser.newPage()
   await page.goto(`http://127.0.0.1:${String(port)}/?token=${token}`, { waitUntil: 'load', timeout: 60_000 })
-  await sleep(3_000)
+  const composer = page.locator('[data-composer-input][contenteditable="true"]').first()
+  const continueBtn = page.getByRole('button', { name: /^Continue$|^继续$/ }).first()
+  await waitUntil(async () => (await composer.count()) > 0 || (await continueBtn.count()) > 0, 15_000, 150)
   // 首启的说明页/预览提示：逐个 Continue 关掉（与 cdp-probe 的同一个坑）。
   for (let i = 0; i < 4; i++) {
-    const button = page.getByRole('button', { name: /^Continue$|^继续$/ }).first()
-    if (await button.count() === 0) break
-    await button.click({ timeout: 2_000 }).catch(() => {})
-    await sleep(300)
+    if (await continueBtn.count() === 0) break
+    await continueBtn.click({ timeout: 2_000 }).catch(() => {})
+    await sleep(150)
   }
-  const composer = page.locator('[data-composer-input][contenteditable="true"]').first()
+  await waitUntil(async () => (await composer.count()) > 0, 10_000, 150)
   if (await composer.count() === 0) {
     fail('composer 在场', '隔离页面没有 composer（未完成 onboarding 或 client 未 apply）')
     throw new Error('composer missing')
@@ -92,44 +102,45 @@ try {
   const logPath = join(home, 'logs/company-client-errors.log')
   const earlyMarker = `client-error-early-${String(Date.now())}`
   await page.evaluate(m => console.error(m), earlyMarker)
-  await sleep(1_500)
-  const earlyRing = await page.evaluate(() => globalThis.__DSH_COMPANY_ERRORS__?.list?.() ?? [])
-  if (earlyRing.some(entry => String(entry.message).includes(earlyMarker))) pass('加载即报错入环')
+  const earlyRingOk = await waitUntil(async () => {
+    const ring = await page.evaluate(() => globalThis.__DSH_COMPANY_ERRORS__?.list?.() ?? [])
+    return ring.some(entry => String(entry.message).includes(earlyMarker))
+  }, 3_000, 100)
+  if (earlyRingOk) pass('加载即报错入环')
   else fail('加载即报错入环', `__DSH_COMPANY_ERRORS__ 未出现 ${earlyMarker}`)
 
   await composer.focus()
   await page.keyboard.type('hi', { delay: 10 })
   await page.keyboard.press('Enter')
   // 会话创建后 title 变 【preset】<workspace>；等它出现，避免在 hero 上注入。
-  let ready = false
-  for (let i = 0; i < 20; i++) {
-    await sleep(500)
-    if ((await page.title()).includes('】')) { ready = true; break }
-  }
+  const ready = await waitUntil(async () => (await page.title()).includes('】'), 10_000, 150)
   if (!ready) fail('会话打开', `title 未出现角色前缀（当前 ${await page.title()}）`)
   else pass('会话打开（单 writer）')
 
   // ①b 会话就绪后：早于第一条消息的错误也应在盘上（队列 + subscribe 补送，或加载时已有会话）。
-  let earlyLogged = false
-  for (let i = 0; i < 20; i++) {
-    await sleep(500)
-    if (existsSync(logPath) && readFileSync(logPath, 'utf8').includes(earlyMarker)) { earlyLogged = true; break }
-  }
+  const earlyLogged = await waitUntil(
+    () => existsSync(logPath) && readFileSync(logPath, 'utf8').includes(earlyMarker),
+    10_000,
+    150,
+  )
   if (earlyLogged) pass('加载即报错最终落盘')
   else fail('加载即报错最终落盘', `未在 ${logPath} 找到 ${earlyMarker}`)
 
   const marker = `client-error-chain-${String(Date.now())}`
   await page.evaluate(m => console.error(m), marker)
-  await sleep(1_500)
-  const ring = await page.evaluate(() => globalThis.__DSH_COMPANY_ERRORS__?.list?.() ?? [])
-  if (ring.some(entry => String(entry.message).includes(marker))) pass('错误环捕获')
+  let ring = []
+  const ringOk = await waitUntil(async () => {
+    ring = await page.evaluate(() => globalThis.__DSH_COMPANY_ERRORS__?.list?.() ?? [])
+    return ring.some(entry => String(entry.message).includes(marker))
+  }, 3_000, 100)
+  if (ringOk) pass('错误环捕获')
   else fail('错误环捕获', `__DSH_COMPANY_ERRORS__ 未出现 marker（${JSON.stringify(ring).slice(0, 200)}）`)
 
-  let logged = false
-  for (let i = 0; i < 20; i++) {
-    await sleep(500)
-    if (existsSync(logPath) && readFileSync(logPath, 'utf8').includes(marker)) { logged = true; break }
-  }
+  const logged = await waitUntil(
+    () => existsSync(logPath) && readFileSync(logPath, 'utf8').includes(marker),
+    10_000,
+    150,
+  )
   if (logged) pass('host 日志落盘')
   else fail('host 日志落盘', `未在 ${logPath} 找到 ${marker}`)
 } catch (error) {

@@ -2,16 +2,17 @@
 
 当场修掉的不建卡——**仅限非材料性**（判据唯一家 = [章程](../README.md)「缺陷的通道」；材料性修复要请示授权并报留痕）。建卡表示发现时决定这次不修。一文件一张 `BUG-<NNN>-<slug>.md`，新卡与索引行同次新增。同一轮有多张卡（哪怕两张），先按根因聚类并写批次计划（组 / 卡 / 共同根因 / 顺序 / 证据）再逐卡修——逐症状打补丁会把同一根因修三遍；**批次是本轮选择一起修的子集，不是所有活跃卡**。**修复流程 = [诊断与修复缺陷](../methods/bug-fix.md)**；本文件管编号、清单、模板与流水，不重复方法正文。
 
-**下一个缺陷号**：Next BUG ID = 406；已分配 BUG-001..405。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
+**下一个缺陷号**：Next BUG ID = 407；已分配 BUG-001..406。本目录与 [已修缺陷](../_archive/fixed_bugs/README.md)、[待修缺陷](../_archive/suspended_bugs/README.md) 一起算，取已分配最大号加一；编号在本文件维护。
 
 修好 `git mv` 到 [fixed_bugs](../_archive/fixed_bugs/README.md)，查明未修到 [suspended_bugs](../_archive/suspended_bugs/README.md)；挂起不是修好。保留文件名与讨论正文，frontmatter 的 `status` 分别改成 `已修` / `待修`，状态行补修复或未修原因，卡顶补 `留痕：` 行，修相对链接并更新两边清单。 **已修卡还必须有 `## 修复证据`（改动面 / 红 / 绿 / 提交）；只翻状态 + `git mv`、仓库一行没变 = `fix-evidence` 门禁红（判据 = [章程](../README.md)「缺陷的通道」）。**
 
 ## 活跃清单
 
-**活跃 0 张（Round 3 UX/UI 盲区深扫立案 BUG-399..405 已全部按五批自主修完并迁入 `fixed_bugs/`）**：
+**活跃 1 张**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
+| [406](BUG-406-regression-coverage-prepush-cpu-saturation-and-timeouts.md) | P1 | infra / tests | `pre-push` 与 `coverage-ratchet` 无并发上限重跑全量 Vitest 覆盖率触发 CPU 过载，致多项 1–5s 测试膨胀超时并拖慢本机 | 修复已落地 |
 
 **按根因聚类摘要（供下轮修复排期）**：
 - **组 1 · 交互安全与宿主生命周期**（[392](../_archive/fixed_bugs/BUG-392-signoff-composer-enter-focus-trap-and-answerable-guard-gaps.md)、[393](../_archive/fixed_bugs/BUG-393-hq-rightbar-no-surface-crash-and-embedded-workshop-lifecycle.md)、[396](../_archive/fixed_bugs/BUG-396-context-picker-arrow-trap-modal-shortcuts-and-stacked-drag.md) 快捷键部分）：容器级键盘未豁免可聚焦控件/`modal`/`terminal`，HQ 全局面板呼唤右栏漏切回会话，内嵌工坊未清理会话 Hero/Chrome；

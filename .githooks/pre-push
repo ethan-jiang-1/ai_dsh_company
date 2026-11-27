@@ -1,26 +1,15 @@
 #!/bin/sh
-# pre-push：push 前跑全量结构门禁 + keyless 行为测试 + 按面的真入口检查（enforcement 通道，2026-09-27 立；接线 = run/env.sh 幂等设 core.hooksPath）。
+# pre-push：push 前无条件结构门禁 + 按出站改动面精准分派窄检查与真入口（enforcement 通道，2026-09-27 立；2026-11-27 BUG-406 收敛热路径）。
 # 为什么：DSH 立场——"Agents follow enforced gates far more reliably than prose conventions"。
-#       实测 2026-11-13：冷分项和 ~44s（verify 8.3 + typecheck 5.4 + lint/dup 1.4 + smoke:fast 2.4 + test 26）；热缓存全链 29–35s（两次实测；test 14–18s）。
-#       仍守「hook 只装便宜高置信缺陷」的边界：慢 E2E（安装/发布/真模型）不进 hook。
-#       分工 = hook 管「忘跑」（verify+typecheck+lint+dup+smoke:fast+surface+coverage 都强制），CI 管「环境差异/绕过」（verify 穷举档）。
-#        test 进 hook 而非 CI（2026-09-28 实证定界）：vitest 的 vendor 内部 @deepseek-ai/* 解析依赖
-#        已构建 lib——本地 dev 树按 bootstrap 必然已构建所以跑得动；CI 干净环境没有，而补齐 =
-#        全量 vendor 构建链（DSH 自己的 test 脚本也是 build && vitest），负担不成比例。
-#        ⇒ 分工 = hook 管「忘跑」（verify+typecheck+lint+dup+test 都强制），CI 管「环境差异/绕过」（verify 穷举档）。
-# 2026-11-13（研究 B 件）：加「按面触发」——真入口检查（client 装配 / preset 挂载 / 回放 / 进程级写面）
-#        原本不在任何 required lane 里。规则唯一家 = tools/lib/core/asset-lanes.mjs 的 SURFACE_RULES；
-#        hook 把 git 喂进来的 ref 清单交给 checks/pre-push-surfaces.mjs，由它算 outgoing 范围再选检查。
-#        成本：只在改到对应面时增加（client ~25s / presets ~30s / content ~2s）。
-# 2026-11-16（二轮）：未分类改动面 = 阻断（pre-push-surfaces 对 unseen 退出非零）；新目录/新文件先登记
-#        SURFACE_RULES（asset 或 coveredBy）。全 tracked 完备性另由 verify 的 surface-coverage 门禁守。
+#       同时守「hook 只装便宜高置信缺陷、热路径不拖慢日常迭代」的边界（BUG-406）：
+#       - 无条件必跑：全量结构门禁 `node checks/run-gates.mjs`（verify）；
+#       - 按出站改动面精准执行（`checks/pre-push-surfaces.mjs --exec-plan`，规则唯一家 = `tools/lib/core/asset-lanes.mjs`）：
+#         docs-only 快速路径只跑 verify；代码/测试/工具/探针只跑受影响面的增量 typecheck / lint / dup / smoke:fast / test:checks / vitest related（与定向 spec）+ 按面真入口；
+#         未分类改动面 fail-closed 阻断（BUG-199）。
+#       - 全量覆盖率棘轮（`pnpm coverage:ratchet`，带 maxWorkers 上限与同 HEAD 缓存复用）下沉至 `pnpm release --verify`、每周 CI（`fresh-clone.yml`）与阶段收口手动执行，不再在每次 push 重扫全量 305 份 spec。
 # 负例留证（2026-09-27）：AGENTS.md 临时加死链 → push 被 verify 拦下（未触网络层）；还原 → 放行到网络层。
-#        （2026-09-28）：临时失败 spec → hook 红；删除 → 绿。
-#        （2026-11-03）：临时写 `const x: number = 's'` → typecheck 拦下；还原 → 绿。
-#        （2026-11-04）：临时把 instance-guard 的 if/else 改回三元 → lint 拦下；还原 → 绿。
-#                      临时在 tools/lib 放 10 行复制块 → dup 拦下；删除 → 绿。
-#        （2026-11-13）：改 client 文件不跑 client-load-smoke 直接 push → surface lane 拦下并点名；
-#                      还原后按面检查 PASS → 绿（见 notes/implemented 的本件 Note）。
+#        （2026-11-13）：改 client 文件不跑 client-load-smoke 直接 push → surface lane 拦下并点名；还原后按面检查 PASS → 绿。
+#        （2026-11-27 BUG-406）：docs-only `--exec-plan --dry-run` 仅跑 verify（跳过 tsc/vitest）；改 probes 精准带出 entry-import-graph.spec.ts；改 src/client 精准带出 typecheck/lint/dup/vitest related/client-load。
 # bypass：git push --no-verify（紧急逃生门；用了要在收尾 Note 说明原因）。
 refs_file=$(mktemp "${TMPDIR:-/tmp}/dsh-prepush-refs.XXXXXX") || exit 1
 if [ -t 0 ]; then
@@ -30,15 +19,7 @@ else
 fi
 cd "$(git rev-parse --show-toplevel)" || exit 1
 node checks/run-gates.mjs || { rm -f "$refs_file"; exit 1; }
-node ./node_modules/typescript/bin/tsc -b packages/company-pack || { rm -f "$refs_file"; exit 1; }
-node ./node_modules/typescript/bin/tsc -p tsconfig.test-client.json || { rm -f "$refs_file"; exit 1; }
-node ./node_modules/typescript/bin/tsc -p tsconfig.test-company.json || { rm -f "$refs_file"; exit 1; }
-node ./node_modules/typescript/bin/tsc -p tsconfig.test-harness.json || { rm -f "$refs_file"; exit 1; }
-pnpm -s lint || { rm -f "$refs_file"; exit 1; }
-pnpm -s dup || { rm -f "$refs_file"; exit 1; }
-pnpm -s smoke:fast || { rm -f "$refs_file"; exit 1; }
-node checks/pre-push-surfaces.mjs --stdin "$refs_file" || { rm -f "$refs_file"; exit 1; }
-pnpm -s test:checks || { rm -f "$refs_file"; exit 1; }
+node checks/pre-push-surfaces.mjs --stdin "$refs_file" --exec-plan
+status=$?
 rm -f "$refs_file"
-# 覆盖率 = 执行下限（C 件）：跑全量测试并比基线棘轮（只升不降；新文件有下限；已知空洞须豁免）。
-exec node checks/audit/coverage-ratchet.mjs
+exit "$status"

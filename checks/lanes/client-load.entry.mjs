@@ -72,7 +72,9 @@ try {
     page.on('pageerror', (e) => { if (String(e).includes('failed to apply loader entry')) loaderErrors.push(String(e)) })
 
     await page.goto(`http://127.0.0.1:${String(port)}/?token=${token}`, { waitUntil: 'load', timeout: 60_000 })
-    await sleep(4_000)
+    // 条件等待替代 4s 硬睡（BUG-406）：等品牌槽或插件失败横幅任一先挂载，再短 settle 捕获晚到 loader 错误。
+    await page.locator('text=/DSH (梦之队|Dream Team)|Failed to load plugins/').first().waitFor({ timeout: 30_000 }).catch(() => {})
+    await sleep(300)
 
     const bannerCount = await page.locator('text=Failed to load plugins').count()
     if (bannerCount > 0) fail('插件挂载零失败', `页面出现 Failed to load plugins banner（${String(bannerCount)} 处）`)
@@ -82,7 +84,7 @@ try {
     else console.log('  PASS console 零 loader 错误')
 
     try {
-      await page.locator('text=/DSH (梦之队|Dream Team)/').first().waitFor({ timeout: 30_000 })
+      await page.locator('text=/DSH (梦之队|Dream Team)/').first().waitFor({ timeout: 10_000 })
       console.log(`  PASS 品牌槽在场（${String(BRAND)}）`)
     } catch {
       fail('品牌槽在场', `${String(BRAND)} 未渲染——app 未完成渲染，或本包 client 入口未成功 apply（fiber PENDING？）`)

@@ -169,12 +169,20 @@ export function caseCounts(base) {
 }
 
 /** Non-content envelope is synthetic and small; all content bytes come from tracked sources. */
+let cachedPatchTargets
+function patchTargets() {
+  if (cachedPatchTargets === undefined) {
+    const pkgSource = JSON.parse(readFileSync(join(ROOT, 'packages/company-pack/package.json'), 'utf8'))
+    cachedPatchTargets = pkgSource.dsh.bundle.patch
+    assert.ok(cachedPatchTargets.length > 0)
+  }
+  return cachedPatchTargets
+}
+
 export function shippedInput(world) {
   const content = textFiles(world)
   // Read the actual combination targets; the envelope never invents product roles.
-  const pkgSource = JSON.parse(readFileSync(join(ROOT, 'packages/company-pack/package.json'), 'utf8'))
-  const targets = pkgSource.dsh.bundle.patch
-  assert.ok(targets.length > 0)
+  const targets = patchTargets()
   const texts = {
     'package/lib/index.js': 'export const x = 1\n',
     'package/lib/client.js': 'require("@deepseek-ai/dsh-client-ui-primitives")\n',

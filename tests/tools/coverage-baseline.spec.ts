@@ -1,5 +1,15 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { NEW_FILE_FLOOR, compareCoverage, indexCoverage, nextBaseline } from '../../checks/lib/coverage-baseline.mjs'
+import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
+import {
+  NEW_FILE_FLOOR,
+  canReuseCoverageCache,
+  compareCoverage,
+  indexCoverage,
+  nextBaseline,
+  resolveCoverageWorkers,
+} from '../../checks/lib/coverage-baseline.mjs'
 
 /**
  * 覆盖率棘轮的判据（研究 C 件）。五条规则各有负例——没有负例的阈值等于装饰：
@@ -149,5 +159,45 @@ describe('改名 / 删除：地板必须显式迁移或删除（BUG-203）', () 
       { renames: [{ from: 'pkg/old-home/moved.ts', to: 'pkg/new-home/moved.ts' }] },
     )
     expect(oldStillLive.violations.map(v => v.kind)).toContain('invalid-rename')
+  })
+})
+
+// 负例留证 2026-11-27：去掉 resolveCoverageWorkers 上限或去掉 canReuseCoverageCache 的 dirty 拒绝 ⇒ 并发打满与脏树误复用用例红（BUG-406）；修复后绿。
+describe('并发上限与同 HEAD 缓存复用判据', () => {
+  it('resolveCoverageWorkers 默认将并发收敛到 [2, 4]，显式正整数优先，非法值回退默认', () => {
+    expect(resolveCoverageWorkers(10)).toBe(4)
+    expect(resolveCoverageWorkers(16)).toBe(4)
+    expect(resolveCoverageWorkers(6)).toBe(3)
+    expect(resolveCoverageWorkers(2)).toBe(2)
+    expect(resolveCoverageWorkers(0)).toBe(2)
+    expect(resolveCoverageWorkers(10, 2)).toBe(2)
+    expect(resolveCoverageWorkers(10, '3')).toBe(3)
+    expect(resolveCoverageWorkers(10, '0')).toBe(4)
+    expect(resolveCoverageWorkers(10, 'abc')).toBe(4)
+  })
+
+  it('canReuseCoverageCache 仅在干净树 + 同 HEAD + 摘要 sha256 一致 + 未 force 时允许复用', () => {
+    const meta = { headSha: 'abc1234', dirty: false, summarySha256: 'deadbeef' }
+    expect(canReuseCoverageCache({ meta, headSha: 'abc1234', dirty: false, summaryExists: true, summarySha256: 'deadbeef' })).toBe(true)
+    expect(canReuseCoverageCache({ meta, headSha: 'abc1234', dirty: false, summaryExists: true, summarySha256: 'tampered' })).toBe(false)
+    expect(canReuseCoverageCache({ meta: { headSha: 'abc1234', dirty: false }, headSha: 'abc1234', dirty: false, summaryExists: true, summarySha256: 'deadbeef' })).toBe(false)
+    expect(canReuseCoverageCache({ meta, headSha: 'abc1234', dirty: true, summaryExists: true, summarySha256: 'deadbeef' })).toBe(false)
+    expect(canReuseCoverageCache({ meta, headSha: 'def5678', dirty: false, summaryExists: true, summarySha256: 'deadbeef' })).toBe(false)
+    expect(canReuseCoverageCache({ meta, headSha: 'abc1234', dirty: false, summaryExists: false, summarySha256: 'deadbeef' })).toBe(false)
+    expect(canReuseCoverageCache({ meta, headSha: 'abc1234', dirty: false, summaryExists: true, summarySha256: 'deadbeef', force: true })).toBe(false)
+    expect(canReuseCoverageCache({ meta: { headSha: 'abc1234', dirty: true, summarySha256: 'deadbeef' }, headSha: 'abc1234', dirty: false, summaryExists: true, summarySha256: 'deadbeef' })).toBe(false)
+    expect(canReuseCoverageCache({ meta: null, headSha: '', dirty: false, summaryExists: true, summarySha256: 'deadbeef' })).toBe(false)
+  })
+
+  it('盘上 checks/lib/coverage-baseline.json 可解析且结构与豁免字段完备', () => {
+    const raw = JSON.parse(readFileSync(join(ROOT, 'checks/lib/coverage-baseline.json'), 'utf8')) as {
+      files?: Record<string, { statements?: number; branches?: number }>
+      exemptions?: Array<{ path?: string; reason?: string; removeWhen?: string }>
+    }
+    expect(raw.files && Object.keys(raw.files).length).toBeGreaterThan(100)
+    expect(Array.isArray(raw.exemptions)).toBe(true)
+    for (const ex of raw.exemptions ?? []) {
+      expect(Boolean(ex.path && ex.reason && ex.removeWhen)).toBe(true)
+    }
   })
 })

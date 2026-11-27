@@ -21,6 +21,36 @@
 export const NEW_FILE_FLOOR = { statements: 80, branches: 70 }
 export const HOLE_FLOOR = 50
 
+/**
+ * 计算 Vitest 覆盖率运行的安全并发上限（BUG-406）：
+ * - 显式传入合法正整数（命令行 `--maxWorkers` 或环境变量 `VITEST_MAX_WORKERS`）时直接采用；
+ * - 否则默认取 `clamp(floor(cpuCount / 2), 2, 4)`，避免全核打满导致同机卡顿与超时假红。
+ * @param {number} cpuCount
+ * @param {number | string | undefined} [explicit]
+ * @returns {number}
+ */
+export function resolveCoverageWorkers(cpuCount, explicit) {
+  const parsed = typeof explicit === 'number' ? explicit : Number(explicit)
+  if (Number.isInteger(parsed) && parsed > 0) return parsed
+  const safeCpus = Number.isFinite(cpuCount) && cpuCount > 0 ? Math.floor(cpuCount) : 4
+  return Math.min(4, Math.max(2, Math.floor(safeCpus / 2)))
+}
+
+/**
+ * 同 `HEAD` 干净工作树覆盖率缓存复用判据（BUG-406）：
+ * 仅当未传 `--force`、摘要文件存在、当前工作树完全干净、`HEAD` 与缓存元数据的 `headSha` 精确一致、
+ * 且盘上 `coverage-summary.json` 的 sha256 与元数据记录的 `summarySha256` 一致时允许复用。
+ * 任何未提交改动（`dirty === true`）或摘要被脏树运行覆写后一律拒绝复用，杜绝缓存假绿。
+ * @param {{ meta?: { headSha?: string, dirty?: boolean, summarySha256?: string } | null, headSha: string, dirty: boolean, summaryExists: boolean, summarySha256?: string, force?: boolean }} input
+ * @returns {boolean}
+ */
+export function canReuseCoverageCache({ meta, headSha, dirty, summaryExists, summarySha256, force = false }) {
+  if (force || !summaryExists || dirty || typeof headSha !== 'string' || headSha === '') return false
+  if (meta?.dirty !== false || meta?.headSha !== headSha) return false
+  if (typeof meta?.summarySha256 !== 'string' || meta.summarySha256 === '') return false
+  return summarySha256 === meta.summarySha256
+}
+
 /** coverage-summary.json 的绝对路径键 → 仓库相对路径；跳过 total。 */
 export function indexCoverage(summary, root) {
   const files = {}

@@ -55,10 +55,14 @@ export function consumerCount(root, assets) {
   const texts = files.map(file => {
     try { return readFileSync(join(root, file), 'utf8') } catch { return '' }
   })
+  // 快速短路索引（BUG-406）：所有 needle 均含大小写不敏感的资产名子串，先做 O(1) 子串排除，
+  // 避免 96 资产 × 6 正则 × 数百文件的全量正则扫描（语义 100% 等价）。
+  const lowerTexts = texts.map(text => text.toLowerCase())
   const counts = {}
   const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   for (const asset of assets) {
     const name = asset.name
+    const lowerName = name.toLowerCase()
     const laneConsumers = Array.isArray(asset.lanes) ? asset.lanes.length : 0
     // 精确 token：文件名/引号包围的名字；`probe.mjs` 不能命中 `team-xxx-probe.mjs`。
     const needles = [`${name}.e2e.mjs`, `${name}.entry.mjs`, `${name}.mjs`, `'${name}'`, `"${name}"`, `\`${name}\``]
@@ -66,6 +70,7 @@ export function consumerCount(root, assets) {
     const refConsumers = files.reduce((sum, file, index) => {
       // 资产自己的文件不是自己的消费者（smoke 的 .e2e/.entry、probe 的 .mjs 都算）。
       if (basename(file).startsWith(`${asset.name}.`)) return sum
+      if (!lowerTexts[index].includes(lowerName)) return sum
       return sum + (patterns.some(pattern => pattern.test(texts[index])) ? 1 : 0)
     }, 0)
     counts[asset.name] = laneConsumers + refConsumers

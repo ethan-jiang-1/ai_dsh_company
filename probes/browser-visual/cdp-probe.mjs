@@ -202,18 +202,28 @@ try {
   // 主动导航（两段式——实测教训：冷 profile 直接带 token URL，303 换 cookie 链会丢状态、
   // 页面停在 "authentication required"；先到 origin 建立上下文再带 token 进，完整挂载）。
   // console 捕获从起手就位（加载期问题不漏）。
+  /** 条件轮询替代固定长 sleep（BUG-406）。 */
+  const waitForCondition = async (expr, timeoutMs, intervalMs = 100) => {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+      if (await evaluate(expr).catch(() => false) === true) return true;
+      await sleep(intervalMs);
+    }
+    return await evaluate(expr).catch(() => false) === true;
+  };
+
   if (attachPort === undefined) {
     const origin = new URL(guiUrl).origin;
     await evaluate(`location.href = ${JSON.stringify(origin)}`).catch(() => {});
-    await new Promise((resolve) => { setTimeout(resolve, 2000) });
+    await waitForCondition(`location.origin === ${JSON.stringify(origin)} && document.readyState === 'complete'`, 2000, 120);
     await evaluate(`location.href = ${JSON.stringify(guiUrl)}`).catch(() => {});
   }
   // composer：第一挂载信号（data-composer-input 是本仓 composer 的稳定标记）
-  let composerReady = false;
-  for (let i = 0; i < 40 && !composerReady; i++) {
-    composerReady = await evaluate(`document.querySelector('[data-composer-input][contenteditable="true"]') !== null`) === true;
-    if (!composerReady) await sleep(500);
-  }
+  const composerReady = await waitForCondition(
+    `document.querySelector('[data-composer-input][contenteditable="true"]') !== null`,
+    20_000,
+    200,
+  );
   verdict.composerReady = composerReady;
 
   // 未登录/未配凭据的 home 会停在 onboarding（add API key / sign in）——那是**环境未就绪**，
@@ -255,7 +265,9 @@ try {
   const getStarted = attachPort === undefined ? await closeGetStarted() : 'skipped-attach';
   verdict.getStarted = getStarted;
   if (getStarted === 'dismissed') verdict.modalsDismissed.push('Get started');
-  if (verdict.modalsDismissed.length > 0) await sleep(1000);
+  if (verdict.modalsDismissed.length > 0) {
+    await waitForCondition(`document.querySelector('[role="dialog"]') === null`, 1000, 100);
+  }
 
   // 品牌（AppFrame 主标题，DSH_CLIENT_TITLE 构建期注入）
   verdict.brandPresent = await evaluate(
@@ -266,6 +278,13 @@ try {
    * 否则走 Start-chip → guide 入口（默认断言面的既有路径）。
    * @returns {'tab'|'guide'|'absent'}
    */
+  const tabVisibleExpr = (title) => `(() => {
+    const nodes = [...document.querySelectorAll(${JSON.stringify(`[data-company-tab-title="${title}"]`)})];
+    return nodes.some(el => {
+      const rect = el.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    });
+  })()`;
   const openCompanyTab = async (title, { direct = true } = {}) => {
     if (direct) {
       const onTabBar = await evaluate(`(() => {
@@ -274,7 +293,11 @@ try {
         tab.click();
         return true;
       })()`) === true;
-      if (onTabBar) { await sleep(400); return 'tab'; }
+      if (onTabBar) {
+        // 判可见而非仅判节点存在（盲审 B5）：dock 保留后台子树，隐藏节点早已存在于 DOM 中。
+        await waitForCondition(tabVisibleExpr(title), 800, 60);
+        return 'tab';
+      }
     }
     await evaluate(`(() => {
       const back = [...document.querySelectorAll('[data-dockkit-tab]')].find(t => /start|开始/i.test(t.textContent ?? ''));
@@ -282,14 +305,16 @@ try {
       const add = document.querySelector('[data-dockkit-add-tab]');
       if (add !== null) add.click();
     })()`);
-    await sleep(400);
+    await waitForCondition(`document.querySelector('.wk-guide-entry-label') !== null`, 800, 50);
     const clicked = await evaluate(`(() => {
       const entry = [...document.querySelectorAll('.wk-guide-entry-label')].find(e => (e.textContent ?? '').includes(${JSON.stringify(title)}));
       if (entry === undefined) return false;
       entry.click();
       return true;
     })()`) === true;
-    if (clicked) await sleep(400);
+    if (clicked) {
+      await waitForCondition(tabVisibleExpr(title), 1000, 60);
+    }
     return clicked ? 'guide' : 'absent';
   };
   /**
@@ -310,21 +335,22 @@ try {
     const btn = [...document.querySelectorAll('button')].find(b => /Open right sidebar|打开右侧边栏/.test(b.getAttribute('aria-label') ?? ''));
     if (btn !== undefined) btn.click();
   })()`);
-  await sleep(800);
+  await waitForCondition(`document.querySelectorAll('.wk-guide-entry-label').length > 0`, 1500, 100);
   verdict.guideLabels = await evaluate(
     `Array.from(document.querySelectorAll('.wk-guide-entry-label')).map(e => e.textContent)`) ?? [];
   const missingGuides = tabs.filter(tab => !verdict.guideLabels.some(label => (label ?? '').includes(tab.title)));
   if (missingGuides.length > 0) {
     verdict.tabFailures.push(`guide 缺失：${missingGuides.map(tab => tab.title).join('、')}`);
   }
-  // ⚠ 驱动的 evaluate 不 await Promise——时序由场景侧 sleep 控制，页面动作用同步 IIFE。
+  // ⚠ 驱动的 evaluate 不 await Promise——时序由场景侧条件轮询控制，页面动作用同步 IIFE。
   for (const tab of tabs) {
     const clicked = (await openCompanyTab(tab.title, { direct: false })) === 'guide';
     // title 是面板外框自己拿到的显示名，不受 contentId/kind 语义影响；每个 catalog 条目唯一。
     const probeBody = () => readCompanyTab(tab.title);
     let rendered = await probeBody();
-    for (let i = 0; i < 6 && !(rendered?.present === true && rendered?.visible === true && rendered?.textLength > 0); i++) {
-      await sleep(500);
+    const bodyDeadline = Date.now() + 3000;
+    while (Date.now() < bodyDeadline && !(rendered?.present === true && rendered?.visible === true && rendered?.textLength > 0)) {
+      await sleep(100);
       rendered = await probeBody();
     }
     // --texts 是金样的输入：等面板文本稳定（连续两次归一化相同且不含 loading 占位）再录。
@@ -333,8 +359,8 @@ try {
     if (clicked && rendered?.present === true && rendered?.visible === true && rendered?.textLength > 0 && captureTexts) {
       settled = false;
       let previous = normalizedText(rendered.text);
-      for (let i = 0; i < 8; i++) {
-        await sleep(300);
+      for (let i = 0; i < 12; i++) {
+        await sleep(150);
         const next = await probeBody();
         if (next?.present === true && next?.visible === true) rendered = next;
         const current = normalizedText(next?.text);

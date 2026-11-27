@@ -10,7 +10,8 @@ import {
 import { parseGfmAst } from '../../../tools/lib/core/repo-markdown.mjs'
 import { makeDocDetailed } from '../../support/doc-grammar'
 
-const CASES = Number(process.env.MARKDOWN_SHAPE_CASES ?? 500)
+// 日常 keyless 回归轻量抽样（60 例覆盖全语法轴与历史回归 seed=0/1/3）；全量 1000 例由 weekly generative.e2e.mjs 跑（BUG-406）。
+const CASES = Number(process.env.MARKDOWN_SHAPE_CASES ?? 60)
 
 interface MdastNode {
   readonly type: string

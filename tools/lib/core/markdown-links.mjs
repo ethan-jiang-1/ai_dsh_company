@@ -79,7 +79,19 @@ export function sourceMarkdownFiles(root) {
   return [...files.values()].sort()
 }
 
-export const parseMarkdownAst = (source) => fromMarkdown(source, { extensions: [gfm()], mdastExtensions: [gfmFromMarkdown()] })
+// 进程内有界 AST 缓存（BUG-406）：返回只读 mdast 树，调用方不得就地修改节点；
+// run-gates 下 75 道门与多份 spec 对同一批 Markdown 文本反复调用 parseMarkdownAst，缓存消除 4–6 倍重复 GFM 解析开销。
+const MAX_AST_CACHE_ENTRIES = 2048
+const astCache = new Map()
+export const parseMarkdownAst = (source, maxEntries = MAX_AST_CACHE_ENTRIES) => {
+  if (maxEntries <= 0) return fromMarkdown(source, { extensions: [gfm()], mdastExtensions: [gfmFromMarkdown()] })
+  const cached = astCache.get(source)
+  if (cached !== undefined) return cached
+  const tree = fromMarkdown(source, { extensions: [gfm()], mdastExtensions: [gfmFromMarkdown()] })
+  if (astCache.size >= maxEntries) astCache.clear()
+  astCache.set(source, tree)
+  return tree
+}
 const parse = parseMarkdownAst
 const visit = (node, fn) => { fn(node); for (const child of node.children ?? []) visit(child, fn) }
 

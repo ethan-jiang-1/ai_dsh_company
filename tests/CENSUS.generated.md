@@ -70,7 +70,7 @@
 | attention-e2e | model | 手动（真模型 + 多用户并发 lane，人工在场时跑） | 模型可见文本 | example | 1 |
 | human-loop-e2e | model | 手动（真模型 + 真浏览器 ~$1–2，人工在场时跑） | 模型可见文本 | example | 1 |
 | entry-probe | model | 手动（真模型认证档；入口链文档改动后手动跑） | 文档指针 | example | 0 |
-| generative | classic | weekly | 文档指针 | generator | 2 |
+| generative | classic | weekly | 文档指针 | generator | 4 |
 
 ## 探针（调试面，不进自动 lane）
 
@@ -80,7 +80,7 @@
 | diagnose-probe | analyze | 会话持久化 | example | 0 |
 | explore-evidence-probe | analyze | 会话持久化 | example | 1 |
 | notes-audit-probe | analyze | 文档指针 | example | 0 |
-| orient-probe | analyze | 会话持久化 | example | 1 |
+| orient-probe | analyze | 会话持久化 | example | 3 |
 | propose-sampler-probe | analyze | 模型可见文本 | example | 0 |
 | session-log-export-probe | analyze | 会话持久化 | example | 0 |
 | attention-panel-probe | browser-visual | client UI | example | 0 |

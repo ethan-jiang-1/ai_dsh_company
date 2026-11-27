@@ -160,6 +160,23 @@ function lineOf(sf, node) {
   return { line: line + 1, col: character + 1 }
 }
 
+// 只读第三方/标准库 .d.ts 的进程级 SourceFile 缓存（BUG-406）：
+// createVirtualProgram 与双 tsconfig 的 loadTsProgram 共享 lib.*.d.ts / node_modules/**/*.d.ts AST，
+// 避免每条单测与双面扫描重复解析数十万行标准库声明；项目自身源码仍每次实时读取。
+const READONLY_LIB_SF_CACHE = new Map()
+const isReadonlyLibDecl = (fileName) => fileName.endsWith('.d.ts') && toPosix(fileName).includes('/node_modules/')
+
+function cachedLibSourceFile(defaultHost, fileName, lang, onError, shouldCreate) {
+  if (!isReadonlyLibDecl(fileName)) return defaultHost.getSourceFile(fileName, lang, onError, shouldCreate)
+  // TS 5.x/6.x 传给 host.getSourceFile 的第二参为 CreateSourceFileOptions 对象（也可能为 ScriptTarget 数字）；
+  // JSON.stringify 跳过函数字段并精确序列化全部标量维度，避免 String(lang) 恒为 "[object Object]"（盲审 B3）。
+  const key = `${JSON.stringify(lang)}:${resolve(fileName)}`
+  if (READONLY_LIB_SF_CACHE.has(key)) return READONLY_LIB_SF_CACHE.get(key)
+  const sf = defaultHost.getSourceFile(fileName, lang, onError, shouldCreate)
+  if (sf !== undefined) READONLY_LIB_SF_CACHE.set(key, sf)
+  return sf
+}
+
 /** Parse tsconfig and throw loudly on errors so broken configs cannot silently pass empty audits. */
 export function loadTsProgram(tsconfigPath) {
   const absConfig = resolve(tsconfigPath)
@@ -172,9 +189,17 @@ export function loadTsProgram(tsconfigPath) {
     const msg = parsed.errors.map(e => ts.flattenDiagnosticMessageText(e.messageText, '\n')).join('; ')
     throw new Error(`tsconfig parse failed (${absConfig}): ${msg}`)
   }
+  const options = { ...parsed.options, noEmit: true, skipLibCheck: true, skipDefaultLibCheck: true }
+  const defaultHost = ts.createCompilerHost(options)
+  const host = {
+    ...defaultHost,
+    getSourceFile: (fileName, lang, onError, shouldCreate) =>
+      cachedLibSourceFile(defaultHost, fileName, lang, onError, shouldCreate),
+  }
   return ts.createProgram({
     rootNames: parsed.fileNames,
-    options: { ...parsed.options, noEmit: true, skipLibCheck: true, skipDefaultLibCheck: true },
+    options,
+    host,
   })
 }
 
@@ -187,6 +212,8 @@ export function createVirtualProgram(filesMap, compilerOptions = {}) {
     strict: true,
     jsx: ts.JsxEmit.ReactJSX,
     noEmit: true,
+    skipLibCheck: true,
+    skipDefaultLibCheck: true,
     ...compilerOptions,
   }
   const defaultHost = ts.createCompilerHost(options)
@@ -199,7 +226,7 @@ export function createVirtualProgram(filesMap, compilerOptions = {}) {
     getSourceFile: (fileName, lang, onError, shouldCreate) => {
       const text = normFiles.get(resolve(fileName))
       if (text !== undefined) return ts.createSourceFile(fileName, text, lang, true)
-      return defaultHost.getSourceFile(fileName, lang, onError, shouldCreate)
+      return cachedLibSourceFile(defaultHost, fileName, lang, onError, shouldCreate)
     },
   }
   return ts.createProgram([...normFiles.keys()], options, host)

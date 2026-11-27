@@ -61,6 +61,23 @@ describe('company-static-audit · 实仓扫描与格式', () => {
   it('无效 tsconfig 路径立即抛错（fail-loud）', () => {
     expect(() => loadTsProgram('/tmp/nonexistent-company-pack-tsconfig.json')).toThrow(/tsconfig read failed/)
   })
+
+  it('同 compilerOptions 复用标准库 SourceFile，不同 compilerOptions 缓存键互不碰撞', () => {
+    const abs = resolve(ROOT, 'packages/company-pack/src/client/virtual-opt.ts')
+    const p1 = createVirtualProgram({ [abs]: 'export const x = 1\n' }, { target: 7 })
+    const p1b = createVirtualProgram({ [abs]: 'export const x = 11\n' }, { target: 7 })
+    const p2 = createVirtualProgram({ [abs]: 'export const x = 2\n' }, { target: 9 })
+    const lib1 = p1.getSourceFiles().find(sf => sf.fileName.endsWith('/lib.es5.d.ts'))
+    const lib1b = p1b.getSourceFiles().find(sf => sf.fileName.endsWith('/lib.es5.d.ts'))
+    const lib2 = p2.getSourceFiles().find(sf => sf.fileName.endsWith('/lib.es5.d.ts'))
+    expect(lib1).toBeDefined()
+    expect(lib1b).toBe(lib1)
+    expect(lib2).toBeDefined()
+    expect(lib1).not.toBe(lib2)
+    expect(lib1?.languageVersion).toBe(7)
+    expect(lib2?.languageVersion).toBe(9)
+    expect(runStaticAudit(ROOT, { programs: [p1, p1b, p2] }).violations).toEqual([])
+  })
 })
 
 describe('R1 must-use-boundary · 负例与正例', () => {

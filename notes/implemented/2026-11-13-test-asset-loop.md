@@ -2,6 +2,8 @@
 
 状态：implemented（B/C/A 三件 2026-11-13 落地）
 
+> **部分取代**：第 6 项「`coverage:ratchet` 进 pre-push 无条件全量执行」已于 2026-11-27 被 [2026-11-27-prepush-fast-path-and-test-budget](./2026-11-27-prepush-fast-path-and-test-budget.md) 取代（全量覆盖率棘轮下沉至 `release:verify`、每周 CI 与手动 `pnpm coverage:ratchet`，pre-push 收敛为无条件 `verify` + 按出站改动面精准分派）。
+
 上游 = 用户 2026-11-13「按卡落地，静默自主、长期正确」；问题卡 = [test-asset-loop](../../_backlog/_archive/settled_issues/2026-11-13-test-asset-loop.md)；研究 = [dsh-test-strategy](../../_backlog/_archive/research/dsh-test-strategy/README.md)（缺口 D1/D5）。
 
 ## 决定

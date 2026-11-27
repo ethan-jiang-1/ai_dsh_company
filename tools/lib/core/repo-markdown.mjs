@@ -152,8 +152,8 @@ function stripInlineHtmlComments(rawLines, tree) {
   return out
 }
 
-/** 逐行返回结构视图（frontmatter、围栏/缩进代码块、块级 HTML 注释均为 `structural: false`）。 */
-export function structuralLines(text) {
+/** 内部共享解析视图（BUG-406）：一次 mdast 解析同时产出 structuralLines 与 AST，消除 headingSections 双解析。 */
+function parseStructuralView(text) {
   const normalized = normalizeMarkdown(text)
   const rawLines = normalized.split('\n')
   const fm = parseFrontmatter(normalized)
@@ -162,11 +162,17 @@ export function structuralLines(text) {
   const tree = parseMarkdownAst(maskedSource)
   markNonStructuralBlocks(tree, null, mask)
   const cleanedLines = stripInlineHtmlComments(rawLines, tree)
-  return rawLines.map((line, idx) => ({
+  const lines = rawLines.map((line, idx) => ({
     text: mask[idx] ? cleanedLines[idx] : line,
     lineNumber: idx + 1,
     structural: Boolean(mask[idx]),
   }))
+  return { lines, tree }
+}
+
+/** 逐行返回结构视图（frontmatter、围栏/缩进代码块、块级 HTML 注释均为 `structural: false`）。 */
+export function structuralLines(text) {
+  return parseStructuralView(text).lines
 }
 
 /**
@@ -175,8 +181,7 @@ export function structuralLines(text) {
  */
 export function headingSections(text, options = {}) {
   const { depth } = options
-  const lines = structuralLines(text)
-  const tree = parseGfmAst(text)
+  const { lines, tree } = parseStructuralView(text)
   const allHeadings = []
   for (const node of tree.children ?? []) {
     if (node.type !== 'heading' || !node.position) continue

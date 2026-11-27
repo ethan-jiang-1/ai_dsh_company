@@ -2,6 +2,8 @@
 
 状态：implemented（2026-11-18；BUG-212 部分修复后转入 suspended_bugs）
 
+> **部分取代**：第 2 项「pre-push 46s 预算挂起」及「输掉的方案：pre-push 去掉 coverage」已于 2026-11-27 随触发条件兑现被 [2026-11-27-prepush-fast-path-and-test-budget](./2026-11-27-prepush-fast-path-and-test-budget.md) 取代（pre-push 收敛为无条件 `verify` + 按面精准分派，`coverage:ratchet` 下沉至 `release:verify`、每周 CI 与手动执行）。
+
 ## 决定
 
 1. **docs-only 收尾走 `release --check/--stamp` 的快速路径**（已修）：`release.mjs` 新增

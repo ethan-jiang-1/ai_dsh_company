@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { globToRegExp, matchesAny, selectSurfaces } from '../../tools/lib/core/asset-lanes.mjs'
+import { globToRegExp, matchesAny, planPrePush, selectSurfaces } from '../../tools/lib/core/asset-lanes.mjs'
 
 /**
  * lane 匹配是 pre-push 按面触发的唯一判据（数据 = tools/lib/core/asset-lanes.mjs 的 SURFACE_RULES）。
@@ -79,5 +79,95 @@ describe('lane 匹配纯逻辑（按面触发的判据）', () => {
     const { covered, unseen } = selectSurfaces(['src/x.ts'], [{ globs: ['src/**'], coveredBy: [], why: 'empty' }])
     expect(covered).toEqual([])
     expect(unseen).toEqual(['src/x.ts'])
+  })
+})
+
+describe('planPrePush 按改动面精准选步', () => {
+  it('docs-only 变更进入快速路径：不跑 tsc / lint / dup / vitest', () => {
+    const plan = planPrePush(['docs/testing.md', 'notes/implemented/x.md', '_backlog/bugs/BUG-406.md', 'CHANGELOG.md'])
+    expect(plan).toEqual({ docsOnly: true, steps: [], relatedFiles: [], targetedSpecs: [] })
+  })
+
+  it('src/host 与包入口改动触发 typecheck + lint + dup + smoke:fast + vitest related（包入口补 pack-exports）', () => {
+    const plan = planPrePush(['packages/company-pack/src/index.ts', 'packages/company-pack/src/host/ledger/catalog.ts'])
+    expect(plan.docsOnly).toBe(false)
+    expect(plan.steps).toEqual(['typecheck', 'lint', 'dup', 'smoke:fast', 'test:spec'])
+    expect(plan.relatedFiles).toEqual(['packages/company-pack/src/index.ts', 'packages/company-pack/src/host/ledger/catalog.ts'])
+    expect(plan.targetedSpecs).toContain('tests/repo/pack/pack-exports.spec.ts')
+  })
+
+  it('presets / content / locale / pack 元数据各命中对应窄集', () => {
+    expect(planPrePush(['packages/company-pack/presets/ceo/persona.md']).targetedSpecs).toEqual(['tests/presets'])
+    const content = planPrePush(['packages/company-pack/content/AGENTS.md'])
+    expect(content.steps).toContain('test:checks')
+    expect(content.targetedSpecs).toEqual([
+      'tests/content',
+      'tests/host/prompt/handbook.spec.ts',
+      'tests/host/run-bundle/bootstrap-content.spec.ts',
+    ])
+    expect(planPrePush(['packages/company-pack/locale/zh.json']).targetedSpecs).toEqual(['tests/client/i18n'])
+    const meta = planPrePush(['packages/company-pack/package.json'])
+    expect(meta.steps).toEqual(['typecheck', 'test:spec'])
+    expect(meta.targetedSpecs).toEqual(['tests/repo/pack', 'tests/repo/release'])
+  })
+
+  it('tests / fixtures / checks / tools / probes / lint 配置 / 根配置各自命中最小必要步骤', () => {
+    expect(planPrePush(['tests/checks/fix-evidence.test.mjs']).steps).toEqual(['test:checks'])
+    const specPlan = planPrePush(['tests/tools/lane-match.spec.ts'])
+    expect(specPlan.steps).toEqual(['typecheck', 'lint', 'test:spec'])
+    expect(specPlan.targetedSpecs).toEqual(['tests/tools/lane-match.spec.ts'])
+    expect(planPrePush(['tests/support/doc-grammar.ts']).relatedFiles).toEqual(['tests/support/doc-grammar.ts'])
+
+    // 盲审 B1(R2)：tests/fixtures 里的 5 组实盘夹具定向映射到真实读取它们的消费者 spec。
+    const mdFixture = planPrePush(['tests/fixtures/companies/acme-hardware-software/identity.md'])
+    expect(mdFixture.docsOnly).toBe(false)
+    expect(mdFixture.targetedSpecs).toEqual([
+      'tests/repo/budget/fixture-provenance.spec.ts',
+      'tests/host/run-bundle/company-fixture.spec.ts',
+      'tests/host/run-bundle/bootstrap.spec.ts',
+      'tests/client/ui/brand.spec.ts',
+      'tests/presets/product-type-coverage.spec.ts',
+    ])
+    expect(planPrePush(['tests/fixtures/catalog.contract.json']).targetedSpecs).toEqual([
+      'tests/repo/budget/fixture-provenance.spec.ts',
+      'tests/client/data/catalog-contract.spec.ts',
+    ])
+    expect(planPrePush(['tests/fixtures/deliverables-r1/workspace.expected/deliverables/kb-rag-assessment.md']).targetedSpecs).toEqual([
+      'tests/repo/budget/fixture-provenance.spec.ts',
+      'tests/tools/deliverables-audit.spec.ts',
+    ])
+    expect(planPrePush(['tests/fixtures/methods/ceo/SKILL.md']).targetedSpecs).toEqual([
+      'tests/repo/budget/fixture-provenance.spec.ts',
+      'tests/tools/quality-loop.spec.ts',
+    ])
+    expect(planPrePush(['tests/fixtures/bundle-manifest-v1.json']).targetedSpecs).toEqual([
+      'tests/repo/budget/fixture-provenance.spec.ts',
+      'tests/host/run-bundle/bundle-manifest.spec.ts',
+    ])
+    expect(planPrePush(['tests/fixtures/future-new/sample.txt']).targetedSpecs).toContain('tests/host/run-bundle')
+    expect(planPrePush(['tests/fixtures/README.md']).docsOnly).toBe(true)
+    expect(planPrePush(['tests/support/bug-coverage-baseline.json']).targetedSpecs).toEqual(['tests/repo/budget/bug-coverage.spec.ts'])
+
+    const toolsLib = planPrePush(['tools/lib/core/asset-lanes.mjs'])
+    expect(toolsLib.steps).toEqual(['lint', 'dup', 'smoke:fast', 'test:checks', 'test:spec'])
+    expect(toolsLib.relatedFiles).toEqual(['tools/lib/core/asset-lanes.mjs'])
+    expect(toolsLib.targetedSpecs).toContain('tests/repo/structure/entry-import-graph.spec.ts')
+
+    const baselineJson = planPrePush(['checks/lib/coverage-baseline.json'])
+    expect(baselineJson.targetedSpecs).toContain('tests/tools/coverage-baseline.spec.ts')
+    expect(planPrePush(['tools/lib/core/compat-tags.json']).targetedSpecs).toContain('tests/tools')
+
+    const prepushScript = planPrePush(['checks/pre-push-surfaces.mjs'])
+    expect(prepushScript.targetedSpecs).toContain('tests/repo/structure/entry-import-graph.spec.ts')
+    expect(prepushScript.targetedSpecs).toContain('tests/repo/budget/asset-lanes.spec.ts')
+
+    const probePlan = planPrePush(['probes/lib/x.mjs', 'probes/analyze/orient-probe.mjs'])
+    expect(probePlan.relatedFiles).toEqual(['probes/lib/x.mjs'])
+    expect(probePlan.targetedSpecs).toEqual(['tests/repo/structure/entry-import-graph.spec.ts'])
+
+    expect(planPrePush(['.oxlintrc.json']).steps).toEqual(['lint', 'dup'])
+    const rootCfg = planPrePush(['vitest.config.ts'])
+    expect(rootCfg.steps).toEqual(['typecheck', 'test:spec'])
+    expect(rootCfg.targetedSpecs).toEqual(['tests/repo'])
   })
 })

@@ -29,7 +29,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, posix, resolve } from 'node:path'
-import { assetByName, selectSurfaces, suffixOf } from '../tools/lib/core/asset-lanes.mjs'
+import { assetByName, planPrePush, selectSurfaces, suffixOf } from '../tools/lib/core/asset-lanes.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const argv = process.argv.slice(2)
@@ -41,6 +41,7 @@ const valueOf = flag => {
 const rootFlag = valueOf('--root')
 const root = rootFlag === undefined ? resolve(here, '..') : resolve(process.cwd(), rootFlag)
 const dryRun = has('--dry-run')
+const execPlan = has('--exec-plan')
 
 const git = args => {
   const result = spawnSync('git', args, { cwd: root, encoding: 'utf8' })
@@ -123,11 +124,11 @@ function changedPaths() {
   return [...paths]
 }
 
-const { assets, matches, covered, unseen } = selectSurfaces(
-  valueOf('--paths') === undefined
-    ? changedPaths()
-    : (valueOf('--paths') ?? '').split(',').map(normalizePath).filter(Boolean),
-)
+const targetPaths = valueOf('--paths') === undefined
+  ? changedPaths()
+  : (valueOf('--paths') ?? '').split(',').map(normalizePath).filter(Boolean)
+const { assets, matches, covered, unseen } = selectSurfaces(targetPaths)
+const plan = execPlan ? planPrePush(targetPaths) : null
 
 const coveredByRule = new Map()
 for (const entry of covered) {
@@ -138,17 +139,10 @@ for (const entry of covered) {
 for (const entry of coveredByRule.values()) {
   const extra = entry.count > 1 ? `（另有 ${String(entry.count - 1)} 个同面文件）` : ''
   const rule = entry.why ? `；${entry.why}` : ''
-  console.log(`pre-push surfaces: 改了 ${entry.path}${extra}（命中 ${entry.glob}${rule}）→ 无额外 lane；证据 = 无条件 ${entry.coveredBy.join(' + ')}`)
+  console.log(`pre-push surfaces: 改了 ${entry.path}${extra}（命中 ${entry.glob}${rule}）→ 无额外 lane；证据 = ${entry.coveredBy.join(' + ')}`)
 }
 if (unseen.length > 0) {
   console.log(`pre-push surfaces: 未分类改动面（既没有 surface 规则，也没有 coveredBy 申报）——登记 SURFACE_RULES（asset 或 coveredBy）后才许通过：${unseen.join('、')}`)
-}
-
-if (assets.length === 0) {
-  console.log(covered.length > 0
-    ? 'pre-push surfaces: 本次没有额外真入口（命中面由无条件步骤覆盖，见上）'
-    : 'pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/core/asset-lanes.mjs SURFACE_RULES）')
-  process.exit(unseen.length > 0 ? 1 : 0)
 }
 
 const matchesByAsset = new Map()
@@ -164,31 +158,114 @@ for (const name of assets) {
   const rule = first.why ? `；${first.why}` : ''
   console.log(`pre-push surfaces: 因为改了 ${first.path}${extra}（命中 ${first.glob}${rule}）→ ${name}`)
 }
+
+if (plan !== null) {
+  if (plan.docsOnly && assets.length === 0 && unseen.length === 0) {
+    console.log('pre-push plan: docs-only 快速路径（仅无条件 verify；跳过 typecheck / lint / dup / vitest）')
+  } else {
+    const summary = [
+      `steps=[${plan.steps.join(', ') || 'none'}]`,
+      `related=${String(plan.relatedFiles.length)}`,
+      `targeted=${String(plan.targetedSpecs.length)}`,
+      `assets=[${assets.join(', ') || 'none'}]`,
+    ].join(' ')
+    console.log(`pre-push plan: ${summary}`)
+  }
+}
+
+if (!execPlan && assets.length === 0) {
+  console.log(covered.length > 0
+    ? 'pre-push surfaces: 本次没有额外真入口（命中面由既定步骤覆盖，见上）'
+    : 'pre-push surfaces: 本次未触发面级检查（规则表 = tools/lib/core/asset-lanes.mjs SURFACE_RULES）')
+  process.exit(unseen.length > 0 ? 1 : 0)
+}
+
+function resolveVitestTargets(plan) {
+  const existingRelated = plan.relatedFiles.filter(rel => existsSync(join(root, rel)))
+  const deletedRelated = plan.relatedFiles.filter(rel => !existsSync(join(root, rel)))
+  const existingTargeted = new Set(plan.targetedSpecs.filter(rel => existsSync(join(root, rel))))
+  // 盲审 B2：删除源码/lib 文件时不能因 existsSync 过滤而静默跳过全部 Vitest。
+  if (deletedRelated.length > 0) {
+    existingTargeted.add('tests/repo/structure/entry-import-graph.spec.ts')
+    if (deletedRelated.some(rel => rel.startsWith('packages/company-pack/src/'))) {
+      existingTargeted.add('tests/repo/pack/pack-exports.spec.ts')
+    }
+  }
+  if (plan.steps.includes('test:spec') && existingRelated.length === 0 && existingTargeted.size === 0) {
+    existingTargeted.add('tests/repo/structure/entry-import-graph.spec.ts')
+  }
+  return { existingRelated, deletedRelated, existingTargeted: [...existingTargeted] }
+}
+
 if (dryRun) {
-  console.log(`pre-push surfaces: --dry-run，应跑 ${assets.join('、')}`)
+  if (assets.length > 0) console.log(`pre-push surfaces: --dry-run，应跑 ${assets.join('、')}`)
+  if (plan !== null) {
+    const resolved = resolveVitestTargets(plan)
+    if (resolved.existingTargeted.length > 0) console.log(`pre-push plan: --dry-run targetedSpecs = ${resolved.existingTargeted.join('、')}`)
+    if (resolved.existingRelated.length > 0) console.log(`pre-push plan: --dry-run relatedFiles = ${resolved.existingRelated.join('、')}`)
+    if (resolved.deletedRelated.length > 0) console.log(`pre-push plan: --dry-run deletedFallback = ${resolved.deletedRelated.join('、')}`)
+  }
   process.exit(unseen.length > 0 ? 1 : 0)
 }
 
 const failures = []
 const started = Date.now()
-for (const name of assets) {
-  const asset = assetByName(name)
-  if (!asset) {
-    failures.push(`${name}（规则引用了未登记资产）`)
-    console.log(`pre-push surfaces FAIL ${name} — 规则引用了未登记资产`)
-    continue
-  }
-  const file = join(here, 'lanes', `${name}.${suffixOf(name)}.mjs`)
-  if (!existsSync(file)) {
-    failures.push(`${name}（盘上没有）`)
-    console.log(`pre-push surfaces FAIL ${name} — 文件不存在：${file}`)
-    continue
-  }
+
+function runStep(label, command, cmdArgs, timeout = 300_000) {
   const t0 = Date.now()
-  const result = spawnSync(process.execPath, [...asset.nodeArgs, file], { stdio: 'inherit', timeout: 300_000 })
+  const result = spawnSync(command, cmdArgs, { cwd: root, stdio: 'inherit', timeout })
   const elapsed = ((Date.now() - t0) / 1000).toFixed(2)
-  console.log(`pre-push surfaces ${result.status === 0 ? 'PASS' : 'FAIL'} ${name} (${elapsed}s)`)
-  if (result.status !== 0) failures.push(`${name}（exit=${String(result.status)}）`)
+  const ok = result.status === 0
+  console.log(`pre-push ${ok ? 'PASS' : 'FAIL'} ${label} (${elapsed}s)`)
+  if (!ok) failures.push(`${label}（exit=${String(result.status)}）`)
+  return ok
+}
+
+if (plan !== null) {
+  for (const step of plan.steps) {
+    if (step === 'typecheck') {
+      runStep('typecheck', 'pnpm', ['-s', 'typecheck'])
+    } else if (step === 'lint') {
+      runStep('lint', 'pnpm', ['-s', 'lint'])
+    } else if (step === 'dup') {
+      runStep('dup', 'pnpm', ['-s', 'dup'])
+    } else if (step === 'smoke:fast') {
+      runStep('smoke:fast', 'pnpm', ['-s', 'smoke:fast'])
+    } else if (step === 'test:checks') {
+      runStep('test:checks', 'pnpm', ['-s', 'test:checks'])
+    } else if (step === 'test:spec') {
+      const { existingRelated, existingTargeted } = resolveVitestTargets(plan)
+      if (existingRelated.length > 0) {
+        runStep(`vitest related (${String(existingRelated.length)} files)`, 'pnpm', ['-s', 'exec', 'vitest', 'related', '--run', '--passWithNoTests', ...existingRelated])
+      }
+      if (existingTargeted.length > 0 && failures.length === 0) {
+        runStep(`vitest targeted (${String(existingTargeted.length)} targets)`, 'pnpm', ['-s', 'exec', 'vitest', 'run', ...existingTargeted])
+      }
+    }
+    if (failures.length > 0) break
+  }
+}
+
+if (failures.length === 0) {
+  for (const name of assets) {
+    const asset = assetByName(name)
+    if (!asset) {
+      failures.push(`${name}（规则引用了未登记资产）`)
+      console.log(`pre-push surfaces FAIL ${name} — 规则引用了未登记资产`)
+      continue
+    }
+    const file = join(here, 'lanes', `${name}.${suffixOf(name)}.mjs`)
+    if (!existsSync(file)) {
+      failures.push(`${name}（盘上没有）`)
+      console.log(`pre-push surfaces FAIL ${name} — 文件不存在：${file}`)
+      continue
+    }
+    const t0 = Date.now()
+    const result = spawnSync(process.execPath, [...asset.nodeArgs, file], { cwd: root, stdio: 'inherit', timeout: 300_000 })
+    const elapsed = ((Date.now() - t0) / 1000).toFixed(2)
+    console.log(`pre-push surfaces ${result.status === 0 ? 'PASS' : 'FAIL'} ${name} (${elapsed}s)`)
+    if (result.status !== 0) failures.push(`${name}（exit=${String(result.status)}）`)
+  }
 }
 
 const total = ((Date.now() - started) / 1000).toFixed(2)
@@ -198,5 +275,8 @@ if (failures.length > 0 || unseen.length > 0) {
   console.error('  这些检查是改动面的完成定义，不是可选建议；`git push --no-verify` 逃生后要在收尾 Note 写原因。')
   process.exitCode = 1
 } else {
-  console.log(`pre-push surfaces: ALL PASS（${String(assets.length)} 条，${total}s）`)
+  const countText = plan !== null
+    ? `${String(plan.steps.length)} scoped + ${String(assets.length)} surface`
+    : `${String(assets.length)} 条`
+  console.log(`pre-push surfaces: ALL PASS（${countText}，${total}s）`)
 }

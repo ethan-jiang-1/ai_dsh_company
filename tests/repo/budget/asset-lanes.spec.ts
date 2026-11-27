@@ -1,13 +1,14 @@
 // 负例留证 2026-11-16：删掉 SURFACE_RULES 的 `src/lib/** → replay` 规则 → 「每个改动面都有证据（BUG-186）」与「src/lib 搬移会触发 replay」红，dry-run 退回「未分类」；还原 → 绿。
 // 负例留证 2026-11-16（二轮）：删掉 `packages/company-pack/locale/**` 规则 → 「全 tracked 代表路径都有证据（BUG-192）」红，verify 的 surface-coverage 也红；还原 → 绿。
-// 负例留证 2026-11-16（二轮）：把 UNCONDITIONAL_STEPS 的 coverage:ratchet 改回 coverage-ratchet → 「每个无条件步骤都是可直接复跑的 pnpm 脚本（BUG-200）」红；还原 → 绿。
+// 负例留证 2026-11-16（二轮）：把 SCOPED_STEPS 某项改成不存在的脚本名 → 「每个无条件与按面步骤都是可直接复跑的 pnpm 脚本（BUG-200）」红；还原 → 绿。
+// 负例留证 2026-11-27（BUG-406）：把 probes/** 在 planPrePush 的 entry-import-graph.spec.ts 去掉 → 「probes 面由真解析入口图的步骤覆盖」红；还原 → 绿。
 import { describe, expect, it } from 'vitest'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layout.mjs'
 import {
-  ASSETS, FAST, KINDS, LANES, SURFACE_RULES, UNCONDITIONAL_STEPS,
-  assetByName, selectSurfaces, selectWeeklyAssets, suffixOf,
+  ASSETS, FAST, KINDS, LANES, SCOPED_STEPS, SURFACE_RULES, UNCONDITIONAL_STEPS,
+  assetByName, planPrePush, selectSurfaces, selectWeeklyAssets, suffixOf,
 } from '../../../tools/lib/core/asset-lanes.mjs'
 
 /**
@@ -37,6 +38,8 @@ const SURFACE_SAMPLES = [
   '.agents/skills/close-out-definition/SKILL.md',
   '_backlog/bugs/README.md',
   'checks/pre-push-surfaces.mjs',
+  'checks/README.md',
+  'checks/lib/coverage-baseline.json',
   'docs/testing.md',
   'notes/implemented/README.md',
   'packages/company-pack/README.md',
@@ -44,12 +47,16 @@ const SURFACE_SAMPLES = [
   'packages/company-pack/content/AGENTS.md',
   'packages/company-pack/presets/ceo/persona.md',
   'packages/company-pack/src/client/index.ts',
+  'packages/company-pack/src/host/README.md',
   'packages/company-pack/src/host/run-bundle/runtime-guard.ts',
   'packages/company-pack/src/index.ts',
   'packages/company-pack/src/lib/presence/presence.ts',
   'probes/browser-visual/cdp-probe.mjs',
   'run/env.sh',
   'snapshots/README.md',
+  'tests/checks/fix-evidence.test.mjs',
+  'tests/fixtures/companies/acme-hardware-software/identity.md',
+  'tests/fixtures/catalog.contract.json',
   'tests/repo/budget/asset-lanes.spec.ts',
   'tools/lib/core/asset-lanes.mjs',
   'vitest.config.ts',
@@ -121,10 +128,14 @@ describe('资产 lane 注册表（空间完备）', () => {
     expect(selectSurfaces(['packages/company-pack/src/lib/presence/presence.ts']).assets).toEqual(['replay'])
   })
 
-  it('probes 面由真解析入口图的无条件步骤覆盖，不是只写 verify', () => {
-    const { covered } = selectSurfaces(['probes/analyze/orient-probe.mjs'])
+  it('probes 面由真解析入口图的步骤覆盖，不是只写 verify', () => {
+    const sample = 'probes/analyze/orient-probe.mjs'
+    const { covered } = selectSurfaces([sample])
     expect(covered, 'probes/** 没有 coveredBy 申报').toHaveLength(1)
-    expect(covered[0]?.coveredBy, 'coverage:ratchet 会跑 entry-import-graph.spec；verify 不加载探针').toContain('coverage:ratchet')
+    expect(covered[0]?.coveredBy, 'probes/** 须由按面 test:spec 跑 entry-import-graph.spec；verify 不加载探针').toContain('test:spec')
+    const plan = planPrePush([sample])
+    expect(plan.steps).toContain('test:spec')
+    expect(plan.targetedSpecs).toContain('tests/repo/structure/entry-import-graph.spec.ts')
   })
 
   it('全 tracked 代表路径都有证据（全集判据 = verify 的 surface-coverage 门禁，BUG-192）', () => {
@@ -159,34 +170,43 @@ describe('资产 lane 注册表（空间完备）', () => {
     expect(unclassified, '新顶层目录 / src 分组没有证据映射——先登记 SURFACE_RULES（assets 或 coveredBy+why）').toEqual([])
   })
 
-  it('coveredBy 只引用 hook 真跑的无条件步骤（申报一条不存在的步骤 = 假豁免）', () => {
+  it('coveredBy 只引用 hook 无条件步骤或 planPrePush 真实触发的按面步骤（申报不存在或未触发的步骤 = 假豁免）', () => {
     const hook = readFileSync(join(ROOT, '.githooks/pre-push'), 'utf8')
     const executed = hook.split('\n').filter(line => !/^\s*#/.test(line)).join('\n')
-    const command: Record<string, string> = {
+    const unconditionalCommands: Record<string, string> = {
       verify: 'node checks/run-gates.mjs',
-      typecheck: 'tsc -p tsconfig.test-harness.json',
-      lint: 'pnpm -s lint',
-      dup: 'pnpm -s dup',
-      'smoke:fast': 'pnpm -s smoke:fast',
-      'test:checks': 'pnpm -s test:checks',
-      'coverage:ratchet': 'node checks/audit/coverage-ratchet.mjs',
     }
-    // 词表与 hook 一一对应：不只查被引用的步骤，否则删掉 hook 里的 lint/dup 也不会红。
     for (const step of UNCONDITIONAL_STEPS) {
-      const expected = command[step]
+      const expected = unconditionalCommands[step]
       expect(expected, `UNCONDITIONAL_STEPS 里的「${step}」缺 hook 命令映射`).toBeTruthy()
       expect(executed, `「${step}」在 .githooks/pre-push 的可执行行里找不到——词表与 hook 已漂`).toContain(expected)
     }
+    expect(executed, '.githooks/pre-push 必须调用 pre-push-surfaces --exec-plan 执行按面计划').toContain('node checks/pre-push-surfaces.mjs --stdin "$refs_file" --exec-plan')
+    expect(executed, 'pre-push 热路径不再无条件全量跑 coverage-ratchet（BUG-406）').not.toContain('checks/audit/coverage-ratchet.mjs')
+
+    const validSteps = [...UNCONDITIONAL_STEPS, ...SCOPED_STEPS]
     for (const rule of SURFACE_RULES) {
       for (const step of rule.coveredBy ?? []) {
-        expect(UNCONDITIONAL_STEPS, `${rule.globs.join(',')} 的 coveredBy「${step}」不在词表`).toContain(step)
+        expect(validSteps, `${rule.globs.join(',')} 的 coveredBy「${step}」不在合法词表`).toContain(step)
+      }
+    }
+    // 真实触发核对：每个 SURFACE_SAMPLES 的 coveredBy 中的 SCOPED_STEPS 必须真被 planPrePush([sample]) 勾选。
+    for (const sample of SURFACE_SAMPLES) {
+      const { covered } = selectSurfaces([sample])
+      const planned = new Set(planPrePush([sample]).steps)
+      for (const entry of covered) {
+        for (const step of entry.coveredBy) {
+          if (UNCONDITIONAL_STEPS.includes(step)) continue
+          expect(planned.has(step), `${sample} 申报 coveredBy=${step}，但 planPrePush 未触发它`).toBe(true)
+        }
       }
     }
   })
 
-  it('每个无条件步骤都是可直接复跑的 pnpm 脚本（证据标签可执行，2026-11-16 二轮，BUG-200）', () => {
+  it('每个无条件与按面步骤都是可直接复跑的 pnpm 脚本（证据标签可执行，2026-11-16 二轮，BUG-200）', () => {
     const scripts = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).scripts ?? {}
-    const missing = UNCONDITIONAL_STEPS.filter(step => typeof scripts[step] !== 'string')
+    const allSteps = [...UNCONDITIONAL_STEPS, ...SCOPED_STEPS]
+    const missing = allSteps.filter(step => typeof scripts[step] !== 'string')
     expect(missing, 'pre-push 把 coveredBy 标签打印成「证据」；标签必须能直接跑（pnpm <label>），否则是假证据').toEqual([])
   })
 

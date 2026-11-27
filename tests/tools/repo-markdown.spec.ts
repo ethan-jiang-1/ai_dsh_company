@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { parseMarkdownAst } from '../../tools/lib/core/markdown-links.mjs'
 import {
   flattenCordisRows,
   headingSections,
@@ -161,5 +162,19 @@ describe('tools/lib/repo-markdown 单原语契约', () => {
     expect(splitGfmTableCells('| a | b\\|c |')).toEqual(['a', 'b|c'])
     expect(splitGfmTableCells('| a | b\\\\| c |')).toEqual(['a', 'b\\', 'c'])
     expect(splitGfmTableCells('| a | b\\|')).toEqual(['a', 'b|'])
+  })
+
+  it('parseMarkdownAst 同文复用缓存、maxEntries<=0 绕过且不落缓存、超限时清零重填', () => {
+    const first = parseMarkdownAst('# cache-hit-doc\n')
+    const second = parseMarkdownAst('# cache-hit-doc\n')
+    expect(second).toBe(first)
+    const bypassed = parseMarkdownAst('# cache-hit-doc\n', 0)
+    expect(bypassed).not.toBe(first)
+    expect(bypassed.type).toBe('root')
+    const uncachedBypass = parseMarkdownAst('# cache-never-stored\n', 0)
+    expect(parseMarkdownAst('# cache-never-stored\n')).not.toBe(uncachedBypass)
+    const afterEvict = parseMarkdownAst('# cache-evict-doc\n', 1)
+    expect(afterEvict.type).toBe('root')
+    expect(parseMarkdownAst('# cache-hit-doc\n')).not.toBe(first)
   })
 })

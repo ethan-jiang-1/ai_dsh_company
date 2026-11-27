@@ -1,5 +1,13 @@
+import { cpus } from 'node:os'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
+
+// 并发上限（BUG-406）：禁止默认按全核派生 OS 子进程打满本机 CPU 导致同机卡顿与超时假红。
+// 可通过 VITEST_MAX_WORKERS 或命令行 `--maxWorkers=N` 显式覆盖。
+const envMaxWorkers = Number(process.env.VITEST_MAX_WORKERS)
+const defaultMaxWorkers = Number.isInteger(envMaxWorkers) && envMaxWorkers > 0
+  ? envMaxWorkers
+  : Math.min(4, Math.max(2, Math.floor(cpus().length / 2)))
 
 // keyless 层（单元/集成）：`pnpm test`。
 // 源码面解析：经 tsconfig paths 把 @deepseek-ai/* 指到 vendor 的 src（DSH 纪律：
@@ -17,11 +25,13 @@ export default defineConfig({
   })],
   test: {
     include: ['tests/**/*.spec.ts'],
+    pool: 'threads',
+    maxWorkers: defaultMaxWorkers,
     testTimeout: 30_000,
     // coverage = **关键模块阈值档**（2026-11-03 Phase 4；原 2026-10-21 观察档升级）。
     // 只统计自写树——tsconfig paths 按设计把 @deepseek-ai/* 指向 vendor src，不收窄会把 vendor
     // 全树算进来淹没读数。全局不设阈值；下列高风险模块有下限，`pnpm test:coverage` 低于即红。
-    // `pnpm test` 仍不跑 coverage（秒级）；阈值是发布前/独立轮的手动棘轮，不塞进 pre-push。
+    // `pnpm test` 仍不跑 coverage（秒级）；全量覆盖率棘轮下沉至 `release:verify`、每周 CI 与手动 `pnpm coverage:ratchet`，不塞进 pre-push 热路径。
     coverage: {
       provider: 'v8',
       include: ['packages/company-pack/src/**/*.{ts,tsx}', 'tools/lib/**/*.mjs', 'checks/lib/*.mjs', 'probes/lib/*.mjs'],

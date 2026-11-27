@@ -333,29 +333,31 @@ export const ASSETS = [
 export const FAST = ['workflow-contract', 'present-catalog', 'company-root-process', 'snapshot-motion']
 
 /**
- * pre-push hook 每次都跑的无条件步骤（封闭词表；面规则可以据此声明「不需要额外 lane」）。
+ * pre-push hook 每次都跑的无条件步骤（封闭词表）。
  *
- * 为什么要有这张表：选择器对「没有规则命中」的改动面静默返回空集——「忘了登记新目录」与
- * 「有意不跑额外检查」长得一模一样（2026-11-15 三批搬移后 src/lib、tools 零命中，replay 的
- * 坏 import 因此活到手工跑才暴露，BUG-186）。把「由哪条无条件步骤覆盖」写成显式值，
- * `tests/repo/budget/asset-lanes.spec.ts` 才能机械检查「每个改动面都有证据」。
- * 词表与 `.githooks/pre-push` 一一对应（spec 读 hook 原文核对；改 hook 不改进表 = 红）。
+ * 2026-11-27（BUG-406）：热路径收敛为「verify 无条件 + 其余按出站改动面由 planPrePush 精准触发」，
+ * 全量覆盖率棘轮 `coverage:ratchet` 下沉至 `release:verify`、每周 CI 与手动执行，不再每次 push 重扫全量 305 份 spec。
+ * 词表（UNCONDITIONAL_STEPS + SCOPED_STEPS）与 `.githooks/pre-push` 及 `planPrePush` 机械核对（asset-lanes.spec）。
  */
-export const UNCONDITIONAL_STEPS = ['verify', 'typecheck', 'lint', 'dup', 'smoke:fast', 'test:checks', 'coverage:ratchet']
+export const UNCONDITIONAL_STEPS = ['verify']
+
+/** pre-push 按出站改动面精准触发的步骤（每项均须是根 package.json 可直接 `pnpm <step>` 复跑的脚本，BUG-200）。 */
+export const SCOPED_STEPS = ['typecheck', 'lint', 'dup', 'smoke:fast', 'test:checks', 'test:spec']
 
 /**
  * 按面触发规则：改到 globs 命中的路径时，pre-push 跑 assets；没有额外 lane 的面必须写
- * `coveredBy`（取自 UNCONDITIONAL_STEPS）+ `why`，不许留空。
+ * `coveredBy`（取自 UNCONDITIONAL_STEPS ∪ SCOPED_STEPS）+ `why`，不许留空。
  *
  * 为什么有两种证据而不是只有 assets：选择器对未命中**静默返回空**，于是「这个面不需要额外
  * 真入口」与「这个面忘了登记」同形（BUG-186：src/lib 搬移没有触发 replay）。`coveredBy`
- * 让豁免也变成登记项：每条都要能对到 hook 真跑的无条件步骤，spec 核对覆盖面完备。
+ * 让豁免也变成登记项：每条都要能对到 hook 无条件步骤或 `planPrePush` 对该面真实触发的窄步骤，
+ * `asset-lanes.spec` 机械核对覆盖面完备且真实触发。
  * **进阶（2026-11-17 BUG-206）**：能对到步骤还不够——步骤必须真的加载/解析该面。
- * `probes/**` 的 coveredBy 因此含 `coverage:ratchet`（入口 import 图 spec 真解析每个探针的本地
- * import）；只写 `verify` 而 verify 不加载探针，就是「有登记 ≠ 被执行」。
+ * `probes/**` 的 coveredBy 含 `test:spec`（`planPrePush` 精准运行 `entry-import-graph.spec.ts` 逐条解析
+ * 每个探针的本地 import）；只写 `verify` 而 verify 不加载探针，就是「有登记 ≠ 被执行」。
  * 规则从窄到宽排列；同一 asset 被多条命中只跑一次。
  * 成本纪律：assets 合计应 ≤ 30s；更贵的真入口（company-entry ~1–2 min、release 分钟级）
- * 留在 weekly / 手动档，用 coveredBy 写清「为什么不进 push」，不许把慢档塞进 hook。
+ * 与全量覆盖率棘轮（`coverage:ratchet`）留在发布前 / weekly / 手动档，不塞进 push 热路径。
  */
 export const SURFACE_RULES = [
   {
@@ -384,29 +386,47 @@ export const SURFACE_RULES = [
     why: '包入口 / bundle 组合行改动 → preset 真挂载（注册面/组合行的完成定义）',
   },
   {
+    // 盲审 S5 / B2：源码/工具/门禁/测试/探针目录的说明与生成物索引归 docs-only 快速路径（与 planPrePush 一致），
+    // 须排在 src/host/**、tools/**、checks/**、tests/**、probes/** 之前，避免先命中宽规则的 coveredBy。
+    globs: [
+      'packages/company-pack/src/**/README.md',
+      'checks/README.md', 'checks/AGENTS.md', 'checks/INDEX.generated.md', 'checks/lib/**/*.md',
+      'tools/README.md', 'probes/README.md',
+      'tests/README.md', 'tests/AGENTS.md', 'tests/failure-classes.md',
+      'tests/CENSUS.generated.md', 'tests/BUG-COVERAGE.generated.md', 'tests/fixtures/README.md',
+    ],
+    coveredBy: ['verify'],
+    why: '源码/工具/门禁/测试/探针目录的说明与生成物索引 = 结构门禁 verify 覆盖（docs-only 快速路径，不触发代码步骤）',
+  },
+  {
     globs: ['packages/company-pack/src/host/**'],
-    coveredBy: ['smoke:fast', 'coverage:ratchet', 'typecheck', 'verify'],
-    why: 'host 由 fast lane 的 present-catalog / company-root-process（直接加载 host src）+ 全量 test + typecheck 覆盖；真安装档 company-entry 要 _dist tarball 且 ~1–2 min（weekly），不进 push',
+    coveredBy: ['smoke:fast', 'test:spec', 'typecheck', 'verify'],
+    why: 'host 由按面触发的 fast lane（present-catalog / company-root-process）+ vitest related 窄测 + 增量 typecheck + verify 覆盖；全量覆盖率与 company-entry 归发布前/weekly',
   },
   {
     globs: ['tools/**', 'checks/**'],
-    coveredBy: ['test:checks', 'coverage:ratchet', 'verify'],
-    why: '工具/门禁面：门禁自测 test:checks + 消费 tools/lib 的全量 test + 结构门禁 verify；盘上没有更便宜的真入口',
+    coveredBy: ['test:checks', 'test:spec', 'verify'],
+    why: '工具/门禁面：按面触发门禁自测 test:checks + vitest related/入口图 spec + 结构门禁 verify；盘上没有更便宜的真入口',
+  },
+  {
+    globs: ['tests/checks/**'],
+    coveredBy: ['test:checks', 'verify'],
+    why: '门禁自测文件改动由按面触发的 test:checks（node:test）+ verify 覆盖',
   },
   {
     globs: ['tests/**'],
-    coveredBy: ['coverage:ratchet'],
-    why: '测试树改动由 pre-push 的全量 vitest（coverage:ratchet = test + 覆盖率棘轮）覆盖；再加 lane = 同一检查跑两遍',
+    coveredBy: ['test:spec', 'verify'],
+    why: '测试树（含夹具与测试支撑模块）改动由按面触发的 vitest 覆盖；再加 lane = 同一检查跑两遍',
   },
   {
     globs: ['packages/company-pack/locale/**'],
     assets: ['client-load'],
-    why: '用户可见文案面：真页面仍要零挂载失败；文案断言在 tests/client/i18n（全量 test）',
+    why: '用户可见文案面：真页面仍要零挂载失败；文案断言由按面触发的 tests/client/i18n 覆盖',
   },
   {
     globs: ['packages/company-pack/package.json', 'packages/company-pack/tsconfig*.json', 'packages/company-pack/tsdown.config.ts', 'packages/company-pack/scripts/**'],
-    coveredBy: ['coverage:ratchet', 'typecheck', 'verify'],
-    why: '包元数据/构建配置/发布前脚本：全量 test（导出/包形状）+ 类型面 + 结构门禁；发布档 release 是手动分钟级',
+    coveredBy: ['test:spec', 'typecheck', 'verify'],
+    why: '包元数据/构建配置/发布前脚本：按面触发 tests/repo/{pack,release} + 增量 typecheck + 结构门禁；发布档 release 是手动分钟级',
   },
   {
     globs: ['packages/company-pack/LICENSE', 'packages/company-pack/icon.svg'],
@@ -414,40 +434,44 @@ export const SURFACE_RULES = [
     why: '随包静态资产：pack-shape 与发布面门禁',
   },
   {
-    globs: ['market-index*.json', '_dist/**', 'runtime/harness-home/README.md', '.*'],
+    globs: ['.oxlintrc.json', '.jscpd.json'],
     coveredBy: ['lint', 'dup', 'verify'],
-    why: '市场索引暂存/生成手册/runtime 白名单/根 dotfile 与 lint-dup 配置：改这些跑对应工具 + 结构门禁',
+    why: 'lint / dup 配置文件改动 → 触发 lint + dup + 结构门禁',
   },
   {
-    // 2026-11-17 BUG-206：`coveredBy` 不是口头豁免——它必须点名一条**真执行/解析该面**的无条件步骤。
-    // 探针入口的本地 import 图由 entry-import-graph.spec 在 coverage:ratchet 下逐条解析；
-    // verify 只做头注/结构，真探针仍按头注手动跑。可解析 ≠ 运行时跑通，不要把这里读成「已验证行为」。
+    globs: ['market-index*.json', '_dist/**', 'runtime/harness-home/README.md', '.*'],
+    coveredBy: ['verify'],
+    why: '市场索引暂存/生成手册/runtime 白名单/根 dotfile：结构与发布面门禁 verify 覆盖',
+  },
+  {
+    // 2026-11-17 BUG-206：`coveredBy` 不是口头豁免——它必须点名一条**真执行/解析该面**的步骤。
+    // 2026-11-27 BUG-406：planPrePush 命中 probes/** 时精准触发 tests/repo/structure/entry-import-graph.spec.ts，
+    // 逐条解析每个探针的本地 import（可解析 ≠ 运行时跑通），不再为此重跑全量 305 份 spec 覆盖率。
     globs: ['probes/**'],
-    coveredBy: ['coverage:ratchet', 'verify'],
-    why: '探针入口图由 tests/repo/structure/entry-import-graph.spec.ts 在 coverage:ratchet 下逐条解析本地 import（可解析 ≠ 运行时跑通）；verify 管头注/结构；真探针按头注手动跑',
+    coveredBy: ['test:spec', 'verify'],
+    why: '探针入口图由 planPrePush 精准触发 tests/repo/structure/entry-import-graph.spec.ts 逐条解析本地 import（可解析 ≠ 运行时跑通）；verify 管头注/结构；真探针按头注手动跑',
   },
   {
-    // 2026-11-18 BUG-228：源码侧 shipped 面由 shipped-shape spec 在 coverage:ratchet 下真跑；
-    // verify 不读 tarball。真实 tarball 的新鲜度/形状仍由 release:shape 判。
+    // 2026-11-18 BUG-228：源码侧 shipped 面由 shipped-links 门禁在 verify 下检查；真实 tarball 由 release:shape 判。
     globs: ['packages/company-pack/README.shipped.md'],
     coveredBy: ['verify'],
     why: '源码侧 shipped shape（README.shipped 链接/pnpm、presets/cordis/content dev 限定、patch 目标）由 checks/gates/shipped-links.mjs 在 verify/run-gates 下检查；真实 tarball 由 release:shape 判',
   },
   {
-    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', 'packages/company-pack/AGENTS.md', '.agents/**', '.claude/**', 'run/**', 'snapshots/**'],
+    globs: ['docs/**', 'notes/**', '_backlog/**', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'tests/README.md', 'packages/company-pack/README.md', 'packages/company-pack/AGENTS.md', '.agents/**', '.claude/**', 'run/**', 'snapshots/**', 'CHANGELOG.md', 'runtime/README.md', 'packages/company-pack/src/README.md'],
     coveredBy: ['verify'],
-    why: '文档/指针/技能/运行配置/快照 = 结构门禁 verify 的射程',
+    why: '文档/指针/技能/运行配置/快照 = 结构门禁 verify 的射程（docs-only 快速路径不跑 tsc/vitest）',
   },
   {
-    globs: ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'tsconfig*.json', 'vitest.config.ts', 'CHANGELOG.md', '.github/**', '.githooks/**', 'runtime/README.md', 'packages/company-pack/src/README.md', 'vendor/**'],
-    coveredBy: ['verify', 'typecheck'],
-    why: '根配置/锁文件/CI/hook/README/vendor 指针 = verify + typecheck 的射程；vendor 内容只读（双门禁），没有独立真入口',
+    globs: ['package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'tsconfig*.json', 'vitest.config.ts', '.github/**', '.githooks/**', 'vendor/**'],
+    coveredBy: ['verify', 'typecheck', 'test:spec'],
+    why: '根配置/锁文件/CI/hook/vendor 指针 = verify + 增量 typecheck + tests/repo 合同回归；vendor 内容只读（双门禁）',
   },
 ]
-// 为什么后三条用 coveredBy 而不是 assets：它们的证据本来就是 hook 每次都跑的步骤（fast lane /
-// verify / test:checks / coverage:ratchet），再列一次 = 同一检查跑两遍；而昂贵的真入口
-// （company-entry 要 _dist tarball 且 ~1–2 min、release 分钟级）属 weekly/手动档，塞进 push
-// 违背成本边界。写下 `coveredBy` 是为了让「有意不进 push」不再与「忘了登记」同形。
+// 为什么后若干条用 coveredBy 而不是 assets：它们的证据是 hook 的无条件 verify 或按面精准触发的
+// fast lane / typecheck / test:checks / 窄 vitest，再列一次 = 同一检查跑两遍；而昂贵的真入口
+// （company-entry ~1–2 min、release 分钟级）与全量覆盖率棘轮（coverage:ratchet）属发布前/weekly/手动档，
+// 塞进 push 热路径违背成本边界。写下 `coveredBy` 是为了让「有意不进 push」不再与「忘了登记」同形。
 
 /** 把 glob 转成锚定的正则；支持 `**`（跨段）、`*`（段内）、`?`（单字符）。 */
 export function globToRegExp(glob) {
@@ -499,6 +523,7 @@ export function selectSurfaces(paths, rules = SURFACE_RULES) {
   const matches = []
   const covered = []
   const seen = new Set()
+  const coveredPaths = new Set()
   for (const rule of rules) {
     for (const path of paths) {
       if (!matchesAny(rule.globs, path)) continue
@@ -510,7 +535,9 @@ export function selectSurfaces(paths, rules = SURFACE_RULES) {
         matches.push({ asset, glob, path, ...(rule.why ? { why: rule.why } : {}) })
         if (!assets.includes(asset)) assets.push(asset)
       }
-      if (rule.coveredBy && rule.coveredBy.length > 0) {
+      // 规则从窄到宽排列：已由更窄规则显式 covered 的路径不再叠加更宽规则的 coveredBy（盲审 S5）。
+      if (rule.coveredBy && rule.coveredBy.length > 0 && !coveredPaths.has(path)) {
+        coveredPaths.add(path)
         covered.push({ glob, path, coveredBy: [...rule.coveredBy], ...(rule.why ? { why: rule.why } : {}) })
       }
     }
@@ -518,6 +545,173 @@ export function selectSurfaces(paths, rules = SURFACE_RULES) {
   const classified = new Set([...matches.map(match => match.path), ...covered.map(entry => entry.path)])
   const unseen = paths.filter(path => !classified.has(path))
   return { assets, matches, covered, unseen }
+}
+
+/**
+ * 按出站变更路径生成 pre-push 热路径的精准执行计划（BUG-406，纯逻辑）。
+ *
+ * 原则：
+ * - `verify` 永远无条件在 hook 首步执行；
+ * - docs-only 变更不跑 tsc / lint / dup / smoke:fast / test:checks / vitest（秒级放行）；
+ * - 代码/测试/工具/门禁/探针变更只跑受影响面的检查 + `vitest related` / 定向 spec，不重跑全量 V8 覆盖率；
+ * - `probes/**` 必触发 `tests/repo/structure/entry-import-graph.spec.ts`（保持 BUG-206 真解析入口图承诺）。
+ *
+ * @param {readonly string[]} paths 本次出站变更路径。
+ * @returns {{ docsOnly: boolean, steps: string[], relatedFiles: string[], targetedSpecs: string[] }}
+ */
+export function planPrePush(paths) {
+  const stepSet = new Set()
+  const relatedFiles = new Set()
+  const targetedSpecs = new Set()
+
+  for (const path of paths) {
+    if (path.startsWith('packages/company-pack/src/') && !path.endsWith('/README.md')) {
+      stepSet.add('typecheck')
+      stepSet.add('lint')
+      stepSet.add('dup')
+      stepSet.add('smoke:fast')
+      stepSet.add('test:spec')
+      relatedFiles.add(path)
+      if (path === 'packages/company-pack/src/index.ts' || path === 'packages/company-pack/src/client/index.ts') {
+        targetedSpecs.add('tests/repo/pack/pack-exports.spec.ts')
+      }
+      continue
+    }
+    if (path.startsWith('packages/company-pack/presets/') || path === 'packages/company-pack/cordis.patch.yml') {
+      stepSet.add('smoke:fast')
+      stepSet.add('test:spec')
+      targetedSpecs.add('tests/presets')
+      continue
+    }
+    if (path.startsWith('packages/company-pack/content/')) {
+      stepSet.add('smoke:fast')
+      stepSet.add('test:checks')
+      stepSet.add('test:spec')
+      targetedSpecs.add('tests/content')
+      // 盲审 S3：content 改动同时影响 host 注入与自举合同，补齐 handbook/bootstrap-content 窄测。
+      targetedSpecs.add('tests/host/prompt/handbook.spec.ts')
+      targetedSpecs.add('tests/host/run-bundle/bootstrap-content.spec.ts')
+      continue
+    }
+    if (path.startsWith('packages/company-pack/locale/')) {
+      stepSet.add('test:spec')
+      targetedSpecs.add('tests/client/i18n')
+      continue
+    }
+    if (
+      path === 'packages/company-pack/package.json'
+      || /^packages\/company-pack\/tsconfig.*\.json$/.test(path)
+      || path === 'packages/company-pack/tsdown.config.ts'
+      || path.startsWith('packages/company-pack/scripts/')
+    ) {
+      stepSet.add('typecheck')
+      stepSet.add('test:spec')
+      targetedSpecs.add('tests/repo/pack')
+      targetedSpecs.add('tests/repo/release')
+      continue
+    }
+    if (path.startsWith('tests/checks/')) {
+      stepSet.add('test:checks')
+      continue
+    }
+    if (path.startsWith('tests/') && path.endsWith('.spec.ts')) {
+      stepSet.add('typecheck')
+      stepSet.add('lint')
+      stepSet.add('test:spec')
+      targetedSpecs.add(path)
+      continue
+    }
+    // 盲审 B1(R2)：tests/fixtures/**（含 .md 与 .json 夹具，除 README.md）不得落 docsOnly，
+    // 必须按盘上 5 组真实夹具定向映射到实际读取它们的消费者 spec。
+    if (path.startsWith('tests/fixtures/') && path !== 'tests/fixtures/README.md') {
+      stepSet.add('test:spec')
+      targetedSpecs.add('tests/repo/budget/fixture-provenance.spec.ts')
+      if (path === 'tests/fixtures/catalog.contract.json') {
+        targetedSpecs.add('tests/client/data/catalog-contract.spec.ts')
+      } else if (path.startsWith('tests/fixtures/companies/')) {
+        targetedSpecs.add('tests/host/run-bundle/company-fixture.spec.ts')
+        targetedSpecs.add('tests/host/run-bundle/bootstrap.spec.ts')
+        targetedSpecs.add('tests/client/ui/brand.spec.ts')
+        targetedSpecs.add('tests/presets/product-type-coverage.spec.ts')
+      } else if (path.startsWith('tests/fixtures/deliverables-r1/')) {
+        targetedSpecs.add('tests/tools/deliverables-audit.spec.ts')
+      } else if (path.startsWith('tests/fixtures/methods/')) {
+        targetedSpecs.add('tests/tools/quality-loop.spec.ts')
+      } else if (path === 'tests/fixtures/bundle-manifest-v1.json') {
+        targetedSpecs.add('tests/host/run-bundle/bundle-manifest.spec.ts')
+      } else {
+        targetedSpecs.add('tests/host/run-bundle')
+        targetedSpecs.add('tests/tools')
+      }
+      continue
+    }
+    if (path.startsWith('tests/') && path.endsWith('/bug-coverage-baseline.json')) {
+      stepSet.add('test:spec')
+      targetedSpecs.add('tests/repo/budget/bug-coverage.spec.ts')
+      continue
+    }
+    if (path.startsWith('tests/') && !path.endsWith('.md')) {
+      stepSet.add('typecheck')
+      stepSet.add('lint')
+      stepSet.add('test:checks')
+      stepSet.add('test:spec')
+      relatedFiles.add(path)
+      continue
+    }
+    if ((path.startsWith('checks/') || path.startsWith('tools/')) && !path.endsWith('.md')) {
+      stepSet.add('lint')
+      stepSet.add('dup')
+      stepSet.add('smoke:fast')
+      stepSet.add('test:checks')
+      stepSet.add('test:spec')
+      // 盲审 B2：tools/lib 与 checks/lib 同样必须跑 entry-import-graph.spec.ts，防止改名/删除破坏探针或入口 import。
+      targetedSpecs.add('tests/repo/structure/entry-import-graph.spec.ts')
+      if (path === 'checks/lib/coverage-baseline.json') {
+        targetedSpecs.add('tests/tools/coverage-baseline.spec.ts')
+      } else if (path.startsWith('checks/lib/') || path.startsWith('tools/lib/')) {
+        relatedFiles.add(path)
+        if (path.endsWith('.json')) targetedSpecs.add('tests/tools')
+      }
+      if (path === 'checks/pre-push-surfaces.mjs' || path.startsWith('checks/lanes/')) {
+        targetedSpecs.add('tests/repo/budget/asset-lanes.spec.ts')
+      }
+      continue
+    }
+    if (path.startsWith('probes/') && !path.endsWith('.md')) {
+      stepSet.add('lint')
+      stepSet.add('test:spec')
+      targetedSpecs.add('tests/repo/structure/entry-import-graph.spec.ts')
+      if (path.startsWith('probes/lib/')) relatedFiles.add(path)
+      continue
+    }
+    if (path === '.oxlintrc.json' || path === '.jscpd.json') {
+      stepSet.add('lint')
+      stepSet.add('dup')
+      continue
+    }
+    if (
+      path === 'package.json'
+      || path === 'pnpm-lock.yaml'
+      || path === 'pnpm-workspace.yaml'
+      || /^tsconfig.*\.json$/.test(path)
+      || path === 'vitest.config.ts'
+      || path.startsWith('.github/')
+      || path.startsWith('.githooks/')
+      || path.startsWith('vendor/')
+    ) {
+      stepSet.add('typecheck')
+      stepSet.add('test:spec')
+      targetedSpecs.add('tests/repo')
+    }
+  }
+
+  const steps = SCOPED_STEPS.filter(step => stepSet.has(step))
+  return {
+    docsOnly: steps.length === 0,
+    steps,
+    relatedFiles: [...relatedFiles],
+    targetedSpecs: [...targetedSpecs],
+  }
 }
 
 /** 按名字取注册项；未登记返回 undefined（调用方据此报错，不猜）。 */

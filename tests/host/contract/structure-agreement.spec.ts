@@ -2,7 +2,7 @@
 /**
  * 跨层结构与 4 消费者契约差分（W3.1 / W3.2，2026-11-14）：
  * 1. `sectionRange` / `scanDocumentDetailed`（pack 原语）与 `repo-markdown.mjs`（`mdast` GFM 门禁原语）
- *    在 500 份组合语法文档上对 `## <标题>` 的定位一致（已声明 BUG-181 跨行反引号策略行除外）；
+ *    在组合语法文档上对 `## <标题>` 的定位一致（默认日常抽样 60 份，周跑 `generative.e2e.mjs` 注入 1000 份；已声明 BUG-181 跨行反引号策略行除外）；
  * 2. 同一批生成/故障注入的交付物语料（`meta.md` + `mrd.md` + `prd.md` + 治理卡）同时喂给：
  *    ① `validateProductDocs`（`prd-check`）
  *    ② `checkRequirements`（`requirements-check`）
@@ -26,8 +26,10 @@ import { checkRequirements } from '../../../packages/company-pack/src/lib/docs/r
 import { headingSections, parseFrontmatter, sectionBody } from '../../../tools/lib/core/repo-markdown.mjs'
 import { makeDeliverableBundle, makeDocDetailed } from '../../support/doc-grammar'
 
-const CASES = Number(process.env.MARKDOWN_SHAPE_CASES ?? 500)
-const BUNDLE_CASES = 90
+// 日常 keyless 回归用轻量抽样（覆盖全部语法分支、历史回归 seed=0/1/3 与 9 类故障 × 3 轮）；
+// 全量 1000 文档 / 90 组语料由周跑 checks/lanes/generative.e2e.mjs 显式注入环境变量执行（BUG-406）。
+const CASES = Number(process.env.MARKDOWN_SHAPE_CASES ?? 60)
+const BUNDLE_CASES = Number(process.env.MARKDOWN_BUNDLE_CASES ?? 27)
 const HEADINGS = ['修复证据', '验收', '决定', '其它', '状态事实与载体', '未覆盖轴'] as const
 
 describe(`sectionRange × scanDocumentDetailed × repo-markdown（${String(CASES)} seeded docs）`, () => {

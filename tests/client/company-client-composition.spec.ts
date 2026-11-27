@@ -528,8 +528,10 @@ describe('company client apply through the whole-client tier', () => {
         const host = document.createElement('div')
         document.body.append(host)
         const root = createRoot(host)
-        await act(async () => { root.render(createElement(target.entry.component, props)) })
-        await act(async () => { await new Promise(resolve => { setTimeout(resolve, 0) }) })
+        await act(async () => {
+          root.render(createElement(target.entry.component, props))
+          await Promise.resolve()
+        })
         act(() => { root.unmount() })
         host.remove()
       }

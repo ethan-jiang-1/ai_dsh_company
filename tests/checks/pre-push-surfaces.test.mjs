@@ -151,3 +151,34 @@ test('非 ASCII 路径不被 git 的 C-quote 误判未分类（2026-11-16 二轮
     assert.doesNotMatch(out, /未分类/, out)
   } finally { cleanup() }
 })
+
+test('--exec-plan --dry-run：docs-only 走快速路径，代码/探针改动按面精准计划（BUG-406）', () => {
+  const runPlan = paths => spawnSync(
+    process.execPath,
+    [SCRIPT, '--exec-plan', '--dry-run', '--paths', paths],
+    { encoding: 'utf8' },
+  )
+  const docs = runPlan('docs/testing.md,notes/implemented/x.md')
+  assert.equal(docs.status, 0, docs.stdout + docs.stderr)
+  assert.match(docs.stdout, /docs-only 快速路径/, docs.stdout)
+
+  const client = runPlan('packages/company-pack/src/client/wiring/error-ring.ts')
+  assert.equal(client.status, 0, client.stdout + client.stderr)
+  assert.match(client.stdout, /steps=\[typecheck, lint, dup, smoke:fast, test:spec\]/, client.stdout)
+  assert.match(client.stdout, /assets=\[client-load\]/, client.stdout)
+
+  const probe = runPlan('probes/analyze/orient-probe.mjs')
+  assert.equal(probe.status, 0, probe.stdout + probe.stderr)
+  assert.match(probe.stdout, /entry-import-graph\.spec\.ts/, probe.stdout)
+
+  // 盲审 S-2：未分类路径退出非零且不得误印 docs-only 快速路径；已删除源码路径须带出兜底 targetedSpecs。
+  const unseen = runPlan('zz-unseen/file.txt')
+  assert.notEqual(unseen.status, 0, unseen.stdout + unseen.stderr)
+  assert.doesNotMatch(unseen.stdout, /docs-only 快速路径/, unseen.stdout)
+
+  const deletedSrc = runPlan('packages/company-pack/src/client/zz-deleted-nonexistent.ts')
+  assert.equal(deletedSrc.status, 0, deletedSrc.stdout + deletedSrc.stderr)
+  assert.match(deletedSrc.stdout, /deletedFallback = packages\/company-pack\/src\/client\/zz-deleted-nonexistent\.ts/, deletedSrc.stdout)
+  assert.match(deletedSrc.stdout, /entry-import-graph\.spec\.ts/, deletedSrc.stdout)
+  assert.match(deletedSrc.stdout, /pack-exports\.spec\.ts/, deletedSrc.stdout)
+})

@@ -316,3 +316,25 @@ test('跨行反引号假标题与同行块注释标题不顶替真实 `## 修复
     assert.deepEqual(gate(dir).problems, [])
   } finally { cleanup() }
 })
+
+test('7 位短 SHA 命中批量祖先索引；merge 提交空 log 文件列表回落 git show 仍准确对账', () => {
+  const { dir, git, commit, cleanup } = repo()
+  try {
+    const baseSha = commit('packages/demo/base.ts', 'export const base = 1\n', 'feat: base')
+    git(['checkout', '-q', '-b', 'side'])
+    commit('packages/demo/side.ts', 'export const side = 1\n', 'feat: side')
+    git(['checkout', '-q', 'main'])
+    commit('packages/demo/main-only.ts', 'export const m = 1\n', 'feat: main')
+    git(['merge', '--no-commit', 'side'])
+    writeFileSync(join(dir, 'packages/demo/merged.ts'), 'export const merged = 1\n')
+    git(['add', '-A'])
+    git(['commit', '-q', '-m', 'merge: add merged.ts'])
+    const mergeSha = git(['rev-parse', 'HEAD'])
+
+    card(dir, { name: 'BUG-920-short.md', evidence: evidence(baseSha.slice(0, 7), 'packages/demo/base.ts') })
+    card(dir, { name: 'BUG-921-merge.md', evidence: evidence(mergeSha.slice(0, 8), 'packages/demo/merged.ts') })
+    const res = gate(dir)
+    assert.deepEqual(res.problems, [])
+    assert.match(res.okLine, /fix-evidence ×2/)
+  } finally { cleanup() }
+})

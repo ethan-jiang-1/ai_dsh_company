@@ -137,13 +137,20 @@ function positionals(tokens, valueFlags) {
  * @param {string} command 反引号里的命令原文。
  * @returns {string | undefined} 不可执行的原因；undefined = 可解析。
  */
-function commandProblem(root, command) {
+function commandProblem(root, command, scriptsCache) {
   const tokens = command.split(/\s+/).filter(Boolean)
   const bin = tokens[0]
   if (bin === 'pnpm') {
     const args = positionals(tokens.slice(1), VALUE_FLAGS.pnpm)
-    let scripts = {}
-    try { scripts = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).scripts ?? {} } catch { return 'package.json 不可读' }
+    let scripts = scriptsCache?.scripts
+    if (scripts === undefined) {
+      try {
+        scripts = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).scripts ?? {}
+        if (scriptsCache !== undefined) scriptsCache.scripts = scripts
+      } catch {
+        return 'package.json 不可读'
+      }
+    }
     if (args[0] === 'exec') {
       const name = args[1]
       if (name === undefined) return 'pnpm exec 缺可执行名'
@@ -193,8 +200,45 @@ function commandProblem(root, command) {
  * @returns {string | undefined} stdout（trim）；非零退出 undefined。
  */
 function git(root, args) {
-  const result = spawnSync('git', args, { cwd: root, encoding: 'utf8' })
+  const result = spawnSync('git', args, { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
   return result.status === 0 ? result.stdout.trim() : undefined
+}
+
+const COMMIT_HEADER_MARKER = '__FIX_EV_COMMIT__'
+
+/**
+ * 批量读取 HEAD 祖先链的提交日期与改动文件（BUG-406）：
+ * 用单次 `git log` 替代对每张已修卡 spawn 4 次 git（从 ~800 次子进程降为 1 次）。
+ * 返回按 7 位短前缀桶索引的 Map；查不到或前缀冲突时由调用方回落单次 git 精确判定（含浅克隆分支）。
+ */
+function buildAncestorIndex(root) {
+  const raw = git(root, ['-c', 'core.quotepath=false', 'log', `--format=${COMMIT_HEADER_MARKER}%H\t%cs`, '--name-only', 'HEAD'])
+  if (raw === undefined) return new Map()
+  const byPrefix = new Map()
+  let current = null
+  for (const line of raw.split('\n')) {
+    if (line.startsWith(COMMIT_HEADER_MARKER)) {
+      const [fullSha, date] = line.slice(COMMIT_HEADER_MARKER.length).split('\t')
+      current = { fullSha, date: date ?? '', files: [] }
+      const prefix = fullSha.slice(0, 7)
+      let bucket = byPrefix.get(prefix)
+      if (bucket === undefined) {
+        bucket = []
+        byPrefix.set(prefix, bucket)
+      }
+      bucket.push(current)
+      continue
+    }
+    if (current !== null && line !== '') current.files.push(line)
+  }
+  return byPrefix
+}
+
+function lookupAncestor(index, sha) {
+  const bucket = index.get(sha.slice(0, 7))
+  if (bucket === undefined) return undefined
+  const matched = bucket.filter(entry => entry.fullSha.startsWith(sha))
+  return matched.length === 1 ? matched[0] : undefined
 }
 
 /**
@@ -202,7 +246,7 @@ function git(root, args) {
  * @param {string} root checkout 根。
  * @param {string} rel 卡片相对路径。
  * @param {string} text 卡片全文。
- * @param {{ problems: string[], shallowSkipped: number, gitAvailable: boolean }} state 累积状态。
+ * @param {{ problems: string[], shallowSkipped: number, gitAvailable: boolean, ancestors: Map<string, any[]>, scriptsCache: { scripts?: Record<string, string> } }} state 累积状态。
  */
 function checkCard(root, rel, text, state) {
   const meta = frontmatter(text)
@@ -231,7 +275,7 @@ function checkCard(root, rel, text, state) {
     state.problems.push(`${rel} 的红/绿没有同一条命令（红→绿必须用同一条命令复跑：红=${redCommands.join(' / ')}；绿=${greenCommands.join(' / ')}）`)
   }
   for (const command of new Set([...redCommands, ...greenCommands])) {
-    const problem = commandProblem(root, command)
+    const problem = commandProblem(root, command, state.scriptsCache)
     if (problem !== undefined) state.problems.push(`${rel} 的红/绿命令不可执行（${command}）：${problem}`)
   }
   const commitField = field(evidence, '提交')
@@ -241,22 +285,33 @@ function checkCard(root, rel, text, state) {
     return
   }
   if (!state.gitAvailable) { state.shallowSkipped += 1; return }
-  const exists = git(root, ['cat-file', '-e', `${sha}^{commit}`])
-  if (exists === undefined) {
-    if (git(root, ['rev-parse', '--is-shallow-repository']) === 'true') { state.shallowSkipped += 1; return }
-    state.problems.push(`${rel} 的提交 ${sha} 不存在（证据必须对到真实提交）`)
-    return
+  const cached = lookupAncestor(state.ancestors, sha)
+  let date
+  let changed
+  if (cached !== undefined) {
+    date = cached.date
+    // merge 提交在 git log --name-only 下 files 可能为空，按需回落一次 git show 保持严格等价。
+    changed = cached.files.length > 0
+      ? cached.files
+      : (git(root, ['-c', 'core.quotepath=false', 'show', '--name-only', '--format=', sha]) ?? '').split('\n').filter(Boolean)
+  } else {
+    const exists = git(root, ['cat-file', '-e', `${sha}^{commit}`])
+    if (exists === undefined) {
+      if (git(root, ['rev-parse', '--is-shallow-repository']) === 'true') { state.shallowSkipped += 1; return }
+      state.problems.push(`${rel} 的提交 ${sha} 不存在（证据必须对到真实提交）`)
+      return
+    }
+    if (git(root, ['merge-base', '--is-ancestor', sha, 'HEAD']) === undefined) {
+      state.problems.push(`${rel} 的提交 ${sha} 不在 HEAD 历史上（证据必须能在当前分支复算）`)
+      return
+    }
+    date = git(root, ['show', '-s', '--format=%cs', sha])
+    changed = (git(root, ['-c', 'core.quotepath=false', 'show', '--name-only', '--format=', sha]) ?? '').split('\n').filter(Boolean)
   }
-  if (git(root, ['merge-base', '--is-ancestor', sha, 'HEAD']) === undefined) {
-    state.problems.push(`${rel} 的提交 ${sha} 不在 HEAD 历史上（证据必须能在当前分支复算）`)
-    return
-  }
-  const date = git(root, ['show', '-s', '--format=%cs', sha])
   const opened = meta.opened ?? ''
   if (date !== undefined && opened !== '' && date < opened) {
     state.problems.push(`${rel} 的提交 ${sha}（${date}）早于发现日期 ${opened}（修复应在发现之后）`)
   }
-  const changed = (git(root, ['show', '--name-only', '--format=', sha]) ?? '').split('\n').filter(Boolean)
   const hit = surfaces.some(path => changed.some(file => file === path || file.startsWith(`${path.replace(/\/$/, '')}/`)))
   if (surfaces.length > 0 && !hit) {
     state.problems.push(`${rel} 的提交 ${sha} 没有改到改动面里的任何路径（卡上证据与提交对不上）`)
@@ -269,7 +324,14 @@ export function run({ root, ok, fail }) {
     fail('fix-evidence', '缺失 _backlog/_archive/fixed_bugs/（已修卡的家；门禁没有对象 ≠ 通过）')
     return
   }
-  const state = { problems: [], shallowSkipped: 0, gitAvailable: git(root, ['rev-parse', '--is-inside-work-tree']) !== undefined }
+  const gitAvailable = git(root, ['rev-parse', '--is-inside-work-tree']) !== undefined
+  const state = {
+    problems: [],
+    shallowSkipped: 0,
+    gitAvailable,
+    ancestors: gitAvailable ? buildAncestorIndex(root) : new Map(),
+    scriptsCache: {},
+  }
   let checked = 0
   for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     if (!entry.isFile() || !CARD.test(entry.name)) continue

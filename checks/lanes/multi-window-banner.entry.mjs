@@ -38,10 +38,18 @@ try {
   const url = `http://127.0.0.1:${String(port)}/?token=${token}`
   await pageA.goto(url, { waitUntil: 'load', timeout: 60_000 })
   await pageB.goto(url, { waitUntil: 'load', timeout: 60_000 })
-  await sleep(12_000)
-  const textA = await pageA.locator('body').innerText()
-  const textB = await pageB.locator('body').innerText()
-  check('同源两页面触发多实例横幅', /观察窗实例|多实例同写共享盘|静默互踩/.test(textA + textB),
+  // 条件等待替代 12s 硬睡（BUG-406）：心跳互见触发横幅后立即推进，最多等 15s。
+  const BANNER_RE = /观察窗实例|多实例同写共享盘|静默互踩/
+  let textA = ''
+  let textB = ''
+  const deadline = Date.now() + 15_000
+  while (Date.now() < deadline) {
+    textA = await pageA.locator('body').innerText().catch(() => '')
+    textB = await pageB.locator('body').innerText().catch(() => '')
+    if (BANNER_RE.test(textA + textB)) break
+    await sleep(250)
+  }
+  check('同源两页面触发多实例横幅', BANNER_RE.test(textA + textB),
     (textA + '\n' + textB).split('\n').filter(line => line.includes('实例') || line.includes('互踩')).join(' | ').slice(0, 300))
 } catch (error) {
   failures.push(error.message)
