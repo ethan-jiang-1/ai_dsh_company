@@ -36,9 +36,9 @@ opened: 2026-11-27
 
 | ID | 范围 | 实测结论 | 关键证据与归宿 |
 |---|---|---|---|
-| **P1** | `final.md` → 发起复盘培养提交链 | **FAIL** | `targeted-r3.spec.tsx` 与 Chromium（`r3-01-p1-final-md-cultivate-rejected.png`）实证：携带绝对路径提交被 `'成品 ref 必须是安全的工作区相对路径'` 拒收 → [BUG-399](../../bugs/BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md)。 |
+| **P1** | `final.md` → 发起复盘培养提交链 | **FAIL** | `targeted-r3.spec.tsx` 与 Chromium（`r3-01-p1-final-md-cultivate-rejected.png`）实证：携带绝对路径提交被 `'成品 ref 必须是安全的工作区相对路径'` 拒收 → [BUG-399](../fixed_bugs/BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md)。 |
 | **P2** | Light 模式白底白字 Token 碰撞 | **FAIL** | Chromium 切浅色主题实测 `--dsw-alias-bg-layer-2` 与 `--dsw-alias-bg-base` 同为 `#ffffff`（`r3-02-light-mode-contrast.png`）→ [BUG-402](../../bugs/BUG-402-light-mode-layer2-invisible-highlight-and-390-textarea-overflow.md)。 |
-| **P3** | 未迁移 `openTab` 入口、S4 TurnTail 与假 Toast | **FAIL** | `targeted-r3.spec.tsx` 复现 HQ 内 `register-s4-ux` / `StrategyButton` / `openDeliverables` 绕过 `openOnSessionSurface` 与假成功 Toast → [BUG-399](../../bugs/BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md)。 |
+| **P3** | 未迁移 `openTab` 入口、S4 TurnTail 与假 Toast | **FAIL** | `targeted-r3.spec.tsx` 复现 HQ 内 `register-s4-ux` / `StrategyButton` / `openDeliverables` 绕过 `openOnSessionSurface` 与假成功 Toast → [BUG-399](../fixed_bugs/BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md)。 |
 | **P4** | 环境角标刷新谎报、HQ 内嵌 `ComposerStatusPill` 与 `HeroMotionOptions` | **FAIL（部分 PASS）** | Chromium 实测 HQ 内嵌保留 `ComposerStatusPill`（`pillInHq=1`），刷新后角标显 `待办 0`/`梦之队就绪` 而 `AttentionTab` 有挂起 `'红线测试待办'` → [BUG-400](../../bugs/BUG-400-embedded-workshop-status-pill-leak-and-cultivation-race-gaps.md)、[BUG-404](../../bugs/BUG-404-stale-zero-badges-after-reload-and-mine-revoked-tag.md)；空白非公司会话 `plainId` 下 `HeroMotionOptions` `count=0`（PASS）。 |
 | **P5** | `BUG-392..397` 其余细节基线复核 | **PASS** | Phase 0 全量基线规格（303 文件 / 2868 用例含 `signoff`/`strategy`/`dag`/`context-picker`）与 `targeted-r3.spec.tsx` 通过。 |
 

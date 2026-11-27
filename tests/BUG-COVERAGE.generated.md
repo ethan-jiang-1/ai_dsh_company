@@ -7,10 +7,10 @@
 
 | 指标 | 数量 |
 |---|---|
-| 已修卡 | 388 |
-| 有具名守卫 | 286 |
+| 已修卡 | 389 |
+| 有具名守卫 | 287 |
 | 无具名守卫 | 102 |
-| 覆盖率 | 73.7% |
+| 覆盖率 | 73.8% |
 
 ## 无具名守卫（候选缺口，按 opened 倒序）
 
@@ -409,3 +409,4 @@
 | 396 | 2026-11-27 | tests/client/cultivation/cultivation-compose-context.spec.ts:238；tests/client/cultivation/cultivation-context-picker.spec.ts:171；tests/client/cultivation/cultivation-view.spec.ts:102 |
 | 397 | 2026-11-27 | tests/client/cultivation/cultivation-board-actions.spec.ts:599；tests/client/cultivation/cultivation-compose-context.spec.ts:261；tests/client/tabs/delegation-flow-panel.spec.ts:70；tests/client/wiring/instance-guard.spec.ts:109 |
 | 398 | 2026-11-27 | tests/client/tabs/deliverables-tab-states.spec.ts:120；tests/client/tabs/panel-frame.spec.ts:99；tests/client/ui/client-css.spec.ts:228；tests/client/ux/ambient-chrome.spec.ts:226；tests/client/ux/company-hq.spec.ts:688 |
+| 399 | 2026-11-27 | tests/client/ux/company-hq.spec.ts:799；tests/client/ux/company-triggers-shortcuts.spec.ts:226；tests/client/ux/company-turn-tail.spec.ts:159 |

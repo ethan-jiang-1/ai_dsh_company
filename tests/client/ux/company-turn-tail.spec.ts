@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// 负例留证 2026-11-27：registerWaveS4Ux 的 openOps/openArchive 去掉 openOnSessionSurface 包装直接调 openTab ⇒ HQ/无会话表面态触发抛 sidebarRight: no session surface is mounted（BUG-399）；还原后绿。BUG-399
 /** Wave S4 `companyTurnSummaryDefinition` 与 `CompanyTurnTailCard`（`conversation.chat.turnTail`）单测。 */
 import { act, createElement, type ComponentProps } from 'react'
 import { createRoot } from 'react-dom/client'

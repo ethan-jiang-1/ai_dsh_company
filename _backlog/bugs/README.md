@@ -8,11 +8,10 @@
 
 ## 活跃清单
 
-**活跃 7 张（Round 3 UX/UI 盲区深扫立案 BUG-399..405；按根因五批依次自主修复）**：
+**活跃 6 张（Round 3 UX/UI 盲区深扫立案 BUG-399..405；按根因五批依次自主修复）**：
 
 | 卡 | 级别 | 运行面 | 摘要 | 状态 |
 |---|---|---|---|---|
-| [399](BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md) | P1 | client / lib | `final.md` 发起复盘培养传绝对路径拒收 + 6 处 `openTab` 入口绕过 `openOnSessionSurface` 抛错、Toast 抢跑与双挂载竞争 | 调查中 |
 | [400](BUG-400-embedded-workshop-status-pill-leak-and-cultivation-race-gaps.md) | P1 | client | 工坊泄漏 `ComposerStatusPill`、`HeroMotionOptions` 缺角色守卫、Picker reject 永驻加载及培养看板空白/取消/后台轮询竞态 | 调查中 |
 | [401](BUG-401-panel-nan-null-crashes-signoff-error-tag-and-question-id-mismatch.md) | P1 | client / lib | `TasksPanel` 缺省崩溃、`BudgetPanel` `NaN`、`SignoffToolView` 失败误标「待拍板」、已答问询未消重及错误环乱序/丢条目 | 调查中 |
 | [402](BUG-402-light-mode-layer2-invisible-highlight-and-390-textarea-overflow.md) | P1 | client / CSS | Light 主题 `--dsw-alias-bg-layer-2` 同 `#fff` 致高亮/轨道零对比度，`390px` 培养输入框缺 `border-box` 右溢 `+18px` | 调查中 |
@@ -42,7 +41,7 @@
 
 | 顺位 | 组 / 卡 | 共同根因 / 依赖 | 修法与留痕 | 序 |
 |---|---|---|---|---|
-| **1 跨表面守卫与意图/路径闭环** | [399](BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md) | 存档路径 `.dsh-company/deliverables-archive/` 未纳入终稿归一；6 处 `openTab`/快捷键绕过 `openOnSessionSurface`；`openDeliverables` 异步前预判 Toast；双挂载 `CultivationCompose` 抢消费 | `deliverables-focus-store.ts` 与 `contextual-actions.tsx` 扩 `deliverables-archive`；`openOnSessionSurface` 增 `onSuccess` 回调，全部 6 处入口改走 `openOnSessionSurface`；`composeIntentStore` 增 `target: 'hq' \| 'sidebar'` 作用域隔离 | 1 |
+| **1 跨表面守卫与意图/路径闭环** | [399](../_archive/fixed_bugs/BUG-399-final-md-cultivate-absolute-ref-rejected-and-open-surface-bypasses.md)（已修 `dd20d299`） | 存档路径 `.dsh-company/deliverables-archive/` 未纳入终稿归一；6 处 `openTab`/快捷键绕过 `openOnSessionSurface`；`openDeliverables` 异步前预判 Toast；双挂载 `CultivationCompose` 抢消费 | `deliverables-focus-store.ts` 与 `contextual-actions.tsx` 扩 `deliverables-archive`；`openOnSessionSurface` 增 `onSuccess` 回调，全部 6 处入口改走 `openOnSessionSurface`；`composeIntentStore` 增 `target: 'hq' \| 'sidebar'` 作用域隔离 | 1 |
 | **2 环境状态同源与培养异步竞态** | [400](BUG-400-embedded-workshop-status-pill-leak-and-cultivation-race-gaps.md) + [404](BUG-404-stale-zero-badges-after-reload-and-mine-revoked-tag.md) | `ComposerStatusPill` 漏内嵌工坊守卫、`HeroMotionOptions` 无公司角色守卫、`workshop-sessions` 无订阅；环境角标未合流 `pageHistory` 历史审批；`CultivationMine` 漏判 `revokedAt`、看板 `records===null` 空白、撤回取消未禁用、Picker 缺 `.catch()`、`visibilitychange` 后台乱读 | 抽共享 `createMergedAttentionObservable`（live+history 去重）接回环境角标；工坊/角色守卫收全并可订阅；`CultivationAdopted`/`Feedback`/`Mine`/`Picker`/`cultivation-data` 补齐加载态、互斥锁定、`.catch()` 与 `visible` 过滤 | 2 |
 | **3 运行期边界防崩、终态标签与错误环** | [401](BUG-401-panel-nan-null-crashes-signoff-error-tag-and-question-id-mismatch.md) | `TasksTableView` 与 `BudgetPanel` 假设投影字段完备有限；`SignoffToolView` 忽略非决策 `error`/`stopped` 终态；`pendingQuestions` 错失 `data.id !== callId` 问询已答事件；`error-ring` 乱序卸破坏全局句柄、`relay` 抛错前 `shift` 丢队列 | 展示层加 `Array.isArray`/`Number.isFinite` 及动画插值连续 ref；`SignoffToolView` 区分失败/中断终态徽标；`pendingQuestions` 兼容跨键已答清理；`installErrorCapture` 按栈恢复、`createErrorRelay` 先发送再出队（单次重试保队列） | 3 |
 | **4 视觉对比度、窄屏溢框、浮窗与 ARIA** | [402](BUG-402-light-mode-layer2-invisible-highlight-and-390-textarea-overflow.md) + [403](BUG-403-floating-pane-dead-close-draft-loss-dangling-aria-and-zindex.md) | Light 模式 `--dsw-alias-bg-layer-2` 同 `#fff` 致高亮/轨道隐身；`.wk-cultivation-body-input` 缺 `border-box`；浮窗未认 `panel.id` 留死按钮；Hub 子页卸载丢草稿；`SegmentedControl` 悬空 `aria-controls`；横幅/顶带 `z-index` 压 `Modal`；`GuideHub` 缺 `replaceTab` | 替换为 Light 可区分设计系统令牌并补 `border-box`；对齐 `z-index: 900 < Modal(1000)`；按 `panel.id.startsWith('float')` 隐藏浮窗冗余按钮；`ArchiveHubTab` 首次访问后保活隐藏；补全全部 `tabpanel` `id`；`GuideHub` 加 `{ replaceTab: true }` | 4 |
