@@ -276,7 +276,12 @@ try {
       })()`) === true;
       if (onTabBar) { await sleep(400); return 'tab'; }
     }
-    await evaluate(`(() => { const back = [...document.querySelectorAll('[data-dockkit-tab]')].find(t => /start|开始/i.test(t.textContent ?? '')); if (back !== undefined) back.click(); })()`);
+    await evaluate(`(() => {
+      const back = [...document.querySelectorAll('[data-dockkit-tab]')].find(t => /start|开始/i.test(t.textContent ?? ''));
+      if (back !== undefined) { back.click(); return; }
+      const add = document.querySelector('[data-dockkit-add-tab]');
+      if (add !== null) add.click();
+    })()`);
     await sleep(400);
     const clicked = await evaluate(`(() => {
       const entry = [...document.querySelectorAll('.wk-guide-entry-label')].find(e => (e.textContent ?? '').includes(${JSON.stringify(title)}));
