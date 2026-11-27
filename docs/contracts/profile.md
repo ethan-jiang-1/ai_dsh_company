@@ -37,7 +37,7 @@
 | `tool-present`（insert） | 交付物声明（deliverables 卡片） | ✅ |
 | `agent-team` + `tool-agent-team`（insert） | 团队协作主通道（M4/D4） | ✅ |
 | `ui-agent-team`（insert） | 团队 Web 可视面 | ✅ |
-| `company-client`（insert，`name: dsh-company-pack`） | 本包 host/client 入口：签字、工作区门、培养、公司状态初始化、workspace 登记、handbook + 项目策略 `systemPrompt.section`、`/company-settings` 命令、目录/账本、品牌/公司页签（含「策略」） | ✅ bundle 自带；应用内装即生效 |
+| `company-client`（insert，`name: dsh-company-pack`） | 本包 host/client 入口：签字工具与 composer 拦截、工作区门、培养、公司状态初始化、workspace 登记、handbook/语言/策略 `systemPrompt.section`、`/req` `/prd` `/delivery` `/deliverables` `/company-settings` `/company-diagnostics`、目录/账本、工作语言桥（`host/language`）、右栏聚合页签与左侧全局「梦之队总部」（HQ） | ✅ bundle 自带；应用内装即生效（架构 = [host-and-lib](../architecture/host-and-lib.md) · [client-ux](../architecture/client-ux.md)） |
 | `company-session-search`（insert + isolate 组） | 会话全文检索（provider + `session_search` 工具同组；per profile 落 home cache） | ✅ 组内 provider/tool active；不替换 host 行 |
 | `time-context`（preset 内声明） | 日期通道（Asia/Shanghai） | ✅ |
 

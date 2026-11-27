@@ -1,8 +1,8 @@
-# 架构地图：组合层、repo 形态与改动入口
+# 架构总纲：系统分层、组合链与技术入口
 
-> 什么时候读：想懂公司怎么组装、组合层怎么分层，或改机制前。这是**有序地图**，不是设计理由——
-> 为什么选 A 不选 B 住 `notes/implemented/`（文末四篇 Note）；当前语义的 owner = `contracts/`。
-> 总入口 = [index.md](./index.md)；决策台账 = [reference/decisions.md](./reference/decisions.md)。
+> 什么时候读：想掌握公司插件的整体技术架构、代码分层与扩展边界时。这是**架构总纲（有序地图）**——
+> 内部代码架构看 [architecture/](./architecture/)，运行态时序看 [runtime-map.md](./runtime-map.md)，当前语义看 [contracts/](./contracts/)，
+> 为什么选 A 不选 B 住 `notes/implemented/`。总入口 = [index.md](./index.md)；决策台账 = [reference/decisions.md](./reference/decisions.md)。
 
 ## 一句话
 
@@ -58,26 +58,24 @@ host 行 = [contracts/profile.md](./contracts/profile.md)；工具面 owner = `p
 边界与“spill store 不是公司记忆”等细节 = [roles-isolation Note](../notes/implemented/2026-11-10-roles-isolation-rationale.md)；
 数据落点 = [contracts/data-model.md](./contracts/data-model.md)。
 
+## 本包代码架构（Host / Lib / Client）
+
+- **Node 宿主与共享纯逻辑**：[architecture/host-and-lib.md](./architecture/host-and-lib.md) —— `src/index.ts` → `src/host/`（Node-only 能力组）→ `src/lib/`（host/client 共享纯逻辑，零 Node 内建），含公司盘生命周期、提示词/语言桥、委派治理、账本/培养与命令面。
+- **浏览器端与 DSH 原生扩展**：[architecture/client-ux.md](./architecture/client-ux.md) —— `src/client/index.ts` 经 L0/L1 原生槽位装配右栏聚合页签、左侧全局总部（HQ）与内嵌培养会话、签字 composer 拦截、`@`/快捷键与双语字典，以及 L2/L3 与 CSS 安全红线。
+
 ## 改动入口
 
+- 宿主与共享模块：[architecture/host-and-lib.md](./architecture/host-and-lib.md) + [src/README](../packages/company-pack/src/README.md)。
+- 客户端 UI 与槽位：[architecture/client-ux.md](./architecture/client-ux.md) + [2026-11-26-dsh-native-ux-upgrade](../notes/implemented/2026-11-26-dsh-native-ux-upgrade.md)。
 - 角色内容（persona / skills）：[contracts/presets.md](./contracts/presets.md) + `presets/<role>/`。
 - host 组合 / 安装：[contracts/profile.md](./contracts/profile.md) + [contracts/release.md](./contracts/release.md)。
 - 委派 / 团队：[contracts/delegation.md](./contracts/delegation.md)。
-- 运行态 / 时序：[runtime-map.md](./runtime-map.md)。
-- 验证：[testing.md](./testing.md) + [tests/README](../tests/README.md)。
-- UI 层为什么这样：[ui-demo Note](../notes/implemented/2026-11-10-ui-demo-rationale.md)。
-- 角色内容为什么这样：[role-content Note](../notes/implemented/2026-11-10-role-content-rationale.md)。
+- 运行态 / 时序：[runtime-map.md](./runtime-map.md)；空间位置：[project-map.md](./project-map.md)。
+- 验证：[testing.md](./testing.md) + [tests/README](../tests/README.md)；文档规矩：[docs/AGENTS.md](./AGENTS.md) · [index.md](./index.md)。
+- 早期设计理由（为什么这样）：[architecture](../notes/implemented/2026-11-10-architecture-rationale.md) · [roles-isolation](../notes/implemented/2026-11-10-roles-isolation-rationale.md) · [ui-demo](../notes/implemented/2026-11-10-ui-demo-rationale.md) · [role-content](../notes/implemented/2026-11-10-role-content-rationale.md)。
 
 ## 升级触发
 
 - 角色长出独立演化的自定义代码 → `company-pack` 内拆内部包（发布载体仍是 pack）。
 - 长出一窝专家 → 升 FAQ 13 方案 D：`packages/<one-expert>/` + registry + templates。
 - 要给 DSH 上游提 seam → 方案 B 通道进 DSH repo 做，本 repo 只留消费者。
-
-## 相关
-
-- 四篇理由 Note：[architecture](../notes/implemented/2026-11-10-architecture-rationale.md) ·
-  [roles-isolation](../notes/implemented/2026-11-10-roles-isolation-rationale.md) ·
-  [ui-demo](../notes/implemented/2026-11-10-ui-demo-rationale.md) ·
-  [role-content](../notes/implemented/2026-11-10-role-content-rationale.md)。
-- 文档层规矩：[docs/AGENTS.md](./AGENTS.md)；文档地图：[index.md](./index.md)。

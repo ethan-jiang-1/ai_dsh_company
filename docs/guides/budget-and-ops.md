@@ -22,7 +22,7 @@
   独立 KV cache（persona prefix 稳定对 cache 友好，roles-isolation §1）。
 - **脉冲成本**：workers（one-shot，随生随灭）、workflow 冲刺（vp-eng 的脚本内 agent() 并发）。
 - **省钱杠杆**：① `context: 'fork'` 可带 Lead 已完成轮（只限已完成轮；当前任务书仍需 prompt/文件），默认 fresh + 任务书更稳，不要把它当默认省 token 杠杆；
-  ② 稳定事实放 KB 文件按需读，不进 persona（role-content-plan §0.2）；③ 长稿交割走 workspace 文件 +
+  ② 稳定事实放 KB 文件按需读，不进 persona（[role-content Note](../../notes/implemented/2026-11-10-role-content-rationale.md)）；③ 长稿交割走 workspace 文件 +
   消息里给路径（避开 64KiB 邮箱上限同时也省 token）；④ 需要压彩排成本时，在彩排动议的委托工具
   `agentOptions` 上临时收紧（正式场不动——D16 默认全员同模型）。
 
@@ -45,12 +45,12 @@
 | 消息"发了没反应" | 发送结果是 `queued`（已持久化，**不得重发**）还是 `accepted` | `queued`＝对方 inactive，冷恢复时必达；等或用 `wait_agent`；别重发造成重复 |
 | 任务板编辑被拒 | `TEAM_TASK_STALE_REVISION`（CAS） | 重新 `team_task_get` 拿最新修订再改——两个人同时改一任务是设计内冲突 |
 | teammate 建不出来 | roster/名册报错连原因列出（fail-loud） | 按报错修 preset 行/名字（名字永久占用不复用，`provisioning` 失败也占名）；超编检查 `maxMembers` |
-| VP 会话被 compaction 洗糊涂 | 长会话压缩后丢细节 | 指引它重读自己 journal/CHARTER（role-content-plan §0.3 的开工动作就是为此） |
+| VP 会话被 compaction 洗糊涂 | 长会话压缩后丢细节 | 指引它重读自己 journal/CHARTER（[presets.md](../contracts/presets.md) 角色语义） |
 | Web 第 4 个窗口卡死 | FAQ 12：rev 轮换+陈旧缓存（动态模块 404） | 按 FAQ 12 runbook：重打补丁→重启→验证；demo 前升过 vendor 必走一遍 |
 | 演示中途要撤回某 VP 的话 | — | Lead `interrupt_agent` + 任务板 reopen；会话日志不可改，复盘时用回放解释 |
 | demo 崩了要重来 | 所有团队状态在 Lead session log（durable） | 重开进程冷恢复：teammates inactive 冷恢复收 queued 消息；或从 JSONL 回放叙事 |
 
-每场 demo/排练结束跑一遍**收割三问**（机制家 = [close-out-definition skill](../../.agents/skills/close-out-definition/SKILL.md)）：①抓到异常没——**材料性**的才立 BUG 卡 + 红绿（判据 = [_backlog 章程](../../_backlog/README.md)「缺陷的通道」），非材料性当场修 + commit 记根因与影响面；②行为值得钉吗（「变了我们要不要知道」）→ `--record` 录 replay 场景或钉判据；③撞到运行态事实没 → 调试阶梯 / 本篇。三问全「无」如实记，不硬凑。
+每场 demo/排练结束跑一遍**收割三问**（机制家 = [close-out-definition skill](../../.agents/skills/close-out-definition/SKILL.md)）：①抓到异常没——**材料性**的才立 BUG 卡 + 红绿（判据 = [policy.md §P1-B](../policy.md#p1-b-缺陷材料性与修复自授权边界唯一定义家)），非材料性当场修 + commit 记根因与影响面；②行为值得钉吗（「变了我们要不要知道」）→ `--record` 录 replay 场景或钉判据；③撞到运行态事实没 → 调试阶梯 / 本篇。三问全「无」如实记，不硬凑。
 
 ## 4. 回放与复盘
 

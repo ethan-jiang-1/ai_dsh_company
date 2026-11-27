@@ -13,12 +13,12 @@
 
 | id | 显示名 | trust | 默认 | 状态 |
 |---|---|---|---|---|
-| `ceo` | CEO | system | ✅ `isDefault` | R1 定稿 |
-| `vp-eng` | VP-Eng | system | — | R1 定稿 |
-| `vp-sales` | VP-Sales | system | — | R2 定稿 |
-| `coo` | COO | system | — | R2 定稿 |
-| `cfo` | CFO | system | — | R2 定稿（增设） |
-| `cmo` | CMO | system | — | 2026-11-05 增设（市场机会/产品定义） |
+| `ceo` | CEO | system | ✅ `isDefault` | 核心定稿 |
+| `vp-eng` | VP-Eng | system | — | 核心定稿 |
+| `vp-sales` | VP-Sales | system | — | 已定稿 |
+| `coo` | COO | system | — | 已定稿 |
+| `cfo` | CFO | system | — | 已定稿 |
+| `cmo` | CMO | system | — | 已定稿（市场机会/产品定义） |
 | `worker` / `worker-researcher` / `worker-orchestrator` | 梦之队 Worker（执行手 / 只读调研 / 小工头） | system | — | 2026-11-09 增设（leaf / 只读 / 可带 leaf；不占编制、不组队/不 workflow、**不注入公司手册**——按 worker family 派生，三个 profile 一致；**不装 control 工具**，fan-out 件数由父代理 brief 决定、不承诺硬上限——BUG-051/052） |
 | `quality-loop-producer` / `quality-loop-verifier` | 质量环能力档（产出者 / 验证者，验证者只读） | system | — | 2026-11-10 增设（**一个 `quality-loop-` 前缀 = 一整套**，人按前缀找齐；support：不占编制、不注入公司手册、不装 control；不是 worker family——有方法槽 `<DSH_HOME>/company/methods/<preset id>/` 与流程 skill `quality-loop`，由 VP-Eng 的 `quality_loop_produce`/`quality_loop_verify` 两条命名行点名；见 [delegation.md §1](./delegation.md#1-命名委托工具通道-a)） |
 

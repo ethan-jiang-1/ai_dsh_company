@@ -35,7 +35,7 @@
 | 固化证据 | [snapshots](../snapshots/README.md) | 按场景保留日志、sidecar、工作区与判据；按日期保存归档证据 |
 | 当前合同 | [docs](index.md) | 当前语义与操作方式；本地图负责路由 |
 | 决策记忆 | [notes](../notes/) | 按主题检索决定、被否决方案与复验依据 |
-| 推敲空间 | [_backlog](../_backlog/README.md) | 未成熟判断材料；任务执行按开发环与用户指令进入 |
+| 推敲空间 | `_backlog/`（上游沙盒，非 `docs/` 权威源） | 探索、未成熟判断与缺陷跟踪材料；定型结论升格 `notes/` 后才被 `docs/` 引用 |
 
 **四个位置影响运行**：**代码来源**决定 DSH 版本、**DSH_HOME** 决定 profile / 会话日志 / workspace 登记 / 方法层 / 账本、**会话 cwd（workspace）** 决定公司事实与产物（含 `.dsh-company/bundle.json` v3）、**验证证据**冻结时点事实——四条状态轴的权威与「不能从这里推断什么」唯一家 = [运行态地图 §二](runtime-map.md)。一个安装 = 一个公司，可顺序服务多个 workspace；不同公司新开 home。开发环境用 `source run/env.sh` 与 `pnpm company`/`pnpm dsh` 配对；裸 `dsh` 是另一份全局安装。[environments](guides/environments.md) 解释双 home 与双 DSH。
 
@@ -64,7 +64,7 @@ flowchart TD
 
 - [根包命令](../package.json) 将 `pnpm dsh` 接到 [vendor CLI](../vendor/dsh/apps/cli/src/bin.ts)；[profile boot](../vendor/dsh/apps/cli/src/profile-boot.ts) 按选择的 profile 装配 patch 层；home patch（`$DSH_HOME/cordis.patch.yml`）在 profile patch 之后生效，随后是命令行 `--patch` 与 telemetry switch。
 - [company-pack 包声明](../packages/company-pack/package.json) 的 `dsh.bundle.patch` 合并 [共享 patch](../packages/company-pack/cordis.patch.yml) 与各 preset 文件（含 quality-loop 两档）；[CEO preset](../packages/company-pack/presets/ceo/agent.cordis.yml) 声明 persona、角色 skills 和会话工具。
-- `company-client` 行接到 [host 入口](../packages/company-pack/src/index.ts)，注册签字工具；[client 入口](../packages/company-pack/src/client/index.ts) 注册品牌、卡片和公司视图，并读取官方会话投影。
+- `company-client` 行接到 [host 入口](../packages/company-pack/src/index.ts)，注册签字工具；[client 入口](../packages/company-pack/src/client/index.ts) 注册品牌、卡片、右栏聚合页签与全局总部（HQ），并读取官方会话投影。
 - 公司手册与事实由会话 cwd 进入；[排练实现](../tools/lib/core/rehearsal.mjs) 为实验换 cwd、刷新参考输入并保留排练产物。
 
 **公司完整操作走 Web profile。** shipped headless 是通用 CLI 面，单独运行它不会自动得到公司组合。headless 实验需要显式组合；[company overlay](../run/company.overlay.yml) 只补部分宿主行，实际组合还由调用脚本的 preset patches 决定。不要把“CLI 可启动”当作“六角色公司已装配”。

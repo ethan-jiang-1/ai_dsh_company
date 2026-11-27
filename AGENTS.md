@@ -29,7 +29,7 @@ snapshots/              回归证据资产；规则与分类 = snapshots/README.
 
 设计全貌 = `docs/index.md`；决策台账 = `docs/reference/decisions.md`。
 
-**一条流水线**（位置唯一家 = 卡 frontmatter `status`；门与守卫 = [_backlog 门牌](_backlog/AGENTS.md)）：卡 `研究 → 定性 → 落地 → 审 → 归档`，毕业 = 门票 + `去向`（`rfc｜note｜implementation｜pending｜none｜rejected`），去向落 `notes/proposed` RFC 或 `notes/implemented` Note，实施见 [dev-loop §1](docs/guides/dev-loop.md)。任务源 = 已批 RFC（proposed 带「批准：」）与用户点名；唯一例外 = 缺陷卡 `修复就绪` 自授权（边界唯一家 = [_backlog 章程](_backlog/README.md)「缺陷的通道」）。**notes/ 是决策记忆**：开工按主题检索，非平凡变更同 diff 更新（分类与收尾唯一家 = [notes/README.md](notes/README.md)）。**条目状态不镜像进本文件**。
+**一条流水线**（位置唯一家 = 卡 frontmatter `status`；门与守卫 = [_backlog 门牌](_backlog/AGENTS.md)）：卡 `研究 → 定性 → 落地 → 审 → 归档`，毕业 = 门票 + `去向`（`rfc｜note｜implementation｜pending｜none｜rejected`），去向落 `notes/proposed` RFC 或 `notes/implemented` Note，实施见 [dev-loop §1](docs/guides/dev-loop.md)。任务源 = 已批 RFC（proposed 带「批准：」）与用户点名；唯一例外 = 缺陷卡 `修复就绪` 自授权（边界唯一家 = [policy §P1-B](docs/policy.md#p1-b-缺陷材料性与修复自授权边界唯一定义家)）。**notes/ 是决策记忆**：开工按主题检索，非平凡变更同 diff 更新（分类与收尾唯一家 = [notes/README.md](notes/README.md)）。**条目状态不镜像进本文件**。
 
 ## 命令表
 

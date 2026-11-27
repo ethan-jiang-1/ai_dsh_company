@@ -25,6 +25,7 @@ import * as methodContract from '../../checks/gates/method-contract.mjs'
 import * as packContentPaths from '../../checks/gates/pack-content-paths.mjs'
 import * as navCountClaims from '../../checks/gates/nav-count-claims.mjs'
 import * as mdLinks from '../../checks/gates/md-links.mjs'
+import * as docTaxonomy from '../../checks/gates/doc-taxonomy.mjs'
 import { mutateFile } from '../support/mutation.mjs'
 
 const ROOT = new URL('../../', import.meta.url).pathname
@@ -185,6 +186,32 @@ const mutateOrFail = (label, path, transform) => {
     if (!clean) failures += 1
     console.log(`${clean ? 'PASS' : 'FAIL'} md-links：仓库内链接 → 绿`)
     for (const m of green.slice(0, 2)) console.log(`  ${m}`)
+  } finally { rmSync(root, { recursive: true, force: true }) }
+}
+
+{
+  // doc-taxonomy（2026-11-27）：禁止 docs/ 出现指向 _backlog/ 的 Markdown 链接；放行反引号代码跨度与 architecture/ tier。
+  const root = mkdtempSync(join(tmpdir(), 'gates-taxonomy-'))
+  try {
+    mkdirSync(join(root, 'docs/architecture'), { recursive: true })
+    mkdirSync(join(root, '_backlog'), { recursive: true })
+    writeFileSync(join(root, '_backlog/README.md'), '# backlog\n')
+    writeFileSync(join(root, 'docs/AGENTS.md'), '# AGENTS\n\n| 层 | 目录 | Job | **不属于这层** |\n|---|---|---|---|')
+    writeFileSync(join(root, 'docs/index.md'), '# index\n\n[AGENTS](./AGENTS.md)\n[architecture/](./architecture/)\n\n纯说明可用 `_backlog/` 反引号。\n')
+    writeFileSync(join(root, 'docs/architecture/host-and-lib.md'), '# host\n')
+    const green = run(docTaxonomy, root)
+    const okClean = !green.some(m => m.startsWith('FAIL'))
+    if (!okClean) failures += 1
+    console.log(`${okClean ? 'PASS' : 'FAIL'} doc-taxonomy：architecture tier + 反引号 _backlog → 绿`)
+    for (const m of green.slice(0, 2)) console.log(`  ${m}`)
+
+    writeFileSync(join(root, 'docs/architecture/bad-link.md'), '# bad\n\n[探索](../../_backlog/README.md)\n')
+    report('doc-taxonomy：docs/ 出现 _backlog Markdown 链接 → 红', run(docTaxonomy, root), '禁止 docs/ 链接 _backlog/')
+    rmSync(join(root, 'docs/architecture/bad-link.md'))
+
+    mkdirSync(join(root, 'docs/zz-tier'), { recursive: true })
+    writeFileSync(join(root, 'docs/zz-tier/zz.md'), '# stray\n')
+    report('doc-taxonomy：未知 tier 目录 → 红', run(docTaxonomy, root), '不在 tier 目录')
   } finally { rmSync(root, { recursive: true, force: true }) }
 }
 

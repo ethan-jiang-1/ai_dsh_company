@@ -16,6 +16,9 @@
 | 公司状态（company/org/owners/台账/章程/journal） | 用户/公司 | workspace 文件 | host 首启只补缺；模型/人改 | `<workspace>/.dsh-company/kb/**` | 跟 workspace；不覆盖 |
 | 交付物 | 用户/CEO | workspace 文件 | 角色 fs；CEO `present` | `<workspace>/.dsh-company/deliverables/**`、`deliverables-archive/**` | 跟 workspace；用户备份 |
 | 培养记录 | 公司/角色 | 记录文件 | 模型 `cultivation_propose`（只建）；人命令改 | `<workspace>/.dsh-company/cultivation/records/**` | 跟 workspace；archive/purge 人工 |
+| 启动策略与覆盖 | 用户/公司 | workspace 文件 | 人 `/company-settings` 写 `startup.json`；host 派生 `startup-options.json`；用户可选 `overrides/` | `<workspace>/.dsh-company/{startup.json,startup-options.json,overrides/**}` | 跟 workspace；options 可重建 |
+| 升级日志 | 插件/这个盘 | workspace 日志 | host（`logging/rotating-log`） | `<workspace>/.dsh-company/logs/**` | 跟 workspace；有界轮转 |
+| 工作语言偏好 | 用户/DSH | DSH `settings` | DSH 设置面板（`locale.preference`）；host 只读桥接（默认 `zh`） | DSH 运行时设置（无独立本包配置文件） | 跟 DSH；live update |
 | 成品索引 | 公司/盘上 meta/final | 派生 | host catalog | `<workspace>/.dsh-company/kb/deliverables-index.json` | 可删可重建 |
 | 会话检索索引 | 会话历史全文 | 派生 K | `session-query-sqlite`（`company-session-search` 隔离组） | `<DSH_HOME>/cache/company/session-search-<profile>.db` | 可删可重建；单进程 owner、不跨 profile |
 | 公司状态清单（身份） | 插件/这次安装 | manifest（host-owned 约定） | host apply；人只读 | `<workspace>/.dsh-company/bundle.json`（v3，legacy 文件名） | 只创建/原地升 v3；home 备份 |

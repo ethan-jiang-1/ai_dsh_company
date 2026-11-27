@@ -14,15 +14,16 @@
 | 层 | 目录 | Job（这层管什么） | **不属于这层** |
 |---|---|---|---|
 | 导航 | [index.md](./index.md) | 文档地图（决策台账 = [decisions.md](./decisions.md) → [reference/decisions.md](./reference/decisions.md)） | 决定正文、理由、输掉的方案（→ Note）；主题事实（→ 该主题的合同） |
+| 架构 | [architecture.md](./architecture.md) · [architecture/](./architecture/) | **怎么组装与分层**：组合链、模块边界、扩展契约与源码入口 | 逐行工具/文件枚举（→ 实现自己）；历史备选与理由（→ Note） |
 | 参考 | [reference/](./reference/) | 查表与登记：D 号、术语、外部材料、面例外 | 决定正文（→ Note）；主题事实（→ 合同） |
-| 政策 | [policy.md](./policy.md) | **常设规则**：授权边界、门禁升格、自动化上限、越界写入、自主协议 | 操作步骤与命令（→ 指南）；机制依据（→ notes/implemented）；决定史（→ Note） |
+| 政策 | [policy.md](./policy.md) | **常设规则**：授权边界、材料性、门禁升格、自动化上限、越界写入、自主协议 | 操作步骤与命令（→ 指南）；机制依据（→ notes/implemented）；决定史（→ Note） |
 | 指南 | `guides/` | **怎么操作**：runbook、查表步骤、环境怎么立 | 机制依据（→ notes/implemented）；枚举型清单（→ 实现自己，见 D28）；完成定义（→ `.agents/skills/` 或该面 owner）；常设禁令（→ 政策层） |
 | 合同 | 顶层跨面宪法（[testing](./testing.md) / [repo-hygiene](./repo-hygiene.md) / [content-charter](./content-charter.md) / [surface-contract](./surface-contract.md)）+ [contracts/](./contracts/)（按主题） | **是什么**：某主题/子系统**现在时**语义，随代码同 diff | 历史决策（→ Note）；迁移计划；未来设想 |
 | 常驻入口 | [orient.md](./orient.md) · [decisions.md](./decisions.md) | 驾驭者七问与顶层决策门牌，只导航 | 任何事实的复述 |
-| 规范 | [AGENTS.md](./AGENTS.md) | 文档层自身的分层、长度与更新规矩 | 主题事实（→ 合同层）；操作步骤（→ 指南） |
+| 规范 | [AGENTS.md](./AGENTS.md) | 文档层自身的分层、长度、单向依赖与更新规矩 | 主题事实（→ 合同层）；操作步骤（→ 指南） |
 
-**「理由」的边界**：为什么选 A 不选 B、输掉的方案、验证证据 → `notes/implemented/`（Agent Note）；
-`docs/` 只留当前语义（合同）、操作（指南）、查表（参考）；理由正文不再在 docs 留一份。
+**单向依赖规则**：`docs/` 只依赖代码实现与已定型的 `notes/`，**禁止出现指向 `_backlog/` 的 Markdown 链接**（`_backlog/` 是上游探索与缺陷跟踪沙盒，重要结论须先升格进 `notes/` 再由 `docs/` 引用；机械门 = `doc-taxonomy`）。
+**「理由」的边界**：为什么选 A 不选 B、输掉的方案、验证证据 → `notes/implemented/`（Agent Note）；`docs/` 只留当前语义（合同/架构）、操作（指南）、查表（参考），理由正文不留第二份。
 
 ## 长度：顶点即信号
 
@@ -45,8 +46,7 @@
 
 ## 新文档
 
-先定位层次 → 定该层详略上限 → 定教程/参考 → 写 → 放进对应 tier；**顶层门/宪法**才在 [index.md](./index.md) 书架登记，tier 内文档由目录承载（树就是 inventory）。
-**别建集中清单**（第二清单必漂，D28/D34 同款教义）：枚举型事实的家 = 实现自己。
+先定位层次 → 定该层详略上限 → 定教程/参考 → 写 → 放进对应 tier；**顶层门/宪法**才在 [index.md](./index.md) 书架登记，tier 内文档由目录承载（树就是 inventory）。**别建集中清单**（第二清单必漂，D28/D34 同款教义）：枚举型事实的家 = 实现自己。
 
 ## 负知识（本仓明确不借的）
 

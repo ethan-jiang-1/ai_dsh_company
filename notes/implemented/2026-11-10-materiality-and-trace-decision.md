@@ -1,13 +1,13 @@
 # 2026-11-10 · 材料性与留痕决定点：一个判据、一次裁决、一条可解析的落点
 
-状态：implemented（2026-11-10 交付；上游 = [卡](../../_backlog/_archive/settled_issues/2026-11-10-materiality-and-trace-decision.md)）
+状态：implemented（2026-11-10 交付；材料性定义唯一家于 2026-11-27 迁至 `docs/policy.md §P1-B`，部分被 [2026-11-27-docs-architecture-and-dependency-alignment.md](./2026-11-27-docs-architecture-and-dependency-alignment.md) 演进；上游 = [卡](../../_backlog/_archive/settled_issues/2026-11-10-materiality-and-trace-decision.md)）
 > 研究依据 = [issue-bug-traceability](../../_backlog/_archive/research/issue-bug-traceability/README.md)（实测盘点 + 判断与取舍）。
 > 前决定 = [五道门](./2026-11-02-backlog-five-gates.md)（去向封闭集、审查记录；本篇在它上面补「落点解析」与缺陷轨的留痕裁决）。
 
 ## 决定
 
 1. **一个判据，两个消费者。****材料性 = P0，或修复/结论触碰章程 / 常设指令、docs 合同、company-pack 公开行为、已记录决定（`notes/implemented` 状态行）。**
-   定义唯一家 = [`_backlog/README.md`](../../_backlog/README.md)「缺陷的通道」。它不是新清单——原本就是「能不能自己修」的授权排除项，
+   定义唯一家 = [docs/policy.md §P1-B](../../docs/policy.md#p1-b-缺陷材料性与修复自授权边界唯一定义家)（2026-11-27 自 `_backlog/README.md` 迁入）。它不是新清单——原本就是「能不能自己修」的授权排除项，
    现在同时回答「要不要留痕」。别处只引用，不复制清单。
 2. **一个决定点：把留痕裁决挂到已有的授权请示上。** 缺陷轨——材料性修复在翻 `等人拍板` 的授权请示里**同时给出留痕建议**
    （`Note` / `commit` / `none — 理由`）；归档时卡顶写 `留痕：` 行（形状 = [`bugs/README.md`](../../_backlog/bugs/README.md) 模板、

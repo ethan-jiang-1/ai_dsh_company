@@ -24,7 +24,7 @@ const DOC_LINE_BUDGETS = [
   ['_backlog/_archive/fixed_bugs/AGENTS.md', 11], // 同上：迁卡前三问（留痕/审查、修复证据四行、verify）——注入面常驻，棘轮只降不升
   ['tests/AGENTS.md', 19],
   ['AGENTS.md', 84],             // 2026-09-23 二次收口；2026-09-27 瘦身轮 108→100、棘轮 115→105；2026-10-06 条目 D 纯路由化（删复述与括号链，纪律指针化；当时 95→72），棘轮 105→84
-  ['docs/index.md', 48],         // 2026-10-20 台账/外部材料迁出：131→70；2026-11-10 DSH 步 2：逐文档登记 → 书架（树即 inventory），内容 +5% = 48
+  ['docs/index.md', 42],         // 2026-10-20 台账/外部材料迁出：131→70；2026-11-10 DSH 步 2：48；2026-11-27 重构为五层总入口（38 行），棘轮下调至 42
   ['docs/surface-contract.md', 28], // 2026-11-16 立（maintenance-surface-taxonomy）：两层×三面×两轴合同；24 行，cap 28（handoff 指定；headroom 14% 仍在 20% 反向棘轮内）。例外表住 docs/reference/（查表登记层），合同保持短页。负例留证 2026-11-16：上限临时 23 → 24 行超限红；还原 28 → PASS
   ['docs/reference/surface-exceptions.md', 16], // 2026-11-16 立：面例外登记（查表）；13 行，cap 16 = 20% 反向棘轮上限（reference 不设 5% headroom）。新增例外行先按表增长；越过 cap 须 Note 论证。负例留证 2026-11-16：上限临时 12 → 13 行超限红；还原 16 → PASS
   ['docs/decisions.md', 9],      // 2026-11-14 立（decision-ledger-unification）：三仓统一顶层门牌，零事实复述、只导航至 reference/decisions.md；台账真身因随 D 号线性追加不再设固定行死卡，改由 ledger-routing 守单格 ≤100 字 + 表外散文 ≤10 行 + 禁代码块/H3+
@@ -48,6 +48,8 @@ const DOC_LINE_BUDGETS = [
   ['docs/contracts/demo.md', 51],         // 2026-11-10 DSH 步 4：genre 拆分，场景/前置 → guides/demo-scenes；237→51
   ['docs/guides/demo-scenes.md', 207],    // 2026-11-10 步 4：演示前置 + 分镜 + 场景 B–F（内容 +5%）
   ['docs/architecture.md', 88], // 2026-11-10 DSH 步 3：design/architecture → 顶层有序地图（83 行 +5%）
+  ['docs/architecture/host-and-lib.md', 58], // 2026-11-27 立：Host/Lib 内部技术架构主干（52 行，+10% headroom）
+  ['docs/architecture/client-ux.md', 36],    // 2026-11-27 立：Client UI 与 DSH 原生扩展架构主干（32 行，+10% headroom）
   ['docs/contracts/multi-human.md', 76],  // 2026-11-10 步 4：runbook 迁 guides/multi-human-runbook；199→76
   ['docs/guides/multi-human-runbook.md', 133], // 2026-11-10 步 4：开门/交接/前提/迁移（内容 +5%）
   ['docs/contracts/presets.md', 139],     // 2026-11-10 步 4：工具枚举去重 + 培养回路迁 cultivation；198→139
@@ -61,7 +63,7 @@ const DOC_LINE_BUDGETS = [
   ['docs/contracts/release.md', 172],        // 最大未受管合同：发布形状与升 pin 程序
   ['docs/guides/bootstrap.md', 165], // 冷启动配方
   ['docs/contracts/delegation.md', 120],     // 汇报线合同
-  ['docs/contracts/data-model.md', 40],      // 数据卡合同
+  ['docs/contracts/data-model.md', 44],      // 数据卡合同（2026-11-27 补齐 startup/logs/language 三行：41 行，按 Note 论证调至 44）
   ['docs/contracts/profile.md', 66],         // host 组合合同
   ['docs/content-charter.md', 110],          // 2026-11-10 立：内容宪章（归位与抽象层次的唯一家；四槽/三层/四问/两测/两消费者/成本表/红牌/变更协议）104 行 +5%；宪法只写判据，步骤住 skill、清单住目录
   // ── 2026-11-03 R5-17：三份最大 owner 文档 + 根 README + 发布 handoff 补预算 ──

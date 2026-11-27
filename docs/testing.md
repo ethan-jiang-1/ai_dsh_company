@@ -67,4 +67,4 @@
 - **执行下限** = 关键模块阈值（[`vitest.config.ts`](../vitest.config.ts) `coverage.thresholds`）+ **全量棘轮** `checks/lib/coverage-baseline.json`（只升不降；新文件 80/70 下限；<50% 的已知空洞必须豁免并写移除条件）；`pnpm coverage:ratchet` 验，低于即红。失败类决策表 = [tests/failure-classes.md](../tests/failure-classes.md)。
 - **tests 的类型面（已知未覆盖面）**：覆盖 = 三个 `tsconfig.test-*` 的 `include` 减 `exclude`（不写分数与未接计数：两者都随测试树搬移必漂）；未接 = `tests/contract`（直引 vendor 源）、`pack-exports`、client、host 四类（都在各 tsconfig 的 `exclude`；清单以配置为准）。
 - **自测轮**（全门禁 sweep + UX 走查 + entry-probe 语义探针）：agent 阶段收口时提案、用户批后跑（2026-10-04 定）；预算按 [policy §P3](./policy.md) 轻任务纪律。
-- **已知未覆盖面（明说不覆盖）**：多人交互/协作 UX 面——4 个常驻真模型判据探针（dual-ceo / task-discovery / claim-race / dual-signoff，触发见头注），历史 BUG-002..006 台账见 [_fixed_bugs](../_backlog/_archive/fixed_bugs/)；机制面 E1/E2 与 `fs-guard-probe` 不变。
+- **已知未覆盖面（明说不覆盖）**：多人交互/协作 UX 面——4 个常驻真模型判据探针（dual-ceo / task-discovery / claim-race / dual-signoff，触发见头注；历史判据见 [collaboration-probe-evidence](../notes/archived/2026-10-09-collaboration-probe-evidence.md)）；机制面 E1/E2 与 `fs-guard-probe` 不变。

@@ -26,7 +26,7 @@ CI=true pnpm company --no-open   # 端口是环境状态；见下方"端口不�
 4. **角色一眼可辨（2026-09-26 起 client 面自带）**：侧栏每个公司会话行首有**角色标记**
    （座位 12px、单字母 C/F/O/E/S/M + **六色底色**——字母管是谁、底色管一眼扫过是谁，悬停出全称缩写；
    几何与色调/对比度判据 = [sidebar-role-mark-probe](../../probes/browser-visual/sidebar-role-mark-probe.mjs)）：
-   CEO 黑、CFO 蓝、COO 绿、VPE 橙、VPS 红；
+   CEO 黑、CFO 蓝、COO 绿、VPE 橙、VPS 红、CMO 蓝紫；
    当前会话的**浏览器窗口标题**带【角色】前缀、窗口最顶有一条细色带——多窗并排也不会认错门。
    **开每扇门时记得选对 preset**（默认是 `ceo`，已实测踩坑）。
 5. **人该动的时候**：谁的门上出现卡，就由**那个人**答/批。
@@ -74,8 +74,7 @@ CEO 门、人应答 → final + present）。证据快照已随真实部署证�
    任务板**认领失败就让位**——不写该任务 owner-bound 产物，回报 lead 后转干别的（2026-10-10 协作安全卡裁决补）。
    三态判据盯着"成品有没有 present 背书"，但**盯不住"是谁写的"** ⇒ 靠手册纪律 + 互审。
 3. **同盘并发**——**"一个文件同一时刻一个写者"是本仓的流程政策，不是文件系统的保证**。
-   机制实况（2026-09-26 复核；**2026-10-03 E1/E2 实测更新**，推敲卡 =
-   `_backlog/_archive/settled_issues/2026-09-29-collab-mechanism-evidence.md`）：
+   机制实况（**E1/E2 实测结论**，详见 [redis-r0-native-collab](../../notes/archived/2026-10-03-redis-r0-native-collab.md) 与 [collaboration-probe-evidence](../../notes/archived/2026-10-09-collaboration-probe-evidence.md)）：
    - **有**：`fs-local` 的**实例内** per-target 排队锁 + 版本守卫（读过再写时版本变了报 `FS_STALE_VERSION`，
      "一胜一 stale"有官方测试）。**E1 实测（真角色会话 ×4 轮全绿，`probes/fs-taskboard/fs-guard-probe.mjs`）**：
      守卫在角色会话真实生效——盲写既有文件被拒（`FS_NOT_OBSERVED`，模型被拒后重读重写）、stale 拒 4/4；
@@ -115,7 +114,7 @@ CEO 门、人应答 → final + present）。证据快照已随真实部署证�
 
 | # | 搬什么 | 为什么 |
 |---|---|---|
-| 1 | `company-workspace/` 整盘——`kb/`（CHARTER + journal + **owners.md** + org.md + motion-ledger.md）、`deliverables/`、`templates/`、`AGENTS.md`（公司手册） | 这是**真正的共享层**；协作全落在它上面 |
+| 1 | `company-workspace/.dsh-company/` 整盘——`kb/`（CHARTER + journal + **owners.md** + org.md + motion-ledger.md）、`deliverables/`、`cultivation/`、`startup.json`、`overrides/` | 这是**真正的共享层**；协作全落在它上面（手册与模板随 pack `content/` 注入，不在 workspace 落盘） |
 | 2 | `packages/company-pack/`（角色 persona/skills + bundle 行 + client 面） | 角色与规矩的来源 |
 | 3 | `docs/` + `notes/`（当前合同与开发记忆） | 迁过去的人要能读懂"规矩从哪来" |
 | 4 | 环境：DSH 本体（**同一 pin**）+ 各自的 `$DSH_HOME` | home **每台机器自己的**（会话库/凭据是本地的，不共享）。**多 home 三个已核事实（实验 D 配置 B 活体，2026-09-26）**：① 每家要**各自装 pack**（新 home 只有 factory preset，公司角色建不了门）；② 同一共享盘在两家**各落一个日志 bucket** ⇒ 审计（`deliverables-check` / `journal-audit` 按 `$DSH_HOME` 扫）**每家跑一遍**，只跑一家会漏另一家的会话；③ Agent Teams 消息跨 home 无寻址路径（进程内能力 + 双服务互不可见）——跨家协作只剩共享盘 |

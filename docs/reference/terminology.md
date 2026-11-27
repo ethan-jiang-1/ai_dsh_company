@@ -15,6 +15,6 @@
 | 会议/任务板/邮箱 | Agent Teams（`ctx.agentTeams`，experimental） | `packages/experimental/agent-team` + `packages/experimental/tool-agent-team` + `vendor/dsh/docs/subsystems/agent-team.md` |
 | 原生四通道 / 组织别名 A/B/D | `spawn`（A 命名委托）/ `fork` / `workflow`（D，只在 vp-eng 同身份扇出）/ `team`（B Agent Teams）；C（dsh-sdk）当前未启用 | [architecture.md](../architecture.md) 协作通道表 + [architecture Note](../../notes/implemented/2026-11-10-architecture-rationale.md) §3 |
 | M1–M4（用法/编排） | 人中继 / 隔离委托 / SDK 编排器 / 团队（roles-isolation §3） | [roles-isolation.md](../../notes/implemented/2026-11-10-roles-isolation-rationale.md) §3 选型速查 |
-| 公司页签 / 公司视图 | 右栏公司页签（可 `float()` 拖出成浮窗）+ 整页视图（`conversation.view` 条目）——页签清单 = 客户端注册面（[src/client](../../packages/company-pack/src/README.md)），随切片增长、不在此枚举 | `packages/client/ui-sidebar-right`（tab 注册与浮窗）+ `vendor/dsh/docs/subsystems/sidebar-right.md` + `packages/client/ui-dockkit`（浮窗手势） |
+| 公司页签 / 总部（HQ） | 右栏聚合页签（作战板/团队/档案，浮窗交由原生 `<DockLayout>`）+ 左侧全局「梦之队总部」面板（`sidebar.panellist` + `main`）+ `conversation.view` 培养入口——清单 = 客户端注册面（[client-ux](../architecture/client-ux.md) · [src/client](../../packages/company-pack/src/README.md)） | `packages/client/ui-sidebar-right` + `packages/client/ui-layout` + `packages/client/ui-dockkit` |
 | 交付物 / 成品 | `present` 工具的 explicit deliveries（**成品 = present 过的 final**；三态合同 = demo.md） | `packages/client/ui-deliverables` |
 | 观察窗 / 驾驶舱 / 驾驶座；R3 / r3 / R3′ | 人侧 web 窗口三别名（「驾驶舱」史名）；R3=退役轮次、r3=场景号、R3′=扫描口径——三义别互推 | `apps/web`；词表 = [orient.md](../orient.md) |
