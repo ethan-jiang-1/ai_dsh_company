@@ -28,7 +28,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 改动面 | 最窄检查（先跑这个） | 受影响时升档 | 同 diff 义务（政策原则 = [testing.md §2](../docs/testing.md)） |
 |---|---|---|---|
 | persona / skill 文案（`packages/company-pack/presets/`） | `pnpm test tests/presets` | [preset-smoke](../checks/lanes/preset.entry.mjs) | **行为判据面**改动（改变"模型被要求做什么/判据怎么落"）→ 场景同 diff 必带（两件套组队 = [product-team-e2e-smoke](../checks/lanes/product-team-e2e.entry.mjs)）；纯措辞润色 → 连通档 + 内容档兜 |
-| 手册 / CHARTER / 模板（`packages/company-pack/content/`——**只读注入面**；host 注入，不落 workspace） | `pnpm verify`（handbook-budget + **replay-fixture-freshness**：runnable 场景的注入新鲜度静态比对） | [handbook.spec](./host/prompt/handbook.spec.ts)（keyless：content/override/section 注册）+ 受影响 replay 场景重跑（[replay-smoke](../checks/lanes/replay.e2e.mjs)；本仓仅 foundation 合成场景） | 注入内容变化 ⇒ 受影响 runnable 场景**同 diff 重录**或声明降档（带日期理由；本仓无 full 档）；规矩变化 ⇒ 行为判据面义务同上行 |
+| 手册 / CHARTER / 模板（`packages/company-pack/content/`——**只读注入面**；host 注入，不落 workspace） | `pnpm verify`（handbook-budget + **replay-fixture-freshness**：runnable 场景的注入新鲜度静态比对） | [handbook.spec](./host/prompt/handbook.spec.ts)（keyless：content/override/section 注册）+ 受影响 replay 场景重跑（[replay-smoke](../checks/lanes/replay.e2e.mjs)：含 `company-handbook-smoke` 与 `foundation-workspace`） | 注入内容变化 ⇒ 受影响 runnable 场景**同 diff 刷新/重录**（authored 场景用 `--refresh`）或声明降档（带日期理由）；规矩变化 ⇒ 行为判据面义务同上行 |
 | bundle / preset 行 config（机制面） | `pnpm test tests/presets` | + [delegation-smoke](../checks/lanes/delegation.entry.mjs)（工具行） | 同 diff 必带 |
 | workflow/subagent 机制面（schema 语义 / 结果渲染 / 委派控制面 / retry 深度与注册面） | `pnpm test tests/contract`（真引擎渲染与子集语义）+ `pnpm test tests/host/delegation/delegation-control.spec.ts` + `pnpm test tests/presets/delegation-retry.spec.ts tests/host/delegation/subagent-retry.spec.ts` | `node --import tsx/esm checks/lanes/workflow-contract.e2e.mjs`（keyless 机制档；改组合行或升 pin） | 上游修好时按 [收口 Note](../notes/implemented/2026-11-08-delegation-contract-repair.md) 的退役条件删规则/工具 |
 | client 面板（用户可见面：视图模型/组件/文案/CSS，`src/client/`） | `pnpm test tests/client`（按模块点名 spec，含 `client-face` / `style-lifecycle`） | [ui-scene-smoke](../checks/lanes/ui-scene.entry.mjs) `--isolated --expected`（隔离空壳页签文本金样；`--steps` 复现交互）+ [client-load-smoke](../checks/lanes/client-load.entry.mjs) + [cdp-probe](../probes/browser-visual/cdp-probe.mjs)（活体全页签） | 用户可见改动 → 同 diff 刷金样（`--refresh-expected`）/ 对应 visual probe；新增/改文案先加载 `company-ui-change-definition` skill，zh+en 成对落 `company` 字典 |
@@ -37,7 +37,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | 启动入口 / workspace 解析 / 公司状态（`src/host/startup*`、`tools/dev/company.mjs` dev-only） | `pnpm test tests/host`（bootstrap/manifest/presented-domain） | [company-entry-smoke](../checks/lanes/company-entry.entry.mjs) + [release-smoke](../checks/lanes/release.entry.mjs) + [client-load-smoke](../checks/lanes/client-load.entry.mjs) | 新入口同 diff 进 checks/README；`pnpm verify` script-index/status |
 | 类型面（改 `src/**` 的导出/导入签名） | `pnpm typecheck`（四套 `tsconfig.test-*` 并集全覆盖：直引 vendor 源的 spec 由 `tsconfig.test-vendor-bridge.json` 承接，清单以配置为准；fresh clone 需先按 [bootstrap](../docs/guides/bootstrap.md) 构建 vendor client 类型） | [release-smoke](../checks/lanes/release.entry.mjs)（发布前）；`verify` 的 src-layering 只守方向不守类型 | — |
 | pack 导出/注册面（Host / Client 注册改动） | `pnpm test tests/repo`（导出形态）+ `pnpm test tests/host`（Host 注册回调行为）+ `pnpm test tests/client`（Client 槽注册） | [release-smoke](../checks/lanes/release.entry.mjs)（真实安装形状；含 researcher） | — |
-| 发布 / 升 pin | `pnpm test tests/repo`（release-foundation 等） | [release-smoke](../checks/lanes/release.entry.mjs) + 升 pin 程序（合同 = [release.md](../docs/contracts/release.md)；**本仓只有不加载 pack 的合成回放，只证管线可跑，不是升 pin 第一道**） | — |
+| 发布 / 升 pin | `pnpm test tests/repo`（release-foundation 等） | [release-smoke](../checks/lanes/release.entry.mjs) + 升 pin 程序（合同 = [release.md](../docs/contracts/release.md)；合成回放含 `company-handbook-smoke` 验 pack 装配与手册注入，多角色业务录制仍在部署仓） | — |
 | 检查与工具入口（`checks/**`、`probes/**`、`tools/**`） | 消费它的 keyless spec + `pnpm verify`（头注/结构门禁） | 真实入口冒烟按脚本头注「何时跑」 | — |
 | 文档 / 指针 | `pnpm verify`（md-links / bare-path / doc-budget） | [entry-probe-smoke](../checks/lanes/entry-probe.entry.mjs)（入口链文档改动后） | — |
 
@@ -66,7 +66,7 @@ spec 清单 = 各区**目录本身**（DSH no-index 教义；D28——清单随�
 | **单元/组件 keyless** | 秒级 | `pnpm test` 或相关 Vitest 文件——含 UI 组件的**纯函数视图模型 + 静态渲染**（`react-dom/server`，不需要浏览器）；便宜 smoke lane = `pnpm smoke:fast`（4 条，~2.2s；pre-push；只证明资产还活着） |
 | 装配 keyless | ~25s | `client-load-smoke`（真页面零挂载失败；slot 名写错会在这里炸） |
 | 机制/边界（1 条 prompt） | ~30s | `delegation-smoke`（模型可见工具目录 + shadow 边界） |
-| **重放 lane（第三档，无 key）** | 现行场景 ~2s | `replay-smoke`（仅 foundation 合成场景，不加载 company-pack；会话日志 + sidecar）——要起进程，不进 `pnpm test`。真页面车道 = `ui-scene-smoke`（自起实例，~40s） |
+| **重放 lane（第三档，无 key）** | 现行场景 ~8s | `replay-smoke`（默认跑全部 runnable 合成场景：`foundation-workspace` + 加载 `company-pack` 的 `company-handbook-smoke`；会话日志 + sidecar）——要起进程，不进 `pnpm test`。真页面车道 = `ui-scene-smoke`（自起实例，~40s） |
 | CLI 集成（keyless，需子进程） | 秒级 | `node checks/lanes/snapshot-motion.e2e.mjs`（真实 CLI + 临时 fixture；不进 `pnpm test`） |
 | 发布与分发（无 key） | 分钟级 | `release-smoke`（构建→npm pack→干净 profile→plugin add→built 入口 boot 冒烟；合同 [release.md](../docs/contracts/release.md)） |
 | 认证档（真模型） | 分钟级 | 按面选择（**逐个脚本的触发条件与成本见其头注「何时跑」**；`script-triggers` 门禁强制） |

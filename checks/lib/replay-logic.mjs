@@ -1,3 +1,6 @@
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 // The date channel injects the current time into durable user/message content, so recordings and replays cannot
 // compare until both the sampled ISO timestamp and rhythm-dependent elapsed duration use stable tokens.
 // Sandbox/mode, approval/policy, and permission/preset values are machine policy (run/env.sh's Seatbelt result),
@@ -58,6 +61,37 @@ const REPLAY_TEMP_PATH = /dsh-replay-[a-z0-9-]+-[A-Za-z0-9]+(?!["A-Za-z0-9-])/g
  */
 export function normalizeReplayTempPaths(text) {
   return text.replace(REPLAY_TEMP_PATH, '{{replay-root}}')
+}
+
+/**
+ * Stabilize host-specific checkout root and temp replay roots inside extracted system-prompt sidecars.
+ * @param {string} prompt - Extracted system prompt text.
+ * @param {string} repoRoot - Current repository root path.
+ * @returns {string} Portable sidecar text without host-specific paths.
+ */
+export function normalizeReplayPromptPaths(prompt, repoRoot) {
+  const withoutRepo = repoRoot ? prompt.split(repoRoot).join('{{repoRoot}}') : prompt
+  return withoutRepo.replace(/(?:\/private)?\/(?:var\/folders\/[^\s"']+|tmp)\/dsh-replay-[a-z0-9-]+-[A-Za-z0-9]+/g, '{{replay-root}}')
+    .replace(REPLAY_TEMP_PATH, '{{replay-root}}')
+}
+
+/**
+ * Enumerate all replay scenarios declared `replayEligible: runnable` on disk.
+ * @param {string} repoRoot - Repository root path.
+ * @returns {string[]} Sorted runnable scenario names.
+ */
+export function listRunnableReplayScenes(repoRoot) {
+  const replayRoot = join(repoRoot, 'snapshots/replay')
+  if (!existsSync(replayRoot)) return []
+  return readdirSync(replayRoot, { withFileTypes: true })
+    .filter(entry => entry.isDirectory() && !entry.name.startsWith('.') && !entry.isSymbolicLink())
+    .map(entry => entry.name)
+    .sort()
+    .filter(scene => {
+      const ymlPath = join(replayRoot, scene, 'snapshot.yml')
+      if (!existsSync(ymlPath)) return false
+      return /^replayEligible:\s*runnable\s*$/m.test(readFileSync(ymlPath, 'utf8'))
+    })
 }
 
 /** @typedef {Record<string, unknown> & { type?: string }} ReplayRecord */

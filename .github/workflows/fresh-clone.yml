@@ -67,10 +67,21 @@ jobs:
       - run: node tools/dev/setup.mjs --check
       - run: pnpm verify
       - run: pnpm test
+      # 真挂载闭环（2026-11-28 维 9 收口）：在干净 macOS runner 上装 Chromium、建 company profile 并实跑
+      # preset.entry + client-load.entry + company-entry.entry，消除真入口脱离 CI 的盲区。
+      - name: Install Playwright Chromium & verify live mount entries
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/runtime/pw-browsers
+        run: |
+          ./node_modules/.pnpm/node_modules/.bin/playwright install chromium
+          node tools/dev/build-client.mjs
+          node tools/release/export-dist.mjs
+          git checkout -- _dist/安装手册.md
+          bash -c 'set -o pipefail && source run/env.sh && node tools/dev/company.mjs --install-only && node checks/lanes/preset.entry.mjs && node checks/lanes/client-load.entry.mjs && node checks/lanes/company-entry.entry.mjs'
       # 2026-11-13（研究 B 件）：环外资产的每周新鲜度回路。真入口证据不在 push 时必跑链里，
       # 最多陈旧 7 天；成员 = tools/lib/core/asset-lanes.mjs（skip 清单每次都打印，资产不许静默消失）。
       # 首几周若因干净环境差异红，按实际结果修环境或把对应资产标 ciSafe:false + 理由，不删资产。
-      - run: node checks/lanes/keyless-lane.mjs --ci
+      - run: bash -c 'source run/env.sh && node checks/lanes/keyless-lane.mjs --ci'
         timeout-minutes: 25
       - run: node checks/audit/coverage-ratchet.mjs
         timeout-minutes: 10

@@ -16,7 +16,8 @@ import { isEvidencePath, markdownLinkTargets } from '../../tools/lib/core/markdo
 //   moved    = 源头非冻结层，目标落在 snapshots/ runtime/ company-workspace/（证据引用已移走）
 //   archived = 源头在冻结层（无论目标）——归档是历史记录，不回写，只设天花板
 // 不查的反面（明说）：① 只认 Markdown 链接（HTML href / 裸文件名不在内）；② 不认 URL 与锚点；
-//   ③ `packages/company-pack/content/` 按部署相对语料排除（其链接由 `shipped-links` 按 content 基准查）。
+//   ③ `packages/company-pack/content/` 按部署相对语料排除（其链接由 `shipped-links` 按 content 基准查）；
+//   ④ `*.expected.md`（replay/UI 金样快照）是系统提示词/页面输出字面量快照（含示例语法 `<path/to/image.png>`），非文档源。
 // 负例留证 2026-11-03（实地造红→还原→绿）：在 `notes/implemented/2026-11-03-round6-hygiene-batch.md`
 //   末尾加 `[x](../../snapshots/visual/zz-missing.png)` →
 //   `FAIL link-debt: moved 1 > 基线 0（源头非冻结层、目标已移出产品仓的证据引用只许降）`；删除 → 绿
@@ -72,7 +73,7 @@ export function run({ root, ok, fail }) {
     return hit
   }
   for (const sourceRel of trackedMarkdown(root)) {
-    if (sourceRel.startsWith('packages/company-pack/content/')) continue
+    if (sourceRel.startsWith('packages/company-pack/content/') || sourceRel.endsWith('.expected.md')) continue
     const absolute = join(root, sourceRel)
     if (!pathExists(absolute)) continue
     let targets

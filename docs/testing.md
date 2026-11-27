@@ -63,7 +63,7 @@
 ## 5. 节奏与授权
 
 - 不默认全量：本地按 §2 选最小证据；CI = 结构门禁 + 干净环境差异；pre-push hook = 免浏览器/免 `DSH_HOME` 的秒级确定性安全网：无条件 `verify` + 按出站改动面精准分派（docs-only 只跑 `verify`；代码/测试/探针跑受影响的增量 `typecheck`/`lint`/`dup`/`smoke:fast`/`test:checks` + 最多一次合并去重 `vitest`；未分类 fail-closed；规则唯一家 = `tools/lib/core/asset-lanes.mjs`）。
-- **真入口面（`client-load` / `preset` / `replay`）**：不再阻塞 `git push`；改由开发收口 `source run/env.sh && pnpm smoke:surface` 与发版前 `pnpm release --verify` 强制兜底（每周 CI `fresh-clone.yml` 另覆盖 `replay`、`coverage:ratchet` 与全局通道 `channel-matrix`，`client-load`/`preset` 在 `--ci` 中显式跳过）。
+- **真入口面（`client-load` / `preset` / `replay`）**：不再阻塞 `git push`；改由开发收口 `source run/env.sh && pnpm smoke:surface`、PR/push 触及插件或车道时的 macOS CI job、每周 CI `fresh-clone.yml`（含 `preset`/`client-load`/`company-entry`/`replay`/`channel-matrix`/`coverage:ratchet`）与发版前 `pnpm release --verify` 强制兜底。
 - **执行下限** = 关键模块阈值（[`vitest.config.ts`](../vitest.config.ts) `coverage.thresholds`）+ **全量棘轮** `checks/lib/coverage-baseline.json`（只升不降；新文件 80/70 下限；<50% 已知空洞须豁免并写移除条件）；`pnpm coverage:ratchet`（带 `maxWorkers` 上限与同 HEAD 干净树复用）在 `release:verify`、每周 CI 与阶段收口执行。失败类决策表 = [tests/failure-classes.md](../tests/failure-classes.md)。
 - **tests 的类型面（全量覆盖）**：由四套 `tsconfig.test-*.json`（`test-client`、`test-company`、`test-harness`、`test-vendor-bridge`）并集覆盖全部 `tests/**/*.spec.{ts,tsx}`（不写分数计数：随测试树增删必漂，零漏网由 `typecheck-coverage-claim.spec` 用真实 TS 配置解析器机械守卫）。
 - **自测轮**（全门禁 sweep + UX 走查 + entry-probe 语义探针）：agent 阶段收口时提案、用户批后跑（2026-10-04 定）；预算按 [policy §P3](./policy.md) 轻任务纪律。

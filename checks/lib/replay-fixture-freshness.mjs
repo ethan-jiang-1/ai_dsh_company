@@ -9,20 +9,44 @@
 // 分档（与 replay-smoke 的判据档位同源）：只有 **runnable + full 档**场景要求注入面新鲜——
 // presence 档的判据本来就跳过内容比对（录制早于内容演进是其已知边界），不适用本判据。
 
-/** 注入包裹里的起点标记（agent-instructions 注入面）。 */
-const MARKER = 'Instructions from: AGENTS.md'
+/** 注入包裹里的起点标记（v2 agent-instructions 注入面与 v3 host systemPrompt section 注入面）。 */
+const MARKER_V2 = 'Instructions from: AGENTS.md'
+const MARKER_V3 = 'If `.dsh-company/overrides/...` exists, prefer the override for templates/charters/handbook.'
+const V3_SECTION_BOUNDARIES = [
+  '\n<!-- system/message change ',
+  '\n\n本项目的启动策略（',
+  '\n\nProject startup strategy (',
+  '\n\n⚠ 项目启动策略文件不可用',
+  '\n\n⚠ Project startup strategy file unavailable',
+  '\n\n\nAgent Teams is available in this session',
+  '\n\n\nCompany delegation · seat note',
+  '\n\n\nTokens prefixed with @',
+  '\n\n\nCheck the [exit code: N]',
+]
 
 /**
- * 从一条注入文本里提取手册正文：marker 之后、`</system-reminder>` 之前，去首尾空行。
- * 没有 marker（该 user/message 不是手册注入）= undefined，不误当空正文。
+ * 从一条注入文本或 system-prompt sidecar 提取手册正文：去包裹头尾与首尾空行。
+ * 没有任一 marker = undefined，不误当空正文。
  */
 export function extractInjectedHandbook(text) {
   const raw = String(text ?? '')
-  const at = raw.indexOf(MARKER)
-  if (at === -1) return undefined
-  const end = raw.lastIndexOf('</system-reminder>')
-  const body = raw.slice(at + MARKER.length, end === -1 ? raw.length : end)
-  return body.replace(/^\n+/, '').replace(/\n+$/, '')
+  const atV2 = raw.indexOf(MARKER_V2)
+  if (atV2 !== -1) {
+    const end = raw.lastIndexOf('</system-reminder>')
+    const body = raw.slice(atV2 + MARKER_V2.length, end === -1 ? raw.length : end)
+    return body.replace(/^\n+/, '').replace(/\n+$/, '')
+  }
+  const atV3 = raw.indexOf(MARKER_V3)
+  if (atV3 !== -1) {
+    const start = atV3 + MARKER_V3.length
+    let end = raw.length
+    for (const boundary of V3_SECTION_BOUNDARIES) {
+      const idx = raw.indexOf(boundary, start)
+      if (idx !== -1 && idx < end) end = idx
+    }
+    return raw.slice(start, end).replace(/^\n+/, '').replace(/\n+$/, '')
+  }
+  return undefined
 }
 
 /** 比较双方都按「去尾部空行」归一（注入包裹会加一层尾换行；文件以单换行结尾是本仓形状）。 */

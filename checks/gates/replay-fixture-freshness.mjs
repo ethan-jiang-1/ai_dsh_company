@@ -18,6 +18,8 @@ import { freshnessProblems } from '../lib/replay-fixture-freshness.mjs'
 //   ① r3-delegation 现行手册（187 行）vs 录制（190 行版）→ 红，报
 //     「注入手册第 152 行与现行不一致：录制『- 第一版只把已生效的签字线落进…』vs 现行『### 规矩缺口…』」；
 //   ② 单测负例（replay-fixture-freshness.spec）：无注入面 → 报形状异常；marker 缺席 → undefined 不误判。
+// 负例留证 2026-11-28（v3 system-prompt sidecar 接入 company-handbook-smoke 真树造红→还原→绿）：
+//   篡改 packages/company-pack/content/AGENTS.md 首行 → `FAIL replay-fixture-freshness: … company-handbook-smoke/system-prompt.expected.md（注入手册第 1 行与现行不一致…）`；还原 → PASS。
 export function run({ root, ok, fail, skip }) {
   const replayRoot = join(root, 'snapshots/replay')
   const handbookPath = join(root, 'packages/company-pack/content/AGENTS.md')
@@ -64,6 +66,12 @@ export function run({ root, ok, fail, skip }) {
           } catch { /* 坏行归 replay-smoke 的 fixture 校验管 */ }
         }
         if (injections.length > 0) fixtureHandbooks.push({ file: name, injections })
+      }
+      for (const name of readdirSync(dir).filter(n => /^system-prompt(?:\.\d+)?\.expected\.md$/.test(n)).sort()) {
+        const text = readFileSync(join(dir, name), 'utf8')
+        if (text.includes('prefer the override for templates/charters/handbook.')) {
+          fixtureHandbooks.push({ file: name, injections: [text] })
+        }
       }
     }
     checkedInjections += fixtureHandbooks.reduce((n, entry) => n + entry.injections.length, 0)

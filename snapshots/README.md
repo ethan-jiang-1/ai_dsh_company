@@ -10,6 +10,7 @@
 | 场景 | 现有资产与证明范围 | 消费入口 |
 |---|---|---|
 | [replay/foundation-workspace](replay/foundation-workspace/) | authored 文件工具回放：`workspace.before → expected` 完整树、replay fixtures、sidecars；无公司事实 | [replay-smoke](../checks/lanes/replay.e2e.mjs) |
+| [replay/company-handbook-smoke](replay/company-handbook-smoke/) | authored 公司包回放：真实挂载 `dsh-company-pack` + `ceo` 预设与公司手册注入面（full 档会话+sidecar 零 diff）；无客户事实 | [replay-smoke](../checks/lanes/replay.e2e.mjs) + [replay-fixture-freshness](../checks/gates/replay-fixture-freshness.mjs) |
 | [visual/company-shell](visual/company-shell/) | UI 金样：隔离空壳（无会话；默认 workspace 指向隔离公司盘）下公司页签（数以 [ui-expected-freshness](../checks/gates/ui-expected-freshness.mjs) 输出为准）的归一化可见文本；断言外壳与空态，不覆盖会话数据面 | [ui-scene-smoke](../checks/lanes/ui-scene.entry.mjs)（`--isolated --expected`）+ [ui-expected-freshness](../checks/gates/ui-expected-freshness.mjs) |
 | [probes/entry-probe](probes/entry-probe/) | 认证档答卷归档：真模型对入口链 13 题的逐题答案 + 来源哈希（合成任务；无部署/客户数据） | [entry-probe-smoke](../checks/lanes/entry-probe.entry.mjs)（真模型，按日期追加） |
 | [probes/human-loop-e2e](probes/human-loop-e2e/) | 真浏览器回执截图：补料/建议/规矩缺口→裁决→回流三相的人机回路现场（合成任务；无客户数据） | [human-loop-e2e-smoke](../checks/lanes/human-loop-e2e.entry.mjs)（真模型+浏览器，按日期追加） |

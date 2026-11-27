@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 状态：常驻（repo dev-only）
 // 何时跑：维护者要在 dev workspace 起一个 `company` profile 看交付形态时。
-// 用法：pnpm company [--link] [--port <n>] [--no-open] [--home <DSH_HOME>] [--workspace <dir>]
+// 用法：pnpm company [--link] [--install-only] [--port <n>] [--no-open] [--home <DSH_HOME>] [--workspace <dir>]
 // 端口缺省 = 0（交系统分配；避免撞上日常 GUI 的 3080），显式 --port 优先。
 //
 // 这**不是**启动入口，也不进 tarball：启动入口是 `dsh --profile company`。
@@ -16,6 +16,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { devTarballName, ensureDefaultPort, migrationNotice, planDevStart, resolveDevMode, shouldReuseBuild } from '../lib/core/dev-install.mjs'
 import { devBuildFingerprint } from '../lib/core/pack-source.mjs'
+import { writeClientBuildFingerprint } from '../lib/core/client-bundle.mjs'
 import { redactTokenUrls } from '../lib/session/session-diagnose.mjs'
 
 const here = fileURLToPath(import.meta.url)
@@ -59,7 +60,7 @@ const stateDir = join(home, 'tmp/dev-pack')
 const passthrough = []
 for (let i = 0; i < args.length; i += 1) {
   if (args[i] === '--home' || args[i] === '--workspace') { i += 1; continue }
-  if (args[i] === '--link' || args[i] === '--rebuild') continue
+  if (args[i] === '--link' || args[i] === '--rebuild' || args[i] === '--install-only') continue
   passthrough.push(args[i])
 }
 // 端口是环境状态：没点名 --port 时交系统分配，避免撞上日常 GUI（通常 3080）。
@@ -128,6 +129,7 @@ if (mode === 'tarball') {
     console.log('company(dev): 构建 + 打包（用户侧同形安装）')
     run([process.execPath, './node_modules/typescript/bin/tsc', '-b', 'packages/company-pack'])
     run([join(root, 'node_modules/.bin/tsdown')], { cwd: packDir })
+    writeClientBuildFingerprint(root)
     const packed = spawnSync('npm', ['pack', '--pack-destination', stateDir, '--json'], {
       cwd: packDir, env: { ...env, npm_config_cache: join(home, 'cache/npm') }, encoding: 'utf8',
     })
@@ -170,6 +172,10 @@ if (mode === 'tarball') {
   for (const name of readdirSync(stateDir)) {
     if (name.endsWith('.tgz') && join(stateDir, name) !== tarballPath) rmSync(join(stateDir, name), { force: true })
   }
+}
+if (args.includes('--install-only')) {
+  console.log('company(dev): --install-only 完成（company profile 已就绪）')
+  process.exit(0)
 }
 
 // 启动输出同时落盘：起窗崩溃时不再只剩终端（2026-11-03 R5-33）。

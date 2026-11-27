@@ -22,7 +22,7 @@
 | **看真页面 / 复现 UI 症状** | [ui-scene-smoke](lanes/ui-scene.entry.mjs)：自起实例 → 全部公司页签 + 浏览器错误环 → 证据（`--keep` 留实例；`--isolated --expected` = 隔离空壳金样档；`--steps` = 复现点击/输入） |
 | 查看已运行页面 | [cdp-probe](../probes/browser-visual/cdp-probe.mjs)；指南 = [CDP 指南](../docs/guides/cdp-probe.md) |
 | **页面报错了但日志里没有** | [client-error-chain-smoke](lanes/client-error-chain.entry.mjs)：隔离单 writer 真页面 → `console.error` → 错误环 → `$DSH_HOME/logs/company-client-errors.log`（keyless ~40s） |
-| 确认录制行为与工作区判据 | [replay-smoke](lanes/replay.e2e.mjs)（当前仅 headless 合成场景） |
+| 确认录制行为与工作区判据 | [replay-smoke](lanes/replay.e2e.mjs)（默认跑全部 runnable 合成场景：含 `company-handbook-smoke` 与 `foundation-workspace`） |
 | 确认 workflow 引擎机制（失败重试/fatal/null/回执拼接） | [workflow-contract-smoke](lanes/workflow-contract.e2e.mjs)（keyless ~2s，fake provider + 真引擎） |
 | 审计动议输出与角色留痕 | [deliverables-check](audit/deliverables-check.mjs) · [authorship-audit](audit/authorship-audit.mjs) · [journal-audit](audit/journal-audit.mjs) |
 | 核对发布链或导出交付包 | [release-smoke](lanes/release.entry.mjs) · [channel-matrix-smoke](lanes/channel-matrix.entry.mjs) · [export-dist](../tools/release/export-dist.mjs) · [market-index](../tools/release/market-index.mjs) |

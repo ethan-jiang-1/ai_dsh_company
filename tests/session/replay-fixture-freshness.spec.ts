@@ -4,10 +4,16 @@ import { extractInjectedHandbook, freshnessProblems, handbookDrift } from '../..
 const wrap = (handbook: string) =>
   `<system-reminder>\nThe following workspace instructions may be relevant…\n\nInstructions from: AGENTS.md\n\n${handbook}\n\n</system-reminder>`
 
+const wrapV3 = (handbook: string, trailing = '') =>
+  `You are the CEO.\n\nCompany content (read-only): {{repoRoot}}/packages/company-pack/content\nIf \`.dsh-company/overrides/...\` exists, prefer the override for templates/charters/handbook.\n\n${handbook}\n${trailing}`
+
 describe('replay-fixture-freshness 纯逻辑', () => {
-  it('提取 marker 到 </system-reminder> 之间的手册正文，去首尾空行', () => {
+  it('提取 marker 到 </system-reminder> 或 v3 system-prompt section 边界之间的手册正文', () => {
     expect(extractInjectedHandbook(wrap('# 手册\n\n- 条款一\n'))).toBe('# 手册\n\n- 条款一')
     expect(extractInjectedHandbook(wrap('# 手册'))).toBe('# 手册')
+    expect(extractInjectedHandbook(wrapV3('# Company handbook\n\n- Rule 1'))).toBe('# Company handbook\n\n- Rule 1')
+    expect(extractInjectedHandbook(wrapV3('# Company handbook\n- Rule 1', '\n本项目的启动策略（已由人指定）：\n- 产品类型：x'))).toBe('# Company handbook\n- Rule 1')
+    expect(extractInjectedHandbook(wrapV3('# Company handbook\n- Rule 1\n', '\n\nAgent Teams is available in this session\n\nBody'))).toBe('# Company handbook\n- Rule 1')
   })
 
   it('无 marker = undefined（普通 user/message 不误当空手册）', () => {

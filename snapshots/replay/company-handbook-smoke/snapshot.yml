@@ -1,0 +1,10 @@
+version: 1
+scenario: company-handbook-smoke
+profile: web
+agentPreset: ceo
+composition: company-web-ceo
+recording: authored
+replayJudges: full
+# 来源性质：authored 合成会话 fixture（不含独立 workspace.expected/ 文件树 oracle，仅验证真实 dsh-company-pack + CEO 预设挂载与手册注入回放；零真实客户/动议数据）。
+replayEligible: runnable
+# 资格理由（2026-11-28）：keyless web+company-pack CEO 回放 ALL PASS（full 档会话+sidecar 零 diff + 手册注入新鲜度由 replay-fixture-freshness 门禁静态守卫）

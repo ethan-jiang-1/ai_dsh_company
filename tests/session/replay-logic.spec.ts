@@ -1,5 +1,14 @@
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { judgeReplaySessions, normalizeReplayTempPaths, normalizeReplayTimeContext } from '../../checks/lib/replay-logic.mjs'
+import {
+  judgeReplaySessions,
+  listRunnableReplayScenes,
+  normalizeReplayPromptPaths,
+  normalizeReplayTempPaths,
+  normalizeReplayTimeContext,
+} from '../../checks/lib/replay-logic.mjs'
 
 describe('replay fixture normalization and judgements', () => {
   it('stabilizes volatile time and posture values while retaining posture source', () => {
@@ -128,5 +137,28 @@ describe('replay temp path normalization · 不碰 cwd 字段', () => {
     const header = '{"cwd":"/private/var/folders/x/T/dsh-replay-r3-delegation-avsDn"}'
     expect(normalizeReplayTempPaths(header)).toContain('avsDn')
     expect(normalizeReplayTempPaths(header)).not.toContain('{{replay-root}}')
+  })
+
+  it('normalizeReplayPromptPaths 将仓库根与临时重放目录替换为稳定占位符', () => {
+    const prompt = 'Company content (read-only): /repo/checkout/packages/company-pack/content/\nWork: /private/var/folders/ab/cd/T/dsh-replay-company-handbook-smoke-XyZ123/sub'
+    expect(normalizeReplayPromptPaths(prompt, '/repo/checkout')).toBe(
+      'Company content (read-only): {{repoRoot}}/packages/company-pack/content/\nWork: {{replay-root}}/sub',
+    )
+    expect(normalizeReplayPromptPaths('plain', '')).toBe('plain')
+  })
+
+  it('listRunnableReplayScenes 只列出声明 replayEligible: runnable 的场景', () => {
+    const root = mkdtempSync(join(tmpdir(), 'replay-scenes-'))
+    try {
+      expect(listRunnableReplayScenes(root)).toEqual([])
+      mkdirSync(join(root, 'snapshots/replay/a-run'), { recursive: true })
+      mkdirSync(join(root, 'snapshots/replay/b-arch'), { recursive: true })
+      mkdirSync(join(root, 'snapshots/replay/c-missing'), { recursive: true })
+      writeFileSync(join(root, 'snapshots/replay/a-run/snapshot.yml'), 'replayEligible: runnable\n')
+      writeFileSync(join(root, 'snapshots/replay/b-arch/snapshot.yml'), 'replayEligible: archived\n')
+      expect(listRunnableReplayScenes(root)).toEqual(['a-run'])
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
   })
 })

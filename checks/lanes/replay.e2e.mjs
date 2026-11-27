@@ -4,33 +4,16 @@
 // 前置：**先 source run/env.sh 再跑**（或显式给同样的 DSH_PERMISSION_MODE）。姿态事件的**值**已脱敏，
 //   但它们的**在场与位置**随机器姿态变（Seatbelt 可用 = workspace-write，损坏 = danger-full-access，
 //   权限事件序列不同）——裸跑会在那些行上红，那是设计内的「序列漂移照样红」，不是夹具坏。
-// 何时跑：录制行为、组合或 workspace replay 改动时（第三档，无 key；现行只有一个 headless 合成场景 ~2s；浏览器档已停用，真页面断言用 checks/lanes/ui-scene.entry.mjs）
-//   --prepare     原始录制（replay/raw/，lead.jsonl + 任意名 child）→ 归一化 fixture
-//                 （session.v3.jsonl + session.<k>.v3.jsonl，child 按 header createdAt 排序）
-//                 + sidecar（system-prompt.expected.md / tool-schemas.expected.json；child 带 .k. 后缀）
-//   --refresh     headless authored 场景无 key 刷新会话/sidecar，完整 workspace oracle 必须先通过且永不重写。
+// 何时跑：录制行为、组合、手册注入面或 workspace replay 改动时（第三档，无 key；默认跑全部 runnable 合成场景；真页面断言用 checks/lanes/ui-scene.entry.mjs）
+//   --prepare     原始录制（replay/raw/，lead.jsonl + 任意名 child）→ 归一化 fixture + sidecar
+//   --refresh     authored 场景无 key 刷新会话/sidecar（若有独立 workspace oracle 则必须先通过且永不重写）
 //   --record      场景组合（replay/cordis.yml，真模型认证档）下重录 → replay/raw/ → 顺带 prepare
-//   answerer: browser（场景 snapshot.yml 可选项）：本场景的问询由**真 UI 认领并作答**（第一项），
-//     录/放两侧同规则 ⇒ 对称。为什么需要它：ask 是前景等待，没人作答整轮不收口、会话日志不封盘，
-//     阻塞型场景因此既录不成也重放不成（2026-10-11 human-exits-ask 实测）。默认不开。
-//   --ui / --refresh-ui  已停用：本仓没有声明 uiEvidence 的场景；真页面断言用
-//                 checks/lanes/ui-scene.entry.mjs（自起实例 + cdp-probe + 证据）。
-//   （默认）       重放组合（replay/cordis.snapshot.yml，llm-replay）复演 → 归一化比对 + sidecar
-//                 比对 + 在场板判据（R5b：重放 lead 的 team/* 事件喂 pack 读模型，非空且与录制
-//                 同形；提案验收 4。场景不带 team 事件时自动跳过）
-// 机制依据：本脚本头注 + snapshots/replay 场景的 snapshot.yml。可行性研究长文已删（历史在 git）。
-// ⚠ 录/放组合必须同构（vendor 教义：cordis.yml 与 cordis.snapshot.yml 仅差 LLM 行）——
-//   title-llm 两侧都禁：其 LLM 调用不进重放脚本（deriveReplayScript 只收 assistant 流），
-//   吃条目会造成供条错位；两侧都走截断回退 ⇒ 事件形态一致。
-//   P1.3 起两侧同构地多两行（ui-agent-team + company-client）：委派卡注册在本包 client 面
-//   （slots 的 tool.call.toolview keyed 注册），行不进组合卡永不渲染（红证即摘行）。
-// sidecar 为什么自算：vendor suite.ts 的 format*Snapshot 有 vitest 依赖，纯 Node 驱动 import
-//   不了；格式（{initial, changes} + <!-- system/message change N --> 分隔）照抄其源码。
-// 浏览器档旧实现（--ui，已停用）曾住 ./lib/replay-ui.mjs（2026-10-14 拆出；2026-11-03 第六轮删除，
-// 需要时从 git 历史取）：vendor apps/web/tests/scaffold.ts
-//   import vitest 不能直接 import，normalizeAria/captureStableAria 等为逐行转写（出处注在该文件函数头）。
-// 分层（guides/dev-loop §9.1 + readiness P1.4）：第三档（无 key、但要起进程与浏览器），不进 pnpm test。
-// 预算（§10）：墙钟 ≤ --wall。
+//   answerer: browser（可选）：问询由真 UI 认领作答（录/放同规则）。--ui / --refresh-ui 已停用。
+//   （默认）       重放组合（replay/cordis.snapshot.yml，llm-replay）复演 → 归一化比对 + sidecar 比对 + 在场板判据
+// 机制依据：本脚本头注 + snapshots/replay 场景的 snapshot.yml。
+// ⚠ 录/放组合必须同构（cordis.yml 与 cordis.snapshot.yml 仅差 LLM 行；title-llm 两侧都禁）。
+// sidecar 自算：vendor suite.ts 的 format*Snapshot 有 vitest 依赖，纯 Node 驱动照其源码产出。
+// 分层（guides/dev-loop §9.1 + readiness P1.4）：第三档（无 key、但要起进程），不进 pnpm test。预算：墙钟 ≤ --wall。
 // 触发线（2026-10-16 立，来源 `_backlog/_archive/settled_issues/2026-10-16-code-structure-round3.md` Item 3）：本文件 >800 行，
 //   或再增第 5 个 mode ⇒ 判据 / 驱动器分家（沿 2026-10-14 replay-ui 拆出先例，不再往本文件叠模式）。
 import { repositoryRoot as ROOT } from '../../tools/lib/core/repository-layout.mjs'
@@ -46,7 +29,7 @@ import { tmpdir } from 'node:os'
 import { createRequire } from 'node:module'
 import { compareWorkspace, seedWorkspace, workspaceOracle } from '../../tools/lib/core/workspace-oracle.mjs'
 import { mirrorCompanyReference } from '../../tools/lib/core/rehearsal.mjs'
-import { judgeReplaySessions, normalizeReplayTempPaths, normalizeReplayTimeContext } from '../lib/replay-logic.mjs'
+import { judgeReplaySessions, listRunnableReplayScenes, normalizeReplayPromptPaths, normalizeReplayTempPaths, normalizeReplayTimeContext } from '../lib/replay-logic.mjs'
 import {
   normalizeSessionLog,
   normalizeSessionSnapshots,
@@ -64,6 +47,7 @@ const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`)
   return i === -1 ? fallback : process.argv[i + 1]
 }
+const HAS_SCENARIO_FLAG = process.argv.includes('--scenario')
 const SCENARIO_ARG = arg('scenario', 'foundation-workspace')
 const WALL_MS = Number(arg('wall', '240')) * 1000
 const PREPARE = process.argv.includes('--prepare')
@@ -72,6 +56,17 @@ const UI = process.argv.includes('--ui')
 const REFRESH_UI = process.argv.includes('--refresh-ui')
 const KEEP = process.argv.includes('--keep')
 const REFRESH = process.argv.includes('--refresh')
+if (!HAS_SCENARIO_FLAG && !PREPARE && !RECORD && !REFRESH && !UI && !REFRESH_UI) {
+  const runnable = listRunnableReplayScenes(ROOT)
+  if (runnable.length > 1) {
+    const scriptPath = fileURLToPath(import.meta.url)
+    for (const scene of runnable) {
+      const sub = spawnSync(process.execPath, [scriptPath, '--scenario', scene, ...process.argv.slice(2)], { cwd: ROOT, stdio: 'inherit' })
+      if (sub.status !== 0) process.exit(sub.status ?? 1)
+    }
+    process.exit(0)
+  }
+}
 const scenarioDir = snapshotScene(ROOT, SCENARIO_ARG)
 const SCENARIO = basename(scenarioDir)
 const replayDir = join(scenarioDir, 'replay')
@@ -92,7 +87,7 @@ if (UI || REFRESH_UI) {
 }
 if (HEADLESS && (RECORD || UI || REFRESH_UI)) throw new Error('Headless workspace fixture supports keyless replay, --prepare, and --refresh only')
 if (HEADLESS && !oracle) throw new Error('Headless workspace replay requires workspace.final with before/expected trees')
-if (REFRESH && (!HEADLESS || RECORD || PREPARE)) throw new Error('--refresh supports only keyless headless replay')
+if (REFRESH && (metadata.recording !== 'authored' || RECORD || PREPARE)) throw new Error('--refresh supports only authored keyless replay scenarios')
 
 /**
  * 场景的 child 会话清单：`replay/raw/` 下除 lead 外的录制，按 header `createdAt` 排序
@@ -193,6 +188,7 @@ function sidecarsOf(rawText, ctx, webUrl) {
     prompt += index === 0 ? body : `\n<!-- system/message change ${String(index)} -->\n\n${body}`
   }
   if (webUrl !== '') prompt = prompt.split(webUrl).join('{{webUrl}}')
+  prompt = normalizeReplayPromptPaths(prompt, ROOT)
   return {
     prompt,
     tools: `${JSON.stringify({ initial: tools[0] ?? [], changes: tools.slice(1) }, null, 2)}\n`,
@@ -347,12 +343,13 @@ async function driveScenario({ patchSource, env, tasks }) {
       env: {
         ...process.env,
         DSH_AGENTS_HOME: join(runRoot, '.agents'),
+        DSH_COMPANY_HOME: workspace,
+        DSH_COMPANY_BROWSER: 'off',
         ...env,
         NODE_OPTIONS: [process.env.NODE_OPTIONS, '--disable-warning=ExperimentalWarning'].filter(Boolean).join(' '),
       },
-      // PRESET_PATCHES 是 '--patch'/路径交错的平铺表（上方 spawnSync CLI lane 复用同一常量，不重构它）；
-      // filter 取奇数位 = 平铺表里的路径项。
-      patch: [patch, ...PRESET_PATCHES.filter((_, i) => i % 2 === 1)],
+      // profiles/web 已把 dsh-company-pack 列入 dsh.profile.bundles（自动挂载全部 12 条 patch），只叠场景自身 patch。
+      patch: [patch],
       port: 0,
     })
     const url = `${base}/?token=${token}` // 浏览器档直接带 token 进页面
