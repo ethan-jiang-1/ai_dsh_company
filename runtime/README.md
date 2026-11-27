@@ -7,7 +7,7 @@
 > 其余目录/文件默认 ignored。`web-logs/` 是 **ignored** 的观察窗启动日志（横幅含 token，绝不入库；BUG-029）。
 > 新增 runtime 子目录默认就忽略；只有必须跟 fresh clone 走的文件才加 `!`，并在本表登记 owner。
 > fresh clone 后其余为空属正常，运行态按需再生；不是公司业务事实，也不是证据快照
-> （四条状态轴的家 = [运行态地图](../docs/runtime-map.md)）。
+> （四条状态轴的家 = [运行态地图](../docs/architecture.md)）。
 
 ## 一、逐件（按权威性与生命周期标记）
 
@@ -46,7 +46,7 @@
 方法层 / 审计账本 / 身份备份 `company/identity/`），不是 bundle 的业务部分。一次安装 = 一个 home +
 一个 `company` profile + 一个 workspace；换项目 = 新 home。dev bundle 的 home 是本目录的
 `harness-home/`，workspace 是仓库根 `company-workspace/`（整树 gitignored；制度件符号链接指回 pack）。
-定义、升级口径与 base/grown 分层唯一家 = [运行态地图 §二·五](../docs/runtime-map.md)。
+定义、升级口径与 base/grown 分层唯一家 = [运行态地图 §二·五](../docs/architecture.md)。
 
 **run trace** = 一次运行的四件套**追溯视图（引用不复制）**：字段与引用规则唯一家 =
 [snapshots/README](../snapshots/README.md)「Run trace 引用合同」节；live 权威 = DSH session + workspace。

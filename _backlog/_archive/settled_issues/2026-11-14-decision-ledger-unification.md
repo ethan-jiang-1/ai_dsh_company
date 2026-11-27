@@ -9,13 +9,13 @@ opened: 2026-11-14
 >
 > **结论/去向**：note — [decision-ledger-unification Note](../../../notes/implemented/2026-11-14-decision-ledger-unification.md)
 
-**问题与期望结果：** 横向对比兄弟项目（`ai_dsh_bsimulation` 与 `ai_dsh_deep_research`）的决策治理体系后确认：本仓确立的**三层职责切分**——① `docs/contracts/` 管现在时语义（What）、② [decisions.md](../../../docs/reference/decisions.md) 管 `≤100` 字纯路由（Where）、③ `notes/implemented/` 与 `notes/archived/` 管理由、输掉的方案与验证证据（Why）——在防腐烂与 Agent 上下文渐进披露（61 条仅 ~6KB，零截断）上明显优于“胖台账”。但本仓仍存在三处影响人机查阅与持续增长的结构摩擦，需一次收口并与兄弟仓统一心智模型：
+**问题与期望结果：** 横向对比兄弟项目（`ai_dsh_bsimulation` 与 `ai_dsh_deep_research`）的决策治理体系后确认：本仓确立的**三层职责切分**——① `docs/contracts/` 管现在时语义（What）、② [decisions.md](../../../docs/decisions.md) 管 `≤100` 字纯路由（Where）、③ `notes/implemented/` 与 `notes/archived/` 管理由、输掉的方案与验证证据（Why）——在防腐烂与 Agent 上下文渐进披露（61 条仅 ~6KB，零截断）上明显优于“胖台账”。但本仓仍存在三处影响人机查阅与持续增长的结构摩擦，需一次收口并与兄弟仓统一心智模型：
 1. **现行与废止混排**：单表从 D1 排到 D61，夹杂多条已废止决定（如 D11、D19+D21、D23+D24 的 `历史：…已退役` 及 D59 的 `~~删除线~~`），随 D 号破百后扫读噪音递增；且缺少 `#dN` 行级锚点，外部引用只能跳文件头、不能跳具体行。
-2. **入口层级偏深**：兄弟仓均在 `docs/` 顶层一眼可见，本仓收在二级目录 [decisions.md](../../../docs/reference/decisions.md)，人类维护者直觉翻找 `docs/` 时易误判缺失。
+2. **入口层级偏深**：兄弟仓均在 `docs/` 顶层一眼可见，本仓收在二级目录 [decisions.md](../../../docs/decisions.md)，人类维护者直觉翻找 `docs/` 时易误判缺失。
 3. **逐行预算制造反向激励**：`checks/gates/doc-budget.mjs` 将追加型路由表锁死在 `67/67` 行，近两周内 6 次因新增 1 条 D 号被迫手工给门禁 `+1`，甚至在 [2026-11-14 Note](../../../notes/implemented/2026-11-14-notes-tree-and-carrier-gates.md) 中出现“因 `67/67` 顶格故不登记新 D 号”的扭曲信号。
 
 **当前情况：**
-- [decisions.md](../../../docs/reference/decisions.md) 原共 67 行（含 D1–D61，其中合并行 `D19+D21`、`D23+D24`），由 `checks/gates/ledger-routing.mjs` 把守三列形状、`一句话 ≤ 100 字符`、家链接可解析及编号非降序。
+- [decisions.md](../../../docs/decisions.md) 原共 67 行（含 D1–D61，其中合并行 `D19+D21`、`D23+D24`），由 `checks/gates/ledger-routing.mjs` 把守三列形状、`一句话 ≤ 100 字符`、家链接可解析及编号非降序。
 - 全仓 `notes/archived/` 与 `_backlog/_archive/` 冻结层已有十余处相对链接指向 `docs/reference/decisions.md`；按 `notes/archived/AGENTS.md` 冻结铁律，真身留在原位可保持冻结层零改动、零断链。
 - `docs/policy.md` §P2 已实行门禁文件数只降不升棘轮（`≤ 75`），所有台账规则升级必须在既有 owner `checks/gates/ledger-routing.mjs` 与 `checks/gates/doc-budget.mjs` 内完成，不新建门禁文件。
 
@@ -28,7 +28,7 @@ opened: 2026-11-14
 ## 范围与排除项
 
 **做（四件事）：**
-1. **双表分离 + `#dN` 行锚点**：将 [decisions.md](../../../docs/reference/decisions.md) 拆为 `## 现行决定` 与 `## 已退役` 两张同构三列表（`| # | 一句话 | 决定的家 |`）。每行首格统一带 `<a id="dN"></a>D#` 锚点（合并行保留双锚点如 `<a id="d19"></a><a id="d21"></a>D19+D21`，编号永不重用）；被完整取代或废止的条目（D11、D19+D21、D45、D48、D59，逐条核对原 Note 后定；D23+D24 与 D34 因主干规则仍在 `docs/policy.md`/`notes/README.md` 现行有效留主表改写现行口径）移入 `## 已退役` 并指明取代者与原 Note；部分修订仍现行有效的条目留在主表，只写当前有效口径。
+1. **双表分离 + `#dN` 行锚点**：将 [decisions.md](../../../docs/decisions.md) 拆为 `## 现行决定` 与 `## 已退役` 两张同构三列表（`| # | 一句话 | 决定的家 |`）。每行首格统一带 `<a id="dN"></a>D#` 锚点（合并行保留双锚点如 `<a id="d19"></a><a id="d21"></a>D19+D21`，编号永不重用）；被完整取代或废止的条目（D11、D19+D21、D45、D48、D59，逐条核对原 Note 后定；D23+D24 与 D34 因主干规则仍在 `docs/policy.md`/`notes/README.md` 现行有效留主表改写现行口径）移入 `## 已退役` 并指明取代者与原 Note；部分修订仍现行有效的条目留在主表，只写当前有效口径。
 2. **三仓同路径门牌入口**：新增 `docs/decisions.md`（≤8 行纯导航门牌，声明三层职责一句话并直链 `./reference/decisions.md` 的 `#现行决定` / `#已退役` 与 `../notes/README.md`，零事实复述），并在 [docs/index.md](../../../docs/README.md) 顶层书架登记，使人类与 Agent 在三仓打开 `docs/decisions.md` 均有一致入口，同时原路径一切冻结归档链保持零改动。
 3. **解除逐行 `+1` 摩擦、改由结构门控长**：从 `checks/gates/doc-budget.mjs` 的固定行数表移出 `docs/reference/decisions.md`，将台账控长完全收归 `checks/gates/ledger-routing.mjs`——由于锁死单 H1 + 双 H2、禁代码块/块级 HTML/frontmatter/H3+、表外散文 `≤ 10` 行且表内每格硬卡 `≤100` 字符，即使增长到 D200 全文也不足 18KB，不再因正当新增 D 号逼改门禁常量。
 4. **`ledger-routing.mjs` 双表与锚点守卫升级**：在既有 `checks/gates/ledger-routing.mjs` 内升级校验——① `## 现行决定` 与 `## 已退役` 两表表头均在场、禁非结构块与 H3+ 且表外散文 `≤ 10` 行；② 两表每行均满足闭合三列、`一句话 ≤ 100` 字符、家含真实可解析链接、首格含匹配 `<a id="dN"></a>` 无前导零锚点；③ 现行表禁止残留 `~~` 删除线或 `已退役`/`**历史**` 字样（防退役决定滞留主表）；④ 两表各自内部编号严格递增，且跨两表 D 号集合全局唯一、无漏号。

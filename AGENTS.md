@@ -9,12 +9,12 @@
 ## 开工最小路径（feature 任务先 Plan Mode，见 [policy §P1](docs/policy.md)）
 
 1. **读架构与地图（1 跳）**：[架构总纲](docs/architecture.md) · [文档入口 `docs/README.md`](docs/README.md) · 接手源码仓见 [源码 handoff](docs/guides/repo-handoff.md)。
-2. **读任务 owner 合同（1 跳）**：改角色内容 = [presets.md](./docs/contracts/presets.md)；改 host/Web 代码 = [src/README](packages/company-pack/src/README.md)；改文档 = [docs/AGENTS.md](docs/AGENTS.md)；新增/搬内容 = [content-charter](./docs/content-charter.md)；改机制/组合 = [profile.md](./docs/contracts/profile.md)。
+2. **读任务 owner 合同（1 跳）**：改角色内容 = [presets.md](./docs/contracts/presets.md)；改 host/Web 代码 = [src/README](packages/company-pack/src/README.md)；改文档 = [docs/AGENTS.md](docs/AGENTS.md)；新增/搬内容 = [content-charter](./docs/contracts/content-charter.md)；改机制/组合 = [profile.md](./docs/contracts/profile.md)。
 3. **按改动面选最窄验证**：[tests/README.md](tests/README.md)「改动面 → 最窄检查」对应行。
 
 - **任务源**：用户点名或已批 RFC（`notes/proposed/` 带「批准：」）；`待落地` 卡不是任务源；唯一例外 = 缺陷卡 `修复就绪` 自授权（边界唯一家 = [policy §P1-B](docs/policy.md#p1-b-缺陷材料性与修复自授权边界唯一定义家)）。
 - **“落地”与“修复”同一判据**：系统里出现可验证的变更（代码/文档/门禁/模板/技能）+ 实跑红→绿证据 + 可对账提交；只写 RFC、翻状态、`git mv` 不算落地或修复（机械门 = `fix-evidence`；细则 = [_backlog 章程](_backlog/README.md)）。
-- **按需扩展**：[项目地图](docs/project-map.md) · [运行态地图](docs/runtime-map.md) · [开发环 §1](docs/guides/dev-loop.md#1-任务入口与交接)/[§2](docs/guides/dev-loop.md#2-执行链从授权到有证据交接) · [policy](docs/policy.md) · [测试宪法](docs/testing.md) · [维护面合同](docs/surface-contract.md) · [脚本索引](checks/README.md) · [orient 七问](docs/orient.md)。
+- **按需扩展**：[架构与运行态](docs/architecture.md) · [开发环 §1](docs/guides/dev-loop.md#1-任务入口与交接)/[§2](docs/guides/dev-loop.md#2-执行链从授权到有证据交接) · [环境与排障](docs/guides/run-ops.md) · [policy（含维护面）](docs/policy.md) · [测试宪法](docs/testing.md) · [脚本索引](checks/README.md) · [orient 七问](docs/guides/orient.md)。
 - **五条高频命令**：`pnpm setup`（[setup.mjs](tools/dev/setup.mjs)）、`source run/env.sh && pnpm company --no-open`（dev-only，`--link` 快速通道；产品入口 = `dsh --profile company`）、`pnpm verify`、`pnpm test`、`pnpm typecheck`。
 - **首跑与验收**：fresh clone 首跑顺序唯一家 = [bootstrap](docs/guides/bootstrap.md)，新 Agent 首跑验收 = [tests/README.md](tests/README.md)。
 
@@ -38,7 +38,7 @@
 | [`runtime/`](runtime/) | 运行残留家（默认 gitignored + 极少数白名单）：`harness-home`、第二 home、`pw-browsers`、`web-logs` | [runtime/README.md](runtime/README.md) |
 | [`snapshots/`](snapshots/) | 回归证据资产与场景元数据 | [snapshots/README.md](snapshots/README.md) |
 
-- **设计全貌** = [docs/README.md](docs/README.md)；**决策台账** = [docs/decisions.md](docs/decisions.md) → [docs/reference/decisions.md](docs/reference/decisions.md)。
+- **设计全貌** = [docs/README.md](docs/README.md)；**决策台账** = [docs/decisions.md](docs/decisions.md)。
 - **一条流水线**（位置唯一家 = 卡 frontmatter `status`；门与守卫 = [_backlog/AGENTS.md](_backlog/AGENTS.md)）：`研究 → 定性 → 落地 → 审 → 归档`；毕业落 `notes/proposed/` RFC 或 `notes/implemented/` Note，实施见 [dev-loop §2](docs/guides/dev-loop.md#2-执行链从授权到有证据交接)。
 - **notes/ 检索纪律**：开工按主题检索，非平凡变更同 diff 更新 [notes/implemented/](notes/implemented/README.md)；条目状态不镜像进本文件。
 
@@ -47,7 +47,7 @@
 ```sh
 git submodule update --init            # 拉下 vendor/dsh（已钉 tag）
 corepack enable pnpm && pnpm install   # workspace 解析；全配方（含 vendor 构建）见 docs/guides/bootstrap.md
-source run/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 接线（⚠ 见 docs/guides/environments.md）
+source run/env.sh                      # 双 home 兜底 + 裸 dsh 拦截 + pre-push 接线（⚠ 见 docs/guides/run-ops.md）
 pnpm bundle:init                       # fresh clone：建 dev 的 .dsh-company/ 状态（不复制插件内容；已有盘不动）
 source run/env.sh && pnpm company --no-open  # repo dev-only：pack + plugin add file: + exec dsh --profile company（--link 快速通道）
 pnpm verify                            # 结构门禁（清单唯一源 = checks/gates/ 目录）
@@ -61,19 +61,19 @@ source run/env.sh && node checks/lanes/preset.entry.mjs  # preset 改动的真�
 ```
 
 - 逐脚本触发/成本/状态唯一源 = 脚本头注（门禁强制自述）；索引见 [检查索引](checks/README.md)——**别抄回本文件，复述必漂**。
-- Web 观察窗开门步骤唯一见 [演示 runbook](./docs/guides/demo-scenes.md#前置本机)：**先 `source run/env.sh`**（日用 `~/.dsh` 另有同名 profile）；端口是环境状态，token URL 从启动横幅读；现场运维见 [budget-and-ops](docs/guides/budget-and-ops.md)。**push 走 `ssh.github.com:443`**。
+- Web 观察窗开门步骤唯一见 [演示 runbook](./docs/guides/demo-scenes.md#前置本机)：**先 `source run/env.sh`**（日用 `~/.dsh` 另有同名 profile）；端口是环境状态，token URL 从启动横幅读；现场运维见 [run-ops](docs/guides/run-ops.md)。**push 走 `ssh.github.com:443`**。
 
 ## 密钥
 
 - `pnpm dsh` 与真模型冒烟需 `DEEPSEEK_API_KEY`；**密钥住凭据库 `<home>/.credentials.yaml`，不是环境变量**——`env | grep DEEPSEEK` 为空不代表没配。
-- 自检 = `source run/env.sh && pnpm orient` 的「凭据」行；凭据按 home 隔离（`runtime/harness-home` 配一次，见 [environments](docs/guides/environments.md)）；永不提交密钥。
+- 自检 = `source run/env.sh && pnpm orient` 的「凭据」行；凭据按 home 隔离（`runtime/harness-home` 配一次，见 [run-ops](docs/guides/run-ops.md)）；永不提交密钥。
 
 ## DSH 源码：三个实体，别混
 
 - **① 唯一权威 = `vendor/dsh/`**（钉 SHA 只读；机制核对一律 `pnpm dsh`）。
 - **② 裸 `dsh` = 日用全局安装**（版本随全局漂移，不作本仓依据；已被 `run/env.sh` 拦截，确要日用执行 `command dsh`）。
-- **③ 外部研究树**（维护者本机路径；`_digested`/FAQ 宿主，只读；登记见 [external-research](./docs/reference/external-research.md)）。
-- 全局不变量 = `vendor/dsh/AGENTS.md` Conventions 节；概念→源码直达 = [术语映射](./docs/reference/terminology.md)。
+- **③ 外部研究树**（维护者本机路径；`_digested`/FAQ 宿主，只读；登记见 [external](./docs/reference/external.md)）。
+- 全局不变量 = `vendor/dsh/AGENTS.md` Conventions 节；概念→源码直达 = [术语映射](./docs/reference/glossary.md)。
 
 ## 纪律（沿 DSH 研发纪律；默认严格照做，偏离必须登记）
 

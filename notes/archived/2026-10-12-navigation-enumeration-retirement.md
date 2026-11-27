@@ -15,7 +15,7 @@ spec / 页签这类**持续增长的清单**从导航文档退役——件名与
 - [docs/index](../../docs/README.md) 术语映射「公司页签」行：曾写「五个平台页签（看板/依赖图/在场/
   用量/任务板）」，客户端注册面同期已有待办/培养/台账切片——[cdp-probe](../../docs/guides/cdp-probe.md)
   断言面写 8，两文相左。改为「页签清单 = 客户端注册面，随切片增长、不在此枚举」。
-- [docs/orient](../../docs/orient.md) 词表：「并入右栏五页签」同病，去计数。
+- [docs/orient](../../docs/guides/orient.md) 词表：「并入右栏五页签」同病，去计数。
 - [ui-demo §5 命名表](../implemented/2026-11-10-ui-demo-rationale.md)：「右栏页签（五个）」+ 代码实体只写
   `company-tabs.tsx`（实际注册面多文件）——改为指向客户端注册面；v4 行「五个平台页签」是交付
   时点记录（✅ 2026-09-23），历史层保留不改。
@@ -57,7 +57,7 @@ checks/README 对在盘脚本全覆盖零漂移）。
 - **architecture §6 目录树退役**：它是对 AGENTS.md 布局块 + project-map 的**第二份空间地图**
   （同 D28 病）——实测漏 tests/_backlog/_dist 三面、snapshots 与 company-workspace 两行注释过期
   （company-workspace 被注成 gitignore 而实际 310 文件 tracked）。§6 保留形态依据与要点 1–6
-  （demo/presets/profile/index 的外部锚点），目录逐件唯一家回 [project-map](../../docs/project-map.md)。
+  （demo/presets/profile/index 的外部锚点），目录逐件唯一家回 [project-map](../../docs/README.md)。
   输掉的方案 = 就地改注释（下轮再漂，同「更新数字」）。
 - **第三次复发证据**：[已结卡 doc-snr-cleanup-audit](../../_backlog/_archive/settled_issues/2026-10-04-doc-snr-cleanup-audit.md)
   第 27 行在 2026-10-04 已诊断「页签 5 vs 8」且结论写对（探针对、地图过期），修复一直未落地——
@@ -145,7 +145,7 @@ checks/README 对在盘脚本全覆盖零漂移）。
   README.md；「一」豁免（「开一个页签」是操作叙述非清点）、notes/ 与快照载荷不扫（历史证据豁免，
   与 retired-path 归档豁免同边界）。红证：orient.md:6 插「五个平台页签」→ FAIL 点名短语与行号，还原即绿；
   豁免方向：cdp-probe「开一个页签」绿。ui-demo v4 行「五个平台页签」→「首批 = …」（留冻结清单、去计数）。
-- **预算健康度**：**术语映射整节迁出 index → [terminology.md](../../docs/reference/terminology.md)**（16 行查表面
+- **预算健康度**：**术语映射整节迁出 index → [terminology.md](../../docs/reference/glossary.md)**（16 行查表面
   不占登记表绑定型文件的头寸；AGENTS/profile 指针随改）、**dev-loop §8 迁 [web-rpc.md](../../docs/guides/web-rpc.md)**
   （36 行 RPC runbook 独立成指南）、§5 压缩、**§0 导航表补全 13 节**（「一面墙」的结构解法：按节查表
   成为真承诺）。棘轮：index 143→**131**（内容 124，头寸 7 行 = 未来 ~7 个 D 号）、dev-loop 395→**367**

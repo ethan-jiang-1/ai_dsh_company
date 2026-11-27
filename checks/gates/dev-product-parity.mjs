@@ -8,7 +8,7 @@ import { join } from 'node:path'
 // 改为默认 tarball + `--link` 显式快速通道；本门禁把这条契约钉在实现上，防回潮。
 // 判据（每条都有可指回的文件）：
 //   ① dev 启动器默认路径含 npm pack + `plugin add file:` + **经 DSH CLI 启动**（`--profile company`），
-//      模式从 resolveDevMode 取；启动次序 = DSH 原生（runtime-map §一），缓存只允许在安装前；
+//      模式从 resolveDevMode 取；启动次序 = DSH 原生（architecture.md §2），缓存只允许在安装前；
 //   ② parity 指南在场，且差异表覆盖必须登记的机制点（安装源/版本门/runtime/workspace/凭据/probe）；
 //   ③ bootstrap 不再把 link 写成 dev 默认（三处实测漂移：观察窗「装进 web profile」、插拔速查
 //      「dev = link:」、升级行「重指 link」）；
@@ -103,8 +103,8 @@ export function run({ root, ok, fail }) {
     ['packages/company-pack/README.md', /产品形状|产品安装|产品入口|产品 home|产品文件|产品承诺|run bundle/],
     ['_dist/安装手册.md', /产品形状|产品安装|产品入口|产品 home|产品文件|产品承诺|run bundle/],
     ['run/README.md', /一 home 一 workspace|启动器强制|第二个 CEO 新开 home|v2/],
-    ['docs/orient.md', /一次安装一个|第二个 CEO 新开 home|run bundle 四件套/],
-    ['docs/reference/external-research.md', /26_plugin-data-model|26_plugin-as-product/],
+    ['docs/guides/orient.md', /一次安装一个|第二个 CEO 新开 home|run bundle 四件套/],
+    ['docs/reference/external.md', /26_plugin-data-model|26_plugin-as-product/],
   ]
   for (const [rel, pattern] of retired) {
     const file = join(root, rel)

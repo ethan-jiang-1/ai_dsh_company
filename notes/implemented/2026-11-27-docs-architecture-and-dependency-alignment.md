@@ -4,19 +4,19 @@
 
 ## 决定
 
-1. **确立 `docs/architecture/` 内部技术架构主干层**：新增 [`docs/architecture/host-and-lib.md`](../../docs/architecture/host-and-lib.md) 与 [`docs/architecture/client-ux.md`](../../docs/architecture/client-ux.md)，保持原有 [`docs/architecture.md`](../../docs/architecture.md)（升级为架构总纲）、[`docs/project-map.md`](../../docs/project-map.md)、[`docs/runtime-map.md`](../../docs/runtime-map.md) 及全部 `contracts/`、`guides/` 路径不变（零历史归档断链），并在 [`docs/README.md`](../../docs/README.md) 统一呈现五层书架与 Agent/人类双起点导航。
+1. **确立 `docs/contracts/` 内部技术架构主干层**：新增 [`docs/contracts/host-and-lib.md`](../../docs/contracts/host-and-lib.md) 与 [`docs/contracts/client-ui.md`](../../docs/contracts/client-ui.md)，保持原有 [`docs/architecture.md`](../../docs/architecture.md)（升级为架构总纲）、[`docs/README.md`](../../docs/README.md)、[`docs/architecture.md`](../../docs/architecture.md) 及全部 `contracts/`、`guides/` 路径不变（零历史归档断链），并在 [`docs/README.md`](../../docs/README.md) 统一呈现五层书架与 Agent/人类双起点导航。
 2. **确立 `docs/` 单向依赖边界并收回跨仓政策**：
    - `docs/` 只能依赖代码实现与已定型 `notes/`，禁止出现指向 `_backlog/` 的 Markdown 链接（纯拓扑说明用反引号代码跨度）；
    - 将「材料性（materiality）」唯一定义与「缺陷修复自授权边界」收回 [`docs/policy.md`](../../docs/policy.md) `§P1-B`，[`_backlog/README.md`](../../_backlog/README.md) 与 [`close-out-definition`](../../.agents/skills/close-out-definition/SKILL.md) 改为单向引用 `docs/policy.md`；
    - `_backlog/methods/` 保留原地，在 [`_backlog/methods/README.md`](../../_backlog/methods/README.md) 明确定位为「`_backlog/` 专属内部作业手册」，切断 `docs/` 对其所有链接；
    - 将上述规则并入既有 [`checks/gates/doc-taxonomy.mjs`](../../checks/gates/doc-taxonomy.mjs)（`TIER_DIRS` 扩入 `architecture`，并消费共享 AST 原语 `parseMarkdownAst` 扫描 `docs/**/*.md` 的 `link` / `definition` / `image` 节点），不新增 gate 文件，遵守 [`docs/policy.md`](../../docs/policy.md) 门禁总数只降不升棘轮。
 3. **全量内容与台账对齐（D70）**：
-   - [`docs/reference/decisions.md`](../../docs/reference/decisions.md) 清零全部 `_backlog/` 链接、修正 D6 / D43 过期 UI 口径，并补齐 D67–D70；
-   - 同步 [`docs/reference/terminology.md`](../../docs/reference/terminology.md)、[`docs/contracts/data-model.md`](../../docs/contracts/data-model.md)（补 `startup.json`/`startup-options.json`/`overrides/`/`logs/` 与宿主工作语言偏好，按此论证将 `doc-budget` 上限由 40 调至 44；[`docs/README.md`](../../docs/README.md) 棘轮下调 48→42）、[`docs/contracts/profile.md`](../../docs/contracts/profile.md)、[`docs/contracts/cultivation.md`](../../docs/contracts/cultivation.md)、[`docs/contracts/presets.md`](../../docs/contracts/presets.md)、[`docs/guides/demo-scenes.md`](../../docs/guides/demo-scenes.md)、[`docs/guides/multi-human-runbook.md`](../../docs/guides/multi-human-runbook.md)、[`docs/guides/dev-loop.md`](../../docs/guides/dev-loop.md) 与 [`docs/guides/budget-and-ops.md`](../../docs/guides/budget-and-ops.md)。
+   - [`docs/decisions.md`](../../docs/decisions.md) 清零全部 `_backlog/` 链接、修正 D6 / D43 过期 UI 口径，并补齐 D67–D70；
+   - 同步 [`docs/reference/glossary.md`](../../docs/reference/glossary.md)、[`docs/contracts/data-model.md`](../../docs/contracts/data-model.md)（补 `startup.json`/`startup-options.json`/`overrides/`/`logs/` 与宿主工作语言偏好，按此论证将 `doc-budget` 上限由 40 调至 44；[`docs/README.md`](../../docs/README.md) 棘轮下调 48→42）、[`docs/contracts/profile.md`](../../docs/contracts/profile.md)、[`docs/contracts/cultivation.md`](../../docs/contracts/cultivation.md)、[`docs/contracts/presets.md`](../../docs/contracts/presets.md)、[`docs/guides/demo-scenes.md`](../../docs/guides/demo-scenes.md)、[`docs/guides/multi-human-runbook.md`](../../docs/guides/multi-human-runbook.md)、[`docs/guides/dev-loop.md`](../../docs/guides/dev-loop.md) 与 [`docs/guides/run-ops.md`](../../docs/guides/run-ops.md)。
 
 ## 输掉的方案
 
-- **大挪 `docs/` 顶层与 `guides/` 目录结构**：全仓相对链接中 `docs/contracts/` 被引用 601 次、`docs/guides/` 540 次（多在冻结归档层，`notes-archived-links` 强制查断链），物理搬迁会造成大面积归档链接失效；改用「稳定物理路径 + 新增 `docs/architecture/` + 重做 `index.md` 分层导览」零断链达成清晰心智模型。
+- **大挪 `docs/` 顶层与 `guides/` 目录结构**：全仓相对链接中 `docs/contracts/` 被引用 601 次、`docs/guides/` 540 次（多在冻结归档层，`notes-archived-links` 强制查断链），物理搬迁会造成大面积归档链接失效；改用「稳定物理路径 + 新增 `docs/contracts/` + 重做 `index.md` 分层导览」零断链达成清晰心智模型。
 - **把 `_backlog/methods/` 迁进 `docs/guides/` 或 `.agents/skills/`**：违背用户选定的轻改方案（选项 B），且这些作业手册强耦合 `_backlog/` 问题卡与缺陷卡流程；留在原地并切断 `docs/` 对其反向依赖边界最干净。
 - **新建独立 `docs-no-backlog-links.mjs` 门禁文件**：违反 `policy §P2` 门禁总数只降不升棘轮；直接并入既有 `doc-taxonomy.mjs`（同样守护 `docs/` 分层规范）。
 
@@ -25,9 +25,9 @@
 | 事实 | 唯一入口 | 读载体 / 写载体 |
 |---|---|---|
 | `docs/` 分层与 `docs/` ↛ `_backlog/` 规则 | [`docs/AGENTS.md`](../../docs/AGENTS.md) · [`doc-taxonomy.mjs`](../../checks/gates/doc-taxonomy.mjs) | 门禁以 `parseMarkdownAst` 读 `docs/**/*.md` 与 `docs/README.md` |
-| 内部技术架构主干（Host/Lib 与 Client UX） | [`docs/architecture/host-and-lib.md`](../../docs/architecture/host-and-lib.md) · [`docs/architecture/client-ux.md`](../../docs/architecture/client-ux.md) | 随 [`src/index.ts`](../../packages/company-pack/src/index.ts) 与 [`src/client/index.ts`](../../packages/company-pack/src/client/index.ts) 同 diff 维护 |
+| 内部技术架构主干（Host/Lib 与 Client UX） | [`docs/contracts/host-and-lib.md`](../../docs/contracts/host-and-lib.md) · [`docs/contracts/client-ui.md`](../../docs/contracts/client-ui.md) | 随 [`src/index.ts`](../../packages/company-pack/src/index.ts) 与 [`src/client/index.ts`](../../packages/company-pack/src/client/index.ts) 同 diff 维护 |
 | 材料性与缺陷修复自授权边界 | [`docs/policy.md`](../../docs/policy.md) `§P1-B` | [`_backlog/README.md`](../../_backlog/README.md) 与 [`close-out-definition`](../../.agents/skills/close-out-definition/SKILL.md) 单向链接 |
-| 架构决策路由 D1–D70 | [`docs/reference/decisions.md`](../../docs/reference/decisions.md) | `ledger-routing` 门禁核对锚点、字长与链接 |
+| 架构决策路由 D1–D70 | [`docs/decisions.md`](../../docs/decisions.md) | `ledger-routing` 门禁核对锚点、字长与链接 |
 
 ## 验证
 
@@ -40,7 +40,7 @@
 
 ## 语义审阅
 
-- **首轮独立盲审（`1c1e44d9-fb64-454f-b0f6-d526170afbee`，`policy.md §P5` 四项判据）**：指出 1 项 Blocker（Note 第 37 行反引号写出不存在路径触发 `bare-path` 红，且不能在 `guard-red-record` 并行失败下泛称 `pnpm verify` 全绿）及 3 项建议（`docs/project-map.md` 与 `docs/runtime-map.md` 残留「公司视图」旧称、`docs/architecture/host-and-lib.md` 补写 `src/host/` 编译输入、`doc-taxonomy.mjs` 纳入 `image` 节点）；已全部清零并复验通过。
+- **首轮独立盲审（`1c1e44d9-fb64-454f-b0f6-d526170afbee`，`policy.md §P5` 四项判据）**：指出 1 项 Blocker（Note 第 37 行反引号写出不存在路径触发 `bare-path` 红，且不能在 `guard-red-record` 并行失败下泛称 `pnpm verify` 全绿）及 3 项建议（`docs/README.md` 与 `docs/architecture.md` 残留「公司视图」旧称、`docs/contracts/host-and-lib.md` 补写 `src/host/` 编译输入、`doc-taxonomy.mjs` 纳入 `image` 节点）；已全部清零并复验通过。
 - **复核结论（`1c1e44d9-fb64-454f-b0f6-d526170afbee`）**：**PASS（0 Blocker）**。
 
 ## 未覆盖轴

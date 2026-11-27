@@ -192,24 +192,33 @@ const mutateOrFail = (label, path, transform) => {
 }
 
 {
-  // doc-taxonomy（2026-11-27）：禁止 docs/ 出现指向 _backlog/ 的 Markdown 链接；放行反引号代码跨度与 architecture/ tier。
+  // doc-taxonomy（2026-11-27）：三分区（contracts/guides/reference）、最大深度 2、分区禁子 README.md、禁 docs/ 链 _backlog/。
   const root = mkdtempSync(join(tmpdir(), 'gates-taxonomy-'))
   try {
-    mkdirSync(join(root, 'docs/architecture'), { recursive: true })
+    mkdirSync(join(root, 'docs/contracts'), { recursive: true })
     mkdirSync(join(root, '_backlog'), { recursive: true })
     writeFileSync(join(root, '_backlog/README.md'), '# backlog\n')
     writeFileSync(join(root, 'docs/AGENTS.md'), '# AGENTS\n\n| 层 | 目录 | Job | **不属于这层** |\n|---|---|---|---|')
-    writeFileSync(join(root, 'docs/README.md'), '# docs\n\n[AGENTS](./AGENTS.md)\n[architecture/](./architecture/)\n\n纯说明可用 `_backlog/` 反引号。\n')
-    writeFileSync(join(root, 'docs/architecture/host-and-lib.md'), '# host\n')
+    writeFileSync(join(root, 'docs/README.md'), '# docs\n\n[AGENTS](./AGENTS.md)\n[contracts/](./contracts/)\n\n纯说明可用 `_backlog/` 反引号。\n')
+    writeFileSync(join(root, 'docs/contracts/host-and-lib.md'), '# host\n')
     const green = run(docTaxonomy, root)
     const okClean = !green.some(m => m.startsWith('FAIL'))
     if (!okClean) failures += 1
-    console.log(`${okClean ? 'PASS' : 'FAIL'} doc-taxonomy：architecture tier + 反引号 _backlog → 绿`)
+    console.log(`${okClean ? 'PASS' : 'FAIL'} doc-taxonomy：三分区 + 反引号 _backlog → 绿`)
     for (const m of green.slice(0, 2)) console.log(`  ${m}`)
 
-    writeFileSync(join(root, 'docs/architecture/bad-link.md'), '# bad\n\n[探索](../../_backlog/README.md)\n')
+    writeFileSync(join(root, 'docs/contracts/bad-link.md'), '# bad\n\n[探索](../../_backlog/README.md)\n')
     report('doc-taxonomy：docs/ 出现 _backlog Markdown 链接 → 红', run(docTaxonomy, root), '禁止 docs/ 链接 _backlog/')
-    rmSync(join(root, 'docs/architecture/bad-link.md'))
+    rmSync(join(root, 'docs/contracts/bad-link.md'))
+
+    mkdirSync(join(root, 'docs/contracts/sub'), { recursive: true })
+    writeFileSync(join(root, 'docs/contracts/sub/deep.md'), '# deep\n')
+    report('doc-taxonomy：分区下超深（深度 >2）→ 红', run(docTaxonomy, root), '超过最大深度 2')
+    rmSync(join(root, 'docs/contracts/sub'), { recursive: true, force: true })
+
+    writeFileSync(join(root, 'docs/contracts/README.md'), '# sub readme\n')
+    report('doc-taxonomy：分区内建子 README.md → 红', run(docTaxonomy, root), '分区目录禁止子 README.md')
+    rmSync(join(root, 'docs/contracts/README.md'))
 
     mkdirSync(join(root, 'docs/zz-tier'), { recursive: true })
     writeFileSync(join(root, 'docs/zz-tier/zz.md'), '# stray\n')

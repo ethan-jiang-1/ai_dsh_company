@@ -1,6 +1,6 @@
 # Host 与共享纯逻辑架构（`src/host/` + `src/lib/`）
 
-> 什么时候读：理解或修改 `company-pack` 的 Node 宿主半（host）与共享纯逻辑层（lib）架构时。
+> **读法**：理解或修改 `company-pack` 的 Node 宿主半（host）与共享纯逻辑层（lib）架构时读。
 > 上游总纲 = [architecture.md](../architecture.md)；模块文件索引 = [src/README](../../packages/company-pack/src/README.md) · [src/host/README](../../packages/company-pack/src/host/README.md)。
 
 ## 1. 分层与依赖方向

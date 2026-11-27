@@ -14,8 +14,8 @@
    P2 门禁升格判据（自 §9）、P3 自动化上限（§10）、P4 越界写入（§11）、P5 自主协议与语义审（§13）。
    `docs/AGENTS.md` 的 tier 表加「政策」行（`不属于这层`：操作步骤、机制依据、决定史）。
 2. **指南按用途再分三处**（每处只有一个 job，dev-loop 只留入口/执行/收尾）：
-   - [docs/guides/debugging.md](../../docs/guides/debugging.md)（32 行）← dev-loop §2 排查阶梯；
-   - [docs/guides/environments.md](../../docs/guides/environments.md)（44 行）← dev-loop §6 双 home/双 DSH；
+   - [docs/guides/debugging.md](../../docs/guides/run-ops.md)（32 行）← dev-loop §2 排查阶梯；
+   - [docs/guides/environments.md](../../docs/guides/run-ops.md)（44 行）← dev-loop §6 双 home/双 DSH；
    - [bootstrap](../../docs/guides/bootstrap.md) ← dev-loop §4 插拔速查（装法表）；
    - [tests/README](../../tests/README.md) ← dev-loop §9.1 命令与预算速查（验证地图的第四块：改动面→检查 + 命令 + 预算 + 首跑）。
 3. **dev-loop 只留入口与执行**：§0 导航、§0.5 入口三步、§1 执行链、§3 设计四问、§7/§8 指针、§9 连通/内容档、§12 记录与收尾；

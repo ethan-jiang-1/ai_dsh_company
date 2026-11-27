@@ -4,12 +4,12 @@
 
 > 上游 = 用户 2026-11-16 原话：「你应该汲取了这个内容之后落地……除非有什么东西对你来说是荒唐的……Goal 之后静默自主」。handoff 的授权边界：P0 已点名、P1 需 A/B **明示答复**；用户本轮只给「落地 + 静默自主」总授权，**未对 A/B 作答**。据此按 handoff §4.2 建议取 A（抬顶 59→66 + Note 论证），B 未取——这不是「用户裁决 A」；若改 B 需新决定。
 > 部分取代 [2026-11-15-tools-purpose-groups](./2026-11-15-tools-purpose-groups.md)（observe 组解散、工具面四组→三组）；其核心决定（保留 `tools/` 名、按用途分组）仍现行。
-> 决策台账 = [D63](../../docs/reference/decisions.md)。
-> 改名处置演进（2026-11-16）：三仓根目录统一由「可选远期」升为承诺方向 = [D64](../../docs/reference/decisions.md#d64) / [surface-root-unification-direction](./2026-11-16-surface-root-unification-direction.md)。本文「输掉的方案」中『三仓统一改名』指盲审撤回的**廉价 P0 改名**，非承诺的独立迁移项目；分类法与 company P0+P1 落地仍现行。
+> 决策台账 = [D63](../../docs/decisions.md)。
+> 改名处置演进（2026-11-16）：三仓根目录统一由「可选远期」升为承诺方向 = [D64](../../docs/decisions.md#d64) / [surface-root-unification-direction](./2026-11-16-surface-root-unification-direction.md)。本文「输掉的方案」中『三仓统一改名』指盲审撤回的**廉价 P0 改名**，非承诺的独立迁移项目；分类法与 company P0+P1 落地仍现行。
 
 ## 决定
 
-1. **P0 先立合同，零搬家**：新增 [surface-contract](../../docs/surface-contract.md)——两层（oracle / entry）× 三面（judge / show / operate）× 两前置轴（生命周期 / 管道件）+ 判定顺序；根布局三行、`checks/` / `probes/` / `tools/` 首屏同步写面声明。
+1. **P0 先立合同，零搬家**：新增 [surface-contract](../../docs/policy.md)——两层（oracle / entry）× 三面（judge / show / operate）× 两前置轴（生命周期 / 管道件）+ 判定顺序；根布局三行、`checks/` / `probes/` / `tools/` 首屏同步写面声明。
 2. **例外表住查表层，不住合同文末**：handoff §3.4 说「13 条放合同文末」且 §3.1 给 28 行预算——两者不可兼得（表头 + 14 行已超合同预算的 5% 留白）。按 [docs/AGENTS](../../docs/AGENTS.md) 的层规矩（参考 = 查表与登记）落到 [surface-exceptions](../../docs/reference/surface-exceptions.md)；合同保持 24 行。**与 handoff 的有意偏差，已在此登记。**
 3. **P1 搬家**：tools/observe/ 7 件（ask-latency / diagnose / explore-evidence / notes-audit / orient / propose-sampler / session-log-export）→ `probes/analyze/*-probe.mjs`（新域 `analyze`：共享 zstd + 会话日志/notes 读取 harness、同一证据源、同一解析失败模式）；tools/repo/refactor-drift.mjs → `checks/audit/refactor-drift-audit.mjs`（judge 归 `checks/`）。tools/observe/ 目录删除，工具面四组 → 三组。
 4. **注册表与棘轮同 diff**：[asset-lanes](../../tools/lib/core/asset-lanes.mjs) PROBES +7（domain `analyze`）、失败类 +7（5 会话持久化 / 1 文档指针 / 1 模型可见文本）；`MAX_PROBES` 59 → 66（[test-census.spec](../../tests/repo/budget/test-census.spec.ts)）。口径 = **登记资产**：搬家是分类变更，入口总数不变，不是能力增长；此后新增仍只降不升。同 diff 在 [policy §P2](../../docs/policy.md) 补一句口径（分类迁移可校准 cap 并在 Note 论证），避免政策与棘轮口径相反。
@@ -29,7 +29,7 @@
 ## 状态事实与载体
 
 - **事实**：维护面 = 两层 × 三面 × 两轴；目录默认面 = `checks/` judge · `probes/` show · `tools/` operate；例外只在 [surface-exceptions](../../docs/reference/surface-exceptions.md) 登记一次（现 6 条非面：1 已耗 / 2 冒烟 runner / 1 测试 runner / 1 纯查询 / 1 fixture）。
-- **唯一入口**：[surface-contract](../../docs/surface-contract.md)（规则）；[surface-exceptions](../../docs/reference/surface-exceptions.md)（例外）；目录首屏 README 只做指针。
+- **唯一入口**：[surface-contract](../../docs/policy.md)（规则）；[surface-exceptions](../../docs/reference/surface-exceptions.md)（例外）；目录首屏 README 只做指针。
 - **读载体 / 写载体**：读 = fresh agent 的 `ls checks probes tools` + 根布局三行；写 = 新入口落目录、例外同 diff 登记、`tools/` 顶层只许三组 + `lib` / `drivers` / `archive`（[script-index](../../checks/gates/script-index.mjs) 守）。
 - **环境坏法**：来源 = 新入口按旧目录名落家（合同 + README 挡）；内容 = 例外表漏登（无门禁，靠同 diff 纪律）；生命周期 = 搬家后 import 深度错（本轮实证，行为面 `pnpm orient` 挡）；扫描面 = 注册表未同 diff（`test-census.spec` 双向对齐挡）。
 
@@ -43,7 +43,7 @@
 - [environment-gap] 未跑真模型 / 浏览器 / 真页面：本轮只动维护面文件与文档，不触 preset、host、client 面 → `checks/lanes/preset.entry.mjs`
 - [environment-gap] 未重跑 clean clone：无新依赖、无构建面变化，仅仓内路径与注册表 → `docs/guides/bootstrap.md`
 - [policy] 库存口径分裂（INDEX 67 = 66 探针 + 1 fixture；census 66 = 注册探针）保持现状：handoff §2 只把它列为既有事实、未列入 P0/P1；修它要先决定「fixture 算不算公开入口」，属独立决定 → `tools/lib/core/checks-index.mjs`
-- [unprovable] 仓库外书签/外部仓对旧扁平常量 tools/observe 的引用，本仓观测不到 → `docs/reference/external-research.md`
+- [unprovable] 仓库外书签/外部仓对旧扁平常量 tools/observe 的引用，本仓观测不到 → `docs/reference/external.md`
 
 ## 独立盲审
 
@@ -56,7 +56,7 @@
 |---|---|---|---|
 | 搬完只改实现、不补引用 | `pnpm verify` | 结构 / 文档指针 / 红 | `FAIL link: checks/INDEX.generated.md:121 → ../tools/observe/ask-latency.mjs (target)`；`FAIL bare-path: _backlog/research/…/2026-11-16-reorg-company.md:20 → tools/observe 不存在` |
 | orient 头注触发条件位置 | `node checks/run-gates.mjs` | 结构 / 文档指针 / 红 | 临时去掉 `// 何时跑：` 前缀 → `FAIL script-triggers: … probes/analyze/orient-probe.mjs`；还原 → 绿 |
-| 新合同行预算 | `node checks/run-gates.mjs` | 结构 / 文档指针 / 红 | 上限临时 23 → `FAIL doc-budget: docs/surface-contract.md 24 行超上限 23`；还原 28 → `PASS doc-budget docs/surface-contract.md (24/28)` |
+| 新合同行预算 | `node checks/run-gates.mjs` | 结构 / 文档指针 / 红 | 上限临时 23 → `FAIL doc-budget: docs/policy.md 24 行超上限 23`；还原 28 → `PASS doc-budget docs/policy.md (24/28)` |
 | 探针棘轮 | `npx vitest run tests/repo/budget/test-census.spec.ts` | 回归 / 注册生命周期 / 红 | `MAX_PROBES` 临时 59 → `AssertionError: 活跃探针总数不得超过 59…: expected 66 to be less than or equal to 59`；还原 66 → 5 passed |
 | 结构门禁 | `pnpm verify` | 结构 / 全 12 类 / 红已见 | `verify: ALL PASS；2 门无对象（replay-fixture-freshness / replay-ui-freshness）` |
 | keyless 回归 | `pnpm test` | 回归 / 全 12 类 / 见上 | `Test Files 253 passed (253)`；`Tests 2157 passed (2157)` |

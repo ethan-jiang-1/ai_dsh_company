@@ -51,7 +51,7 @@
 | Note 门槛 | 共享机制决定 → 一篇批次 Note；独立机械 one-off → commit；判据仍 = `notes/README.md` §二 |
 | 机械门 | `checks/gates/backlog-liveness.mjs`（翻门票前四节；`opened ≥ 2026-11-15` 的复现节须有围栏/行内命令，裸行与只贴输出不算）+ `checks/gates/fix-evidence.mjs`（归档四行 + 提交对账） |
 | 导航 | `_backlog/methods/README.md`、`_backlog/AGENTS.md` |
-| 决策台账 | `docs/reference/decisions.md` D62（一行路由） |
+| 决策台账 | `docs/decisions.md` D62（一行路由） |
 
 ## 验证
 

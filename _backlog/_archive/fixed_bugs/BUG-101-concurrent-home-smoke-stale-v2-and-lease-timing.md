@@ -70,7 +70,7 @@ node runtime/tmp/two-writer-check.mjs
 ## 修复关联
 
 - 发现于 C7；与 [BUG-080](../fixed_bugs/BUG-080-en-tab-title-map-missing-strategy.md) 同属「检查器手维护形状/时序、产品已迁移」。
-- 相关：[`docs/runtime-map.md`](../../../docs/runtime-map.md) 二·五（v3 身份在 workspace）；`checks/lanes/concurrent-home.entry.mjs`。
+- 相关：[`docs/runtime-map.md`](../../../docs/architecture.md) 二·五（v3 身份在 workspace）；`checks/lanes/concurrent-home.entry.mjs`。
 
 ## 已修判定
 

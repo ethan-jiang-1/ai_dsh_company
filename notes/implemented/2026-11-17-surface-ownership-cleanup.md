@@ -2,8 +2,8 @@
 
 状态：implemented（2026-11-17；任务源 = 用户「把文件整理到最合适的位置，确保声明和真正一致；移动不要副作用，长期正确」）
 
-> 上游 = [D65](../../docs/reference/decisions.md#d65) 的库归属分层。本轮把「声明 ↔ 实盘」的剩余漂移收口，并把归属变成 import 边级守卫。
-> 决定台账 = [D66](../../docs/reference/decisions.md#d66)。
+> 上游 = [D65](../../docs/decisions.md#d65) 的库归属分层。本轮把「声明 ↔ 实盘」的剩余漂移收口，并把归属变成 import 边级守卫。
+> 决定台账 = [D66](../../docs/decisions.md#d66)。
 
 ## 决定
 
@@ -32,7 +32,7 @@
 
 - **移动后的家**：`tests/support/mutation.mjs`、`tools/lib/core/{pin.mjs,compat-tags.json}`、`tools/lib/company/{candidate-scan,delegation-model}.mjs`、`checks/lib/coverage-baseline.json`。
 - **局部支撑**：`checks/gates/lib`（gate-local）、`checks/lanes/lib`（lane-local，剩 company-root-probe / lease-probe）、`tests/support`（test-only）。
-- **唯一入口**：归属规则 = [surface-contract](../../docs/surface-contract.md)；库分组 = [tools/README](../../tools/README.md)；例外 = [surface-exceptions](../../docs/reference/surface-exceptions.md)；agent 导航 = [tests/README](../../tests/README.md) / [checks/README](../../checks/README.md) / [probes/README](../../probes/README.md)。
+- **唯一入口**：归属规则 = [surface-contract](../../docs/policy.md)；库分组 = [tools/README](../../tools/README.md)；例外 = [surface-exceptions](../../docs/reference/surface-exceptions.md)；agent 导航 = [tests/README](../../tests/README.md) / [checks/README](../../checks/README.md) / [probes/README](../../probes/README.md)。
 - **读载体 / 写载体**：读 = 新 agent 的三个 README 与本 Note；写 = 新模块先判 6 个落点，再改 `face-boundaries` 允许的形状。
 - **环境坏法**：① 守卫空转（lib 拆组后只扫顶层）→ `layering.spec` 递归 + 非空断言；② 面库反向依赖 → `face-boundaries.spec`；③ 清单口径漂移 → `checks-index.spec` 对账；④ 冻结副本 README 与 wrapper 脱节 → 横幅 + MANIFEST 指纹；⑤ 纯移动触发覆盖率“新文件”误判 → 基线键随家迁移。
 
@@ -56,7 +56,7 @@
 - [policy] `probes` 五域与 `tests/*` 分区名不物理重排；只写判定规则，后续要重排另立 RFC → `probes/README.md`
 - [covered] 发布面 READY：`--prepare --force`（内含 export-dist 端到端）+ `--verify` 7 项全 pass + `--stamp` 后 `--check --allow-pre-publish-index` → `READY 0.11.9 @ d7f0776c（tgz 268 条目；7 项检查 pass）`；`market-index.staged.json` 哨兵仍在场（是否发布/托管归用户） → `_dist/release-manifest.json`
 - [covered] shipped pack 旧指针已清零：`cordis.patch.yml` 兼容台账注释与 3 处 delegation src 注释改指新家，随 `release --prepare --force` 重建 `_dist`（export-dist 端到端 ALL PASS）同批落地；触发线保留在 [release.md](../../docs/contracts/release.md) → `packages/company-pack/cordis.patch.yml`
-- [unprovable] 未来新增模块会放对家没有 oracle；由 `face-boundaries` + 三份 README 的判定规则兜底 → `docs/surface-contract.md`
+- [unprovable] 未来新增模块会放对家没有 oracle；由 `face-boundaries` + 三份 README 的判定规则兜底 → `docs/policy.md`
 
 ## 验证
 

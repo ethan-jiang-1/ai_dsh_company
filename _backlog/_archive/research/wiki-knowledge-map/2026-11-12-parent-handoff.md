@@ -18,7 +18,7 @@ intent: 父会话一手锚点、合同层事实与跨题交接，供深度研究
 
 ## 合同层约束（续作必读）
 
-- [content-charter](../../../../docs/content-charter.md)：四槽三层、方法不进 persona（L43）；wiki = 外部可替换知识输入，不进 persona；改宪章 = 卡 + 语义审。
+- [content-charter](../../../../docs/contracts/content-charter.md)：四槽三层、方法不进 persona（L43）；wiki = 外部可替换知识输入，不进 persona；改宪章 = 卡 + 语义审。
 - [presets 合同](../../../../docs/contracts/presets.md)：四形态矩阵——teammate 继承 Lead 组合、命名 child 按工具行钉 preset；wiki 可见性设计要按形态区分，别按角色名推断。
 - 两轴现状：product-types 2 包；delivery-modes 2 目录 + productized 隐式默认（姊妹材料 §5.3 纠正过「三目录」误锚）。
 

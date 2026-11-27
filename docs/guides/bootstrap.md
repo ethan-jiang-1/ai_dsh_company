@@ -130,7 +130,7 @@ node checks/lanes/delegation.entry.mjs
   （扫描得到、名字也对，就是不能用；`discoverPresets` 的 `broken` 字段是唯一线索）。
   对应 DSH 的 `verify-cordis-config` 门禁；我们同构到 `checks/gates/preset-row-deps.mjs`（原 run-gates 检查 7）。
 - **一次性 profile 退出**：headless 用途优先用 shipped `headless`；自定义 profile 在 profile patch 把
-  `hmr` row 设为 `disabled: true`（见 [调试指南 §3.5](./debugging.md)）。旧的 profile 热重载字段已从当前 vendor 删除，不要再写。
+  `hmr` row 设为 `disabled: true`（见 [调试指南 §3.5](./run-ops.md)）。旧的 profile 热重载字段已从当前 vendor 删除，不要再写。
 - **品牌（皮肤第一笔，零代码）**：`DSH_CLIENT_TITLE` 是构建期环境变量，同时决定**浏览器标签页标题**
   （`apps/web/vite.config.ts`）与**应用内主标题**（`ui-layout/src/client/AppFrame.tsx:192`）——所以
   **上面两条构建命令都要带它**（web dist 与 client 面各注入一次）。侧栏品牌名是插槽

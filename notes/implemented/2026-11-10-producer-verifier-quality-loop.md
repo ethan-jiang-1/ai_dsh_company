@@ -1,6 +1,6 @@
 # 2026-11-10 · 质量环：一个做、一个验——独立 activation + 外部方法层 + 事后审计
 
-状态：implemented（2026-11-10 交付；上游 = [producer/verifier 质量环卡](../../_backlog/_archive/settled_issues/2026-11-10-producer-verifier-quality-loop.md)；决定号 = [D60](../../docs/reference/decisions.md)）
+状态：implemented（2026-11-10 交付；上游 = [producer/verifier 质量环卡](../../_backlog/_archive/settled_issues/2026-11-10-producer-verifier-quality-loop.md)；决定号 = [D60](../../docs/decisions.md)）
 
 > 研究依据 = [能力归位与质量环](../../_backlog/_archive/research/capability-placement-and-quality-loop/README.md)（四槽：人/流程/方法/政策）。
 > 历史对照 = [退役 SA/SQA](./2026-11-09-retire-sa-sqa.md)：E/V 分家的**结构**对，把**方法**写进 persona/skill 才对错——本 Note 复用结构、不复用旧 preset。

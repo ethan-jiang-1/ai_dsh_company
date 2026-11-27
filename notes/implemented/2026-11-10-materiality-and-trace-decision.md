@@ -23,7 +23,7 @@
    门只盯卡顶：正文是散文，不造机械判据。
 5. **入口与习惯。** [`_backlog/AGENTS.md`](../../_backlog/AGENTS.md) 加一行分诊路由（材料性 → 立卡 + 请示；非材料性 → 当场修 + commit）；
    [收尾 skill](../../.agents/skills/close-out-definition/SKILL.md) 收割三问①改「**材料性**的才立 BUG 卡」并承担入口钩子
-   （[`budget-and-ops`](../../docs/guides/budget-and-ops.md) 的同一句同 diff 跟随）；[`bugs/README.md`](../../_backlog/bugs/README.md) 写「同一轮 ≥3 张卡先按根因分组」。
+   （[`budget-and-ops`](../../docs/guides/run-ops.md) 的同一句同 diff 跟随）；[`bugs/README.md`](../../_backlog/bugs/README.md) 写「同一轮 ≥3 张卡先按根因分组」。
 
 ## 输掉的方案
 
@@ -79,7 +79,7 @@
 - **未验证**：真模型/真装配面对本变更不适用（纯制度面 + 一个结构门禁），未跑 preset-smoke / release-smoke。
 - **未验证**：`留痕：` 行的实际执行率——规则生效后的第一次材料性修复才会给出第一个样本。
 - **承压候选**：① `留痕：` 形状不进 gate（触发条件见「输掉的方案」）；② 根 `AGENTS.md` 的净零改写（触发条件 = 之后仍观察到 fresh agent 漏掉分诊）；
-  ③ 决策台账不加 D 号——这是 [D56](../../docs/reference/decisions.md) 制度的一次修订而非重立，决定的家 = 章程 + 本 Note；
+  ③ 决策台账不加 D 号——这是 [D56](../../docs/decisions.md) 制度的一次修订而非重立，决定的家 = 章程 + 本 Note；
   `decisions.md` 65/65 顶格，要加就得先瘦身腾位（不做顺手扩围）。
 - **已知边界**：门只查卡顶 `去向` 行；正文里的 Note 指针（本轮一次性清掉 12 处）没有机械守卫——正文是散文，判据留在语义审。
   全 `_backlog` 现无自链（`self-links: 0 broken: 0`），复发成本 = 一次扫描 + 一次修链。

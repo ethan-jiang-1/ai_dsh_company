@@ -9,11 +9,11 @@
 |---|---|
 | 选择任务、判断授权与 Plan Mode | §1 |
 | 实施、验证、交接 | §2；验证触发条件 = [tests/README §验证分层与预算](../../tests/README.md) |
-| 排查运行问题 | [debugging.md](./debugging.md)（组合层→会话层阶梯） |
+| 排查运行问题 | [debugging.md](./run-ops.md)（组合层→会话层阶梯） |
 | 写新代码前的四问 | §3 |
 | 插拔与装法速查 | [bootstrap §插拔速查](./bootstrap.md) |
 | 升级环与发布 | [release.md](../contracts/release.md)（程序唯一家） |
-| 双 home 与双 DSH | [environments.md](./environments.md) |
+| 双 home 与双 DSH | [environments.md](./run-ops.md) |
 | 环境引导 | [bootstrap.md](./bootstrap.md) |
 | 驱动 Web 面会话（RPC） | [web-rpc 指南](./web-rpc.md) |
 | 门禁分层与测试预算 | §4 + [tests/README §验证分层与预算](../../tests/README.md) |

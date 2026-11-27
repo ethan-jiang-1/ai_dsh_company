@@ -66,7 +66,7 @@ node --import tsx/esm runtime/tmp/c3-workspace-tmp.mts
 ## 修复关联
 
 - 发现于 C3；与 [BUG-094](BUG-094-bundle-manifest-id-path-traversal.md) 同属 workspace 输入边界。
-- 合同：[`docs/contracts/profile.md`](../../../docs/contracts/profile.md)「workspace 解析」；[`docs/runtime-map.md`](../../../docs/runtime-map.md) §二·五。
+- 合同：[`docs/contracts/profile.md`](../../../docs/contracts/profile.md)「workspace 解析」；[`docs/runtime-map.md`](../../../docs/architecture.md) §二·五。
 
 ## 已修判定
 

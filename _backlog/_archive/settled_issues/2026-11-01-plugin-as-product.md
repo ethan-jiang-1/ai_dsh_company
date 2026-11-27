@@ -127,7 +127,7 @@ profile，启动时指向我的项目；我的项目拥有公司身份与产物�
 - **身份错位**：首启把 `<home>/bundle.json`（v1，含 `workspace` 绝对路径）写成 home 身份；
   公司盘默认在 home；方法层 `<home>/company/methods`；presented 账本
   `<home>/storages/company_deliverables.json`；升级/错误日志 `<home>/logs`。
-  （合同现状 = [数据模型](../../../docs/contracts/data-model.md)、[运行态地图](../../../docs/runtime-map.md) §二·五）
+  （合同现状 = [数据模型](../../../docs/contracts/data-model.md)、[运行态地图](../../../docs/architecture.md) §二·五）
 - **入口错位**：`docs/contracts/profile.md` 的现行产品形状是 `web`；`tools/standalone.mjs` 也是
   `web` profile + copy 骨架；`README.md` 的安装句是 `plugin --profile <名> add link:…`，
   首启“写 bundle.json 与 company-workspace”。
@@ -141,7 +141,7 @@ profile，启动时指向我的项目；我的项目拥有公司身份与产物�
   仍未覆盖。（源码 = `vendor/dsh/packages/client/ui-workspace/src/client/navigation.ts`）
 - **历史决定需要被取代**：D45（run bundle = `bundle.json` + home + workspace）与 D48
   （目录独立启动 = 隔离 home + `web` profile + copy 骨架）是旧形状；新形状要在
-  [决策台账](../../../docs/reference/decisions.md) 记新 D 号，并给旧 Note 加取代 banner（历史不回填）。
+  [决策台账](../../../docs/decisions.md) 记新 D 号，并给旧 Note 加取代 banner（历史不回填）。
 - **研究依据**：[研究稿](../research/plugin-as-product/2026-11-01-plugin-as-product.md) 已把
   FAQ 26、vendor 源码、当前合同、实测与影响面收在一处；本卡只留判断与验收，不复述机制细节。
 

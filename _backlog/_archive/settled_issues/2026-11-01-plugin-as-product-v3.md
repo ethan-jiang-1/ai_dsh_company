@@ -368,5 +368,5 @@ run： <workspace>/.dsh-company/{kb,deliverables,deliverables-archive,cultivatio
 
 - 本轮研究：[插件即产品 v3 研究稿](../research/plugin-as-product-v3/2026-11-01-entry-and-run-bundle-boundary.md)。
 - 上一轮：[伞卡](../../_archive/settled_issues/2026-11-01-plugin-as-product.md)、[落地卡](../../_archive/settled_issues/2026-11-01-landing-plan.md)、[主研究稿](../../_archive/research/plugin-as-product/2026-11-01-plugin-as-product.md)、[v2 manifest Note](../../../notes/implemented/2026-11-01-plugin-as-product-v2-manifest.md)。
-- 当前合同：[README](../../../README.md)、[profile](../../../docs/contracts/profile.md)、[runtime map](../../../docs/runtime-map.md)、[data model](../../../docs/contracts/data-model.md)、[release](../../../docs/contracts/release.md)、[`_dist` 手册](../../../_dist/安装手册.md)。
+- 当前合同：[README](../../../README.md)、[profile](../../../docs/contracts/profile.md)、[runtime map](../../../docs/architecture.md)、[data model](../../../docs/contracts/data-model.md)、[release](../../../docs/contracts/release.md)、[`_dist` 手册](../../../_dist/安装手册.md)。
 - 外部 FAQ 26（只读）：`_faq_on_digested/26_plugin-as-product`（2026-11-01 更新：37 生命周期、40 启动/安装、18 安装三成功、17 home 不能供货、16 首启令牌门）。

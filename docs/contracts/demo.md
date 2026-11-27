@@ -1,6 +1,6 @@
 # demo · 动议操作合同
 
-> 什么时候读：演示前核对判据、判断交付物三态时。开门/分镜/场景 = [guides/demo-scenes.md](../guides/demo-scenes.md)。
+> **读法**：演示前核对判据、判断交付物三态时读；开门/分镜/场景 = [guides/demo-scenes.md](../guides/demo-scenes.md)。
 > 合同：demo 的动议、验收判据与已知边界；分镜、场景与观测点 = [guides/demo-scenes.md](../guides/demo-scenes.md)。
 
 ## 动议

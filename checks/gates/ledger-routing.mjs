@@ -1,5 +1,5 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
-// 何时跑：pnpm verify（每次）；改 docs/reference/decisions.md 或本门禁判据后跑 pnpm test:checks。
+// 何时跑：pnpm verify（每次）；改 docs/decisions.md 或本门禁判据后跑 pnpm test:checks。
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { headingSections, structuralLines } from '../../tools/lib/core/repo-markdown.mjs'
@@ -25,8 +25,8 @@ export const LEDGER_MAX_PROSE_LINES = 10
 export const LEDGER_MIN_ACTIVE_ROWS = 20
 export const LEDGER_MIN_RETIRED_ROWS = 3
 
-const LEDGER_REL = 'docs/reference/decisions.md'
-const LEDGER_DIR = 'docs/reference'
+const LEDGER_REL = 'docs/decisions.md'
+const LEDGER_DIR = 'docs'
 const EXPECTED_SECTIONS = ['现行决定', '已退役']
 const ALLOWED_SECTION_FRAGMENTS = new Set(EXPECTED_SECTIONS)
 const LEDGER_HEADER = /^\|\s*#\s*\|\s*一句话\s*\|\s*决定的家\s*\|\s*$/

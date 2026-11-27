@@ -9,7 +9,7 @@ import { repositoryRoot as ROOT } from '../../../tools/lib/core/repository-layou
 /**
  * 面库依赖方向（2026-11-17 归属整理的机械守卫）。
  *
- * 归属规则（docs/surface-contract.md）：
+ * 归属规则（docs/policy.md §P6）：
  * - tools/lib = 跨面共享地基，自包含；不得 import checks/probes/tests。
  * - checks/lib = judge-wide 判据；不得 import show/test，也不得依赖 gate/lane-local。
  * - probes/lib = show-wide 支撑；不得 import judge/test。

@@ -1,7 +1,7 @@
 // 状态：常驻（门禁模块，由 run-gates.mjs 装配；跑法 = pnpm verify）
 // 何时跑：pnpm verify（每次）；新增活动文档/脚本/路径，或改 .gitattributes/换行策略后。
 // 为什么：开源/多环境不是“大家机器一样”——活动 tracked 面里的绝对 home 路径、CRLF、大小写冲突、
-// macOS 专属命令会在一台机器上绿、另一台上红。规则唯一家 = docs/repo-hygiene.md §四。
+// macOS 专属命令会在一台机器上绿、另一台上红。规则唯一家 = docs/contracts/repo-hygiene.md §四。
 // 负例留证 2026-10-25：`docs/zz-portability.md` 写 `/Users/someone/tmp` → 红（点名 file:line）；
 // 删除 → 绿。删 .gitattributes → 红；还原 → 绿。
 // 负例留证 2026-11-10（误报收紧）：`docs/guides/quality-loop.md` 尾部加一行 `/Users/bowhead/probe-abs/`
@@ -17,7 +17,7 @@ import { join } from 'node:path'
 import { worktreeFiles } from './lib/worktree-files.mjs'
 
 const MAX_BYTES = 2 * 1024 * 1024
-// 「绝对」是这条规则的判据（规则唯一家 = docs/repo-hygiene.md §四.2），所以起点必须是真路径根：
+// 「绝对」是这条规则的判据（规则唯一家 = docs/contracts/repo-hygiene.md §四.2），所以起点必须是真路径根：
 // 行首，或紧跟在一个不可能构成路径段边界的字符之后（空格/引号/括号/等号/反引号/`:` 之外的标点）。
 // 反例（2026-11-10 实证）：`tests/fixtures/methods/home/company/methods/` 这类**仓库内相对路径**
 // 里字面目录名 `home` 曾被当成 Linux 家目录根，连报 3 处误红——相对路径永远不该命中。

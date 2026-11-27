@@ -1,9 +1,9 @@
 # web-rpc：驱动 Web 面会话（HTTP RPC）
 
 > 性质：指南层 runbook——脚本化建会话、发 prompt、列会话与读会话日志的 HTTP RPC 面。
-> 何时读：验证角色行为（preset 只在 Web 面挂载，见 [debugging](./debugging.md)）、自动化建会话/发动议、或 UI 静默失败需取真实错误时。
+> 何时读：验证角色行为（preset 只在 Web 面挂载，见 [debugging](./run-ops.md)）、自动化建会话/发动议、或 UI 静默失败需取真实错误时。
 
-preset 只在 Web 面挂载（[debugging §3.6](./debugging.md) 的层），所以**验证角色行为必须驱动 Web 面**：
+preset 只在 Web 面挂载（[debugging §3.6](./run-ops.md) 的层），所以**验证角色行为必须驱动 Web 面**：
 
 ```sh
 # ① token → cookie（cookie 按 origin 隔离：换端口/换实例都要重新换一次；3081 = 示例值，端口是环境状态、从启动横幅读）

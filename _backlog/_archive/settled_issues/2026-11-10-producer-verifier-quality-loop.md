@@ -7,7 +7,7 @@ opened: 2026-11-10
 
 > 立卡：2026-11-10 ｜ 状态：已结 ｜ 类型：Feature ｜ 毕业：做 ｜ 可关闭：是 ｜ 审查：agent — 语义审（对照验收 9 条）+ keyless/typecheck/verify/preset-smoke/审计探针/真模型 E2E 实跑，证据见 Note「验证」
 >
-> **结论/去向**：note — [2026-11-10-producer-verifier-quality-loop.md](../../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md)（落地同变更；决定号 [D60](../../../docs/reference/decisions.md)）
+> **结论/去向**：note — [2026-11-10-producer-verifier-quality-loop.md](../../../notes/implemented/2026-11-10-producer-verifier-quality-loop.md)（落地同变更；决定号 [D60](../../../docs/decisions.md)）
 >
 > **落地时的命名裁定**：两个能力档改用一个共用前缀——`quality-loop-producer` / `quality-loop-verifier`（工具名 `quality_loop_produce` / `quality_loop_verify`）；裸名 `producer` / `verifier` 太泛，且要体现「先生产、再验证」的次序（用户 2026-11-10 两次裁定）。卡内下文保留立卡时的原用词。
 >

@@ -23,7 +23,7 @@
    判据值 = 实测最大 +10% 取整（棘轮只降不升）；SKILL.md frontmatter 走 [parseFrontmatter](../../tools/lib/core/repo-markdown.mjs)，
    不手搓 `---` 正则。
 4. **dim5 端口字面量退役**：`3080 是本 GUI` 在 5 处活跃面（[bootstrap](../../docs/guides/bootstrap.md)、
-   [budget-and-ops](../../docs/guides/budget-and-ops.md)、[dev-product-parity](../../docs/guides/dev-product-parity.md)、
+   [budget-and-ops](../../docs/guides/run-ops.md)、[dev-product-parity](../../docs/guides/dev-product-parity.md)、
    [demo-scenes](../../docs/guides/demo-scenes.md)、[web-window-ops](../../.agents/skills/web-window-ops/SKILL.md)）改为
    「日用 GUI 永不动 / 端口是环境状态」，判据单家 = [multi-human-runbook §2](../../docs/guides/multi-human-runbook.md)（实测 3080/3081/3082 都可能是别人的）。
    决定本身（`--port 0` 安全默认）已在 [handoff-hygiene Note](2026-11-11-handoff-hygiene.md)，本笔只删复述。

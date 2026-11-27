@@ -8,7 +8,7 @@
 
 本轮只读审查确认：仓库已经有一部分真实职责分区，但“维护资产分类”与“产品运行链可理解性”尚未完全对齐。主要依据：
 
-- 根 [AGENTS.md](../../../AGENTS.md) 与 [docs/project-map.md](../../../docs/project-map.md) 已有入口链，但首次运行仍容易把 `pnpm dsh --profile headless` 误认为完整公司运行。
+- 根 [AGENTS.md](../../../AGENTS.md) 与 [docs/project-map.md](../../../docs/README.md) 已有入口链，但首次运行仍容易把 `pnpm dsh --profile headless` 误认为完整公司运行。
 - `tests/`（company/client/presets/harness）、`scripts/`（smoke/probes/audit/tools/archive）、`snapshots/`（replay/visual/probes/archive/corpora）已是物理存在的职责分区，不应为追求对称而重搬。
 - `packages/company-pack/` 同时承载角色配置、host 注册、client 注册、公司读模型和生成的 `lib/`；[src/README.md](../../../packages/company-pack/src/README.md) 还含有不存在的 `routing.ts` 与实际位置错误的 `delegation-keys.ts` 指针。
 - 完整 Web 链实际是：`source dev/env.sh` → `pnpm dsh web` → profile bundles/patches → `company-pack` bundle → Web client/host → 人连接 `company-workspace` → `session/create(agentPreset,cwd)` → preset/skills → agent loop → DSH session log → workspace 产物 → replay/audit/snapshot。进程 cwd 不等于会话 cwd；启动成功不等于五角色已经装配。

@@ -45,7 +45,7 @@ opened: 2026-11-10
 ## 未决问题
 
 1. **形状**：`testing` / `repo-hygiene` / `runtime-map` / `project-map` 留顶层（跨面宪法/地图），其余 7 份主题合同进 `contracts/`；`decisions` / `terminology` / `external-research` 进 `reference/`。是否接受？
-2. **冻结层路径**：66 个 `notes/archived` / `_backlog/_archive` 文件只改链接路径，不改内容；是否作为长期规则写进 [notes/README](../../../notes/README.md) 或 [repo-hygiene](../../../docs/repo-hygiene.md)？
+2. **冻结层路径**：66 个 `notes/archived` / `_backlog/_archive` 文件只改链接路径，不改内容；是否作为长期规则写进 [notes/README](../../../notes/README.md) 或 [repo-hygiene](../../../docs/contracts/repo-hygiene.md)？
 3. **commit 策略**：一次 commit（纯路径 + 预算 + 层表/index）还是拆成“移动 + 代码引用 + index”三笔？
 4. **下一步**：本卡关闭后，另立一张“docs 值修正”卡（14 处过期计数/路径/旋钮），不混进本卡。
 

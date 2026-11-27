@@ -44,7 +44,7 @@
 
 ## 未覆盖轴
 
-- [environment-gap] Linux clean clone 全量构建未跑（本轮 macOS `/tmp` clone）→ `docs/repo-hygiene.md`
+- [environment-gap] Linux clean clone 全量构建未跑（本轮 macOS `/tmp` clone）→ `docs/contracts/repo-hygiene.md`
 - [environment-gap] 无 Playwright cache 的干净机器首屏未跑（本轮用本机 chromium cache）→ `checks/lanes/client-load.entry.mjs`
 - [unprovable] Desktop 真机安装未认证（合同已声明）→ `docs/contracts/release.md`
 - [policy] npm publish / 市场托管不在本轮；staged 保持 → `docs/guides/publish-handoff.md`

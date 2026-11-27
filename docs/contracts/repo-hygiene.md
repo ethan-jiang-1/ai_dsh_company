@@ -1,8 +1,6 @@
 # repo hygiene：什么进 git，什么不进，以及跨环境规则
 
-> 什么时候读：决定什么东西进 git、跨环境搬运或清理运行残留时。
-> 性质：合同（当前边界）。**可执行边界 = [.gitignore](../.gitignore) + [.gitattributes](../.gitattributes)**；
-> 本文件解释规则与例外，不替代实现。变更记录归 `notes/`，这里只写 now。
+> **读法**：决定什么文件进 git、跨环境搬运或清理运行残留时读；可执行边界 = [.gitignore](../../.gitignore) + [.gitattributes](../../.gitattributes)。
 > 一句话：**tracked = 可复现的配方；ignored = 机器本地的状态**。
 
 ## 一、两棵树
@@ -34,7 +32,7 @@
 
 **支持矩阵 = macOS + Linux（CI 双跑）；Windows 原生不支持（POSIX 符号链接/权限/原生插件假设），用 WSL2。**
 CI 证明 install + `bundle:init` + `verify`；vendor 全量构建/测试的干净复现是已知缺口，见
-[repo-hygiene Note](../notes/archived/2026-10-25-repo-hygiene-contract.md)。
+[repo-hygiene Note](../../notes/archived/2026-10-25-repo-hygiene-contract.md)。
 
 1. **行尾**：文本一律 LF（`.gitattributes` 的 `* text=auto eol=lf`）；禁止提交 CRLF；二进制按后缀标记。
 2. **路径**：活动 tracked 文件不写绝对 home 路径（macOS 的 Users 段、Linux 的 home 段、Windows 盘符）；
@@ -69,5 +67,5 @@ CI 证明 install + `bundle:init` + `verify`；vendor 全量构建/测试的干�
 
 - 边界：`.gitignore`（默认拒绝 + 白名单）、`.gitattributes`（LF/二进制）。
 - 门禁：`no-tracked-ignored`、`tracked-file-size`、`gitignore-shape`、`tracked-secrets`、`tracked-portability`。
-- CI：[fresh-clone](../.github/workflows/fresh-clone.yml)（Ubuntu + macOS，install/bundle:init/verify）；
+- CI：[fresh-clone](../../.github/workflows/fresh-clone.yml)（Ubuntu + macOS，install/bundle:init/verify）；
   全量 vendor 构建/测试的缺口登记在 repo-hygiene Note，不用假绿掩盖。

@@ -802,7 +802,7 @@ TTY 询问；无 TTY 且无值 → 非零退出 + 两条命令。**Host 只认 `
 
 **本仓当前合同**
 
-- [运行态地图](../../../../docs/runtime-map.md)、[数据模型](../../../../docs/contracts/data-model.md)、
+- [运行态地图](../../../../docs/architecture.md)、[数据模型](../../../../docs/contracts/data-model.md)、
   [profile 合同](../../../../docs/contracts/profile.md)、[发布合同](../../../../docs/contracts/release.md)
 - [公司包 README](../../../../packages/company-pack/README.md)、
   [公司盘 README](../../../../packages/company-pack/content/README.md)

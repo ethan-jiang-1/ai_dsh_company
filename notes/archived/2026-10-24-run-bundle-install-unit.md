@@ -65,9 +65,9 @@
 - **安装冒烟**：[`checks/lanes/release.entry.mjs`](../../checks/lanes/release.entry.mjs) ⑥ 新增
   bundle.json / 干净底座 / 二次启动 manifest 字节不变；并修掉“release-smoke 直接用 dev home → 把临时
   workspace 记成 dev bundle 身份”的隔离 bug（现在 `DSH_HOME` 用 `runtime/harness-home/tmp/release-smoke-home`）。
-- **文档**：[运行态地图 §二·五](../../docs/runtime-map.md)（定义 + base/grown 表）、[项目地图](../../docs/project-map.md)、
+- **文档**：[运行态地图 §二·五](../../docs/architecture.md)（定义 + base/grown 表）、[项目地图](../../docs/README.md)、
   [release](../../docs/contracts/release.md)、[demo](../../docs/contracts/demo.md)、[bootstrap](../../docs/guides/bootstrap.md)、
-  [orient](../../docs/orient.md)、[run/README](../../run/README.md)、[runtime/README](../../runtime/README.md)、
+  [orient](../../docs/guides/orient.md)、[run/README](../../run/README.md)、[runtime/README](../../runtime/README.md)、
   [pack README](../../packages/company-pack/README.md)、[workspace README](../../packages/company-pack/content/README.md)；
   决策台账 D45。
 

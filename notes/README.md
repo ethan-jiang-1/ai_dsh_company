@@ -2,7 +2,7 @@
 
 > **每个目录装什么、状态怎么读、由谁维护，以本文件为准**——职责由一个具名文件拥有，不由惯例拥有。
 > 精神借源 = 外部仓 ai_dsh_assitant/notes/README.md（维护者本机）（D35；对齐与偏离登记见 §四，
-> 登记行 = [external-research](../docs/reference/external-research.md)）；DSH 原生定义 =
+> 登记行 = [external-research](../docs/reference/external.md)）；DSH 原生定义 =
 > [vendor Agent Notes](../vendor/dsh/.agents/notes/README.md)；收尾动作清单 = [dev-loop §12](../docs/guides/dev-loop.md)；
 > RFC 层合同与实施 TDD 红绿环 = [proposed/README](proposed/README.md)（条目开工必读）；上游推敲/缺陷卡 =
 > [_backlog/issues/](../_backlog/issues/README.md)（未成熟问题的澄清与交接；卡片状态不授权实施；交接程序 = [_backlog/methods/issue-to-note.md](../_backlog/methods/issue-to-note.md)；规则见 [_backlog/](../_backlog/README.md)）。
@@ -30,8 +30,8 @@ Markdown 链接（md-links 门禁硬查）。**生命周期是移动不是复制
 状态行（文件名日期 ≥ 2026-11-14）：全文件唯一，且与目录同轴（archived 保留实现状态）。
 
 **检索配方**（「开工按主题检索相关 Note」的一步操作，2026-10-21 立）：决策级先查
-[decisions.md](../docs/reference/decisions.md) 的 D 号路由表；机制级 `rg -l '<关键词>' notes/implemented/`
-——同义词都试一轮（别名对照 = [terminology](../docs/reference/terminology.md)，如「在场/驾驶舱/presence」）。
+[decisions.md](../docs/decisions.md) 的 D 号路由表；机制级 `rg -l '<关键词>' notes/implemented/`
+——同义词都试一轮（别名对照 = [terminology](../docs/reference/glossary.md)，如「在场/驾驶舱/presence」）。
 no-index 教义下没有主题索引：**目录树 + 全文检索就是清单**，检索不到 ≠ 不存在，换词再试。
 
 ## 二、何时写、取代与真证据（规则唯一家在本文件）
@@ -46,7 +46,7 @@ no-index 教义下没有主题索引：**目录树 + 全文检索就是清单**�
   E2E 首跑收据、批次「已毕业」流水、被合同或后一篇决定完整吸收的研究长文、已退役流程的操作记录。
   这些不再指导行动，写进来只会让 rationale owner 被噪声淹没。
 - **上游回链**：由 `_backlog` 卡毕业的 Note，在状态行或开头带 `上游 = [卡](...)`；卡生 Note 的可追溯性靠这一行，不靠归档卡反查。
-- **归位**：新增/搬动内容类决定另写「## 归位」——为什么这层 / 什么会逼它搬家 / 哪个更低的层被排除（判据 = [内容宪章](../docs/content-charter.md)）。
+- **归位**：新增/搬动内容类决定另写「## 归位」——为什么这层 / 什么会逼它搬家 / 哪个更低的层被排除（判据 = [内容宪章](../docs/contracts/content-charter.md)）。
 - **取代检查（每新增一篇 Note 触发）**：搜活跃树找同决定/同机制的既有 owner——完整取代：吸收其独有
   理由/备选/后果/验证后**同 diff 删除旧的**（历史归 git）；部分取代：双方保留互链并更新仍有效的事实。
   同一决定的事实变化更新原文；决定逆转另写新 Note 互链，不把旧文改写成相反。**互链是双向的**：

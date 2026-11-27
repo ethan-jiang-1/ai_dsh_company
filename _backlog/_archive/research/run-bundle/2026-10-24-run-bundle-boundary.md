@@ -23,7 +23,7 @@ intent: "为「run bundle = 安装单元 / 干净底座」问题卡提供现状�
 | 词 | 现在指什么 | 家 |
 |---|---|---|
 | DSH bundle | profile 的组合层（base / web-app / company-pack），`dsh.bundle.patch` 装配 | vendor + pack [`cordis.patch.yml`](../../../../packages/company-pack/cordis.patch.yml) |
-| run bundle | **逻辑**：一次运行的四件套视图（代码与组合 / DSH 运行状态 / 会话 cwd / 证据），`pnpm orient` / `--scenario` | [运行态地图](../../../../docs/runtime-map.md)、[run/README](../../../../run/README.md)、[快照规则](../../../../snapshots/README.md) |
+| run bundle | **逻辑**：一次运行的四件套视图（代码与组合 / DSH 运行状态 / 会话 cwd / 证据），`pnpm orient` / `--scenario` | [运行态地图](../../../../docs/architecture.md)、[run/README](../../../../run/README.md)、[快照规则](../../../../snapshots/README.md) |
 | bundle patch | pack 的 loader 补丁数组 | [`package.json`](../../../../packages/company-pack/package.json) |
 
 本卡建议把 **run bundle 定义为物理安装单元**：

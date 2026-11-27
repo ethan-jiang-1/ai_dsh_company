@@ -36,10 +36,10 @@
 
 ## 未覆盖轴
 
-- [environment-gap] Linux 全量构建未跑：本轮 clean clone 验收在 macOS 本机完成，Linux 缺口只读工作流头注 → `docs/repo-hygiene.md`
+- [environment-gap] Linux 全量构建未跑：本轮 clean clone 验收在 macOS 本机完成，Linux 缺口只读工作流头注 → `docs/contracts/repo-hygiene.md`
 - [policy] 18 个混面/直引 vendor spec 不进 tsc：独立工程试验已证伪（vendor 源在 root strict 下报错）→ `docs/testing.md`
 - [environment-gap] 新装 profile 的浏览器首屏未单独跑：本轮真页面证据是 dev home 的 client-load → `checks/lanes/client-load.entry.mjs`
-- [policy] 用户工作树的 `temp/` 两篇跨仓提案保持原位（不是仓库字节）→ `docs/repo-hygiene.md`
+- [policy] 用户工作树的 `temp/` 两篇跨仓提案保持原位（不是仓库字节）→ `docs/contracts/repo-hygiene.md`
 - [unprovable] Desktop 真机安装：合同已声明未逐平台认证 → `docs/contracts/release.md`
 
 ## 验证

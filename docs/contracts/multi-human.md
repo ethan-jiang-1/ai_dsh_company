@@ -1,6 +1,6 @@
 # 多人协作 · 同一工作目录，各自开自己的门（现在时）
 
-> 什么时候读：多个物理人要进同一家公司盘协作、或协作行为不符预期时。路线 = 形态表 → 边界/验收；开门 runbook = [guides/multi-human-runbook.md](../guides/multi-human-runbook.md)。
+> **读法**：多个物理人进同一家公司盘协作、或协作行为不符预期时读；路线 = 形态表 → 边界/验收；开门 runbook = [guides/multi-human-runbook.md](../guides/multi-human-runbook.md)。
 > 合同：**多个物理人**在同一家公司共享盘上协作的**形态、边界与验收**；开门/交接/前提/迁移 = [guides/multi-human-runbook.md](../guides/multi-human-runbook.md)。
 > 人侧归属与授权面的事实家 = [`kb/owners.md`（dev bundle workspace；pack 单源）](../../packages/company-pack/content/state/owners.md)；
 > 成员侧的协作规矩 = [`AGENTS.md`（pack 单源）](../../packages/company-pack/content/AGENTS.md)。

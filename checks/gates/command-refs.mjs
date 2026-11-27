@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 // ── 文档命令引用门（command-refs，2026-11-03 第六轮 D4）────────────────────────────
 // 为什么：文档里的 `pnpm <script>` 与 `node <仓内路径>` 此前与实现**零机械联系**。实测：
-//   ① 往 `docs/orient.md` 加「`pnpm nonexistent-script`」→ `verify` 全绿；
+//   ① 往 `docs/guides/orient.md` 加「`pnpm nonexistent-script`」→ `verify` 全绿；
 //   ② 把 `package.json` 的 `orient` 改名 → `verify` 仍全绿（命令表却还在教旧名）。
 //   `bare-path` 不认命令、`md-links` 不认代码块——命令漂移是 D4 里最安静的一条（D4-2）。
 // 规则：活跃文档的**反引号片段与代码围栏**里的

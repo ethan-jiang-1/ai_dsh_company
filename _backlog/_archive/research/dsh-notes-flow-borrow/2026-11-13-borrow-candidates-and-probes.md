@@ -65,7 +65,7 @@ basename 在 `notes/` 下回退一次（`implemented/X.md` → `archived/X.md`�
 | **N5** | 「该写 Note 没写」的存在性门禁 | DSH 也没有；语义判断不能机械判；本仓用「机械单步豁免 + 事后归档」替代（§二） | 有人真的靠「不写 Note」逃过审查，且有实例 |
 
 **N1 的替代压力阀**：`implemented/` 真要按主题找，本仓的原生答案是
-[decisions.md](../../../../docs/reference/decisions.md) 的 D 号路由表（手工、有预算、有门禁），
+[decisions.md](../../../../docs/decisions.md) 的 D 号路由表（手工、有预算、有门禁），
 不是 `INDEX.md`（D34 已退役一份）。若路由表也撑不住，再谈 class 轴。
 
 ## 三、四组实测（E1–E4）

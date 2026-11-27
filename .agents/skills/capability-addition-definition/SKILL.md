@@ -6,7 +6,7 @@ description: "Use when adding or changing company content — a role, capability
 # 新增内容的归位完成定义
 
 适用：要**新增或搬动**公司内容时——角色/persona、能力档、方法包、模板、流程 skill、政策线、默认状态。
-规则唯一家 = [内容宪章](../../../docs/content-charter.md)（四槽、三层、铁律、成本表、红牌、变更协议都住那里）；
+规则唯一家 = [内容宪章](../../../docs/contracts/content-charter.md)（四槽、三层、铁律、成本表、红牌、变更协议都住那里）；
 本 skill 只管**次序与判据**，不复述宪章的表。
 
 ## 为什么这一步不能跳
@@ -53,7 +53,7 @@ description: "Use when adding or changing company content — a role, capability
 
 ## 指针（别复述）
 
-规则与判据 = [内容宪章](../../../docs/content-charter.md)；目录 ↔ 层 = [content/README](../../../packages/company-pack/content/README.md)；
+规则与判据 = [内容宪章](../../../docs/contracts/content-charter.md)；目录 ↔ 层 = [content/README](../../../packages/company-pack/content/README.md)；
 载入清单 = [manifest.json](../../../packages/company-pack/content/manifest.json)；
 卡片模板的 `## 抽象度` = [_backlog 问题卡模板](../../../_backlog/issues/README.md)；
 Note 的归位节 = [notes/README](../../../notes/README.md)；

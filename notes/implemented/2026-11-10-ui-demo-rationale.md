@@ -26,7 +26,7 @@
 
 - 完整原稿：`git show ab0fd622^:docs/design/ui-demo.md`。
 - 官方范本逐行读过：`packages/experimental/client-ui-agent-team/`、`packages/client/ui-deliverables/`；呈现验证 = `cdp-probe` / `client-load-smoke`。
-- 决策台账：[D6 / D22 / D44](../../docs/reference/decisions.md)。
+- 决策台账：[D6 / D22 / D44](../../docs/decisions.md)。
 
 ## 现行语义（canonical）
 

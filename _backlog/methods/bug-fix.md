@@ -37,7 +37,7 @@ This repository is a DSH company-pack plugin: the same symptom can live on diffe
 | vendor (`vendor/dsh/`) | behavior inside DSH itself | minimal repro against `pnpm dsh` | upstream proposal + pin; local workaround with a Note/trigger | editing vendor (forbidden) |
 | environment/session | dev home vs daily home, credentials, ports, HMR | `source run/env.sh && pnpm orient`; `pnpm diagnose --session ...` | reproduce in the right home; no product fix | that an environment issue is a product defect |
 
-The exact mapping is owned by [tests/README](../../tests/README.md); the debug ladder is owned by [debugging](../../docs/guides/debugging.md). This table only routes the triage.
+The exact mapping is owned by [tests/README](../../tests/README.md); the debug ladder is owned by [debugging](../../docs/guides/run-ops.md). This table only routes the triage.
 
 **Questions:**
 
@@ -70,7 +70,7 @@ Minimize before diagnosing: cut inputs, callers, config and data one at a time, 
 
 - Generate three to five ranked, falsifiable hypotheses before testing any. Do not anchor on the first plausible idea.
 - Confirm with evidence, not plausibility: a session-log frame or tool error, a `--dump-config` row, the bundle, git history or `git bisect`, a control experiment, a real mount, or an independent reference implementation.
-- Separate where it surfaced from where it was introduced. A blank client page can be a client entry apply error, a preset mount failure, or a session/workspace issue. Follow the [debug ladder](../../docs/guides/debugging.md); do not jump layers.
+- Separate where it surfaced from where it was introduced. A blank client page can be a client entry apply error, a preset mount failure, or a session/workspace issue. Follow the [debug ladder](../../docs/guides/run-ops.md); do not jump layers.
 - Keep refuted hypotheses on the card; do not erase them.
 - Name the failure class (`tests/failure-classes.md`) and sweep the same class across the plugin surfaces. If the cause is a shared primitive (Markdown/YAML parsing, path segments, a state machine, a gate predicate), elevate to the primitive per `docs/testing.md` §3 第 7 条 and add independent reference truth or a read/write equivalence matrix; a single example guard is not enough.
 - For a shared rule or repeated neighboring escape, apply [family protection](validation-design.md#3-design-protection-for-a-changing-input-family) before declaring the class covered: discover the actual input domain, identify all applicable consumers, anchor expectations independently, and run a predicate/connection negative control with a valid complement. Record refusal/degraded behavior, non-empty per-transformation/consumer counts, the future-member witness, what manual obligation disappeared and what remains curated. A related BUG title or another fixed example is inventory evidence, not family completeness. Keep mechanical one-off fixes narrow with a reason.
@@ -195,4 +195,4 @@ In this plugin, the charter's materiality list is the owner; presets, content, p
 - [ ] `## 修复证据` four lines; `留痕：`; indexes and links updated.
 - [ ] `pnpm verify` green; `fix-evidence` green.
 
-Rules = [_backlog charter](../README.md)「缺陷的通道」; card, template and severity = [bugs README](../bugs/README.md); surface → check = [tests/README](../../tests/README.md); evidence policy = [testing](../../docs/testing.md); Note necessity = [notes/README](../../notes/README.md); DSH ladder = [debugging guide](../../docs/guides/debugging.md); loop discipline = the `diagnosing-bugs` skill when the session exposes it.
+Rules = [_backlog charter](../README.md)「缺陷的通道」; card, template and severity = [bugs README](../bugs/README.md); surface → check = [tests/README](../../tests/README.md); evidence policy = [testing](../../docs/testing.md); Note necessity = [notes/README](../../notes/README.md); DSH ladder = [debugging guide](../../docs/guides/run-ops.md); loop discipline = the `diagnosing-bugs` skill when the session exposes it.

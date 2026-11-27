@@ -51,7 +51,7 @@ v3、生命周期、dev/产品路径 parity、FAQ 26 发行版对齐与 Trajecto
 
 - UX/UI 全表面深度走查与端到端实测卡 2026-11-27 已结：Phase 0 全绿（`verify`/`typecheck`/`lint`/`test`/keyless 车道）+ Phase 1 14 探针（7 PASS / 6 过期 / 1 实证缺陷）+ Phase 2（zh/en × light/dark × 1440/1024/390 全 41 单元台账，`console=0`）+ Phase 3 真模型 E2E（`presence-e2e` 104s、`human-loop`、`request_signoff`→`批准双签`、`/req check`、子代理旁路查看）+ 独立 `research` 子代理盲审清零；共立 `BUG-384..BUG-391`（只报不修，0 产品源码改动）；去向 = none（只产实测台账与 BUG 卡）；卡在[归档](../_archive/settled_issues/2026-11-27-ux-ui-full-verification-and-e2e.md)。
 
-- 决策台账跨仓对齐卡 2026-11-14 已结：`docs/reference/decisions.md` 拆出 `## 现行决定`（54 行）+ `## 已退役`（5 行）与 D1–D61 `<a id="dN"></a>` 行锚点 + `docs/decisions.md` 8 行顶层门牌 + `ledger-routing` 接管表外控长（禁代码块/H3+/漏尾竖线）+ 10 项单测与 5 分支变异 + 独立 `research` 子代理两轮盲审清零；去向 = [Note](../../notes/implemented/2026-11-14-decision-ledger-unification.md)；卡在[归档](../_archive/settled_issues/2026-11-14-decision-ledger-unification.md)。
+- 决策台账跨仓对齐卡 2026-11-14 已结：`docs/decisions.md` 拆出 `## 现行决定`（54 行）+ `## 已退役`（5 行）与 D1–D61 `<a id="dN"></a>` 行锚点 + `docs/decisions.md` 8 行顶层门牌 + `ledger-routing` 接管表外控长（禁代码块/H3+/漏尾竖线）+ 10 项单测与 5 分支变异 + 独立 `research` 子代理两轮盲审清零；去向 = [Note](../../notes/implemented/2026-11-14-decision-ledger-unification.md)；卡在[归档](../_archive/settled_issues/2026-11-14-decision-ledger-unification.md)。
 
 - notes/ 树形与载体执行面卡 2026-11-14 已结：`notes-tree` 门禁（目录闭集/深度/文件名/INDEX 禁令 + 状态行唯一与目录同轴）+ `notes/implemented/AGENTS.md` 与 `notes/archived/AGENTS.md` 两份注入载体；七组真树红证 + 19 项回归；去向 = [Note](../../notes/implemented/2026-11-14-notes-tree-and-carrier-gates.md)；卡在[归档](../_archive/settled_issues/2026-11-14-notes-tree-and-carrier-gates.md)。
 
@@ -166,7 +166,7 @@ opened: YYYY-MM-DD
 - 搬家成本：高 ⇒ 第一天抽象；低成本内容先具体，放它该变的层
 ```
 
-决定做的按 [验收设计](../methods/validation-design.md) 在同卡加 `## 验收标准`（至少三列：命令 | 断言 | 红形态；写不出可执行行 = 还没到 `待落地`），同时把 `status` 翻 `待落地`、卡顶写 `去向`（`rfc｜note｜implementation`）——这三样齐了才算过了定性门，缺一样门禁红。这描述下游做成什么算合格，不要求未来检查已执行；`关闭条件` 不复制实施验收。**新增或搬动内容**（角色/能力/方法/模板/政策）的卡另需 `## 抽象度`（四问 + 第二消费者 + 搬家成本；判据 = [内容宪章](../../docs/content-charter.md)），缺这节定性不算完成。
+决定做的按 [验收设计](../methods/validation-design.md) 在同卡加 `## 验收标准`（至少三列：命令 | 断言 | 红形态；写不出可执行行 = 还没到 `待落地`），同时把 `status` 翻 `待落地`、卡顶写 `去向`（`rfc｜note｜implementation`）——这三样齐了才算过了定性门，缺一样门禁红。这描述下游做成什么算合格，不要求未来检查已执行；`关闭条件` 不复制实施验收。**新增或搬动内容**（角色/能力/方法/模板/政策）的卡另需 `## 抽象度`（四问 + 第二消费者 + 搬家成本；判据 = [内容宪章](../../docs/contracts/content-charter.md)），缺这节定性不算完成。
 
 五道门与全部翻转规则唯一家 = [章程](../README.md)「五道门」「双轨状态生命周期」：门票 = **把问题说清 + 给出验收手段，由格式承载**（问题轨 = `待落地` 时 `## 验收标准`；缺陷轨 = `修复就绪` 时 `## 已修判定`）；`毕业：` 封闭头 `未定｜做｜以后做｜不做｜消化`；状态行镜像 frontmatter（门禁互查）。`待落地` **不是授权**——授权仍来自用户点名或已批 RFC。`去向=note|implementation` 的卡还必须写 `## 落地证据`（至少一个非 `_backlog/`/`notes/` 的路径 + 一条实跑命令）；`去向=rfc` 的卡在定性出口离场，不填这节。
 

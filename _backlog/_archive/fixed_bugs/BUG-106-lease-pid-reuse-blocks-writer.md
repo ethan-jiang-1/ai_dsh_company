@@ -54,7 +54,7 @@ lock exists true
 ## 修复关联
 
 - 发现于 C3 lease 回归；与 [BUG-101](BUG-101-concurrent-home-smoke-stale-v2-and-lease-timing.md) 同属 lease 生命周期，但本卡是 PID 身份问题。
-- 合同：[`docs/runtime-map.md`](../../../docs/runtime-map.md) 二·五（writer lease）；`src/host/run-bundle/lease.ts`。
+- 合同：[`docs/runtime-map.md`](../../../docs/architecture.md) 二·五（writer lease）；`src/host/run-bundle/lease.ts`。
 
 ## 已修判定
 

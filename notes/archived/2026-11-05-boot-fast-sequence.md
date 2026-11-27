@@ -15,7 +15,7 @@
 
 - **改 web-window-ops skill**（我最初提议）：用户 2026-11-05 明确否掉（“不要弄 SKILL”）——skill 管完成定义，
   启动步骤的规则 owner 已在 demo.md；两处写步骤必漂。
-- **加进 [budget-and-ops §3](../../docs/guides/budget-and-ops.md#3-demo-运维-runbook症状--动作) 症状表**：那张表管现场
+- **加进 [budget-and-ops §3](../../docs/guides/run-ops.md#3-demo-运维-runbook症状--动作) 症状表**：那张表管现场
   突发症状；启动慢是步骤顺序问题，写进去会复述步骤，造成第二份事实。
 - **用 `--link` 换速度**：能省 build/pack/add 的几秒，但不验打包面；用户要求“模拟用户安装启动”，交付启动不能用调试通道。
 

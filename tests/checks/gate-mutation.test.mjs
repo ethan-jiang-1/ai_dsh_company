@@ -529,14 +529,14 @@ test('ledger-routing：删「现行表禁删除线」「表外散文上限」「
       const n = i + 1
       const txt = dirty && n === 3 ? '~~旧决定~~ 现已废止' : `现行决定 ${String(n)}`
       const tail = unclosed4th && n === 2 ? ' 第四列逃逸正文' : ''
-      return `| <a id="d${String(n)}"></a>D${String(n)} | ${txt} | [Note](../../notes/implemented/n.md) |${tail}`
+      return `| <a id="d${String(n)}"></a>D${String(n)} | ${txt} | [Note](../notes/implemented/n.md) |${tail}`
     })
     const retired = [
-      '| <a id="d21"></a>D21 | 退役 21 | [旧](../../notes/archived/o.md) |',
-      '| <a id="d22"></a>D22 | 退役 22 | [旧](../../notes/archived/o.md) |',
+      '| <a id="d21"></a>D21 | 退役 21 | [旧](../notes/archived/o.md) |',
+      '| <a id="d22"></a>D22 | 退役 22 | [旧](../notes/archived/o.md) |',
       skip24
-        ? '| <a id="d24"></a>D24 | 跳过 D23 | [旧](../../notes/archived/o.md) |'
-        : '| <a id="d23"></a>D23 | 退役 23 | [旧](../../notes/archived/o.md) |',
+        ? '| <a id="d24"></a>D24 | 跳过 D23 | [旧](../notes/archived/o.md) |'
+        : '| <a id="d23"></a>D23 | 退役 23 | [旧](../notes/archived/o.md) |',
     ]
     return [
       '# 决策台账', '', ...intro, '',
@@ -548,7 +548,7 @@ test('ledger-routing：删「现行表禁删除线」「表外散文上限」「
   const rootDirty = fixture({
     'notes/implemented/n.md': '# n\n',
     'notes/archived/o.md': '# o\n',
-    'docs/reference/decisions.md': mkLedger({ dirty: true }),
+    'docs/decisions.md': mkLedger({ dirty: true }),
   })
   const mutDirty = await mutant('ledger-routing',
     "if (sec.title === '现行决定' && ACTIVE_FORBIDDEN.test(summary)) {",
@@ -561,7 +561,7 @@ test('ledger-routing：删「现行表禁删除线」「表外散文上限」「
   const rootProse = fixture({
     'notes/implemented/n.md': '# n\n',
     'notes/archived/o.md': '# o\n',
-    'docs/reference/decisions.md': mkLedger({ intro: Array.from({ length: 11 }, (_, i) => `散文 ${String(i + 1)}`) }),
+    'docs/decisions.md': mkLedger({ intro: Array.from({ length: 11 }, (_, i) => `散文 ${String(i + 1)}`) }),
   })
   const mutProse = await mutant('ledger-routing',
     'if (proseLines.length > LEDGER_MAX_PROSE_LINES) {',
@@ -574,7 +574,7 @@ test('ledger-routing：删「现行表禁删除线」「表外散文上限」「
   const rootCode = fixture({
     'notes/implemented/n.md': '# n\n',
     'notes/archived/o.md': '# o\n',
-    'docs/reference/decisions.md': mkLedger({ intro: ['```txt', '代码块膨胀', '```'] }),
+    'docs/decisions.md': mkLedger({ intro: ['```txt', '代码块膨胀', '```'] }),
   })
   const mutCode = await mutant('ledger-routing',
     'if (nonStructural.length > 0) {',
@@ -587,7 +587,7 @@ test('ledger-routing：删「现行表禁删除线」「表外散文上限」「
   const rootUnclosed = fixture({
     'notes/implemented/n.md': '# n\n',
     'notes/archived/o.md': '# o\n',
-    'docs/reference/decisions.md': mkLedger({ unclosed4th: true }),
+    'docs/decisions.md': mkLedger({ unclosed4th: true }),
   })
   const mutUnclosed = await mutant('ledger-routing',
     'if (cells.length !== 5 || !closedLeft || !closedRight) {',
@@ -600,7 +600,7 @@ test('ledger-routing：删「现行表禁删除线」「表外散文上限」「
   const rootGap = fixture({
     'notes/implemented/n.md': '# n\n',
     'notes/archived/o.md': '# o\n',
-    'docs/reference/decisions.md': mkLedger({ skip24: true }),
+    'docs/decisions.md': mkLedger({ skip24: true }),
   })
   const mutGap = await mutant('ledger-routing',
     'if (missing.length) {',

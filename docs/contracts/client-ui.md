@@ -1,12 +1,12 @@
 # Client UI 与 DSH 原生扩展架构（`src/client/`）
 
-> 什么时候读：理解或修改浏览器端（client）扩展架构、DSH 槽位注册、界面布局或文案/样式约束时。
+> **读法**：理解或修改浏览器端（client）扩展架构、DSH 槽位注册、界面布局或文案/样式约束时读。
 > 上游总纲 = [architecture.md](../architecture.md)；模块与接线详情 = [src/README](../../packages/company-pack/src/README.md)；实施决策 = [2026-11-26-dsh-native-ux-upgrade](../../notes/implemented/2026-11-26-dsh-native-ux-upgrade.md)。
 
 ## 1. 总体装配与隔离边界
 
 - **入口与模块组**：`src/client/index.ts`（导出 `apply` 与 `inject = ['slots', 'remote', 'sessions', 'locale']`）在 `apply` 闭包内初始化 `attention`、`hubStore`、`startupStore`（**严禁模块级可变单例**），再按服务可用性独立 `ctx.inject([...], ...)` 装配 `wiring/`、`data/`、`ui/`、`tabs/`、`ux/`、`cultivation/`、`startup/`、`presence/`（组清单 = `src/client/` 目录本身）。
-- **自打包与平台白名单**：client 半经 `tsdown` 打包为 `lib/client.js`，`react` 与 `dsh-client-*`/`dsh-api-*` 走浏览器 `PLATFORM_MODULES` 与 `package.json` 的 `dsh.client.inject` 到达边（依赖语义见 [guides/debugging.md §3.9](../guides/debugging.md)）。
+- **自打包与平台白名单**：client 半经 `tsdown` 打包为 `lib/client.js`，`react` 与 `dsh-client-*`/`dsh-api-*` 走浏览器 `PLATFORM_MODULES` 与 `package.json` 的 `dsh.client.inject` 到达边（依赖语义见 [guides/debugging.md §3.9](../guides/run-ops.md)）。
 - **零 `vendor/dsh/` 修改**：全部交互与界面收敛在 DSH 官方 L0/L1 扩展契约面；禁止重复 `$mount` 官方 `ui-agent-team` 产生的 Team Remote。
 
 ## 2. DSH 原生扩展面（S1–S4 现行架构）
@@ -30,6 +30,6 @@
 ## 4. 数据流、错误回传与双语表达
 
 - **数据读写分离**：读盘经 `remote.workspaceFiles`（带字节上限与显式错误状态，禁止静默空态回退）；人侧动作经 `remote.commands.execute` 发 `/cultivation`、`/company-settings` 等命令，由 host 实施角色闸与持久化。
-- **跨会话待办重建**：仅靠事件流对未打开会话零帧；`presence/attention-history.ts` 结合 `installAttentionObservers` 与 `remote.session.page` 投影重建跨会话挂起审批/问询（[D67](../reference/decisions.md#d67)）。
+- **跨会话待办重建**：仅靠事件流对未打开会话零帧；`presence/attention-history.ts` 结合 `installAttentionObservers` 与 `remote.session.page` 投影重建跨会话挂起审批/问询（[D67](../decisions.md#d67)）。
 - **双语表达层**：所有公司 Web UI 文案必须 `zh`/`en` 对称（默认 `zh`），集中住 `src/client/locales.ts` typed `company` 字典，角色表达走 `src/client/roles.ts`，禁止组件内硬编码中文/英文标签（修改流程 = `company-ui-change-definition` skill）。
 - **错误环回传**：客户端异常捕获进 `window.__DSH_COMPANY_ERRORS__`，由 `error-ring.ts` 节流经 `/company-diagnostics` 追加到 `$DSH_HOME/logs/company-client-errors.log`。

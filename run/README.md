@@ -3,7 +3,7 @@
 > 本目录只收「怎么启动」的 tracked 配置；跑过留下的状态一律住 [runtime/](../runtime/README.md)
 > （gitignored 运行残留，逐件 owner = 其 README）。双 home 纪律与机制 =
 > [architecture §6](../docs/architecture.md)；进入开发环境 = `source run/env.sh`
-> （双 home 兜底 + 裸 `dsh` 拦截 + pre-push 接线，幂等）；全链时序 = [运行态地图](../docs/runtime-map.md)。
+> （双 home 兜底 + 裸 `dsh` 拦截 + pre-push 接线，幂等）；全链时序 = [运行态地图](../docs/architecture.md)。
 
 ## 公司状态（workspace 单元）与 run trace（一次运行的追溯视图）
 
@@ -14,7 +14,7 @@ workspace 登记 / lease / 方法层 / presented 账本 / 身份备份）。一�
 
 公司状态**不进 git**；本仓的 dev 公司状态 = workspace `company-workspace/`（整树 gitignored；`pnpm bundle:init`
 只建 `.dsh-company/` 状态；手册/模板住 pack `content/`——host 注入/只读，默认章程与状态首启只补缺），
-身份 = `company-workspace/.dsh-company/bundle.json`（v3，legacy 文件名）。定义与 base/grown 分层唯一家 = [运行态地图 §二·五](../docs/runtime-map.md)。
+身份 = `company-workspace/.dsh-company/bundle.json`（v3，legacy 文件名）。定义与 base/grown 分层唯一家 = [运行态地图 §二·五](../docs/architecture.md)。
 
 **run trace = 一次运行的追溯视图**（引用不复制）：
 

@@ -1,6 +1,6 @@
 # release · 发行版与发布物（company-pack）
 
-> 什么时候读：发布、打包、装进真实 profile、升 vendor pin 时。
+> **读法**：发布、打包、装进真实 profile 或升 vendor pin 时读。
 > 本仓交付一份 **Harness 发行版**：bundle + `company` profile + workspace 公司状态 + Harness home 策略 +
 > 生命周期。**发布物（release artifact）** 只是可下载的 tarball/安装手册；发行版包含六轴。
 > 每次发布的操作步骤 = [guides/release-runbook.md](../guides/release-runbook.md)；一条命令入口 = `pnpm release`。

@@ -20,7 +20,7 @@
 
 边界：过滤在**错误环入口**（`packages/company-pack/src/client/wiring/error-ring.ts` 的 `onError`），
 不是各消费者（`cdp-probe` / `ui-scene-smoke` / host 日志）各写一份——否则 DevTools 与
-[预算与运维 §3](../../docs/guides/budget-and-ops.md) 指引读到的日志仍被污染。
+[预算与运维 §3](../../docs/guides/run-ops.md) 指引读到的日志仍被污染。
 
 ## 输掉的方案
 
@@ -49,7 +49,7 @@
 - 事实：浏览器「用户可见错误」集合 = 真异常 + unhandled rejection + `console.error`，**不含** ResizeObserver 循环通知。
 - 唯一入口（过滤与取文）：[error-ring.ts](../../packages/company-pack/src/client/wiring/error-ring.ts) 的 `textOf` / `onError`。
 - 写载体：页面环 `window.__DSH_COMPANY_ERRORS__` → host 诊断命令 → `$DSH_HOME/logs/company-client-errors.log`
-  （见 [budget-and-ops §3](../../docs/guides/budget-and-ops.md)）；
+  （见 [budget-and-ops §3](../../docs/guides/run-ops.md)）；
 - 读载体：`cdp-probe` verdict 的 `clientErrors`、`ui-scene-smoke`、`pnpm diagnose`。
 - 测试：[error-ring.spec.ts](../../tests/client/wiring/error-ring.spec.ts)。
 

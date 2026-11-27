@@ -129,7 +129,7 @@ export function parseSessionPreset(text) {
 
 /**
  * run bundle 四件套（RFC driver-purpose-top-level S4）：把「一次运行 = 哪四件状态」默认显性化。
- * 只导航不复制——逐轴权威唯一家 = run/README 与 docs/runtime-map §二；引用不复制（不落盘 manifest）。
+ * 只导航不复制——逐轴权威唯一家 = run/README 与 docs/architecture.md §2；引用不复制（不落盘 manifest）。
  */
 export function fourPieceState({ home, profiles, workspaceRoot, root = repositoryRoot }) {
   const scenes = snapshotScenes(root)
@@ -257,7 +257,7 @@ export function renderOrient(state) {
     }
     lines.push('  （ᵈ = 依赖由盘上稿推断满足，* = 稿与状态行矛盾待核实；全部 needsVerify 恒真——真伪人核）')
   }
-  lines.push('', '== run trace 四件套（一次运行 = 这四件状态；权威家 = run/README + docs/runtime-map §二·五）==')
+  lines.push('', '== run trace 四件套（一次运行 = 这四件状态；权威家 = run/README + docs/architecture.md §2）==')
   lines.push(`代码与组合   ${state.fourPiece.code}`)
   lines.push(`运行状态     ${state.fourPiece.runState}`)
   lines.push(`会话 cwd     ${state.fourPiece.sessionCwd}`)

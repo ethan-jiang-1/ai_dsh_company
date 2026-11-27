@@ -47,7 +47,7 @@
   （business-software 同改）；闸门 [prd-gate.ts](../../packages/company-pack/src/host/commands/prd-gate.ts)，注册在
   [index.ts](../../packages/company-pack/src/index.ts)。
 - 读载体：[product-definition 指南](../../docs/guides/product-definition.md)、VP-Eng `prd-playbook`、
-  共享 `product-definition` 技能、[D61](../../docs/reference/decisions.md)。
+  共享 `product-definition` 技能、[D61](../../docs/decisions.md)。
 - 写载体：模板（模型写 PRD 时注入）、`/prd check` 命令、`present` 闸门。
 - 测试：[prd-check.spec](../../tests/lib/docs/prd-check.spec.ts)、
   [prd-gate.spec](../../tests/host/commands/prd-gate.spec.ts)、

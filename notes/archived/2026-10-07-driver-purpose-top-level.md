@@ -9,7 +9,7 @@
 
 驾驭者 2026-10-07 提出五条感受：①运行态/测试/调试/交互应各有其目录，拒绝过大混合子目录；②运行入口与逻辑串联看不清；③测试资产组织要可读；④agent loop、skills、运行态、run bundle 要显性化；⑤鼓励调整目录结构。
 
-探索诊断（同日）：内容大半已存在（tests/ 四区、scripts 内部分区、[orient 五问](../../docs/orient.md)、
+探索诊断（同日）：内容大半已存在（tests/ 四区、scripts 内部分区、[orient 五问](../../docs/guides/orient.md)、
 [改动面→最窄检查](../../tests/README.md)），病在**顶层按形态命名不按用途命名**：
 
 - `scripts/` 是形态词（"脚本"），smoke/probes/audit/tools 挤在其下，顶层读不出"验证/调试/工具"；
@@ -39,14 +39,14 @@ docs/ notes/ _backlog/ company-workspace/ vendor/（不动）
 五切片（全部已交付；每片独立 commit，`pnpm verify` + `pnpm test` 全绿过片）：
 
 - **S1 dev→run**（40ab1b1）：目录改名 + 全部活跃引用更新（~105 处；快照冻结收据不改写）+ run-gates TOP_DIRS
-  换判据 + run/README 增"一次运行四件套"导航节（只导航到 [运行态地图](../../docs/runtime-map.md)，不复制）。
+  换判据 + run/README 增"一次运行四件套"导航节（只导航到 [运行态地图](../../docs/architecture.md)，不复制）。
 - **S2 scripts 升格**（824e578）：smoke→checks/smoke、audit→checks/audit、run-gates.mjs 留 checks/ 根；
   tools/lib/drivers/archive→tools/；package.json 三命令路径；~350 处活跃引用 + 导航链接机械更新；
   门禁（TOP_DIRS、脚本自述递归清单、keyless-imports、layering、repository-layout、entry-probe 允许面）同 diff 改判据当网。
 - **S3 probes 分域**（138f3ad）：team/(9)、fs-taskboard/(7)、browser-visual/(4)、session-context/(6)；48 处引用同步。
 - **S4 驾驭者面板**（38d7410）：`pnpm orient` 默认输出新增「run bundle 四件套」节（代码与组合/运行状态/会话 cwd/证据）；
-  [orient.md](../../docs/orient.md) 五问同步指向。
-- **S5 导航收口**（436436f）：根 [AGENTS.md](../../AGENTS.md) 布局节、[项目地图](../../docs/project-map.md)、
+  [orient.md](../../docs/guides/orient.md) 五问同步指向。
+- **S5 导航收口**（436436f）：根 [AGENTS.md](../../AGENTS.md) 布局节、[项目地图](../../docs/README.md)、
   [检查索引](../../checks/README.md) 叙述同步。
 
 ## 输掉的方案

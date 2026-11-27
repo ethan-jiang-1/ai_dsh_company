@@ -1,6 +1,6 @@
 # 检查与工具索引（judge · show · operate 三面）
 
-> 面：judge（会拦人的判断）。规则与例外 = [surface-contract](../docs/surface-contract.md)。
+> 面：judge（会拦人的判断）。规则与例外 = [surface-contract](../docs/policy.md)。
 
 > 什么时候读：要跑/新增门禁、冒烟、探针或审计时。按要证明的对象选下面的入口。
 本文件是**索引**（政策 = [测试宪法](../docs/testing.md)；改动面映射/验证分层/命令预算 = [tests/README](../tests/README.md)）；**触发条件、成本、状态与参数的唯一家 = 脚本头注**，这里只分类与链接（复述必漂）；开发环境 = [开发环](../docs/guides/dev-loop.md)。
@@ -43,7 +43,7 @@
 [lib](./lib/) 保存 judge-wide 判据（作者/交付物核对、覆盖基线、分层与面判据、回放与快照判据、密钥与 token 扫描）；[gates/lib](gates/lib/) / [lanes/lib](lanes/lib/) 是 gate-local / lane-local 支撑（只许各自子树 import）；跨面共享地基住 [tools/lib](../tools/lib/)（core/ 路径与会话、probe/ 探针骨架、注册表等）；真实驱动住 [tools/drivers](../tools/drivers/)。
 驱动不进入 keyless spec，准入由 [分层守卫](../tests/repo/structure/layering.spec.ts) 检查。
 
-目录取舍见 [driver-purpose-top-level](../notes/archived/2026-10-07-driver-purpose-top-level.md)；顶层导航 = [项目地图](../docs/project-map.md)。
+目录取舍见 [driver-purpose-top-level](../notes/archived/2026-10-07-driver-purpose-top-level.md)；顶层导航 = [项目地图](../docs/README.md)。
 
 ## 待触发复查（触发条件 → 该做什么）
 

@@ -53,7 +53,7 @@ intent: 盘点问题/缺陷从发现到留痕的实际覆盖——卡、Note、�
 - [章程第 9 行](../../../README.md)：「当场修掉的不建卡，其同类横切排查一句话记在该轮轮次回执①行（有 Note 随 Note）。」
 - [缺陷规则第 3 行](../../../bugs/README.md)：「当场修掉的不建卡。建卡表示发现时决定这次不修。」
 - [收尾 skill 第 30 行](../../../../.agents/skills/close-out-definition/SKILL.md)：「①抓到异常没（→BUG 卡 + 红绿修复）」。
-- [budget-and-ops 第 53 行](../../../../docs/guides/budget-and-ops.md) 抄了同一句。
+- [budget-and-ops 第 53 行](../../../../docs/guides/run-ops.md) 抄了同一句。
 
 同一件事，两套文本给出相反动作。fresh agent 读哪份，决定它做不做卡。
 

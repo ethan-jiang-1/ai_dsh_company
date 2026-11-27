@@ -28,11 +28,11 @@
 
 - 完整原稿：`git show ab0fd622^:docs/design/architecture.md`（2026-11-10 迁移前）；本 Note 只留决定与理由，不复制现行表。
 - 机制核对：vendor/dsh 钉住 tag 的 `packages/preset/*`、`subagent/*`、`experimental/agent-team/*`、`workflow/*`；R1 首跑证据与 R3 判定见原稿/相关 Note。
-- 决策台账：[D1–D5/D7](../../docs/reference/decisions.md)。
+- 决策台账：[D1–D5/D7](../../docs/decisions.md)。
 
 ## 现行语义（canonical）
 
-- [docs/architecture.md](../../docs/architecture.md)（组合/地图）· [contracts/profile.md](../../docs/contracts/profile.md)（host 行）· [contracts/presets.md](../../docs/contracts/presets.md)（角色/四形态）· [contracts/delegation.md](../../docs/contracts/delegation.md)（通道/深度）· [runtime-map.md](../../docs/runtime-map.md)（时序/轴）。
+- [docs/architecture.md](../../docs/architecture.md)（组合/地图）· [contracts/profile.md](../../docs/contracts/profile.md)（host 行）· [contracts/presets.md](../../docs/contracts/presets.md)（角色/四形态）· [contracts/delegation.md](../../docs/contracts/delegation.md)（通道/深度）· [runtime-map.md](../../docs/architecture.md)（时序/轴）。
 
 ## 相关
 

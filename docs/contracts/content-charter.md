@@ -1,11 +1,7 @@
 # 内容宪章：按寿命分层，按成本抽象
 
-> 什么时候读：新增或修改角色、能力、方法、模板、流程、政策之前；或不确定「这段内容该住哪层」时（理由与输掉的方案 = [落地 Note](../notes/implemented/2026-11-10-content-charter.md)）。
-> 性质：**归位与抽象层次的唯一家**——四槽、三层、四问、两测、成本判据住这里。步骤住
-> [capability-addition-definition](../.agents/skills/capability-addition-definition/SKILL.md)，机械不变量住
-> [checks/gates/](../checks/gates/)，层内放什么的现行清点住 [content/README](../packages/company-pack/content/README.md)
-> 与 [manifest.json](../packages/company-pack/content/manifest.json)。
-> 适用：动任何东西之前先答第 5 节四问；答不出，不动笔。
+> **读法**：新增或修改角色、能力、方法、模板、流程、政策前先答第 5 节四问；本文件是归位与抽象层次的唯一合同（理由 = [落地 Note](../../notes/implemented/2026-11-10-content-charter.md)）。
+> 执行步骤住 [capability-addition-definition](../../.agents/skills/capability-addition-definition/SKILL.md)，机械不变量住 [checks/gates/](../../checks/gates/)，层内清点住 [content/README](../../packages/company-pack/content/README.md) 与 [manifest.json](../../packages/company-pack/content/manifest.json)。
 
 ## 1. 一句话
 
@@ -35,7 +31,7 @@
 | 公司 | 只这家公司成立吗 | 换公司时 |
 | **方法（正交）** | 换做法要改吗 | 换方法/项目时 |
 
-目录 ↔ 层的现行对应 = [content/README](../packages/company-pack/content/README.md)：本表只给判据，不复述目录清单。
+目录 ↔ 层的现行对应 = [content/README](../../packages/company-pack/content/README.md)：本表只给判据，不复述目录清单。
 
 ## 4. 三条铁律
 
@@ -81,14 +77,14 @@
 - 声称可复用的能力档没有方法槽。
 - 为单一消费者造「通用」层。
 - 把例子当规则贴进规则文件；把政策数字写进代码或注释。
-- 新内容没进 [manifest.json](../packages/company-pack/content/manifest.json) 或对应索引。
+- 新内容没进 [manifest.json](../../packages/company-pack/content/manifest.json) 或对应索引。
 
 ## 10. 变更协议
 
 - **卡**：新增/修改内容，卡里必须有 `## 抽象度`——四问答案 + 第二消费者（或例外）+ 搬家成本；缺这节，定性不算完成。
-- **门**：合并前过 `pnpm verify` 的结构门（清单与判据 = [checks/gates/](../checks/gates/) 目录，本文件不复述）；本宪章对应的机械面 = 内容唯一家、载入清单、通用面零特殊性、preset 结构与名册。
-- **Note**：收尾写「归位」一节——为什么这层 / 什么会逼它搬家 / 哪个更低的层被排除（规则 = [notes/README](../notes/README.md)）。
-- **语义审**（[policy §P5](./policy.md)）只问一句：换公司/产品类型/方法，这段要改吗？要改 preset 或代码 = 错层。
+- **门**：合并前过 `pnpm verify` 的结构门（清单与判据 = [checks/gates/](../../checks/gates/) 目录，本文件不复述）；本宪章对应的机械面 = 内容唯一家、载入清单、通用面零特殊性、preset 结构与名册。
+- **Note**：收尾写「归位」一节——为什么这层 / 什么会逼它搬家 / 哪个更低的层被排除（规则 = [notes/README](../../notes/README.md)）。
+- **语义审**（[policy §P5](../policy.md)）只问一句：换公司/产品类型/方法，这段要改吗？要改 preset 或代码 = 错层。
 
 ## 11. 宪章自己的修改
 
@@ -97,8 +93,8 @@
 
 ## 12. 指针
 
-- 操作步骤 = [capability-addition-definition skill](../.agents/skills/capability-addition-definition/SKILL.md)
-- 机械不变量 = [checks/gates/](../checks/gates/)（每门一文件，装配 = `checks/run-gates.mjs`）
-- 决策记忆 = [notes/](../notes/README.md)（Note 的「归位」一节）
-- 层内放什么 = [content/README](../packages/company-pack/content/README.md) + [manifest.json](../packages/company-pack/content/manifest.json)
-- 文档层规范 = [docs/AGENTS.md](./AGENTS.md)
+- 操作步骤 = [capability-addition-definition skill](../../.agents/skills/capability-addition-definition/SKILL.md)
+- 机械不变量 = [checks/gates/](../../checks/gates/)（每门一文件，装配 = `checks/run-gates.mjs`）
+- 决策记忆 = [notes/](../../notes/README.md)（Note 的「归位」一节）
+- 层内放什么 = [content/README](../../packages/company-pack/content/README.md) + [manifest.json](../../packages/company-pack/content/manifest.json)
+- 文档层规范 = [docs/AGENTS.md](../AGENTS.md)

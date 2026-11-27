@@ -26,11 +26,11 @@
 
 - 完整原稿：`git show ab0fd622^:docs/design/roles-isolation.md`。
 - 0.2.1 源码核对：`packages/subagent/subagent/src/child-agent.ts`、`manager.ts`；活体探针 = `checks/lanes/delegation.entry.mjs`，身份字段 = `list_subagents`。
-- 决策台账：[D18 / D22 / D58](../../docs/reference/decisions.md)。
+- 决策台账：[D18 / D22 / D58](../../docs/decisions.md)。
 
 ## 现行语义（canonical）
 
-- [contracts/delegation.md](../../docs/contracts/delegation.md) · [contracts/presets.md](../../docs/contracts/presets.md)（四形态）· [architecture.md](../../docs/architecture.md)（通道表）· [runtime-map.md](../../docs/runtime-map.md)。
+- [contracts/delegation.md](../../docs/contracts/delegation.md) · [contracts/presets.md](../../docs/contracts/presets.md)（四形态）· [architecture.md](../../docs/architecture.md)（通道表）· [runtime-map.md](../../docs/architecture.md)。
 
 ## 相关
 

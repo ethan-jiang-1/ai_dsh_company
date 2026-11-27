@@ -134,7 +134,7 @@ CI 先按「全配方」跑，连续红，逐条暴露（都不是本仓 tracked
 
 ## 跨环境合同（2026-10-25）
 
-- **新增合同** = [docs/repo-hygiene.md](../../docs/repo-hygiene.md)：两棵树、什么进 git、跨环境规则、例外、执行面。
+- **新增合同** = [docs/repo-hygiene.md](../../docs/contracts/repo-hygiene.md)：两棵树、什么进 git、跨环境规则、例外、执行面。
 - **新增基线** = `.gitattributes`：`* text=auto eol=lf` + 二进制后缀；CI 双跑 Ubuntu/macOS。
 - **新增门禁** = `tracked-portability`：活动面绝对 home 路径、CRLF、大小写冲突、macOS 专属命令。
   例外 = `notes/archived/`、`_backlog/_archive/`、`snapshots/`、合成 fixture；活动面已去本机化
@@ -147,7 +147,7 @@ CI 先按「全配方」跑，连续红，逐条暴露（都不是本仓 tracked
 ## 指针
 
 - 边界 = [.gitignore](../../.gitignore)；逐件 owner / 白名单 = [runtime/README.md](../../runtime/README.md)；
-  空间导航 = [docs/project-map.md](../../docs/project-map.md)。
+  空间导航 = [docs/project-map.md](../../docs/README.md)。
 - 门禁 = [checks/gates/no-tracked-ignored.mjs](../../checks/gates/no-tracked-ignored.mjs)、
   [tracked-file-size.mjs](../../checks/gates/tracked-file-size.mjs)、
   [gitignore-shape.mjs](../../checks/gates/gitignore-shape.mjs)、

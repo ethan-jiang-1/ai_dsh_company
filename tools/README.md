@@ -1,6 +1,6 @@
 # tools/ · 维护工具面
 
-> 面：operate（改世界的操作）。只看/收证据的入口住 `probes/`（show），见 [surface-contract](../docs/surface-contract.md) 与 [例外登记](../docs/reference/surface-exceptions.md)。
+> 面：operate（改世界的操作）。只看/收证据的入口住 `probes/`（show），见 [surface-contract](../docs/policy.md) 与 [例外登记](../docs/reference/surface-exceptions.md)。
 
 > 什么时候读：要手工跑一件维护工具、或给新工具选家时。
 > 本页是**目录规则**，不是文件清单（清单 = 目录本身，D28）；逐工具入口与链接 = [检查索引](../checks/INDEX.generated.md) 的「维护工具」一节。

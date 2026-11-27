@@ -89,7 +89,7 @@ upgrade log 轮转、全量 `company/` namespace、T4/T7 视觉/回放证据、c
 - 培养记录加 `schema: 1`：`recordText` 写新字段，`parseRecord` 缺字段按 1 读；旧记录不改写。
 - client-errors 日志迁 `$DSH_HOME/logs/company-client-errors.log`（保留旧
   `cultivation/client-errors.log` 只读 fallback 一版）；`/company-diagnostics` 与
-  [budget-and-ops](../../docs/guides/budget-and-ops.md) 读路径同 diff；加轮转/上限（按大小截断）。
+  [budget-and-ops](../../docs/guides/run-ops.md) 读路径同 diff；加轮转/上限（按大小截断）。
 - 新增 home 白名单 diff 检查：首启/二启后 `$DSH_HOME` 的相对路径集合必须落在声明白名单内
   （sessions/profiles/storages/bundle.json/logs/company-workspace 等），意外文件判红。
 

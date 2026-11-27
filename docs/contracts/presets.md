@@ -1,6 +1,6 @@
 # presets · 角色 preset 的语义合同
 
-> 什么时候读：改 persona、skills 或角色语义时。路线 = 六角色表 → 验证方式节；培养回路/方法层 = [cultivation.md](./cultivation.md)。
+> **读法**：改 persona、skills 或角色语义时读；路线 = 六角色表 → 验证方式节；培养回路/方法层 = [cultivation.md](./cultivation.md)。
 > 合同：公司角色与 support preset 的"现在时"语义（清单 = `presets/` 目录；persona 定稿、skills 清单、验证方式）。
 > 内容来源 [role-content Note](../../notes/implemented/2026-11-10-role-content-rationale.md)；命名约定见台账 D14（显示名 = 角色名；公司名只在品牌/身份面；preset id 保持 kebab）。
 > **编制唯一事实家 = `company-workspace/.dsh-company/kb/org.md`**（细到岗位）；各角色 CHARTER 只留本条线事实
@@ -40,7 +40,7 @@
 
 改哪一列 → 哪个文件：persona/工具/skills → `presets/<role>/`（owner 表 = [pack README](../../packages/company-pack/README.md)）；手册/模板/默认章程 → `packages/company-pack/content/`（只读；默认章程与状态首启只补缺到 `.dsh-company/`，实例才在 workspace）；生效时点 = 下文「生效边界按面」表。
 
-- **skill/工具实际生效的证据 = 会话日志**（`request/header.tools` 列实际工具名）——多帧 zstd 用 `zstd -d -c` 读（手段唯一家 = [debugging §3.7](../guides/debugging.md)，不复述）；`--dump-config` 只证组合层，不证会话实际全貌。
+- **skill/工具实际生效的证据 = 会话日志**（`request/header.tools` 列实际工具名）——多帧 zstd 用 `zstd -d -c` 读（手段唯一家 = [debugging §3.7](../guides/run-ops.md)，不复述）；`--dump-config` 只证组合层，不证会话实际全貌。
 - **agent loop 是 vendor 运行机制**：本仓负责四个面——preset 声明（`presets/`）、bundle 装配（`cordis.patch.yml`）、host+client 注册（`src/`）、workspace 约束（手册与模板）；**公司手册是给 DSH 会话里的公司角色的，不是 Coding Agent 指令**（两类主体的分界 = 根 [AGENTS.md](../../AGENTS.md) 入口）。
 
 ## CEO（个体：动议的唯一入口与出口）

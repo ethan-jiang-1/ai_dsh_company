@@ -1,6 +1,6 @@
 # 2026-11-10 · docs/ DSH 对齐五步
 
-状态：implemented（2026-11-10 交付；五步 commit `69706354` / `177f887f` / `ab0fd622` / `3beabcca` / `abb02d1e`；部分被 [2026-11-27-docs-architecture-and-dependency-alignment.md](./2026-11-27-docs-architecture-and-dependency-alignment.md) 演进：新增 `docs/architecture/` 层、补全 `docs/README.md` 五层导航并禁止 `docs/` 链接 `_backlog/`）
+状态：implemented（2026-11-10 交付；五步 commit `69706354` / `177f887f` / `ab0fd622` / `3beabcca` / `abb02d1e`；部分被 [2026-11-27-docs-architecture-and-dependency-alignment.md](./2026-11-27-docs-architecture-and-dependency-alignment.md) 演进：新增 `docs/contracts/` 层、补全 `docs/README.md` 五层导航并禁止 `docs/` 链接 `_backlog/`）
 
 上游 = [docs-dsh-alignment](../../_backlog/_archive/settled_issues/2026-11-10-docs-dsh-alignment.md)
 

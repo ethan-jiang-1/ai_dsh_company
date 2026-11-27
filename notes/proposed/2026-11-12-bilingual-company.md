@@ -91,7 +91,7 @@ opened: 2026-11-12
 | day-one | `.agents/skills/company-ui-change-definition/SKILL.md`（Phase 0） | 触发任何 UI 文案/面板/页签/卡片/空态/错误；首 commit 双语；跑 gate + i18n spec + 金样 |
 | 路由 | `packages/company-pack/src/README.md` + `tests/README.md`（Phase 0）；根 `AGENTS.md` 一行（A4） | 改 UI → 读合同 + 加载 skill + 跑 gate |
 
-**为什么不写进 `docs/content-charter.md`**：它管内容分层，不是运行时 UI 文案；没有门禁消费者。**为什么不写进 `packages/company-pack/content/AGENTS.md`**：那是注入公司角色的 system prompt，不是开发者规范。**为什么 Phase 0 不写合同/门禁**：现有文案未迁，写了就是描述未发生行为的假合同；门禁也会把 501 条存量打红。Phase 0 用 skill + 指针止住新增，A4 再转硬。
+**为什么不写进 `docs/contracts/content-charter.md`**：它管内容分层，不是运行时 UI 文案；没有门禁消费者。**为什么不写进 `packages/company-pack/content/AGENTS.md`**：那是注入公司角色的 system prompt，不是开发者规范。**为什么 Phase 0 不写合同/门禁**：现有文案未迁，写了就是描述未发生行为的假合同；门禁也会把 501 条存量打红。Phase 0 用 skill + 指针止住新增，A4 再转硬。
 
 ## 输掉的方案
 

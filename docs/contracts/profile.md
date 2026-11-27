@@ -1,6 +1,6 @@
 # profile · host 组合的现在时（company）
 
-> 什么时候读：改 host 组合、换部署形状（Plugins 安装 vs dev）时。路线 = 形状表 → host 行清单 → 开放点。
+> **读法**：改 host 组合、换部署形状（Plugins 安装 vs dev）时读；路线 = 形状表 → host 行清单 → 开放点。
 > 合同：部署形状与 host 行清单语义。行清单源文件（bundle 层）：
 > [packages/company-pack/cordis.patch.yml](../../packages/company-pack/cordis.patch.yml)。
 > 插件只读内容 = [content/](../../packages/company-pack/content)；公司状态 = `<workspace>/.dsh-company/`。
@@ -37,7 +37,7 @@
 | `tool-present`（insert） | 交付物声明（deliverables 卡片） | ✅ |
 | `agent-team` + `tool-agent-team`（insert） | 团队协作主通道（M4/D4） | ✅ |
 | `ui-agent-team`（insert） | 团队 Web 可视面 | ✅ |
-| `company-client`（insert，`name: dsh-company-pack`） | 本包 host/client 入口：签字工具与 composer 拦截、工作区门、培养、公司状态初始化、workspace 登记、handbook/语言/策略 `systemPrompt.section`、`/req` `/prd` `/delivery` `/deliverables` `/company-settings` `/company-diagnostics`、目录/账本、工作语言桥（`host/language`）、右栏聚合页签与左侧全局「梦之队总部」（HQ） | ✅ bundle 自带；应用内装即生效（架构 = [host-and-lib](../architecture/host-and-lib.md) · [client-ux](../architecture/client-ux.md)） |
+| `company-client`（insert，`name: dsh-company-pack`） | 本包 host/client 入口：签字工具与 composer 拦截、工作区门、培养、公司状态初始化、workspace 登记、handbook/语言/策略 `systemPrompt.section`、`/req` `/prd` `/delivery` `/deliverables` `/company-settings` `/company-diagnostics`、目录/账本、工作语言桥（`host/language`）、右栏聚合页签与左侧全局「梦之队总部」（HQ） | ✅ bundle 自带；应用内装即生效（架构 = [host-and-lib](host-and-lib.md) · [client-ux](client-ui.md)） |
 | `company-session-search`（insert + isolate 组） | 会话全文检索（provider + `session_search` 工具同组；per profile 落 home cache） | ✅ 组内 provider/tool active；不替换 host 行 |
 | `time-context`（preset 内声明） | 日期通道（Asia/Shanghai） | ✅ |
 
