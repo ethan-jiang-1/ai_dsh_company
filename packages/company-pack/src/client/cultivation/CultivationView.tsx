@@ -60,6 +60,9 @@ export const CHAT_MAX = 720
 /** 分界条宽度（grid 的中间列）。 */
 export const SPLIT_GAP = 6
 const CHAT_DEFAULT = 390
+const CHAT_HEIGHT_MIN = 180
+const CHAT_HEIGHT_MAX = 560
+const CHAT_HEIGHT_DEFAULT = 260
 
 /**
  * 两栏布局的**唯一**计算（BUG-315：常量声明了但没人执行——768px 下左板被压到 210、右栏 176）。
@@ -79,6 +82,10 @@ export function splitLayout(available: number, desiredChat: number): { readonly 
 
 function clampChatWidth(value: number): number {
   return Math.max(CHAT_MIN, Math.min(CHAT_MAX, Math.round(value)))
+}
+
+function clampChatHeight(value: number): number {
+  return Math.max(CHAT_HEIGHT_MIN, Math.min(CHAT_HEIGHT_MAX, Math.round(value)))
 }
 
 function initialChatWidth(): number {
@@ -115,10 +122,13 @@ export function createCultivationView(injected: CultivationViewInjected) {
       : (context: CultivationContext) => injected.openContext!(sessionId, context)
     const actions = useMemo(() => cultivationActions(sessionId), [sessionId])
     const splitRef = useRef<HTMLDivElement | null>(null)
+    const cleanupResizeRef = useRef<(() => void) | null>(null)
     const [chatWidth, setChatWidth] = useState(initialChatWidth)
+    const [chatHeight, setChatHeight] = useState(CHAT_HEIGHT_DEFAULT)
     const [dragging, setDragging] = useState(false)
     // 容器可用宽度：两栏/堆叠由 splitLayout 一处决定（BUG-315：声明了下限却没有消费点）。
     const [splitAvailable, setSplitAvailable] = useState(0)
+    useEffect(() => () => { cleanupResizeRef.current?.() }, [])
     useEffect(() => {
       const split = splitRef.current
       if (split === null) return
@@ -144,24 +154,51 @@ export function createCultivationView(injected: CultivationViewInjected) {
       event.preventDefault()
       const split = splitRef.current
       if (split === null) return
+      cleanupResizeRef.current?.()
+      const stacked = layout.stacked
       const max = Math.max(CHAT_MIN, Math.min(CHAT_MAX, split.clientWidth - BOARD_MIN - SPLIT_GAP))
       const startX = event.clientX
+      const startY = event.clientY
       const startWidth = chatWidth
+      const startHeight = chatHeight
       const onMove = (move: PointerEvent): void => {
+        if (stacked) {
+          setChatHeight(clampChatHeight(startHeight + startY - move.clientY))
+          return
+        }
         const next = clampChatWidth(startWidth + startX - move.clientX)
         setChatWidth(Math.min(next, max))
       }
-      const onUp = (): void => {
+      const stopResize = (): void => {
         document.removeEventListener('pointermove', onMove)
-        document.removeEventListener('pointerup', onUp)
+        document.removeEventListener('pointerup', stopResize)
+        document.removeEventListener('pointercancel', stopResize)
+        window.removeEventListener('blur', stopResize)
+        cleanupResizeRef.current = null
         setDragging(false)
       }
+      cleanupResizeRef.current = stopResize
       document.addEventListener('pointermove', onMove)
-      document.addEventListener('pointerup', onUp)
+      document.addEventListener('pointerup', stopResize)
+      document.addEventListener('pointercancel', stopResize)
+      window.addEventListener('blur', stopResize)
       setDragging(true)
     }
 
     const onResizeKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>): void => {
+      if (layout.stacked) {
+        if (event.key === 'ArrowUp') {
+          event.preventDefault()
+          setChatHeight(value => clampChatHeight(value + 16))
+        } else if (event.key === 'ArrowDown') {
+          event.preventDefault()
+          setChatHeight(value => clampChatHeight(value - 16))
+        } else if (event.key === 'Home') {
+          event.preventDefault()
+          setChatHeight(CHAT_HEIGHT_DEFAULT)
+        }
+        return
+      }
       if (event.key === 'ArrowLeft') {
         event.preventDefault()
         setChatWidth(value => clampChatWidth(value + 16))
@@ -191,7 +228,10 @@ export function createCultivationView(injected: CultivationViewInjected) {
           ref={splitRef}
           className={`wk-cult-view-split${dragging ? ' dragging' : ''}`}
           data-stacked={layout.stacked ? 'true' : 'false'}
-          style={{ '--wk-cult-chat-width': `${layout.chat}px` } as CSSProperties}
+          style={{
+            '--wk-cult-chat-width': `${layout.chat}px`,
+            '--wk-cult-chat-height': `${chatHeight}px`,
+          } as CSSProperties}
         >
           <div className="wk-cult-view-board">
             <CultivationBoard
@@ -218,16 +258,19 @@ export function createCultivationView(injected: CultivationViewInjected) {
           <div
             className="wk-cult-resize"
             role="separator"
-            aria-orientation="vertical"
+            aria-orientation={layout.stacked ? 'horizontal' : 'vertical'}
             aria-label={t('cultivation.resizeAria')}
-            aria-valuemin={CHAT_MIN}
-            aria-valuemax={CHAT_MAX}
-            aria-valuenow={Math.round(chatWidth)}
+            aria-valuemin={layout.stacked ? CHAT_HEIGHT_MIN : CHAT_MIN}
+            aria-valuemax={layout.stacked ? CHAT_HEIGHT_MAX : CHAT_MAX}
+            aria-valuenow={Math.round(layout.stacked ? chatHeight : chatWidth)}
             tabIndex={0}
             title={t('cultivation.resizeTitle')}
             onPointerDown={beginResize}
             onKeyDown={onResizeKeyDown}
-            onDoubleClick={() => setChatWidth(CHAT_DEFAULT)}
+            onDoubleClick={() => {
+              if (layout.stacked) setChatHeight(CHAT_HEIGHT_DEFAULT)
+              else setChatWidth(CHAT_DEFAULT)
+            }}
           />
           <aside className="wk-cult-workshop-card" data-company-cultivation-workshop="">
             <div className="wk-cult-workshop-title">{t('hq.tab.cultivation')}</div>

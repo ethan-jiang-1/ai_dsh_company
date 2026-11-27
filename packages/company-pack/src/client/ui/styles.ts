@@ -720,7 +720,7 @@ const CSS = `
    两栏模式下右栏宽度仍由 --wk-cult-chat-width 给（splitLayout 已经 clamp 过）。 */
 .wk-cult-view-split[data-stacked='true'] {
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) 6px minmax(220px, 42%);
+  grid-template-rows: minmax(0, 1fr) 6px var(--wk-cult-chat-height, 260px);
 }
 .wk-cult-view-split[data-stacked='true'] .wk-cult-resize { cursor: row-resize; }
 @media (max-width: 1180px) {

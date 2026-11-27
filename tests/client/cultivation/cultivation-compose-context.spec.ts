@@ -1,3 +1,4 @@
+// 负例留证 2026-11-27：去掉 CultivationCompose 触发 ref 恢复焦点 ⇒ 背景选择器按 Escape 取消后焦点跌回 document.body（BUG-396）；还原后绿。BUG-396
 // @vitest-environment happy-dom
 /**
  * 创作面可选背景的 keyless 交互判据（D1=A / D2=A）：
@@ -230,5 +231,28 @@ describe('跨会话/视角切换的表单隔离（BUG-350）', () => {
     act(() => { root.render(createElement(CultivationBoard, { ...base, viewerRole: 'vp-eng', viewerLabel: 'VP-Eng' })) })
     expect(container.textContent).not.toContain('这是给 CEO 的建议')
     expect(container.textContent).toContain(CULTIVATION_COPY.composeOpen)
+  })
+
+  it('BUG-396：背景选择器按 Escape 取消后将焦点归还触发按钮', async () => {
+    const container = mount({ sources: stubSources(), currentSessionId: 'session-1' })
+    await openCorrection(container)
+    await flush()
+    const changeBtn = button(container, CULTIVATION_COPY.contextChange) as HTMLButtonElement
+    changeBtn.focus()
+    await click(changeBtn)
+    await flush()
+
+    const pickerHost = container.querySelector('#cultivation-context-picker') as HTMLElement
+    expect(pickerHost).not.toBeNull()
+    const pickerInput = pickerHost.querySelector('input') as HTMLInputElement
+    expect(pickerInput).not.toBeNull()
+    pickerInput.focus()
+    expect(document.activeElement).toBe(pickerInput)
+    await act(async () => {
+      pickerInput.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    })
+    await flush()
+    const restoredBtn = button(container, CULTIVATION_COPY.contextChange)
+    expect(document.activeElement).toBe(restoredBtn)
   })
 })

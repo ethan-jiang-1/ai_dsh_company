@@ -18,6 +18,7 @@ const t = ((key: CompanyKey) => zh[key]) as CompanyT
 
 // 负例留证 2026-11-27：去掉 createCompanyRoleTriggerSource 返回项的 localized section ⇒ @ 菜单分组头暴露裸 'company-roles'（BUG-390）；还原后绿。BUG-390
 // 负例留证 2026-11-27：去掉 openSplitPreset review 分支 catch 块的 try 保护 ⇒ 两栏都无法挂载时直接抛未捕获异常（BUG-393）；还原后绿。BUG-393
+// 负例留证 2026-11-27：去掉 observeFixedInput 对 context.modal 与 context.region === 'terminal' 的守卫 ⇒ 弹窗开启或终端聚焦时 Alt+Shift+1/2/3 仍切走右栏（BUG-396）；还原后绿。BUG-396
 describe('Wave S2 triggers, deep links, split presets, and shortcuts', () => {
   it('@ role trigger filters company roles cleanly and picks plain reference text', async () => {
     const source = createCompanyRoleTriggerSource(t)
@@ -184,6 +185,40 @@ describe('Wave S2 triggers, deep links, split presets, and shortcuts', () => {
     })
     expect(consume).toHaveBeenCalledOnce()
     expect(openTab).toHaveBeenCalledWith('company-team')
+
+    const blockedConsume = vi.fn()
+    listener!({
+      type: 'keydown',
+      gesture: {
+        code: 'Digit1',
+        control: false,
+        alt: true,
+        shift: true,
+        meta: false,
+        repeat: false,
+        composing: false,
+        defaultPrevented: false,
+      },
+      context: { region: 'page', modal: 'confirm-dialog', target: null },
+      consume: blockedConsume,
+    })
+    listener!({
+      type: 'keydown',
+      gesture: {
+        code: 'Digit3',
+        control: false,
+        alt: true,
+        shift: true,
+        meta: false,
+        repeat: false,
+        composing: false,
+        defaultPrevented: false,
+      },
+      context: { region: 'terminal', modal: null, target: null },
+      consume: blockedConsume,
+    })
+    expect(blockedConsume).not.toHaveBeenCalled()
+    expect(openTab).toHaveBeenCalledTimes(1)
     dispose()
   })
 })

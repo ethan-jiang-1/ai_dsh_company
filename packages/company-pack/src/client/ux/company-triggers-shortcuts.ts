@@ -181,6 +181,7 @@ export function registerCompanyShortcuts(
     }),
     shortcuts.observeFixedInput((input: ShortcutFixedInput) => {
       if (input.type !== 'keydown') return
+      if (input.context.modal !== null || input.context.region === 'terminal') return
       const { gesture } = input
       if (gesture.composing || gesture.defaultPrevented || gesture.repeat) return
       if (!gesture.alt || !gesture.shift || gesture.control || gesture.meta) return

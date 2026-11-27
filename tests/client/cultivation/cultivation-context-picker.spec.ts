@@ -1,4 +1,5 @@
 // 负例留证 2026-11-24：让 picker 在 listSessions ok:false 时忽略 problem、回落通用空态 ⇒ 本用例红。BUG-366
+// 负例留证 2026-11-27：在容器级 onKeyDown 无差别捕获 ArrowUp/ArrowDown ⇒ 搜索框按 ArrowUp 焦点跳至末条选项且首条按 ArrowUp 无法退回输入框（BUG-396）；还原后绿。BUG-396
 // @vitest-environment happy-dom
 /**
  * 背景选择面板的 keyless 渲染/交互判据（R5-27，2026-11-03 第五轮七维审计）。
@@ -165,5 +166,30 @@ describe('背景选择面板（R5-27）', () => {
     })
     await flush()
     expect(host.textContent).not.toContain('3 条坏形状')
+  })
+
+  it('BUG-396：搜索框按 ArrowUp 不劫持焦点，ArrowDown 进首项且首项 ArrowUp 可退回搜索框', async () => {
+    const host = await mount(createElement(CultivationContextPicker, props()))
+    const input = host.querySelector('input') as HTMLInputElement
+    const group = host.querySelector('[role="group"]') as HTMLElement
+    input.focus()
+    expect(document.activeElement).toBe(input)
+
+    await act(async () => {
+      input.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }))
+    })
+    expect(document.activeElement).toBe(input)
+
+    await act(async () => {
+      group.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+    })
+    const options = [...host.querySelectorAll<HTMLButtonElement>('[role="option"]')]
+    expect(options.length).toBeGreaterThan(0)
+    expect(document.activeElement).toBe(options[0])
+
+    await act(async () => {
+      options[0]?.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }))
+    })
+    expect(document.activeElement).toBe(input)
   })
 })

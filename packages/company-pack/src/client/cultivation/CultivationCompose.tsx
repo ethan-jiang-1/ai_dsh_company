@@ -15,7 +15,7 @@
  * `tests/client/cultivation/cultivation-compose-context.spec.ts`。
  */
 import { Button, Input, Pill } from '@deepseek-ai/dsh-client-ui-primitives'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CULTIVATION_ROLES, extractSubmittedRecordId, roleLabel as defaultRoleLabel } from '../../lib/cultivation/cultivation.ts'
 import { clipExcerpt, encodeContextToken, secretLikeFindings, type CultivationContextRef } from '../../lib/cultivation/cultivation-context.ts'
 import {
@@ -100,8 +100,20 @@ export function CultivationCompose(props: CultivationComposeProps) {
   const [contextProblem, setContextProblem] = useState<string | null>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  const pickerTriggerRef = useRef<HTMLElement | null>(null)
+  const restoreTriggerFocusRef = useRef(false)
   const seq = useRef(0)
   const inflight = useRef<AbortController | null>(null)
+  const togglePicker = (trigger: HTMLElement): void => {
+    pickerTriggerRef.current = trigger
+    setPickerOpen(open => !open)
+  }
+  useEffect(() => {
+    if (!pickerOpen && restoreTriggerFocusRef.current) {
+      restoreTriggerFocusRef.current = false
+      pickerTriggerRef.current?.focus()
+    }
+  }, [pickerOpen])
   // 纠正/建议由目标角色推导：人先说工作，类型不是选择题。
   const isSuggest = targetRole !== props.viewerRole
   const sources = props.sources
@@ -296,7 +308,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
                   <span className="wk-meta">{CULTIVATION_COPY.contextLabel}</span>
                   {context === null && contextStatus === 'idle' && (
                     <Button size="sm" aria-expanded={pickerOpen} aria-controls="cultivation-context-picker"
-                      onClick={() => { setPickerOpen(open => !open) }}>
+                      onClick={event => { togglePicker(event.currentTarget) }}>
                       {CULTIVATION_COPY.contextAdd}
                     </Button>
                   )}
@@ -332,7 +344,7 @@ export function CultivationCompose(props: CultivationComposeProps) {
                         onClick={() => { setExpanded(value => !value) }}>
                         {expanded ? CULTIVATION_COPY.contextCollapse : CULTIVATION_COPY.contextExpand}
                       </Button>
-                      <Button size="sm" variant="ghost" aria-expanded={pickerOpen} onClick={() => { setPickerOpen(open => !open) }}>
+                      <Button size="sm" variant="ghost" aria-expanded={pickerOpen} onClick={event => { togglePicker(event.currentTarget) }}>
                         {CULTIVATION_COPY.contextChange}
                       </Button>
                       <Button size="sm" variant="ghost" onClick={removeContext}>{CULTIVATION_COPY.contextRemove}</Button>
@@ -347,7 +359,10 @@ export function CultivationCompose(props: CultivationComposeProps) {
                       currentSessionId={currentSessionId}
                       targetRole={isSuggest ? targetRole : undefined}
                       onPick={onPick}
-                      onCancel={() => { setPickerOpen(false) }}
+                      onCancel={() => {
+                        restoreTriggerFocusRef.current = true
+                        setPickerOpen(false)
+                      }}
                     />
                   </div>
                 )}

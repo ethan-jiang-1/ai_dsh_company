@@ -102,8 +102,31 @@ export function CultivationContextPicker(props: CultivationContextPickerProps) {
       aria-label={CULTIVATION_COPY.contextPickTitle}
       onKeyDown={event => {
         if (event.key === 'Escape') { event.preventDefault(); props.onCancel(); return }
-        if (event.key === 'ArrowDown') { event.preventDefault(); move(1); return }
-        if (event.key === 'ArrowUp') { event.preventDefault(); move(-1) }
+        const inInput = event.target instanceof HTMLInputElement
+        if (event.key === 'ArrowDown') {
+          if (inInput) {
+            const first = panel.current?.querySelector<HTMLButtonElement>('[role="option"]')
+            if (first !== null && first !== undefined) {
+              event.preventDefault()
+              first.focus()
+            }
+            return
+          }
+          event.preventDefault()
+          move(1)
+          return
+        }
+        if (event.key === 'ArrowUp') {
+          if (inInput) return
+          const items = [...(panel.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? [])]
+          if (items.length > 0 && document.activeElement === items[0]) {
+            event.preventDefault()
+            panel.current?.querySelector<HTMLInputElement>('input')?.focus()
+            return
+          }
+          event.preventDefault()
+          move(-1)
+        }
       }}
     >
       <div className="wk-cultivation-context-picker-head">
