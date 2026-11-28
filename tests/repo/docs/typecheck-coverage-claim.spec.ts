@@ -8,7 +8,7 @@
  * 旧分数（BUG-196）——判据的面必须是「导航面全集」，不是「上次出事的文件清单」。
  *
  * 判据（机械、窄）：导航面文档**不写死**类型面覆盖分数或未接计数，改为单一来源的表达——
- *   覆盖 = 三个 `tsconfig.test-*` 的 include 减 exclude（清单以配置为准）。
+ *   覆盖 = 四套 `tsconfig.test-*` 的并集（清单以配置为准）。
  * 分数与未接个数都随测试树搬移必漂；写「公式 + 未接类别」才不会专业地过期。
  *
  * 扫描面 = `docs/**` + 根 `AGENTS.md` / `README.md` / `tests/README.md` / 包 README +
@@ -59,7 +59,7 @@ function findings(): string[] {
 
 describe('live 文档不写死类型面覆盖分数', () => {
   it('导航面没有「x/y spec」字面量（写法 = include 减 exclude 的公式 + 未接清单，BUG-191）', () => {
-    expect(findings(), '分数随测试树搬移必漂；改成「覆盖 = 三个 tsconfig.test-* 的 include 减 exclude」并指向配置').toEqual([])
+    expect(findings(), '分数随测试树搬移必漂；改成指向四套 tsconfig.test-* 配置清单').toEqual([])
   })
 
   it('导航面覆盖 checks / run / runtime README 与 .agents/skills（2026-11-16 二轮，BUG-196）', () => {

@@ -13,6 +13,8 @@ describe('replay-fixture-freshness 纯逻辑', () => {
     expect(extractInjectedHandbook(wrap('# 手册'))).toBe('# 手册')
     expect(extractInjectedHandbook(wrapV3('# Company handbook\n\n- Rule 1'))).toBe('# Company handbook\n\n- Rule 1')
     expect(extractInjectedHandbook(wrapV3('# Company handbook\n- Rule 1', '\n本项目的启动策略（已由人指定）：\n- 产品类型：x'))).toBe('# Company handbook\n- Rule 1')
+    expect(extractInjectedHandbook(wrapV3('# Company handbook\n- Rule 1', '\n\nProject startup settings (configured by user):\n- Product type: x'))).toBe('# Company handbook\n- Rule 1')
+    expect(extractInjectedHandbook(wrapV3('# Company handbook\n- Rule 1', '\n\nWarning: startup settings file is unusable (.dsh-company/startup.json): bad'))).toBe('# Company handbook\n- Rule 1')
     expect(extractInjectedHandbook(wrapV3('# Company handbook\n- Rule 1\n', '\n\nAgent Teams is available in this session\n\nBody'))).toBe('# Company handbook\n- Rule 1')
   })
 

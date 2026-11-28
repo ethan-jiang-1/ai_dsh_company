@@ -106,7 +106,9 @@ function nativeSystem() {
 }
 
 function webFrontend() {
-  run('web frontend', pnpm, ['--filter', '@deepseek-ai/dsh-web-frontend', 'run', 'build'])
+  run('web frontend', pnpm, ['--filter', '@deepseek-ai/dsh-web-frontend', 'run', 'build'], {
+    env: { ...process.env, DSH_CLIENT_TITLE: 'DSH 梦之队' },
+  })
 }
 
 function packBuild() {

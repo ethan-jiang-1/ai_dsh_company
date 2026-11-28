@@ -757,7 +757,8 @@ function checkTypeEscapesAndSmells(sf, relFile, violations, metrics) {
 const AGENT_INJECT_OWNER = 'packages/company-pack/src/host/run-bundle/for-each-agent.ts'
 
 function checkCordisLifecycleRules(sf, relFile, violations) {
-  const isHostNonOwner = relFile.startsWith('packages/company-pack/src/host/') && relFile !== AGENT_INJECT_OWNER
+  const isHostNonOwner = (relFile.startsWith('packages/company-pack/src/host/') || relFile === 'packages/company-pack/src/index.ts')
+    && relFile !== AGENT_INJECT_OWNER
   const isHostIndexSpec = relFile.startsWith('tests/host/index/')
   if (!isHostNonOwner && !isHostIndexSpec) return
 

@@ -10,7 +10,7 @@
 // 语义分诊 = `.agents/skills/notes-consistency-audit/SKILL.md`。
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { auditNotes } from '../../tools/lib/session/notes-audit.mjs'
+import { auditNotes, collectCurrentDocs } from '../../tools/lib/session/notes-audit.mjs'
 
 const argv = process.argv.slice(2)
 const KNOWN = new Set(['--json', '--strict', '--root'])
@@ -56,29 +56,7 @@ try {
   console.error(`notes-audit: ${error.message}`)
   process.exit(2)
 }
-/** 当前文档（docs + 根 README/AGENTS + _backlog 活区；归档不算阅读路径）——第二个 orphan 口径的输入。 */
-function currentDocs() {
-  const out = ['AGENTS.md', 'README.md', 'tests/README.md', 'checks/README.md', 'packages/company-pack/README.md']
-    .filter(file => existsSync(join(root, file)))
-    .map(file => ({ file, text: readFileSync(join(root, file), 'utf8') }))
-  for (const dir of ['docs', '_backlog']) {
-    const full = join(root, dir)
-    if (!existsSync(full)) continue
-    const walk = (abs, rel) => {
-      for (const entry of readdirSync(abs, { withFileTypes: true })) {
-        if (entry.name === 'node_modules') continue
-        if (dir === '_backlog' && entry.name === '_archive' && entry.isDirectory()) continue
-        const child = `${rel}/${entry.name}`
-        if (entry.isDirectory()) walk(join(abs, entry.name), child)
-        else if (entry.name.endsWith('.md')) out.push({ file: child, text: readFileSync(join(abs, entry.name), 'utf8') })
-      }
-    }
-    walk(full, dir)
-  }
-  return out
-}
-
-const result = auditNotes(notes, { root, externalDocs: currentDocs() })
+const result = auditNotes(notes, { root, externalDocs: collectCurrentDocs(root) })
 result.summary.receiptsArchived = receipts.length
 
 if (asJson) {
@@ -108,6 +86,10 @@ if (asJson) {
   process.stdout.write('提示：机械面只出候选；语义分诊 = .agents/skills/notes-consistency-audit/SKILL.md\n')
 }
 
-if (strict && (result.summary.missingBacklinks.length > 0 || result.summary.statusMismatch.length > 0)) {
+if (strict && (
+  result.summary.missingBacklinks.length > 0
+  || result.summary.statusMismatch.length > 0
+  || result.summary.orphansAnyDoc.length > 0
+)) {
   process.exitCode = 1
 }

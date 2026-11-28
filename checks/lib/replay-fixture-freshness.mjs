@@ -15,8 +15,10 @@ const MARKER_V3 = 'If `.dsh-company/overrides/...` exists, prefer the override f
 const V3_SECTION_BOUNDARIES = [
   '\n<!-- system/message change ',
   '\n\n本项目的启动策略（',
+  '\n\nProject startup settings (',
   '\n\nProject startup strategy (',
   '\n\n⚠ 项目启动策略文件不可用',
+  '\n\nWarning: startup settings file is unusable (',
   '\n\n⚠ Project startup strategy file unavailable',
   '\n\n\nAgent Teams is available in this session',
   '\n\n\nCompany delegation · seat note',

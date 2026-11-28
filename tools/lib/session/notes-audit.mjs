@@ -6,7 +6,7 @@
 // `.agents/skills/notes-consistency-audit/SKILL.md`。
 //
 // 边界：只读；不跑 git、不读会话；不把 `notes/` 当第二本账（不生成索引文件）。
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { basename, dirname, join, normalize } from 'node:path'
 import { headingSections, noteStatusLines, structuralLines } from '../core/repo-markdown.mjs'
 
@@ -252,4 +252,26 @@ export function auditNotes(notes, options = {}) {
       statusMismatch: pick(row => row.statusMismatch),
     },
   }
+}
+
+/** 当前活跃阅读文档（根/测试/检查/包入口 + docs/** + _backlog 活区，不含 _archive 冻结区）。 */
+export function collectCurrentDocs(root) {
+  const out = ['AGENTS.md', 'README.md', 'tests/README.md', 'checks/README.md', 'packages/company-pack/README.md']
+    .filter(file => existsSync(join(root, file)))
+    .map(file => ({ file, text: readFileSync(join(root, file), 'utf8') }))
+  for (const dir of ['docs', '_backlog']) {
+    const full = join(root, dir)
+    if (!existsSync(full)) continue
+    const walk = (abs, rel) => {
+      for (const entry of readdirSync(abs, { withFileTypes: true })) {
+        if (entry.name === 'node_modules') continue
+        if (dir === '_backlog' && entry.name === '_archive' && entry.isDirectory()) continue
+        const child = `${rel}/${entry.name}`
+        if (entry.isDirectory()) walk(join(abs, entry.name), child)
+        else if (entry.name.endsWith('.md')) out.push({ file: child, text: readFileSync(join(abs, entry.name), 'utf8') })
+      }
+    }
+    walk(full, dir)
+  }
+  return out
 }

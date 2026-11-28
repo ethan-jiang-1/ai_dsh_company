@@ -56,10 +56,11 @@ export function run({ root, ok, fail }) {
   //   （实测 335/506 当天即过期）→ `FAIL nav-count-claims: docs/guides/repo-handoff.md:66 → 文档篇数计数声明「notes/`（332 篇」…`；
   //   删两个死数改现算公式 → `OK nav-count-claims ×119`。豁免方向（真东西）：architecture 四篇 / budget-and-ops 本篇·长篇 /
   //   demo-scenes 一篇·（46 篇 journal 已于…）/ external-research 八篇·两篇 均在扫描面内且绿（汉字数词/操作叙述/篇后散文不命中）。
+  // 负例留证 2026-11-28：run/company.overlay.yml:18 写「六个公司角色 preset」→ `FAIL nav-count-claims: run/company.overlay.yml:18 → preset 计数声明「六个公司角色」`；改为无计数表述后绿。
 const navCountFiles = [...new Set([
   ...walkNavMd(join(root, 'docs')),
   ...walkNavMd(join(root, 'packages/company-pack/content')),
-  'AGENTS.md', 'README.md', 'packages/company-pack/README.md',
+  'AGENTS.md', 'README.md', 'packages/company-pack/README.md', 'run/company.overlay.yml',
 ])].filter(f => existsSync(join(root, f)))
   let navCountBad = false
   for (const rel of navCountFiles) {

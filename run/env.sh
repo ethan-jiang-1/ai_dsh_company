@@ -25,18 +25,13 @@ dsh() {
   return 1
 }
 
-# 沙箱后端探测（2026-10-10）：本机 Seatbelt 不可用时自动落到 danger-full-access。
-# 为什么需要：`workspace-write` 依赖 `sandbox-exec` 真正能建围栏。macOS 26 在本机把它禁掉了
-#   （`sandbox-exec -p … /bin/true` → "sandbox_apply: Operation not permitted"，exit 71；
-#   osascript 绕开 harness 同样 71 ⇒ 与 DSH 无关，是全机范围的限制）。
+# 沙箱后端探测（2026-10-10 立；2026-11-28 收紧为默认 fail-closed）：本机 Seatbelt 不可用时默认保持 workspace-write，
+#   仅在显式指定 DSH_ALLOW_UNCONFINED_DEV=1 时才导出 DSH_PERMISSION_MODE=danger-full-access。
+# 为什么需要：`workspace-write` 依赖 `sandbox-exec` 真正能建围栏。若 macOS 本机禁掉 `sandbox-exec`
+#   （`sandbox-exec -p … /bin/true` → "sandbox_apply: Operation not permitted"，exit 71），
 #   DSH 对此是 fail-closed（vendor `SandboxUnavailableError`：refusing to run the command
-#   unconfined），于是**每条 bash 都退化成「请求升级」**——连 ls/pwd 这类纯读命令也一样；
-#   批准一次只买通一条命令（allowed-once），下条照问。这正是观察窗「步步要批准」的来源。
-#   上游指定的处方就写在同一条错误信息里：otherwise switch the consumer to danger-full-access。
-#   danger-full-access 在 base bundle 里同时把审批策略推成 never ⇒ 两个轴一起解决。
-# 探测而非硬编码：后端哪天恢复了就自动回到 workspace-write（围栏优先）。失败是**明示**的——
-#   本文件一切判断都打印一行，因为这里的坑与双 home 同形：不报错、只是行为悄悄变糟。
-# 逃生阀：已显式设过 DSH_PERMISSION_MODE 则尊重它；DSH_SKIP_SANDBOX_PROBE=1 可跳过探测。
+#   unconfined），每条 bash 请求升级。为防止静默撤除围栏，此处只打明示告警并给出显式 opt-in 命令。
+# 逃生阀：已显式设过 DSH_PERMISSION_MODE 则尊重它；DSH_ALLOW_UNCONFINED_DEV=1 显式允许无围栏；DSH_SKIP_SANDBOX_PROBE=1 跳过探测。
 if [ -n "${DSH_PERMISSION_MODE:-}" ]; then
   echo "沙箱：沿用已设的 DSH_PERMISSION_MODE=${DSH_PERMISSION_MODE}（跳过探测）。"
 elif [ "${DSH_SKIP_SANDBOX_PROBE:-}" = "1" ]; then

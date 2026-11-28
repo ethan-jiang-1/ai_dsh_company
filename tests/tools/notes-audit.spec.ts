@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import {
   auditNotes,
+  collectCurrentDocs,
   deadPaths,
   hasDecisionSection,
   lifecycleOf,
@@ -242,5 +243,28 @@ describe('notes-audit · 活引用与状态', () => {
     const receipt = note('notes/implemented/2026-10-03-receipt.md', '# 批次收尾\n\n状态：implemented（不是新决定）\n')
     const result = auditNotes([receipt], { root: process.cwd() })
     expect(result.summary.noDecision).toEqual([])
+  })
+
+  it('collectCurrentDocs 收集根入口、docs/** 与 _backlog 活区，排除 _backlog/_archive 与 node_modules', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'notes-current-docs-'))
+    TMP.push(dir)
+    writeFileSync(join(dir, 'AGENTS.md'), '# root\n')
+    mkdirSync(join(dir, 'docs/guides'), { recursive: true })
+    writeFileSync(join(dir, 'docs/guides/g.md'), '# guide\n')
+    writeFileSync(join(dir, 'docs/guides/skip.txt'), 'not md\n')
+    mkdirSync(join(dir, 'docs/node_modules/pkg'), { recursive: true })
+    writeFileSync(join(dir, 'docs/node_modules/pkg/README.md'), '# ignored\n')
+    mkdirSync(join(dir, '_backlog/issues'), { recursive: true })
+    writeFileSync(join(dir, '_backlog/issues/ISS-1.md'), '# issue\n')
+    mkdirSync(join(dir, '_backlog/_archive'), { recursive: true })
+    writeFileSync(join(dir, '_backlog/_archive/OLD.md'), '# frozen\n')
+    expect(collectCurrentDocs(dir).map(d => d.file)).toEqual([
+      'AGENTS.md',
+      'docs/guides/g.md',
+      '_backlog/issues/ISS-1.md',
+    ])
+    const emptyDir = mkdtempSync(join(tmpdir(), 'notes-empty-docs-'))
+    TMP.push(emptyDir)
+    expect(collectCurrentDocs(emptyDir)).toEqual([])
   })
 })

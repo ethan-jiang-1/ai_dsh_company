@@ -302,6 +302,13 @@ describe('BUG-340 · 六条绕过缝隙的负控', () => {
     `)
     expect(rawInject.violations.map(v => v.rule)).toContain('R5:dual-owner-agent-inject')
 
+    const rawIndexInject = runVirtual('packages/company-pack/src/index.ts', `
+      export function badIndex(agent: { ctx: { inject: (deps: string[], fn: () => void) => void } }) {
+        agent.ctx.inject(['systemPrompt'], () => {})
+      }
+    `)
+    expect(rawIndexInject.violations.map(v => v.rule)).toContain('R5:dual-owner-agent-inject')
+
     const ownerAllowed = runVirtual('packages/company-pack/src/host/run-bundle/for-each-agent.ts', `
       export function ok(agent: { ctx: { inject: (deps: string[], fn: () => void) => void } }) {
         agent.ctx.inject(['systemPrompt'], () => {})

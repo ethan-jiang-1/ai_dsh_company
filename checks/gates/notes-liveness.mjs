@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { sectionStructuralText } from '../../packages/company-pack/src/lib/docs/markdown-shape-core.js'
 import { noteStatusLines } from '../../tools/lib/core/repo-markdown.mjs'
+import { auditNotes, collectCurrentDocs } from '../../tools/lib/session/notes-audit.mjs'
 
 // ── 9-bis. Note 活状态门禁（notes-liveness，2026-10-05 D35 立；notes/ 分类 owner = notes/README.md）──
 // implemented/ 新写 Note（文件名日期 ≥ 生效日）前 6 行须有「状态：」行且以生命周期词开头
@@ -17,6 +18,8 @@ import { noteStatusLines } from '../../tools/lib/core/repo-markdown.mjs'
 // rationale Note 只留决定/理由/证据，现行语义指向 contract/architecture，防第二权威。
 // 负例（2026-11-10 实跑）：临时删 ui-demo rationale 的 canonical 节 →
 //   `FAIL notes-liveness: rationale Note 缺「## 现行语义（canonical）」节或节内无链接…`；还原 → 绿。
+// 2026-11-28 加：implemented/ 全部 Note 须有至少一处当前活跃文档（notes/ + docs/ + 活跃 _backlog/）入链（orphansAnyDoc === 0），
+//   负例留证 2026-11-28：临时新建无入链 `notes/implemented/2026-11-28-zz-orphan.md` → `FAIL notes-liveness: implemented/ 存在零当前文档入链的孤岛 Note…`；删文件还原 → 绿。
 export function run({ root, ok, fail }) {
   const NOTES_EFFECTIVE_DATE = '2026-10-05'
   const FACT_EFFECTIVE_DATE = '2026-11-14'
@@ -66,7 +69,24 @@ export function run({ root, ok, fail }) {
   if (badRationale.length > 0) {
     problems.push(`rationale Note 缺「## 现行语义（canonical）」节或节内无链接（现行语义只住 contract/architecture）：${badRationale.join(', ')}`)
   }
+  if (existsSync(join(root, 'docs'))) {
+    const readNoteDir = dir => {
+      const full = join(root, dir)
+      if (!existsSync(full)) return []
+      return readdirSync(full)
+        .filter(n => n.endsWith('.md') && n !== 'README.md' && n !== 'AGENTS.md')
+        .sort()
+        .map(n => ({ file: `${dir}/${n}`, text: readFileSync(join(full, n), 'utf8') }))
+    }
+    const audited = auditNotes(
+      [...readNoteDir('notes/implemented'), ...readNoteDir('notes/archived'), ...readNoteDir('notes/postmortem')],
+      { root, externalDocs: collectCurrentDocs(root) },
+    )
+    if (audited.summary.orphansAnyDoc.length > 0) {
+      problems.push(`implemented/ 存在零当前文档入链的孤岛 Note（须在所属 docs/ 合同、decisions.md 或活跃 _backlog 挂入）：${audited.summary.orphansAnyDoc.join(', ')}`)
+    }
+  }
   problems.length === 0
-    ? ok(`notes-liveness ×${freshNotes.length}（状态行；决定节生效日 ${DECISION_EFFECTIVE_DATE} 起 ×${decisionNotes.length}；rationale 现行语义 ×${rationaleNotes.length}）`)
+    ? ok(`notes-liveness ×${freshNotes.length}（状态行；决定节生效日 ${DECISION_EFFECTIVE_DATE} 起 ×${decisionNotes.length}；rationale 现行语义 ×${rationaleNotes.length}；零孤岛 orphansAnyDoc=0）`)
     : fail('notes-liveness', problems.join('；'))
 }

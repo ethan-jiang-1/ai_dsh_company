@@ -27,10 +27,11 @@ const valueOf = (name) => {
   return index >= 0 ? args[index + 1] : undefined
 }
 if (args.includes('--help') || args.includes('-h')) {
-  console.log(`用法：pnpm company [--link] [--rebuild] [--port <n>] [--no-open] [--home <DSH_HOME>] [--workspace <dir>]
+  console.log(`用法：pnpm company [--link] [--install-only] [--rebuild] [--port <n>] [--no-open] [--home <DSH_HOME>] [--workspace <dir>]
 
 dev-only：默认 tsc + tsdown + npm pack → \`dsh plugin --profile company add file:<tgz>\` → exec dsh。
 --link = 符号链接快速通道（改 presets/** 即刻生效；不验打包面）。
+--install-only = 仅完成构建与安装到 company profile，不启动常驻 dsh 进程。
 --rebuild = 忽略构建缓存，强制重新构建打包（默认：源/vendor pin/lockfile 未变时复用上次 tarball）。
 --port 缺省 = 0（交系统分配；URL 从启动横幅读），显式 --port 优先。
 应用内安装/启动见 README 与 _dist 手册；本脚本不写 profile patch、不问 workspace。`)

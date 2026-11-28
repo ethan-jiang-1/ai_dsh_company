@@ -11,7 +11,7 @@
     "prepare": "node tools/dev/hooks-install.mjs",
     "dsh": "node --import tsx/esm vendor/dsh/apps/cli/src/bin.ts",
     "company": "node tools/dev/company.mjs",
-    "dev:pack": "node ./node_modules/typescript/bin/tsc -b packages/company-pack && (trap 'kill 0' INT TERM EXIT; node ./node_modules/typescript/bin/tsc -b packages/company-pack --watch --preserveWatchOutput & cd packages/company-pack && ../../node_modules/.bin/tsdown --watch lib/types & wait)",
+    "dev:pack": "node ./node_modules/typescript/bin/tsc -b packages/company-pack && (trap 'kill 0' INT TERM EXIT; node ./node_modules/typescript/bin/tsc -b packages/company-pack --watch --preserveWatchOutput & cd packages/company-pack && ../../node_modules/.bin/tsdown --watch lib/types --on-success 'node ../../tools/dev/build-client.mjs --fingerprint-only' & wait)",
     "bundle:init": "node tools/dev/bundle-init.mjs",
     "methods:init": "node tools/dev/methods-init.mjs",
     "orient": "node probes/analyze/orient-probe.mjs",

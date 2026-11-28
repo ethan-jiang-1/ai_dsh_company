@@ -106,7 +106,7 @@ const fail = (name, detail) => { failures.push(`${name}: ${detail}`); console.lo
 //   防止「静默全跳」变成新的假绿（testing.md §3.6 的零 skip 规矩由此适配）。
 const skips = []
 const skip = (name, reason) => { skips.push({ name, reason }); console.log(`  SKIP ${name}: ${reason}`) }
-const EXPECTED_SKIPS = new Set(['replay-fixture-freshness', 'replay-ui-freshness', 'dist-freshness'])
+const EXPECTED_SKIPS = new Set(['replay-ui-freshness', 'dist-freshness'])
 
 const ctx = { root, ok, fail, skip }
 mdUtf8.run(ctx)

@@ -107,8 +107,8 @@ node tools/dev/setup.mjs --step pack           # company-pack tsc -b + tsdown + 
 - **一次性 profile 退出**：headless 用途优先用 shipped `headless`；自定义 profile 在 profile patch 把
   `hmr` row 设为 `disabled: true`（见 [run-ops.md §2](./run-ops.md#2-调试阶梯组合层--会话层不跳层)）。
 - **品牌（皮肤入口）**：`DSH_CLIENT_TITLE` 是构建期环境变量，同时决定**浏览器标签页标题**
-  （`apps/web/vite.config.ts`）与**应用内主标题**（`ui-layout/src/client/AppFrame.tsx:192`）——所以
-  **上面两条构建命令都要带它**（web dist 与 client 面各注入一次）。侧栏品牌名走插槽
+  （`apps/web/vite.config.ts`）与**应用内主标题**（`ui-layout/src/client/AppFrame.tsx:192`）——
+  `tools/dev/setup.mjs` 的 `vendor-runtime` 与 `web` 两步均注入该变量。侧栏品牌名走插槽
   `sidebar.brand.name`，由 pack 自己的 client 面接管。
 - **上线前必跑 preset 冒烟**（两道防线）：
   1. **防线一（快，`pnpm test`）**：已知必填 config 字段必须随工具行给出（如

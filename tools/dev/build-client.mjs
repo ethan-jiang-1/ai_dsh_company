@@ -10,6 +10,12 @@ import { spawnSync } from 'node:child_process'
 import { repositoryRoot as ROOT } from '../lib/core/repository-layout.mjs'
 import { writeClientBuildFingerprint } from '../lib/core/client-bundle.mjs'
 
+if (process.argv.includes('--fingerprint-only')) {
+  const fingerprint = writeClientBuildFingerprint(ROOT)
+  console.log(`build-client: 已刷新指纹 ${fingerprint.slice(0, 12)}…（packages/company-pack/lib/.build-fingerprint）`)
+  process.exit(0)
+}
+
 const run = (args, cwd) => {
   const result = spawnSync(args[0], args.slice(1), { cwd, stdio: 'inherit' })
   if (result.status !== 0) {
